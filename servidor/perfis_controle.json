@@ -1,0 +1,264 @@
+{
+  "_leia": [
+    "Duas tabelas que se cruzam.",
+    "",
+    "'tipos' e o controle que VOCE tem na mao: quantos botoes, se tem",
+    "analogico, se vibra, se tem as paletas de tras.",
+    "",
+    "'consoles' e o que o aparelho EMULADO entende: o Nintendo 64 tem um",
+    "analogico so e quatro botoes C; o NES nao tem analogico nenhum; o",
+    "PlayStation 2 aceita mouse e teclado.",
+    "",
+    "O ARENA cruza os dois e mostra so o que faz sentido. Nao adianta",
+    "oferecer o analogico direito num jogo de NES."
+  ],
+
+  "tipos": {
+    "xbox360": {
+      "nome": "Xbox 360",
+      "botoes": 11,
+      "analogicos": 2,
+      "direcional": true,
+      "vibracao": true,
+      "gatilhos_analogicos": true,
+      "paletas": 0,
+      "botao_central": "Guide",
+      "rotulos": {
+        "0": "A", "1": "B", "2": "X", "3": "Y",
+        "4": "LB", "5": "RB", "6": "LT", "7": "RT",
+        "8": "Back", "9": "Start", "10": "L3", "11": "R3",
+        "12": "Direcional cima", "13": "Direcional baixo",
+        "14": "Direcional esquerda", "15": "Direcional direita",
+        "16": "Guide"
+      }
+    },
+    "xboxone": {
+      "nome": "Xbox One, Series S e X",
+      "botoes": 11, "analogicos": 2, "direcional": true, "vibracao": true,
+      "gatilhos_analogicos": true, "paletas": 0, "botao_central": "Xbox",
+      "rotulos": {
+        "0": "A", "1": "B", "2": "X", "3": "Y",
+        "4": "LB", "5": "RB", "6": "LT", "7": "RT",
+        "8": "Ver", "9": "Menu", "10": "L3", "11": "R3",
+        "12": "Direcional cima", "13": "Direcional baixo",
+        "14": "Direcional esquerda", "15": "Direcional direita",
+        "16": "Xbox", "17": "Compartilhar"
+      }
+    },
+    "xboxelite": {
+      "nome": "Xbox Elite (com paletas L4 e R4)",
+      "botoes": 11, "analogicos": 2, "direcional": true, "vibracao": true,
+      "gatilhos_analogicos": true, "paletas": 4, "botao_central": "Xbox",
+      "rotulos": {
+        "0": "A", "1": "B", "2": "X", "3": "Y",
+        "4": "LB", "5": "RB", "6": "LT", "7": "RT",
+        "8": "Ver", "9": "Menu", "10": "L3", "11": "R3",
+        "12": "Direcional cima", "13": "Direcional baixo",
+        "14": "Direcional esquerda", "15": "Direcional direita",
+        "16": "Xbox",
+        "20": "Paleta P1 (L4)", "21": "Paleta P2 (R4)",
+        "22": "Paleta P3 (L5)", "23": "Paleta P4 (R5)"
+      },
+      "_nota": "As paletas so aparecem como botao se estiverem configuradas  no aplicativo Acessorios Xbox. Sem isso elas copiam outro botao."
+    },
+    "ps3": {
+      "nome": "PlayStation 3 (DualShock 3)",
+      "botoes": 11, "analogicos": 2, "direcional": true, "vibracao": true,
+      "gatilhos_analogicos": true, "paletas": 0, "botao_central": "PS",
+      "rotulos": {
+        "0": "X", "1": "Circulo", "2": "Quadrado", "3": "Triangulo",
+        "4": "L1", "5": "R1", "6": "L2", "7": "R2",
+        "8": "Select", "9": "Start", "10": "L3", "11": "R3",
+        "12": "Direcional cima", "13": "Direcional baixo",
+        "14": "Direcional esquerda", "15": "Direcional direita",
+        "16": "PS"
+      }
+    },
+    "ps4": {
+      "nome": "PlayStation 4 (DualShock 4)",
+      "botoes": 11, "analogicos": 2, "direcional": true, "vibracao": true,
+      "gatilhos_analogicos": true, "paletas": 0, "botao_central": "PS",
+      "rotulos": {
+        "0": "X", "1": "Circulo", "2": "Quadrado", "3": "Triangulo",
+        "4": "L1", "5": "R1", "6": "L2", "7": "R2",
+        "8": "Share", "9": "Options", "10": "L3", "11": "R3",
+        "12": "Direcional cima", "13": "Direcional baixo",
+        "14": "Direcional esquerda", "15": "Direcional direita",
+        "16": "PS", "17": "Touchpad"
+      }
+    },
+    "ps5": {
+      "nome": "PlayStation 5 (DualSense)",
+      "botoes": 11, "analogicos": 2, "direcional": true, "vibracao": true,
+      "gatilhos_analogicos": true, "paletas": 0, "botao_central": "PS",
+      "rotulos": {
+        "0": "X", "1": "Circulo", "2": "Quadrado", "3": "Triangulo",
+        "4": "L1", "5": "R1", "6": "L2", "7": "R2",
+        "8": "Create", "9": "Options", "10": "L3", "11": "R3",
+        "12": "Direcional cima", "13": "Direcional baixo",
+        "14": "Direcional esquerda", "15": "Direcional direita",
+        "16": "PS", "17": "Touchpad", "18": "Microfone"
+      },
+      "_nota": "A vibracao caprichada do DualSense so funciona por cabo USB."
+    },
+    "switchpro": {
+      "nome": "Nintendo Switch Pro",
+      "botoes": 11, "analogicos": 2, "direcional": true, "vibracao": true,
+      "gatilhos_analogicos": false, "paletas": 0, "botao_central": "Home",
+      "rotulos": {
+        "0": "B", "1": "A", "2": "Y", "3": "X",
+        "4": "L", "5": "R", "6": "ZL", "7": "ZR",
+        "8": "-", "9": "+", "10": "Analogico esquerdo", "11": "Analogico direito",
+        "12": "Direcional cima", "13": "Direcional baixo",
+        "14": "Direcional esquerda", "15": "Direcional direita",
+        "16": "Home", "17": "Captura"
+      },
+      "_nota": "O A e o B ficam trocados em relacao ao Xbox. E do controle,  nao do ARENA."
+    },
+    "joycon": {
+      "nome": "Joy-Con avulso",
+      "botoes": 8, "analogicos": 1, "direcional": true, "vibracao": true,
+      "gatilhos_analogicos": false, "paletas": 0, "botao_central": null,
+      "rotulos": {
+        "0": "Baixo", "1": "Direita", "2": "Esquerda", "3": "Cima",
+        "4": "SL", "5": "SR", "8": "-", "9": "+", "10": "Analogico"
+      },
+      "_nota": "Um Joy-Con sozinho tem poucos botoes. Para jogo de console  grande, e apertado."
+    },
+    "steam": {
+      "nome": "Steam Controller",
+      "botoes": 11, "analogicos": 2, "direcional": true, "vibracao": true,
+      "gatilhos_analogicos": true, "paletas": 2, "botao_central": "Steam",
+      "rotulos": {
+        "0": "A", "1": "B", "2": "X", "3": "Y",
+        "4": "LB", "5": "RB", "6": "LT", "7": "RT",
+        "8": "Back", "9": "Start", "10": "L3", "11": "R3",
+        "12": "Direcional cima", "13": "Direcional baixo",
+        "14": "Direcional esquerda", "15": "Direcional direita",
+        "16": "Steam", "20": "Paleta esquerda", "21": "Paleta direita"
+      },
+      "_nota": "Deixe o Steam aberto: ele converte o controle para o formato  do Xbox sozinho."
+    },
+    "generico12": {
+      "nome": "Generico com 12 botoes e 2 analogicos",
+      "botoes": 11, "analogicos": 2, "direcional": true, "vibracao": false,
+      "gatilhos_analogicos": false, "paletas": 0, "botao_central": null,
+      "rotulos": {
+        "0": "Botao 1", "1": "Botao 2", "2": "Botao 3", "3": "Botao 4",
+        "4": "Botao 5", "5": "Botao 6", "6": "Botao 7", "7": "Botao 8",
+        "8": "Botao 9", "9": "Botao 10", "10": "Botao 11", "11": "Botao 12",
+        "12": "Direcional cima", "13": "Direcional baixo",
+        "14": "Direcional esquerda", "15": "Direcional direita"
+      }
+    },
+    "generico10": {
+      "nome": "Generico com 10 botoes, sem analogico",
+      "botoes": 9, "analogicos": 0, "direcional": true, "vibracao": false,
+      "gatilhos_analogicos": false, "paletas": 0, "botao_central": null,
+      "rotulos": {
+        "0": "Botao 1", "1": "Botao 2", "2": "Botao 3", "3": "Botao 4",
+        "4": "Botao 5", "5": "Botao 6", "6": "Botao 7", "7": "Botao 8",
+        "8": "Botao 9", "9": "Botao 10",
+        "12": "Direcional cima", "13": "Direcional baixo",
+        "14": "Direcional esquerda", "15": "Direcional direita"
+      }
+    },
+    "arcade": {
+      "nome": "Arcade stick",
+      "botoes": 8, "analogicos": 0, "direcional": true, "vibracao": false,
+      "gatilhos_analogicos": false, "paletas": 0, "botao_central": null,
+      "rotulos": {
+        "0": "Botao 1", "1": "Botao 2", "2": "Botao 3", "3": "Botao 4",
+        "4": "Botao 5", "5": "Botao 6", "6": "Botao 7", "7": "Botao 8",
+        "8": "Select", "9": "Start",
+        "12": "Alavanca cima", "13": "Alavanca baixo",
+        "14": "Alavanca esquerda", "15": "Alavanca direita"
+      }
+    },
+    "teclado": {
+      "nome": "Teclado",
+      "botoes": 0, "analogicos": 0, "direcional": true, "vibracao": false,
+      "gatilhos_analogicos": false, "paletas": 0, "botao_central": null,
+      "rotulos": {}
+    }
+  },
+
+  "consoles": {
+    "nes":       { "direcional": true, "analogicos": 0, "vibracao": false,
+                   "botoes": ["b", "a", "start", "select"],
+                   "dispositivo": 1 },
+    "snes":      { "direcional": true, "analogicos": 0, "vibracao": false,
+                   "botoes": ["b", "a", "y", "x", "l", "r", "start", "select"],
+                   "dispositivo": 1, "mouse": 2,
+                   "_nota": "O Super Nintendo teve mouse, usado em Mario Paint." },
+    "n64":       { "direcional": true, "analogicos": 1, "vibracao": true,
+                   "botoes": ["b", "a", "y", "x", "l", "r", "l2", "start"],
+                   "dispositivo": 1,
+                   "_nota": "Um analogico so. Os quatro botoes C aparecem como  Y, X, L e R. A vibracao imita o Rumble Pak." },
+    "gameboy":   { "direcional": true, "analogicos": 0, "vibracao": false,
+                   "botoes": ["b", "a", "start", "select"], "dispositivo": 1 },
+    "gba":       { "direcional": true, "analogicos": 0, "vibracao": false,
+                   "botoes": ["b", "a", "l", "r", "start", "select"],
+                   "dispositivo": 1 },
+    "nds":       { "direcional": true, "analogicos": 0, "vibracao": false,
+                   "botoes": ["b", "a", "y", "x", "l", "r", "start", "select"],
+                   "dispositivo": 1, "mouse": 2,
+                   "_nota": "O mouse do computador vira a caneta da tela de baixo." },
+    "megadrive": { "direcional": true, "analogicos": 0, "vibracao": false,
+                   "botoes": ["b", "a", "y", "x", "l", "r", "start", "select"],
+                   "dispositivo": 1, "mouse": 2 },
+    "ps1":       { "direcional": true, "analogicos": 2, "vibracao": true,
+                   "botoes": ["b", "a", "y", "x", "l", "r", "l2", "r2",
+                              "l3", "r3", "start", "select"],
+                   "dispositivo": 517, "dispositivo_sem_analogico": 513,
+                   "mouse": 2,
+                   "_nota": "Sem analogico e o controle de 1994. Com analogico  e o DualShock, que veio depois e vibra." },
+    "ps2":       { "direcional": true, "analogicos": 2, "vibracao": true,
+                   "botoes": ["b", "a", "y", "x", "l", "r", "l2", "r2",
+                              "l3", "r3", "start", "select"],
+                   "dispositivo": 517, "dispositivo_sem_analogico": 513,
+                   "mouse": 2, "teclado": 3,
+                   "_nota": "Aceitava mouse e teclado USB. Jogo de tiro e de  estrategia usavam." },
+    "psp":       { "direcional": true, "analogicos": 1, "vibracao": false,
+                   "botoes": ["b", "a", "y", "x", "l", "r", "start", "select"],
+                   "dispositivo": 1 },
+    "saturn":    { "direcional": true, "analogicos": 1, "vibracao": false,
+                   "botoes": ["b", "a", "y", "x", "l", "r", "l2", "r2", "start"],
+                   "dispositivo": 517, "dispositivo_sem_analogico": 513,
+                   "mouse": 2,
+                   "_nota": "O 3D Control Pad tinha um analogico e gatilhos." },
+    "dreamcast": { "direcional": true, "analogicos": 1, "vibracao": true,
+                   "botoes": ["b", "a", "y", "x", "l", "r", "start"],
+                   "dispositivo": 517, "dispositivo_sem_analogico": 513,
+                   "mouse": 2, "teclado": 3,
+                   "_nota": "Teve mouse e teclado de verdade. A vibracao imita  o Jump Pack." },
+    "gamecube":  { "direcional": true, "analogicos": 2, "vibracao": true,
+                   "botoes": ["b", "a", "y", "x", "l", "r", "r2", "start"],
+                   "dispositivo": 517 },
+    "arcade":    { "direcional": true, "analogicos": 0, "vibracao": false,
+                   "botoes": ["b", "a", "y", "x", "l", "r", "start", "select"],
+                   "dispositivo": 1, "mouse": 2 },
+    "msx":       { "direcional": true, "analogicos": 0, "vibracao": false,
+                   "botoes": ["b", "a", "start", "select"],
+                   "dispositivo": 1, "teclado": 3, "mouse": 2 },
+    "c64":       { "direcional": true, "analogicos": 0, "vibracao": false,
+                   "botoes": ["b", "a", "start"],
+                   "dispositivo": 1, "teclado": 3, "mouse": 2 },
+    "amiga":     { "direcional": true, "analogicos": 0, "vibracao": false,
+                   "botoes": ["b", "a", "start"],
+                   "dispositivo": 1, "teclado": 3, "mouse": 2 },
+    "dos":       { "direcional": true, "analogicos": 1, "vibracao": false,
+                   "botoes": ["b", "a", "y", "x"],
+                   "dispositivo": 1, "teclado": 3, "mouse": 2 },
+    "scummvm":   { "direcional": true, "analogicos": 0, "vibracao": false,
+                   "botoes": ["b", "a"],
+                   "dispositivo": 1, "teclado": 3, "mouse": 2,
+                   "_nota": "Jogo de apontar e clicar. O mouse e o jeito certo." }
+  },
+
+  "_padrao_console": {
+    "direcional": true, "analogicos": 0, "vibracao": false,
+    "botoes": ["b", "a", "y", "x", "l", "r", "start", "select"],
+    "dispositivo": 1
+  }
+}

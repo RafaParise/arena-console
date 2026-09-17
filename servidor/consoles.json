@@ -1,0 +1,1027 @@
+{
+  "_leia": "Catalogo de plataformas do ARENA, ate a geracao do PlayStation 2. 'custo' vai de 1 (trivial) a 5 (pesadissimo) e e comparado com a capacidade medida da maquina para classificar o desempenho. 'peso' decide se a plataforma aparece em maquina fraca. 'arquivos_sistema' e apenas a QUANTIDADE esperada na pasta system: o ARENA nunca lista, nomeia nem baixa esses arquivos. 'apelidos' sao os nomes de pasta que apontam para esta plataforma. 'tamanho_max_mb' e o tamanho maximo da midia original, usado para desempatar extensao ambigua. 'externo' e o emulador de fora que o ARENA prefere quando encontra a pasta em emuladores/. Se nao encontrar, usa o nucleo do RetroArch normalmente. 'pasta' e o nome da pasta oficial daquele console dentro de jogos/. A pasta e quem decide o console de arquivos com extensao ambigua.",
+  "plataformas": [
+    {
+      "id": "tic80",
+      "nome": "TIC-80",
+      "descricao": "Console de fantasia. E aqui que ficam os jogos da turma.",
+      "core": "tic80_libretro.dll",
+      "extensoes": [
+        ".tic"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": true,
+      "apelidos": [
+        "tic-80",
+        "tic80"
+      ],
+      "pasta": "TIC-80"
+    },
+    {
+      "id": "wasm4",
+      "nome": "WASM-4",
+      "descricao": "Console de fantasia moderno, para jogos pequenos.",
+      "core": "wasm4_libretro.dll",
+      "extensoes": [
+        ".wasm"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": true,
+      "apelidos": [
+        "wasm-4",
+        "wasm4"
+      ],
+      "pasta": "WASM-4"
+    },
+    {
+      "id": "lowresnx",
+      "nome": "LowRes NX",
+      "descricao": "Console de fantasia com editor embutido.",
+      "core": "lowresnx_libretro.dll",
+      "extensoes": [
+        ".nx"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": true,
+      "apelidos": [
+        "lowres nx",
+        "lowresnx"
+      ],
+      "pasta": "LowRes NX"
+    },
+    {
+      "id": "uzebox",
+      "nome": "Uzebox",
+      "descricao": "Console aberto feito com um microcontrolador.",
+      "core": "uzem_libretro.dll",
+      "extensoes": [
+        ".uze"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "uzebox"
+      ],
+      "pasta": "Uzebox"
+    },
+    {
+      "id": "atari2600",
+      "nome": "Atari 2600",
+      "descricao": "O comeco de tudo. Extremamente leve.",
+      "core": "stella_libretro.dll",
+      "extensoes": [
+        ".a26"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "atari 2600",
+        "atari2600"
+      ],
+      "pasta": "Atari 2600"
+    },
+    {
+      "id": "atari5200",
+      "nome": "Atari 5200",
+      "descricao": "Sucessor do 2600.",
+      "core": "a5200_libretro.dll",
+      "extensoes": [
+        ".a52"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 1,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "atari 5200",
+        "atari5200"
+      ],
+      "pasta": "Atari 5200"
+    },
+    {
+      "id": "atari7800",
+      "nome": "Atari 7800",
+      "descricao": "Ultimo console de mesa da Atari.",
+      "core": "prosystem_libretro.dll",
+      "extensoes": [
+        ".a78"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "atari 7800",
+        "atari7800"
+      ],
+      "pasta": "Atari 7800"
+    },
+    {
+      "id": "lynx",
+      "nome": "Atari Lynx",
+      "descricao": "Portatil colorido de 1989.",
+      "core": "handy_libretro.dll",
+      "extensoes": [
+        ".lnx"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 1,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "atari lynx",
+        "lynx"
+      ],
+      "pasta": "Atari Lynx"
+    },
+    {
+      "id": "jaguar",
+      "nome": "Atari Jaguar",
+      "descricao": "Ultima cartada da Atari, de 1993.",
+      "core": "virtualjaguar_libretro.dll",
+      "extensoes": [
+        ".j64",
+        ".jag"
+      ],
+      "peso": "completo",
+      "arquivos_sistema": 0,
+      "custo": 3,
+      "pede_placar": false,
+      "apelidos": [
+        "atari jaguar",
+        "jaguar"
+      ],
+      "pasta": "Atari Jaguar"
+    },
+    {
+      "id": "nes",
+      "nome": "Nintendo (NES)",
+      "descricao": "8 bits. Roda em qualquer maquina.",
+      "core": "fceumm_libretro.dll",
+      "extensoes": [
+        ".nes",
+        ".fds",
+        ".unf",
+        ".unif"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "famicom",
+        "nes",
+        "nintendinho"
+      ],
+      "pasta": "NES"
+    },
+    {
+      "id": "snes",
+      "nome": "Super Nintendo",
+      "descricao": "16 bits. Roda em qualquer maquina.",
+      "core": "snes9x_libretro.dll",
+      "extensoes": [
+        ".sfc",
+        ".smc",
+        ".swc",
+        ".fig"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "sfc",
+        "snes",
+        "super nintendo"
+      ],
+      "pasta": "Super Nintendo"
+    },
+    {
+      "id": "gameboy",
+      "nome": "Game Boy e Game Boy Color",
+      "descricao": "Portatil 8 bits.",
+      "core": "gambatte_libretro.dll",
+      "extensoes": [
+        ".gb",
+        ".gbc"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "game boy",
+        "gameboy",
+        "gb",
+        "gbc"
+      ],
+      "pasta": "Game Boy"
+    },
+    {
+      "id": "gba",
+      "nome": "Game Boy Advance",
+      "descricao": "Portatil 32 bits.",
+      "core": "mgba_libretro.dll",
+      "extensoes": [
+        ".gba"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "game boy advance",
+        "gba"
+      ],
+      "pasta": "Game Boy Advance"
+    },
+    {
+      "id": "virtualboy",
+      "nome": "Virtual Boy",
+      "descricao": "O portatil vermelho de 1995.",
+      "core": "mednafen_vb_libretro.dll",
+      "extensoes": [
+        ".vb",
+        ".vboy"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "virtual boy",
+        "virtualboy"
+      ],
+      "pasta": "Virtual Boy"
+    },
+    {
+      "id": "pokemini",
+      "nome": "Pokemon mini",
+      "descricao": "O menor console de cartucho ja lancado.",
+      "core": "pokemini_libretro.dll",
+      "extensoes": [
+        ".min"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "pokemini",
+        "pokemon mini"
+      ],
+      "pasta": "Pokemon mini"
+    },
+    {
+      "id": "gamewatch",
+      "nome": "Game & Watch",
+      "descricao": "Os jogos de tela de cristal liquido.",
+      "core": "gw_libretro.dll",
+      "extensoes": [
+        ".mgw"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "game and watch",
+        "gamewatch"
+      ],
+      "pasta": "Game and Watch"
+    },
+    {
+      "id": "n64",
+      "nome": "Nintendo 64",
+      "descricao": "Primeiro console 3D da Nintendo.",
+      "core": "mupen64plus_next_libretro.dll",
+      "extensoes": [
+        ".n64",
+        ".z64",
+        ".v64"
+      ],
+      "peso": "completo",
+      "arquivos_sistema": 0,
+      "custo": 3,
+      "pede_placar": false,
+      "apelidos": [
+        "n64",
+        "nintendo 64"
+      ],
+      "pasta": "Nintendo 64"
+    },
+    {
+      "id": "nds",
+      "nome": "Nintendo DS",
+      "descricao": "Duas telas. Use mouse ou teclado na tela de toque.",
+      "core": "melonds_libretro.dll",
+      "extensoes": [
+        ".nds"
+      ],
+      "peso": "completo",
+      "arquivos_sistema": 0,
+      "custo": 3,
+      "pede_placar": false,
+      "apelidos": [
+        "ds",
+        "nds",
+        "nintendo ds"
+      ],
+      "pasta": "Nintendo DS"
+    },
+    {
+      "id": "gamecube",
+      "nome": "GameCube e Wii",
+      "descricao": "Exige maquina forte e placa de video decente.",
+      "core": "dolphin_libretro.dll",
+      "extensoes": [
+        ".rvz",
+        ".gcm",
+        ".gcz",
+        ".wbfs",
+        ".chd",
+        ".iso"
+      ],
+      "peso": "completo",
+      "arquivos_sistema": 0,
+      "custo": 5,
+      "pede_placar": false,
+      "apelidos": [
+        "gamecube",
+        "gc",
+        "ngc",
+        "nintendo wii",
+        "wii"
+      ],
+      "tamanho_max_mb": 9000,
+      "externo": {
+        "nome": "Dolphin",
+        "pasta": "Dolphin",
+        "obrigatorio": false,
+        "executaveis": [
+          "Dolphin.exe"
+        ],
+        "argumentos": [
+          "-b",
+          "-e",
+          "{jogo}"
+        ],
+        "site": "dolphin-emu.org/download",
+        "motivo": "Opcional. O nucleo do RetroArch abre, mas o Dolphin de verdade roda bem melhor GameCube e Wii."
+      },
+      "pasta": "GameCube"
+    },
+    {
+      "id": "sg1000",
+      "nome": "Sega SG-1000",
+      "descricao": "Primeiro console da Sega.",
+      "core": "gearsystem_libretro.dll",
+      "extensoes": [
+        ".sg"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "sg-1000",
+        "sg1000"
+      ],
+      "pasta": "SG-1000"
+    },
+    {
+      "id": "megadrive",
+      "nome": "Mega Drive, Master System e Game Gear",
+      "descricao": "Um nucleo cobre as tres.",
+      "core": "genesis_plus_gx_libretro.dll",
+      "extensoes": [
+        ".md",
+        ".gen",
+        ".smd",
+        ".sms",
+        ".gg"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "game gear",
+        "genesis",
+        "gg",
+        "master system",
+        "md",
+        "mega drive",
+        "megadrive",
+        "sms"
+      ],
+      "pasta": "Mega Drive"
+    },
+    {
+      "id": "sega32x",
+      "nome": "Sega 32X",
+      "descricao": "Expansao 32 bits do Mega Drive.",
+      "core": "picodrive_libretro.dll",
+      "extensoes": [
+        ".32x"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 1,
+      "custo": 2,
+      "pede_placar": false,
+      "apelidos": [
+        "sega 32x",
+        "sega32x"
+      ],
+      "pasta": "Sega 32X"
+    },
+    {
+      "id": "segacd",
+      "nome": "Sega CD",
+      "descricao": "Expansao em CD do Mega Drive.",
+      "core": "genesis_plus_gx_libretro.dll",
+      "extensoes": [
+        ".cue",
+        ".chd",
+        ".iso"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 3,
+      "custo": 2,
+      "pede_placar": false,
+      "apelidos": [
+        "mega cd",
+        "megacd",
+        "scd",
+        "sega cd",
+        "sega-cd",
+        "segacd"
+      ],
+      "tamanho_max_mb": 800,
+      "pasta": "Sega CD"
+    },
+    {
+      "id": "saturn",
+      "nome": "Sega Saturn",
+      "descricao": "Exige processador rapido mesmo sendo de 1994.",
+      "core": "mednafen_saturn_libretro.dll",
+      "extensoes": [
+        ".cue",
+        ".chd"
+      ],
+      "peso": "completo",
+      "arquivos_sistema": 1,
+      "custo": 4,
+      "pede_placar": false,
+      "apelidos": [
+        "saturn",
+        "sega saturn",
+        "ss"
+      ],
+      "tamanho_max_mb": 800,
+      "pasta": "Sega Saturn"
+    },
+    {
+      "id": "dreamcast",
+      "nome": "Sega Dreamcast",
+      "descricao": "Ultimo console da Sega, de 1998.",
+      "core": "flycast_libretro.dll",
+      "extensoes": [
+        ".gdi",
+        ".cdi",
+        ".chd",
+        ".iso"
+      ],
+      "peso": "completo",
+      "arquivos_sistema": 1,
+      "custo": 4,
+      "pede_placar": false,
+      "apelidos": [
+        "dc",
+        "dreamcast",
+        "sega dreamcast"
+      ],
+      "tamanho_max_mb": 1400,
+      "pasta": "Dreamcast"
+    },
+    {
+      "id": "ps1",
+      "nome": "PlayStation",
+      "descricao": "32 bits. Roda ate em maquina modesta.",
+      "core": "swanstation_libretro.dll",
+      "extensoes": [
+        ".pbp",
+        ".m3u",
+        ".cue",
+        ".chd",
+        ".iso"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 1,
+      "custo": 2,
+      "pede_placar": false,
+      "apelidos": [
+        "playstation",
+        "playstation 1",
+        "ps1",
+        "psone",
+        "psx"
+      ],
+      "tamanho_max_mb": 800,
+      "pasta": "PS1"
+    },
+    {
+      "id": "ps2",
+      "nome": "PlayStation 2",
+      "descricao": "Exige maquina forte. Nao roda em PC de 4 GB.",
+      "core": "pcsx2_libretro.dll",
+      "extensoes": [
+        ".iso",
+        ".chd"
+      ],
+      "peso": "completo",
+      "arquivos_sistema": 1,
+      "custo": 5,
+      "pede_placar": false,
+      "apelidos": [
+        "playstation 2",
+        "playstation2",
+        "ps2",
+        "sony ps2"
+      ],
+      "tamanho_max_mb": 9000,
+      "externo": {
+        "nome": "PCSX2",
+        "pasta": "PCSX2",
+        "obrigatorio": true,
+        "executaveis": [
+          "pcsx2-qt.exe",
+          "pcsx2x64-avx2.exe",
+          "pcsx2x64.exe",
+          "pcsx2.exe"
+        ],
+        "argumentos": [
+          "-fullscreen",
+          "{jogo}"
+        ],
+        "site": "pcsx2.net/downloads",
+        "motivo": "OBRIGATORIO. O nucleo de PlayStation 2 do RetroArch e pouco mantido e costuma nem abrir o jogo."
+      },
+      "pasta": "PS2"
+    },
+    {
+      "id": "psp",
+      "nome": "PlayStation Portable",
+      "descricao": "Portatil da Sony.",
+      "core": "ppsspp_libretro.dll",
+      "extensoes": [
+        ".cso",
+        ".iso",
+        ".chd"
+      ],
+      "peso": "completo",
+      "arquivos_sistema": 0,
+      "custo": 3,
+      "pede_placar": false,
+      "apelidos": [
+        "playstation portable",
+        "psp"
+      ],
+      "tamanho_max_mb": 1900,
+      "pasta": "PSP"
+    },
+    {
+      "id": "neogeo",
+      "nome": "Neo Geo",
+      "descricao": "Arcade domestico da SNK.",
+      "core": "fbneo_libretro.dll",
+      "extensoes": [
+        ".zip",
+        ".7z"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 1,
+      "custo": 2,
+      "pede_placar": false,
+      "apelidos": [
+        "neo geo",
+        "neo-geo",
+        "neogeo",
+        "ng"
+      ],
+      "pasta": "Neo Geo"
+    },
+    {
+      "id": "ngp",
+      "nome": "Neo Geo Pocket",
+      "descricao": "Portatil da SNK.",
+      "core": "mednafen_ngp_libretro.dll",
+      "extensoes": [
+        ".ngp",
+        ".ngc"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "neo geo pocket",
+        "ngp"
+      ],
+      "pasta": "Neo Geo Pocket"
+    },
+    {
+      "id": "arcade",
+      "nome": "Arcade (MAME)",
+      "descricao": "Maquinas de fliperama.",
+      "core": "mame_libretro.dll",
+      "extensoes": [
+        ".zip",
+        ".7z"
+      ],
+      "peso": "completo",
+      "arquivos_sistema": 1,
+      "custo": 3,
+      "pede_placar": false,
+      "apelidos": [
+        "arcade",
+        "fliperama",
+        "mame"
+      ],
+      "pasta": "Arcade"
+    },
+    {
+      "id": "pcengine",
+      "nome": "PC Engine",
+      "descricao": "16 bits japones, em cartucho.",
+      "core": "mednafen_pce_libretro.dll",
+      "extensoes": [
+        ".pce",
+        ".sgx"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "pc engine",
+        "pcengine"
+      ],
+      "pasta": "PC Engine"
+    },
+    {
+      "id": "pcfx",
+      "nome": "PC-FX",
+      "descricao": "Console em CD da NEC.",
+      "core": "mednafen_pcfx_libretro.dll",
+      "extensoes": [
+        ".cue",
+        ".chd"
+      ],
+      "peso": "completo",
+      "arquivos_sistema": 1,
+      "custo": 3,
+      "pede_placar": false,
+      "apelidos": [
+        "pc fx",
+        "pc-fx",
+        "pcfx"
+      ],
+      "tamanho_max_mb": 800,
+      "pasta": "PC-FX"
+    },
+    {
+      "id": "wonderswan",
+      "nome": "WonderSwan",
+      "descricao": "Portatil da Bandai.",
+      "core": "mednafen_wswan_libretro.dll",
+      "extensoes": [
+        ".ws",
+        ".wsc"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "wonderswan"
+      ],
+      "pasta": "WonderSwan"
+    },
+    {
+      "id": "threedo",
+      "nome": "3DO",
+      "descricao": "Console multimidia de 1993.",
+      "core": "opera_libretro.dll",
+      "extensoes": [
+        ".iso",
+        ".cue",
+        ".chd"
+      ],
+      "peso": "completo",
+      "arquivos_sistema": 1,
+      "custo": 3,
+      "pede_placar": false,
+      "apelidos": [
+        "3do",
+        "panasonic 3do",
+        "threedo"
+      ],
+      "tamanho_max_mb": 800,
+      "pasta": "3DO"
+    },
+    {
+      "id": "cdi",
+      "nome": "Philips CD-i",
+      "descricao": "Plataforma multimidia dos anos 90.",
+      "core": "same_cdi_libretro.dll",
+      "extensoes": [
+        ".chd",
+        ".cue"
+      ],
+      "peso": "completo",
+      "arquivos_sistema": 1,
+      "custo": 3,
+      "pede_placar": false,
+      "apelidos": [
+        "cd-i",
+        "cdi",
+        "philips cdi"
+      ],
+      "tamanho_max_mb": 800,
+      "pasta": "CD-i"
+    },
+    {
+      "id": "odyssey2",
+      "nome": "Magnavox Odyssey 2",
+      "descricao": "Console de 1978.",
+      "core": "o2em_libretro.dll",
+      "extensoes": [
+        ".bin"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 1,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "odyssey 2",
+        "odyssey2"
+      ],
+      "pasta": "Odyssey 2"
+    },
+    {
+      "id": "colecovision",
+      "nome": "ColecoVision",
+      "descricao": "Console de 1982.",
+      "core": "gearcoleco_libretro.dll",
+      "extensoes": [
+        ".col"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 1,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "colecovision"
+      ],
+      "pasta": "ColecoVision"
+    },
+    {
+      "id": "intellivision",
+      "nome": "Intellivision",
+      "descricao": "Console da Mattel, de 1979.",
+      "core": "freeintv_libretro.dll",
+      "extensoes": [
+        ".int"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 1,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "intellivision"
+      ],
+      "pasta": "Intellivision"
+    },
+    {
+      "id": "vectrex",
+      "nome": "Vectrex",
+      "descricao": "Console com tela vetorial propria.",
+      "core": "vecx_libretro.dll",
+      "extensoes": [
+        ".vec"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "vectrex"
+      ],
+      "pasta": "Vectrex"
+    },
+    {
+      "id": "msx",
+      "nome": "MSX",
+      "descricao": "Microcomputador dos anos 80.",
+      "core": "bluemsx_libretro.dll",
+      "extensoes": [
+        ".rom",
+        ".dsk",
+        ".cas"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 1,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "msx",
+        "msx2"
+      ],
+      "pasta": "MSX"
+    },
+    {
+      "id": "c64",
+      "nome": "Commodore 64",
+      "descricao": "O microcomputador mais vendido da historia.",
+      "core": "vice_x64_libretro.dll",
+      "extensoes": [
+        ".d64",
+        ".t64",
+        ".prg",
+        ".crt"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "c64",
+        "commodore 64"
+      ],
+      "pasta": "Commodore 64"
+    },
+    {
+      "id": "amiga",
+      "nome": "Commodore Amiga",
+      "descricao": "Microcomputador de 16 bits.",
+      "core": "puae_libretro.dll",
+      "extensoes": [
+        ".adf",
+        ".hdf",
+        ".ipf"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 1,
+      "custo": 2,
+      "pede_placar": false,
+      "apelidos": [
+        "amiga",
+        "commodore amiga"
+      ],
+      "pasta": "Amiga"
+    },
+    {
+      "id": "spectrum",
+      "nome": "ZX Spectrum",
+      "descricao": "Microcomputador britanico de 1982.",
+      "core": "fuse_libretro.dll",
+      "extensoes": [
+        ".tzx",
+        ".tap",
+        ".z80",
+        ".szx"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "spectrum",
+        "zx spectrum"
+      ],
+      "pasta": "ZX Spectrum"
+    },
+    {
+      "id": "amstrad",
+      "nome": "Amstrad CPC",
+      "descricao": "Microcomputador de 1984.",
+      "core": "cap32_libretro.dll",
+      "extensoes": [
+        ".cdt",
+        ".sna",
+        ".dsk"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "amstrad",
+        "amstrad cpc",
+        "cpc"
+      ],
+      "pasta": "Amstrad CPC"
+    },
+    {
+      "id": "dos",
+      "nome": "MS-DOS",
+      "descricao": "Jogos de PC dos anos 80 e 90.",
+      "core": "dosbox_pure_libretro.dll",
+      "extensoes": [
+        ".exe",
+        ".com",
+        ".bat",
+        ".conf"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 2,
+      "pede_placar": false,
+      "apelidos": [
+        "dos",
+        "ms-dos"
+      ],
+      "pasta": "MS-DOS"
+    },
+    {
+      "id": "scummvm",
+      "nome": "ScummVM",
+      "descricao": "Aventuras de apontar e clicar.",
+      "core": "scummvm_libretro.dll",
+      "extensoes": [
+        ".scummvm",
+        ".svm"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "scummvm"
+      ],
+      "pasta": "ScummVM"
+    }
+  ],
+  "preferencia": {
+    ".iso": [
+      "ps2",
+      "ps1",
+      "psp",
+      "gamecube",
+      "dreamcast",
+      "threedo",
+      "segacd"
+    ],
+    ".chd": [
+      "ps1",
+      "ps2",
+      "dreamcast",
+      "saturn",
+      "psp",
+      "segacd",
+      "pcfx",
+      "cdi",
+      "threedo",
+      "gamecube"
+    ],
+    ".cue": [
+      "ps1",
+      "segacd",
+      "saturn",
+      "pcfx",
+      "threedo",
+      "cdi"
+    ],
+    ".bin": [
+      "megadrive",
+      "odyssey2"
+    ],
+    ".zip": [
+      "arcade",
+      "neogeo"
+    ],
+    ".7z": [
+      "arcade",
+      "neogeo"
+    ],
+    ".dsk": [
+      "amstrad",
+      "msx"
+    ],
+    ".rom": [
+      "msx"
+    ]
+  }
+}

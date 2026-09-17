@@ -1,0 +1,2 @@
+Coloque aqui os arquivos de sistema exigidos por algumas plataformas.
+O ARENA nao lista, nao nomeia e nao baixa esses arquivos.
