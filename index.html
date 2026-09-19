@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ARENA — o console da turma</title>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --bg2: #12121a;
+      --card: #1a1a2e;
+      --text: #e0e0e0;
+      --muted: #888;
+      --accent: #00d4aa;
+      --accent2: #7b61ff;
+      --border: #2a2a3e;
+      --font: 'Segoe UI', system-ui, sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .hero {
+      width: 100%;
+      max-width: 780px;
+      padding: 60px 24px 40px;
+      text-align: center;
+    }
+    .hero h1 {
+      font-size: 3rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+    .hero .sub {
+      color: var(--muted);
+      font-size: 1.1rem;
+      margin-bottom: 32px;
+    }
+    .buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #0a0a0f;
+      border-color: var(--accent);
+    }
+    .btn-primary:hover { background: #00e8bb; transform: translateY(-2px); }
+    .btn-secondary {
+      background: var(--card);
+      color: var(--text);
+    }
+    .btn-secondary:hover { background: #252540; transform: translateY(-2px); }
+    .features {
+      width: 100%;
+      max-width: 780px;
+      padding: 0 24px 40px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+    .feature {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+    .feature .icon { font-size: 2rem; margin-bottom: 8px; }
+    .feature h3 { font-size: 0.95rem; color: var(--accent); margin-bottom: 6px; }
+    .feature p { font-size: 0.85rem; color: var(--muted); line-height: 1.5; }
+    .install {
+      width: 100%;
+      max-width: 780px;
+      padding: 0 24px 40px;
+      background: var(--bg2);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      padding: 28px;
+    }
+    .install h2 {
+      font-size: 1.3rem;
+      margin-bottom: 16px;
+      color: var(--accent2);
+    }
+    .install ol { padding-left: 20px; }
+    .install li { margin-bottom: 10px; color: var(--text); line-height: 1.6; font-size: 0.95rem; }
+    .install li strong { color: var(--accent); }
+    .install code {
+      background: #2a2a3e;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Consolas', monospace;
+      font-size: 0.85rem;
+      color: var(--accent);
+    }
+    .footer {
+      margin-top: auto;
+      padding: 24px;
+      color: var(--muted);
+      font-size: 0.8rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <h1>ARENA</h1>
+    <p class="sub">O console da turma — copie a pasta, dê dois cliques e jogue.</p>
+    <div class="buttons">
+      <a class="btn btn-primary" href="#instalar">⬇ Como instalar</a>
+      <a class="btn btn-secondary" href="https://github.com/DAVI3DS/ARENA-remake-">📦 GitHub</a>
+    </div>
+  </div>
+
+  <div class="features">
+    <div class="feature">
+      <div class="icon">🎮</div>
+      <h3>47 consoles</h3>
+      <p>NES, SNES, PlayStation, N64, GBA, Arcade e muito mais dentro do mesmo lugar.</p>
+    </div>
+    <div class="feature">
+      <div class="icon">💾</div>
+      <h3>Tudo viaja junto</h3>
+      <p>Jogos, saves, recordes, controles e configuração numa única pasta portátil.</p>
+    </div>
+    <div class="feature">
+      <div class="icon">🚫</div>
+      <h3>Sem instalação</h3>
+      <p>Python embutido, sem pip, sem internet. Funciona num pen drive USB.</p>
+    </div>
+    <div class="feature">
+      <div class="icon">👥</div>
+      <h3>Jogue a dois</h3>
+      <p>Mesmo Wi-Fi, cabo direto, notebook ou até sem rede — a mala do pen drive.</p>
+    </div>
+    <div class="feature">
+      <div class="icon">🎯</div>
+      <h3>Controle em 1 clique</h3>
+      <p>Mapear meu controle sozinho preenche os 16 botões. Xbox, PS4/5, Switch.</p>
+    </div>
+    <div class="feature">
+      <div class="icon">🔒</div>
+      <h3>Privacidade</h3>
+      <p>Apenas apelido. Sem nome completo, sem gravação de vídeo.</p>
+    </div>
+  </div>
+
+  <div class="install" id="instalar">
+    <h2>Como instalar</h2>
+    <ol>
+      <li><strong>Copie</strong> a pasta <code>ARENA</code> para o pen drive ou disco.</li>
+      <li><strong>Dois cliques</strong> em <code>ARENA.bat</code>. A janela preta abre — não a feche.</li>
+      <li>O navegador abre o ARENA. <strong>Escreva seu apelido</strong> no topo.</li>
+      <li><strong>Crie as pastas dos consoles</strong> e arraste os jogos para a pasta de cada um.</li>
+      <li><strong>Atualize a lista</strong> e clique no jogo para abrir.</li>
+    </ol>
+    <p style="color:var(--muted); margin-top:16px; font-size:0.9rem;">
+      Precisa do <strong>Python embutido</strong> em <code>servidor\python\python.exe</code> e do
+      <strong>RetroArch</strong> em <code>retroarch\retroarch.exe</code>.
+      Veja o <strong>LEIA-ME.md</strong> e o documento <strong>1-COMECAR.md</strong> para os passos completos.
+    </p>
+  </div>
+
+  <div class="footer">
+    ARENA — projeto open-source para educação.<br>
+    Código no <a href="https://github.com/DAVI3DS/ARENA-remake-" style="color:var(--accent)">GitHub</a>.
+  </div>
+</body>
+</html>

@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ARENA</title>
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+
+<canvas id="galaxyCanvas"></canvas>
+<canvas id="fieldCanvas"></canvas>
+
+<!-- ===================== BARRA DE ESTADO DA MAQUINA ===================== -->
+<header class="painel-topo">
+  <div class="marca">
+    <span class="marca-nome">ARENA</span>
+    <span class="marca-sub">console da turma</span>
+  </div>
+
+  <dl class="leitura">
+    <div><dt>Processador</dt><dd id="lidoCpu">lendo…</dd></div>
+    <div><dt>Memória</dt><dd id="lidoRam">—</dd></div>
+    <div><dt>Motor</dt><dd id="lidoDriver">—</dd></div>
+    <div><dt>Jogos</dt><dd id="lidoJogos">0</dd></div>
+  </dl>
+
+  <div class="topo-acoes">
+    <button class="botao" id="btnAmigos" type="button">Amigos</button>
+    <button class="botao" id="btnRecordes" type="button">Recordes</button>
+    <button class="botao" id="btnConquistas" type="button">Conquistas</button>
+    <button class="botao" id="btnAcervo" type="button">Biblioteca</button>
+    <button class="botao botao-tema" id="btnTema" type="button" aria-label="Alternar modo de cor">☾ Escuro</button>
+    <button class="botao" id="btnSincronizar" type="button">
+      Enviar recordes <span class="selo" id="seloPendentes" hidden>0</span>
+    </button>
+    <button class="botao" id="btnAjustes" type="button">Ajustes</button>
+  </div>
+</header>
+
+<!-- ===================== AVISO DE PROBLEMA ===================== -->
+<div class="aviso" id="aviso" hidden>
+  <p id="avisoTexto"></p>
+</div>
+
+<main class="corpo">
+
+  <!-- ---------- TRILHO DE PLATAFORMAS ---------- -->
+  <nav class="trilho" aria-label="Plataformas">
+    <button class="trilho-item trilho-item--todos ativo" data-plataforma="" type="button">
+      <span class="trilho-nome">Todos os jogos</span>
+      <span class="trilho-conta" id="contaTodos">0</span>
+    </button>
+    <ul class="trilho-lista" id="listaPlataformas"></ul>
+    <button class="botao botao--largo" id="btnCriarPastas" type="button">Criar pastas dos consoles</button>
+    <button class="botao botao--largo" id="btnAtualizar" type="button">Atualizar lista</button>
+  </nav>
+
+  <!-- ---------- LISTA DE JOGOS ---------- -->
+  <section class="conteudo">
+    <div class="filtro">
+      <input id="campoBusca" type="search" placeholder="Procurar por nome do jogo"
+             autocomplete="off" aria-label="Procurar jogo">
+      <div class="filtros-rapidos" role="group" aria-label="Filtros rápidos">
+        <button class="filtro-rapido ativo" id="btnTodosJogos" type="button">Todos</button>
+        <button class="filtro-rapido" id="btnFavoritos" type="button">★ Favoritos</button>
+        <button class="filtro-rapido" id="btnRecentes" type="button">Recentes</button>
+      </div>
+      <span class="filtro-conta" id="contaVisivel"></span>
+    </div>
+
+    <div class="rolagem">
+      <ul class="jogos" id="listaJogos"></ul>
+      <button class="botao botao--largo" id="btnMais" type="button" hidden>Mostrar mais</button>
+
+      <div class="vazio" id="vazio" hidden>
+        <h2 id="vazioTitulo">Nenhum jogo na lista ainda</h2>
+        <p id="vazioTexto">
+          Jogue seus arquivos na pasta <code>jogos\pessoais</code> e clique em
+          Atualizar lista. O ARENA descobre sozinho de qual console é cada um.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <aside class="detalhes-jogo" id="detalhesJogo" aria-labelledby="detalhesTitulo">
+    <div class="detalhes-capa" id="detalhesCapa" aria-hidden="true">AR</div>
+    <div class="detalhes-corpo">
+      <span class="detalhes-kicker" id="detalhesConsole">Sua biblioteca</span>
+      <h2 id="detalhesTitulo">Selecione um jogo</h2>
+      <p class="detalhes-descricao" id="detalhesDescricao">Escolha um título na grade para ver mais informações.</p>
+      <dl class="detalhes-meta">
+        <div><dt>Console</dt><dd id="detalhesPlataforma">—</dd></div>
+        <div><dt>Tamanho</dt><dd id="detalhesTamanho">—</dd></div>
+        <div><dt>Origem</dt><dd id="detalhesOrigem">—</dd></div>
+      </dl>
+      <div class="detalhes-acoes">
+        <button class="botao botao--principal" id="btnJogarSelecionado" type="button" disabled>Jogar agora</button>
+        <button class="botao" id="btnMultiplayerSelecionado" type="button" disabled>Jogar multiplayer</button>
+        <button class="botao" id="btnGerirSelecionado" type="button" disabled>Saves e cheats</button>
+        <button class="botao" id="btnEscolherConsole" type="button" hidden>Escolher console</button>
+      </div>
+    </div>
+  </aside>
+</main>
+
+<!-- ===================== ACERVO AUTORIZADO ===================== -->
+<aside class="gaveta" id="gavetaAcervo" hidden aria-labelledby="tituloAcervo">
+  <div class="gaveta-cabeca">
+    <h2 id="tituloAcervo">Biblioteca online</h2>
+    <button class="botao botao--fechar" data-fechar="gavetaAcervo" type="button">Fechar</button>
+  </div>
+  <div class="aba-conteudo">
+    <p class="explica">Pesquise e instale jogos gratuitos.</p>
+    <label class="campo acervo-busca">
+      <span>Pesquisar jogo</span>
+      <input id="campoBuscaOnline" type="search" maxlength="80" placeholder="ex.: Quattris, Pong, aventura" autocomplete="off">
+    </label>
+    <p class="explica" id="bibliotecaOnlineStatus">Digite o nome de um jogo.</p>
+    <ul class="controles" id="listaBibliotecaOnline"></ul>
+    <h3 class="grupo-titulo">Jogos já instalados</h3>
+    <div class="acervo-fontes" id="listaFontesAcervo"></div>
+    <ul class="controles" id="listaAcervo"></ul>
+    <button class="botao" id="btnNovoAcervo" type="button" hidden>Gerenciar catálogo</button>
+    <p class="explica" id="acervoVazio">
+      Nenhum jogo encontrado. Tente outro nome.
+    </p>
+  </div>
+</aside>
+
+<!-- ===================== GAVETA DE AJUSTES ===================== -->
+<aside class="gaveta" id="gavetaAjustes" hidden aria-labelledby="tituloAjustes">
+  <div class="gaveta-cabeca">
+    <h2 id="tituloAjustes">Ajustes</h2>
+    <button class="botao botao--fechar" data-fechar="gavetaAjustes" type="button">Fechar</button>
+  </div>
+
+  <div class="abas" role="tablist">
+    <button class="aba ativo" role="tab" data-aba="simples" type="button">Simples</button>
+    <button class="aba" role="tab" data-aba="avancado" type="button">Avançado</button>
+    <button class="aba" role="tab" data-aba="rede" type="button">Amigos</button>
+    <button class="aba" role="tab" data-aba="maquina" type="button">Máquina</button>
+    <button class="aba" role="tab" data-aba="perfil" type="button">Perfil</button>
+    <button class="aba" role="tab" data-aba="controles" type="button">Controles</button>
+    <button class="aba" role="tab" data-aba="emuladores" type="button">Emuladores</button>
+  </div>
+
+  <!-- Aba simples -->
+  <div class="aba-conteudo" data-painel="simples">
+    <p class="explica">Automático é o recomendado.</p>
+    <div class="perfis" id="listaPerfis"></div>
+
+    <div class="onde">
+      <h3>Onde ficam suas coisas</h3>
+      <ul class="onde-lista">
+        <li><span>Jogos salvos</span><code id="camSaves">—</code></li>
+        <li><span>Fotos da tela</span><code id="camCapturas">—</code></li>
+        <li><span>Seus jogos</span><code id="camJogos">—</code></li>
+        <li><span>Arquivos de sistema</span><code id="camSistema">—</code></li>
+      </ul>
+      <p class="explica">Tudo fica dentro da pasta do ARENA.</p>
+    </div>
+  </div>
+
+  <!-- Aba avancada -->
+  <div class="aba-conteudo" data-painel="avancado" hidden>
+    <p class="explica">Ajustes avançados do emulador.</p>
+    <div class="avancado" id="listaAvancado"></div>
+    <button class="botao" id="btnRestaurar" type="button">Voltar tudo ao padrão</button>
+  </div>
+
+  <!-- Aba amigos -->
+  <div class="aba-conteudo" data-painel="rede" hidden>
+    <div>
+      <h3 class="grupo-titulo">Meus amigos</h3>
+      <p class="explica">Adicione amigos pelo código.</p>
+      <div class="codigo-amigo-box">
+        <span class="opcao-rotulo">Seu código de amigo</span>
+        <code id="meuCodigoAmigo">—</code>
+        <span class="opcao-ajuda">Compartilhe este código.</span>
+      </div>
+      <div class="cheat-form">
+        <label class="campo">
+          <span>Código do amigo</span>
+          <input id="amigoCodigo" type="text" maxlength="12"
+                 placeholder="ARENA-AB12-CD34" autocomplete="off" spellcheck="false">
+        </label>
+        <button class="botao botao--principal" id="btnAddAmigoCodigo" type="button">
+          Adicionar pelo código
+        </button>
+      </div>
+      <ul class="amigos" id="listaAmigos"></ul>
+
+      <h3 class="grupo-titulo">Atividade na rede</h3>
+      <p class="explica">Partidas abertas na rede local.</p>
+      <ul class="controles" id="listaColegas"></ul>
+      <p class="explica" id="statusPendentes">Nenhum recorde aguardando envio.</p>
+      <button class="botao botao--principal" id="btnEnviarAgora" type="button">
+        Sincronizar agora
+      </button>
+    </div>
+
+    <div>
+      <h3 class="grupo-titulo">Sem rede nenhuma: trocar pelo pen drive</h3>
+      <p class="explica">Transfira recordes pelo pen drive.</p>
+      <ul class="onde-lista">
+        <li><span>Onde a mala fica</span><code id="malaCaminho">—</code></li>
+        <li><span>Situação</span><code id="malaSituacao">—</code></li>
+      </ul>
+      <button class="botao botao--principal" id="btnMala" type="button">
+        Trocar pelo pen drive
+      </button>
+      <p class="explica">Os recordes repetidos não são duplicados.</p>
+    </div>
+
+    <p class="explica rede-automatica">Descoberta local automática. IPs ficam ocultos.</p>
+  </div>
+
+  <!-- Aba máquina -->
+  <div class="aba-conteudo" data-painel="maquina" hidden>
+    <dl class="maquina">
+      <div><dt>Processador</dt><dd id="hwCpu">—</dd></div>
+      <div><dt>Núcleos</dt><dd id="hwNucleos">—</dd></div>
+      <div><dt>Memória RAM</dt><dd id="hwRam">—</dd></div>
+      <div><dt>Disco</dt><dd id="hwDisco">—</dd></div>
+      <div><dt>Sistema</dt><dd id="hwSistema">—</dd></div>
+      <div><dt>Motor gráfico</dt><dd id="hwMotor">—</dd></div>
+      <div><dt>Perfil aplicado</dt><dd id="hwPerfil">—</dd></div>
+      <div><dt>Bibliotecas gráficas</dt><dd id="hwRuntime">—</dd></div>
+      <div><dt>Capacidade</dt><dd id="hwCapacidade">—</dd></div>
+      <div><dt>Espaço livre</dt><dd id="hwEspaco">—</dd></div>
+      <div><dt>Velocidade de gravação</dt><dd id="hwVelocidade">—</dd></div>
+      <div><dt>Internet</dt><dd id="hwInternet">—</dd></div>
+    </dl>
+
+    <div id="blocoRuntime" hidden>
+      <h3 class="grupo-titulo">Bibliotecas gráficas ausentes</h3>
+      <p class="explica">Necessário para abrir os jogos.</p>
+      <button class="botao botao--principal" id="btnRepararRuntime" type="button">
+        Copiar para a pasta do ARENA
+      </button>
+    </div>
+
+    <div>
+      <h3 class="grupo-titulo">Modo desempenho</h3>
+      <p class="explica">Dá prioridade ao jogo enquanto ele estiver aberto.</p>
+      <div class="opcao">
+        <span class="opcao-rotulo">Dar prioridade ao jogo</span>
+        <button class="chave opcao-controle" id="chaveDesempenho"
+                aria-pressed="false" aria-label="Modo desempenho"></button>
+        <span class="opcao-ajuda">Útil em computadores modestos.</span>
+      </div>
+      <div class="opcao">
+        <span class="opcao-rotulo">Ultra desempenho</span>
+        <button class="chave opcao-controle" id="chaveUltra"
+                aria-pressed="false" aria-label="Ultra desempenho"></button>
+        <span class="opcao-ajuda">Dedica mais recursos ao jogo.</span>
+      </div>
+      <p class="explica"><b>Modo ultra:</b> máximo desempenho, com menos recursos para o Arena.</p>
+      <div class="opcao">
+        <span class="opcao-rotulo">Travar Alt+Tab e tecla Windows</span>
+        <button class="chave opcao-controle" id="chaveTravar"
+                aria-pressed="false" aria-label="Travar teclas do sistema"></button>
+        <span class="opcao-ajuda">Use F9 para liberar o teclado.</span>
+      </div>
+      <p class="explica">O modo ultra não altera o Windows.</p>
+    </div>
+
+    <div>
+      <h3 class="grupo-titulo">Jogos que fecharam sozinhos</h3>
+      <p class="explica">Histórico de jogos encerrados inesperadamente.</p>
+      <ul class="controles" id="listaFechamentos"></ul>
+    </div>
+
+    <div>
+      <h3 class="grupo-titulo">Cópia de segurança</h3>
+      <p class="explica">Guarda automaticamente as 3 cópias mais recentes.</p>
+      <button class="botao" id="btnBackup" type="button">Fazer cópia agora</button>
+    </div>
+
+    <div>
+      <h3 class="grupo-titulo">Levar meu progresso para outro lugar</h3>
+      <p class="explica">Junta saves, cheats e recordes em um pacote portátil.</p>
+      <button class="botao botao--principal" id="btnExportar" type="button">
+        Montar meu pacote
+      </button>
+
+      <ul class="onde-lista" id="listaPacotes"></ul>
+      <p class="explica">O progresso existente não é sobrescrito.</p>
+    </div>
+  </div>
+
+  <!-- Aba perfil -->
+  <div class="aba-conteudo" data-painel="perfil" hidden>
+    <p class="explica">Crie um perfil novo para esta máquina.</p>
+
+    <div>
+      <h3 class="grupo-titulo">Este ARENA agora</h3>
+      <ul class="onde-lista">
+        <li><span>Jogando como</span><code id="perfilApelido">—</code></li>
+        <li><span>Código deste ARENA</span><code id="perfilCodigo">—</code></li>
+        <li><span>Recordes guardados</span><code id="perfilRecordes">—</code></li>
+      </ul>
+    </div>
+
+    <div>
+      <h3 class="grupo-titulo">Começar do zero</h3>
+      <p class="explica">Apaga o perfil e as configurações. Os jogos ficam.</p>
+
+      <div class="opcao">
+        <span class="opcao-rotulo">Apagar também os saves e cheats</span>
+        <button class="chave opcao-controle" id="chaveApagarSaves"
+                aria-pressed="false" aria-label="Apagar saves e cheats"></button>
+        <span class="opcao-ajuda">
+          Desligado, seus saves ficam.
+        </span>
+      </div>
+
+      <button class="botao botao--perigo" id="btnNovoPerfil" type="button">
+        Começar do zero
+      </button>
+    </div>
+  </div>
+
+  <!-- Aba controles -->
+  <div class="aba-conteudo" data-painel="controles" hidden>
+    <p class="explica">Conecte o controle antes de abrir o jogo.</p>
+
+    <div class="opcao">
+      <span class="opcao-rotulo">Tipo de controle</span>
+      <select class="opcao-controle" id="listaDriverControle" aria-label="Tipo de controle">
+        <option value="xinput">xinput</option>
+        <option value="dinput">dinput</option>
+      </select>
+      <span class="opcao-ajuda">Troque se o controle não aparecer.</span>
+    </div>
+
+    <div>
+      <h3 class="grupo-titulo">O que funciona</h3>
+      <ul class="controles" id="listaControles"></ul>
+    </div>
+
+    <div>
+      <h3 class="grupo-titulo">Mapear as teclas e os botões</h3>
+      <p class="explica">Escolha um botão e pressione a tecla ou botão desejado.</p>
+
+      <div class="opcao">
+        <span class="opcao-rotulo">Qual controle você tem</span>
+        <select class="opcao-controle" id="mapaTipo"
+                aria-label="Tipo de controle"></select>
+        <span class="opcao-ajuda" id="notaTipo">
+          Mostra os botões compatíveis.
+        </span>
+      </div>
+
+      <div class="opcao">
+        <span class="opcao-rotulo">Para qual console</span>
+        <select class="opcao-controle" id="mapaConsole"
+                aria-label="Console do mapeamento"></select>
+        <span class="opcao-ajuda" id="notaConsole">
+          Escolha o console.
+        </span>
+      </div>
+
+      <div class="perfil-chaves" id="perfilChaves">
+        <div class="opcao">
+          <span class="opcao-rotulo">Direcional</span>
+          <button class="chave opcao-controle" id="chaveDirecional"
+                  aria-pressed="true" aria-label="Usar o direcional"></button>
+          <span class="opcao-ajuda">Direções.</span>
+        </div>
+        <div class="opcao">
+          <span class="opcao-rotulo">Analógico esquerdo</span>
+          <button class="chave opcao-controle" id="chaveAnalogicoEsq"
+                  aria-pressed="true" aria-label="Usar o analógico esquerdo"></button>
+          <span class="opcao-ajuda">Movimento.</span>
+        </div>
+        <div class="opcao">
+          <span class="opcao-rotulo">Analógico direito</span>
+          <button class="chave opcao-controle" id="chaveAnalogicoDir"
+                  aria-pressed="true" aria-label="Usar o analógico direito"></button>
+          <span class="opcao-ajuda">Câmera e mira.</span>
+        </div>
+        <div class="opcao">
+          <span class="opcao-rotulo">Vibração</span>
+          <button class="chave opcao-controle" id="chaveVibracao"
+                  aria-pressed="true" aria-label="Vibração"></button>
+          <span class="opcao-ajuda">Quando disponível.</span>
+        </div>
+        <div class="opcao" id="campoExtra" hidden>
+          <span class="opcao-rotulo">Jogador 2 usa</span>
+          <select class="opcao-controle" id="listaExtra"
+                  aria-label="Dispositivo do jogador 2">
+            <option value="">controle</option>
+            <option value="mouse">mouse do computador</option>
+            <option value="teclado">teclado do computador</option>
+          </select>
+          <span class="opcao-ajuda" id="notaExtra">
+            Compatibilidade do console.
+          </span>
+        </div>
+      </div>
+
+      <div class="opcao">
+        <span class="opcao-rotulo">Jogador</span>
+        <select class="opcao-controle" id="mapaJogador" aria-label="Jogador">
+          <option value="1">Jogador 1</option>
+          <option value="2">Jogador 2</option>
+        </select>
+        <span class="opcao-ajuda">Configuração por jogador.</span>
+      </div>
+
+      <ul class="mapa" id="listaMapa"></ul>
+
+      <div class="modal-acoes">
+        <button class="botao" id="btnMapaLimpar" type="button">Limpar tudo</button>
+        <button class="botao" id="btnMapaPadrao" type="button">Padrão do teclado</button>
+        <button class="botao botao--principal" id="btnMapaAuto" type="button">
+          Mapear meu controle sozinho
+        </button>
+        <button class="botao botao--principal" id="btnMapaWizard" type="button" hidden>
+          Configurar com assistente
+        </button>
+      </div>
+      <p class="explica">Preenche os botões automaticamente.</p>
+      <p class="explica" id="mapaResumo">—</p>
+      <p class="explica" id="mapaWatacao" hidden>Para controles genéricos, clique em "Configurar com assistente" e pressione cada botão quando pedido.</p>
+    </div>
+
+    <!-- Assistente para controles genéricos -->
+    <div class="wizard-generico" id="wizardGenerico" hidden>
+      <div class="wizard-cabecalho">
+        <h3 class="wizard-titulo" id="wizardTitulo">Configurando controle genérico</h3>
+        <p class="wizard-instrucao" id="wizardInstrucao">Pressione cada botão quando o ARENA pedir.</p>
+      </div>
+      <div class="wizard-corpo">
+        <p class="wizard-descricao" id="wizardDescricao"></p>
+        <div class="wizard-botoes">
+          <button class="botao botao--principal" id="wizardAguardar" type="button">
+            Estou pronto — pressione o botão agora
+          </button>
+          <button class="botao" id="wizardPular" type="button">
+            Não tenho esse botão
+          </button>
+        </div>
+      </div>
+      <div class="wizard-andamento" id="wizardAndamento"></div>
+      <p class="wizard-observacao" id="wizardObservacao" hidden></p>
+    </div>
+
+    <div>
+      <h3 class="grupo-titulo">Que botão é qual, em cada console</h3>
+      <p class="explica">Veja os nomes dos botões de cada console.</p>
+      <div class="opcao">
+        <span class="opcao-rotulo">Console</span>
+        <select class="opcao-controle" id="listaConsoleBotoes"
+                aria-label="Console para ver os botões"></select>
+        <span class="opcao-ajuda">A tabela é atualizada.</span>
+      </div>
+      <ul class="controles" id="listaBotoes"></ul>
+    </div>
+
+    <div>
+      <h3 class="grupo-titulo">Se os botões estiverem trocados</h3>
+      <p class="explica">Se necessário, remapeie os botões pelo menu do jogo.</p>
+    </div>
+  </div>
+
+  <!-- Aba emuladores -->
+  <div class="aba-conteudo" data-painel="emuladores" hidden>
+    <p class="explica">Emuladores externos opcionais.</p>
+    <ul class="controles" id="listaExternos"></ul>
+    <p class="explica">Coloque cada emulador na pasta <code>emuladores</code>.</p>
+
+    <div>
+      <h3 class="grupo-titulo">Qual BIOS usar em cada console</h3>
+      <p class="explica">Escolha uma BIOS instalada em <code>retroarch\system</code>.</p>
+      <div class="avancado" id="listaBios"></div>
+
+      <div class="opcao">
+        <span class="opcao-rotulo">Abrir a tela inicial do console</span>
+        <select class="opcao-controle" id="listaBiosAbrir"
+                aria-label="Console para abrir a BIOS"></select>
+          <span class="opcao-ajuda">Abre a tela inicial do console.</span>
+      </div>
+      <button class="botao botao--principal" id="btnAbrirBios" type="button">
+        Abrir só a BIOS
+      </button>
+    </div>
+
+    <div>
+      <h3 class="grupo-titulo">Memory card</h3>
+      <p class="explica">Memory cards de PlayStation 1 e 2.</p>
+      <ul class="controles" id="listaCartoes"></ul>
+    </div>
+
+    <div>
+      <h3 class="grupo-titulo">Data e hora do console</h3>
+      <p class="explica">Usa a data e hora do computador.</p>
+      <ul class="onde-lista">
+        <li><span>Agora no computador</span><code id="relogioPc">—</code></li>
+        <li><span>Onde a BIOS guarda os ajustes</span><code id="pastaBios">—</code></li>
+      </ul>
+      <p class="explica">As alterações ficam salvas na BIOS.</p>
+    </div>
+  </div>
+</aside>
+
+<!-- ===================== GAVETA DE CONQUISTAS ===================== -->
+<aside class="gaveta" id="gavetaConquistas" hidden aria-labelledby="tituloConquistas">
+  <div class="gaveta-cabeca">
+    <h2 id="tituloConquistas">Conquistas da turma</h2>
+    <button class="botao botao--fechar" data-fechar="gavetaConquistas" type="button">Fechar</button>
+  </div>
+  <div class="aba-conteudo">
+    <p class="explica">Conquistas da turma.</p>
+    <div id="listaConquistas" class="conquistas-lista"></div>
+  </div>
+</aside>
+
+<!-- ===================== GAVETA DE RECORDES ===================== -->
+<aside class="gaveta" id="gavetaRecordes" hidden aria-labelledby="tituloRecordes">
+  <div class="gaveta-cabeca">
+    <h2 id="tituloRecordes">Recordes</h2>
+    <button class="botao botao--fechar" data-fechar="gavetaRecordes" type="button">Fechar</button>
+  </div>
+
+  <div class="abas" role="tablist">
+    <button class="aba ativo" role="tab" data-aba="pontos" type="button">Pontuação</button>
+    <button class="aba" role="tab" data-aba="tempo" type="button">Tempo de jogo</button>
+  </div>
+
+  <div class="aba-conteudo" data-painel="pontos"><div id="rankingPontos"></div></div>
+  <div class="aba-conteudo" data-painel="tempo" hidden><div id="rankingTempo"></div></div>
+</aside>
+
+<!-- ===================== GAVETA DO JOGO ===================== -->
+<aside class="gaveta" id="gavetaJogo" hidden aria-labelledby="tituloJogo">
+  <div class="gaveta-cabeca">
+    <h2 id="tituloJogo">Jogo</h2>
+    <button class="botao botao--fechar" data-fechar="gavetaJogo" type="button">Fechar</button>
+  </div>
+
+  <div class="abas" role="tablist">
+    <button class="aba ativo" role="tab" data-aba="estados" type="button">Save states</button>
+    <button class="aba" role="tab" data-aba="cheats" type="button">Cheats</button>
+  </div>
+
+  <!-- Save states -->
+  <div class="aba-conteudo" data-painel="estados">
+    <h3 class="jogo-nome" id="jogoNomeEstados">—</h3>
+
+    <div class="opcao">
+      <span class="opcao-rotulo">Console deste jogo</span>
+      <select class="opcao-controle" id="listaConsoleJogo"
+              aria-label="Console deste jogo"></select>
+      <span class="opcao-ajuda" id="avisoConsole">
+        Troque se o jogo abrir no emulador errado.
+      </span>
+    </div>
+
+    <p class="explica">10 slots de save state. F2 salva e F4 carrega.</p>
+    <div class="espacos" id="listaEspacos"></div>
+    <p class="explica" id="temSave">—</p>
+  </div>
+
+  <!-- Cheats -->
+  <div class="aba-conteudo" data-painel="cheats" hidden>
+    <h3 class="jogo-nome" id="jogoNomeCheats">—</h3>
+    <p class="explica">Adicione códigos e ative-os durante o jogo.</p>
+    <ul class="cheats-lista" id="listaCheats"></ul>
+
+    <div class="cheat-form">
+      <label class="campo">
+        <span>O que o código faz</span>
+        <input id="cheatDescricao" type="text" maxlength="120"
+               placeholder="Vidas infinitas" autocomplete="off">
+      </label>
+      <label class="campo">
+        <span>Código</span>
+        <textarea id="cheatCodigo" spellcheck="false"
+                  placeholder="7E0DBE09&#10;7E0DBF09"></textarea>
+      </label>
+      <button class="botao botao--principal" id="btnAddCheat" type="button">
+        Adicionar código
+      </button>
+    </div>
+  </div>
+</aside>
+
+<!-- ===================== JANELA DE PARTIDA A DOIS ===================== -->
+<div class="modal" id="modalPartida" hidden>
+  <div class="modal-caixa" role="dialog" aria-modal="true" aria-labelledby="tituloPartida">
+    <h2 id="tituloPartida">Jogar junto</h2>
+    <p class="explica" id="partidaJogo"></p>
+
+    <div class="perfis">
+      <button class="perfil" data-papel="hospedar" type="button">
+        <span class="perfil-nome">Eu abro a partida</span>
+        <span class="perfil-resumo">Cria uma partida.</span>
+      </button>
+      <button class="perfil" data-papel="entrar" type="button">
+        <span class="perfil-nome">Entrar na partida do amigo</span>
+        <span class="perfil-resumo">Entra em uma partida aberta.</span>
+      </button>
+      <button class="perfil" data-papel="assistir" type="button">
+        <span class="perfil-nome">Só assistir</span>
+        <span class="perfil-resumo">Assiste sem controlar.</span>
+      </button>
+    </div>
+
+    <div class="opcao" id="campoInternet" hidden>
+      <span class="opcao-rotulo">Estamos em casas diferentes</span>
+      <button class="chave opcao-controle" id="chaveInternet"
+              aria-pressed="false" aria-label="Jogar pela internet"></button>
+      <span class="opcao-ajuda">Para amigos fora da rede local.</span>
+    </div>
+
+    <label class="campo" id="campoAmigoPartida" hidden>
+      <span>Amigo ou partida encontrada</span>
+      <select id="listaAmigosPartida">
+        <option value="">Procurando colegas na rede…</option>
+      </select>
+    </label>
+
+    <p class="explica">Os dois precisam do mesmo jogo e arquivo.</p>
+
+    <button class="botao" id="btnTestarPartida" type="button">
+      Testar antes de começar
+    </button>
+    <p class="explica" id="resultadoTeste"></p>
+
+    <div class="modal-acoes">
+      <button class="botao" data-fechar="modalPartida" type="button">Cancelar</button>
+      <button class="botao botao--principal" id="btnAbrirPartida" type="button">Começar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== JANELA DE PONTUACAO ===================== -->
+<div class="modal" id="modalPlacar" hidden>
+  <div class="modal-caixa" role="dialog" aria-modal="true" aria-labelledby="tituloPlacar">
+    <h2 id="tituloPlacar">Registrar pontuação</h2>
+    <p class="explica" id="placarJogo"></p>
+    <label class="campo">
+      <span>Quantos pontos você fez?</span>
+      <input id="campoPontos" type="number" min="0" step="1" inputmode="numeric">
+    </label>
+    <p class="explica">F8 tira uma foto como comprovante.</p>
+    <div class="modal-acoes">
+      <button class="botao" data-fechar="modalPlacar" type="button">Cancelar</button>
+      <button class="botao botao--principal" id="btnSalvarPontos" type="button">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== EDITOR DO ACERVO ===================== -->
+<div class="modal" id="modalAcervo" hidden>
+  <div class="modal-caixa modal-caixa--largo" role="dialog" aria-modal="true" aria-labelledby="tituloAcervoEditor">
+    <h2 id="tituloAcervoEditor">Adicionar jogo autorizado</h2>
+    <p class="explica">Adicione apenas jogos autorizados.</p>
+    <div class="acervo-formulario">
+      <label class="campo"><span>Identificador</span><input id="acervoId" maxlength="64" placeholder="meu-homebrew" autocomplete="off" spellcheck="false"></label>
+      <label class="campo"><span>Título</span><input id="acervoTitulo" maxlength="120" placeholder="Meu jogo homebrew"></label>
+      <label class="campo"><span>Plataforma</span><input id="acervoPlataforma" maxlength="80" placeholder="Nintendo NES"></label>
+      <label class="campo acervo-formulario--inteiro"><span>Descrição</span><textarea id="acervoDescricao" maxlength="400" rows="2" placeholder="Jogo criado e liberado pelo autor."></textarea></label>
+      <label class="campo"><span>Licença/autorização</span><input id="acervoLicenca" maxlength="160" placeholder="CC0, domínio público ou autorização do autor"></label>
+      <label class="campo"><span>Fonte pública</span><input id="acervoFonte" maxlength="240" placeholder="https://github.com/..." inputmode="url"></label>
+      <label class="campo acervo-formulario--inteiro"><span>URL HTTPS do arquivo</span><input id="acervoUrl" maxlength="500" placeholder="https://raw.githubusercontent.com/..." inputmode="url"></label>
+      <label class="campo"><span>Arquivo dentro de jogos\\livres</span><input id="acervoDestino" maxlength="240" placeholder="NES/Meu jogo.nes"></label>
+      <label class="campo"><span>SHA-256 do arquivo</span><input id="acervoSha256" maxlength="64" placeholder="64 caracteres hexadecimais" autocomplete="off" spellcheck="false"></label>
+    </div>
+    <label class="opcao acervo-autorizacao">
+      <input id="acervoAutorizado" type="checkbox">
+      <span>Confirmo que tenho autorização para redistribuir este arquivo nesta turma.</span>
+    </label>
+    <p class="explica" id="acervoEditorStatus"></p>
+    <div class="modal-acoes">
+      <button class="botao" data-fechar="modalAcervo" type="button">Cancelar</button>
+      <button class="botao botao--principal" id="btnSalvarAcervo" type="button">Salvar item</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== ESCOLHA DE CONSOLE ===================== -->
+<div class="modal" id="modalConsole" hidden>
+  <div class="modal-caixa" role="dialog" aria-modal="true" aria-labelledby="tituloConsoleJogo">
+    <h2 id="tituloConsoleJogo">Qual é o console deste jogo?</h2>
+    <p class="explica" id="explicaConsoleJogo"></p>
+    <label class="campo">
+      <span>Console</span>
+      <select id="listaConsoleJogo"></select>
+    </label>
+    <p class="explica">A escolha fica salva para este arquivo.</p>
+    <div class="modal-acoes">
+      <button class="botao" data-fechar="modalConsole" type="button">Cancelar</button>
+      <button class="botao botao--principal" id="btnSalvarConsole" type="button">Salvar escolha</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== PRIMEIRO ACESSO ===================== -->
+<div class="modal" id="modalApelido" hidden>
+  <div class="modal-caixa" role="dialog" aria-modal="true" aria-labelledby="tituloApelido">
+    <h2 id="tituloApelido">Como podemos chamar você?</h2>
+    <p class="explica">Escolha o apelido que aparecerá no Arena.</p>
+    <label class="campo">
+      <span>Seu apelido</span>
+      <input id="campoApelidoInicial" type="text" maxlength="24" placeholder="ex.: PixelMaster" autocomplete="off" spellcheck="false">
+    </label>
+    <div class="modal-acoes">
+      <button class="botao botao--principal" id="btnSalvarApelido" type="button">Começar</button>
+    </div>
+  </div>
+</div>
+
+<div class="recado" id="recado" hidden></div>
+
+<script src="galaxy-background.js"></script>
+<script src="field-background.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

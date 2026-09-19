@@ -1,0 +1,68 @@
+# Arquivos grandes/temporários
+*.zip
+*.iso
+*.7z
+backup/
+*.tmp
+*.log
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.env
+
+# Node (se houver)
+node_modules/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Dados temporários
+dados/*.json
+
+# Mantém as pastas de código, interface e documentação
+!launcher/
+!servidor/
+
+# Mantém documentação e arquivos de configuração
+!*.py
+!*.js
+!*.css
+!*.html
+!*.json
+!*.md
+!*.bat
+!LEIA-ME.md
+!1-COMECAR.md
+!2-JOGOS.md
+!3-IMAGEM-SOM-CONTROLE.md
+!4-SAVES.md
+!5-AMIGOS.md
+!6-RECURSOS-E-REPARO.md
+!ARENA.bat
+
+# Ignora conteúdo de jogos, emuladores e retroarch (não commitar)
+jogos/
+emuladores/
+retroarch/
+
+# Mantém estrutura de pastas vazias (sem arquivos de conteúdo)
+jogos/livres/
+jogos/turma/
+jogos/pessoais/
+emuladores/PCSX2/
+emuladores/Dolphin/
+retroarch/system/
+retroarch/cores/
+retroarch/states/
+retroarch/saves/
+retroarch/cheats/
+retroarch/remaps/
+retroarch/controles/
+
+# Dados do usuário (não commitar)
+dados/

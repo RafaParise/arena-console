@@ -1,0 +1,378 @@
+{
+  "_leia": [
+    "Ajustes finos de imagem para cada emulador, escolhidos pela nota da",
+    "maquina (1 a 5). O ARENA junta isso no arquivo de opcoes do RetroArch",
+    "antes de abrir o jogo.",
+    "",
+    "Voce pode editar este arquivo a vontade. Opcao que o RetroArch nao",
+    "reconhecer e simplesmente ignorada - nao quebra nada. Se errar alguma",
+    "coisa, apague o arquivo e o ARENA volta a rodar sem ajuste fino.",
+    "",
+    "'nota_minima' e a nota que a maquina precisa ter para receber aquele",
+    "bloco. Um bloco com nota_minima 4 nunca entra num PC fraco."
+  ],
+  "shaders": {
+    "_leia": "Filtro de tela aplicado por cima do jogo. Custa GPU, nao disco.",
+    "3": "shaders/shaders_slang/interpolation/shaders/pixellate.slangp",
+    "4": "shaders/shaders_slang/handheld/console-border/gbc-lcd-grid-v2.slangp",
+    "5": "shaders/shaders_slang/crt/crt-geom.slangp"
+  },
+  "nucleos": {
+    "swanstation": {
+      "_nome": "PlayStation",
+      "_leia": "PGXP entra ja na nota 2: e o ajuste que tira o tremido dos poligonos, marca registrada do PlayStation, e custa pouco.",
+      "sempre": {
+        "swanstation_CDROM_LoadImageToRAM": "true",
+        "swanstation_GPU_DisableInterlacing": "true",
+        "duckstation_GPU.DisableInterlacing": "true",
+        "swanstation_GPU.DisableInterlacing": "true",
+        "swanstation_Display_CropMode": "overscan"
+      },
+      "por_nota": [
+        {
+          "nota_minima": 1,
+          "opcoes": {
+            "swanstation_GPU_Renderer": "Hardware",
+            "duckstation_GPU.Renderer": "Hardware",
+            "swanstation_GPU.Renderer": "Hardware",
+            "swanstation_GPU_ResolutionScale": "1",
+            "duckstation_GPU.ResolutionScale": "1",
+            "swanstation_GPU.ResolutionScale": "1",
+            "swanstation_GPU_TextureFilter": "Nearest",
+            "duckstation_GPU.TextureFilter": "Nearest",
+            "swanstation_GPU.TextureFilter": "Nearest"
+          }
+        },
+        {
+          "nota_minima": 2,
+          "opcoes": {
+            "swanstation_GPU_PGXPEnable": "true",
+            "duckstation_GPU.PGXPEnable": "true",
+            "swanstation_GPU.PGXPEnable": "true",
+            "swanstation_GPU_PGXPTextureCorrection": "true",
+            "duckstation_GPU.PGXPTextureCorrection": "true",
+            "swanstation_GPU.PGXPTextureCorrection": "true",
+            "swanstation_GPU_PGXPCulling": "true",
+            "duckstation_GPU.PGXPCulling": "true",
+            "swanstation_GPU.PGXPCulling": "true",
+            "swanstation_GPU_ResolutionScale": "2",
+            "duckstation_GPU.ResolutionScale": "2",
+            "swanstation_GPU.ResolutionScale": "2",
+            "swanstation_GPU_TrueColor": "true",
+            "duckstation_GPU.TrueColor": "true",
+            "swanstation_GPU.TrueColor": "true"
+          }
+        },
+        {
+          "nota_minima": 3,
+          "opcoes": {
+            "swanstation_GPU_ResolutionScale": "4",
+            "duckstation_GPU.ResolutionScale": "4",
+            "swanstation_GPU.ResolutionScale": "4",
+            "swanstation_GPU_ScaledDithering": "true",
+            "duckstation_GPU.ScaledDithering": "true",
+            "swanstation_GPU.ScaledDithering": "true",
+            "swanstation_GPU_PGXPVertexCache": "true",
+            "duckstation_GPU.PGXPVertexCache": "true",
+            "swanstation_GPU.PGXPVertexCache": "true",
+            "swanstation_Display_AspectRatio": "Auto (Game Native)"
+          }
+        },
+        {
+          "nota_minima": 4,
+          "opcoes": {
+            "swanstation_GPU_ResolutionScale": "6",
+            "duckstation_GPU.ResolutionScale": "6",
+            "swanstation_GPU.ResolutionScale": "6",
+            "swanstation_GPU_TextureFilter": "xBR",
+            "duckstation_GPU.TextureFilter": "xBR",
+            "swanstation_GPU.TextureFilter": "xBR",
+            "swanstation_GPU_PGXPDepthBuffer": "true",
+            "duckstation_GPU.PGXPDepthBuffer": "true",
+            "swanstation_GPU.PGXPDepthBuffer": "true",
+            "swanstation_GPU_MSAA": "4",
+            "duckstation_GPU.MSAA": "4",
+            "swanstation_GPU.MSAA": "4"
+          }
+        }
+      ]
+    },
+    "mupen64plus_next": {
+      "_nome": "Nintendo 64",
+      "sempre": {
+        "mupen64plus-EnableLODEmulation": "True",
+        "mupen64plus-EnableFBEmulation": "True"
+      },
+      "por_nota": [
+        {
+          "nota_minima": 1,
+          "opcoes": {
+            "mupen64plus-rdp-plugin": "gliden64",
+            "mupen64plus-EnableNativeResFactor": "1",
+            "mupen64plus-txFilterMode": "None",
+            "mupen64plus-MultiSampling": "0"
+          }
+        },
+        {
+          "nota_minima": 3,
+          "opcoes": {
+            "mupen64plus-EnableNativeResFactor": "2",
+            "mupen64plus-txFilterMode": "Smooth filtering 1",
+            "mupen64plus-MultiSampling": "2"
+          }
+        },
+        {
+          "nota_minima": 4,
+          "opcoes": {
+            "mupen64plus-EnableNativeResFactor": "3",
+            "mupen64plus-MultiSampling": "2",
+            "mupen64plus-EnableHWLighting": "True"
+          }
+        }
+      ]
+    },
+    "ppsspp": {
+      "_nome": "PlayStation Portable",
+      "_leia": "Sem aumento de textura por xBRZ: era ele que enchia a tela de pontinhos pretos. O ganho de imagem vem da resolucao interna, que nao cria defeito nenhum.",
+      "sempre": {
+        "ppsspp_frameskip": "0",
+        "ppsspp_auto_frameskip": "disabled",
+        "ppsspp_io_timing_method": "Host",
+        "ppsspp_texture_scaling_level": "off",
+        "ppsspp_texture_deposterize": "disabled",
+        "ppsspp_lower_resolution_for_effects": "off",
+        "ppsspp_disable_slow_framebuffer_effects": "disabled"
+      },
+      "por_nota": [
+        {
+          "nota_minima": 1,
+          "opcoes": {
+            "ppsspp_internal_resolution": "480x272",
+            "ppsspp_texture_filtering": "Nearest",
+            "ppsspp_rendering_mode": "Buffered"
+          }
+        },
+        {
+          "nota_minima": 3,
+          "opcoes": {
+            "ppsspp_internal_resolution": "960x544",
+            "ppsspp_texture_filtering": "Auto",
+            "ppsspp_texture_anisotropic_filtering": "4x"
+          }
+        },
+        {
+          "nota_minima": 4,
+          "opcoes": {
+            "ppsspp_internal_resolution": "1920x1088",
+            "ppsspp_texture_anisotropic_filtering": "16x"
+          }
+        }
+      ]
+    },
+    "flycast": {
+      "_nome": "Dreamcast",
+      "sempre": {
+        "reicast_mipmapping": "enabled",
+        "reicast_enable_rttb": "disabled",
+        "reicast_threaded_rendering": "enabled"
+      },
+      "por_nota": [
+        {
+          "nota_minima": 1,
+          "opcoes": {
+            "reicast_internal_resolution": "640x480",
+            "reicast_anisotropic_filtering": "off",
+            "reicast_texupscale": "off"
+          }
+        },
+        {
+          "nota_minima": 4,
+          "opcoes": {
+            "reicast_internal_resolution": "1280x960",
+            "reicast_anisotropic_filtering": "4"
+          }
+        },
+        {
+          "nota_minima": 5,
+          "opcoes": {
+            "reicast_internal_resolution": "1920x1440",
+            "reicast_anisotropic_filtering": "8",
+            "reicast_texupscale": "2"
+          }
+        }
+      ]
+    },
+    "pcsx2": {
+      "_nome": "PlayStation 2",
+      "sempre": {
+        "pcsx2_fastboot": "enabled",
+        "pcsx2_frameskip": "disabled"
+      },
+      "por_nota": [
+        {
+          "nota_minima": 4,
+          "opcoes": {
+            "pcsx2_upscale_multiplier": "1",
+            "pcsx2_texture_filtering": "Bilinear (PS2)",
+            "pcsx2_anisotropic_filtering": "0"
+          }
+        },
+        {
+          "nota_minima": 5,
+          "opcoes": {
+            "pcsx2_upscale_multiplier": "2",
+            "pcsx2_anisotropic_filtering": "4",
+            "pcsx2_texture_filtering": "Bilinear (Forced excluding sprite)"
+          }
+        }
+      ]
+    },
+    "dolphin": {
+      "_nome": "GameCube e Wii",
+      "sempre": {
+        "dolphin_shader_compilation_mode": "async_uber",
+        "dolphin_cheats_enabled": "disabled",
+        "dolphin_wait_for_shaders": "disabled"
+      },
+      "por_nota": [
+        {
+          "nota_minima": 4,
+          "opcoes": {
+            "dolphin_efb_scale": "x1 (640 x 528)",
+            "dolphin_max_anisotropy": "1x",
+            "dolphin_efb_to_texture": "enabled"
+          }
+        },
+        {
+          "nota_minima": 5,
+          "opcoes": {
+            "dolphin_efb_scale": "x2 (1280 x 1056)",
+            "dolphin_max_anisotropy": "4x"
+          }
+        }
+      ]
+    },
+    "mednafen_saturn": {
+      "_nome": "Sega Saturn",
+      "sempre": {
+        "beetle_saturn_cdimagecache": "enabled"
+      },
+      "por_nota": [
+        {
+          "nota_minima": 4,
+          "opcoes": {
+            "beetle_saturn_horizontal_overscan": "0",
+            "beetle_saturn_autortc": "enabled"
+          }
+        }
+      ]
+    },
+    "genesis_plus_gx": {
+      "_nome": "Mega Drive, Master System e Game Gear",
+      "sempre": {
+        "genesis_plus_gx_lcd_filter": "disabled",
+        "genesis_plus_gx_overscan": "disabled"
+      },
+      "por_nota": [
+        {
+          "nota_minima": 3,
+          "opcoes": {
+            "genesis_plus_gx_blargg_ntsc_md": "composite",
+            "genesis_plus_gx_render": "interlaced"
+          }
+        }
+      ]
+    },
+    "snes9x": {
+      "_nome": "Super Nintendo",
+      "sempre": {
+        "snes9x_overscan": "disabled"
+      },
+      "por_nota": [
+        {
+          "nota_minima": 3,
+          "opcoes": {
+            "snes9x_blargg": "rgb",
+            "snes9x_gfx_clip": "enabled",
+            "snes9x_gfx_transp": "enabled"
+          }
+        }
+      ]
+    },
+    "fceumm": {
+      "_nome": "Nintendo (NES)",
+      "sempre": {
+        "fceumm_overscan_h": "disabled"
+      },
+      "por_nota": [
+        {
+          "nota_minima": 3,
+          "opcoes": {
+            "fceumm_ntsc_filter": "composite",
+            "fceumm_palette": "default"
+          }
+        }
+      ]
+    },
+    "mgba": {
+      "_nome": "Game Boy Advance",
+      "sempre": {
+        "mgba_frameskip": "disabled"
+      },
+      "por_nota": [
+        {
+          "nota_minima": 3,
+          "opcoes": {
+            "mgba_color_correction": "GBA",
+            "mgba_interframe_blending": "mix"
+          }
+        }
+      ]
+    },
+    "gambatte": {
+      "_nome": "Game Boy e Game Boy Color",
+      "sempre": {},
+      "por_nota": [
+        {
+          "nota_minima": 3,
+          "opcoes": {
+            "gambatte_gbc_color_correction": "GBC only",
+            "gambatte_mix_frames": "lcd_ghosting_fast"
+          }
+        }
+      ]
+    },
+    "melonds": {
+      "_nome": "Nintendo DS",
+      "sempre": {
+        "melonds_threaded_renderer": "enabled"
+      },
+      "por_nota": [
+        {
+          "nota_minima": 3,
+          "opcoes": {
+            "melonds_opengl_renderer": "enabled",
+            "melonds_opengl_resolution": "2x native (512x384)",
+            "melonds_opengl_better_polygons": "enabled"
+          }
+        },
+        {
+          "nota_minima": 4,
+          "opcoes": {
+            "melonds_opengl_resolution": "4x native (1024x768)"
+          }
+        }
+      ]
+    }
+  },
+  "_usa_nota_gpu": [
+    "ppsspp",
+    "mupen64plus_next",
+    "melonds",
+    "dolphin",
+    "flycast",
+    "swanstation",
+    "pcsx2",
+    "mednafen_saturn"
+  ]
+}

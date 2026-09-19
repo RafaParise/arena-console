@@ -1,0 +1,1488 @@
+/* ==========================================================================
+   ARENA - folha de estilo unica
+   Todo o design fica nas variaveis do bloco :root. Mudou ali, mudou no app.
+   Sem fonte da internet: a escola trabalha offline, entao so fontes que ja
+   vem no Windows.
+   ========================================================================== */
+
+:root {
+  /* ---- Tema claro pele mil pastel: acolhedor, legivel e portatil ---- */
+  --fundo:          linear-gradient(135deg, #f5e6e8 0%, #e8f5f2 50%, #fef9e7 100%);
+  --painel:         #ffffff;
+  --painel-alto:    #f8f4f0;
+  --borda:          #e6d8c0;
+  --borda-forte:    #d4bfb8;
+
+  /* ---- Texto: preto suave ---- */
+  --texto:          #3a2e24;
+  --texto-fraco:    #7a624e;
+  --texto-apagado:  #9a8a73;
+
+  /* ---- Cores SNES vintage: vermelho, verde, amarelo, azul ---- */
+  --azul:           #ff718f;   /* vermelho SNES Mega Man */
+  --azul-claro:     #ff9d68;   /* laranja SNES Kirby */
+  --azul-escuro:    #ffa502;   /* amarelo SNES Donkey Kong */
+  --pronto:         #2ed573;   /* verde SNES Super Mario */
+  --espera:         #3742fa;   /* azul SNES Metroid */
+  --bloqueado:      #9c8871;
+  --erro:           #ff4757;   /* vermelho SNES Street Fighter */
+
+  /* ---- Tipografia (so fontes que ja vem no Windows) ---- */
+  --fonte-titulo:   "Courier New", "Cascadia Mono", monospace;
+  --fonte-texto:    "Segoe UI", system-ui, sans-serif;
+  --fonte-numero:   "Consolas", "Cascadia Mono", monospace;
+
+  --t-micro:        0.72rem;
+  --t-peq:          0.82rem;
+  --t-base:         0.94rem;
+  --t-med:          1.15rem;
+  --t-grande:       1.6rem;
+
+  --gap:            0.75rem;
+  --gap-g:          1.5rem;
+  --raio:           12px;
+  --trilho-larg:    248px;
+  --gaveta-larg:    440px;
+  --transicao:      140ms ease;
+  --sombra:         0 12px 30px rgba(0, 0, 0, 0.24);
+}
+
+body[data-tema="escuro"] {
+  --fundo: #0b0d17;
+  --painel: #161a2d;
+  --painel-alto: #1e2440;
+  --borda: #2a3252;
+  --borda-forte: #404a70;
+  --texto: #ffffff;
+  --texto-fraco: #b8c4e0;
+  --texto-apagado: #8a9bb8;
+  --azul: #66d9ff;
+  --azul-claro: #8be1ff;
+  --azul-escuro: #3a5080;
+  background: #0b0d17;
+}
+
+/* ---- Céu galáctico pixel art (canvas) - só aparece no tema escuro ---- */
+#galaxyCanvas {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  display: none;
+  pointer-events: none;
+}
+
+body[data-tema="escuro"] #galaxyCanvas {
+  display: block;
+}
+
+/* ---- Campo verde pixel art (canvas) - só aparece no tema claro ---- */
+#fieldCanvas {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  display: block;
+  pointer-events: none;
+}
+
+body[data-tema="escuro"] #fieldCanvas {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --transicao: 0ms; }
+  * { animation: none !important; }
+}
+
+* { box-sizing: border-box; }
+
+/* Barras de rolagem seguem o tema do ARENA, em vez do branco padrão do
+   navegador. As regras valem para a biblioteca, gavetas e abas. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--borda-forte) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+*::-webkit-scrollbar-track {
+  background: color-mix(in srgb, var(--fundo) 70%, transparent);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--borda-forte);
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--azul);
+  background-clip: padding-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background:
+    radial-gradient(circle at 82% 8%, rgba(255, 176, 201, .30), transparent 26rem),
+    radial-gradient(circle at 20% 100%, rgba(141, 207, 255, .28), transparent 30rem),
+    var(--fundo);
+  color: var(--texto);
+  font-family: var(--fonte-texto);
+  font-size: var(--t-base);
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+:focus-visible {
+  outline: 2px solid var(--pronto);
+  outline-offset: 2px;
+}
+
+code {
+  font-family: var(--fonte-numero);
+  font-size: var(--t-peq);
+  color: var(--texto-fraco);
+  word-break: break-all;
+}
+
+/* ========================= BARRA DE ESTADO ========================= */
+
+.painel-topo {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-g);
+  padding: 0 var(--gap-g);
+  min-height: 70px;
+  height: auto;
+  min-width: 0;
+  background: color-mix(in srgb, var(--painel) 94%, transparent);
+  border-bottom: 1px solid var(--borda);
+  flex-shrink: 0;
+}
+
+.marca { display: flex; align-items: baseline; gap: 0.5rem; }
+
+.marca-nome {
+  font-family: var(--fonte-titulo);
+  font-size: var(--t-grande);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: #ffe08a;
+  text-shadow: 3px 3px 0 #7c4d9e, 0 0 18px rgba(255, 209, 102, .25);
+}
+
+.marca-sub {
+  font-size: var(--t-micro);
+  color: var(--texto-apagado);
+}
+
+.leitura {
+  display: flex;
+  gap: var(--gap-g);
+  margin: 0;
+  padding-left: var(--gap-g);
+  border-left: 1px solid var(--borda);
+}
+
+.leitura dt {
+  font-size: var(--t-micro);
+  color: var(--texto-apagado);
+}
+
+.leitura dd {
+  margin: 0;
+  font-family: var(--fonte-numero);
+  font-size: var(--t-peq);
+  color: var(--texto-fraco);
+}
+
+.topo-acoes {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--gap);
+}
+
+.campo-apelido {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.campo-apelido span {
+  font-size: var(--t-micro);
+  color: var(--texto-apagado);
+}
+
+input[type="text"],
+input[type="search"],
+input[type="number"],
+select {
+  background: var(--fundo);
+  border: 1px solid var(--borda-forte);
+  border-radius: var(--raio);
+  color: var(--texto);
+  font-family: var(--fonte-texto);
+  font-size: var(--t-peq);
+  padding: 0.35rem 0.55rem;
+}
+
+input::placeholder { color: var(--texto-apagado); }
+
+/* ========================= BOTOES ========================= */
+
+.botao {
+  background: var(--painel-alto);
+  border: 1px solid var(--borda-forte);
+  border-radius: 10px;
+  color: var(--texto);
+  cursor: pointer;
+  font-family: var(--fonte-texto);
+  font-size: var(--t-peq);
+  padding: 0.45rem 0.9rem;
+  transition: transform var(--transicao), background var(--transicao), border-color var(--transicao);
+}
+
+.botao:hover { background: var(--azul-claro); border-color: var(--azul); transform: translateY(-1px); }
+.botao--principal { background: linear-gradient(135deg, #ff718f, #ff9d68); border-color: #ffb18a; color: #281d35; font-weight: 700; }
+.botao:active { background: var(--painel); }
+
+.botao--principal {
+  background: var(--azul);
+  border-color: var(--azul);
+  color: #ffffff;
+  font-weight: 600;
+}
+.botao--principal:hover { background: var(--azul-claro); border-color: var(--azul-claro); }
+.botao-tema { border-color: var(--espera); }
+
+.botao--largo { width: 100%; margin-top: auto; }
+#btnMais { margin: var(--gap) 0 0; flex-shrink: 0; }
+.botao--fechar { padding: 0.3rem 0.7rem; }
+
+/* ========================= AVISO ========================= */
+
+.aviso {
+  background: #35291a;
+  border-bottom: 1px solid var(--espera);
+  padding: 0.6rem var(--gap-g);
+  flex-shrink: 0;
+}
+.aviso p { margin: 0; font-size: var(--t-peq); color: #e8cfa4; }
+
+/* ========================= LAYOUT PRINCIPAL ========================= */
+
+.corpo {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+/* ---- trilho de plataformas ---- */
+
+.trilho {
+  width: var(--trilho-larg);
+  flex-shrink: 0;
+  background: color-mix(in srgb, var(--painel) 82%, transparent);
+  border-right: 1px solid var(--borda);
+  padding: var(--gap);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-width: 0;
+}
+
+.trilho-lista {
+  list-style: none;
+  margin: 0 0 var(--gap) 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.trilho-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  background: none;
+  border: 0;
+  border-left: 3px solid transparent;
+  border-radius: 0 var(--raio) var(--raio) 0;
+  color: var(--texto-fraco);
+  cursor: pointer;
+  font-family: var(--fonte-texto);
+  font-size: var(--t-peq);
+  padding: 0.45rem 0.6rem;
+  text-align: left;
+  transition: background var(--transicao), color var(--transicao);
+}
+
+.trilho-item:hover { background: var(--painel-alto); color: var(--texto); }
+
+.trilho-item.ativo {
+  background: var(--painel-alto);
+  border-left-color: var(--pronto);
+  color: var(--texto);
+}
+
+.trilho-item--todos {
+  font-family: var(--fonte-titulo);
+  font-size: var(--t-base);
+  margin-bottom: var(--gap);
+}
+
+.trilho-nome { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.trilho-conta {
+  font-family: var(--fonte-numero);
+  font-size: var(--t-micro);
+  color: var(--texto-apagado);
+}
+
+/* Ponto de estado da plataforma. A cor E a informacao. */
+.sinal {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--bloqueado);
+}
+.sinal--pronta        { background: var(--pronto); }
+.sinal--falta_sistema { background: var(--espera); }
+.sinal--pesada        { background: var(--bloqueado); }
+.sinal--sem_core      { background: var(--bloqueado); opacity: 0.5; }
+
+/* ---- lista de jogos ---- */
+
+.conteudo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem 1.5rem 1.5rem;
+  gap: var(--gap);
+  overflow: hidden;
+}
+
+.filtro { display: flex; align-items: center; gap: var(--gap); flex-wrap: wrap; }
+.filtro input { flex: 1; max-width: 380px; padding: 0.5rem 0.7rem; }
+.filtro input:focus {
+  border-color: var(--azul);
+  box-shadow: 0 0 0 3px rgba(61, 139, 253, 0.14);
+}
+.filtros-rapidos { display: flex; gap: .35rem; }
+.filtro-rapido {
+  border: 1px solid var(--borda);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--texto-fraco);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--t-micro);
+  padding: .35rem .7rem;
+}
+.filtro-rapido:hover, .filtro-rapido.ativo {
+  background: var(--azul-escuro);
+  border-color: var(--azul);
+  color: var(--texto);
+}
+.filtro-conta { font-family: var(--fonte-numero); font-size: var(--t-micro); color: var(--texto-apagado); }
+
+.rolagem {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--borda);
+  /* Avisa o navegador que esta area rola: ele otimiza a pintura. */
+  contain: layout paint;
+  overflow-x: hidden;
+}
+
+.jogos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+  align-content: start;
+}
+
+.jogos[hidden] { display: none; }
+
+.jogo {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--borda);
+  border-radius: 14px;
+  background: linear-gradient(180deg, #343760 0%, var(--painel) 62%);
+  overflow: hidden;
+  transition: transform var(--transicao), border-color var(--transicao),
+              box-shadow var(--transicao), opacity var(--transicao);
+  position: relative;
+  opacity: 1;
+  transform: translateY(0);
+}
+.jogo-favorito {
+  position: absolute;
+  top: .65rem;
+  right: .65rem;
+  z-index: 2;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 50%;
+  background: rgba(16, 19, 24, .72);
+  color: #ffd166;
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+.jogo-favorito:hover { background: rgba(16, 19, 24, .95); transform: scale(1.08); }
+
+.jogo:hover {
+  border-color: var(--borda-forte);
+  box-shadow: var(--sombra);
+  transform: translateY(-4px) rotate(-.35deg);
+}
+.jogo--selecionado { border-color: var(--azul); box-shadow: 0 0 0 2px rgba(61,139,253,.22), var(--sombra); }
+
+.jogo--indisponivel {
+  opacity: 0.5;
+}
+.jogo--indisponivel:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.jogo--desaparecendo {
+  opacity: 0;
+  transform: scale(0.95);
+  pointer-events: none;
+}
+
+/* Faixa de estado no topo do card */
+.jogo-faixa {
+  height: 3px;
+  flex-shrink: 0;
+  background: var(--bloqueado);
+  transition: background var(--transicao);
+}
+.jogo--pronta        .jogo-faixa { background: var(--pronto); }
+.jogo--falta_sistema .jogo-faixa { background: var(--espera); }
+.jogo--sem_pasta    .jogo-faixa { background: var(--azul-claro); }
+
+/* Capa / box art */
+.jogo-cover {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  position: relative;
+  object-fit: cover;
+  display: block;
+  background: var(--painel-alto);
+  border-bottom: 1px solid var(--borda);
+}
+.capa-imagem {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+.jogo-cover--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  color: var(--texto-apagado);
+  font-family: var(--fonte-titulo);
+  font-size: 2.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.12) 25%, transparent 25%) 0 0 / 18px 18px,
+    linear-gradient(315deg, rgba(255,255,255,.06) 25%, transparent 25%) 0 0 / 18px 18px,
+    linear-gradient(135deg, #7546a3, #28264b 70%);
+  color: rgba(255,255,255,.88);
+  user-select: none;
+}
+.capa-super-nintendo { background: linear-gradient(135deg, #74458e, #29233b 70%); }
+.capa-playstation-1, .capa-playstation-2 { background: linear-gradient(135deg, #3759a0, #1c263d 70%); }
+.capa-gamecube-e-wii { background: linear-gradient(135deg, #b34d68, #39243d 70%); }
+.capa-atari-2600, .capa-mega-drive-master-system-game-gear { background: linear-gradient(135deg, #9a542c, #33251f 70%); }
+
+/* Corpo do card */
+.jogo-corpo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0.6rem 0.7rem;
+  flex: 1;
+}
+
+.jogo-abrir {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: none;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  font-family: var(--fonte-texto);
+  padding: 0;
+  text-align: left;
+  width: 100%;
+  transition: background var(--transicao);
+}
+.jogo-abrir:hover { background: none; }
+.jogo--indisponivel .jogo-abrir { cursor: not-allowed; color: var(--texto-apagado); }
+.jogo--indisponivel .jogo-abrir:hover { background: none; }
+
+.jogo-titulo {
+  font-size: var(--t-base);
+  font-weight: 600;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.jogo-meta {
+  font-size: var(--t-micro);
+  color: var(--texto-apagado);
+}
+
+.jogo-motivo { font-size: var(--t-micro); color: var(--espera); }
+
+.jogo-origem {
+  font-size: var(--t-micro);
+  color: var(--texto-apagado);
+}
+
+/* Selo de desempenho */
+.desempenho {
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.desempenho--verde    { background: #17402f; color: #6ee7a8; }
+.desempenho--azul     { background: var(--azul-escuro); color: var(--azul-claro); }
+.desempenho--vermelho { background: #40201e; color: #f0908b; }
+
+/* Botões do card */
+.jogo-acoes {
+  display: flex;
+  gap: var(--gap);
+  padding: 0.15rem 0.7rem 0.7rem;
+  flex-wrap: wrap;
+}
+.jogo-acoes .botao {
+  font-size: var(--t-micro);
+  padding: 0.3rem 0.6rem;
+  flex-shrink: 1;
+  flex: 1 1 auto;
+}
+
+/* ========================= PAINEL DE DETALHES ========================= */
+.detalhes-jogo {
+  width: 265px;
+  flex: 0 0 265px;
+  margin: var(--gap-g) var(--gap-g) var(--gap-g) 0;
+  border: 1px solid var(--borda);
+  border-radius: 16px;
+  background: linear-gradient(180deg, var(--painel-alto), var(--painel));
+  overflow-y: auto;
+  overflow-x: hidden;
+  align-self: stretch;
+}
+.detalhes-capa {
+  position: relative;
+  aspect-ratio: 1 / 1.12;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    linear-gradient(90deg, transparent 48%, rgba(255,255,255,.1) 49% 51%, transparent 52%) 0 0 / 22px 22px,
+    linear-gradient(135deg, #ff6f9c, #7145a3 58%, #315f9e);
+  color: white;
+  font: 700 3.6rem var(--fonte-titulo);
+  letter-spacing: .08em;
+}
+.detalhes-capa .capa-imagem { z-index: 1; }
+.detalhes-corpo { padding: 1rem; }
+.detalhes-kicker { color: var(--azul-claro); font-size: var(--t-micro); text-transform: uppercase; letter-spacing: .08em; }
+.detalhes-corpo h2 { margin: .3rem 0 .5rem; font: 600 var(--t-med) var(--fonte-titulo); }
+.detalhes-descricao { color: var(--texto-fraco); font-size: var(--t-peq); }
+.detalhes-meta { display: grid; gap: .6rem; margin: 1rem 0; }
+.detalhes-meta div { border-top: 1px solid var(--borda); padding-top: .45rem; }
+.detalhes-meta dt { color: var(--texto-apagado); font-size: var(--t-micro); }
+.detalhes-meta dd { margin: .1rem 0 0; font-size: var(--t-peq); }
+.detalhes-acoes { display: grid; gap: .45rem; }
+.detalhes-acoes .botao { width: 100%; }
+
+/* Estado vazio */
+.vazio {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 0.5rem;
+  color: var(--texto-fraco);
+}
+.vazio h2 {
+  font-family: var(--fonte-titulo);
+  font-size: var(--t-med);
+  font-weight: 600;
+  margin: 0;
+  color: var(--texto);
+}
+.vazio p { margin: 0; max-width: 46ch; font-size: var(--t-peq); }
+
+/* ========================= GAVETAS ========================= */
+
+.gaveta {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: var(--gaveta-larg);
+  max-width: 100vw;
+  background: var(--painel);
+  border-left: 1px solid var(--borda-forte);
+  box-shadow: -18px 0 40px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  min-width: 0;
+  z-index: 20;
+}
+
+.gaveta[hidden] { display: none; }
+
+.gaveta-cabeca {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--gap) var(--gap-g);
+  border-bottom: 1px solid var(--borda);
+  position: sticky;
+  top: 0;
+  background: var(--painel);
+  min-width: 0;
+}
+
+.gaveta-cabeca h2 {
+  font-family: var(--fonte-titulo);
+  font-size: var(--t-med);
+  font-weight: 600;
+  margin: 0;
+}
+
+.abas {
+  display: flex;
+  gap: 0;
+  padding: 0 var(--gap-g);
+  border-bottom: 1px solid var(--borda);
+  flex: 0 0 auto;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-gutter: stable;
+  scrollbar-color: var(--azul) transparent;
+}
+
+.aba {
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  color: var(--texto-fraco);
+  cursor: pointer;
+  font-family: var(--fonte-texto);
+  font-size: var(--t-peq);
+  padding: 0.6rem 0.9rem;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+.aba.ativo { color: var(--texto); border-bottom-color: var(--pronto); }
+
+.abas::-webkit-scrollbar { height: 7px; }
+.abas::-webkit-scrollbar-thumb {
+  background: var(--azul);
+  border: 1px solid transparent;
+  background-clip: padding-box;
+}
+
+.aba-conteudo { padding: var(--gap-g); display: flex; flex-direction: column; gap: var(--gap-g); min-width: 0; max-width: 100%; overflow-x: hidden; box-sizing: border-box; }
+.aba-conteudo[hidden] { display: none; }
+
+.explica { margin: 0; font-size: var(--t-peq); color: var(--texto-fraco); }
+
+/* ---- niveis de qualidade ---- */
+
+.perfis { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.perfil {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--painel-alto);
+  border: 1px solid var(--borda-forte);
+  border-radius: var(--raio);
+  color: var(--texto);
+  cursor: pointer;
+  font-family: var(--fonte-texto);
+  padding: 0.7rem 0.9rem;
+  text-align: left;
+  transition: border-color var(--transicao), background var(--transicao);
+}
+.perfil:hover { border-color: #545b65; }
+.perfil.ativo { border-color: var(--azul); background: var(--azul-escuro); }
+
+.perfil-nome { font-family: var(--fonte-titulo); font-size: var(--t-base); }
+.perfil-resumo { font-size: var(--t-micro); color: var(--texto-fraco); }
+
+/* ---- onde ficam as coisas ---- */
+
+.onde h3 {
+  font-family: var(--fonte-titulo);
+  font-size: var(--t-base);
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+}
+.onde-lista { list-style: none; margin: 0 0 0.6rem; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; }
+.onde-lista li { display: flex; flex-direction: column; gap: 1px; }
+.onde-lista span { font-size: var(--t-micro); color: var(--texto-apagado); }
+
+/* ---- opcoes avancadas ---- */
+
+.avancado { display: flex; flex-direction: column; gap: 0.9rem; }
+
+.grupo-titulo {
+  font-family: var(--fonte-titulo);
+  font-size: var(--t-peq);
+  font-weight: 600;
+  color: var(--texto-fraco);
+  margin: 0.6rem 0 -0.2rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--borda);
+}
+.grupo-titulo:first-child { margin-top: 0; }
+
+.opcao {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 0.2rem var(--gap);
+  padding-bottom: 0.9rem;
+  border-bottom: 1px solid var(--borda);
+}
+.opcao:last-child { border-bottom: 0; padding-bottom: 0; }
+.opcao-rotulo { font-size: var(--t-peq); }
+.opcao-ajuda { grid-column: 1; font-size: var(--t-micro); color: var(--texto-apagado); }
+.opcao-controle { grid-row: 1 / span 2; }
+
+/* interruptor */
+.chave {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  background: var(--borda-forte);
+  border: 0;
+  border-radius: 11px;
+  cursor: pointer;
+  transition: background var(--transicao);
+}
+.chave::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--texto-fraco);
+  transition: transform var(--transicao), background var(--transicao);
+}
+.chave[aria-pressed="true"] { background: var(--azul); }
+.chave[aria-pressed="true"]::after { transform: translateX(18px); background: #ffffff; }
+
+/* ========================= RECORDES ========================= */
+
+.ranking-jogo { margin-bottom: var(--gap-g); }
+.ranking-jogo:last-child { margin-bottom: 0; }
+
+.ranking-titulo {
+  font-family: var(--fonte-titulo);
+  font-size: var(--t-base);
+  margin: 0 0 0.4rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--borda);
+}
+
+.ranking-linha {
+  display: grid;
+  grid-template-columns: 2ch 1fr auto;
+  gap: var(--gap);
+  padding: 0.3rem 0;
+  font-size: var(--t-peq);
+}
+.ranking-pos { font-family: var(--fonte-numero); color: var(--texto-apagado); }
+.ranking-pos--1 { color: var(--pronto); }
+.ranking-valor { font-family: var(--fonte-numero); color: var(--texto-fraco); }
+
+/* ========================= CONQUISTAS ========================= */
+.conquistas-lista { display: flex; flex-direction: column; gap: 1.25rem; }
+.conquistas-jogador h3 {
+  margin: 0 0 .5rem;
+  font-family: var(--fonte-titulo);
+  font-size: var(--t-base);
+  border-bottom: 1px solid var(--borda);
+  padding-bottom: .35rem;
+}
+.conquista {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .65rem .75rem;
+  border-bottom: 1px solid var(--borda);
+  opacity: .42;
+}
+.conquista--liberada { opacity: 1; background: rgba(61,139,253,.08); }
+.conquista-icone { width: 1.5rem; color: var(--texto-apagado); font-size: 1.35rem; text-align: center; }
+.conquista--liberada .conquista-icone { color: #ffd166; }
+.conquista-texto { display: flex; flex-direction: column; gap: 1px; }
+.conquista-texto small { color: var(--texto-fraco); font-size: var(--t-micro); }
+
+/* ========================= MODAL ========================= */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 11, 13, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+}
+.modal[hidden] { display: none; }
+
+.modal-caixa {
+  background: var(--painel);
+  border: 1px solid var(--borda-forte);
+  border-radius: var(--raio);
+  padding: var(--gap-g);
+  width: 400px;
+  max-width: 92vw;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+.modal-caixa--largo { width: min(720px, calc(100vw - 2rem)); }
+.modal-caixa h2 { font-family: var(--fonte-titulo); font-size: var(--t-med); margin: 0; }
+
+.campo { display: flex; flex-direction: column; gap: 3px; }
+.campo span { font-size: var(--t-peq); color: var(--texto-fraco); }
+.campo input { padding: 0.5rem 0.7rem; }
+
+.modal-acoes { display: flex; justify-content: flex-end; gap: 0.5rem; }
+
+/* ========================= RECADO RAPIDO ========================= */
+
+.recado {
+  position: fixed;
+  bottom: var(--gap-g);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--painel-alto);
+  border: 1px solid var(--borda-forte);
+  border-left: 3px solid var(--pronto);
+  border-radius: var(--raio);
+  padding: 0.6rem 1.1rem;
+  font-size: var(--t-peq);
+  z-index: 40;
+  max-width: 80vw;
+}
+.recado[hidden] { display: none; }
+.recado--erro { border-left-color: var(--erro); }
+
+/* ========================= TELAS ESTREITAS ========================= */
+
+@media (max-width: 1050px) {
+  .leitura { display: none; }
+  .marca-sub { display: none; }
+  .trilho { width: 180px; }
+  :root { --gaveta-larg: 100vw; }
+  .painel-topo { align-items: stretch; flex-wrap: wrap; padding: .7rem 1rem; gap: .65rem 1rem; }
+  .leitura { order: 3; width: 100%; overflow-x: hidden; padding-left: 0; border-left: 0; min-width: 0; }
+  .topo-acoes { margin-left: auto; flex-wrap: wrap; justify-content: flex-end; }
+  .conteudo { padding: 1rem; }
+  .jogos { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
+  .detalhes-jogo { display: none; }
+}
+
+@media (max-width: 560px) {
+  .marca { width: 100%; }
+  .topo-acoes { width: 100%; margin-left: 0; justify-content: stretch; }
+  .campo-apelido { flex: 1 1 100%; }
+  .topo-acoes > .botao { flex: 1; }
+  .jogos { grid-template-columns: 1fr 1fr; gap: .65rem; }
+  .jogo-titulo { font-size: .82rem; }
+  .acervo-formulario { grid-template-columns: 1fr; }
+  .acervo-formulario--inteiro { grid-column: auto; }
+  .jogo-acoes { flex-direction: column; }
+  .jogo-acoes .botao { width: 100%; }
+}
+
+/* ========================= SELO DE PENDENTES ========================= */
+
+.selo {
+  display: inline-block;
+  min-width: 18px;
+  padding: 0 5px;
+  margin-left: 4px;
+  border-radius: 9px;
+  background: var(--espera);
+  color: #1c1508;
+  font-family: var(--fonte-numero);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-align: center;
+  line-height: 18px;
+}
+.selo[hidden] { display: none; }
+
+/* Botao desabilitado durante o envio */
+.botao:disabled {
+  opacity: 0.5;
+  cursor: progress;
+}
+
+/* Aba Rede: blocos separados por respiro, nao por caixa */
+.aba-conteudo[data-painel="rede"] > div + div {
+  padding-top: var(--gap-g);
+  border-top: 1px solid var(--borda);
+}
+
+/* ========================= PAINEL DA MAQUINA ========================= */
+
+.maquina {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--gap);
+  margin: 0;
+}
+
+.maquina div {
+  background: var(--painel-alto);
+  border: 1px solid var(--borda);
+  border-left: 3px solid var(--azul);
+  border-radius: var(--raio);
+  padding: 0.6rem 0.8rem;
+}
+
+.maquina dt {
+  font-size: var(--t-micro);
+  color: var(--texto-apagado);
+  margin-bottom: 2px;
+}
+
+.maquina dd {
+  margin: 0;
+  font-size: var(--t-peq);
+  color: var(--texto);
+  overflow-wrap: anywhere;
+}
+
+/* ========================= GAVETA DO JOGO ========================= */
+
+.jogo-nome {
+  font-family: var(--fonte-titulo);
+  font-size: var(--t-med);
+  margin: 0 0 var(--gap);
+}
+
+/* --- os 10 espacos de save state --- */
+
+.espacos {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.4rem;
+}
+
+.espaco {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: var(--painel-alto);
+  border: 1px solid var(--borda-forte);
+  border-radius: var(--raio);
+  padding: 0.5rem 0.2rem;
+  text-align: center;
+}
+
+.espaco--cheio { border-color: var(--azul); }
+
+.espaco-numero {
+  font-family: var(--fonte-numero);
+  font-size: var(--t-med);
+  color: var(--texto-apagado);
+}
+.espaco--cheio .espaco-numero { color: var(--azul-claro); }
+
+.espaco-info {
+  font-size: 0.62rem;
+  color: var(--texto-apagado);
+  line-height: 1.3;
+}
+
+.espaco-apagar {
+  background: none;
+  border: 0;
+  color: var(--texto-apagado);
+  cursor: pointer;
+  font-size: 0.62rem;
+  padding: 2px 4px;
+  text-decoration: underline;
+}
+.espaco-apagar:hover { color: var(--erro); }
+
+/* --- lista de cheats --- */
+
+.cheats-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.cheat {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.2rem var(--gap);
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--borda);
+}
+.cheat:last-child { border-bottom: 0; }
+
+.cheat-desc { font-size: var(--t-peq); }
+
+.cheat-codigo {
+  grid-column: 2;
+  font-family: var(--fonte-numero);
+  font-size: var(--t-micro);
+  color: var(--texto-apagado);
+  overflow-wrap: anywhere;
+}
+
+.cheat-apagar {
+  background: none;
+  border: 0;
+  color: var(--texto-apagado);
+  cursor: pointer;
+  font-size: var(--t-micro);
+  grid-row: 1 / span 2;
+  text-decoration: underline;
+}
+.cheat-apagar:hover { color: var(--erro); }
+
+.cheat-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-top: var(--gap);
+  border-top: 1px solid var(--borda);
+}
+.cheat-form textarea {
+  background: var(--fundo);
+  border: 1px solid var(--borda-forte);
+  border-radius: var(--raio);
+  color: var(--texto);
+  font-family: var(--fonte-numero);
+  font-size: var(--t-peq);
+  padding: 0.5rem;
+  resize: vertical;
+  min-height: 64px;
+}
+
+/* Botao de gerenciar dentro da linha do jogo */
+.jogo-gerir {
+  margin-right: var(--gap);
+  font-size: var(--t-micro);
+  padding: 0.25rem 0.6rem;
+}
+
+/* ========================= SELO DE DESEMPENHO ========================= */
+/* Diz, na propria linha do jogo, como aquele console vai rodar aqui.
+   A cor carrega o significado; o texto explica sem precisar decorar. */
+
+.desempenho {
+  align-self: flex-start;
+  margin-top: 3px;
+  padding: 1px 7px;
+  border-radius: 10px;
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.desempenho--verde    { background: #17402f; color: #6ee7a8; }
+.desempenho--azul     { background: var(--azul-escuro); color: var(--azul-claro); }
+.desempenho--vermelho { background: #40201e; color: #f0908b; }
+
+/* ========================= LISTA DE AMIGOS ========================= */
+
+.codigo-amigo-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.8rem;
+  margin-bottom: var(--gap);
+  background: var(--fundo);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+}
+
+.codigo-amigo-box code {
+  color: var(--azul-claro);
+  font-family: var(--fonte-numero);
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.amigos {
+  list-style: none;
+  margin: 0 0 var(--gap);
+  padding: 0;
+}
+
+.amigo {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.2rem var(--gap);
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--borda);
+}
+.amigo:last-child { border-bottom: 0; }
+
+.amigo-nome { font-size: var(--t-peq); }
+
+.amigo-url {
+  grid-column: 2;
+  font-family: var(--fonte-numero);
+  font-size: var(--t-micro);
+  color: var(--texto-apagado);
+  overflow-wrap: anywhere;
+}
+
+.amigo .cheat-apagar { grid-row: 1 / span 2; }
+
+/* ========================= LISTA DE CONTROLES ========================= */
+
+.controles { list-style: none; margin: 0; padding: 0; }
+
+.controle {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--borda);
+}
+.controle:last-child { border-bottom: 0; }
+
+.controle-nome { font-size: var(--t-peq); }
+.controle-nota { font-size: var(--t-micro); color: var(--texto-apagado); }
+
+.controle-acoes { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .35rem; }
+.controle-acoes .botao { font-size: var(--t-micro); padding: .28rem .55rem; }
+.download-progresso {
+  display: block;
+  height: .45rem;
+  margin: .35rem 0 .1rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--borda);
+}
+.download-progresso::after {
+  content: "";
+  display: block;
+  width: 35%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--azul), #ff9d68);
+  transform: translateX(-110%);
+}
+.download-progresso--ativo::after { animation: progresso-vai 1.1s ease-in-out infinite; }
+.download-progresso--concluido::after { width: 100%; transform: none; background: #48c98b; }
+@keyframes progresso-vai { to { transform: translateX(320%); } }
+.botao--perigo { border-color: #bd7184; color: #ffc3ce; }
+.botao--perigo:hover { background: #643242; border-color: #ff8fa6; }
+.acervo-cabeca-acoes { justify-content: flex-start; }
+.acervo-busca { margin-top: -.35rem; }
+.acervo-fontes { display: flex; flex-wrap: wrap; gap: .4rem; }
+.acervo-fonte-selo {
+  padding: .25rem .55rem;
+  border: 1px solid var(--borda);
+  border-radius: 999px;
+  color: var(--texto-fraco);
+  font-size: var(--t-micro);
+}
+.acervo-formulario {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .8rem;
+}
+.acervo-formulario--inteiro { grid-column: 1 / -1; }
+.acervo-formulario textarea { resize: vertical; min-height: 3.5rem; }
+.acervo-autorizacao { align-items: flex-start; gap: .55rem; }
+.acervo-autorizacao input { margin-top: .2rem; accent-color: var(--azul); }
+
+.controle-tipo {
+  align-self: flex-start;
+  margin-top: 2px;
+  padding: 0 6px;
+  border-radius: 9px;
+  background: var(--azul-escuro);
+  color: var(--azul-claro);
+  font-family: var(--fonte-numero);
+  font-size: 0.62rem;
+}
+
+/* Botao de jogar junto na linha do jogo */
+.jogo-dupla { margin-right: var(--gap); font-size: var(--t-micro); padding: 0.25rem 0.6rem; }
+
+/* ============ ABA AVANCADA: recursos com explicacao e exemplo ============ */
+
+.grupo-resumo {
+  grid-column: 1 / -1;
+  margin: -0.4rem 0 0.2rem;
+  font-size: var(--t-micro);
+  color: var(--texto-apagado);
+}
+
+/* Selo de custo: avisa antes de ligar algo pesado */
+.custo {
+  padding: 0 5px;
+  border-radius: 8px;
+  font-size: 0.6rem;
+  font-weight: 600;
+  vertical-align: 1px;
+}
+.custo--baixo, .custo--medio { background: var(--azul-escuro); color: var(--azul-claro); }
+.custo--alto { background: #3b2c16; color: var(--espera); }
+
+.opcao-exemplo-botao {
+  grid-column: 1;
+  justify-self: start;
+  background: none;
+  border: 0;
+  color: var(--azul-claro);
+  cursor: pointer;
+  font-family: var(--fonte-texto);
+  font-size: var(--t-micro);
+  padding: 2px 0;
+  text-decoration: underline;
+}
+.opcao-exemplo-botao[hidden] { display: none; }
+
+.opcao-exemplo {
+  grid-column: 1 / -1;
+  margin-top: 2px;
+  padding: 0.5rem 0.7rem;
+  border-left: 2px solid var(--azul);
+  background: var(--painel-alto);
+  border-radius: 0 var(--raio) var(--raio) 0;
+  font-size: var(--t-micro);
+  color: var(--texto-fraco);
+}
+.opcao-exemplo[hidden] { display: none; }
+
+/* ============ ARRASTAR UM JOGO PARA A PASTA DE OUTRO CONSOLE ============ */
+
+.jogo { cursor: grab; }
+.jogo--arrastando { opacity: 0.4; cursor: grabbing; }
+
+/* Console recebendo o jogo arrastado */
+.trilho-item--alvo {
+  background: var(--azul-escuro);
+  border-left-color: var(--azul-claro);
+  color: var(--texto);
+  outline: 1px dashed var(--azul-claro);
+  outline-offset: -2px;
+}
+
+/* Jogo sem pasta de console definida */
+.jogo--sem_pasta .jogo-faixa { background: var(--azul-claro); }
+.jogo--sem_pasta .jogo-titulo::after {
+  content: " — escolha o console";
+  color: var(--azul-claro);
+  font-size: var(--t-micro);
+}
+.sinal--sem_pasta { background: var(--azul-claro); }
+
+/* ========================= MAPEAR TECLAS E BOTOES ========================= */
+
+.mapa { list-style: none; margin: var(--gap) 0; padding: 0; }
+
+.mapa-linha {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: var(--gap);
+  padding: 0.45rem 0;
+  border-bottom: 1px solid var(--borda);
+}
+.mapa-linha:last-child { border-bottom: 0; }
+
+.mapa-nome { font-size: var(--t-peq); }
+
+.mapa-tecnico {
+  grid-column: 1;
+  font-size: var(--t-micro);
+  color: var(--texto-apagado);
+}
+
+.mapa-valor {
+  font-family: var(--fonte-numero);
+  font-size: var(--t-micro);
+  color: var(--texto-fraco);
+  min-width: 8ch;
+  text-align: right;
+}
+.mapa-valor--vazio { color: var(--texto-apagado); font-style: italic; }
+
+.mapa-definir { font-size: var(--t-micro); padding: 0.25rem 0.7rem; }
+
+/* Enquanto espera a tecla ser apertada */
+.mapa-linha--ouvindo {
+  background: var(--azul-escuro);
+  outline: 1px dashed var(--azul-claro);
+  outline-offset: -2px;
+}
+.mapa-linha--ouvindo .mapa-valor { color: var(--azul-claro); }
+
+/* Botao de acao destrutiva: precisa parecer diferente antes do clique */
+.botao--perigo {
+  background: #4a2020;
+  border-color: #7a3333;
+  color: #ffb4b4;
+}
+.botao--perigo:hover { background: #5c2828; border-color: #9c4141; }
+
+/* Chaves do perfil de controle: agrupadas e recuadas */
+.perfil-chaves {
+  margin: var(--gap) 0;
+  padding-left: var(--gap);
+  border-left: 2px solid var(--borda);
+}
+
+/* ========================= ASSISTENTE DE CONTROLES ========================= */
+
+.wizard-generico {
+  background: var(--painel);
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+  padding: 1.2rem;
+  margin: var(--gap) 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.wizard-cabecalho {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  margin-bottom: 0.8rem;
+}
+
+.wizard-titulo {
+  font-size: var(--t-media);
+  font-weight: 600;
+  color: var(--texto);
+  margin: 0;
+}
+
+.wizard-instrucao {
+  margin: 0;
+  color: var(--texto-fraco);
+  font-size: var(--t-micro);
+}
+
+.wizard-corpo {
+  padding: 1rem 0;
+}
+
+.wizard-descricao {
+  font-size: var(--t-media);
+  color: var(--texto);
+  margin: 0 0 1.2rem;
+  padding: 0.8rem 1rem;
+  background: var(--fundo);
+  border-radius: 6px;
+  border-left: 4px solid var(--azul);
+  min-height: 2.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.wizard-botoes {
+  display: flex;
+  gap: var(--gap);
+  margin-bottom: 0.5rem;
+}
+
+.wizard-botoes .botao {
+  flex: 1;
+}
+
+.wizard-andamento {
+  font-size: var(--t-micro);
+  color: var(--texto-apagado);
+  text-align: center;
+  margin-bottom: 0.3rem;
+}
+
+.wizard-observacao {
+  font-size: var(--t-micro);
+  color: var(--texto-fraco);
+  text-align: center;
+  margin-top: 0;
+}
