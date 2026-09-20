@@ -119,6 +119,11 @@
     <p class="explica" id="bibliotecaOnlineStatus">Digite o nome de um jogo.</p>
     <ul class="controles" id="listaBibliotecaOnline"></ul>
     <h3 class="grupo-titulo">Jogos já instalados</h3>
+    <label class="campo acervo-busca">
+      <span>Filtrar os instalados</span>
+      <input id="campoBuscaAcervo" type="search" maxlength="80"
+             placeholder="nome, console ou licença" autocomplete="off">
+    </label>
     <div class="acervo-fontes" id="listaFontesAcervo"></div>
     <ul class="controles" id="listaAcervo"></ul>
     <button class="botao" id="btnNovoAcervo" type="button" hidden>Gerenciar catálogo</button>
@@ -392,6 +397,17 @@
 
     <div class="opcao">
       <span class="opcao-rotulo">Tipo de controle</span>
+      <select class="opcao-controle" id="listaDriverControleTopo"
+              aria-label="Tipo de conexão do controle">
+        <option value="xinput">xinput — Xbox, PS4, PS5, Switch Pro</option>
+        <option value="dinput">dinput — PS3, arcade stick, genérico antigo</option>
+      </select>
+      <span class="opcao-ajuda">
+        Se o controle não aparecer de jeito nenhum, troque aqui e reabra o
+        ARENA. É a primeira coisa a tentar.
+      </span>
+    </div>
+    <div class="opcao" hidden>
       <select class="opcao-controle" id="listaDriverControle" aria-label="Tipo de controle">
         <option value="xinput">xinput</option>
         <option value="dinput">dinput</option>
@@ -488,6 +504,7 @@
       </div>
       <p class="explica">Preenche os botões automaticamente.</p>
       <p class="explica" id="mapaResumo">—</p>
+      <p class="explica">As alterações valem no próximo jogo.</p>
       <p class="explica" id="mapaWatacao" hidden>Para controles genéricos, clique em "Configurar com assistente" e pressione cada botão quando pedido.</p>
     </div>
 
@@ -753,7 +770,7 @@
     <p class="explica" id="explicaConsoleJogo"></p>
     <label class="campo">
       <span>Console</span>
-      <select id="listaConsoleJogo"></select>
+      <select id="listaConsoleJogoModal"></select>
     </label>
     <p class="explica">A escolha fica salva para este arquivo.</p>
     <div class="modal-acoes">

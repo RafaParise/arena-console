@@ -188,6 +188,8 @@ async function carregarEstado() {
   prepararAbrirBios(dados.bios_consoles || []);
   $("#relogioPc").textContent = new Date().toLocaleString("pt-BR");
   $("#pastaBios").textContent = dados.pastas.sistema;
+  $("#listaDriverControleTopo").value =
+    estado.efetivas.input_joypad_driver || "xinput";
   $("#listaDriverControle").value =
     estado.efetivas.input_joypad_driver || "xinput";
 
@@ -509,7 +511,7 @@ function desenharDetalhes() {
 async function abrirEscolhaConsole(jogo) {
   try {
     const dados = await pedir("/api/jogo?id=" + encodeURIComponent(jogo.id));
-    const lista = $("#listaConsoleJogo");
+    const lista = $("#listaConsoleJogoModal");
     lista.replaceChildren();
     for (const console of dados.consoles || []) {
       const opcao = document.createElement("option");
@@ -2365,6 +2367,7 @@ async function carregarAcervo() {
 }
 
 let atrasoBiblioteca = null;
+let atrasoAcervo = null;
 
 async function carregarBibliotecaOnline() {
   const consulta = $("#campoBuscaOnline").value.trim();
@@ -2590,7 +2593,7 @@ function ligarEventos() {
     try {
       await pedir("/api/jogo/console", "POST", {
         jogo_id: jogoConsoleEditando.id,
-        plataforma: $("#listaConsoleJogo").value,
+        plataforma: $("#listaConsoleJogoModal").value,
       });
       $("#modalConsole").hidden = true;
       jogoConsoleEditando = null;
@@ -2620,6 +2623,10 @@ function ligarEventos() {
   $("#campoBuscaOnline").addEventListener("input", () => {
     clearTimeout(atrasoBiblioteca);
     atrasoBiblioteca = setTimeout(carregarBibliotecaOnline, 300);
+  });
+  $("#campoBuscaAcervo").addEventListener("input", () => {
+    clearTimeout(atrasoAcervo);
+    atrasoAcervo = setTimeout(carregarAcervo, 300);
   });
   $("#btnNovoAcervo").addEventListener("click", () => abrirEditorAcervo());
   $("#btnSalvarAcervo").addEventListener("click", async () => {
@@ -2836,6 +2843,17 @@ function ligarEventos() {
       recado(falha.message, true);
     }
   });
+
+  $("#listaDriverControleTopo").addEventListener("change", async (evento) => {
+    try {
+      await salvarConfig({ avancado: { input_joypad_driver: evento.target.value } });
+      $("#listaDriverControle").value = evento.target.value;
+      recado("Pronto. Feche e abra o ARENA para o controle ser reconhecido.");
+    } catch (falha) {
+      recado(falha.message, true);
+    }
+  });
+
   $("#btnAddAmigoCodigo").addEventListener("click", adicionarAmigoCodigo);
   $("#btnTestarAmigo").addEventListener("click", testarAmigo);
   $("#btnAddAmigo").addEventListener("click", adicionarAmigo);
