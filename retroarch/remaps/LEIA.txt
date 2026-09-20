@@ -1,0 +1,1 @@
+Botoes trocados por jogo. Criado pelo RetroArch quando voce salva um remapeamento.

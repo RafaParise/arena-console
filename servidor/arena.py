@@ -1196,8 +1196,17 @@ def avaliar_plataformas(forcar=False):
             estado = "pronta"
             motivo = ""
         elif not core_ok:
-            estado = "sem_core"
-            motivo = "Nucleo nao instalado. Baixe pelo RetroArch."
+            externo_obrigatorio = (plataforma.get("externo") or {}).get("obrigatorio")
+            if externo_obrigatorio and not plataforma["core"]:
+                # Plataforma sem nucleo nenhum no RetroArch (PS3, Xbox 360):
+                # nao faz sentido mandar "baixar pelo RetroArch" algo que
+                # nao existe. O unico caminho e o emulador de fora.
+                estado = "falta_externo"
+                motivo = ("%s obrigatorio. Baixe e coloque em emuladores\\%s." %
+                          (plataforma["externo"]["nome"], plataforma["externo"]["pasta"]))
+            else:
+                estado = "sem_core"
+                motivo = "Nucleo nao instalado. Baixe pelo RetroArch."
         elif precisa_sistema and not tem_sistema:
             estado = "falta_sistema"
             motivo = ("Precisa de %d arquivo(s) de sistema em "

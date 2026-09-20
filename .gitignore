@@ -40,25 +40,65 @@ dados/*.cfg
 # (Python embutido e o RetroArch inteiro; ver LEIA-ME.md)
 servidor/python/
 
-# Ignora conteúdo de jogos, emuladores e retroarch (não commitar)
-jogos/
-emuladores/
-retroarch/
+# ---------------------------------------------------------------------------
+# jogos/, emuladores/ e retroarch/: mantém só a estrutura de pastas vazias
+# (o LEIA.txt de cada uma), ignora o conteúdo de verdade (ROMs, emuladores
+# baixados, o RetroArch inteiro). Git não faz negação dentro de uma pasta
+# já ignorada por inteiro, por isso o "/*" em cada nível em vez de só "/".
+# ---------------------------------------------------------------------------
 
-# Mantém estrutura de pastas vazias (sem arquivos de conteúdo)
-jogos/livres/
-jogos/turma/
-jogos/pessoais/
-emuladores/PCSX2/
-emuladores/Dolphin/
-retroarch/system/
-retroarch/cores/
-retroarch/states/
-retroarch/saves/
-retroarch/cheats/
-retroarch/remaps/
-retroarch/controles/
-retroarch/screenshots/
+jogos/*
+!jogos/livres/
+!jogos/pessoais/
+!jogos/turma/
+jogos/livres/*
+!jogos/livres/LEIA.txt
+jogos/pessoais/*
+!jogos/pessoais/LEIA.txt
+jogos/turma/*
+!jogos/turma/LEIA.txt
+
+emuladores/*
+!emuladores/LEIA.txt
+!emuladores/PCSX2/
+!emuladores/Dolphin/
+!emuladores/RPCS3/
+!emuladores/Xenia/
+emuladores/PCSX2/*
+!emuladores/PCSX2/LEIA.txt
+emuladores/Dolphin/*
+!emuladores/Dolphin/LEIA.txt
+emuladores/RPCS3/*
+!emuladores/RPCS3/LEIA.txt
+emuladores/Xenia/*
+!emuladores/Xenia/LEIA.txt
+
+retroarch/*
+!retroarch/system/
+!retroarch/cores/
+!retroarch/states/
+!retroarch/saves/
+!retroarch/cheats/
+!retroarch/remaps/
+!retroarch/controles/
+!retroarch/screenshots/
+retroarch/system/*
+!retroarch/system/LEIA.txt
+retroarch/cores/*
+!retroarch/cores/LEIA.txt
+retroarch/states/*
+!retroarch/states/LEIA.txt
+retroarch/saves/*
+!retroarch/saves/LEIA.txt
+retroarch/cheats/*
+!retroarch/cheats/LEIA.txt
+retroarch/remaps/*
+!retroarch/remaps/LEIA.txt
+retroarch/controles/*
+!retroarch/controles/LEIA.txt
+retroarch/screenshots/*
+!retroarch/screenshots/LEIA.txt
 
 # Dados do usuário (não commitar)
-dados/
+dados/*
+!dados/LEIA.txt

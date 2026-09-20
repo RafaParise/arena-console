@@ -1,0 +1,20 @@
+PCSX2 - PlayStation 2   (OBRIGATORIO)
+=====================================
+
+Sem ele, jogo de PlayStation 2 nao abre. O nucleo do RetroArch para esse
+console e pouco mantido e costuma fechar sem dizer nada.
+
+1. Baixe em:  pcsx2.net/downloads
+2. Pegue "Windows 64-bit AVX2  -  Portable"   (arquivo .7z)
+   NAO pegue o instalador.
+3. Descompacte AQUI DENTRO desta pasta.
+
+Tem que ficar assim:
+   emuladores\PCSX2\pcsx2-qt.exe
+
+Se vier dentro de uma subpasta com o numero da versao, tudo bem:
+   emuladores\PCSX2\pcsx2-v2.4.0\pcsx2-qt.exe
+
+4. Feche e abra o ARENA. Em Ajustes > Emuladores vai aparecer "em uso".
+
+A BIOS voce configura na primeira vez que o PCSX2 abrir, pela tela dele.

@@ -972,6 +972,102 @@
         "scummvm"
       ],
       "pasta": "ScummVM"
+    },
+    {
+      "id": "j2me",
+      "nome": "Java ME (celular antigo)",
+      "descricao": "Jogos de celular Java de antes do smartphone (Nokia e outros). Precisa do Java instalado no computador - o ARENA nao o instala.",
+      "core": "freej2me_plus_libretro.dll",
+      "extensoes": [
+        ".jar",
+        ".jad"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "j2me",
+        "java me",
+        "javame",
+        "nokia",
+        "midlet",
+        "celular antigo"
+      ],
+      "pasta": "J2ME"
+    },
+    {
+      "id": "ps3",
+      "nome": "PlayStation 3",
+      "descricao": "Exige computador forte (nada de Celeron/4GB). Nao existe nucleo de PS3 no RetroArch - o RPCS3 e obrigatorio.",
+      "core": "",
+      "extensoes": [
+        ".iso",
+        ".pkg"
+      ],
+      "peso": "completo",
+      "arquivos_sistema": 0,
+      "custo": 5,
+      "pede_placar": false,
+      "apelidos": [
+        "playstation 3",
+        "playstation3",
+        "ps3",
+        "sony ps3",
+        "rpcs3"
+      ],
+      "tamanho_max_mb": 51200,
+      "externo": {
+        "nome": "RPCS3",
+        "pasta": "RPCS3",
+        "obrigatorio": true,
+        "executaveis": [
+          "rpcs3.exe"
+        ],
+        "argumentos": [
+          "--no-gui",
+          "{jogo}"
+        ],
+        "site": "rpcs3.net/download",
+        "motivo": "OBRIGATORIO. Nao existe nucleo de PlayStation 3 no RetroArch - so o RPCS3 emula este console, e so em computador forte."
+      },
+      "pasta": "PS3"
+    },
+    {
+      "id": "xbox360",
+      "nome": "Xbox 360",
+      "descricao": "Exige computador forte com placa de video dedicada. Nao existe nucleo de Xbox 360 no RetroArch - o Xenia e obrigatorio.",
+      "core": "",
+      "extensoes": [
+        ".iso",
+        ".xex"
+      ],
+      "peso": "completo",
+      "arquivos_sistema": 0,
+      "custo": 5,
+      "pede_placar": false,
+      "apelidos": [
+        "xbox 360",
+        "xbox360",
+        "x360",
+        "xenia"
+      ],
+      "tamanho_max_mb": 15000,
+      "externo": {
+        "nome": "Xenia",
+        "pasta": "Xenia",
+        "obrigatorio": true,
+        "executaveis": [
+          "xenia_canary.exe",
+          "xenia.exe"
+        ],
+        "argumentos": [
+          "{jogo}"
+        ],
+        "site": "xenia-emulator.com/canary",
+        "motivo": "OBRIGATORIO. Nao existe nucleo de Xbox 360 no RetroArch - so o Xenia emula este console, e so com placa de video dedicada."
+      },
+      "pasta": "XBOX360"
     }
   ],
   "preferencia": {

@@ -1,0 +1,25 @@
+Xenia - Xbox 360   (OBRIGATORIO para Xbox 360)
+===============================================
+
+Nao existe nucleo de Xbox 360 no RetroArch. Sem o Xenia, jogo de Xbox
+360 nem aparece como pronto para jogar.
+
+ATENCAO: Xbox 360 exige computador forte COM PLACA DE VIDEO DEDICADA.
+Nao roda em maquina com placa de video integrada.
+
+1. Baixe o Xenia Canary em:  xenia-emulator.com/canary
+   (e a versao mais atualizada - o Xenia "normal" quase parou)
+2. Pegue o pacote para Windows (.zip, portatil).
+3. Descompacte AQUI DENTRO desta pasta.
+
+Tem que ficar assim:
+   emuladores\Xenia\xenia_canary.exe
+
+4. Feche e abra o ARENA. Em Ajustes > Emuladores vai aparecer "em uso".
+
+O Xenia Canary ja e portatil por padrao: guarda a configuracao do lado
+do executavel, dentro desta mesma pasta.
+
+AVISO: o comando que o ARENA usa para abrir o jogo pelo Xenia ainda nao
+foi testado contra o programa de verdade - vem da documentacao publica
+dele. Se o jogo nao abrir do jeito esperado, avise para ajustar.
