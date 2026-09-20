@@ -1169,22 +1169,7 @@ async function desenharMapa() {
     const atribuidos = mapa.mapeamento[jogador] || {};
     const lote = document.createDocumentFragment();
 
-    const novoMetodoBotoes = [
-      ["**Nem todos** os controles genericos possuem todos os botoes listados",
-       "Alguns botoes podem nao existir no seu controle"]
-    ];
-
-    // Logica para mapear botoes conforme o perfil configurado
-    const botoesMapeados = {};
-    perfil.linhas.forEach((linha) => {
-      const label = linha.no_controle || `Botao ${linha.botao}`;
-      // Verifica se o botao ja foi mapeado
-      if (estado.mapa.mapeamento &&
-          estado.mapa.mapeamento[jogador] &&
-          estado.mapa.mapeamento[jogador][linha.botao]) {
-        botoesMapeados[linha.botao] = estado.mapa.mapeamento[jogador][linha.botao];
-      }
-    });
+    const permitidos = new Set(perfil.linhas.map((l) => l.botao));
 
     for (const botao of mapa.botoes) {
       if (!permitidos.has(botao)) continue;
@@ -1232,8 +1217,9 @@ async function desenharMapa() {
 
     // Controles conhecidos (Xbox, PlayStation, etc.) já têm mapeamento
     // automático — o assistente só aparece para controles genéricos.
-    $jit["btnMapaWizard"].hidden = !ehGenerico;
-    $jit["mapaWatacao"].hidden = !ehGenerico;
+    const ehGenerico = tipo.startsWith("generico");
+    $("#btnMapaWizard").hidden = !ehGenerico;
+    $("#mapaWatacao").hidden = !ehGenerico;
   } catch (falha) {
     recado(falha.message, true);
   }
@@ -1370,26 +1356,27 @@ function wizardAguardar() {
   estado.ouvindo = encerrar;
 }
 
-function gravaWizard(tipo, valor) {
+async function gravaWizard(tipo, valor) {
   const passo = PASSOS_WIZARD[wizardEstado.passo];
   if (!passo) return;
 
   wizardCancela = null;
   estado.ouvindo = null;
 
-  $.post("/api/mapeamento/definir", {
-    jogador: wizardEstado.jogador,
-    botao: passo.botao,
-    tipo: tipo,
-    valor: valor,
-  }).then(() => {
+  try {
+    await pedir("/api/mapeamento/definir", "POST", {
+      jogador: wizardEstado.jogador,
+      botao: passo.botao,
+      tipo: tipo,
+      valor: valor,
+    });
     wizardEstado.passo++;
     wizardPasso(wizardEstado.passo);
     recado("Registrado! Próximo passo.");
-  }).catch((falha) => {
+  } catch (falha) {
     recado(falha.message || "Erro ao gravar.", true);
     wizardCancelar();
-  });
+  }
 }
 
 function wizardPular() {
