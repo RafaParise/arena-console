@@ -1,0 +1,64 @@
+# Arquivos grandes/temporários
+*.zip
+*.iso
+*.7z
+backup/
+*.tmp
+*.log
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Dados temporários
+dados/*.json
+dados/*.db
+dados/*.cfg
+
+# Mantém as pastas de código, interface e documentação
+!launcher/
+!servidor/
+
+# Mantém documentação e arquivos de configuração
+!*.py
+!*.js
+!*.css
+!*.html
+!*.json
+!*.md
+!*.bat
+
+# Runtime pesado que não entra no git — copiar manualmente para rodar
+# (Python embutido e o RetroArch inteiro; ver LEIA-ME.md)
+servidor/python/
+
+# Ignora conteúdo de jogos, emuladores e retroarch (não commitar)
+jogos/
+emuladores/
+retroarch/
+
+# Mantém estrutura de pastas vazias (sem arquivos de conteúdo)
+jogos/livres/
+jogos/turma/
+jogos/pessoais/
+emuladores/PCSX2/
+emuladores/Dolphin/
+retroarch/system/
+retroarch/cores/
+retroarch/states/
+retroarch/saves/
+retroarch/cheats/
+retroarch/remaps/
+retroarch/controles/
+retroarch/screenshots/
+
+# Dados do usuário (não commitar)
+dados/
