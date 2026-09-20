@@ -216,7 +216,13 @@ def achar_externo_detalhado(plataforma):
         return None, None, externo
 
     procurados = [n.lower() for n in externo["executaveis"]]
+    # Se o nome exato mudar numa versao futura do emulador (ja aconteceu:
+    # o proprio cadastro dos nomes nunca foi conferido contra um download
+    # real do PCSX2), ainda reconhece por prefixo -- "PCSX2" cadastrado
+    # acha "pcsx2-qtx64-avx2.exe" mesmo sem esse nome exato na lista.
+    prefixo = externo["nome"].lower()
     compactado = None
+    candidato_prefixo = None
 
     # Primeiro na propria pasta, depois um nivel abaixo.
     for raiz, subpastas, arquivos in os.walk(base):
@@ -224,6 +230,9 @@ def achar_externo_detalhado(plataforma):
             nome_baixo = arquivo.lower()
             if nome_baixo in procurados:
                 return os.path.join(raiz, arquivo), None, externo
+            if (candidato_prefixo is None and nome_baixo.endswith(".exe")
+                    and nome_baixo.startswith(prefixo)):
+                candidato_prefixo = os.path.join(raiz, arquivo)
             if compactado is None and nome_baixo.endswith(EXTENSOES_COMPACTADO):
                 compactado = os.path.join(raiz, arquivo)
         # Nao descer mais que dois niveis: pasta de emulador e cheia de
@@ -231,6 +240,8 @@ def achar_externo_detalhado(plataforma):
         if raiz.count(os.sep) - base.count(os.sep) >= 1:
             subpastas[:] = []
 
+    if candidato_prefixo:
+        return candidato_prefixo, None, externo
     return None, compactado, externo
 
 
