@@ -1568,13 +1568,21 @@ function desenharExternos(lista) {
 
     const nota = document.createElement("span");
     nota.className = "controle-nota";
-    nota.textContent = item.instalado
-      ? "instalado. O ARENA está usando ele."
-      : `${item.motivo} Baixe em ${item.site} e ponha em ${item.pasta}`;
+    if (item.instalado) {
+      nota.textContent = "instalado. O ARENA está usando ele.";
+    } else if (item.compactado_pendente) {
+      nota.textContent =
+        `Achamos "${item.compactado_pendente}" em ${item.pasta}, mas ele ` +
+        `ainda está compactado. Extraia o conteúdo dentro dessa mesma pasta.`;
+    } else {
+      nota.textContent = `${item.motivo} Baixe em ${item.site} e ponha em ${item.pasta}`;
+    }
 
     const selo = document.createElement("span");
     selo.className = "controle-tipo";
-    selo.textContent = item.instalado ? "em uso" : "não instalado";
+    selo.textContent = item.instalado
+      ? "em uso"
+      : (item.compactado_pendente ? "falta extrair" : "não instalado");
     if (!item.instalado) selo.style.opacity = "0.55";
 
     linha.append(titulo, nota, selo);

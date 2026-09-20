@@ -183,6 +183,9 @@ def shader_para(nota):
 # passa a chamar ele para aquela plataforma. Continua sendo tudo dentro
 # da pasta do ARENA, sem instalar nada.
 
+EXTENSOES_COMPACTADO = (".zip", ".7z", ".rar")
+
+
 def achar_externo(plataforma):
     """Procura o emulador de fora daquela plataforma.
 
@@ -190,27 +193,45 @@ def achar_externo(plataforma):
     Procura na pasta cadastrada e um nivel abaixo, porque quase todo
     programa vem dentro de uma subpasta com o numero da versao.
     """
+    caminho, _, externo = achar_externo_detalhado(plataforma)
+    return caminho, externo
+
+
+def achar_externo_detalhado(plataforma):
+    """Como achar_externo(), mas tambem avisa se so achou um .zip/.7z.
+
+    Erro comum: baixar o emulador e largar o arquivo compactado dentro da
+    pasta sem extrair. Sem esse aviso, a tela so diz "nao instalado" e o
+    aluno nao entende por que, ja que o arquivo esta bem ali.
+
+    Devolve (caminho do executavel ou None, caminho do compactado achado
+    ou None, dados do cadastro).
+    """
     externo = plataforma.get("externo")
     if not externo:
-        return None, None
+        return None, None, None
 
     base = os.path.join(PASTA_EMULADORES, externo["pasta"])
     if not os.path.isdir(base):
-        return None, externo
+        return None, None, externo
 
     procurados = [n.lower() for n in externo["executaveis"]]
+    compactado = None
 
     # Primeiro na propria pasta, depois um nivel abaixo.
     for raiz, subpastas, arquivos in os.walk(base):
         for arquivo in arquivos:
-            if arquivo.lower() in procurados:
-                return os.path.join(raiz, arquivo), externo
+            nome_baixo = arquivo.lower()
+            if nome_baixo in procurados:
+                return os.path.join(raiz, arquivo), None, externo
+            if compactado is None and nome_baixo.endswith(EXTENSOES_COMPACTADO):
+                compactado = os.path.join(raiz, arquivo)
         # Nao descer mais que dois niveis: pasta de emulador e cheia de
         # subpastas e varrer tudo seria lento em pen drive.
         if raiz.count(os.sep) - base.count(os.sep) >= 1:
             subpastas[:] = []
 
-    return None, externo
+    return None, compactado, externo
 
 
 def comando_externo(caminho_executavel, dados, caminho_jogo):
@@ -229,7 +250,7 @@ def situacao_dos_externos(plataformas):
         externo = plataforma.get("externo")
         if not externo:
             continue
-        caminho, _ = achar_externo(plataforma)
+        caminho, compactado, _ = achar_externo_detalhado(plataforma)
         saida.append({
             "plataforma": plataforma["nome"],
             "id": plataforma["id"],
@@ -238,6 +259,7 @@ def situacao_dos_externos(plataformas):
             "site": externo.get("site", ""),
             "motivo": externo.get("motivo", ""),
             "instalado": bool(caminho),
+            "compactado_pendente": os.path.basename(compactado) if compactado else "",
         })
     return saida
 

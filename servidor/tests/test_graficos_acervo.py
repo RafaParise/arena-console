@@ -23,6 +23,11 @@ class TestGraficos(unittest.TestCase):
         self._old_arquivo = getattr(self.mod, "ARQUIVO_OPCOES_CORE", None)
         self.mod.ARQUIVO_OPCOES_CORE = os.path.join(
             self.dir, "retroarch-core-options.cfg")
+        # ARQUIVO_GRAFICOS tambem precisa apontar pro json de teste, senao
+        # carregar_graficos() le o servidor/graficos.json de verdade (com
+        # as centenas de opcoes reais) e os testes abaixo veem dado errado.
+        self._old_arquivo_graficos = self.mod.ARQUIVO_GRAFICOS
+        self.mod.ARQUIVO_GRAFICOS = os.path.join(self.dir, "graficos.json")
         self._old_cache = graficos._cache.copy()
         graficos._cache = {"graficos": None}
         os.makedirs(os.path.join(self.dir, "retroarch"), exist_ok=True)
@@ -34,13 +39,20 @@ class TestGraficos(unittest.TestCase):
         self.mod.RAIZ = self._old_raiz
         if self._old_arquivo is not None:
             self.mod.ARQUIVO_OPCOES_CORE = self._old_arquivo
+        self.mod.ARQUIVO_GRAFICOS = self._old_arquivo_graficos
         self.mod._cache = self._old_cache
         shutil.rmtree(self.dir, ignore_errors=True)
 
     def test_gravar_opcoes_dos_nucleos_arquivo_vazio(self):
         opcoes = self.mod.gravar_opcoes_dos_nucleos(3)
         self.assertEqual(opcoes, 0)
-        self.assertFalse(os.path.isfile(self.mod.ARQUIVO_OPCOES_CORE))
+        # gravar_opcoes_dos_nucleos sempre grava o arquivo, mesmo sem
+        # opcoes (fica so com as duas linhas de cabecalho) -- e assim
+        # que arena.py espera encontrar o arquivo depois de chamar isto.
+        self.assertTrue(os.path.isfile(self.mod.ARQUIVO_OPCOES_CORE))
+        with open(self.mod.ARQUIVO_OPCOES_CORE, encoding="utf-8") as f:
+            texto = f.read()
+        self.assertEqual(texto.count("\n"), 2)
 
     def test_gravar_opcoes_dos_nucleos_com_dados(self):
         with open(os.path.join(self.dir, "graficos.json"), "w",
@@ -87,17 +99,20 @@ class TestAcervo(unittest.TestCase):
         os.makedirs(acervo_pasta, exist_ok=True)
         with open(os.path.join(acervo_pasta, "acervo_autorizado.json"), "w",
                   encoding="utf-8") as f:
-            f.write('{"fontes": ["teste"], "itens": []}')
-        self._old_arquivo = getattr(self.mod, "ARQUIVO_ACERVO", None)
-        self.mod.ARQUIVO_ACERVO = os.path.join(acervo_pasta,
-                                               "acervo_autorizado.json")
+            f.write('[]')
+        # A constante de verdade em acervo.py se chama ARQUIVO (nao
+        # ARQUIVO_ACERVO). Com o nome errado o monkeypatch nao pegava e
+        # ler_itens()/_salvar_itens() liam e escreviam no
+        # dados/acervo_autorizado.json REAL do projeto.
+        self._old_arquivo = self.mod.ARQUIVO
+        self.mod.ARQUIVO = os.path.join(acervo_pasta,
+                                        "acervo_autorizado.json")
 
     def tearDown(self):
         self.mod.RAIZ = self._old_raiz
         if self._old_pasta_livres is not None:
             self.mod.PASTA_LIVRES = self._old_pasta_livres
-        if self._old_arquivo is not None:
-            self.mod.ARQUIVO_ACERVO = self._old_arquivo
+        self.mod.ARQUIVO = self._old_arquivo
         shutil.rmtree(self.dir, ignore_errors=True)
 
     def test_listar_vazio(self):

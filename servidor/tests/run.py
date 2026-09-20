@@ -457,6 +457,8 @@ def main():
     suite = unittest.TestSuite()
 
     pasta_testes = os.path.dirname(os.path.abspath(__file__))
+    if pasta_testes not in sys.path:
+        sys.path.insert(0, pasta_testes)
     for nome in sorted(os.listdir(pasta_testes)):
         if not nome.startswith("test_") or not nome.endswith(".py"):
             continue
