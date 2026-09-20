@@ -969,9 +969,7 @@ def opcoes_efetivas(config, custo=None):
 #     roda, entao nao ha nenhuma tarefa de fundo disputando o processador;
 #   - a placa de som passa a ser do jogo em modo exclusivo (WASAPI), o que
 #     tira o misturador do Windows do caminho;
-#   - tela cheia de verdade, nao janela sem borda;
-#   - o teclado e o mouse ficam presos na janela do jogo, entao a tecla
-#     Windows e o Alt+Tab vao para o jogo em vez do sistema;
+#   - tela cheia sem borda (nao a exclusiva - motivo abaixo);
 #   - filtros, voltar no tempo e resposta instantanea saem de cena.
 #
 # O que ele NAO faz, e nao adianta prometer:
@@ -980,7 +978,9 @@ def opcoes_efetivas(config, custo=None):
 #     senha de administrador e driver proprio conseguiria, e o aluno nao
 #     tem essa senha na maquina da escola;
 #   - nao fecha programas de ninguem. Se o Teams estiver aberto, ele
-#     continua aberto - so perde a vez na fila do processador.
+#     continua aberto - so perde a vez na fila do processador;
+#   - NAO prende o teclado. Isso e outra chave (travar_teclas, mais
+#     abaixo). Ultra desempenho sozinho nunca tranca o Esc.
 #
 # Para sair: feche o jogo com F10.
 
@@ -991,9 +991,14 @@ ULTRA_DESEMPENHO = {
     "audio_latency": "32",
     "audio_resampler_quality": "1",
 
-    # Tela cheia de verdade.
+    # Tela cheia SEM BORDA, nao a exclusiva. A exclusiva troca o modo de
+    # video da placa e, em placa de video integrada (o caso comum na
+    # escola), costuma perder o foco do teclado quando o Esc tenta abrir
+    # o menu - o RetroArch "recebe" o Esc mas a troca de superficie
+    # engasga e o menu nao aparece. Sem borda custa quase nada de FPS e
+    # nao tem esse problema.
     "video_fullscreen": "true",
-    "video_windowed_fullscreen": "false",
+    "video_windowed_fullscreen": "true",
     "video_max_swapchain_images": "2",
     "video_hard_sync": "false",
     "video_threaded": "false",

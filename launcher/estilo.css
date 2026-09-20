@@ -259,14 +259,17 @@ input::placeholder { color: var(--texto-apagado); }
   transition: transform var(--transicao), background var(--transicao), border-color var(--transicao);
 }
 
-.botao:hover { background: var(--azul-claro); border-color: var(--azul); transform: translateY(-1px); }
-.botao--principal { background: linear-gradient(135deg, #ff718f, #ff9d68); border-color: #ffb18a; color: #281d35; font-weight: 700; }
+/* --azul e --azul-claro sao sempre cores claras/vibrantes nos dois temas
+   (rosa no claro, ciano no escuro) - texto escuro fixo em cima delas le
+   bem nos dois casos. Texto branco em cima do ciano do tema escuro tinha
+   contraste ruim. */
+.botao:hover { background: var(--azul-claro); border-color: var(--azul); color: #1a1428; transform: translateY(-1px); }
 .botao:active { background: var(--painel); }
 
 .botao--principal {
   background: var(--azul);
   border-color: var(--azul);
-  color: #ffffff;
+  color: #1a1428;
   font-weight: 600;
 }
 .botao--principal:hover { background: var(--azul-claro); border-color: var(--azul-claro); }

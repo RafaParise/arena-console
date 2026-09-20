@@ -414,19 +414,8 @@ desempenho**.
 - o ARENA **para de vigiar a rede** enquanto você joga — nenhuma tarefa de
   fundo disputando o processador;
 - a placa de som passa a ser do jogo, sem o misturador do Windows no meio;
-- tela cheia de verdade, não janela sem borda;
-- filtros e efeitos saem de cena.
-
-**Travar o `Alt`+`Tab` é uma chave separada**, logo abaixo. Ela prende o
-teclado no jogo — mas prende o `Esc` junto, então **o menu para de abrir**
-enquanto estiver ligada.
-
-Para soltar sem fechar o jogo: **`F9`**. Aperte uma vez e o `Esc` volta a
-funcionar; aperte de novo para travar outra vez.
-
-Ela vem **desligada**. Antes ela vinha junto com o ultra desempenho, e o
-aluno ficava sem menu sem entender por quê — eram duas decisões diferentes
-num botão só.
+- tela cheia sem borda (não a exclusiva — em placa de vídeo integrada a
+  exclusiva às vezes engasga a troca de tela e o menu não aparece);
 - filtros, voltar no tempo e resposta instantânea saem de cena.
 
 **O que ele não faz**, e não adianta prometer:
@@ -435,7 +424,39 @@ num botão só.
   senha de administrador e um driver próprio — o aluno não tem essa senha
   na máquina da escola;
 - **não fecha programa de ninguém.** Se o Teams estiver aberto, continua
-  aberto: só perde a vez na fila do processador.
+  aberto: só perde a vez na fila do processador;
+- **não prende o teclado.** O `Esc` sempre abre o menu do RetroArch com o
+  Ultra desempenho ligado sozinho. Prender o teclado é outra chave, veja
+  abaixo.
+
+### Travar `Alt`+`Tab` e a tecla Windows
+
+Outra chave, separada do Ultra desempenho, em **Ajustes → Máquina →
+Travar Alt+Tab e tecla Windows**.
+
+Ela prende o teclado inteiro no jogo — inclusive o **`Esc`**, então o
+menu do RetroArch para de abrir enquanto estiver ligada.
+
+Para soltar sem fechar o jogo: aperte **`F9`**. O `Esc` volta a
+funcionar; aperte `F9` de novo para travar outra vez.
+
+Vem **desligada** por padrão. Antes ela vinha junto com o Ultra
+desempenho, e o aluno ficava sem menu sem entender por quê — eram duas
+decisões diferentes num botão só. Se você quer só desempenho, deixe
+esta chave desligada.
+
+**Resumo do que abre o menu e as savestates, sem precisar do `Esc`:**
+
+| Tecla | O que faz |
+|---|---|
+| `F2` | Salva o jogo agora (savestate) |
+| `F4` | Carrega o último salvo (savestate) |
+| `F9` | Destrava o teclado, se "Travar Alt+Tab" estiver ligada |
+| `F10` | Fecha o jogo e volta pro ARENA |
+
+Essas quatro teclas funcionam **mesmo com o menu do `Esc` travado** —
+são a forma mais rápida de salvar e carregar, sem precisar abrir menu
+nenhum.
 
 Para sair: **`F10`**, que fecha o jogo. Aí tudo volta ao normal sozinho.
 

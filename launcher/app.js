@@ -91,13 +91,13 @@ async function pedir(rota, metodo = "GET", corpo = null) {
 
 let temporizadorRecado = null;
 
-function recado(texto, erro = false) {
+function recado(texto, erro = false, duracaoMs = 4500) {
   const caixa = $("#recado");
   caixa.textContent = texto;
   caixa.classList.toggle("recado--erro", erro);
   caixa.hidden = false;
   clearTimeout(temporizadorRecado);
-  temporizadorRecado = setTimeout(() => { caixa.hidden = true; }, 4500);
+  temporizadorRecado = setTimeout(() => { caixa.hidden = true; }, duracaoMs);
 }
 
 function aviso(texto) {
@@ -618,7 +618,11 @@ async function jogar(jogo) {
     const dados = await pedir("/api/jogar", "POST", { jogo_id: jogo.id, apelido });
     const recentes = [jogo.id, ...(estado.config.recentes || []).filter((id) => id !== jogo.id)].slice(0, 20);
     salvarConfig({ recentes }).then(() => desenharJogos()).catch(() => {});
-    recado(`Abrindo ${jogo.titulo} pelo ${dados.emulador}. Aguarde uns segundos.`);
+    const dicaTeclas = estado.config.travar_teclas
+      ? " F2 salva, F4 carrega, F9 destrava o teclado, F10 fecha o jogo."
+      : " F2 salva, F4 carrega, F10 fecha o jogo.";
+    recado(`Abrindo ${jogo.titulo} pelo ${dados.emulador}. Aguarde uns segundos.` + dicaTeclas,
+      false, 9000);
   } catch (falha) {
     recado(falha.message, true);
   }
