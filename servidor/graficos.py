@@ -27,6 +27,7 @@ So biblioteca padrao.
 
 import json
 import os
+import re
 import time
 import threading
 
@@ -223,13 +224,14 @@ def achar_externo_detalhado(plataforma):
     prefixo = externo["nome"].lower()
     compactado = None
     candidato_prefixo = None
+    achados = {}  # nome exato encontrado -> caminho completo
 
     # Primeiro na propria pasta, depois um nivel abaixo.
     for raiz, subpastas, arquivos in os.walk(base):
         for arquivo in arquivos:
             nome_baixo = arquivo.lower()
-            if nome_baixo in procurados:
-                return os.path.join(raiz, arquivo), None, externo
+            if nome_baixo in procurados and nome_baixo not in achados:
+                achados[nome_baixo] = os.path.join(raiz, arquivo)
             if (candidato_prefixo is None and nome_baixo.endswith(".exe")
                     and nome_baixo.startswith(prefixo)):
                 candidato_prefixo = os.path.join(raiz, arquivo)
@@ -239,6 +241,14 @@ def achar_externo_detalhado(plataforma):
         # subpastas e varrer tudo seria lento em pen drive.
         if raiz.count(os.sep) - base.count(os.sep) >= 1:
             subpastas[:] = []
+
+    # Quando mais de uma variante esta instalada ao mesmo tempo (ex.: o
+    # Xenia Canary normal E a versao com netplay), vence a que vier
+    # primeiro na lista do cadastro - "executaveis" fica em ordem de
+    # preferencia, nao em ordem alfabetica.
+    for nome in procurados:
+        if nome in achados:
+            return achados[nome], None, externo
 
     if candidato_prefixo:
         return candidato_prefixo, None, externo
@@ -694,6 +704,180 @@ def escrever_config_pcsx2(caminho_executavel, ultra=False):
 
     try:
         os.makedirs(os.path.dirname(destino), exist_ok=True)
+        gravar_atomico(destino, texto)
+        return destino
+    except OSError:
+        return None
+
+
+def _trocar_valor_toml(texto, chave, valor):
+    """Troca so o VALOR de uma linha 'chave = valor  # comentario' do TOML.
+
+    Preserva o alinhamento e o comentario que vem depois - o arquivo do
+    Xenia e feito pra ser lido por gente, com centenas de linhas de
+    explicacao, e reescrever tudo do zero jogaria essas explicacoes fora.
+    So mexe na primeira ocorrencia da chave no inicio da linha.
+    """
+    padrao = re.compile(r"^(" + re.escape(chave) + r"\s*=\s*)\S+", re.MULTILINE)
+    return padrao.sub(lambda m: m.group(1) + valor, texto, count=1)
+
+
+def escrever_config_xenia(caminho_executavel, nota, nota_gpu=None, modesto=False,
+                          ultra=False):
+    """Escreve o bloco de video do Xenia (Xbox 360), preservando o resto.
+
+    NAO escreve mapeamento de controle: o formato dos 'keybind_*' do Xenia
+    (codigo de tecla do Windows em hexadecimal, ou letra solta, ou um
+    prefixo '^' cujo significado exato nao pude confirmar sem testar de
+    verdade) e arriscado demais pra converter as cegas a partir do mapa
+    interno do ARENA. Fica pro RetroArch, onde o ARENA ja sabe traduzir
+    tecla com confianca.
+
+    So mexe se o Xenia ja rodou pelo menos uma vez e criou o arquivo dele
+    - nao inventamos um do zero, pra nao perder as centenas de opcoes que
+    so o Xenia sabe o valor certo.
+    """
+    pasta = os.path.dirname(caminho_executavel)
+    nome_exe = os.path.splitext(os.path.basename(caminho_executavel))[0]
+    nome_config = nome_exe.replace("_", "-") + ".config.toml"
+    destino = os.path.join(pasta, nome_config)
+
+    if not os.path.isfile(destino):
+        return None
+
+    try:
+        with open(destino, "r", encoding="utf-8") as arquivo:
+            texto = arquivo.read()
+    except OSError:
+        return None
+
+    alvo_nota = nota_gpu if nota_gpu is not None else nota
+    forte = alvo_nota >= 4 and not modesto
+
+    ajustes = {
+        "fullscreen": "true" if ultra else "false",
+        "vsync": "true",
+        "framerate_limit": "0",
+    }
+    if modesto or alvo_nota <= 2:
+        # Resolucao nativa do jogo, sem escala nem suavizacao - o mais
+        # leve possivel, para quando ate o perfil normal engasga.
+        ajustes.update({
+            "draw_resolution_scale_x": "1",
+            "draw_resolution_scale_y": "1",
+            "anisotropic_override": "0",
+            "postprocess_antialiasing": '""',
+            "postprocess_scaling_and_sharpening": '"bilinear"',
+        })
+    elif forte:
+        # Maquina forte: dobra a resolucao interna e usa o FSR da AMD pra
+        # deixar a imagem mais nitida - funciona em qualquer placa, nao
+        # so AMD.
+        ajustes.update({
+            "draw_resolution_scale_x": "2",
+            "draw_resolution_scale_y": "2",
+            "anisotropic_override": "5",
+            "postprocess_antialiasing": '""',
+            "postprocess_scaling_and_sharpening": '"fsr"',
+        })
+    else:
+        ajustes.update({
+            "draw_resolution_scale_x": "1",
+            "draw_resolution_scale_y": "1",
+            "anisotropic_override": "2",
+            "postprocess_antialiasing": '"fxaa"',
+            "postprocess_scaling_and_sharpening": '"bilinear"',
+        })
+
+    for chave, valor in ajustes.items():
+        texto = _trocar_valor_toml(texto, chave, valor)
+
+    try:
+        gravar_atomico(destino, texto)
+        return destino
+    except OSError:
+        return None
+
+
+def _trocar_valor_yaml(texto, secao, chave, valor):
+    """Troca o valor de 'chave: valor' dentro de uma secao do YAML do RPCS3.
+
+    O YAML do RPCS3 usa indentacao (2 espacos por nivel) pra dizer o que
+    esta dentro de que secao - por isso nao da pra so procurar a chave em
+    qualquer lugar do arquivo: "Renderer:" aparece dentro de "Video:" E
+    de "Audio:", com sentidos diferentes. So troca a chave de 2 espacos
+    de indentacao que estiver dentro da secao pedida (0 espacos).
+    """
+    linhas = texto.split("\n")
+    prefixo = "  " + chave + ":"
+    dentro = False
+    for i, linha in enumerate(linhas):
+        if linha.startswith(secao + ":"):
+            dentro = True
+            continue
+        if not linha.startswith(" ") and linha.strip():
+            dentro = False
+        if dentro and linha.startswith(prefixo):
+            linhas[i] = "  %s: %s" % (chave, valor)
+    return "\n".join(linhas)
+
+
+def escrever_config_rpcs3(caminho_executavel, nota, nota_gpu=None, modesto=False,
+                          ultra=False):
+    """Escreve o bloco de video do RPCS3 (PlayStation 3), preservando o resto.
+
+    Mesma logica do Xenia: so mexe se o RPCS3 ja criou o config.yml dele
+    (primeira vez que abre, mesmo sem jogo nenhum). O mapeamento de
+    controle do RPCS3 fica em arquivos separados dentro de
+    config/input_configs/ e o formato deles ainda nao foi conferido -
+    fica pra depois.
+    """
+    pasta = os.path.dirname(caminho_executavel)
+    destino = os.path.join(pasta, "config", "config.yml")
+
+    if not os.path.isfile(destino):
+        return None
+
+    try:
+        with open(destino, "r", encoding="utf-8") as arquivo:
+            texto = arquivo.read()
+    except OSError:
+        return None
+
+    alvo_nota = nota_gpu if nota_gpu is not None else nota
+    forte = alvo_nota >= 4 and not modesto
+
+    if modesto or alvo_nota <= 2:
+        video = {
+            "Resolution Scale": "100",
+            "Anisotropic Filter Override": "0",
+            "MSAA": "Disabled",
+            "Frame limit": "Off",
+        }
+    elif forte:
+        video = {
+            "Resolution Scale": "150",
+            "Anisotropic Filter Override": "16",
+            "MSAA": "Auto",
+            "Frame limit": "Auto",
+        }
+    else:
+        video = {
+            "Resolution Scale": "100",
+            "Anisotropic Filter Override": "4",
+            "MSAA": "Auto",
+            "Frame limit": "Auto",
+        }
+    video["VSync Mode"] = "Disabled"  # o RetroArch e o Xenia ja cuidam disso melhor
+
+    for chave, valor in video.items():
+        texto = _trocar_valor_yaml(texto, "Video", chave, valor)
+
+    texto = _trocar_valor_yaml(texto, "Miscellaneous",
+                               "Start games in fullscreen mode",
+                               "true" if ultra else "false")
+
+    try:
         gravar_atomico(destino, texto)
         return destino
     except OSError:

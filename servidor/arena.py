@@ -1537,6 +1537,26 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             if escrito:
                 print("[ARENA] Controle do PCSX2 configurado.")
 
+        # Xenia e RPCS3: mesma ideia do PCSX2 acima, mas so o video por
+        # enquanto (ver o comentario em escrever_config_xenia/rpcs3 sobre
+        # por que o controle ainda nao entra aqui).
+        elif jogo["externo"]["dados"]["nome"] == "Xenia":
+            escrito = graficos.escrever_config_xenia(
+                jogo["externo"]["caminho"], CAPACIDADE["nota"],
+                CAPACIDADE.get("nota_gpu"),
+                modesto=bool(config.get("modo_modesto")),
+                ultra=bool(config.get("ultra_desempenho")))
+            if escrito:
+                print("[ARENA] Video do Xenia configurado.")
+        elif jogo["externo"]["dados"]["nome"] == "RPCS3":
+            escrito = graficos.escrever_config_rpcs3(
+                jogo["externo"]["caminho"], CAPACIDADE["nota"],
+                CAPACIDADE.get("nota_gpu"),
+                modesto=bool(config.get("modo_modesto")),
+                ultra=bool(config.get("ultra_desempenho")))
+            if escrito:
+                print("[ARENA] Video do RPCS3 configurado.")
+
         print("[ARENA] Abrindo pelo %s" % jogo["externo"]["dados"]["nome"])
     else:
         extra = dict(partida["opcoes"]) if partida else None
