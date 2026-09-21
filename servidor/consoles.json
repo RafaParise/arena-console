@@ -304,7 +304,7 @@
     {
       "id": "n64",
       "nome": "Nintendo 64",
-      "descricao": "Primeiro console 3D da Nintendo.",
+      "descricao": "Primeiro console 3D da Nintendo. Tem 4 entradas de controle de fabrica.",
       "core": "mupen64plus_next_libretro.dll",
       "extensoes": [
         ".n64",
@@ -315,6 +315,7 @@
       "arquivos_sistema": 0,
       "custo": 3,
       "pede_placar": false,
+      "jogadores_max": 4,
       "apelidos": [
         "n64",
         "nintendo 64"

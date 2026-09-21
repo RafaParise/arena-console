@@ -1223,6 +1223,7 @@ def avaliar_plataformas(forcar=False):
             "peso": plataforma["peso"],
             "pasta": plataforma["pasta"],
             "custo": plataforma.get("custo", 3),
+            "jogadores_max": plataforma.get("jogadores_max", 2),
             "estado": estado,
             "motivo": motivo,
             # Como vai rodar nesta maquina: verde, azul ou vermelho.
@@ -3674,13 +3675,20 @@ class Manipulador(BaseHTTPRequestHandler):
                         return self.erro("Informe o endereco de quem esta "
                                          "hospedando a partida.")
                 pela_internet = bool(dados.get("pela_internet"))
+                jogadores_max = plataforma.get("jogadores_max", 2)
+                try:
+                    posicao = int(dados.get("jogador") or 2)
+                except (TypeError, ValueError):
+                    posicao = 2
+                posicao = max(2, min(posicao, jogadores_max))
                 partida = {
                     "opcoes": graficos.opcoes_de_partida(
                         apelido, hospedar, assistir=assistir,
                         pela_internet=pela_internet,
-                        repasse=str(dados.get("repasse", "saopaulo"))),
+                        repasse=str(dados.get("repasse", "saopaulo")),
+                        jogador=posicao),
                     "argumentos": graficos.argumentos_de_partida(hospedar, endereco),
-                    "papel": "jogador 1" if hospedar else "jogador 2",
+                    "papel": "jogador 1" if hospedar else "jogador %d" % posicao,
                 }
 
             threading.Thread(

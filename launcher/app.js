@@ -1760,6 +1760,7 @@ function abrirPartida(jogo) {
   estado.papelDaPartida = "hospedar";
   $("#partidaJogo").textContent = jogo.titulo;
   $("#campoAmigoPartida").hidden = true;
+  $("#campoJogadorPartida").hidden = true;
   preencherAmigosPartida();
   carregarColegas();
   $("#campoInternet").hidden = false;
@@ -1790,6 +1791,9 @@ async function comecarPartida() {
     corpo.endereco = escolha ? escolha.value : "";
     corpo.partida_token = escolha ? (escolha.dataset.token || "") : "";
     if (!corpo.endereco) { recado("Nenhum amigo encontrado na rede local.", true); return; }
+  }
+  if (estado.papelDaPartida === "entrar" && !$("#campoJogadorPartida").hidden) {
+    corpo.jogador = Number($("#listaJogadorPartida").value) || 2;
   }
 
   try {
@@ -2837,6 +2841,20 @@ function ligarEventos() {
       $("#campoAmigoPartida").hidden = !entrando;
       $("#campoInternet").hidden = false;
       preencherAmigosPartida();
+
+      const maximo = (estado.porPlataforma[estado.jogoDaPartida?.plataforma] || {}).jogadores_max || 2;
+      const mostrarJogador = estado.papelDaPartida === "entrar" && maximo > 2;
+      $("#campoJogadorPartida").hidden = !mostrarJogador;
+      if (mostrarJogador) {
+        const opcoes = document.createDocumentFragment();
+        for (let n = 2; n <= maximo; n++) {
+          const item = document.createElement("option");
+          item.value = String(n);
+          item.textContent = `Jogador ${n}`;
+          opcoes.append(item);
+        }
+        $("#listaJogadorPartida").replaceChildren(opcoes);
+      }
     });
 
   $("#listaDriverControle").addEventListener("change", async (evento) => {

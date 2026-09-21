@@ -912,8 +912,12 @@ REPASSES = {
 REPASSE_PADRAO = "saopaulo"
 
 
+JOGADORES_PADRAO_NETPLAY = 2
+JOGADORES_MAXIMO_NETPLAY = 8  # limite de seguranca; nenhum console cadastrado passa disso
+
+
 def opcoes_de_partida(apelido, hospedar, atraso=0, assistir=False,
-                      pela_internet=False, repasse=REPASSE_PADRAO):
+                      pela_internet=False, repasse=REPASSE_PADRAO, jogador=None):
     """Opcoes do RetroArch para hospedar, entrar ou assistir uma partida.
 
     Assistir e o mesmo caminho de entrar numa partida, so que sem pegar
@@ -924,6 +928,13 @@ def opcoes_de_partida(apelido, hospedar, atraso=0, assistir=False,
 
     Por isso o amigo precisa ter o mesmo jogo para assistir. Sem o jogo,
     nao ha o que desenhar deste lado.
+
+    'jogador' e o numero da posicao (1 a 8) que esta maquina vai ocupar -
+    quem hospeda e sempre o 1; quem entra escolhe 2, 3, 4... conforme o
+    console permitir (N64 tem 4 entradas de fabrica, por exemplo). Cada
+    posicao usa uma chave propria do RetroArch,
+    'netplay_request_device_pN' - nao existe uma unica chave "sou o
+    jogador X", tem que ligar a certa e deixar as outras desligadas.
     """
     # Na rede local os dois se alcancam direto, e e sempre melhor: menos
     # atraso e nada sai da escola. Pela internet, o repasse e o unico
@@ -949,18 +960,15 @@ def opcoes_de_partida(apelido, hospedar, atraso=0, assistir=False,
         "netplay_stateless_mode": "false",
     }
 
-    if assistir:
-        # Espectador nao pede controle nenhum: so olha.
-        opcoes["netplay_request_device_p1"] = "false"
-        opcoes["netplay_request_device_p2"] = "false"
-    elif hospedar:
-        # Quem hospeda fica com o controle do jogador 1.
-        opcoes["netplay_request_device_p1"] = "true"
-        opcoes["netplay_request_device_p2"] = "false"
-    else:
-        # Quem entra fica com o jogador 2.
-        opcoes["netplay_request_device_p1"] = "false"
-        opcoes["netplay_request_device_p2"] = "true"
+    posicao = 1 if hospedar else int(jogador or JOGADORES_PADRAO_NETPLAY)
+    posicao = max(1, min(posicao, JOGADORES_MAXIMO_NETPLAY))
+
+    for n in range(1, JOGADORES_MAXIMO_NETPLAY + 1):
+        # Espectador nao pede controle nenhum: so olha. Todo mundo comeca
+        # desligado, e so a posicao escolhida liga - senao o RetroArch
+        # pode herdar "true" de uma partida anterior gravada no override.
+        opcoes["netplay_request_device_p%d" % n] = (
+            "true" if (not assistir and n == posicao) else "false")
 
     return opcoes
 

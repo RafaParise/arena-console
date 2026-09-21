@@ -267,8 +267,15 @@ partida** → **Começar**. Você é o jogador 1.
 **Quem vai entrar:** clique em **Jogar junto** no **mesmo jogo** → **Entrar
 na partida do amigo** → cole o endereço → **Começar**. Você é o jogador 2.
 
-Os dois precisam do **mesmo arquivo de jogo**. Se um tiver a versão
-americana e o outro a japonesa, a partida nem começa.
+**Jogos com mais de 2 jogadores** (o Nintendo 64 tem 4 entradas de
+controle de fábrica, por exemplo): cada amigo que entra escolhe um
+número diferente — jogador 2, jogador 3, jogador 4 — numa lista que
+aparece na hora de entrar. Cada um joga na sua própria máquina, sem
+dividir tela; o console é que trata todos como se estivessem plugados
+ali. Quem abriu a partida continua sendo sempre o jogador 1.
+
+Os dois (ou mais) precisam do **mesmo arquivo de jogo**. Se um tiver a
+versão americana e o outro a japonesa, a partida nem começa.
 
 Pela rede não passa vídeo nem som, só *"o jogador 2 apertou soco"*. Por isso
 funciona bem até em cabo direto entre dois computadores fracos.
