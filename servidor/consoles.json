@@ -974,6 +974,26 @@
       "pasta": "ScummVM"
     },
     {
+      "id": "tamagotchi",
+      "nome": "Tamagotchi",
+      "descricao": "O bichinho virtual original (1997). So existe UM jogo - o arquivo tama.b, tirado de um conjunto de ROMs do MAME.",
+      "core": "tamalibretro_libretro.dll",
+      "extensoes": [
+        ".b",
+        ".bin"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "tamagotchi",
+        "bichinho virtual",
+        "tama"
+      ],
+      "pasta": "Tamagotchi"
+    },
+    {
       "id": "j2me",
       "nome": "Java ME (celular antigo)",
       "descricao": "Jogos de celular Java de antes do smartphone (Nokia e outros). Precisa do Java instalado no computador - o ARENA nao o instala.",
