@@ -757,6 +757,9 @@ def config_padrao():
         "modo_desempenho": False,
         "ultra_desempenho": False,
         "modo_modesto": False,
+        # "automatico" (decide pela nota da maquina), "leve" ou "bonito".
+        # Vale para os emuladores externos (PCSX2, RPCS3, Xenia).
+        "preset_grafico_externo": "automatico",
         # Interface: tema, jogos marcados e os ultimos abertos.
         "tema": "claro",
         "favoritos": [],
@@ -846,6 +849,8 @@ def ler_config_do_disco():
     config["modo_desempenho"] = bool(salvo.get("modo_desempenho"))
     config["ultra_desempenho"] = bool(salvo.get("ultra_desempenho"))
     config["modo_modesto"] = bool(salvo.get("modo_modesto"))
+    if salvo.get("preset_grafico_externo") in ("automatico", "leve", "bonito"):
+        config["preset_grafico_externo"] = salvo["preset_grafico_externo"]
 
     if salvo.get("tema") in ("claro", "escuro"):
         config["tema"] = salvo["tema"]
@@ -1544,19 +1549,23 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         # enquanto (ver o comentario em escrever_config_xenia/rpcs3 sobre
         # por que o controle ainda nao entra aqui).
         elif jogo["externo"]["dados"]["nome"] == "Xenia":
+            preset = config.get("preset_grafico_externo", "automatico")
             escrito = graficos.escrever_config_xenia(
                 jogo["externo"]["caminho"], CAPACIDADE["nota"],
                 CAPACIDADE.get("nota_gpu"),
                 modesto=bool(config.get("modo_modesto")),
-                ultra=bool(config.get("ultra_desempenho")))
+                ultra=bool(config.get("ultra_desempenho")),
+                preset=None if preset == "automatico" else preset)
             if escrito:
                 print("[ARENA] Video do Xenia configurado.")
         elif jogo["externo"]["dados"]["nome"] == "RPCS3":
+            preset = config.get("preset_grafico_externo", "automatico")
             escrito = graficos.escrever_config_rpcs3(
                 jogo["externo"]["caminho"], CAPACIDADE["nota"],
                 CAPACIDADE.get("nota_gpu"),
                 modesto=bool(config.get("modo_modesto")),
-                ultra=bool(config.get("ultra_desempenho")))
+                ultra=bool(config.get("ultra_desempenho")),
+                preset=None if preset == "automatico" else preset)
             if escrito:
                 print("[ARENA] Video do RPCS3 configurado.")
 
@@ -3550,6 +3559,8 @@ class Manipulador(BaseHTTPRequestHandler):
 
             if "modo_desempenho" in dados:
                 config["modo_desempenho"] = bool(dados["modo_desempenho"])
+            if dados.get("preset_grafico_externo") in ("automatico", "leve", "bonito"):
+                config["preset_grafico_externo"] = dados["preset_grafico_externo"]
             if dados.get("tema") in ("claro", "escuro"):
                 config["tema"] = dados["tema"]
 

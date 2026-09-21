@@ -554,6 +554,28 @@
     <p class="explica">Coloque cada emulador na pasta <code>emuladores</code>.</p>
 
     <div>
+      <h3 class="grupo-titulo">Qualidade gráfica nesses emuladores</h3>
+      <p class="explica">
+        Vale para PCSX2, RPCS3 e Xenia. O ARENA ajusta resolução,
+        suavização de serrilhado e nitidez sozinho — escolha só o
+        resultado que quer.
+      </p>
+      <div class="opcao">
+        <span class="opcao-rotulo">Como ajustar</span>
+        <select class="opcao-controle" id="listaPresetGrafico">
+          <option value="automatico">Automático (recomendado)</option>
+          <option value="leve">Mais leve</option>
+          <option value="bonito">Mais bonito</option>
+        </select>
+      </div>
+      <p class="explica" id="explicaPresetGrafico">
+        O ARENA escolhe pela força do seu computador: aumenta a
+        resolução em máquina forte, deixa no tamanho original em
+        máquina fraca.
+      </p>
+    </div>
+
+    <div>
       <h3 class="grupo-titulo">Qual BIOS usar em cada console</h3>
       <p class="explica">Escolha uma BIOS instalada em <code>retroarch\system</code>.</p>
       <div class="avancado" id="listaBios"></div>

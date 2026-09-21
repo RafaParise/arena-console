@@ -129,6 +129,9 @@ async function carregarEstado() {
   $("#chaveModesto").setAttribute("aria-pressed",
     dados.config.modo_modesto ? "true" : "false");
 
+  $("#listaPresetGrafico").value = dados.config.preset_grafico_externo || "automatico";
+  atualizarExplicaPreset();
+
   desenharEnderecos(dados.enderecos || []);
   estado.efetivas = dados.efetivas;
   estado.perfis = dados.perfis;
@@ -895,6 +898,26 @@ async function carregarColegas() {
   } catch (falha) {
     // Sem rede liberada isso é esperado. Não vale um aviso na tela.
   }
+}
+
+// --------------------------------------------------------------------------
+// Qualidade gráfica dos emuladores externos (PCSX2, RPCS3, Xenia)
+// --------------------------------------------------------------------------
+
+const EXPLICA_PRESET_GRAFICO = {
+  automatico: "O ARENA escolhe pela força do seu computador: aumenta a " +
+    "resolução em máquina forte, deixa no tamanho original em máquina fraca.",
+  leve: "Sempre no tamanho original do jogo, sem suavizar nada. Ex.: um " +
+    "jogo de PS3 que travava vira jogável, mas com um pouco mais de serrilhado.",
+  bonito: "Sempre a maior resolução e o melhor acabamento que o ARENA " +
+    "sabe pedir. Ex.: um jogo de Xbox 360 fica bem mais nítido, mas pode " +
+    "cair de quadros por segundo em computador fraco.",
+};
+
+function atualizarExplicaPreset() {
+  const valor = $("#listaPresetGrafico").value;
+  $("#explicaPresetGrafico").textContent =
+    EXPLICA_PRESET_GRAFICO[valor] || EXPLICA_PRESET_GRAFICO.automatico;
 }
 
 // --------------------------------------------------------------------------
@@ -2777,6 +2800,16 @@ function ligarEventos() {
       recado(novo
         ? "Gráfico igual ao console original. Vale no próximo jogo."
         : "Voltou ao gráfico melhorado.");
+    } catch (falha) {
+      recado(falha.message, true);
+    }
+  });
+
+  $("#listaPresetGrafico").addEventListener("change", async (evento) => {
+    try {
+      await salvarConfig({ preset_grafico_externo: evento.target.value });
+      atualizarExplicaPreset();
+      recado("Pronto. Vale no próximo jogo que você abrir pelo PCSX2, RPCS3 ou Xenia.");
     } catch (falha) {
       recado(falha.message, true);
     }

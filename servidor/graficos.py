@@ -723,8 +723,12 @@ def _trocar_valor_toml(texto, chave, valor):
 
 
 def escrever_config_xenia(caminho_executavel, nota, nota_gpu=None, modesto=False,
-                          ultra=False):
+                          ultra=False, preset=None):
     """Escreve o bloco de video do Xenia (Xbox 360), preservando o resto.
+
+    'preset' deixa a pessoa escolher na mao em vez de confiar na nota da
+    maquina: "leve" (o mais leve possivel), "bonito" (o melhor que a
+    placa aguentar) ou None/"automatico" (decide pela nota, o padrao).
 
     NAO escreve mapeamento de controle: o formato dos 'keybind_*' do Xenia
     (codigo de tecla do Windows em hexadecimal, ou letra solta, ou um
@@ -752,14 +756,20 @@ def escrever_config_xenia(caminho_executavel, nota, nota_gpu=None, modesto=False
         return None
 
     alvo_nota = nota_gpu if nota_gpu is not None else nota
-    forte = alvo_nota >= 4 and not modesto
+    if preset == "leve":
+        modo_fraco, forte = True, False
+    elif preset == "bonito":
+        modo_fraco, forte = False, True
+    else:
+        modo_fraco = modesto or alvo_nota <= 2
+        forte = alvo_nota >= 4 and not modesto
 
     ajustes = {
         "fullscreen": "true" if ultra else "false",
         "vsync": "true",
         "framerate_limit": "0",
     }
-    if modesto or alvo_nota <= 2:
+    if modo_fraco:
         # Resolucao nativa do jogo, sem escala nem suavizacao - o mais
         # leve possivel, para quando ate o perfil normal engasga.
         ajustes.update({
@@ -823,7 +833,7 @@ def _trocar_valor_yaml(texto, secao, chave, valor):
 
 
 def escrever_config_rpcs3(caminho_executavel, nota, nota_gpu=None, modesto=False,
-                          ultra=False):
+                          ultra=False, preset=None):
     """Escreve o bloco de video do RPCS3 (PlayStation 3), preservando o resto.
 
     Mesma logica do Xenia: so mexe se o RPCS3 ja criou o config.yml dele
@@ -831,6 +841,8 @@ def escrever_config_rpcs3(caminho_executavel, nota, nota_gpu=None, modesto=False
     controle do RPCS3 fica em arquivos separados dentro de
     config/input_configs/ e o formato deles ainda nao foi conferido -
     fica pra depois.
+
+    'preset': "leve", "bonito" ou None/"automatico" (decide pela nota).
     """
     pasta = os.path.dirname(caminho_executavel)
     destino = os.path.join(pasta, "config", "config.yml")
@@ -845,9 +857,15 @@ def escrever_config_rpcs3(caminho_executavel, nota, nota_gpu=None, modesto=False
         return None
 
     alvo_nota = nota_gpu if nota_gpu is not None else nota
-    forte = alvo_nota >= 4 and not modesto
+    if preset == "leve":
+        modo_fraco, forte = True, False
+    elif preset == "bonito":
+        modo_fraco, forte = False, True
+    else:
+        modo_fraco = modesto or alvo_nota <= 2
+        forte = alvo_nota >= 4 and not modesto
 
-    if modesto or alvo_nota <= 2:
+    if modo_fraco:
         video = {
             "Resolution Scale": "100",
             "Anisotropic Filter Override": "0",
