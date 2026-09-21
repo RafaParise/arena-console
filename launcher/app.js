@@ -503,7 +503,11 @@ function desenharDetalhes() {
   capa.className = `detalhes-capa capa-${classeDaCapa(jogo.plataforma_nome)}`;
   prepararCapa(capa, jogo);
   jogarBotao.disabled = plataforma.estado !== "pronta";
-  multiplayerBotao.disabled = plataforma.estado !== "pronta";
+  const semRede = plataforma.netplay === false;
+  multiplayerBotao.disabled = plataforma.estado !== "pronta" || semRede;
+  multiplayerBotao.title = semRede
+    ? (plataforma.netplay_motivo || "Este console não tem jogo em rede disponível.")
+    : "";
   gerirBotao.disabled = plataforma.estado !== "pronta";
   consoleBotao.hidden = jogo.plataforma !== "indefinido";
 }

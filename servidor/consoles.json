@@ -304,7 +304,7 @@
     {
       "id": "n64",
       "nome": "Nintendo 64",
-      "descricao": "Primeiro console 3D da Nintendo. Tem 4 entradas de controle de fabrica.",
+      "descricao": "Primeiro console 3D da Nintendo. Tem 4 entradas de controle de fabrica - mas so para jogar dividindo a mesma tela, num so computador.",
       "core": "mupen64plus_next_libretro.dll",
       "extensoes": [
         ".n64",
@@ -316,6 +316,8 @@
       "custo": 3,
       "pede_placar": false,
       "jogadores_max": 4,
+      "netplay": false,
+      "netplay_motivo": "O nucleo do N64 (Mupen64Plus-Next) nao suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa. Os 4 jogadores so valem no mesmo computador, com 4 controles.",
       "apelidos": [
         "n64",
         "nintendo 64"

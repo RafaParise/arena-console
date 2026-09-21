@@ -1224,6 +1224,8 @@ def avaliar_plataformas(forcar=False):
             "pasta": plataforma["pasta"],
             "custo": plataforma.get("custo", 3),
             "jogadores_max": plataforma.get("jogadores_max", 2),
+            "netplay": plataforma.get("netplay", True),
+            "netplay_motivo": plataforma.get("netplay_motivo", ""),
             "estado": estado,
             "motivo": motivo,
             # Como vai rodar nesta maquina: verde, azul ou vermelho.
@@ -3659,6 +3661,12 @@ class Manipulador(BaseHTTPRequestHandler):
                     "Jogar junto so funciona pelo RetroArch. Esta plataforma "
                     "esta usando o %s, que tem rede propria."
                     % dados_externo["nome"], 409)
+            if modo and not plataforma.get("netplay", True):
+                with TRAVA_JOGO:
+                    JOGO_EM_ANDAMENTO["ativo"] = False
+                    JOGO_EM_ANDAMENTO["titulo"] = ""
+                return self.erro(plataforma.get("netplay_motivo") or
+                                 "Este console nao tem jogo em rede disponivel.", 409)
             if modo in ("hospedar", "entrar"):
                 hospedar = (modo == "hospedar")
                 assistir = False
