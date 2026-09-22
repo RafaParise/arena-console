@@ -1544,11 +1544,19 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         # O ARENA escreve o controle ali: dois analogicos, direcional
         # junto, vibracao e as mesmas teclas do resto do ARENA.
         if jogo["externo"]["dados"]["nome"] == "PCSX2":
+            bios_copiada = graficos.preparar_bios_pcsx2(
+                jogo["externo"]["caminho"], PASTA_SISTEMA)
+            if bios_copiada:
+                print("[ARENA] BIOS do PS2 copiada para o PCSX2: %s" % bios_copiada)
+            preset = config.get("preset_grafico_externo", "automatico")
             escrito = graficos.escrever_config_pcsx2(
                 jogo["externo"]["caminho"],
-                ultra=bool(config.get("ultra_desempenho")))
+                ultra=bool(config.get("ultra_desempenho")),
+                nota=CAPACIDADE["nota"], nota_gpu=CAPACIDADE.get("nota_gpu"),
+                modesto=bool(config.get("modo_modesto")),
+                preset=None if preset == "automatico" else preset)
             if escrito:
-                print("[ARENA] Controle do PCSX2 configurado.")
+                print("[ARENA] Controle e qualidade do PCSX2 configurados.")
 
         # Xenia e RPCS3: mesma ideia do PCSX2 acima, mas so o video por
         # enquanto (ver o comentario em escrever_config_xenia/rpcs3 sobre

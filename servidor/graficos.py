@@ -28,6 +28,7 @@ So biblioteca padrao.
 import json
 import os
 import re
+import shutil
 import time
 import threading
 
@@ -428,6 +429,47 @@ def opcoes_de_bios(nome_curto_core, arquivo):
     return {chave: arquivo for chave in chaves}
 
 
+# BIOS de PS2 tem sempre 4 MB (4194304 bytes) - tamanho fixo, diferente da
+# BIOS de PS1 (512 KB) e do "rom1.bin" que acompanha algumas delas (so o
+# modulo de DVD, nao a BIOS principal). Da pra separar sem ler CRC32.
+TAMANHO_BIOS_PS2 = 4194304
+
+
+def preparar_bios_pcsx2(caminho_executavel, pasta_sistema):
+    """Copia uma BIOS de PS2 de 'pasta_sistema' pra pasta que o PCSX2
+    procura sozinho (bios\\, do lado do executavel) - sem isso ele abre
+    num assistente pedindo pra escolher a BIOS na tela, e o ARENA nao tem
+    como responder por conta do aluno.
+
+    Existem varias BIOS de regioes diferentes possiveis em pasta_sistema;
+    sem CRC32 cadastrado pra cada uma (o jeito que o RetroArch resolve
+    isso sozinho), o ARENA nao sabe qual e' "a certa" pro jogo - so pega
+    a primeira em ordem alfabetica, de forma sempre igual. Nao sobrescreve
+    se ja tem alguma BIOS la' dentro (o aluno pode ter colocado a dele).
+    """
+    destino = os.path.join(os.path.dirname(caminho_executavel), "bios")
+    try:
+        if os.path.isdir(destino) and any(
+                nome.lower().endswith(EXTENSOES_BIOS)
+                for nome in os.listdir(destino)):
+            return None  # ja tem BIOS la, nao mexe.
+
+        candidatos = sorted(
+            nome for nome in os.listdir(pasta_sistema)
+            if nome.lower().endswith(".bin") and
+            os.path.getsize(os.path.join(pasta_sistema, nome)) == TAMANHO_BIOS_PS2)
+        if not candidatos:
+            return None
+
+        os.makedirs(destino, exist_ok=True)
+        escolhida = candidatos[0]
+        shutil.copy2(os.path.join(pasta_sistema, escolhida),
+                     os.path.join(destino, escolhida))
+        return escolhida
+    except OSError:
+        return None
+
+
 def listar_memory_cards(pasta_saves):
     """Lista os memory cards, como se fossem cartoes fisicos numa caixinha.
 
@@ -761,16 +803,32 @@ ShutdownVM = Keyboard/F10
 """
 
 
-def escrever_config_pcsx2(caminho_executavel, ultra=False):
-    """Escreve o bloco de controle e teclas do PCSX2.
+def escrever_config_pcsx2(caminho_executavel, ultra=False, nota=None,
+                          nota_gpu=None, modesto=False, preset=None):
+    """Escreve o bloco de controle, teclas e qualidade grafica do PCSX2.
 
     Preserva tudo o que ja estiver no arquivo fora desses blocos - em
     especial a BIOS, que o aluno configura uma vez pela tela do programa.
+
+    O PCSX2 so grava [EmuCore/GS] no arquivo quando a pessoa muda algo pela
+    tela de Configuracoes - abrir um jogo sozinho, mesmo rodando de
+    verdade, nao cria o bloco (confirmado testando: 20s de corrida real
+    sem nenhuma linha nova). Por isso este bloco e' escrito do zero, com
+    as mesmas chaves que o PCSX2 usa por dentro (UpscaleMultiplier,
+    MaxAnisotropy, TexturePreloading - conferidas no codigo-fonte do
+    PCSX2, nao inventadas), em vez de so completar um arquivo existente
+    como e' feito com o Xenia/RPCS3.
+
+    'preset': "leve", "bonito" ou None/"automatico" (decide pela nota da
+    placa de video, mesma logica do Xenia/RPCS3). Passe 'nota' e/ou
+    'nota_gpu' pra habilitar o ajuste automatico; sem nenhuma nota, so
+    grava controle e teclas (comportamento antigo).
     """
     pasta = os.path.dirname(caminho_executavel)
     destino = os.path.join(pasta, "inis", "PCSX2.ini")
 
-    nossos = {"[Pad1]", "[Pad2]", "[InputSources]", "[Hotkeys]"}
+    nossos = {"[Pad1]", "[Pad2]", "[InputSources]", "[Hotkeys]",
+              "[EmuCore/GS]", "[UI]"}
     guardar, bloco_atual = [], None
 
     try:
@@ -784,12 +842,40 @@ def escrever_config_pcsx2(caminho_executavel, ultra=False):
     except OSError:
         guardar = []
 
-    extra = []
+    linhas_gs = []
+    alvo_nota = nota_gpu if nota_gpu is not None else nota
+    if alvo_nota is not None:
+        if preset == "leve":
+            fraco, forte = True, False
+        elif preset == "bonito":
+            fraco, forte = False, True
+        else:
+            fraco = modesto or alvo_nota <= 2
+            forte = alvo_nota >= 4 and not modesto
+
+        if fraco:
+            # Resolucao nativa do PS2, sem suavizar nada - o mais leve
+            # possivel, para quando ate o perfil normal engasga.
+            escala, aniso, pre_carga = "1", "0", "0"
+        elif forte:
+            escala, aniso, pre_carga = "4", "16", "2"
+        else:
+            escala, aniso, pre_carga = "2", "4", "2"
+
+        linhas_gs += ["UpscaleMultiplier = " + escala,
+                      "MaxAnisotropy = " + aniso,
+                      "TexturePreloading = " + pre_carga]
+
     if ultra:
-        extra = ["", "[EmuCore/GS]", "VsyncEnable = 1",
-                 "OsdShowMessages = false", "OsdShowSpeed = false",
-                 "", "[UI]", "StartFullscreen = true",
-                 "ConfirmShutdown = false"]
+        linhas_gs += ["VsyncEnable = 1", "OsdShowMessages = false",
+                      "OsdShowSpeed = false"]
+
+    extra = []
+    if linhas_gs:
+        extra = ["", "[EmuCore/GS]"] + linhas_gs
+    if ultra:
+        extra += ["", "[UI]", "StartFullscreen = true",
+                  "ConfirmShutdown = false"]
 
     texto = "\n".join(guardar + [""] + BLOCO_PCSX2.splitlines() + extra) + "\n"
 

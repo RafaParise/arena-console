@@ -362,8 +362,12 @@ Ao abrir um jogo, o aviso diz por qual programa: *"Abrindo Black pelo PCSX2"*.
 
 #### Pelos emuladores de fora
 
-O PCSX2 e o Dolphin pedem a BIOS pela tela deles mesmos, na primeira vez que
-abrem. Siga o que o programa pedir.
+**PCSX2:** o ARENA copia uma BIOS de PS2 sozinho (de `retroarch\system`) na
+primeira vez que você abre um jogo por ele, sem precisar mexer em nada. Se
+você já colocou uma BIOS na pasta do PCSX2 antes, o ARENA não mexe nela.
+
+**Dolphin:** ainda pede a BIOS pela tela dele mesmo, na primeira vez que
+abre. Siga o que o programa pedir.
 
 #### Abrir só a BIOS, sem jogo nenhum
 
@@ -393,6 +397,22 @@ volta para 1 de janeiro toda vez e a tela inicial parece vazia.
 
 Fixando uma, você abre a tela do PlayStation, vê a data certa e os
 **ícones do memory card** — do jeito que era no aparelho de verdade.
+
+---
+
+### Qualidade gráfica do PCSX2, RPCS3 e Xenia
+
+Em **Ajustes → Emuladores** tem o seletor **Automático / Mais leve / Mais
+bonito**, com um exemplo de cada opção. Vale para os três emuladores de
+fora que têm imagem ajustável (PS2, PS3, Xbox 360).
+
+| Opção | O que faz |
+|---|---|
+| **Automático** | O padrão. Decide pela nota da placa de vídeo desta máquina — mesma lógica do resto do ARENA |
+| **Mais leve** | Sempre resolução original do console, sem suavizar nada |
+| **Mais bonito** | Sempre a resolução mais alta e o melhor acabamento que o ARENA sabe pedir |
+
+O Dolphin (GameCube) não entra nessa lista ainda.
 
 ---
 
