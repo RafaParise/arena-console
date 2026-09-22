@@ -206,7 +206,6 @@ async function carregarEstado() {
   desenharAmigos([]);
   preencherAmigosPartida();
 
-  $("#perfilApelidoAtual").textContent = estado.config.apelido || "Sem apelido ainda";
   atualizarFotoPerfil(dados.tem_foto_perfil);
 
   $("#camSaves").textContent = dados.pastas.saves;
@@ -542,8 +541,10 @@ function desenharDetalhes() {
     multiplayerBotao.disabled = true;
     gerirBotao.disabled = true;
     consoleBotao.hidden = true;
+    $("#btnAtualizarCapa").disabled = true;
     return;
   }
+  $("#btnAtualizarCapa").disabled = false;
   const plataforma = estado.porPlataforma[jogo.plataforma] || {};
   painel.classList.remove("detalhes--vazio");
   $("#detalhesTitulo").textContent = jogo.titulo;
@@ -2739,6 +2740,42 @@ function ligarEventos() {
   });
   $("#btnEscolherConsole").addEventListener("click", () => {
     if (estado.jogoSelecionado) abrirEscolhaConsole(estado.jogoSelecionado);
+  });
+  $("#btnAtualizarCapa").addEventListener("click", async () => {
+    const jogo = estado.jogoSelecionado;
+    if (!jogo) return;
+    recado("Procurando capa…");
+    try {
+      await pedir("/api/capa/atualizar", "POST", { jogo_id: jogo.id });
+      await carregarCatalogo();
+      recado("Capa encontrada!");
+    } catch (falha) {
+      recado(falha.message, true);
+    }
+  });
+  $("#campoEnviarCapa").addEventListener("change", async (evento) => {
+    const jogo = estado.jogoSelecionado;
+    const arquivo = evento.target.files[0];
+    evento.target.value = "";
+    if (!jogo || !arquivo) return;
+    if (arquivo.size > 6 * 1024 * 1024) {
+      recado("Imagem grande demais (limite de 6 MB).", true);
+      return;
+    }
+    recado("Enviando capa…");
+    try {
+      const imagem = await new Promise((resolve, reject) => {
+        const leitor = new FileReader();
+        leitor.onerror = () => reject(new Error("Não consegui ler o arquivo."));
+        leitor.onload = () => resolve(leitor.result);
+        leitor.readAsDataURL(arquivo);
+      });
+      await pedir("/api/capa/enviar", "POST", { jogo_id: jogo.id, imagem });
+      await carregarCatalogo();
+      recado("Capa enviada!");
+    } catch (falha) {
+      recado(falha.message, true);
+    }
   });
   $("#btnSalvarConsole").addEventListener("click", async () => {
     if (!jogoConsoleEditando) return;

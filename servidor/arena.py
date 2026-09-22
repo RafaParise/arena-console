@@ -54,6 +54,7 @@ import cheats      # noqa: E402
 import controles   # noqa: E402
 import acervo      # noqa: E402
 import internet_archive  # noqa: E402
+import capas_online     # noqa: E402
 import graficos    # noqa: E402
 import hardware    # noqa: E402
 import indexador   # noqa: E402  (precisam vir depois do ajuste de sys.path)
@@ -3663,6 +3664,71 @@ class Manipulador(BaseHTTPRequestHandler):
                 return self.erro("Nao foi possivel gravar a copia.")
             return self.responder_json(
                 {"ok": True, "pasta": os.path.basename(destino)})
+
+        # ---- capa do jogo, buscada sob pedido -------------------------------
+        if caminho == "/api/capa/atualizar":
+            jogo = achar_jogo(str(dados.get("jogo_id", "")))
+            if not jogo:
+                return self.erro("Jogo nao esta no catalogo. Clique em Atualizar lista.", 404)
+            if not VIGIA["internet"]:
+                return self.erro("Sem internet agora. Essa busca precisa de conexao.", 503)
+
+            nome_base = os.path.splitext(os.path.basename(jogo["arquivo"]))[0]
+            ok, motivo = capas_online.buscar_e_baixar(
+                jogo["plataforma"], jogo["titulo"], nome_base)
+            if not ok:
+                return self.erro(motivo or "Nao consegui achar a capa.", 404)
+
+            limpar_caches()
+            manifesto(forcar=True)
+            return self.responder_json({"ok": True})
+
+        if caminho == "/api/capa/enviar":
+            jogo = achar_jogo(str(dados.get("jogo_id", "")))
+            if not jogo:
+                return self.erro("Jogo nao esta no catalogo. Clique em Atualizar lista.", 404)
+
+            imagem = str(dados.get("imagem", ""))
+            if not imagem:
+                return self.erro("Nenhuma imagem enviada.")
+            if "," in imagem:
+                imagem = imagem.split(",", 1)[1]
+            try:
+                brutos = base64.b64decode(imagem, validate=True)
+            except (binascii.Error, ValueError):
+                return self.erro("Imagem invalida.")
+            if not brutos or len(brutos) > 6 * 1024 * 1024:
+                return self.erro("Imagem grande demais (limite de 6 MB).")
+            tipo = _tipo_da_imagem(brutos)
+            if not tipo:
+                return self.erro("Formato de imagem nao aceito (use PNG, JPG ou WEBP).")
+
+            caminho_rom = os.path.join(RAIZ, jogo["arquivo"])
+            if not dentro_da_pasta(caminho_rom, PASTA_JOGOS) or not os.path.isfile(caminho_rom):
+                return self.erro("O arquivo do jogo nao esta mais no lugar.", 404)
+
+            extensoes = {"image/png": ".png", "image/jpeg": ".jpg", "image/webp": ".webp"}
+            pasta_jogo = os.path.dirname(caminho_rom)
+            nome_base = os.path.splitext(os.path.basename(caminho_rom))[0]
+            destino = os.path.join(pasta_jogo, "capas", nome_base + extensoes[tipo])
+            if not dentro_da_pasta(destino, PASTA_JOGOS):
+                return self.erro("Destino invalido.")
+
+            try:
+                os.makedirs(os.path.dirname(destino), exist_ok=True)
+                temporario = "%s.%d.tmp" % (destino, threading.get_ident())
+                with TRAVA_ARQUIVO:
+                    with open(temporario, "wb") as arquivo:
+                        arquivo.write(brutos)
+                        arquivo.flush()
+                        os.fsync(arquivo.fileno())
+                    os.replace(temporario, destino)
+            except OSError as falha:
+                return self.erro("Nao consegui gravar a capa: %s" % falha, 500)
+
+            limpar_caches()
+            manifesto(forcar=True)
+            return self.responder_json({"ok": True})
 
         # ---- perfil (apelido + foto, permanente) ---------------------------
         if caminho == "/api/perfil/foto":

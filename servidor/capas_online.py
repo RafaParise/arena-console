@@ -1,0 +1,96 @@
+# -*- coding: utf-8 -*-
+"""Busca a capa (box art) de um jogo no libretro-thumbnails - o mesmo
+banco de miniaturas que o proprio RetroArch usa no "Atualizador Online
+-> Miniaturas" do menu dele. E' curado pelo projeto libretro, gratis,
+sem chave de API.
+
+So funciona sob pedido (botao "Atualizar capa"), nunca sozinho - a regra
+do ARENA e' nao depender de internet no meio da aula (ver comentario em
+indexador.py). O aluno clica quando quiser tentar.
+"""
+
+import os
+import re
+import subprocess
+import urllib.parse
+
+
+RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PASTA_MINIATURAS = os.path.join(RAIZ, "retroarch", "thumbnails")
+
+# So os sistemas conferidos de verdade (baixei uma capa real de cada e
+# confirmei que chegou). Console que nao esta aqui nao tem essa opcao -
+# PS2, PS3 e Xbox 360 nao tem cobertura boa nesse banco (nao sao nucleos
+# nativos do RetroArch), entao ficam de fora em vez de fingir que tem.
+REPO_POR_PLATAFORMA = {
+    "nes": "Nintendo_-_Nintendo_Entertainment_System",
+    "snes": "Nintendo_-_Super_Nintendo_Entertainment_System",
+    "n64": "Nintendo_-_Nintendo_64",
+    "gameboy": "Nintendo_-_Game_Boy",
+    "gba": "Nintendo_-_Game_Boy_Advance",
+    "nds": "Nintendo_-_Nintendo_DS",
+    "gamecube": "Nintendo_-_GameCube",
+    "megadrive": "Sega_-_Mega_Drive_-_Genesis",
+    "segacd": "Sega_-_Mega-CD_-_Sega_CD",
+    "saturn": "Sega_-_Saturn",
+    "dreamcast": "Sega_-_Dreamcast",
+    "ps1": "Sony_-_PlayStation",
+    "psp": "Sony_-_PlayStation_Portable",
+    "neogeo": "SNK_-_Neo_Geo",
+    "arcade": "MAME",
+}
+
+
+def _limpar_nome_arquivo(nome):
+    """Mesma regra do libretro-thumbnails: troca caractere invalido por
+    "_" no nome do arquivo."""
+    return re.sub(r'[&*/:`<>?\\|"]', "_", nome)
+
+
+def buscar_e_baixar(plataforma_id, titulo_limpo, nome_base_arquivo):
+    """Tenta achar a capa pelo nome do ARQUIVO (com a tag de regiao,
+    tipo "Crash Bandicoot (USA)") e, se nao achar, pelo titulo limpo
+    sem regiao. Salva em retroarch/thumbnails/<plataforma>/Named_Boxarts/
+    com o TITULO LIMPO (e' o que indexador.capas_do_jogo ja procura).
+
+    Devolve (ok, motivo).
+    """
+    repo = REPO_POR_PLATAFORMA.get(plataforma_id)
+    if not repo:
+        return False, "Este console ainda nao tem esse banco de capas."
+
+    candidatos = []
+    if nome_base_arquivo and nome_base_arquivo != titulo_limpo:
+        candidatos.append(nome_base_arquivo)
+    candidatos.append(titulo_limpo)
+
+    for nome in candidatos:
+        nome_arquivo = _limpar_nome_arquivo(nome) + ".png"
+        url = ("https://raw.githubusercontent.com/libretro-thumbnails/%s/"
+              "master/Named_Boxarts/%s" %
+              (repo, urllib.parse.quote(nome_arquivo)))
+
+        destino_pasta = os.path.join(PASTA_MINIATURAS, plataforma_id, "Named_Boxarts")
+        destino = os.path.join(destino_pasta, _limpar_nome_arquivo(titulo_limpo) + ".png")
+        temporario = destino + ".baixando"
+
+        try:
+            os.makedirs(destino_pasta, exist_ok=True)
+            resultado = subprocess.run(
+                ["curl.exe", "--fail", "--silent", "--show-error", "--location",
+                 "--max-time", "15", "-A", "ARENA/1.0", "-o", temporario, url],
+                capture_output=True)
+            if resultado.returncode == 0 and os.path.isfile(temporario) and \
+                    os.path.getsize(temporario) > 0:
+                os.replace(temporario, destino)
+                return True, None
+        except (OSError, subprocess.SubprocessError):
+            pass
+        finally:
+            if os.path.exists(temporario):
+                try:
+                    os.remove(temporario)
+                except OSError:
+                    pass
+
+    return False, "Não achei capa pra esse jogo nesse banco."

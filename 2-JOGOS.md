@@ -36,6 +36,15 @@ Sem capa, aparecem as duas primeiras letras do título. Não tem limite de
 tamanho de imagem além do bom senso — o ARENA não redimensiona a capa do
 jogo (diferente da foto de perfil, que é sempre pequena).
 
+**Buscar automático:** com o jogo selecionado, o painel de detalhes tem
+os botões **Buscar capa** (procura no banco de miniaturas do próprio
+RetroArch — libretro-thumbnails — o mesmo que o RetroArch usa no
+Atualizador Online dele; precisa de internet) e **Enviar capa** (escolhe
+um arquivo do computador na hora, sem precisar navegar até a pasta).
+Cobre bem os consoles emulados pelo RetroArch (SNES, N64, Mega Drive,
+PS1, Dreamcast, Neo Geo, PSP, entre outros); PS2, PS3 e Xbox 360 não têm
+banco de capas bom nessa fonte — para esses, o jeito é enviar manual.
+
 ### Parte A — Adicionar jogos
 
 #### Passo 1 — Escolha a pasta
