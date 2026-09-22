@@ -2135,6 +2135,33 @@ def colegas_na_rede():
     return saida
 
 
+def resolver_endereco_amigo(amigo):
+    """Acha o endereco ATUAL de um amigo, mesmo que o IP tenha mudado
+    desde que foi adicionado.
+
+    Bug relatado: todo amigo tinha o endereco fixo no dia que foi
+    adicionado; IP de DHCP muda (outro dia, outra rede, reconectou o
+    Wi-Fi) e o amigo "sumia", so voltando se alguem removesse e
+    adicionasse nao dinovo. A descoberta automatica de colegas
+    (VIZINHOS, broadcast UDP na 55436) ja resolve exatamente isso, so
+    que so pra quem ainda nao e' amigo - o amigo salvo nunca era
+    conferido contra ela. Agora confere: se o id do amigo estiver entre
+    os vizinhos vistos AGORA, usa o IP de agora (e corrige o salvo, pra
+    nao pedir de novo da proxima vez) - so cai pro endereco antigo salvo
+    se ele nao estiver na rede local agora (rede diferente, internet).
+    """
+    amigo_id = str(amigo.get("id") or "")
+    if amigo_id:
+        with TRAVA_VIZINHOS:
+            vizinho = VIZINHOS.get(amigo_id)
+        if vizinho:
+            url_atual = "http://%s:%d" % (vizinho["ip"], vizinho["porta"])
+            if normalizar_url(url_atual) != normalizar_url(amigo.get("url", "")):
+                amigo["url"] = url_atual
+            return url_atual
+    return amigo.get("url", "")
+
+
 def servidor_alcancavel(url):
     """Testa se o servidor da sala responde, sem travar a interface."""
     url = normalizar_url(url)
@@ -2316,7 +2343,7 @@ def sincronizar_com(destino, config):
     repetida a vontade sem duplicar nada. Se a rede cair no meio, e so
     tentar de novo.
     """
-    url = normalizar_url(destino.get("url"))
+    url = normalizar_url(resolver_endereco_amigo(destino))
     apelido_destino = destino.get("apelido", "servidor")
 
     if not url:
@@ -2487,16 +2514,28 @@ VIGIA = {
 
 
 def quem_esta_online(config):
-    """Testa todos os amigos EM PARALELO, com espera curta."""
+    """Testa todos os amigos EM PARALELO, com espera curta.
+
+    Antes de testar, confere se o amigo apareceu na descoberta automatica
+    com um IP diferente do salvo (DHCP mudou, trocou de rede) - se sim,
+    corrige o endereco salvo sozinho. E o que faz o amigo nao precisar
+    ser removido e adicionado de novo toda vez que o IP muda.
+    """
     amigos = config.get("servidores") or []
     if not amigos:
-        return []
+        return [], False
 
     online = []
+    mudou = [False]
     trava = threading.Lock()
 
     def testar(amigo):
-        if servidor_alcancavel(amigo["url"]):
+        url_anterior = amigo.get("url", "")
+        url = resolver_endereco_amigo(amigo)
+        if url != url_anterior:
+            with trava:
+                mudou[0] = True
+        if servidor_alcancavel(url):
             with trava:
                 online.append(amigo["apelido"])
 
@@ -2507,7 +2546,7 @@ def quem_esta_online(config):
     # Espera curta: o teste de cada um ja tem limite proprio.
     for t in threads:
         t.join(timeout=3.0)
-    return online
+    return online, mudou[0]
 
 
 def rodar_vigia():
@@ -2518,7 +2557,9 @@ def rodar_vigia():
 
         try:
             config = carregar_config()
-            online = quem_esta_online(config)
+            online, enderecos_corrigidos = quem_esta_online(config)
+            if enderecos_corrigidos:
+                salvar_config(config)
             tem_internet = internet_disponivel()
             enderecos_locais(forcar=True)   # renova o cache fora da tela
 
@@ -3157,7 +3198,8 @@ class Manipulador(BaseHTTPRequestHandler):
                                  "'Aceitar conexoes' ligado.", 404)
             return self.api_post("/api/amigo/adicionar",
                                  {"apelido": vizinho["apelido"],
-                                  "url": vizinho["url"]})
+                                  "url": vizinho["url"],
+                                  "id": vizinho["id"]})
 
         # ---- comecar do zero: novo perfil ---------------------------------
         if caminho == "/api/perfil/novo":
@@ -3528,6 +3570,12 @@ class Manipulador(BaseHTTPRequestHandler):
             config["servidores"].append({
                 "apelido": apelido, "url": url,
                 "escola": bool(dados.get("escola")),
+                # Guarda o id do aparelho, quando vem (adicionado pela
+                # descoberta automatica) - e' o que deixa o ARENA achar o
+                # amigo de novo sozinho quando o IP dele mudar. Sem id
+                # (amigo digitado na mao por endereco), fica so o
+                # endereco fixo mesmo, do jeito antigo.
+                "id": str(dados.get("id", ""))[:64],
             })
             salvar_config(config)
             return self.responder_json({"ok": True,

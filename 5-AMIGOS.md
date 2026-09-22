@@ -153,6 +153,13 @@ endereço já preenchido. Clique em **Adicionar** e acabou.
 **Não precisa digitar endereço nenhum** — e some de vez o erro de copiar o
 endereço do adaptador virtual.
 
+Adicionado assim, o amigo fica **permanente de verdade**: se o endereço
+dele mudar depois (outro dia, outro Wi-Fi, o roteador deu um IP novo), o
+ARENA percebe sozinho da próxima vez que ele aparecer na rede e corrige
+— não precisa remover e adicionar de novo. Isso vale só pra quem foi
+adicionado por aqui; amigo digitado na mão (endereço fixo, geralmente de
+internet, "jogar de casa") continua com o endereço que foi digitado.
+
 Funciona em qualquer rede compartilhada: Wi-Fi da escola, ponto de acesso do
 notebook, roteamento do celular ou cabo direto. Os dois precisam estar com
 *Aceitar conexões da rede* ligado. Leva uns segundos para aparecer.
