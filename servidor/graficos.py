@@ -29,6 +29,7 @@ import json
 import os
 import re
 import shutil
+import subprocess
 import time
 import threading
 
@@ -885,6 +886,122 @@ def escrever_config_pcsx2(caminho_executavel, ultra=False, nota=None,
         return destino
     except OSError:
         return None
+
+
+# ---------------------------------------------------------------------------
+# PS2 pela rede: "system link" original, via PCSX2 (DEV9)
+# ---------------------------------------------------------------------------
+# Diferente do RetroArch, o PS2 nao tem netplay generico: o PCSX2 emula a
+# placa de rede de verdade (DEV9) e e' o proprio JOGO que conversa pela
+# rede, do jeito que faria em dois PS2 fisicos ligados por cabo ou num
+# mesmo roteador. So vale pros jogos que ja saiam com essa funcao (existem
+# uns 56 titulos conhecidos - a lista em consoles.json comeca curta, com
+# so o que foi testado de verdade, e cresce aos poucos).
+#
+# O modo que funciona pros dois lados (hospedar OU entrar) precisa do
+# driver Npcap ou WinPcap - instalar pede administrador do Windows, contra
+# a regra do ARENA de nunca pedir isso sozinho. Por isso e' opcional: o
+# ARENA so DETECTA se ja esta instalado (isso nao pede admin nenhum, so
+# confere se o arquivo do driver existe) e configura o PCSX2 de acordo.
+# Sem o driver, ainda da pra ENTRAR (nao hospedar) numa partida de outra
+# maquina que ja tenha o driver, ou de um PS2 de verdade - modo "Sockets"
+# do proprio PCSX2, documentado assim pela comunidade dele.
+
+ADAPTADORES_VIRTUAIS_PS2 = (
+    "virtualbox", "vmware", "hyper-v", "wsl", "loopback", "tap-windows",
+    "npcap loopback", "wi-fi direct", "bluetooth",
+)
+
+
+def jogo_tem_system_link_ps2(plataforma, titulo):
+    """Confere se o jogo esta na lista de PS2 com 'system link' de
+    verdade (consoles.json -> externo.jogos_system_link). Lista curta de
+    proposito: so cresce testando com jogo real, nunca por suposicao."""
+    lista = (plataforma.get("externo") or {}).get("jogos_system_link", [])
+    titulo_normalizado = (titulo or "").lower()
+    return any(nome.lower() in titulo_normalizado for nome in lista)
+
+
+def npcap_instalado():
+    """Confere se o Npcap (ou WinPcap) esta instalado - so olha se os
+    arquivos do driver existem, sem precisar de administrador pra isso."""
+    raiz_windows = os.environ.get("WINDIR", "C:\\Windows")
+    candidatos = [
+        os.path.join(raiz_windows, "System32", "Npcap", "wpcap.dll"),
+        os.path.join(raiz_windows, "System32", "wpcap.dll"),
+    ]
+    return any(os.path.isfile(c) for c in candidatos)
+
+
+def adaptador_de_rede_real():
+    """Acha o nome do primeiro adaptador de rede de verdade (Wi-Fi,
+    Ethernet) que estiver ligado, ignorando os virtuais - pro PCSX2 saber
+    por onde sair pra rede de verdade em vez de um adaptador que nenhum
+    colega alcanca (mesma ideia da lista de adaptadores virtuais que a
+    descoberta de colegas ja usa, so que aqui por nome, nao por IP)."""
+    try:
+        saida = subprocess.run(
+            ["powershell.exe", "-NoProfile", "-NonInteractive", "-Command",
+             "Get-NetAdapter | Where-Object Status -eq 'Up' | "
+             "Sort-Object ifIndex | Select-Object -ExpandProperty Name"],
+            capture_output=True, text=True, timeout=10)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    for linha in saida.stdout.splitlines():
+        nome = linha.strip()
+        if nome and not any(v in nome.lower() for v in ADAPTADORES_VIRTUAIS_PS2):
+            return nome
+    return None
+
+
+def escrever_config_rede_ps2(caminho_executavel):
+    """Escreve o bloco [DEV9/Eth] do PCSX2 pra habilitar a rede do PS2 de
+    verdade (system link), preservando o resto do arquivo.
+
+    Com o driver instalado: modo 'PCAPBridged', que funciona pros dois
+    lados, ligado ao primeiro adaptador de rede de verdade que achar.
+    Sem o driver: modo 'Sockets', que so serve pra ENTRAR numa partida
+    hospedada por outra maquina com o driver (ou um PS2 de verdade).
+
+    Retorna um dicionario dizendo o que foi configurado, pra tela poder
+    avisar certo (com ou sem driver, qual adaptador) - ou None se nao deu
+    pra escrever.
+    """
+    pasta = os.path.dirname(caminho_executavel)
+    destino = os.path.join(pasta, "inis", "PCSX2.ini")
+
+    nosso_bloco = "[DEV9/Eth]"
+    guardar, bloco_atual = [], None
+    try:
+        with open(destino, "r", encoding="utf-8", errors="replace") as arquivo:
+            for linha in arquivo:
+                limpo = linha.strip()
+                if limpo.startswith("[") and limpo.endswith("]"):
+                    bloco_atual = limpo
+                if bloco_atual != nosso_bloco:
+                    guardar.append(linha.rstrip("\n"))
+    except OSError:
+        guardar = []
+
+    com_driver = npcap_instalado()
+    adaptador = adaptador_de_rede_real() if com_driver else None
+
+    linhas = ["", "[DEV9/Eth]", "EthEnable = true"]
+    if com_driver and adaptador:
+        linhas += ["EthApi = PCAPBridged", "InterfaceName = %s" % adaptador]
+        modo = "pcap"
+    else:
+        linhas += ["EthApi = Sockets"]
+        modo = "sockets"
+
+    texto = "\n".join(guardar + linhas) + "\n"
+    try:
+        os.makedirs(os.path.dirname(destino), exist_ok=True)
+        gravar_atomico(destino, texto)
+    except OSError:
+        return None
+
+    return {"modo": modo, "adaptador": adaptador, "com_driver": bool(com_driver)}
 
 
 def _trocar_valor_toml(texto, chave, valor):

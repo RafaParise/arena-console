@@ -131,6 +131,7 @@ async function carregarEstado() {
 
   $("#listaPresetGrafico").value = dados.config.preset_grafico_externo || "automatico";
   atualizarExplicaPreset();
+  desenharRedePs2(dados.rede_ps2 || {});
 
   desenharEnderecos(dados.enderecos || []);
   estado.efetivas = dados.efetivas;
@@ -918,6 +919,26 @@ function atualizarExplicaPreset() {
   const valor = $("#listaPresetGrafico").value;
   $("#explicaPresetGrafico").textContent =
     EXPLICA_PRESET_GRAFICO[valor] || EXPLICA_PRESET_GRAFICO.automatico;
+}
+
+function desenharRedePs2(redePs2) {
+  const jogos = redePs2.jogos || [];
+  const status = $("#statusRedePs2");
+  const explicaDriver = $("#explicaDriverPs2");
+
+  if (jogos.length === 0) {
+    status.textContent = "Nenhum jogo com rede de verdade confirmado ainda.";
+    explicaDriver.hidden = true;
+    return;
+  }
+
+  const lista = jogos.map((j) => j[0].toUpperCase() + j.slice(1)).join(", ");
+  if (redePs2.driver_instalado) {
+    status.textContent = `Driver de rede instalado — hospedar e entrar liberados em: ${lista}.`;
+  } else {
+    status.textContent = `Sem o driver de rede — só dá pra entrar (não hospedar) em: ${lista}.`;
+  }
+  explicaDriver.hidden = !!redePs2.driver_instalado;
 }
 
 // --------------------------------------------------------------------------

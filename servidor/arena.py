@@ -1558,6 +1558,18 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             if escrito:
                 print("[ARENA] Controle e qualidade do PCSX2 configurados.")
 
+            plataforma_ps2 = next((p for p in carregar_catalogo()
+                                   if p["id"] == jogo.get("plataforma")), None)
+            if plataforma_ps2 and graficos.jogo_tem_system_link_ps2(
+                    plataforma_ps2, jogo["titulo"]):
+                rede = graficos.escrever_config_rede_ps2(jogo["externo"]["caminho"])
+                if rede and rede["com_driver"]:
+                    print("[ARENA] Rede do PS2 (system link) configurada "
+                         "pelo adaptador %s." % rede["adaptador"])
+                elif rede:
+                    print("[ARENA] Rede do PS2 configurada so pra ENTRAR "
+                         "(sem o driver Npcap, nao da pra hospedar).")
+
         # Xenia e RPCS3: mesma ideia do PCSX2 acima, mas so o video por
         # enquanto (ver o comentario em escrever_config_xenia/rpcs3 sobre
         # por que o controle ainda nao entra aqui).
@@ -2735,6 +2747,12 @@ class Manipulador(BaseHTTPRequestHandler):
                     for p in carregar_catalogo()
                     if p["id"] in graficos.consoles_com_botoes()],
                 "externos": graficos.situacao_dos_externos(carregar_catalogo()),
+                "rede_ps2": {
+                    "driver_instalado": graficos.npcap_instalado(),
+                    "jogos": next(
+                        ((p.get("externo") or {}).get("jogos_system_link", [])
+                         for p in carregar_catalogo() if p["id"] == "ps2"), []),
+                },
                 "bios_disponiveis": graficos.bios_disponiveis(PASTA_SISTEMA),
                 "memory_cards": graficos.listar_memory_cards(PASTA_SAVES),
                 "bios_consoles": [
@@ -3773,6 +3791,19 @@ class Manipulador(BaseHTTPRequestHandler):
                 resposta["porta"] = graficos.PORTA_PARTIDA
             if aviso_netplay:
                 resposta["aviso"] = aviso_netplay
+            elif (caminho_externo and dados_externo["nome"] == "PCSX2" and
+                  graficos.jogo_tem_system_link_ps2(plataforma, jogo["titulo"])):
+                if graficos.npcap_instalado():
+                    resposta["aviso"] = (
+                        "Este jogo tem rede de verdade (system link) - o ARENA "
+                        "ja configurou. Abra o menu de rede DENTRO do jogo pra "
+                        "hospedar ou entrar numa partida.")
+                else:
+                    resposta["aviso"] = (
+                        "Este jogo tem rede de verdade (system link), mas so "
+                        "pra ENTRAR numa partida de outra maquina - falta o "
+                        "driver de rede pra tambem hospedar. Ver Ajustes -> "
+                        "Emuladores.")
             return self.responder_json(resposta)
 
         if caminho == "/api/placar":

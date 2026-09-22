@@ -585,7 +585,10 @@
           "{jogo}"
         ],
         "site": "pcsx2.net/downloads",
-        "motivo": "OBRIGATORIO. O nucleo de PlayStation 2 do RetroArch e pouco mantido e costuma nem abrir o jogo."
+        "motivo": "OBRIGATORIO. O nucleo de PlayStation 2 do RetroArch e pouco mantido e costuma nem abrir o jogo.",
+        "jogos_system_link": [
+          "gran turismo 4"
+        ]
       },
       "pasta": "PS2"
     },

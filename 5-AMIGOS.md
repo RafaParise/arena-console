@@ -540,7 +540,27 @@ passar o mouse em cima.
 | Super Nintendo, Mega Drive/Master System/Game Gear, a maioria dos consoles 2D | Funciona normal |
 | PlayStation 1 | Funciona, mas usa um emulador diferente por baixo (PCSX ReARMed) só enquanto durar o Jogar Junto — jogando sozinho, o emulador de sempre continua sendo o usado |
 | Nintendo 64, Dreamcast, PSP | Não dá. O emulador de cada um não tem esse recurso |
-| PS2, PS3, Xbox 360 | Não dá pelo Jogar Junto normal — esses usam um programa à parte (PCSX2, RPCS3, Xenia), sem esse recurso em rede pronto do jeito do RetroArch |
+| PS2, PS3, Xbox 360 | Não dá pelo Jogar Junto normal — esses usam um programa à parte (PCSX2, RPCS3, Xenia), sem esse recurso em rede pronto do jeito do RetroArch. Alguns jogos de PS2 têm rede de um outro jeito — ver abaixo |
+
+### PS2 em rede de verdade (system link)
+
+Uns poucos jogos de PS2 (a lista cresce conforme forem testados — hoje só
+o *Gran Turismo 4*) têm rede de verdade, do jeito que tinham no console
+físico: dois PS2 ligados por cabo ou no mesmo roteador. Não é o botão
+Jogar Junto — é o **próprio jogo** que hospeda ou entra numa partida,
+pelo menu de rede dele mesmo, dentro do jogo.
+
+O ARENA prepara a rede sozinho quando você abre um desses jogos — nada
+para configurar. Só tem uma diferença:
+
+- **Com o driver de rede instalado (Npcap):** dá para hospedar e entrar.
+- **Sem o driver:** só dá para entrar numa partida de outra máquina que
+  já tenha o driver (ou de um PS2 de verdade).
+
+O driver é opcional porque instalar ele pede a senha de administrador do
+Windows — o ARENA nunca pede isso sozinho para nada. Quem quiser tentar
+instalar encontra o status e o link oficial em **Ajustes → Emuladores**,
+seção "PS2 em rede (system link)".
 
 ### Como a tela fica em cada um
 
