@@ -517,6 +517,19 @@ input::placeholder { color: var(--texto-apagado); }
   object-fit: cover;
   border-radius: inherit;
 }
+/* Cartucho, caixa de DVD/Xbox e cartao sao retangulos - mostra a capa
+   INTEIRA (sem cortar topo/base), preenchendo o resto com a cor do
+   molde em vez de esticar ou cortar a imagem enviada. So o disco
+   (jewel case/UMD) continua com "cover", porque ali a capa VIRA o
+   disco de proposito. */
+.midia--cartucho_h .capa-imagem,
+.midia--cartucho_v .capa-imagem,
+.midia--caixa_dvd .capa-imagem,
+.midia--caixa_xbox .capa-imagem,
+.midia--cartao .capa-imagem {
+  object-fit: contain;
+  background: rgba(0,0,0,.25);
+}
 .midia-etiqueta {
   position: absolute;
   display: flex;
@@ -615,6 +628,47 @@ input::placeholder { color: var(--texto-apagado); }
   background: linear-gradient(180deg, #3a3a44, #16161a);
   border-right: 1px solid rgba(0,0,0,.5);
 }
+
+/* Caixa do Xbox 360: mesma ideia da caixa de DVD, mas com a lombada
+   verde - a cor mais associada ao console. */
+.midia--caixa_xbox {
+  padding: 4% 4% 4% 10%;
+  background: #0c0c0f;
+  border: 1px solid rgba(255,255,255,.08);
+}
+.midia--caixa_xbox .midia-etiqueta { inset: 4% 4% 4% 10%; border-radius: 1px; }
+.midia--caixa_xbox::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 8%;
+  background: linear-gradient(180deg, #6fbf3f, #2f6318);
+  border-right: 1px solid rgba(0,0,0,.5);
+}
+
+/* UMD do PSP: disco pequeno dentro de uma caixinha propria (bem menor
+   que o disco do PS1/PS3, com moldura visivel ao redor). */
+.midia--umd {
+  padding: 14%;
+  background: linear-gradient(160deg, #3a3a44, #17171c 75%);
+}
+.midia--umd .midia-etiqueta {
+  inset: 14%;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 2px rgba(0,0,0,.4),
+    inset 0 0 0 6px rgba(0,0,0,.15);
+}
+.midia--umd .midia-etiqueta::after {
+  content: "";
+  position: absolute;
+  inset: 0; margin: auto;
+  width: 22%; height: 22%;
+  border-radius: 50%;
+  background: #17171c;
+  box-shadow: 0 0 0 2px rgba(0,0,0,.5);
+}
+.midia--umd .capa-imagem { border-radius: 50%; }
 
 /* Cartao/digital: sem molde de plastico - so um cartao arredondado
    simples, pra deixar claro que nao teve mídia física de verdade. */

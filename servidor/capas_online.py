@@ -47,11 +47,19 @@ def _limpar_nome_arquivo(nome):
     return re.sub(r'[&*/:`<>?\\|"]', "_", nome)
 
 
+# O libretro-thumbnails nomeia pela regiao do jogo. Quando o nome do
+# arquivo da ROM nao tem regiao nenhuma (ou tem uma que o banco nao tem
+# exatamente essa revisao), tentar as tags mais comuns aumenta bastante
+# a chance de achar sem precisar adivinhar o nome exato.
+TAGS_REGIAO = ("(USA)", "(World)", "(Europe)", "(Japan)", "(USA, Europe)")
+
+
 def buscar_e_baixar(plataforma_id, titulo_limpo, nome_base_arquivo):
-    """Tenta achar a capa pelo nome do ARQUIVO (com a tag de regiao,
-    tipo "Crash Bandicoot (USA)") e, se nao achar, pelo titulo limpo
-    sem regiao. Salva em retroarch/thumbnails/<plataforma>/Named_Boxarts/
-    com o TITULO LIMPO (e' o que indexador.capas_do_jogo ja procura).
+    """Tenta achar a capa por varios nomes candidatos, do mais especifico
+    (nome do ARQUIVO, com a tag de regiao de verdade) ao mais generico
+    (titulo limpo + cada tag de regiao comum). Salva em
+    retroarch/thumbnails/<plataforma>/Named_Boxarts/ com o TITULO LIMPO
+    (e' o que indexador.capas_do_jogo ja procura).
 
     Devolve (ok, motivo).
     """
@@ -63,6 +71,9 @@ def buscar_e_baixar(plataforma_id, titulo_limpo, nome_base_arquivo):
     if nome_base_arquivo and nome_base_arquivo != titulo_limpo:
         candidatos.append(nome_base_arquivo)
     candidatos.append(titulo_limpo)
+    if "(" not in titulo_limpo:
+        for tag in TAGS_REGIAO:
+            candidatos.append("%s %s" % (titulo_limpo, tag))
 
     for nome in candidatos:
         nome_arquivo = _limpar_nome_arquivo(nome) + ".png"

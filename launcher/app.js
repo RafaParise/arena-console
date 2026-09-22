@@ -386,13 +386,16 @@ const MIDIA_POR_PLATAFORMA = {
     "wonderswan", "nds", "lynx", "pcengine",
   ],
   jewel_case: [
-    "ps1", "saturn", "dreamcast", "segacd", "threedo", "cdi", "pcfx",
+    "ps1", "ps3", "saturn", "dreamcast", "segacd", "threedo", "cdi", "pcfx",
     "scummvm", "dos", "amiga", "spectrum",
   ],
-  caixa_dvd: ["ps2", "gamecube", "ps3", "xbox360"],
-  // Sem mídia física de verdade (portátil digital, homebrew, PSP em UMD
-  // pequeno demais pra valer um molde próprio) - cartão genérico.
-  cartao: ["psp", "tic80", "wasm4", "lowresnx", "uzebox", "tamagotchi", "j2me"],
+  caixa_dvd: ["ps2", "gamecube"],
+  caixa_xbox: ["xbox360"],
+  // UMD: disco pequeno numa caixinha propria, nem CD nem cartucho.
+  umd: ["psp"],
+  // Sem mídia física de verdade (portátil digital, homebrew) - cartão
+  // genérico.
+  cartao: ["tic80", "wasm4", "lowresnx", "uzebox", "tamagotchi", "j2me"],
 };
 
 const TIPO_MIDIA_POR_ID = {};
@@ -466,7 +469,8 @@ function linhaDoJogo(jogo) {
                    `midia midia--${tipoMidia}`;
   capa.setAttribute("aria-hidden", "true");
   capa.title = { cartucho_h: "Cartucho", cartucho_v: "Cartucho portátil",
-                jewel_case: "Caixa de CD", caixa_dvd: "Caixa de DVD",
+                jewel_case: "Caixa de CD/Blu-ray", caixa_dvd: "Caixa de DVD",
+                caixa_xbox: "Caixa de DVD (Xbox 360)", umd: "UMD",
                 cartao: "Mídia digital" }[tipoMidia];
 
   const etiqueta = document.createElement("div");
