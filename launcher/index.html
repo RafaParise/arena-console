@@ -177,6 +177,27 @@
   <!-- Aba amigos -->
   <div class="aba-conteudo" data-painel="rede" hidden>
     <div>
+      <h3 class="grupo-titulo">Meu perfil</h3>
+      <p class="explica">
+        Fica sempre igual, mesmo se o computador ou o pen drive mudar de
+        lugar. É como os colegas te reconhecem.
+      </p>
+      <div class="perfil-box">
+        <img id="perfilFoto" class="perfil-foto" alt="Sua foto de perfil" hidden>
+        <div id="perfilFotoVazia" class="perfil-foto perfil-foto--vazia" aria-hidden="true">?</div>
+        <div class="perfil-box-info">
+          <span class="opcao-rotulo" id="perfilApelidoAtual">—</span>
+          <div class="perfil-box-botoes">
+            <label class="botao" for="perfilFotoArquivo">Escolher foto</label>
+            <input id="perfilFotoArquivo" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+            <button class="botao" id="btnRemoverFotoPerfil" type="button" hidden>Remover foto</button>
+          </div>
+          <span class="opcao-ajuda">PNG, JPG ou WEBP, até 2 MB.</span>
+        </div>
+      </div>
+    </div>
+
+    <div>
       <h3 class="grupo-titulo">Meus amigos</h3>
       <p class="explica">Adicione amigos pelo código.</p>
       <div class="codigo-amigo-box">

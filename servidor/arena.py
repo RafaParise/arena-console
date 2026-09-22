@@ -16,6 +16,8 @@ So biblioteca padrao do Python:
 Nenhum 'pip install'. Nenhuma conexao com a internet.
 """
 
+import base64
+import binascii
 import contextlib
 import ctypes
 import errno
@@ -58,6 +60,7 @@ import indexador   # noqa: E402  (precisam vir depois do ajuste de sys.path)
 
 PASTA_LAUNCHER = os.path.join(RAIZ, "launcher")
 PASTA_DADOS = os.path.join(RAIZ, "dados")
+PASTA_PERFIL = os.path.join(PASTA_DADOS, "perfil")
 PASTA_JOGOS = os.path.join(RAIZ, "jogos")
 PASTA_RETROARCH = os.path.join(RAIZ, "retroarch")
 PASTA_CORES = os.path.join(PASTA_RETROARCH, "cores")
@@ -904,6 +907,93 @@ def salvar_config(config):
     os.makedirs(PASTA_DADOS, exist_ok=True)
     gravar_texto_atomico(
         ARQUIVO_CONFIG, json.dumps(config, ensure_ascii=False, indent=2))
+
+
+# ---------------------------------------------------------------------------
+# Perfil do aluno: apelido + foto, permanente (como um perfil de Steam)
+# ---------------------------------------------------------------------------
+# A foto fica num arquivo separado do config.json, nao dentro dele - imagem
+# em base64 misturada com config de texto deixaria o arquivo ilegivel e
+# pesado de reler a cada requisicao. So um arquivo por vez: nome sempre
+# "foto.<extensao>", trocar a foto apaga a extensao antiga.
+
+TIPOS_FOTO_PERFIL = {"image/png": ".png", "image/jpeg": ".jpg", "image/webp": ".webp"}
+ASSINATURAS_FOTO_PERFIL = {
+    b"\x89PNG\r\n\x1a\n": "image/png",
+    b"\xff\xd8\xff": "image/jpeg",
+}
+LIMITE_FOTO_PERFIL = 2 * 1024 * 1024
+
+
+def foto_perfil_caminho():
+    """Acha o arquivo da foto atual, seja qual for a extensao - ou None
+    se ninguem colocou foto ainda."""
+    try:
+        for nome in os.listdir(PASTA_PERFIL):
+            if nome.startswith("foto."):
+                return os.path.join(PASTA_PERFIL, nome)
+    except OSError:
+        pass
+    return None
+
+
+def _tipo_da_imagem(brutos):
+    for assinatura, tipo in ASSINATURAS_FOTO_PERFIL.items():
+        if brutos.startswith(assinatura):
+            return tipo
+    # WEBP: RIFF....WEBP
+    if brutos[:4] == b"RIFF" and brutos[8:12] == b"WEBP":
+        return "image/webp"
+    return None
+
+
+def gravar_foto_perfil(imagem_base64):
+    """Decodifica e grava a foto de perfil, conferindo de verdade o tipo
+    do arquivo (nao confia na extensao nem no que o navegador disse que
+    era) - mesmo cuidado que o resto do ARENA tem com entrada de fora.
+    """
+    if "," in imagem_base64:
+        imagem_base64 = imagem_base64.split(",", 1)[1]
+    try:
+        brutos = base64.b64decode(imagem_base64, validate=True)
+    except (binascii.Error, ValueError):
+        raise ValueError("Imagem invalida.")
+
+    if not brutos or len(brutos) > LIMITE_FOTO_PERFIL:
+        raise ValueError("Foto grande demais (limite de 2 MB).")
+
+    tipo = _tipo_da_imagem(brutos)
+    if tipo not in TIPOS_FOTO_PERFIL:
+        raise ValueError("Formato de imagem nao aceito (use PNG, JPG ou WEBP).")
+
+    os.makedirs(PASTA_PERFIL, exist_ok=True)
+    antiga = foto_perfil_caminho()
+    if antiga:
+        try:
+            os.remove(antiga)
+        except OSError:
+            pass
+
+    destino = os.path.join(PASTA_PERFIL, "foto" + TIPOS_FOTO_PERFIL[tipo])
+    temporario = "%s.%d.tmp" % (destino, threading.get_ident())
+    with TRAVA_ARQUIVO:
+        with open(temporario, "wb") as arquivo:
+            arquivo.write(brutos)
+            arquivo.flush()
+            os.fsync(arquivo.fileno())
+        os.replace(temporario, destino)
+    return destino
+
+
+def apagar_foto_perfil():
+    caminho = foto_perfil_caminho()
+    if caminho:
+        try:
+            os.remove(caminho)
+        except OSError:
+            pass
+        return True
+    return False
 
 
 def perfil_para(config, custo=None):
@@ -2800,6 +2890,7 @@ class Manipulador(BaseHTTPRequestHandler):
                 # Codigo curto que o aluno passa ao colega em vez do
                 # endereco. O colega digita e o ARENA acha na rede.
                 "codigo_amigo": config["dispositivo_id"],
+                "tem_foto_perfil": bool(foto_perfil_caminho()),
                 "capacidade": CAPACIDADE,
                 "economico": ECONOMICO,
                 "versao_confere": VERSAO,
@@ -2946,6 +3037,27 @@ class Manipulador(BaseHTTPRequestHandler):
             self.send_header("Content-Length", str(len(dados_imagem)))
             # A arte nao muda: o navegador guarda e nao pede de novo.
             self.send_header("Cache-Control", "max-age=86400")
+            self.end_headers()
+            self.wfile.write(dados_imagem)
+            return
+
+        if caminho == "/api/perfil/foto":
+            alvo = foto_perfil_caminho()
+            if not alvo:
+                return self.send_error(404, "Sem foto de perfil ainda")
+
+            tipos = {".png": "image/png", ".jpg": "image/jpeg", ".webp": "image/webp"}
+            tipo = tipos.get(os.path.splitext(alvo)[1].lower(), "application/octet-stream")
+            try:
+                with open(alvo, "rb") as arquivo:
+                    dados_imagem = arquivo.read()
+            except OSError:
+                return self.send_error(404, "Nao consegui ler a foto")
+
+            self.send_response(200)
+            self.send_header("Content-Type", tipo)
+            self.send_header("Content-Length", str(len(dados_imagem)))
+            self.send_header("Cache-Control", "no-cache")
             self.end_headers()
             self.wfile.write(dados_imagem)
             return
@@ -3551,6 +3663,21 @@ class Manipulador(BaseHTTPRequestHandler):
                 return self.erro("Nao foi possivel gravar a copia.")
             return self.responder_json(
                 {"ok": True, "pasta": os.path.basename(destino)})
+
+        # ---- perfil (apelido + foto, permanente) ---------------------------
+        if caminho == "/api/perfil/foto":
+            if dados.get("remover"):
+                apagar_foto_perfil()
+                return self.responder_json({"ok": True, "tem_foto": False})
+
+            imagem = str(dados.get("imagem", ""))
+            if not imagem:
+                return self.erro("Nenhuma imagem enviada.")
+            try:
+                gravar_foto_perfil(imagem)
+            except ValueError as falha:
+                return self.erro(str(falha))
+            return self.responder_json({"ok": True, "tem_foto": True})
 
         # ---- amigos e servidores -------------------------------------------
         if caminho == "/api/amigo/adicionar":

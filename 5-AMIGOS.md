@@ -9,6 +9,14 @@ Ver a pontuação dos colegas e jogar junto, com ou sem Wi-Fi.
 
 ---
 
+### Meu perfil
+
+Em **Ajustes → Amigos**, no topo, tem **Meu perfil**: apelido e uma foto
+opcional (PNG, JPG ou WEBP, até 2 MB — o ARENA recorta e reduz sozinho
+pra 256×256, bem leve). Fica salvo em `dados\perfil\`, permanente —
+sobrevive a fechar e abrir o ARENA, trocar de pen drive não perde nada
+se a pasta `dados` for junto.
+
 ## Parte A — Servidor da sala e amigos
 
 Ver a pontuação dos colegas, comparar tempo de jogo e jogar a dois.

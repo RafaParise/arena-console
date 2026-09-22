@@ -206,6 +206,9 @@ async function carregarEstado() {
   desenharAmigos([]);
   preencherAmigosPartida();
 
+  $("#perfilApelidoAtual").textContent = estado.config.apelido || "Sem apelido ainda";
+  atualizarFotoPerfil(dados.tem_foto_perfil);
+
   $("#camSaves").textContent = dados.pastas.saves;
   $("#camCapturas").textContent = dados.pastas.capturas;
   $("#camJogos").textContent = dados.pastas.jogos;
@@ -922,6 +925,51 @@ function atualizarExplicaPreset() {
   const valor = $("#listaPresetGrafico").value;
   $("#explicaPresetGrafico").textContent =
     EXPLICA_PRESET_GRAFICO[valor] || EXPLICA_PRESET_GRAFICO.automatico;
+}
+
+// --------------------------------------------------------------------------
+// Perfil: apelido + foto, permanente
+// --------------------------------------------------------------------------
+
+function atualizarFotoPerfil(temFoto) {
+  const img = $("#perfilFoto");
+  const vazia = $("#perfilFotoVazia");
+  const remover = $("#btnRemoverFotoPerfil");
+  if (temFoto) {
+    img.src = "/api/perfil/foto?t=" + Date.now();
+    img.hidden = false;
+    vazia.hidden = true;
+    remover.hidden = false;
+  } else {
+    img.hidden = true;
+    vazia.hidden = false;
+    remover.hidden = true;
+  }
+}
+
+function redimensionarFotoPerfil(arquivo) {
+  return new Promise((resolve, reject) => {
+    const leitor = new FileReader();
+    leitor.onerror = () => reject(new Error("Não consegui ler o arquivo."));
+    leitor.onload = () => {
+      const imagem = new Image();
+      imagem.onerror = () => reject(new Error("Arquivo não é uma imagem válida."));
+      imagem.onload = () => {
+        const tamanho = 256;
+        const tela = document.createElement("canvas");
+        tela.width = tamanho;
+        tela.height = tamanho;
+        const ctx = tela.getContext("2d");
+        const lado = Math.min(imagem.width, imagem.height);
+        const origemX = (imagem.width - lado) / 2;
+        const origemY = (imagem.height - lado) / 2;
+        ctx.drawImage(imagem, origemX, origemY, lado, lado, 0, 0, tamanho, tamanho);
+        resolve(tela.toDataURL("image/jpeg", 0.85));
+      };
+      imagem.src = leitor.result;
+    };
+    leitor.readAsDataURL(arquivo);
+  });
 }
 
 function desenharRedePs2(redePs2) {
@@ -2826,6 +2874,34 @@ function ligarEventos() {
       recado(novo
         ? "Gráfico igual ao console original. Vale no próximo jogo."
         : "Voltou ao gráfico melhorado.");
+    } catch (falha) {
+      recado(falha.message, true);
+    }
+  });
+
+  $("#perfilFotoArquivo").addEventListener("change", async (evento) => {
+    const arquivo = evento.target.files[0];
+    evento.target.value = "";
+    if (!arquivo) return;
+    if (arquivo.size > 2 * 1024 * 1024) {
+      recado("Foto grande demais (limite de 2 MB).", true);
+      return;
+    }
+    try {
+      const imagem = await redimensionarFotoPerfil(arquivo);
+      await pedir("/api/perfil/foto", "POST", { imagem });
+      atualizarFotoPerfil(true);
+      recado("Foto de perfil atualizada.");
+    } catch (falha) {
+      recado(falha.message, true);
+    }
+  });
+
+  $("#btnRemoverFotoPerfil").addEventListener("click", async () => {
+    try {
+      await pedir("/api/perfil/foto", "POST", { remover: true });
+      atualizarFotoPerfil(false);
+      recado("Foto de perfil removida.");
     } catch (falha) {
       recado(falha.message, true);
     }

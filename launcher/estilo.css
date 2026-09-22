@@ -1191,6 +1191,49 @@ input::placeholder { color: var(--texto-apagado); }
   letter-spacing: 0.12em;
 }
 
+.perfil-box {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.8rem;
+  margin-bottom: var(--gap);
+  background: var(--fundo);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+}
+
+.perfil-foto {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 2px solid var(--borda);
+}
+
+.perfil-foto--vazia {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--fundo-suave, var(--fundo));
+  color: var(--azul-claro);
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.perfil-box-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.perfil-box-botoes {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
 .amigos {
   list-style: none;
   margin: 0 0 var(--gap);
