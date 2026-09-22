@@ -64,6 +64,7 @@ PASTA_DADOS = os.path.join(RAIZ, "dados")
 PASTA_PERFIL = os.path.join(PASTA_DADOS, "perfil")
 PASTA_JOGOS = os.path.join(RAIZ, "jogos")
 PASTA_RETROARCH = os.path.join(RAIZ, "retroarch")
+PASTA_MINIATURAS = os.path.join(PASTA_RETROARCH, "thumbnails")
 PASTA_CORES = os.path.join(PASTA_RETROARCH, "cores")
 PASTA_SISTEMA = os.path.join(PASTA_RETROARCH, "system")
 PASTA_SAVES = os.path.join(PASTA_RETROARCH, "saves")
@@ -3017,9 +3018,12 @@ class Manipulador(BaseHTTPRequestHandler):
             pedido = (parametros.get("arquivo") or [""])[0]
             alvo = os.path.join(RAIZ, pedido.replace("/", os.sep))
 
-            # So arte dentro da pasta de jogos. Sem isto, bastaria pedir
+            # So arte dentro da pasta de jogos OU das miniaturas baixadas
+            # (retroarch/thumbnails). Sem isto, bastaria pedir
             # ../../dados/config.json para ler o que nao devia.
-            if not dentro_da_pasta(alvo, PASTA_JOGOS) or not os.path.isfile(alvo):
+            permitido = (dentro_da_pasta(alvo, PASTA_JOGOS) or
+                        dentro_da_pasta(alvo, PASTA_MINIATURAS))
+            if not permitido or not os.path.isfile(alvo):
                 return self.send_error(404, "Capa nao encontrada")
             if not alvo.lower().endswith((".png", ".jpg", ".jpeg", ".webp")):
                 return self.send_error(404, "Nao e imagem")
