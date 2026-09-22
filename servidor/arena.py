@@ -3740,6 +3740,18 @@ class Manipulador(BaseHTTPRequestHandler):
                     "argumentos": graficos.argumentos_de_partida(hospedar, endereco),
                     "papel": "jogador 1" if hospedar else "jogador %d" % posicao,
                 }
+                if plataforma.get("core_netplay"):
+                    # O nucleo alternativo so de netplay (ex.: PCSX ReARMed
+                    # no PS1) tem estado maior pra serializar que o nucleo
+                    # normal. A checagem periodica de dessincronia (a cada
+                    # 600 quadros, ~10s) e' a comunidade que reporta como
+                    # pesada o bastante pra travar um instante em hardware
+                    # fraco - testado aqui que desligar (=0) nao quebra a
+                    # conexao, mas o ganho de fluidez so foi confirmado
+                    # pela comunidade: esta maquina de desenvolvimento e'
+                    # forte demais pra revelar o custo que so pesa no
+                    # Positivo fraco da escola.
+                    partida["opcoes"]["netplay_check_frames"] = "0"
 
             threading.Thread(
                 target=executar_jogo,
