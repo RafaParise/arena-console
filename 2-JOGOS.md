@@ -15,6 +15,27 @@ Como adicionar jogos e como liberar os consoles que ficam amarelos.
 
 ---
 
+### Capa dos jogos
+
+Cada jogo aparece na tela dentro de um molde parecido com a mídia física
+de verdade do console dele — cartucho, caixa de CD (o disco aparece ao
+passar o mouse), caixa de DVD ou cartão, dependendo do console. É por
+categoria de mídia, não um desenho exato de cada console — leve de
+propósito, para rodar bem até no Celeron mais fraco da escola.
+
+**Para colocar a capa de um jogo**, coloque uma imagem (`.png`, `.jpg`,
+`.jpeg` ou `.webp`) com o **mesmo nome do jogo** na mesma pasta dele, ou
+dentro de uma subpasta `capas`:
+
+```
+jogos\pessoais\PS1\Twisted Metal 2.chd
+jogos\pessoais\PS1\capas\Twisted Metal 2.png
+```
+
+Sem capa, aparecem as duas primeiras letras do título. Não tem limite de
+tamanho de imagem além do bom senso — o ARENA não redimensiona a capa do
+jogo (diferente da foto de perfil, que é sempre pequena).
+
 ### Parte A — Adicionar jogos
 
 #### Passo 1 — Escolha a pasta

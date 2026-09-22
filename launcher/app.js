@@ -371,6 +371,40 @@ function iniciaisDaCapa(titulo) {
     .toUpperCase();
 }
 
+// Tipo de midia fisica por console, pra desenhar um molde parecido com o
+// objeto de verdade (cartucho, jewel case de CD, caixa de DVD...) em vez
+// de so um retangulo generico. Agrupado por TIPO, nao por console - um
+// molde fiel por console seria trabalho de design grande demais; um por
+// categoria da o suficiente pro aluno reconhecer o formato.
+const MIDIA_POR_PLATAFORMA = {
+  cartucho_h: [
+    "nes", "snes", "megadrive", "sega32x", "n64", "sg1000", "atari2600",
+    "atari5200", "atari7800", "jaguar", "intellivision", "colecovision",
+    "odyssey2", "arcade", "c64", "msx", "vectrex", "neogeo", "amstrad",
+  ],
+  cartucho_v: [
+    "gameboy", "gba", "virtualboy", "pokemini", "gamewatch", "ngp",
+    "wonderswan", "nds", "lynx", "pcengine",
+  ],
+  jewel_case: [
+    "ps1", "saturn", "dreamcast", "segacd", "threedo", "cdi", "pcfx",
+    "scummvm", "dos", "amiga", "spectrum",
+  ],
+  caixa_dvd: ["ps2", "gamecube", "ps3", "xbox360"],
+  // Sem mídia física de verdade (portátil digital, homebrew, PSP em UMD
+  // pequeno demais pra valer um molde próprio) - cartão genérico.
+  cartao: ["psp", "tic80", "wasm4", "lowresnx", "uzebox", "tamagotchi", "j2me"],
+};
+
+const TIPO_MIDIA_POR_ID = {};
+for (const [tipo, ids] of Object.entries(MIDIA_POR_PLATAFORMA)) {
+  for (const id of ids) TIPO_MIDIA_POR_ID[id] = tipo;
+}
+
+function tipoDeMidia(plataformaId) {
+  return TIPO_MIDIA_POR_ID[plataformaId] || "cartao";
+}
+
 function classeDaCapa(plataforma) {
   return String(plataforma || "").toLowerCase()
     .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
@@ -427,10 +461,19 @@ function linhaDoJogo(jogo) {
   const faixa = document.createElement("span");
   faixa.className = "jogo-faixa";
 
+  const tipoMidia = tipoDeMidia(jogo.plataforma);
   const capa = document.createElement("div");
-  capa.className = `jogo-cover jogo-cover--placeholder capa-${classeDaCapa(jogo.plataforma_nome)}`;
+  capa.className = `jogo-cover jogo-cover--placeholder capa-${classeDaCapa(jogo.plataforma_nome)} ` +
+                   `midia midia--${tipoMidia}`;
   capa.setAttribute("aria-hidden", "true");
-  prepararCapa(capa, jogo);
+  capa.title = { cartucho_h: "Cartucho", cartucho_v: "Cartucho portátil",
+                jewel_case: "Caixa de CD", caixa_dvd: "Caixa de DVD",
+                cartao: "Mídia digital" }[tipoMidia];
+
+  const etiqueta = document.createElement("div");
+  etiqueta.className = "midia-etiqueta";
+  prepararCapa(etiqueta, jogo);
+  capa.append(etiqueta);
 
   const abrir = document.createElement("button");
   abrir.type = "button";

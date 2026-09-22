@@ -517,14 +517,14 @@ input::placeholder { color: var(--texto-apagado); }
   object-fit: cover;
   border-radius: inherit;
 }
-.jogo-cover--placeholder {
+.midia-etiqueta {
+  position: absolute;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.5rem;
-  color: var(--texto-apagado);
+  overflow: hidden;
   font-family: var(--fonte-titulo);
-  font-size: 2.8rem;
+  font-size: 2.2rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   background:
@@ -533,7 +533,64 @@ input::placeholder { color: var(--texto-apagado); }
     linear-gradient(135deg, #7546a3, #28264b 70%);
   color: rgba(255,255,255,.88);
   user-select: none;
+  border-radius: 2px;
 }
+
+/* Molde por tipo de midia fisica - um por categoria, nao por console
+   (fiel o bastante pro aluno reconhecer o formato, leve de sobra). */
+.midia { background: #1a1a22; }
+
+.midia--cartucho_h,
+.midia--cartucho_v {
+  padding: 10% 6% 16%;
+  background: linear-gradient(160deg, #3a3a44, #17171c 75%);
+}
+.midia--cartucho_h .midia-etiqueta { inset: 10% 6% 16%; }
+.midia--cartucho_v .midia-etiqueta { inset: 8% 14% 20%; }
+.midia--cartucho_v { padding: 8% 14% 20%; }
+.midia--cartucho_h::after,
+.midia--cartucho_v::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 6%;
+  height: 6%;
+  background: repeating-linear-gradient(90deg, #08080a 0 3px, #232329 3px 6px);
+}
+
+.midia--jewel_case {
+  padding: 4%;
+  background: linear-gradient(155deg, rgba(255,255,255,.18), rgba(255,255,255,.02) 40%), #0d0d10;
+  border: 1px solid rgba(255,255,255,.15);
+}
+.midia--jewel_case .midia-etiqueta { inset: 4%; }
+.midia--jewel_case::after {
+  content: "";
+  position: absolute;
+  top: 6%; right: 6%;
+  width: 34%; aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #e8e8f0, #9a9ab0 55%, #6a6a80 100%);
+  box-shadow: 0 0 0 2px rgba(0,0,0,.4);
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity var(--transicao), transform var(--transicao);
+}
+.jogo:hover .midia--jewel_case::after,
+.jogo:focus-within .midia--jewel_case::after { opacity: 1; transform: translateY(0); }
+
+.midia--caixa_dvd {
+  padding: 3%;
+  background: #101014;
+  border-left: 6px solid #050507;
+}
+.midia--caixa_dvd .midia-etiqueta { inset: 3%; }
+
+.midia--cartao {
+  padding: 6%;
+  background: linear-gradient(160deg, #2a2a33, #131317 75%);
+  border-radius: 8px;
+}
+.midia--cartao .midia-etiqueta { inset: 6%; border-radius: 6px; }
 .capa-super-nintendo { background: linear-gradient(135deg, #74458e, #29233b 70%); }
 .capa-playstation-1, .capa-playstation-2 { background: linear-gradient(135deg, #3759a0, #1c263d 70%); }
 .capa-gamecube-e-wii { background: linear-gradient(135deg, #b34d68, #39243d 70%); }
