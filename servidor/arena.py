@@ -3128,7 +3128,9 @@ class Manipulador(BaseHTTPRequestHandler):
                 if JOGO_EM_ANDAMENTO["ativo"]:
                     return self.erro("Feche o jogo aberto antes de baixar.", 409)
             try:
-                resultado = internet_archive.instalar(dados.get("item") or {})
+                resultado = internet_archive.instalar(
+                    str(dados.get("id", "")), str(dados.get("arquivo", "")),
+                    str(dados.get("plataforma", "")))
             except ValueError as falha:
                 return self.erro(str(falha))
             except Exception as falha:

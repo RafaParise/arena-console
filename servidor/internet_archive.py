@@ -1,7 +1,16 @@
 # -*- coding: utf-8 -*-
-"""Catalogo de software do Internet Archive (Busca Geral).
+"""Catalogo de jogos livres do Internet Archive.
 
-Removida a restrição de coleções de shareware e validação de licenças.
+So busca em colecoes de shareware/freeware/dominio publico - programas
+que a propria colecao ja garante que podem ser distribuidos de graca.
+"Mediatype:software" sozinho pega qualquer coisa, jogo comercial
+incluido; isso e' risco legal real pra um projeto de escola. Uma versao
+anterior deste arquivo removeu esse filtro (ver historico do git) - foi
+revertido.
+
+A busca em si e' ampla dentro dessas colecoes: titulo, descricao,
+varias colecoes ao mesmo tempo. "Aberto" e' o alcance da busca, nao a
+seguranca legal.
 """
 
 import hashlib
@@ -17,7 +26,20 @@ import urllib.request
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PASTA_LIVRES = os.path.join(RAIZ, "jogos", "livres")
 HOST = "archive.org"
-# Removido o filtro de coleção específica para permitir busca geral
+
+# Colecoes do Internet Archive com curadoria editorial de verdade e
+# licenca de distribuicao livre conhecida - nao e' so o nome da colecao
+# dizer "livre"/"homebrew"/"dominio publico": a maioria dos itens com
+# esse rotulo no Internet Archive sao envios de usuario sem checagem
+# nenhuma, muitas vezes ROM comercial rotulada errado (Nintendo nao vira
+# dominio publico por alguem marcar assim). So entra aqui colecao da
+# propria curadoria "Software Library" do Internet Archive, confirmada
+# uma por uma - por isso comeca curta. Nunca "mediatype:software"
+# sozinho, que pega qualquer coisa.
+COLECOES_LIVRES = (
+    "softwarelibrary_msdos_shareware",
+)
+
 LIMITE = 4 * 1024 * 1024 * 1024
 EXTENSOES = (".zip", ".7z", ".lha", ".gz", ".exe", ".com", ".dsk", ".img", ".iso")
 
@@ -36,6 +58,16 @@ def _texto(valor):
     return str(valor or "")
 
 
+def _colecao_permitida(meta):
+    """Confere se o item pertence a uma das colecoes livres - a mesma
+    checagem vale na busca (query) e de novo aqui, na hora de instalar,
+    pra ninguem baixar um item que so apareceu buscando errado."""
+    colecoes = meta.get("metadata", {}).get("collection", [])
+    if isinstance(colecoes, str):
+        colecoes = [colecoes]
+    return any(c in COLECOES_LIVRES for c in colecoes)
+
+
 def _arquivo(meta):
     candidatos = []
     for arquivo in meta.get("files", []):
@@ -47,7 +79,8 @@ def _arquivo(meta):
                 tamanho = 0
             if 0 < tamanho <= LIMITE:
                 candidatos.append((nome, arquivo, tamanho))
-    # Ordenação prioritária para arquivos compactados
+    # .zip primeiro - mais facil de identificar o console pela extensao
+    # de dentro, e menor que um .iso solto na maioria dos casos.
     candidatos.sort(key=lambda item: (0 if item[0].lower().endswith(".zip") else 1, item[0].lower()))
     return candidatos[0] if candidatos else None
 
@@ -59,16 +92,19 @@ def buscar(consulta):
     termo = re.sub(r'[^\w .+\-]', " ", consulta, flags=re.UNICODE).strip()[:80]
     if not termo:
         return []
-    
-    # Alterado os parâmetros de busca para remover o filtro 'collection:softwarelibrary_msdos_shareware'
-    # Agora ele busca por mediatype:software e o termo nos títulos/descrições
+
+    filtro_colecoes = " OR ".join("collection:%s" % c for c in COLECOES_LIVRES)
     parametros = urllib.parse.urlencode([
-        ("q", f'mediatype:software AND (title:"{termo}" OR description:"{termo}")'),
+        ("q", '(%s) AND (title:"%s" OR description:"%s")' % (filtro_colecoes, termo, termo)),
         ("fl[]", "identifier"), ("fl[]", "title"), ("fl[]", "description"),
-        ("fl[]", "creator"), ("rows", "20"), ("output", "json"),
+        ("fl[]", "creator"), ("fl[]", "collection"), ("rows", "30"), ("output", "json"),
     ])
-    
-    dados = _ler("https://archive.org/advancedsearch.php?" + parametros)
+
+    try:
+        dados = _ler("https://archive.org/advancedsearch.php?" + parametros)
+    except (OSError, ValueError, urllib.error.URLError, subprocess.SubprocessError):
+        return []
+
     resultado = []
     for documento in dados.get("response", {}).get("docs", []):
         identificador = str(documento.get("identifier", ""))
@@ -76,13 +112,14 @@ def buscar(consulta):
             continue
         try:
             meta = _ler("https://archive.org/metadata/" + urllib.parse.quote(identificador))
+            if not _colecao_permitida(meta):
+                continue
             arquivo = _arquivo(meta)
-            # Removida a chamada da função _autorizado
             if not arquivo:
                 continue
         except (OSError, ValueError, urllib.error.URLError, subprocess.SubprocessError):
             continue
-            
+
         resultado.append({
             "id": identificador,
             "titulo": _texto(meta.get("metadata", {}).get("title") or documento.get("title"))[:160],
@@ -97,39 +134,40 @@ def buscar(consulta):
 
 def instalar(identificador, nome_arquivo, plataforma=""):
     if not re.fullmatch(r"[A-Za-z0-9_-]{3,100}", str(identificador or "")):
-        raise ValueError("Item do Internet Archive inválido.")
-    
+        raise ValueError("Item do Internet Archive invalido.")
+
     meta = _ler("https://archive.org/metadata/" + urllib.parse.quote(identificador))
-    
-    # Removida a validação de licença aqui também
-    
+
+    if not _colecao_permitida(meta):
+        raise ValueError("Este item nao esta numa colecao de distribuicao livre.")
+
     arquivo = next((item for item in meta.get("files", [])
                     if str(item.get("name", "")) == str(nome_arquivo)), None)
     if not arquivo or not str(nome_arquivo).lower().endswith(EXTENSOES):
-        raise ValueError("Arquivo não encontrado no item.")
-        
+        raise ValueError("Arquivo nao encontrado no item.")
+
     try:
         tamanho_meta = int(arquivo.get("size", 0) or 0)
     except (TypeError, ValueError):
         tamanho_meta = 0
-        
+
     if not tamanho_meta or tamanho_meta > LIMITE:
         raise ValueError("Arquivo grande demais para o Arena.")
 
     nome_seguro = re.sub(r"[^A-Za-z0-9._()\- ]", "_", os.path.basename(str(nome_arquivo)))
     destino = os.path.abspath(os.path.join(PASTA_LIVRES, "Internet Archive", nome_seguro))
     livres = os.path.abspath(PASTA_LIVRES)
-    
+
     if os.path.commonpath([destino, livres]) != livres:
-        raise ValueError("Destino inválido.")
-        
+        raise ValueError("Destino invalido.")
+
     os.makedirs(os.path.dirname(destino), exist_ok=True)
     temporario = destino + ".download"
     digest = hashlib.sha256()
     tamanho = 0
     url = "https://archive.org/download/%s/%s" % (
         urllib.parse.quote(str(identificador)), urllib.parse.quote(str(nome_arquivo), safe="/"))
-    
+
     try:
         subprocess.run(
             ["curl.exe", "--fail", "--silent", "--show-error", "--location",
@@ -144,7 +182,7 @@ def instalar(identificador, nome_arquivo, plataforma=""):
                 if tamanho > LIMITE:
                     raise ValueError("Arquivo grande demais para o Arena.")
                 digest.update(bloco)
-                
+
         os.replace(temporario, destino)
     finally:
         if os.path.exists(temporario):
@@ -152,5 +190,5 @@ def instalar(identificador, nome_arquivo, plataforma=""):
                 os.remove(temporario)
             except OSError:
                 pass
-                
+
     return {"titulo": meta.get("metadata", {}).get("title", identificador), "tamanho": tamanho}

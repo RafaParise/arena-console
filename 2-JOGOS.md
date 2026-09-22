@@ -30,6 +30,15 @@ Como adicionar jogos e como liberar os consoles que ficam amarelos.
 Arraste para dentro da pasta. Pode criar subpastas para se organizar — o
 ARENA entra nelas.
 
+#### Biblioteca online
+
+Em **Ajustes → Biblioteca** dá para buscar e baixar direto para
+`jogos\livres`, sem precisar copiar nada na mão. A busca só olha
+coleções do Internet Archive com curadoria de verdade e licença livre
+confirmada (hoje: shareware de MS-DOS) — não é a internet inteira, é só
+o que pode ser distribuído sem problema nenhum. Precisa de internet;
+sem ela, o acervo que já está na pasta continua funcionando normal.
+
 #### Passo 3 — Atualize a lista
 
 No ARENA, clique em **Atualizar lista**, no canto inferior esquerdo.
