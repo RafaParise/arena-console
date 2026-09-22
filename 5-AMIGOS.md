@@ -562,6 +562,15 @@ Windows — o ARENA nunca pede isso sozinho para nada. Quem quiser tentar
 instalar encontra o status e o link oficial em **Ajustes → Emuladores**,
 seção "PS2 em rede (system link)".
 
+### Xbox 360 em rede de verdade (Systemlink)
+
+Alguns jogos de Xbox 360 (hoje só o *Gears of War*) também têm rede
+local de verdade — e aqui **não precisa de driver nenhum**. O Xenia tem
+um segundo programa, dedicado a isso (o "Xenia Netplay"), que o ARENA usa
+só quando abre um desses jogos — jogando sozinho, continua o Xenia de
+sempre. Mesma ideia do PS2: é o próprio jogo que hospeda ou entra, pelo
+menu de rede dele.
+
 ### Como a tela fica em cada um
 
 Isto costuma surpreender, então vale explicar antes.

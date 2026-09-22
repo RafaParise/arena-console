@@ -1103,6 +1103,61 @@ def escrever_config_xenia(caminho_executavel, nota, nota_gpu=None, modesto=False
         return None
 
 
+# ---------------------------------------------------------------------------
+# Xbox 360 pela rede: Xenia Netplay, "Systemlink" - sem driver nenhum
+# ---------------------------------------------------------------------------
+# Diferente do PS2, aqui nao precisa de driver: o Xenia Netplay (um build
+# separado, xenia_canary_netplay.exe, feito por uma comunidade dedicada a
+# isso) tem um modo "Systemlink" que e' rede local pura, em software -
+# so muda a chave network_mode no config.toml dele (0 = offline, 1 =
+# systemlink, 2 = Xbox Live, que usa um servidor de terceiros pra
+# partida pela internet - esse sim teria a mesma ressalva de privacidade
+# do RPCN do RPCS3, por isso nao ligado aqui).
+#
+# Igual ao core_netplay do PS1: o build normal (xenia_canary.exe) continua
+# sendo o de sempre pra jogar sozinho, mais atualizado; o build de
+# netplay so entra quando for Jogar Junto.
+
+def jogo_tem_netplay_xbox360(plataforma, titulo):
+    """Confere se o jogo esta na lista com netplay testado de verdade
+    (consoles.json -> externo.jogos_netplay). Lista curta de proposito."""
+    lista = (plataforma.get("externo") or {}).get("jogos_netplay", [])
+    titulo_normalizado = (titulo or "").lower()
+    return any(nome.lower() in titulo_normalizado for nome in lista)
+
+
+def escrever_config_netplay_xbox360(caminho_executavel):
+    """Liga o modo Systemlink (network_mode = 1) do Xenia Netplay - rede
+    local de verdade, sem precisar de driver nenhum.
+
+    So mexe se o Xenia Netplay ja rodou pelo menos uma vez e criou o
+    config.toml dele - mesma regra do escrever_config_xenia, pra nao
+    inventar um arquivo do zero e perder as centenas de opcoes que so o
+    Xenia sabe o valor certo.
+    """
+    pasta = os.path.dirname(caminho_executavel)
+    nome_exe = os.path.splitext(os.path.basename(caminho_executavel))[0]
+    nome_config = nome_exe.replace("_", "-") + ".config.toml"
+    destino = os.path.join(pasta, nome_config)
+
+    if not os.path.isfile(destino):
+        return False
+
+    try:
+        with open(destino, "r", encoding="utf-8") as arquivo:
+            texto = arquivo.read()
+    except OSError:
+        return False
+
+    texto = _trocar_valor_toml(texto, "network_mode", "1")
+
+    try:
+        gravar_atomico(destino, texto)
+        return True
+    except OSError:
+        return False
+
+
 def _trocar_valor_yaml(texto, secao, chave, valor):
     """Troca o valor de 'chave: valor' dentro de uma secao do YAML do RPCS3.
 

@@ -1101,7 +1101,11 @@
           "{jogo}"
         ],
         "site": "xenia-emulator.com/canary",
-        "motivo": "OBRIGATORIO. Nao existe nucleo de Xbox 360 no RetroArch - so o Xenia emula este console, e so com placa de video dedicada."
+        "motivo": "OBRIGATORIO. Nao existe nucleo de Xbox 360 no RetroArch - so o Xenia emula este console, e so com placa de video dedicada.",
+        "executavel_netplay": "xenia_canary_netplay.exe",
+        "jogos_netplay": [
+          "gears of war"
+        ]
       },
       "pasta": "XBOX360"
     }

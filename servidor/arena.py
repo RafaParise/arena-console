@@ -1574,6 +1574,23 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         # enquanto (ver o comentario em escrever_config_xenia/rpcs3 sobre
         # por que o controle ainda nao entra aqui).
         elif jogo["externo"]["dados"]["nome"] == "Xenia":
+            plataforma_360 = next((p for p in carregar_catalogo()
+                                   if p["id"] == jogo.get("plataforma")), None)
+            externo_360 = (plataforma_360 or {}).get("externo") or {}
+            if (plataforma_360 and externo_360.get("executavel_netplay") and
+                    graficos.jogo_tem_netplay_xbox360(plataforma_360, jogo["titulo"])):
+                caminho_netplay = os.path.join(
+                    os.path.dirname(jogo["externo"]["caminho"]),
+                    externo_360["executavel_netplay"])
+                if os.path.isfile(caminho_netplay):
+                    jogo["externo"]["caminho"] = caminho_netplay
+                    comando = graficos.comando_externo(
+                        caminho_netplay, jogo["externo"]["dados"], caminho_jogo)
+                    ligou = graficos.escrever_config_netplay_xbox360(caminho_netplay)
+                    if ligou:
+                        print("[ARENA] Rede do Xbox 360 (Systemlink) ligada - "
+                             "sem precisar de driver nenhum.")
+
             preset = config.get("preset_grafico_externo", "automatico")
             escrito = graficos.escrever_config_xenia(
                 jogo["externo"]["caminho"], CAPACIDADE["nota"],
@@ -3804,6 +3821,13 @@ class Manipulador(BaseHTTPRequestHandler):
                         "pra ENTRAR numa partida de outra maquina - falta o "
                         "driver de rede pra tambem hospedar. Ver Ajustes -> "
                         "Emuladores.")
+            elif (caminho_externo and dados_externo["nome"] == "Xenia" and
+                  graficos.jogo_tem_netplay_xbox360(plataforma, jogo["titulo"])):
+                resposta["aviso"] = (
+                    "Este jogo tem rede local de verdade (Systemlink) - o "
+                    "ARENA ja configurou, sem precisar de driver nenhum. Abra "
+                    "o menu de rede DENTRO do jogo pra hospedar ou entrar "
+                    "numa partida.")
             return self.responder_json(resposta)
 
         if caminho == "/api/placar":
