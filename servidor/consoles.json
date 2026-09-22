@@ -429,6 +429,7 @@
         "megadrive",
         "sms"
       ],
+      "netplay": true,
       "pasta": "Mega Drive"
     },
     {
@@ -516,6 +517,8 @@
         "sega dreamcast"
       ],
       "tamanho_max_mb": 1400,
+      "netplay": false,
+      "netplay_motivo": "O nucleo do Dreamcast (Flycast) nao suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa (\"o nucleo nao tem suporte para Netplay\"). Multiplayer so vale no mesmo computador.",
       "pasta": "Dreamcast"
     },
     {
@@ -605,6 +608,8 @@
         "psp"
       ],
       "tamanho_max_mb": 1900,
+      "netplay": false,
+      "netplay_motivo": "O nucleo do PSP (PPSSPP) nao suporta jogo em rede pelo RetroArch - confirmado tentando hospedar, o RetroArch recusa (\"o nucleo nao tem suporte para Netplay\"). O PPSSPP tem rede ad-hoc propria, mas e' outro mecanismo, separado do netplay do RetroArch.",
       "pasta": "PSP"
     },
     {

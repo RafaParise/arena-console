@@ -537,10 +537,10 @@ passar o mouse em cima.
 
 | Console | Jogar Junto |
 |---|---|
-| Super Nintendo, a maioria dos consoles 2D | Funciona normal |
+| Super Nintendo, Mega Drive/Master System/Game Gear, a maioria dos consoles 2D | Funciona normal |
 | PlayStation 1 | Funciona, mas usa um emulador diferente por baixo (PCSX ReARMed) só enquanto durar o Jogar Junto — jogando sozinho, o emulador de sempre continua sendo o usado |
-| Nintendo 64 | Não dá. O emulador dele não tem esse recurso |
-| PS2, PS3, Xbox 360 | Não dá — esses usam um programa à parte (PCSX2, RPCS3, Xenia), sem esse recurso em rede |
+| Nintendo 64, Dreamcast, PSP | Não dá. O emulador de cada um não tem esse recurso |
+| PS2, PS3, Xbox 360 | Não dá pelo Jogar Junto normal — esses usam um programa à parte (PCSX2, RPCS3, Xenia), sem esse recurso em rede pronto do jeito do RetroArch |
 
 ### Como a tela fica em cada um
 
