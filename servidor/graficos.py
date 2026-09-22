@@ -67,6 +67,97 @@ PASTA_EMULADORES = os.path.join(RAIZ, "emuladores")
 
 
 # ---------------------------------------------------------------------------
+# Auto-conserto do retroarch.cfg (pen drive muda de letra, pasta muda de lugar)
+# ---------------------------------------------------------------------------
+# O RetroArch grava, ao fechar (config_save_on_exit = true), os caminhos
+# absolutos que recebeu. Se a pasta do ARENA for movida - pen drive com
+# letra diferente, pasta renomeada, copiada pra outro computador - esses
+# caminhos ficam apontando pra um lugar que nao existe mais.
+#
+# Nao precisa saber qual era a pasta antiga. Toda linha 'chave = "caminho"'
+# do retroarch.cfg que aponta pra dentro do ARENA sempre contem uma das
+# pastas que sempre existem (dados, retroarch, jogos, launcher,
+# emuladores). Acha essa pasta dentro do valor antigo e reconstroi o
+# caminho a partir da raiz ATUAL - nao importa qual era a raiz antiga.
+
+PASTAS_CONHECIDAS_ARENA = ("dados", "retroarch", "jogos", "launcher", "emuladores")
+
+_PADRAO_LINHA_CAMINHO = re.compile(
+    r'^([a-zA-Z0-9_]+\s*=\s*)"([A-Za-z]:\\[^"]*)"\s*$')
+
+
+# Chaves que o RetroArch usa por padrao (fora da pasta do ARENA) quando
+# ninguem diz o contrario, e que so ganham valor certo depois que um jogo
+# abre e fecha pelo menos uma vez. Ex.: cache_directory sem isto vira a
+# pasta Temp do Windows - contra a regra de nunca deixar nada fora do
+# ARENA. Forcadas sempre, nao so quando "parecem" um caminho velho.
+CHAVES_SEMPRE_DENTRO_DO_ARENA = {
+    "cache_directory": "retroarch\\cache",
+}
+
+
+def corrigir_caminhos_retroarch_cfg():
+    """Reescreve, dentro do retroarch.cfg, todo caminho que nao aponta mais
+    para a pasta atual do ARENA. Devolve quantas linhas foram trocadas.
+    """
+    caminho_cfg = os.path.join(PASTA_RETROARCH, "retroarch.cfg")
+    try:
+        with open(caminho_cfg, "r", encoding="utf-8", errors="replace") as arquivo:
+            linhas = arquivo.readlines()
+    except OSError:
+        return 0
+
+    raiz_baixo = RAIZ.lower()
+    trocados = 0
+    achadas = set()
+
+    for i, linha in enumerate(linhas):
+        m = _PADRAO_LINHA_CAMINHO.match(linha.rstrip("\n"))
+        if not m:
+            continue
+        prefixo, caminho_velho = m.group(1), m.group(2)
+        chave = prefixo.split("=", 1)[0].strip()
+
+        if chave in CHAVES_SEMPRE_DENTRO_DO_ARENA:
+            achadas.add(chave)
+            certo = os.path.join(RAIZ, CHAVES_SEMPRE_DENTRO_DO_ARENA[chave])
+            if caminho_velho == certo:
+                continue
+            linhas[i] = '%s"%s"\n' % (prefixo, certo)
+            trocados += 1
+            continue
+
+        if caminho_velho.lower().startswith(raiz_baixo):
+            continue  # ja aponta pra pasta certa
+
+        velho_baixo = caminho_velho.lower()
+        for pasta in PASTAS_CONHECIDAS_ARENA:
+            meio = "\\" + pasta + "\\"
+            indice = velho_baixo.find(meio)
+            if indice == -1 and velho_baixo.endswith("\\" + pasta):
+                indice = len(velho_baixo) - len(pasta) - 1
+            if indice == -1:
+                continue
+            resto = caminho_velho[indice + 1:]  # sem a barra inicial
+            linhas[i] = '%s"%s"\n' % (prefixo, os.path.join(RAIZ, resto))
+            trocados += 1
+            break
+
+    # Chave que nem aparece no arquivo (RetroArch novo, nunca rodou): cria.
+    for chave, relativo in CHAVES_SEMPRE_DENTRO_DO_ARENA.items():
+        if chave in achadas:
+            continue
+        certo = os.path.join(RAIZ, relativo)
+        linhas.append('%s = "%s"\n' % (chave, certo))
+        trocados += 1
+
+    if trocados:
+        os.makedirs(os.path.join(RAIZ, "retroarch", "cache"), exist_ok=True)
+        gravar_atomico(caminho_cfg, "".join(linhas))
+    return trocados
+
+
+# ---------------------------------------------------------------------------
 # Graficos
 # ---------------------------------------------------------------------------
 

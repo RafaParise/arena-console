@@ -68,6 +68,7 @@ PASTA_CAPTURAS = os.path.join(PASTA_RETROARCH, "screenshots")
 PASTA_CHEATS = os.path.join(PASTA_RETROARCH, "cheats")
 PASTA_REMAPS = os.path.join(PASTA_RETROARCH, "remaps")
 PASTA_CONTROLES = os.path.join(PASTA_RETROARCH, "controles")
+PASTA_CACHE = os.path.join(PASTA_RETROARCH, "cache")
 PASTA_BACKUP = os.path.join(RAIZ, "backup")
 
 EXECUTAVEL_RETROARCH = os.path.join(PASTA_RETROARCH, "retroarch.exe")
@@ -1106,7 +1107,7 @@ def gravar_override(config, custo=None, extras=None, em_partida=False):
         opcoes.update(extras)
 
     for pasta in (PASTA_SAVES, PASTA_STATES, PASTA_CAPTURAS, PASTA_SISTEMA,
-                  PASTA_CHEATS, PASTA_REMAPS, PASTA_CONTROLES):
+                  PASTA_CHEATS, PASTA_REMAPS, PASTA_CONTROLES, PASTA_CACHE):
         os.makedirs(pasta, exist_ok=True)
 
     # Saves, estados e capturas sempre dentro do ARENA: e o que torna a
@@ -1120,6 +1121,10 @@ def gravar_override(config, custo=None, extras=None, em_partida=False):
     opcoes["joypad_autoconfig_dir"] = PASTA_CONTROLES
     opcoes["playlist_directory"] = PASTA_DADOS
     opcoes["log_dir"] = PASTA_DADOS
+    # Sem isto, o RetroArch usa a pasta Temp do Windows pra descompactar
+    # jogo em .zip - fora da pasta do ARENA, contra a regra de nunca
+    # deixar nada fora dela.
+    opcoes["cache_directory"] = PASTA_CACHE
 
     linhas = ["# Gerado pelo ARENA. Nao edite a mao: sera reescrito."]
     linhas += ['%s = "%s"' % (c, opcoes[c]) for c in sorted(opcoes)]
@@ -3971,6 +3976,13 @@ def principal():
     if orfaos:
         print("  Limpeza:  %d arquivo(s) temporario(s) de uma sessao anterior"
               % orfaos)
+
+    # Pen drive muda de letra, pasta muda de lugar - conserta sozinho antes
+    # de mais nada, senao o RetroArch abre com caminho de uma pasta que
+    # nao existe mais nesta maquina.
+    trocados = graficos.corrigir_caminhos_retroarch_cfg()
+    if trocados:
+        print("  Caminhos: %d corrigido(s) no retroarch.cfg" % trocados)
 
     preparar_banco()
     config = carregar_config()

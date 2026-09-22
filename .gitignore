@@ -82,6 +82,7 @@ retroarch/*
 !retroarch/remaps/
 !retroarch/controles/
 !retroarch/screenshots/
+!retroarch/cache/
 retroarch/system/*
 !retroarch/system/LEIA.txt
 retroarch/cores/*
@@ -98,6 +99,8 @@ retroarch/controles/*
 !retroarch/controles/LEIA.txt
 retroarch/screenshots/*
 !retroarch/screenshots/LEIA.txt
+retroarch/cache/*
+!retroarch/cache/LEIA.txt
 
 # Dados do usuário (não commitar)
 dados/*
