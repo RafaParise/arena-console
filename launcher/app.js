@@ -129,6 +129,9 @@ async function carregarEstado() {
   $("#chaveModesto").setAttribute("aria-pressed",
     dados.config.modo_modesto ? "true" : "false");
 
+  $("#chaveRpcn").setAttribute("aria-pressed",
+    dados.config.rpcn_ativo ? "true" : "false");
+
   $("#listaPresetGrafico").value = dados.config.preset_grafico_externo || "automatico";
   atualizarExplicaPreset();
   desenharRedePs2(dados.rede_ps2 || {});
@@ -2823,6 +2826,20 @@ function ligarEventos() {
       recado(novo
         ? "Gráfico igual ao console original. Vale no próximo jogo."
         : "Voltou ao gráfico melhorado.");
+    } catch (falha) {
+      recado(falha.message, true);
+    }
+  });
+
+  $("#chaveRpcn").addEventListener("click", async (evento) => {
+    const botao = evento.currentTarget;
+    const novo = botao.getAttribute("aria-pressed") !== "true";
+    try {
+      await salvarConfig({ rpcn_ativo: novo });
+      botao.setAttribute("aria-pressed", novo ? "true" : "false");
+      recado(novo
+        ? "RPCN ligado. Precisa da conta já criada pela tela do RPCS3."
+        : "RPCN desligado.");
     } catch (falha) {
       recado(falha.message, true);
     }

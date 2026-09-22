@@ -761,6 +761,7 @@ def config_padrao():
         # "automatico" (decide pela nota da maquina), "leve" ou "bonito".
         # Vale para os emuladores externos (PCSX2, RPCS3, Xenia).
         "preset_grafico_externo": "automatico",
+        "rpcn_ativo": False,
         # Interface: tema, jogos marcados e os ultimos abertos.
         "tema": "claro",
         "favoritos": [],
@@ -850,6 +851,7 @@ def ler_config_do_disco():
     config["modo_desempenho"] = bool(salvo.get("modo_desempenho"))
     config["ultra_desempenho"] = bool(salvo.get("ultra_desempenho"))
     config["modo_modesto"] = bool(salvo.get("modo_modesto"))
+    config["rpcn_ativo"] = bool(salvo.get("rpcn_ativo"))
     if salvo.get("preset_grafico_externo") in ("automatico", "leve", "bonito"):
         config["preset_grafico_externo"] = salvo["preset_grafico_externo"]
 
@@ -1610,6 +1612,11 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
                 preset=None if preset == "automatico" else preset)
             if escrito:
                 print("[ARENA] Video do RPCS3 configurado.")
+            if config.get("rpcn_ativo"):
+                ligou = graficos.escrever_config_rpcn(jogo["externo"]["caminho"])
+                if ligou:
+                    print("[ARENA] RPCN ligado (precisa de conta ja criada "
+                         "pela tela do RPCS3).")
 
         print("[ARENA] Abrindo pelo %s" % jogo["externo"]["dados"]["nome"])
     else:
@@ -3648,6 +3655,9 @@ class Manipulador(BaseHTTPRequestHandler):
 
             if "permitir_rede" in dados:
                 config["permitir_rede"] = bool(dados["permitir_rede"])
+
+            if "rpcn_ativo" in dados:
+                config["rpcn_ativo"] = bool(dados["rpcn_ativo"])
 
             if dados.get("restaurar"):
                 config["avancado"] = dict(AVANCADO_PADRAO)

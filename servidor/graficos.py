@@ -1252,6 +1252,44 @@ def escrever_config_rpcs3(caminho_executavel, nota, nota_gpu=None, modesto=False
 
 
 # ---------------------------------------------------------------------------
+# PS3 online de verdade: RPCN
+# ---------------------------------------------------------------------------
+# O RPCN e' um servidor comunitario (nao e' da Sony, nao e' do ARENA) que
+# devolve matchmaking, salas e trocas online pra jogos de PS3 compativeis,
+# direto pelo RPCS3 - sem driver, sem admin. So que precisa de uma conta
+# feita pela PROPRIA tela do RPCS3 (Toolbar -> RPCN -> Account -> Create
+# Account: usuario, e-mail, senha, confirma por token que chega no
+# e-mail). O ARENA NUNCA cria essa conta sozinho - e' dado de gente (nome,
+# e-mail, senha) indo pra um servico de terceiros que a escola nao
+# administra. O que o ARENA faz e' so ligar a opcao quando o professor
+# decidir usar (desligado por padrao), depois que a conta ja existir.
+
+def escrever_config_rpcn(caminho_executavel):
+    """Liga 'Internet enabled' e 'PSN status: RPCN' no config.yml do
+    RPCS3. So mexe se o RPCS3 ja rodou uma vez (mesma regra do resto)."""
+    pasta = os.path.dirname(caminho_executavel)
+    destino = os.path.join(pasta, "config", "config.yml")
+
+    if not os.path.isfile(destino):
+        return False
+
+    try:
+        with open(destino, "r", encoding="utf-8") as arquivo:
+            texto = arquivo.read()
+    except OSError:
+        return False
+
+    texto = _trocar_valor_yaml(texto, "Net", "Internet enabled", "Connected")
+    texto = _trocar_valor_yaml(texto, "Net", "PSN status", "RPCN")
+
+    try:
+        gravar_atomico(destino, texto)
+        return True
+    except OSError:
+        return False
+
+
+# ---------------------------------------------------------------------------
 # Partida a dois
 # ---------------------------------------------------------------------------
 # O RetroArch tem rede propria, do mesmo tipo que Mortal Kombat 3 e os

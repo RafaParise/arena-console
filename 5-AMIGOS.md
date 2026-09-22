@@ -571,6 +571,18 @@ só quando abre um desses jogos — jogando sozinho, continua o Xenia de
 sempre. Mesma ideia do PS2: é o próprio jogo que hospeda ou entra, pelo
 menu de rede dele.
 
+### PS3 online (RPCN)
+
+O RPCS3 tem acesso a um servidor comunitário chamado RPCN, que devolve
+partida online de verdade (não só rede local) pra jogos de PS3
+compatíveis. Diferente do PS2 e do Xbox 360, aqui **precisa de uma
+conta** — feita por você mesmo, pela tela do RPCS3 (botão RPCN na barra
+de ferramentas → Account → Create Account), com confirmação por e-mail.
+O ARENA nunca cria essa conta sozinho.
+
+Depois que a conta existir, ligue em **Ajustes → Emuladores → PS3
+online (RPCN)**. Fica desligado por padrão.
+
 ### Como a tela fica em cada um
 
 Isto costuma surpreender, então vale explicar antes.
