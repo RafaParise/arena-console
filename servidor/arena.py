@@ -3683,6 +3683,24 @@ class Manipulador(BaseHTTPRequestHandler):
                     JOGO_EM_ANDAMENTO["titulo"] = ""
                 return self.erro(plataforma.get("netplay_motivo") or
                                  "Este console nao tem jogo em rede disponivel.", 409)
+
+            # Alguns consoles (PS1: SwanStation) tem um nucleo mais fiel para
+            # jogar sozinho, mas sem suporte a jogo em rede - nesse caso o
+            # cadastro aponta um segundo nucleo so para quando for Jogar
+            # Junto. Jogando sozinho, o normal continua valendo.
+            aviso_netplay = ""
+            if modo in ("hospedar", "entrar", "assistir") and plataforma.get("core_netplay"):
+                core_netplay = os.path.join(PASTA_CORES, plataforma["core_netplay"])
+                if not os.path.isfile(core_netplay):
+                    with TRAVA_JOGO:
+                        JOGO_EM_ANDAMENTO["ativo"] = False
+                        JOGO_EM_ANDAMENTO["titulo"] = ""
+                    return self.erro(
+                        "Falta o nucleo %s para jogar em rede neste console."
+                        % plataforma["core_netplay"], 409)
+                jogo["core"] = plataforma["core_netplay"]
+                aviso_netplay = plataforma.get("netplay_aviso", "")
+
             if modo in ("hospedar", "entrar"):
                 hospedar = (modo == "hospedar")
                 assistir = False
@@ -3733,6 +3751,8 @@ class Manipulador(BaseHTTPRequestHandler):
             if partida:
                 resposta["papel"] = partida["papel"]
                 resposta["porta"] = graficos.PORTA_PARTIDA
+            if aviso_netplay:
+                resposta["aviso"] = aviso_netplay
             return self.responder_json(resposta)
 
         if caminho == "/api/placar":

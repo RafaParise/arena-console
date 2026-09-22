@@ -1827,11 +1827,13 @@ async function comecarPartida() {
     const dados = await pedir("/api/jogar", "POST", corpo);
     $("#modalPartida").hidden = true;
     const porRepasse = dados.pela_internet ? " (pela internet, com repasse)" : "";
-    recado(estado.papelDaPartida === "hospedar"
+    const texto = estado.papelDaPartida === "hospedar"
       ? `Sala criada${porRepasse}. O jogo abrirá quando seu amigo entrar.`
       : estado.papelDaPartida === "assistir"
       ? "Entrando para assistir. Você vê a tela dele, sem controlar nada."
-      : `Entrando como ${dados.papel}. Aguarde a tela abrir.`);
+      : `Entrando como ${dados.papel}. Aguarde a tela abrir.`;
+    const aviso = dados.aviso ? " " + dados.aviso : "";
+    recado(texto + aviso, false, aviso ? 9000 : 4500);
   } catch (falha) {
     recado(falha.message, true);
   }

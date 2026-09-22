@@ -534,8 +534,9 @@
       "arquivos_sistema": 1,
       "custo": 2,
       "pede_placar": false,
-      "netplay": false,
-      "netplay_motivo": "O nucleo do PS1 (SwanStation) nao tem jogo em rede ligado - confirmado tentando hospedar, o RetroArch recusa (\"nucleo nao tem suporte para Netplay\"). Multiplayer de PS1 so vale no mesmo computador, com dois controles.",
+      "netplay": true,
+      "core_netplay": "pcsx_rearmed_libretro.dll",
+      "netplay_aviso": "Jogar Junto no PlayStation usa o PCSX ReARMed em vez do nucleo normal - o SwanStation (mais fiel) nao tem jogo em rede. Sozinho, continua sendo o SwanStation.",
       "apelidos": [
         "playstation",
         "playstation 1",

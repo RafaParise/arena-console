@@ -267,12 +267,16 @@ partida** → **Começar**. Você é o jogador 1.
 **Quem vai entrar:** clique em **Jogar junto** no **mesmo jogo** → **Entrar
 na partida do amigo** → cole o endereço → **Começar**. Você é o jogador 2.
 
-**Jogos com mais de 2 jogadores** (o Nintendo 64 tem 4 entradas de
-controle de fábrica, por exemplo): cada amigo que entra escolhe um
-número diferente — jogador 2, jogador 3, jogador 4 — numa lista que
-aparece na hora de entrar. Cada um joga na sua própria máquina, sem
-dividir tela; o console é que trata todos como se estivessem plugados
-ali. Quem abriu a partida continua sendo sempre o jogador 1.
+**Jogos com mais de 2 jogadores:** quando o console permitir, cada amigo
+que entra escolhe um número diferente — jogador 2, jogador 3, jogador 4
+— numa lista que aparece na hora de entrar. Cada um joga na sua própria
+máquina, sem dividir tela; o console é que trata todos como se
+estivessem plugados ali. Quem abriu a partida continua sendo sempre o
+jogador 1.
+
+*(O Nintendo 64 tem 4 entradas de controle de fábrica, mas isso só vale
+jogando todo mundo no mesmo computador — o núcleo dele não faz Jogar
+Junto em máquinas separadas. Veja a tabela na próxima seção.)*
 
 Os dois (ou mais) precisam do **mesmo arquivo de jogo**. Se um tiver a
 versão americana e o outro a japonesa, a partida nem começa.
@@ -523,6 +527,20 @@ aparelho de verdade, dá para jogar assim.
 
 Não funciona em jogo de um jogador só. Nesse caso o segundo entra como
 espectador.
+
+### Nem todo console tem Jogar Junto
+
+Alguns emuladores simplesmente não sabem jogar em rede — não é falta de
+configuração, é limitação do programa. O ARENA avisa antes: se o botão
+**Jogar Junto** aparecer apagado, é por isso, e o motivo aparece se você
+passar o mouse em cima.
+
+| Console | Jogar Junto |
+|---|---|
+| Super Nintendo, a maioria dos consoles 2D | Funciona normal |
+| PlayStation 1 | Funciona, mas usa um emulador diferente por baixo (PCSX ReARMed) só enquanto durar o Jogar Junto — jogando sozinho, o emulador de sempre continua sendo o usado |
+| Nintendo 64 | Não dá. O emulador dele não tem esse recurso |
+| PS2, PS3, Xbox 360 | Não dá — esses usam um programa à parte (PCSX2, RPCS3, Xenia), sem esse recurso em rede |
 
 ### Como a tela fica em cada um
 
