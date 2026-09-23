@@ -254,7 +254,135 @@ aplicar:
 
 ### Fica pendente (não é da Fase 1)
 
-- `dados\` com 38 logs do RetroArch sem rodízio (achado na Fase 0) — a correção (limite de tamanho + rodízio) é da Fase 2, não da Fase 1.
+- `dados\` com 38 logs do RetroArch sem rodízio (achado na Fase 0) — a correção (limite de tamanho + rodízio) é da Fase 2, não da Fase 1. **Resolvido na Fase 2, ver abaixo.**
+
+---
+
+## Fase 2 — Leveza e desempenho
+
+### CPU parado
+
+Já medido na Fase 0: **0,04%**, perto de zero. Nada a corrigir — não achei
+nenhuma consulta repetida sem necessidade na revisão desta fase (o catálogo
+e a configuração já têm cache por data de modificação do arquivo, ver
+`CLAUDE.md` seção 6).
+
+### Gravações em disco — logs do RetroArch sem rodízio (achado real da Fase 0, corrigido)
+
+`dados\` tinha 38 arquivos `retroarch__AAAA_MM_DD__HH_MM_SS.log` (um por
+sessão, `log_to_file_timestamp = true`), crescendo para sempre — o
+comentário original do código («o arquivo fica em dados\retroarch.log e o
+ARENA não o apaga») estava desatualizado: virou um arquivo novo por sessão,
+não um único arquivo reescrito.
+
+**Correção**: `limpar_logs_antigos()` nova em `arena.py`, chamada a cada
+abertura (`principal()`), mantém só os `LOGS_MANTIDOS = 10` mais recentes —
+dá pra investigar uma sessão recente sem o cartão SD/pen drive acumular log
+para sempre. Testado contra pasta isolada (`ferramentas\teste_rodizio_logs.py`,
+16 logs falsos → sobram 10, arquivo que não é log não é tocado) **e** contra
+a pasta real do projeto, subindo o ARENA de verdade uma vez: **36 → 10**
+logs, confirmado.
+
+### Fundos animados — pendência antiga do CLAUDE.md, resolvida
+
+Achado real, lendo o código: `galaxy-background.js` e `field-background.js`
+tinham um loop de animação (`requestAnimationFrame`) que **rodava para
+sempre, a cada quadro, mesmo com o canvas escondido** (tema errado) — só não
+desenhava nada, mas continuava agendando o próximo quadro sem parar. Nem
+modo modesto nem "prefira menos movimento" (do Windows/navegador) tinham
+como desligar isso: a informação de modo modesto nem chegava a
+`document.body.dataset` para o script ler.
+
+**Correção**: `atualizarBotaoTema()` (`app.js`) agora também grava
+`document.body.dataset.modoModesto`; os dois fundos ganharam `deveAnimar()`
+(tema certo **e** modo modesto desligado **e** sem pedido de menos
+movimento) e só chamam `requestAnimationFrame` quando isso é verdade — caso
+contrário o loop para de vez, e um vigia a cada 2s (não mais a cada quadro)
+o acorda se a condição mudar.
+
+**Bug pego no meio do próprio teste, antes de aplicar**: a primeira versão
+da correção só atualizava `canvas.style.display` durante o `draw()` — como
+o `draw()` para de rodar quando pausado, trocar de tema com o modo modesto
+ligado deixaria o fundo errado preso na tela. Corrigido separando
+`sincronizarVisibilidade()` (roda sempre, inclusive pausado) de `draw()`
+(só roda quando deveAnimar()). Confirmado no navegador de verdade: tema
+escuro+modo modesto → só o fundo galáctico aparece; tema claro+modo modesto
+→ só o fundo de campo aparece, os dois com a animação parada.
+
+**Limitação de medição, honesta**: não consegui medir o custo de CPU do
+loop *ativo* (rodando de verdade) nesta sessão de automação do navegador —
+a aba controlada pelo Claude in Chrome ficou com `document.visibilityState
+= "hidden"` o tempo todo (não é a janela em foco do sistema), e navegador
+nenhum roda `requestAnimationFrame` de aba em segundo plano, pausado ou não
+— então não dava pra ver a diferença de custo entre "animando" e "pausado"
+por essa via. O que ficou provado, por leitura de código e pelo teste do
+`sincronizarVisibilidade()`: o loop realmente para de se re-agendar quando
+pausado (não é mais "sempre pediu o próximo quadro"), o que já resolve o
+crescimento sem fim que a pendência do CLAUDE.md descrevia. Medir o ganho
+de FPS/CPU de verdade, num Celeron fraco, fica pro roteiro manual de sala
+(Fase 4/6) — mesma limitação já registrada para o `netplay_check_frames`.
+
+### CSS não usado
+
+Script novo `testes\varredura_fase2_css.py`: 185 seletores de classe no
+CSS, 32 sem nenhuma ocorrência fora do `estilo.css`. Conferido um a um
+(risco de falso positivo: classe montada por template literal no JS, tipo
+`` `midia--${tipo}` ``, nunca aparece como texto literal na busca) —
+**27 eram exatamente isso**, confirmados vivos (`midia--*`, `capa-*`,
+`jogo--*`, `custo--*`, `desempenho--*`, `sinal--*`, `ranking-pos--*`, todos
+construídos com um valor vindo de dado, não digitados por extenso em
+lugar nenhum). **5 eram mortos de verdade**, confirmados por dois lados —
+zero ocorrência do nome completo E zero ocorrência da raiz do nome em
+`app.js`/`index.html`, e a maioria com uma explicação encontrada no próprio
+código do motivo de terem ficado pra trás:
+
+| Classe | Por que estava morta |
+|---|---|
+| `.campo-apelido` (+ `span`, + regra de tela pequena) | O campo de apelido virou um modal (`#modalApelido`) num redesenho; a classe do wrapper antigo nunca foi apagada do CSS |
+| `.jogo-acoes` (+ `.botao`, + regra de tela pequena) | Comentário no próprio `app.js` (linha 531): "As ações grandes ficam no painel de detalhes... não repete uma fileira de botões pequenos em cada jogo" — decisão de design documentada, CSS órfão desde então |
+| `.jogo-gerir` | Botão de gerenciar virou `#btnGerirSelecionado` (id, no painel de detalhes), não mais uma classe no card |
+| `.jogo-dupla` | Mesmo padrão — Jogar Junto virou `#btnMultiplayerSelecionado` |
+| `.acervo-cabeca-acoes` | Sem nenhum vestígio em `index.html`; layout do acervo mudou e a classe ficou pra trás |
+
+Removidas as 5. Confirmado visualmente no navegador de verdade depois da
+remoção (tela principal, Ajustes → Avançado, Biblioteca online) — nenhuma
+mudança visual, como esperado de CSS morto. Bateria de 44 testes: OK.
+
+### JavaScript não usado
+
+Não achei função JS órfã nesta revisão (o `app.js` é um arquivo só, sem
+módulos separados para cruzar) — o achado real de JS desperdiçado desta
+fase foi o loop de animação sem fim dos fundos, já corrigido acima.
+
+### Teste de estresse do catálogo (5.000 jogos falsos)
+
+Script novo `testes\teste_estresse_catalogo.py`: cria 4.998 arquivos falsos
+(extensão válida, 0 bytes) espalhados em 3 consoles reais (NES, Super
+Nintendo, Game Boy), numa subpasta própria fácil de apagar depois, e mede
+`indexador.indexar()` direto (sem precisar do servidor HTTP inteiro).
+Apaga tudo ao final, mesmo se o teste falhar no meio (bloco `finally`).
+
+| Medida | Resultado |
+|---|---|
+| Antes (catálogo real) | 32 jogos, indexado em 0,131s |
+| Depois (+4.998 falsos = 5.030 jogos) | indexado em **1,481s** — varredura fria, sem cache |
+| Segunda chamada, mesmo catálogo | **0,023s** — cache por assinatura de pasta funcionando, ~64× mais rápido |
+
+Catálogo real conferido depois: voltou para 32 jogos, pasta de teste
+apagada. Não subi o servidor HTTP para conferir "a tela continua
+respondendo" à parte — a rota `/api/catalogo` só devolve o que
+`indexador.indexar()` já calculou, então uma indexação de 1,48s não vira
+travamento perceptível na tela.
+
+### Aplicação e testes (Fase 2)
+
+Bateria de 44 testes automatizados: **OK, 0 falhas**, em cada etapa
+(rodízio de logs, fundos animados, remoção de CSS, teste de estresse).
+Arquivos alterados: `servidor\arena.py` (rodízio de logs),
+`launcher\app.js`, `launcher\galaxy-background.js`,
+`launcher\field-background.js` (fundos animados), `launcher\estilo.css`
+(CSS morto removido). Scripts novos: `testes\varredura_fase2_css.py`,
+`testes\teste_estresse_catalogo.py`, `ferramentas\teste_rodizio_logs.py`.
 
 ---
 

@@ -1,0 +1,32 @@
+{
+  "total_seletores": 180,
+  "candidatos": [
+    "capa-atari-2600",
+    "capa-gamecube-e-wii",
+    "capa-mega-drive-master-system-game-gear",
+    "capa-playstation-1",
+    "capa-playstation-2",
+    "capa-super-nintendo",
+    "custo--alto",
+    "custo--baixo",
+    "custo--medio",
+    "desempenho--azul",
+    "desempenho--verde",
+    "desempenho--vermelho",
+    "jogo--desaparecendo",
+    "jogo--falta_sistema",
+    "jogo--pronta",
+    "jogo--sem_pasta",
+    "midia--caixa_dvd",
+    "midia--caixa_xbox",
+    "midia--cartao",
+    "midia--cartucho_h",
+    "midia--cartucho_v",
+    "midia--jewel_case",
+    "midia--umd",
+    "ranking-pos--1",
+    "sinal--falta_sistema",
+    "sinal--sem_core",
+    "sinal--sem_pasta"
+  ]
+}

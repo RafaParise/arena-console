@@ -197,7 +197,7 @@ lista de remoção; Fase 7 - mudanças de texto; Fase 8 - juntar ao
 
 - [x] Fase 0 — Linha de base e inventário (23/09/2026)
 - [x] Fase 1 — Varredura e limpeza (debloat) (23/09/2026)
-- [ ] Fase 2 — Leveza e desempenho
+- [x] Fase 2 — Leveza e desempenho (23/09/2026)
 - [ ] Fase 3 — Testes do servidor e da API
 - [ ] Fase 4 — Jogar Junto
 - [ ] Fase 5 — Matriz de jogos

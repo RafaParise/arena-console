@@ -219,17 +219,6 @@ code {
   gap: var(--gap);
 }
 
-.campo-apelido {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.campo-apelido span {
-  font-size: var(--t-micro);
-  color: var(--texto-apagado);
-}
-
 input[type="text"],
 input[type="search"],
 input[type="number"],
@@ -746,20 +735,6 @@ input::placeholder { color: var(--texto-apagado); }
 .desempenho--azul     { background: var(--azul-escuro); color: var(--azul-claro); }
 .desempenho--vermelho { background: #40201e; color: #f0908b; }
 
-/* Botões do card */
-.jogo-acoes {
-  display: flex;
-  gap: var(--gap);
-  padding: 0.15rem 0.7rem 0.7rem;
-  flex-wrap: wrap;
-}
-.jogo-acoes .botao {
-  font-size: var(--t-micro);
-  padding: 0.3rem 0.6rem;
-  flex-shrink: 1;
-  flex: 1 1 auto;
-}
-
 /* ========================= PAINEL DE DETALHES ========================= */
 .detalhes-jogo {
   width: 265px;
@@ -1115,14 +1090,11 @@ input::placeholder { color: var(--texto-apagado); }
 @media (max-width: 560px) {
   .marca { width: 100%; }
   .topo-acoes { width: 100%; margin-left: 0; justify-content: stretch; }
-  .campo-apelido { flex: 1 1 100%; }
   .topo-acoes > .botao { flex: 1; }
   .jogos { grid-template-columns: 1fr 1fr; gap: .65rem; }
   .jogo-titulo { font-size: .82rem; }
   .acervo-formulario { grid-template-columns: 1fr; }
   .acervo-formulario--inteiro { grid-column: auto; }
-  .jogo-acoes { flex-direction: column; }
-  .jogo-acoes .botao { width: 100%; }
 }
 
 /* ========================= SELO DE PENDENTES ========================= */
@@ -1299,13 +1271,6 @@ input::placeholder { color: var(--texto-apagado); }
   min-height: 64px;
 }
 
-/* Botao de gerenciar dentro da linha do jogo */
-.jogo-gerir {
-  margin-right: var(--gap);
-  font-size: var(--t-micro);
-  padding: 0.25rem 0.6rem;
-}
-
 /* ========================= SELO DE DESEMPENHO ========================= */
 /* Diz, na propria linha do jogo, como aquele console vai rodar aqui.
    A cor carrega o significado; o texto explica sem precisar decorar. */
@@ -1456,7 +1421,6 @@ input::placeholder { color: var(--texto-apagado); }
 @keyframes progresso-vai { to { transform: translateX(320%); } }
 .botao--perigo { border-color: #bd7184; color: #ffc3ce; }
 .botao--perigo:hover { background: #643242; border-color: #ff8fa6; }
-.acervo-cabeca-acoes { justify-content: flex-start; }
 .acervo-busca { margin-top: -.35rem; }
 .acervo-fontes { display: flex; flex-wrap: wrap; gap: .4rem; }
 .acervo-fonte-selo {
@@ -1486,9 +1450,6 @@ input::placeholder { color: var(--texto-apagado); }
   font-family: var(--fonte-numero);
   font-size: 0.62rem;
 }
-
-/* Botao de jogar junto na linha do jogo */
-.jogo-dupla { margin-right: var(--gap); font-size: var(--t-micro); padding: 0.25rem 0.6rem; }
 
 /* ============ ABA AVANCADA: recursos com explicacao e exemplo ============ */
 

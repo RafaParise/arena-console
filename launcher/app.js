@@ -55,6 +55,10 @@ function atualizarBotaoTema() {
   if (!botao || !estado.config) return;
   const escuro = estado.config.tema === "escuro";
   document.body.dataset.tema = escuro ? "escuro" : "claro";
+  // Os fundos animados (galaxy-background.js, field-background.js) leem
+  // isto para se desligar sozinhos no modo modesto -- computador fraco
+  // nao precisa gastar quadro nenhum com decoracao.
+  document.body.dataset.modoModesto = estado.config.modo_modesto ? "true" : "false";
   botao.textContent = escuro ? "☀ Claro" : "☾ Escuro";
   botao.setAttribute("aria-label", escuro ? "Usar modo claro" : "Usar modo escuro");
 }

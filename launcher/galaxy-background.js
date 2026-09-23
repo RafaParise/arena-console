@@ -115,17 +115,42 @@
     return document.body.dataset.tema === 'escuro';
   }
 
+  // Modo modesto e "prefira menos movimento" (Windows/navegador) desligam
+  // o fundo animado -- computador fraco nao precisa gastar quadro nenhum
+  // com decoração, e quem pediu menos movimento nao quer isto piscando.
+  // Achado real na auditoria (pendência antiga do CLAUDE.md): antes disto,
+  // o loop de animação rodava para sempre, em todo quadro, mesmo com o
+  // canvas escondido -- só não desenhava nada, mas continuava agendando o
+  // próximo quadro sem parar.
+  const prefereMenosMovimento = window.matchMedia
+    && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function deveAnimar() {
+    return estaVisivel()
+      && document.body.dataset.modoModesto !== 'true'
+      && !prefereMenosMovimento;
+  }
+
+  // Troca de tema tem que continuar valendo mesmo com a animação pausada
+  // (modo modesto ligado, por exemplo) -- senão o fundo errado fica preso
+  // na tela quando o aluno troca de tema com o modo modesto ligado.
+  function sincronizarVisibilidade() {
+    canvas.style.display = estaVisivel() ? 'block' : 'none';
+  }
+
   let t = 0;
   let ultimoFrame = performance.now();
+  let animando = false;
 
   function draw() {
     ultimoFrame = performance.now();
+    sincronizarVisibilidade();
 
-    const visivel = estaVisivel();
-    canvas.style.display = visivel ? 'block' : 'none';
-
-    if (!visivel) {
-      requestAnimationFrame(draw);
+    if (!deveAnimar()) {
+      // Para de agendar quadro -- o vigia, la embaixo, acorda o loop
+      // sozinho quando a condição mudar (tema, modo modesto ou a
+      // preferência do sistema).
+      animando = false;
       return;
     }
 
@@ -231,20 +256,23 @@
       console.error('Fundo galáctico: erro num frame, seguindo pro próximo.', e);
     }
 
+    animando = true;
     requestAnimationFrame(draw);
   }
 
   draw();
 
-  // Vigia: se o loop de animação parar de rodar por qualquer motivo
-  // (perda de contexto que escapou do tratamento acima, erro fora do
-  // try/catch, travamento do navegador, etc.), detecta e reinicia
-  // sozinho, sem precisar recarregar a página.
+  // Vigia, a cada 2s (nunca por quadro): reinicia o loop se ele devia
+  // estar animando e parou por acidente (perda de contexto que escapou
+  // do tratamento acima, erro fora do try/catch, travamento do
+  // navegador); e acorda o loop quando a condição de pausa (tema, modo
+  // modesto, preferência do sistema) deixa de valer.
   setInterval(function () {
+    sincronizarVisibilidade();
     if (document.visibilityState !== 'visible') return;
-    const parado = performance.now() - ultimoFrame > 3000;
+    if (!deveAnimar()) return;
+    const parado = !animando || performance.now() - ultimoFrame > 3000;
     if (parado) {
-      console.warn('Fundo galáctico parado há mais de 3s, reiniciando o loop.');
       draw();
     }
   }, 2000);

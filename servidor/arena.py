@@ -464,8 +464,9 @@ BASE_COMUM = {
     "config_save_on_exit": "true",
 
     # --- Deixar rastro quando algo der errado ----------------------------
-    # Sem log, cada fechamento inesperado e uma investigacao do zero. O
-    # arquivo fica em dados\retroarch.log e o ARENA nao o apaga.
+    # Sem log, cada fechamento inesperado e uma investigacao do zero. Um
+    # arquivo por sessao em dados\retroarch__AAAA_MM_DD__HH_MM_SS.log;
+    # limpar_logs_antigos() mantem so os LOGS_MANTIDOS mais recentes.
     "log_to_file": "true",
     "log_to_file_timestamp": "true",
     "log_verbosity": "true",
@@ -1847,6 +1848,29 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
 
 ARQUIVOS_DE_BACKUP = ("arena.db", "config.json", "controles.json")
 COPIAS_MANTIDAS = 3
+LOGS_MANTIDOS = 10
+
+
+def limpar_logs_antigos():
+    """Apaga os logs do RetroArch mais velhos, mantendo so os LOGS_MANTIDOS
+    mais recentes (por nome -- o carimbo de data/hora no nome ja ordena
+    certo). Devolve quantos apagou."""
+    try:
+        nomes = sorted(
+            nome for nome in os.listdir(PASTA_DADOS)
+            if nome.startswith("retroarch__") and nome.endswith(".log"))
+    except OSError:
+        return 0
+
+    excedentes = nomes[:-LOGS_MANTIDOS] if len(nomes) > LOGS_MANTIDOS else []
+    apagados = 0
+    for nome in excedentes:
+        try:
+            os.remove(os.path.join(PASTA_DADOS, nome))
+            apagados += 1
+        except OSError:
+            pass
+    return apagados
 
 
 def fazer_backup():
@@ -4348,6 +4372,16 @@ def principal():
     if orfaos:
         print("  Limpeza:  %d arquivo(s) temporario(s) de uma sessao anterior"
               % orfaos)
+
+    # O RetroArch grava um retroarch__AAAA_MM_DD__HH_MM_SS.log por sessao
+    # (log_to_file_timestamp = true, la embaixo neste arquivo) e nunca
+    # apaga nenhum sozinho. Achado real na auditoria: depois de um dia de
+    # testes, dados\ tinha 38 desses. Mantem so os mais recentes -- da
+    # pra investigar um fechamento recente sem o cartao SD/pen drive
+    # acumular log para sempre.
+    apagados_log = limpar_logs_antigos()
+    if apagados_log:
+        print("  Limpeza:  %d log(s) antigo(s) do RetroArch" % apagados_log)
 
     # Pen drive muda de letra, pasta muda de lugar - conserta sozinho antes
     # de mais nada, senao o RetroArch abre com caminho de uma pasta que
