@@ -201,27 +201,29 @@
       </div>
       <ul class="amigos" id="listaAmigos"></ul>
 
-      <h3 class="grupo-titulo">Ou digite o endereço na mão</h3>
-      <p class="explica">
-        Use quando o código não funcionar — por exemplo, se vocês estão em
-        redes que não se enxergam.
-      </p>
-      <div class="cheat-form">
-        <label class="campo">
-          <span>Apelido do amigo</span>
-          <input id="amigoApelido" type="text" maxlength="24"
-                 placeholder="lucas" autocomplete="off" spellcheck="false">
-        </label>
-        <label class="campo">
-          <span>Endereço que ele te passou</span>
-          <input id="amigoUrl" type="text" maxlength="120"
-                 placeholder="192.168.0.22" autocomplete="off" spellcheck="false">
-        </label>
-        <div class="modal-acoes">
-          <button class="botao" id="btnTestarAmigo" type="button">Testar</button>
-          <button class="botao botao--principal" id="btnAddAmigo" type="button">Adicionar</button>
+      <details class="detalhe-avancado">
+        <summary class="grupo-titulo">Ou digite o endereço na mão</summary>
+        <p class="explica">
+          Use quando o código não funcionar — por exemplo, se vocês estão em
+          redes que não se enxergam.
+        </p>
+        <div class="cheat-form">
+          <label class="campo">
+            <span>Apelido do amigo</span>
+            <input id="amigoApelido" type="text" maxlength="24"
+                   placeholder="lucas" autocomplete="off" spellcheck="false">
+          </label>
+          <label class="campo">
+            <span>Endereço que ele te passou</span>
+            <input id="amigoUrl" type="text" maxlength="120"
+                   placeholder="192.168.0.22" autocomplete="off" spellcheck="false">
+          </label>
+          <div class="modal-acoes">
+            <button class="botao" id="btnTestarAmigo" type="button">Testar</button>
+            <button class="botao botao--principal" id="btnAddAmigo" type="button">Adicionar</button>
+          </div>
         </div>
-      </div>
+      </details>
 
       <h3 class="grupo-titulo">Deixar meus amigos me acharem</h3>
       <div class="opcao">
@@ -328,16 +330,14 @@
         <span class="opcao-rotulo">Ultra desempenho</span>
         <button class="chave opcao-controle" id="chaveUltra"
                 aria-pressed="false" aria-label="Ultra desempenho"></button>
-        <span class="opcao-ajuda">Dedica mais recursos ao jogo.</span>
+        <span class="opcao-ajuda">Máximo desempenho, com menos recursos para o Arena. Não altera o Windows.</span>
       </div>
-      <p class="explica"><b>Modo ultra:</b> máximo desempenho, com menos recursos para o Arena.</p>
       <div class="opcao">
         <span class="opcao-rotulo">Travar Alt+Tab e tecla Windows</span>
         <button class="chave opcao-controle" id="chaveTravar"
                 aria-pressed="false" aria-label="Travar teclas do sistema"></button>
         <span class="opcao-ajuda">Use F9 para liberar o teclado.</span>
       </div>
-      <p class="explica">O modo ultra não altera o Windows.</p>
     </div>
 
     <div>
@@ -366,8 +366,6 @@
 
   <!-- Aba perfil -->
   <div class="aba-conteudo" data-painel="perfil" hidden>
-    <p class="explica">Crie um perfil novo para esta máquina.</p>
-
     <div>
       <h3 class="grupo-titulo">Este ARENA agora</h3>
       <p class="explica">
@@ -428,14 +426,6 @@
         ARENA. É a primeira coisa a tentar.
       </span>
     </div>
-    <div class="opcao" hidden>
-      <select class="opcao-controle" id="listaDriverControle" aria-label="Tipo de controle">
-        <option value="xinput">xinput</option>
-        <option value="dinput">dinput</option>
-      </select>
-      <span class="opcao-ajuda">Troque se o controle não aparecer.</span>
-    </div>
-
     <div>
       <h3 class="grupo-titulo">O que funciona</h3>
       <ul class="controles" id="listaControles"></ul>
@@ -523,9 +513,11 @@
           Configurar com assistente
         </button>
       </div>
-      <p class="explica">Preenche os botões automaticamente.</p>
       <p class="explica" id="mapaResumo">—</p>
-      <p class="explica">As alterações valem no próximo jogo.</p>
+      <p class="explica">
+        "Mapear sozinho" preenche tudo pelo número de cada botão; vale no
+        próximo jogo.
+      </p>
       <p class="explica" id="mapaWatacao" hidden>Para controles genéricos, clique em "Configurar com assistente" e pressione cada botão quando pedido.</p>
     </div>
 
@@ -560,11 +552,7 @@
         <span class="opcao-ajuda">A tabela é atualizada.</span>
       </div>
       <ul class="controles" id="listaBotoes"></ul>
-    </div>
-
-    <div>
-      <h3 class="grupo-titulo">Se os botões estiverem trocados</h3>
-      <p class="explica">Se necessário, remapeie os botões pelo menu do jogo.</p>
+      <p class="explica">Se os botões vierem trocados dentro do jogo, remapeie pelo menu do próprio jogo.</p>
     </div>
   </div>
 

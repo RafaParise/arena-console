@@ -197,8 +197,6 @@ async function carregarEstado() {
   $("#pastaBios").textContent = dados.pastas.sistema;
   $("#listaDriverControleTopo").value =
     estado.efetivas.input_joypad_driver || "xinput";
-  $("#listaDriverControle").value =
-    estado.efetivas.input_joypad_driver || "xinput";
 
   estado.amigos = estado.config.servidores || [];
   const codigo = $("#meuCodigoAmigo");
@@ -3094,19 +3092,9 @@ function ligarEventos() {
       }
     });
 
-  $("#listaDriverControle").addEventListener("change", async (evento) => {
-    try {
-      await salvarConfig({ avancado: { input_joypad_driver: evento.target.value } });
-      recado("Pronto. Vale no próximo jogo que você abrir.");
-    } catch (falha) {
-      recado(falha.message, true);
-    }
-  });
-
   $("#listaDriverControleTopo").addEventListener("change", async (evento) => {
     try {
       await salvarConfig({ avancado: { input_joypad_driver: evento.target.value } });
-      $("#listaDriverControle").value = evento.target.value;
       recado("Pronto. Feche e abra o ARENA para o controle ser reconhecido.");
     } catch (falha) {
       recado(falha.message, true);

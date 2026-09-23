@@ -950,6 +950,16 @@ input::placeholder { color: var(--texto-apagado); }
 }
 .grupo-titulo:first-child { margin-top: 0; }
 
+/* Secao avancada, escondida ate o aluno precisar (ex.: adicionar amigo
+   digitando o endereco na mao, em vez do jeito facil pelo codigo). */
+.detalhe-avancado summary.grupo-titulo {
+  cursor: pointer;
+  user-select: none;
+  list-style-position: outside;
+}
+.detalhe-avancado summary.grupo-titulo::-webkit-details-marker { color: var(--texto-fraco); }
+.detalhe-avancado[open] summary.grupo-titulo { margin-bottom: 0.6rem; }
+
 .opcao {
   display: grid;
   grid-template-columns: 1fr auto;
