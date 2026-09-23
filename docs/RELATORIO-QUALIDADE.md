@@ -127,10 +127,15 @@ Fase 1, que decide o que é código morto):
   `/api/sinc/receber`, `/api/sinc/ola`, `/api/sinc/ranking` — fazem parte da
   sincronização de placar entre colegas, chamadas pelo `arena.py` de um
   colega para o outro, não pelo navegador.
-- **Não encontrada em `fetch(...)` na busca automática** (pode estar em uso
-  como `<img src="/api/capa?...">`, que a busca por `fetch(` não pega —
-  precisa conferir na Fase 1, não presumir que é morta): `/api/capa`,
-  `/api/jogo/impressao`.
+- **Resolvido na Fase 1** (não apareciam em `fetch(...)` porque não são
+  chamadas desse jeito — confirmado, não são rotas mortas):
+  `/api/capa` é montada **pelo servidor**, não pela tela — `arena.py:1401`
+  gera `jogo["capa_urls"]` com a URL pronta (`/api/capa?arquivo=...`), que
+  vira `<img src>` direto; `/api/jogo/impressao` é chamada de servidor para
+  servidor, por `arena.py:3415` e por `servidor\partida.py:187/189` (o
+  `PARTIDA.bat`), para comparar se os dois lados têm o mesmo arquivo de jogo
+  antes de conectar o Jogar Junto — não é rota de tela, é rota de
+  diagnóstico entre ARENAs.
 
 ### Inventário de chaves de configuração (`config.json`, via `config_padrao()` em `arena.py`)
 
@@ -156,8 +161,14 @@ a Fase 1.
 
 Threads efêmeras (nascem e morrem por pedido, não contam como "serviço
 rodando"): teste de endereço de amigo (`arena.py:2634`), download em
-segundo plano de capa/jogo (`arena.py:3517`, `4048`), transferência de
-arquivo (`transferencia.py:59`, usada pela mala do pen drive).
+segundo plano de capa/jogo (`arena.py:3517`, `4048`).
+
+**Correção desta entrada, feita na Fase 1**: eu tinha escrito aqui, por
+suposição, que `transferencia.py:59` era usada pela mala do pen drive.
+Não é — conferido na Fase 1: `transferencia.py` inteiro nunca é importado
+por `arena.py`, é um módulo órfão. A mala do pen drive de verdade é
+`ARENA-troca.json`, por arquivo, sem servidor HTTP nenhum (ver CLAUDE.md).
+Ver a lista de remoções da Fase 1 abaixo.
 
 ### Inventário do que depende de internet
 
@@ -173,6 +184,53 @@ Tudo com o padrão já documentado em `CLAUDE.md`: degrada, não trava, quando
 não há internet. Testar isso de propósito (DNS falho, timeout, Wi-Fi da
 escola devolvendo HTML de login) é o que a Fase 3 pede — não testado ainda
 nesta fase, só inventariado.
+
+---
+
+## Fase 1 — Varredura e limpeza (lista para aprovação)
+
+Script usado: `testes\varredura_fase1.py` (resultado bruto em
+`docs\varredura_fase1_bruta.json`). Ele só aponta candidatos — cada um foi
+conferido à mão, lendo o código de verdade, antes de entrar nesta lista
+(regra 3: nada entra por suposição de regex).
+
+**Nada foi alterado ainda.** Isto é a lista para o Rafael aprovar, item por
+item ou em bloco, antes de eu aplicar qualquer coisa.
+
+### Remoções propostas (código morto, com prova)
+
+| # | O quê | Prova | Risco de remover |
+|---|---|---|---|
+| 1 | `servidor\transferencia.py` inteiro (116 linhas) — um servidor HTTP de transferência P2P de jogos por Wi-Fi, tipo snapdrop.net | `grep` por `transferencia`, `ServidorTransferencia` e `TransferHandler` no projeto inteiro só acha o próprio arquivo. `arena.py` nunca importa `transferencia`. Nenhum guia (1–6, LEIA-ME) menciona a função. Não está na lista "Funcionalidades existentes" do CLAUDE.md. | Nenhum — nada usa |
+| 2 | `graficos.opcoes_de_controle()` (`graficos.py:619-636`) — função que liga o analógico via `input_libretro_device_pN` | Nunca chamada (`grep` só acha a definição). A mesma responsabilidade já é feita de verdade por `controles.opcoes_do_console()`, chamada em `arena.py:1614` — que é quem realmente grava `input_libretro_device_pN` (`controles.py:198-205`). É duplicata morta, não a versão em uso. | Nenhum — é a cópia que não roda |
+| 3 | `hardware.shutil_disk_usage()` (`hardware.py:265-267`) — wrapper de 2 linhas em volta de `shutil.disk_usage` | Nunca chamada. O espaço em disco de verdade já é calculado direto em `hardware.disco()` (`hardware.py:215`). | Nenhum |
+
+### Correções propostas (bug real ou risco real, não é remoção de código morto)
+
+| # | O quê | Prova / cenário concreto | Proposta |
+|---|---|---|---|
+| 4 | **Bug real — perda de dados silenciosa.** `arena.py:3334-3337`, dentro de `/api/perfil/novo` ("Começar do zero"): `fazer_backup()` roda dentro de `try / except Exception: pass` **antes** de apagar `arena.db`, `config.json`, `controles.json`, `manifesto.json` e `arena_override.cfg`. Se o backup falhar, o código apaga os arquivos do mesmo jeito. | O comentário do próprio código promete "se alguém clicar por engano, o progresso ainda está em backup" — mas se `fazer_backup()` lançar exceção (pen drive quase cheio, pasta de backup virou só-leitura, mídia removida no meio), essa promessa quebra sem avisar ninguém. Cenário: professor clica "Começar do zero" com o pen drive cheio → backup falha → perfil inteiro apagado, sem cópia e sem mensagem de erro. | Se o backup falhar, **cancelar o apagamento** e devolver erro claro ("Não consegui garantir uma cópia de segurança antes de apagar. Nada foi apagado. Verifique o espaço livre e tente de novo.") em vez de seguir em frente sem rede de segurança. |
+| 5 | **Portabilidade — navegador não encontrado sem admin.** `arena.py:4275-4279`, lista `NAVEGADORES`, só verifica os caminhos de instalação **com administrador** (`C:\Program Files\...`). | Instalação de Chrome **sem admin** (comportamento padrão do instalador quando falta privilégio — o cenário exato que o ARENA já assume como normal, "sem permissão de administrador") fica em `%LOCALAPPDATA%\Google\Chrome\Application\chrome.exe`, caminho que a lista não verifica. Confirmado nesta máquina de desenvolvimento: o Edge instalado no caminho padrão foi achado, mas a checagem não cobre instalação por usuário. Quando nenhum caminho da lista bate, o ARENA cai silenciosamente para `webbrowser.open()` — abre numa aba comum, sem o modo "app" limpo. | Acrescentar os caminhos `%LOCALAPPDATA%\Google\Chrome\Application\chrome.exe` e `%LOCALAPPDATA%\Microsoft\Edge\Application\msedge.exe` (via `os.environ["LOCALAPPDATA"]`) à lista `NAVEGADORES`, antes dos caminhos de admin. |
+| 6 | **Documentação desatualizada.** `2-JOGOS.md:358-359` diz, para o PlayStation 1: "o núcleo dele *é* o DuckStation". | O núcleo de verdade, hoje, é o **SwanStation** (só troca para PCSX ReARMed durante o Jogar Junto — ver CLAUDE.md, seção "Rede e partida a dois"). Um aluno que abrir a lista de núcleos do RetroArch procurando "DuckStation" não vai achar nenhum com esse nome. | Trocar a frase para citar SwanStation, com uma nota de que ele nasceu como um fork do DuckStation (é por isso que o nome aparece em alguns lugares do código) — mantém o contexto sem confundir o aluno na hora de procurar. |
+
+### Verificar, não decidir agora (pendência já existente, só reforçada)
+
+| # | O quê | Situação |
+|---|---|---|
+| 7 | `graficos.py:397` grava a chave `"duckstation_BIOS.Path"` (além de `"swanstation_BIOS_Path"`); `graficos.py:550-551` grava `"duckstation_MemoryCards.Card1Type"` e `"duckstation_MemoryCards.Directory"`. | Pode ser hedge intencional (SwanStation nasceu como fork do DuckStation e pode aceitar as duas grafias de opção) ou resíduo de quando o projeto usava o núcleo DuckStation de verdade. **Não decido sozinho** — isto é exatamente a pendência já escrita no CLAUDE.md, seção 10: "Confirmar as chaves de BIOS e memory card do núcleo swanstation contra um `retroarch-core-options.cfg` gerado pelo RetroArch real". Proponho resolver isso quando testarmos PS1 de verdade (Fase 3 ou Fase 5), não como remoção às cegas agora. |
+
+### Checado, sem achado (para não parecer que não foi olhado)
+
+- **As 20 chaves de `config.json`**: todas usadas mais de uma vez no código. Nenhuma órfã.
+- **~50 `except OSError/Exception: pass` ou `continue`**: a grande maioria segue o padrão defensivo já documentado no CLAUDE.md ("tenta a próxima fonte, degrada sem travar") — sondagem de adaptador de rede, leitura de hardware opcional, prioridade de processo, checkpoint de banco ao fechar. Não escondem bug real, exceto o item 4 acima, que é o único promovido à lista de correção.
+- **Rotas da API**: as 2 que pareciam sem uso na Fase 0 (`/api/capa`, `/api/jogo/impressao`) foram confirmadas vivas — ver correção acima, no inventário de rotas.
+- **Textos em inglês na tela**: nenhum achado na varredura por padrões comuns (`Save`, `Cancel`, `Loading`, `Settings`, `alert(...)` em inglês).
+- **Arquivos duplicados da junção das duas versões**: `launcher\` tem exatamente os 5 arquivos que o CLAUDE.md documenta (`index.html`, `app.js`, `estilo.css`, `galaxy-background.js`, `field-background.js`) — nada sobrando.
+- **Frequência dos 2 serviços permanentes** (`rodar_vigia`, `anunciar_e_escutar`): já justificada no CLAUDE.md pelo desgaste do cartão SD (modo econômico sobe o intervalo do vigia de 20s para 60s). Não proponho mudança agora — a Fase 2 pede o número real de gravações em disco por hora, e é lá que decido se ainda está alto demais.
+
+### Fica pendente (não é da Fase 1)
+
+- `dados\` com 38 logs do RetroArch sem rodízio (achado na Fase 0) — a correção (limite de tamanho + rodízio) é da Fase 2, não da Fase 1.
 
 ---
 
