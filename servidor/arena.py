@@ -3330,11 +3330,22 @@ class Manipulador(BaseHTTPRequestHandler):
             apagados = []
 
             # Guarda uma copia antes de apagar. Se alguem clicar por
-            # engano, o progresso ainda esta em backup.
+            # engano, o progresso ainda esta em backup. Por isso a copia
+            # precisa dar certo de verdade -- se falhar (pen drive cheio,
+            # pasta de backup virou so-leitura, midia removida no meio),
+            # o apagamento e cancelado em vez de seguir sem rede de
+            # seguranca (achado real na auditoria: antes, uma falha aqui
+            # era engolida em silencio e o perfil era apagado do mesmo
+            # jeito, sem copia nenhuma).
             try:
-                fazer_backup()
+                copia_de_seguranca = fazer_backup()
             except Exception:
-                pass
+                copia_de_seguranca = None
+            if not copia_de_seguranca:
+                return self.erro(
+                    "Nao consegui garantir uma copia de seguranca antes de "
+                    "apagar. Nada foi apagado. Verifique o espaco livre no "
+                    "disco/pen drive e tente de novo.", 500)
 
             for arquivo in ("arena.db", "config.json", "controles.json",
                             "manifesto.json", "arena_override.cfg"):
@@ -4272,10 +4283,19 @@ def internet_disponivel():
     return False
 
 
+_LOCALAPPDATA = os.environ.get("LOCALAPPDATA", "")
+
 NAVEGADORES = [
     r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
     r"C:\Program Files\Google\Chrome\Application\chrome.exe",
     r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
+    # Instalacao SEM administrador (o instalador do Chrome cai aqui
+    # quando falta privilegio -- exatamente o caso normal de notebook de
+    # aluno, sem admin nenhum). Achado real na auditoria: sem isto, o
+    # ARENA nao encontrava o navegador e caia, sem avisar, para uma aba
+    # comum em vez da janela "modo app".
+    os.path.join(_LOCALAPPDATA, "Google", "Chrome", "Application", "chrome.exe"),
+    os.path.join(_LOCALAPPDATA, "Microsoft", "Edge", "Application", "msedge.exe"),
 ]
 
 

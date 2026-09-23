@@ -187,15 +187,16 @@ nesta fase, só inventariado.
 
 ---
 
-## Fase 1 — Varredura e limpeza (lista para aprovação)
+## Fase 1 — Varredura e limpeza
 
 Script usado: `testes\varredura_fase1.py` (resultado bruto em
 `docs\varredura_fase1_bruta.json`). Ele só aponta candidatos — cada um foi
 conferido à mão, lendo o código de verdade, antes de entrar nesta lista
 (regra 3: nada entra por suposição de regex).
 
-**Nada foi alterado ainda.** Isto é a lista para o Rafael aprovar, item por
-item ou em bloco, antes de eu aplicar qualquer coisa.
+**Aprovada em bloco pelo Rafael ("Todas por gentileza") e aplicada em
+23/09/2026.** Os 6 itens abaixo foram todos aplicados, testados e
+commitados. Detalhe de cada aplicação logo após a tabela correspondente.
 
 ### Remoções propostas (código morto, com prova)
 
@@ -227,6 +228,29 @@ item ou em bloco, antes de eu aplicar qualquer coisa.
 - **Textos em inglês na tela**: nenhum achado na varredura por padrões comuns (`Save`, `Cancel`, `Loading`, `Settings`, `alert(...)` em inglês).
 - **Arquivos duplicados da junção das duas versões**: `launcher\` tem exatamente os 5 arquivos que o CLAUDE.md documenta (`index.html`, `app.js`, `estilo.css`, `galaxy-background.js`, `field-background.js`) — nada sobrando.
 - **Frequência dos 2 serviços permanentes** (`rodar_vigia`, `anunciar_e_escutar`): já justificada no CLAUDE.md pelo desgaste do cartão SD (modo econômico sobe o intervalo do vigia de 20s para 60s). Não proponho mudança agora — a Fase 2 pede o número real de gravações em disco por hora, e é lá que decido se ainda está alto demais.
+
+### Aplicação (23/09/2026)
+
+Todos os 6 itens aplicados no ramo `auditoria`. Verificação depois de
+aplicar:
+
+- `import arena, graficos, hardware` sem erro de sintaxe (as remoções 1–3
+  não quebraram nenhum import).
+- Bateria de 44 testes automatizados: **OK, 0 falhas**, antes e depois.
+- Item 4 (o bug de perda de dados) ganhou teste novo e específico —
+  `ferramentas\teste_backup_falha_cancela_apagamento.py`, que sobe um ARENA
+  isolado (cópia temporária, não mexe na pasta real) e prova os dois
+  caminhos: **Caso 1** (backup funciona) continua apagando o perfil normal
+  (HTTP 200, `apagados: 5`); **Caso 2** (backup forçado a falhar) agora
+  **cancela** o apagamento (HTTP 500, mensagem clara, os 3 arquivos
+  conferidos continuam intactos). Os dois casos passaram.
+- Item 5 (lista `NAVEGADORES`): conferido que os 2 caminhos novos
+  (`%LOCALAPPDATA%\...`) entram corretamente na lista, expandidos para o
+  caminho real desta máquina. Não havia Chrome/Edge instalado sem admin
+  nesta máquina de desenvolvimento para testar o caso positivo de verdade
+  (só o Edge no caminho padrão) — fica como item do roteiro manual de sala,
+  se algum notebook da escola tiver Chrome instalado por usuário.
+- Item 6: frase de `2-JOGOS.md` corrigida para citar SwanStation.
 
 ### Fica pendente (não é da Fase 1)
 

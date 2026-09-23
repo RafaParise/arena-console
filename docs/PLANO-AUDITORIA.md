@@ -196,7 +196,7 @@ lista de remoção; Fase 7 - mudanças de texto; Fase 8 - juntar ao
 ## Progresso da auditoria
 
 - [x] Fase 0 — Linha de base e inventário (23/09/2026)
-- [ ] Fase 1 — Varredura e limpeza (debloat)
+- [x] Fase 1 — Varredura e limpeza (debloat) (23/09/2026)
 - [ ] Fase 2 — Leveza e desempenho
 - [ ] Fase 3 — Testes do servidor e da API
 - [ ] Fase 4 — Jogar Junto

@@ -262,11 +262,6 @@ def disco(pasta):
     }
 
 
-def shutil_disk_usage(pasta):
-    import shutil
-    return shutil.disk_usage(pasta).free
-
-
 # ---------------------------------------------------------------------------
 # Sistema operacional
 # ---------------------------------------------------------------------------

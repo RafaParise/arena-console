@@ -587,53 +587,6 @@ CONTROLES_CONHECIDOS = [
 ]
 
 
-# ---------------------------------------------------------------------------
-# Dizer ao console que o controle tem analogico
-# ---------------------------------------------------------------------------
-# Faltava isto, e era o motivo de o analogico nao funcionar no PlayStation
-# por mais que o controle estivesse certo.
-#
-# O console nao adivinha que controle esta plugado. O PlayStation 1 saiu de
-# fabrica com um controle SEM analogico; o DualShock veio depois. O
-# emulador comeca imitando o controle antigo, e ai os dois analogicos nao
-# fazem nada - nem o esquerdo, nem o direito.
-#
-# 513 = controle comum (so direcional)
-# 517 = controle com dois analogicos (DualShock e equivalentes)
-
-CONTROLE_ANALOGICO = 517
-CONTROLE_COMUM = 513
-
-# Consoles cujo controle padrao tem dois analogicos.
-COM_ANALOGICO = {
-    "ps1": CONTROLE_ANALOGICO,       # DualShock
-    "ps2": CONTROLE_ANALOGICO,       # DualShock 2
-    "dreamcast": CONTROLE_ANALOGICO,
-    "saturn": CONTROLE_ANALOGICO,    # 3D Control Pad
-    "gamecube": CONTROLE_ANALOGICO,
-    "n64": CONTROLE_ANALOGICO,       # o N64 tem um analogico so, mas o
-                                     # nucleo aceita o mesmo codigo
-}
-
-
-def opcoes_de_controle(plataforma_id, quantos_jogadores=2):
-    """Diz ao nucleo que tipo de controle cada jogador esta usando.
-
-    Sem isto, o analogico fica mudo em PlayStation, Dreamcast e Saturn -
-    o console acha que o controle e o velho, sem analogico nenhum.
-    """
-    tipo = COM_ANALOGICO.get(plataforma_id)
-    if not tipo:
-        return {}
-
-    opcoes = {}
-    for jogador in range(1, max(1, min(quantos_jogadores, 4)) + 1):
-        opcoes["input_libretro_device_p%d" % jogador] = str(tipo)
-        # O analogico esquerdo tambem anda como direcional, e o direcional
-        # continua funcionando. O analogico direito fica livre para o que
-        # o jogo quiser - camera, mira.
-        opcoes["input_player%d_analog_dpad_mode" % jogador] = "1"
-    return opcoes
 
 
 # ---------------------------------------------------------------------------

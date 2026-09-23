@@ -356,7 +356,9 @@ PlayStation 2 mantém. O ARENA passa a chamar ele sozinho.
 #### 1. Baixe o emulador
 
 **Só dois.** O RetroArch dá conta de todo o resto, inclusive PlayStation 1
-(o núcleo dele *é* o DuckStation) e PSP.
+(o núcleo dele é o **SwanStation** — nasceu como um fork do DuckStation,
+por isso o nome aparece em alguns lugares, mas quem roda o jogo é o
+SwanStation) e PSP.
 
 | Console | Programa | Precisa? | Onde |
 |---|---|---|---|
