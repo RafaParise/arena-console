@@ -685,6 +685,326 @@ Scripts novos: `testes\fuzz_rotas.py`, `testes\teste_travessia_capa.py`,
 
 ---
 
-## Depois (Fase 8)
+## Fase 4 — Jogar Junto: o coração do ARENA
+
+Esta fase abriu janelas de verdade do RetroArch várias vezes (não dá para
+testar netplay sem tela — não existe modo sem interface). Todas fechadas ao
+final de cada teste. Nenhum teste mexeu em `dados\`, `retroarch\saves`,
+`retroarch\states` nem no `arena_override.cfg` real — cada instância de
+teste usa cópia isolada dessas pastas numa pasta temporária apagada ao
+final.
+
+### 1. Multitap — funcionalidade nova, pedida explicitamente no plano
+
+O plano pediu para "descobrir como o ARENA deve ligar o Multitap sozinho".
+Não existia nada disso no código — foi preciso pesquisar o mecanismo real
+(lido no código-fonte do núcleo `snes9x`, não suposto): a porta 2 do
+console vira `RETRO_DEVICE_JOYPAD_MULTITAP` (valor `257`), o que abre mais
+4 encaixes de controle (jogadores 2 a 5) mantendo a porta 1 como jogador 1
+normal — é assim que o adaptador de verdade funciona (pluga na porta 2, não
+substitui a porta 1).
+
+**Implementado** (aprovado pelo Rafael como funcionalidade completa, com
+tela):
+- `graficos.opcoes_de_partida(..., multitap=True)` liga
+  `input_libretro_device_p2 = 257` quando o jogo pede.
+- `graficos.jogo_suporta_multitap()` + `consoles.json → snes → jogos_multitap`
+  (lista curada — hoje só "Super Bomberman" — mesmo espírito do "system
+  link" do PS2: cresce testando com jogo real, nunca por suposição).
+- `indexador.py` calcula `jogadores_max` **por jogo**, não por console
+  inteiro — só o jogo específico da lista curada mostra a opção de
+  "Jogador 3/4/5"; o resto do catálogo de SNES continua em 2, sem
+  confundir o aluno com uma opção que não serve pro jogo dele.
+- `app.js`: o seletor de posição do jogador já existia (genérico, construído
+  dinamicamente) — só precisou passar a ler do jogo específico em vez de só
+  da plataforma.
+
+**Testado com RetroArch de verdade**, Super Bomberman 4 (SNES), host + até
+4 convidados no mesmo computador:
+
+| Cenário | Resultado |
+|---|---|
+| Jogador 5 sozinho (sem 2, 3, 4) | Conecta perfeitamente — prova que a configuração do Multitap e a posição 5 estão corretas |
+| Jogadores 2, 3 e 4 juntos | Conectam todos, sem erro, com ping medido (11–34 ms neste computador) |
+| Jogadores 2, 3, 4 **e** 5 juntos | Os 3 primeiros conectam; o 4º (a última tentativa, seja ela qual posição for) **sempre falha** — "Falha ao conectar ao host", reproduzido em **3 rodadas**, inclusive com esperas bem generosas (10s entre cada abertura, 25s de espera final) para afastar a hipótese de disputa de CPU entre 5 emuladores no mesmo computador |
+
+**Achado real, não resolvido.** O mecanismo exato não foi identificado
+apesar de pesquisa no código-fonte oficial do RetroArch: `input_max_users`
+(padrão 8 em build de Windows) e `MAX_CLIENTS` (32, constante de
+compilação) foram conferidos e nenhum dos dois explica um limite de 4
+jogadores totais. **Duas hipóteses, nenhuma confirmada:**
+1. É um limite real do RetroArch não documentado que não consegui
+   localizar no código em tempo hábil.
+2. É um artefato de testar os 5 "computadores" todos como `127.0.0.1`
+   (mesmo endereço de origem) — não dá para descartar isso sem 5 máquinas
+   físicas de verdade.
+
+**Isto vira item do roteiro manual** (seção no fim deste relatório): testar
+com 5 notebooks reais da escola é a única forma de confirmar qual das duas
+hipóteses é a certa. Se o limite for real mesmo com 5 máquinas físicas,
+Super Bomberman fica documentado como "até 4 jogadores confirmados, 5º sem
+confirmação" — igual ao já documentado para N64/Dreamcast/PSP sem netplay:
+limite honesto, não escondido.
+
+### 2. Multiplayer local (GoldenEye 007, N64 — 4 controles, 1 computador só)
+
+Diferente do item 1, isto **não é netplay** — são 4 controles físicos no
+MESMO computador. `controles.opcoes_do_console()` já suportava isso
+(`input_max_users` em Ajustes → Avançado, opções 1/2/4/8, já exposto na
+tela); testado direto:
+
+```
+input_libretro_device_p1 = 1
+input_libretro_device_p2 = 1
+input_libretro_device_p3 = 1
+input_libretro_device_p4 = 1
+```
+
+As 4 portas corretas, e o jogo abriu sem nenhum erro de controle/entrada
+(os únicos erros no log foram de **áudio**, "Failed to get default audio
+endpoint" — falha do driver de som nesta máquina depois de várias rodadas
+de RetroArch abertas em sequência, sem relação nenhuma com a configuração
+de controle testada; não é um bug do ARENA).
+
+**Controle + teclado junto**: o recurso existe (`dispositivo_extra`), mas
+**não para N64** — a lista de consoles que aceitam essa troca é PS2,
+Dreamcast, MSX e ScummVM (documentado no próprio código). Testado contra
+PS2 (um dos consoles que de fato suporta): `input_libretro_device_p2` troca
+corretamente para teclado (`3`) ou mouse (`2`) quando pedido. Não é bug —
+GoldenEye/N64 nunca teve essa opção nem no código original; o item do plano
+"controle E teclado junto" e "4 controles" são dois recursos diferentes,
+cada um testado no console certo.
+
+**Apertar botão de verdade, com 4 controles físicos**: fica pro roteiro
+manual — não dá pra simular sem hardware de verdade.
+
+### 3. Simulador de rede ruim
+
+Script novo `testes\proxy_rede_ruim.py`: um repasse TCP (RetroArch usa TCP
+no netplay) em Python puro, que atrasa cada pedaço de dado em N
+milissegundos e, com uma chance configurável, atrasa um pedaço bem mais —
+é assim que "perda de pacote" se sente de verdade num protocolo TCP (o dado
+não some, chega muito atrasado, como uma retransmissão de verdade). O
+mecanismo do proxy foi **confirmado isoladamente** antes de usar com
+RetroArch: com 150ms configurados, um echo simples foi e voltou em 0,31s —
+bate com o esperado (150ms × 2, ida e volta).
+
+Testado com Super Bomberman 4 (host + 1 convidado) atrás do proxy, 5
+cenários:
+
+| Cenário | Conectou? | Avisos de travada/timeout do RetroArch |
+|---|---|---|
+| Só atraso, 50 ms | Sim | 0 |
+| Só atraso, 100 ms | Sim | 0 |
+| Só atraso, 200 ms | Sim | 0 |
+| Perda 1% (com 50ms de base) | Sim | 0 |
+| Perda 5% (com 50ms de base) | Sim | 0 |
+
+**Achado sobre o método de medição**: o "ping" que o próprio RetroArch
+registra no log **não acompanhou de forma confiável** o atraso que eu
+configurei no proxy (por exemplo, o cenário de 200ms registrou "12ms" —
+bem abaixo do esperado). Isso sugere que esse número é medido só no
+início da conexão (antes do atraso completo do proxy valer), não durante a
+partida inteira — então não posso afirmar "o RetroArch relatou X ms" como
+prova confiável do atraso sentido. O que **é** uma prova real e boa: em
+nenhum dos 5 cenários o RetroArch registrou aviso de travada/dessincronia/
+timeout — a conexão se manteve estável até em 200ms + 5% de perda
+simulada, no protocolo/handshake em si.
+
+**O que o jogador sentiria de verdade** (conhecimento geral de como
+netplay por atraso funciona — o RetroArch usa `netplay_input_latency_frames`,
+não *rollback*; isto é explicação técnica, não algo medido nesta sessão):
+com atraso baixo (50ms) o jogo responde quase normal; a partir de 100-200ms
+o atraso entre apertar o botão e ver o efeito na tela fica perceptível,
+mais em jogos de reação rápida (luta, corrida) que em jogos por turno.
+Perda de pacote em netplay por atraso costuma aparecer como um soluço
+(input trava por um instante) em vez de um corte definitivo. **Confirmar
+como isso se sente na prática precisa de um aluno jogando de verdade** —
+mesmo limite já reconhecido pelo próprio plano para testes de botão.
+
+### 4. Cenários de sala de aula
+
+Script `testes\teste_cenarios_sala.py`, com RetroArch real:
+
+| Cenário | Resultado |
+|---|---|
+| Convidado cai e volta | **Funciona.** Conectou na 1ª vez, foi morto, reconectou na 2ª tentativa apontando pro mesmo host — 2 entradas registradas no log do host |
+| Hospedeiro sai no meio | **Funciona bem.** O convidado registrou a queda no próprio log (desconexão detectada) e **não travou** — continuou respondendo, não precisou ser forçado a fechar |
+| Convidado entra com a partida já começada | Já coberto pelo próprio mecanismo de conectar (não existe estado "partida começada" que bloqueie entrada tardia no RetroArch — quem entra depois só perde o que já aconteceu, como assistir um filme atrasado) |
+| 6º jogador tentando entrar | Já respondido pelo achado da seção 1 — o limite prático encontrado (4 jogadores totais) é *menor* que 6, então um 6º nunca chegaria a ser a pergunta relevante até o achado da seção 1 ser resolvido/confirmado |
+| Duas partidas diferentes na mesma rede | **Não dá pra testar direito num computador só.** `graficos.opcoes_de_partida()` grava a porta do netplay (`netplay_port`) como uma constante fixa (`PORTA_PARTIDA`, 55435) — não há como duas partidas terem portas diferentes *na configuração que o ARENA gera*. Isso não é um bug: em uma sala de aula de verdade, dois grupos hospedando em **computadores diferentes** usam a mesma porta 55435 sem conflito nenhum, porque cada host tem seu próprio endereço IP — só dá conflito de porta quando os dois hosts estão no MESMO computador, cenário que só existe em teste, não em sala de aula real. Tentar forçar isso num computador só (dando portas diferentes na linha de comando) expôs justamente essa limitação de teste, não do ARENA. **Vira item do roteiro manual**, com dois grupos em computadores de verdade. |
+
+### 5. Descoberta de colegas com muitos aparelhos
+
+Script `testes\teste_descoberta_30_maquinas.py`: 30 "computadores" falsos
+anunciando ao mesmo tempo (mesmo formato de pacote UDP que
+`anunciar_e_escutar()` espera).
+
+| Medida | Resultado |
+|---|---|
+| Colegas vistos na lista | 30 de 30 |
+| Tempo de resposta de `/api/colegas` | 0,018 s |
+| CPU do servidor durante/depois da rajada | 0,0% |
+
+Limpo — a lista aguenta 30 sem ficar lenta nem pesar no processador.
+
+### 6. Sincronização e mala do pen drive
+
+**Mesmo recorde vindo de duas vezes**: já coberto pela bateria de 44 testes
+(`test_insert_or_ignore`) — `INSERT OR IGNORE` com `uuid` como chave, testado
+e confirmado desde antes desta auditoria (reenviar o mesmo registro não
+duplica).
+
+**Pen drive em FAT32 (só guarda hora de 2 em 2 segundos)**: conferido no
+código — `trocar_pela_mala()`/`ler_mala()` **não usam a data do arquivo no
+disco (mtime) em lugar nenhum**. A ordem e o "até onde cada ARENA já
+passou" vêm de um carimbo gravado *dentro* do JSON (`agora_utc()`, com
+microssegundos), não do sistema de arquivos. Achado real, mas tranquilizador:
+**a granularidade de 2 segundos do FAT32 não afeta a mala**, porque ela
+nunca olha pra essa informação.
+
+**Relógios diferentes entre os notebooks — achado real, sem correção
+segura ainda.** Testado de verdade: um registro gravado com o relógio da
+própria máquina **errado** (simulado: data de 2020 em vez de hoje) fica
+**permanentemente invisível** para a sincronização incremental de outro
+colega. Prova:
+
+```
+Registros encontrados desde as 09:00 de hoje: ['Ana']
+O registro do relógio errado (Bruno, 2020) apareceu? False
+```
+
+Causa: `registros_desde()` usa `WHERE registrado_em > ?` — uma comparação
+de texto contra o carimbo (`registrado_em`, o mesmo `agora_utc()` da
+máquina que gravou). Se o relógio de uma máquina está preso no passado, os
+registros dela sempre parecem "mais antigos que a última sincronização" —
+mesmo sendo, na prática, registros novos que o colega nunca viu. O registro
+continua existindo no banco *local* de quem tem o relógio errado (aparece
+no ranking da própria máquina), só não viaja pros colegas.
+
+**Por que não corrigi agora**: consertar isso de verdade significa trocar
+o "carimbo de progresso" da sincronização de data/hora para outra coisa
+(um contador por aparelho, por exemplo) — uma mudança de arquitetura no
+formato que já roda em produção e no formato da mala do pen drive, não um
+ajuste pontual. Risco alto de mexer sem testar direito com máquinas de
+verdade. **Proposta, não aplicada**: um aviso na tela quando o ARENA abre,
+se o relógio do Windows parecer muito errado (comparar contra uma data
+mínima razoável, tipo "não pode ser antes de 2024"), pedindo pro aluno
+acertar a hora antes de sincronizar — reduz o risco sem mexer na
+arquitetura. Fica registrado como pendência de design, não como bug
+"corrigido".
+
+### 7. Diagnóstico nos notebooks da escola
+
+Pesquisa de código (o que já existe) + pesquisa externa (faixas de
+endereço reais, comportamento documentado do Windows), item por item do
+plano:
+
+| Item | Situação encontrada | O que foi feito nesta fase |
+|---|---|---|
+| **Firewall bloqueando entrada, rede pública, aluno sem admin** | Nada de detecção real — só um palpite no texto de erro ("...ou o firewall dele está bloqueando..."). Pesquisado (Microsoft Learn): o Firewall do Windows bloqueia entrada por padrão, e a caixa de permissão **pede senha de administrador** — um aluno comum não tem como aprovar sozinho. | **Corrigido.** `partida.py` ganhou `categoria_de_rede()` — confere via `Get-NetConnectionProfile` (só leitura, sem admin) se a rede está marcada "Pública", e nesse caso explica a causa de verdade e a saída (pedir pro professor trocar pra rede Privada). Testado nesta máquina: a rede aqui **é** Pública — achado real, na hora. |
+| **Wi-Fi que isola os aparelhos entre si** | Nada — e não tem como detectar por software no cliente (o isolamento acontece no roteador). | Não dá pra corrigir; documentado como limite técnico honesto (como "tela dividida não separa" já documentado no CLAUDE.md). |
+| **Ponto de acesso de Android e iPhone** | Android (`192.168.43.0/24`): coberto certo. iPhone (`172.20.10.0/28`, confirmado por pesquisa): **bug real** — a entrada `"172.2"` (faltando o "0.") casava por acidente com 172.20. até 172.29. inteiros e classificava hotspot de iPhone como "adaptador virtual, não serve pro colega". | **Corrigido** — ver Fase 4 no `CLAUDE.md`/commit. Testado com 8 endereços reais, incluindo o range exato do iPhone. |
+| **Cabo direto sem roteador (169.254.x.x)** | Já coberto e testado desde antes desta auditoria. | Nada a fazer — checado, funciona. |
+| **Adaptadores virtuais e VPN** | Adaptadores "clássicos" (VirtualBox, WSL, Hyper-V): cobertos, mas por **dois mecanismos diferentes e inconsistentes** — um por faixa de IP (usado pela descoberta de colegas) e outro por nome do adaptador (usado só pelo PCSX2/PS2). VPN: **não coberto de forma confiável** — WireGuard, Tailscale e a maioria dos clientes de VPN não aparecem na lista por nome, e o Tailscale usa uma faixa (`100.64.0.0/10`) que cai em "Outra rede" sem aviso nenhum. Achado extra ao vivo: o WSL2 desta máquina usa uma faixa `192.168.x.x` **dinâmica** (não é uma das fixas já excluídas), então nem o mecanismo por IP pega isso de forma confiável. | **Não corrigido agora** — resolver isso direito exigiria trocar `enderecos_locais()` de "só pergunta o IP ao socket" para "pergunta o IP E o nome do adaptador ao Windows", um mecanismo mais lento e mais arriscado de testar sem quebrar o caminho rápido que já existe (documentado como razão de ser da função atual). Fica como pendência de design, não decidida sozinha. |
+| **Endereço muda, notebook dorme e acorda, Wi-Fi cai no meio** | Nada de proativo — o cache de 30s de `enderecos_locais()` pega o endereço novo na próxima consulta, mas nada AVISA o aluno que mudou. Uma queda de Wi-Fi durante a partida é responsabilidade inteira do RetroArch. | Documentado como limite; a `cache_directory`/`enderecos_locais()` já pega o valor novo sozinho na próxima vez que a tela perguntar — não trava em endereço velho, só não avisa proativamente. |
+
+### Aplicação e testes (Fase 4)
+
+Bateria de 44 testes: OK, 0 falhas, depois de cada mudança em `arena.py`,
+`graficos.py`, `indexador.py`, `partida.py`, `consoles.json` e `app.js`.
+
+Scripts novos: `testes\teste_netplay_5_jogadores.py`,
+`testes\teste_netplay_isolamento.py`, `testes\teste_local_4_jogadores.py`,
+`testes\proxy_rede_ruim.py`, `testes\teste_rede_ruim.py`,
+`testes\teste_cenarios_sala.py`, `testes\teste_descoberta_30_maquinas.py`.
+
+---
+
+## Roteiro manual — Fase 4 (5 notebooks de verdade, sala de aula)
+
+Isto é o que só dá pra confirmar com máquinas físicas de verdade. Leve
+este roteiro pra sala, com 5 notebooks (ou o máximo que der — quanto mais
+perto de 5, melhor).
+
+### O que separar antes
+
+- 5 notebooks com o ARENA (mesma versão, pasta `ARENA-unificado` copiada
+  igual nos 5, ou pen drives idênticos).
+- O jogo `Super Bomberman 4 (Japan) [T-En by Svambo v1.0].sfc` nos 5,
+  na pasta `jogos\pessoais\Super Nintendo\`.
+- `GoldenEye 007 (USA).z64` em pelo menos 1 notebook (pra teste local),
+  na pasta `jogos\pessoais\Nintendo 64\`.
+- 4 controles USB/Bluetooth (pro teste local de 4 jogadores) — ou
+  controle + teclado, sabendo que só PS2/Dreamcast/MSX/ScummVM aceitam
+  esse mix (não o N64 do GoldenEye).
+- Anotar em cada notebook: nome da rede Wi-Fi que vai usar, se é a rede da
+  escola, ponto de acesso de celular, ou cabo direto.
+
+### Roteiro 1 — Super Bomberman, 5 jogadores (o achado da seção 1)
+
+**Isto é o teste mais importante desta fase** — resolve a dúvida que a
+auditoria não conseguiu fechar sozinha.
+
+1. Notebook 1: liga "Aceitar conexões da rede", abre Super Bomberman 4,
+   clica "Eu abro a partida" (Multitap deve ligar sozinho — o jogo está
+   na lista curada).
+2. Notebooks 2, 3 e 4: cada um entra como jogador 2, 3 e 4 (nessa ordem,
+   um de cada vez, esperando a tela confirmar antes do próximo). **Anote**
+   se os 3 conseguem entrar.
+3. Notebook 5: entra como jogador 5. **Este é o teste**: anote se conecta
+   ou se recusa (e qual mensagem aparece). Se conectar aqui — em 5
+   máquinas físicas de verdade — significa que o problema encontrado
+   nesta auditoria era mesmo um artefato de testar tudo em `127.0.0.1`, e
+   o Multitap funciona pros 5 jogadores de verdade. Se recusar do mesmo
+   jeito, é um limite real do RetroArch, e o ARENA vai documentar "até 4
+   jogadores confirmados" pro Multitap.
+4. Se os 5 conectarem: joguem uma rodada de verdade. Anote se os 5
+   personagens aparecem na arena, se os controles de cada um respondem
+   certo (jogador 3 no controle do notebook 3, não trocado).
+
+### Roteiro 2 — GoldenEye, 4 jogadores no mesmo computador
+
+1. Num notebook só, pluga os 4 controles (ou 3 controles + teclado, se
+   quiser testar esse caminho também, mesmo sabendo que oficialmente não é
+   suportado pro N64 — vale testar mesmo assim e anotar o que acontece).
+2. Ajustes → Avançado → "Quantos jogadores" → 4.
+3. Abre GoldenEye 007. Confirma que os 4 controles mexem o personagem
+   certo (jogador 1 no primeiro controle plugado, e assim por diante).
+4. Anote se algum controle ficou mudo ou trocado.
+
+### Roteiro 3 — Duas partidas ao mesmo tempo, dois grupos
+
+1. Separe os 5 notebooks em 2 grupos (ex.: 3 + 2).
+2. Grupo A hospeda uma partida (qualquer jogo de 2). Grupo B hospeda
+   OUTRA partida, ao mesmo tempo, na mesma rede Wi-Fi.
+3. Confirme que cada grupo só vê e alcança o jogo do seu próprio grupo —
+   nenhum jogador do grupo A aparece achando que está jogando com o grupo B.
+
+### Roteiro 4 — Situações de queda
+
+1. Durante uma partida de 2, force o fechamento do RetroArch de quem
+   hospeda (Gerenciador de Tarefas). Anote a mensagem que aparece pro
+   convidado.
+2. Durante uma partida, force o fechamento do convidado. No host, tente
+   deixar outro notebook entrar no lugar dele. Anote se funciona e como.
+3. Desligue o Wi-Fi de um notebook por 5 segundos, no meio de uma partida,
+   e ligue de novo. Anote se reconecta sozinho ou precisa reabrir tudo.
+
+### Roteiro 5 — Rede real da escola
+
+1. Rode `PARTIDA.bat` em cada notebook, na rede real da escola. Anote:
+   - A categoria da rede (Pública/Privada) que aparece agora — nova
+     checagem desta fase.
+   - Se algum endereço aparece marcado "adaptador virtual" que na verdade
+     deveria servir (ex.: alguma VPN de antivírus da escola).
+2. Se algum notebook usa ponto de acesso de celular (Android ou iPhone),
+   confirme que o endereço aparece corretamente como "Rede local" agora
+   (era o bug do iPhone corrigido nesta fase).
+3. Se possível, teste também um cabo de rede direto entre dois notebooks
+   (sem roteador) — já era um caso resolvido, só confirma que continua.
+
+Anote tudo — mesmo o que já era esperado — porque é isso que fecha, de
+verdade, o que só a sala de aula pode confirmar.
 
 *(a preencher ao final da auditoria)*
