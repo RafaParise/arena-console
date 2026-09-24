@@ -233,8 +233,39 @@ def banco():
 
 
 def preparar_banco():
-    with banco() as conexao:
-        conexao.executescript(ESQUEMA)
+    try:
+        with banco() as conexao:
+            conexao.executescript(ESQUEMA)
+    except sqlite3.DatabaseError as falha:
+        # Banco corrompido -- pen drive arrancado no meio de uma
+        # gravacao, cartao SD com setor ruim, arquivo trocado por
+        # engano. Achado real na auditoria: sem este tratamento, isso
+        # derrubava o ARENA INTEIRO, cru, com traceback do Python, antes
+        # mesmo do servidor HTTP conseguir subir -- exatamente o
+        # contrario do que o projeto promete ("abre mesmo assim e
+        # explica"). Guarda o arquivo quebrado do lado (nunca apaga dado
+        # do usuario sem manter uma copia) e comeca um banco novo vazio.
+        print("[ARENA] O banco de recordes (arena.db) esta corrompido: %s" % falha)
+        try:
+            quebrado = ARQUIVO_BANCO + ".corrompido-" + time.strftime("%Y%m%d-%H%M%S")
+            os.replace(ARQUIVO_BANCO, quebrado)
+            print("[ARENA] Guardei o arquivo quebrado em: %s" % quebrado)
+        except OSError as falha_ao_guardar:
+            print("[ARENA] Nao consegui guardar uma copia do banco quebrado "
+                 "(%s) -- vou sobrescrever." % falha_ao_guardar)
+        # O SQLite pode ter deixado arquivos -wal/-shm associados ao
+        # banco quebrado; sem apaga-los, o banco NOVO tentaria reusa-los
+        # e cairia no mesmo erro.
+        for sufixo in ("-wal", "-shm"):
+            try:
+                os.remove(ARQUIVO_BANCO + sufixo)
+            except OSError:
+                pass
+        with banco() as conexao:
+            conexao.executescript(ESQUEMA)
+        print("[ARENA] Comecei um banco novo, vazio. Os recordes antigos "
+             "ficaram guardados no arquivo acima, mas nao aparecem mais "
+             "na tela (um banco novo nao consegue ler um arquivo quebrado).")
 
 
 def fechar_banco():

@@ -1107,6 +1107,184 @@ verdade, o que só a sala de aula pode confirmar.
 
 ---
 
+## Fase 6 — Portabilidade e robustez
+
+### Queda de energia no meio da gravação — provado ao vivo
+
+Script `testes\teste_queda_no_meio_da_gravacao.py`: mata o processo
+exatamente no pior instante possível — o arquivo temporário já está
+escrito e sincronizado no disco (`flush` + `fsync`), mas a troca
+(`os.replace`) ainda não aconteceu. Resultado: `config.json` continua
+**exatamente como estava antes**, JSON válido, apelido antigo intacto —
+a troca nunca chegou a acontecer, exatamente como o `os.replace()` atômico
+promete. Sobra um arquivo `.tmp` órfão, que já é limpo sozinho na próxima
+abertura (mecanismo que já existia). **Confirmado, não é suposição.**
+
+### Config, JSON e banco corrompidos de propósito
+
+Script `testes\teste_arquivos_corrompidos.py`: `config.json`,
+`controles.json` **e** `arena.db` substituídos por lixo binário/texto
+inválido de propósito, ao mesmo tempo.
+
+**Achado real, corrigido — o ARENA travava por completo com banco
+corrompido.** `config.json` e `controles.json` corrompidos já eram
+tratados direito (a leitura cai nos padrões, sem travar — comportamento
+que já existia). `arena.db` corrompido **não**: `preparar_banco()`
+deixava o erro do SQLite (`sqlite3.DatabaseError: file is not a
+database`) subir sem tratamento nenhum, e isso **derrubava o processo
+inteiro**, com traceback cru, **antes mesmo do servidor HTTP conseguir
+escutar** — o exato oposto do que o projeto promete ("abre mesmo assim e
+explica"). Provado ao vivo com o traceback real capturado.
+
+**Corrigido**: `preparar_banco()` agora pega esse erro específico, guarda
+o banco quebrado do lado (nunca apaga sem manter cópia — mesma regra de
+sempre) com um nome com carimbo de data/hora, remove os arquivos
+`-wal`/`-shm` que poderiam confundir o banco novo, e começa um banco
+limpo. Mensagem clara no console explicando o que aconteceu. Testado de
+novo depois da correção: os 3 arquivos corrompidos ao mesmo tempo, e o
+ARENA sobe normal, com os padrões, sem travar. Confirmado que o arquivo
+quebrado fica guardado (`arena.db.corrompido-<data>-<hora>`).
+
+`diagnostico.py` (`VERIFICAR.bat`) **já tinha** essa proteção antes desta
+auditoria (com tentativa de restaurar de um backup recente) — meu
+conserto cobre o caminho que faltava: a abertura **normal** do
+`ARENA.bat`, que um aluno usaria sem saber que precisa rodar o
+`VERIFICAR.bat` primeiro.
+
+### FAT32 — achado real, corrigido
+
+**Este projeto tem jogos reais que já passam do limite de 4 GB do
+FAT32**: Gran Turismo 4 (4,95 GB) e Naruto Shippuden - Ultimate Ninja 4
+(4,08 GB), ambos em `jogos\pessoais\PS2`. Copiar qualquer um desses para
+um pen drive em FAT32 falha ou trunca no meio — e o ARENA não tinha
+nenhuma forma de avisar sobre isso.
+
+**Corrigido**: `hardware.sistema_de_arquivos()` nova (lê o tipo do
+disco via `GetVolumeInformationW`, API do Windows, sem admin) +
+seção nova no `VERIFICAR.bat` ("8. Espaço em disco"): se o disco é
+FAT32, varre `jogos\` procurando arquivo maior que 4 GB e avisa
+especificamente quais jogos provavelmente vieram truncados, com a
+solução (copiar para exFAT ou NTFS). Testado com um arquivo esparso de
+4,5 GB (não ocupa 4,5 GB de disco de verdade — só reserva o tamanho) e
+um `FAT32` simulado: detectou o jogo grande certo, marcou como GRAVE.
+
+### Windows de 32 bits — achado real, corrigido
+
+`hardware.sistema()` já detectava Windows 10 × 11 corretamente (pela
+build ≥ 22000), mas o campo "bits" checava `sys.maxsize`, que mede o
+**Python**, não o Windows — como o Python embutido no ARENA é sempre de
+**64 bits**, esse código nunca conseguiria detectar um Windows de 32
+bits de verdade, porque um Windows de 32 bits **nem consegue rodar** um
+`python.exe` de 64 bits — o processo falharia ao abrir, antes de
+qualquer linha de Python rodar. Ou seja: o próprio Python nunca chegaria
+a executar essa checagem no cenário que ela tenta detectar.
+
+**Corrigido no lugar certo**: `ARENA.bat` ganhou uma checagem **antes**
+de tentar abrir o Python embutido, usando `PROCESSOR_ARCHITECTURE` e
+`PROCESSOR_ARCHITEW6432` (variáveis que o próprio Windows define, sem
+precisar de admin nem de programa nenhum) — se o Windows for de 32 bits
+de verdade, mostra uma mensagem clara em vez de deixar o Windows recusar
+o programa com um erro genérico. Testado isolando só essa lógica (não dá
+pra rodar o `ARENA.bat` inteiro simulando 32 bits, porque ele tentaria
+abrir o Python de verdade): caso normal passa direto, caso 32 bits
+simulado é detectado e para.
+
+### Caminho muito comprido — achado real, não corrigido (documentado)
+
+Testado ao vivo: um caminho de 279 caracteres (pasta do núcleo + nome de
+jogo longo, um cenário realista — nomes de ROM com região/revisão/crédito
+de tradução passam de 50 caracteres com frequência, como já existe neste
+próprio catálogo) **falha** ao gravar com o Python embutido:
+`[Errno 2] No such file or directory`. É o limite clássico do Windows
+(260 caracteres, "MAX_PATH") — o Python embutido do ARENA não tem o
+aviso de "caminho longo" ligado.
+
+**Por que não corrigi agora**: a função central de gravação atômica
+(`gravar_texto_atomico`) **não é o risco real** — ela só grava
+`config.json`/`controles.json`/a mala, caminhos sempre curtos e fixos,
+que nunca crescem com o nome do jogo. O risco de verdade está em outro
+lugar: `capas_online.py` (nome do arquivo de capa vem do título do jogo),
+`indexador.py` (varre os arquivos de jogo pelos caminhos reais, que já
+podem ser compridos por conta própria) e, principalmente, o **próprio
+RetroArch** (grava save state e captura de tela em `retroarch\states\` e
+`retroarch\screenshots\`, com o nome do jogo no meio do caminho) — não
+testei se o RetroArch (um programa em C++, não Python) tem a mesma
+limitação. Uma correção de verdade precisaria cobrir os dois lados
+(Python **e** RetroArch), e testar RetroArch com caminho comprido de
+propósito é mais uma sessão de trabalho, não um ajuste pontual. **Fica
+registrado como pendência real, não decidida sozinha** — mesmo padrão já
+usado para VPN e relógio errado nesta auditoria.
+
+### Notebook sem driver de vídeo de verdade
+
+Checado no código: `graficos.py` **nunca força** um `video_driver`
+específico (nem `gl`, nem `d3d11`) em lugar nenhum — deixa o RetroArch
+decidir sozinho, que é o comportamento mais seguro possível (o ARENA não
+piora nada aqui, só não tem nenhuma ajuda extra pro caso do adaptador de
+vídeo básico da Microsoft). Não dá pra testar de verdade sem uma máquina
+com esse adaptador específico — fica pro roteiro manual, se a escola
+tiver algum notebook assim.
+
+### Antivírus e SmartScreen bloqueando os `.bat`
+
+A tabela de problemas do `1-COMECAR.md` já citava "antivírus bloqueou"
+mas sem explicar COMO liberar, e não mencionava o SmartScreen (a tela
+azul "O Windows protegeu o seu computador" — mecanismo diferente do
+antivírus, do próprio Windows). **Corrigido**: seção nova em
+`1-COMECAR.md`, passo a passo pros dois casos (SmartScreen: "Mais
+informações" → "Executar assim mesmo"; antivírus: onde ficam as
+exclusões, com os passos específicos do Segurança do Windows).
+
+### Código que precisa de administrador
+
+Varredura completa por `winreg`, `netsh`, criação de serviço
+(`sc`/`New-Service`), `schtasks`, `icacls`, `takeown`: os únicos usos de
+`winreg` encontrados (`hardware.py`, 3 lugares) são **leituras**
+(`OpenKey`/`QueryValueEx`) contra `HKEY_LOCAL_MACHINE` — ler o registro
+não pede admin no Windows, só **gravar** pede. Zero ocorrências de
+`SetValueEx`/`CreateKey`, zero `netsh`, zero criação de serviço. **Nada
+no código do ARENA precisa de administrador.** Confirma o que o projeto
+já promete.
+
+### Pen drive com letras diferentes / caminho com espaços e acentos
+
+**Já coberto e já testado antes desta auditoria** —
+`corrigir_caminhos_retroarch_cfg()` (chamada a cada abertura) e os
+scripts `ferramentas\teste_correcao_caminhos.py` e
+`ferramentas\teste_aceite_pasta_movida.py` de sessão anterior. Caminho
+com espaço e acento **não é hipótese** — é o caminho real deste projeto
+(`C:\Projetos\Criador De Apps Pedagógicos\ARENA\...`), testado
+implicitamente em **centenas** de comandos ao longo desta auditoria
+inteira, sem nenhum problema.
+
+### Disco cheio
+
+**Não testado** — não achei uma forma segura de simular "disco cheio" de
+verdade nesta máquina sem arriscar de verdade encher um disco real.
+Raciocínio por leitura de código (não é prova ao vivo, é análise): o
+padrão de gravação atômica já usado em tudo (`gravar_texto_atomico`)
+escreve no temporário primeiro — se o disco encher durante essa escrita,
+o `open()`/`write()` levanta `OSError` (`No space left on device`),
+capturado pelos `try/except OSError` que já existem ao redor de toda
+gravação no código; o arquivo ORIGINAL nunca é tocado até o
+`os.replace()` no final, que só acontece se a escrita completa deu
+certo. Pelo desenho do próprio mecanismo, disco cheio deveria falhar de
+forma segura (arquivo antigo intacto) — mas isto é raciocínio, não teste
+ao vivo, e fica marcado como tal.
+
+### Aplicação e testes (Fase 6)
+
+Bateria de 44 testes: OK, 0 falhas, depois de cada mudança em
+`servidor\arena.py`, `servidor\hardware.py`, `servidor\diagnostico.py` e
+`ARENA.bat`. Scripts novos:
+`testes\teste_queda_no_meio_da_gravacao.py`,
+`testes\teste_arquivos_corrompidos.py`,
+`testes\teste_fat32_arquivo_grande.py`,
+`testes\teste_pasta_somente_leitura.py`. `1-COMECAR.md` atualizado com o
+passo a passo de SmartScreen/antivírus.
+
+---
+
 ## Depois (Fase 8)
 
 *(a preencher ao final da auditoria)*

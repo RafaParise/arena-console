@@ -262,6 +262,29 @@ def disco(pasta):
     }
 
 
+def sistema_de_arquivos(pasta):
+    """Nome do sistema de arquivos do disco onde 'pasta' esta (FAT32,
+    exFAT, NTFS...), via GetVolumeInformationW -- so leitura, sem admin.
+
+    Importa porque FAT32 nao aceita arquivo maior que 4 GB. Achado real
+    na auditoria: este projeto tem jogos de PS2 reais passando disso
+    (Gran Turismo 4, 4,95 GB) -- copiar um arquivo assim para um pen
+    drive em FAT32 falha ou trunca no meio, sem o ARENA saber por que o
+    jogo "nao abre". So funciona no Windows; None nos outros.
+    """
+    if not sys.platform.startswith("win"):
+        return None
+    try:
+        raiz = os.path.splitdrive(os.path.abspath(pasta))[0] + "\\"
+        nome_buffer = ctypes.create_unicode_buffer(256)
+        ok = ctypes.windll.kernel32.GetVolumeInformationW(
+            ctypes.c_wchar_p(raiz), None, 0, None, None, None,
+            nome_buffer, ctypes.sizeof(nome_buffer))
+        return nome_buffer.value if ok else None
+    except Exception:
+        return None
+
+
 # ---------------------------------------------------------------------------
 # Sistema operacional
 # ---------------------------------------------------------------------------

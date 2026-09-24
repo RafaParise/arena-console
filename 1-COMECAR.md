@@ -363,9 +363,47 @@ ARENA\
 | `[ERRO] O Python nao foi encontrado` | Passo 2 incompleto | Confira `servidor\python\python.exe` |
 | `[AVISO] retroarch.exe nao encontrado` | Passo 3 incompleto | A pasta precisa se chamar `retroarch` |
 | `A porta 8777 ja esta em uso` | ARENA já aberto | Procure a outra janela preta |
-| Janela preta abre e fecha na hora | Antivírus bloqueou | Libere a pasta do ARENA no antivírus |
+| Janela preta abre e fecha na hora | Antivírus bloqueou | Libere a pasta do ARENA no antivírus (veja abaixo) |
 | ARENA abre mas nenhum jogo inicia | Falta o Visual C++ | Passo 4b |
 | Tudo lento na primeira abertura no pen drive | Varredura inicial | Normal. Depois o catálogo é reaproveitado |
 
+#### "O Windows protegeu o seu computador" (SmartScreen)
+
+Isso costuma aparecer na **primeira vez** que você abre um `.bat` ou
+`.exe` que veio de um arquivo `.zip` baixado da internet (o Windows marca
+o arquivo como "de fora", mesmo sendo o próprio ARENA). É diferente de
+antivírus — é uma tela azul do próprio Windows, não do programa de
+segurança.
+
+1. Na tela azul, clique em **"Mais informações"** (não no X).
+2. Vai aparecer o botão **"Executar assim mesmo"** — clique nele.
+3. Isso só acontece uma vez por arquivo. Nas próximas aberturas, não
+   aparece mais.
+
+#### Antivírus bloqueando (janela preta abre e fecha na hora)
+
+Cada antivírus tem seu próprio caminho, mas o princípio é sempre "liberar
+a pasta inteira do ARENA como confiável" (nunca precisa desativar o
+antivírus inteiro):
+
+1. Abra o programa antivírus instalado no computador.
+2. Procure por **"Exclusões"**, **"Exceções"** ou **"Itens confiáveis"**
+   (o nome muda de antivírus para antivírus).
+3. Adicione a **pasta inteira** do ARENA (não só o `.bat`) — arrastar
+   pouco a pasta errada é o erro mais comum aqui.
+
+No **Segurança do Windows** (o antivírus que já vem com o Windows, sem
+instalar nada a mais):
+
+1. Iniciar → **Segurança do Windows**.
+2. **Proteção contra vírus e ameaças → Gerenciar configurações**
+   (role a tela até achar).
+3. Em **Exclusões**, clique em **Adicionar ou remover exclusões**.
+4. **Adicionar uma exclusão → Pasta** → escolha a pasta do ARENA.
+
+Se mesmo assim o ARENA continuar fechando sozinho, peça pro professor
+(com acesso de administrador) fazer esse passo — em computador de escola,
+o antivírus às vezes é gerenciado central e um aluno comum não consegue
+mexer nele.
 
 ---

@@ -339,6 +339,41 @@ try:
 except OSError:
     pass
 
+# FAT32 nao aceita arquivo maior que 4 GB -- achado real na auditoria: um
+# ISO de PS2 grande (Gran Turismo 4 tem 4,95 GB, e nao e' o unico jogo
+# assim) simplesmente nao cabe inteiro num pen drive formatado em FAT32.
+# So funciona no Windows.
+sys.path.insert(0, PASTA_SERVIDOR)
+import hardware  # noqa: E402
+sistema_arquivos = hardware.sistema_de_arquivos(RAIZ)
+if sistema_arquivos:
+    print("  sistema de arquivos: %s" % sistema_arquivos)
+    if sistema_arquivos.upper() == "FAT32":
+        pasta_jogos = caminho("jogos")
+        grandes = []
+        if os.path.isdir(pasta_jogos):
+            for atual, _subs, arquivos in os.walk(pasta_jogos):
+                for nome in arquivos:
+                    caminho_arquivo = os.path.join(atual, nome)
+                    try:
+                        if os.path.getsize(caminho_arquivo) >= 4 * 1024 * 1024 * 1024:
+                            grandes.append(os.path.relpath(caminho_arquivo, RAIZ))
+                    except OSError:
+                        continue
+        if grandes:
+            grave.append("%d jogo(s) maior(es) que 4 GB numa pasta FAT32" % len(grandes))
+            print("  GRAVE  Este pen drive e' FAT32, que nao aceita arquivo maior")
+            print("         que 4 GB. %d jogo(s) provavelmente vieram truncados:" % len(grandes))
+            for g in grandes[:5]:
+                print("           %s" % g)
+            print("         Copie de novo para um pen drive em exFAT ou NTFS.")
+        else:
+            atencao.append("pen drive em FAT32 (limite de 4 GB por arquivo)")
+            print("  Nenhum jogo passa de 4 GB ainda, mas cuidado: FAT32 recusa")
+            print("  qualquer arquivo futuro maior que isso (ISO de PS2, por exemplo).")
+    else:
+        ok.append("sistema de arquivos aceita arquivo grande")
+
 
 # ---------------------------------------------------------------------------
 titulo("9. Copias de seguranca")

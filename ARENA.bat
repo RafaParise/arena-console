@@ -16,6 +16,22 @@ echo   ARENA
 echo   Iniciando. Nao feche esta janela enquanto estiver jogando.
 echo.
 
+REM --- 0. Windows de 32 bits nao roda o Python de 64 bits embutido -----------
+REM  PROCESSOR_ARCHITECTURE=x86 e SEM PROCESSOR_ARCHITEW6432 = Windows de
+REM  verdade e' 32 bits (nao um cmd de 32 bits rodando num Windows de 64 --
+REM  esse caso sempre tem a segunda variavel setada pelo proprio Windows).
+if /i "%PROCESSOR_ARCHITECTURE%"=="x86" if not defined PROCESSOR_ARCHITEW6432 (
+    echo   [ERRO] Este Windows e de 32 bits.
+    echo.
+    echo   O Python que vem junto na pasta ^(servidor\python^) e de 64 bits e
+    echo   nao roda aqui. Nao ha como consertar isso sem trocar de Windows ou
+    echo   de computador - Windows de 32 bits nao existe mais nas versoes
+    echo   novas do Windows 10/11.
+    echo.
+    pause
+    exit /b 1
+)
+
 REM --- 1. Python que veio junto na pasta -------------------------------------
 set "PYTHON=%~dp0servidor\python\python.exe"
 if exist "%PYTHON%" goto :temPython

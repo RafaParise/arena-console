@@ -201,6 +201,6 @@ lista de remoção; Fase 7 - mudanças de texto; Fase 8 - juntar ao
 - [x] Fase 3 — Testes do servidor e da API (24/09/2026)
 - [x] Fase 4 — Jogar Junto (24/09/2026)
 - [x] Fase 5 — Matriz de jogos (24/09/2026)
-- [ ] Fase 6 — Portabilidade e robustez
+- [x] Fase 6 — Portabilidade e robustez (24/09/2026)
 - [ ] Fase 7 — Clareza para todos
 - [ ] Fase 8 — Relatório final e entrega
