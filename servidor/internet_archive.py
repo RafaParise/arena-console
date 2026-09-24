@@ -136,7 +136,16 @@ def instalar(identificador, nome_arquivo, plataforma=""):
     if not re.fullmatch(r"[A-Za-z0-9_-]{3,100}", str(identificador or "")):
         raise ValueError("Item do Internet Archive invalido.")
 
-    meta = _ler("https://archive.org/metadata/" + urllib.parse.quote(identificador))
+    # Achado real na auditoria: sem este try/except, uma falha de rede (sem
+    # internet, DNS fora) ou uma pagina de login de Wi-Fi de escola no
+    # lugar do JSON esperado vazava como OSError/erro de JSON cru --
+    # buscar() ja tinha essa protecao, instalar() nao tinha.
+    try:
+        meta = _ler("https://archive.org/metadata/" + urllib.parse.quote(identificador))
+    except (OSError, ValueError, urllib.error.URLError, subprocess.SubprocessError):
+        raise ValueError(
+            "Nao consegui falar com o Internet Archive agora. Confira a "
+            "internet e tente de novo.")
 
     if not _colecao_permitida(meta):
         raise ValueError("Este item nao esta numa colecao de distribuicao livre.")
@@ -163,16 +172,31 @@ def instalar(identificador, nome_arquivo, plataforma=""):
 
     os.makedirs(os.path.dirname(destino), exist_ok=True)
     temporario = destino + ".download"
-    digest = hashlib.sha256()
+    digest = hashlib.sha1()
     tamanho = 0
     url = "https://archive.org/download/%s/%s" % (
         urllib.parse.quote(str(identificador)), urllib.parse.quote(str(nome_arquivo), safe="/"))
+    # O Internet Archive nao declara SHA-256 por arquivo, so md5/sha1/crc32
+    # -- confirmado na propria API (/metadata devolve isto pra cada item de
+    # "files"). sha1 e' o mais forte dos tres que eles tem. Sem isto, um
+    # download incompleto (queda de rede no meio) ou adulterado no caminho
+    # virava jogo instalado sem ninguem perceber.
+    sha1_esperado = str(arquivo.get("sha1") or "").lower()
 
     try:
-        subprocess.run(
-            ["curl.exe", "--fail", "--silent", "--show-error", "--location",
-             "--max-time", "120", "-A", "ARENA/1.0", "-o", temporario, url],
-            check=True)
+        # Achado real na auditoria: sem tratar o erro do curl aqui, uma
+        # queda de rede NO MEIO DO DOWNLOAD (diferente da busca de
+        # metadados, ja tratada acima) vazava como CalledProcessError cru.
+        try:
+            subprocess.run(
+                ["curl.exe", "--fail", "--silent", "--show-error", "--location",
+                 "--max-time", "120", "-A", "ARENA/1.0", "-o", temporario, url],
+                check=True)
+        except (OSError, subprocess.SubprocessError):
+            raise ValueError(
+                "O download caiu no meio do caminho. Confira a internet e "
+                "tente de novo.")
+
         with open(temporario, "rb") as entrada:
             while True:
                 bloco = entrada.read(1024 * 1024)
@@ -182,6 +206,11 @@ def instalar(identificador, nome_arquivo, plataforma=""):
                 if tamanho > LIMITE:
                     raise ValueError("Arquivo grande demais para o Arena.")
                 digest.update(bloco)
+
+        if sha1_esperado and digest.hexdigest() != sha1_esperado:
+            raise ValueError(
+                "O arquivo baixado nao bate com o esperado (SHA-1 "
+                "diferente). Download recusado por seguranca.")
 
         os.replace(temporario, destino)
     finally:

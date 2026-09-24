@@ -120,7 +120,23 @@ def gravar_texto_atomico(caminho, texto):
                 arquivo.write(texto)
                 arquivo.flush()
                 os.fsync(arquivo.fileno())
-            os.replace(temporario, caminho)
+            # No Windows, o proprio os.replace() pode falhar com "Acesso
+            # negado" quando outra thread tem o arquivo destino aberto
+            # so para LEITURA no instante exato da troca (carregar_config()
+            # e outras leituras nao usam esta trava, so os gravadores usam
+            # -- de proposito, senao toda leitura esperaria toda escrita).
+            # Achado real na auditoria, testando 50 pedidos simultaneos:
+            # a leitura solta por uma fracao de segundo é o suficiente pro
+            # Windows recusar a troca. E transitorio -- tentar de novo
+            # poucas vezes resolve, sem precisar travar as leituras.
+            for tentativa in range(5):
+                try:
+                    os.replace(temporario, caminho)
+                    break
+                except PermissionError:
+                    if tentativa == 4:
+                        raise
+                    time.sleep(0.05)
         finally:
             if os.path.exists(temporario):
                 try:
@@ -2063,6 +2079,17 @@ def trocar_pela_mala(caminho=None):
     Uma passada so resolve os dois lados: quem recebe ja deixa na mala o
     que o outro ainda nao tem.
     """
+    # 'caminho' pode apontar para a raiz de QUALQUER midia (pen drive,
+    # disco), entao nao da pra travar com dentro_da_pasta() como as outras
+    # rotas fazem. Mas o NOME tem que ser sempre o da mala -- sem isto, um
+    # pedido malicioso (achado real na auditoria: nenhuma validacao aqui)
+    # conseguia mandar o ARENA gravar um arquivo em QUALQUER caminho, com
+    # QUALQUER nome, so escolhendo o valor de 'caminho'.
+    if caminho and os.path.basename(caminho) != NOME_DA_MALA:
+        return {"ok": False,
+                "erro": "Caminho da mala invalido: o arquivo precisa se "
+                        "chamar %s." % NOME_DA_MALA}
+
     config = carregar_config()
     destino = caminho or caminho_da_mala()
 
@@ -2806,12 +2833,51 @@ def dentro_da_pasta(caminho, pasta):
         return False
 
 
+# As UNICAS rotas que outro computador da rede pode chamar quando
+# "permitir_rede" esta ligado -- exatamente o que a partida a dois e a
+# sincronizacao entre ARENAs precisam (descoberta de colega, testar se
+# alcanca, conferir se o arquivo do jogo e o mesmo, trocar placar). Achado
+# real na auditoria: antes desta lista, TODAS as 49 rotas ficavam abertas
+# pra rede inteira assim que "permitir_rede" era ligado -- incluindo
+# apagar perfil, mudar configuracao, instalar cheat e mandar abrir jogo.
+# O jogo em si (netplay do RetroArch) nunca passa por aqui: usa a porta
+# 55435 dele, direto, separada desta.
+ROTAS_REDE_EXTERNA = frozenset((
+    "/api/colegas",         # GET - quem esta online, pra tela de amigos
+    "/api/ranking",         # GET - placar compartilhado (= /api/sinc/ranking)
+    "/api/jogo/impressao",  # GET - confere se e o mesmo arquivo de jogo
+    "/api/amigo/testar",    # POST - "esse endereco responde?"
+    "/api/amigo/codigo",    # POST - adicionar amigo pelo codigo
+    "/api/partida/testar",  # POST - pre-voo do Jogar Junto
+    "/api/sinc/ola",        # POST - handshake da sincronizacao
+    "/api/sinc/receber",    # POST - recebe placar/sessoes de outro ARENA
+))
+
+
 class Manipulador(BaseHTTPRequestHandler):
 
     protocol_version = "HTTP/1.1"
 
     def log_message(self, formato, *args):
         pass
+
+    def pedido_e_local(self):
+        """O pedido veio deste MESMO computador (qualquer um dos enderecos
+        dele), e nao de outra maquina na rede?"""
+        origem = self.client_address[0]
+        if origem == "127.0.0.1":
+            return True
+        return origem in {e["ip"] for e in enderecos_locais()}
+
+    def checar_acesso_de_rede(self, caminho):
+        """Barra rota sensivel vinda de fora deste computador. Devolve
+        True se o pedido pode seguir, False se ja respondeu com erro."""
+        if caminho in ROTAS_REDE_EXTERNA or self.pedido_e_local():
+            return True
+        self.erro(
+            "Esta rota so pode ser usada por este computador, nao pela "
+            "rede.", 403)
+        return False
 
     # -- utilitarios ------------------------------------------------------
     def responder_json(self, dados, codigo=200):
@@ -2867,6 +2933,8 @@ class Manipulador(BaseHTTPRequestHandler):
         caminho = urllib.parse.urlparse(self.path).path
 
         if caminho.startswith("/api/"):
+            if not self.checar_acesso_de_rede(caminho):
+                return
             try:
                 return self.api_get(caminho)
             except Exception as falha:
@@ -3048,9 +3116,9 @@ class Manipulador(BaseHTTPRequestHandler):
             permitido = (dentro_da_pasta(alvo, PASTA_JOGOS) or
                         dentro_da_pasta(alvo, PASTA_MINIATURAS))
             if not permitido or not os.path.isfile(alvo):
-                return self.send_error(404, "Capa nao encontrada")
+                return self.erro("Capa nao encontrada.", 404)
             if not alvo.lower().endswith((".png", ".jpg", ".jpeg", ".webp")):
-                return self.send_error(404, "Nao e imagem")
+                return self.erro("Nao e imagem.", 404)
 
             tipos = {".png": "image/png", ".jpg": "image/jpeg",
                      ".jpeg": "image/jpeg", ".webp": "image/webp"}
@@ -3059,7 +3127,7 @@ class Manipulador(BaseHTTPRequestHandler):
                 with open(alvo, "rb") as arquivo:
                     dados_imagem = arquivo.read()
             except OSError:
-                return self.send_error(404, "Nao consegui ler a capa")
+                return self.erro("Nao consegui ler a capa.", 404)
 
             self.send_response(200)
             self.send_header("Content-Type", tipo)
@@ -3073,7 +3141,7 @@ class Manipulador(BaseHTTPRequestHandler):
         if caminho == "/api/perfil/foto":
             alvo = foto_perfil_caminho()
             if not alvo:
-                return self.send_error(404, "Sem foto de perfil ainda")
+                return self.erro("Sem foto de perfil ainda.", 404)
 
             tipos = {".png": "image/png", ".jpg": "image/jpeg", ".webp": "image/webp"}
             tipo = tipos.get(os.path.splitext(alvo)[1].lower(), "application/octet-stream")
@@ -3081,7 +3149,7 @@ class Manipulador(BaseHTTPRequestHandler):
                 with open(alvo, "rb") as arquivo:
                     dados_imagem = arquivo.read()
             except OSError:
-                return self.send_error(404, "Nao consegui ler a foto")
+                return self.erro("Nao consegui ler a foto.", 404)
 
             self.send_response(200)
             self.send_header("Content-Type", tipo)
@@ -3136,12 +3204,37 @@ class Manipulador(BaseHTTPRequestHandler):
                 "cheats": cheats.ler_cheats(jogo),
             })
 
-        return self.send_error(404, "Rota nao encontrada")
+        return self.erro("Rota nao encontrada.", 404)
 
     # -- POST -------------------------------------------------------------
     def do_POST(self):
         caminho = urllib.parse.urlparse(self.path).path
         try:
+            if not self.checar_acesso_de_rede(caminho):
+                return
+            # So aceita Content-Type application/json -- e' o que a propria
+            # tela (pedir(), app.js) e a sincronizacao entre ARENAs sempre
+            # mandam. Achado real na auditoria, provado ao vivo com uma
+            # pagina de outra origem: uma aba qualquer aberta no MESMO
+            # navegador conseguia mandar POST pra qualquer rota daqui
+            # usando Content-Type "text/plain" -- esse tipo nao obriga o
+            # navegador a perguntar permissao (preflight CORS) antes de
+            # mandar, entao o pedido chegava e era processado do mesmo
+            # jeito, mesmo sem o site nunca poder LER a resposta (CSRF as
+            # cegas). Esta checagem barra esse pedido aqui (Content-Type
+            # errado, 415). Se em vez disso a pagina tentasse mandar
+            # "application/json" de verdade pra passar por esta checagem,
+            # ela deixaria de ser um "pedido simples" e o proprio navegador
+            # exigiria permissao explicita (preflight) antes de mandar --
+            # permissao que este servidor nunca da, entao o navegador
+            # bloqueia sozinho. Ou de um jeito ou de outro, o pedido nao
+            # chega a mudar nada. Nao substitui uma trava de verdade (rota
+            # por rede, ver achado maior desta fase), mas fecha o jeito
+            # mais facil de abusar disso.
+            tipo = (self.headers.get("Content-Type") or "").split(";")[0].strip().lower()
+            if tipo != "application/json":
+                return self.erro(
+                    "Content-Type precisa ser application/json.", 415)
             dados, falha_corpo = self.ler_corpo()
             if falha_corpo:
                 return self.erro(falha_corpo, 413)
@@ -3422,9 +3515,25 @@ class Manipulador(BaseHTTPRequestHandler):
             resultado = {"endereco": endereco, "arena": False,
                          "partida": False, "arquivo": None}
 
+            # Resolve o nome/endereco UMA vez so, antes de tentar as duas
+            # portas. Achado real na auditoria, medido ao vivo: cada
+            # socket.create_connection() faz a PROPRIA resolucao de nome
+            # por baixo, e no Windows isso nao respeita o timeout do
+            # socket -- um endereco invalido custava ~2,6s so pra falhar a
+            # resolucao, DUAS vezes seguidas (~5,3s no total) pra um pedido
+            # que devia ser rejeitado na hora. Resolvendo uma vez e
+            # reusando o IP, o custo de um endereco ruim cai pela metade.
+            try:
+                ip = socket.gethostbyname(endereco)
+            except OSError:
+                resultado["diagnostico"] = (
+                    "Nao alcanco o computador dele. Confira o endereco, e se "
+                    "ele ligou 'Aceitar conexoes da rede' e reabriu o ARENA.")
+                return self.responder_json(resultado)
+
             # 1. O ARENA dele responde? Isso prova que as maquinas se veem.
             try:
-                with socket.create_connection((endereco, porta_dele), timeout=2.0):
+                with socket.create_connection((ip, porta_dele), timeout=2.0):
                     resultado["arena"] = True
             except OSError:
                 pass
@@ -3433,7 +3542,7 @@ class Manipulador(BaseHTTPRequestHandler):
             #    ele so escuta enquanto a partida esta aberta.
             try:
                 with socket.create_connection(
-                        (endereco, graficos.PORTA_PARTIDA), timeout=2.0):
+                        (ip, graficos.PORTA_PARTIDA), timeout=2.0):
                     resultado["partida"] = True
             except OSError:
                 pass
@@ -4146,7 +4255,7 @@ class Manipulador(BaseHTTPRequestHandler):
                 )
             return self.responder_json({"ok": True, "pendentes": contar_pendentes()})
 
-        return self.send_error(404, "Rota nao encontrada")
+        return self.erro("Rota nao encontrada.", 404)
 
 
 class Servidor(ThreadingHTTPServer):

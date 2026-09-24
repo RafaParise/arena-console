@@ -1,0 +1,2198 @@
+[
+  {
+    "rota": "/api/estado",
+    "metodo": "GET",
+    "categoria": "dados_corretos",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/estado",
+    "metodo": "GET",
+    "categoria": "dados_faltando",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/estado",
+    "metodo": "GET",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/catalogo",
+    "metodo": "GET",
+    "categoria": "dados_corretos",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/catalogo",
+    "metodo": "GET",
+    "categoria": "dados_faltando",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/catalogo",
+    "metodo": "GET",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/acervo",
+    "metodo": "GET",
+    "categoria": "dados_corretos",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/acervo",
+    "metodo": "GET",
+    "categoria": "dados_faltando",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/acervo",
+    "metodo": "GET",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/conquistas",
+    "metodo": "GET",
+    "categoria": "dados_corretos",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/conquistas",
+    "metodo": "GET",
+    "categoria": "dados_faltando",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/conquistas",
+    "metodo": "GET",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/perfil/foto",
+    "metodo": "GET",
+    "categoria": "dados_corretos",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/perfil/foto",
+    "metodo": "GET",
+    "categoria": "dados_faltando",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/perfil/foto",
+    "metodo": "GET",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/colegas",
+    "metodo": "GET",
+    "categoria": "dados_corretos",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/colegas",
+    "metodo": "GET",
+    "categoria": "dados_faltando",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/colegas",
+    "metodo": "GET",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/mapeamento",
+    "metodo": "GET",
+    "categoria": "dados_corretos",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/mapeamento",
+    "metodo": "GET",
+    "categoria": "dados_faltando",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/mapeamento",
+    "metodo": "GET",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/ranking",
+    "metodo": "GET",
+    "categoria": "dados_corretos",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/ranking",
+    "metodo": "GET",
+    "categoria": "dados_faltando",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/ranking",
+    "metodo": "GET",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/perfis-controle",
+    "metodo": "GET",
+    "categoria": "dados_corretos",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/perfis-controle",
+    "metodo": "GET",
+    "categoria": "dados_faltando",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/perfis-controle",
+    "metodo": "GET",
+    "categoria": "tipo_errado",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=tipo"
+  },
+  {
+    "rota": "/api/perfis-controle",
+    "metodo": "GET",
+    "categoria": "tipo_errado",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=console"
+  },
+  {
+    "rota": "/api/perfis-controle",
+    "metodo": "GET",
+    "categoria": "texto_gigante",
+    "status": 414,
+    "ok": false,
+    "motivo": "erro 4xx com corpo nao-JSON",
+    "extra": "campo=tipo"
+  },
+  {
+    "rota": "/api/perfis-controle",
+    "metodo": "GET",
+    "categoria": "texto_gigante",
+    "status": 414,
+    "ok": false,
+    "motivo": "erro 4xx com corpo nao-JSON",
+    "extra": "campo=console"
+  },
+  {
+    "rota": "/api/perfis-controle",
+    "metodo": "GET",
+    "categoria": "emoji",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=tipo"
+  },
+  {
+    "rota": "/api/perfis-controle",
+    "metodo": "GET",
+    "categoria": "emoji",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=console"
+  },
+  {
+    "rota": "/api/perfis-controle",
+    "metodo": "GET",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/jogo/impressao",
+    "metodo": "GET",
+    "categoria": "dados_corretos",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/jogo/impressao",
+    "metodo": "GET",
+    "categoria": "dados_faltando",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/jogo/impressao",
+    "metodo": "GET",
+    "categoria": "tipo_errado",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=titulo"
+  },
+  {
+    "rota": "/api/jogo/impressao",
+    "metodo": "GET",
+    "categoria": "texto_gigante",
+    "status": 414,
+    "ok": false,
+    "motivo": "erro 4xx com corpo nao-JSON",
+    "extra": "campo=titulo"
+  },
+  {
+    "rota": "/api/jogo/impressao",
+    "metodo": "GET",
+    "categoria": "emoji",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=titulo"
+  },
+  {
+    "rota": "/api/jogo/impressao",
+    "metodo": "GET",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/biblioteca-online",
+    "metodo": "GET",
+    "categoria": "dados_corretos",
+    "status": 503,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/biblioteca-online",
+    "metodo": "GET",
+    "categoria": "dados_faltando",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/biblioteca-online",
+    "metodo": "GET",
+    "categoria": "tipo_errado",
+    "status": 503,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=q"
+  },
+  {
+    "rota": "/api/biblioteca-online",
+    "metodo": "GET",
+    "categoria": "texto_gigante",
+    "status": 414,
+    "ok": false,
+    "motivo": "erro 4xx com corpo nao-JSON",
+    "extra": "campo=q"
+  },
+  {
+    "rota": "/api/biblioteca-online",
+    "metodo": "GET",
+    "categoria": "emoji",
+    "status": 503,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=q"
+  },
+  {
+    "rota": "/api/biblioteca-online",
+    "metodo": "GET",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/capa",
+    "metodo": "GET",
+    "categoria": "dados_corretos",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/capa",
+    "metodo": "GET",
+    "categoria": "dados_faltando",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/capa",
+    "metodo": "GET",
+    "categoria": "tipo_errado",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=arquivo"
+  },
+  {
+    "rota": "/api/capa",
+    "metodo": "GET",
+    "categoria": "texto_gigante",
+    "status": 414,
+    "ok": false,
+    "motivo": "erro 4xx com corpo nao-JSON",
+    "extra": "campo=arquivo"
+  },
+  {
+    "rota": "/api/capa",
+    "metodo": "GET",
+    "categoria": "emoji",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=arquivo"
+  },
+  {
+    "rota": "/api/capa",
+    "metodo": "GET",
+    "categoria": "travessia_pasta",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=arquivo payload=../../../../Windows/win.ini"
+  },
+  {
+    "rota": "/api/capa",
+    "metodo": "GET",
+    "categoria": "travessia_pasta",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=arquivo payload=..\\..\\..\\..\\Windows\\win.ini"
+  },
+  {
+    "rota": "/api/capa",
+    "metodo": "GET",
+    "categoria": "travessia_pasta",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=arquivo payload=/etc/passwd"
+  },
+  {
+    "rota": "/api/capa",
+    "metodo": "GET",
+    "categoria": "travessia_pasta",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=arquivo payload=C:\\Windows\\win.ini"
+  },
+  {
+    "rota": "/api/capa",
+    "metodo": "GET",
+    "categoria": "travessia_pasta",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=arquivo payload=....//....//....//Windows/win.ini"
+  },
+  {
+    "rota": "/api/capa",
+    "metodo": "GET",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/botoes",
+    "metodo": "GET",
+    "categoria": "dados_corretos",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/botoes",
+    "metodo": "GET",
+    "categoria": "dados_faltando",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/botoes",
+    "metodo": "GET",
+    "categoria": "tipo_errado",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=console"
+  },
+  {
+    "rota": "/api/botoes",
+    "metodo": "GET",
+    "categoria": "texto_gigante",
+    "status": 414,
+    "ok": false,
+    "motivo": "erro 4xx com corpo nao-JSON",
+    "extra": "campo=console"
+  },
+  {
+    "rota": "/api/botoes",
+    "metodo": "GET",
+    "categoria": "emoji",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=console"
+  },
+  {
+    "rota": "/api/botoes",
+    "metodo": "GET",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/jogo",
+    "metodo": "GET",
+    "categoria": "dados_corretos",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/jogo",
+    "metodo": "GET",
+    "categoria": "dados_faltando",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/jogo",
+    "metodo": "GET",
+    "categoria": "tipo_errado",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=id"
+  },
+  {
+    "rota": "/api/jogo",
+    "metodo": "GET",
+    "categoria": "texto_gigante",
+    "status": 414,
+    "ok": false,
+    "motivo": "erro 4xx com corpo nao-JSON",
+    "extra": "campo=id"
+  },
+  {
+    "rota": "/api/jogo",
+    "metodo": "GET",
+    "categoria": "emoji",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=id"
+  },
+  {
+    "rota": "/api/jogo",
+    "metodo": "GET",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/sinc/receber",
+    "metodo": "POST",
+    "categoria": "dados_corretos",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/sinc/receber",
+    "metodo": "POST",
+    "categoria": "dados_faltando",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/sinc/receber",
+    "metodo": "POST",
+    "categoria": "tipo_errado",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=placares"
+  },
+  {
+    "rota": "/api/sinc/receber",
+    "metodo": "POST",
+    "categoria": "tipo_errado",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=sessoes"
+  },
+  {
+    "rota": "/api/sinc/receber",
+    "metodo": "POST",
+    "categoria": "tipo_errado",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=dispositivo"
+  },
+  {
+    "rota": "/api/sinc/receber",
+    "metodo": "POST",
+    "categoria": "texto_gigante",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=dispositivo"
+  },
+  {
+    "rota": "/api/sinc/receber",
+    "metodo": "POST",
+    "categoria": "emoji",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=dispositivo"
+  },
+  {
+    "rota": "/api/sinc/receber",
+    "metodo": "POST",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/mala",
+    "metodo": "POST",
+    "categoria": "dados_corretos",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/mala",
+    "metodo": "POST",
+    "categoria": "dados_faltando",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/mala",
+    "metodo": "POST",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/sincronizar",
+    "metodo": "POST",
+    "categoria": "dados_corretos",
+    "status": 502,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/sincronizar",
+    "metodo": "POST",
+    "categoria": "dados_faltando",
+    "status": 502,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/sincronizar",
+    "metodo": "POST",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/perfil-controle",
+    "metodo": "POST",
+    "categoria": "dados_corretos",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/perfil-controle",
+    "metodo": "POST",
+    "categoria": "dados_faltando",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/perfil-controle",
+    "metodo": "POST",
+    "categoria": "tipo_errado",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=console"
+  },
+  {
+    "rota": "/api/perfil-controle",
+    "metodo": "POST",
+    "categoria": "tipo_errado",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=direcional"
+  },
+  {
+    "rota": "/api/perfil-controle",
+    "metodo": "POST",
+    "categoria": "texto_gigante",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=console"
+  },
+  {
+    "rota": "/api/perfil-controle",
+    "metodo": "POST",
+    "categoria": "emoji",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=console"
+  },
+  {
+    "rota": "/api/perfil-controle",
+    "metodo": "POST",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/mapeamento/definir",
+    "metodo": "POST",
+    "categoria": "dados_corretos",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/mapeamento/definir",
+    "metodo": "POST",
+    "categoria": "dados_faltando",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/mapeamento/definir",
+    "metodo": "POST",
+    "categoria": "tipo_errado",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=jogador"
+  },
+  {
+    "rota": "/api/mapeamento/definir",
+    "metodo": "POST",
+    "categoria": "tipo_errado",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=botao"
+  },
+  {
+    "rota": "/api/mapeamento/definir",
+    "metodo": "POST",
+    "categoria": "tipo_errado",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=tipo"
+  },
+  {
+    "rota": "/api/mapeamento/definir",
+    "metodo": "POST",
+    "categoria": "tipo_errado",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=valor"
+  },
+  {
+    "rota": "/api/mapeamento/definir",
+    "metodo": "POST",
+    "categoria": "texto_gigante",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=jogador"
+  },
+  {
+    "rota": "/api/mapeamento/definir",
+    "metodo": "POST",
+    "categoria": "texto_gigante",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=botao"
+  },
+  {
+    "rota": "/api/mapeamento/definir",
+    "metodo": "POST",
+    "categoria": "texto_gigante",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=tipo"
+  },
+  {
+    "rota": "/api/mapeamento/definir",
+    "metodo": "POST",
+    "categoria": "texto_gigante",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=valor"
+  },
+  {
+    "rota": "/api/mapeamento/definir",
+    "metodo": "POST",
+    "categoria": "emoji",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=jogador"
+  },
+  {
+    "rota": "/api/mapeamento/definir",
+    "metodo": "POST",
+    "categoria": "emoji",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=botao"
+  },
+  {
+    "rota": "/api/mapeamento/definir",
+    "metodo": "POST",
+    "categoria": "emoji",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=tipo"
+  },
+  {
+    "rota": "/api/mapeamento/definir",
+    "metodo": "POST",
+    "categoria": "emoji",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=valor"
+  },
+  {
+    "rota": "/api/mapeamento/definir",
+    "metodo": "POST",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/mapeamento/padrao",
+    "metodo": "POST",
+    "categoria": "dados_corretos",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/mapeamento/padrao",
+    "metodo": "POST",
+    "categoria": "dados_faltando",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/mapeamento/padrao",
+    "metodo": "POST",
+    "categoria": "tipo_errado",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=jogador"
+  },
+  {
+    "rota": "/api/mapeamento/padrao",
+    "metodo": "POST",
+    "categoria": "texto_gigante",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=jogador"
+  },
+  {
+    "rota": "/api/mapeamento/padrao",
+    "metodo": "POST",
+    "categoria": "emoji",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=jogador"
+  },
+  {
+    "rota": "/api/mapeamento/padrao",
+    "metodo": "POST",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/mapeamento/limpar",
+    "metodo": "POST",
+    "categoria": "dados_corretos",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/mapeamento/limpar",
+    "metodo": "POST",
+    "categoria": "dados_faltando",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/mapeamento/limpar",
+    "metodo": "POST",
+    "categoria": "tipo_errado",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=jogador"
+  },
+  {
+    "rota": "/api/mapeamento/limpar",
+    "metodo": "POST",
+    "categoria": "texto_gigante",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=jogador"
+  },
+  {
+    "rota": "/api/mapeamento/limpar",
+    "metodo": "POST",
+    "categoria": "emoji",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=jogador"
+  },
+  {
+    "rota": "/api/mapeamento/limpar",
+    "metodo": "POST",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/acervo/remover",
+    "metodo": "POST",
+    "categoria": "dados_corretos",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/acervo/remover",
+    "metodo": "POST",
+    "categoria": "dados_faltando",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/acervo/remover",
+    "metodo": "POST",
+    "categoria": "tipo_errado",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=id"
+  },
+  {
+    "rota": "/api/acervo/remover",
+    "metodo": "POST",
+    "categoria": "texto_gigante",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=id"
+  },
+  {
+    "rota": "/api/acervo/remover",
+    "metodo": "POST",
+    "categoria": "emoji",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=id"
+  },
+  {
+    "rota": "/api/acervo/remover",
+    "metodo": "POST",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/amigo/codigo",
+    "metodo": "POST",
+    "categoria": "dados_corretos",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/amigo/codigo",
+    "metodo": "POST",
+    "categoria": "dados_faltando",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/amigo/codigo",
+    "metodo": "POST",
+    "categoria": "tipo_errado",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=codigo"
+  },
+  {
+    "rota": "/api/amigo/codigo",
+    "metodo": "POST",
+    "categoria": "texto_gigante",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=codigo"
+  },
+  {
+    "rota": "/api/amigo/codigo",
+    "metodo": "POST",
+    "categoria": "emoji",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=codigo"
+  },
+  {
+    "rota": "/api/amigo/codigo",
+    "metodo": "POST",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/partida/testar",
+    "metodo": "POST",
+    "categoria": "dados_corretos",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/partida/testar",
+    "metodo": "POST",
+    "categoria": "dados_faltando",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/partida/testar",
+    "metodo": "POST",
+    "categoria": "tipo_errado",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=endereco"
+  },
+  {
+    "rota": "/api/partida/testar",
+    "metodo": "POST",
+    "categoria": "texto_gigante",
+    "status": 500,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=endereco"
+  },
+  {
+    "rota": "/api/partida/testar",
+    "metodo": "POST",
+    "categoria": "emoji",
+    "status": 500,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=endereco"
+  },
+  {
+    "rota": "/api/partida/testar",
+    "metodo": "POST",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/bios/abrir",
+    "metodo": "POST",
+    "categoria": "dados_corretos",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/bios/abrir",
+    "metodo": "POST",
+    "categoria": "dados_faltando",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/bios/abrir",
+    "metodo": "POST",
+    "categoria": "tipo_errado",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=plataforma"
+  },
+  {
+    "rota": "/api/bios/abrir",
+    "metodo": "POST",
+    "categoria": "texto_gigante",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=plataforma"
+  },
+  {
+    "rota": "/api/bios/abrir",
+    "metodo": "POST",
+    "categoria": "emoji",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=plataforma"
+  },
+  {
+    "rota": "/api/bios/abrir",
+    "metodo": "POST",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/pastas/criar",
+    "metodo": "POST",
+    "categoria": "dados_corretos",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/pastas/criar",
+    "metodo": "POST",
+    "categoria": "dados_faltando",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/pastas/criar",
+    "metodo": "POST",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/jogo/console",
+    "metodo": "POST",
+    "categoria": "dados_corretos",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/jogo/console",
+    "metodo": "POST",
+    "categoria": "dados_faltando",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/jogo/console",
+    "metodo": "POST",
+    "categoria": "tipo_errado",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=jogo_id"
+  },
+  {
+    "rota": "/api/jogo/console",
+    "metodo": "POST",
+    "categoria": "tipo_errado",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=plataforma"
+  },
+  {
+    "rota": "/api/jogo/console",
+    "metodo": "POST",
+    "categoria": "texto_gigante",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=jogo_id"
+  },
+  {
+    "rota": "/api/jogo/console",
+    "metodo": "POST",
+    "categoria": "texto_gigante",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=plataforma"
+  },
+  {
+    "rota": "/api/jogo/console",
+    "metodo": "POST",
+    "categoria": "emoji",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=jogo_id"
+  },
+  {
+    "rota": "/api/jogo/console",
+    "metodo": "POST",
+    "categoria": "emoji",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=plataforma"
+  },
+  {
+    "rota": "/api/jogo/console",
+    "metodo": "POST",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/estado/apagar",
+    "metodo": "POST",
+    "categoria": "dados_corretos",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/estado/apagar",
+    "metodo": "POST",
+    "categoria": "dados_faltando",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/estado/apagar",
+    "metodo": "POST",
+    "categoria": "tipo_errado",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=jogo_id"
+  },
+  {
+    "rota": "/api/estado/apagar",
+    "metodo": "POST",
+    "categoria": "tipo_errado",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=espaco"
+  },
+  {
+    "rota": "/api/estado/apagar",
+    "metodo": "POST",
+    "categoria": "texto_gigante",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=jogo_id"
+  },
+  {
+    "rota": "/api/estado/apagar",
+    "metodo": "POST",
+    "categoria": "emoji",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=jogo_id"
+  },
+  {
+    "rota": "/api/estado/apagar",
+    "metodo": "POST",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/cheat/adicionar",
+    "metodo": "POST",
+    "categoria": "dados_corretos",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/cheat/adicionar",
+    "metodo": "POST",
+    "categoria": "dados_faltando",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/cheat/adicionar",
+    "metodo": "POST",
+    "categoria": "tipo_errado",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=jogo_id"
+  },
+  {
+    "rota": "/api/cheat/adicionar",
+    "metodo": "POST",
+    "categoria": "tipo_errado",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=codigo"
+  },
+  {
+    "rota": "/api/cheat/adicionar",
+    "metodo": "POST",
+    "categoria": "tipo_errado",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=descricao"
+  },
+  {
+    "rota": "/api/cheat/adicionar",
+    "metodo": "POST",
+    "categoria": "texto_gigante",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=jogo_id"
+  },
+  {
+    "rota": "/api/cheat/adicionar",
+    "metodo": "POST",
+    "categoria": "texto_gigante",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=codigo"
+  },
+  {
+    "rota": "/api/cheat/adicionar",
+    "metodo": "POST",
+    "categoria": "texto_gigante",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=descricao"
+  },
+  {
+    "rota": "/api/cheat/adicionar",
+    "metodo": "POST",
+    "categoria": "emoji",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=jogo_id"
+  },
+  {
+    "rota": "/api/cheat/adicionar",
+    "metodo": "POST",
+    "categoria": "emoji",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=codigo"
+  },
+  {
+    "rota": "/api/cheat/adicionar",
+    "metodo": "POST",
+    "categoria": "emoji",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=descricao"
+  },
+  {
+    "rota": "/api/cheat/adicionar",
+    "metodo": "POST",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/cheat/alterar",
+    "metodo": "POST",
+    "categoria": "dados_corretos",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/cheat/alterar",
+    "metodo": "POST",
+    "categoria": "dados_faltando",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/cheat/alterar",
+    "metodo": "POST",
+    "categoria": "tipo_errado",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=jogo_id"
+  },
+  {
+    "rota": "/api/cheat/alterar",
+    "metodo": "POST",
+    "categoria": "tipo_errado",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=indice"
+  },
+  {
+    "rota": "/api/cheat/alterar",
+    "metodo": "POST",
+    "categoria": "texto_gigante",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=jogo_id"
+  },
+  {
+    "rota": "/api/cheat/alterar",
+    "metodo": "POST",
+    "categoria": "emoji",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=jogo_id"
+  },
+  {
+    "rota": "/api/cheat/alterar",
+    "metodo": "POST",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/exportar",
+    "metodo": "POST",
+    "categoria": "dados_corretos",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/exportar",
+    "metodo": "POST",
+    "categoria": "dados_faltando",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/exportar",
+    "metodo": "POST",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/importar",
+    "metodo": "POST",
+    "categoria": "dados_corretos",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/importar",
+    "metodo": "POST",
+    "categoria": "dados_faltando",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/importar",
+    "metodo": "POST",
+    "categoria": "tipo_errado",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=arquivo"
+  },
+  {
+    "rota": "/api/importar",
+    "metodo": "POST",
+    "categoria": "texto_gigante",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=arquivo"
+  },
+  {
+    "rota": "/api/importar",
+    "metodo": "POST",
+    "categoria": "emoji",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=arquivo"
+  },
+  {
+    "rota": "/api/importar",
+    "metodo": "POST",
+    "categoria": "travessia_pasta",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=arquivo payload=../../../../Windows/win.ini"
+  },
+  {
+    "rota": "/api/importar",
+    "metodo": "POST",
+    "categoria": "travessia_pasta",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=arquivo payload=..\\..\\..\\..\\Windows\\win.ini"
+  },
+  {
+    "rota": "/api/importar",
+    "metodo": "POST",
+    "categoria": "travessia_pasta",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=arquivo payload=/etc/passwd"
+  },
+  {
+    "rota": "/api/importar",
+    "metodo": "POST",
+    "categoria": "travessia_pasta",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=arquivo payload=C:\\Windows\\win.ini"
+  },
+  {
+    "rota": "/api/importar",
+    "metodo": "POST",
+    "categoria": "travessia_pasta",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=arquivo payload=....//....//....//Windows/win.ini"
+  },
+  {
+    "rota": "/api/importar",
+    "metodo": "POST",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/backup",
+    "metodo": "POST",
+    "categoria": "dados_corretos",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/backup",
+    "metodo": "POST",
+    "categoria": "dados_faltando",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/backup",
+    "metodo": "POST",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/capa/atualizar",
+    "metodo": "POST",
+    "categoria": "dados_corretos",
+    "status": 503,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/capa/atualizar",
+    "metodo": "POST",
+    "categoria": "dados_faltando",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/capa/atualizar",
+    "metodo": "POST",
+    "categoria": "tipo_errado",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=jogo_id"
+  },
+  {
+    "rota": "/api/capa/atualizar",
+    "metodo": "POST",
+    "categoria": "texto_gigante",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=jogo_id"
+  },
+  {
+    "rota": "/api/capa/atualizar",
+    "metodo": "POST",
+    "categoria": "emoji",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=jogo_id"
+  },
+  {
+    "rota": "/api/capa/atualizar",
+    "metodo": "POST",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/amigo/adicionar",
+    "metodo": "POST",
+    "categoria": "dados_corretos",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/amigo/adicionar",
+    "metodo": "POST",
+    "categoria": "dados_faltando",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/amigo/adicionar",
+    "metodo": "POST",
+    "categoria": "tipo_errado",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=apelido"
+  },
+  {
+    "rota": "/api/amigo/adicionar",
+    "metodo": "POST",
+    "categoria": "tipo_errado",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=url"
+  },
+  {
+    "rota": "/api/amigo/adicionar",
+    "metodo": "POST",
+    "categoria": "texto_gigante",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=apelido"
+  },
+  {
+    "rota": "/api/amigo/adicionar",
+    "metodo": "POST",
+    "categoria": "texto_gigante",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=url"
+  },
+  {
+    "rota": "/api/amigo/adicionar",
+    "metodo": "POST",
+    "categoria": "emoji",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=apelido"
+  },
+  {
+    "rota": "/api/amigo/adicionar",
+    "metodo": "POST",
+    "categoria": "emoji",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=url"
+  },
+  {
+    "rota": "/api/amigo/adicionar",
+    "metodo": "POST",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/amigo/remover",
+    "metodo": "POST",
+    "categoria": "dados_corretos",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/amigo/remover",
+    "metodo": "POST",
+    "categoria": "dados_faltando",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/amigo/remover",
+    "metodo": "POST",
+    "categoria": "tipo_errado",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=apelido"
+  },
+  {
+    "rota": "/api/amigo/remover",
+    "metodo": "POST",
+    "categoria": "texto_gigante",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=apelido"
+  },
+  {
+    "rota": "/api/amigo/remover",
+    "metodo": "POST",
+    "categoria": "emoji",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=apelido"
+  },
+  {
+    "rota": "/api/amigo/remover",
+    "metodo": "POST",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/amigo/testar",
+    "metodo": "POST",
+    "categoria": "dados_corretos",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/amigo/testar",
+    "metodo": "POST",
+    "categoria": "dados_faltando",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/amigo/testar",
+    "metodo": "POST",
+    "categoria": "tipo_errado",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=url"
+  },
+  {
+    "rota": "/api/amigo/testar",
+    "metodo": "POST",
+    "categoria": "texto_gigante",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=url"
+  },
+  {
+    "rota": "/api/amigo/testar",
+    "metodo": "POST",
+    "categoria": "emoji",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=url"
+  },
+  {
+    "rota": "/api/amigo/testar",
+    "metodo": "POST",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/sinc/ola",
+    "metodo": "POST",
+    "categoria": "dados_corretos",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/sinc/ola",
+    "metodo": "POST",
+    "categoria": "dados_faltando",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/sinc/ola",
+    "metodo": "POST",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/indexar",
+    "metodo": "POST",
+    "categoria": "dados_corretos",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/indexar",
+    "metodo": "POST",
+    "categoria": "dados_faltando",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/indexar",
+    "metodo": "POST",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/config",
+    "metodo": "POST",
+    "categoria": "dados_corretos",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/config",
+    "metodo": "POST",
+    "categoria": "dados_faltando",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/config",
+    "metodo": "POST",
+    "categoria": "tipo_errado",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=tema"
+  },
+  {
+    "rota": "/api/config",
+    "metodo": "POST",
+    "categoria": "texto_gigante",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=tema"
+  },
+  {
+    "rota": "/api/config",
+    "metodo": "POST",
+    "categoria": "emoji",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=tema"
+  },
+  {
+    "rota": "/api/config",
+    "metodo": "POST",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/placar",
+    "metodo": "POST",
+    "categoria": "dados_corretos",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/placar",
+    "metodo": "POST",
+    "categoria": "dados_faltando",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/placar",
+    "metodo": "POST",
+    "categoria": "tipo_errado",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=pontos"
+  },
+  {
+    "rota": "/api/placar",
+    "metodo": "POST",
+    "categoria": "tipo_errado",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=jogo_id"
+  },
+  {
+    "rota": "/api/placar",
+    "metodo": "POST",
+    "categoria": "tipo_errado",
+    "status": 500,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=apelido"
+  },
+  {
+    "rota": "/api/placar",
+    "metodo": "POST",
+    "categoria": "texto_gigante",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=jogo_id"
+  },
+  {
+    "rota": "/api/placar",
+    "metodo": "POST",
+    "categoria": "texto_gigante",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=apelido"
+  },
+  {
+    "rota": "/api/placar",
+    "metodo": "POST",
+    "categoria": "emoji",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=jogo_id"
+  },
+  {
+    "rota": "/api/placar",
+    "metodo": "POST",
+    "categoria": "emoji",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=apelido"
+  },
+  {
+    "rota": "/api/placar",
+    "metodo": "POST",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  }
+]

@@ -47,6 +47,25 @@ def _limpar_nome_arquivo(nome):
     return re.sub(r'[&*/:`<>?\\|"]', "_", nome)
 
 
+_ASSINATURA_PNG = b"\x89PNG\r\n\x1a\n"
+
+
+def _e_png_de_verdade(caminho):
+    """Confere os primeiros bytes do arquivo, nao so o nome.
+
+    curl com --fail devolve sucesso (codigo 0) para qualquer resposta
+    HTTP 200 -- inclusive a pagina de login de um portal cativo de Wi-Fi,
+    que chega como HTML disfarcado de "capa baixada com sucesso" se
+    ninguem checar o conteudo de verdade. Achado real na auditoria,
+    confirmado simulando um portal cativo local.
+    """
+    try:
+        with open(caminho, "rb") as arquivo:
+            return arquivo.read(len(_ASSINATURA_PNG)) == _ASSINATURA_PNG
+    except OSError:
+        return False
+
+
 # O libretro-thumbnails nomeia pela regiao do jogo. Quando o nome do
 # arquivo da ROM nao tem regiao nenhuma (ou tem uma que o banco nao tem
 # exatamente essa revisao), tentar as tags mais comuns aumenta bastante
@@ -92,7 +111,7 @@ def buscar_e_baixar(plataforma_id, titulo_limpo, nome_base_arquivo):
                  "--max-time", "15", "-A", "ARENA/1.0", "-o", temporario, url],
                 capture_output=True)
             if resultado.returncode == 0 and os.path.isfile(temporario) and \
-                    os.path.getsize(temporario) > 0:
+                    os.path.getsize(temporario) > 0 and _e_png_de_verdade(temporario):
                 os.replace(temporario, destino)
                 return True, None
         except (OSError, subprocess.SubprocessError):

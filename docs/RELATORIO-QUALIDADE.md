@@ -386,6 +386,305 @@ Arquivos alterados: `servidor\arena.py` (rodízio de logs),
 
 ---
 
+## Fase 3 — Testes do servidor e da API (offline e online)
+
+Nenhum teste desta fase mexeu na pasta real do projeto — todos sobem um
+ARENA isolado (cópia temporária de `servidor`/`dados`/`launcher`, apagada
+ao final, mesmo padrão já usado desde a Fase 1) ou testam a função
+diretamente. As únicas exceções, feitas de propósito e de forma segura,
+foram as provas ao vivo do CSRF (revertida no mesmo teste) e da limpeza de
+logs (rodou o ARENA real uma vez, só para confirmar o rodízio na pasta de
+verdade).
+
+### 1. Fuzz das 45 rotas
+
+Script novo `testes\fuzz_rotas.py`: para cada rota, testa dados corretos,
+dados faltando, tipo errado, texto gigante (2 MB), acentos/emoji, tentativa
+de sair da pasta (nos campos que recebem caminho de arquivo) e 20 pedidos
+repetidos rápido. 244 checagens ao todo.
+
+**Resultado final: 7 "falhas" reportadas pelo script, todas explicadas —
+nenhuma é bug real:**
+
+- **7×** `414 URI Too Long` em rotas GET com o campo de texto gigante na
+  query string. Isto não é o ARENA: é o `http.server` da própria biblioteca
+  padrão do Python recusando a linha da URL antes mesmo dela chegar ao
+  código do ARENA — comportamento correto e seguro (rejeita cedo, não
+  trava). A checagem do meu script era severa demais aqui (esperava corpo
+  JSON até em erro que nunca passa pelo roteador da aplicação); não é um
+  achado da auditoria.
+
+Antes de chegar nesses 7, o fuzz achou e ajudou a corrigir problemas reais
+— ver itens 2, 4 e 6 abaixo.
+
+**Achado real, corrigido — respostas de erro inconsistentes.** 4 pontos
+usavam `self.send_error(...)` (gera uma página HTML de erro, do próprio
+Python) em vez do `self.erro(...)` do ARENA (`{"ok": false, "erro": "..."}`,
+o formato que todas as outras ~45 rotas usam): os 3 erros de `/api/capa`
+("Capa não encontrada", "Não é imagem", "Não consegui ler a capa"), os 2 de
+`/api/perfil/foto`, e os 2 "Rota não encontrada" genéricos no fim de
+`api_get`/`api_post`. Corrigido — as 7 trocadas para `self.erro(...)`.
+Confirmado: bateria de 44 testes OK, fuzz não aponta mais essas 7 como
+inconsistentes.
+
+### 2. Tentativa de sair da pasta (path traversal)
+
+O fuzz genérico não testava isto direito para `/api/capa` (todo payload de
+travessia usado lá termina em `.ini`, e a rota recusa **antes** de checar a
+pasta, só por não ser imagem). Script à parte,
+`testes\teste_travessia_capa.py`: cria um "segredo" fora da pasta permitida
+terminando em `.png` de propósito, e tenta 6 formas de alcançá-lo
+(`../`, `..\`, caminho absoluto, misturado com `jogos/..`). **Nenhuma
+vazou** — `dentro_da_pasta()` (usa `os.path.commonpath`, não `startswith`)
+funciona.
+
+`/api/mala` foi outra história — ver item 4b.
+
+### 3. Concorrência — 50 pedidos ao mesmo tempo
+
+Script `testes\teste_concorrencia.py`: 50 threads batendo ao mesmo tempo em
+`/api/config`, `/api/placar`, `/api/mapeamento/definir` e
+`/api/cheat/adicionar` (todas gravam em disco).
+
+**Achado real, corrigido — corrida de gravação no Windows.** Rodando pela
+primeira vez: 0 a 4 das 50 respostas (variava a cada rodada) vinham com
+erro 500, `[WinError 5] Acesso negado`, no `os.replace()` de
+`gravar_texto_atomico()`. Causa: `carregar_config()`/`ler_config_do_disco()`
+**leem** o arquivo sem usar a trava `TRAVA_ARQUIVO` (de propósito — senão
+toda leitura esperaria toda escrita), e no Windows (diferente do Linux)
+`os.replace()` pode falhar quando OUTRA thread tem o arquivo destino aberto
+para leitura no instante exato da troca. É transitório: a leitura solta em
+microssegundos. Corrigido com uma repetição curta (até 5 tentativas, 50ms
+de espera entre elas) só em cima do `PermissionError` do `os.replace()` —
+não muda o resto da função. Confirmado com **6 rodadas consecutivas de 50
+pedidos simultâneos, 0 erros em todas**, e depois nas rodadas seguintes de
+toda a Fase 3. Bateria de 44 testes: OK.
+
+Nenhum arquivo saiu corrompido em nenhuma rodada (`config.json`/
+`controles.json` continuavam JSON válido, `PRAGMA integrity_check` do
+`arena.db` sempre `ok`) — mesmo nas rodadas com erro 500, o problema era a
+gravação **recusada**, não uma gravação pela metade. O `os.replace()`
+atômico já garantia isso; o achado era só a experiência ruim de ver "erro
+interno" numa operação normal.
+
+### 4. Segurança
+
+#### 4a. Rede — achado maior da auditoria, corrigido
+
+**Antes desta fase, TODAS as 45 rotas da API ficavam abertas para
+qualquer computador da rede assim que "Aceitar conexões da rede" era
+ligado** (obrigatório para o Jogar Junto funcionar). Conferido lendo o
+código inteiro: `self.client_address` (o endereço de quem fez o pedido) só
+era consultado em UM lugar, dentro de `/api/sinc/receber`, sem relação
+nenhuma com controle de acesso — nenhuma outra rota checava de onde o
+pedido vinha. Na prática: um colega na mesma rede da escola conseguiria
+mandar `/api/perfil/novo` (apagar o perfil de outro aluno), `/api/config`
+(mudar a configuração de outro), `/api/jogar` (abrir jogo no computador de
+outro), `/api/cheat/adicionar`, etc — exatamente o cenário que o plano da
+auditoria descreve como inaceitável.
+
+**Corrigido**: lista nova `ROTAS_REDE_EXTERNA` em `arena.py` com só as 8
+rotas que a partida a dois e a sincronização precisam de verdade
+(`/api/colegas`, `/api/ranking`, `/api/jogo/impressao`, `/api/amigo/testar`,
+`/api/amigo/codigo`, `/api/partida/testar`, `/api/sinc/ola`,
+`/api/sinc/receber`). Toda outra rota, vinda de um endereço que não é este
+computador (nem 127.0.0.1 nem nenhum dos próprios endereços de rede da
+máquina), é recusada com 403 antes de executar qualquer coisa. O jogo em
+si (netplay do RetroArch) nunca passou por aqui — usa a porta 55435 dele,
+separada — então isto não tira nenhuma funcionalidade de verdade.
+
+Testado com `testes\teste_acesso_de_rede.py`: como não dá para simular o
+endereço de uma segunda máquina de verdade sem uma segunda máquina física
+(a detecção usa o endereço real do socket, que o próprio Python garante),
+o teste subclassa o `Manipulador` só para forçar
+`pedido_e_local()` a devolver `False` — exatamente a condição que uma rede
+de verdade produz. Resultado: as 8 rotas da lista continuam respondendo
+normalmente; **todas** as outras testadas (`/api/config`, `/api/perfil/novo`,
+`/api/jogar`, `/api/cheat/adicionar`, `/api/mala`, `/api/estado`,
+`/api/catalogo`) foram recusadas com 403, e o `config.json` de verdade
+ficou intocado. Bateria de 44 testes: OK.
+
+**Limite honesto**: isto prova a lógica de bloqueio de verdade (a condição
+que dispara é exatamente a de um pedido vindo de fora), mas não substitui
+confirmar com uma segunda máquina física na rede da escola — vira item do
+roteiro manual da Fase 4/6.
+
+#### 4b. CSRF / origem cruzada — provado ao vivo, corrigido
+
+Testado de verdade, não só lido: subi o ARENA real e uma página HTML servida
+por **outra origem** (porta diferente, `127.0.0.1:9999`) no mesmo Chrome,
+com um `fetch()` mandando `POST /api/config` com `Content-Type: text/plain`
+contendo `{"tema":"escuro"}`. **Funcionou** — o `tema` no `config.json` real
+mudou para `"escuro"`, mesmo a página tendo relatado "Failed to fetch" (o
+navegador nunca deixou o site LER a resposta, mas o pedido já tinha sido
+processado no servidor — CSRF às cegas, o tipo mais perigoso: o site nem
+precisa saber se funcionou). Revertido no mesmo teste.
+
+Causa: `ler_corpo()` sempre tentava interpretar o corpo como JSON,
+**qualquer que fosse o `Content-Type`**. Um `Content-Type: text/plain` é um
+"pedido simples" para o navegador — não exige permissão prévia (preflight
+CORS) para ser enviado, só para a resposta ser lida. Como o ARENA nunca
+checava o cabeçalho, processava o pedido mesmo assim.
+
+**Corrigido**: `do_POST` agora recusa (415) qualquer pedido cujo
+`Content-Type` não seja exatamente `application/json` — é o que a própria
+tela (`pedir()` em `app.js`) e a sincronização entre ARENAs sempre mandam,
+conferido nos dois lugares antes de aplicar. Reproduzido o mesmo ataque
+depois da correção: `tema` continuou `"claro"`. Bateria de 44 testes +
+todos os outros testes de HTTP desta fase: OK (todos já mandavam
+`Content-Type: application/json` de propósito).
+
+#### 4c. `/api/mala` — escrita em caminho arbitrário, provada ao vivo, corrigida
+
+Achado durante o mapeamento das rotas: `trocar_pela_mala(dados.get("caminho"))`
+usava o `caminho` vindo do cliente **sem validação nenhuma** — nem
+`dentro_da_pasta()`, nem `os.path.basename()`, os dois que toda outra rota
+com caminho de arquivo do cliente usa (ex.: `/api/importar`). Provado ao
+vivo: um `POST /api/mala` com `{"caminho": "C:\\Users\\...\\Temp\\arena_prova_mala.json"}`
+criou o arquivo exatamente ali — escrita em qualquer caminho que o processo
+consiga gravar, escolhido inteiramente pelo cliente.
+
+**Corrigido**, respeitando o uso de verdade (a mala pode estar na raiz de
+QUALQUER pen drive, não só dentro da pasta do ARENA — por isso não dá para
+usar `dentro_da_pasta()` como as outras rotas): agora exige que o **nome**
+do arquivo seja exatamente `ARENA-troca.json`, rejeitando qualquer outro
+nome. Testado em 3 casos (`testes\teste_mala_validacao.py`): nome arbitrário
+→ recusado, arquivo não criado; nome certo numa pasta diferente (simulando
+outro pen drive) → continua funcionando; sem `caminho` nenhum (uso normal)
+→ continua funcionando. Bateria de 44 testes: OK.
+
+#### 4d. XSS — checado, sem achado
+
+`app.js` nunca usa `innerHTML`/`insertAdjacentHTML`/`outerHTML` em lugar
+nenhum (varredura completa do arquivo) — todo texto vindo de fora (apelido
+de colega, título de jogo, mensagens) passa por `.textContent`, que nunca
+interpreta HTML. Não há caminho de XSS refletido nem armazenado pela tela.
+
+### 5. Internet ruim (DNS falho, timeout, portal cativo)
+
+**Achado real, corrigido — `internet_archive.instalar()` não tratava falha
+de rede nem resposta fora do esperado.** `buscar()` já tinha essa proteção;
+`instalar()` não, em dois pontos: a busca de metadados (`_ler(...)`, sem
+try/except) e o download em si (`subprocess.run(["curl.exe", ...])`, erro
+do curl não tratado). Provado ao vivo com dois cenários simulados
+(monkeypatch de `_ler`, sem precisar de rede de verdade): (1) rede fora —
+vazava `OSError` cru; a rota em `arena.py` tem um `except Exception`
+genérico que evita o 500 sem tratamento, mas a mensagem virava "Download
+falhou: rede inacessivel" (técnica, não explica o que fazer); (2) portal
+cativo (HTML no lugar do JSON esperado) — o `json.loads` no HTML gerava
+`Expecting value: line 1 column 1 (char 0)`, mensagem do interpretador
+Python, não uma frase para o aluno entender.
+
+Corrigido: as duas chamadas agora ficam dentro de `try/except`, convertendo
+para uma mensagem única e clara: "Não consegui falar com o Internet Archive
+agora. Confira a internet e tente de novo." (metadados) e "O download caiu
+no meio do caminho. Confira a internet e tente de novo." (arquivo).
+Reproduzidos os dois cenários depois da correção: mensagem clara nos dois
+casos, nenhuma exceção crua. Bateria de 44 testes: OK.
+
+**Achado real, corrigido — `capas_online.py` aceitava qualquer resposta
+200 como "capa baixada com sucesso", mesmo sem ser imagem.** `curl --fail`
+só falha em erro HTTP (4xx/5xx) — um portal cativo de Wi-Fi normalmente
+responde 200 com a página de login em HTML, então `--fail` não pega isso.
+Provado ao vivo com um servidor local simulando o portal: `curl` devolveu
+código de saída 0 e um arquivo de 85 bytes de HTML foi salvo — exatamente
+a condição que o código aceitava como "capa boa" (`returncode == 0` +
+arquivo não vazio), sem checar o CONTEÚDO. Corrigido: `_e_png_de_verdade()`
+nova, confere a assinatura de bytes real do PNG (`\x89PNG\r\n\x1a\n`) antes
+de aceitar. Testado com HTML disfarçado de `.png` (recusado) e PNG de
+verdade (aceito). Bateria de 44 testes: OK.
+
+Netplay pela internet (repasse do RetroArch): `graficos.repasses_disponiveis()`
+é só uma lista fixa, sem chamada de rede nenhuma — não tem como travar por
+internet ruim. A conexão de repasse em si é feita pelo próprio RetroArch
+(processo separado), fora do servidor Python do ARENA.
+
+### 6. Acervo — verificação de SHA-256
+
+**Confirmado funcionando, ao vivo** (`testes\teste_acervo_sha256.py`):
+subi um servidor HTTP local com um arquivo de conteúdo e hash conhecidos,
+salvei um item no manifesto com um SHA-256 **errado** de propósito — `acervo.instalar()`
+recusou (`"SHA-256 diferente: download recusado por seguranca."`), sem
+criar o arquivo de destino. Com o SHA-256 **certo**, instalou normalmente.
+Esta é exatamente a proteção que o plano da auditoria pedia para conferir,
+e ela já existia e funciona.
+
+**Achado à parte, corrigido por analogia** — o caminho de download do
+Internet Archive (`internet_archive.instalar()`, mecanismo diferente e mais
+novo, busca dinâmica em vez de manifesto curado) não tinha proteção
+equivalente: calculava um SHA-256 do arquivo baixado mas **nunca comparava
+com nada** (nem guardava no retorno). O Internet Archive não declara
+SHA-256 por arquivo na própria API — declara `md5`, `sha1` e `crc32`
+(conferido numa consulta real à API deles). Corrigido: agora calcula SHA-1
+(o mais forte dos três que existem) e compara com o que o Internet Archive
+declarou para aquele arquivo específico, recusando se não bater. Testado
+em 3 casos (`testes\teste_internet_archive_download.py`): download que cai
+no meio (erro claro), conteúdo trocado/incompleto (SHA-1 não bate, recusado,
+nada instalado), caminho feliz (instala normal). Bateria de 44 testes: OK.
+
+### 7. `/api/partida/testar` — custo real de um endereço inválido
+
+Achado durante o fuzz: um `endereco` sem sentido de rede (ex.: `"12345"`)
+fazia a rota demorar o bastante para estourar o tempo limite do meu
+script de teste. Medido à parte: **~5,3 s** — a rota tenta resolver o
+mesmo endereço **duas vezes seguidas** (uma para a porta do ARENA, outra
+para a porta da partida), e no Windows `socket.create_connection()` não
+respeita o `timeout` do socket na fase de resolução de nome (medido direto:
+uma resolução de endereço inválido custa ~2,6 s sozinha). Não é um bug de
+segurança — a rota já está na lista de acesso de rede restrito (item 4a) —
+mas é um custo real e evitável: um colega testando o endereço errado
+repetidas vezes ocuparia uma thread por ~5 s a cada tentativa.
+
+Corrigido: resolve o endereço **uma vez** (`socket.gethostbyname`) e reusa
+o IP nas duas tentativas de conexão, cortando o custo pela metade — medido
+depois da correção: **~2,68 s**. Confirmado que a mensagem de diagnóstico
+("Não alcanço o computador dele...") continua aparecendo igual no caminho
+rápido, e que o caminho feliz (endereço alcançável) continua funcionando
+normal (`testes\teste_partida_testar_timing.py`). Bateria de 44 testes: OK.
+
+### 8. Teste de longa duração (acelerado)
+
+"Horas" de verdade não cabem numa sessão de auditoria — acelerado:
+milhares de pedidos num intervalo curto, medindo RAM e handles do processo
+a cada 10s (`testes\teste_longa_duracao.py`).
+
+| Duração testada | Pedidos | Falhas de conexão | Crescimento de RAM | Crescimento de handles |
+|---|---|---|---|---|
+| 3 min | 57.596 | 0 | 0,2 MB | 10 |
+| 45s (reconfirmação, depois de todas as correções desta fase) | 15.316 | 0 | 0,4 MB | 14 |
+
+RAM e handles ficam estáveis depois do aquecimento inicial (esperado — é o
+Python se ajustando) — nenhum vazamento detectado sob carga sustentada,
+nas duas rodadas.
+
+### 9. Sem internet, o que é local funciona 100%
+
+Confirmado por construção, não só por suposição: **todos** os testes desta
+fase (fuzz das 45 rotas, concorrência, mala, acesso de rede, longa duração)
+rodam contra uma cópia isolada do ARENA que não tem nenhuma mock nem
+simulação de internet — e todos passaram normalmente, porque nenhuma rota
+local (catálogo, config, controles, cheats, placar, mapeamento, mala) faz
+qualquer chamada de rede. As únicas partes que tocam a internet de verdade
+(`internet_archive.py`, `capas_online.py`, repasse de netplay) já foram
+testadas à parte, com internet simulada ruim (item 5) — e falham com
+mensagem clara, sem travar o resto do ARENA.
+
+### Aplicação e testes (Fase 3)
+
+Todas as correções desta fase foram aplicadas direto (a Fase 3 não tem
+"pare e espere aprovação" no plano — só as Fases 1, 7 e 8 têm), testadas
+uma a uma e a bateria de 44 testes automatizados conferida depois de cada
+mudança em `servidor\arena.py`, `servidor\internet_archive.py` e
+`servidor\capas_online.py`: **OK, 0 falhas, em toda etapa.**
+
+Scripts novos: `testes\fuzz_rotas.py`, `testes\teste_travessia_capa.py`,
+`testes\teste_concorrencia.py`, `testes\teste_acesso_de_rede.py`,
+`testes\teste_mala_validacao.py`, `testes\teste_acervo_sha256.py`,
+`testes\teste_internet_archive_download.py`,
+`testes\teste_partida_testar_timing.py`, `testes\teste_longa_duracao.py`.
+
+---
+
 ## Depois (Fase 8)
 
 *(a preencher ao final da auditoria)*

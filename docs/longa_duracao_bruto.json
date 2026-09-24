@@ -1,0 +1,42 @@
+{
+  "duracao_s": 45.0,
+  "pedidos_total": 15316,
+  "falhas": 0,
+  "amostras": [
+    {
+      "t": 0.0,
+      "ram_mb": 37.1,
+      "handles": 186,
+      "threads": 10,
+      "pedidos_ate_aqui": 7
+    },
+    {
+      "t": 10.0,
+      "ram_mb": 37.1,
+      "handles": 186,
+      "threads": 10,
+      "pedidos_ate_aqui": 3766
+    },
+    {
+      "t": 20.0,
+      "ram_mb": 37.4,
+      "handles": 199,
+      "threads": 11,
+      "pedidos_ate_aqui": 7616
+    },
+    {
+      "t": 30.0,
+      "ram_mb": 37.5,
+      "handles": 200,
+      "threads": 13,
+      "pedidos_ate_aqui": 11515
+    },
+    {
+      "t": 40.0,
+      "ram_mb": 37.5,
+      "handles": 200,
+      "threads": 13,
+      "pedidos_ate_aqui": 13965
+    }
+  ]
+}
