@@ -3081,7 +3081,12 @@ function ligarEventos() {
       $("#campoInternet").hidden = false;
       preencherAmigosPartida();
 
-      const maximo = (estado.porPlataforma[estado.jogoDaPartida?.plataforma] || {}).jogadores_max || 2;
+      // O jogo especifico pode aceitar mais jogadores que o console em
+      // geral (Multitap, ex.: Super Bomberman) -- por isso o numero vem
+      // do PROPRIO jogo agora, nao so da plataforma.
+      const maximo = estado.jogoDaPartida?.jogadores_max
+        || (estado.porPlataforma[estado.jogoDaPartida?.plataforma] || {}).jogadores_max
+        || 2;
       const mostrarJogador = estado.papelDaPartida === "entrar" && maximo > 2;
       $("#campoJogadorPartida").hidden = !mostrarJogador;
       if (mostrarJogador) {

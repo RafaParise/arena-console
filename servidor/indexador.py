@@ -405,6 +405,15 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None):
                 plataforma = por_id[id_plataforma]
             titulo = limpar_titulo(nome_arquivo)
 
+            # So ESTE jogo, nao o console inteiro, aceita mais jogadores?
+            # Lista curada em consoles.json -> jogos_multitap (mesmo
+            # espirito do "system link" do PS2: cresce testando com jogo
+            # real, nunca por suposicao). A maioria dos jogos de um
+            # console nao usa Multitap - mostrar "Jogador 3/4/5" pra eles
+            # confundiria o aluno a toa.
+            lista_multitap = plataforma.get("jogos_multitap", [])
+            usa_multitap = any(nome.lower() in titulo.lower() for nome in lista_multitap)
+
             encontrados.append({
                 "id": identificacao,
                 "titulo": titulo,
@@ -415,6 +424,7 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None):
                 "origem": origem,
                 "origem_rotulo": ORIGENS.get(origem, origem),
                 "pede_placar": plataforma.get("pede_placar", False),
+                "jogadores_max": 5 if usa_multitap else plataforma.get("jogadores_max", 2),
                 "tamanho_mb": round(tamanho_mb, 1),
                 # Quando houve desempate, a tela oferece a correcao.
                 "ambiguo": incerto,

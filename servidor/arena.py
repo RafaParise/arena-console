@@ -4161,7 +4161,14 @@ class Manipulador(BaseHTTPRequestHandler):
                         return self.erro("Informe o endereco de quem esta "
                                          "hospedando a partida.")
                 pela_internet = bool(dados.get("pela_internet"))
-                jogadores_max = plataforma.get("jogadores_max", 2)
+                # Jogo especifico usa Multitap (lista curada, consoles.json
+                # -> jogos_multitap)? So entao o limite de jogadores sobe
+                # do padrao da plataforma (2) para o que o multitap
+                # oferece. Nao e' por console inteiro -- a maioria dos
+                # jogos de SNES, por exemplo, nao usa multitap nenhum.
+                multitap = graficos.jogo_suporta_multitap(plataforma, jogo["titulo"])
+                jogadores_max = (5 if multitap else
+                                plataforma.get("jogadores_max", 2))
                 try:
                     posicao = int(dados.get("jogador") or 2)
                 except (TypeError, ValueError):
@@ -4172,7 +4179,7 @@ class Manipulador(BaseHTTPRequestHandler):
                         apelido, hospedar, assistir=assistir,
                         pela_internet=pela_internet,
                         repasse=str(dados.get("repasse", "saopaulo")),
-                        jogador=posicao),
+                        jogador=posicao, multitap=multitap),
                     "argumentos": graficos.argumentos_de_partida(hospedar, endereco),
                     "papel": "jogador 1" if hospedar else "jogador %d" % posicao,
                 }
@@ -4290,18 +4297,33 @@ FAIXAS_DE_REDE = [
     ("172.17.", "virtual", "Adaptador virtual (nao serve para o colega)"),
     ("172.18.", "virtual", "Adaptador virtual (nao serve para o colega)"),
     ("172.19.", "virtual", "Adaptador virtual (nao serve para o colega)"),
-    ("172.2", "virtual", "Adaptador virtual (nao serve para o colega)"),
     ("172.30.", "virtual", "Adaptador virtual (nao serve para o colega)"),
     ("172.31.", "virtual", "Adaptador virtual (nao serve para o colega)"),
     ("192.168.56.", "virtual", "Adaptador virtual (nao serve para o colega)"),
     ("192.168.99.", "virtual", "Adaptador virtual (nao serve para o colega)"),
+    # Ponto de acesso pessoal do iPhone usa 172.20.10.0/28 -- faixa real de
+    # rede local (celular do colega), nao adaptador virtual nenhum. Achado
+    # real na auditoria: a entrada antiga aqui era "172.2" (faltou o "0."),
+    # que sem querer casava com 172.20. ATE 172.29. inteiros (o Python
+    # confere prefixo de texto, nao limite de bloco de IP) e classificava
+    # hotspot de iPhone como "adaptador virtual, nao serve para o colega" --
+    # exatamente o endereco que o aluno precisava passar.
     ("192.168.", "rede_local", "Rede local"),
     ("10.", "rede_local", "Rede local"),
     ("172.16.", "rede_local", "Rede local"),
     ("172.17.", "rede_local", "Rede local"),
     ("172.18.", "rede_local", "Rede local"),
     ("172.19.", "rede_local", "Rede local"),
-    ("172.2", "rede_local", "Rede local"),
+    ("172.20.", "rede_local", "Rede local (hotspot de iPhone usa essa faixa)"),
+    ("172.21.", "rede_local", "Rede local"),
+    ("172.22.", "rede_local", "Rede local"),
+    ("172.23.", "rede_local", "Rede local"),
+    ("172.24.", "rede_local", "Rede local"),
+    ("172.25.", "rede_local", "Rede local"),
+    ("172.26.", "rede_local", "Rede local"),
+    ("172.27.", "rede_local", "Rede local"),
+    ("172.28.", "rede_local", "Rede local"),
+    ("172.29.", "rede_local", "Rede local"),
     ("172.30.", "rede_local", "Rede local"),
     ("172.31.", "rede_local", "Rede local"),
 ]

@@ -1,0 +1,42 @@
+[
+  {
+    "cenario": "so atraso 50ms",
+    "atraso_ms": 50,
+    "perda_pct": 0,
+    "conectou": true,
+    "ping_reportado_ms": "12",
+    "avisos_travada": 0
+  },
+  {
+    "cenario": "so atraso 100ms",
+    "atraso_ms": 100,
+    "perda_pct": 0,
+    "conectou": true,
+    "ping_reportado_ms": "27",
+    "avisos_travada": 0
+  },
+  {
+    "cenario": "so atraso 200ms",
+    "atraso_ms": 200,
+    "perda_pct": 0,
+    "conectou": true,
+    "ping_reportado_ms": "12",
+    "avisos_travada": 0
+  },
+  {
+    "cenario": "perda 1% (com 50ms de base)",
+    "atraso_ms": 50,
+    "perda_pct": 1,
+    "conectou": true,
+    "ping_reportado_ms": "29",
+    "avisos_travada": 0
+  },
+  {
+    "cenario": "perda 5% (com 50ms de base)",
+    "atraso_ms": 50,
+    "perda_pct": 5,
+    "conectou": true,
+    "ping_reportado_ms": "28",
+    "avisos_travada": 0
+  }
+]

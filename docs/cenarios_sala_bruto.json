@@ -1,0 +1,19 @@
+[
+  {
+    "cenario": "convidado_cai_e_volta",
+    "conectou_primeira_vez": true,
+    "reconectou": true
+  },
+  {
+    "cenario": "host_sai_no_meio",
+    "conectou_antes": true,
+    "convidado_registrou_queda": true,
+    "convidado_nao_travou": true
+  },
+  {
+    "cenario": "duas_partidas_simultaneas",
+    "partida_A_ok": false,
+    "partida_B_ok": false,
+    "misturou": true
+  }
+]

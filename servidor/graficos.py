@@ -1273,9 +1273,30 @@ REPASSE_PADRAO = "saopaulo"
 JOGADORES_PADRAO_NETPLAY = 2
 JOGADORES_MAXIMO_NETPLAY = 8  # limite de seguranca; nenhum console cadastrado passa disso
 
+# Device ID do libretro para "Multitap" (nucleo snes9x: RETRO_DEVICE_JOYPAD_MULTITAP
+# = (1 << 8) | RETRO_DEVICE_JOYPAD = 257 -- conferido no codigo-fonte do
+# nucleo, nao inventado). Ligado na porta 2, o multitap abre mais 4 encaixes
+# de controle (portas 2 a 5) -- porta 1 continua sendo o jogador 1 normal.
+# E' assim que o adaptador de verdade funciona: pluga na porta 2 do
+# Super Nintendo, nao substitui a porta 1.
+DISPOSITIVO_MULTITAP_SNES = 257
+
+
+def jogo_suporta_multitap(plataforma, titulo):
+    """Confere se ESTE jogo (pelo titulo) esta na lista curada de jogos que
+    aceitam o adaptador Multitap (consoles.json -> jogos_multitap). Lista
+    curta de proposito, do mesmo jeito que o PS2 com 'system link': so
+    cresce testando com jogo real, nunca por suposicao -- a maioria dos
+    jogos de um console nao usa multitap, e mostrar "Jogador 3/4/5" pra
+    eles confundiria o aluno a toa."""
+    lista = plataforma.get("jogos_multitap", [])
+    titulo_normalizado = (titulo or "").lower()
+    return any(nome.lower() in titulo_normalizado for nome in lista)
+
 
 def opcoes_de_partida(apelido, hospedar, atraso=0, assistir=False,
-                      pela_internet=False, repasse=REPASSE_PADRAO, jogador=None):
+                      pela_internet=False, repasse=REPASSE_PADRAO, jogador=None,
+                      multitap=False):
     """Opcoes do RetroArch para hospedar, entrar ou assistir uma partida.
 
     Assistir e o mesmo caminho de entrar numa partida, so que sem pegar
@@ -1327,6 +1348,14 @@ def opcoes_de_partida(apelido, hospedar, atraso=0, assistir=False,
         # pode herdar "true" de uma partida anterior gravada no override.
         opcoes["netplay_request_device_p%d" % n] = (
             "true" if (not assistir and n == posicao) else "false")
+
+    if multitap:
+        # Liga o adaptador na porta 2 do console (nao na 1 - e assim que o
+        # Multitap de verdade pluga). Isso abre 4 encaixes (jogadores 2 a
+        # 5); jogador 1 continua na porta normal. Precisa estar igual em
+        # TODAS as maquinas da partida (quem hospeda e quem entra) para o
+        # estado do nucleo bater nos dois lados.
+        opcoes["input_libretro_device_p2"] = str(DISPOSITIVO_MULTITAP_SNES)
 
     return opcoes
 
