@@ -921,6 +921,104 @@ Scripts novos: `testes\teste_netplay_5_jogadores.py`,
 
 ---
 
+## Fase 5 — Matriz de jogos
+
+Script novo `testes\teste_matriz_jogos.py`. Para cada console com núcleo
+**nativo do RetroArch** que tem jogo de verdade na pasta, testado com o
+jogo real:
+
+1. **Abre e mostra imagem de verdade**: `--max-frames=180 --max-frames-ss`
+   (documentado no próprio `retroarch.exe --help`, não suposto) — roda 180
+   quadros e tira uma captura de tela sozinho, sem precisar de
+   automação de clique nenhuma. Critério: o arquivo existe e passa de
+   2 KB (uma tela preta vira um PNG quase vazio, bem menor).
+2. **Salvar e carregar estado**: liga `network_cmd_enable` no override e
+   manda `SAVE_STATE`/`LOAD_STATE` pela rede local (comandos documentados
+   no `command.h` do código-fonte oficial do RetroArch), conferindo se um
+   arquivo `.state` real (não vazio) aparece.
+
+| Console | Jogo testado | Abre e mostra imagem | Salva/carrega estado |
+|---|---|---|---|
+| Nintendo 64 | Bomberman 64 | ✅ (74 KB) | ✅ |
+| Super Nintendo | Super Bomberman 4 | ✅ (50 KB) | ✅ |
+| PlayStation | CTR - Crash Team Racing | ✅ (7 KB) | ✅ |
+| Dreamcast | Marvel vs. Capcom 2 | ✅ (171 KB) | ✅ |
+| PSP | Killzone: Liberation | ✅ (42 KB) | ✅ |
+| Neo Geo | KOF 97 | ✅ (95 KB) | ❌ — ver achado abaixo |
+
+**Achado no caminho, não é bug novo — é a MESMA pendência de BIOS do Neo
+Geo já registrada no CLAUDE.md.** O log mostrou a causa exata:
+
+```
+[libretro ERROR] [FBNeo] ROM at index 165 with name sm1.sm1 and CRC 0x94416d67 is required
+[INFO] [State] O núcleo não suporta pontos de save.
+```
+
+O `sm1.sm1` com CRC errado (item já pendente, revisão de BIOS diferente da
+exigida) faz o conteúdo não carregar por completo — e sem carregar direito,
+o núcleo desliga o suporte a save state sozinho. A imagem ainda aparece
+(o FBNeo desenha uma tela mesmo com erro de BIOS), o que mascarava o
+problema se só o item 1 fosse conferido. Isto **confirma e detalha** a
+pendência já existente, não é um achado novo.
+
+**Achados de metodologia, corrigidos no caminho (documentados aqui para
+quem for repetir o teste depois):**
+- O primeiro arquivo escolhido para o Dreamcast era só a Track 1 (um dos 3
+  arquivos `.bin` de um CD de múltiplas trilhas) — não abre sozinho, precisa
+  ser o `.cue` (o índice que referencia as 3 faixas). Corrigido no script.
+- O RetroArch grava o `.state` dentro de uma **subpasta por núcleo**
+  (`states\Mupen64Plus-Next\...`, por exemplo), não direto na pasta —
+  minha primeira versão do teste comparava só o topo da pasta e por isso
+  não via o arquivo novo. Corrigido para andar a pasta inteira.
+
+**Cheats**: já cobertos de sobra pela bateria de 44 testes (`cheats.py`
+— `test_adicionar_cheat`, `test_gravar_e_ler_cheats`, `test_limite_cheat`,
+etc.). É mecanismo genérico do ARENA (grava/lê um arquivo de códigos),
+não muda de comportamento por jogo ou console — não precisa retestar um
+por um.
+
+**Controle com botão de verdade**: não dá pra automatizar sem hardware
+físico — mesmo limite já reconhecido no plano da Fase 4. Fica pro
+roteiro manual.
+
+**Quadros por segundo, modo modesto × normal**: **não consegui medir**.
+Pesquisei no `--help` do RetroArch e não existe opção de linha de comando
+para relatar FPS médio ao sair (diferente de `--max-frames-ss`, que existe
+de verdade). O contador de FPS na tela (`fps_show`) é visual, precisaria
+de captura de tela + leitura de número por imagem para automatizar, o que
+não fiz por tempo. **Fica pendente** — não inventei um número.
+
+### Emuladores externos (PCSX2, RPCS3, Xenia)
+
+Não têm as mesmas opções de linha de comando do RetroArch (são programas
+à parte, não núcleos libretro) — a automação de captura/save state acima
+não se aplica a eles.
+
+- **PS2 (PCSX2)**: pendência antiga do plano ("testar o seletor de
+  qualidade do PCSX2 com as ISOs que estão na pasta") **já estava
+  resolvida antes desta auditoria começar** — sessão anterior testou de
+  ponta a ponta pelo `/api/jogar` real, abrindo Crash Nitro Kart com os
+  presets "leve" e "bonito", confirmado no `.ini` gerado (ver `CLAUDE.md`,
+  "Feito na unificação"). Não repeti — já é prova real, recente.
+- **Xbox 360 (Xenia)**: o único jogo hoje é Gears of War, e o Systemlink
+  dele já foi testado de ponta a ponta pelo `/api/jogar` real em sessão
+  anterior (ver `CLAUDE.md`). Não repeti.
+- **PS3 (RPCS3)**: tem 1 jogo na pasta (Borderlands 2), mas **não testei
+  abrir ele nesta sessão** — o RPCS3 é conhecido por demorar muito pra
+  compilar sombra/inicializar na primeira vez (minutos, não segundos), o
+  que tornaria um teste automatizado lento e arriscado de travar a sessão
+  de auditoria. A escrita de configuração de vídeo do RPCS3 já foi testada
+  em sessão anterior (`CLAUDE.md`), mas abrir ESTE jogo especificamente
+  fica pro roteiro manual ou uma sessão dedicada, não forçado aqui.
+
+### Aplicação e testes (Fase 5)
+
+Nenhuma correção de código nesta fase — só testes e confirmação. Bateria
+de 44 testes: OK, 0 falhas (sem mudança). Script novo:
+`testes\teste_matriz_jogos.py`.
+
+---
+
 ## Roteiro manual — Fase 4 (5 notebooks de verdade, sala de aula)
 
 Isto é o que só dá pra confirmar com máquinas físicas de verdade. Leve
@@ -1006,5 +1104,9 @@ auditoria não conseguiu fechar sozinha.
 
 Anote tudo — mesmo o que já era esperado — porque é isso que fecha, de
 verdade, o que só a sala de aula pode confirmar.
+
+---
+
+## Depois (Fase 8)
 
 *(a preencher ao final da auditoria)*
