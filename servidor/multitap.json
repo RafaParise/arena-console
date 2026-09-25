@@ -1,0 +1,156 @@
+{
+  "_leia": "Mapa de como cada nucleo aceita mais de dois controles. Conferido em 25/09/2026 contra o .dll que esta NESTA pasta (ferramentas\\conferir_mapa_multitap.py) e contra o codigo-fonte oficial. Explicacao completa e fontes em docs\\MAPA-MULTITAP.md. Nucleo atualizado? Rode o conferidor antes de confiar no mapa.",
+
+  "retroarch": {
+    "versao_conferida": "1.22.2",
+    "limite_jogar_junto": {
+      "chave": "netplay_max_connections",
+      "padrao": 3,
+      "teto_do_codigo": 32,
+      "regra": "jogadores_do_jogo - 1 (quem hospeda nao conta como conexao)",
+      "fonte": "RetroArch v1.22.2 config.def.h linha 1367 (DEFAULT_NETPLAY_MAX_CONNECTIONS 3); network/netplay/netplay_private.h linha 54 (MAX_CLIENTS 32)"
+    },
+    "controles_no_mesmo_computador": {
+      "chave": "input_max_users",
+      "padrao_do_retroarch": 8,
+      "padrao_do_arena": 2,
+      "regra": "no minimo jogadores_do_jogo, senao os controles 3 em diante ficam mudos",
+      "fonte": "RetroArch v1.22.2 config.def.h linha 1645 (DEFAULT_INPUT_MAX_USERS 8); padrao do ARENA em servidor\\arena.py (config avancado) = 2",
+      "nao_confirmado": "se input_max_users tambem limita quem entra pelo Jogar Junto. O teste de 5 jogadores entrou com o ARENA em 2, mas 'entrar' nao prova 'controlar'. Confirmar na Fase D."
+    }
+  },
+
+  "nucleos": {
+    "snes9x_libretro.dll": {
+      "console": "snes",
+      "jogadores_sem_adaptador": 2,
+      "jogar_junto": true,
+      "adaptador": {
+        "tipo": "dispositivo",
+        "nome_no_nucleo": "Multitap",
+        "chaves": {"input_libretro_device_p2": "257"},
+        "jogadores": 5,
+        "fonte": "snes9x libretro/libretro.cpp linha 36 (RETRO_DEVICE_JOYPAD_MULTITAP = (1<<8)|RETRO_DEVICE_JOYPAD = 257) e linhas 279/286 (Multitap nas portas 1 e 2); texto 'Multitap' presente no .dll",
+        "observacao": "Na porta 2, como o adaptador de verdade: jogador 1 na porta 1 + 4 no adaptador. Nas duas portas seriam 8, mas nenhum jogo da pasta usa."
+      }
+    },
+
+    "fceumm_libretro.dll": {
+      "console": "nes",
+      "jogadores_sem_adaptador": 2,
+      "jogar_junto": true,
+      "adaptador": {
+        "tipo": "dispositivo",
+        "nome_no_nucleo": "4-Player Adapter (Four Score)",
+        "chaves": {"input_libretro_device_p3": "513", "input_libretro_device_p4": "513"},
+        "jogadores": 4,
+        "fonte": "libretro-fceumm src/drivers/libretro/libretro.c linha 114 (RETRO_DEVICE_GAMEPAD = RETRO_DEVICE_SUBCLASS(JOYPAD,1)) + libretro.h (SUBCLASS(base,id) = ((id+1)<<8)|base -> 513) e linhas 1522-1550 (controle nas portas 3/4 liga o Four Score); textos '4-Player Adapter' e 'Four Players' Tennis' presentes no .dll",
+        "observacao": "O nucleo JA liga sozinho o Four Score para os jogos da lista interna dele (fourscore_db_list, por CRC). As chaves acima servem para garantir nos outros."
+      }
+    },
+
+    "pcsx_rearmed_libretro.dll": {
+      "console": "ps1",
+      "uso": "Jogar Junto (consoles.json -> core_netplay)",
+      "jogadores_sem_adaptador": 2,
+      "jogar_junto": true,
+      "adaptador": {
+        "tipo": "opcao_do_nucleo",
+        "nome_no_nucleo": "Multitap Mode",
+        "chaves": {"pcsx_rearmed_multitap": "port 1"},
+        "desligado": "disabled",
+        "jogadores": 5,
+        "valores_possiveis": {"port 1": 5, "port 2": 5, "ports 1 and 2": 8},
+        "fonte": "pcsx_rearmed frontend/libretro_core_options.h (chave, valores e padrao 'disabled') e frontend/libretro.c funcao update_multitap(); valores 'port 1', 'port 2', 'ports 1 and 2' presentes no .dll",
+        "observacao": "Opcao do nucleo: vai no arquivo de opcoes de nucleo da partida, nao no retroarch.cfg. As chaves antigas pcsx_rearmed_multitap1/2 ainda aparecem no .dll, mas so nas traducoes; o codigo atual le so pcsx_rearmed_multitap."
+      }
+    },
+
+    "swanstation_libretro.dll": {
+      "console": "ps1",
+      "uso": "jogando no mesmo computador (sem Jogar Junto: o nucleo recusa)",
+      "jogadores_sem_adaptador": 2,
+      "jogar_junto": false,
+      "adaptador": {
+        "tipo": "opcao_do_nucleo",
+        "nome_no_nucleo": "Multitap Mode",
+        "chaves": {"swanstation_ControllerPorts_MultitapMode": "Port1Only"},
+        "desligado": "Disabled",
+        "jogadores": 5,
+        "valores_possiveis": {"Port1Only": 5, "Port2Only": 5, "BothPorts": 8},
+        "fonte": "swanstation src/libretro/libretro_core_options.h linha 856 (chave e valores), src/core/settings.h linha 220 (padrao Disabled), src/libretro/libretro_host_interface.cpp linhas 1201-1206 (5 portas com um adaptador, 8 com dois); valores presentes no .dll"
+      }
+    },
+
+    "mednafen_saturn_libretro.dll": {
+      "console": "saturn",
+      "jogadores_sem_adaptador": 2,
+      "jogar_junto": "nao_confirmado",
+      "adaptador": {
+        "tipo": "opcao_do_nucleo",
+        "nome_no_nucleo": "6Player Adaptor",
+        "chaves": {"beetle_saturn_multitap_port1": "enabled"},
+        "desligado": "disabled",
+        "jogadores": 7,
+        "valores_possiveis": {"enabled": 7},
+        "segundo_adaptador": {"chaves": {"beetle_saturn_multitap_port2": "enabled"}, "jogadores": 12},
+        "fonte": "beetle-saturn-libretro libretro_core_options.h (duas chaves, valores enabled/disabled, padrao disabled) e input.c linhas 24 e 174-245 (6 encaixes por adaptador, ate 12); textos presentes no .dll",
+        "observacao": "Saturn Bomberman aceita 10: precisa das duas portas (beetle_saturn_multitap_port2 = enabled tambem). O .info declara savestate 'deterministic', mas o Jogar Junto do Saturn nunca foi testado aqui."
+      }
+    },
+
+    "mupen64plus_next_libretro.dll": {
+      "console": "n64",
+      "jogadores_sem_adaptador": 4,
+      "jogar_junto": false,
+      "adaptador": {
+        "tipo": "nenhum",
+        "motivo": "O N64 ja tem 4 entradas de controle; nao existe adaptador. Precisa so de input_max_users = 4 no mesmo computador.",
+        "fonte": "mupen64plus-libretro-nx libretro/libretro.c linha 346 (4 portas)"
+      },
+      "motivo_sem_jogar_junto": "O nucleo recusa o Jogar Junto (confirmado tentando hospedar, auditoria 1)."
+    },
+
+    "flycast_libretro.dll": {
+      "console": "dreamcast",
+      "jogadores_sem_adaptador": 4,
+      "jogar_junto": false,
+      "adaptador": {
+        "tipo": "nenhum",
+        "motivo": "O Dreamcast ja tem 4 entradas de controle; nao existe adaptador. Precisa so de input_max_users = 4 no mesmo computador.",
+        "fonte": "flycast shell/libretro/libretro.cpp linha 344 (4 portas)"
+      },
+      "motivo_sem_jogar_junto": "O nucleo recusa o Jogar Junto (confirmado tentando hospedar)."
+    },
+
+    "ppsspp_libretro.dll": {
+      "console": "psp",
+      "jogadores_sem_adaptador": 1,
+      "jogar_junto": false,
+      "adaptador": {
+        "tipo": "nenhum",
+        "motivo": "O PSP e' um aparelho de uma pessoa so. Multijogador do PSP e' por rede propria (ad hoc), nao por controle.",
+        "fonte": "ppsspp libretro/libretro.cpp linha 1157 (1 porta)"
+      },
+      "motivo_sem_jogar_junto": "O nucleo recusa o Jogar Junto do RetroArch (confirmado tentando hospedar)."
+    },
+
+    "fbneo_libretro.dll": {
+      "console": "neogeo",
+      "jogadores_sem_adaptador": 2,
+      "jogar_junto": true,
+      "adaptador": {
+        "tipo": "nenhum",
+        "motivo": "No arcade, o numero de jogadores vem de cada jogo (BurnDrvGetMaxPlayers); os jogos de Neo Geo sao de 2.",
+        "fonte": "FBNeo src/burner/libretro/libretro.cpp linha 2020"
+      }
+    }
+  },
+
+  "externos": {
+    "gamecube": {"emulador": "Dolphin", "motivo": "Abre pelo Dolphin, que tem 4 entradas proprias; o multitap e o Jogar Junto do RetroArch nao se aplicam."},
+    "ps2": {"emulador": "PCSX2", "motivo": "Abre pelo PCSX2; o multitap e o Jogar Junto do RetroArch nao se aplicam. Como o proprio PCSX2 liga o multitap do PS2: nao confirmado (nao pesquisado nesta fase)."},
+    "ps3": {"emulador": "RPCS3", "motivo": "Abre pelo RPCS3; o multitap e o Jogar Junto do RetroArch nao se aplicam."},
+    "xbox360": {"emulador": "Xenia", "motivo": "Abre pelo Xenia, que tem 4 entradas proprias; o multitap e o Jogar Junto do RetroArch nao se aplicam."}
+  }
+}

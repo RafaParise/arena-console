@@ -43,6 +43,14 @@ def main():
         for pasta in ("servidor", "dados", "launcher"):
             shutil.copytree(os.path.join(RAIZ, pasta), os.path.join(destino, pasta),
                              ignore=shutil.ignore_patterns("__pycache__", "tests"))
+        # A copia herda o tema que o professor escolheu de verdade; se ele
+        # ja usa "escuro", o teste abaixo (que tenta mudar PARA escuro)
+        # acusava falha sem ter havido invasao nenhuma (visto em 25/09/2026).
+        # Fixa "claro" so NA COPIA; o dados\ real nao e' tocado.
+        cfg_copia = os.path.join(destino, "dados", "config.json")
+        cfg = json.load(open(cfg_copia, encoding="utf-8"))
+        cfg["tema"] = "claro"
+        json.dump(cfg, open(cfg_copia, "w", encoding="utf-8"), ensure_ascii=False)
 
         spec = importlib.util.spec_from_file_location(
             "arena_rede_teste", os.path.join(destino, "servidor", "arena.py"))
