@@ -383,6 +383,36 @@ if sistema_arquivos:
     else:
         ok.append("sistema de arquivos aceita arquivo grande")
 
+# Caminho comprido demais (revisao pos-auditoria; achado da Fase 6). O
+# Windows recusa caminho com mais de 260 letras, e o RetroArch monta o do
+# save com o NOME DO JOGO no meio: <pasta do ARENA>\retroarch\states\
+# <nucleo>\<nome do jogo>.state.auto.png. Jogo com nome longo numa pasta
+# funda = save que nao grava, sem aviso nenhum dentro do jogo. Aqui da para
+# prever: faz a conta para cada jogo, com folga para o nome do nucleo.
+LIMITE_CAMINHO = 259
+FOLGA_NUCLEO_E_EXTENSAO = len("\\retroarch\\states\\") + 24 + len(".state.auto.png")
+pasta_jogos = caminho("jogos")
+compridos = []
+if os.path.isdir(pasta_jogos):
+    for atual, _subs, arquivos in os.walk(pasta_jogos):
+        for nome in arquivos:
+            nome_sem_ext = os.path.splitext(nome)[0]
+            pior_caso = max(len(os.path.join(atual, nome)),
+                            len(RAIZ) + FOLGA_NUCLEO_E_EXTENSAO + len(nome_sem_ext))
+            if pior_caso > LIMITE_CAMINHO:
+                compridos.append((pior_caso, os.path.relpath(os.path.join(atual, nome), RAIZ)))
+if compridos:
+    atencao.append("%d jogo(s) com caminho comprido demais para o save" % len(compridos))
+    print("  ATENCAO  %d jogo(s) podem nao conseguir salvar: o caminho do save" % len(compridos))
+    print("           passaria de %d letras, o limite do Windows:" % (LIMITE_CAMINHO + 1))
+    for tamanho, nome in sorted(compridos, reverse=True)[:5]:
+        print("             %s (%d letras)" % (nome, tamanho))
+    print("           O que fazer: encurte o nome do arquivo do jogo, ou coloque")
+    print("           a pasta do ARENA mais perto do comeco do disco (ex.: E:\\ARENA).")
+    print("           Esta pasta ja usa %d letras so no caminho dela." % len(RAIZ))
+else:
+    ok.append("caminhos de save cabem no limite do Windows")
+
 
 # ---------------------------------------------------------------------------
 titulo("9. Copias de seguranca")

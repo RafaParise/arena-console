@@ -363,7 +363,7 @@ servidor\python\python.exe servidor\diagnostico.py --so-ver
 | 5 | O catálogo de jogos está legível | **Sim**, apaga para ser remontado |
 | 6 | O banco de recordes está íntegro | **Sim**, restaura da cópia |
 | 7 | RetroArch e emuladores presentes | Não, avisa |
-| 8 | Espaço em disco e tipo do pen drive (FAT32 não aceita arquivo acima de 4 GB) | Não, avisa |
+| 8 | Espaço em disco, tipo do pen drive (FAT32 não aceita arquivo acima de 4 GB) e jogo com nome tão comprido que o save passaria do limite de 260 letras do Windows | Não, avisa e diz o que fazer |
 | 9 | Cópias de segurança existem | Não, informa |
 | 10 | A porta 8777 está livre | Não, avisa |
 
