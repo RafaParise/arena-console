@@ -2921,14 +2921,48 @@ class Manipulador(BaseHTTPRequestHandler):
             return True
         return origem in {e["ip"] for e in enderecos_locais()}
 
+    def host_confiavel(self):
+        """O cabecalho Host e' um nome deste computador?
+
+        Protecao contra DNS rebinding (achado da Fase 8 da auditoria,
+        provado com testes\\teste_dns_rebinding.py): um site faz o proprio
+        nome passar a apontar para 127.0.0.1, e o navegador deixa a pagina
+        dele conversar com o ARENA como se fosse a nossa tela. O pedido
+        chega de 127.0.0.1 -- parece local --, mas o Host continua com o
+        nome do site. A nossa tela sempre usa 127.0.0.1 (ou localhost)."""
+        host = (self.headers.get("Host") or "").strip().lower()
+        if not host:
+            return True  # sem Host nao e' navegador (so programa de linha de comando)
+        if host.startswith("["):
+            nome = host[1:host.find("]")] if "]" in host else host[1:]
+        else:
+            nome = host.rsplit(":", 1)[0]
+        if nome in ("127.0.0.1", "localhost", "::1"):
+            return True
+        if nome == socket.gethostname().lower():
+            return True
+        return nome in {e["ip"] for e in enderecos_locais()}
+
     def checar_acesso_de_rede(self, caminho):
         """Barra rota sensivel vinda de fora deste computador. Devolve
         True se o pedido pode seguir, False se ja respondeu com erro."""
-        if caminho in ROTAS_REDE_EXTERNA or self.pedido_e_local():
+        if self.pedido_e_local():
+            # Pedido deste computador: so aceita se veio da nossa tela, e nao
+            # de um site que se disfarcou de 127.0.0.1 (DNS rebinding).
+            # Pedido de OUTRA maquina nao passa por aqui: rebinding so ataca
+            # o navegador deste computador, e amigo pela internet pode usar
+            # um nome no lugar do IP.
+            if self.host_confiavel():
+                return True
+            self.erro(
+                "Pedido recusado: ele não veio da tela do ARENA. "
+                "Abra o ARENA pelo ARENA.bat.", 403)
+            return False
+        if caminho in ROTAS_REDE_EXTERNA:
             return True
         self.erro(
-            "Esta rota so pode ser usada por este computador, nao pela "
-            "rede.", 403)
+            "Esta parte do ARENA só pode ser usada neste computador, não "
+            "por outro da rede.", 403)
         return False
 
     # -- utilitarios ------------------------------------------------------
@@ -4017,6 +4051,10 @@ class Manipulador(BaseHTTPRequestHandler):
                 "apelido": config.get("apelido", ""),
                 "servidor_id": config["dispositivo_id"],
                 "arena": True,
+                # O PARTIDA.bat compara a versao dos dois lados por aqui.
+                # Antes lia /api/estado do colega, que desde a Fase 3 so
+                # responde a este computador (tem a configuracao inteira).
+                "versao": VERSAO,
             })
 
         # ---- bibliotecas graficas sem instalar ------------------------------

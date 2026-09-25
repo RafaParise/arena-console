@@ -48,9 +48,16 @@ def olhar(texto):
     falar("  [olhe]    %s" % texto)
 
 
-def pedir(url, tempo=4):
+def pedir(url, tempo=4, corpo=None):
+    """GET normal; com `corpo`, manda POST em JSON (o servidor so aceita
+    POST com Content-Type application/json)."""
     try:
-        with urllib.request.urlopen(url, timeout=tempo) as resposta:
+        requisicao = urllib.request.Request(url)
+        if corpo is not None:
+            requisicao = urllib.request.Request(
+                url, data=json.dumps(corpo).encode("utf-8"), method="POST",
+                headers={"Content-Type": "application/json"})
+        with urllib.request.urlopen(requisicao, timeout=tempo) as resposta:
             return json.loads(resposta.read().decode("utf-8"))
     except Exception:
         return None
@@ -190,8 +197,14 @@ if colega:
     else:
         certo("o ARENA dele responde")
 
-        dele = pedir("http://%s:%d/api/estado" % (colega, PORTA))
-        if dele:
+        # /api/sinc/ola e' uma das rotas abertas a rede; /api/estado (que
+        # era usada aqui) so responde ao proprio computador desde a Fase 3
+        # da auditoria -- com ela, estas duas checagens sumiam em silencio.
+        dele = pedir("http://%s:%d/api/sinc/ola" % (colega, PORTA), corpo={})
+        if not dele:
+            olhar("o ARENA dele respondeu, mas nao consegui ler a versao e o "
+                  "codigo do aparelho dele.")
+        else:
             if dele.get("versao") != meu.get("versao"):
                 torto("Versoes diferentes: voce %s, ele %s."
                       % (versao, dele.get("versao", "antiga")),
@@ -199,7 +212,7 @@ if colega:
             else:
                 certo("mesma versao dos dois lados")
 
-            if dele["config"]["dispositivo_id"] == meu["config"]["dispositivo_id"]:
+            if dele.get("servidor_id") == meu["config"]["dispositivo_id"]:
                 torto("Voces dois tem o MESMO codigo de aparelho.",
                       "Um dos dois usa Ajustes > Perfil > Comecar do zero.")
             else:

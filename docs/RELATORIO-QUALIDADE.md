@@ -1442,11 +1442,13 @@ aluno foi apagado.
    FAT32 não deixa esse arquivo existir. O teste da Fase 6 passou porque
    fingiu o disco (arquivo de 4,5 GB num disco NTFS marcado como FAT32 por
    programa). **O que funciona de verdade:** o aviso geral "este pen drive
-   é FAT32, arquivo acima de 4 GB não cabe". **Proposta (não aplicada,
-   espera aprovação):** trocar a busca por "arquivo com 4 GB menos 1 byte",
-   que é o tamanho exato de uma cópia cortada no limite, e corrigir o
-   teste para usar esse tamanho. O Roteiro 8 confere o que o Windows faz
-   de verdade ao copiar.
+   é FAT32, arquivo acima de 4 GB não cabe". **Corrigido (aprovado pelo
+   Rafael, commit `e96e178`):** agora procura arquivo com o tamanho máximo
+   do FAT32 (4 GB menos 1 byte), onde uma cópia que não coube para de
+   escrever. O teste usa esse tamanho, mais um jogo de 3 GB que **não**
+   pode ser acusado; os dois casos passam. O aviso geral agora também diz
+   o que o aluno vê: "o Windows recusa a cópia e o jogo não aparece". O
+   Roteiro 8 confere o que o Windows faz de verdade ao copiar.
 2. **Proteção contra DNS rebinding não foi feita.** O plano pedia na Fase
    3 ("contra pedidos de outra origem **e contra DNS rebinding**"); a Fase
    3 fechou o CSRF, mas não este. Como funciona o ataque: um site faz o
@@ -1454,13 +1456,33 @@ aluno foi apagado.
    o mesmo site e deixa ele conversar com o ARENA como se fosse a própria
    tela. O servidor não confere o cabeçalho `Host`. Os navegadores novos
    (Chrome/Edge) têm uma barreira própria para isso, mas o ARENA não deve
-   depender dela. **Proposta (não aplicada, espera aprovação):** quando o
-   pedido vem deste computador, aceitar só `Host` igual a `127.0.0.1`,
-   `localhost` ou um dos endereços da própria máquina; pedidos vindos de
-   outra máquina (as 8 rotas da rede) não mudam. Mais um teste
-   automatizado para provar.
-3. A mensagem de recusa de rota pela rede estava sem acento ("so", "nao").
-   Pequeno; entra junto com o item 2 se aprovado.
+   depender dela. **Reproduzido e corrigido (aprovado pelo Rafael):**
+   `testes\teste_dns_rebinding.py` mandou, de 127.0.0.1, `POST /api/config`
+   com `Host: sitemalicioso.example` — **antes: 200, e o tema mudou**.
+   `host_confiavel()` nova em `arena.py`: pedido deste computador só passa
+   se o `Host` for `127.0.0.1`, `localhost`, `::1`, o nome da máquina ou um
+   dos endereços dela. **Depois: 403, config intacta**; 127.0.0.1 e
+   localhost continuam funcionando; pedido de outra máquina com um nome no
+   `Host` (amigo pela internet com endereço fixo) continua funcionando nas
+   8 rotas da rede. A tela abre em `http://127.0.0.1:8777`, que está na lista.
+3. A mensagem de recusa de rota pela rede estava sem acento e sem dizer o
+   que fazer. Reescrita junto com o item 2.
+4. **Achado no caminho do item 2: o `PARTIDA.bat` perdeu duas checagens
+   desde a Fase 3, sem avisar.** Ele pedia `/api/estado` ao ARENA do
+   colega para comparar a versão e o código do aparelho. Essa rota só
+   responde ao próprio computador desde a Fase 3, o pedido voltava
+   recusado, e as duas checagens simplesmente não apareciam. **Corrigido:**
+   `/api/sinc/ola` (já aberta à rede, já devolvia o código do aparelho)
+   passou a devolver também a versão (dado inofensivo, aparece no topo da
+   tela), e o `partida.py` usa essa rota. Se ainda assim não conseguir ler,
+   agora avisa em vez de ficar calado. Teste `testes\teste_partida_colega.py`:
+   com o `partida.py` antigo, FALHOU (as duas checagens sumiram); com o
+   novo, PASSOU.
+
+Depois dos itens 2 a 4: bateria de 44, acesso de rede, rebinding, PARTIDA
+com colega, concorrência (50 pedidos), mala, descoberta de 30 máquinas:
+todos OK. Fuzz das 244 checagens: as mesmas 7 recusas `414` de sempre,
+nenhuma nova.
 
 ### Rodada final (regra 7)
 
@@ -1513,5 +1535,3 @@ para uma correção pontual):**
   — o ping que o RetroArch mostra não acompanhou o atraso simulado.
 - `dados\fechamentos.json` só tem sujeira de teste; esperando o Rafael
   dizer se pode zerar.
-- Os dois achados da Fase 8 acima (FAT32 e DNS rebinding), esperando
-  aprovação.
