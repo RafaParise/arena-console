@@ -41,7 +41,11 @@ def rodar(caminho_relativo):
 
 def principal():
     scripts = [os.path.join("servidor", "tests", "run.py"),
-               os.path.join("testes", "fuzz_rotas.py")]
+               os.path.join("testes", "fuzz_rotas.py"),
+               # auditoria 2: frases da tela sem acento (Fase 7) e ARENA
+               # copiado para outra pasta se conserta sozinho (Fase 6)
+               os.path.join("testes", "textos_sem_acento.py"),
+               os.path.join("ferramentas", "teste_aceite_pasta_movida.py")]
     scripts += sorted(os.path.relpath(c, RAIZ)
                       for c in glob.glob(os.path.join(RAIZ, "testes", "teste_*.py")))
     resultados = [rodar(s) for s in scripts]

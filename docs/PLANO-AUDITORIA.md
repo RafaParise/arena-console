@@ -247,8 +247,8 @@ passa a identificar e recomendar ação.
 - [x] Fase 2 — Leveza e desempenho (25/09/2026)
 - [x] Fase 3 — Servidor e API (25/09/2026)
 - [x] Fase 4 — Jogar Junto (25/09/2026)
-- [ ] Fase 5 — Matriz de jogos
-- [ ] Fase 6 — Portabilidade e robustez
-- [ ] Fase 7 — Clareza para todos
-- [ ] Fase 8 — Relatório final e entrega
+- [x] Fase 5 — Matriz de jogos (25/09/2026)
+- [x] Fase 6 — Portabilidade e robustez (25/09/2026)
+- [x] Fase 7 — Clareza para todos (25/09/2026)
+- [x] Fase 8 — Relatório final e entrega (25/09/2026) — rodada final 42 de 42, bateria 71; juntada ao `main`
 - [x] Extra — Barreiras de lentidão (testador + ARENA) (25/09/2026)

@@ -2,34 +2,34 @@
   "pastas": {
     "retroarch": {
       "arquivos": 15072,
-      "mb": 2154.2
+      "mb": 2155.9
     },
     "emuladores": {
       "arquivos": 3212,
       "mb": 666.7
     },
     "servidor": {
-      "arquivos": 66,
-      "mb": 21.3
-    },
-    "ferramentas": {
-      "arquivos": 30,
-      "mb": 0.2
-    },
-    "testes": {
-      "arquivos": 47,
-      "mb": 0.2
-    },
-    "docs": {
-      "arquivos": 16,
-      "mb": 0.2
-    },
-    "launcher": {
-      "arquivos": 5,
-      "mb": 0.2
+      "arquivos": 72,
+      "mb": 21.4
     },
     "dados": {
       "arquivos": 24,
+      "mb": 0.3
+    },
+    "ferramentas": {
+      "arquivos": 33,
+      "mb": 0.3
+    },
+    "testes": {
+      "arquivos": 55,
+      "mb": 0.3
+    },
+    "docs": {
+      "arquivos": 23,
+      "mb": 0.3
+    },
+    "launcher": {
+      "arquivos": 5,
       "mb": 0.2
     },
     "(raiz)": {
@@ -42,23 +42,24 @@
     }
   },
   "linhas_do_produto": {
-    "servidor\\arena.py": 4992,
-    "launcher\\app.js": 3329,
-    "launcher\\estilo.css": 1684,
-    "servidor\\graficos.py": 1554,
+    "servidor\\arena.py": 5061,
+    "launcher\\app.js": 3429,
+    "launcher\\estilo.css": 1705,
+    "servidor\\graficos.py": 1617,
     "servidor\\consoles.json": 1165,
-    "3-IMAGEM-SOM-CONTROLE.md": 1019,
-    "launcher\\index.html": 902,
+    "3-IMAGEM-SOM-CONTROLE.md": 1065,
+    "launcher\\index.html": 915,
     "5-AMIGOS.md": 689,
     "servidor\\recursos.json": 644,
+    "servidor\\barreiras.py": 621,
     "2-JOGOS.md": 596,
     "servidor\\indexador.py": 535,
     "servidor\\hardware.py": 531,
-    "6-RECURSOS-E-REPARO.md": 516,
+    "servidor\\diagnostico.py": 522,
+    "6-RECURSOS-E-REPARO.md": 518,
     "4-SAVES.md": 509,
-    "servidor\\diagnostico.py": 482,
-    "servidor\\graficos.json": 462,
     "servidor\\controles.py": 433,
+    "servidor\\graficos.json": 426,
     "1-COMECAR.md": 413,
     "servidor\\identificador.py": 307,
     "servidor\\partida.py": 291,
@@ -68,7 +69,7 @@
     "servidor\\cheats.py": 266,
     "servidor\\acervo.py": 229,
     "servidor\\internet_archive.py": 223,
-    "LEIA-ME.md": 217,
+    "LEIA-ME.md": 218,
     "servidor\\capas_online.py": 126,
     "ARENA.bat": 82,
     "COLETAR.bat": 77,
@@ -143,6 +144,22 @@
     },
     {
       "rota": "/api/backup",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/barreiras",
+      "metodo": "GET",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/barreiras/fechar",
       "metodo": "POST",
       "chamada_por": [
         "tela"
@@ -466,14 +483,6 @@
       "aberta_a_rede": true
     },
     {
-      "rota": "/api/sinc/ranking",
-      "metodo": "GET",
-      "chamada_por": [
-        "ninguem achado"
-      ],
-      "aberta_a_rede": false
-    },
-    {
       "rota": "/api/sinc/receber",
       "metodo": "POST",
       "chamada_por": [
@@ -577,49 +586,49 @@
   "linhas_de_execucao": [
     {
       "arquivo": "arena.py",
-      "linha": 2841,
+      "linha": 2884,
       "tipo": "Thread",
       "alvo": "testar"
     },
     {
       "arquivo": "arena.py",
-      "linha": 3875,
+      "linha": 3927,
       "tipo": "Thread",
       "alvo": "rodar"
     },
     {
       "arquivo": "arena.py",
-      "linha": 4439,
+      "linha": 4501,
       "tipo": "Thread",
       "alvo": "executar_jogo"
     },
     {
       "arquivo": "arena.py",
-      "linha": 4622,
+      "linha": 4691,
       "tipo": "Thread",
       "alvo": "atualizar_adaptadores"
     },
     {
       "arquivo": "arena.py",
-      "linha": 4820,
+      "linha": 4889,
       "tipo": "Thread",
       "alvo": "encerrar_depois_da_resposta"
     },
     {
       "arquivo": "arena.py",
-      "linha": 4947,
+      "linha": 5016,
       "tipo": "Thread",
       "alvo": "rodar_vigia"
     },
     {
       "arquivo": "arena.py",
-      "linha": 4948,
+      "linha": 5017,
       "tipo": "Thread",
       "alvo": "anunciar_e_escutar"
     },
     {
       "arquivo": "arena.py",
-      "linha": 4949,
+      "linha": 5018,
       "tipo": "Timer",
       "alvo": "abrir_janela"
     }
@@ -647,13 +656,11 @@
     }
   ],
   "resumo": {
-    "linhas_do_produto": 23186,
-    "arquivos_do_produto": 33,
-    "rotas": 51,
+    "linhas_do_produto": 24126,
+    "arquivos_do_produto": 34,
+    "rotas": 52,
     "rotas_abertas_a_rede": 8,
-    "rotas_sem_chamador": [
-      "/api/sinc/ranking GET"
-    ],
+    "rotas_sem_chamador": [],
     "chaves_de_config": 20,
     "chaves_nao_lidas": []
   }
