@@ -71,7 +71,8 @@
 
 | Item | O que falta para confirmar |
 |---|---|
-| `input_max_users` também limita quem **controla** pelo Jogar Junto? | O teste de 5 jogadores entrou com o ARENA em 2, mas "entrar" não prova "controlar". Teste da Fase D (5 instâncias, conferir no registro quem ganhou controle) |
+| `input_max_users` também limita quem **controla** pelo Jogar Junto? | **Parte respondida (Fase D):** com o `input_max_users` em 2 (teste antigo) e em 5 (arquivo do ARENA), o registro diz "você se juntou como jogador N" para os 5 — a atribuição do jogador não depende dele. O ARENA agora manda 5 de qualquer jeito. Que o boneco do jogador 5 se **mexe**: só com aparelho (`docs\ROTEIRO-MULTITAP.md`, passo 7) |
+| O núcleo aplicou o 257 na porta 2? | O RetroArch **não registra** a troca de tipo de controle. O arquivo da partida tem o 257 (provado). A prova é o menu de batalha do Super Bomberman 4 oferecer 5 jogadores (roteiro, passo 6) |
 | Jogar Junto do Saturn | Testar com o jogo completo (ver arquivos abaixo) na Fase E |
 | NES `513` numa partida de verdade | O número vem da fórmula do `libretro.h`; conferir no registro do RetroArch ("Player 3: Gamepad") na Fase D. **Não há jogo de 4 jogadores de NES na pasta** (Contra é de 2) |
 | Mega Drive: 4-Way Play (EA) | Nenhum jogo da pasta usa; como o cartucho declara, não confirmado — não é ligado. J-Cart só pelos 5 números de série da lista do núcleo (os reconhecidos por soma, como Super Skidmarks, ficam em 2) |
