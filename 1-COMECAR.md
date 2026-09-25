@@ -363,6 +363,7 @@ ARENA\
 | `[ERRO] O Python nao foi encontrado` | Passo 2 incompleto | Confira `servidor\python\python.exe` |
 | `[AVISO] retroarch.exe nao encontrado` | Passo 3 incompleto | A pasta precisa se chamar `retroarch` |
 | `A porta 8777 ja esta em uso` | ARENA já aberto | Procure a outra janela preta |
+| `[ERRO] Este Windows e de 32 bits` | O Python da pasta é de 64 bits | Não tem conserto nesse computador. Use outro |
 | Janela preta abre e fecha na hora | Antivírus bloqueou | Libere a pasta do ARENA no antivírus (veja abaixo) |
 | ARENA abre mas nenhum jogo inicia | Falta o Visual C++ | Passo 4b |
 | Tudo lento na primeira abertura no pen drive | Varredura inicial | Normal. Depois o catálogo é reaproveitado |
@@ -389,8 +390,8 @@ antivírus inteiro):
 1. Abra o programa antivírus instalado no computador.
 2. Procure por **"Exclusões"**, **"Exceções"** ou **"Itens confiáveis"**
    (o nome muda de antivírus para antivírus).
-3. Adicione a **pasta inteira** do ARENA (não só o `.bat`) — arrastar
-   pouco a pasta errada é o erro mais comum aqui.
+3. Adicione a **pasta inteira** do ARENA (não só o `.bat`). Escolher a
+   pasta errada é o erro mais comum aqui.
 
 No **Segurança do Windows** (o antivírus que já vem com o Windows, sem
 instalar nada a mais):
@@ -400,6 +401,9 @@ instalar nada a mais):
    (role a tela até achar).
 3. Em **Exclusões**, clique em **Adicionar ou remover exclusões**.
 4. **Adicionar uma exclusão → Pasta** → escolha a pasta do ARENA.
+
+Atenção: o Windows pede a senha de administrador nos passos 2 e 3. Aluno
+não tem essa senha — é um passo para o professor ou para o técnico.
 
 Se mesmo assim o ARENA continuar fechando sozinho, peça pro professor
 (com acesso de administrador) fazer esse passo — em computador de escola,

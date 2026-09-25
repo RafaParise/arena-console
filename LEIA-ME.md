@@ -160,7 +160,9 @@ sem áudio e sem sair do computador.
 
 | O que aconteceu | O que fazer |
 |---|---|
-| A janela preta some na hora | Falta o Python. Documento 1 |
+| A janela preta some na hora | Falta o Python, ou o antivírus bloqueou. Documento 1 |
+| Tela azul "O Windows protegeu o seu computador" | Clique em *Mais informações* → *Executar assim mesmo*. Documento 1 |
+| Diz que o Windows é de 32 bits | Esse computador não roda o ARENA. Use outro |
 | Diz que a porta 8777 está em uso | O ARENA já está aberto. Procure a outra janela preta |
 | Diz que faltou o RetroArch | A pasta tem que se chamar `retroarch`. Documento 1 |
 | A lista está vazia | Clique em Atualizar lista. Documento 2 |

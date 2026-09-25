@@ -363,7 +363,7 @@ servidor\python\python.exe servidor\diagnostico.py --so-ver
 | 5 | O catálogo de jogos está legível | **Sim**, apaga para ser remontado |
 | 6 | O banco de recordes está íntegro | **Sim**, restaura da cópia |
 | 7 | RetroArch e emuladores presentes | Não, avisa |
-| 8 | Espaço em disco | Não, avisa |
+| 8 | Espaço em disco e tipo do pen drive (FAT32 não aceita arquivo acima de 4 GB) | Não, avisa |
 | 9 | Cópias de segurança existem | Não, informa |
 | 10 | A porta 8777 está livre | Não, avisa |
 
@@ -401,6 +401,13 @@ toda vez que você fecha um jogo.
 
 Se não houver cópia nenhuma, ele avisa e não mexe. Nesse caso, veja o
 documento 4.
+
+**E se você abrir o `ARENA.bat` direto, sem passar pelo verificador?** O
+ARENA abre do mesmo jeito. Ele guarda o banco danificado do lado, com o
+nome `arena.db.corrompido-` mais a data e a hora, e começa um banco novo,
+vazio. A janela preta mostra onde ficou a cópia. Os recordes antigos não
+aparecem na tela, mas não foram apagados: rode o `VERIFICAR.bat` depois,
+que ele tenta restaurar da cópia em `backup\`.
 
 ---
 

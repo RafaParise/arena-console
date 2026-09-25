@@ -1105,6 +1105,59 @@ auditoria não conseguiu fechar sozinha.
 Anote tudo — mesmo o que já era esperado — porque é isso que fecha, de
 verdade, o que só a sala de aula pode confirmar.
 
+### Roteiro 6 — Máquina fraca (Positivo dual-core, 4 GB) — Fases 0, 2, 5 e 7
+
+Use um notebook **recém-ligado**, sem Edge nem Chrome abertos antes.
+
+1. Abra o `ARENA.bat`. No Gerenciador de Tarefas, aba Processos, anote a
+   **Memória** do processo do navegador com o título da janela do ARENA
+   (a auditoria não conseguiu isolar esse número — Fase 0).
+2. Ajustes → escolha um tema com fundo animado. Anote o **uso de CPU** do
+   navegador por 30 s, olhando a coluna CPU. Ligue o **modo modesto** e
+   anote de novo. A diferença é o que o fundo animado custa (Fase 2).
+3. Abra um jogo de SNES e um de PS1. Aperte `F2` (salvar), `F4` (carregar)
+   e confira que o controle físico mexe o personagem (Fase 5 — sem
+   hardware, a automação não confirmou o controle).
+4. Com o modo modesto ligado e depois desligado, abra o mesmo jogo de PS1
+   e anote se o som picota ou a imagem engasga (Fase 5 — FPS contínuo não
+   foi medido).
+5. Jogar Junto de PS1 (Crash Team Racing) entre dois Positivos: anote se a
+   corrida fica lisa. Isso mede o `netplay_check_frames = 0` que não deu
+   para medir no computador de desenvolvimento.
+6. **Só teclado** (sem mouse): aperte `Tab` até um card de jogo ficar
+   marcado e aperte `Enter`. O jogo precisa abrir (Fase 7 — não conferido
+   no navegador).
+7. Ajustes → tema claro. Leia os textos cinza-claro (dicas embaixo dos
+   campos) a um braço de distância. Anote se dá para ler sem esforço.
+
+### Roteiro 7 — Segurança na rede da escola — Fase 3
+
+Precisa de 2 notebooks na mesma rede. Notebook A com "Aceitar conexões da
+rede" ligado e reiniciado.
+
+1. No notebook B, abra o navegador e digite
+   `http://ENDEREÇO-DO-A:8777/api/ranking` (o endereço aparece em
+   Ajustes → Amigos no A). **Esperado:** aparece um texto com o placar.
+2. No mesmo navegador do B, digite `http://ENDEREÇO-DO-A:8777/api/estado`.
+   **Esperado:** recusado, com mensagem de que isso só funciona no próprio
+   computador. Se aparecer a configuração do A, anote — é falha de
+   segurança.
+3. Confirme que o Jogar Junto e a troca de recordes entre A e B continuam
+   funcionando normalmente.
+
+### Roteiro 8 — Pen drive e jogos pesados — Fases 5 e 6
+
+1. Num pen drive formatado em **FAT32**, copie a pasta do ARENA e rode o
+   `VERIFICAR.bat`. **Esperado:** aviso de que FAT32 não aceita arquivo
+   acima de 4 GB. Anote também o que o Windows disse ao copiar um jogo
+   grande (Gran Turismo 4, 4,95 GB) — a auditoria acha que o Windows
+   recusa a cópia inteira, não que ela chega cortada.
+2. Num notebook com placa de vídeo sem driver (aparece como "Adaptador de
+   Vídeo Básico da Microsoft" no Gerenciador de Dispositivos), abra um
+   jogo de SNES. Anote se abre imagem ou tela preta.
+3. PS3 (Borderlands 2, RPCS3): abra pelo ARENA e espere até 5 minutos.
+   Anote se chega ao menu do jogo (a automação não testou o RPCS3).
+
 ---
 
 ## Fase 6 — Portabilidade e robustez
@@ -1285,6 +1338,180 @@ passo a passo de SmartScreen/antivírus.
 
 ---
 
+## Fase 7 — Clareza para todos
+
+Proposta apresentada ao Rafael e aprovada em bloco ("fazer todos").
+Aplicado no commit `5c8180b`.
+
+| Item | O que era | O que ficou |
+|---|---|---|
+| A1 | "Jogo não encontrado" sem dizer o que fazer (7 rotas) | Diz o que aconteceu e manda clicar em **Atualizar lista** |
+| A2/A4 | "Índice inválido", "Espaço inválido", "Imagem inválida", "Destino inválido", "Console/Tipo de controle desconhecido" | Reescritas em duas partes: o que aconteceu + o que fazer |
+| A3 | Texto cru do Windows/Python chegava na tela (`[WinError 5] Acesso negado...`) em 7 pontos | `traduzir_erro_do_sistema()` em `arena.py` troca por frase em português |
+| B | "BIOS" aparecia sem explicação | Explicada em `index.html` e em `2-JOGOS.md` |
+| C | `--texto-apagado` no modo claro com contraste ~2,8:1 (abaixo do mínimo) | `#75634d`, ≥ 4,76:1 (WCAG AA), **calculado**, não medido na tela |
+| D | Card do jogo só abria com o mouse | `tabindex`, `role=button`, Enter/Espaço abrem o jogo |
+
+**Bug real achado no caminho, corrigido:** `/api/conquistas` dava erro 500
+com 2 ou mais jogadores no placar (`sorted()` sobre `sqlite3.Row`) —
+justamente o caso de sala de aula. Teste: `testes\teste_fase7.py`.
+
+**Não testado no navegador de verdade:** o foco por teclado do card e a cor
+nova. Entra no roteiro manual (Roteiro 6, abaixo).
+
+**O que a Fase 7 pediu e não foi feito por inteiro:** a caminhada clique a
+clique com as 5 pessoas (Ana, Pedro, Lucas, Dona Maria, professor) e a
+contagem de passos e decisões por tarefa. A proposta aprovada cobriu as
+mensagens de erro, o contraste, o teclado e a BIOS; a contagem de passos
+não foi registrada com números. Fica como pendência honesta (ver "O que
+ainda falta").
+
+---
+
 ## Depois (Fase 8)
 
-*(a preencher ao final da auditoria)*
+Medido em 25/09/2026, mesma máquina da Fase 0, com o mesmo script
+(`testes\linha_base.py`; resultado bruto em `docs\linha_base_depois_bruta.json`
+— o da Fase 0 continua em `docs\linha_base_bruta.json`).
+
+### Tabela antes × depois
+
+| Medida | Antes (Fase 0) | Depois (Fase 8) | Leitura |
+|---|---|---|---|
+| Tamanho do pacote, sem jogos | 2.809,8 MB | 2.810,0 MB | Igual. 99% é RetroArch + emuladores (terceiros); a auditoria não mexeu neles |
+| Linhas de código **do produto** (servidor sem testes, tela, `.bat`, guias) | 22.428 | 22.801 (+373) | Cresceu pouco: saiu `transferencia.py` (−115) e CSS morto (−39); entraram as proteções de rede, os avisos de FAT32/32 bits/rede pública, o Multitap e as mensagens claras |
+| Arquivos do produto | 34 | 33 | Saiu `servidor\transferencia.py` |
+| Tempo de abertura até a página responder | 0,63 s | 0,63 s | Igual |
+| CPU com o ARENA parado | 0,04% | 0,02% | Igual na prática (os dois são "perto de zero") |
+| RAM do servidor parado | 35,5 MB | 35,8 MB | Igual na prática |
+| Threads do servidor | 15 | 14 | Igual na prática |
+| Portas em escuta (rede desligada, padrão) | só 127.0.0.1:8777 | só 127.0.0.1:8777 | Igual |
+| Rotas abertas à rede quando "Aceitar conexões" está ligado | **45 de 45** | **8 de 45** | A mudança mais importante da auditoria (Fase 3) |
+| Logs do RetroArch acumulados em `dados\` | 38, sem limite | no máximo 10 | Fase 2 |
+| Gravações em disco por hora, parado | não medido | **0** (0 operações, 0 KB, nenhum arquivo de `dados\`/`backup\` mudou em 10 min) | Pendência da Fase 0, fechada agora (`testes\medir_gravacoes_parado.py`, bruto em `docs\gravacoes_parado_bruto.json`). A janela cobriu 30 ciclos do vigia (20 s cada). O backup não roda por relógio, só ao fechar um jogo (`arena.py`, depois de encerrar a sessão), então parado não grava nada. Ótimo para pen drive e cartão SD |
+| RAM da tela (janela do navegador) | não isolável nesta máquina | não isolável nesta máquina | Roteiro 6, passo 1 |
+| Bateria de referência (44 testes) | 44 OK | 44 OK | Nunca piorou em nenhuma fase |
+| Testes novos da auditoria | — | 21 scripts + fuzz; 21 de 23 passam, as 2 "falhas" explicadas | Ver "Rodada final" abaixo |
+
+**Por que o código cresceu em vez de encolher:** o plano pedia "sem código
+inútil", e o inútil saiu (módulo inteiro órfão, duas funções mortas, cinco
+classes de CSS, o campo de controle duplicado). O que entrou foi correção
+de problema real — sobretudo segurança de rede e mensagens para o aluno.
+Não houve remoção só para o número cair.
+
+### O que foi removido (todos aprovados pelo Rafael na Fase 1/2)
+
+| O quê | Prova de que não era usado |
+|---|---|
+| `servidor\transferencia.py` (115 linhas) | Nenhum `import` em lugar nenhum |
+| `graficos.opcoes_de_controle()` | Duplicata; quem liga o analógico é `controles.opcoes_do_console()` |
+| `hardware.shutil_disk_usage()` | Nunca chamada |
+| 5 classes de CSS (`campo-apelido`, `jogo-acoes`, `jogo-gerir`, `jogo-dupla`, `acervo-cabeca-acoes`) | Nenhum uso no HTML nem no JS, nem por nome montado |
+| Logs antigos do RetroArch (rodízio, mantém 10) | Arquivo de diagnóstico, não dado do aluno |
+
+Nenhum jogo, save, BIOS, núcleo, memory card ou arquivo de `dados\` do
+aluno foi apagado.
+
+### O que foi corrigido (bug real, reproduzido antes de corrigir)
+
+| Fase | Problema | Efeito para o aluno |
+|---|---|---|
+| 1 | `/api/perfil/novo` apagava o perfil mesmo quando a cópia de segurança falhava | Perdia os recordes sem aviso |
+| 1 | Navegador instalado sem administrador não era achado | A tela não abria sozinha |
+| 2 | Fundos animados rodavam para sempre, até escondidos e no modo modesto | CPU gasta à toa em máquina fraca |
+| 3 | **Todas as rotas abertas à rede** | Um colega podia mudar a configuração, apagar perfil ou abrir jogo no computador de outro |
+| 3 | **CSRF**: um site qualquer mudava a configuração do ARENA | Provado ao vivo |
+| 3 | **`/api/mala` gravava em qualquer caminho do disco** | Provado ao vivo |
+| 3 | Gravação falhava sob concorrência no Windows | Erro aleatório com muitos pedidos juntos |
+| 3 | Biblioteca online sem mensagem para rede fora/portal cativo, sem conferir SHA-1 | Mensagem técnica crua; arquivo errado aceito |
+| 3 | Capa "baixada" podia ser a página HTML do Wi-Fi da escola | Capa quebrada |
+| 3 | `/api/partida/testar` levava ~5,3 s num endereço errado | Agora ~2,7 s |
+| 4 | Hotspot de iPhone classificado como "adaptador virtual" | O aluno não achava o endereço certo |
+| 4 | Rede "Pública" não era detectada | Firewall bloqueava sem explicação |
+| 4 | Multitap não existia | Super Bomberman só com 2 jogadores |
+| 6 | `arena.db` corrompido derrubava o ARENA inteiro na abertura | Tela nem abria |
+| 6 | Windows de 32 bits nunca era detectado | Janela preta sumia sem explicação |
+| 6 | Nada avisava sobre pen drive FAT32 | Jogo grande não cabia e ninguém sabia por quê (ver ressalva abaixo) |
+| 7 | `/api/conquistas` dava erro com 2+ jogadores | Tela de conquistas quebrada justamente em sala |
+| 7 | Mensagens de erro sem "o que fazer", texto cru do Windows, contraste baixo, card sem teclado | Ver seção da Fase 7 |
+
+### Achados da própria Fase 8 (conferindo o trabalho das fases anteriores)
+
+1. **O alerta de "jogo truncado" do FAT32 (Fase 6) nunca dispara na vida
+   real.** Ele procura arquivo **maior que 4 GB** num disco FAT32 — mas o
+   FAT32 não deixa esse arquivo existir. O teste da Fase 6 passou porque
+   fingiu o disco (arquivo de 4,5 GB num disco NTFS marcado como FAT32 por
+   programa). **O que funciona de verdade:** o aviso geral "este pen drive
+   é FAT32, arquivo acima de 4 GB não cabe". **Proposta (não aplicada,
+   espera aprovação):** trocar a busca por "arquivo com 4 GB menos 1 byte",
+   que é o tamanho exato de uma cópia cortada no limite, e corrigir o
+   teste para usar esse tamanho. O Roteiro 8 confere o que o Windows faz
+   de verdade ao copiar.
+2. **Proteção contra DNS rebinding não foi feita.** O plano pedia na Fase
+   3 ("contra pedidos de outra origem **e contra DNS rebinding**"); a Fase
+   3 fechou o CSRF, mas não este. Como funciona o ataque: um site faz o
+   próprio nome passar a apontar para `127.0.0.1`; o navegador acha que é
+   o mesmo site e deixa ele conversar com o ARENA como se fosse a própria
+   tela. O servidor não confere o cabeçalho `Host`. Os navegadores novos
+   (Chrome/Edge) têm uma barreira própria para isso, mas o ARENA não deve
+   depender dela. **Proposta (não aplicada, espera aprovação):** quando o
+   pedido vem deste computador, aceitar só `Host` igual a `127.0.0.1`,
+   `localhost` ou um dos endereços da própria máquina; pedidos vindos de
+   outra máquina (as 8 rotas da rede) não mudam. Mais um teste
+   automatizado para provar.
+3. A mensagem de recusa de rota pela rede estava sem acento ("so", "nao").
+   Pequeno; entra junto com o item 2 se aprovado.
+
+### Rodada final (regra 7)
+
+`ferramentas\rodada_final.py` rodou, um de cada vez, a bateria de
+referência + o fuzz + os 21 scripts `testes\teste_*.py` (resultado bruto:
+`docs\rodada_final_bruta.json`). **21 de 23 passaram.** As 2 "falhas":
+
+| Script | O que aconteceu | É defeito? |
+|---|---|---|
+| `fuzz_rotas.py` | Reprova as **mesmas 7** das 244 checagens da Fase 3, todas `414 URI Too Long` (URL de 2 MB recusada pelo próprio `http.server` do Python antes de chegar ao ARENA). Conferido checagem por checagem contra o resultado salvo na Fase 3 | Não. Já explicado na Fase 3 |
+| `teste_local_4_jogadores.py` | GoldenEye abre e fica vivo com as 4 portas certas. As 6 linhas `[ERROR]` do log são todas de **som**: `Failed to get default audio endpoint` — o Windows estava sem saída de áudio padrão na hora (madrugada, placas de som "OK" no sistema, mas nenhuma saída ativa). Repetido sozinho: mesmo resultado | Não é do ARENA. O teste reprova qualquer `[ERROR]`, inclusive de som. Rodar de novo com fone ou caixa ligados |
+
+Passaram, entre outros: bateria de 44 (0,3 s), acesso de rede, concorrência,
+longa duração (183 s), cenários de sala (RetroArch real), matriz de jogos
+(6 consoles, RetroArch real), Jogar Junto com 5 RetroArch, isolamento do
+netplay, rede ruim, queda no meio da gravação, arquivos corrompidos, pasta
+só de leitura, mala, travessia de caminho na capa, SHA-256 do acervo, Fase 7.
+
+### O que ainda falta (com honestidade)
+
+**Só a sala de aula confirma** (roteiros 1 a 8, acima):
+
+- Multitap com 5 jogadores: o 4º convidado nunca conectou no teste de um
+  computador só. Pode ser limite do RetroArch ou artefato do teste. Roteiro 1.
+- RAM da janela do ARENA, custo real dos fundos animados num Celeron,
+  ganho do `netplay_check_frames = 0`, FPS no modo modesto × normal,
+  controle físico. Roteiro 6.
+- Bloqueio de rede com uma segunda máquina de verdade. Roteiro 7.
+- Notebook sem driver de vídeo e RPCS3 (PS3). Roteiro 8.
+- Foco por teclado no card e a cor nova do modo claro no navegador real. Roteiro 6.
+
+**Conhecido e não corrigido (decisão de design ou trabalho grande demais
+para uma correção pontual):**
+
+- Relógio errado num notebook deixa os registros dele invisíveis para a
+  sincronização dos outros. Correção de verdade troca o carimbo de data
+  por outra coisa. Proposta mais simples: avisar na tela quando o relógio
+  do Windows parecer muito errado.
+- Caminho com mais de 260 caracteres falha (limite clássico do Windows).
+  O risco está em `capas_online.py`, `indexador.py` e no próprio RetroArch.
+- VPN não é detectada como tal.
+- Memory card do PS1 no Jogar Junto: o convidado recebe um cartão em branco.
+- Neo Geo: faltam 3 arquivos de BIOS na revisão certa.
+- Duas chaves `duckstation_*` em `graficos.py`: resíduo ou precaução, só
+  um `retroarch-core-options.cfg` real do SwanStation responde.
+- Disco cheio: confiado à gravação atômica, conferido só lendo o código.
+- Fase 7: a caminhada clique a clique com as 5 pessoas não foi registrada
+  com número de passos e decisões por tarefa.
+- Fase 4: "o que o jogador sente" com rede ruim ficou sem conclusão firme
+  — o ping que o RetroArch mostra não acompanhou o atraso simulado.
+- `dados\fechamentos.json` só tem sujeira de teste; esperando o Rafael
+  dizer se pode zerar.
+- Os dois achados da Fase 8 acima (FAT32 e DNS rebinding), esperando
+  aprovação.

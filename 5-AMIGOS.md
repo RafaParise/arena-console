@@ -130,6 +130,13 @@ controle do roteador da escola.
 
 Ligue e **feche e abra o ARENA**. A mudança só vale depois de reiniciar.
 
+**Isso é seguro?** Sim. Ligar essa chave abre para a rede só o que a
+partida a dois e a troca de recordes precisam. Um colega na mesma rede não
+consegue mudar as suas configurações, apagar os seus saves nem abrir jogo
+no seu computador — o ARENA recusa esses pedidos quando eles vêm de outra
+máquina. É como deixar o portão aberto para a festa, mas com a porta do
+quarto trancada.
+
 Logo abaixo aparece a lista de endereços do seu computador:
 
 | Etiqueta | Quando usar |

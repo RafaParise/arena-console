@@ -1,0 +1,110 @@
+{
+  "tamanho_total_mb": 2810.0,
+  "tamanho_por_pasta_mb": {
+    "retroarch": 2121.3,
+    "emuladores": 666.7,
+    "servidor": 21.2,
+    "launcher": 0.2,
+    "docs": 0.2,
+    "testes": 0.1,
+    "dados": 0.1,
+    "(raiz)": 0.1,
+    "ferramentas": 0.1
+  },
+  "linhas_por_extensao": {
+    ".py": 16418,
+    ".js": 3829,
+    ".html": 887,
+    ".css": 1649,
+    ".json": 5750
+  },
+  "arquivos_por_extensao": {
+    ".py": 63,
+    ".js": 3,
+    ".html": 1,
+    ".css": 1,
+    ".json": 19
+  },
+  "maiores_arquivos": [
+    [
+      "servidor\\arena.py",
+      4689
+    ],
+    [
+      "launcher\\app.js",
+      3277
+    ],
+    [
+      "docs\\fuzz_rotas_bruto.json",
+      2198
+    ],
+    [
+      "launcher\\estilo.css",
+      1649
+    ],
+    [
+      "servidor\\graficos.py",
+      1377
+    ],
+    [
+      "servidor\\consoles.json",
+      1166
+    ],
+    [
+      "launcher\\index.html",
+      887
+    ],
+    [
+      "servidor\\recursos.json",
+      645
+    ],
+    [
+      "servidor\\indexador.py",
+      535
+    ],
+    [
+      "servidor\\hardware.py",
+      531
+    ],
+    [
+      "servidor\\tests\\run.py",
+      486
+    ],
+    [
+      "servidor\\graficos.json",
+      463
+    ],
+    [
+      "servidor\\diagnostico.py",
+      443
+    ],
+    [
+      "docs\\varredura_fase1_bruta.json",
+      438
+    ],
+    [
+      "servidor\\controles.py",
+      433
+    ]
+  ],
+  "tempo_abertura_s": 0.63,
+  "cpu_parado_pct": 0.02,
+  "cpu_medido_em_s": 16.0,
+  "ram_total_mb": 35.8,
+  "processos": [
+    {
+      "pid": 3256,
+      "nome": "python",
+      "ram_mb": 35.8,
+      "threads": 14
+    }
+  ],
+  "threads_total": 14,
+  "portas_escutando": [
+    {
+      "LocalAddress": "127.0.0.1",
+      "LocalPort": 8777,
+      "OwningProcess": 3256
+    }
+  ]
+}
