@@ -357,7 +357,7 @@ servidor\python\python.exe servidor\diagnostico.py --so-ver
 | # | O quê | Conserta sozinho? |
 |---|---|---|
 | 1 | As 17 pastas do ARENA existem | **Sim**, recria |
-| 2 | Os 13 arquivos do programa estão lá | Não, avisa |
+| 2 | Os 20 arquivos de que o ARENA precisa para abrir estão lá | Não, avisa |
 | 3 | Arquivos temporários esquecidos | **Sim**, apaga |
 | 4 | Suas configurações estão legíveis | **Sim**, põe de lado a versão quebrada |
 | 5 | O catálogo de jogos está legível | **Sim**, apaga para ser remontado |

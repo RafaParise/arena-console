@@ -30,16 +30,24 @@ PASTAS = [
     "retroarch/controles", "retroarch/screenshots",
 ]
 
+# Tudo o que o ARENA precisa para ABRIR. Corrigido na auditoria 2: a lista
+# tinha so 5 dos 11 modulos que o arena.py importa na abertura (faltavam
+# controles, acervo, internet_archive, capas_online, identificador e o novo
+# barreiras) -- faltando qualquer um, o ARENA nem abria, e o verificador
+# dizia que estava tudo presente.
 PROGRAMA = [
     "ARENA.bat", "LEIA-ME.md",
     "launcher/index.html", "launcher/estilo.css", "launcher/app.js",
-    "servidor/arena.py", "servidor/indexador.py", "servidor/hardware.py",
-    "servidor/cheats.py", "servidor/graficos.py",
+    "servidor/arena.py", "servidor/indexador.py", "servidor/identificador.py",
+    "servidor/hardware.py", "servidor/cheats.py", "servidor/graficos.py",
+    "servidor/controles.py", "servidor/acervo.py", "servidor/barreiras.py",
+    "servidor/internet_archive.py", "servidor/capas_online.py",
     "servidor/consoles.json", "servidor/graficos.json", "servidor/recursos.json",
+    "servidor/perfis_controle.json",
 ]
 
 JSONS = ["servidor/consoles.json", "servidor/graficos.json",
-         "servidor/recursos.json"]
+         "servidor/recursos.json", "servidor/perfis_controle.json"]
 
 SO_VER = "--so-ver" in sys.argv
 
