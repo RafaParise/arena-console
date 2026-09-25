@@ -49,6 +49,28 @@
       }
     },
 
+    "genesis_plus_gx_libretro.dll": {
+      "console": "megadrive",
+      "jogadores_sem_adaptador": 2,
+      "jogar_junto": true,
+      "adaptador": {
+        "tipo": "dispositivo",
+        "nome_no_nucleo": "MD Joypad 3 Button + Teamplayer",
+        "chaves": {"input_libretro_device_p1": "1537"},
+        "jogadores": 4,
+        "so_se_o_cartucho_declarar": "4",
+        "fonte": "Genesis-Plus-GX libretro/libretro.c linha 62 (RETRO_DEVICE_MDPAD_3B_TEAMPLAYER = SUBCLASS(JOYPAD,5) = (6<<8)|1 = 1537) e linhas 3235-3243; core/input_hw/input.c linhas 152-170 (Team Player na porta 1 = jogadores 1 a 4, em sequencia); core/loadrom.c linha 188 (codigo '4' no cabecalho do cartucho = Team Player); texto 'MD Joypad 3 Button + Teamplayer' presente no .dll",
+        "observacao": "O nucleo NAO liga o Team Player sozinho, e cada jogo usa um adaptador (Team Player da Sega, 4-Way Play da EA, J-Cart no cartucho). Por isso so liga quando o proprio cartucho declara '4' no cabecalho (0x190). Mega Bomberman (USA) declara 'J4'. 4-Way Play: nao ligado (nenhum jogo da pasta usa; nao confirmado como o cartucho declara)."
+      },
+      "automatico": {
+        "nome": "J-Cart",
+        "jogadores": 4,
+        "series": ["T-120096", "T-120106", "T-120146", "T-120066", "T-123456"],
+        "fonte": "Genesis-Plus-GX core/cart_hw/eeprom_i2c.c linhas 147-156 (lista de cartuchos J-Cart pela serie) e core/input_hw/input.c linhas 355-375 (duas entradas a mais, jogadores 3 e 4, depois das duas portas)",
+        "observacao": "O proprio cartucho tem as entradas 3 e 4; o nucleo reconhece pela serie e liga sozinho. O ARENA so libera os 4 controles (input_max_users). Micro Machines 2 (T-120096) esta na lista."
+      }
+    },
+
     "pcsx_rearmed_libretro.dll": {
       "console": "ps1",
       "uso": "Jogar Junto (consoles.json -> core_netplay)",

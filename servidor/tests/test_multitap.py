@@ -95,6 +95,54 @@ class TestJogadoresDoJogo(unittest.TestCase):
         self.assertEqual(r["cfg"], {})
 
 
+class TestMegaDrivePeloCartucho(unittest.TestCase):
+    """Mega Drive: o adaptador depende do que o proprio cartucho declara."""
+
+    def setUp(self):
+        self.dir = tempfile.mkdtemp(prefix="arena_md_teste_")
+
+    def tearDown(self):
+        shutil.rmtree(self.dir, ignore_errors=True)
+
+    def cartucho(self, nome, serie, acessorios, sega=True):
+        dados = bytearray(0x400)
+        if sega:
+            dados[0x100:0x110] = b"SEGA MEGA DRIVE "
+        dados[0x180:0x180 + len(serie)] = serie.encode()
+        dados[0x190:0x190 + len(acessorios)] = acessorios.encode()
+        caminho = os.path.join(self.dir, nome)
+        open(caminho, "wb").write(bytes(dados))
+        return caminho
+
+    def ligar(self, caminho, n=4):
+        return graficos.jogadores_do_jogo("genesis_plus_gx_libretro.dll", n, 2, arquivo=caminho)
+
+    def test_team_player_so_quando_o_cartucho_declara(self):
+        r = self.ligar(self.cartucho("bomber.md", "GM MK-1573-00", "J4"))
+        self.assertEqual(r["jogadores"], 4)
+        self.assertEqual(r["cfg"]["input_libretro_device_p1"], "1537")
+        s = self.ligar(self.cartucho("sonic.md", "GM MK-1079 -00", "J"))
+        self.assertEqual(s["jogadores"], 2)
+        self.assertEqual(s["cfg"], {})
+        self.assertIn("cartucho", s["motivo"])
+
+    def test_j_cart_pela_serie_sem_chave_de_adaptador(self):
+        r = self.ligar(self.cartucho("mm2.md", "GM T-120096-50", "J"))
+        self.assertEqual(r["jogadores"], 4)
+        self.assertEqual(r["cfg"], {"input_max_users": "4"})
+
+    def test_master_system_ou_arquivo_ilegivel_fica_em_2(self):
+        for caminho in (self.cartucho("alex.sms", "", "4", sega=False),
+                        os.path.join(self.dir, "nao_existe.md"), None):
+            r = self.ligar(caminho)
+            self.assertEqual(r["jogadores"], 2)
+            self.assertEqual(r["cfg"], {})
+
+    def test_dois_jogadores_nem_le_o_cartucho(self):
+        r = self.ligar(self.cartucho("bomber.md", "GM MK-1573-00", "J4"), n=2)
+        self.assertEqual(r["cfg"], {})
+
+
 class TestArquivosDaPartida(unittest.TestCase):
 
     def setUp(self):

@@ -4530,7 +4530,8 @@ class Manipulador(BaseHTTPRequestHandler):
             if not caminho_externo:
                 jogo["ligacao"] = graficos.jogadores_do_jogo(
                     jogo["core"], jogadores_pedidos(plataforma, jogo),
-                    config.get("avancado", {}).get("input_max_users", 2))
+                    config.get("avancado", {}).get("input_max_users", 2),
+                    arquivo=os.path.join(RAIZ, jogo["arquivo"]))
 
             if modo in ("hospedar", "entrar"):
                 hospedar = (modo == "hospedar")

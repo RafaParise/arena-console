@@ -37,6 +37,7 @@
 |---|---|---|---|---|---|---|
 | Super Nintendo | snes9x | 2 | **tipo de controle** numa porta ("Multitap") | `input_libretro_device_p2 = "257"` | **5** (8 com as duas portas) | sim |
 | NES | fceumm | 2 | **tipo de controle** "Gamepad" nas portas 3 e 4, que liga o Four Score (o "4-Player Adapter" do núcleo é outro: o do Famicom japonês, na porta 5). O núcleo **já liga sozinho** para os jogos de uma lista interna dele | `input_libretro_device_p3 = "513"` e `input_libretro_device_p4 = "513"` | **4** | sim |
+| Mega Drive | genesis_plus_gx | 2 | **depende do cartucho** — o núcleo não escolhe sozinho. **Team Player** (Sega): tipo de controle na porta 1, só quando o cartucho declara "4" no cabeçalho (0x190). **J-Cart** (entradas no próprio cartucho): o núcleo liga sozinho pela série | Team Player: `input_libretro_device_p1 = "1537"`. J-Cart: nenhuma chave (só `input_max_users` = 4) | **4** | sim |
 | PS1 jogando junto | pcsx_rearmed | 2 | **opção do núcleo** "Multitap Mode" | `pcsx_rearmed_multitap = "port 1"` (desligado: `"disabled"`) | **5** (`"ports 1 and 2"` = 8) | sim |
 | PS1 no mesmo computador | swanstation | 2 | **opção do núcleo** "Multitap Mode" | `swanstation_ControllerPorts_MultitapMode = "Port1Only"` (desligado: `"Disabled"`) | **5** (`"BothPorts"` = 8) | não (núcleo recusa) |
 | Sega Saturn | mednafen_saturn | 2 | **opção do núcleo**, uma por porta ("6Player Adaptor") | `beetle_saturn_multitap_port1 = "enabled"` (+ `..._port2 = "enabled"`) | **7** com um, **12** com os dois | **não confirmado** (nunca testado) |
@@ -73,6 +74,8 @@
 | `input_max_users` também limita quem **controla** pelo Jogar Junto? | O teste de 5 jogadores entrou com o ARENA em 2, mas "entrar" não prova "controlar". Teste da Fase D (5 instâncias, conferir no registro quem ganhou controle) |
 | Jogar Junto do Saturn | Testar com o jogo completo (ver arquivos abaixo) na Fase E |
 | NES `513` numa partida de verdade | O número vem da fórmula do `libretro.h`; conferir no registro do RetroArch ("Player 3: Gamepad") na Fase D. **Não há jogo de 4 jogadores de NES na pasta** (Contra é de 2) |
+| Mega Drive: 4-Way Play (EA) | Nenhum jogo da pasta usa; como o cartucho declara, não confirmado — não é ligado. J-Cart só pelos 5 números de série da lista do núcleo (os reconhecidos por soma, como Super Skidmarks, ficam em 2) |
+| Mega Drive na prática | Mega Bomberman (Team Player) e Micro Machines 2 (J-Cart) com controles de verdade: Fase E |
 | Multitap do PS2 dentro do PCSX2 | Fora do RetroArch; não pesquisado nesta fase |
 | Versões | Chaves e valores foram achados no `.dll` **da pasta**; a contagem de jogadores veio do código-fonte atual de cada núcleo, que pode ser mais novo que o `.dll`. Os testes das Fases D e E confirmam na prática |
 

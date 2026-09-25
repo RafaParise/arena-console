@@ -437,7 +437,8 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None,
             # O que o jogo aceita, limitado ao que o nucleo permite
             # (servidor\multitap.json). O mesmo calculo do /api/jogar.
             ligacao = graficos.jogadores_do_jogo(
-                plataforma.get("core", ""), do_jogo, mapa=mapa_multitap)
+                plataforma.get("core", ""), do_jogo, mapa=mapa_multitap,
+                arquivo=caminho_absoluto)
             # Console de emulador externo (Dolphin, Xenia, PCSX2, RPCS3): o
             # adaptador e o limite do RetroArch nao se aplicam, quem cuida
             # dos controles e' o proprio emulador. Vale o numero do

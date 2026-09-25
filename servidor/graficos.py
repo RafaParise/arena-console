@@ -1626,7 +1626,22 @@ def carregar_mapa_multitap():
         return {}
 
 
-def jogadores_do_jogo(nucleo, jogadores, jogadores_da_config=2, mapa=None):
+def cabecalho_mega_drive(caminho):
+    """Serie e acessorios que o cartucho de Mega Drive declara no proprio
+    cabecalho (0x180 e 0x190). None se o arquivo nao e' um cartucho de Mega
+    Drive legivel (Master System, Game Gear, .zip, .smd intercalado...)."""
+    try:
+        with open(caminho, "rb") as arquivo:
+            topo = arquivo.read(0x200)
+    except (OSError, TypeError):
+        return None
+    if len(topo) < 0x1A0 or b"SEGA" not in topo[0x100:0x110]:
+        return None
+    return {"serie": topo[0x180:0x18E].decode("latin-1").strip(),
+            "acessorios": topo[0x190:0x1A0].decode("latin-1").strip()}
+
+
+def jogadores_do_jogo(nucleo, jogadores, jogadores_da_config=2, mapa=None, arquivo=None):
     """Diz o que escrever para ESTE nucleo aceitar 'jogadores' controles.
 
     Devolve um dicionario:
@@ -1658,6 +1673,22 @@ def jogadores_do_jogo(nucleo, jogadores, jogadores_da_config=2, mapa=None):
 
     aceitos = min(pedido, int(info.get("jogadores_sem_adaptador", 2)))
     adaptador = info.get("adaptador", {})
+    motivo_cartucho = ""
+    exigido = adaptador.get("so_se_o_cartucho_declarar")
+    automatico = info.get("automatico")
+    if (exigido or automatico) and pedido > aceitos:
+        # Mega Drive: cada jogo usa um adaptador diferente, e o nucleo nao
+        # escolhe sozinho. Quem diz e' o proprio cartucho (ver o mapa).
+        cabecalho = cabecalho_mega_drive(arquivo)
+        serie = (cabecalho or {}).get("serie", "")
+        if automatico and any(s in serie for s in automatico.get("series", [])):
+            # O cartucho tem as entradas extras; o nucleo liga sozinho.
+            aceitos = min(pedido, int(automatico.get("jogadores", aceitos)))
+            adaptador = {}
+        elif not cabecalho or exigido not in cabecalho.get("acessorios", ""):
+            adaptador = {}
+            motivo_cartucho = ("Este cartucho não declara adaptador para mais "
+                               "de %d jogadores." % aceitos)
     if pedido > aceitos and adaptador.get("tipo") in ("dispositivo", "opcao_do_nucleo"):
         chaves = dict(adaptador.get("chaves", {}))
         aceitos = min(pedido, int(adaptador.get("jogadores", aceitos)))
@@ -1669,8 +1700,8 @@ def jogadores_do_jogo(nucleo, jogadores, jogadores_da_config=2, mapa=None):
         resultado[destino].update(chaves)
 
     if aceitos < pedido:
-        resultado["motivo"] = ("Neste console o emulador aceita até %d "
-                               "jogadores." % aceitos)
+        resultado["motivo"] = motivo_cartucho or (
+            "Neste console o emulador aceita até %d jogadores." % aceitos)
     resultado["jogadores"] = aceitos
     if aceitos > 2:
         # Sem isto o RetroArch so le os 2 primeiros controles (o ARENA vem
