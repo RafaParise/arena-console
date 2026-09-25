@@ -506,12 +506,6 @@ input::placeholder { color: var(--texto-apagado); }
   box-shadow: none;
 }
 
-.jogo--desaparecendo {
-  opacity: 0;
-  transform: scale(0.95);
-  pointer-events: none;
-}
-
 /* Faixa de estado no topo do card */
 .jogo-faixa {
   height: 3px;
@@ -1546,8 +1540,8 @@ input::placeholder { color: var(--texto-apagado); }
   outline-offset: -2px;
 }
 
-/* Jogo sem pasta de console definida */
-.jogo--sem_pasta .jogo-faixa { background: var(--azul-claro); }
+/* Jogo sem pasta de console definida (a cor da faixa fica junto das outras,
+   em .jogo--sem_pasta .jogo-faixa, la em cima) */
 .jogo--sem_pasta .jogo-titulo::after {
   content: " — escolha o console";
   color: var(--azul-claro);

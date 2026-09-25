@@ -66,3 +66,52 @@ Brutos em `docs\auditoria2\` (`linha_base_fase0.json` e `medir_fase0\`).
 
 **Não é a máquina alvo.** Estes números servem para comparar antes/depois
 nesta mesma máquina; o alvo é o Celeron (COLETAR.bat na escola).
+
+---
+
+## Fase 1 — Varredura e limpeza
+
+Ferramentas: `testes\varredura_fase1.py` (a da primeira auditoria, de novo),
+e duas novas nesta rodada: `testes\funcoes_js_mortas.py` (funções do
+`app.js` nunca chamadas) e `testes\ids_da_tela.py` (todo `#id` que o JS
+procura existe no HTML? todo id do HTML é usado?). Mais o `inventario.py`
+da Fase 0 (rota sem chamador).
+
+### Removido (lista com prova, aprovada em bloco como na primeira auditoria)
+
+| # | O quê | Prova de que não é usado | O que quebra se sair |
+|---|---|---|---|
+| R1 | Apelido de rota `/api/sinc/ranking` | Nenhum chamador em nenhuma versão: nem no ARENA atual, nem nas duas versões originais (`ARENA - Versão antiga…` e `ARENA-remake--master` só **atendem** a rota, nunca chamam). E nem estava na lista de rotas abertas à rede, onde faria sentido | Nada. `/api/ranking` continua igual |
+| R2 | Função `registros_pendentes()` em `arena.py` | Definida e nunca chamada (nem nos testes). Sobra da época do `db.py` | Nada |
+| R3 | CSS `.jogo--desaparecendo` | O servidor só produz os estados `pronta`, `falta_externo`, `sem_core`, `falta_sistema`, `sem_pasta`. A primeira auditoria deixou passar porque o prefixo `jogo--${estado}` fazia parecer vivo | Nada |
+| R4 | Regra CSS duplicada `.jogo--sem_pasta .jogo-faixa` | Idêntica nas linhas 524 e 1550 do `estilo.css` | Nada (a da linha 524 fica) |
+
+### Checado, sem achado
+
+- **Funções mortas no JS:** 94 funções no `app.js`, nenhuma sem uso.
+- **Ids da tela:** 219 ids no HTML, 195 procurados pelo JS, **nenhum
+  procurado e ausente**. 5 ids sem uso aparente (`lblEnviarCapa`,
+  `perfilChaves`, `rankingPontos`, `rankingTempo`, `wizardInstrucao`):
+  servem de rótulo/âncora e não pesam nada — ficam.
+- **Funções Python "usadas uma vez só":** as 13 candidatas da varredura são
+  todas chamadas indiretamente (alvo de thread, método do servidor HTTP
+  como `do_GET`, lista de regras do identificador) — vivas. Só
+  `registros_pendentes` era morta de fato (R2).
+- **CSS montado por partes:** os 27 candidatos da primeira auditoria foram
+  conferidos de novo, prefixo por prefixo (`sinal--${…}`, `jogo--${…}`,
+  `capa-${…}`, `desempenho--${…}`, `custo--${…}`, `ranking-pos--${…}`,
+  `midia--${…}`) — vivos, menos o `jogo--desaparecendo` (R3).
+- **Estado `falta_externo` sem cor própria:** o `.sinal` já é cinza por
+  padrão, que é a cor certa para "falta o emulador". Não é defeito.
+- **Caminhos absolutos:** só reservas do Windows (`SystemRoot`, `WINDIR`)
+  e a lista de navegadores. Nenhum caminho da máquina.
+- **Funções já removidas:** "duckstation" só em comentário e no filtro que
+  limpa essa sobra antiga; "transmissão" só no comentário que explica por
+  que está desligada. Scroll Lock: nenhuma ocorrência.
+- **Texto em inglês na tela:** nenhum.
+- **Chaves de configuração:** 20, todas lidas.
+
+### Testes
+
+Bateria **63 OK** (45 + 18 novos das barreiras, ver Extra), fuzz 0 falhas,
+acesso de rede, sincronização e ids da tela: OK.

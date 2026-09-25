@@ -2492,18 +2492,6 @@ def servidor_alcancavel(url):
 LIMITE_LOTE = 500
 
 
-def registros_pendentes(limite=LIMITE_LOTE):
-    with banco() as conexao:
-        placares = [dict(l) for l in conexao.execute(
-            "SELECT uuid, apelido, jogo_id, jogo_titulo, pontos, registrado_em, "
-            "dispositivo FROM placar WHERE enviado = 0 LIMIT ?", (limite,))]
-        sessoes = [dict(l) for l in conexao.execute(
-            "SELECT uuid, apelido, jogo_id, jogo_titulo, inicio, segundos, "
-            "dispositivo FROM sessao WHERE enviado = 0 AND encerrada = 1 "
-            "AND segundos > 30 LIMIT ?", (limite,))]
-    return placares, sessoes
-
-
 def contar_pendentes():
     with banco() as conexao:
         placares = conexao.execute(
@@ -3000,7 +2988,7 @@ def dentro_da_pasta(caminho, pasta):
 # 55435 dele, direto, separada desta.
 ROTAS_REDE_EXTERNA = frozenset((
     "/api/colegas",         # GET - quem esta online, pra tela de amigos
-    "/api/ranking",         # GET - placar compartilhado (= /api/sinc/ranking)
+    "/api/ranking",         # GET - placar compartilhado
     "/api/jogo/impressao",  # GET - confere se e o mesmo arquivo de jogo
     "/api/amigo/testar",    # POST - "esse endereco responde?"
     "/api/amigo/codigo",    # POST - adicionar amigo pelo codigo
@@ -3388,7 +3376,9 @@ class Manipulador(BaseHTTPRequestHandler):
             return self.responder_json(
                 {"botoes": graficos.botoes_do_console(plataforma)})
 
-        if caminho in ("/api/ranking", "/api/sinc/ranking"):
+        # Havia tambem o apelido "/api/sinc/ranking", removido na auditoria 2:
+        # nenhuma versao do ARENA (nem as duas originais) chama esse nome.
+        if caminho == "/api/ranking":
             return self.responder_json(ler_ranking())
 
         if caminho == "/api/jogo":

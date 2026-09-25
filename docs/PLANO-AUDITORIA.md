@@ -243,7 +243,7 @@ passa a identificar e recomendar ação.
 ### Progresso da auditoria 2
 
 - [x] Fase 0 — Linha de base e inventário (25/09/2026)
-- [ ] Fase 1 — Varredura e limpeza
+- [x] Fase 1 — Varredura e limpeza (25/09/2026)
 - [ ] Fase 2 — Leveza e desempenho
 - [ ] Fase 3 — Servidor e API
 - [ ] Fase 4 — Jogar Junto
