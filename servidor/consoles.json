@@ -205,7 +205,10 @@
         "snes",
         "super nintendo"
       ],
-      "pasta": "Super Nintendo"
+      "pasta": "Super Nintendo",
+      "jogos_multitap": [
+        "Super Bomberman"
+      ]
     },
     {
       "id": "gameboy",

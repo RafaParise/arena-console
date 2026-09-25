@@ -120,7 +120,23 @@ def gravar_texto_atomico(caminho, texto):
                 arquivo.write(texto)
                 arquivo.flush()
                 os.fsync(arquivo.fileno())
-            os.replace(temporario, caminho)
+            # No Windows, o proprio os.replace() pode falhar com "Acesso
+            # negado" quando outra thread tem o arquivo destino aberto
+            # so para LEITURA no instante exato da troca (carregar_config()
+            # e outras leituras nao usam esta trava, so os gravadores usam
+            # -- de proposito, senao toda leitura esperaria toda escrita).
+            # Achado real na auditoria, testando 50 pedidos simultaneos:
+            # a leitura solta por uma fracao de segundo é o suficiente pro
+            # Windows recusar a troca. E transitorio -- tentar de novo
+            # poucas vezes resolve, sem precisar travar as leituras.
+            for tentativa in range(5):
+                try:
+                    os.replace(temporario, caminho)
+                    break
+                except PermissionError:
+                    if tentativa == 4:
+                        raise
+                    time.sleep(0.05)
         finally:
             if os.path.exists(temporario):
                 try:
@@ -217,8 +233,39 @@ def banco():
 
 
 def preparar_banco():
-    with banco() as conexao:
-        conexao.executescript(ESQUEMA)
+    try:
+        with banco() as conexao:
+            conexao.executescript(ESQUEMA)
+    except sqlite3.DatabaseError as falha:
+        # Banco corrompido -- pen drive arrancado no meio de uma
+        # gravacao, cartao SD com setor ruim, arquivo trocado por
+        # engano. Achado real na auditoria: sem este tratamento, isso
+        # derrubava o ARENA INTEIRO, cru, com traceback do Python, antes
+        # mesmo do servidor HTTP conseguir subir -- exatamente o
+        # contrario do que o projeto promete ("abre mesmo assim e
+        # explica"). Guarda o arquivo quebrado do lado (nunca apaga dado
+        # do usuario sem manter uma copia) e comeca um banco novo vazio.
+        print("[ARENA] O banco de recordes (arena.db) esta corrompido: %s" % falha)
+        try:
+            quebrado = ARQUIVO_BANCO + ".corrompido-" + time.strftime("%Y%m%d-%H%M%S")
+            os.replace(ARQUIVO_BANCO, quebrado)
+            print("[ARENA] Guardei o arquivo quebrado em: %s" % quebrado)
+        except OSError as falha_ao_guardar:
+            print("[ARENA] Nao consegui guardar uma copia do banco quebrado "
+                 "(%s) -- vou sobrescrever." % falha_ao_guardar)
+        # O SQLite pode ter deixado arquivos -wal/-shm associados ao
+        # banco quebrado; sem apaga-los, o banco NOVO tentaria reusa-los
+        # e cairia no mesmo erro.
+        for sufixo in ("-wal", "-shm"):
+            try:
+                os.remove(ARQUIVO_BANCO + sufixo)
+            except OSError:
+                pass
+        with banco() as conexao:
+            conexao.executescript(ESQUEMA)
+        print("[ARENA] Comecei um banco novo, vazio. Os recordes antigos "
+             "ficaram guardados no arquivo acima, mas nao aparecem mais "
+             "na tela (um banco novo nao consegue ler um arquivo quebrado).")
 
 
 def fechar_banco():
@@ -464,8 +511,9 @@ BASE_COMUM = {
     "config_save_on_exit": "true",
 
     # --- Deixar rastro quando algo der errado ----------------------------
-    # Sem log, cada fechamento inesperado e uma investigacao do zero. O
-    # arquivo fica em dados\retroarch.log e o ARENA nao o apaga.
+    # Sem log, cada fechamento inesperado e uma investigacao do zero. Um
+    # arquivo por sessao em dados\retroarch__AAAA_MM_DD__HH_MM_SS.log;
+    # limpar_logs_antigos() mantem so os LOGS_MANTIDOS mais recentes.
     "log_to_file": "true",
     "log_to_file_timestamp": "true",
     "log_verbosity": "true",
@@ -1489,7 +1537,7 @@ def montar_conquistas():
             lideres.add(apelido)
 
     jogadores = []
-    for apelido, quantos, consoles in sorted(linhas):
+    for apelido, quantos, consoles in sorted(linhas, key=lambda linha: linha[0]):
         segundos = tempos.get(apelido, 0)
         ganhou = {
             "primeiro_recorde": quantos >= 1,
@@ -1847,6 +1895,50 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
 
 ARQUIVOS_DE_BACKUP = ("arena.db", "config.json", "controles.json")
 COPIAS_MANTIDAS = 3
+LOGS_MANTIDOS = 10
+
+
+def traduzir_erro_do_sistema(falha, acao):
+    """Troca o texto cru do Windows/Python por uma frase que o aluno entende:
+    o que aconteceu + o que fazer agora."""
+    if isinstance(falha, PermissionError) or getattr(falha, "errno", None) in (errno.EACCES, errno.EPERM):
+        motivo = ("Outro programa está usando esse arquivo, ou a pasta está "
+                  "protegida. Feche os outros programas e tente de novo.")
+    elif getattr(falha, "errno", None) == errno.ENOSPC:
+        motivo = ("Acabou o espaço no disco ou no pen drive. Apague algo que "
+                  "não precisa mais e tente de novo.")
+    elif isinstance(falha, FileNotFoundError):
+        motivo = ("Um arquivo ou pasta sumiu no meio do caminho. Clique em "
+                  "Atualizar lista e tente de novo.")
+    elif isinstance(falha, (urllib.error.URLError, socket.timeout, TimeoutError, ConnectionError)):
+        motivo = ("A internet falhou no meio do caminho. Confira a conexão e "
+                  "tente de novo.")
+    else:
+        motivo = "Tente de novo; se continuar, chame o professor."
+    print("[ARENA] %s falhou: %r" % (acao, falha))
+    return "Não consegui %s. %s" % (acao, motivo)
+
+
+def limpar_logs_antigos():
+    """Apaga os logs do RetroArch mais velhos, mantendo so os LOGS_MANTIDOS
+    mais recentes (por nome -- o carimbo de data/hora no nome ja ordena
+    certo). Devolve quantos apagou."""
+    try:
+        nomes = sorted(
+            nome for nome in os.listdir(PASTA_DADOS)
+            if nome.startswith("retroarch__") and nome.endswith(".log"))
+    except OSError:
+        return 0
+
+    excedentes = nomes[:-LOGS_MANTIDOS] if len(nomes) > LOGS_MANTIDOS else []
+    apagados = 0
+    for nome in excedentes:
+        try:
+            os.remove(os.path.join(PASTA_DADOS, nome))
+            apagados += 1
+        except OSError:
+            pass
+    return apagados
 
 
 def fazer_backup():
@@ -2039,6 +2131,17 @@ def trocar_pela_mala(caminho=None):
     Uma passada so resolve os dois lados: quem recebe ja deixa na mala o
     que o outro ainda nao tem.
     """
+    # 'caminho' pode apontar para a raiz de QUALQUER midia (pen drive,
+    # disco), entao nao da pra travar com dentro_da_pasta() como as outras
+    # rotas fazem. Mas o NOME tem que ser sempre o da mala -- sem isto, um
+    # pedido malicioso (achado real na auditoria: nenhuma validacao aqui)
+    # conseguia mandar o ARENA gravar um arquivo em QUALQUER caminho, com
+    # QUALQUER nome, so escolhendo o valor de 'caminho'.
+    if caminho and os.path.basename(caminho) != NOME_DA_MALA:
+        return {"ok": False,
+                "erro": "Caminho da mala invalido: o arquivo precisa se "
+                        "chamar %s." % NOME_DA_MALA}
+
     config = carregar_config()
     destino = caminho or caminho_da_mala()
 
@@ -2782,12 +2885,85 @@ def dentro_da_pasta(caminho, pasta):
         return False
 
 
+# As UNICAS rotas que outro computador da rede pode chamar quando
+# "permitir_rede" esta ligado -- exatamente o que a partida a dois e a
+# sincronizacao entre ARENAs precisam (descoberta de colega, testar se
+# alcanca, conferir se o arquivo do jogo e o mesmo, trocar placar). Achado
+# real na auditoria: antes desta lista, TODAS as 49 rotas ficavam abertas
+# pra rede inteira assim que "permitir_rede" era ligado -- incluindo
+# apagar perfil, mudar configuracao, instalar cheat e mandar abrir jogo.
+# O jogo em si (netplay do RetroArch) nunca passa por aqui: usa a porta
+# 55435 dele, direto, separada desta.
+ROTAS_REDE_EXTERNA = frozenset((
+    "/api/colegas",         # GET - quem esta online, pra tela de amigos
+    "/api/ranking",         # GET - placar compartilhado (= /api/sinc/ranking)
+    "/api/jogo/impressao",  # GET - confere se e o mesmo arquivo de jogo
+    "/api/amigo/testar",    # POST - "esse endereco responde?"
+    "/api/amigo/codigo",    # POST - adicionar amigo pelo codigo
+    "/api/partida/testar",  # POST - pre-voo do Jogar Junto
+    "/api/sinc/ola",        # POST - handshake da sincronizacao
+    "/api/sinc/receber",    # POST - recebe placar/sessoes de outro ARENA
+))
+
+
 class Manipulador(BaseHTTPRequestHandler):
 
     protocol_version = "HTTP/1.1"
 
     def log_message(self, formato, *args):
         pass
+
+    def pedido_e_local(self):
+        """O pedido veio deste MESMO computador (qualquer um dos enderecos
+        dele), e nao de outra maquina na rede?"""
+        origem = self.client_address[0]
+        if origem == "127.0.0.1":
+            return True
+        return origem in {e["ip"] for e in enderecos_locais()}
+
+    def host_confiavel(self):
+        """O cabecalho Host e' um nome deste computador?
+
+        Protecao contra DNS rebinding (achado da Fase 8 da auditoria,
+        provado com testes\\teste_dns_rebinding.py): um site faz o proprio
+        nome passar a apontar para 127.0.0.1, e o navegador deixa a pagina
+        dele conversar com o ARENA como se fosse a nossa tela. O pedido
+        chega de 127.0.0.1 -- parece local --, mas o Host continua com o
+        nome do site. A nossa tela sempre usa 127.0.0.1 (ou localhost)."""
+        host = (self.headers.get("Host") or "").strip().lower()
+        if not host:
+            return True  # sem Host nao e' navegador (so programa de linha de comando)
+        if host.startswith("["):
+            nome = host[1:host.find("]")] if "]" in host else host[1:]
+        else:
+            nome = host.rsplit(":", 1)[0]
+        if nome in ("127.0.0.1", "localhost", "::1"):
+            return True
+        if nome == socket.gethostname().lower():
+            return True
+        return nome in {e["ip"] for e in enderecos_locais()}
+
+    def checar_acesso_de_rede(self, caminho):
+        """Barra rota sensivel vinda de fora deste computador. Devolve
+        True se o pedido pode seguir, False se ja respondeu com erro."""
+        if self.pedido_e_local():
+            # Pedido deste computador: so aceita se veio da nossa tela, e nao
+            # de um site que se disfarcou de 127.0.0.1 (DNS rebinding).
+            # Pedido de OUTRA maquina nao passa por aqui: rebinding so ataca
+            # o navegador deste computador, e amigo pela internet pode usar
+            # um nome no lugar do IP.
+            if self.host_confiavel():
+                return True
+            self.erro(
+                "Pedido recusado: ele não veio da tela do ARENA. "
+                "Abra o ARENA pelo ARENA.bat.", 403)
+            return False
+        if caminho in ROTAS_REDE_EXTERNA:
+            return True
+        self.erro(
+            "Esta parte do ARENA só pode ser usada neste computador, não "
+            "por outro da rede.", 403)
+        return False
 
     # -- utilitarios ------------------------------------------------------
     def responder_json(self, dados, codigo=200):
@@ -2843,6 +3019,8 @@ class Manipulador(BaseHTTPRequestHandler):
         caminho = urllib.parse.urlparse(self.path).path
 
         if caminho.startswith("/api/"):
+            if not self.checar_acesso_de_rede(caminho):
+                return
             try:
                 return self.api_get(caminho)
             except Exception as falha:
@@ -3006,7 +3184,7 @@ class Manipulador(BaseHTTPRequestHandler):
             try:
                 return self.responder_json({"itens": internet_archive.buscar(consulta)})
             except Exception as falha:
-                return self.erro("Nao consegui pesquisar: %s" % falha, 502)
+                return self.erro(traduzir_erro_do_sistema(falha, "pesquisar"), 502)
 
         # ---- conquistas da turma ------------------------------------------
         if caminho == "/api/conquistas":
@@ -3024,9 +3202,9 @@ class Manipulador(BaseHTTPRequestHandler):
             permitido = (dentro_da_pasta(alvo, PASTA_JOGOS) or
                         dentro_da_pasta(alvo, PASTA_MINIATURAS))
             if not permitido or not os.path.isfile(alvo):
-                return self.send_error(404, "Capa nao encontrada")
+                return self.erro("Capa nao encontrada.", 404)
             if not alvo.lower().endswith((".png", ".jpg", ".jpeg", ".webp")):
-                return self.send_error(404, "Nao e imagem")
+                return self.erro("Nao e imagem.", 404)
 
             tipos = {".png": "image/png", ".jpg": "image/jpeg",
                      ".jpeg": "image/jpeg", ".webp": "image/webp"}
@@ -3035,7 +3213,7 @@ class Manipulador(BaseHTTPRequestHandler):
                 with open(alvo, "rb") as arquivo:
                     dados_imagem = arquivo.read()
             except OSError:
-                return self.send_error(404, "Nao consegui ler a capa")
+                return self.erro("Nao consegui ler a capa.", 404)
 
             self.send_response(200)
             self.send_header("Content-Type", tipo)
@@ -3049,7 +3227,7 @@ class Manipulador(BaseHTTPRequestHandler):
         if caminho == "/api/perfil/foto":
             alvo = foto_perfil_caminho()
             if not alvo:
-                return self.send_error(404, "Sem foto de perfil ainda")
+                return self.erro("Sem foto de perfil ainda.", 404)
 
             tipos = {".png": "image/png", ".jpg": "image/jpeg", ".webp": "image/webp"}
             tipo = tipos.get(os.path.splitext(alvo)[1].lower(), "application/octet-stream")
@@ -3057,7 +3235,7 @@ class Manipulador(BaseHTTPRequestHandler):
                 with open(alvo, "rb") as arquivo:
                     dados_imagem = arquivo.read()
             except OSError:
-                return self.send_error(404, "Nao consegui ler a foto")
+                return self.erro("Nao consegui ler a foto.", 404)
 
             self.send_response(200)
             self.send_header("Content-Type", tipo)
@@ -3094,7 +3272,8 @@ class Manipulador(BaseHTTPRequestHandler):
                 urllib.parse.urlparse(self.path).query)
             jogo = achar_jogo((parametros.get("id") or [""])[0])
             if not jogo:
-                return self.erro("Jogo nao encontrado.", 404)
+                return self.erro("Jogo nao encontrado. Ele pode ter sido movido ou apagado. "
+                                 "Clique em Atualizar lista e tente de novo.", 404)
             return self.responder_json({
                 "titulo": jogo["titulo"],
                 "plataforma": jogo["plataforma"],
@@ -3112,12 +3291,37 @@ class Manipulador(BaseHTTPRequestHandler):
                 "cheats": cheats.ler_cheats(jogo),
             })
 
-        return self.send_error(404, "Rota nao encontrada")
+        return self.erro("Rota nao encontrada.", 404)
 
     # -- POST -------------------------------------------------------------
     def do_POST(self):
         caminho = urllib.parse.urlparse(self.path).path
         try:
+            if not self.checar_acesso_de_rede(caminho):
+                return
+            # So aceita Content-Type application/json -- e' o que a propria
+            # tela (pedir(), app.js) e a sincronizacao entre ARENAs sempre
+            # mandam. Achado real na auditoria, provado ao vivo com uma
+            # pagina de outra origem: uma aba qualquer aberta no MESMO
+            # navegador conseguia mandar POST pra qualquer rota daqui
+            # usando Content-Type "text/plain" -- esse tipo nao obriga o
+            # navegador a perguntar permissao (preflight CORS) antes de
+            # mandar, entao o pedido chegava e era processado do mesmo
+            # jeito, mesmo sem o site nunca poder LER a resposta (CSRF as
+            # cegas). Esta checagem barra esse pedido aqui (Content-Type
+            # errado, 415). Se em vez disso a pagina tentasse mandar
+            # "application/json" de verdade pra passar por esta checagem,
+            # ela deixaria de ser um "pedido simples" e o proprio navegador
+            # exigiria permissao explicita (preflight) antes de mandar --
+            # permissao que este servidor nunca da, entao o navegador
+            # bloqueia sozinho. Ou de um jeito ou de outro, o pedido nao
+            # chega a mudar nada. Nao substitui uma trava de verdade (rota
+            # por rede, ver achado maior desta fase), mas fecha o jeito
+            # mais facil de abusar disso.
+            tipo = (self.headers.get("Content-Type") or "").split(";")[0].strip().lower()
+            if tipo != "application/json":
+                return self.erro(
+                    "Content-Type precisa ser application/json.", 415)
             dados, falha_corpo = self.ler_corpo()
             if falha_corpo:
                 return self.erro(falha_corpo, 413)
@@ -3206,13 +3410,15 @@ class Manipulador(BaseHTTPRequestHandler):
             if dados.get("tipo_controle"):
                 validos = {t["id"] for t in controles.tipos_de_controle()}
                 if str(dados["tipo_controle"]) not in validos:
-                    return self.erro("Tipo de controle desconhecido.")
+                    return self.erro("Tipo de controle desconhecido. Escolha um da lista em "
+                                 "Ajustes → Controles.")
                 config["tipo_controle"] = str(dados["tipo_controle"])
 
             console = str(dados.get("console", "")).strip().lower()
             if console:
                 if console not in {p["id"] for p in carregar_catalogo()}:
-                    return self.erro("Console desconhecido.")
+                    return self.erro("Console desconhecido. Escolha um console da lista "
+                                 "(ou confira a pasta do jogo em jogos\\pessoais).")
                 atual = dict(config.get("perfil_controle", {}).get(console, {}))
                 for chave in ("direcional", "analogico_esq",
                               "analogico_dir", "vibracao"):
@@ -3264,7 +3470,7 @@ class Manipulador(BaseHTTPRequestHandler):
             except ValueError as falha:
                 return self.erro(str(falha))
             except OSError as falha:
-                return self.erro("Nao consegui gravar o acervo: %s" % falha)
+                return self.erro(traduzir_erro_do_sistema(falha, "gravar o acervo"))
             return self.responder_json({"ok": True, "item": item})
 
         if caminho == "/api/acervo/remover":
@@ -3283,7 +3489,7 @@ class Manipulador(BaseHTTPRequestHandler):
             except ValueError as falha:
                 return self.erro(str(falha))
             except OSError as falha:
-                return self.erro("Download falhou: %s" % falha, 502)
+                return self.erro(traduzir_erro_do_sistema(falha, "baixar o jogo"), 502)
             limpar_caches()
             manifesto(forcar=True)
             return self.responder_json(dict(ok=True, **resultado))
@@ -3299,7 +3505,7 @@ class Manipulador(BaseHTTPRequestHandler):
             except ValueError as falha:
                 return self.erro(str(falha))
             except Exception as falha:
-                return self.erro("Download falhou: %s" % falha, 502)
+                return self.erro(traduzir_erro_do_sistema(falha, "baixar o jogo"), 502)
             limpar_caches()
             manifesto(forcar=True)
             return self.responder_json(dict(ok=True, **resultado))
@@ -3330,11 +3536,22 @@ class Manipulador(BaseHTTPRequestHandler):
             apagados = []
 
             # Guarda uma copia antes de apagar. Se alguem clicar por
-            # engano, o progresso ainda esta em backup.
+            # engano, o progresso ainda esta em backup. Por isso a copia
+            # precisa dar certo de verdade -- se falhar (pen drive cheio,
+            # pasta de backup virou so-leitura, midia removida no meio),
+            # o apagamento e cancelado em vez de seguir sem rede de
+            # seguranca (achado real na auditoria: antes, uma falha aqui
+            # era engolida em silencio e o perfil era apagado do mesmo
+            # jeito, sem copia nenhuma).
             try:
-                fazer_backup()
+                copia_de_seguranca = fazer_backup()
             except Exception:
-                pass
+                copia_de_seguranca = None
+            if not copia_de_seguranca:
+                return self.erro(
+                    "Nao consegui garantir uma copia de seguranca antes de "
+                    "apagar. Nada foi apagado. Verifique o espaco livre no "
+                    "disco/pen drive e tente de novo.", 500)
 
             for arquivo in ("arena.db", "config.json", "controles.json",
                             "manifesto.json", "arena_override.cfg"):
@@ -3387,9 +3604,25 @@ class Manipulador(BaseHTTPRequestHandler):
             resultado = {"endereco": endereco, "arena": False,
                          "partida": False, "arquivo": None}
 
+            # Resolve o nome/endereco UMA vez so, antes de tentar as duas
+            # portas. Achado real na auditoria, medido ao vivo: cada
+            # socket.create_connection() faz a PROPRIA resolucao de nome
+            # por baixo, e no Windows isso nao respeita o timeout do
+            # socket -- um endereco invalido custava ~2,6s so pra falhar a
+            # resolucao, DUAS vezes seguidas (~5,3s no total) pra um pedido
+            # que devia ser rejeitado na hora. Resolvendo uma vez e
+            # reusando o IP, o custo de um endereco ruim cai pela metade.
+            try:
+                ip = socket.gethostbyname(endereco)
+            except OSError:
+                resultado["diagnostico"] = (
+                    "Nao alcanco o computador dele. Confira o endereco, e se "
+                    "ele ligou 'Aceitar conexoes da rede' e reabriu o ARENA.")
+                return self.responder_json(resultado)
+
             # 1. O ARENA dele responde? Isso prova que as maquinas se veem.
             try:
-                with socket.create_connection((endereco, porta_dele), timeout=2.0):
+                with socket.create_connection((ip, porta_dele), timeout=2.0):
                     resultado["arena"] = True
             except OSError:
                 pass
@@ -3398,7 +3631,7 @@ class Manipulador(BaseHTTPRequestHandler):
             #    ele so escuta enquanto a partida esta aberta.
             try:
                 with socket.create_connection(
-                        (endereco, graficos.PORTA_PARTIDA), timeout=2.0):
+                        (ip, graficos.PORTA_PARTIDA), timeout=2.0):
                     resultado["partida"] = True
             except OSError:
                 pass
@@ -3465,7 +3698,8 @@ class Manipulador(BaseHTTPRequestHandler):
             plataforma = next((p for p in carregar_catalogo()
                                if p["id"] == plataforma_id), None)
             if not plataforma:
-                return self.erro("Console desconhecido.")
+                return self.erro("Console desconhecido. Escolha um console da lista "
+                                 "(ou confira a pasta do jogo em jogos\\pessoais).")
 
             with TRAVA_JOGO:
                 if JOGO_EM_ANDAMENTO["ativo"]:
@@ -3538,13 +3772,15 @@ class Manipulador(BaseHTTPRequestHandler):
         if caminho == "/api/jogo/mover":
             jogo = achar_jogo(str(dados.get("jogo_id", "")))
             if not jogo:
-                return self.erro("Jogo nao encontrado.", 404)
+                return self.erro("Jogo nao encontrado. Ele pode ter sido movido ou apagado. "
+                                 "Clique em Atualizar lista e tente de novo.", 404)
 
             destino_id = str(dados.get("plataforma", "")).strip().lower()
             plataforma = next((p for p in carregar_catalogo()
                                if p["id"] == destino_id), None)
             if not plataforma:
-                return self.erro("Console desconhecido.")
+                return self.erro("Console desconhecido. Escolha um console da lista "
+                                 "(ou confira a pasta do jogo em jogos\\pessoais).")
 
             origem = os.path.join(RAIZ, jogo["arquivo"])
             if not dentro_da_pasta(origem, PASTA_JOGOS) or not os.path.isfile(origem):
@@ -3574,7 +3810,7 @@ class Manipulador(BaseHTTPRequestHandler):
                 # os.replace nao atravessa disco; move e o caminho seguro.
                 shutil.move(origem, destino)
             except OSError as falha:
-                return self.erro("Nao consegui mover: %s" % falha)
+                return self.erro(traduzir_erro_do_sistema(falha, "mover o jogo"))
 
             # O jogo mudou de lugar, entao o save antigo perderia o vinculo.
             # Como o nome do arquivo nao muda, os saves continuam valendo.
@@ -3593,12 +3829,14 @@ class Manipulador(BaseHTTPRequestHandler):
         if caminho == "/api/jogo/console":
             jogo_id = str(dados.get("jogo_id", ""))
             if not achar_jogo(jogo_id):
-                return self.erro("Jogo nao encontrado.", 404)
+                return self.erro("Jogo nao encontrado. Ele pode ter sido movido ou apagado. "
+                                 "Clique em Atualizar lista e tente de novo.", 404)
 
             plataforma = str(dados.get("plataforma", "")).strip().lower()
             validas = {p["id"] for p in carregar_catalogo()}
             if plataforma and plataforma not in validas:
-                return self.erro("Console desconhecido.")
+                return self.erro("Console desconhecido. Escolha um console da lista "
+                                 "(ou confira a pasta do jogo em jogos\\pessoais).")
 
             indexador.gravar_manual(jogo_id, plataforma)
             limpar_caches()
@@ -3614,11 +3852,13 @@ class Manipulador(BaseHTTPRequestHandler):
         if caminho == "/api/estado/apagar":
             jogo = achar_jogo(dados.get("jogo_id"))
             if not jogo:
-                return self.erro("Jogo nao encontrado.", 404)
+                return self.erro("Jogo nao encontrado. Ele pode ter sido movido ou apagado. "
+                                 "Clique em Atualizar lista e tente de novo.", 404)
             try:
                 apagou = cheats.apagar_estado(jogo, dados.get("espaco"))
             except (TypeError, ValueError):
-                return self.erro("Espaco invalido.")
+                return self.erro("Esse número de espaço não existe. Escolha um dos que "
+                                 "aparecem na lista de saves do jogo.")
             return self.responder_json({
                 "ok": True, "apagou": apagou,
                 "estados": cheats.listar_estados(jogo)})
@@ -3627,7 +3867,8 @@ class Manipulador(BaseHTTPRequestHandler):
         if caminho == "/api/cheat/adicionar":
             jogo = achar_jogo(dados.get("jogo_id"))
             if not jogo:
-                return self.erro("Jogo nao encontrado.", 404)
+                return self.erro("Jogo nao encontrado. Ele pode ter sido movido ou apagado. "
+                                 "Clique em Atualizar lista e tente de novo.", 404)
             lista, erro = cheats.adicionar_cheat(
                 jogo, str(dados.get("descricao", ""))[:120],
                 str(dados.get("codigo", "")), bool(dados.get("ligado")))
@@ -3638,11 +3879,13 @@ class Manipulador(BaseHTTPRequestHandler):
         if caminho == "/api/cheat/alterar":
             jogo = achar_jogo(dados.get("jogo_id"))
             if not jogo:
-                return self.erro("Jogo nao encontrado.", 404)
+                return self.erro("Jogo nao encontrado. Ele pode ter sido movido ou apagado. "
+                                 "Clique em Atualizar lista e tente de novo.", 404)
             try:
                 indice = int(dados.get("indice"))
             except (TypeError, ValueError):
-                return self.erro("Indice invalido.")
+                return self.erro("Esse código não está mais na lista de cheats. "
+                                 "Reabra o painel do jogo e tente de novo.")
             lista, erro = cheats.alterar_cheat(
                 jogo, indice, dados.get("ligado"), bool(dados.get("apagar")))
             if erro:
@@ -3654,7 +3897,7 @@ class Manipulador(BaseHTTPRequestHandler):
             try:
                 return self.responder_json(dict(ok=True, **exportar_saves()))
             except OSError as falha:
-                return self.erro("Nao consegui montar o pacote: %s" % falha)
+                return self.erro(traduzir_erro_do_sistema(falha, "montar o pacote"))
 
         if caminho == "/api/importar":
             resultado, erro = importar_saves(dados.get("arquivo"))
@@ -3700,7 +3943,7 @@ class Manipulador(BaseHTTPRequestHandler):
             try:
                 brutos = base64.b64decode(imagem, validate=True)
             except (binascii.Error, ValueError):
-                return self.erro("Imagem invalida.")
+                return self.erro("Essa imagem não abriu. Use um arquivo .png, .jpg ou .webp.")
             if not brutos or len(brutos) > 6 * 1024 * 1024:
                 return self.erro("Imagem grande demais (limite de 6 MB).")
             tipo = _tipo_da_imagem(brutos)
@@ -3716,7 +3959,8 @@ class Manipulador(BaseHTTPRequestHandler):
             nome_base = os.path.splitext(os.path.basename(caminho_rom))[0]
             destino = os.path.join(pasta_jogo, "capas", nome_base + extensoes[tipo])
             if not dentro_da_pasta(destino, PASTA_JOGOS):
-                return self.erro("Destino invalido.")
+                return self.erro("Não consegui achar onde guardar essa capa. Clique em "
+                                 "Atualizar lista e tente de novo.")
 
             try:
                 os.makedirs(os.path.dirname(destino), exist_ok=True)
@@ -3728,7 +3972,7 @@ class Manipulador(BaseHTTPRequestHandler):
                         os.fsync(arquivo.fileno())
                     os.replace(temporario, destino)
             except OSError as falha:
-                return self.erro("Nao consegui gravar a capa: %s" % falha, 500)
+                return self.erro(traduzir_erro_do_sistema(falha, "gravar a capa"), 500)
 
             limpar_caches()
             manifesto(forcar=True)
@@ -3807,6 +4051,10 @@ class Manipulador(BaseHTTPRequestHandler):
                 "apelido": config.get("apelido", ""),
                 "servidor_id": config["dispositivo_id"],
                 "arena": True,
+                # O PARTIDA.bat compara a versao dos dois lados por aqui.
+                # Antes lia /api/estado do colega, que desde a Fase 3 so
+                # responde a este computador (tem a configuracao inteira).
+                "versao": VERSAO,
             })
 
         # ---- bibliotecas graficas sem instalar ------------------------------
@@ -4017,7 +4265,14 @@ class Manipulador(BaseHTTPRequestHandler):
                         return self.erro("Informe o endereco de quem esta "
                                          "hospedando a partida.")
                 pela_internet = bool(dados.get("pela_internet"))
-                jogadores_max = plataforma.get("jogadores_max", 2)
+                # Jogo especifico usa Multitap (lista curada, consoles.json
+                # -> jogos_multitap)? So entao o limite de jogadores sobe
+                # do padrao da plataforma (2) para o que o multitap
+                # oferece. Nao e' por console inteiro -- a maioria dos
+                # jogos de SNES, por exemplo, nao usa multitap nenhum.
+                multitap = graficos.jogo_suporta_multitap(plataforma, jogo["titulo"])
+                jogadores_max = (5 if multitap else
+                                plataforma.get("jogadores_max", 2))
                 try:
                     posicao = int(dados.get("jogador") or 2)
                 except (TypeError, ValueError):
@@ -4028,7 +4283,7 @@ class Manipulador(BaseHTTPRequestHandler):
                         apelido, hospedar, assistir=assistir,
                         pela_internet=pela_internet,
                         repasse=str(dados.get("repasse", "saopaulo")),
-                        jogador=posicao),
+                        jogador=posicao, multitap=multitap),
                     "argumentos": graficos.argumentos_de_partida(hospedar, endereco),
                     "papel": "jogador 1" if hospedar else "jogador %d" % posicao,
                 }
@@ -4097,7 +4352,8 @@ class Manipulador(BaseHTTPRequestHandler):
 
             jogo = achar_jogo(dados.get("jogo_id"))
             if not jogo:
-                return self.erro("Jogo nao encontrado.", 404)
+                return self.erro("Jogo nao encontrado. Ele pode ter sido movido ou apagado. "
+                                 "Clique em Atualizar lista e tente de novo.", 404)
 
             config = carregar_config()
             apelido = (dados.get("apelido") or config["apelido"] or "convidado")[:24]
@@ -4111,7 +4367,7 @@ class Manipulador(BaseHTTPRequestHandler):
                 )
             return self.responder_json({"ok": True, "pendentes": contar_pendentes()})
 
-        return self.send_error(404, "Rota nao encontrada")
+        return self.erro("Rota nao encontrada.", 404)
 
 
 class Servidor(ThreadingHTTPServer):
@@ -4146,18 +4402,33 @@ FAIXAS_DE_REDE = [
     ("172.17.", "virtual", "Adaptador virtual (nao serve para o colega)"),
     ("172.18.", "virtual", "Adaptador virtual (nao serve para o colega)"),
     ("172.19.", "virtual", "Adaptador virtual (nao serve para o colega)"),
-    ("172.2", "virtual", "Adaptador virtual (nao serve para o colega)"),
     ("172.30.", "virtual", "Adaptador virtual (nao serve para o colega)"),
     ("172.31.", "virtual", "Adaptador virtual (nao serve para o colega)"),
     ("192.168.56.", "virtual", "Adaptador virtual (nao serve para o colega)"),
     ("192.168.99.", "virtual", "Adaptador virtual (nao serve para o colega)"),
+    # Ponto de acesso pessoal do iPhone usa 172.20.10.0/28 -- faixa real de
+    # rede local (celular do colega), nao adaptador virtual nenhum. Achado
+    # real na auditoria: a entrada antiga aqui era "172.2" (faltou o "0."),
+    # que sem querer casava com 172.20. ATE 172.29. inteiros (o Python
+    # confere prefixo de texto, nao limite de bloco de IP) e classificava
+    # hotspot de iPhone como "adaptador virtual, nao serve para o colega" --
+    # exatamente o endereco que o aluno precisava passar.
     ("192.168.", "rede_local", "Rede local"),
     ("10.", "rede_local", "Rede local"),
     ("172.16.", "rede_local", "Rede local"),
     ("172.17.", "rede_local", "Rede local"),
     ("172.18.", "rede_local", "Rede local"),
     ("172.19.", "rede_local", "Rede local"),
-    ("172.2", "rede_local", "Rede local"),
+    ("172.20.", "rede_local", "Rede local (hotspot de iPhone usa essa faixa)"),
+    ("172.21.", "rede_local", "Rede local"),
+    ("172.22.", "rede_local", "Rede local"),
+    ("172.23.", "rede_local", "Rede local"),
+    ("172.24.", "rede_local", "Rede local"),
+    ("172.25.", "rede_local", "Rede local"),
+    ("172.26.", "rede_local", "Rede local"),
+    ("172.27.", "rede_local", "Rede local"),
+    ("172.28.", "rede_local", "Rede local"),
+    ("172.29.", "rede_local", "Rede local"),
     ("172.30.", "rede_local", "Rede local"),
     ("172.31.", "rede_local", "Rede local"),
 ]
@@ -4272,10 +4543,19 @@ def internet_disponivel():
     return False
 
 
+_LOCALAPPDATA = os.environ.get("LOCALAPPDATA", "")
+
 NAVEGADORES = [
     r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
     r"C:\Program Files\Google\Chrome\Application\chrome.exe",
     r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
+    # Instalacao SEM administrador (o instalador do Chrome cai aqui
+    # quando falta privilegio -- exatamente o caso normal de notebook de
+    # aluno, sem admin nenhum). Achado real na auditoria: sem isto, o
+    # ARENA nao encontrava o navegador e caia, sem avisar, para uma aba
+    # comum em vez da janela "modo app".
+    os.path.join(_LOCALAPPDATA, "Google", "Chrome", "Application", "chrome.exe"),
+    os.path.join(_LOCALAPPDATA, "Microsoft", "Edge", "Application", "msedge.exe"),
 ]
 
 
@@ -4328,6 +4608,16 @@ def principal():
     if orfaos:
         print("  Limpeza:  %d arquivo(s) temporario(s) de uma sessao anterior"
               % orfaos)
+
+    # O RetroArch grava um retroarch__AAAA_MM_DD__HH_MM_SS.log por sessao
+    # (log_to_file_timestamp = true, la embaixo neste arquivo) e nunca
+    # apaga nenhum sozinho. Achado real na auditoria: depois de um dia de
+    # testes, dados\ tinha 38 desses. Mantem so os mais recentes -- da
+    # pra investigar um fechamento recente sem o cartao SD/pen drive
+    # acumular log para sempre.
+    apagados_log = limpar_logs_antigos()
+    if apagados_log:
+        print("  Limpeza:  %d log(s) antigo(s) do RetroArch" % apagados_log)
 
     # Pen drive muda de letra, pasta muda de lugar - conserta sozinho antes
     # de mais nada, senao o RetroArch abre com caminho de uma pasta que

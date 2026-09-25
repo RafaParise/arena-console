@@ -48,9 +48,16 @@ def olhar(texto):
     falar("  [olhe]    %s" % texto)
 
 
-def pedir(url, tempo=4):
+def pedir(url, tempo=4, corpo=None):
+    """GET normal; com `corpo`, manda POST em JSON (o servidor so aceita
+    POST com Content-Type application/json)."""
     try:
-        with urllib.request.urlopen(url, timeout=tempo) as resposta:
+        requisicao = urllib.request.Request(url)
+        if corpo is not None:
+            requisicao = urllib.request.Request(
+                url, data=json.dumps(corpo).encode("utf-8"), method="POST",
+                headers={"Content-Type": "application/json"})
+        with urllib.request.urlopen(requisicao, timeout=tempo) as resposta:
             return json.loads(resposta.read().decode("utf-8"))
     except Exception:
         return None
@@ -62,6 +69,27 @@ def porta_aberta(endereco, porta, tempo=2.0):
             return True
     except OSError:
         return False
+
+
+def categoria_de_rede():
+    """Confere se o Windows marcou a rede atual como Publica -- so LER essa
+    categoria nao pede administrador, mas o Firewall do Windows trata rede
+    Publica de um jeito bem mais fechado, e um aluno comum (sem senha de
+    admin) nao consegue aprovar a caixa "Permitir que este app se comunique"
+    que aparece nesse caso. Achado real na auditoria: antes desta checagem,
+    o ARENA so *chutava* firewall como possivel causa, sem confirmar nada.
+    Devolve a categoria ("Public", "Private", "DomainAuthenticated") ou None
+    se nao deu pra descobrir (comando indisponivel, por exemplo)."""
+    import subprocess
+    try:
+        resultado = subprocess.run(
+            ["powershell.exe", "-NoProfile", "-NonInteractive", "-Command",
+             "(Get-NetConnectionProfile | Select-Object -First 1 -ExpandProperty NetworkCategory)"],
+            capture_output=True, text=True, timeout=5)
+        saida = resultado.stdout.strip()
+        return saida or None
+    except Exception:
+        return None
 
 
 falar("=" * 62)
@@ -128,6 +156,23 @@ falar()
 
 certo("porta %d (ARENA) esta escutando" % PORTA)
 
+categoria = categoria_de_rede()
+if categoria == "Public":
+    torto(
+        "O Windows marcou esta rede como PUBLICA.",
+        "O Firewall do Windows fecha bem mais numa rede publica, e a caixa "
+        "'Permitir que este app se comunique' pede senha de administrador -- "
+        "um aluno comum nao consegue aprovar sozinho. Peca para o professor "
+        "(com a senha de admin) trocar a rede para 'Privada' em "
+        "Configuracoes > Rede e Internet > Wi-Fi > Propriedades, ou aprove "
+        "a caixa do Firewall quando ela aparecer.")
+elif categoria:
+    certo("rede categorizada como %s (nao e publica)" % categoria)
+else:
+    olhar("nao consegui perguntar ao Windows a categoria da rede (comando "
+         "indisponivel). Se a partida nao conectar, confira manualmente em "
+         "Configuracoes > Rede e Internet.")
+
 if porta_aberta("127.0.0.1", PORTA_PARTIDA, 1.0):
     certo("porta %d (partida) esta aberta - tem jogo em rede rodando"
           % PORTA_PARTIDA)
@@ -152,8 +197,14 @@ if colega:
     else:
         certo("o ARENA dele responde")
 
-        dele = pedir("http://%s:%d/api/estado" % (colega, PORTA))
-        if dele:
+        # /api/sinc/ola e' uma das rotas abertas a rede; /api/estado (que
+        # era usada aqui) so responde ao proprio computador desde a Fase 3
+        # da auditoria -- com ela, estas duas checagens sumiam em silencio.
+        dele = pedir("http://%s:%d/api/sinc/ola" % (colega, PORTA), corpo={})
+        if not dele:
+            olhar("o ARENA dele respondeu, mas nao consegui ler a versao e o "
+                  "codigo do aparelho dele.")
+        else:
             if dele.get("versao") != meu.get("versao"):
                 torto("Versoes diferentes: voce %s, ele %s."
                       % (versao, dele.get("versao", "antiga")),
@@ -161,7 +212,7 @@ if colega:
             else:
                 certo("mesma versao dos dois lados")
 
-            if dele["config"]["dispositivo_id"] == meu["config"]["dispositivo_id"]:
+            if dele.get("servidor_id") == meu["config"]["dispositivo_id"]:
                 torto("Voces dois tem o MESMO codigo de aparelho.",
                       "Um dos dois usa Ajustes > Perfil > Comecar do zero.")
             else:

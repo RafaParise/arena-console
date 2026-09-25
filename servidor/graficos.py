@@ -587,53 +587,6 @@ CONTROLES_CONHECIDOS = [
 ]
 
 
-# ---------------------------------------------------------------------------
-# Dizer ao console que o controle tem analogico
-# ---------------------------------------------------------------------------
-# Faltava isto, e era o motivo de o analogico nao funcionar no PlayStation
-# por mais que o controle estivesse certo.
-#
-# O console nao adivinha que controle esta plugado. O PlayStation 1 saiu de
-# fabrica com um controle SEM analogico; o DualShock veio depois. O
-# emulador comeca imitando o controle antigo, e ai os dois analogicos nao
-# fazem nada - nem o esquerdo, nem o direito.
-#
-# 513 = controle comum (so direcional)
-# 517 = controle com dois analogicos (DualShock e equivalentes)
-
-CONTROLE_ANALOGICO = 517
-CONTROLE_COMUM = 513
-
-# Consoles cujo controle padrao tem dois analogicos.
-COM_ANALOGICO = {
-    "ps1": CONTROLE_ANALOGICO,       # DualShock
-    "ps2": CONTROLE_ANALOGICO,       # DualShock 2
-    "dreamcast": CONTROLE_ANALOGICO,
-    "saturn": CONTROLE_ANALOGICO,    # 3D Control Pad
-    "gamecube": CONTROLE_ANALOGICO,
-    "n64": CONTROLE_ANALOGICO,       # o N64 tem um analogico so, mas o
-                                     # nucleo aceita o mesmo codigo
-}
-
-
-def opcoes_de_controle(plataforma_id, quantos_jogadores=2):
-    """Diz ao nucleo que tipo de controle cada jogador esta usando.
-
-    Sem isto, o analogico fica mudo em PlayStation, Dreamcast e Saturn -
-    o console acha que o controle e o velho, sem analogico nenhum.
-    """
-    tipo = COM_ANALOGICO.get(plataforma_id)
-    if not tipo:
-        return {}
-
-    opcoes = {}
-    for jogador in range(1, max(1, min(quantos_jogadores, 4)) + 1):
-        opcoes["input_libretro_device_p%d" % jogador] = str(tipo)
-        # O analogico esquerdo tambem anda como direcional, e o direcional
-        # continua funcionando. O analogico direito fica livre para o que
-        # o jogo quiser - camera, mira.
-        opcoes["input_player%d_analog_dpad_mode" % jogador] = "1"
-    return opcoes
 
 
 # ---------------------------------------------------------------------------
@@ -1320,9 +1273,30 @@ REPASSE_PADRAO = "saopaulo"
 JOGADORES_PADRAO_NETPLAY = 2
 JOGADORES_MAXIMO_NETPLAY = 8  # limite de seguranca; nenhum console cadastrado passa disso
 
+# Device ID do libretro para "Multitap" (nucleo snes9x: RETRO_DEVICE_JOYPAD_MULTITAP
+# = (1 << 8) | RETRO_DEVICE_JOYPAD = 257 -- conferido no codigo-fonte do
+# nucleo, nao inventado). Ligado na porta 2, o multitap abre mais 4 encaixes
+# de controle (portas 2 a 5) -- porta 1 continua sendo o jogador 1 normal.
+# E' assim que o adaptador de verdade funciona: pluga na porta 2 do
+# Super Nintendo, nao substitui a porta 1.
+DISPOSITIVO_MULTITAP_SNES = 257
+
+
+def jogo_suporta_multitap(plataforma, titulo):
+    """Confere se ESTE jogo (pelo titulo) esta na lista curada de jogos que
+    aceitam o adaptador Multitap (consoles.json -> jogos_multitap). Lista
+    curta de proposito, do mesmo jeito que o PS2 com 'system link': so
+    cresce testando com jogo real, nunca por suposicao -- a maioria dos
+    jogos de um console nao usa multitap, e mostrar "Jogador 3/4/5" pra
+    eles confundiria o aluno a toa."""
+    lista = plataforma.get("jogos_multitap", [])
+    titulo_normalizado = (titulo or "").lower()
+    return any(nome.lower() in titulo_normalizado for nome in lista)
+
 
 def opcoes_de_partida(apelido, hospedar, atraso=0, assistir=False,
-                      pela_internet=False, repasse=REPASSE_PADRAO, jogador=None):
+                      pela_internet=False, repasse=REPASSE_PADRAO, jogador=None,
+                      multitap=False):
     """Opcoes do RetroArch para hospedar, entrar ou assistir uma partida.
 
     Assistir e o mesmo caminho de entrar numa partida, so que sem pegar
@@ -1374,6 +1348,14 @@ def opcoes_de_partida(apelido, hospedar, atraso=0, assistir=False,
         # pode herdar "true" de uma partida anterior gravada no override.
         opcoes["netplay_request_device_p%d" % n] = (
             "true" if (not assistir and n == posicao) else "false")
+
+    if multitap:
+        # Liga o adaptador na porta 2 do console (nao na 1 - e assim que o
+        # Multitap de verdade pluga). Isso abre 4 encaixes (jogadores 2 a
+        # 5); jogador 1 continua na porta normal. Precisa estar igual em
+        # TODAS as maquinas da partida (quem hospeda e quem entra) para o
+        # estado do nucleo bater nos dois lados.
+        opcoes["input_libretro_device_p2"] = str(DISPOSITIVO_MULTITAP_SNES)
 
     return opcoes
 

@@ -55,6 +55,10 @@ function atualizarBotaoTema() {
   if (!botao || !estado.config) return;
   const escuro = estado.config.tema === "escuro";
   document.body.dataset.tema = escuro ? "escuro" : "claro";
+  // Os fundos animados (galaxy-background.js, field-background.js) leem
+  // isto para se desligar sozinhos no modo modesto -- computador fraco
+  // nao precisa gastar quadro nenhum com decoracao.
+  document.body.dataset.modoModesto = estado.config.modo_modesto ? "true" : "false";
   botao.textContent = escuro ? "☀ Claro" : "☾ Escuro";
   botao.setAttribute("aria-label", escuro ? "Usar modo claro" : "Usar modo escuro");
 }
@@ -442,6 +446,17 @@ function linhaDoJogo(jogo) {
                    (disponivel ? "" : " jogo--indisponivel");
   item.dataset.jogo = jogo.id;
   item.classList.toggle("jogo--selecionado", estado.jogoSelecionado?.id === jogo.id);
+  // Sem isto, quem usa só o teclado não consegue abrir o painel de detalhes.
+  item.tabIndex = 0;
+  item.setAttribute("role", "button");
+  item.setAttribute("aria-label", `Ver detalhes de ${jogo.titulo}`);
+  item.addEventListener("keydown", (evento) => {
+    if (evento.target !== item) return;
+    if (evento.key === "Enter" || evento.key === " ") {
+      evento.preventDefault();
+      selecionarJogo(jogo);
+    }
+  });
 
   // Arrastar a linha e soltar num console do lado esquerdo move o
   // arquivo de verdade para a pasta daquele console.
@@ -3077,7 +3092,12 @@ function ligarEventos() {
       $("#campoInternet").hidden = false;
       preencherAmigosPartida();
 
-      const maximo = (estado.porPlataforma[estado.jogoDaPartida?.plataforma] || {}).jogadores_max || 2;
+      // O jogo especifico pode aceitar mais jogadores que o console em
+      // geral (Multitap, ex.: Super Bomberman) -- por isso o numero vem
+      // do PROPRIO jogo agora, nao so da plataforma.
+      const maximo = estado.jogoDaPartida?.jogadores_max
+        || (estado.porPlataforma[estado.jogoDaPartida?.plataforma] || {}).jogadores_max
+        || 2;
       const mostrarJogador = estado.papelDaPartida === "entrar" && maximo > 2;
       $("#campoJogadorPartida").hidden = !mostrarJogador;
       if (mostrarJogador) {

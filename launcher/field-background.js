@@ -124,17 +124,32 @@
     return document.body.dataset.tema !== 'escuro';
   }
 
+  // Modo modesto e "prefira menos movimento" desligam o fundo animado --
+  // ver a mesma correção em galaxy-background.js para o porquê.
+  const prefereMenosMovimento = window.matchMedia
+    && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function deveAnimar() {
+    return estaVisivel()
+      && document.body.dataset.modoModesto !== 'true'
+      && !prefereMenosMovimento;
+  }
+
+  // Ver a mesma correção em galaxy-background.js para o porquê.
+  function sincronizarVisibilidade() {
+    canvas.style.display = estaVisivel() ? 'block' : 'none';
+  }
+
   let t = 0;
   let ultimoFrame = performance.now();
+  let animando = false;
 
   function draw() {
     ultimoFrame = performance.now();
+    sincronizarVisibilidade();
 
-    const visivel = estaVisivel();
-    canvas.style.display = visivel ? 'block' : 'none';
-
-    if (!visivel) {
-      requestAnimationFrame(draw);
+    if (!deveAnimar()) {
+      animando = false;
       return;
     }
 
@@ -240,16 +255,18 @@
       console.error('Fundo de campo: erro num frame, seguindo pro próximo.', e);
     }
 
+    animando = true;
     requestAnimationFrame(draw);
   }
 
   draw();
 
   setInterval(function () {
+    sincronizarVisibilidade();
     if (document.visibilityState !== 'visible') return;
-    const parado = performance.now() - ultimoFrame > 3000;
+    if (!deveAnimar()) return;
+    const parado = !animando || performance.now() - ultimoFrame > 3000;
     if (parado) {
-      console.warn('Fundo de campo parado há mais de 3s, reiniciando o loop.');
       draw();
     }
   }, 2000);

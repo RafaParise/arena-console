@@ -1,0 +1,50 @@
+[
+  {
+    "console": "Nintendo 64",
+    "jogo": "Bomberman 64 (USA).n64",
+    "abre_e_mostra_imagem": true,
+    "tamanho_captura_bytes": 73905,
+    "salva_estado": true,
+    "carrega_sem_travar": true
+  },
+  {
+    "console": "Super Nintendo",
+    "jogo": "Super Bomberman 4 (Japan) [T-En by Svambo v1.0].sfc",
+    "abre_e_mostra_imagem": true,
+    "tamanho_captura_bytes": 50098,
+    "salva_estado": true,
+    "carrega_sem_travar": true
+  },
+  {
+    "console": "PlayStation",
+    "jogo": "CTR - Crash Team Racing (USA).bin",
+    "abre_e_mostra_imagem": true,
+    "tamanho_captura_bytes": 7105,
+    "salva_estado": true,
+    "carrega_sem_travar": true
+  },
+  {
+    "console": "Dreamcast",
+    "jogo": "Marvel vs. Capcom 2 (USA).cue",
+    "abre_e_mostra_imagem": true,
+    "tamanho_captura_bytes": 171413,
+    "salva_estado": true,
+    "carrega_sem_travar": true
+  },
+  {
+    "console": "Neo Geo",
+    "jogo": "kof97.zip",
+    "abre_e_mostra_imagem": true,
+    "tamanho_captura_bytes": 95210,
+    "salva_estado": false,
+    "carrega_sem_travar": true
+  },
+  {
+    "console": "PSP",
+    "jogo": "Killzone - Liberation (USA) (En,Fr,De,Es,It,Nl,Pl,Ru).iso",
+    "abre_e_mostra_imagem": true,
+    "tamanho_captura_bytes": 41924,
+    "salva_estado": true,
+    "carrega_sem_travar": true
+  }
+]

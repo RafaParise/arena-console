@@ -130,6 +130,13 @@ controle do roteador da escola.
 
 Ligue e **feche e abra o ARENA**. A mudança só vale depois de reiniciar.
 
+**Isso é seguro?** Sim. Ligar essa chave abre para a rede só o que a
+partida a dois e a troca de recordes precisam. Um colega na mesma rede não
+consegue mudar as suas configurações, apagar os seus saves nem abrir jogo
+no seu computador — o ARENA recusa esses pedidos quando eles vêm de outra
+máquina. É como deixar o portão aberto para a festa, mas com a porta do
+quarto trancada.
+
 Logo abaixo aparece a lista de endereços do seu computador:
 
 | Etiqueta | Quando usar |
@@ -293,6 +300,13 @@ jogador 1.
 jogando todo mundo no mesmo computador — o núcleo dele não faz Jogar
 Junto em máquinas separadas. Veja a tabela na próxima seção.)*
 
+**Super Bomberman (Super Nintendo) liga o Multitap sozinho.** Jogos dessa
+série aceitam até 5 jogadores — o ARENA reconhece e libera as opções
+"Jogador 2" até "Jogador 5" automaticamente, sem precisar configurar nada.
+Testado de verdade com 4 jogadores juntos (hospedeiro + 3 convidados); o
+5º jogador ainda não foi confirmado em máquinas separadas — se você testar
+com 5 notebooks de verdade, veja se funciona e avise.
+
 Os dois (ou mais) precisam do **mesmo arquivo de jogo**. Se um tiver a
 versão americana e o outro a japonesa, a partida nem começa.
 
@@ -429,6 +443,13 @@ Para liberar na mão, nos dois computadores:
 1. Iniciar → **Firewall do Windows Defender com Segurança Avançada**
 2. **Regras de Entrada → Nova Regra → Porta → TCP → 55435**
 3. **Permitir a conexão** → marque só **Particular** → nome: `ARENA partida`
+
+**Se a rede está marcada como "Pública"** (comum em rede de escola que
+nunca foi configurada), o Windows fecha ainda mais e a caixa de permissão
+passa a pedir **senha de administrador** — um aluno comum não consegue
+aprovar sozinho. O `PARTIDA.bat` agora detecta isso sozinho e avisa; se
+aparecer esse aviso, peça pro professor trocar a rede para "Privada" em
+**Configurações → Rede e Internet → Wi-Fi → Propriedades**.
 
 ---
 

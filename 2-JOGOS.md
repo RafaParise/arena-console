@@ -356,7 +356,9 @@ PlayStation 2 mantém. O ARENA passa a chamar ele sozinho.
 #### 1. Baixe o emulador
 
 **Só dois.** O RetroArch dá conta de todo o resto, inclusive PlayStation 1
-(o núcleo dele *é* o DuckStation) e PSP.
+(o núcleo dele é o **SwanStation** — nasceu como um fork do DuckStation,
+por isso o nome aparece em alguns lugares, mas quem roda o jogo é o
+SwanStation) e PSP.
 
 | Console | Programa | Precisa? | Onde |
 |---|---|---|---|
@@ -398,6 +400,11 @@ Ao abrir um jogo, o aviso diz por qual programa: *"Abrindo Black pelo PCSX2"*.
 ---
 
 ### A BIOS
+
+**BIOS** é o programinha que vem de fábrica dentro do console de verdade e
+liga ele por dentro. Sem uma cópia dele, o emulador não sabe nem começar —
+é como tentar dar a partida num carro sem a chave: o motor está lá, mas
+falta a peça que acorda tudo.
 
 #### Pelos emuladores de fora
 

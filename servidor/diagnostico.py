@@ -339,6 +339,50 @@ try:
 except OSError:
     pass
 
+# FAT32 nao aceita arquivo maior que 4 GB -- achado real na auditoria: um
+# ISO de PS2 grande (Gran Turismo 4 tem 4,95 GB, e nao e' o unico jogo
+# assim) simplesmente nao cabe inteiro num pen drive formatado em FAT32.
+# So funciona no Windows.
+#
+# Cuidado (corrigido na Fase 8): num FAT32 de verdade NAO EXISTE arquivo
+# maior que 4 GB -- procurar por isso nunca acharia nada. O que pode
+# existir e' um arquivo com o tamanho MAXIMO do FAT32 (4 GB menos 1 byte):
+# e' onde uma copia que nao coube para de escrever. Jogo com esse tamanho
+# exato quase certamente veio cortado.
+LIMITE_FAT32 = 4 * 1024 * 1024 * 1024 - 1
+sys.path.insert(0, PASTA_SERVIDOR)
+import hardware  # noqa: E402
+sistema_arquivos = hardware.sistema_de_arquivos(RAIZ)
+if sistema_arquivos:
+    print("  sistema de arquivos: %s" % sistema_arquivos)
+    if sistema_arquivos.upper() == "FAT32":
+        pasta_jogos = caminho("jogos")
+        cortados = []
+        if os.path.isdir(pasta_jogos):
+            for atual, _subs, arquivos in os.walk(pasta_jogos):
+                for nome in arquivos:
+                    caminho_arquivo = os.path.join(atual, nome)
+                    try:
+                        if os.path.getsize(caminho_arquivo) >= LIMITE_FAT32:
+                            cortados.append(os.path.relpath(caminho_arquivo, RAIZ))
+                    except OSError:
+                        continue
+        if cortados:
+            grave.append("%d jogo(s) cortado(s) no limite do FAT32" % len(cortados))
+            print("  GRAVE  Este pen drive e' FAT32, que nao aceita arquivo maior")
+            print("         que 4 GB. %d jogo(s) pararam exatamente nesse limite" % len(cortados))
+            print("         -- quase certamente vieram cortados e nao vao abrir:")
+            for g in cortados[:5]:
+                print("           %s" % g)
+            print("         Copie de novo para um pen drive em exFAT ou NTFS.")
+        else:
+            atencao.append("pen drive em FAT32 (limite de 4 GB por arquivo)")
+            print("  Cuidado: FAT32 nao aceita jogo maior que 4 GB (ISO de PS2,")
+            print("  por exemplo). O Windows recusa a copia, e o jogo simplesmente")
+            print("  nao aparece na lista. Para jogo grande, use exFAT ou NTFS.")
+    else:
+        ok.append("sistema de arquivos aceita arquivo grande")
+
 
 # ---------------------------------------------------------------------------
 titulo("9. Copias de seguranca")
