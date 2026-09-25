@@ -134,4 +134,9 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    # Devolve o retroarch.cfg real como estava (o RetroArch grava ao
+    # fechar, e levaria junto as pastas temporarias deste teste).
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(
+        os.path.abspath(__file__))), "testes"))
+    import protege_cfg
+    sys.exit(protege_cfg.rodar(main))

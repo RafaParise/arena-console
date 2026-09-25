@@ -223,7 +223,13 @@ def main():
               raiz_teste, ") -- rode de novo o script pra limpar.")
         print("Resumo salvo em", destino_relatorio)
 
-        return 0
+        # Corrigido na revisao pos-auditoria: antes devolvia 0 SEMPRE, e a
+        # rodada final contava como "passou" mesmo com um convidado de fora.
+        faltaram = [n for n, t in tempos_de_entrada.items() if t is None]
+        ok = not faltaram and vivos == len(papeis)
+        print("\nRESULTADO:", "PASSOU (os %d convidados entraram)" % len(tempos_de_entrada)
+              if ok else "FALHOU (nao entraram: %s)" % (", ".join(faltaram) or "-"))
+        return 0 if ok else 1
     finally:
         print("\nEncerrando os 5 processos...")
         for p in processos:
@@ -245,4 +251,9 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    # Devolve o retroarch.cfg real como estava (o RetroArch grava ao
+    # fechar, e levaria junto as pastas temporarias deste teste).
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(
+        os.path.abspath(__file__))), "testes"))
+    import protege_cfg
+    sys.exit(protege_cfg.rodar(main))

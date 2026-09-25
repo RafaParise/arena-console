@@ -97,6 +97,27 @@ CHAVES_SEMPRE_DENTRO_DO_ARENA = {
     "cache_directory": "retroarch\\cache",
 }
 
+# Lugar certo de cada chave quando o caminho gravado aponta para FORA do
+# ARENA e nao tem nenhuma pasta conhecida dentro para reaproveitar. Achado
+# real (revisao pos-auditoria): um teste abriu o RetroArch com pastas
+# temporarias, o RetroArch gravou isso ao fechar, e o retroarch.cfg ficou
+# com saves, estados e historico apontando para uma pasta do Temp que ja
+# tinha sido apagada. Os mesmos lugares que o ARENA manda em toda partida
+# (arena.py, opcoes da partida). "{nome}" = o nome do arquivo antigo.
+CHAVES_COM_LUGAR_CERTO = {
+    "savefile_directory": "retroarch\\saves",
+    "savestate_directory": "retroarch\\states",
+    "screenshot_directory": "retroarch\\screenshots",
+    "system_directory": "retroarch\\system",
+    "playlist_directory": "dados",
+    "log_dir": "dados",
+    "content_favorites_path": "dados\\builtin\\{nome}",
+    "content_history_path": "dados\\builtin\\{nome}",
+    "content_image_history_path": "dados\\builtin\\{nome}",
+    "content_music_history_path": "dados\\builtin\\{nome}",
+    "content_video_history_path": "dados\\builtin\\{nome}",
+}
+
 
 def corrigir_caminhos_retroarch_cfg():
     """Reescreve, dentro do retroarch.cfg, todo caminho que nao aponta mais
@@ -144,6 +165,14 @@ def corrigir_caminhos_retroarch_cfg():
             linhas[i] = '%s"%s"\n' % (prefixo, os.path.join(RAIZ, resto))
             trocados += 1
             break
+        else:
+            # Nenhuma pasta do ARENA dentro do caminho velho: se a chave
+            # tem lugar certo conhecido, volta para ele.
+            if chave in CHAVES_COM_LUGAR_CERTO:
+                relativo = CHAVES_COM_LUGAR_CERTO[chave].format(
+                    nome=os.path.basename(caminho_velho))
+                linhas[i] = '%s"%s"\n' % (prefixo, os.path.join(RAIZ, relativo))
+                trocados += 1
 
     # Chave que nem aparece no arquivo (RetroArch novo, nunca rodou): cria.
     for chave, relativo in CHAVES_SEMPRE_DENTRO_DO_ARENA.items():
@@ -1280,6 +1309,8 @@ JOGADORES_MAXIMO_NETPLAY = 8  # limite de seguranca; nenhum console cadastrado p
 # E' assim que o adaptador de verdade funciona: pluga na porta 2 do
 # Super Nintendo, nao substitui a porta 1.
 DISPOSITIVO_MULTITAP_SNES = 257
+JOGADORES_MULTITAP = 5          # jogador 1 na porta 1 + 4 no adaptador da porta 2
+NETPLAY_CONEXOES_PADRAO = 3     # o mesmo padrao do RetroArch (netplay_max_connections)
 
 
 def jogo_suporta_multitap(plataforma, titulo):
@@ -1356,6 +1387,14 @@ def opcoes_de_partida(apelido, hospedar, atraso=0, assistir=False,
         # TODAS as maquinas da partida (quem hospeda e quem entra) para o
         # estado do nucleo bater nos dois lados.
         opcoes["input_libretro_device_p2"] = str(DISPOSITIVO_MULTITAP_SNES)
+
+    # Quantas maquinas podem se conectar em quem hospeda. O padrao do
+    # RetroArch e' 3 (= 4 jogadores contando o hospedeiro) -- era por isso
+    # que, com o Multitap, o 4o convidado (jogador 5) sempre era recusado
+    # (achado na Fase 4 da auditoria, causa confirmada depois). So sobe no
+    # Multitap; o resto continua no padrao, que ja sobra para 2 jogadores.
+    opcoes["netplay_max_connections"] = str(
+        JOGADORES_MULTITAP - 1 if multitap else NETPLAY_CONEXOES_PADRAO)
 
     return opcoes
 
