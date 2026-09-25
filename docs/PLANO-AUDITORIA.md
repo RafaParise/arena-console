@@ -244,7 +244,7 @@ passa a identificar e recomendar ação.
 
 - [x] Fase 0 — Linha de base e inventário (25/09/2026)
 - [x] Fase 1 — Varredura e limpeza (25/09/2026)
-- [ ] Fase 2 — Leveza e desempenho
+- [x] Fase 2 — Leveza e desempenho (25/09/2026)
 - [ ] Fase 3 — Servidor e API
 - [ ] Fase 4 — Jogar Junto
 - [ ] Fase 5 — Matriz de jogos

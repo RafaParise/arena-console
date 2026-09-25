@@ -115,3 +115,74 @@ da Fase 0 (rota sem chamador).
 
 Bateria **63 OK** (45 + 18 novos das barreiras, ver Extra), fuzz 0 falhas,
 acesso de rede, sincronização e ids da tela: OK.
+
+---
+
+## Fase 2 — Leveza e desempenho
+
+### Achado 1 — 37 ajustes de imagem que não faziam nada (corrigido)
+
+Ferramenta nova: `testes\teste_chaves_graficos.py`, que confere **cada**
+chave de opção do `servidor\graficos.json` contra o texto de dentro do
+`.dll` do núcleo (onde as chaves ficam escritas). Das 98 chaves, **28 não
+existiam** no núcleo — o ARENA as gravava a cada jogo, sem efeito nenhum:
+
+| Núcleo | Chaves inexistentes | O que foi feito |
+|---|---|---|
+| SwanStation (PS1) | 24: toda opção vinha em três formas (`swanstation_GPU_X`, `duckstation_GPU.X`, `swanstation_GPU.X`); só a primeira existe | As duas formas falsas saíram (37 ocorrências no arquivo) |
+| Genesis Plus GX (Mega Drive) | `genesis_plus_gx_blargg_ntsc_md` | Renomeada para `genesis_plus_gx_blargg_ntsc_filter` (nome atual, conferido no `.dll`, valores `composite`/`disabled` válidos). **O filtro NTSC passa a valer** nas máquinas nota ≥ 3, como o arquivo sempre pretendeu |
+| PPSSPP (PSP) | `ppsspp_disable_slow_framebuffer_effects` | Renomeada para `ppsspp_skip_gpu_readbacks` (mesmo sentido, valor `disabled`) |
+| PPSSPP (PSP) | `ppsspp_rendering_mode` | Virou `ppsspp_skip_buffer_effects = "disabled"`. O modo modesto pedia "pular efeitos de buffer", que o próprio núcleo avisa: *"em alguns jogos nada é desenhado"*. Nunca chegou a valer; ligar agora, sem teste, arriscaria tela preta. **Decidir com os números do Celeron** |
+| PCSX2 do RetroArch | `pcsx2_frameskip` | Saiu (não existe mais; o padrão já é não pular quadros) |
+
+Agora: **73 chaves, todas existem.** O teste entra na rodada completa e pega
+a próxima renomeação quando um núcleo for atualizado. Ferramentas:
+`ferramentas\opcoes_do_nucleo.py` (lista as opções que um núcleo conhece) e
+`ferramentas\corrigir_chaves_graficos.py` (a correção, mantendo ordem e
+recuo do arquivo). Matriz de jogos passou a incluir o **Mega Drive**
+(7 consoles): abre, mostra imagem, salva e carrega estado, com o filtro novo.
+
+### Achado 2 — 15 a 50 MB regravados a cada jogo de PS1 (corrigido no modo econômico)
+
+`testes\medir_cache_ps1.py` abriu o mesmo jogo de PS1 várias vezes com as
+opções reais do ARENA:
+
+| Situação | Abrir o jogo | Cache `vulkan_pipelines.bin` |
+|---|---|---|
+| Com o cache (50 MB) | 6,4–7,1 s | **Regravado inteiro a cada partida, com o conteúdo IGUAL** |
+| Sem o cache | 6,2 s | recriado (15,6 MB só deste jogo) |
+| `swanstation_GPU_ShaderPrecompile = false` | igual | regravado do mesmo jeito (não é a opção certa) |
+| Arquivo somente leitura | 6,4–7,1 s | **intocado**, e o jogo abre igual |
+
+Ou seja: o cache não acelera a abertura, e o núcleo regrava dezenas de MB
+toda vez que o jogo fecha. Num pen drive lento (5–10 MB/s) são 5 a 10 s com
+o jogo "travado" fechando — e desgaste. **Correção** (`graficos.preparar_cache_ps1`
+e `fixar_cache_ps1`, ligadas em `executar_jogo`), **só no modo econômico**
+(o que o ARENA já liga em máquina fraca ou em pen drive/cartão): se depois
+da partida o cache não cresceu, ele vira somente leitura; se o pen drive
+for para outro computador (outra placa de vídeo), o cache antigo é apagado
+para o núcleo montar um novo. Jogar Junto não entra (usa outro núcleo).
+Testes: `servidor\tests\test_cache_ps1.py` (4). **Limite honesto:** o modo
+econômico não liga nesta máquina de desenvolvimento, então o caminho
+completo dentro da partida fica para o roteiro de sala (Roteiro 9).
+
+### Achado 3 — rodízio de registros só na abertura (corrigido)
+
+Com o limite de 10, havia **20** registros do RetroArch em `dados\`: o
+rodízio só rodava ao abrir o ARENA, e o ARENA fica aberto a aula inteira.
+Pequenos (15 KB em média), mas o limite não era real. Agora roda também ao
+fim de cada partida.
+
+### Medido e sem achado
+
+| Medida | Valor |
+|---|---|
+| CPU com o ARENA parado | 0,02% (Fase 0) |
+| Gravações em disco parado | 0 por minuto |
+| Tela (`launcher\`) | 220 KB no total (app.js 118 KB, index.html 41 KB, estilo.css 44 KB, fundos 17 KB); sem imagens |
+| Fundo animado × modo modesto (`testes\medir_tela.ps1`) | 0,8% × 0,5% de um núcleo nesta rodada (2,0% × 0,5% na medição anterior): a animação do navegador varia com a janela em foco ou não. RAM da tela ~420 MB, igual. O número que decide é o do Celeron |
+| Estresse do catálogo (5.000 jogos falsos) | passou na rodada de referência (`teste_estresse_catalogo.py`) |
+| CSS e JS não usados | ver Fase 1 |
+
+Bateria **67 OK**; `teste_chaves_graficos`, `teste_opcoes_nucleo_ponta_a_ponta`
+e a matriz (7 consoles) OK; `retroarch.cfg` sem caminho temporário.

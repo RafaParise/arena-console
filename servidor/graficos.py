@@ -662,6 +662,69 @@ def opcoes_de_memory_card(pasta_saves, plataforma_id):
     return {"swanstation_MemoryCards_Card1Type": "Libretro"}
 
 
+# ---------------------------------------------------------------------------
+# Cache de video do PS1 (so no modo economico)
+# ---------------------------------------------------------------------------
+# Achado da auditoria 2 (testes\cache_pipelines_ps1.py): o SwanStation
+# regrava INTEIRO o arquivo retroarch\system\swanstation\vulkan_pipelines.bin
+# (15 a 50 MB) toda vez que um jogo de PS1 fecha -- com o conteudo IGUAL. E
+# o cache nem acelera a abertura (6,2 s sem ele x 6,4-7,1 s com ele). Num
+# pen drive lento sao 5 a 10 s com o jogo "travado" fechando, e desgaste.
+# Nao existe opcao do nucleo para isso (ShaderPrecompile=false testado: nao
+# muda nada). O que funciona: arquivo somente leitura -- o jogo abre igual e
+# o arquivo para de ser regravado (testado).
+#
+# Regra: depois de uma partida, se o cache NAO cresceu (nada novo
+# aprendido), vira somente leitura. Se o pen drive for para outro
+# computador (outra placa de video), o cache antigo nao serve la: libera
+# e apaga, para o nucleo montar um novo para esta placa.
+
+CACHE_PS1 = os.path.join(PASTA_RETROARCH, "system", "swanstation", "vulkan_pipelines.bin")
+
+
+def _marca_do_cache_ps1():
+    return CACHE_PS1 + ".placa"
+
+
+def preparar_cache_ps1(placa):
+    """Antes de abrir um jogo de PS1. Devolve o tamanho atual do cache
+    (ou -1 se nao existe), para comparar depois."""
+    try:
+        if not os.path.isfile(CACHE_PS1):
+            return -1
+        try:
+            with open(_marca_do_cache_ps1(), encoding="utf-8") as f:
+                placa_do_cache = f.read().strip()
+        except OSError:
+            placa_do_cache = ""
+        if placa_do_cache and placa_do_cache != placa:
+            # Veio de outro computador: nao serve aqui.
+            os.chmod(CACHE_PS1, 0o666)
+            os.remove(CACHE_PS1)
+            return -1
+        return os.path.getsize(CACHE_PS1)
+    except OSError:
+        return -1
+
+
+def fixar_cache_ps1(tamanho_antes, placa):
+    """Depois do jogo de PS1: se o cache nao cresceu, trava contra regravacao.
+    Devolve True se travou agora."""
+    try:
+        if not os.path.isfile(CACHE_PS1) or tamanho_antes < 0:
+            return False
+        if os.path.getsize(CACHE_PS1) != tamanho_antes:
+            return False                      # aprendeu coisa nova: deixa livre
+        if not os.access(CACHE_PS1, os.W_OK):
+            return False                      # ja estava travado
+        os.chmod(CACHE_PS1, 0o444)
+        with open(_marca_do_cache_ps1(), "w", encoding="utf-8") as f:
+            f.write(placa)
+        return True
+    except OSError:
+        return False
+
+
 def chaves_gerenciadas_pelo_arena():
     """Toda chave de opcao de nucleo que o ARENA pode escrever, em qualquer
     nota, modo ou excecao. So estas o ARENA controla; as outras sao do aluno

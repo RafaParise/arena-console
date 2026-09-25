@@ -37,6 +37,10 @@ spec_a.loader.exec_module(arena)
 JOGOS = [
     ("Nintendo 64", "mupen64plus_next_libretro.dll",
      os.path.join(RAIZ, "jogos", "pessoais", "Nintendo 64", "Bomberman 64 (USA).n64")),
+    # Auditoria 2: o Mega Drive entrou porque o filtro NTSC dele passou a
+    # valer (a chave antiga do graficos.json nao existia no nucleo).
+    ("Mega Drive", "genesis_plus_gx_libretro.dll",
+     os.path.join(RAIZ, "jogos", "pessoais", "Mega Drive", "Sonic The Hedgehog 3 (USA).md")),
     ("Super Nintendo", "snes9x_libretro.dll",
      os.path.join(RAIZ, "jogos", "pessoais", "Super Nintendo",
                  "Super Bomberman 4 (Japan) [T-En by Svambo v1.0].sfc")),

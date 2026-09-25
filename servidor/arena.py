@@ -1929,8 +1929,27 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             print("[ARENA] %s" % " ".join(
                 ('"%s"' % p if " " in p else p) for p in comando))
 
+            # Modo economico + PS1 no SwanStation: nao deixa o nucleo
+            # regravar 15-50 MB de cache de video a cada fechamento (ver
+            # graficos.preparar_cache_ps1). Nao vale no Jogar Junto, que usa
+            # outro nucleo.
+            cuidar_cache_ps1 = (ECONOMICO and jogo["plataforma"] == "ps1" and not partida
+                                and not jogo.get("externo")
+                                and "swanstation" in str(jogo.get("core", "")))
+            placa = str(MAQUINA["gpu"].get("nome", ""))
+            cache_antes = graficos.preparar_cache_ps1(placa) if cuidar_cache_ps1 else -1
+
             processo = subprocess.Popen(comando, cwd=pasta_trabalho, **extras)
             codigo = processo.wait()
+
+            if cuidar_cache_ps1 and graficos.fixar_cache_ps1(cache_antes, placa):
+                print("[ARENA] Cache de video do PS1 estavel: nao sera mais regravado.")
+
+            # Cada partida deixa um registro do RetroArch em dados\. O rodizio
+            # rodava so na abertura do ARENA: aberto a aula inteira, os
+            # registros passavam do limite (auditoria 2 achou 20 com limite
+            # 10). Agora roda tambem aqui, ao fim de cada jogo.
+            limpar_logs_antigos()
 
             VIGIA["suspenso"] = False
 
