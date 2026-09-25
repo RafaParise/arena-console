@@ -3074,6 +3074,19 @@ class Manipulador(BaseHTTPRequestHandler):
     def erro(self, mensagem, codigo=400):
         self.responder_json({"ok": False, "erro": mensagem}, codigo)
 
+    def erro_interno(self, falha):
+        """Ultima rede de seguranca de toda rota. Erro do sistema (disco
+        cheio, arquivo em uso, rede) vira frase em portugues -- achado da
+        revisao pos-auditoria: disco cheio chegava na tela como
+        "[Errno 28] No space left on device". Erro de programa (defeito do
+        ARENA) mantem o detalhe tecnico, que e' o que o professor precisa
+        para achar a causa, mas com o "o que fazer" na frente."""
+        if isinstance(falha, (OSError, urllib.error.URLError)):
+            return self.erro(traduzir_erro_do_sistema(falha, "concluir o pedido"), 500)
+        print("[ARENA] Erro interno: %r" % (falha,))
+        return self.erro("Algo deu errado aqui dentro do ARENA. Tente de novo; "
+                         "se continuar, chame o professor e mostre isto: %s" % falha, 500)
+
     LIMITE_CORPO = 4 * 1024 * 1024
 
     def ler_corpo(self):
@@ -3120,7 +3133,7 @@ class Manipulador(BaseHTTPRequestHandler):
             try:
                 return self.api_get(caminho)
             except Exception as falha:
-                return self.erro("Erro interno: %s" % falha, 500)
+                return self.erro_interno(falha)
 
         if caminho in ("/", "/index.html"):
             caminho = "/index.html"
@@ -3430,7 +3443,7 @@ class Manipulador(BaseHTTPRequestHandler):
                 return self.erro(falha_corpo, 413)
             return self.api_post(caminho, dados)
         except Exception as falha:
-            return self.erro("Erro interno: %s" % falha, 500)
+            return self.erro_interno(falha)
 
     def api_post(self, caminho, dados):
 
