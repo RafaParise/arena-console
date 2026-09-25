@@ -1050,13 +1050,11 @@ auditoria não conseguiu fechar sozinha.
 2. Notebooks 2, 3 e 4: cada um entra como jogador 2, 3 e 4 (nessa ordem,
    um de cada vez, esperando a tela confirmar antes do próximo). **Anote**
    se os 3 conseguem entrar.
-3. Notebook 5: entra como jogador 5. **Este é o teste**: anote se conecta
-   ou se recusa (e qual mensagem aparece). Se conectar aqui — em 5
-   máquinas físicas de verdade — significa que o problema encontrado
-   nesta auditoria era mesmo um artefato de testar tudo em `127.0.0.1`, e
-   o Multitap funciona pros 5 jogadores de verdade. Se recusar do mesmo
-   jeito, é um limite real do RetroArch, e o ARENA vai documentar "até 4
-   jogadores confirmados" pro Multitap.
+3. Notebook 5: entra como jogador 5. **Este é o teste.** *(Atualizado na
+   revisão pós-auditoria: a causa da recusa foi achada — o limite padrão
+   do RetroArch de 3 convidados — e corrigida; num computador só, os 4
+   convidados já entram.)* **Esperado agora: conecta.** Se recusar, anote a
+   mensagem: aí há um segundo limite que só aparece em rede de verdade.
 4. Se os 5 conectarem: joguem uma rodada de verdade. Anote se os 5
    personagens aparecem na arena, se os controles de cada um respondem
    certo (jogador 3 no controle do notebook 3, não trocado).
@@ -1155,8 +1153,10 @@ rede" ligado e reiniciado.
 2. Num notebook com placa de vídeo sem driver (aparece como "Adaptador de
    Vídeo Básico da Microsoft" no Gerenciador de Dispositivos), abra um
    jogo de SNES. Anote se abre imagem ou tela preta.
-3. PS3 (Borderlands 2, RPCS3): abra pelo ARENA e espere até 5 minutos.
-   Anote se chega ao menu do jogo (a automação não testou o RPCS3).
+3. PS3 (Borderlands 2, RPCS3): **antes**, instale o firmware do PS3 no
+   RPCS3 (guia 2, "PS3: falta mais um passo"). Sem ele o ARENA avisa e não
+   abre — confirmado na revisão pós-auditoria. Com ele, abra pelo ARENA e
+   espere até 5 minutos. Anote se chega ao menu do jogo.
 
 ---
 
@@ -1503,35 +1503,140 @@ só de leitura, mala, travessia de caminho na capa, SHA-256 do acervo, Fase 7.
 
 ### O que ainda falta (com honestidade)
 
+*Atualizado em 25/09/2026, depois da revisão pós-auditoria (seção abaixo).
+Riscado = resolvido nessa revisão.*
+
 **Só a sala de aula confirma** (roteiros 1 a 8, acima):
 
-- Multitap com 5 jogadores: o 4º convidado nunca conectou no teste de um
-  computador só. Pode ser limite do RetroArch ou artefato do teste. Roteiro 1.
-- RAM da janela do ARENA, custo real dos fundos animados num Celeron,
-  ganho do `netplay_check_frames = 0`, FPS no modo modesto × normal,
-  controle físico. Roteiro 6.
+- Multitap com 5 jogadores **em 5 notebooks de verdade**. A causa do 4º
+  convidado recusado foi achada e corrigida (`netplay_max_connections`); no
+  teste de um computador só, os 4 convidados entram. Falta confirmar em
+  rede real. Roteiro 1.
+- Custo do fundo animado **num Celeron** (aqui, num Ryzen: 2,0% × 0,5% de
+  um núcleo), ganho do `netplay_check_frames = 0`, FPS no modo modesto ×
+  normal, controle físico. Roteiro 6.
 - Bloqueio de rede com uma segunda máquina de verdade. Roteiro 7.
-- Notebook sem driver de vídeo e RPCS3 (PS3). Roteiro 8.
-- Foco por teclado no card e a cor nova do modo claro no navegador real. Roteiro 6.
+- Notebook sem driver de vídeo. Roteiro 8.
+- "O que o jogador sente" com rede ruim (o ping do RetroArch não acompanhou
+  o atraso simulado).
+- Placar (HUD) do Mario Kart 64 com `parallel-rdp`: o jogo não está na
+  pasta. O ajuste agora chega de verdade ao núcleo (ver revisão).
 
-**Conhecido e não corrigido (decisão de design ou trabalho grande demais
-para uma correção pontual):**
+**Depende de você (arquivo ou conta que só você pode trazer):**
 
-- Relógio errado num notebook deixa os registros dele invisíveis para a
-  sincronização dos outros. Correção de verdade troca o carimbo de data
-  por outra coisa. Proposta mais simples: avisar na tela quando o relógio
-  do Windows parecer muito errado.
-- Caminho com mais de 260 caracteres falha (limite clássico do Windows).
-  O risco está em `capas_online.py`, `indexador.py` e no próprio RetroArch.
-- VPN não é detectada como tal.
-- Memory card do PS1 no Jogar Junto: o convidado recebe um cartão em branco.
-- Neo Geo: faltam 3 arquivos de BIOS na revisão certa.
-- Duas chaves `duckstation_*` em `graficos.py`: resíduo ou precaução, só
-  um `retroarch-core-options.cfg` real do SwanStation responde.
-- Disco cheio: confiado à gravação atômica, conferido só lendo o código.
-- Fase 7: a caminhada clique a clique com as 5 pessoas não foi registrada
-  com número de passos e decisões por tarefa.
-- Fase 4: "o que o jogador sente" com rede ruim ficou sem conclusão firme
-  — o ping que o RetroArch mostra não acompanhou o atraso simulado.
-- `dados\fechamentos.json` só tem sujeira de teste; esperando o Rafael
-  dizer se pode zerar.
+- Firmware do PS3 no RPCS3 (arquivo oficial da Sony). Sem ele o PS3 não
+  abre; o ARENA agora avisa em vez de "piscar e fechar".
+- BIOS do Neo Geo na revisão certa (3 arquivos).
+- Conta RPCN (PS3 online).
+
+**Decisões suas, propostas nesta revisão (nada aplicado):**
+
+- Remover `servidor\db.py` (cópia não usada do código de banco; ver revisão).
+- Ligar "Salvar ao sair" + "carregar ao abrir" por padrão (passo a passo das
+  5 pessoas, abaixo).
+- Memory card do PS1 no Jogar Junto (convidado com cartão em branco).
+- RAM da tela (~420 MB num Edge isolado).
+
+**Resolvidos na revisão pós-auditoria:** ~~relógio errado deixava recordes
+invisíveis~~ · ~~caminho com mais de 260 letras~~ (o VERIFICAR avisa por
+jogo) · ~~VPN não detectada~~ · ~~chaves `duckstation_*`~~ · ~~disco cheio
+só por leitura de código~~ · ~~passo a passo das 5 pessoas~~ · ~~RAM da tela
+não medida~~ · ~~PS3 não testado~~ · ~~download real do acervo~~ ·
+~~`fechamentos.json` com sujeira de teste~~ (zerado com autorização).
+
+---
+
+## Revisão pós-auditoria (25/09/2026)
+
+Pedido do Rafael depois da junção ao `main`: *"revise todas as pendências,
+erros e falta de informação ou qualquer coisa que tenha ficado para trás"*.
+Cada item abaixo foi reproduzido antes de corrigir e tem teste. Tudo no
+`main`, um commit por item.
+
+### Achados graves (o ARENA não fazia o que prometia)
+
+| # | Achado | Prova | Correção |
+|---|---|---|---|
+| 1 | **O ajuste de imagem do ARENA era ignorado em 8 núcleos** (SNES, N64, PS1, PSP, Dreamcast, Neo Geo, NES e mais um). Com `global_core_options = false` (padrão do RetroArch), cada núcleo lê o próprio `.opt`; o arquivo do ARENA só valia na primeira vez que o núcleo abria. Resolução, modo modesto, `parallel-rdp` do N64, "PSP sem xBRZ": nada disso chegava | `teste_qual_opcao_de_nucleo_vale.py`: ARENA escreve 3, núcleo usa 2 (do `.opt`) | `gravar_override` liga `global_core_options`; o arquivo do ARENA passa a **manter** o que o aluno mudou no menu (migra os `.opt`). Ponta a ponta: `teste_opcoes_nucleo_ponta_a_ponta.py`. Matriz com as opções reais: 6/6 abrem |
+| 2 | **Multitap: o 5º jogador era recusado pelo padrão do RetroArch**, `netplay_max_connections = 3` (3 convidados). Era a causa do achado não resolvido da Fase 4 | O teste de 5 RetroArch **sempre devolvia OK**, mesmo com um convidado de fora | Com Multitap, sobe para 4. Teste real: os 4 convidados entram (0,6–0,9 s). Teste passa a falhar se alguém ficar de fora |
+| 3 | **Sincronização dependia do relógio.** (a) notebook com relógio errado: recordes invisíveis para sempre; (b) **partida mais longa que o intervalo do vigia nunca era enviada** (a sessão nasce no começo e fecha no fim; o cursor por data já tinha passado) | `teste_sinc_sem_relogio.py`: os dois `False` antes, `True` depois | Número de ordem de chegada (`seq`) no lugar da data. Banco antigo migra sozinho (testado numa cópia do real: 2 recordes e 23 sessões, nada perdido). 1.250 recordes em lotes: nenhum pulado ou repetido |
+| 4 | **O `retroarch.cfg` real estava com saves, estados e histórico apontando para uma pasta temporária já apagada** — o teste da matriz (Fase 5) abriu o RetroArch, e ele gravou os caminhos do teste ao fechar. Pelo ARENA os saves iam certo (ele manda o caminho em toda partida), mas o `retroarch.exe` aberto direto salvaria no vazio. Também tinha o **nome completo do Rafael** como apelido de netplay, num arquivo que vai para o pen drive de todo aluno | Leitura do arquivo | Correção automática de caminhos passa a trazer para dentro qualquer caminho de fora; `testes\protege_cfg.py` nos 11 scripts que abrem o RetroArch; apelido trocado por "jogador" (cópia do original em `backup\`) |
+| 5 | **Escolher a BIOS não fazia nada em 3 dos 4 núcleos** que o ARENA dizia controlar (chaves inexistentes, conferido dentro de cada `.dll`), e a tela prometia "vai usar X sempre" para todo console | `ferramentas\chaves_bios_nucleos.py` | Só chaves reais; a tela só oferece escolha onde funciona e diz "o emulador acha sozinho" nos outros. Conferido no Chrome |
+| 6 | **Memory card**: "um cartão por console" (guia 2) nunca valeu — todo save de PS1 está num cartão por jogo. A lista de cartões mostrava "Nenhum cartão ainda" com 6 jogos salvos | Pasta `saves` | Mantido um cartão por jogo (ligar o compartilhado agora esconderia os saves de hoje); a lista mostra os cartões reais; guia 2 reescrito |
+| 7 | **PARTIDA.bat perdia em silêncio**, desde a Fase 3, as checagens de versão e código de aparelho do colega | Já no relatório da Fase 8 | Já corrigido (commit `051084e`) |
+
+### Outros achados corrigidos
+
+| Achado | Correção | Teste |
+|---|---|---|
+| Nesta máquina, o Hyper-V (`192.168.96.1`) aparecia como "Rede local" e os adaptadores virtuais do Wi-Fi como "Cabo direto"; VPN nunca era detectada | Tipo pelo **nome** do adaptador (PowerShell, sem admin, em segundo plano, 10 min de cache); etiqueta nova "VPN" na tela e no PARTIDA.bat | `teste_adaptadores_vpn.py` |
+| Jogo de nome comprido: save passaria de 260 letras e não gravaria | VERIFICAR calcula por jogo e diz o que fazer | `teste_caminho_comprido.py` |
+| Disco cheio: dados seguros, mas a tela mostrava `[Errno 28] No space left on device` | Tratador geral das rotas usa a tradução da Fase 7 | `teste_disco_cheio.py` |
+| PS3: sem o firmware, o jogo "piscava e fechava" (log do RPCS3: *Missing Firmware*) | `/api/jogar` recusa antes com a frase do que fazer; aba Emuladores mostra "incompleto"; guia 2 com o passo | `teste_ps3_sem_firmware.py` |
+| Fuzz reprovava sempre as 7 recusas `414` (já explicadas na Fase 3) | Critério corrigido | `fuzz_rotas.py`: 0 falhas |
+| Teste de 4 jogadores locais reprovava por erro de **som** | Ignora só erro de áudio/MIDI | `teste_local_4_jogadores.py` |
+| Um teste criou um cartão de memória vazio (CTR) na pasta de saves real | Movido para `backup\`; os testes usam pasta temporária | — |
+
+### Medido pela primeira vez
+
+| Medida | Valor | Como |
+|---|---|---|
+| Gravações em disco por hora, parado | **0** | Já na Fase 8 |
+| RAM da tela | **~420 MB** (soma de 7 processos de um Edge isolado — é um teto; no uso normal parte é dividida com o Edge já aberto) | `testes\medir_tela.ps1` |
+| CPU do fundo animado | **2,0% de um núcleo** animando × **0,5%** com modo modesto (Ryzen 5 5600G) | idem |
+| Download real do acervo | Arquivo real de `raw.githubusercontent.com`: SHA certo instala, errado recusa sem sobra, origem proibida recusa no cadastro | `teste_acervo_download_real.py` |
+
+### Passo a passo das 5 pessoas (pendência da Fase 7)
+
+**Método, com honestidade:** contagem feita por mim lendo a tela real
+(`index.html`/`app.js`), não observando pessoas. Ação = clique, tecla ou
+texto digitado. Decisão = momento em que a pessoa precisa escolher.
+
+| Tarefa | Ações | Decisões | Onde trava |
+|---|---|---|---|
+| Abrir e jogar (1ª vez) | 5 (duplo clique no `ARENA.bat`, digitar apelido, Começar, clicar no jogo, Jogar agora) | 2 (apelido, jogo) | **Dona Maria**: a janela preta que "não pode fechar" parece erro. **Ana**: digitar o apelido |
+| Salvar e continuar depois | 5 (F2, F10; depois jogo, Jogar agora, F4) | 0–1 (10 lugares de save com F6/F7) | **Lucas, Pedro, Dona Maria**: as teclas F2/F4 não aparecem na tela durante o jogo; tem que decorar. "Salvar ao sair" existe, mas vem **desligado** |
+| Jogar com um amigo em outro notebook (1ª vez, mesma sala) | Anfitrião ~9, convidado ~10 (os dois: Ajustes → Amigos → ligar chave → **fechar e reabrir o ARENA**; depois jogo → Jogar multiplayer → papel → [amigo, número do jogador] → Começar) + caixa do Firewall | 3 (papel, amigo, número) | **Todos**: reabrir o ARENA e a caixa do Firewall (em rede Pública pede senha de admin). **Professor com 5 minutos**: 30 alunos ligando a chave e reabrindo |
+| "Meu amigo não aparece na lista" | 1 (duplo clique no `PARTIDA.bat`) + ler | várias | **Lucas, Dona Maria**: o PARTIDA.bat é texto técnico longo, em janela preta. É ferramenta de professor, não de aluno |
+| Levar o progresso no pen drive | 4 (Ajustes → Máquina → Montar meu pacote → copiar o arquivo) | 1 (onde copiar) | **Dona Maria**: achar o arquivo gerado no Explorador |
+
+**Propostas (não aplicadas — mudam comportamento, decisão do Rafael):**
+1. Ligar **"Salvar ao sair" + "carregar ao abrir"** por padrão: "salvar e
+   continuar" cai de 5 ações e uma tecla decorada para zero.
+2. **"Aceitar conexões da rede" sem reabrir o ARENA**: hoje o servidor só
+   escuta a rede se já abrir com a chave ligada. Dá para trocar sem
+   reiniciar (reabrir o socket), mas mexe no coração do servidor — merece
+   teste próprio.
+3. Na tela do jogo aberto, uma faixa fixa **"F2 salva · F4 volta · F10
+   fecha"** (hoje só no LEIA-ME).
+
+### Proposta de remoção (regra 3 da auditoria — só com aprovação)
+
+**`servidor\db.py` (427 linhas).** O `arena.py` tem a própria cópia de todas
+as funções de banco e **nunca importa `db.py`**. Só a bateria de testes
+importa (`servidor\tests\run.py`, classe `TestDB`) — ou seja, os testes de
+banco da bateria testam uma cópia, não o código que roda. Já estão
+diferentes: a correção da sincronização (item 3) só está no `arena.py`.
+**O que quebra se sair:** a classe `TestDB` da bateria. Proposta: apontar
+esses testes para o `arena.py` e remover o `db.py`.
+
+### O que continua limitado (não é defeito do ARENA)
+
+- **Memory card do PS1 no Jogar Junto**: o convidado recebe um cartão em
+  branco porque o PCSX ReARMed gerencia o cartão por fora do RetroArch.
+  Mandar o cartão do anfitrião antes da partida é possível, mas se o
+  cartão não entrar no estado sincronizado, as duas máquinas podem
+  dessincronizar no meio da corrida. Sem teste em 2 notebooks, não aplico.
+- **RAM da tela**: é o Edge. Diminuir exigiria trocar a tela por outra
+  coisa ou mexer em opções internas do navegador; nenhuma das duas é
+  simples ou segura sem medir num notebook de 4 GB.
+
+### Testes
+
+Bateria de referência: **45** testes (44 + 1 novo, a migração das opções
+do aluno). Scripts novos desta revisão: `teste_sinc_sem_relogio`,
+`teste_sinc_migracao_e_lotes`, `teste_qual_opcao_de_nucleo_vale`,
+`teste_opcoes_nucleo_ponta_a_ponta`, `teste_caminho_fora_no_cfg`,
+`teste_adaptadores_vpn`, `teste_caminho_comprido`, `teste_disco_cheio`,
+`teste_ps3_sem_firmware`, `teste_acervo_download_real`, `medir_tela.ps1`.
+Rodada final completa: RODADA_REVISAO.

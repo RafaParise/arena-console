@@ -86,6 +86,10 @@ def montar_override(destino_cfg, pasta_instancia):
         graficos.ARQUIVO_OPCOES_CORE = original
     opcoes["global_core_options"] = "true"
     opcoes["core_options_path"] = opcoes_nucleo
+    # O RetroArch nao grava a configuracao ao fechar: se este teste for
+    # morto no meio (aconteceu por falta de memoria), o protege_cfg nao chega
+    # a devolver o retroarch.cfg, e as pastas temporarias ficariam nele.
+    opcoes["config_save_on_exit"] = "false"
     linhas = ["# teste matriz de jogos"] + ['%s = "%s"' % (c, opcoes[c]) for c in sorted(opcoes)]
     with open(destino_cfg, "w", encoding="utf-8") as f:
         f.write("\n".join(linhas) + "\n")

@@ -111,6 +111,7 @@ CHAVES_COM_LUGAR_CERTO = {
     "system_directory": "retroarch\\system",
     "playlist_directory": "dados",
     "log_dir": "dados",
+    "core_options_path": "retroarch\\retroarch-core-options.cfg",
     "content_favorites_path": "dados\\builtin\\{nome}",
     "content_history_path": "dados\\builtin\\{nome}",
     "content_image_history_path": "dados\\builtin\\{nome}",
