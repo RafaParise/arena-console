@@ -66,9 +66,13 @@ def sem_mudanca_de_proposito(chaves_override):
       - botao/eixo de controle nao definido pelo aluno vai "nul" (numero
         velho no retroarch.cfg punha o Start no R3);
       - input_remapping_directory aponta para o .rmp da partida (o RetroArch
-        ignora o tipo de porta vindo do --appendconfig)."""
+        ignora o tipo de porta vindo do --appendconfig);
+      - o teclado de todos os jogadores vai escrito (o teclado e' o primeiro
+        jogador sem controle; pedido do Rafael, 25/09/2026)."""
+    teclado = r"^input_player\d+_(up|down|left|right|a|b|x|y|l|r|l2|r2|l3|r3|start|select)$"
     return {c: v for c, v in chaves_override.items()
             if c != "input_remapping_directory"
+            and not re.match(teclado, c)
             and not (v == "nul" and re.match(r"^input_player\d+_\w+_(btn|axis)$", c))}
 
 
@@ -141,6 +145,10 @@ def trabalhador(raiz, porta):
     arena.servidor_alcancavel = lambda *a, **k: False
     arena.limpar_logs_antigos = lambda *a, **k: None
     arena.VIGIA["online"] = False
+    # O resultado nao pode depender de quantos controles estao plugados
+    # nesta maquina na hora do teste (o teclado muda de jogador com isso).
+    if hasattr(arena.controles, "contar_controles"):
+        arena.controles.contar_controles = lambda: 0
 
     servidor = arena.Servidor(("127.0.0.1", porta), arena.Manipulador)
     threading.Thread(target=servidor.serve_forever, daemon=True).start()

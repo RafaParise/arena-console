@@ -1188,9 +1188,11 @@ def opcoes_efetivas(config, custo=None):
     opcoes["video_driver"] = driver
     opcoes["log_dir"] = PASTA_DADOS
 
-    # Teclas e botoes que o aluno definiu na tela do ARENA. Entram por
-    # ultimo, e so o que ele mexeu: o resto continua como o RetroArch tinha.
-    opcoes.update(controles.opcoes_do_retroarch())
+    # Teclas e botoes que o aluno definiu na tela do ARENA, entrando por
+    # ultimo. O teclado vai para o primeiro jogador sem controle: por isso
+    # conta os controles ligados AGORA, na hora de abrir o jogo.
+    opcoes.update(controles.opcoes_do_retroarch(
+        controles_ligados=controles.contar_controles()))
 
     # Filtro de tela: so entra se o perfil pedir E o arquivo existir.
     if opcoes.get("video_shader_enable") == "true":

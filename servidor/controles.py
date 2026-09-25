@@ -11,9 +11,10 @@ como 'input_player1_a'. O nome delas vem do Super Nintendo, entao 'a' num
 jogo de PlayStation e o Circulo. A tela do ARENA traduz; este modulo
 escreve.
 
-Regra importante: TECLA que o aluno nao mexeu fica de fora do arquivo, e
-o que o RetroArch ja tinha continua valendo (o teclado soma, nao apaga).
-BOTAO DE CONTROLE e diferente: o que o aluno nao definiu vai como "nul",
+Regra importante: o TECLADO e' o primeiro jogador sem controle (3
+controles ligados -> teclado no jogador 4; nenhum -> jogador 1), com as
+teclas padrao do RetroArch e o que o aluno mudou por cima.
+BOTAO DE CONTROLE que o aluno nao definiu vai como "nul",
 e ai o reconhecimento automatico do RetroArch decide. Sem isso, numeros
 velhos esquecidos no retroarch.cfg (de outro tipo de controle) passavam
 por cima: o Start virava o R3.
@@ -334,12 +335,93 @@ def limpar(jogador=None):
 # Virar configuracao do RetroArch
 # ---------------------------------------------------------------------------
 
-def opcoes_do_retroarch(dados=None):
+# Teclado padrao do RetroArch para o jogador 1 (o mesmo do retroarch.cfg de
+# fabrica). Fica aqui, fixo, porque o RetroArch reescreve o retroarch.cfg ao
+# fechar com o que veio da partida: se o teclado foi para o jogador 4 numa
+# partida, o retroarch.cfg passaria a dizer "jogador 1 sem teclado".
+TECLADO_PADRAO = {
+    "up": "up", "down": "down", "left": "left", "right": "right",
+    "a": "x", "b": "z", "x": "s", "y": "a", "l": "q", "r": "w",
+    "start": "enter", "select": "rshift",
+}
+
+
+def contar_controles():
+    """Quantos controles de jogo estao ligados agora, de qualquer tipo.
+
+    Le a lista de joysticks do Windows (winmm: pega Xbox, PlayStation,
+    fliperama e generico) e o XInput; fica com o maior. Sem administrador.
+    Fora do Windows, ou se der erro, responde 0 (teclado no jogador 1)."""
+    try:
+        import ctypes
+        from ctypes import wintypes
+
+        class JOYINFOEX(ctypes.Structure):
+            _fields_ = [(nome, wintypes.DWORD) for nome in (
+                "dwSize", "dwFlags", "dwXpos", "dwYpos", "dwZpos", "dwRpos",
+                "dwUpos", "dwVpos", "dwButtons", "dwButtonNumber", "dwPOV",
+                "dwReserved1", "dwReserved2")]
+
+        winmm = ctypes.windll.winmm
+        pela_lista = 0
+        for numero in range(16):
+            info = JOYINFOEX()
+            info.dwSize = ctypes.sizeof(JOYINFOEX)
+            info.dwFlags = 0xFF
+            if winmm.joyGetPosEx(numero, ctypes.byref(info)) == 0:
+                pela_lista += 1
+
+        pelo_xinput = 0
+        estado = (ctypes.c_ubyte * 16)()
+        for nome in ("xinput1_4", "xinput1_3", "xinput9_1_0"):
+            try:
+                xinput = getattr(ctypes.windll, nome)
+            except OSError:
+                continue
+            pelo_xinput = sum(1 for n in range(4)
+                              if xinput.XInputGetState(n, ctypes.byref(estado)) == 0)
+            break
+        return max(pela_lista, pelo_xinput)
+    except (AttributeError, OSError, ValueError):
+        return 0
+
+
+def opcoes_do_teclado(dados, controles_ligados):
+    """Em qual jogador o teclado fica, e com quais teclas.
+
+    Regra (aprovada pelo Rafael): o teclado e' o PRIMEIRO jogador sem
+    controle. 3 controles -> teclado no jogador 4; nenhum -> jogador 1
+    (quem nao tem controle continua jogando). Escreve o teclado de todos os
+    jogadores explicitamente, para nada velho do retroarch.cfg valer."""
+    teclas = dict(TECLADO_PADRAO)
+    for botao, atribuicao in (dados.get("1") or {}).items():
+        if atribuicao.get("tipo") == "teclado":
+            teclas[botao] = atribuicao.get("valor", "")
+
+    dono = min(max(controles_ligados, 0) + 1, JOGADORES_NO_CONTROLE)
+    opcoes = {}
+    for jogador in range(1, JOGADORES_NO_CONTROLE + 1):
+        for botao in BOTOES:
+            opcoes["input_player%d_%s" % (jogador, botao)] = "nul"
+    for botao, tecla in teclas.items():
+        if tecla:
+            opcoes["input_player%d_%s" % (dono, botao)] = tecla
+    # Teclas que o aluno pos em outro jogador na tela (hoje, o jogador 2)
+    # continuam la.
+    for jogador in JOGADORES[1:]:
+        for botao, atribuicao in (dados.get(jogador) or {}).items():
+            if atribuicao.get("tipo") == "teclado" and atribuicao.get("valor"):
+                opcoes["input_player%s_%s" % (jogador, botao)] = atribuicao["valor"]
+    return opcoes
+
+
+def opcoes_do_retroarch(dados=None, controles_ligados=0):
     """Transforma o mapeamento nas chaves que o RetroArch entende.
 
-    Tecla que o aluno nao mexeu nem aparece no arquivo. Botao e eixo de
-    controle que ele nao mexeu vao como "nul": o RetroArch entao usa o
-    reconhecimento automatico, e nao um numero velho do retroarch.cfg.
+    Botao e eixo de controle que o aluno nao mexeu vao como "nul": o
+    RetroArch entao usa o reconhecimento automatico, e nao um numero velho
+    do retroarch.cfg. O teclado vai para o primeiro jogador sem controle
+    (ver opcoes_do_teclado).
     """
     dados = dados if dados is not None else ler()
     opcoes = {}
@@ -348,12 +430,13 @@ def opcoes_do_retroarch(dados=None):
         for botao in BOTOES:
             opcoes["input_player%d_%s_btn" % (jogador, botao)] = "nul"
             opcoes["input_player%d_%s_axis" % (jogador, botao)] = "nul"
+    opcoes.update(opcoes_do_teclado(dados, controles_ligados))
 
     for jogador in JOGADORES:
         for botao, atribuicao in (dados.get(jogador) or {}).items():
             tipo = atribuicao.get("tipo")
-            if tipo not in SUFIXO:
-                continue
+            if tipo not in SUFIXO or tipo == "teclado":
+                continue   # teclado: ja resolvido em opcoes_do_teclado
             chave = "input_player%s_%s%s" % (jogador, botao, SUFIXO[tipo])
             opcoes[chave] = atribuicao.get("valor", "")
 

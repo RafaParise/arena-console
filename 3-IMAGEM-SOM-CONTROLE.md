@@ -13,7 +13,21 @@ Tudo o que muda como o jogo se vê, se ouve e responde ao seu comando.
 ## Parte A — Teclado e controles
 
 Qualquer controle serve: Xbox, PlayStation, Switch, arcade stick ou genérico.
-E o teclado sempre funciona, mesmo com controle plugado.
+O ARENA usa os cerca de 380 perfis prontos do RetroArch (pasta
+`retroarch\autoconfig`), então os botões já saem no lugar certo.
+
+**O teclado é o primeiro jogador sem controle.** Na hora de abrir o jogo,
+o ARENA conta os controles plugados:
+
+| Controles plugados | O teclado joga como |
+|---|---|
+| nenhum | jogador 1 |
+| 1 | jogador 2 |
+| 3 | jogador 4 |
+
+Assim ninguém briga pelo mesmo boneco, e quem não tem controle continua
+jogando sozinho no teclado. Plugou ou tirou um controle? Feche e abra o
+jogo de novo.
 
 ---
 
@@ -34,7 +48,7 @@ sozinhos.
 | **Steam Controller** | Deixe o Steam aberto — ele converte sozinho |
 | **Arcade stick** | Quase todos funcionam. Se não, troque para `dinput` |
 | **Genéricos** | Quase todos funcionam. Se não, troque para `dinput` |
-| **Teclado** | Sempre funciona como jogador 1, mesmo com controle plugado |
+| **Teclado** | Sempre funciona, como o primeiro jogador sem controle (veja acima) |
 
 ### Se o controle não aparecer
 
@@ -128,8 +142,9 @@ Se algum sair trocado, refaça só aquele em **Definir**. O resto fica.
 
 Para o teclado, o botão ao lado é **Padrão do teclado**.
 
-E dá para misturar: **jogador 1 no controle, jogador 2 no teclado**, ao
-mesmo tempo. É só escolher o jogador antes de clicar.
+E dá para misturar controle e teclado ao mesmo tempo: com um controle
+plugado, o teclado já vira o jogador 2 sozinho. As teclas que você mudar
+no **jogador 1** acompanham o teclado para o jogador em que ele estiver.
 
 #### O direcional é diferente dos outros botões
 

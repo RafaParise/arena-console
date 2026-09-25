@@ -121,6 +121,7 @@ def trabalhador(raiz, porta):
     arena.servidor_alcancavel = lambda *a, **k: False
     arena.limpar_logs_antigos = lambda *a, **k: None
     arena.VIGIA["online"] = False
+    arena.controles.contar_controles = lambda: 0   # nao depende do que esta plugado
     servidor = arena.Servidor(("127.0.0.1", porta), arena.Manipulador)
     threading.Thread(target=servidor.serve_forever, daemon=True).start()
 

@@ -212,6 +212,12 @@ class TestControles(unittest.TestCase):
         self.dir = pasta_temp()
         self._old_raiz = self.mod.RAIZ
         self.mod.RAIZ = self.dir
+        # ARQUIVO e PASTA_DADOS sao calculados na importacao: trocar so a
+        # RAIZ fazia a bateria gravar no dados\controles.json DE VERDADE
+        # (achado 25/09/2026: o jogador 2 do aluno ficava com "a = botao 0").
+        self._old_arquivo, self._old_pasta = self.mod.ARQUIVO, self.mod.PASTA_DADOS
+        self.mod.PASTA_DADOS = os.path.join(self.dir, "dados")
+        self.mod.ARQUIVO = os.path.join(self.mod.PASTA_DADOS, "controles.json")
         self.dados_pasta = os.path.join(self.dir, "dados")
         os.makedirs(self.dados_pasta, exist_ok=True)
         with open(os.path.join(self.dados_pasta, "controles.json"), "w") as f:
@@ -219,7 +225,32 @@ class TestControles(unittest.TestCase):
 
     def tearDown(self):
         self.mod.RAIZ = self._old_raiz
+        self.mod.ARQUIVO, self.mod.PASTA_DADOS = self._old_arquivo, self._old_pasta
         shutil.rmtree(self.dir, ignore_errors=True)
+
+    def test_nao_grava_no_controles_json_de_verdade(self):
+        self.assertTrue(self.mod.ARQUIVO.startswith(self.dir))
+
+    def test_teclado_sem_controle_fica_no_jogador_1(self):
+        opcoes = self.mod.opcoes_do_retroarch(controles_ligados=0)
+        self.assertEqual(opcoes["input_player1_start"], "enter")
+        self.assertEqual(opcoes["input_player2_start"], "nul")
+
+    def test_teclado_com_3_controles_vai_para_o_jogador_4(self):
+        self.mod.definir("1", "b", "teclado", "c")   # tecla mudada pelo aluno
+        opcoes = self.mod.opcoes_do_retroarch(controles_ligados=3)
+        self.assertEqual(opcoes["input_player1_start"], "nul")
+        self.assertEqual(opcoes["input_player1_b"], "nul")
+        self.assertEqual(opcoes["input_player4_start"], "enter")
+        self.assertEqual(opcoes["input_player4_b"], "c")
+        self.assertEqual(opcoes["input_player4_up"], "up")
+
+    def test_botao_de_controle_nao_definido_vai_nul(self):
+        self.mod.definir("1", "a", "botao", "1")
+        opcoes = self.mod.opcoes_do_retroarch(controles_ligados=1)
+        self.assertEqual(opcoes["input_player1_a_btn"], "1")
+        self.assertEqual(opcoes["input_player1_start_btn"], "nul")
+        self.assertEqual(opcoes["input_player5_start_axis"], "nul")
 
     def test_validar_teclado(self):
         casos = [
