@@ -72,11 +72,29 @@
 | Item | O que falta para confirmar |
 |---|---|
 | `input_max_users` também limita quem **controla** pelo Jogar Junto? | **Parte respondida (Fase D):** com o `input_max_users` em 2 (teste antigo) e em 5 (arquivo do ARENA), o registro diz "você se juntou como jogador N" para os 5 — a atribuição do jogador não depende dele. O ARENA agora manda 5 de qualquer jeito. Que o boneco do jogador 5 se **mexe**: só com aparelho (`docs\ROTEIRO-MULTITAP.md`, passo 7) |
-| O núcleo aplicou o 257 na porta 2? | O RetroArch **não registra** a troca de tipo de controle. O arquivo da partida tem o 257 (provado). A prova é o menu de batalha do Super Bomberman 4 oferecer 5 jogadores (roteiro, passo 6) |
+| O núcleo aplicou o 257 na porta 2? | **RESPONDIDO (Fase E, 25/09/2026) — e era NÃO.** O RetroArch ignora `input_libretro_device_pN` vindo do `--appendconfig`: o jogo abria com "SNES Joypad" e 2 jogadores. Corrigido: o tipo vai também num `.rmp` só da partida (`arena.remapeamento_da_partida`). Com ele, 5 jogadores sem mexer no menu |
 | Jogar Junto do Saturn | Testar com o jogo completo (ver arquivos abaixo) na Fase E |
 | NES `513` numa partida de verdade | O número vem da fórmula do `libretro.h`; conferir no registro do RetroArch ("Player 3: Gamepad") na Fase D. **Não há jogo de 4 jogadores de NES na pasta** (Contra é de 2) |
 | Mega Drive: 4-Way Play (EA) | Nenhum jogo da pasta usa; como o cartucho declara, não confirmado — não é ligado. J-Cart só pelos 5 números de série da lista do núcleo (os reconhecidos por soma, como Super Skidmarks, ficam em 2) |
-| Mega Drive na prática | Mega Bomberman (Team Player) e Micro Machines 2 (J-Cart) com controles de verdade: Fase E |
+| Mega Drive na prática | **CONFIRMADO (Fase E):** Mega Bomberman (Team Player) e Micro Machines 2 (J-Cart) com 4 jogadores. O Micro Machines 2 só funcionou com o driver XInput: no DirectInput cada GameSir aparece duplicado |
+
+## Fase E — teste com controles de verdade (25/09/2026)
+
+3 GameSir (G7 HE com cabo, dois T4 Nova Lite sem fio) + teclado, com o Rafael.
+
+| Jogo | Jogadores | Resultado |
+|---|---|---|
+| Super Bomberman 4 (SNES, Multitap) | 5 | funcionou, depois do `.rmp` da partida |
+| Mega Bomberman (Mega Drive, Team Player) | 4 | funcionou, analógico e direcional juntos |
+| Micro Machines 2 (Mega Drive, J-Cart) | 4 | funcionou com XInput |
+| CTR (PS1, multitap) | 4 | funcionou, analógicos ok, depois de corrigir a detecção da placa de vídeo (imagem quebrada em 6x) |
+| GoldenEye 007 (N64) | 4 | funcionou |
+
+Achados corrigidos no caminho: tipo de porta ignorado no `--appendconfig`;
+botões na numeração do navegador (Start no R3); a bateria gravando no
+`controles.json` real; perfis de controle prontos escondidos
+(`retroarch\autoconfig`); placa de vídeo lida de uma sobra do registro. O
+teclado passou a ser o primeiro jogador sem controle.
 | Multitap do PS2 dentro do PCSX2 | Fora do RetroArch; não pesquisado nesta fase |
 | Versões | Chaves e valores foram achados no `.dll` **da pasta**; a contagem de jogadores veio do código-fonte atual de cada núcleo, que pode ser mais novo que o `.dll`. Os testes das Fases D e E confirmam na prática |
 
