@@ -332,7 +332,8 @@ def avaliar(fatos, proprios=("python", "retroarch")):
                             "Feche as abas que não precisa (a janela do ARENA pode ficar).", ACOES_ALUNO))
     outros = [p for p in pesados if p["nome"] not in FECHAVEIS
               and p["nome"] not in ("msedge", "chrome", "firefox", "opera", "brave")
-              and p["nome"] not in PROCESSOS_ATUALIZACAO and p["nome"] not in PROCESSOS_ANTIVIRUS]
+              and p["nome"] not in PROCESSOS_ATUALIZACAO and p["nome"] not in PROCESSOS_ANTIVIRUS
+              and p["nome"] not in ("searchindexer", "searchprotocolhost", "searchfilterhost")]
     if outros:
         outros.sort(key=lambda p: (-p.get("cpu", 0), -p.get("mb", 0)))
         barreiras.append(_b("pesados", "media", "Programas pesados abertos",
@@ -422,6 +423,27 @@ def avaliar(fatos, proprios=("python", "retroarch")):
                             ", ".join(quais) + " ligados num HD mecânico.",
                             "Num HD, esses serviços ficam lendo o disco o tempo todo, e o jogo espera.",
                             "O TI pode desativar esses serviços (services.msc) nas máquinas com HD.", ACOES_TI))
+    # Servicos que nao servem para nada numa sala de aula (fax, loja de
+    # demonstracao, mapas offline, Xbox, compartilhar musica do Media Player,
+    # mensagens push de telemetria) e mesmo assim rodam.
+    inuteis = {"Fax": "Fax", "RetailDemo": "Demonstração de loja", "MapsBroker": "Mapas baixados",
+               "WMPNetworkSvc": "Compartilhamento do Windows Media Player",
+               "XblAuthManager": "Xbox (conta)", "XblGameSave": "Xbox (salvar jogo na nuvem)",
+               "XboxNetApiSvc": "Xbox (rede)", "dmwappushservice": "Mensagens push de telemetria"}
+    ligados = [texto for nome, texto in inuteis.items() if rodando(nome)]
+    if ligados:
+        barreiras.append(_b("servicos_inuteis", "baixa", "Serviços que a escola não usa rodando",
+                            ", ".join(ligados) + ".",
+                            "Cada serviço ligado ocupa um pouco de memória e acorda de vez em quando.",
+                            "O TI pode deixá-los em \"Manual\" ou \"Desativado\" (services.msc).", ACOES_TI))
+    indexando = por_nome.get("searchindexer") or por_nome.get("searchprotocolhost")
+    if indexando and indexando.get("cpu", 0) >= 10:
+        barreiras.append(_b("indexando", "media", "O Windows está indexando os arquivos agora",
+                            "A busca do Windows (%s) está usando %s%% do processador." % (
+                                indexando["nome"], indexando.get("cpu")),
+                            "Enquanto indexa, o Windows lê o disco sem parar -- num HD, tudo trava.",
+                            "Espere terminar. Se acontecer toda aula, o TI pode desligar a indexação "
+                            "da pasta do ARENA ou do disco (Opções de Indexação).", ACOES_TI))
     if rodando("DiagTrack") and fatos.get("telemetria_politica") not in (0, 1):
         barreiras.append(_b("telemetria", "baixa", "Telemetria do Windows no máximo",
                             "O serviço de telemetria (DiagTrack) está ligado, sem limite de política.",

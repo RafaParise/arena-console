@@ -118,6 +118,17 @@ class TestBarreiras(unittest.TestCase):
         self.assertIn("reiniciar", achados)
         self.assertNotIn("pesados", achados)     # atualizacao nao aparece duas vezes
 
+    def test_servicos_inuteis_e_indexacao(self):
+        fatos = {"servicos": [{"nome": "Fax", "rodando": True}, {"nome": "XblGameSave", "rodando": True},
+                              {"nome": "Spooler", "rodando": True}],
+                 "processos": [{"nome": "searchindexer", "mb": 60, "cpu": 22}]}
+        lista = barreiras.avaliar(fatos)
+        inuteis = next(b for b in lista if b["id"] == "servicos_inuteis")
+        self.assertIn("Fax", inuteis["achado"])
+        self.assertNotIn("Spooler", inuteis["achado"])     # impressora serve na escola
+        self.assertIn("indexando", ids(lista))
+        self.assertNotIn("pesados", ids(lista))            # nao aparece duas vezes
+
     def test_bloatware(self):
         item = next(b for b in barreiras.avaliar({"bloatware_instalado": ["McAfee LiveSafe", "WildTangent Games",
                                                                            "Candy Crush Saga"]})
