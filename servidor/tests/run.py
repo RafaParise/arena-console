@@ -352,19 +352,23 @@ class TestHardware(unittest.TestCase):
 
 
 # ============================================================================
-# 5. db.py
+# 5. Banco (arena.py)
 # ============================================================================
+# Ate 25/09/2026 esta classe testava servidor\db.py, uma COPIA das funcoes de
+# banco que o ARENA nunca importava -- a bateria passava mesmo com o codigo de
+# verdade diferente. Agora testa o arena.py, pelas mesmas funcoes que ele usa
+# para gravar (inserir_placar...), e a marca de sincronizacao por numero de
+# chegada ("seq:N"), nao por data.
 
 class TestDB(unittest.TestCase):
 
     def setUp(self):
-        import db
-        self.mod = db
+        import arena
+        self.mod = arena
         self.dir = pasta_temp()
         self._old_pd = self.mod.PASTA_DADOS
         self._old_ab = self.mod.ARQUIVO_BANCO
         self.mod.PASTA_DADOS = self.dir
-        os.makedirs(self.mod.PASTA_DADOS, exist_ok=True)
         self.mod.ARQUIVO_BANCO = os.path.join(self.dir, "arena.db")
         self.mod.preparar_banco()
 
@@ -373,80 +377,56 @@ class TestDB(unittest.TestCase):
         self.mod.ARQUIVO_BANCO = self._old_ab
         shutil.rmtree(self.dir, ignore_errors=True)
 
+    def placar(self, uuid, apelido, pontos, dispositivo="d1", enviado=0):
+        with self.mod.banco() as c:
+            return self.mod.inserir_placar(
+                c, uuid, apelido, "j1", "Jogo", pontos,
+                "2026-01-01T00:00:00Z", dispositivo, enviado)
+
     def test_schema(self):
         with self.mod.banco() as c:
-            t1 = c.execute(
-                "SELECT name FROM sqlite_master WHERE type='table' AND name='placar'"
-            ).fetchone()
-            t2 = c.execute(
-                "SELECT name FROM sqlite_master WHERE type='table' AND name='sessao'"
-            ).fetchone()
-            self.assertIsNotNone(t1)
-            self.assertIsNotNone(t2)
+            tabelas = {l[0] for l in c.execute(
+                "SELECT name FROM sqlite_master WHERE type='table'")}
+            colunas = {l[1] for l in c.execute("PRAGMA table_info(placar)")}
+        self.assertTrue({"placar", "sessao", "contador"} <= tabelas)
+        self.assertIn("seq", colunas)
 
     def test_insert_e_select(self):
+        self.placar("abc", "pedro", 1000)
         with self.mod.banco() as c:
-            c.execute(
-                "INSERT INTO placar (uuid, apelido, jogo_id, jogo_titulo, "
-                "pontos, registrado_em, dispositivo) VALUES (?,?,?,?,?,?,?)",
-                ("abc", "pedro", "j1", "Super Jogo", 1000,
-                 "2026-01-01T00:00:00.000Z", "dev1"))
             row = c.execute(
                 "SELECT * FROM placar WHERE apelido='pedro'").fetchone()
-            self.assertEqual(row["pontos"], 1000)
+        self.assertEqual(row["pontos"], 1000)
+        self.assertIsNotNone(row["seq"])
 
     def test_insert_or_ignore(self):
-        reg = ("abc", "ana", "j1", "Jogo", 500, "2026-01-01T00:00:00Z", "d1")
-        with self.mod.banco() as c:
-            c.execute(
-                "INSERT OR IGNORE INTO placar "
-                "(uuid, apelido, jogo_id, jogo_titulo, pontos, registrado_em, "
-                "dispositivo, enviado) VALUES (?,?,?,?,?,?,?,1)",
-                reg)
-            c.execute(
-                "INSERT OR IGNORE INTO placar "
-                "(uuid, apelido, jogo_id, jogo_titulo, pontos, registrado_em, "
-                "dispositivo, enviado) VALUES (?,?,?,?,?,?,?,1)",
-                reg)
+        self.assertEqual(self.placar("abc", "ana", 500, enviado=1), 1)
+        self.assertEqual(self.placar("abc", "ana", 500, enviado=1), 0)
         with self.mod.banco() as c:
             n = c.execute(
                 "SELECT COUNT(*) FROM placar WHERE uuid='abc'").fetchone()[0]
-            self.assertEqual(n, 1)
+        self.assertEqual(n, 1)
 
     def test_marcar_enviados(self):
-        with self.mod.banco() as c:
-            c.execute(
-                "INSERT INTO placar (uuid, apelido, jogo_id, jogo_titulo, "
-                "pontos, registrado_em, dispositivo) VALUES (?,?,?,?,?,?,?)",
-                ("x1", "bia", "j2", "J2", 300, "2026-01-02T00:00:00Z", "d2"))
+        self.placar("x1", "bia", 300)
         self.mod.marcar_enviados([{"uuid": "x1"}], [])
         with self.mod.banco() as c:
             row = c.execute(
                 "SELECT enviado FROM placar WHERE uuid='x1'").fetchone()
-            self.assertEqual(row["enviado"], 1)
+        self.assertEqual(row["enviado"], 1)
 
     def test_registros_desde(self):
-        with self.mod.banco() as c:
-            c.execute(
-                "INSERT INTO placar (uuid, apelido, jogo_id, jogo_titulo, "
-                "pontos, registrado_em, dispositivo) VALUES (?,?,?,?,?,?,?)",
-                ("r1", "carlos", "j3", "J3", 900,
-                 "2026-03-01T00:00:00.000Z", "d3"))
-            c.execute(
-                "INSERT INTO placar (uuid, apelido, jogo_id, jogo_titulo, "
-                "pontos, registrado_em, dispositivo) VALUES (?,?,?,?,?,?,?)",
-                ("r2", "daniel", "j3", "J3", 1200,
-                 "2026-04-01T00:00:00.000Z", "d3"))
-        desde = "2026-03-15T00:00:00.000Z"
-        placares, sessoes, ate = self.mod.registros_desde(desde)
-        self.assertEqual(len(placares), 1)
-        self.assertEqual(placares[0]["apelido"], "daniel")
+        self.placar("r1", "carlos", 900, "d3")
+        _p, _s, marca = self.mod.registros_desde("")
+        self.assertTrue(marca.startswith("seq:"))
+        self.placar("r2", "daniel", 1200, "d3")
+        placares, sessoes, _ = self.mod.registros_desde(marca)
+        self.assertEqual([p["apelido"] for p in placares], ["daniel"])
 
     def test_integrity(self):
         with self.mod.banco() as c:
             self.assertEqual(c.execute(
                 "PRAGMA integrity_check").fetchone()[0], "ok")
-
 
 # ============================================================================
 # Runner
