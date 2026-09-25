@@ -75,6 +75,11 @@ PASTA_CHEATS = os.path.join(PASTA_RETROARCH, "cheats")
 PASTA_REMAPS = os.path.join(PASTA_RETROARCH, "remaps")
 PASTA_REMAP_PARTIDA = os.path.join(RAIZ, "dados", "remap_partida")
 PASTA_CONTROLES = os.path.join(PASTA_RETROARCH, "controles")
+# Os ~380 perfis prontos que vem com o RetroArch (Xbox, DualShock 3/4,
+# DualSense, fliperamas, 8BitDo, genericos...). O RetroArch so procura em
+# UMA pasta: apontar para "controles" (vazia) escondia todos, e controle
+# que nao fosse do formato Xbox podia ficar com os botoes trocados.
+PASTA_PERFIS_CONTROLE = os.path.join(PASTA_RETROARCH, "autoconfig")
 PASTA_CACHE = os.path.join(PASTA_RETROARCH, "cache")
 PASTA_BACKUP = os.path.join(RAIZ, "backup")
 
@@ -1412,7 +1417,9 @@ def gravar_override(config, custo=None, extras=None, em_partida=False,
             print("[ARENA] Nao consegui gravar o tipo de controle das portas: %s" % falha)
         if pasta_remap:
             opcoes["input_remapping_directory"] = pasta_remap
-    opcoes["joypad_autoconfig_dir"] = PASTA_CONTROLES
+    opcoes["joypad_autoconfig_dir"] = (PASTA_PERFIS_CONTROLE
+                                       if os.path.isdir(PASTA_PERFIS_CONTROLE)
+                                       else PASTA_CONTROLES)
     opcoes["playlist_directory"] = PASTA_DADOS
     opcoes["log_dir"] = PASTA_DADOS
     # As opcoes de cada nucleo (resolucao, filtro, BIOS, memory card, modo

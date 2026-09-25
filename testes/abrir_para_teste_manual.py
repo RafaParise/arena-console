@@ -87,7 +87,7 @@ def main():
                   "cache_directory", "playlist_directory", "log_dir"):
         chaves[chave] = pasta
     chaves["system_directory"] = os.path.join(RAIZ, "retroarch", "system")
-    chaves["joypad_autoconfig_dir"] = os.path.join(RAIZ, "retroarch", "controles")
+    chaves["joypad_autoconfig_dir"] = os.path.join(RAIZ, "retroarch", "autoconfig")
     chaves["config_save_on_exit"] = "false"
     if "opcoes_nucleo_partida" in chaves.get("core_options_path", ""):
         # PS1/Saturn: a copia das opcoes (com o multitap) que o ARENA gerou.
