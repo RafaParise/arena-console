@@ -800,9 +800,9 @@ def opcoes_do_aluno():
 DRIVERS_CONTROLE = ["xinput", "dinput"]
 
 CONTROLES_CONHECIDOS = [
-    ("Xbox 360, One e Series", "xinput", "Plugou, funcionou. Nao precisa de nada."),
+    ("Xbox 360, One e Series", "xinput", "Plugou, funcionou. Não precisa de nada."),
     ("PlayStation 4 e 5", "xinput",
-     "Por cabo USB funciona direto. Por Bluetooth tambem, depois de parear."),
+     "Por cabo USB funciona direto. Por Bluetooth também, depois de parear."),
     ("PlayStation 3", "dinput",
      "Precisa do driver SCP ou DsHidMini no Windows. Depois disso funciona."),
     ("Nintendo Switch Pro", "xinput",
@@ -812,7 +812,7 @@ CONTROLES_CONHECIDOS = [
     ("Steam Controller", "xinput",
      "Deixe o Steam aberto: ele converte para XInput sozinho."),
     ("Genericos e arcade stick", "dinput",
-     "Quase todos funcionam. Se nao aparecer, troque o driver para dinput."),
+     "Quase todos funcionam. Se não aparecer, troque o driver para dinput."),
     ("Teclado", "-", "Sempre funciona como jogador 1, mesmo com controle plugado."),
 ]
 

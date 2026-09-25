@@ -254,7 +254,7 @@ def coletar_fatos():
     registrado em fatos['nao_deu_para_ler']."""
     fatos = {"nao_deu_para_ler": []}
     if not sys.platform.startswith("win"):
-        fatos["nao_deu_para_ler"].append("este diagnostico e' so para Windows")
+        fatos["nao_deu_para_ler"].append("este diagnóstico é só para Windows")
         return fatos
     try:
         fatos.update(_memoria_e_energia())

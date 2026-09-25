@@ -134,7 +134,7 @@ def buscar(consulta):
 
 def instalar(identificador, nome_arquivo, plataforma=""):
     if not re.fullmatch(r"[A-Za-z0-9_-]{3,100}", str(identificador or "")):
-        raise ValueError("Item do Internet Archive invalido.")
+        raise ValueError("Item do Internet Archive inválido.")
 
     # Achado real na auditoria: sem este try/except, uma falha de rede (sem
     # internet, DNS fora) ou uma pagina de login de Wi-Fi de escola no
@@ -144,16 +144,16 @@ def instalar(identificador, nome_arquivo, plataforma=""):
         meta = _ler("https://archive.org/metadata/" + urllib.parse.quote(identificador))
     except (OSError, ValueError, urllib.error.URLError, subprocess.SubprocessError):
         raise ValueError(
-            "Nao consegui falar com o Internet Archive agora. Confira a "
+            "Não consegui falar com o Internet Archive agora. Confira a "
             "internet e tente de novo.")
 
     if not _colecao_permitida(meta):
-        raise ValueError("Este item nao esta numa colecao de distribuicao livre.")
+        raise ValueError("Este item não está numa coleção de distribuição livre.")
 
     arquivo = next((item for item in meta.get("files", [])
                     if str(item.get("name", "")) == str(nome_arquivo)), None)
     if not arquivo or not str(nome_arquivo).lower().endswith(EXTENSOES):
-        raise ValueError("Arquivo nao encontrado no item.")
+        raise ValueError("Arquivo não encontrado no item.")
 
     try:
         tamanho_meta = int(arquivo.get("size", 0) or 0)
@@ -168,7 +168,7 @@ def instalar(identificador, nome_arquivo, plataforma=""):
     livres = os.path.abspath(PASTA_LIVRES)
 
     if os.path.commonpath([destino, livres]) != livres:
-        raise ValueError("Destino invalido.")
+        raise ValueError("Destino inválido.")
 
     os.makedirs(os.path.dirname(destino), exist_ok=True)
     temporario = destino + ".download"
@@ -209,8 +209,8 @@ def instalar(identificador, nome_arquivo, plataforma=""):
 
         if sha1_esperado and digest.hexdigest() != sha1_esperado:
             raise ValueError(
-                "O arquivo baixado nao bate com o esperado (SHA-1 "
-                "diferente). Download recusado por seguranca.")
+                "O arquivo baixado não bate com o esperado (SHA-1 "
+                "diferente). Download recusado por segurança.")
 
         os.replace(temporario, destino)
     finally:

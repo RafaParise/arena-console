@@ -63,7 +63,7 @@ def _validar_item(item):
         try:
             tamanho = int(tamanho)
         except (TypeError, ValueError):
-            raise ValueError("O tamanho precisa ser um numero de bytes.")
+            raise ValueError("O tamanho precisa ser um número de bytes.")
         if tamanho < 0 or tamanho > TAMANHO_MAXIMO:
             raise ValueError("O tamanho precisa ficar entre 0 e %d GB."
                              % (TAMANHO_MAXIMO // (1024 ** 3)))
@@ -180,9 +180,9 @@ def _item(item_id):
 def instalar(item_id):
     item = _item(item_id)
     if not item:
-        raise ValueError("Jogo autorizado nao encontrado no manifesto.")
+        raise ValueError("Jogo autorizado não encontrado no manifesto.")
     if not item.get("autorizado") or not item.get("licenca"):
-        raise ValueError("O item nao declara autorizacao/licenca.")
+        raise ValueError("O item não declara autorização/licença.")
 
     url = str(item.get("url", ""))
     partes = urllib.parse.urlparse(url)
@@ -217,7 +217,7 @@ def instalar(item_id):
                     digest.update(bloco)
                     arquivo.write(bloco)
         if digest.hexdigest() != sha256:
-            raise ValueError("SHA-256 diferente: download recusado por seguranca.")
+            raise ValueError("SHA-256 diferente: download recusado por segurança.")
         os.replace(temporario, destino)
     finally:
         if os.path.exists(temporario):
