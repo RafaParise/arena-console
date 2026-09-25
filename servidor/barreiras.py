@@ -87,58 +87,62 @@ ACOES_TI = "professor/TI"      # precisa da senha de administrador
 # ---------------------------------------------------------------------------
 
 _SCRIPT = r"""
+# Escrito para funcionar tambem no PowerShell em "modo de linguagem
+# restrita" (Constrained Language Mode), que muita escola liga para aluno:
+# nada de [pscustomobject], [math], [Environment], [Convert] nem metodos de
+# objetos que nao sejam texto/numero. Objetos saem de Select-Object com
+# propriedades calculadas (permitido); as contas finas sao feitas no Python.
 $ErrorActionPreference = 'SilentlyContinue'
-[Console]::OutputEncoding = [Text.Encoding]::UTF8
-function Reg($caminho, $nome) { try { (Get-ItemProperty -Path $caminho -Name $nome -ErrorAction Stop).$nome } catch { $null } }
-$r = [ordered]@{}
+try { [Console]::OutputEncoding = [Text.Encoding]::UTF8 } catch { }
+function Reg($caminho, $nome) { (Get-ItemProperty -Path $caminho -Name $nome -ErrorAction SilentlyContinue).$nome }
+$r = @{}
 
 # Processos: duas fotos com 2 s de intervalo, para o uso de CPU de cada um.
 $p1 = @{}; Get-Process | ForEach-Object { $p1[$_.Id] = $_.CPU }
 $t1 = Get-Date
 Start-Sleep -Milliseconds 2000
 $seg = ((Get-Date) - $t1).TotalSeconds
-$nucleos = [Environment]::ProcessorCount
-$r.processos = @(Get-Process | ForEach-Object {
-  $cpu = 0
-  if ($p1.ContainsKey($_.Id) -and $_.CPU -ne $null -and $p1[$_.Id] -ne $null) { $cpu = ($_.CPU - $p1[$_.Id]) / $seg / $nucleos * 100 }
-  [pscustomobject]@{ nome = $_.ProcessName.ToLower(); mb = [int]($_.WorkingSet64 / 1MB); cpu = [math]::Round($cpu, 1) }
-} | Group-Object nome | ForEach-Object {
-  [pscustomobject]@{ nome = $_.Name; instancias = $_.Count;
-    mb = ($_.Group | Measure-Object mb -Sum).Sum; cpu = [math]::Round(($_.Group | Measure-Object cpu -Sum).Sum, 1) }
-})
+$nucleos = [int]$env:NUMBER_OF_PROCESSORS
+if ($nucleos -lt 1) { $nucleos = 1 }
+$r.processos = @(Get-Process | Select-Object @{n='nome';e={$_.ProcessName.ToLower()}},
+    @{n='mb';e={[int]($_.WorkingSet64 / 1MB)}},
+    @{n='cpu';e={ if ($p1[$_.Id] -ne $null -and $_.CPU -ne $null) { ($_.CPU - $p1[$_.Id]) / $seg / $nucleos * 100 } else { 0 } }} |
+  Group-Object nome | Select-Object @{n='nome';e={$_.Name}}, @{n='instancias';e={$_.Count}},
+    @{n='mb';e={($_.Group | Measure-Object mb -Sum).Sum}}, @{n='cpu';e={($_.Group | Measure-Object cpu -Sum).Sum}})
 
 # Inicializacao: so o NOME e o lugar. Nada de usuario ou SID.
 $ini = @()
 foreach ($par in @(@('HKCU:\Software\Microsoft\Windows\CurrentVersion\Run','usuario'),
                    @('HKLM:\Software\Microsoft\Windows\CurrentVersion\Run','computador'),
                    @('HKLM:\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Run','computador'))) {
-  $k = Get-Item -Path $par[0]
-  if ($k) { foreach ($n in $k.GetValueNames()) { if ($n) { $ini += [pscustomobject]@{ nome = $n; onde = $par[1] } } } }
+  $onde = $par[1]
+  foreach ($n in @((Get-Item -Path $par[0]).Property)) {
+    if ($n) { $ini += ('' | Select-Object @{n='nome';e={$n}}, @{n='onde';e={$onde}}) } }
 }
-# O que o aluno desligou no Gerenciador de Tarefas fica marcado aqui (byte 0 par = ligado).
+# O que o aluno desligou no Gerenciador de Tarefas fica marcado aqui (byte 0 impar = desligado).
 $desligados = @{}
 foreach ($c in @('HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run',
                  'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run',
                  'HKLM:\Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run32',
                  'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\StartupFolder')) {
-  $k = Get-Item -Path $c
-  if ($k) { foreach ($n in $k.GetValueNames()) { $v = $k.GetValue($n); if ($v -and ($v[0] % 2) -eq 1) { $desligados[$n] = $true } } }
+  $valores = Get-ItemProperty -Path $c
+  foreach ($n in @((Get-Item -Path $c).Property)) { $v = $valores.$n; if ($v -and ($v[0] % 2) -eq 1) { $desligados[$n] = $true } }
 }
-foreach ($pasta in @([Environment]::GetFolderPath('Startup'), [Environment]::GetFolderPath('CommonStartup'))) {
-  if ($pasta -and (Test-Path $pasta)) {
+foreach ($pasta in @(($env:APPDATA + '\Microsoft\Windows\Start Menu\Programs\Startup'),
+                     ($env:ProgramData + '\Microsoft\Windows\Start Menu\Programs\StartUp'))) {
+  if (Test-Path $pasta) {
     Get-ChildItem -Path $pasta -File | Where-Object Name -ne 'desktop.ini' | ForEach-Object {
-      $ini += [pscustomobject]@{ nome = $_.BaseName; onde = 'pasta Inicializar' } }
-  }
+      $ini += ($_ | Select-Object @{n='nome';e={$_.BaseName}}, @{n='onde';e={'pasta Inicializar'}}) } }
 }
-$r.inicializacao = @($ini | ForEach-Object { [pscustomobject]@{ nome = $_.nome; onde = $_.onde; desligado = [bool]$desligados[$_.nome] } })
+$r.inicializacao = @($ini | Select-Object nome, onde, @{n='desligado';e={[bool]$desligados[$_.nome]}})
 
 # Servicos (so os observados; os protegidos que negam leitura sao pulados).
-$r.servicos = @(Get-Service -Name @(%SERVICOS%) -ErrorAction SilentlyContinue | ForEach-Object {
-  [pscustomobject]@{ nome = $_.Name; rodando = ($_.Status -eq 'Running'); inicio = [string]$_.StartType } })
+$r.servicos = @(Get-Service -Name @(%SERVICOS%) -ErrorAction SilentlyContinue |
+  Select-Object @{n='nome';e={$_.Name}}, @{n='rodando';e={[string]$_.Status -eq 'Running'}}, @{n='inicio';e={[string]$_.StartType}})
 
 # Antivirus pela Central de Seguranca (qualquer usuario pode ler).
-$r.antivirus = @(Get-CimInstance -Namespace root/SecurityCenter2 -ClassName AntiVirusProduct | ForEach-Object {
-  [pscustomobject]@{ nome = $_.displayName; ligado = ((($_.productState -shr 12) -band 0xF) -eq 1) } })
+$r.antivirus = @(Get-CimInstance -Namespace root/SecurityCenter2 -ClassName AntiVirusProduct |
+  Select-Object @{n='nome';e={$_.displayName}}, @{n='ligado';e={((($_.productState -shr 12) -band 15) -eq 1)}})
 
 # Programas instalados: so a lista de NOMES, filtrada no Python.
 $r.instalados = @(Get-ItemProperty -Path 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*',
@@ -159,15 +163,16 @@ $r.reinicio_pendente = (Test-Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersi
                        (Test-Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired')
 # Tipo do disco do Windows (HDD/SSD), dito pelo proprio Windows.
 $letra = $env:SystemDrive.TrimEnd(':')
-$dw = Get-Partition -DriveLetter $letra | Get-Disk | ForEach-Object { $n = $_.Number; Get-PhysicalDisk | Where-Object DeviceId -eq $n } | Select-Object -First 1
+$dw = Get-Partition -DriveLetter $letra | Get-Disk | ForEach-Object { $num = $_.Number; Get-PhysicalDisk | Where-Object DeviceId -eq $num } | Select-Object -First 1
 $r.disco_windows_tipo = if ($dw) { [string]$dw.MediaType } else { $null }
 $v = Get-CimInstance Win32_VideoController | Select-Object -First 1
 $r.video = if ($v) { [string]$v.Name } else { $null }
 
-# Limite de uso do processador no plano de energia atual (0x64 = 100%).
+# Limite de uso do processador no plano de energia atual (0x64 = 100%). Vai
+# o texto bruto; a conversao e' feita no Python.
 $q = powercfg /query SCHEME_CURRENT SUB_PROCESSOR PROCTHROTTLEMAX 2>$null
 $hex = @($q | Select-String '0x[0-9a-fA-F]{8}' -AllMatches | ForEach-Object { $_.Matches } | ForEach-Object { $_.Value })
-if ($hex.Count -ge 2) { $r.processador_maximo_tomada = [Convert]::ToInt32($hex[-2], 16); $r.processador_maximo_bateria = [Convert]::ToInt32($hex[-1], 16) }
+if ($hex.Count -ge 2) { $r.processador_maximo_hex = @($hex[-2], $hex[-1]) }
 $r.plano_de_energia = ((powercfg /getactivescheme) -replace '^.*\((.*)\).*$', '$1')
 
 $r | ConvertTo-Json -Depth 4 -Compress
@@ -259,6 +264,20 @@ def coletar_fatos():
         fatos.update(_powershell_fatos())
     except Exception as falha:
         fatos["nao_deu_para_ler"].append("Windows (PowerShell): %s" % str(falha)[:120])
+    # Arredondamento aqui (no PowerShell em modo restrito o [math] e' recusado).
+    for p in _processos(fatos):
+        try:
+            p["cpu"] = round(float(p.get("cpu") or 0), 1)
+            p["mb"] = int(p.get("mb") or 0)
+        except (TypeError, ValueError):
+            p["cpu"], p["mb"] = 0.0, 0
+    brutos = fatos.pop("processador_maximo_hex", None)
+    if isinstance(brutos, list) and len(brutos) == 2:
+        try:
+            fatos["processador_maximo_tomada"] = int(str(brutos[0]), 16)
+            fatos["processador_maximo_bateria"] = int(str(brutos[1]), 16)
+        except ValueError:
+            pass
     # Da lista de instalados, fica SO o que e' bloatware conhecido.
     instalados = fatos.pop("instalados", None) or []
     fatos["bloatware_instalado"] = sorted({n for n in instalados if isinstance(n, str)

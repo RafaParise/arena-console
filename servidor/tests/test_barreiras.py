@@ -149,6 +149,23 @@ class TestBarreiras(unittest.TestCase):
             self.assertTrue(b["acao"] and b["por_que"] and b["achado"], b["id"])
             self.assertIn(b["quem"], (barreiras.ACOES_ALUNO, barreiras.ACOES_TI))
 
+    @unittest.skipUnless(sys.platform.startswith("win"), "so no Windows")
+    def test_powershell_bloqueado_nao_quebra(self):
+        # Escola que bloqueia o PowerShell para aluno (politica/AppLocker):
+        # o diagnostico segue com o que da para ler sem ele.
+        original = barreiras._powershell_fatos
+
+        def bloqueado(*a, **k):
+            raise PermissionError("O acesso ao PowerShell foi bloqueado pela politica")
+        barreiras._powershell_fatos = bloqueado
+        try:
+            resultado = barreiras.diagnosticar()
+        finally:
+            barreiras._powershell_fatos = original
+        self.assertIsInstance(resultado["barreiras"], list)
+        self.assertTrue(any("PowerShell" in m for m in resultado["nao_deu_para_ler"]))
+        self.assertIn("memoria_total_mb", resultado["fatos"])   # o que nao depende dele continua
+
     def test_fechar_so_da_lista(self):
         ok, mensagem = barreiras.fechar_programa("explorer")
         self.assertFalse(ok)

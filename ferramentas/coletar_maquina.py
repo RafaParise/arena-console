@@ -54,13 +54,19 @@ def powershell(comando, limite=25):
     """Roda um comando do PowerShell que ja vem no Windows (nao e' pip nem
     instalacao). Devolve o texto, ou None se falhar ou demorar demais."""
     # Saida em UTF-8 dos dois lados: sem isso "Conexao" com til chega torto.
+    # (No "modo restrito" essa primeira linha e' recusada e o resto segue.)
     comando = "[Console]::OutputEncoding = [Text.Encoding]::UTF8; " + comando
+    if os.environ.get("ARENA_TESTE_PS_RESTRITO"):       # so para o teste do modo restrito
+        comando = '$ExecutionContext.SessionState.LanguageMode = "ConstrainedLanguage"; ' + comando
     try:
         r = subprocess.run(
             ["powershell.exe", "-NoProfile", "-NonInteractive", "-Command", comando],
             capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=limite,
             creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
-        return r.stdout.strip() if r.returncode == 0 else None
+        # Usa a saida mesmo com codigo de erro: no PowerShell em "modo
+        # restrito" (comum em escola) uma linha recusada deixa o codigo de
+        # saida diferente de zero, mas o resto do comando ja respondeu.
+        return r.stdout.strip() or None
     except (OSError, subprocess.SubprocessError):
         return None
 
@@ -213,12 +219,15 @@ def coletar_memoria():
     # trabalha em canal simples: a placa de video integrada (a do Celeron)
     # divide essa memoria e perde muito desempenho.
     pentes = powershell_json("Get-CimInstance Win32_PhysicalMemory | Select-Object "
-                             "@{n='gb';e={[math]::Round($_.Capacity/1GB,1)}}, "
+                             "@{n='bytes';e={$_.Capacity}}, "
                              "@{n='mhz';e={if ($_.ConfiguredClockSpeed) {$_.ConfiguredClockSpeed} else {$_.Speed}}}")
     if pentes is None:
         resultado["pentes"] = falhou("consulta de pentes nao respondeu")
     else:
-        resultado["pentes"] = [{"gb": p.get("gb"), "mhz": p.get("mhz")} for p in pentes]
+        # O arredondamento e' feito aqui: no PowerShell em modo restrito o
+        # [math] e' recusado.
+        resultado["pentes"] = [{"gb": round(float(p.get("bytes") or 0) / 1024 ** 3, 1), "mhz": p.get("mhz")}
+                               for p in pentes]
         resultado["canal_simples"] = len(pentes) == 1
     return resultado
 
@@ -373,7 +382,8 @@ def coletar_disco(raiz, pasta_teste, rotulo):
     midia = powershell_json(
         "Get-Partition -DriveLetter %s -ErrorAction Stop | Get-Disk | ForEach-Object { "
         "$d = Get-PhysicalDisk | Where-Object DeviceId -eq $_.Number; "
-        "[pscustomobject]@{ tipo = [string]$d.MediaType; ligacao = [string]$d.BusType; modelo = $d.FriendlyName } }" % letra)
+        "$d | Select-Object @{n='tipo';e={[string]$_.MediaType}}, @{n='ligacao';e={[string]$_.BusType}}, "
+        "@{n='modelo';e={$_.FriendlyName}} }" % letra)
     if midia:
         resultado["windows_diz"] = midia[0]
         if midia[0].get("tipo") == "HDD" and "mecanico" not in str(resultado["palpite"]):
@@ -525,10 +535,22 @@ def coletar_rede():
     rede = {}
     enderecos = powershell_json(
         "Get-NetIPAddress -AddressFamily IPv4 -ErrorAction SilentlyContinue | "
-        "Where-Object { $_.IPAddress -ne '127.0.0.1' } | ForEach-Object { "
-        "$a = Get-NetAdapter -InterfaceIndex $_.InterfaceIndex -ErrorAction SilentlyContinue; "
-        "[pscustomobject]@{ adaptador = $_.InterfaceAlias; descricao = $a.InterfaceDescription; "
-        "endereco = $_.IPAddress; mascara_bits = $_.PrefixLength; origem = [string]$_.PrefixOrigin } }")
+        "Where-Object { $_.IPAddress -ne '127.0.0.1' } | Select-Object "
+        "@{n='adaptador';e={$_.InterfaceAlias}}, "
+        "@{n='descricao';e={(Get-NetAdapter -InterfaceIndex $_.InterfaceIndex -ErrorAction SilentlyContinue).InterfaceDescription}}, "
+        "@{n='endereco';e={$_.IPAddress}}, @{n='mascara_bits';e={$_.PrefixLength}}, "
+        "@{n='origem';e={[string]$_.PrefixOrigin}}")
+    if enderecos is None:
+        # Reserva sem PowerShell (bloqueado ou em modo restrito sem os modulos
+        # de rede): os enderecos pelo proprio Python. Sem mascara nem
+        # descricao, mas com o essencial -- quais enderecos a maquina tem.
+        try:
+            achados = sorted({i[4][0] for i in socket.getaddrinfo(socket.gethostname(), None, socket.AF_INET)
+                              if not i[4][0].startswith("127.")})
+            enderecos = [{"adaptador": "?", "descricao": "(lido sem PowerShell)", "endereco": ip,
+                          "mascara_bits": None, "origem": None} for ip in achados]
+        except OSError:
+            enderecos = None
     rede["adaptadores"] = enderecos if enderecos is not None else falhou("consulta de enderecos nao respondeu")
 
     # So a categoria (Publica/Privada/Dominio). O nome da rede Wi-Fi nao e'
@@ -545,10 +567,11 @@ def coletar_rede():
     retroarch = os.path.join(RAIZ, "retroarch", "retroarch.exe").lower()
     regras = powershell_json(
         "Get-NetFirewallApplicationFilter -PolicyStore ActiveStore -ErrorAction Stop | "
-        "Where-Object { $_.Program -and ($_.Program.ToLower() -eq '%s' -or $_.Program.ToLower() -eq '%s') } | "
-        "ForEach-Object { $r = $_ | Get-NetFirewallRule; [pscustomobject]@{ programa = $_.Program; "
-        "direcao = [string]$r.Direction; acao = [string]$r.Action; perfis = [string]$r.Profile; "
-        "ligada = [string]$r.Enabled } }" % (python_arena.replace("'", "''"), retroarch.replace("'", "''")),
+        "Where-Object { $_.Program -and ($_.Program -eq '%s' -or $_.Program -eq '%s') } | "
+        "ForEach-Object { $regra = $_ | Get-NetFirewallRule; $_ | Select-Object @{n='programa';e={$_.Program}}, "
+        "@{n='direcao';e={[string]$regra.Direction}}, @{n='acao';e={[string]$regra.Action}}, "
+        "@{n='perfis';e={[string]$regra.Profile}}, @{n='ligada';e={[string]$regra.Enabled}} }"
+        % (python_arena.replace("'", "''"), retroarch.replace("'", "''")),
         limite=60)
     if regras is None:
         rede["firewall"] = falhou("leitura das regras do Firewall nao respondeu (pode exigir mais permissao)")
