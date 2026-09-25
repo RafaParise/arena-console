@@ -397,6 +397,22 @@ cada um que ele encontrou.
 
 Ao abrir um jogo, o aviso diz por qual programa: *"Abrindo Black pelo PCSX2"*.
 
+#### PS3: falta mais um passo (o firmware)
+
+O RPCS3 sozinho não abre jogo nenhum. Ele precisa do **firmware** do PS3 —
+o "sistema operacional" do console, o mesmo que a Sony manda como
+atualização. Sem ele, o jogo pisca e fecha.
+
+Isso é passo do professor, uma vez só:
+
+1. Baixe o arquivo `PS3UPDAT.PUP` no site oficial da PlayStation (página
+   de atualização do sistema do PS3).
+2. Abra o `rpcs3.exe` (em `emuladores\RPCS3\RPCS3\`).
+3. Menu **File → Install Firmware** e escolha o arquivo baixado.
+
+Enquanto o firmware não está lá, a aba Emuladores mostra o RPCS3 como
+**incompleto**, e o ARENA avisa em vez de tentar abrir o jogo.
+
 ---
 
 ### A BIOS

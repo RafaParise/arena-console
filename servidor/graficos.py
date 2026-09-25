@@ -397,6 +397,24 @@ def comando_externo(caminho_executavel, dados, caminho_jogo):
     return [caminho_executavel] + argumentos
 
 
+def falta_para_o_externo(nome_externo, caminho_executavel):
+    """O que falta, alem do proprio emulador, para ele abrir um jogo.
+    Devolve a frase para o aluno, ou "" se nao falta nada que se saiba.
+
+    RPCS3 (revisao pos-auditoria): sem o firmware oficial do PS3 instalado
+    nele, o RPCS3 desiste em 1 segundo ("Missing Firmware" no log dele) e o
+    jogo so "pisca e fecha" -- testado com Borderlands 2. O firmware e' o
+    arquivo oficial da Sony; o ARENA nao fornece, so avisa."""
+    if nome_externo == "RPCS3" and caminho_executavel:
+        firmware = os.path.join(os.path.dirname(caminho_executavel),
+                                "dev_flash", "sys", "external", "liblv2.sprx")
+        if not os.path.isfile(firmware):
+            return ("O PS3 precisa do firmware oficial da Sony instalado no RPCS3, "
+                    "e ele ainda não está. Peça ao professor: no RPCS3, menu File > "
+                    "Install Firmware, com o arquivo PS3UPDAT.PUP do site da PlayStation.")
+    return ""
+
+
 def situacao_dos_externos(plataformas):
     """Diz, para a tela, quais emuladores de fora estao instalados."""
     saida = []
@@ -414,6 +432,7 @@ def situacao_dos_externos(plataformas):
             "motivo": externo.get("motivo", ""),
             "instalado": bool(caminho),
             "compactado_pendente": os.path.basename(compactado) if compactado else "",
+            "falta": falta_para_o_externo(externo["nome"], caminho),
         })
     return saida
 

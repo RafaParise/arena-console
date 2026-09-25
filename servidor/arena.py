@@ -4309,6 +4309,11 @@ class Manipulador(BaseHTTPRequestHandler):
             if not dentro_da_pasta(caminho_rom, PASTA_JOGOS) or not os.path.isfile(caminho_rom):
                 return self.erro("O arquivo do jogo nao esta mais no lugar.", 404)
 
+            if caminho_externo:
+                falta = graficos.falta_para_o_externo(dados_externo["nome"], caminho_externo)
+                if falta:
+                    return self.erro(falta, 409)
+
             jogo = dict(jogo)
             jogo["core"] = plataforma["core"]
             if caminho_externo:

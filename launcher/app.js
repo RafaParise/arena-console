@@ -1721,7 +1721,9 @@ function desenharExternos(lista) {
 
     const nota = document.createElement("span");
     nota.className = "controle-nota";
-    if (item.instalado) {
+    if (item.instalado && item.falta) {
+      nota.textContent = `instalado, mas falta uma coisa: ${item.falta}`;
+    } else if (item.instalado) {
       nota.textContent = "instalado. O ARENA está usando ele.";
     } else if (item.compactado_pendente) {
       nota.textContent =
@@ -1734,9 +1736,9 @@ function desenharExternos(lista) {
     const selo = document.createElement("span");
     selo.className = "controle-tipo";
     selo.textContent = item.instalado
-      ? "em uso"
+      ? (item.falta ? "incompleto" : "em uso")
       : (item.compactado_pendente ? "falta extrair" : "não instalado");
-    if (!item.instalado) selo.style.opacity = "0.55";
+    if (!item.instalado || item.falta) selo.style.opacity = "0.55";
 
     linha.append(titulo, nota, selo);
     lote.append(linha);
