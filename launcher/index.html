@@ -43,6 +43,19 @@
   <p id="avisoTexto"></p>
 </div>
 
+<!-- ===================== TECLAS DO JOGO ===================== -->
+<!-- Aparece quando um jogo abre e fica ate ele fechar. A mensagem nao da
+     para aparecer DENTRO do jogo com seguranca (ver faixaTeclas no app.js),
+     entao fica aqui, grande, onde o aluno ve ao abrir e a cada Alt+Tab. -->
+<div class="faixa-teclas" id="faixaTeclas" role="status" hidden>
+  <span class="faixa-teclas-titulo">No jogo:</span>
+  <span class="faixa-tecla"><kbd>F2</kbd> salva</span>
+  <span class="faixa-tecla"><kbd>F4</kbd> volta ao save</span>
+  <span class="faixa-tecla" id="faixaTeclaF9" hidden><kbd>F9</kbd> destrava o teclado</span>
+  <span class="faixa-tecla"><kbd>F10</kbd> fecha o jogo</span>
+  <span class="faixa-tecla"><kbd>Esc</kbd> abre o menu</span>
+</div>
+
 <main class="corpo">
 
   <!-- ---------- TRILHO DE PLATAFORMAS ---------- -->

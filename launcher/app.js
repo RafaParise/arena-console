@@ -693,15 +693,43 @@ async function jogar(jogo) {
     const dados = await pedir("/api/jogar", "POST", { jogo_id: jogo.id, apelido });
     const recentes = [jogo.id, ...(estado.config.recentes || []).filter((id) => id !== jogo.id)].slice(0, 20);
     salvarConfig({ recentes }).then(() => desenharJogos()).catch(() => {});
-    const dicaTeclas = estado.config.travar_teclas
-      ? " F2 salva, F4 carrega, F9 destrava o teclado, F10 fecha o jogo."
-      : " F2 salva, F4 carrega, F10 fecha o jogo.";
-    recado(`Abrindo ${jogo.titulo} pelo ${dados.emulador}. Aguarde uns segundos.` + dicaTeclas,
-      false, 9000);
+    recado(`Abrindo ${jogo.titulo} pelo ${dados.emulador}. Aguarde uns segundos.`,
+      false, 6000);
+    mostrarFaixaTeclas();
   } catch (falha) {
     recado(falha.message, true);
   }
 }
+
+// --------------------------------------------------------------------------
+// Faixa com as teclas do jogo
+// --------------------------------------------------------------------------
+// O ideal seria a mensagem aparecer DENTRO do jogo. Nao da, com seguranca:
+// o RetroArch deste ARENA nao le comandos pelo stdin no Windows (testado:
+// ignorou QUIT), e o outro caminho -- comandos pela rede -- deixaria um
+// colega fechar o jogo de outro (brecha fechada na revisao pos-auditoria).
+// Entao a faixa fica na janela do ARENA: aparece ao abrir o jogo e some
+// quando ele fecha. Para saber se fechou, NAO fica perguntando ao servidor
+// a cada segundo (roubaria processador do jogo num Celeron): pergunta uma
+// vez so, quando o aluno volta para esta janela.
+
+function mostrarFaixaTeclas() {
+  $("#faixaTeclaF9").hidden = !estado.config.travar_teclas;
+  $("#faixaTeclas").hidden = false;
+}
+
+async function conferirFaixaTeclas() {
+  const faixa = $("#faixaTeclas");
+  if (faixa.hidden) return;
+  try {
+    const dados = await pedir("/api/estado");
+    if (!(dados.jogo_em_andamento && dados.jogo_em_andamento.ativo)) faixa.hidden = true;
+  } catch (falha) {
+    // sem resposta: deixa a faixa como esta, confere na proxima volta
+  }
+}
+
+window.addEventListener("focus", conferirFaixaTeclas);
 
 async function alternarFavorito(jogo) {
   const atuais = new Set(estado.config.favoritos || []);
@@ -1983,6 +2011,7 @@ async function comecarPartida() {
       : `Entrando como ${dados.papel}. Aguarde a tela abrir.`;
     const aviso = dados.aviso ? " " + dados.aviso : "";
     recado(texto + aviso, false, aviso ? 9000 : 4500);
+    mostrarFaixaTeclas();
   } catch (falha) {
     recado(falha.message, true);
   }

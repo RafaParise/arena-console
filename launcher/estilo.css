@@ -278,6 +278,41 @@ input::placeholder { color: var(--texto-apagado); }
 }
 .aviso p { margin: 0; font-size: var(--t-peq); color: #e8cfa4; }
 
+/* ========================= TECLAS DO JOGO ========================= */
+/* Grande e sem animacao: e' para ler de relance, inclusive quem tem
+   dificuldade de leitura. Cada tecla desenhada como tecla de verdade. */
+
+.faixa-teclas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.4rem;
+  padding: 0.7rem var(--gap-g);
+  background: var(--painel-alto);
+  border-bottom: 2px solid var(--borda-forte);
+  color: var(--texto);
+  font-size: 1.05rem;
+  flex-shrink: 0;
+}
+.faixa-teclas[hidden] { display: none; }
+.faixa-teclas-titulo { font-weight: 700; }
+.faixa-tecla { white-space: nowrap; }
+.faixa-tecla[hidden] { display: none; }
+.faixa-teclas kbd {
+  display: inline-block;
+  min-width: 2.4em;
+  padding: 0.15em 0.45em;
+  margin-right: 0.3em;
+  border: 1px solid var(--borda-forte);
+  border-bottom-width: 3px;
+  border-radius: 6px;
+  background: var(--painel);
+  color: var(--texto);
+  font-family: var(--fonte-numero);
+  font-weight: 700;
+  text-align: center;
+}
+
 /* ========================= LAYOUT PRINCIPAL ========================= */
 
 .corpo {

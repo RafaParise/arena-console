@@ -36,6 +36,9 @@ Para desligar o ARENA, feche a janela preta.
 
 Atenção: **Esc não fecha o jogo, abre o menu.** Para fechar é F10.
 
+Não precisa decorar: enquanto o jogo está aberto, o ARENA mostra essas
+teclas numa faixa no alto da janela dele. Deu Alt+Tab, elas estão lá.
+
 ---
 
 ## Os documentos
