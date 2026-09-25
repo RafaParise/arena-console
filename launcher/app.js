@@ -1513,9 +1513,9 @@ async function desenharMapa() {
     }
 
     $("#listaMapa").replaceChildren(lote);
-    $("#mapaResumo").textContent =
-      `Jogador 1: ${mapa.resumo["1"]} botões definidos · ` +
-      `Jogador 2: ${mapa.resumo["2"]} definidos.`;
+    $("#mapaResumo").textContent = Object.entries(mapa.resumo || {})
+      .map(([numero, quantos]) => `Jogador ${numero}: ${quantos}`)
+      .join(" · ") + " botões definidos.";
 
     // Controles conhecidos (Xbox, PlayStation, etc.) já têm mapeamento
     // automático — o assistente só aparece para controles genéricos.
@@ -1766,6 +1766,17 @@ function capturar(linha, valor, botaoDefinir, jogador, botao) {
   // 360 mostrou.
   const DIRECIONAL_DO_NAVEGADOR = { 12: "up", 13: "down", 14: "left", 15: "right" };
 
+  // Controle XInput (Xbox, GameSir...): o número do navegador NÃO é o do
+  // RetroArch. Sem esta tradução, o Start (9 no navegador) virava o R3 (9
+  // no XInput do RetroArch) — achado com os GameSir do Rafael (25/09/2026).
+  // Os gatilhos no RetroArch são eixos, não botões.
+  const XINPUT_DO_NAVEGADOR = {
+    0: ["botao", "0"], 1: ["botao", "1"], 2: ["botao", "2"], 3: ["botao", "3"],
+    4: ["botao", "4"], 5: ["botao", "5"], 6: ["eixo", "+4"], 7: ["eixo", "+5"],
+    8: ["botao", "7"], 9: ["botao", "6"], 10: ["botao", "8"], 11: ["botao", "9"],
+    16: ["botao", "10"],
+  };
+
   // Controle: o navegador só entrega o estado, então a gente olha a cada
   // quadro até algum botão estar apertado.
   function olharControle() {
@@ -1773,11 +1784,34 @@ function capturar(linha, valor, botaoDefinir, jogador, botao) {
     const conectados = navigator.getGamepads ? navigator.getGamepads() : [];
     for (const pad of conectados) {
       if (!pad) continue;
+      const padrao = pad.mapping === "standard";
+      // O Chrome atual chama os controles XInput de "Xbox One Game
+      // Controller (STANDARD GAMEPAD)", sem a palavra "XInput" (visto com
+      // os GameSir, 25/09/2026). Outros navegadores ainda dizem "XInput".
+      const xinput = /xinput|xbox/i.test(pad.id);
       for (let i = 0; i < pad.buttons.length; i++) {
         if (!pad.buttons[i].pressed) continue;
-        if (DIRECIONAL_DO_NAVEGADOR[i]) {
+        if (padrao && DIRECIONAL_DO_NAVEGADOR[i]) {
           gravar("hat", DIRECIONAL_DO_NAVEGADOR[i]);
+        } else if (xinput) {
+          const traduzido = XINPUT_DO_NAVEGADOR[i];
+          if (!traduzido) {
+            encerrar();
+            desenharMapa();
+            recado("Esse botão o RetroArch não lê neste controle. Clique em Definir e aperte outro.", true);
+            return;
+          }
+          gravar(traduzido[0], traduzido[1]);
+        } else if (padrao) {
+          // PlayStation, Switch e outros que o navegador reconhece: o número
+          // de verdade ele não mostra, e o RetroArch já tem o perfil pronto.
+          encerrar();
+          desenharMapa();
+          recado("Esse controle já é reconhecido sozinho pelo RetroArch — " +
+                 "não precisa definir. Se algum botão sair trocado, use " +
+                 "Voltar ao reconhecimento automático.");
         } else {
+          // Genérico sem padrão: o número cru é o mesmo do DirectInput.
           gravar("botao", String(i));
         }
         return;
@@ -3080,8 +3114,8 @@ function ligarEventos() {
       await pedir("/api/mapeamento/padrao", "POST",
         { jogador: $("#mapaJogador").value, tipo: "controle" });
       await desenharMapa();
-      recado("Controle mapeado. O direcional fica por conta do RetroArch, " +
-             "que já acerta sozinho. Teste no jogo e refaça só o que sair trocado.");
+      recado("Pronto: o controle deste jogador voltou ao reconhecimento " +
+             "automático. As teclas do teclado continuam como estavam.");
     } catch (falha) {
       recado(falha.message, true);
     }

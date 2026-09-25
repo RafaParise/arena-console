@@ -131,14 +131,19 @@ Alguns consoles aceitavam mouse e teclado de verdade. Nesses, aparece
 | MSX, Commodore 64, Amiga, MS-DOS | mouse e teclado |
 | ScummVM | mouse e teclado |
 
-#### O jeito rápido: mapear sozinho
+#### O jeito rápido: não mexer em nada
 
-Plugou o controle e quer jogar agora? Clique em **Mapear meu controle
-sozinho**. Ele preenche os 16 botões de uma vez, na numeração que Xbox,
-PlayStation 4 e 5, Switch Pro, Steam Controller e a maioria dos genéricos
-usam.
+Plugou o controle e quer jogar agora? **Só abra o jogo.** O RetroArch
+reconhece sozinho Xbox, PlayStation 3, 4 e 5, Switch Pro, fliperamas e
+muitos genéricos, com os botões no lugar certo.
 
-Se algum sair trocado, refaça só aquele em **Definir**. O resto fica.
+Mexeu nos botões e ficou pior? Clique em **Voltar ao reconhecimento
+automático**. Ele apaga os botões de controle que você definiu para aquele
+jogador (as teclas do teclado ficam) e o reconhecimento automático volta.
+
+**Definir** serve para o controle genérico que o RetroArch não conhece. Em
+controle de PlayStation ou Switch, a tela avisa que não precisa: o perfil
+pronto já acerta. Dá para configurar os **jogadores 1 a 5**.
 
 Para o teclado, o botão ao lado é **Padrão do teclado**.
 
@@ -148,10 +153,7 @@ no **jogador 1** acompanham o teclado para o jogador em que ele estiver.
 
 #### O direcional é diferente dos outros botões
 
-O **Mapear meu controle sozinho** preenche os botões mas **não toca no
-direcional**, de propósito.
-
-Motivo: o direcional do Xbox e da maioria dos controles modernos não é um
+Motivo de o ARENA não escrever número no direcional: o direcional do Xbox e da maioria dos controles modernos não é um
 botão comum. É um "chapéu" — um controle de quatro posições que o driver
 reporta de outro jeito. Qualquer número que o ARENA escrevesse ali teria
 boa chance de estar errado, e o direcional ficaria mudo.

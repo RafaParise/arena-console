@@ -95,9 +95,10 @@ voltar.
 
 Em **Ajustes → Controles**, o ARENA mapeia com os nomes do seu console.
 
-**Plugou e quer jogar agora?** Clique em **Mapear meu controle sozinho**.
-Ele preenche os 16 botões de uma vez, e funciona em Xbox, PlayStation 4 e 5,
-Switch Pro, Steam Controller e genéricos.
+**Plugou e quer jogar agora?** Só abra o jogo: Xbox, PlayStation 3, 4 e 5,
+Switch Pro, fliperamas e muitos genéricos são reconhecidos sozinhos. O
+teclado joga como o primeiro jogador sem controle. Se mexer nos botões e
+piorar, clique em **Voltar ao reconhecimento automático**.
 
 Para ajustar um botão específico: escolha o console, escolha o jogador,
 clique em **Definir** e **aperte a tecla ou o botão** — ele reconhece

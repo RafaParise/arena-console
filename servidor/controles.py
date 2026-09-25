@@ -34,7 +34,7 @@ ARQUIVO_PERFIS = os.path.join(PASTA_SERVIDOR, "perfis_controle.json")
 
 _TRAVA = threading.Lock()
 
-JOGADORES = ("1", "2")
+JOGADORES = ("1", "2", "3", "4", "5")
 
 # Quantos jogadores tem os botoes de controle zerados em toda partida (o
 # Saturn com dois adaptadores chega a 10; o RetroArch aceita ate 16).
@@ -149,7 +149,7 @@ def montar_perfil(tipo_id, console_id, usar_direcional=True,
 
     linhas = []
     for botao in botoes_do_console:
-        numero = PADRAO_CONTROLE.get(botao)
+        numero = NUMERO_NO_NAVEGADOR.get(botao)
         linhas.append({
             "botao": botao,
             "no_controle": rotulos.get(numero, "botao %s" % numero)
@@ -159,7 +159,7 @@ def montar_perfil(tipo_id, console_id, usar_direcional=True,
 
     if tem_direcional:
         for botao in ("up", "down", "left", "right"):
-            numero = PADRAO_CONTROLE.get(botao)
+            numero = NUMERO_NO_NAVEGADOR.get(botao)
             linhas.append({
                 "botao": botao,
                 "no_controle": rotulos.get(numero, "direcional"),
@@ -469,51 +469,35 @@ PADRAO_TECLADO = {
 }
 
 
-# Como os controles modernos numeram os botoes. O navegador entrega sempre
-# nesta ordem (padrao "Standard Gamepad"), entao da para mapear sozinho
-# qualquer controle que o Windows reconheca - Xbox, PS4, PS5, Switch Pro,
-# Steam Controller e a maioria dos genericos.
-#
-#   0 = botao de baixo    (A no Xbox, X no PlayStation)
-#   1 = botao da direita  (B no Xbox, Circulo no PlayStation)
-#   2 = botao da esquerda (X no Xbox, Quadrado no PlayStation)
-#   3 = botao de cima     (Y no Xbox, Triangulo no PlayStation)
-PADRAO_CONTROLE = {
+# Numeracao do NAVEGADOR ("Standard Gamepad"). Serve SO para achar o nome
+# do botao nos rotulos de perfis_controle.json e mostrar na tela ("A",
+# "Cruz"...). NUNCA escrever estes numeros no RetroArch: no XInput dele o
+# Start e' 6, nao 9 (ver aplicar_padrao_controle).
+NUMERO_NO_NAVEGADOR = {
     "b": "0", "a": "1", "y": "2", "x": "3",
     "l": "4", "r": "5", "l2": "6", "r2": "7",
     "select": "8", "start": "9", "l3": "10", "r3": "11",
     "up": "12", "down": "13", "left": "14", "right": "15",
 }
 
-# Os quatro do direcional NAO entram no mapeamento automatico.
-#
-# Motivo: a numeracao acima e a do navegador, onde o direcional aparece
-# como botoes 12 a 15. O RetroArch nao usa essa numeracao: no xinput o
-# direcional e um chapeu (h0up), e num controle generico pode ser botao de
-# verdade, com outro numero. Escrever "12" ali quebra o direcional em
-# ambos os casos.
-#
-# O RetroArch ja reconhece o direcional sozinho, pelo autoconfig, e acerta.
-# O ARENA nao tem o que melhorar ali - so o que estragar. Entao deixa.
-SEM_MAPEAR_SOZINHO = ("up", "down", "left", "right")
-
 
 def aplicar_padrao_controle(jogador):
-    """Mapeia o controle inteiro de uma vez, na numeracao padrao.
+    """Volta o controle daquele jogador ao reconhecimento automatico.
 
-    Serve para quem plugou um controle e quer jogar agora. Se algum botao
-    sair trocado, e so refazer aquele em Definir - o resto fica.
+    Apaga os botoes de CONTROLE definidos a mao (o teclado fica). Ai o
+    RetroArch usa o perfil pronto do controle (~380 em retroarch\\autoconfig).
 
-    O direcional fica de fora de proposito: o RetroArch ja o reconhece
-    sozinho e acerta, e qualquer numero que o ARENA escrevesse ali teria
-    boa chance de estar errado. Veja SEM_MAPEAR_SOZINHO.
+    Antes, este botao ("Mapear meu controle sozinho") gravava a numeracao
+    do NAVEGADOR (Start 9, Select 8, gatilhos 6/7...). No XInput do
+    RetroArch esses numeros sao outros botoes: o Start caia no R3. Achado
+    com os GameSir do Rafael (25/09/2026); era a origem dos numeros sujos
+    no retroarch.cfg.
     """
     if jogador not in JOGADORES:
         return None, "Jogador inválido."
     dados = ler()
-    dados[jogador] = {botao: {"tipo": "botao", "valor": numero}
-                      for botao, numero in PADRAO_CONTROLE.items()
-                      if botao not in SEM_MAPEAR_SOZINHO}
+    dados[jogador] = {botao: atribuicao for botao, atribuicao in dados[jogador].items()
+                      if atribuicao.get("tipo") == "teclado"}
     _gravar(dados)
     return dados, None
 
@@ -522,6 +506,9 @@ def aplicar_padrao(jogador):
     """Coloca o mapeamento de fabrica do teclado para aquele jogador."""
     if jogador not in JOGADORES:
         return None, "Jogador inválido."
+    if jogador not in PADRAO_TECLADO:
+        return None, ("O teclado padrão existe para os jogadores 1 e 2. "
+                      "Para este jogador, defina as teclas uma a uma.")
     dados = ler()
     dados[jogador] = {botao: {"tipo": "teclado", "valor": tecla}
                       for botao, tecla in PADRAO_TECLADO[jogador].items()}

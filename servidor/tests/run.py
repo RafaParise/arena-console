@@ -317,10 +317,23 @@ class TestControles(unittest.TestCase):
         self.assertEqual(dados["1"]["a"]["valor"], "x")
         self.assertEqual(dados["1"]["start"]["valor"], "enter")
 
-    def test_padrao_controle(self):
-        dados, _ = self.mod.aplicar_padrao_controle("1")
-        self.assertEqual(dados["1"]["b"], {"tipo": "botao", "valor": "0"})
-        self.assertNotIn("up", dados["1"])
+    def test_padrao_controle_volta_ao_automatico(self):
+        # Antes gravava a numeracao do navegador (Start 9 = R3 no XInput do
+        # RetroArch). Agora apaga os botoes de controle e deixa o teclado.
+        self.mod.definir("3", "start", "botao", "9")
+        self.mod.definir("3", "b", "teclado", "c")
+        dados, erro = self.mod.aplicar_padrao_controle("3")
+        self.assertIsNone(erro)
+        self.assertNotIn("start", dados["3"])
+        self.assertEqual(dados["3"]["b"], {"tipo": "teclado", "valor": "c"})
+
+    def test_jogadores_1_a_5(self):
+        self.assertEqual(self.mod.JOGADORES, ("1", "2", "3", "4", "5"))
+        _, erro = self.mod.definir("5", "a", "botao", "1")
+        self.assertIsNone(erro)
+        self.assertEqual(self.mod.opcoes_do_retroarch()["input_player5_a_btn"], "1")
+        _, erro = self.mod.aplicar_padrao("4")
+        self.assertIsNotNone(erro)   # teclado padrao so existe para 1 e 2
 
 
 # ============================================================================
