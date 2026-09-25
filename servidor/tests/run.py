@@ -130,9 +130,10 @@ class TestCheats(unittest.TestCase):
 
     def test_validar_codigo_invalido(self):
         casos = [
-            ("", "Digite o codigo."),
-            ("XYZ", "Codigo invalido."),
-            ("7E0DBE:ZZZ", "Codigo invalido."),
+            # Auditoria 2, Fase 7: a mensagem ganhou acento (vai para a tela).
+            ("", "Digite o código."),
+            ("XYZ", "Código inválido."),
+            ("7E0DBE:ZZZ", "Código inválido."),
         ]
         for codigo, mensagem in casos:
             with self.subTest(codigo=codigo[:40]):

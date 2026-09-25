@@ -320,7 +320,7 @@
       "pede_placar": false,
       "jogadores_max": 4,
       "netplay": false,
-      "netplay_motivo": "O nucleo do N64 (Mupen64Plus-Next) nao suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa. Os 4 jogadores so valem no mesmo computador, com 4 controles.",
+      "netplay_motivo": "O núcleo do N64 (Mupen64Plus-Next) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa. Os 4 jogadores só valem no mesmo computador, com 4 controles.",
       "apelidos": [
         "n64",
         "nintendo 64"
@@ -384,7 +384,7 @@
           "{jogo}"
         ],
         "site": "dolphin-emu.org/download",
-        "motivo": "Opcional. O nucleo do RetroArch abre, mas o Dolphin de verdade roda bem melhor GameCube e Wii."
+        "motivo": "Opcional. O núcleo do RetroArch abre, mas o Dolphin de verdade roda bem melhor GameCube e Wii."
       },
       "pasta": "GameCube"
     },
@@ -521,7 +521,7 @@
       ],
       "tamanho_max_mb": 1400,
       "netplay": false,
-      "netplay_motivo": "O nucleo do Dreamcast (Flycast) nao suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa (\"o nucleo nao tem suporte para Netplay\"). Multiplayer so vale no mesmo computador.",
+      "netplay_motivo": "O núcleo do Dreamcast (Flycast) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Multiplayer só vale no mesmo computador.",
       "pasta": "Dreamcast"
     },
     {
@@ -542,7 +542,7 @@
       "pede_placar": false,
       "netplay": true,
       "core_netplay": "pcsx_rearmed_libretro.dll",
-      "netplay_aviso": "Jogar Junto no PlayStation usa o PCSX ReARMed em vez do nucleo normal - o SwanStation (mais fiel) nao tem jogo em rede. Sozinho, continua sendo o SwanStation.",
+      "netplay_aviso": "Jogar Junto no PlayStation usa o PCSX ReARMed em vez do núcleo normal - o SwanStation (mais fiel) não tem jogo em rede. Sozinho, continua sendo o SwanStation.",
       "apelidos": [
         "playstation",
         "playstation 1",
@@ -588,7 +588,7 @@
           "{jogo}"
         ],
         "site": "pcsx2.net/downloads",
-        "motivo": "OBRIGATORIO. O nucleo de PlayStation 2 do RetroArch e pouco mantido e costuma nem abrir o jogo.",
+        "motivo": "OBRIGATÓRIO. O núcleo de PlayStation 2 do RetroArch é pouco mantido e costuma nem abrir o jogo.",
         "jogos_system_link": [
           "gran turismo 4"
         ]
@@ -615,7 +615,7 @@
       ],
       "tamanho_max_mb": 1900,
       "netplay": false,
-      "netplay_motivo": "O nucleo do PSP (PPSSPP) nao suporta jogo em rede pelo RetroArch - confirmado tentando hospedar, o RetroArch recusa (\"o nucleo nao tem suporte para Netplay\"). O PPSSPP tem rede ad-hoc propria, mas e' outro mecanismo, separado do netplay do RetroArch.",
+      "netplay_motivo": "O núcleo do PSP (PPSSPP) não suporta jogo em rede pelo RetroArch - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). O PPSSPP tem rede ad-hoc própria, mas é outro mecanismo, separado do netplay do RetroArch.",
       "pasta": "PSP"
     },
     {
@@ -1066,7 +1066,7 @@
           "{jogo}"
         ],
         "site": "rpcs3.net/download",
-        "motivo": "OBRIGATORIO. Nao existe nucleo de PlayStation 3 no RetroArch - so o RPCS3 emula este console, e so em computador forte."
+        "motivo": "OBRIGATÓRIO. Não existe núcleo de PlayStation 3 no RetroArch - só o RPCS3 emula este console, e só em computador forte."
       },
       "pasta": "PS3"
     },
@@ -1104,7 +1104,7 @@
           "{jogo}"
         ],
         "site": "xenia-emulator.com/canary",
-        "motivo": "OBRIGATORIO. Nao existe nucleo de Xbox 360 no RetroArch - so o Xenia emula este console, e so com placa de video dedicada.",
+        "motivo": "OBRIGATÓRIO. Não existe núcleo de Xbox 360 no RetroArch - só o Xenia emula este console, e só com placa de vídeo dedicada.",
         "executavel_netplay": "xenia_canary_netplay.exe",
         "jogos_netplay": [
           "gears of war"

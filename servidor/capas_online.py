@@ -84,7 +84,7 @@ def buscar_e_baixar(plataforma_id, titulo_limpo, nome_base_arquivo):
     """
     repo = REPO_POR_PLATAFORMA.get(plataforma_id)
     if not repo:
-        return False, "Este console ainda nao tem esse banco de capas."
+        return False, "Este console ainda não tem esse banco de capas."
 
     candidatos = []
     if nome_base_arquivo and nome_base_arquivo != titulo_limpo:

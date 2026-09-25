@@ -105,3 +105,6 @@ retroarch/cache/*
 # Dados do usuário (não commitar)
 dados/*
 !dados/LEIA.txt
+
+# Coletas do perfil-alvo (COLETAR.bat): dados de maquinas, nao vao para o git
+perfil/

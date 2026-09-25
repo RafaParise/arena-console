@@ -2,14 +2,14 @@
   {
     "modo_modesto": false,
     "processos": 7,
-    "ram_mb": 420.4,
-    "cpu_pct_da_maquina": 0.17,
-    "cpu_pct_de_um_nucleo": 2.0
+    "ram_mb": 420.8,
+    "cpu_pct_da_maquina": 0.06,
+    "cpu_pct_de_um_nucleo": 0.8
   },
   {
     "modo_modesto": true,
     "processos": 7,
-    "ram_mb": 419.1,
+    "ram_mb": 418.7,
     "cpu_pct_da_maquina": 0.05,
     "cpu_pct_de_um_nucleo": 0.5
   }

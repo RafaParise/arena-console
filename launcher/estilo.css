@@ -278,6 +278,33 @@ input::placeholder { color: var(--texto-apagado); }
 }
 .aviso p { margin: 0; font-size: var(--t-peq); color: #e8cfa4; }
 
+/* ============ O QUE DEIXA O COMPUTADOR LENTO (Ajustes > Maquina) ============ */
+/* A gravidade vai na cor da borda E escrita no selo: cor sozinha nao serve
+   para quem nao distingue cores. */
+
+.barreiras { list-style: none; margin: var(--gap) 0 0; padding: 0; display: grid; gap: var(--gap); }
+.barreira {
+  border: 1px solid var(--borda);
+  border-left: 5px solid var(--borda-forte);
+  border-radius: var(--raio);
+  background: var(--painel);
+  padding: 0.6rem 0.9rem;
+}
+.barreira p { margin: 0.25rem 0; }
+.barreira--alta  { border-left-color: var(--erro); }
+.barreira--media { border-left-color: var(--azul-escuro); }
+.barreira-titulo { font-weight: 700; }
+.barreira-selo {
+  display: inline-block;
+  padding: 0 0.45em;
+  border-radius: 999px;
+  border: 1px solid var(--borda-forte);
+  font-size: var(--t-micro);
+  text-transform: uppercase;
+}
+.barreira-quem { color: var(--texto-fraco); font-size: var(--t-peq); }
+.barreira .botao { margin: 0.3rem 0.4rem 0 0; }
+
 /* ========================= TECLAS DO JOGO ========================= */
 /* Grande e sem animacao: e' para ler de relance, inclusive quem tem
    dificuldade de leitura. Cada tecla desenhada como tecla de verdade. */
@@ -504,12 +531,6 @@ input::placeholder { color: var(--texto-apagado); }
 .jogo--indisponivel:hover {
   transform: none;
   box-shadow: none;
-}
-
-.jogo--desaparecendo {
-  opacity: 0;
-  transform: scale(0.95);
-  pointer-events: none;
 }
 
 /* Faixa de estado no topo do card */
@@ -1546,8 +1567,8 @@ input::placeholder { color: var(--texto-apagado); }
   outline-offset: -2px;
 }
 
-/* Jogo sem pasta de console definida */
-.jogo--sem_pasta .jogo-faixa { background: var(--azul-claro); }
+/* Jogo sem pasta de console definida (a cor da faixa fica junto das outras,
+   em .jogo--sem_pasta .jogo-faixa, la em cima) */
 .jogo--sem_pasta .jogo-titulo::after {
   content: " — escolha o console";
   color: var(--azul-claro);

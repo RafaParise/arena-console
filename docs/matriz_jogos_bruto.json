@@ -8,6 +8,14 @@
     "carrega_sem_travar": true
   },
   {
+    "console": "Mega Drive",
+    "jogo": "Sonic The Hedgehog 3 (USA).md",
+    "abre_e_mostra_imagem": true,
+    "tamanho_captura_bytes": 53677,
+    "salva_estado": true,
+    "carrega_sem_travar": true
+  },
+  {
     "console": "Super Nintendo",
     "jogo": "Super Bomberman 4 (Japan) [T-En by Svambo v1.0].sfc",
     "abre_e_mostra_imagem": true,

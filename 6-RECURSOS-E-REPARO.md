@@ -285,8 +285,8 @@ Chegou uma versão nova? **Copie por cima. Não apague nada.**
 O que vem na versão nova e substitui:
 
 ```
-ARENA.bat  ·  VERIFICAR.bat  ·  os 6 leia-me
-launcher\   ·  servidor\ (menos a pasta python)
+ARENA.bat  ·  VERIFICAR.bat  ·  PARTIDA.bat  ·  COLETAR.bat  ·  os 6 leia-me
+launcher\   ·  servidor\ (menos a pasta python)  ·  ferramentas\
 ```
 
 O que é **seu** e nunca vem no pacote:
@@ -295,7 +295,8 @@ O que é **seu** e nunca vem no pacote:
 jogos\        seus jogos
 dados\        recordes, apelido, amigos, mapeamento de controle
 retroarch\    o emulador, os núcleos, saves, states, cheats, BIOS
-emuladores\   PCSX2 e Dolphin
+emuladores\   PCSX2, Dolphin, RPCS3 e Xenia
+perfil\       as coletas do COLETAR.bat
 servidor\python\   o Python embutido
 backup\       suas cópias
 ```
@@ -357,7 +358,7 @@ servidor\python\python.exe servidor\diagnostico.py --so-ver
 | # | O quê | Conserta sozinho? |
 |---|---|---|
 | 1 | As 17 pastas do ARENA existem | **Sim**, recria |
-| 2 | Os 13 arquivos do programa estão lá | Não, avisa |
+| 2 | Os 20 arquivos de que o ARENA precisa para abrir estão lá | Não, avisa |
 | 3 | Arquivos temporários esquecidos | **Sim**, apaga |
 | 4 | Suas configurações estão legíveis | **Sim**, põe de lado a versão quebrada |
 | 5 | O catálogo de jogos está legível | **Sim**, apaga para ser remontado |
@@ -366,6 +367,7 @@ servidor\python\python.exe servidor\diagnostico.py --so-ver
 | 8 | Espaço em disco, tipo do pen drive (FAT32 não aceita arquivo acima de 4 GB) e jogo com nome tão comprido que o save passaria do limite de 260 letras do Windows | Não, avisa e diz o que fazer |
 | 9 | Cópias de segurança existem | Não, informa |
 | 10 | A porta 8777 está livre | Não, avisa |
+| 11 | O que deixa este computador lento (programas, serviços, telemetria, bateria, memória, disco...) — detalhes no documento 3 | Não, só diz o que fazer e quem faz |
 
 ---
 
@@ -479,3 +481,38 @@ Aparece quando ele encontrou algo que não consegue consertar:
 
 
 ---
+
+---
+
+## Parte C — Coletar o perfil desta máquina (para o professor)
+
+O **`COLETAR.bat`**, na raiz, tira um retrato da máquina e mede como o
+ARENA roda nela. Serve para comparar os notebooks da escola e decidir o que
+o ARENA precisa melhorar para o mais fraco.
+
+1. Feche o ARENA, se estiver aberto.
+2. Dois cliques em **`COLETAR.bat`**. Leva uns 5 minutos.
+3. No meio, um jogo de Super Nintendo abre sozinho por uns 70 segundos. É
+   de propósito: olhe se o som e a imagem ficam lisos.
+4. No fim, responda as 5 perguntas (uma tecla e Enter).
+
+O resultado fica em `perfil\<código>_<data-hora>\`:
+
+| Arquivo | Para quê |
+|---|---|
+| `maquina.txt` | Retrato da máquina em português: processador, memória (e quantos pentes), discos (com velocidade e o que o Windows diz deles), vídeo, Windows, rede, de onde o ARENA roda, e **o que deixa essa máquina lenta**, com o que fazer |
+| `arena.txt` | O ARENA nessa máquina: tempo para abrir, servidor, lista de jogos, gravações em disco e o jogo de SNES (quadros por segundo), com BOM / NO LIMITE / RUIM |
+| `maquina.json`, `arena.json` | Os mesmos números, para análise |
+
+**Não coleta nada pessoal.** Nem nome da máquina, nem usuário, nem endereço
+da placa de rede. A máquina aparece só como um código embaralhado.
+
+**Não pede administrador e não precisa de internet.** O que não dá para
+medir sem administrador vira "não foi possível medir". O teste de disco
+grava e apaga um arquivo de 64 MB.
+
+**Não muda nada no ARENA.** O efeito é o mesmo de abrir o ARENA e clicar em
+Atualizar lista. O jogo roda com saves temporários.
+
+Leve a pasta `perfil` inteira no pen drive: cada máquina ganha a sua pasta,
+uma não apaga a outra.

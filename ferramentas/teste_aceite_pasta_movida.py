@@ -97,5 +97,20 @@ def main():
     return 0
 
 
+def apagar_copia():
+    """Auditoria 2: o teste deixava a copia (182 MB, com uma copia do dados\\
+    do aluno) largada fora da pasta do ARENA. Apaga no fim, passe ou falhe
+    -- tirando antes o somente-leitura (o cache do PS1 pode estar travado)."""
+    def liberar_e_tentar_de_novo(funcao, caminho, _erro):
+        os.chmod(caminho, 0o666)
+        funcao(caminho)
+    if os.path.isdir(DESTINO):
+        shutil.rmtree(DESTINO, onerror=liberar_e_tentar_de_novo)
+
+
 if __name__ == "__main__":
-    sys.exit(main())
+    try:
+        codigo = main()
+    finally:
+        apagar_copia()
+    sys.exit(codigo)

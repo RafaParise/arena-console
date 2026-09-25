@@ -127,7 +127,7 @@ def listar_estados(jogo):
 def apagar_estado(jogo, espaco):
     """Apaga um espaco especifico."""
     if not 0 <= int(espaco) < TOTAL_ESPACOS:
-        raise ValueError("Espaco fora da faixa de 0 a 9.")
+        raise ValueError("Espaço fora da faixa de 0 a 9.")
     espaco = int(espaco)
     sufixo = ".state" if espaco == 0 else ".state%d" % espaco
     caminho = os.path.join(PASTA_STATES, base_do_jogo(jogo) + sufixo)
@@ -195,12 +195,12 @@ def validar_codigo(codigo):
     """
     codigo = (codigo or "").strip()
     if not codigo:
-        return None, "Digite o codigo."
+        return None, "Digite o código."
     if len(codigo) > 2000:
-        return None, "Codigo grande demais."
+        return None, "Código grande demais."
     if not RE_CODIGO.match(codigo):
-        return None, ("Codigo invalido. Use apenas numeros e as letras de A a F, "
-                      "separando as linhas por espaco ou dois-pontos.")
+        return None, ("Código inválido. Use apenas números e as letras de A a F, "
+                      "separando as linhas por espaço ou dois-pontos.")
     # Normaliza: uma linha so, blocos separados por '+', que e o separador
     # que o RetroArch usa para codigo de varias linhas.
     blocos = [b for b in re.split(r"[\s+]+", codigo) if b]
@@ -257,7 +257,7 @@ def adicionar_cheat(jogo, descricao, codigo, ligado=False):
 def alterar_cheat(jogo, indice, ligado=None, apagar=False):
     cheats = ler_cheats(jogo)
     if not 0 <= indice < len(cheats):
-        return None, "Codigo nao encontrado."
+        return None, "Código não encontrado."
     if apagar:
         cheats.pop(indice)
     elif ligado is not None:

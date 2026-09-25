@@ -3,55 +3,67 @@
     {
       "funcao": "executar_jogo",
       "arquivo": "servidor\\arena.py",
-      "linha": 1592,
+      "linha": 1748,
       "ocorrencias": 1
     },
     {
       "funcao": "anunciar_e_escutar",
       "arquivo": "servidor\\arena.py",
-      "linha": 2119,
+      "linha": 2323,
+      "ocorrencias": 1
+    },
+    {
+      "funcao": "registros_pendentes",
+      "arquivo": "servidor\\arena.py",
+      "linha": 2495,
       "ocorrencias": 1
     },
     {
       "funcao": "rodar_vigia",
       "arquivo": "servidor\\arena.py",
-      "linha": 2644,
+      "linha": 2851,
+      "ocorrencias": 1
+    },
+    {
+      "funcao": "atualizar_adaptadores",
+      "arquivo": "servidor\\arena.py",
+      "linha": 4586,
       "ocorrencias": 1
     },
     {
       "funcao": "testar",
       "arquivo": "servidor\\arena.py",
-      "linha": 2624,
+      "linha": 2831,
+      "ocorrencias": 1
+    },
+    {
+      "funcao": "log_message",
+      "arquivo": "servidor\\arena.py",
+      "linha": 3017,
       "ocorrencias": 1
     },
     {
       "funcao": "do_GET",
       "arquivo": "servidor\\arena.py",
-      "linha": 2842,
+      "linha": 3135,
       "ocorrencias": 1
     },
     {
       "funcao": "do_POST",
       "arquivo": "servidor\\arena.py",
-      "linha": 3118,
+      "linha": 3421,
+      "ocorrencias": 1
+    },
+    {
+      "funcao": "encerrar_depois_da_resposta",
+      "arquivo": "servidor\\arena.py",
+      "linha": 4811,
       "ocorrencias": 1
     },
     {
       "funcao": "rodar",
       "arquivo": "servidor\\arena.py",
-      "linha": 3506,
-      "ocorrencias": 1
-    },
-    {
-      "funcao": "opcoes_de_controle",
-      "arquivo": "servidor\\graficos.py",
-      "linha": 619,
-      "ocorrencias": 1
-    },
-    {
-      "funcao": "shutil_disk_usage",
-      "arquivo": "servidor\\hardware.py",
-      "linha": 265,
+      "linha": 3864,
       "ocorrencias": 1
     },
     {
@@ -65,44 +77,14 @@
       "arquivo": "servidor\\identificador.py",
       "linha": 116,
       "ocorrencias": 1
-    },
-    {
-      "funcao": "verificar_conexao_wi_fi",
-      "arquivo": "servidor\\transferencia.py",
-      "linha": 85,
-      "ocorrencias": 1
-    },
-    {
-      "funcao": "obter_ip_para_amigo",
-      "arquivo": "servidor\\transferencia.py",
-      "linha": 99,
-      "ocorrencias": 1
-    },
-    {
-      "funcao": "set_jogos",
-      "arquivo": "servidor\\transferencia.py",
-      "linha": 41,
-      "ocorrencias": 1
-    },
-    {
-      "funcao": "adicionar_jogo",
-      "arquivo": "servidor\\transferencia.py",
-      "linha": 45,
-      "ocorrencias": 1
-    },
-    {
-      "funcao": "parar",
-      "arquivo": "servidor\\transferencia.py",
-      "linha": 67,
-      "ocorrencias": 1
     }
   ],
   "chaves_config": {
-    "apelido": 56,
+    "apelido": 54,
     "avancado": 11,
     "bios": 11,
     "codigo_proprio": 5,
-    "dispositivo_id": 24,
+    "dispositivo_id": 23,
     "escola": 6,
     "favoritos": 8,
     "modo_desempenho": 9,
@@ -110,9 +92,9 @@
     "nome_dispositivo": 4,
     "perfil_controle": 8,
     "perfil_grafico": 9,
-    "permitir_rede": 10,
+    "permitir_rede": 13,
     "preset_grafico_externo": 10,
-    "quando": 11,
+    "quando": 15,
     "recentes": 6,
     "rpcn_ativo": 7,
     "servidores": 20,
@@ -120,7 +102,7 @@
     "tipo_controle": 9,
     "travar_teclas": 7,
     "ultra_desempenho": 14,
-    "url": 29,
+    "url": 30,
     "valor": 12
   },
   "excecoes_silenciosas": [
@@ -131,127 +113,132 @@
     },
     {
       "arquivo": "servidor\\arena.py",
-      "linha": 128,
+      "linha": 144,
       "trecho": "except OSError: pass"
     },
     {
       "arquivo": "servidor\\arena.py",
-      "linha": 233,
+      "linha": 312,
+      "trecho": "except OSError: pass"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 371,
       "trecho": "except sqlite3.Error: pass"
     },
     {
       "arquivo": "servidor\\arena.py",
-      "linha": 937,
+      "linha": 1076,
       "trecho": "except OSError: pass"
     },
     {
       "arquivo": "servidor\\arena.py",
-      "linha": 976,
+      "linha": 1115,
       "trecho": "except OSError: pass"
     },
     {
       "arquivo": "servidor\\arena.py",
-      "linha": 995,
+      "linha": 1134,
       "trecho": "except OSError: pass"
     },
     {
       "arquivo": "servidor\\arena.py",
-      "linha": 1579,
+      "linha": 1735,
       "trecho": "except Exception: pass"
     },
     {
       "arquivo": "servidor\\arena.py",
-      "linha": 1766,
+      "linha": 1918,
       "trecho": "except Exception: pass"
     },
     {
       "arquivo": "servidor\\arena.py",
-      "linha": 1792,
+      "linha": 1944,
       "trecho": "except Exception: pass"
     },
     {
       "arquivo": "servidor\\arena.py",
-      "linha": 1996,
+      "linha": 2040,
+      "trecho": "except OSError: pass"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 2189,
       "trecho": "except OSError: continue"
     },
     {
       "arquivo": "servidor\\arena.py",
-      "linha": 2129,
+      "linha": 2333,
       "trecho": "except OSError: pass"
     },
     {
       "arquivo": "servidor\\arena.py",
-      "linha": 2164,
+      "linha": 2368,
       "trecho": "except OSError: pass"
     },
     {
       "arquivo": "servidor\\arena.py",
-      "linha": 2745,
+      "linha": 2952,
       "trecho": "except OSError: pass"
     },
     {
       "arquivo": "servidor\\arena.py",
-      "linha": 3336,
-      "trecho": "except Exception: pass"
-    },
-    {
-      "arquivo": "servidor\\arena.py",
-      "linha": 3346,
+      "linha": 3687,
       "trecho": "except OSError: pass"
     },
     {
       "arquivo": "servidor\\arena.py",
-      "linha": 3358,
+      "linha": 3699,
       "trecho": "except OSError: pass"
     },
     {
       "arquivo": "servidor\\arena.py",
-      "linha": 3394,
+      "linha": 3751,
       "trecho": "except OSError: pass"
     },
     {
       "arquivo": "servidor\\arena.py",
-      "linha": 3403,
+      "linha": 3760,
       "trecho": "except OSError: pass"
     },
     {
       "arquivo": "servidor\\arena.py",
-      "linha": 3500,
+      "linha": 3858,
       "trecho": "except OSError: pass"
     },
     {
       "arquivo": "servidor\\arena.py",
-      "linha": 3532,
+      "linha": 3890,
       "trecho": "except OSError: pass"
     },
     {
       "arquivo": "servidor\\arena.py",
-      "linha": 3888,
+      "linha": 4260,
       "trecho": "except OSError: pass"
     },
     {
       "arquivo": "servidor\\arena.py",
-      "linha": 4226,
+      "linha": 4698,
       "trecho": "except OSError: continue"
     },
     {
       "arquivo": "servidor\\arena.py",
-      "linha": 4270,
+      "linha": 4742,
       "trecho": "except OSError: continue"
     },
     {
       "arquivo": "servidor\\arena.py",
-      "linha": 4301,
+      "linha": 4782,
       "trecho": "except OSError: continue"
     },
     {
       "arquivo": "servidor\\arena.py",
-      "linha": 4326,
+      "linha": 4843,
       "trecho": "except OSError: pass"
     },
     {
       "arquivo": "servidor\\capas_online.py",
-      "linha": 104,
+      "linha": 123,
       "trecho": "except OSError: pass"
     },
     {
@@ -270,16 +257,6 @@
       "trecho": "except OSError: pass"
     },
     {
-      "arquivo": "servidor\\db.py",
-      "linha": 120,
-      "trecho": "except OSError: pass"
-    },
-    {
-      "arquivo": "servidor\\db.py",
-      "linha": 252,
-      "trecho": "except sqlite3.Error: pass"
-    },
-    {
       "arquivo": "servidor\\diagnostico.py",
       "linha": 131,
       "trecho": "except OSError: pass"
@@ -292,6 +269,11 @@
     {
       "arquivo": "servidor\\diagnostico.py",
       "linha": 368,
+      "trecho": "except OSError: continue"
+    },
+    {
+      "arquivo": "servidor\\diagnostico.py",
+      "linha": 442,
       "trecho": "except OSError: pass"
     },
     {
@@ -301,13 +283,23 @@
     },
     {
       "arquivo": "servidor\\graficos.py",
-      "linha": 420,
+      "linha": 521,
       "trecho": "except OSError: pass"
     },
     {
       "arquivo": "servidor\\graficos.py",
-      "linha": 496,
+      "linha": 594,
       "trecho": "except OSError: continue"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 608,
+      "trecho": "except OSError: continue"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 697,
+      "trecho": "except OSError: pass"
     },
     {
       "arquivo": "servidor\\hardware.py",
@@ -326,27 +318,27 @@
     },
     {
       "arquivo": "servidor\\hardware.py",
-      "linha": 299,
+      "linha": 317,
       "trecho": "except ValueError: pass"
     },
     {
       "arquivo": "servidor\\hardware.py",
-      "linha": 335,
+      "linha": 353,
       "trecho": "except Exception: pass"
     },
     {
       "arquivo": "servidor\\hardware.py",
-      "linha": 348,
+      "linha": 366,
       "trecho": "except Exception: pass"
     },
     {
       "arquivo": "servidor\\hardware.py",
-      "linha": 381,
+      "linha": 399,
       "trecho": "except OSError: continue"
     },
     {
       "arquivo": "servidor\\hardware.py",
-      "linha": 418,
+      "linha": 436,
       "trecho": "except OSError: continue"
     },
     {
@@ -361,18 +353,13 @@
     },
     {
       "arquivo": "servidor\\indexador.py",
-      "linha": 464,
+      "linha": 474,
       "trecho": "except OSError: pass"
     },
     {
       "arquivo": "servidor\\internet_archive.py",
-      "linha": 191,
+      "linha": 220,
       "trecho": "except OSError: pass"
-    },
-    {
-      "arquivo": "servidor\\transferencia.py",
-      "linha": 108,
-      "trecho": "except: pass"
     }
   ],
   "open_sem_with": [
@@ -385,27 +372,27 @@
   "caminhos_absolutos": [
     {
       "arquivo": "servidor\\arena.py",
-      "linha": 2730,
+      "linha": 2937,
       "trecho": "origens = [os.path.join(os.environ.get(\"SystemRoot\", r\"C:\\Windows\"), \"System32\")]"
     },
     {
       "arquivo": "servidor\\arena.py",
-      "linha": 4276,
+      "linha": 4750,
       "trecho": "r\"C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe\","
     },
     {
       "arquivo": "servidor\\arena.py",
-      "linha": 4277,
+      "linha": 4751,
       "trecho": "r\"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe\","
     },
     {
       "arquivo": "servidor\\arena.py",
-      "linha": 4278,
+      "linha": 4752,
       "trecho": "r\"C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe\","
     },
     {
       "arquivo": "servidor\\graficos.py",
-      "linha": 928,
+      "linha": 1048,
       "trecho": "raiz_windows = os.environ.get(\"WINDIR\", \"C:\\\\Windows\")"
     }
   ],
@@ -413,24 +400,29 @@
     "duckstation": [
       {
         "arquivo": "servidor\\graficos.py",
-        "linha": 397,
-        "trecho": "\"swanstation\": [\"swanstation_BIOS_Path\", \"duckstation_BIOS.Path\"],"
+        "linha": 474,
+        "trecho": "# antes a lista tinha \"swanstation_BIOS_Path\" e \"duckstation_BIOS.Path\" (nao"
       },
       {
         "arquivo": "servidor\\graficos.py",
-        "linha": 550,
-        "trecho": "\"duckstation_MemoryCards.Card1Type\": \"Shared\","
+        "linha": 654,
+        "trecho": "\"duckstation_*\" nem existem no SwanStation. Na pratica, todo save de"
       },
       {
         "arquivo": "servidor\\graficos.py",
-        "linha": 551,
-        "trecho": "\"duckstation_MemoryCards.Directory\": cartao,"
+        "linha": 706,
+        "trecho": "cima, o arquivo global atual. Chaves \"duckstation_*\" (lixo antigo, o"
+      },
+      {
+        "arquivo": "servidor\\graficos.py",
+        "linha": 719,
+        "trecho": "if k not in gerenciadas and not k.startswith(\"duckstation_\")}"
       }
     ],
     "transmiss": [
       {
         "arquivo": "servidor\\arena.py",
-        "linha": 433,
+        "linha": 571,
         "trecho": "# --- Gravacao e transmissao: desligadas de verdade -------------------"
       }
     ]

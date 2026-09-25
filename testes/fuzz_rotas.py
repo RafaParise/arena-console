@@ -63,6 +63,9 @@ def preparar_ambiente(destino):
         pass
 
 
+ROTAS_LENTAS = {"/api/barreiras": 60}
+
+
 def requisicao(metodo, caminho, corpo=None, timeout=5):
     url = ENDERECO + caminho
     dados = None
@@ -139,6 +142,7 @@ def montar_rotas(jogo_id_real):
         ("GET", "/api/colegas", {}, []),
         ("GET", "/api/mapeamento", {}, []),
         ("GET", "/api/ranking", {}, []),
+        ("GET", "/api/barreiras", {}, []),          # auditoria 2
 
         # ---- GET, com parametro ----
         ("GET", "/api/perfis-controle", {"tipo": "xbox360", "console": "ps1"}, []),
@@ -168,6 +172,8 @@ def montar_rotas(jogo_id_real):
         ("POST", "/api/exportar", {}, []),
         ("POST", "/api/importar", {"arquivo": "naoexiste.zip"}, ["arquivo"]),
         ("POST", "/api/backup", {}, []),
+        # auditoria 2: "notepad" nao esta na lista segura -> recusa sem fechar nada
+        ("POST", "/api/barreiras/fechar", {"programa": "notepad"}, ["programa"]),
         ("POST", "/api/capa/atualizar", {"jogo_id": jogo_id_real or "abc"}, []),
         ("POST", "/api/amigo/adicionar", {"apelido": "TesteFuzz", "url": "192.168.0.5:8777"}, []),
         ("POST", "/api/amigo/remover", {"apelido": "TesteFuzz"}, []),
@@ -204,12 +210,17 @@ def testar_rota(metodo, caminho, campos_ok, campos_caminho, relatorio):
         })
         return ok
 
+    # Rotas lentas de proposito (auditoria 2): o diagnostico de lentidao
+    # pergunta ao Windows por PowerShell (~5 s aqui, mais num Celeron). A tela
+    # espera sem prazo; so o fuzz precisava saber.
+    prazo = ROTAS_LENTAS.get(caminho, 5)
+
     def enviar(corpo):
         if metodo == "GET":
             query = "&".join("%s=%s" % (k, urllib.request.quote(str(v))) for k, v in corpo.items())
             alvo = caminho + ("?" + query if query else "")
-            return requisicao("GET", alvo)
-        return requisicao("POST", caminho, corpo)
+            return requisicao("GET", alvo, timeout=prazo)
+        return requisicao("POST", caminho, corpo, timeout=prazo)
 
     # 1. dados corretos
     status, texto = enviar(campos_ok)

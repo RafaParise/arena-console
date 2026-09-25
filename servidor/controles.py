@@ -265,12 +265,12 @@ def validar(tipo, valor):
 
     if tipo == "teclado":
         if valor not in TECLAS:
-            return None, ("O RetroArch nao conhece a tecla '%s'." % valor)
+            return None, ("O RetroArch não conhece a tecla '%s'." % valor)
         return valor, None
 
     if tipo == "botao":
         if not valor.isdigit() or not 0 <= int(valor) <= 31:
-            return None, "Numero de botao invalido. Use de 0 a 31."
+            return None, "Número de botão inválido. Use de 0 a 31."
         return str(int(valor)), None
 
     if tipo == "hat":
@@ -278,14 +278,14 @@ def validar(tipo, valor):
             return valor, None          # ja veio pronto: h0up
         if valor in DIRECOES_HAT:
             return "h0" + valor, None
-        return None, "Direcao de direcional invalida."
+        return None, "Direção de direcional inválida."
 
     if tipo == "eixo":
         # Formato do RetroArch: sinal e o numero do eixo, tipo '-0' ou '+1'.
         if len(valor) < 2 or valor[0] not in "+-" or not valor[1:].isdigit():
-            return None, "Eixo invalido. Use algo como -0 ou +1."
+            return None, "Eixo inválido. Use algo como -0 ou +1."
         if not 0 <= int(valor[1:]) <= 15:
-            return None, "Numero de eixo invalido. Use de 0 a 15."
+            return None, "Número de eixo inválido. Use de 0 a 15."
         return valor, None
 
     return None, "Tipo de comando desconhecido."
@@ -294,7 +294,7 @@ def validar(tipo, valor):
 def definir(jogador, botao, tipo, valor):
     """Guarda uma atribuicao. Com tipo vazio, apaga."""
     if jogador not in JOGADORES:
-        return None, "Jogador invalido."
+        return None, "Jogador inválido."
     if botao not in BOTOES:
         return None, "Botao desconhecido."
 
@@ -413,7 +413,7 @@ def aplicar_padrao_controle(jogador):
     boa chance de estar errado. Veja SEM_MAPEAR_SOZINHO.
     """
     if jogador not in JOGADORES:
-        return None, "Jogador invalido."
+        return None, "Jogador inválido."
     dados = ler()
     dados[jogador] = {botao: {"tipo": "botao", "valor": numero}
                       for botao, numero in PADRAO_CONTROLE.items()
@@ -425,7 +425,7 @@ def aplicar_padrao_controle(jogador):
 def aplicar_padrao(jogador):
     """Coloca o mapeamento de fabrica do teclado para aquele jogador."""
     if jogador not in JOGADORES:
-        return None, "Jogador invalido."
+        return None, "Jogador inválido."
     dados = ler()
     dados[jogador] = {botao: {"tipo": "teclado", "valor": tecla}
                       for botao, tecla in PADRAO_TECLADO[jogador].items()}

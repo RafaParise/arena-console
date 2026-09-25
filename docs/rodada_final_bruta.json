@@ -2,12 +2,12 @@
   {
     "script": "servidor\\tests\\run.py",
     "codigo_saida": 0,
-    "segundos": 0.3,
+    "segundos": 0.4,
     "ultimas_linhas": [
       "test_schema (__main__.TestDB.test_schema) ... ok",
       "",
       "----------------------------------------------------------------------",
-      "Ran 45 tests in 0.224s",
+      "Ran 71 tests in 0.312s",
       "",
       "OK"
     ]
@@ -15,14 +15,34 @@
   {
     "script": "testes\\fuzz_rotas.py",
     "codigo_saida": 0,
-    "segundos": 178.3,
+    "segundos": 183.5,
     "ultimas_linhas": [
       "",
       "--- RESUMO ---",
-      "Total de checagens: 244",
+      "Total de checagens: 258",
       "Falhas: 0",
       "",
       "Relatorio completo salvo em C:\\Projetos\\Criador De Apps Pedagógicos\\ARENA\\ARENA-unificado\\docs\\fuzz_rotas_bruto.json"
+    ]
+  },
+  {
+    "script": "testes\\textos_sem_acento.py",
+    "codigo_saida": 0,
+    "segundos": 0.0,
+    "ultimas_linhas": [
+      "0 frase(s) sem acento que chegam na tela."
+    ]
+  },
+  {
+    "script": "ferramentas\\teste_aceite_pasta_movida.py",
+    "codigo_saida": 0,
+    "segundos": 6.8,
+    "ultimas_linhas": [
+      "Copiando (sem jogos/cores/BIOS/assets) para:",
+      "  C:\\Projetos\\Criador De Apps Pedagógicos\\ARENA\\ARENA-teste-pasta-movida",
+      "Abrindo o ARENA da pasta nova por alguns segundos...",
+      "OK: nenhum caminho absoluto do retroarch.cfg aponta pra fora de",
+      "  C:\\Projetos\\Criador De Apps Pedagógicos\\ARENA\\ARENA-teste-pasta-movida"
     ]
   },
   {
@@ -32,7 +52,7 @@
     "ultimas_linhas": [
       "Arquivo de teste: https://raw.githubusercontent.com/libretro/RetroArch/master/COPYING (35147 bytes)",
       "1. SHA certo: instalado {'titulo': 'Arquivo de teste', 'tamanho': 35147}, conteudo identico: True",
-      "2. SHA errado: recusado (SHA-256 diferente: download recusado por seguranca.); sobrou: []",
+      "2. SHA errado: recusado (SHA-256 diferente: download recusado por segurança.); sobrou: []",
       "3. Origem fora da lista: recusado (A URL precisa ser HTTPS e estar em archive.org ou raw.githubusercontent.com.)",
       "",
       "RESULTADO: PASSOU"
@@ -91,6 +111,32 @@
     ]
   },
   {
+    "script": "testes\\teste_barreiras_api.py",
+    "codigo_saida": 0,
+    "segundos": 7.1,
+    "ultimas_linhas": [
+      "   segunda consulta (guardada): 0.001 s",
+      "2. sem lista de processos: True; dado pessoal vazado: nenhum",
+      "3. fechar programa fora da lista: recusado nos 5 casos: True",
+      "4. de outra maquina: GET 403, fechar 403 (esperado 403 e 403)",
+      "",
+      "RESULTADO: PASSOU"
+    ]
+  },
+  {
+    "script": "testes\\teste_barreiras_modo_restrito.py",
+    "codigo_saida": 0,
+    "segundos": 9.4,
+    "ultimas_linhas": [
+      "  antivirus      normal    1 | restrito    1  ok",
+      "  instalados     normal  262 | restrito  262  ok",
+      "  campos simples iguais nos dois modos: 13 de 13",
+      "  avaliar() com os fatos do modo restrito: 1 barreira(s), sem erro",
+      "",
+      "RESULTADO: PASSOU"
+    ]
+  },
+  {
     "script": "testes\\teste_caminho_comprido.py",
     "codigo_saida": 0,
     "segundos": 1.1,
@@ -108,11 +154,11 @@
     "codigo_saida": 0,
     "segundos": 0.1,
     "ultimas_linhas": [
-      "  playlist_directory         dentro do ARENA",
       "  content_history_path       dentro do ARENA",
       "  content_favorites_path     dentro do ARENA",
+      "  network_cmd_enable desligado: True",
       "",
-      "Linhas trocadas: 7",
+      "Linhas trocadas: 8",
       "RESULTADO: PASSOU"
     ]
   },
@@ -125,8 +171,18 @@
       "--- RESUMO ---",
       "  {'cenario': 'convidado_cai_e_volta', 'conectou_primeira_vez': True, 'reconectou': True}",
       "  {'cenario': 'host_sai_no_meio', 'conectou_antes': True, 'convidado_registrou_queda': True, 'convidado_nao_travou': True}",
-      "  {'cenario': 'duas_partidas_simultaneas', 'partida_A_ok': False, 'partida_B_ok': False, 'misturou': True}",
+      "  {'cenario': 'duas_partidas_simultaneas', 'partida_A_ok': True, 'partida_B_ok': False, 'misturou': True}",
       "[protege_cfg] retroarch.cfg real devolvido como estava antes do teste."
+    ]
+  },
+  {
+    "script": "testes\\teste_chaves_graficos.py",
+    "codigo_saida": 0,
+    "segundos": 0.2,
+    "ultimas_linhas": [
+      "73 chaves conferidas.",
+      "Nucleos sem .dll na pasta (nao deu para conferir): nenhum",
+      "Todas as chaves existem nos nucleos."
     ]
   },
   {
@@ -145,7 +201,7 @@
   {
     "script": "testes\\teste_descoberta_30_maquinas.py",
     "codigo_saida": 0,
-    "segundos": 13.5,
+    "segundos": 13.4,
     "ultimas_linhas": [
       "Tempo de resposta de /api/colegas: 0.019 s",
       "CPU do servidor durante/depois da rajada: 0.0%",
@@ -158,7 +214,7 @@
   {
     "script": "testes\\teste_disco_cheio.py",
     "codigo_saida": 0,
-    "segundos": 1.2,
+    "segundos": 1.3,
     "ultimas_linhas": [
       "API: status 500, resposta {\"ok\": false, \"erro\": \"Não consegui concluir o pedido. Acabou o espaço no disco ou no pen drive. Apague algo que não precisa mais e tente de novo.\"}",
       "Mensagem sem texto cru do sistema: True",
@@ -184,9 +240,9 @@
   {
     "script": "testes\\teste_estresse_catalogo.py",
     "codigo_saida": 0,
-    "segundos": 4.6,
+    "segundos": 4.2,
     "ultimas_linhas": [
-      "Cache:  0.025s (reaproveitado)",
+      "Cache:  0.027s (reaproveitado)",
       "RESULTADO: PASSOU",
       "",
       "Apagando os arquivos falsos...",
@@ -200,9 +256,9 @@
     "segundos": 1.2,
     "ultimas_linhas": [
       "OK    conquistas com 3 jogadores 200",
-      "OK    jogo inexistente tem 2 partes Jogo nao encontrado. Ele pode ter sido movido ou apagado. Clique em Atualizar lista e tente de novo.",
-      "OK    cheat em jogo inexistente Jogo nao encontrado. Ele pode ter sido movido ou apagado. Clique em Atualizar lista e tente de novo.",
-      "OK    capa em jogo inexistente Jogo nao esta no catalogo. Clique em Atualizar lista.",
+      "OK    jogo inexistente tem 2 partes Jogo não encontrado. Ele pode ter sido movido ou apagado. Clique em Atualizar lista e tente de novo.",
+      "OK    cheat em jogo inexistente Jogo não encontrado. Ele pode ter sido movido ou apagado. Clique em Atualizar lista e tente de novo.",
+      "OK    capa em jogo inexistente Jogo não está no catálogo. Clique em Atualizar lista.",
       "",
       "RESULTADO: PASSOU"
     ]
@@ -249,10 +305,10 @@
   {
     "script": "testes\\teste_longa_duracao.py",
     "codigo_saida": 0,
-    "segundos": 182.6,
+    "segundos": 182.7,
     "ultimas_linhas": [
-      "Pedidos totais: 52374 | falhas de conexao: 0",
-      "Crescimento de RAM (apos aquecimento): 0.8 MB",
+      "Pedidos totais: 53235 | falhas de conexao: 0",
+      "Crescimento de RAM (apos aquecimento): 0.7 MB",
       "Crescimento de handles (apos aquecimento): 10",
       "",
       "Relatorio salvo em C:\\Projetos\\Criador De Apps Pedagógicos\\ARENA\\ARENA-unificado\\docs\\longa_duracao_bruto.json",
@@ -262,10 +318,10 @@
   {
     "script": "testes\\teste_mala_validacao.py",
     "codigo_saida": 0,
-    "segundos": 1.4,
+    "segundos": 1.3,
     "ultimas_linhas": [
-      "Caso 1 (nome arbitrario) -- status=400 resp={'ok': False, 'erro': 'Caminho da mala invalido: o arquivo precisa se chamar ARENA-troca.json.'} arquivo_criado=False",
-      "Caso 2 (nome correto, pasta diferente) -- status=200 resp={'ok': True, 'recebidos': 0, 'na_mala': 2, 'maquinas': 1, 'arquivo': 'C:\\\\Users\\\\passo\\\\AppData\\\\Local\\\\Temp\\\\arena_mala__9sehqsm\\\\pendrive_simulado\\\\ARENA-troca.json'} arquivo_criado=True",
+      "Caso 1 (nome arbitrario) -- status=400 resp={'ok': False, 'erro': 'Caminho da mala inválido: o arquivo precisa se chamar ARENA-troca.json.'} arquivo_criado=False",
+      "Caso 2 (nome correto, pasta diferente) -- status=200 resp={'ok': True, 'recebidos': 0, 'na_mala': 2, 'maquinas': 1, 'arquivo': 'C:\\\\Users\\\\passo\\\\AppData\\\\Local\\\\Temp\\\\arena_mala_qbqmh5_n\\\\pendrive_simulado\\\\ARENA-troca.json'} arquivo_criado=True",
       "Caso 3 (sem caminho, usa o padrao) -- status=200 resp={'ok': True, 'recebidos': 0, 'na_mala': 2, 'maquinas': 1, 'arquivo': 'C:\\\\Users\\\\passo\\\\AppData\\\\Local\\\\Temp\\\\ARENA-troca.json'}",
       "",
       "RESULTADO: PASSOU"
@@ -274,7 +330,7 @@
   {
     "script": "testes\\teste_matriz_jogos.py",
     "codigo_saida": 0,
-    "segundos": 102.2,
+    "segundos": 118.4,
     "ultimas_linhas": [
       "  {'console': 'Super Nintendo', 'jogo': 'Super Bomberman 4 (Japan) [T-En by Svambo v1.0].sfc', 'abre_e_mostra_imagem': True, 'tamanho_captura_bytes': 50098, 'salva_estado': True, 'carrega_sem_travar': True}",
       "  {'console': 'PlayStation', 'jogo': 'CTR - Crash Team Racing (USA).bin', 'abre_e_mostra_imagem': True, 'tamanho_captura_bytes': 11139, 'salva_estado': True, 'carrega_sem_travar': True}",
@@ -287,7 +343,7 @@
   {
     "script": "testes\\teste_netplay_5_jogadores.py",
     "codigo_saida": 0,
-    "segundos": 37.9,
+    "segundos": 38.5,
     "ultimas_linhas": [
       "Resumo salvo em C:\\Projetos\\Criador De Apps Pedagógicos\\ARENA\\ARENA-unificado\\docs\\netplay_5_jogadores_bruto.json",
       "",
@@ -302,18 +358,18 @@
     "codigo_saida": 0,
     "segundos": 25.2,
     "ultimas_linhas": [
-      "  [INFO] [Playlist] Carregando arquivo de histórico: \"C:\\Users\\passo\\AppData\\Local\\Temp\\arena_netplay_iso_s1wafjt5\\hospedeiro\\builtin\\content_video_history.lpl\".",
-      "  [INFO] [Playlist] Written to file: \"C:\\Users\\passo\\AppData\\Local\\Temp\\arena_netplay_iso_s1wafjt5\\hospedeiro\\builtin\\content_history.lpl\".",
+      "  [INFO] [Playlist] Carregando arquivo de histórico: \"C:\\Users\\passo\\AppData\\Local\\Temp\\arena_netplay_iso_lpg2fzyy\\hospedeiro\\builtin\\content_video_history.lpl\".",
+      "  [INFO] [Playlist] Written to file: \"C:\\Users\\passo\\AppData\\Local\\Temp\\arena_netplay_iso_lpg2fzyy\\hospedeiro\\builtin\\content_history.lpl\".",
       "  [INFO] [Netplay] Vaga de conexão 0",
       "  [INFO] [Netplay] Conexão recebida de: \"Jogador5\"",
-      "  [INFO] [Netplay] Jogador5 se juntou como o jogador 5 (ping: 27 ms)",
+      "  [INFO] [Netplay] Jogador5 se juntou como o jogador 5 (ping: 12 ms)",
       "[protege_cfg] retroarch.cfg real devolvido como estava antes do teste."
     ]
   },
   {
     "script": "testes\\teste_opcoes_nucleo_ponta_a_ponta.py",
     "codigo_saida": 0,
-    "segundos": 6.0,
+    "segundos": 6.1,
     "ultimas_linhas": [
       "Opcao do aluno (swanstation_Display_ShowOSDMessages): nucleo usou false (esperado false)",
       "Memory card: Libretro (esperado Libretro)",
@@ -326,7 +382,7 @@
   {
     "script": "testes\\teste_partida_colega.py",
     "codigo_saida": 0,
-    "segundos": 12.9,
+    "segundos": 12.8,
     "ultimas_linhas": [
       "",
       "",
@@ -343,7 +399,7 @@
     "ultimas_linhas": [
       "--- Endereco alcancavel (o proprio localhost) ---",
       "Status=200 tempo=2.00s",
-      "Resposta: {'endereco': '127.0.0.1', 'arena': True, 'partida': False, 'arquivo': None, 'diagnostico': \"Voces se enxergam, mas a porta da partida esta fechada. Duas causas: ele ainda nao clicou em 'Eu abro a partida', ou o firewall do Windows dele esta bloqueando o retroarch.exe. Veja o documento 5.\"}",
+      "Resposta: {'endereco': '127.0.0.1', 'arena': True, 'partida': False, 'arquivo': None, 'diagnostico': \"Vocês se enxergam, mas a porta da partida está fechada. Duas causas: ele ainda não clicou em 'Eu abro a partida', ou o firewall do Windows dele está bloqueando o retroarch.exe. Veja o documento 5.\"}",
       "",
       "Tempo com endereco invalido: 2.68s (antes da correcao: ~5,3s medido)",
       "RESULTADO: PASSOU"
@@ -367,7 +423,7 @@
     "codigo_saida": 0,
     "segundos": 1.3,
     "ultimas_linhas": [
-      "Aba Emuladores, PS3: [{'plataforma': 'PlayStation 3', 'id': 'ps3', 'nome': 'RPCS3', 'pasta': 'emuladores\\\\RPCS3', 'site': 'rpcs3.net/download', 'motivo': 'OBRIGATORIO. Nao existe nucleo de PlayStation 3 no RetroArch - so o RPCS3 emula este console, e so em computador forte.', 'instalado': True, 'compactado_pendente': '', 'falta': 'O PS3 precisa do firmware oficial da Sony instalado no RPCS3, e ele ainda não está. Peça ao professor: no RPCS3, menu File > Install Firmware, com o arquivo PS3UPDAT.PUP do site da PlayStation.'}]",
+      "Aba Emuladores, PS3: [{'plataforma': 'PlayStation 3', 'id': 'ps3', 'nome': 'RPCS3', 'pasta': 'emuladores\\\\RPCS3', 'site': 'rpcs3.net/download', 'motivo': 'OBRIGATÓRIO. Não existe núcleo de PlayStation 3 no RetroArch - só o RPCS3 emula este console, e só em computador forte.', 'instalado': True, 'compactado_pendente': '', 'falta': 'O PS3 precisa do firmware oficial da Sony instalado no RPCS3, e ele ainda não está. Peça ao professor: no RPCS3, menu File > Install Firmware, com o arquivo PS3UPDAT.PUP do site da PlayStation.'}]",
       "Abrir Borderlands 2: status 409 -> O PS3 precisa do firmware oficial da Sony instalado no RPCS3, e ele ainda não está. Peça ao professor: no RPCS3, menu File > Install Firmware, com o arquivo PS3UPDAT.PUP do site da PlayStation.",
       "ARENA continua livre para abrir outro jogo: True",
       "",
@@ -377,7 +433,7 @@
   {
     "script": "testes\\teste_qual_opcao_de_nucleo_vale.py",
     "codigo_saida": 0,
-    "segundos": 15.8,
+    "segundos": 15.9,
     "ultimas_linhas": [
       "   [INFO] [Core] Saved core options file to \"C:\\Projetos\\Criador De Apps Pedagógicos\\ARENA\\ARENA-unificado\\retroarch\\retroarch-core-options.cfg\".",
       "",
@@ -395,7 +451,7 @@
       "Codigo de saida do processo filho (137 = morto de proposito): 137",
       "config.json continua JSON valido: True",
       "apelido depois (tem que ser o ANTIGO, nao 'NomeQueDeviaGravar' -- a troca nunca aconteceu): RafaParise",
-      "arquivos .tmp orfaos encontrados (esperado: 1, sera limpo na proxima abertura): ['config.json.6844.tmp']",
+      "arquivos .tmp orfaos encontrados (esperado: 1, sera limpo na proxima abertura): ['config.json.14256.tmp']",
       "",
       "RESULTADO: PASSOU (arquivo antigo protegido, nada corrompido)"
     ]
@@ -405,12 +461,25 @@
     "codigo_saida": 0,
     "segundos": 112.8,
     "ultimas_linhas": [
-      "  {'cenario': 'so atraso 50ms', 'atraso_ms': 50, 'perda_pct': 0, 'conectou': True, 'ping_reportado_ms': '28', 'avisos_travada': 0}",
-      "  {'cenario': 'so atraso 100ms', 'atraso_ms': 100, 'perda_pct': 0, 'conectou': True, 'ping_reportado_ms': '11', 'avisos_travada': 0}",
-      "  {'cenario': 'so atraso 200ms', 'atraso_ms': 200, 'perda_pct': 0, 'conectou': True, 'ping_reportado_ms': '29', 'avisos_travada': 0}",
-      "  {'cenario': 'perda 1% (com 50ms de base)', 'atraso_ms': 50, 'perda_pct': 1, 'conectou': True, 'ping_reportado_ms': '28', 'avisos_travada': 0}",
-      "  {'cenario': 'perda 5% (com 50ms de base)', 'atraso_ms': 50, 'perda_pct': 5, 'conectou': True, 'ping_reportado_ms': '12', 'avisos_travada': 0}",
+      "  {'cenario': 'so atraso 50ms', 'atraso_ms': 50, 'perda_pct': 0, 'conectou': True, 'ping_reportado_ms': '25', 'avisos_travada': 0}",
+      "  {'cenario': 'so atraso 100ms', 'atraso_ms': 100, 'perda_pct': 0, 'conectou': True, 'ping_reportado_ms': '12', 'avisos_travada': 0}",
+      "  {'cenario': 'so atraso 200ms', 'atraso_ms': 200, 'perda_pct': 0, 'conectou': True, 'ping_reportado_ms': '12', 'avisos_travada': 0}",
+      "  {'cenario': 'perda 1% (com 50ms de base)', 'atraso_ms': 50, 'perda_pct': 1, 'conectou': True, 'ping_reportado_ms': '29', 'avisos_travada': 0}",
+      "  {'cenario': 'perda 5% (com 50ms de base)', 'atraso_ms': 50, 'perda_pct': 5, 'conectou': True, 'ping_reportado_ms': '28', 'avisos_travada': 0}",
       "[protege_cfg] retroarch.cfg real devolvido como estava antes do teste."
+    ]
+  },
+  {
+    "script": "testes\\teste_rede_sem_reabrir.py",
+    "codigo_saida": 0,
+    "segundos": 16.1,
+    "ultimas_linhas": [
+      "2. Ligou pela API (rede_aplicada=True): escuta em ['0.0.0.0'] depois de 3.8 s",
+      "3. Desligou: escuta em ['127.0.0.1']",
+      "4. Liga/desliga 5 vezes seguidas: vivo=True, escuta final ['0.0.0.0'] (esperado 0.0.0.0)",
+      "5. 12 cliques colados: vivo=True, escuta ['0.0.0.0'] (ultimo clique = ligar)",
+      "",
+      "RESULTADO: PASSOU"
     ]
   },
   {
@@ -445,9 +514,20 @@
       "  ..\\segredo_fora_da_pasta.png                            status=404  bloqueado",
       "  jogos/../../segredo_fora_da_pasta.png                   status=404  bloqueado",
       "  jogos\\..\\..\\segredo_fora_da_pasta.png                   status=404  bloqueado",
-      "  C:\\Users\\passo\\AppData\\Local\\Temp\\arena_travessia_pt_lks1e\\segredo_fora_da_pasta.png status=404  bloqueado",
+      "  C:\\Users\\passo\\AppData\\Local\\Temp\\arena_travessia_7rcwey7q\\segredo_fora_da_pasta.png status=404  bloqueado",
       "",
       "RESULTADO: PASSOU (nenhuma travessia vazou o segredo)"
+    ]
+  },
+  {
+    "script": "testes\\teste_verificador_arquivos.py",
+    "codigo_saida": 0,
+    "segundos": 1.2,
+    "ultimas_linhas": [
+      "Sem controles.py o ARENA nao abre (importa na abertura): True",
+      "O verificador acusou a falta de controles.py: True",
+      "",
+      "RESULTADO: PASSOU"
     ]
   }
 ]

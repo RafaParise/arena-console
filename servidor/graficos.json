@@ -28,8 +28,6 @@
       "sempre": {
         "swanstation_CDROM_LoadImageToRAM": "true",
         "swanstation_GPU_DisableInterlacing": "true",
-        "duckstation_GPU.DisableInterlacing": "true",
-        "swanstation_GPU.DisableInterlacing": "true",
         "swanstation_Display_CropMode": "overscan"
       },
       "por_nota": [
@@ -37,48 +35,26 @@
           "nota_minima": 1,
           "opcoes": {
             "swanstation_GPU_Renderer": "Hardware",
-            "duckstation_GPU.Renderer": "Hardware",
-            "swanstation_GPU.Renderer": "Hardware",
             "swanstation_GPU_ResolutionScale": "1",
-            "duckstation_GPU.ResolutionScale": "1",
-            "swanstation_GPU.ResolutionScale": "1",
-            "swanstation_GPU_TextureFilter": "Nearest",
-            "duckstation_GPU.TextureFilter": "Nearest",
-            "swanstation_GPU.TextureFilter": "Nearest"
+            "swanstation_GPU_TextureFilter": "Nearest"
           }
         },
         {
           "nota_minima": 2,
           "opcoes": {
             "swanstation_GPU_PGXPEnable": "true",
-            "duckstation_GPU.PGXPEnable": "true",
-            "swanstation_GPU.PGXPEnable": "true",
             "swanstation_GPU_PGXPTextureCorrection": "true",
-            "duckstation_GPU.PGXPTextureCorrection": "true",
-            "swanstation_GPU.PGXPTextureCorrection": "true",
             "swanstation_GPU_PGXPCulling": "true",
-            "duckstation_GPU.PGXPCulling": "true",
-            "swanstation_GPU.PGXPCulling": "true",
             "swanstation_GPU_ResolutionScale": "2",
-            "duckstation_GPU.ResolutionScale": "2",
-            "swanstation_GPU.ResolutionScale": "2",
-            "swanstation_GPU_TrueColor": "true",
-            "duckstation_GPU.TrueColor": "true",
-            "swanstation_GPU.TrueColor": "true"
+            "swanstation_GPU_TrueColor": "true"
           }
         },
         {
           "nota_minima": 3,
           "opcoes": {
             "swanstation_GPU_ResolutionScale": "4",
-            "duckstation_GPU.ResolutionScale": "4",
-            "swanstation_GPU.ResolutionScale": "4",
             "swanstation_GPU_ScaledDithering": "true",
-            "duckstation_GPU.ScaledDithering": "true",
-            "swanstation_GPU.ScaledDithering": "true",
             "swanstation_GPU_PGXPVertexCache": "true",
-            "duckstation_GPU.PGXPVertexCache": "true",
-            "swanstation_GPU.PGXPVertexCache": "true",
             "swanstation_Display_AspectRatio": "Auto (Game Native)"
           }
         },
@@ -86,17 +62,9 @@
           "nota_minima": 4,
           "opcoes": {
             "swanstation_GPU_ResolutionScale": "6",
-            "duckstation_GPU.ResolutionScale": "6",
-            "swanstation_GPU.ResolutionScale": "6",
             "swanstation_GPU_TextureFilter": "xBR",
-            "duckstation_GPU.TextureFilter": "xBR",
-            "swanstation_GPU.TextureFilter": "xBR",
             "swanstation_GPU_PGXPDepthBuffer": "true",
-            "duckstation_GPU.PGXPDepthBuffer": "true",
-            "swanstation_GPU.PGXPDepthBuffer": "true",
-            "swanstation_GPU_MSAA": "4",
-            "duckstation_GPU.MSAA": "4",
-            "swanstation_GPU.MSAA": "4"
+            "swanstation_GPU_MSAA": "4"
           }
         }
       ]
@@ -145,7 +113,7 @@
         "ppsspp_texture_scaling_level": "off",
         "ppsspp_texture_deposterize": "disabled",
         "ppsspp_lower_resolution_for_effects": "off",
-        "ppsspp_disable_slow_framebuffer_effects": "disabled"
+        "ppsspp_skip_gpu_readbacks": "disabled"
       },
       "por_nota": [
         {
@@ -153,7 +121,7 @@
           "opcoes": {
             "ppsspp_internal_resolution": "480x272",
             "ppsspp_texture_filtering": "Nearest",
-            "ppsspp_rendering_mode": "Buffered"
+            "ppsspp_skip_buffer_effects": "disabled"
           }
         },
         {
@@ -209,8 +177,7 @@
     "pcsx2": {
       "_nome": "PlayStation 2",
       "sempre": {
-        "pcsx2_fastboot": "enabled",
-        "pcsx2_frameskip": "disabled"
+        "pcsx2_fastboot": "enabled"
       },
       "por_nota": [
         {
@@ -281,7 +248,7 @@
         {
           "nota_minima": 3,
           "opcoes": {
-            "genesis_plus_gx_blargg_ntsc_md": "composite",
+            "genesis_plus_gx_blargg_ntsc_filter": "composite",
             "genesis_plus_gx_render": "interlaced"
           }
         }
@@ -402,18 +369,14 @@
       "swanstation_GPU_TrueColor": "false",
       "swanstation_GPU_ScaledDithering": "false",
       "swanstation_GPU_PGXPEnable": "false",
-      "swanstation_GPU_MSAA": "1",
-      "duckstation_GPU.Renderer": "Software",
-      "duckstation_GPU.ResolutionScale": "1",
-      "duckstation_GPU.PGXPEnable": "false",
-      "duckstation_GPU.MSAA": "1"
+      "swanstation_GPU_MSAA": "1"
     },
     "ppsspp": {
       "ppsspp_internal_resolution": "480x272",
       "ppsspp_texture_filtering": "Nearest",
       "ppsspp_texture_anisotropic_filtering": "off",
       "ppsspp_texture_scaling_level": "off",
-      "ppsspp_rendering_mode": "Skip buffer effects (non-buffered, faster)"
+      "ppsspp_skip_buffer_effects": "disabled"
     },
     "mupen64plus_next": {
       "mupen64plus-EnableNativeResFactor": "1",
@@ -445,7 +408,7 @@
       "pcsx2_texture_filtering": "Nearest"
     },
     "genesis_plus_gx": {
-      "genesis_plus_gx_blargg_ntsc_md": "disabled"
+      "genesis_plus_gx_blargg_ntsc_filter": "disabled"
     },
     "snes9x": {
       "snes9x_blargg": "disabled"

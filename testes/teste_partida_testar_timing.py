@@ -53,7 +53,7 @@ def main():
         duracao = time.monotonic() - inicio
         print("Status=%s tempo=%.2fs" % (status, duracao))
         print("Resposta:", resp)
-        caso1_ok = status == 200 and resp.get("arena") is False and "confira o endereco" in resp.get("diagnostico", "").lower()
+        caso1_ok = status == 200 and resp.get("arena") is False and "confira o endereço" in resp.get("diagnostico", "").lower()
 
         print("\n--- Endereco alcancavel (o proprio localhost) ---")
         inicio = time.monotonic()

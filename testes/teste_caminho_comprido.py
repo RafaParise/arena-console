@@ -33,7 +33,7 @@ def main():
             open(os.path.join(pasta_jogo, nome), "wb").close()
 
         codigo = open(os.path.join(destino, "servidor", "diagnostico.py"), encoding="utf-8").read()
-        sys.argv = ["diagnostico.py", "--so-ver"]
+        sys.argv = ["diagnostico.py", "--so-ver", "--sem-barreiras"]
         saida = io.StringIO()
         with contextlib.redirect_stdout(saida):
             try:

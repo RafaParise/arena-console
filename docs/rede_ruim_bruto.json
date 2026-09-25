@@ -4,7 +4,7 @@
     "atraso_ms": 50,
     "perda_pct": 0,
     "conectou": true,
-    "ping_reportado_ms": "28",
+    "ping_reportado_ms": "25",
     "avisos_travada": 0
   },
   {
@@ -12,7 +12,7 @@
     "atraso_ms": 100,
     "perda_pct": 0,
     "conectou": true,
-    "ping_reportado_ms": "11",
+    "ping_reportado_ms": "12",
     "avisos_travada": 0
   },
   {
@@ -20,7 +20,7 @@
     "atraso_ms": 200,
     "perda_pct": 0,
     "conectou": true,
-    "ping_reportado_ms": "29",
+    "ping_reportado_ms": "12",
     "avisos_travada": 0
   },
   {
@@ -28,7 +28,7 @@
     "atraso_ms": 50,
     "perda_pct": 1,
     "conectou": true,
-    "ping_reportado_ms": "28",
+    "ping_reportado_ms": "29",
     "avisos_travada": 0
   },
   {
@@ -36,7 +36,7 @@
     "atraso_ms": 50,
     "perda_pct": 5,
     "conectou": true,
-    "ping_reportado_ms": "12",
+    "ping_reportado_ms": "28",
     "avisos_travada": 0
   }
 ]

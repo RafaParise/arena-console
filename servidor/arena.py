@@ -53,6 +53,7 @@ if PASTA_SERVIDOR not in sys.path:
 import cheats      # noqa: E402
 import controles   # noqa: E402
 import acervo      # noqa: E402
+import barreiras   # noqa: E402  (o que deixa o computador lento -- auditoria 2)
 import internet_archive  # noqa: E402
 import capas_online     # noqa: E402
 import graficos    # noqa: E402
@@ -676,7 +677,7 @@ PERFIL_AUTOMATICO = {
 PERFIS_GRAFICOS = {
     "desempenho": {
         "rotulo": "Desempenho",
-        "resumo": "Para PC fraco. Feio, mas nao trava.",
+        "resumo": "Para PC fraco. Feio, mas não trava.",
         "opcoes": {
             "video_threaded": "true",
             "video_smooth": "false",
@@ -714,7 +715,7 @@ PERFIS_GRAFICOS = {
     },
     "qualidade": {
         "rotulo": "Qualidade",
-        "resumo": "O mais bonito. So use se o PC aguentar.",
+        "resumo": "O mais bonito. Só use se o PC aguentar.",
         "opcoes": {
             "video_threaded": "false",
             "video_smooth": "true",
@@ -760,7 +761,7 @@ CLASSES = {
     "ruim": {
         "rotulo": "Capenga",
         "cor": "vermelho",
-        "detalhe": "Seu PC nao da conta deste console. Vai travar.",
+        "detalhe": "Seu PC não dá conta deste console. Vai travar.",
         "perfil": "desempenho",
     },
 }
@@ -1098,14 +1099,14 @@ def gravar_foto_perfil(imagem_base64):
     try:
         brutos = base64.b64decode(imagem_base64, validate=True)
     except (binascii.Error, ValueError):
-        raise ValueError("Imagem invalida.")
+        raise ValueError("Imagem inválida.")
 
     if not brutos or len(brutos) > LIMITE_FOTO_PERFIL:
         raise ValueError("Foto grande demais (limite de 2 MB).")
 
     tipo = _tipo_da_imagem(brutos)
     if tipo not in TIPOS_FOTO_PERFIL:
-        raise ValueError("Formato de imagem nao aceito (use PNG, JPG ou WEBP).")
+        raise ValueError("Formato de imagem não aceito (use PNG, JPG ou WEBP).")
 
     os.makedirs(PASTA_PERFIL, exist_ok=True)
     antiga = foto_perfil_caminho()
@@ -1466,7 +1467,7 @@ def avaliar_plataformas(forcar=False):
                           (plataforma["externo"]["nome"], plataforma["externo"]["pasta"]))
             else:
                 estado = "sem_core"
-                motivo = "Nucleo nao instalado. Baixe pelo RetroArch."
+                motivo = "Núcleo não instalado. Baixe pelo RetroArch."
         elif precisa_sistema and not tem_sistema:
             estado = "falta_sistema"
             motivo = ("Precisa de %d arquivo(s) de sistema em "
@@ -1500,8 +1501,8 @@ def avaliar_plataformas(forcar=False):
             # deixar o aluno clicar e receber um erro no meio da aula.
             "aceita_partida": not caminho_externo,
             "motivo_sem_partida": (
-                "Esta plataforma usa o %s, que tem rede propria. "
-                "Jogar junto so funciona pelo RetroArch."
+                "Esta plataforma usa o %s, que tem rede própria. "
+                "Jogar junto só funciona pelo RetroArch."
                 % dados_externo["nome"] if caminho_externo else ""),
             "externo_sugerido": (dados_externo["nome"] if dados_externo
                                  and not caminho_externo else None),
@@ -1818,7 +1819,7 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
                          "pelo adaptador %s." % rede["adaptador"])
                 elif rede:
                     print("[ARENA] Rede do PS2 configurada so pra ENTRAR "
-                         "(sem o driver Npcap, nao da pra hospedar).")
+                         "(sem o driver Npcap, não dá pra hospedar).")
 
         # Xenia e RPCS3: mesma ideia do PCSX2 acima, mas so o video por
         # enquanto (ver o comentario em escrever_config_xenia/rpcs3 sobre
@@ -1929,8 +1930,27 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             print("[ARENA] %s" % " ".join(
                 ('"%s"' % p if " " in p else p) for p in comando))
 
+            # Modo economico + PS1 no SwanStation: nao deixa o nucleo
+            # regravar 15-50 MB de cache de video a cada fechamento (ver
+            # graficos.preparar_cache_ps1). Nao vale no Jogar Junto, que usa
+            # outro nucleo.
+            cuidar_cache_ps1 = (ECONOMICO and jogo["plataforma"] == "ps1" and not partida
+                                and not jogo.get("externo")
+                                and "swanstation" in str(jogo.get("core", "")))
+            placa = str(MAQUINA["gpu"].get("nome", ""))
+            cache_antes = graficos.preparar_cache_ps1(placa) if cuidar_cache_ps1 else -1
+
             processo = subprocess.Popen(comando, cwd=pasta_trabalho, **extras)
             codigo = processo.wait()
+
+            if cuidar_cache_ps1 and graficos.fixar_cache_ps1(cache_antes, placa):
+                print("[ARENA] Cache de video do PS1 estavel: nao sera mais regravado.")
+
+            # Cada partida deixa um registro do RetroArch em dados\. O rodizio
+            # rodava so na abertura do ARENA: aberto a aula inteira, os
+            # registros passavam do limite (auditoria 2 achou 20 com limite
+            # 10). Agora roda tambem aqui, ao fim de cada jogo.
+            limpar_logs_antigos()
 
             VIGIA["suspenso"] = False
 
@@ -2018,6 +2038,41 @@ def traduzir_erro_do_sistema(falha, acao):
         motivo = "Tente de novo; se continuar, chame o professor."
     print("[ARENA] %s falhou: %r" % (acao, falha))
     return "Não consegui %s. %s" % (acao, motivo)
+
+
+_cache_barreiras = {"quando": 0.0, "resultado": None}
+TRAVA_BARREIRAS = threading.Lock()
+
+
+def diagnostico_de_barreiras(forcar=False):
+    """Roda barreiras.diagnosticar() no maximo uma vez por minuto (o aluno
+    pode clicar varias vezes). Um de cada vez: dois cliques colados nao
+    abrem dois PowerShell. Para a tela vai so o que ela mostra -- nada da
+    lista de processos inteira."""
+    with TRAVA_BARREIRAS:
+        with TRAVA_CACHE:
+            idade = time.time() - _cache_barreiras["quando"]
+            salvo = _cache_barreiras["resultado"]
+        if salvo and idade < 60 and not forcar:
+            return salvo
+        # O tipo do disco do Windows (HD ou SSD) o proprio diagnostico
+        # pergunta ao Windows; aqui nao se mede nada.
+        completo = barreiras.diagnosticar()
+        fatos = completo.get("fatos", {})
+        resultado = {
+            "ok": True,
+            "barreiras": completo["barreiras"],
+            "segundos": completo["segundos"],
+            "nao_deu_para_ler": completo["nao_deu_para_ler"],
+            "resumo": {chave: fatos.get(chave) for chave in (
+                "memoria_livre_mb", "memoria_total_mb", "ligado_ha_horas",
+                "programas_instalados", "disco_windows_livre_gb")},
+            "verificado_em": agora_utc(),
+        }
+        with TRAVA_CACHE:
+            _cache_barreiras["quando"] = time.time()
+            _cache_barreiras["resultado"] = resultado
+        return resultado
 
 
 def limpar_logs_antigos():
@@ -2139,7 +2194,7 @@ def importar_saves(nome_arquivo):
 
     caminho = os.path.join(PASTA_BACKUP, os.path.basename(str(nome_arquivo)))
     if not dentro_da_pasta(caminho, PASTA_BACKUP) or not os.path.isfile(caminho):
-        return None, "Pacote nao encontrado na pasta backup."
+        return None, "Pacote não encontrado na pasta backup."
 
     destinos = {"saves": PASTA_SAVES, "states": PASTA_STATES,
                 "cheats": PASTA_CHEATS, "remaps": PASTA_REMAPS,
@@ -2240,7 +2295,7 @@ def trocar_pela_mala(caminho=None):
     # QUALQUER nome, so escolhendo o valor de 'caminho'.
     if caminho and os.path.basename(caminho) != NOME_DA_MALA:
         return {"ok": False,
-                "erro": "Caminho da mala invalido: o arquivo precisa se "
+                "erro": "Caminho da mala inválido: o arquivo precisa se "
                         "chamar %s." % NOME_DA_MALA}
 
     config = carregar_config()
@@ -2286,7 +2341,7 @@ def trocar_pela_mala(caminho=None):
                              json.dumps(nova, ensure_ascii=False,
                                         separators=(",", ":")))
     except OSError as falha:
-        return {"ok": False, "erro": "Nao consegui gravar a mala: %s" % falha}
+        return {"ok": False, "erro": "Não consegui gravar a mala: %s" % falha}
 
     marcar_enviados(placares[:0], sessoes[:0])   # a mala nao e um destino fixo
 
@@ -2336,7 +2391,7 @@ def anunciar_e_escutar():
         ouvinte.bind(("", PORTA_DESCOBERTA))
     except OSError as falha:
         print("[ARENA] Nao consegui escutar a rede local (%s). Os colegas "
-              "ainda podem ser adicionados pelo endereco." % falha)
+              "ainda podem ser adicionados pelo endereço." % falha)
         return
 
     falante = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -2492,18 +2547,6 @@ def servidor_alcancavel(url):
 LIMITE_LOTE = 500
 
 
-def registros_pendentes(limite=LIMITE_LOTE):
-    with banco() as conexao:
-        placares = [dict(l) for l in conexao.execute(
-            "SELECT uuid, apelido, jogo_id, jogo_titulo, pontos, registrado_em, "
-            "dispositivo FROM placar WHERE enviado = 0 LIMIT ?", (limite,))]
-        sessoes = [dict(l) for l in conexao.execute(
-            "SELECT uuid, apelido, jogo_id, jogo_titulo, inicio, segundos, "
-            "dispositivo FROM sessao WHERE enviado = 0 AND encerrada = 1 "
-            "AND segundos > 30 LIMIT ?", (limite,))]
-    return placares, sessoes
-
-
 def contar_pendentes():
     with banco() as conexao:
         placares = conexao.execute(
@@ -2647,7 +2690,7 @@ def sincronizar_com(destino, config):
 
     if not url:
         return {"ok": False, "apelido": apelido_destino,
-                "erro": "Endereco vazio."}
+                "erro": "Endereço vazio."}
 
     # O que enviar para ESTE destino: tudo que e mais novo que a ultima
     # troca com ele. Nao so o que foi gravado aqui - tambem o que chegou
@@ -2675,7 +2718,7 @@ def sincronizar_com(destino, config):
         except Exception:
             detalhe = ""
         return {"ok": False, "apelido": apelido_destino,
-                "erro": detalhe or "Recusado (codigo %d)." % falha.code}
+                "erro": detalhe or "Recusado (código %d)." % falha.code}
     except urllib.error.URLError as falha:
         return {"ok": False, "apelido": apelido_destino,
                 "erro": "Sem resposta de %s (%s)." % (url, falha.reason)}
@@ -2707,7 +2750,7 @@ def sincronizar_com(destino, config):
 
         if alvo in meus:
             return {"ok": False, "apelido": apelido_destino,
-                    "erro": "Este endereco e o proprio computador."}
+                    "erro": "Este endereço é o próprio computador."}
 
         # Caso 2: e outro computador. Trocar o NOSSO codigo, guardar, e
         # avisar. Na proxima sincronizacao ja funciona.
@@ -2718,8 +2761,8 @@ def sincronizar_com(destino, config):
         config["codigo_proprio"] = True
         salvar_config(config)
         return {"ok": False, "apelido": apelido_destino,
-                "erro": ("Voces dois tinham o mesmo codigo de aparelho. "
-                         "Ja troquei o meu. Clique em sincronizar de novo.")}
+                "erro": ("Vocês dois tinham o mesmo código de aparelho. "
+                         "Já troquei o meu. Clique em sincronizar de novo.")}
 
     # Marca como enviados os registros criados aqui. Serve so para o
     # contador de pendentes da tela.
@@ -2930,9 +2973,9 @@ def reparar_runtime():
     import shutil
 
     if not sys.platform.startswith("win"):
-        return [], "Este reparo so faz sentido no Windows."
+        return [], "Este reparo só faz sentido no Windows."
     if not os.path.isdir(PASTA_RETROARCH):
-        return [], "A pasta retroarch nao foi encontrada."
+        return [], "A pasta retroarch não foi encontrada."
 
     origens = [os.path.join(os.environ.get("SystemRoot", r"C:\Windows"), "System32")]
     copiadas, achadas = [], 0
@@ -2954,9 +2997,9 @@ def reparar_runtime():
             break
 
     if achadas == 0:
-        return [], ("Este computador tambem nao tem as bibliotecas. Copie "
+        return [], ("Este computador também não tem as bibliotecas. Copie "
                     "a pasta do ARENA de um computador que tenha, ou peca "
-                    "a instalacao do Visual C++ Redistributable.")
+                    "a instalação do Visual C++ Redistributable.")
     return copiadas, None
 
 
@@ -3000,7 +3043,7 @@ def dentro_da_pasta(caminho, pasta):
 # 55435 dele, direto, separada desta.
 ROTAS_REDE_EXTERNA = frozenset((
     "/api/colegas",         # GET - quem esta online, pra tela de amigos
-    "/api/ranking",         # GET - placar compartilhado (= /api/sinc/ranking)
+    "/api/ranking",         # GET - placar compartilhado
     "/api/jogo/impressao",  # GET - confere se e o mesmo arquivo de jogo
     "/api/amigo/testar",    # POST - "esse endereco responde?"
     "/api/amigo/codigo",    # POST - adicionar amigo pelo codigo
@@ -3108,7 +3151,7 @@ class Manipulador(BaseHTTPRequestHandler):
         try:
             tamanho = int(self.headers.get("Content-Length") or 0)
         except ValueError:
-            return {}, "Tamanho do envio invalido."
+            return {}, "Tamanho do envio inválido."
 
         if tamanho <= 0:
             return {}, None
@@ -3129,7 +3172,7 @@ class Manipulador(BaseHTTPRequestHandler):
         try:
             return json.loads(self.rfile.read(tamanho).decode("utf-8")), None
         except (ValueError, UnicodeDecodeError):
-            return {}, "O conteudo enviado nao e um JSON valido."
+            return {}, "O conteúdo enviado não é um JSON válido."
 
     # -- GET --------------------------------------------------------------
     def do_GET(self):
@@ -3282,10 +3325,10 @@ class Manipulador(BaseHTTPRequestHandler):
             achado = next((j for j in manifesto()["jogos"]
                            if j["titulo"].lower() == titulo), None)
             if not achado:
-                return self.erro("Nao tenho esse jogo.", 404)
+                return self.erro("Não tenho esse jogo.", 404)
             marca = impressao_do_jogo(achado)
             if not marca:
-                return self.erro("Nao consegui ler o arquivo.", 404)
+                return self.erro("Não consegui ler o arquivo.", 404)
             return self.responder_json(marca)
 
         # ---- acervo de jogos livres ---------------------------------------
@@ -3303,7 +3346,7 @@ class Manipulador(BaseHTTPRequestHandler):
                 return self.responder_json({"itens": []})
             if not VIGIA["internet"]:
                 return self.erro("Sem internet agora. A busca online precisa "
-                                 "de conexao; o acervo local continua "
+                                 "de conexão; o acervo local continua "
                                  "funcionando.", 503)
             try:
                 return self.responder_json({"itens": internet_archive.buscar(consulta)})
@@ -3313,6 +3356,13 @@ class Manipulador(BaseHTTPRequestHandler):
         # ---- conquistas da turma ------------------------------------------
         if caminho == "/api/conquistas":
             return self.responder_json(montar_conquistas())
+
+        if caminho == "/api/barreiras":
+            # O que esta deixando ESTE computador lento. So sob pedido (botao
+            # "Verificar agora"): custa ~5 s de PowerShell, entao nunca roda
+            # sozinho em segundo plano -- o ARENA parado continua a 0%.
+            return self.responder_json(diagnostico_de_barreiras(
+                forcar=urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query).get("forcar") == ["1"]))
 
         if caminho == "/api/capa":
             parametros = urllib.parse.parse_qs(
@@ -3326,9 +3376,9 @@ class Manipulador(BaseHTTPRequestHandler):
             permitido = (dentro_da_pasta(alvo, PASTA_JOGOS) or
                         dentro_da_pasta(alvo, PASTA_MINIATURAS))
             if not permitido or not os.path.isfile(alvo):
-                return self.erro("Capa nao encontrada.", 404)
+                return self.erro("Capa não encontrada.", 404)
             if not alvo.lower().endswith((".png", ".jpg", ".jpeg", ".webp")):
-                return self.erro("Nao e imagem.", 404)
+                return self.erro("Não é imagem.", 404)
 
             tipos = {".png": "image/png", ".jpg": "image/jpeg",
                      ".jpeg": "image/jpeg", ".webp": "image/webp"}
@@ -3337,7 +3387,7 @@ class Manipulador(BaseHTTPRequestHandler):
                 with open(alvo, "rb") as arquivo:
                     dados_imagem = arquivo.read()
             except OSError:
-                return self.erro("Nao consegui ler a capa.", 404)
+                return self.erro("Não consegui ler a capa.", 404)
 
             self.send_response(200)
             self.send_header("Content-Type", tipo)
@@ -3359,7 +3409,7 @@ class Manipulador(BaseHTTPRequestHandler):
                 with open(alvo, "rb") as arquivo:
                     dados_imagem = arquivo.read()
             except OSError:
-                return self.erro("Nao consegui ler a foto.", 404)
+                return self.erro("Não consegui ler a foto.", 404)
 
             self.send_response(200)
             self.send_header("Content-Type", tipo)
@@ -3388,7 +3438,9 @@ class Manipulador(BaseHTTPRequestHandler):
             return self.responder_json(
                 {"botoes": graficos.botoes_do_console(plataforma)})
 
-        if caminho in ("/api/ranking", "/api/sinc/ranking"):
+        # Havia tambem o apelido "/api/sinc/ranking", removido na auditoria 2:
+        # nenhuma versao do ARENA (nem as duas originais) chama esse nome.
+        if caminho == "/api/ranking":
             return self.responder_json(ler_ranking())
 
         if caminho == "/api/jogo":
@@ -3396,7 +3448,7 @@ class Manipulador(BaseHTTPRequestHandler):
                 urllib.parse.urlparse(self.path).query)
             jogo = achar_jogo((parametros.get("id") or [""])[0])
             if not jogo:
-                return self.erro("Jogo nao encontrado. Ele pode ter sido movido ou apagado. "
+                return self.erro("Jogo não encontrado. Ele pode ter sido movido ou apagado. "
                                  "Clique em Atualizar lista e tente de novo.", 404)
             return self.responder_json({
                 "titulo": jogo["titulo"],
@@ -3415,7 +3467,7 @@ class Manipulador(BaseHTTPRequestHandler):
                 "cheats": cheats.ler_cheats(jogo),
             })
 
-        return self.erro("Rota nao encontrada.", 404)
+        return self.erro("Rota não encontrada.", 404)
 
     # -- POST -------------------------------------------------------------
     def do_POST(self):
@@ -3460,7 +3512,7 @@ class Manipulador(BaseHTTPRequestHandler):
             placares = dados.get("placares")
             sessoes = dados.get("sessoes")
             if not isinstance(placares, list) or not isinstance(sessoes, list):
-                return self.erro("Formato do lote invalido.")
+                return self.erro("Formato do lote inválido.")
             if len(placares) + len(sessoes) > 5000:
                 return self.erro("Lote grande demais. Sincronize por partes.")
             meu_id = carregar_config()["dispositivo_id"]
@@ -3488,11 +3540,11 @@ class Manipulador(BaseHTTPRequestHandler):
                     config["codigo_proprio"] = True
                     salvar_config(config)
                     return self.erro(
-                        "Voces dois tinham o mesmo codigo de aparelho. Ja "
-                        "troquei o meu. Peca para ele sincronizar de novo.", 409)
+                        "Vocês dois tinham o mesmo código de aparelho. Já "
+                        "troquei o meu. Peça para ele sincronizar de novo.", 409)
 
                 return self.erro(
-                    "Este endereco e o proprio computador. Digite o endereco "
+                    "Este endereço é o próprio computador. Digite o endereço "
                     "do servidor da sala.", 409)
 
             novos = gravar_recebidos(placares, sessoes)
@@ -3640,9 +3692,9 @@ class Manipulador(BaseHTTPRequestHandler):
             vizinho = next((v for v in colegas_na_rede()
                             if v["id"] == codigo), None)
             if not vizinho:
-                return self.erro("Nao achei ninguem com esse codigo na rede. "
+                return self.erro("Não achei ninguém com esse código na rede. "
                                  "Os dois precisam estar na mesma rede e com "
-                                 "'Aceitar conexoes' ligado.", 404)
+                                 "'Aceitar conexões' ligado.", 404)
             return self.api_post("/api/amigo/adicionar",
                                  {"apelido": vizinho["apelido"],
                                   "url": vizinho["url"],
@@ -3673,8 +3725,8 @@ class Manipulador(BaseHTTPRequestHandler):
                 copia_de_seguranca = None
             if not copia_de_seguranca:
                 return self.erro(
-                    "Nao consegui garantir uma copia de seguranca antes de "
-                    "apagar. Nada foi apagado. Verifique o espaco livre no "
+                    "Não consegui garantir uma cópia de segurança antes de "
+                    "apagar. Nada foi apagado. Verifique o espaço livre no "
                     "disco/pen drive e tente de novo.", 500)
 
             for arquivo in ("arena.db", "config.json", "controles.json",
@@ -3723,7 +3775,7 @@ class Manipulador(BaseHTTPRequestHandler):
             # o mesmo - e a resposta seria sempre "sim".
             porta_dele = partes.port or PORTA
             if not endereco:
-                return self.erro("Informe o endereco do colega.")
+                return self.erro("Informe o endereço do colega.")
 
             resultado = {"endereco": endereco, "arena": False,
                          "partida": False, "arquivo": None}
@@ -3740,8 +3792,8 @@ class Manipulador(BaseHTTPRequestHandler):
                 ip = socket.gethostbyname(endereco)
             except OSError:
                 resultado["diagnostico"] = (
-                    "Nao alcanco o computador dele. Confira o endereco, e se "
-                    "ele ligou 'Aceitar conexoes da rede' e reabriu o ARENA.")
+                    "Não alcanço o computador dele. Confira o endereço, e se "
+                    "ele ligou 'Aceitar conexões da rede' e reabriu o ARENA.")
                 return self.responder_json(resultado)
 
             # 1. O ARENA dele responde? Isso prova que as maquinas se veem.
@@ -3787,32 +3839,32 @@ class Manipulador(BaseHTTPRequestHandler):
 
             if resultado["arquivo"] == "diferente":
                 resultado["diagnostico"] = (
-                    "Voces tem o mesmo jogo, mas ARQUIVOS DIFERENTES - regiao "
-                    "ou versao. A partida nao comeca assim. Um dos dois "
+                    "Vocês têm o mesmo jogo, mas ARQUIVOS DIFERENTES - região "
+                    "ou versão. A partida não começa assim. Um dos dois "
                     "precisa copiar o arquivo do outro.")
             elif resultado["arquivo"] == "eu nao tenho":
                 resultado["diagnostico"] = (
-                    "Esse jogo nao esta na SUA lista. Clique em Atualizar "
+                    "Esse jogo não está na SUA lista. Clique em Atualizar "
                     "lista, ou peca o arquivo ao colega.")
             elif resultado["arquivo"] == "ele nao tem":
                 resultado["diagnostico"] = (
-                    "Ele nao tem esse jogo na lista. Passe o arquivo para ele "
+                    "Ele não tem esse jogo na lista. Passe o arquivo para ele "
                     "antes de comecar.")
             elif resultado["arena"] and resultado["partida"]:
                 resultado["diagnostico"] = (
-                    "Tudo certo. A partida dele esta aberta e voce alcanca.")
+                    "Tudo certo. A partida dele está aberta e você alcança.")
             elif resultado["arena"]:
                 resultado["diagnostico"] = (
-                    "Voces se enxergam%s, mas a porta da partida esta fechada. "
+                    "Vocês se enxergam%s, mas a porta da partida está fechada. "
                     % (" e o arquivo do jogo e o mesmo"
                        if resultado["arquivo"] == "igual" else "") +
-                    "Duas causas: ele ainda nao clicou em 'Eu abro a partida', "
-                    "ou o firewall do Windows dele esta bloqueando o "
+                    "Duas causas: ele ainda não clicou em 'Eu abro a partida', "
+                    "ou o firewall do Windows dele está bloqueando o "
                     "retroarch.exe. Veja o documento 5.")
             else:
                 resultado["diagnostico"] = (
-                    "Nao alcanco o computador dele. Confira o endereco, e se "
-                    "ele ligou 'Aceitar conexoes da rede' e reabriu o ARENA.")
+                    "Não alcanço o computador dele. Confira o endereço, e se "
+                    "ele ligou 'Aceitar conexões da rede' e reabriu o ARENA.")
 
             return self.responder_json(resultado)
 
@@ -3843,7 +3895,7 @@ class Manipulador(BaseHTTPRequestHandler):
                     with TRAVA_JOGO:
                         JOGO_EM_ANDAMENTO["ativo"] = False
                         JOGO_EM_ANDAMENTO["titulo"] = ""
-                    return self.erro("Este console nao tem emulador instalado.")
+                    return self.erro("Este console não tem emulador instalado.")
                 # Sem jogo no comando: o console abre na tela inicial, que
                 # e onde ficam o relogio, os ajustes e o memory card.
                 extras = {}
@@ -3896,7 +3948,7 @@ class Manipulador(BaseHTTPRequestHandler):
         if caminho == "/api/jogo/mover":
             jogo = achar_jogo(str(dados.get("jogo_id", "")))
             if not jogo:
-                return self.erro("Jogo nao encontrado. Ele pode ter sido movido ou apagado. "
+                return self.erro("Jogo não encontrado. Ele pode ter sido movido ou apagado. "
                                  "Clique em Atualizar lista e tente de novo.", 404)
 
             destino_id = str(dados.get("plataforma", "")).strip().lower()
@@ -3908,7 +3960,7 @@ class Manipulador(BaseHTTPRequestHandler):
 
             origem = os.path.join(RAIZ, jogo["arquivo"])
             if not dentro_da_pasta(origem, PASTA_JOGOS) or not os.path.isfile(origem):
-                return self.erro("O arquivo do jogo nao esta mais no lugar.", 404)
+                return self.erro("O arquivo do jogo não está mais no lugar.", 404)
 
             with TRAVA_JOGO:
                 if JOGO_EM_ANDAMENTO["ativo"]:
@@ -3927,7 +3979,7 @@ class Manipulador(BaseHTTPRequestHandler):
                      "plataforma_nome": plataforma["nome"]})
             if os.path.exists(destino):
                 return self.erro(
-                    "Ja existe um arquivo com esse nome em %s." % plataforma["pasta"])
+                    "Já existe um arquivo com esse nome em %s." % plataforma["pasta"])
 
             try:
                 os.makedirs(pasta_destino, exist_ok=True)
@@ -3953,7 +4005,7 @@ class Manipulador(BaseHTTPRequestHandler):
         if caminho == "/api/jogo/console":
             jogo_id = str(dados.get("jogo_id", ""))
             if not achar_jogo(jogo_id):
-                return self.erro("Jogo nao encontrado. Ele pode ter sido movido ou apagado. "
+                return self.erro("Jogo não encontrado. Ele pode ter sido movido ou apagado. "
                                  "Clique em Atualizar lista e tente de novo.", 404)
 
             plataforma = str(dados.get("plataforma", "")).strip().lower()
@@ -3976,7 +4028,7 @@ class Manipulador(BaseHTTPRequestHandler):
         if caminho == "/api/estado/apagar":
             jogo = achar_jogo(dados.get("jogo_id"))
             if not jogo:
-                return self.erro("Jogo nao encontrado. Ele pode ter sido movido ou apagado. "
+                return self.erro("Jogo não encontrado. Ele pode ter sido movido ou apagado. "
                                  "Clique em Atualizar lista e tente de novo.", 404)
             try:
                 apagou = cheats.apagar_estado(jogo, dados.get("espaco"))
@@ -3991,7 +4043,7 @@ class Manipulador(BaseHTTPRequestHandler):
         if caminho == "/api/cheat/adicionar":
             jogo = achar_jogo(dados.get("jogo_id"))
             if not jogo:
-                return self.erro("Jogo nao encontrado. Ele pode ter sido movido ou apagado. "
+                return self.erro("Jogo não encontrado. Ele pode ter sido movido ou apagado. "
                                  "Clique em Atualizar lista e tente de novo.", 404)
             lista, erro = cheats.adicionar_cheat(
                 jogo, str(dados.get("descricao", ""))[:120],
@@ -4003,7 +4055,7 @@ class Manipulador(BaseHTTPRequestHandler):
         if caminho == "/api/cheat/alterar":
             jogo = achar_jogo(dados.get("jogo_id"))
             if not jogo:
-                return self.erro("Jogo nao encontrado. Ele pode ter sido movido ou apagado. "
+                return self.erro("Jogo não encontrado. Ele pode ter sido movido ou apagado. "
                                  "Clique em Atualizar lista e tente de novo.", 404)
             try:
                 indice = int(dados.get("indice"))
@@ -4032,7 +4084,7 @@ class Manipulador(BaseHTTPRequestHandler):
         if caminho == "/api/backup":
             destino = fazer_backup()
             if not destino:
-                return self.erro("Nao foi possivel gravar a copia.")
+                return self.erro("Não foi possível gravar a cópia.")
             return self.responder_json(
                 {"ok": True, "pasta": os.path.basename(destino)})
 
@@ -4040,15 +4092,15 @@ class Manipulador(BaseHTTPRequestHandler):
         if caminho == "/api/capa/atualizar":
             jogo = achar_jogo(str(dados.get("jogo_id", "")))
             if not jogo:
-                return self.erro("Jogo nao esta no catalogo. Clique em Atualizar lista.", 404)
+                return self.erro("Jogo não está no catálogo. Clique em Atualizar lista.", 404)
             if not VIGIA["internet"]:
-                return self.erro("Sem internet agora. Essa busca precisa de conexao.", 503)
+                return self.erro("Sem internet agora. Essa busca precisa de conexão.", 503)
 
             nome_base = os.path.splitext(os.path.basename(jogo["arquivo"]))[0]
             ok, motivo = capas_online.buscar_e_baixar(
                 jogo["plataforma"], jogo["titulo"], nome_base)
             if not ok:
-                return self.erro(motivo or "Nao consegui achar a capa.", 404)
+                return self.erro(motivo or "Não consegui achar a capa.", 404)
 
             limpar_caches()
             manifesto(forcar=True)
@@ -4057,7 +4109,7 @@ class Manipulador(BaseHTTPRequestHandler):
         if caminho == "/api/capa/enviar":
             jogo = achar_jogo(str(dados.get("jogo_id", "")))
             if not jogo:
-                return self.erro("Jogo nao esta no catalogo. Clique em Atualizar lista.", 404)
+                return self.erro("Jogo não está no catálogo. Clique em Atualizar lista.", 404)
 
             imagem = str(dados.get("imagem", ""))
             if not imagem:
@@ -4072,11 +4124,11 @@ class Manipulador(BaseHTTPRequestHandler):
                 return self.erro("Imagem grande demais (limite de 6 MB).")
             tipo = _tipo_da_imagem(brutos)
             if not tipo:
-                return self.erro("Formato de imagem nao aceito (use PNG, JPG ou WEBP).")
+                return self.erro("Formato de imagem não aceito (use PNG, JPG ou WEBP).")
 
             caminho_rom = os.path.join(RAIZ, jogo["arquivo"])
             if not dentro_da_pasta(caminho_rom, PASTA_JOGOS) or not os.path.isfile(caminho_rom):
-                return self.erro("O arquivo do jogo nao esta mais no lugar.", 404)
+                return self.erro("O arquivo do jogo não está mais no lugar.", 404)
 
             extensoes = {"image/png": ".png", "image/jpeg": ".jpg", "image/webp": ".webp"}
             pasta_jogo = os.path.dirname(caminho_rom)
@@ -4125,12 +4177,12 @@ class Manipulador(BaseHTTPRequestHandler):
             if not apelido:
                 return self.erro("Escreva o apelido do amigo.")
             if not url:
-                return self.erro("Escreva o endereco do ARENA dele.")
+                return self.erro("Escreva o endereço do ARENA dele.")
             if len(config["servidores"]) >= 20:
                 return self.erro("Limite de 20 amigos.")
             if any(a["apelido"].lower() == apelido.lower()
                    for a in config["servidores"]):
-                return self.erro("Ja existe um amigo com esse apelido.")
+                return self.erro("Já existe um amigo com esse apelido.")
 
             config["servidores"].append({
                 "apelido": apelido, "url": url,
@@ -4158,12 +4210,12 @@ class Manipulador(BaseHTTPRequestHandler):
         if caminho == "/api/amigo/testar":
             url = normalizar_url(str(dados.get("url", "")))
             if not url:
-                return self.erro("Endereco vazio.")
+                return self.erro("Endereço vazio.")
             try:
                 retorno = falar_com(url, "/api/sinc/ola", {}, "POST", 4)
             except Exception:
-                return self.erro("Nao respondeu. Confira o endereco e se o "
-                                 "ARENA dele esta aberto com a rede liberada.")
+                return self.erro("Não respondeu. Confira o endereço e se o "
+                                 "ARENA dele está aberto com a rede liberada.")
             return self.responder_json({"ok": True,
                                         "apelido": retorno.get("apelido", ""),
                                         "id": retorno.get("servidor_id", "")})
@@ -4182,6 +4234,16 @@ class Manipulador(BaseHTTPRequestHandler):
             })
 
         # ---- bibliotecas graficas sem instalar ------------------------------
+        if caminho == "/api/barreiras/fechar":
+            # So programas da lista curta e segura (barreiras.FECHAVEIS), e
+            # so quando o aluno clica. Nunca navegador, Word, etc.
+            ok, mensagem = barreiras.fechar_programa(dados.get("programa"))
+            if not ok:
+                return self.erro(mensagem)
+            with TRAVA_CACHE:
+                _cache_barreiras["quando"] = 0.0   # a proxima consulta ja ve fechado
+            return self.responder_json({"ok": True, "mensagem": mensagem})
+
         if caminho == "/api/reparar-runtime":
             copiadas, erro = reparar_runtime()
             if erro:
@@ -4297,7 +4359,7 @@ class Manipulador(BaseHTTPRequestHandler):
         if caminho == "/api/jogar":
             jogo = achar_jogo(dados.get("jogo_id"))
             if not jogo:
-                return self.erro("Jogo nao esta no catalogo. Clique em Atualizar lista.", 404)
+                return self.erro("Jogo não está no catálogo. Clique em Atualizar lista.", 404)
 
             plataforma = next((p for p in carregar_catalogo()
                                if p["id"] == jogo["plataforma"]), None)
@@ -4311,18 +4373,18 @@ class Manipulador(BaseHTTPRequestHandler):
             if not caminho_externo:
                 if not os.path.isfile(EXECUTAVEL_RETROARCH):
                     return self.erro(
-                        "retroarch.exe nao foi encontrado na pasta retroarch.")
+                        "retroarch.exe não foi encontrado na pasta retroarch.")
                 if not os.path.isfile(os.path.join(PASTA_CORES, plataforma["core"])):
                     sugestao = ""
                     if dados_externo:
                         sugestao = (" Ou instale o %s na pasta emuladores."
                                     % dados_externo["nome"])
                     return self.erro(
-                        "O nucleo desta plataforma nao esta instalado." + sugestao)
+                        "O núcleo desta plataforma não está instalado." + sugestao)
 
             caminho_rom = os.path.join(RAIZ, jogo["arquivo"])
             if not dentro_da_pasta(caminho_rom, PASTA_JOGOS) or not os.path.isfile(caminho_rom):
-                return self.erro("O arquivo do jogo nao esta mais no lugar.", 404)
+                return self.erro("O arquivo do jogo não está mais no lugar.", 404)
 
             if caminho_externo:
                 falta = graficos.falta_para_o_externo(dados_externo["nome"], caminho_externo)
@@ -4345,7 +4407,7 @@ class Manipulador(BaseHTTPRequestHandler):
             with TRAVA_JOGO:
                 if JOGO_EM_ANDAMENTO["ativo"]:
                     return self.erro(
-                        "Ja existe um jogo aberto (%s). Feche com F10 antes "
+                        "Já existe um jogo aberto (%s). Feche com F10 antes "
                         "de abrir outro." % JOGO_EM_ANDAMENTO["titulo"], 409)
                 JOGO_EM_ANDAMENTO["ativo"] = True
                 JOGO_EM_ANDAMENTO["titulo"] = jogo["titulo"]
@@ -4358,15 +4420,15 @@ class Manipulador(BaseHTTPRequestHandler):
                     JOGO_EM_ANDAMENTO["ativo"] = False
                     JOGO_EM_ANDAMENTO["titulo"] = ""
                 return self.erro(
-                    "Jogar junto so funciona pelo RetroArch. Esta plataforma "
-                    "esta usando o %s, que tem rede propria."
+                    "Jogar junto só funciona pelo RetroArch. Esta plataforma "
+                    "está usando o %s, que tem rede própria."
                     % dados_externo["nome"], 409)
             if modo and not plataforma.get("netplay", True):
                 with TRAVA_JOGO:
                     JOGO_EM_ANDAMENTO["ativo"] = False
                     JOGO_EM_ANDAMENTO["titulo"] = ""
                 return self.erro(plataforma.get("netplay_motivo") or
-                                 "Este console nao tem jogo em rede disponivel.", 409)
+                                 "Este console não tem jogo em rede disponível.", 409)
 
             # Alguns consoles (PS1: SwanStation) tem um nucleo mais fiel para
             # jogar sozinho, mas sem suporte a jogo em rede - nesse caso o
@@ -4380,7 +4442,7 @@ class Manipulador(BaseHTTPRequestHandler):
                         JOGO_EM_ANDAMENTO["ativo"] = False
                         JOGO_EM_ANDAMENTO["titulo"] = ""
                     return self.erro(
-                        "Falta o nucleo %s para jogar em rede neste console."
+                        "Falta o núcleo %s para jogar em rede neste console."
                         % plataforma["core_netplay"], 409)
                 jogo["core"] = plataforma["core_netplay"]
                 aviso_netplay = plataforma.get("netplay_aviso", "")
@@ -4398,7 +4460,7 @@ class Manipulador(BaseHTTPRequestHandler):
                         with TRAVA_JOGO:
                             JOGO_EM_ANDAMENTO["ativo"] = False
                             JOGO_EM_ANDAMENTO["titulo"] = ""
-                        return self.erro("Informe o endereco de quem esta "
+                        return self.erro("Informe o endereço de quem está "
                                          "hospedando a partida.")
                 pela_internet = bool(dados.get("pela_internet"))
                 # Jogo especifico usa Multitap (lista curada, consoles.json
@@ -4456,24 +4518,31 @@ class Manipulador(BaseHTTPRequestHandler):
                 resposta["porta"] = graficos.PORTA_PARTIDA
             if aviso_netplay:
                 resposta["aviso"] = aviso_netplay
+            # Na hora de jogar, o que pode travar o jogo AGORA: memoria quase
+            # cheia, notebook na bateria, economia de bateria (~10 ms, sem
+            # PowerShell). A tela avisa junto com "Abrindo...".
+            alertas = barreiras.checagem_rapida()
+            if alertas:
+                resposta["alerta_maquina"] = [
+                    {"titulo": b["titulo"], "acao": b["acao"]} for b in alertas]
             elif (caminho_externo and dados_externo["nome"] == "PCSX2" and
                   graficos.jogo_tem_system_link_ps2(plataforma, jogo["titulo"])):
                 if graficos.npcap_instalado():
                     resposta["aviso"] = (
                         "Este jogo tem rede de verdade (system link) - o ARENA "
-                        "ja configurou. Abra o menu de rede DENTRO do jogo pra "
+                        "já configurou. Abra o menu de rede DENTRO do jogo pra "
                         "hospedar ou entrar numa partida.")
                 else:
                     resposta["aviso"] = (
-                        "Este jogo tem rede de verdade (system link), mas so "
-                        "pra ENTRAR numa partida de outra maquina - falta o "
-                        "driver de rede pra tambem hospedar. Ver Ajustes -> "
+                        "Este jogo tem rede de verdade (system link), mas só "
+                        "pra ENTRAR numa partida de outra máquina - falta o "
+                        "driver de rede pra também hospedar. Ver Ajustes -> "
                         "Emuladores.")
             elif (caminho_externo and dados_externo["nome"] == "Xenia" and
                   graficos.jogo_tem_netplay_xbox360(plataforma, jogo["titulo"])):
                 resposta["aviso"] = (
                     "Este jogo tem rede local de verdade (Systemlink) - o "
-                    "ARENA ja configurou, sem precisar de driver nenhum. Abra "
+                    "ARENA já configurou, sem precisar de driver nenhum. Abra "
                     "o menu de rede DENTRO do jogo pra hospedar ou entrar "
                     "numa partida.")
             return self.responder_json(resposta)
@@ -4488,7 +4557,7 @@ class Manipulador(BaseHTTPRequestHandler):
 
             jogo = achar_jogo(dados.get("jogo_id"))
             if not jogo:
-                return self.erro("Jogo nao encontrado. Ele pode ter sido movido ou apagado. "
+                return self.erro("Jogo não encontrado. Ele pode ter sido movido ou apagado. "
                                  "Clique em Atualizar lista e tente de novo.", 404)
 
             config = carregar_config()
@@ -4500,7 +4569,7 @@ class Manipulador(BaseHTTPRequestHandler):
                                config["dispositivo_id"])
             return self.responder_json({"ok": True, "pendentes": contar_pendentes()})
 
-        return self.erro("Rota nao encontrada.", 404)
+        return self.erro("Rota não encontrada.", 404)
 
 
 class Servidor(ThreadingHTTPServer):
@@ -4531,14 +4600,14 @@ FAIXAS_DE_REDE = [
     # VirtualBox e Docker. Aparecem como se fossem rede local, mas nenhum
     # colega alcanca esses enderecos - e era isso que fazia o aluno copiar
     # o endereco errado e a conexao nunca funcionar.
-    ("172.16.", "virtual", "Adaptador virtual (nao serve para o colega)"),
-    ("172.17.", "virtual", "Adaptador virtual (nao serve para o colega)"),
-    ("172.18.", "virtual", "Adaptador virtual (nao serve para o colega)"),
-    ("172.19.", "virtual", "Adaptador virtual (nao serve para o colega)"),
-    ("172.30.", "virtual", "Adaptador virtual (nao serve para o colega)"),
-    ("172.31.", "virtual", "Adaptador virtual (nao serve para o colega)"),
-    ("192.168.56.", "virtual", "Adaptador virtual (nao serve para o colega)"),
-    ("192.168.99.", "virtual", "Adaptador virtual (nao serve para o colega)"),
+    ("172.16.", "virtual", "Adaptador virtual (não serve para o colega)"),
+    ("172.17.", "virtual", "Adaptador virtual (não serve para o colega)"),
+    ("172.18.", "virtual", "Adaptador virtual (não serve para o colega)"),
+    ("172.19.", "virtual", "Adaptador virtual (não serve para o colega)"),
+    ("172.30.", "virtual", "Adaptador virtual (não serve para o colega)"),
+    ("172.31.", "virtual", "Adaptador virtual (não serve para o colega)"),
+    ("192.168.56.", "virtual", "Adaptador virtual (não serve para o colega)"),
+    ("192.168.99.", "virtual", "Adaptador virtual (não serve para o colega)"),
     # Ponto de acesso pessoal do iPhone usa 172.20.10.0/28 -- faixa real de
     # rede local (celular do colega), nao adaptador virtual nenhum. Achado
     # real na auditoria: a entrada antiga aqui era "172.2" (faltou o "0."),
@@ -4630,17 +4699,17 @@ def classificar_endereco(ip, adaptador=""):
         return "ponto_acesso", "Ponto de acesso do Windows"
     if adaptador:
         if any(p in adaptador for p in PALAVRAS_VPN):
-            return "vpn", "VPN (so serve se o colega estiver na mesma VPN)"
+            return "vpn", "VPN (só serve se o colega estiver na mesma VPN)"
         # "Conexao Local* 10" / "Local Area Connection* 10": o asterisco e'
         # como o Windows nomeia os adaptadores virtuais do proprio Wi-Fi.
         if (any(p in adaptador for p in PALAVRAS_VIRTUAL)
                 or "local*" in adaptador or "connection*" in adaptador):
-            return "virtual", "Adaptador virtual (nao serve para o colega)"
+            return "virtual", "Adaptador virtual (não serve para o colega)"
     for prefixo, tipo, rotulo in FAIXAS_DE_REDE:
         if ip.startswith(prefixo):
             return tipo, rotulo
     if ip.startswith("127."):
-        return "so_aqui", "So este computador"
+        return "so_aqui", "Só este computador"
     return "outro", "Outra rede"
 
 
@@ -4714,7 +4783,7 @@ def enderecos_locais(forcar=False):
 
     if not lista:
         lista.append({"ip": "127.0.0.1", "tipo": "so_aqui",
-                      "rotulo": "So este computador",
+                      "rotulo": "Só este computador",
                       "url": "http://127.0.0.1:%d" % PORTA})
 
     with TRAVA_CACHE:

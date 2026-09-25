@@ -1,0 +1,74 @@
+{
+  "versao_coletor": 1,
+  "codigo_maquina": "012944B9B2",
+  "medido_em": "2026-09-25T10:45:34",
+  "abertura": {
+    "servidor_responde_s": 0.52,
+    "dados_da_tela_prontos_s": 0.54,
+    "memoria_consumida_mb": 84,
+    "nota": "memoria_consumida = RAM livre do Windows antes - depois de abrir (servidor + janela do navegador). O desenho da tela em si nao e' medido."
+  },
+  "servidor": {
+    "parado": {
+      "segundos": 30.0,
+      "cpu_pct_de_um_nucleo": 0.2,
+      "cpu_pct_da_maquina": 0.01,
+      "ram_mb": 36.2
+    },
+    "em_uso": {
+      "segundos": 20.0,
+      "cpu_pct_de_um_nucleo": 89.9,
+      "cpu_pct_da_maquina": 7.5,
+      "ram_mb": 37.2,
+      "pedidos": 4172,
+      "falhas": 0,
+      "resposta_media_ms": 4.8,
+      "resposta_p95_ms": 13.6
+    },
+    "ram_pico_mb": 37.4
+  },
+  "indexacao": {
+    "segundos": 0.14,
+    "total": 35,
+    "por_console": {
+      "dreamcast": 4,
+      "megadrive": 1,
+      "n64": 5,
+      "neogeo": 4,
+      "ps1": 8,
+      "ps2": 9,
+      "ps3": 1,
+      "psp": 1,
+      "snes": 1,
+      "xbox360": 1
+    }
+  },
+  "gravacoes_parado": {
+    "janela_s": 120,
+    "por_minuto": 0.0,
+    "kb_por_minuto": 0.0,
+    "arquivos_de_dados_que_mudaram": []
+  },
+  "jogo": {
+    "jogo": "Super Bomberman 4 (Japan) [T-En by Svambo v1.0].sfc",
+    "modo_modesto": false,
+    "quadros": 4200,
+    "fps_medio": 60.0,
+    "tempo_de_abrir_s": 2.0,
+    "cpu_media_pct_da_maquina": 0.5,
+    "cpu_pico_pct_da_maquina": 1.0,
+    "ram_pico_mb": 147.8,
+    "monitor_hz_medido": 60.103378,
+    "variacao_dos_quadros_pct": 3.131,
+    "driver_de_video": "vulkan",
+    "jogo_mais_rapido_que_o_monitor": true
+  },
+  "respostas": {
+    "tela_inteira": "nao vi",
+    "tempo_tela": "nao vi",
+    "som_picotou": "nao ouvi",
+    "imagem_engasgou": "nao vi",
+    "controle": "nao testei"
+  },
+  "duracao_s": 254.5
+}

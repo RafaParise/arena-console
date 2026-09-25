@@ -1,0 +1,667 @@
+{
+  "pastas": {
+    "retroarch": {
+      "arquivos": 15072,
+      "mb": 2155.9
+    },
+    "emuladores": {
+      "arquivos": 3212,
+      "mb": 666.7
+    },
+    "servidor": {
+      "arquivos": 72,
+      "mb": 21.4
+    },
+    "dados": {
+      "arquivos": 24,
+      "mb": 0.3
+    },
+    "ferramentas": {
+      "arquivos": 33,
+      "mb": 0.3
+    },
+    "testes": {
+      "arquivos": 55,
+      "mb": 0.3
+    },
+    "docs": {
+      "arquivos": 23,
+      "mb": 0.3
+    },
+    "launcher": {
+      "arquivos": 5,
+      "mb": 0.2
+    },
+    "(raiz)": {
+      "arquivos": 13,
+      "mb": 0.1
+    },
+    "perfil": {
+      "arquivos": 13,
+      "mb": 0.0
+    }
+  },
+  "linhas_do_produto": {
+    "servidor\\arena.py": 5061,
+    "launcher\\app.js": 3429,
+    "launcher\\estilo.css": 1705,
+    "servidor\\graficos.py": 1617,
+    "servidor\\consoles.json": 1165,
+    "3-IMAGEM-SOM-CONTROLE.md": 1065,
+    "launcher\\index.html": 915,
+    "5-AMIGOS.md": 689,
+    "servidor\\recursos.json": 644,
+    "servidor\\barreiras.py": 621,
+    "2-JOGOS.md": 596,
+    "servidor\\indexador.py": 535,
+    "servidor\\hardware.py": 531,
+    "servidor\\diagnostico.py": 522,
+    "6-RECURSOS-E-REPARO.md": 518,
+    "4-SAVES.md": 509,
+    "servidor\\controles.py": 433,
+    "servidor\\graficos.json": 426,
+    "1-COMECAR.md": 413,
+    "servidor\\identificador.py": 307,
+    "servidor\\partida.py": 291,
+    "launcher\\galaxy-background.js": 279,
+    "launcher\\field-background.js": 273,
+    "servidor\\perfis_controle.json": 268,
+    "servidor\\cheats.py": 266,
+    "servidor\\acervo.py": 229,
+    "servidor\\internet_archive.py": 223,
+    "LEIA-ME.md": 218,
+    "servidor\\capas_online.py": 126,
+    "ARENA.bat": 82,
+    "COLETAR.bat": 77,
+    "VERIFICAR.bat": 37,
+    "PARTIDA.bat": 29,
+    "RODAR_TESTES.bat": 27
+  },
+  "rotas": [
+    {
+      "rota": "/api/acervo",
+      "metodo": "GET",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/acervo/instalar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/acervo/remover",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/acervo/salvar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/amigo/adicionar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/amigo/codigo",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": true
+    },
+    {
+      "rota": "/api/amigo/remover",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/amigo/testar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": true
+    },
+    {
+      "rota": "/api/backup",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/barreiras",
+      "metodo": "GET",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/barreiras/fechar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/biblioteca-online",
+      "metodo": "GET",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/biblioteca-online/instalar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/bios/abrir",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/botoes",
+      "metodo": "GET",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/capa",
+      "metodo": "GET",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/capa/atualizar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/capa/enviar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/catalogo",
+      "metodo": "GET",
+      "chamada_por": [
+        "tela",
+        "PARTIDA.bat"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/cheat/adicionar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/cheat/alterar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/colegas",
+      "metodo": "GET",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": true
+    },
+    {
+      "rota": "/api/config",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/conquistas",
+      "metodo": "GET",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/estado",
+      "metodo": "GET",
+      "chamada_por": [
+        "tela",
+        "PARTIDA.bat"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/estado/apagar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/exportar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/importar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/indexar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/jogar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/jogo",
+      "metodo": "GET",
+      "chamada_por": [
+        "tela",
+        "PARTIDA.bat"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/jogo/console",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/jogo/impressao",
+      "metodo": "GET",
+      "chamada_por": [
+        "PARTIDA.bat"
+      ],
+      "aberta_a_rede": true
+    },
+    {
+      "rota": "/api/jogo/mover",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/mala",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/mapeamento",
+      "metodo": "GET",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/mapeamento/definir",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/mapeamento/limpar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/mapeamento/padrao",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/partida/testar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": true
+    },
+    {
+      "rota": "/api/pastas/criar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/perfil-controle",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/perfil/foto",
+      "metodo": "GET",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/perfil/foto",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/perfil/novo",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/perfis-controle",
+      "metodo": "GET",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/placar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/ranking",
+      "metodo": "GET",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": true
+    },
+    {
+      "rota": "/api/reparar-runtime",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/sinc/ola",
+      "metodo": "POST",
+      "chamada_por": [
+        "PARTIDA.bat",
+        "outro ARENA"
+      ],
+      "aberta_a_rede": true
+    },
+    {
+      "rota": "/api/sinc/receber",
+      "metodo": "POST",
+      "chamada_por": [
+        "outro ARENA"
+      ],
+      "aberta_a_rede": true
+    },
+    {
+      "rota": "/api/sincronizar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "aberta_a_rede": false
+    }
+  ],
+  "chaves_de_config": {
+    "apelido": [
+      "servidor\\arena.py",
+      "servidor\\diagnostico.py",
+      "servidor\\partida.py",
+      "launcher\\app.js"
+    ],
+    "avancado": [
+      "servidor\\arena.py",
+      "launcher\\app.js"
+    ],
+    "bios": [
+      "servidor\\arena.py",
+      "servidor\\graficos.py",
+      "launcher\\app.js"
+    ],
+    "codigo_proprio": [
+      "servidor\\arena.py"
+    ],
+    "dispositivo_id": [
+      "servidor\\arena.py",
+      "servidor\\partida.py",
+      "launcher\\app.js"
+    ],
+    "favoritos": [
+      "servidor\\arena.py",
+      "launcher\\app.js"
+    ],
+    "modo_desempenho": [
+      "servidor\\arena.py",
+      "launcher\\app.js"
+    ],
+    "modo_modesto": [
+      "servidor\\arena.py",
+      "launcher\\app.js"
+    ],
+    "nome_dispositivo": [
+      "servidor\\arena.py"
+    ],
+    "perfil_controle": [
+      "servidor\\arena.py"
+    ],
+    "perfil_grafico": [
+      "servidor\\arena.py",
+      "launcher\\app.js"
+    ],
+    "permitir_rede": [
+      "servidor\\arena.py",
+      "servidor\\partida.py",
+      "launcher\\app.js"
+    ],
+    "preset_grafico_externo": [
+      "servidor\\arena.py",
+      "launcher\\app.js"
+    ],
+    "recentes": [
+      "servidor\\arena.py",
+      "launcher\\app.js"
+    ],
+    "rpcn_ativo": [
+      "servidor\\arena.py",
+      "launcher\\app.js"
+    ],
+    "servidores": [
+      "servidor\\arena.py",
+      "servidor\\diagnostico.py",
+      "launcher\\app.js"
+    ],
+    "tema": [
+      "servidor\\arena.py",
+      "launcher\\app.js"
+    ],
+    "tipo_controle": [
+      "servidor\\arena.py"
+    ],
+    "travar_teclas": [
+      "servidor\\arena.py",
+      "launcher\\app.js"
+    ],
+    "ultra_desempenho": [
+      "servidor\\arena.py",
+      "launcher\\app.js"
+    ]
+  },
+  "linhas_de_execucao": [
+    {
+      "arquivo": "arena.py",
+      "linha": 2884,
+      "tipo": "Thread",
+      "alvo": "testar"
+    },
+    {
+      "arquivo": "arena.py",
+      "linha": 3927,
+      "tipo": "Thread",
+      "alvo": "rodar"
+    },
+    {
+      "arquivo": "arena.py",
+      "linha": 4501,
+      "tipo": "Thread",
+      "alvo": "executar_jogo"
+    },
+    {
+      "arquivo": "arena.py",
+      "linha": 4691,
+      "tipo": "Thread",
+      "alvo": "atualizar_adaptadores"
+    },
+    {
+      "arquivo": "arena.py",
+      "linha": 4889,
+      "tipo": "Thread",
+      "alvo": "encerrar_depois_da_resposta"
+    },
+    {
+      "arquivo": "arena.py",
+      "linha": 5016,
+      "tipo": "Thread",
+      "alvo": "rodar_vigia"
+    },
+    {
+      "arquivo": "arena.py",
+      "linha": 5017,
+      "tipo": "Thread",
+      "alvo": "anunciar_e_escutar"
+    },
+    {
+      "arquivo": "arena.py",
+      "linha": 5018,
+      "tipo": "Timer",
+      "alvo": "abrir_janela"
+    }
+  ],
+  "internet": [
+    {
+      "arquivo": "servidor\\capas_online.py",
+      "enderecos": [
+        "raw.githubusercontent.com"
+      ]
+    },
+    {
+      "arquivo": "servidor\\internet_archive.py",
+      "enderecos": [
+        "archive.org"
+      ]
+    },
+    {
+      "arquivo": "launcher\\index.html",
+      "enderecos": [
+        "github.com",
+        "npcap.com",
+        "raw.githubusercontent.com"
+      ]
+    }
+  ],
+  "resumo": {
+    "linhas_do_produto": 24126,
+    "arquivos_do_produto": 34,
+    "rotas": 52,
+    "rotas_abertas_a_rede": 8,
+    "rotas_sem_chamador": [],
+    "chaves_de_config": 20,
+    "chaves_nao_lidas": []
+  }
+}

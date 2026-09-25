@@ -204,3 +204,51 @@ lista de remoção; Fase 7 - mudanças de texto; Fase 8 - juntar ao
 - [x] Fase 6 — Portabilidade e robustez (24/09/2026)
 - [x] Fase 7 — Clareza para todos (24/09/2026)
 - [x] Fase 8 — Relatório final e entrega (25/09/2026) — aprovada pelo Rafael e juntada ao `main` em 25/09/2026 (commit `2633704`); revisão pós-auditoria no mesmo dia; rodada final completa: 35 de 35
+
+---
+
+## Auditoria 2 (25/09/2026) — pedido do Rafael, sem resumir
+
+> "Agora no esforço ultracode, refaça a auditoria completa, leia as
+> instruções enviadas anteriormente e siga como recomendado, inatruções,
+> passo 0 até o 8, mas exatamente com as mesmas escolhas e decisões que fiz
+> nessa primeira auditoria, mas revise também o testador de maquinas e suas
+> especificações e garanta que ele possa identificar todas as barreiras
+> desses computadores que deixam eles lentos como bloatwares, serviços e
+> recursos desnecessários, telemetria e etc... Se tiver algum problema o
+> ARENA precisa saber identificar para recomendar ação"
+
+**Leitura adotada ("as mesmas escolhas e decisões"):** na primeira
+auditoria o Rafael (1) autorizou seguir de fase em fase sozinho, (2)
+aprovou a lista de remoção da Fase 1 em bloco, (3) aprovou todas as
+mudanças da Fase 7 ("fazer todos"), (4) aprovou juntar ao `main`. Nesta
+segunda rodada essas quatro decisões valem de novo: as paradas do plano
+viram registro no relatório, não pergunta. Continuam valendo as 10 regras
+do plano — em especial: nada removido sem prova, nada de dado do aluno
+apagado, número real para toda afirmação de "mais leve/rápido", roteiro
+manual para o que só a sala confirma.
+
+**Ramo:** `auditoria`, avançado (sem perder nada) até o `perfil-alvo`, que
+é o `main` + as ferramentas de coleta.
+
+**Relatório desta rodada:** `docs\RELATORIO-AUDITORIA-2.md` (o da primeira,
+`RELATORIO-QUALIDADE.md`, fica como histórico).
+
+**Extra pedido nesta rodada:** o testador de máquinas passa a identificar
+as barreiras que deixam o computador lento (inicialização, bloatware,
+serviços, telemetria, atualização em andamento, antivírus, efeitos
+visuais, gravação em segundo plano, disco, calor/bateria...), e o ARENA
+passa a identificar e recomendar ação.
+
+### Progresso da auditoria 2
+
+- [x] Fase 0 — Linha de base e inventário (25/09/2026)
+- [x] Fase 1 — Varredura e limpeza (25/09/2026)
+- [x] Fase 2 — Leveza e desempenho (25/09/2026)
+- [x] Fase 3 — Servidor e API (25/09/2026)
+- [x] Fase 4 — Jogar Junto (25/09/2026)
+- [x] Fase 5 — Matriz de jogos (25/09/2026)
+- [x] Fase 6 — Portabilidade e robustez (25/09/2026)
+- [x] Fase 7 — Clareza para todos (25/09/2026)
+- [x] Fase 8 — Relatório final e entrega (25/09/2026) — rodada final 42 de 42, bateria 71; juntada ao `main`
+- [x] Extra — Barreiras de lentidão (testador + ARENA) (25/09/2026)

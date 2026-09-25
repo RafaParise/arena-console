@@ -696,9 +696,101 @@ async function jogar(jogo) {
     recado(`Abrindo ${jogo.titulo} pelo ${dados.emulador}. Aguarde uns segundos.`,
       false, 6000);
     mostrarFaixaTeclas();
+    mostrarAlertaMaquina(dados.alerta_maquina);
   } catch (falha) {
     recado(falha.message, true);
   }
+}
+
+// --------------------------------------------------------------------------
+// O que esta deixando este computador lento (Ajustes > Maquina)
+// --------------------------------------------------------------------------
+// Tudo vem pronto do servidor (servidor/barreiras.py): o que foi achado, por
+// que pesa, o que fazer e quem faz. A tela so desenha. O unico botao que
+// muda alguma coisa e' "Fechar", e so para programas da lista segura.
+
+const NOME_GRAVIDADE = { alta: "Grave", media: "Médio", baixa: "Leve" };
+
+function desenharBarreiras(dados) {
+  const lista = $("#listaBarreiras");
+  const itens = dados.barreiras || [];
+  $("#barreirasEstado").textContent = itens.length
+    ? `${itens.length} coisa(s) encontrada(s), da mais grave para a mais leve. (Levou ${dados.segundos} s.)`
+    : `Nada encontrado: este computador está sem as barreiras que o ARENA conhece. (Levou ${dados.segundos} s.)`;
+  const lote = document.createDocumentFragment();
+  for (const b of itens) {
+    const item = document.createElement("li");
+    item.className = `barreira barreira--${b.gravidade}`;
+
+    const titulo = document.createElement("p");
+    titulo.className = "barreira-titulo";
+    const selo = document.createElement("span");
+    selo.className = "barreira-selo";
+    selo.textContent = NOME_GRAVIDADE[b.gravidade] || b.gravidade;
+    titulo.append(selo, " " + b.titulo);
+
+    const achado = document.createElement("p");
+    achado.textContent = b.achado + " " + b.por_que;
+
+    const acao = document.createElement("p");
+    const rotulo = document.createElement("strong");
+    rotulo.textContent = "O que fazer: ";
+    acao.append(rotulo, b.acao);
+
+    const quem = document.createElement("p");
+    quem.className = "barreira-quem";
+    quem.textContent = b.quem === "aluno"
+      ? "Você consegue fazer isso sozinho."
+      : "Precisa do professor ou do TI (pede senha de administrador).";
+
+    item.append(titulo, achado, acao, quem);
+
+    for (const alvo of b.fechar || []) {
+      const botao = document.createElement("button");
+      botao.className = "botao";
+      botao.type = "button";
+      botao.textContent = `Fechar ${alvo.nome}`;
+      botao.addEventListener("click", async () => {
+        botao.disabled = true;
+        try {
+          const r = await pedir("/api/barreiras/fechar", "POST", { programa: alvo.processo });
+          recado(r.mensagem);
+          botao.textContent = "Fechado";
+        } catch (falha) {
+          recado(falha.message, true);
+          botao.disabled = false;
+        }
+      });
+      item.append(botao);
+    }
+    lote.append(item);
+  }
+  lista.replaceChildren(lote);
+}
+
+async function verificarBarreiras() {
+  const botao = $("#btnBarreiras");
+  botao.disabled = true;
+  botao.textContent = "Verificando…";
+  $("#barreirasEstado").textContent = "Olhando o Windows. Leva uns 5 segundos.";
+  try {
+    desenharBarreiras(await pedir("/api/barreiras?forcar=1"));
+  } catch (falha) {
+    $("#barreirasEstado").textContent = falha.message;
+  } finally {
+    botao.disabled = false;
+    botao.textContent = "Verificar de novo";
+  }
+}
+
+// Memoria quase cheia, notebook na bateria, economia de bateria: o servidor
+// confere isso na hora de abrir o jogo (~10 ms). Fica na barra de aviso do
+// topo ate o jogo fechar -- o recado sumiria antes do aluno voltar.
+function mostrarAlertaMaquina(alertas) {
+  if (!alertas || !alertas.length) return;
+  estado.avisoDaMaquina = true;
+  aviso("Pode travar: " + alertas.map((a) => `${a.titulo}. ${a.acao}`).join(" ") +
+        " (Veja mais em Ajustes > Máquina > O que está deixando este computador lento.)");
 }
 
 // --------------------------------------------------------------------------
@@ -723,7 +815,13 @@ async function conferirFaixaTeclas() {
   if (faixa.hidden) return;
   try {
     const dados = await pedir("/api/estado");
-    if (!(dados.jogo_em_andamento && dados.jogo_em_andamento.ativo)) faixa.hidden = true;
+    if (!(dados.jogo_em_andamento && dados.jogo_em_andamento.ativo)) {
+      faixa.hidden = true;
+      if (estado.avisoDaMaquina) {
+        estado.avisoDaMaquina = false;
+        aviso("");
+      }
+    }
   } catch (falha) {
     // sem resposta: deixa a faixa como esta, confere na proxima volta
   }
@@ -3192,6 +3290,8 @@ function ligarEventos() {
       evento.currentTarget.disabled = false;
     }
   });
+
+  $("#btnBarreiras").addEventListener("click", verificarBarreiras);
 
   $("#btnBackup").addEventListener("click", async () => {
     try {

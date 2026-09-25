@@ -30,16 +30,24 @@ PASTAS = [
     "retroarch/controles", "retroarch/screenshots",
 ]
 
+# Tudo o que o ARENA precisa para ABRIR. Corrigido na auditoria 2: a lista
+# tinha so 5 dos 11 modulos que o arena.py importa na abertura (faltavam
+# controles, acervo, internet_archive, capas_online, identificador e o novo
+# barreiras) -- faltando qualquer um, o ARENA nem abria, e o verificador
+# dizia que estava tudo presente.
 PROGRAMA = [
     "ARENA.bat", "LEIA-ME.md",
     "launcher/index.html", "launcher/estilo.css", "launcher/app.js",
-    "servidor/arena.py", "servidor/indexador.py", "servidor/hardware.py",
-    "servidor/cheats.py", "servidor/graficos.py",
+    "servidor/arena.py", "servidor/indexador.py", "servidor/identificador.py",
+    "servidor/hardware.py", "servidor/cheats.py", "servidor/graficos.py",
+    "servidor/controles.py", "servidor/acervo.py", "servidor/barreiras.py",
+    "servidor/internet_archive.py", "servidor/capas_online.py",
     "servidor/consoles.json", "servidor/graficos.json", "servidor/recursos.json",
+    "servidor/perfis_controle.json",
 ]
 
 JSONS = ["servidor/consoles.json", "servidor/graficos.json",
-         "servidor/recursos.json"]
+         "servidor/recursos.json", "servidor/perfis_controle.json"]
 
 SO_VER = "--so-ver" in sys.argv
 
@@ -450,6 +458,38 @@ else:
     print("  Se o ARENA ja estiver aberto, tudo bem. Se nao, feche o outro")
     print("  programa que esta usando essa porta.")
     atencao.append("porta %d ocupada" % porta)
+
+
+# ---------------------------------------------------------------------------
+titulo("11. O que deixa este computador lento")
+# Auditoria 2: o mesmo diagnostico da tela (Ajustes > Maquina), em
+# servidor\barreiras.py. So olha, nao muda nada no Windows. O que e' grave
+# aqui vira "atencao" no resumo: "grave" neste verificador e' instalacao do
+# ARENA quebrada, e computador lento nao e' isso.
+if "--sem-barreiras" in sys.argv:
+    print("  pulado (--sem-barreiras).")
+else:
+    if PASTA_SERVIDOR not in sys.path:
+        sys.path.insert(0, PASTA_SERVIDOR)
+    try:
+        import barreiras
+        print("  olhando o Windows (uns 5 segundos)...")
+        diagnostico_maquina = barreiras.diagnosticar()
+        achados = diagnostico_maquina["barreiras"]
+        if not achados:
+            print("  nada encontrado: sem as barreiras que o ARENA conhece.")
+            ok.append("computador sem barreiras de lentidao conhecidas")
+        for b in achados:
+            print("  [%s] %s" % ({"alta": "GRAVE", "media": "MEDIO", "baixa": "leve"}[b["gravidade"]],
+                                 b["titulo"]))
+            print("         %s" % b["achado"])
+            print("         O que fazer (%s): %s" % (b["quem"], b["acao"]))
+            if b["gravidade"] == "alta":
+                atencao.append("computador: %s" % b["titulo"])
+        for motivo in diagnostico_maquina["nao_deu_para_ler"]:
+            print("  (nao deu para ler: %s)" % motivo)
+    except Exception as falha:          # o verificador nunca pode quebrar aqui
+        print("  nao foi possivel olhar o Windows: %s" % falha)
 
 
 # ---------------------------------------------------------------------------
