@@ -11,9 +11,12 @@ como 'input_player1_a'. O nome delas vem do Super Nintendo, entao 'a' num
 jogo de PlayStation e o Circulo. A tela do ARENA traduz; este modulo
 escreve.
 
-Regra importante: o ARENA so escreve o que o aluno definiu AQUI. Botao que
-ele nao mexeu fica de fora do arquivo, e o que o RetroArch ja tinha
-continua valendo. Assim o mapeamento do ARENA soma, nao apaga.
+Regra importante: TECLA que o aluno nao mexeu fica de fora do arquivo, e
+o que o RetroArch ja tinha continua valendo (o teclado soma, nao apaga).
+BOTAO DE CONTROLE e diferente: o que o aluno nao definiu vai como "nul",
+e ai o reconhecimento automatico do RetroArch decide. Sem isso, numeros
+velhos esquecidos no retroarch.cfg (de outro tipo de controle) passavam
+por cima: o Start virava o R3.
 
 So biblioteca padrao.
 """
@@ -31,6 +34,10 @@ ARQUIVO_PERFIS = os.path.join(PASTA_SERVIDOR, "perfis_controle.json")
 _TRAVA = threading.Lock()
 
 JOGADORES = ("1", "2")
+
+# Quantos jogadores tem os botoes de controle zerados em toda partida (o
+# Saturn com dois adaptadores chega a 10; o RetroArch aceita ate 16).
+JOGADORES_NO_CONTROLE = 16
 
 # Botoes que o RetroArch conhece, na ordem em que ficam bonitos na tela.
 BOTOES = ["up", "down", "left", "right",
@@ -330,11 +337,17 @@ def limpar(jogador=None):
 def opcoes_do_retroarch(dados=None):
     """Transforma o mapeamento nas chaves que o RetroArch entende.
 
-    So entra o que o aluno definiu. Botao que ele nao mexeu nem aparece no
-    arquivo, entao o que o RetroArch ja sabia continua valendo.
+    Tecla que o aluno nao mexeu nem aparece no arquivo. Botao e eixo de
+    controle que ele nao mexeu vao como "nul": o RetroArch entao usa o
+    reconhecimento automatico, e nao um numero velho do retroarch.cfg.
     """
     dados = dados if dados is not None else ler()
     opcoes = {}
+
+    for jogador in range(1, JOGADORES_NO_CONTROLE + 1):
+        for botao in BOTOES:
+            opcoes["input_player%d_%s_btn" % (jogador, botao)] = "nul"
+            opcoes["input_player%d_%s_axis" % (jogador, botao)] = "nul"
 
     for jogador in JOGADORES:
         for botao, atribuicao in (dados.get(jogador) or {}).items():

@@ -60,6 +60,18 @@ def arquivos_do_git(revisao, pastas):
 REVISAO_ANTES = "97ffe03"
 
 
+def sem_mudanca_de_proposito(chaves_override):
+    """Tira as duas mudancas que valem para TODO jogo, de proposito (teste
+    com os controles na mao, 25/09/2026):
+      - botao/eixo de controle nao definido pelo aluno vai "nul" (numero
+        velho no retroarch.cfg punha o Start no R3);
+      - input_remapping_directory aponta para o .rmp da partida (o RetroArch
+        ignora o tipo de porta vindo do --appendconfig)."""
+    return {c: v for c, v in chaves_override.items()
+            if c != "input_remapping_directory"
+            and not (v == "nul" and re.match(r"^input_player\d+_\w+_(btn|axis)$", c))}
+
+
 def montar(destino, revisao):
     """revisao=None -> copia a pasta de trabalho de agora; senao, le do git."""
     if revisao:
@@ -84,6 +96,8 @@ def montar(destino, revisao):
     os.makedirs(os.path.join(ra, "cores"))
     open(os.path.join(ra, "retroarch.exe"), "wb").close()
     shutil.copy2(os.path.join(RAIZ, "retroarch", "retroarch.cfg"), os.path.join(ra, "retroarch.cfg"))
+    # O nome de cada nucleo (pasta do .rmp da partida) vem do .info.
+    shutil.copytree(os.path.join(RAIZ, "retroarch", "info"), os.path.join(ra, "info"))
     for nome in os.listdir(os.path.join(RAIZ, "retroarch", "cores")):
         open(os.path.join(ra, "cores", nome), "wb").close()
 
@@ -218,8 +232,9 @@ def principal():
                 continue
             mais_de_dois = (b["jogadores_max"] or 2) > 2 and b["status"] == 200
             if not mais_de_dois:
-                if a["status"] != b["status"] or a["override"] != b["override"]:
-                    dif = sorted(set(chaves(a["override"]).items()) ^ set(chaves(b["override"]).items()))
+                ca, cb = sem_mudanca_de_proposito(chaves(a["override"])), sem_mudanca_de_proposito(chaves(b["override"]))
+                if a["status"] != b["status"] or ca != cb:
+                    dif = sorted(set(ca.items()) ^ set(cb.items()))
                     falhas.append("%s: MUDOU (status %s -> %s) %s" % (caso, a["status"], b["status"], dif[:6]))
                 else:
                     iguais += 1

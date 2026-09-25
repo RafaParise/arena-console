@@ -159,7 +159,16 @@ def trabalhador(raiz, porta):
         nucleo = {}
         if chaves.get("core_options_path", "").endswith("opcoes_nucleo_partida.cfg") and os.path.exists(copia):
             nucleo = dict(re.findall(r'^(\S*multitap\S*) = "(.*)"$', open(copia, encoding="utf-8").read(), re.M | re.I))
-        saida.append({"titulo": titulo, "modo": modo, "status": status, "chaves": chaves,
+        # O RetroArch IGNORA o tipo de porta vindo do --appendconfig (provado
+        # com os controles na mao): o que vale e' o .rmp da pasta de remap.
+        rmp = {}
+        pasta_rmp = chaves.get("input_remapping_directory", "")
+        for base, _, arquivos in os.walk(pasta_rmp if pasta_rmp.startswith(raiz) else os.devnull):
+            for nome in arquivos:
+                if nome.endswith(".rmp"):
+                    rmp.update(re.findall(r'^(input_libretro_device_p\d+) = "(.*)"$',
+                                          open(os.path.join(base, nome), encoding="utf-8").read(), re.M))
+        saida.append({"titulo": titulo, "modo": modo, "status": status, "chaves": chaves, "rmp": rmp,
                       "nucleo": nucleo, "core_options_path": chaves.get("core_options_path", ""),
                       "cartao": jogo.get("jogadores_max"), "motivo": jogo.get("motivo_jogadores", ""),
                       "cfg_antes": antes, "cfg_depois": regra_valores(cfg_real)})
@@ -197,6 +206,9 @@ def principal():
                 continue
             erros = ["%s=%r (esperado %r)" % (k, res["chaves"].get(k), v)
                      for k, v in esperadas.items() if res["chaves"].get(k) != v]
+            erros += ["no .rmp %s=%r (esperado %r)" % (k, res["rmp"].get(k), v)
+                      for k, v in esperadas.items()
+                      if k.startswith("input_libretro_device_p") and res["rmp"].get(k) != v]
             if res["nucleo"] != nucleo_esperado:
                 erros.append("opcoes de nucleo %r (esperado %r)" % (res["nucleo"], nucleo_esperado))
             if not nucleo_esperado and "opcoes_nucleo_partida" in res["core_options_path"]:

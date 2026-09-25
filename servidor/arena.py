@@ -73,6 +73,7 @@ PASTA_STATES = os.path.join(PASTA_RETROARCH, "states")
 PASTA_CAPTURAS = os.path.join(PASTA_RETROARCH, "screenshots")
 PASTA_CHEATS = os.path.join(PASTA_RETROARCH, "cheats")
 PASTA_REMAPS = os.path.join(PASTA_RETROARCH, "remaps")
+PASTA_REMAP_PARTIDA = os.path.join(RAIZ, "dados", "remap_partida")
 PASTA_CONTROLES = os.path.join(PASTA_RETROARCH, "controles")
 PASTA_CACHE = os.path.join(PASTA_RETROARCH, "cache")
 PASTA_BACKUP = os.path.join(RAIZ, "backup")
@@ -1273,8 +1274,54 @@ ULTRA_DESEMPENHO = {
 }
 
 
+def remapeamento_da_partida(opcoes, caminho_core, caminho_jogo):
+    """Grava o tipo de cada porta (input_libretro_device_pN) num arquivo de
+    remapeamento SO desta partida e devolve a pasta dele.
+
+    Achado real (Multitap, 25/09/2026, com os controles na mao): o RetroArch
+    IGNORA input_libretro_device_pN vindo do --appendconfig. O Super
+    Bomberman 4 abria com "SNES Joypad" na porta 2 e so 2 jogadores, mesmo
+    com o arquivo da partida pedindo o Multitap (257). O arquivo de
+    remapeamento (.rmp) e' onde o proprio RetroArch guarda o "Tipo de
+    dispositivo" -- dele ele le sempre. Provado: com ele, 5 jogadores."""
+    tipos = {c: v for c, v in opcoes.items() if c.startswith("input_libretro_device_p")}
+    if not tipos:
+        return None
+    nome_info = os.path.splitext(os.path.basename(caminho_core))[0] + ".info"
+    nome_nucleo = None
+    try:
+        with open(os.path.join(PASTA_RETROARCH, "info", nome_info), encoding="utf-8") as arquivo:
+            for linha in arquivo:
+                if linha.startswith("corename"):
+                    nome_nucleo = linha.split("=", 1)[1].strip().strip('"')
+                    break
+    except OSError:
+        pass
+    if not nome_nucleo:
+        return None
+    nome_jogo = os.path.splitext(os.path.basename(caminho_jogo))[0]
+
+    # O remapeamento que o aluno salvou pelo menu do RetroArch continua
+    # valendo: entra primeiro, e so o tipo das portas e' trocado.
+    linhas = []
+    for candidato in (os.path.join(PASTA_REMAPS, nome_nucleo, nome_jogo + ".rmp"),
+                      os.path.join(PASTA_REMAPS, nome_nucleo, nome_nucleo + ".rmp")):
+        if os.path.isfile(candidato):
+            with open(candidato, encoding="utf-8", errors="replace") as arquivo:
+                linhas = [l.rstrip("\n") for l in arquivo
+                          if not l.startswith("input_libretro_device_p")]
+            break
+    linhas += ['%s = "%s"' % (c, tipos[c]) for c in sorted(tipos)]
+
+    shutil.rmtree(PASTA_REMAP_PARTIDA, ignore_errors=True)
+    pasta_nucleo = os.path.join(PASTA_REMAP_PARTIDA, nome_nucleo)
+    os.makedirs(pasta_nucleo, exist_ok=True)
+    gravar_texto_atomico(os.path.join(pasta_nucleo, nome_jogo + ".rmp"), "\n".join(linhas) + "\n")
+    return PASTA_REMAP_PARTIDA
+
+
 def gravar_override(config, custo=None, extras=None, em_partida=False,
-                    opcoes_de_nucleo=None):
+                    opcoes_de_nucleo=None, remapear=None):
     """Monta o arquivo de configuracao extra que o RetroArch vai ler.
 
     'opcoes_de_nucleo': caminho de uma COPIA do arquivo de opcoes de nucleo
@@ -1357,6 +1404,14 @@ def gravar_override(config, custo=None, extras=None, em_partida=False,
     opcoes["system_directory"] = PASTA_SISTEMA
     opcoes["cheat_database_path"] = PASTA_CHEATS
     opcoes["input_remapping_directory"] = PASTA_REMAPS
+    if remapear:
+        try:
+            pasta_remap = remapeamento_da_partida(opcoes, *remapear)
+        except OSError as falha:
+            pasta_remap = None
+            print("[ARENA] Nao consegui gravar o tipo de controle das portas: %s" % falha)
+        if pasta_remap:
+            opcoes["input_remapping_directory"] = pasta_remap
     opcoes["joypad_autoconfig_dir"] = PASTA_CONTROLES
     opcoes["playlist_directory"] = PASTA_DADOS
     opcoes["log_dir"] = PASTA_DADOS
@@ -1953,7 +2008,8 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             "-L", os.path.join(PASTA_CORES, jogo["core"]),
             "--appendconfig", gravar_override(
                 config, custo, opcoes_jogo,
-                em_partida=bool(partida), opcoes_de_nucleo=copia_nucleo),
+                em_partida=bool(partida), opcoes_de_nucleo=copia_nucleo,
+                remapear=(os.path.join(PASTA_CORES, jogo["core"]), caminho_jogo)),
         ]
         if partida:
             comando += partida["argumentos"]
