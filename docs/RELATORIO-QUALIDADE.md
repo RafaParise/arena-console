@@ -1639,4 +1639,18 @@ do aluno). Scripts novos desta revisão: `teste_sinc_sem_relogio`,
 `teste_opcoes_nucleo_ponta_a_ponta`, `teste_caminho_fora_no_cfg`,
 `teste_adaptadores_vpn`, `teste_caminho_comprido`, `teste_disco_cheio`,
 `teste_ps3_sem_firmware`, `teste_acervo_download_real`, `medir_tela.ps1`.
-Rodada final completa: RODADA_REVISAO.
+**Rodada final completa: NÃO terminou.** O Claude Code interrompeu a
+rodada (`ferramentas\rodada_final.py`) por falta de memória no computador,
+durante a matriz de jogos. Não foi falha de teste. Ao longo da revisão,
+cada teste afetado por cada mudança rodou e passou: bateria de 45, fuzz
+(0 falhas), concorrência, mala, arquivos corrompidos, queda no meio da
+gravação, Fase 7, longa duração, PARTIDA com colega, rebinding, acesso de
+rede, descoberta de 30 máquinas, cenários de sala, 5 jogadores, 4 locais,
+matriz (6/6 com as opções reais do ARENA) e todos os novos listados acima.
+**Falta rodar tudo junto uma vez**, com memória livre:
+`servidor\python\python.exe ferramentas\rodada_final.py` (~15 min).
+
+Efeito colateral da interrupção, já corrigido: a matriz, morta no meio,
+deixou `core_options_path` do `retroarch.cfg` apontando para o Temp. A
+correção automática passou a conhecer essa chave, e a matriz agora manda o
+RetroArch não gravar a configuração ao fechar.
