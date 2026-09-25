@@ -36,7 +36,7 @@
 | Console | Núcleo que o ARENA usa | Jogadores sem adaptador | Como liga o adaptador | Chave = valor exato | Jogadores com adaptador | Jogar Junto |
 |---|---|---|---|---|---|---|
 | Super Nintendo | snes9x | 2 | **tipo de controle** numa porta ("Multitap") | `input_libretro_device_p2 = "257"` | **5** (8 com as duas portas) | sim |
-| NES | fceumm | 2 | **tipo de controle** nas portas 3 e 4 ("4-Player Adapter" / Four Score). O núcleo **já liga sozinho** para os jogos de uma lista interna dele | `input_libretro_device_p3 = "513"` e `input_libretro_device_p4 = "513"` | **4** | sim |
+| NES | fceumm | 2 | **tipo de controle** "Gamepad" nas portas 3 e 4, que liga o Four Score (o "4-Player Adapter" do núcleo é outro: o do Famicom japonês, na porta 5). O núcleo **já liga sozinho** para os jogos de uma lista interna dele | `input_libretro_device_p3 = "513"` e `input_libretro_device_p4 = "513"` | **4** | sim |
 | PS1 jogando junto | pcsx_rearmed | 2 | **opção do núcleo** "Multitap Mode" | `pcsx_rearmed_multitap = "port 1"` (desligado: `"disabled"`) | **5** (`"ports 1 and 2"` = 8) | sim |
 | PS1 no mesmo computador | swanstation | 2 | **opção do núcleo** "Multitap Mode" | `swanstation_ControllerPorts_MultitapMode = "Port1Only"` (desligado: `"Disabled"`) | **5** (`"BothPorts"` = 8) | não (núcleo recusa) |
 | Sega Saturn | mednafen_saturn | 2 | **opção do núcleo**, uma por porta ("6Player Adaptor") | `beetle_saturn_multitap_port1 = "enabled"` (+ `..._port2 = "enabled"`) | **7** com um, **12** com os dois | **não confirmado** (nunca testado) |
@@ -49,14 +49,22 @@
 | PS3 | RPCS3 (externo) | — | fora do RetroArch | — | — | não pelo RetroArch |
 | Xbox 360 | Xenia (externo) | — | fora do RetroArch | — | — | não pelo RetroArch |
 
-**Onde cada tipo vai escrito (importa para a Fase B):**
+**Onde cada tipo vai escrito (como ficou na Fase B):**
 - **Tipo de controle** (SNES, NES): no arquivo de configuração temporário
-  da partida, que já existe (`--appendconfig`). Não toca no `retroarch.cfg`.
-- **Opção do núcleo** (PS1, Saturn): **não** vai nesse arquivo. Vai no arquivo
-  de opções de núcleo, que o ARENA já grava a cada partida
-  (`retroarch-core-options.cfg`, com o ajuste de imagem). Na Fase B ela é
-  escrita só na partida que precisa e desligada na seguinte, para
-  "sozinho ou em dois, nada muda" continuar valendo.
+  da partida (`--appendconfig`), aplicado **por último**, depois das opções
+  de controle — antes elas escreviam "controle comum" por cima do 257.
+- **Opção do núcleo** (PS1, Saturn): **não** cabe nesse arquivo. Só na
+  partida de 3+, o ARENA copia o arquivo de opções de sempre para
+  `dados\opcoes_nucleo_partida.cfg`, acrescenta o multitap e aponta a
+  partida para a cópia (`core_options_path`). O arquivo de sempre não é
+  tocado (decisão do Rafael). Confirmado com o RetroArch real: o PCSX
+  ReARMed registrou "multitap: 1 0" com a cópia e "disabled" sem ela.
+- **O que vaza ao fechar:** o RetroArch grava no `retroarch.cfg`, ao fechar,
+  o que veio no arquivo temporário. Depois de uma partida de 3+, o ARENA
+  devolve essas chaves (adaptador, portas 3 em diante, caminho da cópia)
+  ao valor de antes. Com 1 ou 2 jogadores nada disso acontece — provado por
+  `testes\teste_multitap_regra_de_ouro.py` contra a versão de antes do
+  multitap (114 casos iguais).
 
 ## Não confirmado — o que falta
 

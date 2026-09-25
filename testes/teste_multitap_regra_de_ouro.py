@@ -3,7 +3,7 @@ r"""Multitap, Fase B: a regra de ouro.
 
 "Jogando sozinho ou em dois, nada muda em relacao a hoje." Este teste prova
 isso comparando o arquivo de configuracao da partida (o --appendconfig)
-gerado pela versao ANTERIOR do ARENA (ultimo commit, lido do git) com o da
+gerado pela versao do ARENA de ANTES do multitap (commit 97ffe03, lido do git) com o da
 versao ATUAL, jogo por jogo, pela rota /api/jogar de verdade.
 
 Como: monta duas copias temporarias (antes e agora), com os mesmos nomes de
@@ -54,21 +54,25 @@ def arquivos_do_git(revisao, pastas):
             and "/tests/" not in l]
 
 
+# A versao "de hoje" da regra de ouro e' SEMPRE a de antes de todo o trabalho
+# do multitap (Fase A so pesquisou, nao mudou o funcionamento). Comparar com
+# o ultimo commit deixaria uma mudanca se esconder de fase em fase.
+REVISAO_ANTES = "97ffe03"
+
+
 def montar(destino, revisao):
-    """revisao=None -> copia os arquivos de agora; senao, le do git."""
-    for caminho in arquivos_do_git("HEAD", ["servidor", "launcher"]):
-        alvo = os.path.join(destino, *caminho.split("/"))
-        os.makedirs(os.path.dirname(alvo), exist_ok=True)
-        if revisao:
+    """revisao=None -> copia a pasta de trabalho de agora; senao, le do git."""
+    if revisao:
+        for caminho in arquivos_do_git(revisao, ["servidor", "launcher"]):
+            alvo = os.path.join(destino, *caminho.split("/"))
+            os.makedirs(os.path.dirname(alvo), exist_ok=True)
             conteudo = subprocess.run(["git", "show", "%s:%s" % (revisao, caminho)],
                                       cwd=RAIZ, capture_output=True, check=True).stdout
             open(alvo, "wb").write(conteudo)
-        else:
-            shutil.copy2(os.path.join(RAIZ, *caminho.split("/")), alvo)
-    # Arquivo novo desta fase (ainda fora do git na hora do teste).
-    if not revisao:
-        for nome in ("multitap.json",):
-            shutil.copy2(os.path.join(RAIZ, "servidor", nome), os.path.join(destino, "servidor", nome))
+    else:
+        ignorar = shutil.ignore_patterns("python", "tests", "__pycache__")
+        for pasta in ("servidor", "launcher"):
+            shutil.copytree(os.path.join(RAIZ, pasta), os.path.join(destino, pasta), ignore=ignorar)
 
     os.makedirs(os.path.join(destino, "dados"))
     config = json.load(open(os.path.join(RAIZ, "dados", "config.json"), encoding="utf-8"))
@@ -191,7 +195,7 @@ def principal():
     antes_dir = tempfile.mkdtemp(prefix="arena_regra_antes_")
     agora_dir = tempfile.mkdtemp(prefix="arena_regra_agora_")
     try:
-        montar(antes_dir, "HEAD")
+        montar(antes_dir, REVISAO_ANTES)
         montar(agora_dir, None)
         saidas = {}
         for nome, pasta, porta in (("antes", antes_dir, 18791), ("agora", agora_dir, 18792)):

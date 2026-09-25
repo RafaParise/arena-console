@@ -41,10 +41,10 @@
       "jogar_junto": true,
       "adaptador": {
         "tipo": "dispositivo",
-        "nome_no_nucleo": "4-Player Adapter (Four Score)",
+        "nome_no_nucleo": "Gamepad (nas portas 3 e 4 liga o Four Score)",
         "chaves": {"input_libretro_device_p3": "513", "input_libretro_device_p4": "513"},
         "jogadores": 4,
-        "fonte": "libretro-fceumm src/drivers/libretro/libretro.c linha 114 (RETRO_DEVICE_GAMEPAD = RETRO_DEVICE_SUBCLASS(JOYPAD,1)) + libretro.h (SUBCLASS(base,id) = ((id+1)<<8)|base -> 513) e linhas 1522-1550 (controle nas portas 3/4 liga o Four Score); textos '4-Player Adapter' e 'Four Players' Tennis' presentes no .dll",
+        "fonte": "libretro-fceumm src/drivers/libretro/libretro.c linha 114 (RETRO_DEVICE_GAMEPAD = RETRO_DEVICE_SUBCLASS(JOYPAD,1)) + libretro.h (SUBCLASS(base,id) = ((id+1)<<8)|base -> 513) linhas 1522-1550 (Gamepad nas portas 3/4 liga o Four Score) e linhas 1780-1807 (Gamepad oferecido nas portas 3 e 4); texto 'Gamepad' presente no .dll. O '4-Player Adapter' do .dll e' outro: o adaptador do Famicom japones, na porta 5",
         "observacao": "O nucleo JA liga sozinho o Four Score para os jogos da lista interna dele (fourscore_db_list, por CRC). As chaves acima servem para garantir nos outros."
       }
     },

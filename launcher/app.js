@@ -437,6 +437,12 @@ function prepararCapa(elemento, jogo) {
   tentar();
 }
 
+// "1 jogador", "até 2 jogadores", "até 5 jogadores" -- linguagem de aluno.
+function textoJogadores(numero) {
+  const n = Number(numero) || 2;
+  return n <= 1 ? "1 jogador" : `até ${n} jogadores`;
+}
+
 function linhaDoJogo(jogo) {
   const plataforma = estado.porPlataforma[jogo.plataforma] || {};
   const disponivel = plataforma.estado === "pronta";
@@ -512,7 +518,9 @@ function linhaDoJogo(jogo) {
 
   const meta = document.createElement("span");
   meta.className = "jogo-meta";
-  meta.textContent = `${jogo.plataforma_nome} · ${jogo.tamanho_mb} MB`;
+  // Quantos jogam juntos: o número do arquivo do professor, já limitado
+  // ao que o emulador deste console permite (servidor\jogadores.py).
+  meta.textContent = `${jogo.plataforma_nome} · ${jogo.tamanho_mb} MB · ${textoJogadores(jogo.jogadores_max)}`;
 
   abrir.append(titulo, meta);
 

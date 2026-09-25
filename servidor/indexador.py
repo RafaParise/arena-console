@@ -26,6 +26,7 @@ import unicodedata
 
 import graficos
 import identificador
+import jogadores
 
 # ---------------------------------------------------------------------------
 # BLOCO 1 - Onde estamos no disco
@@ -151,6 +152,12 @@ def carregar_plataformas():
 # BLOCO 4 - Assinatura das pastas (evita varredura desnecessaria)
 # ---------------------------------------------------------------------------
 
+def arquivo_de_jogadores():
+    """O dados\\jogadores.txt do professor, na MESMA pasta de dados do indice
+    (calculado na hora: teste que troca PASTA_DADOS nunca toca no real)."""
+    return os.path.join(PASTA_DADOS, jogadores.NOME)
+
+
 def assinatura_das_pastas():
     """Resume o estado atual das pastas de jogos em um texto curto.
 
@@ -168,6 +175,13 @@ def assinatura_das_pastas():
                 partes.append("%s|%d" % (pasta_atual, os.path.getmtime(pasta_atual)))
             except OSError:
                 continue
+    # O arquivo de jogadores do professor e o mapa do multitap tambem mudam
+    # a lista (numero de jogadores de cada jogo).
+    partes.append(jogadores.assinatura(arquivo_de_jogadores()))
+    try:
+        partes.append("mapa|%d" % os.path.getmtime(graficos.ARQUIVO_MAPA_MULTITAP))
+    except OSError:
+        pass
     texto = "\n".join(sorted(partes))
     return hashlib.md5(texto.encode("utf-8")).hexdigest()
 
@@ -335,7 +349,8 @@ def escolher_plataforma(candidatos, por_id, nome_pasta, marcado, tamanho_mb,
     return SEM_PASTA, sugestao
 
 
-def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None):
+def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None,
+                 regras=None):
     """Percorre uma pasta e devolve a lista de jogos encontrados.
 
     os.walk entra tambem nas subpastas, entao o aluno pode organizar os
@@ -407,20 +422,28 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None):
                 plataforma = por_id[id_plataforma]
             titulo = limpar_titulo(nome_arquivo)
 
-            # So ESTE jogo, nao o console inteiro, aceita mais jogadores?
-            # Lista curada em consoles.json -> jogos_multitap (mesmo
-            # espirito do "system link" do PS2: cresce testando com jogo
-            # real, nunca por suposicao). A maioria dos jogos de um
-            # console nao usa Multitap - mostrar "Jogador 3/4/5" pra eles
-            # confundiria o aluno a toa.
-            lista_multitap = plataforma.get("jogos_multitap", [])
-            usa_multitap = any(nome.lower() in titulo.lower() for nome in lista_multitap)
+            # Quantos jogadores ESTE jogo aceita: quem diz e' o professor,
+            # no dados\jogadores.txt (servidor\jogadores.py). Sem o arquivo
+            # (so na primeira vez, antes de o ARENA cria-lo), vale o que
+            # valia antes dele: a lista de Multitap do consoles.json (5) e
+            # o numero do console (N64: 4) -- e' com isso que o arquivo
+            # nasce preenchido.
+            if regras is None:
+                lista_multitap = plataforma.get("jogos_multitap", [])
+                usa_multitap = any(nome.lower() in titulo.lower() for nome in lista_multitap)
+                do_jogo = 5 if usa_multitap else int(plataforma.get("jogadores_max", 2) or 2)
+            else:
+                do_jogo = jogadores.numero_do_jogo(titulo, regras)
             # O que o jogo aceita, limitado ao que o nucleo permite
             # (servidor\multitap.json). O mesmo calculo do /api/jogar.
             ligacao = graficos.jogadores_do_jogo(
-                plataforma.get("core", ""),
-                5 if usa_multitap else plataforma.get("jogadores_max", 2),
-                mapa=mapa_multitap)
+                plataforma.get("core", ""), do_jogo, mapa=mapa_multitap)
+            # Console de emulador externo (Dolphin, Xenia, PCSX2, RPCS3): o
+            # adaptador e o limite do RetroArch nao se aplicam, quem cuida
+            # dos controles e' o proprio emulador. Vale o numero do
+            # professor (achado na revisao: GameCube mostrava "ate 2").
+            if plataforma.get("externo") and id_plataforma in mapa_multitap.get("externos", {}):
+                ligacao = {"jogadores": do_jogo, "motivo": ""}
 
             encontrados.append({
                 "id": identificacao,
@@ -432,6 +455,9 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None):
                 "origem": origem,
                 "origem_rotulo": ORIGENS.get(origem, origem),
                 "pede_placar": plataforma.get("pede_placar", False),
+                # O que o jogo aceita (arquivo do professor) e o que da
+                # para jogar de verdade neste console (limitado ao nucleo).
+                "jogadores_do_jogo": do_jogo,
                 "jogadores_max": ligacao["jogadores"],
                 # Frase para o aluno quando o jogo aceita mais do que o
                 # emulador deste console permite (vazio no resto).
@@ -502,12 +528,26 @@ def indexar(forcar=False):
     por_id, por_extensao = carregar_plataformas()
 
     manuais = ler_manuais()
+    regras = jogadores.ler(arquivo_de_jogadores())
     jogos = []
     for origem in ORIGENS:
         jogos.extend(
             varrer_pasta(os.path.join(PASTA_JOGOS, origem), origem,
-                         por_extensao, por_id, manuais)
+                         por_extensao, por_id, manuais, regras)
         )
+
+    # Primeira vez: cria o dados\jogadores.txt com os jogos da pasta e o
+    # numero que cada um aceitava ate aqui (nada muda para ninguem).
+    if regras is None and jogos:
+        try:
+            if jogadores.criar([{"titulo": j["titulo"], "plataforma_nome": j["plataforma_nome"],
+                                 "jogadores_antes": j["jogadores_do_jogo"]} for j in jogos],
+                               arquivo_de_jogadores()):
+                # O arquivo novo mudou a assinatura; guarda a de agora para
+                # nao refazer a lista a toa na proxima vez.
+                assinatura = assinatura_das_pastas()
+        except OSError:
+            pass  # pen drive protegido etc.: segue com os numeros de antes
 
     # Ordena por plataforma e depois por titulo, sem acento atrapalhar.
     jogos.sort(key=lambda j: (j["plataforma_nome"], j["ordenacao"]))

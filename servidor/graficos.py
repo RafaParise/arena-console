@@ -1675,7 +1675,11 @@ def jogadores_do_jogo(nucleo, jogadores, jogadores_da_config=2, mapa=None):
     if aceitos > 2:
         # Sem isto o RetroArch so le os 2 primeiros controles (o ARENA vem
         # com input_max_users = 2): o 3o em diante fica mudo.
-        resultado["cfg"]["input_max_users"] = str(max(aceitos, int(jogadores_da_config or 2)))
+        try:
+            da_config = int(jogadores_da_config or 2)
+        except (TypeError, ValueError):
+            da_config = 2  # config torta nao derruba a partida
+        resultado["cfg"]["input_max_users"] = str(max(aceitos, da_config))
         # O padrao do RetroArch (3 conexoes) recusava o 5o jogador mesmo com
         # o adaptador certo. Nunca abaixo do padrao de hoje.
         resultado["max_conexoes"] = max(NETPLAY_CONEXOES_PADRAO, aceitos - 1)

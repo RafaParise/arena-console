@@ -1751,12 +1751,16 @@ def ler_fechamentos():
         return []
 
 
-def jogadores_pedidos(plataforma, titulo):
+def jogadores_pedidos(plataforma, jogo):
     """Quantos jogadores o JOGO aceita (antes de ver o que o nucleo deixa).
 
-    Hoje: 5 para os jogos da lista de Multitap (consoles.json ->
-    jogos_multitap), senao o numero do console (N64: 4), senao 2."""
-    if graficos.jogo_suporta_multitap(plataforma, titulo):
+    Vem do indice (indexador), que le o dados\\jogadores.txt do professor --
+    o MESMO numero que o cartao mostra. Indice antigo, de antes do arquivo
+    existir: a regra de antes (lista de Multitap = 5, numero do console,
+    senao 2)."""
+    if jogo.get("jogadores_do_jogo"):
+        return int(jogo["jogadores_do_jogo"])
+    if graficos.jogo_suporta_multitap(plataforma, jogo.get("titulo")):
         return graficos.JOGADORES_MULTITAP
     return int(plataforma.get("jogadores_max", 2) or 2)
 
@@ -1768,6 +1772,13 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
     o aluno joga.
     """
     sessao_uuid = uuid.uuid4().hex
+
+    # Definidos antes do 'try': se gravar as opcoes falhar (pen drive
+    # protegido...), o jogo ainda abre, so sem esses ajustes -- em vez de
+    # cair mais abaixo por falta destas variaveis (achado na revisao).
+    extras_controle = {}
+    jogadores_controle = 2
+    jogadores_ligacao = int((jogo.get("ligacao") or {}).get("jogadores") or 0)
 
     # Ajuste fino de imagem do emulador deste jogo (resolucao interna,
     # filtro de textura, mipmap, carregar CD para a memoria).
@@ -1783,12 +1794,26 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         # Avisa o console de que o controle tem analogico. Sem isto, no
         # PlayStation os dois analogicos ficam mudos.
         escolhas = config.get("perfil_controle", {}).get(jogo["plataforma"], {})
+        jogadores_controle = int(config.get("avancado", {}).get("input_max_users", 2) or 2)
+        # Partida de 3+ (Fase B do multitap): o tipo de controle vai para
+        # TODOS os jogadores, nao so para os da configuracao (2). Achado na
+        # revisao: sem isto, numa partida de 4 no Dreamcast ou de 5 no PS1
+        # os jogadores 3 em diante ficavam sem o 517 -- analogico mudo, o
+        # mesmo defeito antigo do PS1. Com 1 ou 2, a conta e' a de sempre.
+        if jogadores_ligacao > 2:
+            jogadores_controle = max(jogadores_controle, jogadores_ligacao)
         extras_controle = controles.opcoes_do_console(
             jogo["plataforma"],
-            jogadores=int(config.get("avancado", {}).get("input_max_users", 2) or 2),
+            jogadores=jogadores_controle,
             usar_analogico=escolhas.get("analogico_esq", True),
             vibracao=escolhas.get("vibracao", True),
             dispositivo_extra=escolhas.get("extra"))
+        # opcoes_do_console cobre ate 4 portas; o 5o jogador em diante (PS1 e
+        # Saturn com adaptador) recebe o mesmo tipo de controle do 1o.
+        for n in range(5, jogadores_ligacao + 1):
+            for chave in ("input_libretro_device_p%d", "input_player%d_analog_dpad_mode"):
+                if chave % 1 in extras_controle:
+                    extras_controle[chave % n] = extras_controle[chave % 1]
         graficos.gravar_opcoes_dos_nucleos(
             CAPACIDADE["nota"], extras_core, CAPACIDADE.get("nota_gpu"),
             modesto=bool(config.get("modo_modesto")))
@@ -1902,8 +1927,17 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
                 print("[ARENA] Nao consegui ligar o adaptador de controles: %s" % falha)
         # O RetroArch grava no retroarch.cfg, ao fechar, o que veio aqui;
         # guarda o valor de antes para devolver no fim (ver graficos).
-        cfg_antes = graficos.valores_no_retroarch_cfg(
-            list(ligacao.get("cfg", {})) + (["core_options_path"] if copia_nucleo else []))
+        # Tudo o que so a partida de 3+ escreve: o adaptador (ligacao), as
+        # portas 3 em diante (tipo de controle e analogico, acima) e a copia
+        # das opcoes de nucleo. Com 1 ou 2 jogadores a lista fica vazia.
+        so_desta_partida = list(ligacao.get("cfg", {}))
+        if jogadores_ligacao > 2:
+            for n in range(3, jogadores_controle + 1):
+                so_desta_partida += ["input_libretro_device_p%d" % n,
+                                     "input_player%d_analog_dpad_mode" % n]
+        if copia_nucleo:
+            so_desta_partida.append("core_options_path")
+        cfg_antes = graficos.valores_no_retroarch_cfg(so_desta_partida)
         # ORDEM IMPORTA. As opcoes vem antes do arquivo do jogo.
         #
         # Estava assim: retroarch -L core JOGO --appendconfig X --host
@@ -4495,7 +4529,7 @@ class Manipulador(BaseHTTPRequestHandler):
             # Vale jogando no mesmo computador tambem, nao so no Jogar Junto.
             if not caminho_externo:
                 jogo["ligacao"] = graficos.jogadores_do_jogo(
-                    jogo["core"], jogadores_pedidos(plataforma, jogo["titulo"]),
+                    jogo["core"], jogadores_pedidos(plataforma, jogo),
                     config.get("avancado", {}).get("input_max_users", 2))
 
             if modo in ("hospedar", "entrar"):

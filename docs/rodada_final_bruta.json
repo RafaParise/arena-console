@@ -2,12 +2,12 @@
   {
     "script": "servidor\\tests\\run.py",
     "codigo_saida": 0,
-    "segundos": 0.4,
+    "segundos": 1.6,
     "ultimas_linhas": [
       "test_schema (__main__.TestDB.test_schema) ... ok",
       "",
       "----------------------------------------------------------------------",
-      "Ran 83 tests in 0.349s",
+      "Ran 89 tests in 1.482s",
       "",
       "OK"
     ]
@@ -15,7 +15,7 @@
   {
     "script": "testes\\fuzz_rotas.py",
     "codigo_saida": 0,
-    "segundos": 184.4,
+    "segundos": 184.9,
     "ultimas_linhas": [
       "",
       "--- RESUMO ---",
@@ -27,15 +27,10 @@
   },
   {
     "script": "testes\\textos_sem_acento.py",
-    "codigo_saida": 1,
+    "codigo_saida": 0,
     "segundos": 0.0,
     "ultimas_linhas": [
-      "multitap.json:151  Abre pelo Dolphin, que tem 4 entradas proprias; o multitap e o Jogar Junto do RetroArch nao se aplicam.",
-      "multitap.json:152  Abre pelo PCSX2; o multitap e o Jogar Junto do RetroArch nao se aplicam. Como o proprio PCSX2 liga o multitap ",
-      "multitap.json:153  Abre pelo RPCS3; o multitap e o Jogar Junto do RetroArch nao se aplicam.",
-      "multitap.json:154  Abre pelo Xenia, que tem 4 entradas proprias; o multitap e o Jogar Junto do RetroArch nao se aplicam.",
-      "",
-      "8 frase(s) sem acento que chegam na tela."
+      "0 frase(s) sem acento que chegam na tela."
     ]
   },
   {
@@ -53,7 +48,7 @@
   {
     "script": "testes\\teste_acervo_download_real.py",
     "codigo_saida": 0,
-    "segundos": 0.6,
+    "segundos": 0.4,
     "ultimas_linhas": [
       "Arquivo de teste: https://raw.githubusercontent.com/libretro/RetroArch/master/COPYING (35147 bytes)",
       "1. SHA certo: instalado {'titulo': 'Arquivo de teste', 'tamanho': 35147}, conteudo identico: True",
@@ -118,7 +113,7 @@
   {
     "script": "testes\\teste_barreiras_api.py",
     "codigo_saida": 0,
-    "segundos": 7.4,
+    "segundos": 7.1,
     "ultimas_linhas": [
       "   segunda consulta (guardada): 0.001 s",
       "2. sem lista de processos: True; dado pessoal vazado: nenhum",
@@ -245,9 +240,9 @@
   {
     "script": "testes\\teste_estresse_catalogo.py",
     "codigo_saida": 0,
-    "segundos": 4.8,
+    "segundos": 4.4,
     "ultimas_linhas": [
-      "Cache:  0.029s (reaproveitado)",
+      "Cache:  0.027s (reaproveitado)",
       "RESULTADO: PASSOU",
       "",
       "Apagando os arquivos falsos...",
@@ -296,14 +291,14 @@
   },
   {
     "script": "testes\\teste_local_4_jogadores.py",
-    "codigo_saida": 1,
+    "codigo_saida": 0,
     "segundos": 9.7,
     "ultimas_linhas": [
+      "Abrindo GoldenEye 007 com config de 4 jogadores...",
       "Processo vivo apos 8s: True",
-      "Linhas de erro no log: 1",
-      "   [ERROR] [Autoconf] No free and unreserved player slots found for adding new device \"Controller (XBOX 360 For Windows)\"! Detected port 3, max_users: 2, first free slot 4.",
+      "Linhas de erro no log: 0",
       "",
-      "RESULTADO: FALHOU/PRECISA OLHAR",
+      "RESULTADO: PASSOU (abriu sem erro com 4 portas configuradas)",
       "[protege_cfg] retroarch.cfg real devolvido como estava antes do teste."
     ]
   },
@@ -312,8 +307,8 @@
     "codigo_saida": 0,
     "segundos": 182.7,
     "ultimas_linhas": [
-      "Pedidos totais: 51688 | falhas de conexao: 0",
-      "Crescimento de RAM (apos aquecimento): 0.7 MB",
+      "Pedidos totais: 52038 | falhas de conexao: 0",
+      "Crescimento de RAM (apos aquecimento): 0.2 MB",
       "Crescimento de handles (apos aquecimento): 10",
       "",
       "Relatorio salvo em C:\\Projetos\\Criador De Apps Pedagógicos\\ARENA\\ARENA-unificado\\docs\\longa_duracao_bruto.json",
@@ -326,7 +321,7 @@
     "segundos": 1.4,
     "ultimas_linhas": [
       "Caso 1 (nome arbitrario) -- status=400 resp={'ok': False, 'erro': 'Caminho da mala inválido: o arquivo precisa se chamar ARENA-troca.json.'} arquivo_criado=False",
-      "Caso 2 (nome correto, pasta diferente) -- status=200 resp={'ok': True, 'recebidos': 0, 'na_mala': 2, 'maquinas': 1, 'arquivo': 'C:\\\\Users\\\\passo\\\\AppData\\\\Local\\\\Temp\\\\arena_mala_ot3az89l\\\\pendrive_simulado\\\\ARENA-troca.json'} arquivo_criado=True",
+      "Caso 2 (nome correto, pasta diferente) -- status=200 resp={'ok': True, 'recebidos': 0, 'na_mala': 2, 'maquinas': 1, 'arquivo': 'C:\\\\Users\\\\passo\\\\AppData\\\\Local\\\\Temp\\\\arena_mala_kouf2wsh\\\\pendrive_simulado\\\\ARENA-troca.json'} arquivo_criado=True",
       "Caso 3 (sem caminho, usa o padrao) -- status=200 resp={'ok': True, 'recebidos': 0, 'na_mala': 2, 'maquinas': 1, 'arquivo': 'C:\\\\Users\\\\passo\\\\AppData\\\\Local\\\\Temp\\\\ARENA-troca.json'}",
       "",
       "RESULTADO: PASSOU"
@@ -350,9 +345,9 @@
     "codigo_saida": 0,
     "segundos": 11.1,
     "ultimas_linhas": [
-      "   [sem] [libretro INFO] Loading memory card C:\\Users\\passo\\AppData\\Local\\Temp\\arena_multitap_real_nisnx2ya\\PCSX-ReARMed/pcsx-card2.mcd",
-      "   [sem] [INFO] [SRAM] Salvando tipo de RAM #0 em \"C:\\Users\\passo\\AppData\\Local\\Temp\\arena_multitap_real_nisnx2ya\\PCSX-ReARMed\\CTR - Crash Team Racing (USA).sr",
-      "   [sem] [INFO] [SRAM] Salvo com sucesso em \"C:\\Users\\passo\\AppData\\Local\\Temp\\arena_multitap_real_nisnx2ya\\PCSX-ReARMed\\CTR - Crash Team Racing (USA).srm\".",
+      "   [sem] [libretro INFO] Loading memory card C:\\Users\\passo\\AppData\\Local\\Temp\\arena_multitap_real_zwvnww0z\\PCSX-ReARMed/pcsx-card2.mcd",
+      "   [sem] [INFO] [SRAM] Salvando tipo de RAM #0 em \"C:\\Users\\passo\\AppData\\Local\\Temp\\arena_multitap_real_zwvnww0z\\PCSX-ReARMed\\CTR - Crash Team Racing (USA).sr",
+      "   [sem] [INFO] [SRAM] Salvo com sucesso em \"C:\\Users\\passo\\AppData\\Local\\Temp\\arena_multitap_real_zwvnww0z\\PCSX-ReARMed\\CTR - Crash Team Racing (USA).srm\".",
       "   [sem] [INFO] [Core] Saved core options file to \"C:\\Projetos\\Criador De Apps Pedagógicos\\ARENA\\ARENA-unificado\\retroarch\\retroarch-core-options.cfg\".",
       "RESULTADO: PASSOU",
       "[protege_cfg] retroarch.cfg real devolvido como estava antes do teste."
@@ -374,7 +369,7 @@
   {
     "script": "testes\\teste_netplay_5_jogadores.py",
     "codigo_saida": 0,
-    "segundos": 38.7,
+    "segundos": 37.2,
     "ultimas_linhas": [
       "Resumo salvo em C:\\Projetos\\Criador De Apps Pedagógicos\\ARENA\\ARENA-unificado\\docs\\netplay_5_jogadores_bruto.json",
       "",
@@ -389,8 +384,8 @@
     "codigo_saida": 0,
     "segundos": 25.2,
     "ultimas_linhas": [
-      "  [INFO] [Playlist] Carregando arquivo de histórico: \"C:\\Users\\passo\\AppData\\Local\\Temp\\arena_netplay_iso_13dxpe4o\\hospedeiro\\builtin\\content_video_history.lpl\".",
-      "  [INFO] [Playlist] Written to file: \"C:\\Users\\passo\\AppData\\Local\\Temp\\arena_netplay_iso_13dxpe4o\\hospedeiro\\builtin\\content_history.lpl\".",
+      "  [INFO] [Playlist] Carregando arquivo de histórico: \"C:\\Users\\passo\\AppData\\Local\\Temp\\arena_netplay_iso_771uijcn\\hospedeiro\\builtin\\content_video_history.lpl\".",
+      "  [INFO] [Playlist] Written to file: \"C:\\Users\\passo\\AppData\\Local\\Temp\\arena_netplay_iso_771uijcn\\hospedeiro\\builtin\\content_history.lpl\".",
       "  [INFO] [Netplay] Vaga de conexão 0",
       "  [INFO] [Netplay] Conexão recebida de: \"Jogador5\"",
       "  [INFO] [Netplay] Jogador5 se juntou como o jogador 5 (ping: 27 ms)",
@@ -400,7 +395,7 @@
   {
     "script": "testes\\teste_opcoes_nucleo_ponta_a_ponta.py",
     "codigo_saida": 0,
-    "segundos": 5.9,
+    "segundos": 5.6,
     "ultimas_linhas": [
       "Opcao do aluno (swanstation_Display_ShowOSDMessages): nucleo usou false (esperado false)",
       "Memory card: Libretro (esperado Libretro)",
@@ -452,7 +447,7 @@
   {
     "script": "testes\\teste_ps3_sem_firmware.py",
     "codigo_saida": 0,
-    "segundos": 1.2,
+    "segundos": 1.3,
     "ultimas_linhas": [
       "Aba Emuladores, PS3: [{'plataforma': 'PlayStation 3', 'id': 'ps3', 'nome': 'RPCS3', 'pasta': 'emuladores\\\\RPCS3', 'site': 'rpcs3.net/download', 'motivo': 'OBRIGATÓRIO. Não existe núcleo de PlayStation 3 no RetroArch - só o RPCS3 emula este console, e só em computador forte.', 'instalado': True, 'compactado_pendente': '', 'falta': ''}]",
       "RPCS3 ausente ou com firmware: nada a testar aqui."
@@ -479,7 +474,7 @@
       "Codigo de saida do processo filho (137 = morto de proposito): 137",
       "config.json continua JSON valido: True",
       "apelido depois (tem que ser o ANTIGO, nao 'NomeQueDeviaGravar' -- a troca nunca aconteceu): RafaParise",
-      "arquivos .tmp orfaos encontrados (esperado: 1, sera limpo na proxima abertura): ['config.json.2800.tmp']",
+      "arquivos .tmp orfaos encontrados (esperado: 1, sera limpo na proxima abertura): ['config.json.13356.tmp']",
       "",
       "RESULTADO: PASSOU (arquivo antigo protegido, nada corrompido)"
     ]
@@ -487,22 +482,22 @@
   {
     "script": "testes\\teste_rede_ruim.py",
     "codigo_saida": 0,
-    "segundos": 112.7,
+    "segundos": 112.8,
     "ultimas_linhas": [
-      "  {'cenario': 'so atraso 50ms', 'atraso_ms': 50, 'perda_pct': 0, 'conectou': True, 'ping_reportado_ms': '12', 'avisos_travada': 0}",
-      "  {'cenario': 'so atraso 100ms', 'atraso_ms': 100, 'perda_pct': 0, 'conectou': True, 'ping_reportado_ms': '12', 'avisos_travada': 0}",
+      "  {'cenario': 'so atraso 50ms', 'atraso_ms': 50, 'perda_pct': 0, 'conectou': True, 'ping_reportado_ms': '28', 'avisos_travada': 0}",
+      "  {'cenario': 'so atraso 100ms', 'atraso_ms': 100, 'perda_pct': 0, 'conectou': True, 'ping_reportado_ms': '28', 'avisos_travada': 0}",
       "  {'cenario': 'so atraso 200ms', 'atraso_ms': 200, 'perda_pct': 0, 'conectou': True, 'ping_reportado_ms': '28', 'avisos_travada': 0}",
-      "  {'cenario': 'perda 1% (com 50ms de base)', 'atraso_ms': 50, 'perda_pct': 1, 'conectou': True, 'ping_reportado_ms': '28', 'avisos_travada': 0}",
-      "  {'cenario': 'perda 5% (com 50ms de base)', 'atraso_ms': 50, 'perda_pct': 5, 'conectou': True, 'ping_reportado_ms': '12', 'avisos_travada': 0}",
+      "  {'cenario': 'perda 1% (com 50ms de base)', 'atraso_ms': 50, 'perda_pct': 1, 'conectou': True, 'ping_reportado_ms': '29', 'avisos_travada': 0}",
+      "  {'cenario': 'perda 5% (com 50ms de base)', 'atraso_ms': 50, 'perda_pct': 5, 'conectou': True, 'ping_reportado_ms': '11', 'avisos_travada': 0}",
       "[protege_cfg] retroarch.cfg real devolvido como estava antes do teste."
     ]
   },
   {
     "script": "testes\\teste_rede_sem_reabrir.py",
     "codigo_saida": 0,
-    "segundos": 15.2,
+    "segundos": 16.7,
     "ultimas_linhas": [
-      "2. Ligou pela API (rede_aplicada=True): escuta em ['0.0.0.0'] depois de 2.0 s",
+      "2. Ligou pela API (rede_aplicada=True): escuta em ['0.0.0.0'] depois de 3.9 s",
       "3. Desligou: escuta em ['127.0.0.1']",
       "4. Liga/desliga 5 vezes seguidas: vivo=True, escuta final ['0.0.0.0'] (esperado 0.0.0.0)",
       "5. 12 cliques colados: vivo=True, escuta ['0.0.0.0'] (ultimo clique = ligar)",
@@ -542,7 +537,7 @@
       "  ..\\segredo_fora_da_pasta.png                            status=404  bloqueado",
       "  jogos/../../segredo_fora_da_pasta.png                   status=404  bloqueado",
       "  jogos\\..\\..\\segredo_fora_da_pasta.png                   status=404  bloqueado",
-      "  C:\\Users\\passo\\AppData\\Local\\Temp\\arena_travessia_bt399r7u\\segredo_fora_da_pasta.png status=404  bloqueado",
+      "  C:\\Users\\passo\\AppData\\Local\\Temp\\arena_travessia_iem6j0wn\\segredo_fora_da_pasta.png status=404  bloqueado",
       "",
       "RESULTADO: PASSOU (nenhuma travessia vazou o segredo)"
     ]
