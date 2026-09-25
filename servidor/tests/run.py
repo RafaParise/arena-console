@@ -373,6 +373,19 @@ class TestHardware(unittest.TestCase):
         resultado = hardware.capacidade(caps)
         self.assertLessEqual(resultado["nota_gpu"], 3)
 
+    def test_placa_da_tela_vence_o_registro(self):
+        # Achado 25/09/2026: o registro listava primeiro uma GeForce 210 que
+        # ja saiu da maquina; a tela esta na Radeon integrada.
+        import hardware
+        original = hardware.placa_da_tela_principal
+        try:
+            hardware.placa_da_tela_principal = lambda: "AMD Radeon(TM) Graphics"
+            placa = hardware.placa_video()
+            self.assertEqual(placa["nome"], "AMD Radeon(TM) Graphics")
+            self.assertTrue(placa["integrada"])
+        finally:
+            hardware.placa_da_tela_principal = original
+
     def test_classificar(self):
         import arena
         # classificar() lê CAPACIDADE["nota"] global — mock temporário.

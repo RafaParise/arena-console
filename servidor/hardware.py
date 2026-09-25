@@ -372,6 +372,36 @@ def identidade_da_maquina():
     return hashlib.sha1("|".join(pedacos).encode("utf-8")).hexdigest()[:12]
 
 
+def placa_da_tela_principal():
+    """Nome da placa de video que desenha a tela principal (ou "" se nao
+    der para saber). Usa EnumDisplayDevicesW, da propria API do Windows."""
+    try:
+        import ctypes
+        from ctypes import wintypes
+
+        class DISPLAY_DEVICEW(ctypes.Structure):
+            _fields_ = [("cb", wintypes.DWORD), ("DeviceName", wintypes.WCHAR * 32),
+                        ("DeviceString", wintypes.WCHAR * 128),
+                        ("StateFlags", wintypes.DWORD),
+                        ("DeviceID", wintypes.WCHAR * 128),
+                        ("DeviceKey", wintypes.WCHAR * 128)]
+
+        LIGADA_NA_TELA, PRINCIPAL = 0x1, 0x4
+        ligada = ""
+        for indice in range(16):
+            placa = DISPLAY_DEVICEW()
+            placa.cb = ctypes.sizeof(placa)
+            if not ctypes.windll.user32.EnumDisplayDevicesW(None, indice, ctypes.byref(placa), 0):
+                break
+            if placa.StateFlags & PRINCIPAL:
+                return placa.DeviceString
+            if placa.StateFlags & LIGADA_NA_TELA and not ligada:
+                ligada = placa.DeviceString
+        return ligada
+    except (AttributeError, OSError, ValueError):
+        return ""
+
+
 def placa_video():
     """Descobre a placa de video e se ela e integrada ou dedicada.
 
@@ -382,10 +412,15 @@ def placa_video():
     era jogo travando e som picotando - o processador dava conta, a placa
     nao.
 
-    Le do registro do Windows, sem programa externo e sem administrador.
+    Pergunta primeiro ao Windows qual placa esta LIGADA NA TELA PRINCIPAL.
+    O registro sozinho engana: ele guarda placas que ja sairam da maquina.
+    Achado real (25/09/2026): o registro desta maquina de desenvolvimento
+    lista primeiro uma "NVIDIA GeForce 210" antiga; a tela esta na Radeon
+    integrada. O ARENA achava que era placa dedicada, dava nota 4 e o PS1
+    ia para 6x -- o texto do CTR saia quebrado. Sem administrador.
     """
-    nome = ""
-    if sys.platform.startswith("win"):
+    nome = placa_da_tela_principal() if sys.platform.startswith("win") else ""
+    if not nome and sys.platform.startswith("win"):
         try:
             import winreg
             base = (r"SYSTEM\CurrentControlSet\Control\Class"
