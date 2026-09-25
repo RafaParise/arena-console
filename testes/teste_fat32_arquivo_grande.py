@@ -27,12 +27,19 @@ def main():
         os.makedirs(os.path.join(destino, "launcher"), exist_ok=True)
         os.makedirs(os.path.join(destino, "retroarch"), exist_ok=True)
 
-        # arquivo esparso de 4,5 GB -- so reserva o tamanho, nao escreve
-        # 4,5 GB de dado de verdade no disco
-        caminho_jogo_grande = os.path.join(pasta_jogo, "Jogo Grande de Teste.iso")
-        with open(caminho_jogo_grande, "wb") as f:
-            f.seek(int(4.5 * 1024 * 1024 * 1024) - 1)
-            f.write(b"\x00")
+        # Arquivos esparsos -- so reservam o tamanho, nao escrevem gigabytes
+        # de verdade no disco. Corrigido na Fase 8: a versao anterior usava
+        # 4,5 GB, tamanho que NAO PODE existir num FAT32 de verdade (o teste
+        # passava num caso impossivel). Agora:
+        #  - um no tamanho maximo do FAT32 (4 GB - 1 byte) = copia cortada,
+        #    TEM que ser acusado;
+        #  - um de 3 GB = jogo normal, NAO pode ser acusado.
+        def esparso(nome, tamanho):
+            with open(os.path.join(pasta_jogo, nome), "wb") as f:
+                f.seek(tamanho - 1)
+                f.write(b"\x00")
+        esparso("Jogo Grande de Teste.iso", 4 * 1024 * 1024 * 1024 - 1)
+        esparso("Jogo Normal de Teste.iso", 3 * 1024 * 1024 * 1024)
 
         sys.path.insert(0, os.path.join(destino, "servidor"))
         spec = importlib.util.spec_from_file_location("hardware_fat32_teste", os.path.join(destino, "servidor", "hardware.py"))
@@ -62,10 +69,12 @@ def main():
 
         achou_arquivo = "Jogo Grande de Teste.iso" in texto
         achou_grave = "GRAVE" in texto and "FAT32" in texto
-        print("Detectou o arquivo grande:", achou_arquivo)
+        acusou_normal = "Jogo Normal de Teste.iso" in texto
+        print("Detectou o arquivo cortado no limite:", achou_arquivo)
         print("Marcou como GRAVE:", achou_grave)
+        print("Acusou o jogo normal por engano:", acusou_normal)
 
-        ok = achou_arquivo and achou_grave
+        ok = achou_arquivo and achou_grave and not acusou_normal
         print("\nRESULTADO:", "PASSOU" if ok else "FALHOU")
         return 0 if ok else 1
     finally:
