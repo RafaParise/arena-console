@@ -1,0 +1,31 @@
+MEDICOES DO ARENA NESTA MAQUINA
+Codigo da maquina: 012944B9B2    Medido em: 2026-09-25T07:12:36
+
+ABRIR O ARENA
+  servidor respondeu em 0.52 s  [BOM]
+  dados da tela prontos em 0.54 s  [BOM]
+  memoria que o ARENA tomou do Windows: 141 MB  [BOM]
+
+SERVIDOR
+  parado: 0.02% da maquina, 36.0 MB  [BOM]
+  em uso: 7.52% da maquina, 4044 pedidos, resposta media 4.9 ms, pior 5% 14.3 ms  [BOM]
+
+LISTA DE JOGOS
+  35 jogos, relidos em 0.14 s  [BOM]
+  por console: dreamcast 4, megadrive 1, n64 5, neogeo 4, ps1 8, ps2 9, ps3 1, psp 1, snes 1, xbox360 1
+
+GRAVACOES EM DISCO (ARENA PARADO)
+  0.0 por minuto (0.0 KB/min)  [BOM]
+
+JOGO DE SUPER NINTENDO
+  Super Bomberman 4 (Japan) [T-En by Svambo v1.0].sfc
+  60.0 quadros por segundo em media (o normal e' 60)  [BOM]
+  variacao do tempo de cada quadro: 3.175%  [BOM]
+  RetroArch: CPU media 0.6% da maquina (pico 0.9%), RAM 147.7 MB, abriu em 2.0 s, video vulkan
+
+O QUE VOCE VIU
+  perguntas puladas (--sem-perguntas)
+
+BOM / NO LIMITE / RUIM: limites PROVISORIOS (estimativa, ainda nao calibrada
+com o Celeron), escritos em LIMITES, dentro de medir_arena.py.
+Tempo total: 254.4 s

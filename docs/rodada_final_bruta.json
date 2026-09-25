@@ -7,7 +7,7 @@
       "test_schema (__main__.TestDB.test_schema) ... ok",
       "",
       "----------------------------------------------------------------------",
-      "Ran 45 tests in 0.224s",
+      "Ran 45 tests in 0.237s",
       "",
       "OK"
     ]
@@ -15,7 +15,7 @@
   {
     "script": "testes\\fuzz_rotas.py",
     "codigo_saida": 0,
-    "segundos": 178.3,
+    "segundos": 178.5,
     "ultimas_linhas": [
       "",
       "--- RESUMO ---",
@@ -28,7 +28,7 @@
   {
     "script": "testes\\teste_acervo_download_real.py",
     "codigo_saida": 0,
-    "segundos": 0.5,
+    "segundos": 0.4,
     "ultimas_linhas": [
       "Arquivo de teste: https://raw.githubusercontent.com/libretro/RetroArch/master/COPYING (35147 bytes)",
       "1. SHA certo: instalado {'titulo': 'Arquivo de teste', 'tamanho': 35147}, conteudo identico: True",
@@ -108,11 +108,11 @@
     "codigo_saida": 0,
     "segundos": 0.1,
     "ultimas_linhas": [
-      "  playlist_directory         dentro do ARENA",
       "  content_history_path       dentro do ARENA",
       "  content_favorites_path     dentro do ARENA",
+      "  network_cmd_enable desligado: True",
       "",
-      "Linhas trocadas: 7",
+      "Linhas trocadas: 8",
       "RESULTADO: PASSOU"
     ]
   },
@@ -125,7 +125,7 @@
       "--- RESUMO ---",
       "  {'cenario': 'convidado_cai_e_volta', 'conectou_primeira_vez': True, 'reconectou': True}",
       "  {'cenario': 'host_sai_no_meio', 'conectou_antes': True, 'convidado_registrou_queda': True, 'convidado_nao_travou': True}",
-      "  {'cenario': 'duas_partidas_simultaneas', 'partida_A_ok': False, 'partida_B_ok': False, 'misturou': True}",
+      "  {'cenario': 'duas_partidas_simultaneas', 'partida_A_ok': True, 'partida_B_ok': False, 'misturou': True}",
       "[protege_cfg] retroarch.cfg real devolvido como estava antes do teste."
     ]
   },
@@ -145,7 +145,7 @@
   {
     "script": "testes\\teste_descoberta_30_maquinas.py",
     "codigo_saida": 0,
-    "segundos": 13.5,
+    "segundos": 13.2,
     "ultimas_linhas": [
       "Tempo de resposta de /api/colegas: 0.019 s",
       "CPU do servidor durante/depois da rajada: 0.0%",
@@ -158,7 +158,7 @@
   {
     "script": "testes\\teste_disco_cheio.py",
     "codigo_saida": 0,
-    "segundos": 1.2,
+    "segundos": 1.3,
     "ultimas_linhas": [
       "API: status 500, resposta {\"ok\": false, \"erro\": \"Não consegui concluir o pedido. Acabou o espaço no disco ou no pen drive. Apague algo que não precisa mais e tente de novo.\"}",
       "Mensagem sem texto cru do sistema: True",
@@ -184,9 +184,9 @@
   {
     "script": "testes\\teste_estresse_catalogo.py",
     "codigo_saida": 0,
-    "segundos": 4.6,
+    "segundos": 4.8,
     "ultimas_linhas": [
-      "Cache:  0.025s (reaproveitado)",
+      "Cache:  0.027s (reaproveitado)",
       "RESULTADO: PASSOU",
       "",
       "Apagando os arquivos falsos...",
@@ -249,10 +249,10 @@
   {
     "script": "testes\\teste_longa_duracao.py",
     "codigo_saida": 0,
-    "segundos": 182.6,
+    "segundos": 182.7,
     "ultimas_linhas": [
-      "Pedidos totais: 52374 | falhas de conexao: 0",
-      "Crescimento de RAM (apos aquecimento): 0.8 MB",
+      "Pedidos totais: 50246 | falhas de conexao: 0",
+      "Crescimento de RAM (apos aquecimento): 0.7 MB",
       "Crescimento de handles (apos aquecimento): 10",
       "",
       "Relatorio salvo em C:\\Projetos\\Criador De Apps Pedagógicos\\ARENA\\ARENA-unificado\\docs\\longa_duracao_bruto.json",
@@ -262,10 +262,10 @@
   {
     "script": "testes\\teste_mala_validacao.py",
     "codigo_saida": 0,
-    "segundos": 1.4,
+    "segundos": 1.3,
     "ultimas_linhas": [
       "Caso 1 (nome arbitrario) -- status=400 resp={'ok': False, 'erro': 'Caminho da mala invalido: o arquivo precisa se chamar ARENA-troca.json.'} arquivo_criado=False",
-      "Caso 2 (nome correto, pasta diferente) -- status=200 resp={'ok': True, 'recebidos': 0, 'na_mala': 2, 'maquinas': 1, 'arquivo': 'C:\\\\Users\\\\passo\\\\AppData\\\\Local\\\\Temp\\\\arena_mala__9sehqsm\\\\pendrive_simulado\\\\ARENA-troca.json'} arquivo_criado=True",
+      "Caso 2 (nome correto, pasta diferente) -- status=200 resp={'ok': True, 'recebidos': 0, 'na_mala': 2, 'maquinas': 1, 'arquivo': 'C:\\\\Users\\\\passo\\\\AppData\\\\Local\\\\Temp\\\\arena_mala_vo4cxtmn\\\\pendrive_simulado\\\\ARENA-troca.json'} arquivo_criado=True",
       "Caso 3 (sem caminho, usa o padrao) -- status=200 resp={'ok': True, 'recebidos': 0, 'na_mala': 2, 'maquinas': 1, 'arquivo': 'C:\\\\Users\\\\passo\\\\AppData\\\\Local\\\\Temp\\\\ARENA-troca.json'}",
       "",
       "RESULTADO: PASSOU"
@@ -274,7 +274,7 @@
   {
     "script": "testes\\teste_matriz_jogos.py",
     "codigo_saida": 0,
-    "segundos": 102.2,
+    "segundos": 102.8,
     "ultimas_linhas": [
       "  {'console': 'Super Nintendo', 'jogo': 'Super Bomberman 4 (Japan) [T-En by Svambo v1.0].sfc', 'abre_e_mostra_imagem': True, 'tamanho_captura_bytes': 50098, 'salva_estado': True, 'carrega_sem_travar': True}",
       "  {'console': 'PlayStation', 'jogo': 'CTR - Crash Team Racing (USA).bin', 'abre_e_mostra_imagem': True, 'tamanho_captura_bytes': 11139, 'salva_estado': True, 'carrega_sem_travar': True}",
@@ -287,7 +287,7 @@
   {
     "script": "testes\\teste_netplay_5_jogadores.py",
     "codigo_saida": 0,
-    "segundos": 37.9,
+    "segundos": 38.2,
     "ultimas_linhas": [
       "Resumo salvo em C:\\Projetos\\Criador De Apps Pedagógicos\\ARENA\\ARENA-unificado\\docs\\netplay_5_jogadores_bruto.json",
       "",
@@ -302,11 +302,11 @@
     "codigo_saida": 0,
     "segundos": 25.2,
     "ultimas_linhas": [
-      "  [INFO] [Playlist] Carregando arquivo de histórico: \"C:\\Users\\passo\\AppData\\Local\\Temp\\arena_netplay_iso_s1wafjt5\\hospedeiro\\builtin\\content_video_history.lpl\".",
-      "  [INFO] [Playlist] Written to file: \"C:\\Users\\passo\\AppData\\Local\\Temp\\arena_netplay_iso_s1wafjt5\\hospedeiro\\builtin\\content_history.lpl\".",
+      "  [INFO] [Playlist] Carregando arquivo de histórico: \"C:\\Users\\passo\\AppData\\Local\\Temp\\arena_netplay_iso_b5j9acwy\\hospedeiro\\builtin\\content_video_history.lpl\".",
+      "  [INFO] [Playlist] Written to file: \"C:\\Users\\passo\\AppData\\Local\\Temp\\arena_netplay_iso_b5j9acwy\\hospedeiro\\builtin\\content_history.lpl\".",
       "  [INFO] [Netplay] Vaga de conexão 0",
       "  [INFO] [Netplay] Conexão recebida de: \"Jogador5\"",
-      "  [INFO] [Netplay] Jogador5 se juntou como o jogador 5 (ping: 27 ms)",
+      "  [INFO] [Netplay] Jogador5 se juntou como o jogador 5 (ping: 28 ms)",
       "[protege_cfg] retroarch.cfg real devolvido como estava antes do teste."
     ]
   },
@@ -326,7 +326,7 @@
   {
     "script": "testes\\teste_partida_colega.py",
     "codigo_saida": 0,
-    "segundos": 12.9,
+    "segundos": 12.8,
     "ultimas_linhas": [
       "",
       "",
@@ -352,7 +352,7 @@
   {
     "script": "testes\\teste_pasta_somente_leitura.py",
     "codigo_saida": 0,
-    "segundos": 0.9,
+    "segundos": 1.0,
     "ultimas_linhas": [
       "Marcando config.json como somente-leitura (attrib +R)...",
       "ARENA subiu com dados\\ somente-leitura: True",
@@ -377,7 +377,7 @@
   {
     "script": "testes\\teste_qual_opcao_de_nucleo_vale.py",
     "codigo_saida": 0,
-    "segundos": 15.8,
+    "segundos": 15.4,
     "ultimas_linhas": [
       "   [INFO] [Core] Saved core options file to \"C:\\Projetos\\Criador De Apps Pedagógicos\\ARENA\\ARENA-unificado\\retroarch\\retroarch-core-options.cfg\".",
       "",
@@ -395,7 +395,7 @@
       "Codigo de saida do processo filho (137 = morto de proposito): 137",
       "config.json continua JSON valido: True",
       "apelido depois (tem que ser o ANTIGO, nao 'NomeQueDeviaGravar' -- a troca nunca aconteceu): RafaParise",
-      "arquivos .tmp orfaos encontrados (esperado: 1, sera limpo na proxima abertura): ['config.json.6844.tmp']",
+      "arquivos .tmp orfaos encontrados (esperado: 1, sera limpo na proxima abertura): ['config.json.12356.tmp']",
       "",
       "RESULTADO: PASSOU (arquivo antigo protegido, nada corrompido)"
     ]
@@ -405,18 +405,31 @@
     "codigo_saida": 0,
     "segundos": 112.8,
     "ultimas_linhas": [
-      "  {'cenario': 'so atraso 50ms', 'atraso_ms': 50, 'perda_pct': 0, 'conectou': True, 'ping_reportado_ms': '28', 'avisos_travada': 0}",
+      "  {'cenario': 'so atraso 50ms', 'atraso_ms': 50, 'perda_pct': 0, 'conectou': True, 'ping_reportado_ms': '12', 'avisos_travada': 0}",
       "  {'cenario': 'so atraso 100ms', 'atraso_ms': 100, 'perda_pct': 0, 'conectou': True, 'ping_reportado_ms': '11', 'avisos_travada': 0}",
-      "  {'cenario': 'so atraso 200ms', 'atraso_ms': 200, 'perda_pct': 0, 'conectou': True, 'ping_reportado_ms': '29', 'avisos_travada': 0}",
-      "  {'cenario': 'perda 1% (com 50ms de base)', 'atraso_ms': 50, 'perda_pct': 1, 'conectou': True, 'ping_reportado_ms': '28', 'avisos_travada': 0}",
-      "  {'cenario': 'perda 5% (com 50ms de base)', 'atraso_ms': 50, 'perda_pct': 5, 'conectou': True, 'ping_reportado_ms': '12', 'avisos_travada': 0}",
+      "  {'cenario': 'so atraso 200ms', 'atraso_ms': 200, 'perda_pct': 0, 'conectou': True, 'ping_reportado_ms': '13', 'avisos_travada': 0}",
+      "  {'cenario': 'perda 1% (com 50ms de base)', 'atraso_ms': 50, 'perda_pct': 1, 'conectou': True, 'ping_reportado_ms': '12', 'avisos_travada': 0}",
+      "  {'cenario': 'perda 5% (com 50ms de base)', 'atraso_ms': 50, 'perda_pct': 5, 'conectou': True, 'ping_reportado_ms': '28', 'avisos_travada': 0}",
       "[protege_cfg] retroarch.cfg real devolvido como estava antes do teste."
+    ]
+  },
+  {
+    "script": "testes\\teste_rede_sem_reabrir.py",
+    "codigo_saida": 0,
+    "segundos": 15.9,
+    "ultimas_linhas": [
+      "2. Ligou pela API (rede_aplicada=True): escuta em ['0.0.0.0'] depois de 3.7 s",
+      "3. Desligou: escuta em ['127.0.0.1']",
+      "4. Liga/desliga 5 vezes seguidas: vivo=True, escuta final ['0.0.0.0'] (esperado 0.0.0.0)",
+      "5. 12 cliques colados: vivo=True, escuta ['0.0.0.0'] (ultimo clique = ligar)",
+      "",
+      "RESULTADO: PASSOU"
     ]
   },
   {
     "script": "testes\\teste_sinc_migracao_e_lotes.py",
     "codigo_saida": 0,
-    "segundos": 0.3,
+    "segundos": 0.2,
     "ultimas_linhas": [
       "Banco real (copia): tinha 'seq' antes? True",
       "  recordes 2 -> 2, sessoes 23 -> 23, encerrados sem numero: 0",
@@ -429,7 +442,7 @@
   {
     "script": "testes\\teste_sinc_sem_relogio.py",
     "codigo_saida": 0,
-    "segundos": 0.3,
+    "segundos": 0.2,
     "ultimas_linhas": [
       "Recorde gravado com relogio em 2020 chega ao colega: True",
       "Partida longa (sinc. no meio) chega ao colega quando fecha: True",
@@ -445,7 +458,7 @@
       "  ..\\segredo_fora_da_pasta.png                            status=404  bloqueado",
       "  jogos/../../segredo_fora_da_pasta.png                   status=404  bloqueado",
       "  jogos\\..\\..\\segredo_fora_da_pasta.png                   status=404  bloqueado",
-      "  C:\\Users\\passo\\AppData\\Local\\Temp\\arena_travessia_pt_lks1e\\segredo_fora_da_pasta.png status=404  bloqueado",
+      "  C:\\Users\\passo\\AppData\\Local\\Temp\\arena_travessia_ng2ssmle\\segredo_fora_da_pasta.png status=404  bloqueado",
       "",
       "RESULTADO: PASSOU (nenhuma travessia vazou o segredo)"
     ]

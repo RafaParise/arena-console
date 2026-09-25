@@ -1,0 +1,111 @@
+{
+  "tamanho_total_mb": 2845.1,
+  "tamanho_por_pasta_mb": {
+    "retroarch": 2155.9,
+    "emuladores": 666.7,
+    "servidor": 21.3,
+    "ferramentas": 0.2,
+    "testes": 0.2,
+    "docs": 0.2,
+    "launcher": 0.2,
+    "dados": 0.2,
+    "(raiz)": 0.1,
+    "perfil": 0.0
+  },
+  "linhas_por_extensao": {
+    ".py": 20602,
+    ".js": 3881,
+    ".html": 902,
+    ".css": 1684,
+    ".json": 7647
+  },
+  "arquivos_por_extensao": {
+    ".py": 90,
+    ".js": 3,
+    ".html": 1,
+    ".css": 1,
+    ".json": 28
+  },
+  "maiores_arquivos": [
+    [
+      "servidor\\arena.py",
+      4992
+    ],
+    [
+      "launcher\\app.js",
+      3329
+    ],
+    [
+      "docs\\fuzz_rotas_bruto.json",
+      2198
+    ],
+    [
+      "launcher\\estilo.css",
+      1684
+    ],
+    [
+      "servidor\\graficos.py",
+      1554
+    ],
+    [
+      "servidor\\consoles.json",
+      1166
+    ],
+    [
+      "launcher\\index.html",
+      902
+    ],
+    [
+      "ferramentas\\coletar_maquina.py",
+      833
+    ],
+    [
+      "docs\\inventario_bruto.json",
+      660
+    ],
+    [
+      "servidor\\recursos.json",
+      645
+    ],
+    [
+      "ferramentas\\medir_arena.py",
+      606
+    ],
+    [
+      "servidor\\barreiras.py",
+      549
+    ],
+    [
+      "servidor\\indexador.py",
+      535
+    ],
+    [
+      "servidor\\hardware.py",
+      531
+    ],
+    [
+      "servidor\\diagnostico.py",
+      482
+    ]
+  ],
+  "tempo_abertura_s": 0.62,
+  "cpu_parado_pct": 0.02,
+  "cpu_medido_em_s": 16.0,
+  "ram_total_mb": 36.0,
+  "processos": [
+    {
+      "pid": 8340,
+      "nome": "python",
+      "ram_mb": 36.0,
+      "threads": 14
+    }
+  ],
+  "threads_total": 14,
+  "portas_escutando": [
+    {
+      "LocalAddress": "127.0.0.1",
+      "LocalPort": 8777,
+      "OwningProcess": 8340
+    }
+  ]
+}
