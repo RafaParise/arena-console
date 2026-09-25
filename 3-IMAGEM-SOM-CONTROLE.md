@@ -46,8 +46,8 @@ sozinhos.
 | **Switch Pro** | Por cabo funciona. Por Bluetooth, pareie antes |
 | **Joy-Con avulso** | Funciona, mas mapeie os botões na mão |
 | **Steam Controller** | Deixe o Steam aberto — ele converte sozinho |
-| **Arcade stick** | Quase todos funcionam. Se não, troque para `dinput` |
-| **Genéricos** | Quase todos funcionam. Se não, troque para `dinput` |
+| **Arcade stick** | Quase todos funcionam. Se não, troque para `dinput` (veja o cuidado abaixo) |
+| **Genéricos** | Quase todos funcionam. Se não, troque para `dinput` (veja o cuidado abaixo) |
 | **Teclado** | Sempre funciona, como o primeiro jogador sem controle (veja acima) |
 
 ### Se o controle não aparecer
@@ -56,10 +56,16 @@ sozinhos.
 
 | Tipo | Cobre |
 |---|---|
-| **xinput** (padrão) | Xbox, PS4, PS5, Switch Pro e a maioria dos modernos |
-| **dinput** | PS3, arcade stick, genéricos antigos |
+| **xinput** (padrão) | Xbox, PS4, PS5, Switch Pro e a maioria dos modernos — e também os genéricos |
+| **dinput** | Só quando **todos** os controles ligados são PS3, arcade stick ou genérico antigo |
 
-Troque, feche o ARENA, abra de novo e teste.
+**Cuidado com o dinput:** nele, controle do tipo Xbox (Xbox, GameSir e
+parecidos) aparece **duas vezes** para o emulador, e os jogadores se
+embaralham — um controle some, outro vira o jogador errado. Aconteceu de
+verdade com 3 GameSir no Micro Machines 2. A tela avisa quando você troca.
+Na dúvida, deixe em **xinput**.
+
+Troque e abra o jogo de novo para testar.
 
 ### Mapear as teclas e os botões pelo ARENA
 

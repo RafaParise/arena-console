@@ -3308,8 +3308,24 @@ function ligarEventos() {
 
   $("#listaDriverControleTopo").addEventListener("change", async (evento) => {
     try {
-      await salvarConfig({ avancado: { input_joypad_driver: evento.target.value } });
-      recado("Pronto. Feche e abra o ARENA para o controle ser reconhecido.");
+      const escolhido = evento.target.value;
+      await salvarConfig({ avancado: { input_joypad_driver: escolhido } });
+      if (escolhido !== "dinput") {
+        recado("Pronto. Vale no próximo jogo que você abrir.");
+        return;
+      }
+      // No dinput, controle do tipo Xbox aparece duas vezes para o RetroArch
+      // e os jogadores se embaralham — achado com 3 GameSir no Micro
+      // Machines 2 (25/09/2026): 7 "controles" para 3 de verdade.
+      const conectados = navigator.getGamepads ? [...navigator.getGamepads()] : [];
+      const tipoXbox = conectados.some((pad) => pad && /xinput|xbox/i.test(pad.id));
+      recado(tipoXbox
+        ? "Atenção: tem um controle do tipo Xbox ligado. No dinput ele aparece " +
+          "duas vezes e os jogadores se embaralham. Se não foi de propósito, " +
+          "volte para xinput."
+        : "Pronto: dinput. Se tiver algum controle do tipo Xbox (Xbox, GameSir " +
+          "e parecidos), ele vai aparecer duas vezes e embaralhar os jogadores — " +
+          "aí volte para xinput.", true);
     } catch (falha) {
       recado(falha.message, true);
     }
