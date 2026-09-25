@@ -4534,7 +4534,75 @@ FAIXAS_DE_REDE = [
 ]
 
 
-def classificar_endereco(ip):
+# Classificacao pelo NOME do adaptador (revisao pos-auditoria). So pela faixa
+# de endereco, nesta propria maquina de desenvolvimento, o adaptador do
+# Hyper-V (192.168.96.1, "vEthernet (Default Switch)") aparecia como "Rede
+# local", e os adaptadores virtuais do Wi-Fi ("Conexao Local*", 169.254.x)
+# como "Cabo direto" -- o aluno podia passar qualquer um dos dois ao colega.
+# E VPN (OpenVPN em 10.8.x, por exemplo) aparecia como rede local.
+PALAVRAS_VIRTUAL = ("hyper-v", "vethernet", "virtualbox", "vmware", "wsl",
+                    "docker", "wi-fi direct", "virtual adapter", "loopback")
+PALAVRAS_VPN = ("vpn", "tap-windows", "wireguard", "wintun", "openvpn",
+                "tailscale", "zerotier", "anyconnect", "fortinet", "forticlient",
+                "pangp", "globalprotect", "juniper", "sonicwall", "hamachi",
+                "radmin", "nordlynx", "windscribe", "warp")
+
+_adaptadores = {"quando": 0.0, "mapa": {}, "buscando": False}
+
+
+def atualizar_adaptadores():
+    """Pergunta ao Windows o nome de cada adaptador (nao pede administrador).
+    Demora ~2,5 s: roda em segundo plano e fica guardado por 10 minutos."""
+    mapa = {}
+    try:
+        comando = ("Get-NetIPAddress -AddressFamily IPv4 | ForEach-Object { "
+                   "$a = Get-NetAdapter -InterfaceIndex $_.InterfaceIndex "
+                   "-ErrorAction SilentlyContinue; "
+                   "'{0}|{1}|{2}' -f $_.IPAddress, $_.InterfaceAlias, $a.InterfaceDescription }")
+        saida = subprocess.run(
+            ["powershell.exe", "-NoProfile", "-NonInteractive", "-Command", comando],
+            capture_output=True, text=True, timeout=15,
+            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0)).stdout
+        for linha in saida.splitlines():
+            partes = linha.strip().split("|")
+            if len(partes) == 3 and partes[0]:
+                mapa[partes[0]] = (partes[1] + " " + partes[2]).lower()
+    except (OSError, subprocess.SubprocessError):
+        pass
+    with TRAVA_CACHE:
+        if mapa:
+            _adaptadores["mapa"] = mapa
+        _adaptadores["quando"] = time.time()
+        _adaptadores["buscando"] = False
+        _cache_enderecos["quando"] = 0.0  # a proxima consulta ja usa os nomes
+
+
+def nome_do_adaptador(ip):
+    """Nome do adaptador ja conhecido (ou "" se ainda nao se sabe). Se a
+    informacao estiver velha ou faltar este endereco, pede uma atualizacao
+    em segundo plano -- nunca faz a tela esperar."""
+    with TRAVA_CACHE:
+        mapa = _adaptadores["mapa"]
+        velho = (time.time() - _adaptadores["quando"]) > 600 or ip not in mapa
+        if velho and not _adaptadores["buscando"] and sys.platform.startswith("win"):
+            _adaptadores["buscando"] = True
+            threading.Thread(target=atualizar_adaptadores, daemon=True).start()
+        return mapa.get(ip, "")
+
+
+def classificar_endereco(ip, adaptador=""):
+    # Ponto de acesso do Windows primeiro: ele TAMBEM aparece como adaptador
+    # "Wi-Fi Direct" virtual, mas e' justamente o endereco que serve.
+    if ip.startswith("192.168.137."):
+        return "ponto_acesso", "Ponto de acesso do Windows"
+    if adaptador:
+        if any(p in adaptador for p in PALAVRAS_VPN):
+            return "vpn", "VPN (so serve se o colega estiver na mesma VPN)"
+        # "Conexao Local* 10" / "Local Area Connection* 10": o asterisco e'
+        # como o Windows nomeia os adaptadores virtuais do proprio Wi-Fi.
+        if (any(p in adaptador for p in PALAVRAS_VIRTUAL)
+                or "local*" in adaptador or "connection*" in adaptador):
+            return "virtual", "Adaptador virtual (nao serve para o colega)"
     for prefixo, tipo, rotulo in FAIXAS_DE_REDE:
         if ip.startswith(prefixo):
             return tipo, rotulo
@@ -4601,14 +4669,14 @@ def enderecos_locais(forcar=False):
     for ip in sorted(achados):
         if ip.startswith("127."):
             continue
-        tipo, rotulo = classificar_endereco(ip)
+        tipo, rotulo = classificar_endereco(ip, nome_do_adaptador(ip))
         lista.append({"ip": ip, "tipo": tipo, "rotulo": rotulo,
                       "url": "http://%s:%d" % (ip, PORTA)})
 
     # Ordem de utilidade: rede local primeiro, cabo direto logo depois.
     # Virtual por ultimo: e o endereco que nunca serve para o colega.
     ordem = {"rede_local": 0, "ponto_acesso": 1, "cabo_direto": 2,
-             "outro": 3, "virtual": 9}
+             "outro": 3, "vpn": 4, "virtual": 9}
     lista.sort(key=lambda e: ordem.get(e["tipo"], 9))
 
     if not lista:

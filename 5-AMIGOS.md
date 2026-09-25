@@ -144,7 +144,13 @@ Logo abaixo aparece a lista de endereços do seu computador:
 | **Rede local** | Mesmo Wi-Fi ou mesmo switch |
 | **Ponto de acesso do Windows** | Você criou a rede pelo notebook |
 | **Cabo direto entre dois PCs** | Cabo ligado direto, sem roteador |
+| **VPN** | Só se o colega estiver ligado na mesma VPN. Na mesma sala, use o de rede local |
+| **Adaptador virtual** | Nunca. É uma rede de mentira que o Windows cria (Hyper-V, VirtualBox, Wi-Fi Direct) |
 | **Só este computador** | A rede ainda não foi liberada |
+
+O ARENA descobre o tipo pelo **nome** do adaptador de rede, não só pelo
+número do endereço. Logo que abre, pode levar uns segundos para a etiqueta
+certa aparecer.
 
 Passe **um** deles para o colega. Se aparecer mais de um, tente o primeiro;
 não funcionou, tente o próximo.

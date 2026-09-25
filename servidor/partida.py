@@ -129,8 +129,9 @@ if not meu["config"].get("permitir_rede"):
 else:
     certo("aceita conexoes da rede")
 
-uteis = [e for e in meu.get("enderecos", []) if e["tipo"] != "virtual"]
+uteis = [e for e in meu.get("enderecos", []) if e["tipo"] not in ("virtual", "vpn")]
 virtuais = [e for e in meu.get("enderecos", []) if e["tipo"] == "virtual"]
+vpns = [e for e in meu.get("enderecos", []) if e["tipo"] == "vpn"]
 
 if not uteis:
     torto("Nenhum endereco que sirva para o colega.",
@@ -145,6 +146,12 @@ if virtuais:
           "NAO passe esses." % len(virtuais))
     for e in virtuais:
         falar("      (nao usar) %s" % e["url"])
+
+if vpns:
+    olhar("Tem %d endereco de VPN. So serve se o colega estiver ligado na "
+          "MESMA VPN. Na mesma sala, use o endereco de rede local." % len(vpns))
+    for e in vpns:
+        falar("      (VPN) %s" % e["url"])
 
 # ---------------------------------------------------------------- 3. portas
 falar()
