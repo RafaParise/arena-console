@@ -1,0 +1,81 @@
+# -*- coding: utf-8 -*-
+r"""Multitap, Fase B: o RetroArch de verdade obedece a COPIA das opcoes de
+nucleo que o ARENA aponta no arquivo da partida (core_options_path)?
+
+PS1 e Saturn ligam o adaptador por opcao do nucleo. O ARENA grava uma copia
+do arquivo de opcoes com o multitap ligado e aponta a partida para ela. Se o
+RetroArch ignorasse esse apontamento, o multitap falharia em silencio.
+
+Prova: abre o CTR (PS1) no PCSX ReARMed por ~5 s (--max-frames), duas vezes:
+  1. com a copia apontada   -> o nucleo escreve "multitap: 1 0" no registro;
+  2. sem apontar nada extra -> o nucleo NAO liga o multitap.
+Protege o retroarch.cfg real (testes\protege_cfg.py).
+
+Uso:
+    servidor\python\python.exe testes\teste_multitap_opcao_nucleo_real.py
+"""
+import os
+import subprocess
+import sys
+import tempfile
+
+RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(RAIZ, "servidor"))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import graficos  # noqa: E402
+import protege_cfg  # noqa: E402
+
+RETROARCH = os.path.join(RAIZ, "retroarch", "retroarch.exe")
+NUCLEO = os.path.join(RAIZ, "retroarch", "cores", "pcsx_rearmed_libretro.dll")
+JOGO = os.path.join(RAIZ, "jogos", "pessoais", "PS1", "CTR - Crash Team Racing (USA).cue")
+
+
+def abrir(pasta, com_copia):
+    log = os.path.join(pasta, "ra_%s.log" % ("com" if com_copia else "sem"))
+    linhas = ['config_save_on_exit = "false"', 'network_cmd_enable = "false"',
+              'global_core_options = "true"',
+              'system_directory = "%s"' % os.path.join(RAIZ, "retroarch", "system"),
+              'savefile_directory = "%s"' % pasta, 'savestate_directory = "%s"' % pasta,
+              'audio_enable = "false"']
+    if com_copia:
+        # O mesmo caminho do ARENA: copia do arquivo de sempre + o multitap.
+        antigo = graficos.ARQUIVO_OPCOES_CORE_PARTIDA
+        graficos.ARQUIVO_OPCOES_CORE_PARTIDA = os.path.join(pasta, "opcoes_partida.cfg")
+        try:
+            copia = graficos.gravar_opcoes_de_nucleo_da_partida({"pcsx_rearmed_multitap": "port 1"})
+        finally:
+            graficos.ARQUIVO_OPCOES_CORE_PARTIDA = antigo
+        linhas.append('core_options_path = "%s"' % copia)
+    else:
+        linhas.append('core_options_path = "%s"' % graficos.ARQUIVO_OPCOES_CORE)
+    extra = os.path.join(pasta, "extra_%s.cfg" % ("com" if com_copia else "sem"))
+    open(extra, "w", encoding="utf-8").write("\n".join(linhas) + "\n")
+    subprocess.run([RETROARCH, "-L", NUCLEO, "--appendconfig", extra, "--verbose",
+                    "--log-file", log, "--max-frames", "300", JOGO],
+                   cwd=os.path.dirname(RETROARCH), timeout=120)
+    return open(log, encoding="utf-8", errors="replace").read() if os.path.exists(log) else ""
+
+
+def main():
+    for caminho in (RETROARCH, NUCLEO, JOGO):
+        if not os.path.isfile(caminho):
+            print("PULADO: falta %s" % caminho)
+            return 0
+    pasta = tempfile.mkdtemp(prefix="arena_multitap_real_")
+    com = abrir(pasta, True)
+    sem = abrir(pasta, False)
+    ligou_com = "multitap: 1 0" in com
+    ligou_sem = "multitap: 1" in sem
+    print("Com a copia apontada: registro diz 'multitap: 1 0'?", ligou_com)
+    print("Sem a copia:          multitap ligado?              ", ligou_sem)
+    for texto, nome in ((com, "com"), (sem, "sem")):
+        for linha in texto.splitlines():
+            if "multitap" in linha.lower() or "core options" in linha.lower():
+                print("   [%s] %s" % (nome, linha.strip()[:150]))
+    ok = ligou_com and not ligou_sem
+    print("RESULTADO:", "PASSOU" if ok else "FALHOU")
+    return 0 if ok else 1
+
+
+if __name__ == "__main__":
+    sys.exit(protege_cfg.rodar(main))

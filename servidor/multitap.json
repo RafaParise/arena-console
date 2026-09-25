@@ -105,10 +105,10 @@
       "jogar_junto": false,
       "adaptador": {
         "tipo": "nenhum",
-        "motivo": "O N64 ja tem 4 entradas de controle; nao existe adaptador. Precisa so de input_max_users = 4 no mesmo computador.",
+        "motivo": "O N64 já tem 4 entradas de controle; não existe adaptador. Precisa só de input_max_users = 4 no mesmo computador.",
         "fonte": "mupen64plus-libretro-nx libretro/libretro.c linha 346 (4 portas)"
       },
-      "motivo_sem_jogar_junto": "O nucleo recusa o Jogar Junto (confirmado tentando hospedar, auditoria 1)."
+      "motivo_sem_jogar_junto": "O núcleo recusa o Jogar Junto (confirmado tentando hospedar, auditoria 1)."
     },
 
     "flycast_libretro.dll": {
@@ -117,10 +117,10 @@
       "jogar_junto": false,
       "adaptador": {
         "tipo": "nenhum",
-        "motivo": "O Dreamcast ja tem 4 entradas de controle; nao existe adaptador. Precisa so de input_max_users = 4 no mesmo computador.",
+        "motivo": "O Dreamcast já tem 4 entradas de controle; não existe adaptador. Precisa só de input_max_users = 4 no mesmo computador.",
         "fonte": "flycast shell/libretro/libretro.cpp linha 344 (4 portas)"
       },
-      "motivo_sem_jogar_junto": "O nucleo recusa o Jogar Junto (confirmado tentando hospedar)."
+      "motivo_sem_jogar_junto": "O núcleo recusa o Jogar Junto (confirmado tentando hospedar)."
     },
 
     "ppsspp_libretro.dll": {
@@ -129,10 +129,10 @@
       "jogar_junto": false,
       "adaptador": {
         "tipo": "nenhum",
-        "motivo": "O PSP e' um aparelho de uma pessoa so. Multijogador do PSP e' por rede propria (ad hoc), nao por controle.",
+        "motivo": "O PSP é um aparelho de uma pessoa só. Multijogador do PSP é por rede própria (ad hoc), não por controle.",
         "fonte": "ppsspp libretro/libretro.cpp linha 1157 (1 porta)"
       },
-      "motivo_sem_jogar_junto": "O nucleo recusa o Jogar Junto do RetroArch (confirmado tentando hospedar)."
+      "motivo_sem_jogar_junto": "O núcleo recusa o Jogar Junto do RetroArch (confirmado tentando hospedar)."
     },
 
     "fbneo_libretro.dll": {
@@ -141,16 +141,16 @@
       "jogar_junto": true,
       "adaptador": {
         "tipo": "nenhum",
-        "motivo": "No arcade, o numero de jogadores vem de cada jogo (BurnDrvGetMaxPlayers); os jogos de Neo Geo sao de 2.",
+        "motivo": "No arcade, o número de jogadores vem de cada jogo (BurnDrvGetMaxPlayers); os jogos de Neo Geo são de 2.",
         "fonte": "FBNeo src/burner/libretro/libretro.cpp linha 2020"
       }
     }
   },
 
   "externos": {
-    "gamecube": {"emulador": "Dolphin", "motivo": "Abre pelo Dolphin, que tem 4 entradas proprias; o multitap e o Jogar Junto do RetroArch nao se aplicam."},
-    "ps2": {"emulador": "PCSX2", "motivo": "Abre pelo PCSX2; o multitap e o Jogar Junto do RetroArch nao se aplicam. Como o proprio PCSX2 liga o multitap do PS2: nao confirmado (nao pesquisado nesta fase)."},
-    "ps3": {"emulador": "RPCS3", "motivo": "Abre pelo RPCS3; o multitap e o Jogar Junto do RetroArch nao se aplicam."},
-    "xbox360": {"emulador": "Xenia", "motivo": "Abre pelo Xenia, que tem 4 entradas proprias; o multitap e o Jogar Junto do RetroArch nao se aplicam."}
+    "gamecube": {"emulador": "Dolphin", "motivo": "Abre pelo Dolphin, que tem 4 entradas próprias; o multitap e o Jogar Junto do RetroArch não se aplicam."},
+    "ps2": {"emulador": "PCSX2", "motivo": "Abre pelo PCSX2; o multitap e o Jogar Junto do RetroArch não se aplicam. Como o próprio PCSX2 liga o multitap do PS2: não confirmado (não pesquisado nesta fase)."},
+    "ps3": {"emulador": "RPCS3", "motivo": "Abre pelo RPCS3; o multitap e o Jogar Junto do RetroArch não se aplicam."},
+    "xbox360": {"emulador": "Xenia", "motivo": "Abre pelo Xenia, que tem 4 entradas próprias; o multitap e o Jogar Junto do RetroArch não se aplicam."}
   }
 }

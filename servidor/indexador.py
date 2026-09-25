@@ -24,6 +24,7 @@ import re
 import threading
 import unicodedata
 
+import graficos
 import identificador
 
 # ---------------------------------------------------------------------------
@@ -341,6 +342,7 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None):
     arquivos em pastas por console que continua funcionando.
     """
     encontrados = []
+    mapa_multitap = graficos.carregar_mapa_multitap()
 
     if not os.path.isdir(caminho_pasta):
         return encontrados
@@ -413,6 +415,12 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None):
             # confundiria o aluno a toa.
             lista_multitap = plataforma.get("jogos_multitap", [])
             usa_multitap = any(nome.lower() in titulo.lower() for nome in lista_multitap)
+            # O que o jogo aceita, limitado ao que o nucleo permite
+            # (servidor\multitap.json). O mesmo calculo do /api/jogar.
+            ligacao = graficos.jogadores_do_jogo(
+                plataforma.get("core", ""),
+                5 if usa_multitap else plataforma.get("jogadores_max", 2),
+                mapa=mapa_multitap)
 
             encontrados.append({
                 "id": identificacao,
@@ -424,7 +432,10 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None):
                 "origem": origem,
                 "origem_rotulo": ORIGENS.get(origem, origem),
                 "pede_placar": plataforma.get("pede_placar", False),
-                "jogadores_max": 5 if usa_multitap else plataforma.get("jogadores_max", 2),
+                "jogadores_max": ligacao["jogadores"],
+                # Frase para o aluno quando o jogo aceita mais do que o
+                # emulador deste console permite (vazio no resto).
+                "motivo_jogadores": ligacao["motivo"],
                 "tamanho_mb": round(tamanho_mb, 1),
                 # Quando houve desempate, a tela oferece a correcao.
                 "ambiguo": incerto,

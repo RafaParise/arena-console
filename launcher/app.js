@@ -576,9 +576,11 @@ function desenharDetalhes() {
   jogarBotao.disabled = plataforma.estado !== "pronta";
   const semRede = plataforma.netplay === false;
   multiplayerBotao.disabled = plataforma.estado !== "pronta" || semRede;
+  // Mesmo lugar do motivo do N64: quando o jogo aceita mais jogadores do
+  // que o emulador deste console permite, a frase explica o limite.
   multiplayerBotao.title = semRede
     ? (plataforma.netplay_motivo || "Este console não tem jogo em rede disponível.")
-    : "";
+    : (jogo.motivo_jogadores || "");
   gerirBotao.disabled = plataforma.estado !== "pronta";
   consoleBotao.hidden = jogo.plataforma !== "indefinido";
 }

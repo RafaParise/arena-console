@@ -1273,8 +1273,13 @@ ULTRA_DESEMPENHO = {
 }
 
 
-def gravar_override(config, custo=None, extras=None, em_partida=False):
-    """Monta o arquivo de configuracao extra que o RetroArch vai ler."""
+def gravar_override(config, custo=None, extras=None, em_partida=False,
+                    opcoes_de_nucleo=None):
+    """Monta o arquivo de configuracao extra que o RetroArch vai ler.
+
+    'opcoes_de_nucleo': caminho de uma COPIA do arquivo de opcoes de nucleo
+    (partida de 3+ jogadores no PS1/Saturn, que ligam o adaptador por opcao
+    do nucleo). Sem ele, vale o arquivo de sempre."""
     opcoes = opcoes_efetivas(config, custo)
 
     if not em_partida:
@@ -1363,7 +1368,7 @@ def gravar_override(config, custo=None, extras=None, em_partida=False):
     # lido na PRIMEIRA vez que o nucleo abria. Depois disso, todo ajuste do
     # ARENA era ignorado em silencio. Com isto, vale sempre o do ARENA.
     opcoes["global_core_options"] = "true"
-    opcoes["core_options_path"] = graficos.ARQUIVO_OPCOES_CORE
+    opcoes["core_options_path"] = opcoes_de_nucleo or graficos.ARQUIVO_OPCOES_CORE
     # Comandos pela rede SEMPRE desligados. Achado real (revisao
     # pos-auditoria): o retroarch.cfg estava com network_cmd_enable = "true"
     # (sobra de teste), e o RetroArch ficava esperando comandos em
@@ -1746,6 +1751,16 @@ def ler_fechamentos():
         return []
 
 
+def jogadores_pedidos(plataforma, titulo):
+    """Quantos jogadores o JOGO aceita (antes de ver o que o nucleo deixa).
+
+    Hoje: 5 para os jogos da lista de Multitap (consoles.json ->
+    jogos_multitap), senao o numero do console (N64: 4), senao 2."""
+    if graficos.jogo_suporta_multitap(plataforma, titulo):
+        return graficos.JOGADORES_MULTITAP
+    return int(plataforma.get("jogadores_max", 2) or 2)
+
+
 def executar_jogo(jogo, apelido, config, custo=None, partida=None):
     """Abre o RetroArch, espera fechar e grava a sessao.
 
@@ -1870,6 +1885,25 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         print("[ARENA] Abrindo pelo %s" % jogo["externo"]["dados"]["nome"])
     else:
         extra = dict(partida["opcoes"]) if partida else None
+        # Mais de 2 jogadores (graficos.jogadores_do_jogo, calculado no
+        # /api/jogar). Entra POR ULTIMO, depois das opcoes de controle:
+        # achado real (Fase B do multitap) -- as opcoes de controle
+        # escreviam input_libretro_device_p2 = "1" por cima do "257" do
+        # Multitap, e o adaptador do Super Bomberman nunca chegava ao
+        # RetroArch. Com 1 ou 2 jogadores, 'ligacao' vem vazia e nada muda.
+        ligacao = jogo.get("ligacao") or {}
+        opcoes_jogo = dict(extra or {}, **extras_controle)
+        opcoes_jogo.update(ligacao.get("cfg", {}))
+        copia_nucleo = None
+        if ligacao.get("nucleo"):
+            try:
+                copia_nucleo = graficos.gravar_opcoes_de_nucleo_da_partida(ligacao["nucleo"])
+            except OSError as falha:
+                print("[ARENA] Nao consegui ligar o adaptador de controles: %s" % falha)
+        # O RetroArch grava no retroarch.cfg, ao fechar, o que veio aqui;
+        # guarda o valor de antes para devolver no fim (ver graficos).
+        cfg_antes = graficos.valores_no_retroarch_cfg(
+            list(ligacao.get("cfg", {})) + (["core_options_path"] if copia_nucleo else []))
         # ORDEM IMPORTA. As opcoes vem antes do arquivo do jogo.
         #
         # Estava assim: retroarch -L core JOGO --appendconfig X --host
@@ -1884,8 +1918,8 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             EXECUTAVEL_RETROARCH,
             "-L", os.path.join(PASTA_CORES, jogo["core"]),
             "--appendconfig", gravar_override(
-                config, custo, dict(extra or {}, **extras_controle),
-                em_partida=bool(partida)),
+                config, custo, opcoes_jogo,
+                em_partida=bool(partida), opcoes_de_nucleo=copia_nucleo),
         ]
         if partida:
             comando += partida["argumentos"]
@@ -1942,6 +1976,14 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
 
             processo = subprocess.Popen(comando, cwd=pasta_trabalho, **extras)
             codigo = processo.wait()
+
+            # Partida de 3+ jogadores: o que foi so dela nao pode ficar no
+            # retroarch.cfg para o proximo jogo (ver graficos).
+            if not jogo.get("externo") and cfg_antes:
+                try:
+                    graficos.devolver_valores_no_retroarch_cfg(cfg_antes)
+                except OSError as falha:
+                    print("[ARENA] Nao consegui arrumar o retroarch.cfg: %s" % falha)
 
             if cuidar_cache_ps1 and graficos.fixar_cache_ps1(cache_antes, placa):
                 print("[ARENA] Cache de video do PS1 estavel: nao sera mais regravado.")
@@ -4447,6 +4489,15 @@ class Manipulador(BaseHTTPRequestHandler):
                 jogo["core"] = plataforma["core_netplay"]
                 aviso_netplay = plataforma.get("netplay_aviso", "")
 
+            # Quantos jogadores ESTE jogo aceita, e o que o nucleo que vai
+            # abrir (ja trocado acima, se for Jogar Junto) precisa para isso:
+            # adaptador, controles lidos, conexoes (servidor\multitap.json).
+            # Vale jogando no mesmo computador tambem, nao so no Jogar Junto.
+            if not caminho_externo:
+                jogo["ligacao"] = graficos.jogadores_do_jogo(
+                    jogo["core"], jogadores_pedidos(plataforma, jogo["titulo"]),
+                    config.get("avancado", {}).get("input_max_users", 2))
+
             if modo in ("hospedar", "entrar"):
                 hospedar = (modo == "hospedar")
                 assistir = False
@@ -4463,14 +4514,9 @@ class Manipulador(BaseHTTPRequestHandler):
                         return self.erro("Informe o endereço de quem está "
                                          "hospedando a partida.")
                 pela_internet = bool(dados.get("pela_internet"))
-                # Jogo especifico usa Multitap (lista curada, consoles.json
-                # -> jogos_multitap)? So entao o limite de jogadores sobe
-                # do padrao da plataforma (2) para o que o multitap
-                # oferece. Nao e' por console inteiro -- a maioria dos
-                # jogos de SNES, por exemplo, nao usa multitap nenhum.
-                multitap = graficos.jogo_suporta_multitap(plataforma, jogo["titulo"])
-                jogadores_max = (5 if multitap else
-                                plataforma.get("jogadores_max", 2))
+                # Quantos cabem vem da ligacao acima: o que o jogo aceita,
+                # limitado ao que o nucleo permite.
+                jogadores_max = jogo["ligacao"]["jogadores"]
                 try:
                     posicao = int(dados.get("jogador") or 2)
                 except (TypeError, ValueError):
@@ -4481,10 +4527,14 @@ class Manipulador(BaseHTTPRequestHandler):
                         apelido, hospedar, assistir=assistir,
                         pela_internet=pela_internet,
                         repasse=str(dados.get("repasse", "saopaulo")),
-                        jogador=posicao, multitap=multitap),
+                        jogador=posicao),
                     "argumentos": graficos.argumentos_de_partida(hospedar, endereco),
                     "papel": "jogador 1" if hospedar else "jogador %d" % posicao,
                 }
+                # Com 3+ jogadores, o padrao do RetroArch (3 conexoes)
+                # recusaria o ultimo colega. Com 1 ou 2, continua 3.
+                partida["opcoes"]["netplay_max_connections"] = str(
+                    jogo["ligacao"]["max_conexoes"])
                 if plataforma.get("core_netplay"):
                     # O nucleo alternativo so de netplay (ex.: PCSX ReARMed
                     # no PS1) tem estado maior pra serializar que o nucleo
@@ -4551,7 +4601,7 @@ class Manipulador(BaseHTTPRequestHandler):
             try:
                 pontos = int(dados.get("pontos"))
             except (TypeError, ValueError):
-                return self.erro("Informe a pontuacao usando apenas numeros.")
+                return self.erro("Informe a pontuacao usando apenas números.")
             if not 0 <= pontos <= 99999999:
                 return self.erro("Pontuacao fora da faixa aceita.")
 

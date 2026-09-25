@@ -37,6 +37,13 @@ def main():
         opcoes = arena.opcoes_efetivas(config)
         extras = controles.opcoes_do_console("n64", jogadores=4, usar_analogico=True, vibracao=True)
         opcoes.update(extras)
+        # Multitap, Fase B: o mesmo calculo do /api/jogar. Sem isto o teste
+        # ficava com input_max_users = 2 (padrao do ARENA) e, com um 3o
+        # controle fisico ligado, o RetroArch recusava ("No free and
+        # unreserved player slots... max_users: 2") -- visto em 25/09/2026.
+        # Era exatamente o defeito que a Fase B corrige no ARENA.
+        opcoes.update(arena.graficos.jogadores_do_jogo(
+            os.path.basename(CORE), 4, config["avancado"]["input_max_users"])["cfg"])
 
         for chave in ("saves", "states"):
             os.makedirs(os.path.join(raiz_teste, chave), exist_ok=True)

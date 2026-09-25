@@ -1600,6 +1600,156 @@ def opcoes_de_partida(apelido, hospedar, atraso=0, assistir=False,
     return opcoes
 
 
+# ---------------------------------------------------------------------------
+# Mais de dois jogadores: o mapa de cada nucleo (servidor\multitap.json).
+#
+# Cada nucleo liga o adaptador de um jeito: uns por TIPO DE CONTROLE numa
+# porta (SNES: "Multitap" = 257), outros por OPCAO DO NUCLEO (PS1: "port 1";
+# Saturn: "enabled"). O mapa foi conferido contra o .dll desta pasta
+# (ferramentas\conferir_mapa_multitap.py) -- nada aqui e' de memoria.
+# ---------------------------------------------------------------------------
+
+ARQUIVO_MAPA_MULTITAP = os.path.join(PASTA_SERVIDOR, "multitap.json")
+# Copia do arquivo de opcoes de nucleo, SO para a partida de 3+ jogadores
+# que precisa de uma opcao a mais (PS1, Saturn). O arquivo de sempre nao e'
+# tocado: a proxima partida sozinho sai igualzinha (decisao do Rafael,
+# 25/09/2026). Fica em dados\ porque o RetroArch grava nele ao fechar.
+ARQUIVO_OPCOES_CORE_PARTIDA = os.path.join(RAIZ, "dados", "opcoes_nucleo_partida.cfg")
+
+
+def carregar_mapa_multitap():
+    try:
+        with open(ARQUIVO_MAPA_MULTITAP, encoding="utf-8") as arquivo:
+            return json.load(arquivo)
+    except (OSError, ValueError):
+        # Sem o mapa, o ARENA continua como sempre: ate 2 jogadores.
+        return {}
+
+
+def jogadores_do_jogo(nucleo, jogadores, jogadores_da_config=2, mapa=None):
+    """Diz o que escrever para ESTE nucleo aceitar 'jogadores' controles.
+
+    Devolve um dicionario:
+      jogadores   - quantos o nucleo aceita de verdade (pode ser menos que o
+                    pedido, se o nucleo nao tem adaptador);
+      cfg         - chaves para o arquivo temporario da partida
+                    (--appendconfig): tipo de controle das portas e
+                    input_max_users;
+      nucleo      - opcoes do nucleo (vao numa copia do arquivo de opcoes);
+      max_conexoes - netplay_max_connections para o Jogar Junto;
+      motivo      - frase para o aluno quando o nucleo nao chega ao pedido.
+
+    REGRA DE OURO: com 1 ou 2 jogadores nao devolve chave nenhuma -- o
+    arquivo da partida sai exatamente como antes desta funcao existir.
+    """
+    resultado = {"jogadores": max(1, int(jogadores or 2)), "cfg": {}, "nucleo": {},
+                 "max_conexoes": NETPLAY_CONEXOES_PADRAO, "motivo": ""}
+    pedido = resultado["jogadores"]
+    if pedido <= 2:
+        return resultado
+
+    mapa = carregar_mapa_multitap() if mapa is None else mapa
+    info = mapa.get("nucleos", {}).get(os.path.basename(nucleo or ""))
+    if not info:
+        resultado["jogadores"] = 2
+        resultado["motivo"] = ("Este console ainda não foi conferido para mais "
+                               "de 2 jogadores no ARENA.")
+        return resultado
+
+    aceitos = min(pedido, int(info.get("jogadores_sem_adaptador", 2)))
+    adaptador = info.get("adaptador", {})
+    if pedido > aceitos and adaptador.get("tipo") in ("dispositivo", "opcao_do_nucleo"):
+        chaves = dict(adaptador.get("chaves", {}))
+        aceitos = min(pedido, int(adaptador.get("jogadores", aceitos)))
+        segundo = adaptador.get("segundo_adaptador")
+        if segundo and pedido > aceitos:
+            chaves.update(segundo.get("chaves", {}))
+            aceitos = min(pedido, int(segundo.get("jogadores", aceitos)))
+        destino = "cfg" if adaptador["tipo"] == "dispositivo" else "nucleo"
+        resultado[destino].update(chaves)
+
+    if aceitos < pedido:
+        resultado["motivo"] = ("Neste console o emulador aceita até %d "
+                               "jogadores." % aceitos)
+    resultado["jogadores"] = aceitos
+    if aceitos > 2:
+        # Sem isto o RetroArch so le os 2 primeiros controles (o ARENA vem
+        # com input_max_users = 2): o 3o em diante fica mudo.
+        resultado["cfg"]["input_max_users"] = str(max(aceitos, int(jogadores_da_config or 2)))
+        # O padrao do RetroArch (3 conexoes) recusava o 5o jogador mesmo com
+        # o adaptador certo. Nunca abaixo do padrao de hoje.
+        resultado["max_conexoes"] = max(NETPLAY_CONEXOES_PADRAO, aceitos - 1)
+    return resultado
+
+
+def gravar_opcoes_de_nucleo_da_partida(extras):
+    """Copia o arquivo de opcoes de nucleo de sempre, acrescenta 'extras'
+    (ex.: pcsx_rearmed_multitap = "port 1") e devolve o caminho da copia,
+    para a partida apontar core_options_path para ela."""
+    try:
+        with open(ARQUIVO_OPCOES_CORE, encoding="utf-8", errors="replace") as arquivo:
+            linhas = arquivo.read().splitlines()
+    except OSError:
+        linhas = []
+    linhas = [l for l in linhas if l.split("=", 1)[0].strip() not in extras]
+    linhas += ['%s = "%s"' % (chave, valor) for chave, valor in sorted(extras.items())]
+    os.makedirs(os.path.dirname(ARQUIVO_OPCOES_CORE_PARTIDA), exist_ok=True)
+    temporario = "%s.%d.tmp" % (ARQUIVO_OPCOES_CORE_PARTIDA, threading.get_ident())
+    with open(temporario, "w", encoding="utf-8", newline="\n") as arquivo:
+        arquivo.write("\n".join(linhas) + "\n")
+    os.replace(temporario, ARQUIVO_OPCOES_CORE_PARTIDA)
+    return ARQUIVO_OPCOES_CORE_PARTIDA
+
+
+def valores_no_retroarch_cfg(chaves):
+    """Le do retroarch.cfg o valor atual de cada chave (None se nao existe)."""
+    valores = dict.fromkeys(chaves)
+    try:
+        with open(os.path.join(PASTA_RETROARCH, "retroarch.cfg"), encoding="utf-8",
+                  errors="replace") as arquivo:
+            for linha in arquivo:
+                chave, _, valor = linha.partition("=")
+                chave = chave.strip()
+                if chave in valores:
+                    valores[chave] = valor.strip().strip('"')
+    except OSError:
+        pass
+    return valores
+
+
+def devolver_valores_no_retroarch_cfg(antes):
+    """O RetroArch grava no retroarch.cfg, ao fechar, o que veio no arquivo
+    temporario da partida (ver testes\\protege_cfg.py). Depois de uma partida
+    de 3+ jogadores, devolve SO as chaves que o ARENA mudou para ela ao
+    valor de antes -- senao o tipo de controle das portas 3/4 (ex.: 513 no
+    NES) vazaria para a proxima partida de 2, que nao reescreve essas portas.
+    Devolve quantas linhas mudaram."""
+    caminho = os.path.join(PASTA_RETROARCH, "retroarch.cfg")
+    try:
+        with open(caminho, encoding="utf-8", errors="replace") as arquivo:
+            linhas = arquivo.readlines()
+    except OSError:
+        return 0
+    novas, trocadas = [], 0
+    for linha in linhas:
+        chave = linha.split("=", 1)[0].strip()
+        if chave in antes:
+            valor = antes[chave]
+            certo = None if valor is None else '%s = "%s"\n' % (chave, valor)
+            if certo != linha:
+                trocadas += 1
+            if certo:
+                novas.append(certo)
+            continue
+        novas.append(linha)
+    if trocadas:
+        temporario = "%s.%d.tmp" % (caminho, threading.get_ident())
+        with open(temporario, "w", encoding="utf-8", newline="") as arquivo:
+            arquivo.writelines(novas)
+        os.replace(temporario, caminho)
+    return trocadas
+
+
 def argumentos_de_partida(hospedar, endereco=None, porta=None):
     """Parametros de linha de comando para abrir o jogo em rede.
 
