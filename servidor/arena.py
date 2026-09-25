@@ -1537,7 +1537,7 @@ def montar_conquistas():
             lideres.add(apelido)
 
     jogadores = []
-    for apelido, quantos, consoles in sorted(linhas):
+    for apelido, quantos, consoles in sorted(linhas, key=lambda linha: linha[0]):
         segundos = tempos.get(apelido, 0)
         ganhou = {
             "primeiro_recorde": quantos >= 1,
@@ -1896,6 +1896,27 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
 ARQUIVOS_DE_BACKUP = ("arena.db", "config.json", "controles.json")
 COPIAS_MANTIDAS = 3
 LOGS_MANTIDOS = 10
+
+
+def traduzir_erro_do_sistema(falha, acao):
+    """Troca o texto cru do Windows/Python por uma frase que o aluno entende:
+    o que aconteceu + o que fazer agora."""
+    if isinstance(falha, PermissionError) or getattr(falha, "errno", None) in (errno.EACCES, errno.EPERM):
+        motivo = ("Outro programa está usando esse arquivo, ou a pasta está "
+                  "protegida. Feche os outros programas e tente de novo.")
+    elif getattr(falha, "errno", None) == errno.ENOSPC:
+        motivo = ("Acabou o espaço no disco ou no pen drive. Apague algo que "
+                  "não precisa mais e tente de novo.")
+    elif isinstance(falha, FileNotFoundError):
+        motivo = ("Um arquivo ou pasta sumiu no meio do caminho. Clique em "
+                  "Atualizar lista e tente de novo.")
+    elif isinstance(falha, (urllib.error.URLError, socket.timeout, TimeoutError, ConnectionError)):
+        motivo = ("A internet falhou no meio do caminho. Confira a conexão e "
+                  "tente de novo.")
+    else:
+        motivo = "Tente de novo; se continuar, chame o professor."
+    print("[ARENA] %s falhou: %r" % (acao, falha))
+    return "Não consegui %s. %s" % (acao, motivo)
 
 
 def limpar_logs_antigos():
@@ -3129,7 +3150,7 @@ class Manipulador(BaseHTTPRequestHandler):
             try:
                 return self.responder_json({"itens": internet_archive.buscar(consulta)})
             except Exception as falha:
-                return self.erro("Nao consegui pesquisar: %s" % falha, 502)
+                return self.erro(traduzir_erro_do_sistema(falha, "pesquisar"), 502)
 
         # ---- conquistas da turma ------------------------------------------
         if caminho == "/api/conquistas":
@@ -3217,7 +3238,8 @@ class Manipulador(BaseHTTPRequestHandler):
                 urllib.parse.urlparse(self.path).query)
             jogo = achar_jogo((parametros.get("id") or [""])[0])
             if not jogo:
-                return self.erro("Jogo nao encontrado.", 404)
+                return self.erro("Jogo nao encontrado. Ele pode ter sido movido ou apagado. "
+                                 "Clique em Atualizar lista e tente de novo.", 404)
             return self.responder_json({
                 "titulo": jogo["titulo"],
                 "plataforma": jogo["plataforma"],
@@ -3354,13 +3376,15 @@ class Manipulador(BaseHTTPRequestHandler):
             if dados.get("tipo_controle"):
                 validos = {t["id"] for t in controles.tipos_de_controle()}
                 if str(dados["tipo_controle"]) not in validos:
-                    return self.erro("Tipo de controle desconhecido.")
+                    return self.erro("Tipo de controle desconhecido. Escolha um da lista em "
+                                 "Ajustes → Controles.")
                 config["tipo_controle"] = str(dados["tipo_controle"])
 
             console = str(dados.get("console", "")).strip().lower()
             if console:
                 if console not in {p["id"] for p in carregar_catalogo()}:
-                    return self.erro("Console desconhecido.")
+                    return self.erro("Console desconhecido. Escolha um console da lista "
+                                 "(ou confira a pasta do jogo em jogos\\pessoais).")
                 atual = dict(config.get("perfil_controle", {}).get(console, {}))
                 for chave in ("direcional", "analogico_esq",
                               "analogico_dir", "vibracao"):
@@ -3412,7 +3436,7 @@ class Manipulador(BaseHTTPRequestHandler):
             except ValueError as falha:
                 return self.erro(str(falha))
             except OSError as falha:
-                return self.erro("Nao consegui gravar o acervo: %s" % falha)
+                return self.erro(traduzir_erro_do_sistema(falha, "gravar o acervo"))
             return self.responder_json({"ok": True, "item": item})
 
         if caminho == "/api/acervo/remover":
@@ -3431,7 +3455,7 @@ class Manipulador(BaseHTTPRequestHandler):
             except ValueError as falha:
                 return self.erro(str(falha))
             except OSError as falha:
-                return self.erro("Download falhou: %s" % falha, 502)
+                return self.erro(traduzir_erro_do_sistema(falha, "baixar o jogo"), 502)
             limpar_caches()
             manifesto(forcar=True)
             return self.responder_json(dict(ok=True, **resultado))
@@ -3447,7 +3471,7 @@ class Manipulador(BaseHTTPRequestHandler):
             except ValueError as falha:
                 return self.erro(str(falha))
             except Exception as falha:
-                return self.erro("Download falhou: %s" % falha, 502)
+                return self.erro(traduzir_erro_do_sistema(falha, "baixar o jogo"), 502)
             limpar_caches()
             manifesto(forcar=True)
             return self.responder_json(dict(ok=True, **resultado))
@@ -3640,7 +3664,8 @@ class Manipulador(BaseHTTPRequestHandler):
             plataforma = next((p for p in carregar_catalogo()
                                if p["id"] == plataforma_id), None)
             if not plataforma:
-                return self.erro("Console desconhecido.")
+                return self.erro("Console desconhecido. Escolha um console da lista "
+                                 "(ou confira a pasta do jogo em jogos\\pessoais).")
 
             with TRAVA_JOGO:
                 if JOGO_EM_ANDAMENTO["ativo"]:
@@ -3713,13 +3738,15 @@ class Manipulador(BaseHTTPRequestHandler):
         if caminho == "/api/jogo/mover":
             jogo = achar_jogo(str(dados.get("jogo_id", "")))
             if not jogo:
-                return self.erro("Jogo nao encontrado.", 404)
+                return self.erro("Jogo nao encontrado. Ele pode ter sido movido ou apagado. "
+                                 "Clique em Atualizar lista e tente de novo.", 404)
 
             destino_id = str(dados.get("plataforma", "")).strip().lower()
             plataforma = next((p for p in carregar_catalogo()
                                if p["id"] == destino_id), None)
             if not plataforma:
-                return self.erro("Console desconhecido.")
+                return self.erro("Console desconhecido. Escolha um console da lista "
+                                 "(ou confira a pasta do jogo em jogos\\pessoais).")
 
             origem = os.path.join(RAIZ, jogo["arquivo"])
             if not dentro_da_pasta(origem, PASTA_JOGOS) or not os.path.isfile(origem):
@@ -3749,7 +3776,7 @@ class Manipulador(BaseHTTPRequestHandler):
                 # os.replace nao atravessa disco; move e o caminho seguro.
                 shutil.move(origem, destino)
             except OSError as falha:
-                return self.erro("Nao consegui mover: %s" % falha)
+                return self.erro(traduzir_erro_do_sistema(falha, "mover o jogo"))
 
             # O jogo mudou de lugar, entao o save antigo perderia o vinculo.
             # Como o nome do arquivo nao muda, os saves continuam valendo.
@@ -3768,12 +3795,14 @@ class Manipulador(BaseHTTPRequestHandler):
         if caminho == "/api/jogo/console":
             jogo_id = str(dados.get("jogo_id", ""))
             if not achar_jogo(jogo_id):
-                return self.erro("Jogo nao encontrado.", 404)
+                return self.erro("Jogo nao encontrado. Ele pode ter sido movido ou apagado. "
+                                 "Clique em Atualizar lista e tente de novo.", 404)
 
             plataforma = str(dados.get("plataforma", "")).strip().lower()
             validas = {p["id"] for p in carregar_catalogo()}
             if plataforma and plataforma not in validas:
-                return self.erro("Console desconhecido.")
+                return self.erro("Console desconhecido. Escolha um console da lista "
+                                 "(ou confira a pasta do jogo em jogos\\pessoais).")
 
             indexador.gravar_manual(jogo_id, plataforma)
             limpar_caches()
@@ -3789,11 +3818,13 @@ class Manipulador(BaseHTTPRequestHandler):
         if caminho == "/api/estado/apagar":
             jogo = achar_jogo(dados.get("jogo_id"))
             if not jogo:
-                return self.erro("Jogo nao encontrado.", 404)
+                return self.erro("Jogo nao encontrado. Ele pode ter sido movido ou apagado. "
+                                 "Clique em Atualizar lista e tente de novo.", 404)
             try:
                 apagou = cheats.apagar_estado(jogo, dados.get("espaco"))
             except (TypeError, ValueError):
-                return self.erro("Espaco invalido.")
+                return self.erro("Esse número de espaço não existe. Escolha um dos que "
+                                 "aparecem na lista de saves do jogo.")
             return self.responder_json({
                 "ok": True, "apagou": apagou,
                 "estados": cheats.listar_estados(jogo)})
@@ -3802,7 +3833,8 @@ class Manipulador(BaseHTTPRequestHandler):
         if caminho == "/api/cheat/adicionar":
             jogo = achar_jogo(dados.get("jogo_id"))
             if not jogo:
-                return self.erro("Jogo nao encontrado.", 404)
+                return self.erro("Jogo nao encontrado. Ele pode ter sido movido ou apagado. "
+                                 "Clique em Atualizar lista e tente de novo.", 404)
             lista, erro = cheats.adicionar_cheat(
                 jogo, str(dados.get("descricao", ""))[:120],
                 str(dados.get("codigo", "")), bool(dados.get("ligado")))
@@ -3813,11 +3845,13 @@ class Manipulador(BaseHTTPRequestHandler):
         if caminho == "/api/cheat/alterar":
             jogo = achar_jogo(dados.get("jogo_id"))
             if not jogo:
-                return self.erro("Jogo nao encontrado.", 404)
+                return self.erro("Jogo nao encontrado. Ele pode ter sido movido ou apagado. "
+                                 "Clique em Atualizar lista e tente de novo.", 404)
             try:
                 indice = int(dados.get("indice"))
             except (TypeError, ValueError):
-                return self.erro("Indice invalido.")
+                return self.erro("Esse código não está mais na lista de cheats. "
+                                 "Reabra o painel do jogo e tente de novo.")
             lista, erro = cheats.alterar_cheat(
                 jogo, indice, dados.get("ligado"), bool(dados.get("apagar")))
             if erro:
@@ -3829,7 +3863,7 @@ class Manipulador(BaseHTTPRequestHandler):
             try:
                 return self.responder_json(dict(ok=True, **exportar_saves()))
             except OSError as falha:
-                return self.erro("Nao consegui montar o pacote: %s" % falha)
+                return self.erro(traduzir_erro_do_sistema(falha, "montar o pacote"))
 
         if caminho == "/api/importar":
             resultado, erro = importar_saves(dados.get("arquivo"))
@@ -3875,7 +3909,7 @@ class Manipulador(BaseHTTPRequestHandler):
             try:
                 brutos = base64.b64decode(imagem, validate=True)
             except (binascii.Error, ValueError):
-                return self.erro("Imagem invalida.")
+                return self.erro("Essa imagem não abriu. Use um arquivo .png, .jpg ou .webp.")
             if not brutos or len(brutos) > 6 * 1024 * 1024:
                 return self.erro("Imagem grande demais (limite de 6 MB).")
             tipo = _tipo_da_imagem(brutos)
@@ -3891,7 +3925,8 @@ class Manipulador(BaseHTTPRequestHandler):
             nome_base = os.path.splitext(os.path.basename(caminho_rom))[0]
             destino = os.path.join(pasta_jogo, "capas", nome_base + extensoes[tipo])
             if not dentro_da_pasta(destino, PASTA_JOGOS):
-                return self.erro("Destino invalido.")
+                return self.erro("Não consegui achar onde guardar essa capa. Clique em "
+                                 "Atualizar lista e tente de novo.")
 
             try:
                 os.makedirs(os.path.dirname(destino), exist_ok=True)
@@ -3903,7 +3938,7 @@ class Manipulador(BaseHTTPRequestHandler):
                         os.fsync(arquivo.fileno())
                     os.replace(temporario, destino)
             except OSError as falha:
-                return self.erro("Nao consegui gravar a capa: %s" % falha, 500)
+                return self.erro(traduzir_erro_do_sistema(falha, "gravar a capa"), 500)
 
             limpar_caches()
             manifesto(forcar=True)
@@ -4279,7 +4314,8 @@ class Manipulador(BaseHTTPRequestHandler):
 
             jogo = achar_jogo(dados.get("jogo_id"))
             if not jogo:
-                return self.erro("Jogo nao encontrado.", 404)
+                return self.erro("Jogo nao encontrado. Ele pode ter sido movido ou apagado. "
+                                 "Clique em Atualizar lista e tente de novo.", 404)
 
             config = carregar_config()
             apelido = (dados.get("apelido") or config["apelido"] or "convidado")[:24]

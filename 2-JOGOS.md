@@ -401,6 +401,11 @@ Ao abrir um jogo, o aviso diz por qual programa: *"Abrindo Black pelo PCSX2"*.
 
 ### A BIOS
 
+**BIOS** é o programinha que vem de fábrica dentro do console de verdade e
+liga ele por dentro. Sem uma cópia dele, o emulador não sabe nem começar —
+é como tentar dar a partida num carro sem a chave: o motor está lá, mas
+falta a peça que acorda tudo.
+
 #### Pelos emuladores de fora
 
 **PCSX2:** o ARENA copia uma BIOS de PS2 sozinho (de `retroarch\system`) na

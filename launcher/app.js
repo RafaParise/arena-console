@@ -446,6 +446,17 @@ function linhaDoJogo(jogo) {
                    (disponivel ? "" : " jogo--indisponivel");
   item.dataset.jogo = jogo.id;
   item.classList.toggle("jogo--selecionado", estado.jogoSelecionado?.id === jogo.id);
+  // Sem isto, quem usa só o teclado não consegue abrir o painel de detalhes.
+  item.tabIndex = 0;
+  item.setAttribute("role", "button");
+  item.setAttribute("aria-label", `Ver detalhes de ${jogo.titulo}`);
+  item.addEventListener("keydown", (evento) => {
+    if (evento.target !== item) return;
+    if (evento.key === "Enter" || evento.key === " ") {
+      evento.preventDefault();
+      selecionarJogo(jogo);
+    }
+  });
 
   // Arrastar a linha e soltar num console do lado esquerdo move o
   // arquivo de verdade para a pasta daquele console.
