@@ -20,6 +20,11 @@ class TestGraficos(unittest.TestCase):
         self.dir = tempfile.mkdtemp(prefix="arena_graf_")
         self._old_raiz = self.mod.RAIZ
         self.mod.RAIZ = self.dir
+        # PASTA_RETROARCH tambem: gravar_opcoes_dos_nucleos agora le as
+        # opcoes que o aluno mudou (retroarch\config\*\*.opt) para nao
+        # apaga-las. Sem isto o teste leria as da maquina de verdade.
+        self._old_pasta_ra = self.mod.PASTA_RETROARCH
+        self.mod.PASTA_RETROARCH = os.path.join(self.dir, "retroarch")
         self._old_arquivo = getattr(self.mod, "ARQUIVO_OPCOES_CORE", None)
         self.mod.ARQUIVO_OPCOES_CORE = os.path.join(
             self.dir, "retroarch-core-options.cfg")
@@ -37,6 +42,7 @@ class TestGraficos(unittest.TestCase):
 
     def tearDown(self):
         self.mod.RAIZ = self._old_raiz
+        self.mod.PASTA_RETROARCH = self._old_pasta_ra
         if self._old_arquivo is not None:
             self.mod.ARQUIVO_OPCOES_CORE = self._old_arquivo
         self.mod.ARQUIVO_GRAFICOS = self._old_arquivo_graficos
@@ -63,6 +69,26 @@ class TestGraficos(unittest.TestCase):
         with open(self.mod.ARQUIVO_OPCOES_CORE, encoding="utf-8") as f:
             texto = f.read()
         self.assertIn("x = \"1\"", texto)
+
+    def test_gravar_opcoes_mantem_o_que_o_aluno_mudou(self):
+        # Revisao pos-auditoria: com global_core_options ligado, reescrever
+        # o arquivo do zero apagaria o que o aluno mudou no menu. O que
+        # estava no .opt antigo do nucleo migra; chave do ARENA vence; lixo
+        # "duckstation_*" nao entra.
+        with open(os.path.join(self.dir, "graficos.json"), "w",
+                  encoding="utf-8") as f:
+            f.write('{"nucleos": {"fbneo": {"sempre": {"x": "1"}}}}')
+        pasta_opt = os.path.join(self.dir, "retroarch", "config", "Nucleo")
+        os.makedirs(pasta_opt)
+        with open(os.path.join(pasta_opt, "Nucleo.opt"), "w", encoding="utf-8") as f:
+            f.write('x = "9"\ndo_aluno = "sim"\nduckstation_BIOS.Path = "a.bin"\n')
+        self.mod.gravar_opcoes_dos_nucleos(3)
+        with open(self.mod.ARQUIVO_OPCOES_CORE, encoding="utf-8") as f:
+            texto = f.read()
+        self.assertIn('x = "1"', texto)
+        self.assertNotIn('x = "9"', texto)
+        self.assertIn('do_aluno = "sim"', texto)
+        self.assertNotIn("duckstation_", texto)
 
     def test_gravar_atomico(self):
         caminho = os.path.join(self.dir, "teste.txt")

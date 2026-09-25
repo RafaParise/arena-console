@@ -437,12 +437,20 @@ Em **Ajustes → Emuladores** tem a lista **Qual BIOS usar em cada console**.
 Aparecem ali os arquivos que você já colocou em `retroarch\system`. O ARENA
 não fornece, não indica onde conseguir e não baixa nada.
 
-**Por que fixar uma:** o console guarda a data, a hora e as preferências
-*dentro* da BIOS. Se cada jogo abrir com um arquivo diferente, o relógio
-volta para 1 de janeiro toda vez e a tela inicial parece vazia.
+**Na maioria dos consoles não precisa escolher.** O emulador confere o
+conteúdo de cada arquivo e acha a BIOS certa sozinho. Nesses, a tela
+escreve isso em vez de mostrar uma lista.
 
-Fixando uma, você abre a tela do PlayStation, vê a data certa e os
-**ícones do memory card** — do jeito que era no aparelho de verdade.
+A escolha só aparece onde o emulador deixa escolher de verdade:
+
+| Console | O que dá para escolher |
+|---|---|
+| PlayStation 1 | Só arquivos com um destes nomes: `scph5500.bin`, `scph5501.bin`, `scph5502.bin`, `psxonpsp660.bin`, `ps1_rom.bin`, `openbios.bin`. Com outro nome (por exemplo `SCPH1001.BIN`), o emulador ignora a escolha, então a tela nem oferece. Ele acha esse arquivo sozinho do mesmo jeito |
+| 3DO | Qualquer arquivo da pasta |
+
+**Por que fixar uma, quando dá:** o console guarda a data, a hora e as
+preferências *dentro* da BIOS. Se cada jogo abrir com um arquivo diferente,
+o relógio volta para 1 de janeiro toda vez.
 
 ---
 
@@ -464,18 +472,23 @@ O Dolphin (GameCube) não entra nessa lista ainda.
 
 ### Memory card
 
-Um cartão por console, guardado em:
+No PlayStation 1, **cada jogo tem o seu próprio cartão**, guardado em:
 
 ```
-ARENA\retroarch\saves\memcards\
+ARENA\retroarch\saves\SwanStation\Nome do Jogo.srm
 ```
 
-É o **mesmo cartão em todos os jogos daquele console**. Por isso os saves
-aparecem juntos na tela inicial, com os iconezinhos, e dá para copiar de um
-jogo para outro como no aparelho original.
+É como ter um memory card separado para cada jogo, com o nome do jogo
+escrito na etiqueta. Um jogo nunca apaga o save do outro. O lado ruim: a
+tela inicial do console (Abrir só a BIOS) não mostra os saves dos jogos,
+porque ali não tem nenhum jogo aberto.
 
-O ARENA cria a pasta sozinho na primeira vez. Vale para PlayStation 1 e 2;
-os outros consoles gravam do jeito deles, cada jogo no seu arquivo.
+(Até setembro de 2026 este guia dizia que era um cartão só por console.
+Essa configuração nunca chegou a valer de verdade, e todo save já feito
+está no cartão do próprio jogo. Por isso o ARENA manteve assim: mudar
+agora faria os saves de hoje sumirem da tela do jogo.)
+
+O PlayStation 2 usa o PCSX2, que cuida dos cartões dele sozinho.
 
 #### Ver os cartões
 
@@ -483,7 +496,7 @@ Na mesma aba, embaixo, o ARENA lista os cartões que existem — como uma
 caixinha de memory cards em cima da TV:
 
 ```
-ps1-1.mcd    4 de 15 blocos usados · último uso em 07/09/2026 22:14   [11 livres]
+Crash Bandicoot (USA)    1 de 15 blocos usados · último uso em 10/09/2026 08:56   [14 livres]
 ```
 
 Para o cartão de PlayStation 1 ele conta os blocos de verdade, lendo o

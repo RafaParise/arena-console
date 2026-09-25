@@ -265,13 +265,24 @@ def gravar_opcoes_dos_nucleos(nota, extras=None, nota_gpu=None, modesto=False):
         for chave in sorted(opcoes):
             linhas.append('%s = "%s"' % (chave, opcoes[chave]))
 
-    # BIOS escolhida e pasta do memory card entram por cima.
+    # BIOS escolhida e memory card entram por cima.
     for chave in sorted(extras or {}):
         linhas.append('%s = "%s"' % (chave, extras[chave]))
 
+    # O resto e' do aluno: opcao que ele mudou no menu do RetroArch e que o
+    # ARENA nao ajusta. Antes este arquivo era reescrito do zero -- nao fazia
+    # mal so porque o RetroArch nem lia este arquivo (ver global_core_options
+    # em arena.gravar_override). Agora que le, apagar seria perder o ajuste.
+    ja_escritas = {l.split(" = ", 1)[0] for l in linhas if " = " in l}
+    do_aluno = {k: v for k, v in opcoes_do_aluno().items() if k not in ja_escritas}
+    if do_aluno:
+        linhas.append("# Opcoes mudadas no menu do RetroArch (o ARENA mantem):")
+        for chave in sorted(do_aluno):
+            linhas.append('%s = "%s"' % (chave, do_aluno[chave]))
+
     os.makedirs(PASTA_RETROARCH, exist_ok=True)
     gravar_atomico(ARQUIVO_OPCOES_CORE, "\n".join(linhas) + "\n")
-    return len(linhas) - 2
+    return len(linhas) - 2 - (1 if do_aluno else 0) - len(do_aluno)
 
 
 def shader_para(nota):
@@ -420,14 +431,38 @@ def situacao_dos_externos(plataformas):
 
 EXTENSOES_BIOS = (".bin", ".rom", ".bios", ".img", ".pup", ".mec", ".nvm")
 
-# Chave do RetroArch que escolhe a BIOS, por nucleo. So os nucleos em que
-# faz diferenca escolher entre varias.
+# Chave do RetroArch que escolhe a BIOS, por nucleo. So os nucleos que TEM
+# essa chave de verdade -- conferido lendo cada .dll
+# (ferramentas\chaves_bios_nucleos.py). Corrigido na revisao pos-auditoria:
+# antes a lista tinha "swanstation_BIOS_Path" e "duckstation_BIOS.Path" (nao
+# existem), "beetle_saturn_region" (e' a REGIAO do console, nao um arquivo) e
+# "reicast_boot_to_bios" (nao existe nesta versao do Flycast). A escolha na
+# tela nao fazia nada nesses consoles. Os outros acham a BIOS sozinhos, pelo
+# conteudo do arquivo.
 CHAVE_BIOS = {
-    "swanstation": ["swanstation_BIOS_Path", "duckstation_BIOS.Path"],
-    "mednafen_saturn": ["beetle_saturn_region"],
+    # Uma chave por regiao; a mesma BIOS escolhida vale para as tres.
+    "swanstation": ["swanstation_BIOS_PathNTSCJ", "swanstation_BIOS_PathNTSCU",
+                    "swanstation_BIOS_PathPAL"],
     "opera": ["opera_bios"],
-    "flycast": ["reicast_boot_to_bios"],
 }
+
+# Alguns nucleos so aceitam uma lista fechada de nomes de arquivo nessa
+# chave. Arquivo com outro nome e' ignorado pelo nucleo -- entao nem oferecer.
+BIOS_ACEITAS = {
+    "swanstation": ("scph5500.bin", "scph5501.bin", "scph5502.bin",
+                    "psxonpsp660.bin", "ps1_rom.bin", "openbios.bin"),
+}
+
+
+def bios_que_o_nucleo_aceita(nome_curto_core, arquivos):
+    """Dos arquivos da pasta de BIOS, quais este nucleo deixa ESCOLHER.
+    Lista vazia = a escolha nao funciona nesse nucleo (ele acha sozinho)."""
+    if nome_curto_core not in CHAVE_BIOS:
+        return []
+    aceitas = BIOS_ACEITAS.get(nome_curto_core)
+    if aceitas is None:
+        return list(arquivos)
+    return [a for a in arquivos if a.lower() in aceitas]
 
 
 def bios_disponiveis(pasta_sistema):
@@ -453,10 +488,11 @@ def bios_disponiveis(pasta_sistema):
 
 def opcoes_de_bios(nome_curto_core, arquivo):
     """Diz ao emulador qual arquivo usar como BIOS."""
-    if not arquivo:
+    if not arquivo or not bios_que_o_nucleo_aceita(nome_curto_core, [arquivo]):
         return {}
-    chaves = CHAVE_BIOS.get(nome_curto_core, [])
-    return {chave: arquivo for chave in chaves}
+    if nome_curto_core in BIOS_ACEITAS:
+        arquivo = arquivo.lower()  # a lista do nucleo e' toda em minusculas
+    return {chave: arquivo for chave in CHAVE_BIOS[nome_curto_core]}
 
 
 # BIOS de PS2 tem sempre 4 MB (4194304 bytes) - tamanho fixo, diferente da
@@ -507,16 +543,26 @@ def listar_memory_cards(pasta_saves):
     tem formato conhecido e simples, tambem conta quantos blocos estao em
     uso - o mesmo numero que o console mostrava na tela de memory card.
     """
-    pasta = os.path.join(pasta_saves, "memcards")
+    # Corrigido na revisao pos-auditoria: so olhava saves\memcards, que fica
+    # vazia -- os cartoes de verdade sao um por jogo, na pasta de cada
+    # nucleo (saves\SwanStation\Crash Bandicoot (USA).srm). A tela dizia
+    # "Nenhum cartao ainda" com varios jogos salvos. A subpasta .netplay
+    # (cartao temporario de partida a dois) fica de fora.
+    candidatos = []
+    for pasta in [os.path.join(pasta_saves, "memcards")] + [
+            os.path.join(pasta_saves, n) for n in ("SwanStation", "PCSX-ReARMed")]:
+        try:
+            for nome in sorted(os.listdir(pasta)):
+                candidatos.append((pasta, nome))
+        except OSError:
+            continue
     achados = []
-    try:
-        nomes = sorted(os.listdir(pasta))
-    except OSError:
-        return achados
 
-    for nome in nomes:
+    for pasta, nome in candidatos:
         caminho = os.path.join(pasta, nome)
         if not os.path.isfile(caminho):
+            continue
+        if not nome.lower().endswith((".mcd", ".mcr", ".srm", ".ps2")):
             continue
         try:
             tamanho = os.path.getsize(caminho)
@@ -530,7 +576,8 @@ def listar_memory_cards(pasta_saves):
             usados = _blocos_usados_ps1(caminho)
 
         achados.append({
-            "arquivo": nome,
+            "arquivo": os.path.splitext(nome)[0] if pasta != os.path.join(
+                pasta_saves, "memcards") else nome,
             "tamanho_kb": round(tamanho / 1024.0),
             "quando": quando,
             "blocos_usados": usados,
@@ -562,23 +609,77 @@ def _blocos_usados_ps1(caminho):
 
 
 def opcoes_de_memory_card(pasta_saves, plataforma_id):
-    """Deixa o memory card num lugar fixo, um por console.
+    """Memory card do PlayStation 1: um cartao por jogo.
 
-    Assim os saves de PlayStation nao se misturam com os de Sega, e o
-    mesmo cartao aparece toda vez que voce abre qualquer jogo daquele
-    console - inclusive com os iconezinhos na tela inicial.
+    Corrigido na revisao pos-auditoria. A ideia antiga era um cartao so por
+    console ("Shared"), mas a chave nunca chegava ao nucleo (o RetroArch lia
+    o .opt do nucleo, nao o arquivo do ARENA) e "..._Directory" /
+    "duckstation_*" nem existem no SwanStation. Na pratica, todo save de
+    PS1 feito ate hoje esta num cartao POR JOGO (saves\\SwanStation\\<jogo>.srm).
+    Ligar "Shared" agora faria esses saves sumirem da tela do jogo (ele
+    abriria um cartao novo, vazio). Por isso fica escrito o que ja vale:
+    "Libretro", um cartao por jogo, salvo junto com os outros saves.
     """
-    if plataforma_id not in ("ps1", "ps2"):
+    if plataforma_id != "ps1":
         return {}
+    return {"swanstation_MemoryCards_Card1Type": "Libretro"}
 
-    cartao = os.path.join(pasta_saves, "memcards")
-    os.makedirs(cartao, exist_ok=True)
-    return {
-        "swanstation_MemoryCards_Card1Type": "Shared",
-        "swanstation_MemoryCards_Directory": cartao,
-        "duckstation_MemoryCards.Card1Type": "Shared",
-        "duckstation_MemoryCards.Directory": cartao,
-    }
+
+def chaves_gerenciadas_pelo_arena():
+    """Toda chave de opcao de nucleo que o ARENA pode escrever, em qualquer
+    nota, modo ou excecao. So estas o ARENA controla; as outras sao do aluno
+    (mudadas no menu do RetroArch) e ficam como estao."""
+    dados = carregar_graficos()
+    chaves = set()
+    for nucleo in dados.get("nucleos", {}).values():
+        chaves.update(nucleo.get("sempre", {}))
+        for bloco in nucleo.get("por_nota", []):
+            chaves.update(bloco.get("opcoes", {}))
+    for opcoes in dados.get("modesto", {}).values():
+        chaves.update(opcoes)
+    for excecao in dados.get("excecoes", {}).values():
+        for bloco in excecao.get("por_nota", []):
+            chaves.update(bloco.get("opcoes", {}))
+    for lista in CHAVE_BIOS.values():
+        chaves.update(lista)
+    chaves.add("swanstation_MemoryCards_Card1Type")
+    return chaves
+
+
+_PADRAO_OPCAO = re.compile(r'^([A-Za-z0-9_.\-]+)\s*=\s*"(.*)"\s*$')
+
+
+def _ler_opcoes(caminho):
+    opcoes = {}
+    try:
+        with open(caminho, "r", encoding="utf-8", errors="replace") as arquivo:
+            for linha in arquivo:
+                m = _PADRAO_OPCAO.match(linha.strip())
+                if m:
+                    opcoes[m.group(1)] = m.group(2)
+    except OSError:
+        pass
+    return opcoes
+
+
+def opcoes_do_aluno():
+    """Opcoes de nucleo que NAO sao do ARENA, para nao apagar o que o aluno
+    mudou no menu do RetroArch. Le os .opt antigos de cada nucleo (onde o
+    RetroArch guardava antes do ARENA ligar global_core_options) e, por
+    cima, o arquivo global atual. Chaves "duckstation_*" (lixo antigo, o
+    nucleo nao conhece) ficam de fora."""
+    juntas = {}
+    pasta_config = os.path.join(PASTA_RETROARCH, "config")
+    try:
+        nucleos = sorted(os.listdir(pasta_config))
+    except OSError:
+        nucleos = []
+    for nucleo in nucleos:
+        juntas.update(_ler_opcoes(os.path.join(pasta_config, nucleo, nucleo + ".opt")))
+    juntas.update(_ler_opcoes(ARQUIVO_OPCOES_CORE))
+    gerenciadas = chaves_gerenciadas_pelo_arena()
+    return {k: v for k, v in juntas.items()
+            if k not in gerenciadas and not k.startswith("duckstation_")}
 
 
 # ---------------------------------------------------------------------------

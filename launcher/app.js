@@ -1772,6 +1772,20 @@ function desenharBios(consoles, arquivos) {
     rotulo.className = "opcao-rotulo";
     rotulo.textContent = c.nome;
 
+    // O emulador deste console nao deixa escolher (ele confere o conteudo
+    // de cada arquivo e acha a BIOS certa sozinho). Oferecer uma lista aqui
+    // seria prometer uma escolha que nao acontece.
+    const escolhiveis = c.escolhiveis || [];
+    if (escolhiveis.length === 0) {
+      const sozinho = document.createElement("span");
+      sozinho.className = "opcao-ajuda";
+      sozinho.textContent =
+        "O emulador acha a BIOS certa sozinho, pelo conteúdo do arquivo. Não precisa escolher.";
+      linha.append(rotulo, sozinho);
+      lote.append(linha);
+      continue;
+    }
+
     const lista = document.createElement("select");
     lista.className = "opcao-controle";
     lista.setAttribute("aria-label", "BIOS do " + c.nome);
@@ -1781,7 +1795,7 @@ function desenharBios(consoles, arquivos) {
     nenhum.textContent = "deixar o emulador escolher";
     lista.append(nenhum);
 
-    for (const a of arquivos) {
+    for (const a of arquivos.filter((a) => escolhiveis.includes(a.arquivo))) {
       const item = document.createElement("option");
       item.value = a.arquivo;
       item.textContent = `${a.arquivo} · ${a.tamanho_kb} KB`;

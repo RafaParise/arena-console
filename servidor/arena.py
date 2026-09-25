@@ -1263,6 +1263,15 @@ def gravar_override(config, custo=None, extras=None, em_partida=False):
     opcoes["joypad_autoconfig_dir"] = PASTA_CONTROLES
     opcoes["playlist_directory"] = PASTA_DADOS
     opcoes["log_dir"] = PASTA_DADOS
+    # As opcoes de cada nucleo (resolucao, filtro, BIOS, memory card, modo
+    # modesto...) que o ARENA monta ficam em retroarch-core-options.cfg.
+    # Achado real (revisao pos-auditoria, testes\teste_qual_opcao_de_nucleo_vale.py):
+    # no padrao do RetroArch (global_core_options = false) quem vale e' o
+    # arquivo retroarch\config\<Nucleo>\<Nucleo>.opt, e o do ARENA so era
+    # lido na PRIMEIRA vez que o nucleo abria. Depois disso, todo ajuste do
+    # ARENA era ignorado em silencio. Com isto, vale sempre o do ARENA.
+    opcoes["global_core_options"] = "true"
+    opcoes["core_options_path"] = graficos.ARQUIVO_OPCOES_CORE
     # Sem isto, o RetroArch usa a pasta Temp do Windows pra descompactar
     # jogo em .zip - fora da pasta do ARENA, contra a regra de nunca
     # deixar nada fora dela.
@@ -3091,8 +3100,15 @@ class Manipulador(BaseHTTPRequestHandler):
                 },
                 "bios_disponiveis": graficos.bios_disponiveis(PASTA_SISTEMA),
                 "memory_cards": graficos.listar_memory_cards(PASTA_SAVES),
+                # "escolhiveis": os arquivos que o nucleo daquele console
+                # deixa escolher de verdade. Vazio = o nucleo acha a BIOS
+                # sozinho, e a tela diz isso em vez de oferecer uma escolha
+                # que nao faria nada (achado da revisao pos-auditoria).
                 "bios_consoles": [
-                    {"id": p["id"], "nome": p["nome"]}
+                    {"id": p["id"], "nome": p["nome"],
+                     "escolhiveis": graficos.bios_que_o_nucleo_aceita(
+                         nome_curto_do_core(p.get("core", "")),
+                         [b["arquivo"] for b in graficos.bios_disponiveis(PASTA_SISTEMA)])}
                     for p in carregar_catalogo()
                     if p["arquivos_sistema"] > 0],
                 "shader": os.path.basename(
