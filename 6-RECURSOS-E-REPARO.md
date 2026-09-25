@@ -479,3 +479,38 @@ Aparece quando ele encontrou algo que não consegue consertar:
 
 
 ---
+
+---
+
+## Parte C — Coletar o perfil desta máquina (para o professor)
+
+O **`COLETAR.bat`**, na raiz, tira um retrato da máquina e mede como o
+ARENA roda nela. Serve para comparar os notebooks da escola e decidir o que
+o ARENA precisa melhorar para o mais fraco.
+
+1. Feche o ARENA, se estiver aberto.
+2. Dois cliques em **`COLETAR.bat`**. Leva uns 5 minutos.
+3. No meio, um jogo de Super Nintendo abre sozinho por uns 70 segundos. É
+   de propósito: olhe se o som e a imagem ficam lisos.
+4. No fim, responda as 5 perguntas (uma tecla e Enter).
+
+O resultado fica em `perfil\<código>_<data-hora>\`:
+
+| Arquivo | Para quê |
+|---|---|
+| `maquina.txt` | Retrato da máquina em português: processador, memória, discos (com velocidade), vídeo, Windows, rede, de onde o ARENA roda |
+| `arena.txt` | O ARENA nessa máquina: tempo para abrir, servidor, lista de jogos, gravações em disco e o jogo de SNES (quadros por segundo), com BOM / NO LIMITE / RUIM |
+| `maquina.json`, `arena.json` | Os mesmos números, para análise |
+
+**Não coleta nada pessoal.** Nem nome da máquina, nem usuário, nem endereço
+da placa de rede. A máquina aparece só como um código embaralhado.
+
+**Não pede administrador e não precisa de internet.** O que não dá para
+medir sem administrador vira "não foi possível medir". O teste de disco
+grava e apaga um arquivo de 64 MB.
+
+**Não muda nada no ARENA.** O efeito é o mesmo de abrir o ARENA e clicar em
+Atualizar lista. O jogo roda com saves temporários.
+
+Leve a pasta `perfil` inteira no pen drive: cada máquina ganha a sua pasta,
+uma não apaga a outra.
