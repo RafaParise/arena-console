@@ -127,7 +127,7 @@ async function carregarEstado() {
   $("#chaveRede").setAttribute("aria-pressed",
     dados.config.permitir_rede ? "true" : "false");
   $("#ajudaRede").textContent = dados.config.permitir_rede
-    ? "Ligado. Feche e abra o ARENA para valer."
+    ? "Ligado. Os colegas já podem te achar."
     : "Desligado, só este computador acessa.";
 
   $("#chaveModesto").setAttribute("aria-pressed",
@@ -2968,10 +2968,17 @@ function ligarEventos() {
     const botao = evento.currentTarget;
     const novo = botao.getAttribute("aria-pressed") !== "true";
     try {
-      await salvarConfig({ permitir_rede: novo });
+      const resposta = await salvarConfig({ permitir_rede: novo });
       botao.setAttribute("aria-pressed", novo ? "true" : "false");
+      // O servidor reabre sozinho com a escuta nova (rede_aplicada). Se por
+      // algum motivo nao reabriu, ai sim precisa fechar e abrir o ARENA.
+      const aplicou = resposta.rede_aplicada;
+      $("#ajudaRede").textContent = novo
+        ? "Ligado. Os colegas já podem te achar."
+        : "Desligado, só este computador acessa.";
       recado(novo
-        ? "Ligado. Feche e abra o ARENA para os colegas te acharem."
+        ? (aplicou ? "Ligado. Os colegas já podem te achar."
+                   : "Ligado. Feche e abra o ARENA para valer.")
         : "Desligado. Só este computador acessa.");
     } catch (falha) {
       recado(falha.message, true);

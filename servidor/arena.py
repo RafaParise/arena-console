@@ -4262,8 +4262,11 @@ class Manipulador(BaseHTTPRequestHandler):
             if "apelido" in dados:
                 config["apelido"] = str(dados["apelido"]).strip()[:24]
 
+            rede_mudou = False
             if "permitir_rede" in dados:
-                config["permitir_rede"] = bool(dados["permitir_rede"])
+                novo = bool(dados["permitir_rede"])
+                rede_mudou = novo != config["permitir_rede"]
+                config["permitir_rede"] = novo
 
             if "rpcn_ativo" in dados:
                 config["rpcn_ativo"] = bool(dados["rpcn_ativo"])
@@ -4274,9 +4277,13 @@ class Manipulador(BaseHTTPRequestHandler):
 
             salvar_config(config)
             gravar_override(config)
+            # A chave da rede vale NA HORA (antes precisava fechar e abrir o
+            # ARENA): o servidor reabre sozinho, logo depois desta resposta.
+            rede_aplicada = trocar_escuta_de_rede() if rede_mudou else False
             return self.responder_json({
                 "ok": True, "config": config,
                 "efetivas": opcoes_efetivas(config),
+                "rede_aplicada": rede_aplicada,
             })
 
         if caminho == "/api/jogar":
@@ -4770,6 +4777,42 @@ def abrir_janela(endereco):
     webbrowser.open(endereco)
 
 
+# O servidor HTTP que esta no ar agora, e se ele esta sendo trocado.
+# "Aceitar conexoes da rede" muda ONDE o servidor escuta: so neste computador
+# (127.0.0.1) ou na rede inteira (0.0.0.0). Isso e' decidido ao abrir o
+# socket -- antes, a unica forma de mudar era fechar e abrir o ARENA (passo
+# que travava a sala: 30 alunos fechando e reabrindo). Agora o servidor
+# encerra e sobe de novo sozinho, no mesmo processo, em menos de 1 segundo.
+SERVIDOR_ATUAL = {"servidor": None, "trocando": False}
+# A marca "trocando" e a troca do servidor andam juntas sob esta trava. Sem
+# ela, dois cliques rapidos na chave podiam fazer o laco de principal() ver
+# um servidor encerrado SEM a marca -- e o ARENA fechava em vez de reabrir.
+TRAVA_REDE = threading.Lock()
+
+
+def escuta_da_config(config):
+    return "0.0.0.0" if config.get("permitir_rede") else "127.0.0.1"
+
+
+def trocar_escuta_de_rede():
+    """Pede para o servidor reabrir com a escuta nova. Devolve False quando
+    nao ha servidor principal (ex.: teste que sobe o seu proprio)."""
+    if SERVIDOR_ATUAL["servidor"] is None:
+        return False
+
+    def encerrar_depois_da_resposta():
+        time.sleep(0.3)   # deixa a resposta do /api/config chegar na tela
+        with TRAVA_REDE:
+            atual = SERVIDOR_ATUAL["servidor"]
+            if atual is None:
+                return
+            SERVIDOR_ATUAL["trocando"] = True
+        atual.shutdown()   # fora da trava: shutdown espera o laco parar
+
+    threading.Thread(target=encerrar_depois_da_resposta, daemon=True).start()
+    return True
+
+
 def principal():
     print("=" * 62)
     print("  ARENA %s - servidor local" % VERSAO)
@@ -4866,12 +4909,11 @@ def principal():
 
     # Escuta so no proprio computador por padrao. Para a sala jogar junto,
     # marque 'permitir_rede' nos Ajustes.
-    if config["permitir_rede"]:
-        escuta = "0.0.0.0"
+    escuta = escuta_da_config(config)
+    if escuta == "0.0.0.0":
         print("  Rede:     LIBERADA. Outros PCs usam http://%s:%d"
               % (ip_da_rede(), PORTA))
     else:
-        escuta = "127.0.0.1"
         print("  Rede:     fechada (so este computador)")
 
     local = "http://127.0.0.1:%d" % PORTA
@@ -4899,10 +4941,39 @@ def principal():
     threading.Timer(1.0, lambda: abrir_janela(local)).start()
 
     try:
-        servidor.serve_forever()
+        with TRAVA_REDE:
+            SERVIDOR_ATUAL["servidor"] = servidor
+        while True:
+            servidor.serve_forever()
+            # serve_forever so volta quando alguem chama shutdown(). Se foi a
+            # chave da rede, reabre com a escuta nova; senao, e' para sair.
+            servidor.server_close()
+            with TRAVA_REDE:
+                if not SERVIDOR_ATUAL["trocando"]:
+                    break
+                SERVIDOR_ATUAL["trocando"] = False
+                # A config e' lida AQUI, dentro da trava: vale sempre o
+                # ultimo clique, mesmo com varios cliques seguidos.
+                escuta = escuta_da_config(carregar_config())
+                try:
+                    servidor = Servidor((escuta, PORTA), Manipulador)
+                except OSError as falha:
+                    # Nao conseguiu abrir para a rede: volta a escutar so
+                    # aqui, para a tela nunca ficar sem servidor.
+                    print("[ARENA] Nao consegui abrir para a rede (%s). "
+                          "Continuo so neste computador." % falha)
+                    servidor = Servidor(("127.0.0.1", PORTA), Manipulador)
+                    escuta = "127.0.0.1"
+                SERVIDOR_ATUAL["servidor"] = servidor
+            if escuta == "0.0.0.0":
+                print("  Rede:     LIBERADA agora. Outros PCs usam http://%s:%d"
+                      % (ip_da_rede(), PORTA))
+            else:
+                print("  Rede:     fechada agora (so este computador)")
     except KeyboardInterrupt:
         print("\n  Encerrando...")
     finally:
+        SERVIDOR_ATUAL["servidor"] = None
         VIGIA["encerrar"].set()
         servidor.server_close()
         fechar_banco()

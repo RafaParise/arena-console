@@ -125,7 +125,7 @@ falar("-" * 62)
 
 if not meu["config"].get("permitir_rede"):
     torto("'Aceitar conexoes da rede' esta DESLIGADO.",
-          "Ajustes > Amigos > ligue, e feche e abra o ARENA.")
+          "Ajustes > Amigos > ligue. Vale na hora, sem fechar o ARENA.")
 else:
     certo("aceita conexoes da rede")
 

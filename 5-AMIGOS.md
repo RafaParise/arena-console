@@ -128,7 +128,8 @@ controle do roteador da escola.
 
 **Ajustes → Amigos → Aceitar conexões da rede.**
 
-Ligue e **feche e abra o ARENA**. A mudança só vale depois de reiniciar.
+Ligue. **Vale na hora**: não precisa fechar o ARENA. (Até setembro de 2026
+precisava fechar e abrir; se o seu ARENA for mais antigo, ainda precisa.)
 
 **Isso é seguro?** Sim. Ligar essa chave abre para a rede só o que a
 partida a dois e a troca de recordes precisam. Um colega na mesma rede não
@@ -346,7 +347,7 @@ Para quem vai centralizar o placar na TV.
 
 1. **Onde:** SSD por adaptador USB 3.2 é o melhor. Disco `C:` também serve.
    **Cartão SD não** — documento 1.
-2. Ligue **Aceitar conexões da rede** e reinicie o ARENA.
+2. Ligue **Aceitar conexões da rede** (vale na hora).
 3. Escreva o endereço na lousa.
 4. Libere no firewall quando o Windows perguntar.
 
