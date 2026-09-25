@@ -186,3 +186,133 @@ fim de cada partida.
 
 Bateria **67 OK**; `teste_chaves_graficos`, `teste_opcoes_nucleo_ponta_a_ponta`
 e a matriz (7 consoles) OK; `retroarch.cfg` sem caminho temporário.
+
+---
+
+## Extra — Barreiras de lentidão (o testador e o ARENA)
+
+Pedido do Rafael nesta rodada: *"garanta que ele possa identificar todas as
+barreiras desses computadores que deixam eles lentos como bloatwares,
+serviços e recursos desnecessários, telemetria e etc... Se tiver algum
+problema o ARENA precisa saber identificar para recomendar ação"*.
+
+**Um módulo só, `servidor\barreiras.py`, usado em três lugares** — tela do
+ARENA, `VERIFICAR.bat` (item 11) e `COLETAR.bat` — para os três nunca
+discordarem. Duas partes separadas de propósito:
+
+- `coletar_fatos()` **lê** o Windows sem administrador: registro (só
+  leitura), processos (duas fotos com 2 s entre elas, para o uso de CPU),
+  serviços, Central de Segurança, programas instalados. Uma chamada ao
+  PowerShell (~5 s aqui). O que falhar vira "não deu para ler" e segue.
+- `avaliar(fatos)` **decide**, sem tocar em nada: função pura, testada com
+  fatos inventados (22 testes na bateria).
+
+**O que ele identifica** (cada item diz o que achou, por que pesa, o que
+fazer e **quem faz** — o aluno ou o professor/TI):
+
+| Grupo | Barreiras |
+|---|---|
+| Memória e processos | memória quase cheia / pouca livre; programas pesados abertos; **programas fecháveis** (OneDrive, Teams, Discord, Spotify, Steam, Epic, Zoom, WhatsApp, Widgets, Game Bar... — com botão **Fechar**); navegador com muitas abas; processador ocupado sem ninguém jogando |
+| Windows | atualização rodando agora; reinício pendente; ligado há dias; indexação do Windows Search trabalhando |
+| Segurança | **dois antivírus ligados**; antivírus examinando agora |
+| Instalados | **bloatware** de fábrica e "teste grátis" (McAfee, Norton, WildTangent, Candy Crush, assistentes de fabricante...) |
+| Inicialização | muitos programas abrindo com o Windows (conta só os que não foram desligados no Gerenciador de Tarefas) |
+| Serviços | SysMain e Windows Search num HD mecânico; **serviços que a escola não usa** (Fax, Demonstração de loja, Mapas, Xbox, compartilhamento do Media Player, push de telemetria); Otimização de Entrega num HD |
+| Telemetria | DiagTrack ligado sem limite de política |
+| Recursos visuais e de jogo | **gravação em segundo plano do Xbox Game Bar**; Modo de Jogo desligado; transparência e animações; apps em segundo plano |
+| Energia | na bateria; economia de bateria; plano "Economia"; **processador limitado pelo plano** (estado máximo < 100%) |
+| Disco e memória virtual | disco do Windows quase cheio; temporários enormes; **memória virtual desligada** |
+| Vídeo | sem driver de verdade (Adaptador de Vídeo Básico) |
+
+**No ARENA:**
+- Ajustes → Máquina → **"O que está deixando este computador lento"** com
+  o botão **Verificar agora** (só sob pedido: com o ARENA parado continua
+  0% de processador). Conferido no Chrome.
+- **Na hora de jogar**, uma checagem de ~10 ms (memória quase cheia, na
+  bateria, economia de bateria) avisa na barra do topo até o jogo fechar.
+- `GET /api/barreiras` e `POST /api/barreiras/fechar` — **só para este
+  computador** (403 vindo da rede); fechar **só** programas da lista
+  segura, só com o clique; nunca navegador, Word ou algo com trabalho do
+  aluno. A resposta não leva a lista de processos nem dado pessoal.
+
+**No testador (`coletar_maquina.py`)**, além das barreiras: **quantos pentes
+de memória e de que velocidade** (um pente só = canal simples, e o vídeo
+integrado do Celeron perde muito) e **o que o próprio Windows diz do disco**
+(HDD/SSD/NVMe/USB), como segunda opinião ao lado do teste de velocidade.
+
+**Privacidade:** da inicialização guarda só o nome do programa e se é "do
+usuário" ou "do computador" (a lista do Windows traz o nome do usuário e da
+máquina — descartados). Dos instalados, só os que batem com a lista de
+bloatware. Dos processos, só os 15 mais pesados. Teste confirma: nenhum
+nome de usuário ou de máquina na resposta.
+
+---
+
+## Fase 3 — Servidor e API
+
+| Item | Resultado |
+|---|---|
+| Fuzz das rotas (agora com `/api/barreiras` e `/api/barreiras/fechar`) | **0 falhas**. O fuzz dava 5 s a toda rota; o diagnóstico leva ~5 s de propósito — ganhou prazo de 60 s só para ele (`ROTAS_LENTAS`). A tela espera sem prazo |
+| Rotas novas vindas da rede | 403 (teste `teste_barreiras_api.py`) |
+| Fechar programa fora da lista | recusado nos 5 casos testados (`notepad`, `explorer`, `../../x`, vazio, nulo) |
+| Rotas abertas à rede | continuam as mesmas **8** |
+| CSRF e DNS rebinding | valem para as rotas novas automaticamente (checagem geral do servidor) |
+
+### Achado — PowerShell bloqueado ou em "modo restrito" (corrigido)
+
+Muita escola bloqueia o PowerShell ou liga o **modo de linguagem restrita**
+para aluno. Nele, `[pscustomobject]`, `[math]`, `[Environment]`,
+`[Convert]` e métodos de objetos não-básicos são recusados. O diagnóstico
+usava tudo isso e **perdia listas inteiras em silêncio** — e o primeiro teste
+que escrevi só contava os campos, não o conteúdo, e deixou passar.
+
+**Corrigido:** os scripts do diagnóstico e do coletor foram reescritos com
+`Select-Object` calculado (permitido) e as contas feitas no Python.
+`teste_barreiras_modo_restrito.py` agora compara **conteúdo**: paridade
+total (63 processos, 5 itens de inicialização, 16 serviços, 1 antivírus,
+262 programas, 13 campos iguais). Com o PowerShell **bloqueado de vez**, o
+diagnóstico segue com memória, energia e disco e diz o que não conseguiu
+ler (teste na bateria). O coletor passou a usar a resposta mesmo com código
+de erro (no modo restrito uma linha recusada deixa o código diferente de
+zero) e ganhou reserva sem PowerShell para os endereços de rede.
+
+**Limite honesto:** ligar o modo restrito pelo próprio script (a única
+simulação possível aqui) é **mais duro** que a política de verdade: bloqueia
+também os módulos da Microsoft de rede, disco e Firewall, que numa escola
+com modo restrito real continuam liberados por serem assinados. Esses três
+itens do coletor ficam "não foi possível medir" na simulação. Roteiro 10
+confere numa conta de aluno de verdade.
+
+### Achado — o VERIFICAR não conferia 7 arquivos sem os quais o ARENA nem abre (corrigido)
+
+A lista de "arquivos do programa" tinha 5 dos 11 módulos que o `arena.py`
+importa na abertura: faltavam `controles`, `acervo`, `internet_archive`,
+`capas_online`, `identificador`, o novo `barreiras` e o
+`perfis_controle.json`. Faltando qualquer um, o ARENA não abria — e o
+verificador dizia *"os 13 arquivos do programa estão presentes"*. Agora
+confere **20**. `teste_verificador_arquivos.py` prova as duas pontas numa
+cópia sem o `controles.py`: o ARENA não abre, e o verificador acusa. (No
+caminho, o teste pegou uma armadilha: o Python embutido já traz a pasta
+`servidor` de verdade no caminho de busca — linha `..` do `python313._pth` —
+e achava o arquivo original. O teste tira essa pasta antes de provar.)
+
+---
+
+## Fase 4 — Jogar Junto
+
+Rodados de novo com RetroArch de verdade, depois das mudanças desta rodada
+na partida (cache do PS1 fora do Jogar Junto; rodízio de registros ao fim
+do jogo): 5 jogadores (os 4 convidados entram), isolamento, cenários de sala,
+PARTIDA.bat com colega, rede sem reabrir, descoberta de 30 máquinas,
+sincronização sem relógio, migração e lotes, mala: **9 de 9**.
+
+### Pergunta nova: notas diferentes dessincronizam a partida?
+
+Agora que o ajuste de imagem do ARENA chega aos núcleos, o Ryzen e o Celeron
+recebem opções diferentes. O Jogar Junto exige que as duas máquinas simulem
+o jogo **igualzinho**. Conferido núcleo por núcleo: nos que fazem Jogar
+Junto de verdade (SNES, Mega Drive, NES, e o PS1 pelo PCSX ReARMed), o
+`graficos.json` só manda opções **de imagem** (filtros NTSC, bordas, paleta,
+transparência, recorte). O PCSX ReARMed não recebe nenhuma. **Nenhuma opção
+de simulação** — sem risco conhecido. A prova definitiva (host no Ryzen,
+convidado no Celeron) fica no Roteiro 1.

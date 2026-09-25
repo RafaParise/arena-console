@@ -6,38 +6,38 @@
       "[INFO] [Netplay] Você se juntou como jogador 1",
       "[INFO] [Netplay] Vaga de conexão 0",
       "[INFO] [Netplay] Conexão recebida de: \"Jogador2\"",
-      "[INFO] [Netplay] Jogador2 se juntou como o jogador 2 (ping: 29 ms)",
+      "[INFO] [Netplay] Jogador2 se juntou como o jogador 2 (ping: 12 ms)",
       "[INFO] [Netplay] Vaga de conexão 1",
       "[INFO] [Netplay] Conexão recebida de: \"Jogador3\"",
-      "[INFO] [Netplay] Jogador3 se juntou como o jogador 3 (ping: 16 ms)",
+      "[INFO] [Netplay] Jogador3 se juntou como o jogador 3 (ping: 33 ms)",
       "[INFO] [Netplay] Vaga de conexão 2",
       "[INFO] [Netplay] Conexão recebida de: \"Jogador4\"",
-      "[INFO] [Netplay] Jogador4 se juntou como o jogador 4 (ping: 17 ms)",
+      "[INFO] [Netplay] Jogador4 se juntou como o jogador 4 (ping: 16 ms)",
       "[INFO] [Netplay] Vaga de conexão 3",
       "[INFO] [Netplay] Conexão recebida de: \"Jogador5\"",
-      "[INFO] [Netplay] Jogador5 se juntou como o jogador 5 (ping: 16 ms)"
+      "[INFO] [Netplay] Jogador5 se juntou como o jogador 5 (ping: 17 ms)"
     ],
     "convidado2": [
       "[INFO] [Netplay] Conectado a: \"Anfitriao\"",
-      "[INFO] [Netplay] Você se juntou como jogador 2 (ping: 17 ms)",
+      "[INFO] [Netplay] Você se juntou como jogador 2 (ping: 16 ms)",
       "[INFO] [Netplay] Jogador3 se juntou como o jogador 3",
       "[INFO] [Netplay] Jogador4 se juntou como o jogador 4",
       "[INFO] [Netplay] Jogador5 se juntou como o jogador 5"
     ],
     "convidado3": [
       "[INFO] [Netplay] Conectado a: \"Anfitriao\"",
-      "[INFO] [Netplay] Você se juntou como jogador 3 (ping: 16 ms)",
+      "[INFO] [Netplay] Você se juntou como jogador 3 (ping: 17 ms)",
       "[INFO] [Netplay] Jogador4 se juntou como o jogador 4",
       "[INFO] [Netplay] Jogador5 se juntou como o jogador 5"
     ],
     "convidado4": [
       "[INFO] [Netplay] Conectado a: \"Anfitriao\"",
-      "[INFO] [Netplay] Você se juntou como jogador 4 (ping: 17 ms)",
+      "[INFO] [Netplay] Você se juntou como jogador 4 (ping: 16 ms)",
       "[INFO] [Netplay] Jogador5 se juntou como o jogador 5"
     ],
     "convidado5": [
       "[INFO] [Netplay] Conectado a: \"Anfitriao\"",
-      "[INFO] [Netplay] Você se juntou como jogador 5 (ping: 17 ms)"
+      "[INFO] [Netplay] Você se juntou como jogador 5 (ping: 16 ms)"
     ]
   },
   "tempos_de_entrada_s": {
@@ -49,23 +49,23 @@
   "amostras_host": [
     {
       "apos": "convidado2",
-      "ram_mb": 247.5,
-      "cpu_s": 1.484375
+      "ram_mb": 248.9,
+      "cpu_s": 1.453125
     },
     {
       "apos": "convidado3",
-      "ram_mb": 247.7,
-      "cpu_s": 1.984375
+      "ram_mb": 249.0,
+      "cpu_s": 2
     },
     {
       "apos": "convidado4",
-      "ram_mb": 247.7,
-      "cpu_s": 2.578125
+      "ram_mb": 249.0,
+      "cpu_s": 2.515625
     },
     {
       "apos": "convidado5",
-      "ram_mb": 247.8,
-      "cpu_s": 3.0625
+      "ram_mb": 249.1,
+      "cpu_s": 3.015625
     }
   ]
 }

@@ -216,6 +216,33 @@
     "extra": "falhas=0/20"
   },
   {
+    "rota": "/api/barreiras",
+    "metodo": "GET",
+    "categoria": "dados_corretos",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/barreiras",
+    "metodo": "GET",
+    "categoria": "dados_faltando",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/barreiras",
+    "metodo": "GET",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
     "rota": "/api/perfis-controle",
     "metodo": "GET",
     "categoria": "dados_corretos",
@@ -1747,6 +1774,105 @@
   },
   {
     "rota": "/api/backup",
+    "metodo": "POST",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/barreiras/fechar",
+    "metodo": "POST",
+    "categoria": "dados_corretos",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/barreiras/fechar",
+    "metodo": "POST",
+    "categoria": "dados_faltando",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/barreiras/fechar",
+    "metodo": "POST",
+    "categoria": "tipo_errado",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=programa"
+  },
+  {
+    "rota": "/api/barreiras/fechar",
+    "metodo": "POST",
+    "categoria": "texto_gigante",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=programa"
+  },
+  {
+    "rota": "/api/barreiras/fechar",
+    "metodo": "POST",
+    "categoria": "emoji",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=programa"
+  },
+  {
+    "rota": "/api/barreiras/fechar",
+    "metodo": "POST",
+    "categoria": "travessia_pasta",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=programa payload=../../../../Windows/win.ini"
+  },
+  {
+    "rota": "/api/barreiras/fechar",
+    "metodo": "POST",
+    "categoria": "travessia_pasta",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=programa payload=..\\..\\..\\..\\Windows\\win.ini"
+  },
+  {
+    "rota": "/api/barreiras/fechar",
+    "metodo": "POST",
+    "categoria": "travessia_pasta",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=programa payload=/etc/passwd"
+  },
+  {
+    "rota": "/api/barreiras/fechar",
+    "metodo": "POST",
+    "categoria": "travessia_pasta",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=programa payload=C:\\Windows\\win.ini"
+  },
+  {
+    "rota": "/api/barreiras/fechar",
+    "metodo": "POST",
+    "categoria": "travessia_pasta",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=programa payload=....//....//....//Windows/win.ini"
+  },
+  {
+    "rota": "/api/barreiras/fechar",
     "metodo": "POST",
     "categoria": "repeticao_rapida",
     "status": 200,

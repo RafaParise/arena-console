@@ -245,10 +245,10 @@ passa a identificar e recomendar ação.
 - [x] Fase 0 — Linha de base e inventário (25/09/2026)
 - [x] Fase 1 — Varredura e limpeza (25/09/2026)
 - [x] Fase 2 — Leveza e desempenho (25/09/2026)
-- [ ] Fase 3 — Servidor e API
-- [ ] Fase 4 — Jogar Junto
+- [x] Fase 3 — Servidor e API (25/09/2026)
+- [x] Fase 4 — Jogar Junto (25/09/2026)
 - [ ] Fase 5 — Matriz de jogos
 - [ ] Fase 6 — Portabilidade e robustez
 - [ ] Fase 7 — Clareza para todos
 - [ ] Fase 8 — Relatório final e entrega
-- [ ] Extra — Barreiras de lentidão (testador + ARENA)
+- [x] Extra — Barreiras de lentidão (testador + ARENA) (25/09/2026)
