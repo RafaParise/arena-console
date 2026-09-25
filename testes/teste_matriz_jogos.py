@@ -70,6 +70,22 @@ def montar_override(destino_cfg, pasta_instancia):
     opcoes["menu_driver"] = "rgui"
     opcoes["network_cmd_enable"] = "true"
     opcoes["network_cmd_port"] = str(PORTA_COMANDO)
+    # Revisao pos-auditoria: as opcoes de nucleo do ARENA so passaram a valer
+    # com global_core_options ligado. A matriz agora abre cada jogo com
+    # EXATAMENTE essas opcoes (geradas pela nota desta maquina), numa copia
+    # temporaria do arquivo -- o de verdade nao e' tocado.
+    import graficos
+    opcoes_nucleo = os.path.join(pasta_instancia, "retroarch-core-options.cfg")
+    original = graficos.ARQUIVO_OPCOES_CORE
+    graficos.ARQUIVO_OPCOES_CORE = opcoes_nucleo
+    try:
+        graficos.gravar_opcoes_dos_nucleos(
+            arena.CAPACIDADE["nota"], graficos.opcoes_de_memory_card("", "ps1"),
+            arena.CAPACIDADE.get("nota_gpu"), bool(config.get("modo_modesto")))
+    finally:
+        graficos.ARQUIVO_OPCOES_CORE = original
+    opcoes["global_core_options"] = "true"
+    opcoes["core_options_path"] = opcoes_nucleo
     linhas = ["# teste matriz de jogos"] + ['%s = "%s"' % (c, opcoes[c]) for c in sorted(opcoes)]
     with open(destino_cfg, "w", encoding="utf-8") as f:
         f.write("\n".join(linhas) + "\n")
