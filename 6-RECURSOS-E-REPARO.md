@@ -366,6 +366,7 @@ servidor\python\python.exe servidor\diagnostico.py --so-ver
 | 8 | Espaço em disco, tipo do pen drive (FAT32 não aceita arquivo acima de 4 GB) e jogo com nome tão comprido que o save passaria do limite de 260 letras do Windows | Não, avisa e diz o que fazer |
 | 9 | Cópias de segurança existem | Não, informa |
 | 10 | A porta 8777 está livre | Não, avisa |
+| 11 | O que deixa este computador lento (programas, serviços, telemetria, bateria, memória, disco...) — detalhes no documento 3 | Não, só diz o que fazer e quem faz |
 
 ---
 
@@ -498,7 +499,7 @@ O resultado fica em `perfil\<código>_<data-hora>\`:
 
 | Arquivo | Para quê |
 |---|---|
-| `maquina.txt` | Retrato da máquina em português: processador, memória, discos (com velocidade), vídeo, Windows, rede, de onde o ARENA roda |
+| `maquina.txt` | Retrato da máquina em português: processador, memória (e quantos pentes), discos (com velocidade e o que o Windows diz deles), vídeo, Windows, rede, de onde o ARENA roda, e **o que deixa essa máquina lenta**, com o que fazer |
 | `arena.txt` | O ARENA nessa máquina: tempo para abrir, servidor, lista de jogos, gravações em disco e o jogo de SNES (quadros por segundo), com BOM / NO LIMITE / RUIM |
 | `maquina.json`, `arena.json` | Os mesmos números, para análise |
 

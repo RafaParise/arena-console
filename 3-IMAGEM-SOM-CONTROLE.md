@@ -496,9 +496,55 @@ O que muda:
 | Cópia de segurança | a cada jogo fechado | a cada 15 min |
 | Lista de jogos em memória | 4 s | 15 s |
 | Conexões em espera | 128 | 48 |
+| Cache de vídeo do PS1 | regravado a cada jogo | travado quando para de crescer |
 
 Nada some. O ARENA só conversa menos com o disco e com a rede — que é
 exatamente o que trava um Celeron de dois núcleos e desgasta um cartão SD.
+
+O cache de vídeo do PS1 (`retroarch\system\swanstation\vulkan_pipelines.bin`)
+tem de 15 a 50 MB, e o emulador o regravava inteiro toda vez que o jogo
+fechava, mesmo sem mudar nada. Num pen drive, isso deixava o jogo "travado"
+fechando por vários segundos. No modo econômico, quando o cache para de
+crescer, o ARENA o marca como somente leitura. Se o pen drive for para outro
+computador, o ARENA apaga esse cache e o emulador monta outro, próprio da
+placa de vídeo daquele computador.
+
+### O que está deixando o computador lento
+
+Em **Ajustes → Máquina**, o botão **Verificar agora** olha o Windows (leva
+uns 5 segundos) e lista o que pesa, do mais grave para o mais leve:
+
+| O ARENA procura | Exemplo do que aparece |
+|---|---|
+| Pouca memória livre | "Só 600 MB livres de 4000 MB" |
+| Programas pesados abertos, ou que dá para fechar | OneDrive, Teams, Discord, Steam — com botão **Fechar** |
+| Navegador com muitas abas | "O navegador está usando 1500 MB" |
+| Windows se atualizando, ou esperando reiniciar | "O Windows está se atualizando agora" |
+| Dois antivírus ligados, ou antivírus examinando agora | "Dois antivírus ligados ao mesmo tempo" |
+| Programas de fábrica e de teste grátis | McAfee, WildTangent, Candy Crush... |
+| Muitos programas que abrem com o Windows | "12 programas abrem junto com o Windows" |
+| Serviços que ocupam um HD mecânico | SysMain, Windows Search |
+| Telemetria no máximo | serviço DiagTrack sem limite de política |
+| Gravação de jogo em segundo plano | Xbox Game Bar gravando o tempo todo |
+| Efeitos visuais, apps em segundo plano, Modo de Jogo desligado | transparência, animações |
+| Bateria, economia de bateria, plano de energia que segura o processador | "Notebook na bateria" |
+| Disco do Windows cheio, pasta de temporários grande, memória virtual desligada | "Só 3 GB livres" |
+| Sem driver de vídeo de verdade | "Adaptador de Vídeo Básico" |
+
+Cada item diz **o que fazer** e **quem faz**: "você consegue sozinho" ou
+"precisa do professor ou do TI" (o que pede senha de administrador).
+
+**O ARENA só olha.** Ele nunca muda nada no Windows sozinho. O único botão
+que faz alguma coisa é **Fechar**, e só para programas de uma lista curta e
+segura (OneDrive, Teams, Discord, Spotify, Steam e parecidos) — nunca o
+navegador, o Word ou qualquer coisa com trabalho seu.
+
+**Na hora de jogar**, o ARENA confere em um instante o que pode travar o
+jogo agora (memória quase cheia, notebook na bateria, economia de bateria) e
+avisa na barra do topo.
+
+O mesmo diagnóstico aparece no `VERIFICAR.bat` (item 11) e no `COLETAR.bat`
+(documento 6).
 
 ### Partida a dois pesa o dobro
 

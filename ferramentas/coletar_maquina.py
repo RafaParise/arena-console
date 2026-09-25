@@ -206,9 +206,21 @@ def memoria_agora():
 def coletar_memoria():
     etapa("memoria")
     try:
-        return memoria_agora()
+        resultado = memoria_agora()
     except (OSError, AttributeError) as falha:
         return falhou(falha)
+    # Pentes de memoria (sem administrador). Com UM pente so, a memoria
+    # trabalha em canal simples: a placa de video integrada (a do Celeron)
+    # divide essa memoria e perde muito desempenho.
+    pentes = powershell_json("Get-CimInstance Win32_PhysicalMemory | Select-Object "
+                             "@{n='gb';e={[math]::Round($_.Capacity/1GB,1)}}, "
+                             "@{n='mhz';e={if ($_.ConfiguredClockSpeed) {$_.ConfiguredClockSpeed} else {$_.Speed}}}")
+    if pentes is None:
+        resultado["pentes"] = falhou("consulta de pentes nao respondeu")
+    else:
+        resultado["pentes"] = [{"gb": p.get("gb"), "mhz": p.get("mhz")} for p in pentes]
+        resultado["canal_simples"] = len(pentes) == 1
+    return resultado
 
 
 # ---------------------------------------------------------------------------
@@ -355,6 +367,19 @@ def coletar_disco(raiz, pasta_teste, rotulo):
         except (OSError, AttributeError) as falha:
             resultado["velocidade"] = falhou(falha)
     resultado["palpite"] = palpite_do_disco(tipo, resultado["velocidade"])
+    # Segunda opiniao: o que o proprio Windows diz do disco fisico dessa
+    # letra (HD/SSD e o tipo de ligacao). Sem administrador.
+    letra = raiz[0]
+    midia = powershell_json(
+        "Get-Partition -DriveLetter %s -ErrorAction Stop | Get-Disk | ForEach-Object { "
+        "$d = Get-PhysicalDisk | Where-Object DeviceId -eq $_.Number; "
+        "[pscustomobject]@{ tipo = [string]$d.MediaType; ligacao = [string]$d.BusType; modelo = $d.FriendlyName } }" % letra)
+    if midia:
+        resultado["windows_diz"] = midia[0]
+        if midia[0].get("tipo") == "HDD" and "mecanico" not in str(resultado["palpite"]):
+            resultado["palpite"] += " (o Windows diz HD mecanico)"
+    else:
+        resultado["windows_diz"] = falhou("o Windows nao informou o tipo do disco")
     return resultado
 
 
@@ -576,6 +601,29 @@ def coletar_instalacao():
 
 
 # ---------------------------------------------------------------------------
+# Barreiras de lentidao (o mesmo diagnostico que o ARENA usa)
+# ---------------------------------------------------------------------------
+
+def coletar_barreiras(dados):
+    """Usa servidor\\barreiras.py -- o MESMO codigo que o ARENA usa na tela,
+    para o coletor e o ARENA nunca discordarem. Aqui ele ainda recebe o
+    resultado do teste de disco (HD mecanico), que o ARENA nao mede."""
+    etapa("o que deixa esta maquina lenta (programas, servicos, telemetria...)")
+    sys.path.insert(0, os.path.join(RAIZ, "servidor"))
+    try:
+        import barreiras
+        windows = next((d for d in dados.get("discos", []) if d.get("uso") == "onde esta o Windows"),
+                       (dados.get("discos") or [{}])[0])
+        mecanico = "mecanico" in str(windows.get("palpite", ""))
+        resultado = barreiras.diagnosticar(disco_mecanico=mecanico)
+        # No retrato fica so o que ajuda a decidir: sem a lista de processos
+        # inteira (so os 15 mais pesados, ja cortados no modulo).
+        return resultado
+    except Exception as falha:
+        return falhou(falha)
+
+
+# ---------------------------------------------------------------------------
 # Resumo em portugues
 # ---------------------------------------------------------------------------
 
@@ -617,6 +665,12 @@ def escrever_resumo(dados):
     else:
         L.append("  %s MB no total, %s MB livres agora (%s%% em uso com o Windows aberto)" % (
             m["total_mb"], m["livre_mb"], m["em_uso_pct"]))
+        pentes = m.get("pentes")
+        if isinstance(pentes, list) and pentes:
+            L.append("  %d pente(s): %s" % (len(pentes), ", ".join(
+                "%s GB a %s MHz" % (p["gb"], p["mhz"]) for p in pentes)))
+            if m.get("canal_simples"):
+                L.append("  ! Um pente so (canal simples): o video integrado perde desempenho.")
     L.append("")
 
     L.append("DISCOS")
@@ -630,6 +684,10 @@ def escrever_resumo(dados):
                 vel["escrita_mb_s"], vel["leitura_mb_s"], vel["leitura_4k_mediana_ms"], d["palpite"]))
         else:
             L.append("      velocidade: %s" % _v(vel))
+        wd = d.get("windows_diz")
+        if isinstance(wd, dict) and not wd.get(NAO_MEDIU):
+            L.append("      o Windows diz: %s, ligado por %s (%s)" % (
+                wd.get("tipo") or "?", wd.get("ligacao") or "?", wd.get("modelo") or "?"))
         if str(d.get("sistema_de_arquivos", "")).upper() == "FAT32":
             L.append("      ! FAT32: jogo acima de 4 GB nao cabe.")
     L.append("")
@@ -709,6 +767,26 @@ def escrever_resumo(dados):
     if i.get("bloqueio_aviso"):
         L.append("  (%s)" % i["bloqueio_aviso"])
     L.append("")
+
+    b = dados.get("barreiras", {})
+    L.append("O QUE DEIXA ESTA MAQUINA LENTA")
+    if b.get(NAO_MEDIU):
+        L.append("  " + _v(b))
+    elif not b.get("barreiras"):
+        L.append("  Nada encontrado. Maquina sem barreiras conhecidas.")
+    else:
+        for item in b["barreiras"]:
+            L.append("  [%s] %s" % (item["gravidade"].upper(), item["titulo"]))
+            L.append("      achado: %s" % item["achado"])
+            L.append("      o que fazer (%s): %s" % (item["quem"], item["acao"]))
+    f = b.get("fatos", {}) if isinstance(b, dict) else {}
+    if f:
+        L.append("  (ligado ha %s h; %s programas instalados; %s na inicializacao; leitura em %s s)" % (
+            f.get("ligado_ha_horas", "?"), f.get("programas_instalados", "?"),
+            len([x for x in f.get("inicializacao") or [] if not x.get("desligado")]), b.get("segundos", "?")))
+    if b.get("nao_deu_para_ler"):
+        L.append("  nao deu para ler: %s" % "; ".join(b["nao_deu_para_ler"]))
+    L.append("")
     L.append("Tempo da coleta: %s s" % dados["duracao_s"])
     return "\n".join(L) + "\n"
 
@@ -734,6 +812,7 @@ def coletar(pasta=None):
     dados["sistema"] = coletar_sistema()
     dados["rede"] = coletar_rede()
     dados["instalacao"] = coletar_instalacao()
+    dados["barreiras"] = coletar_barreiras(dados)
     dados["duracao_s"] = round(time.time() - inicio, 1)
 
     with open(os.path.join(pasta, "maquina.json"), "w", encoding="utf-8") as f:

@@ -173,6 +173,7 @@ sem áudio e sem sair do computador.
 | Jogo de PlayStation 2 não abre | Documento 2, parte B. Precisa do PCSX2 |
 | O jogo abre e fecha na hora | Documento 2 (falta arquivo) ou 4 (motor gráfico) |
 | Trava ou o som falha | Documento 2 |
+| O computador todo está lento | Ajustes → Máquina → **Verificar agora**. Diz o que pesa e o que fazer. Documento 3 |
 | Diz que já tem um jogo aberto | Feche o outro com F10 |
 | Não sei o que houve, só sei que quebrou | Dois cliques em **`VERIFICAR.bat`**. Documento 6 |
 

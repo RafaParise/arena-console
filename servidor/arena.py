@@ -53,6 +53,7 @@ if PASTA_SERVIDOR not in sys.path:
 import cheats      # noqa: E402
 import controles   # noqa: E402
 import acervo      # noqa: E402
+import barreiras   # noqa: E402  (o que deixa o computador lento -- auditoria 2)
 import internet_archive  # noqa: E402
 import capas_online     # noqa: E402
 import graficos    # noqa: E402
@@ -2039,6 +2040,41 @@ def traduzir_erro_do_sistema(falha, acao):
     return "Não consegui %s. %s" % (acao, motivo)
 
 
+_cache_barreiras = {"quando": 0.0, "resultado": None}
+TRAVA_BARREIRAS = threading.Lock()
+
+
+def diagnostico_de_barreiras(forcar=False):
+    """Roda barreiras.diagnosticar() no maximo uma vez por minuto (o aluno
+    pode clicar varias vezes). Um de cada vez: dois cliques colados nao
+    abrem dois PowerShell. Para a tela vai so o que ela mostra -- nada da
+    lista de processos inteira."""
+    with TRAVA_BARREIRAS:
+        with TRAVA_CACHE:
+            idade = time.time() - _cache_barreiras["quando"]
+            salvo = _cache_barreiras["resultado"]
+        if salvo and idade < 60 and not forcar:
+            return salvo
+        # O tipo do disco do Windows (HD ou SSD) o proprio diagnostico
+        # pergunta ao Windows; aqui nao se mede nada.
+        completo = barreiras.diagnosticar()
+        fatos = completo.get("fatos", {})
+        resultado = {
+            "ok": True,
+            "barreiras": completo["barreiras"],
+            "segundos": completo["segundos"],
+            "nao_deu_para_ler": completo["nao_deu_para_ler"],
+            "resumo": {chave: fatos.get(chave) for chave in (
+                "memoria_livre_mb", "memoria_total_mb", "ligado_ha_horas",
+                "programas_instalados", "disco_windows_livre_gb")},
+            "verificado_em": agora_utc(),
+        }
+        with TRAVA_CACHE:
+            _cache_barreiras["quando"] = time.time()
+            _cache_barreiras["resultado"] = resultado
+        return resultado
+
+
 def limpar_logs_antigos():
     """Apaga os logs do RetroArch mais velhos, mantendo so os LOGS_MANTIDOS
     mais recentes (por nome -- o carimbo de data/hora no nome ja ordena
@@ -3321,6 +3357,13 @@ class Manipulador(BaseHTTPRequestHandler):
         if caminho == "/api/conquistas":
             return self.responder_json(montar_conquistas())
 
+        if caminho == "/api/barreiras":
+            # O que esta deixando ESTE computador lento. So sob pedido (botao
+            # "Verificar agora"): custa ~5 s de PowerShell, entao nunca roda
+            # sozinho em segundo plano -- o ARENA parado continua a 0%.
+            return self.responder_json(diagnostico_de_barreiras(
+                forcar=urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query).get("forcar") == ["1"]))
+
         if caminho == "/api/capa":
             parametros = urllib.parse.parse_qs(
                 urllib.parse.urlparse(self.path).query)
@@ -4191,6 +4234,16 @@ class Manipulador(BaseHTTPRequestHandler):
             })
 
         # ---- bibliotecas graficas sem instalar ------------------------------
+        if caminho == "/api/barreiras/fechar":
+            # So programas da lista curta e segura (barreiras.FECHAVEIS), e
+            # so quando o aluno clica. Nunca navegador, Word, etc.
+            ok, mensagem = barreiras.fechar_programa(dados.get("programa"))
+            if not ok:
+                return self.erro(mensagem)
+            with TRAVA_CACHE:
+                _cache_barreiras["quando"] = 0.0   # a proxima consulta ja ve fechado
+            return self.responder_json({"ok": True, "mensagem": mensagem})
+
         if caminho == "/api/reparar-runtime":
             copiadas, erro = reparar_runtime()
             if erro:
@@ -4465,6 +4518,13 @@ class Manipulador(BaseHTTPRequestHandler):
                 resposta["porta"] = graficos.PORTA_PARTIDA
             if aviso_netplay:
                 resposta["aviso"] = aviso_netplay
+            # Na hora de jogar, o que pode travar o jogo AGORA: memoria quase
+            # cheia, notebook na bateria, economia de bateria (~10 ms, sem
+            # PowerShell). A tela avisa junto com "Abrindo...".
+            alertas = barreiras.checagem_rapida()
+            if alertas:
+                resposta["alerta_maquina"] = [
+                    {"titulo": b["titulo"], "acao": b["acao"]} for b in alertas]
             elif (caminho_externo and dados_externo["nome"] == "PCSX2" and
                   graficos.jogo_tem_system_link_ps2(plataforma, jogo["titulo"])):
                 if graficos.npcap_instalado():

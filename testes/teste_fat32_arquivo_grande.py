@@ -48,7 +48,7 @@ def main():
         hardware.sistema_de_arquivos = lambda pasta: "FAT32"  # finge FAT32
         sys.modules["hardware"] = hardware
 
-        sys.argv = ["diagnostico.py", "--so-ver"]
+        sys.argv = ["diagnostico.py", "--so-ver", "--sem-barreiras"]
         caminho_diag_original = os.path.join(destino, "servidor", "diagnostico.py")
         codigo = open(caminho_diag_original, encoding="utf-8").read()
         codigo = codigo.replace('RAIZ = os.path.dirname(PASTA_SERVIDOR)',
