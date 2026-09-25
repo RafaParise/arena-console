@@ -203,4 +203,4 @@ lista de remoção; Fase 7 - mudanças de texto; Fase 8 - juntar ao
 - [x] Fase 5 — Matriz de jogos (24/09/2026)
 - [x] Fase 6 — Portabilidade e robustez (24/09/2026)
 - [x] Fase 7 — Clareza para todos (24/09/2026)
-- [x] Fase 8 — Relatório final e entrega (25/09/2026) — aprovada pelo Rafael e juntada ao `main` em 25/09/2026 (commit `2633704`)
+- [x] Fase 8 — Relatório final e entrega (25/09/2026) — aprovada pelo Rafael e juntada ao `main` em 25/09/2026 (commit `2633704`); revisão pós-auditoria no mesmo dia; rodada final completa: 35 de 35

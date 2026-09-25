@@ -1639,18 +1639,19 @@ do aluno). Scripts novos desta revisão: `teste_sinc_sem_relogio`,
 `teste_opcoes_nucleo_ponta_a_ponta`, `teste_caminho_fora_no_cfg`,
 `teste_adaptadores_vpn`, `teste_caminho_comprido`, `teste_disco_cheio`,
 `teste_ps3_sem_firmware`, `teste_acervo_download_real`, `medir_tela.ps1`.
-**Rodada final completa: NÃO terminou.** O Claude Code interrompeu a
-rodada (`ferramentas\rodada_final.py`) por falta de memória no computador,
-durante a matriz de jogos. Não foi falha de teste. Ao longo da revisão,
-cada teste afetado por cada mudança rodou e passou: bateria de 45, fuzz
-(0 falhas), concorrência, mala, arquivos corrompidos, queda no meio da
-gravação, Fase 7, longa duração, PARTIDA com colega, rebinding, acesso de
-rede, descoberta de 30 máquinas, cenários de sala, 5 jogadores, 4 locais,
-matriz (6/6 com as opções reais do ARENA) e todos os novos listados acima.
-**Falta rodar tudo junto uma vez**, com memória livre:
-`servidor\python\python.exe ferramentas\rodada_final.py` (~15 min).
+**Rodada final completa (25/09/2026): 35 de 35 passaram.** Bateria de
+referência (45 testes) + fuzz das 244 checagens (0 falhas) + 33 scripts de
+`testes\`, um por vez, com RetroArch de verdade onde o teste pede (matriz
+de 6 consoles com as opções reais do ARENA, Jogar Junto com 5 instâncias
+— os 4 convidados entraram —, cenários de sala, rede ruim). Resultado
+bruto: `docs\rodada_final_bruta.json`. Depois da rodada: nenhum processo
+solto, `retroarch.cfg` sem caminho temporário, nenhum save real tocado.
 
-Efeito colateral da interrupção, já corrigido: a matriz, morta no meio,
+Uma primeira tentativa dessa rodada tinha sido interrompida pelo Claude
+Code por falta de memória no computador (não foi falha de teste); a
+repetição, com 6,7 GB livres, foi até o fim.
+
+Efeito colateral daquela interrupção, já corrigido: a matriz, morta no meio,
 deixou `core_options_path` do `retroarch.cfg` apontando para o Temp. A
 correção automática passou a conhecer essa chave, e a matriz agora manda o
 RetroArch não gravar a configuração ao fechar.
