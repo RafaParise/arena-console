@@ -1363,6 +1363,14 @@ def gravar_override(config, custo=None, extras=None, em_partida=False):
     # ARENA era ignorado em silencio. Com isto, vale sempre o do ARENA.
     opcoes["global_core_options"] = "true"
     opcoes["core_options_path"] = graficos.ARQUIVO_OPCOES_CORE
+    # Comandos pela rede SEMPRE desligados. Achado real (revisao
+    # pos-auditoria): o retroarch.cfg estava com network_cmd_enable = "true"
+    # (sobra de teste), e o RetroArch ficava esperando comandos em
+    # 0.0.0.0:55355 -- conferido pelo Windows. Como o aluno libera o
+    # retroarch.exe no Firewall para o Jogar Junto, um colega na mesma rede
+    # poderia mandar QUIT (fechar o jogo), SAVE_STATE, LOAD_STATE... no
+    # computador de outro. O ARENA nunca precisa disso.
+    opcoes["network_cmd_enable"] = "false"
     # Sem isto, o RetroArch usa a pasta Temp do Windows pra descompactar
     # jogo em .zip - fora da pasta do ARENA, contra a regra de nunca
     # deixar nada fora dela.

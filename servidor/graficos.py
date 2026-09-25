@@ -120,9 +120,19 @@ CHAVES_COM_LUGAR_CERTO = {
 }
 
 
+# Chaves que NUNCA podem ficar ligadas no retroarch.cfg, nem para quem abrir
+# o retroarch.exe direto, fora do ARENA. network_cmd_enable deixava o
+# RetroArch aceitar comandos (fechar o jogo, salvar...) de qualquer maquina
+# da rede, em 0.0.0.0:55355 -- achado real na revisao pos-auditoria.
+VALORES_OBRIGATORIOS = {
+    "network_cmd_enable": "false",
+}
+
+
 def corrigir_caminhos_retroarch_cfg():
     """Reescreve, dentro do retroarch.cfg, todo caminho que nao aponta mais
-    para a pasta atual do ARENA. Devolve quantas linhas foram trocadas.
+    para a pasta atual do ARENA, e desliga o que nunca pode ficar ligado
+    (VALORES_OBRIGATORIOS). Devolve quantas linhas foram trocadas.
     """
     caminho_cfg = os.path.join(PASTA_RETROARCH, "retroarch.cfg")
     try:
@@ -136,6 +146,13 @@ def corrigir_caminhos_retroarch_cfg():
     achadas = set()
 
     for i, linha in enumerate(linhas):
+        chave_da_linha = linha.split("=", 1)[0].strip()
+        if chave_da_linha in VALORES_OBRIGATORIOS:
+            certo = '%s = "%s"\n' % (chave_da_linha, VALORES_OBRIGATORIOS[chave_da_linha])
+            if linha != certo:
+                linhas[i] = certo
+                trocados += 1
+            continue
         m = _PADRAO_LINHA_CAMINHO.match(linha.rstrip("\n"))
         if not m:
             continue

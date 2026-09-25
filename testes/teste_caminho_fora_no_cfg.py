@@ -40,6 +40,8 @@ def main():
             for chave, valor in LINHAS.items():
                 f.write('%s = "%s"\n' % (chave, valor))
             f.write('video_driver = "gl"\n')  # linha que nao e caminho: nao pode mudar
+            # Comandos pela rede ligados (sobra de teste real): tem que desligar
+            f.write('network_cmd_enable = "true"\n')
 
         sys.path.insert(0, os.path.join(destino, "servidor"))
         spec = importlib.util.spec_from_file_location(
@@ -60,6 +62,9 @@ def main():
         esperado_saves = os.path.join(destino, "retroarch", "saves")
         ok = ok and ('savefile_directory = "%s"' % esperado_saves) in texto
         ok = ok and 'video_driver = "gl"' in texto
+        desligou = 'network_cmd_enable = "false"' in texto
+        print("  network_cmd_enable desligado:", desligou)
+        ok = ok and desligou
         ok = ok and FORA.lower() not in texto.lower()
         print("\nLinhas trocadas:", trocados)
         print("RESULTADO:", "PASSOU" if ok else "FALHOU")
