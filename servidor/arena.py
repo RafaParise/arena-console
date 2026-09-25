@@ -208,6 +208,9 @@ CREATE INDEX IF NOT EXISTS idx_sessao_envio  ON sessao(enviado);
 """
 
 
+_ESQUEMA_CONFERIDO = {}
+
+
 @contextlib.contextmanager
 def banco():
     """Abre a conexao, confirma a transacao e FECHA de verdade no final.
@@ -223,6 +226,12 @@ def banco():
         # quando o banco esta em pen drive.
         conexao.execute("PRAGMA journal_mode = WAL")
         conexao.execute("PRAGMA synchronous = NORMAL")
+        # Na primeira conexao do processo, garante o esquema atual (coluna
+        # 'seq' e tabela 'contador'), por qualquer caminho que chegue aqui --
+        # nao so pela abertura normal (preparar_banco).
+        if _ESQUEMA_CONFERIDO.get(ARQUIVO_BANCO) is not True:
+            _ESQUEMA_CONFERIDO[ARQUIVO_BANCO] = True
+            aplicar_esquema(conexao)
         yield conexao
         conexao.commit()
     except Exception:
@@ -232,10 +241,51 @@ def banco():
         conexao.close()
 
 
+def aplicar_esquema(conexao):
+    """Cria as tabelas e acrescenta o que faltar num banco antigo.
+
+    'seq' = ordem de chegada NESTE computador (1, 2, 3...). E' por ela que a
+    sincronizacao sabe o que ja mandou para cada colega -- e nao pela data.
+    Achado real (revisao pos-auditoria, testes\\teste_sinc_sem_relogio.py):
+    com a data como marca, (1) notebook com o relogio errado tinha os
+    recordes invisiveis para sempre, e (2) partida mais longa que o
+    intervalo do vigia nunca era enviada, porque a sessao nasce no comeco e
+    so fecha no fim. Numero de chegada nao depende de relogio nenhum.
+
+    Banco antigo (sem 'seq'): a coluna entra e os registros que ja existiam
+    recebem numero na ordem em que foram gravados. Nada e' apagado.
+    """
+    conexao.executescript(ESQUEMA)
+    conexao.execute("CREATE TABLE IF NOT EXISTS contador ("
+                    "nome TEXT PRIMARY KEY, valor INTEGER NOT NULL)")
+    for tabela in ("placar", "sessao"):
+        colunas = {c["name"] for c in conexao.execute("PRAGMA table_info(%s)" % tabela)}
+        if "seq" not in colunas:
+            conexao.execute("ALTER TABLE %s ADD COLUMN seq INTEGER" % tabela)
+    if conexao.execute("SELECT 1 FROM contador WHERE nome = 'sinc'").fetchone() is None:
+        conexao.execute("UPDATE placar SET seq = rowid WHERE seq IS NULL")
+        deslocamento = conexao.execute("SELECT COALESCE(MAX(seq), 0) FROM placar").fetchone()[0]
+        conexao.execute("UPDATE sessao SET seq = rowid + ? WHERE seq IS NULL AND encerrada = 1",
+                        (deslocamento,))
+        maior = conexao.execute(
+            "SELECT MAX(COALESCE((SELECT MAX(seq) FROM placar), 0), "
+            "COALESCE((SELECT MAX(seq) FROM sessao), 0))").fetchone()[0]
+        conexao.execute("INSERT INTO contador (nome, valor) VALUES ('sinc', ?)", (maior,))
+    conexao.execute("CREATE INDEX IF NOT EXISTS idx_placar_seq ON placar(seq)")
+    conexao.execute("CREATE INDEX IF NOT EXISTS idx_sessao_seq ON sessao(seq)")
+
+
+def proximo_seq(conexao):
+    """Proximo numero de chegada. Dentro da mesma transacao da gravacao --
+    o SQLite so deixa um escrever por vez, entao a ordem nunca embaralha."""
+    conexao.execute("UPDATE contador SET valor = valor + 1 WHERE nome = 'sinc'")
+    return conexao.execute("SELECT valor FROM contador WHERE nome = 'sinc'").fetchone()[0]
+
+
 def preparar_banco():
     try:
         with banco() as conexao:
-            conexao.executescript(ESQUEMA)
+            aplicar_esquema(conexao)
     except sqlite3.DatabaseError as falha:
         # Banco corrompido -- pen drive arrancado no meio de uma
         # gravacao, cartao SD com setor ruim, arquivo trocado por
@@ -262,10 +312,51 @@ def preparar_banco():
             except OSError:
                 pass
         with banco() as conexao:
-            conexao.executescript(ESQUEMA)
+            aplicar_esquema(conexao)
         print("[ARENA] Comecei um banco novo, vazio. Os recordes antigos "
              "ficaram guardados no arquivo acima, mas nao aparecem mais "
              "na tela (um banco novo nao consegue ler um arquivo quebrado).")
+
+
+def inserir_placar(conexao, id_registro, apelido, jogo_id, jogo_titulo, pontos,
+                   registrado_em, dispositivo, enviado=0):
+    """Grava um recorde. Devolve quantas linhas entraram (0 = ja existia).
+    Todo recorde passa por aqui -- o feito neste computador e o que chegou
+    de um colega -- para a sincronizacao marcar a ordem de chegada igual."""
+    return conexao.execute(
+        "INSERT OR IGNORE INTO placar (uuid, apelido, jogo_id, jogo_titulo, "
+        "pontos, registrado_em, dispositivo, enviado, seq) "
+        "VALUES (?,?,?,?,?,?,?,?,?)",
+        (id_registro, apelido, jogo_id, jogo_titulo, pontos, registrado_em,
+         dispositivo, enviado, proximo_seq(conexao))).rowcount
+
+
+def abrir_sessao(conexao, id_registro, apelido, jogo_id, jogo_titulo, inicio,
+                 dispositivo):
+    """Sessao de jogo comecando (ainda aberta: so conta quando fechar)."""
+    conexao.execute(
+        "INSERT INTO sessao (uuid, apelido, jogo_id, jogo_titulo, inicio, "
+        "dispositivo) VALUES (?,?,?,?,?,?)",
+        (id_registro, apelido, jogo_id, jogo_titulo, inicio, dispositivo))
+
+
+def encerrar_sessao(conexao, id_registro, segundos):
+    # O numero de chegada vem AGORA, no fim da partida: e' quando ela passa
+    # a contar e precisa ir para os colegas.
+    conexao.execute(
+        "UPDATE sessao SET segundos = ?, encerrada = 1, seq = ? WHERE uuid = ?",
+        (segundos, proximo_seq(conexao), id_registro))
+
+
+def inserir_sessao_recebida(conexao, id_registro, apelido, jogo_id, jogo_titulo,
+                            inicio, segundos, dispositivo):
+    """Sessao ja encerrada vinda de outro ARENA. 0 = ja existia."""
+    return conexao.execute(
+        "INSERT OR IGNORE INTO sessao (uuid, apelido, jogo_id, jogo_titulo, "
+        "inicio, segundos, encerrada, dispositivo, enviado, seq) "
+        "VALUES (?,?,?,?,?,?,1,?,1,?)",
+        (id_registro, apelido, jogo_id, jogo_titulo, inicio, segundos,
+         dispositivo, proximo_seq(conexao))).rowcount
 
 
 def fechar_banco():
@@ -1793,12 +1884,8 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
 
     try:
         with TRAVA_BANCO, banco() as conexao:
-            conexao.execute(
-                "INSERT INTO sessao (uuid, apelido, jogo_id, jogo_titulo, "
-                "inicio, dispositivo) VALUES (?, ?, ?, ?, ?, ?)",
-                (sessao_uuid, apelido, jogo["id"], jogo["titulo"],
-                 agora_utc(), config["dispositivo_id"]),
-            )
+            abrir_sessao(conexao, sessao_uuid, apelido, jogo["id"], jogo["titulo"],
+                         agora_utc(), config["dispositivo_id"])
 
         inicio = time.monotonic()
         try:
@@ -1859,10 +1946,7 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         duracao = int(time.monotonic() - inicio)
 
         with TRAVA_BANCO, banco() as conexao:
-            conexao.execute(
-                "UPDATE sessao SET segundos = ?, encerrada = 1 WHERE uuid = ?",
-                (duracao, sessao_uuid),
-            )
+            encerrar_sessao(conexao, sessao_uuid, duracao)
         print("[ARENA] Sessao encerrada: %ds" % duracao)
 
         # Copia de seguranca dentro da pasta. Em maquina modesta ou com
@@ -2433,28 +2517,20 @@ def gravar_recebidos(placares, sessoes):
     with TRAVA_BANCO, banco() as conexao:
         for p in placares:
             try:
-                cursor = conexao.execute(
-                    "INSERT OR IGNORE INTO placar (uuid, apelido, jogo_id, "
-                    "jogo_titulo, pontos, registrado_em, dispositivo, enviado) "
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, 1)",
-                    (str(p["uuid"])[:40], str(p["apelido"])[:24],
-                     str(p["jogo_id"])[:400], str(p["jogo_titulo"])[:200],
-                     int(p["pontos"]), str(p["registrado_em"])[:40],
-                     str(p["dispositivo"])[:40]))
-                novos += cursor.rowcount
+                novos += inserir_placar(
+                    conexao, str(p["uuid"])[:40], str(p["apelido"])[:24],
+                    str(p["jogo_id"])[:400], str(p["jogo_titulo"])[:200],
+                    int(p["pontos"]), str(p["registrado_em"])[:40],
+                    str(p["dispositivo"])[:40], enviado=1)
             except (KeyError, TypeError, ValueError, sqlite3.Error):
                 continue
         for s in sessoes:
             try:
-                cursor = conexao.execute(
-                    "INSERT OR IGNORE INTO sessao (uuid, apelido, jogo_id, "
-                    "jogo_titulo, inicio, segundos, encerrada, dispositivo, "
-                    "enviado) VALUES (?, ?, ?, ?, ?, ?, 1, ?, 1)",
-                    (str(s["uuid"])[:40], str(s["apelido"])[:24],
-                     str(s["jogo_id"])[:400], str(s["jogo_titulo"])[:200],
-                     str(s["inicio"])[:40], int(s["segundos"]),
-                     str(s["dispositivo"])[:40]))
-                novos += cursor.rowcount
+                novos += inserir_sessao_recebida(
+                    conexao, str(s["uuid"])[:40], str(s["apelido"])[:24],
+                    str(s["jogo_id"])[:400], str(s["jogo_titulo"])[:200],
+                    str(s["inicio"])[:40], int(s["segundos"]),
+                    str(s["dispositivo"])[:40])
             except (KeyError, TypeError, ValueError, sqlite3.Error):
                 continue
     return novos
@@ -2495,7 +2571,14 @@ def registros_desde(carimbo, limite=LIMITE_LOTE, exceto=None):
     de ferias mandaria os primeiros 500 recordes e perderia todo o resto
     para sempre, porque a marca teria pulado para o presente.
     """
+    # A marca e' "seq:<numero de chegada>" (ver aplicar_esquema). Marca
+    # antiga (uma data, de antes desta correcao) ou vazia = desde o comeco:
+    # manda tudo uma vez, e o uuid impede duplicata do outro lado.
     carimbo = str(carimbo or "")[:40]
+    try:
+        desde = int(carimbo[4:]) if carimbo.startswith("seq:") else 0
+    except ValueError:
+        desde = 0
     # Nao devolver ao amigo os registros que ele mesmo criou: ele ja tem.
     # Sem isso, a sala inteira trocava dez vezes mais dados do que precisa.
     excluir = str(exceto or "")[:40]
@@ -2503,27 +2586,31 @@ def registros_desde(carimbo, limite=LIMITE_LOTE, exceto=None):
     with banco() as conexao:
         placares = [dict(l) for l in conexao.execute(
             "SELECT uuid, apelido, jogo_id, jogo_titulo, pontos, registrado_em, "
-            "dispositivo FROM placar WHERE registrado_em > ? AND dispositivo <> ? "
-            "ORDER BY registrado_em LIMIT ?", (carimbo, excluir, limite))]
+            "dispositivo, seq FROM placar WHERE seq > ? AND dispositivo <> ? "
+            "ORDER BY seq LIMIT ?", (desde, excluir, limite))]
         sessoes = [dict(l) for l in conexao.execute(
             "SELECT uuid, apelido, jogo_id, jogo_titulo, inicio, segundos, "
-            "dispositivo FROM sessao WHERE encerrada = 1 AND segundos > 30 "
-            "AND inicio > ? AND dispositivo <> ? "
-            "ORDER BY inicio LIMIT ?", (carimbo, excluir, limite))]
+            "dispositivo, seq FROM sessao WHERE encerrada = 1 AND segundos > 30 "
+            "AND seq > ? AND dispositivo <> ? "
+            "ORDER BY seq LIMIT ?", (desde, excluir, limite))]
+        maior = conexao.execute(
+            "SELECT valor FROM contador WHERE nome = 'sinc'").fetchone()[0]
 
     lotado = len(placares) >= limite or len(sessoes) >= limite
     if lotado:
         # Avanca so ate o mais antigo dos dois ultimos, para nao pular nada.
         marcas = []
         if len(placares) >= limite:
-            marcas.append(placares[-1]["registrado_em"])
+            marcas.append(placares[-1]["seq"])
         if len(sessoes) >= limite:
-            marcas.append(sessoes[-1]["inicio"])
+            marcas.append(sessoes[-1]["seq"])
         ate = min(marcas)
     else:
-        ate = agora_utc()
+        ate = maior
 
-    return placares, sessoes, ate
+    for registro in placares + sessoes:
+        registro.pop("seq", None)  # numero local, nao interessa ao colega
+    return placares, sessoes, "seq:%d" % ate
 
 
 def falar_com(url, rota, corpo=None, metodo="POST", segundos=8):
@@ -4375,12 +4462,9 @@ class Manipulador(BaseHTTPRequestHandler):
             apelido = (dados.get("apelido") or config["apelido"] or "convidado")[:24]
 
             with TRAVA_BANCO, banco() as conexao:
-                conexao.execute(
-                    "INSERT INTO placar (uuid, apelido, jogo_id, jogo_titulo, "
-                    "pontos, registrado_em, dispositivo) VALUES (?,?,?,?,?,?,?)",
-                    (uuid.uuid4().hex, apelido, jogo["id"], jogo["titulo"],
-                     pontos, agora_utc(), config["dispositivo_id"]),
-                )
+                inserir_placar(conexao, uuid.uuid4().hex, apelido, jogo["id"],
+                               jogo["titulo"], pontos, agora_utc(),
+                               config["dispositivo_id"])
             return self.responder_json({"ok": True, "pendentes": contar_pendentes()})
 
         return self.erro("Rota nao encontrada.", 404)

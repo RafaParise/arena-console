@@ -97,6 +97,13 @@ def resposta_e_sadia(status, texto):
                 return False, "500 sem mensagem de erro"
         except ValueError:
             return False, "500 com corpo nao-JSON (provavel traceback cru)"
+    if status == 414:
+        # URL gigante recusada pelo proprio http.server do Python ANTES de
+        # chegar ao ARENA: rejeita cedo e nao trava, que e' o certo. Nao ha
+        # como devolver JSON aqui sem reescrever o servidor da biblioteca
+        # padrao. Conclusao da Fase 3, aplicada ao criterio na revisao
+        # pos-auditoria (antes o script reprovava essas 7 checagens sempre).
+        return True, "414 recusado pelo http.server (esperado)"
     if status >= 400:
         try:
             corpo = json.loads(texto)

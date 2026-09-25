@@ -256,8 +256,8 @@
     "metodo": "GET",
     "categoria": "texto_gigante",
     "status": 414,
-    "ok": false,
-    "motivo": "erro 4xx com corpo nao-JSON",
+    "ok": true,
+    "motivo": "414 recusado pelo http.server (esperado)",
     "extra": "campo=tipo"
   },
   {
@@ -265,8 +265,8 @@
     "metodo": "GET",
     "categoria": "texto_gigante",
     "status": 414,
-    "ok": false,
-    "motivo": "erro 4xx com corpo nao-JSON",
+    "ok": true,
+    "motivo": "414 recusado pelo http.server (esperado)",
     "extra": "campo=console"
   },
   {
@@ -328,8 +328,8 @@
     "metodo": "GET",
     "categoria": "texto_gigante",
     "status": 414,
-    "ok": false,
-    "motivo": "erro 4xx com corpo nao-JSON",
+    "ok": true,
+    "motivo": "414 recusado pelo http.server (esperado)",
     "extra": "campo=titulo"
   },
   {
@@ -382,8 +382,8 @@
     "metodo": "GET",
     "categoria": "texto_gigante",
     "status": 414,
-    "ok": false,
-    "motivo": "erro 4xx com corpo nao-JSON",
+    "ok": true,
+    "motivo": "414 recusado pelo http.server (esperado)",
     "extra": "campo=q"
   },
   {
@@ -436,8 +436,8 @@
     "metodo": "GET",
     "categoria": "texto_gigante",
     "status": 414,
-    "ok": false,
-    "motivo": "erro 4xx com corpo nao-JSON",
+    "ok": true,
+    "motivo": "414 recusado pelo http.server (esperado)",
     "extra": "campo=arquivo"
   },
   {
@@ -535,8 +535,8 @@
     "metodo": "GET",
     "categoria": "texto_gigante",
     "status": 414,
-    "ok": false,
-    "motivo": "erro 4xx com corpo nao-JSON",
+    "ok": true,
+    "motivo": "414 recusado pelo http.server (esperado)",
     "extra": "campo=console"
   },
   {
@@ -589,8 +589,8 @@
     "metodo": "GET",
     "categoria": "texto_gigante",
     "status": 414,
-    "ok": false,
-    "motivo": "erro 4xx com corpo nao-JSON",
+    "ok": true,
+    "motivo": "414 recusado pelo http.server (esperado)",
     "extra": "campo=id"
   },
   {
