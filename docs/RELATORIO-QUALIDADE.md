@@ -1529,13 +1529,11 @@ Riscado = resolvido nessa revisão.*
 - BIOS do Neo Geo na revisão certa (3 arquivos).
 - Conta RPCN (PS3 online).
 
-**Decisões suas, propostas nesta revisão (nada aplicado):**
-
-- Remover `servidor\db.py` (cópia não usada do código de banco; ver revisão).
-- Ligar "Salvar ao sair" + "carregar ao abrir" por padrão (passo a passo das
-  5 pessoas, abaixo).
-- Memory card do PS1 no Jogar Junto (convidado com cartão em branco).
-- RAM da tela (~420 MB num Edge isolado).
+**Decisões do Rafael sobre as propostas (25/09/2026):** aprovadas e
+aplicadas a remoção do `db.py`, "Aceitar conexões da rede" sem reabrir e a
+faixa de teclas (ver "Decisões aplicadas", no fim). **Não aprovado, fica
+como está:** "Salvar ao sair" + "carregar ao abrir" por padrão. Continuam
+limitados: memory card do PS1 no Jogar Junto; RAM da tela (~420 MB).
 
 **Resolvidos na revisão pós-auditoria:** ~~relógio errado deixava recordes
 invisíveis~~ · ~~caminho com mais de 260 letras~~ (o VERIFICAR avisa por
@@ -1655,3 +1653,39 @@ Efeito colateral daquela interrupção, já corrigido: a matriz, morta no meio,
 deixou `core_options_path` do `retroarch.cfg` apontando para o Temp. A
 correção automática passou a conhecer essa chave, e a matriz agora manda o
 RetroArch não gravar a configuração ao fechar.
+
+---
+
+## Decisões aplicadas (25/09/2026)
+
+O Rafael escolheu 3 das 4 propostas: **1** (remover `db.py`), **3** (rede
+sem reabrir) e **4** (faixa de teclas). A **2** ("Salvar ao sair" +
+"carregar ao abrir" por padrão) não foi escolhida e ficou como estava.
+
+| # | Decisão | O que foi feito | Prova |
+|---|---|---|---|
+| 1 | Remover `servidor\db.py` | Apagado. A classe `TestDB` da bateria passou a testar o `arena.py` (antes testava a cópia). Nada mais importava o arquivo; o VERIFICAR não o exige | Bateria 45 OK; VERIFICAR: os 13 arquivos presentes. Commit `9a13b97` |
+| 3 | "Aceitar conexões da rede" sem reabrir | O servidor reabre sozinho, no mesmo processo, com a escuta nova (~0,3 s). Trava contra cliques colados (sem ela o ARENA podia fechar em vez de reabrir) | `teste_rede_sem_reabrir.py` com o ARENA de verdade: escuta 127.0.0.1 ⇄ 0.0.0.0 confirmada pelo Windows, 12 cliques colados. No Chrome: recado certo, e o endereço do Wi-Fi responde com a chave ligada e recusa desligada. Commit `2a0bb63` |
+| 4 | Faixa "F2 salva · F4 volta · F10 fecha" | **Na janela do ARENA**, não dentro do jogo (ver abaixo). Aparece ao abrir o jogo, mostra F9 quando o teclado fica travado, some quando o jogo fecha — uma consulta só, ao voltar para a janela, nada rodando durante o jogo | No Chrome: uma linha, 59 px, os dois temas; fica com jogo aberto, some sem jogo. Commit `ac45ade` |
+
+**Por que a faixa não aparece dentro do jogo:** o RetroArch só mostra
+mensagem por comando. Pelo stdin, este RetroArch não lê comandos no
+Windows (testado: recebeu `QUIT` e não fechou). O outro caminho é pela
+rede, e isso é justamente o achado abaixo.
+
+### Achado de segurança no caminho — corrigido
+
+**O RetroArch aceitava comandos de qualquer computador da rede.** O
+`retroarch.cfg` estava com `network_cmd_enable = "true"` (sobra de teste;
+as cópias de antes das limpezas já tinham) e o ARENA nunca mexia nessa
+chave. Conferido pelo Windows: com um jogo aberto, o RetroArch escutava em
+**`0.0.0.0:55355`**. Como o aluno libera o `retroarch.exe` no Firewall para
+o Jogar Junto (a permissão é do programa inteiro, não de uma porta), um
+colega na mesma rede podia mandar "fechar o jogo", "salvar" ou "carregar
+estado" para o computador de outro.
+
+**Corrigido nos dois lados:** o ARENA força `network_cmd_enable = "false"`
+em toda partida, e a correção automática do `retroarch.cfg` também, para
+quem abrir o `retroarch.exe` direto. Depois: nenhuma porta de comando
+aberta (conferido pelo Windows). Teste: `teste_caminho_fora_no_cfg.py`.
+Commit `7c2911f`.
