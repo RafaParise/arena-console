@@ -285,8 +285,8 @@ Chegou uma versão nova? **Copie por cima. Não apague nada.**
 O que vem na versão nova e substitui:
 
 ```
-ARENA.bat  ·  VERIFICAR.bat  ·  os 6 leia-me
-launcher\   ·  servidor\ (menos a pasta python)
+ARENA.bat  ·  VERIFICAR.bat  ·  PARTIDA.bat  ·  COLETAR.bat  ·  os 6 leia-me
+launcher\   ·  servidor\ (menos a pasta python)  ·  ferramentas\
 ```
 
 O que é **seu** e nunca vem no pacote:
@@ -295,7 +295,8 @@ O que é **seu** e nunca vem no pacote:
 jogos\        seus jogos
 dados\        recordes, apelido, amigos, mapeamento de controle
 retroarch\    o emulador, os núcleos, saves, states, cheats, BIOS
-emuladores\   PCSX2 e Dolphin
+emuladores\   PCSX2, Dolphin, RPCS3 e Xenia
+perfil\       as coletas do COLETAR.bat
 servidor\python\   o Python embutido
 backup\       suas cópias
 ```
