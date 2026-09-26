@@ -1695,10 +1695,8 @@ def escrever_config_rpcs3(caminho_executavel, nota, nota_gpu=None, modesto=False
     """Escreve o bloco de video do RPCS3 (PlayStation 3), preservando o resto.
 
     Mesma logica do Xenia: so mexe se o RPCS3 ja criou o config.yml dele
-    (primeira vez que abre, mesmo sem jogo nenhum). O mapeamento de
-    controle do RPCS3 fica em arquivos separados dentro de
-    config/input_configs/ e o formato deles ainda nao foi conferido -
-    fica pra depois.
+    (primeira vez que abre, mesmo sem jogo nenhum). Os controles ficam em
+    outro arquivo: ver escrever_controles_rpcs3.
 
     'preset': "leve", "bonito" ou None/"automatico" (decide pela nota).
     """
@@ -1755,6 +1753,80 @@ def escrever_config_rpcs3(caminho_executavel, nota, nota_gpu=None, modesto=False
 
     try:
         gravar_atomico(destino, texto)
+        return destino
+    except OSError:
+        return None
+
+
+# Controles do RPCS3. O PS3 aceita 7 controles sem adaptador nenhum, entao
+# nao ha multitap: cada controle XInput ligado vira um jogador, na ordem, e
+# o teclado e' o primeiro jogador sem controle (regra do ARENA). O arquivo
+# e' config/input_configs/global/Default.yml (o que o proprio RPCS3 grava
+# quando se configura pela tela "Pads"). Achado 26/09/2026: so o jogador 1
+# vinha configurado; os outros estavam "Null" - nenhum 2o controle entrava.
+# Nomes dos botoes: os mesmos que o RPCS3 gravou para o XInput. O aparelho
+# "XInput Pad #N" conta de 1 (N = numero do Windows + 1).
+RPCS3_BOTOES_XINPUT = [
+    ("Left Stick Left", "LS X-"), ("Left Stick Down", "LS Y-"),
+    ("Left Stick Right", "LS X+"), ("Left Stick Up", "LS Y+"),
+    ("Right Stick Left", "RS X-"), ("Right Stick Down", "RS Y-"),
+    ("Right Stick Right", "RS X+"), ("Right Stick Up", "RS Y+"),
+    ("Start", "Start"), ("Select", "Back"), ("PS Button", '"Back&Start,Guide"'),
+    ("Square", "X"), ("Cross", "A"), ("Circle", "B"), ("Triangle", "Y"),
+    ("Left", "Left"), ("Down", "Down"), ("Right", "Right"), ("Up", "Up"),
+    ("R1", "RB"), ("R2", "RT"), ("R3", "RS"), ("L1", "LB"), ("L2", "LT"), ("L3", "LS"),
+]
+# Zonas mortas iguais as que o RPCS3 grava para um controle XInput.
+RPCS3_AJUSTES_XINPUT = [
+    ("Left Stick Deadzone", "7849"), ("Right Stick Deadzone", "8689"),
+    ("Left Stick Anti-Deadzone", "4259"), ("Right Stick Anti-Deadzone", "4259"),
+    ("Left Trigger Threshold", "30"), ("Right Trigger Threshold", "30"),
+    ("Left Pad Squircling Factor", "4000"), ("Right Pad Squircling Factor", "4000"),
+    ("Vibration Threshold", "63"),
+]
+# Mesmas teclas do resto do ARENA (setas, Z, X, A, S, Q, W, E, R, Enter, Shift).
+RPCS3_BOTOES_TECLADO = [
+    ("Up", "Up"), ("Down", "Down"), ("Left", "Left"), ("Right", "Right"),
+    ("Cross", "Z"), ("Circle", "X"), ("Square", "A"), ("Triangle", "S"),
+    ("L1", "Q"), ("R1", "W"), ("L2", "E"), ("R2", "R"),
+    ("Select", "Shift"), ("Start", "Return"),
+]
+RPCS3_JOGADORES = 7
+
+
+def controles_rpcs3(controles_xinput, teclado=True):
+    """Texto do Default.yml do RPCS3: um jogador por controle XInput ligado,
+    depois o teclado; o resto fica "Null" (sem nada)."""
+    controles_xinput = list(controles_xinput or [])[:RPCS3_JOGADORES]
+    linhas = []
+    teclado_usado = not teclado
+    for jogador in range(RPCS3_JOGADORES):
+        linhas.append("Player %d Input:" % (jogador + 1))
+        if jogador < len(controles_xinput):
+            linhas += ["  Handler: XInput",
+                       '  Device: "XInput Pad #%d"' % (controles_xinput[jogador] + 1),
+                       "  Config:"]
+            linhas += ["    %s: %s" % par for par in RPCS3_BOTOES_XINPUT + RPCS3_AJUSTES_XINPUT]
+        elif not teclado_usado:
+            teclado_usado = True
+            linhas += ["  Handler: Keyboard", "  Device: Keyboard", "  Config:"]
+            linhas += ["    %s: %s" % par for par in RPCS3_BOTOES_TECLADO]
+        else:
+            linhas += ['  Handler: "Null"', '  Device: "Null"']
+        linhas.append('  Buddy Device: ""')
+    return "\n".join(linhas) + "\n"
+
+
+def escrever_controles_rpcs3(caminho_executavel, controles_xinput):
+    """Grava os controles do RPCS3 (todos os jogos usam o perfil "Default")."""
+    pasta = os.path.join(os.path.dirname(caminho_executavel), "config", "input_configs")
+    destino = os.path.join(pasta, "global", "Default.yml")
+    try:
+        os.makedirs(os.path.dirname(destino), exist_ok=True)
+        gravar_atomico(destino, controles_rpcs3(controles_xinput))
+        ativo = os.path.join(pasta, "active_input_configurations.yml")
+        if not os.path.isfile(ativo):
+            gravar_atomico(ativo, "Active Configurations:\n  global: Default\n")
         return destino
     except OSError:
         return None

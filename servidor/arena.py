@@ -1987,6 +1987,9 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
                 preset=None if preset == "automatico" else preset)
             if escrito:
                 print("[ARENA] Video do RPCS3 configurado.")
+            if graficos.escrever_controles_rpcs3(jogo["externo"]["caminho"],
+                                                 controles.controles_xinput()):
+                print("[ARENA] Controles do RPCS3 configurados.")
             if config.get("rpcn_ativo"):
                 ligou = graficos.escrever_config_rpcn(jogo["externo"]["caminho"])
                 if ligou:

@@ -164,6 +164,19 @@ class TestGraficos(unittest.TestCase):
         self.assertIn("[GCPad1]\nDevice = DInput/0/Keyboard Mouse", gc)
         self.assertIn("SIDevice1 = 0", dolphin)
 
+    def test_rpcs3_um_jogador_por_controle_e_teclado_depois(self):
+        # Achado 26/09/2026: so o jogador 1 vinha configurado no RPCS3.
+        exe = os.path.join(self.dir, "R", "rpcs3.exe")
+        os.makedirs(os.path.dirname(exe))
+        destino = self.mod.escrever_controles_rpcs3(exe, [0, 2, 1])
+        texto = open(destino).read()
+        self.assertIn('Player 1 Input:\n  Handler: XInput\n  Device: "XInput Pad #1"', texto)
+        self.assertIn('Player 2 Input:\n  Handler: XInput\n  Device: "XInput Pad #3"', texto)
+        self.assertIn('Player 3 Input:\n  Handler: XInput\n  Device: "XInput Pad #2"', texto)
+        self.assertIn("Player 4 Input:\n  Handler: Keyboard", texto)
+        self.assertIn('Player 5 Input:\n  Handler: "Null"', texto)
+        self.assertEqual(texto.count("Input:"), 7)
+
     def test_gravar_atomico(self):
         caminho = os.path.join(self.dir, "teste.txt")
         self.mod.gravar_atomico(caminho, "olá")
