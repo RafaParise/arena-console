@@ -1179,7 +1179,11 @@ def escrever_config_pcsx2(caminho_executavel, ultra=False, nota=None,
         extra = ["", "[EmuCore/GS]"] + linhas_gs
     # SetupWizardIncomplete = false sempre: no modo portatil, sem isto o
     # PCSX2 abre o assistente de primeira vez e fica esperando cliques.
-    extra += ["", "[UI]", "SetupWizardIncomplete = false"]
+    # SettingsVersion = 1: sem ela o PCSX2 acha que a configuracao e' de
+    # outra versao e VOLTA TUDO AO PADRAO ao abrir (pcsx2/VMManager.cpp,
+    # CheckSettingsVersion, SETTINGS_VERSION = 1) -- era por isso que o
+    # teclado virava o jogador 1 e os controles sumiam (26/09/2026).
+    extra += ["", "[UI]", "SettingsVersion = 1", "SetupWizardIncomplete = false"]
     if ultra:
         extra += ["StartFullscreen = true", "ConfirmShutdown = false"]
 
