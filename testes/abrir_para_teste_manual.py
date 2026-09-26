@@ -120,8 +120,15 @@ def main():
     print("Arquivo da partida: " + ", ".join("%s=%s" % (k, v) for k, v in sorted(chaves.items())
                                              if k.startswith("input_libretro_device") or k == "input_max_users"))
     print("Abrindo... (feche com F10)")
+    extra = []
+    if len(sys.argv) > 3 and sys.argv[3] == "foto":
+        # Sem ninguem na frente: roda ~20 s pelo caminho do ARENA e tira foto.
+        extra = ["--max-frames=1200", "--max-frames-ss",
+                 "--max-frames-ss-path=" + os.path.join(pasta, "foto.png")]
     subprocess.run([os.path.join(RAIZ, "retroarch", "retroarch.exe"), "-L", nucleo, "--appendconfig", cfg,
-                    "--verbose", "--log-file", log, jogo], cwd=os.path.join(RAIZ, "retroarch"))
+                    "--verbose", "--log-file", log] + extra + [jogo], cwd=os.path.join(RAIZ, "retroarch"))
+    if extra:
+        print("Foto: " + os.path.join(pasta, "foto.png"))
     print("\nControles no registro:")
     for linha in open(log, encoding="utf-8", errors="replace"):
         if "[Autoconf]" in linha and ("porta" in linha or "port" in linha.lower()):

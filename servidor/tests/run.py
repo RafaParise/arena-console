@@ -114,10 +114,17 @@ class TestIndexador(unittest.TestCase):
         criar(ps1, "Jogo (USA).cue", 'FILE "Jogo (USA).bin" BINARY\n')
         criar(ps1, "Jogo (USA).bin")
         criar(pessoais, "neogeo.mame.zip")
+        # Fliperama: o .chd do kinst mora em Arcade\kinst\ e nao e' jogo;
+        # a BIOS pgm.zip tambem nao.
+        arcade = os.path.join(pessoais, "Arcade")
+        os.makedirs(os.path.join(arcade, "kinst"))
+        criar(arcade, "kinst.zip")
+        criar(os.path.join(arcade, "kinst"), "kinst.chd")
+        criar(arcade, "pgm.zip")
 
         achados = self.mod.varrer_pasta(pessoais, "pessoais", por_ext, por_id)
         arquivos = sorted(os.path.basename(j["arquivo"]) for j in achados)
-        self.assertEqual(arquivos, ["Bomber (USA).cue", "Jogo (USA).chd", "disc.gdi"])
+        self.assertEqual(arquivos, ["Bomber (USA).cue", "Jogo (USA).chd", "disc.gdi", "kinst.zip"])
         titulos = {os.path.basename(j["arquivo"]): j["titulo"] for j in achados}
         self.assertEqual(titulos["disc.gdi"], "Capcom Vs SNK 2")
 

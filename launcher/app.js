@@ -703,8 +703,11 @@ async function jogar(jogo) {
     const dados = await pedir("/api/jogar", "POST", { jogo_id: jogo.id, apelido });
     const recentes = [jogo.id, ...(estado.config.recentes || []).filter((id) => id !== jogo.id)].slice(0, 20);
     salvarConfig({ recentes }).then(() => desenharJogos()).catch(() => {});
-    recado(`Abrindo ${jogo.titulo} pelo ${dados.emulador}. Aguarde uns segundos.`,
-      false, 6000);
+    // O aviso do servidor (ficha do fliperama, rede do PS2/Xbox 360) nao
+    // aparecia jogando sozinho: so o Jogar Junto lia dados.aviso.
+    const aviso = dados.aviso ? " " + dados.aviso : "";
+    recado(`Abrindo ${jogo.titulo} pelo ${dados.emulador}. Aguarde uns segundos.` + aviso,
+      false, aviso ? 9000 : 6000);
     mostrarFaixaTeclas();
     mostrarAlertaMaquina(dados.alerta_maquina);
   } catch (falha) {

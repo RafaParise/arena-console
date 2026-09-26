@@ -4708,6 +4708,11 @@ class Manipulador(BaseHTTPRequestHandler):
                     "ARENA já configurou, sem precisar de driver nenhum. Abra "
                     "o menu de rede DENTRO do jogo pra hospedar ou entrar "
                     "numa partida.")
+            # Aviso fixo do console (ex.: fliperama precisa de ficha antes do
+            # Start), vindo do consoles.json -> aviso_ao_abrir.
+            if plataforma.get("aviso_ao_abrir"):
+                resposta["aviso"] = (resposta.get("aviso", "") + " " +
+                                     plataforma["aviso_ao_abrir"]).strip()
             return self.responder_json(resposta)
 
         if caminho == "/api/placar":

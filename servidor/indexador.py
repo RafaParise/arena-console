@@ -55,9 +55,23 @@ ORIGENS = {
 IGNORAR = {"leia.txt", "leia-me.txt", "_console.txt", "readme.txt", "licenca.txt",
            "license.txt", "thumbs.db", "desktop.ini", ".gitkeep"}
 
-# BIOS que o aluno costuma deixar junto dos jogos (neogeo.zip,
-# neogeo.mame.zip...): nao e jogo, nao entra na lista.
-RE_BIOS_NA_PASTA = re.compile(r"^neogeo([ ._-].*)?\.zip$", re.I)
+# BIOS de fliperama que o aluno costuma deixar junto dos jogos (neogeo.zip,
+# neogeo.mame.zip, pgm.zip...): nao e jogo, nao entra na lista. Os nomes sao
+# os dos romsets de BIOS do MAME/FBNeo (e o qsound.zip, som do CPS2).
+RE_BIOS_NA_PASTA = re.compile(
+    r"^(neogeo|pgm|naomi|naomi2|naomigd|awbios|stvbios|skns|cpzn1|cpzn2|hng64|"
+    r"nss|playch10|megatech|megaplay|decocass|konamigv|taitogn|isgsm|qsound)"
+    r"([ ._-].*)?\.(zip|7z)$", re.I)
+
+
+def chd_de_fliperama(pasta_atual):
+    """True se a pasta e' a do disco (.chd) de um jogo de fliperama: o guia
+    do libretro manda por o CHD numa subpasta com o nome do romset, ao lado
+    do .zip (ex.: Arcade\\kinst.zip + Arcade\\kinst\\kinst.chd). Esse .chd
+    nao e' um jogo sozinho -- e' parte do kinst.zip."""
+    nome = os.path.basename(pasta_atual)
+    pai = os.path.dirname(pasta_atual)
+    return any(os.path.isfile(os.path.join(pai, nome + ext)) for ext in (".zip", ".7z"))
 
 # Jogo de CD em varios arquivos: o indice (.cue/.gdi) aponta as trilhas.
 # So o indice entra na lista; as trilhas ficam escondidas. E, se o mesmo
@@ -431,6 +445,8 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None,
         # 'Sony\PlayStation 2\Corrida' tambem e atendido.
         caminho_relativo_pasta = os.path.relpath(pasta_atual, caminho_pasta)
         marcado = ler_marcacao(pasta_atual, por_id)
+        if chd_de_fliperama(pasta_atual):
+            continue   # disco de um romset de fliperama, nao um jogo
         trilhas = trilhas_dos_indices(pasta_atual, arquivos)
         arquivos_por_base = {}
         for nome in arquivos:

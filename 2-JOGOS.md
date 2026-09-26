@@ -148,6 +148,34 @@ mesma pasta, de preferência uma pasta com o nome do jogo.
 - A BIOS do Neo Geo (`neogeo.zip`) não aparece como jogo, mesmo se estiver
   na pasta dos jogos.
 
+#### Fliperama: Neo Geo e Arcade (MAME)
+
+São dois consoles diferentes no ARENA, cada um com o seu emulador:
+
+| Console | Pasta | Emulador | Serve para |
+|---|---|---|---|
+| **Neo Geo** | `jogos\pessoais\Neo Geo` | FBNeo | KOF, Metal Slug, Samurai Shodown... |
+| **Arcade (MAME)** | `jogos\pessoais\Arcade` | MAME (versão atual) | O resto dos fliperamas |
+
+Regras que valem para os dois (do guia oficial do libretro):
+
+- **O jogo é o `.zip` inteiro, com o nome original** (`kof97.zip`,
+  `mslugx.zip`). Não descompacte e não renomeie: nome trocado não abre.
+- **O `.zip` precisa ser da versão que o emulador espera.** Cópia antiga ou
+  "desprotegida" (arquivos com nomes inventados, subpastas dentro do `.zip`)
+  não abre. O próprio emulador mostra uma tela dizendo quais arquivos faltam.
+- **BIOS:** o `neogeo.zip` fica em `retroarch\system` (e pode ficar também na
+  pasta dos jogos, o ARENA não o mostra como jogo).
+- **Jogo com disco rígido ou CD** (Killer Instinct, por exemplo) precisa
+  também de um `.chd`, numa subpasta com o nome do jogo:
+  `Arcade\kinst.zip` + `Arcade\kinst\kinst.chd`. Esse `.chd` não aparece na
+  lista como jogo separado.
+- **Ficha:** fliperama abre em demonstração ("CREDIT 00"). Aperte **Select**
+  (no controle Xbox, **Back**) para pôr uma ficha e depois **Start**. O
+  ARENA lembra disso toda vez que abre um jogo de fliperama.
+
+O MAME atual é pesado: em máquina fraca, prefira os jogos de Neo Geo.
+
 #### Passo 1 — Criar as pastas
 
 No ARENA, clique em **Criar pastas dos consoles**, embaixo da lista à

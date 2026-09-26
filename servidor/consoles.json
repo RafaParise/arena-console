@@ -656,6 +656,7 @@
       "id": "neogeo",
       "nome": "Neo Geo",
       "descricao": "Arcade domestico da SNK.",
+      "aviso_ao_abrir": "É fliperama: aperte Select (Back) para pôr uma ficha e depois Start. Sem ficha, o jogo fica na demonstração.",
       "core": "fbneo_libretro.dll",
       "extensoes": [
         ".zip",
@@ -696,6 +697,7 @@
       "id": "arcade",
       "nome": "Arcade (MAME)",
       "descricao": "Maquinas de fliperama.",
+      "aviso_ao_abrir": "É fliperama: aperte Select (Back) para pôr uma ficha e depois Start. Sem ficha, o jogo fica na demonstração.",
       "core": "mame_libretro.dll",
       "extensoes": [
         ".zip",
