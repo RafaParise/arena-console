@@ -332,7 +332,9 @@ Left 4 Dead 2 (Xbox 360) e Gran Turismo 4 (PS2). Neles, a janela avisa: com
 2 computadores, abra o jogo nos dois e use o menu de rede de **dentro** do
 jogo. No Left 4 Dead 2, 4 jogadores = 2 computadores com 2 jogadores em
 cada (tela dividida), ou 4 computadores; o próprio jogo não passa de 2 numa
-tela só.
+tela só. O **Borderlands 2** é igual: a tela dividida vai até 2, então
+4 jogadores = 2 computadores com 2 em cada, usando a versão de **Xbox 360**
+(a de PS3 não tem rede local — os 4 dela são só online).
 
 Os dois (ou mais) precisam do **mesmo arquivo de jogo**. Se um tiver a
 versão americana e o outro a japonesa, a partida nem começa.
@@ -627,7 +629,8 @@ seção "PS2 em rede (system link)".
 
 ### Xbox 360 em rede de verdade (Systemlink)
 
-Alguns jogos de Xbox 360 (hoje só o *Gears of War*) também têm rede
+Alguns jogos de Xbox 360 (hoje *Gears of War*, *Left 4 Dead 2* e
+*Borderlands 2*) também têm rede
 local de verdade — e aqui **não precisa de driver nenhum**. O Xenia tem
 um segundo programa, dedicado a isso (o "Xenia Netplay"), que o ARENA usa
 só quando abre um desses jogos — jogando sozinho, continua o Xenia de

@@ -1149,7 +1149,8 @@
         "executavel_netplay": "xenia_canary_netplay.exe",
         "jogos_netplay": [
           "gears of war",
-          "left 4 dead 2"
+          "left 4 dead 2",
+          "borderlands 2"
         ],
         "placa": "vulkan"
       },

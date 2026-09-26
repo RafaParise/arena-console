@@ -216,6 +216,20 @@ class TestGraficos(unittest.TestCase):
         self.mod.escrever_config_xenia(exe, 3, placa="vulkan")
         self.assertIn('gpu = "vulkan"   # placa', open(toml, encoding="utf-8").read())
 
+    def test_lista_de_rede_do_xbox360_no_consoles_json(self):
+        # Borderlands 2 (26/09/2026): 2 na tela dividida; 4 so com 2
+        # computadores pelo System Link da versao de Xbox 360.
+        import json
+        caminho = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                               "consoles.json")
+        dados = json.load(open(caminho, encoding="utf-8"))
+        lista = dados["plataformas"] if isinstance(dados, dict) else dados
+        por_id = {p["id"]: p for p in lista}
+        for titulo in ("Gears of War", "Left 4 Dead 2", "Borderlands 2"):
+            self.assertTrue(self.mod.jogo_tem_netplay_xbox360(por_id["xbox360"], titulo))
+        self.assertFalse(self.mod.jogo_tem_netplay_xbox360(por_id["xbox360"], "Dead Space 3"))
+        self.assertFalse(self.mod.jogo_tem_netplay_xbox360(por_id["ps3"], "Borderlands 2"))
+
     def test_gravar_atomico(self):
         caminho = os.path.join(self.dir, "teste.txt")
         self.mod.gravar_atomico(caminho, "olá")
