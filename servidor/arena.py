@@ -1947,9 +1947,9 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
                 print("[ARENA] Controles do Dolphin configurados (%s)."
                       % ("Wii" if console == "wii" else "GameCube"))
 
-        # Xenia e RPCS3: mesma ideia do PCSX2 acima, mas so o video por
-        # enquanto (ver o comentario em escrever_config_xenia/rpcs3 sobre
-        # por que o controle ainda nao entra aqui).
+        # Xenia e RPCS3: mesma ideia do PCSX2 acima - video, controles (o
+        # teclado no primeiro jogador sem controle) e, no Xenia, a placa
+        # (Vulkan nos jogos que travam no Direct3D 12).
         elif jogo["externo"]["dados"]["nome"] == "Xenia":
             plataforma_360 = next((p for p in carregar_catalogo()
                                    if p["id"] == jogo.get("plataforma")), None)
@@ -1975,7 +1975,8 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
                 modesto=bool(config.get("modo_modesto")),
                 ultra=bool(config.get("ultra_desempenho")),
                 preset=None if preset == "automatico" else preset,
-                controles_xinput=controles.controles_xinput())
+                controles_xinput=controles.controles_xinput(),
+                placa=graficos.placa_do_xenia(plataforma_360 or {}, jogo["titulo"]))
             if escrito:
                 print("[ARENA] Video e teclado do Xenia configurados.")
         elif jogo["externo"]["dados"]["nome"] == "RPCS3":

@@ -1150,6 +1150,9 @@
         "jogos_netplay": [
           "gears of war",
           "left 4 dead 2"
+        ],
+        "jogos_vulkan": [
+          "left 4 dead 2"
         ]
       },
       "pasta": "XBOX360"

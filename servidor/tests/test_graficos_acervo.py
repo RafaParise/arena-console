@@ -204,6 +204,19 @@ class TestGraficos(unittest.TestCase):
             self.assertIn("keyboard_mode = %s   # x" % modo, texto)
             self.assertIn("keyboard_user_index = %s   # y" % indice, texto)
 
+    def test_xenia_vulkan_so_nos_jogos_da_lista(self):
+        # Achado 26/09/2026: Left 4 Dead 2 travava no Direct3D 12.
+        plataforma = {"externo": {"jogos_vulkan": ["left 4 dead 2"]}}
+        self.assertEqual(self.mod.placa_do_xenia(plataforma, "Left 4 Dead 2"), "vulkan")
+        self.assertEqual(self.mod.placa_do_xenia(plataforma, "Gears of War"), "any")
+        exe = os.path.join(self.dir, "XV", "xenia_canary.exe")
+        toml = os.path.join(self.dir, "XV", "xenia-canary.config.toml")
+        os.makedirs(os.path.dirname(toml))
+        with open(toml, "w", encoding="utf-8") as f:
+            f.write('gpu = "any"   # placa\n')
+        self.mod.escrever_config_xenia(exe, 3, placa="vulkan")
+        self.assertIn('gpu = "vulkan"   # placa', open(toml, encoding="utf-8").read())
+
     def test_gravar_atomico(self):
         caminho = os.path.join(self.dir, "teste.txt")
         self.mod.gravar_atomico(caminho, "olá")

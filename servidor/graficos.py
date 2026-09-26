@@ -1526,7 +1526,8 @@ def _trocar_valor_toml(texto, chave, valor):
 
 
 def escrever_config_xenia(caminho_executavel, nota, nota_gpu=None, modesto=False,
-                          ultra=False, preset=None, controles_xinput=None):
+                          ultra=False, preset=None, controles_xinput=None,
+                          placa="any"):
     """Escreve o bloco de video do Xenia (Xbox 360), preservando o resto.
 
     'preset' deixa a pessoa escolher na mao em vez de confiar na nota da
@@ -1573,6 +1574,7 @@ def escrever_config_xenia(caminho_executavel, nota, nota_gpu=None, modesto=False
         forte = alvo_nota >= 4 and not modesto
 
     ajustes = {
+        "gpu": '"%s"' % placa,  # ver placa_do_xenia
         "fullscreen": "true" if ultra else "false",
         "vsync": "true",
         "framerate_limit": "0",
@@ -1643,6 +1645,19 @@ def jogo_tem_netplay_xbox360(plataforma, titulo):
     lista = (plataforma.get("externo") or {}).get("jogos_netplay", [])
     titulo_normalizado = (titulo or "").lower()
     return any(nome.lower() in titulo_normalizado for nome in lista)
+
+
+def placa_do_xenia(plataforma, titulo):
+    """"vulkan" para os jogos da lista consoles.json -> externo.jogos_vulkan;
+    "any" (o Xenia escolhe; no Windows, Direct3D 12) para o resto.
+
+    Achado 26/09/2026: Left 4 Dead 2 no Direct3D 12 ficava sem memoria de
+    video na Radeon integrada ("Failed to create a command allocator",
+    "Graphics device lost") - tela preta/branca e o Xenia travado. Com o
+    Vulkan, a abertura do jogo aparece. Lista curta, so com jogo testado."""
+    lista = (plataforma.get("externo") or {}).get("jogos_vulkan", [])
+    titulo_normalizado = (titulo or "").lower()
+    return "vulkan" if any(n.lower() in titulo_normalizado for n in lista) else "any"
 
 
 def escrever_config_netplay_xbox360(caminho_executavel):
