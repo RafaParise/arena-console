@@ -1845,9 +1845,15 @@ def escrever_controles_rpcs3(caminho_executavel, controles_xinput):
 # administra. O que o ARENA faz e' so ligar a opcao quando o professor
 # decidir usar (desligado por padrao), depois que a conta ja existir.
 
-def escrever_config_rpcn(caminho_executavel):
-    """Liga 'Internet enabled' e 'PSN status: RPCN' no config.yml do
-    RPCS3. So mexe se o RPCS3 ja rodou uma vez (mesma regra do resto)."""
+def escrever_config_rpcn(caminho_executavel, ligado=True):
+    """Liga ou desliga a internet do RPCS3 (e com ela o RPCN), seguindo a
+    chave 'rpcn_ativo' do ARENA. So mexe se o RPCS3 ja rodou uma vez.
+
+    Desligar tambem e' tarefa do ARENA. Achado 26/09/2026: o RPCN tinha
+    sido ligado pela tela do RPCS3 e ficou ligado para todos os jogos; o
+    Minecraft dava "falhou no carregamento" ao criar o mundo e funcionou
+    com 4 jogadores assim que a internet do RPCS3 foi desligada. A conta
+    (rpcn.yml) nao e' tocada: religar a chave volta a usa-la."""
     pasta = os.path.dirname(caminho_executavel)
     destino = os.path.join(pasta, "config", "config.yml")
 
@@ -1860,8 +1866,10 @@ def escrever_config_rpcn(caminho_executavel):
     except OSError:
         return False
 
-    texto = _trocar_valor_yaml(texto, "Net", "Internet enabled", "Connected")
-    texto = _trocar_valor_yaml(texto, "Net", "PSN status", "RPCN")
+    texto = _trocar_valor_yaml(texto, "Net", "Internet enabled",
+                               "Connected" if ligado else "Disconnected")
+    if ligado:
+        texto = _trocar_valor_yaml(texto, "Net", "PSN status", "RPCN")
 
     try:
         gravar_atomico(destino, texto)

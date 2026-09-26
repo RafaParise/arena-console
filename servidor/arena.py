@@ -1990,11 +1990,13 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             if graficos.escrever_controles_rpcs3(jogo["externo"]["caminho"],
                                                  controles.controles_xinput()):
                 print("[ARENA] Controles do RPCS3 configurados.")
-            if config.get("rpcn_ativo"):
-                ligou = graficos.escrever_config_rpcn(jogo["externo"]["caminho"])
-                if ligou:
-                    print("[ARENA] RPCN ligado (precisa de conta ja criada "
-                         "pela tela do RPCS3).")
+            # Segue a chave nos dois sentidos: desligada, o ARENA desliga o
+            # RPCN que alguem tenha ligado pela tela do RPCS3 (ver
+            # graficos.escrever_config_rpcn - caso do Minecraft).
+            rpcn = bool(config.get("rpcn_ativo"))
+            if graficos.escrever_config_rpcn(jogo["externo"]["caminho"], ligado=rpcn):
+                print("[ARENA] RPCN %s." % ("ligado (precisa de conta ja criada "
+                                            "pela tela do RPCS3)" if rpcn else "desligado"))
 
         print("[ARENA] Abrindo pelo %s" % jogo["externo"]["dados"]["nome"])
     else:

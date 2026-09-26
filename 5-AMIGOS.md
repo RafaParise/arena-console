@@ -646,6 +646,12 @@ O ARENA nunca cria essa conta sozinho.
 Depois que a conta existir, ligue em **Ajustes → Emuladores → PS3
 online (RPCN)**. Fica desligado por padrão.
 
+A chave vale nos dois sentidos: **desligada, o ARENA desliga a internet
+do RPCS3** a cada jogo de PS3, mesmo que alguém tenha ligado o RPCN pela
+tela do próprio RPCS3. A conta continua salva; é só religar a chave.
+Motivo: com o RPCN ligado, o **Minecraft** dá "falhou no carregamento" ao
+criar o mundo — desligado, funciona com 4 jogadores.
+
 ### Como a tela fica em cada um
 
 Isto costuma surpreender, então vale explicar antes.

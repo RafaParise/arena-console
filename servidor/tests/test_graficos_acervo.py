@@ -177,6 +177,19 @@ class TestGraficos(unittest.TestCase):
         self.assertIn('Player 5 Input:\n  Handler: "Null"', texto)
         self.assertEqual(texto.count("Input:"), 7)
 
+    def test_rpcn_segue_a_chave_nos_dois_sentidos(self):
+        # Achado 26/09/2026: RPCN ligado pela tela do RPCS3 quebrava o Minecraft.
+        exe = os.path.join(self.dir, "R2", "rpcs3.exe")
+        cfg = os.path.join(self.dir, "R2", "config", "config.yml")
+        os.makedirs(os.path.dirname(cfg))
+        with open(cfg, "w", encoding="utf-8") as f:
+            f.write("Net:\n  Internet enabled: Connected\n  PSN status: RPCN\n")
+        self.assertTrue(self.mod.escrever_config_rpcn(exe, ligado=False))
+        texto = open(cfg, encoding="utf-8").read()
+        self.assertIn("Internet enabled: Disconnected", texto)
+        self.assertTrue(self.mod.escrever_config_rpcn(exe, ligado=True))
+        self.assertIn("Internet enabled: Connected", open(cfg, encoding="utf-8").read())
+
     def test_gravar_atomico(self):
         caminho = os.path.join(self.dir, "teste.txt")
         self.mod.gravar_atomico(caminho, "olá")
