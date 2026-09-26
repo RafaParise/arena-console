@@ -573,6 +573,54 @@ def preparar_bios_pcsx2(caminho_executavel, pasta_sistema):
         return None
 
 
+def preparar_portatil_pcsx2(caminho_executavel):
+    """Liga o modo portatil do PCSX2 e traz os memory cards de Documentos.
+
+    Achado 26/09/2026: sem 'portable.txt' (vazio) ao lado do pcsx2-qt.exe,
+    o PCSX2 le e grava em Documentos\\PCSX2 -- aqui, dentro do OneDrive.
+    Tudo o que o ARENA escrevia na pasta dele (controles, multitap,
+    qualidade) era IGNORADO, e os saves de PS2 ficavam fora do pen drive.
+    Regra do codigo do PCSX2 (Pcsx2Config.cpp): portable.ini/portable.txt
+    em AppRoot; o conteudo do .txt e' uma subpasta, por isso fica vazio.
+
+    Na primeira vez, COPIA (nao move) os memory cards de Documentos para a
+    pasta do PCSX2 no ARENA, para ninguem perder o progresso. Devolve os
+    nomes dos cartoes usados (slot 1, slot 2)."""
+    pasta = os.path.dirname(caminho_executavel)
+    portatil = os.path.join(pasta, "portable.txt")
+    if not os.path.exists(portatil):
+        with open(portatil, "w", encoding="utf-8"):
+            pass
+    cartoes = os.path.join(pasta, "memcards")
+    nomes = ["Mcd001.ps2", "Mcd002.ps2"]
+    antigo = os.path.join(os.path.expanduser("~"), "Documents", "PCSX2")
+    try:
+        import ctypes.wintypes
+        caminho = ctypes.create_unicode_buffer(260)
+        if ctypes.windll.shell32.SHGetFolderPathW(None, 5, None, 0, caminho) == 0:
+            antigo = os.path.join(caminho.value, "PCSX2")   # 5 = Meus Documentos
+    except (AttributeError, OSError):
+        pass
+    ini_antigo = os.path.join(antigo, "inis", "PCSX2.ini")
+    if os.path.isfile(ini_antigo):
+        try:
+            with open(ini_antigo, encoding="utf-8", errors="replace") as arquivo:
+                texto = arquivo.read()
+            for i, chave in enumerate(("Slot1_Filename", "Slot2_Filename")):
+                achado = re.search(r"^%s\s*=\s*(.+)$" % chave, texto, re.M)
+                if achado:
+                    nomes[i] = achado.group(1).strip()
+        except OSError:
+            pass
+    if not os.path.isdir(cartoes):
+        os.makedirs(cartoes, exist_ok=True)
+        for nome in nomes:
+            origem = os.path.join(antigo, "memcards", nome)
+            if os.path.isfile(origem):
+                shutil.copy2(origem, os.path.join(cartoes, nome))
+    return nomes
+
+
 def listar_memory_cards(pasta_saves):
     """Lista os memory cards, como se fossem cartoes fisicos numa caixinha.
 
@@ -1059,7 +1107,8 @@ def controles_pcsx2(jogadores, controles_xinput):
 
 def escrever_config_pcsx2(caminho_executavel, ultra=False, nota=None,
                           nota_gpu=None, modesto=False, preset=None,
-                          jogadores=2, controles_xinput=(0, 1)):
+                          jogadores=2, controles_xinput=(0, 1),
+                          cartoes=("Mcd001.ps2", "Mcd002.ps2")):
     """Escreve o bloco de controle, teclas e qualidade grafica do PCSX2.
 
     Preserva tudo o que ja estiver no arquivo fora desses blocos - em
@@ -1128,14 +1177,26 @@ def escrever_config_pcsx2(caminho_executavel, ultra=False, nota=None,
     extra = []
     if linhas_gs:
         extra = ["", "[EmuCore/GS]"] + linhas_gs
+    # SetupWizardIncomplete = false sempre: no modo portatil, sem isto o
+    # PCSX2 abre o assistente de primeira vez e fica esperando cliques.
+    extra += ["", "[UI]", "SetupWizardIncomplete = false"]
     if ultra:
-        extra += ["", "[UI]", "StartFullscreen = true",
-                  "ConfirmShutdown = false"]
+        extra += ["StartFullscreen = true", "ConfirmShutdown = false"]
 
     # Os [Pad1]/[Pad2] fixos do BLOCO_PCSX2 dao lugar aos gerados por jogo.
     fixo = BLOCO_PCSX2[BLOCO_PCSX2.index("[InputSources]"):]
     texto = "\n".join(guardar + [""] + controles_pcsx2(jogadores, controles_xinput)
                       + fixo.splitlines() + extra) + "\n"
+    # Pastas e arquivos que o modo portatil precisa (sem eles, assistente).
+    pasta_bios = os.path.join(pasta, "bios")
+    bios = sorted(n for n in (os.listdir(pasta_bios) if os.path.isdir(pasta_bios) else [])
+                  if n.lower().endswith(EXTENSOES_BIOS))
+    texto = _trocar_chaves_ini(texto, "Folders", {"Bios": "bios", "MemoryCards": "memcards"})
+    if bios:
+        texto = _trocar_chaves_ini(texto, "Filenames", {"BIOS": bios[0]})
+    texto = _trocar_chaves_ini(texto, "MemoryCards", {
+        "Slot1_Enable": "true", "Slot1_Filename": cartoes[0],
+        "Slot2_Enable": "true", "Slot2_Filename": cartoes[1]})
 
     try:
         os.makedirs(os.path.dirname(destino), exist_ok=True)

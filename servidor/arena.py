@@ -1903,6 +1903,11 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
                 jogo["externo"]["caminho"], PASTA_SISTEMA)
             if bios_copiada:
                 print("[ARENA] BIOS do PS2 copiada para o PCSX2: %s" % bios_copiada)
+            try:
+                cartoes_ps2 = graficos.preparar_portatil_pcsx2(jogo["externo"]["caminho"])
+            except OSError as falha:
+                cartoes_ps2 = ("Mcd001.ps2", "Mcd002.ps2")
+                print("[ARENA] Nao consegui deixar o PCSX2 portatil: %s" % falha)
             preset = config.get("preset_grafico_externo", "automatico")
             escrito = graficos.escrever_config_pcsx2(
                 jogo["externo"]["caminho"],
@@ -1911,7 +1916,8 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
                 modesto=bool(config.get("modo_modesto")),
                 preset=None if preset == "automatico" else preset,
                 jogadores=jogo.get("jogadores_max", 2),
-                controles_xinput=controles.controles_xinput())
+                controles_xinput=controles.controles_xinput(),
+                cartoes=cartoes_ps2)
             if escrito:
                 print("[ARENA] Controle e qualidade do PCSX2 configurados "
                       "(%s jogadores)." % jogo.get("jogadores_max", 2))
