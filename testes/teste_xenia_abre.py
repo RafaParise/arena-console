@@ -18,7 +18,7 @@ import time
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PASTA = os.path.join(RAIZ, "emuladores", "Xenia", "Xenia")
 FOTO_PS1 = os.path.join(os.path.dirname(os.path.abspath(__file__)), "foto_tela.ps1")
-ESPERA = 70
+ESPERA = int(os.environ.get("ESPERA", "70"))
 
 
 def main():
