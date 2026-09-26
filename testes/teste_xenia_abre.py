@@ -29,6 +29,12 @@ def main():
     log = os.path.join(PASTA, "xenia.log")
     processo = subprocess.Popen([os.path.join(PASTA, exe)] + extras + [jogo], cwd=PASTA)
     time.sleep(ESPERA)
+    teclas = os.environ.get("TECLAS")  # ex.: "x,x" = Start duas vezes (teclado do Xenia)
+    if teclas:
+        subprocess.run(["pwsh", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File",
+                        os.path.join(os.path.dirname(FOTO_PS1), "apertar_teclas.ps1"),
+                        "-Processo", os.path.splitext(exe)[0], "-Teclas", teclas,
+                        "-Intervalo", "8"], capture_output=True, timeout=120)
     subprocess.run(["pwsh", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", FOTO_PS1,
                     "-Foto", foto], capture_output=True, timeout=60)
     vivo = processo.poll() is None

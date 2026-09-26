@@ -571,6 +571,11 @@ fora que têm imagem ajustável (PS2, PS3, Xbox 360).
 
 O Dolphin (GameCube) não entra nessa lista ainda.
 
+**Xbox 360 abre sempre no Vulkan.** No modo de vídeo padrão do Xenia
+(Direct3D 12), a placa integrada "caía" no meio do jogo — tela preta,
+mensagem "Graphics device lost" e o Xenia travado, saindo só pelo
+Gerenciador de Tarefas. No Vulkan os mesmos jogos rodaram estáveis.
+
 ---
 
 ### Memory card

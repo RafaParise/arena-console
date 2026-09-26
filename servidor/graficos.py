@@ -1647,17 +1647,16 @@ def jogo_tem_netplay_xbox360(plataforma, titulo):
     return any(nome.lower() in titulo_normalizado for nome in lista)
 
 
-def placa_do_xenia(plataforma, titulo):
-    """"vulkan" para os jogos da lista consoles.json -> externo.jogos_vulkan;
-    "any" (o Xenia escolhe; no Windows, Direct3D 12) para o resto.
+def placa_do_xenia(plataforma, titulo=None):
+    """Modo de video do Xenia: consoles.json -> externo.placa ("vulkan"),
+    ou "any" (o Xenia escolhe; no Windows, Direct3D 12) se nao houver.
 
-    Achado 26/09/2026: Left 4 Dead 2 no Direct3D 12 ficava sem memoria de
-    video na Radeon integrada ("Failed to create a command allocator",
-    "Graphics device lost") - tela preta/branca e o Xenia travado. Com o
-    Vulkan, a abertura do jogo aparece. Lista curta, so com jogo testado."""
-    lista = (plataforma.get("externo") or {}).get("jogos_vulkan", [])
-    titulo_normalizado = (titulo or "").lower()
-    return "vulkan" if any(n.lower() in titulo_normalizado for n in lista) else "any"
+    Achado 26/09/2026, na Radeon integrada: no Direct3D 12 a placa "caia"
+    ("Graphics device lost", "Failed to create a command allocator") no
+    Left 4 Dead 2 e, na segunda abertura, no Gears of War - tela preta e o
+    Xenia travado, so saia pelo Gerenciador de Tarefas. No Vulkan os dois
+    rodaram estaveis. 'titulo' fica para uma excecao por jogo no futuro."""
+    return (plataforma.get("externo") or {}).get("placa") or "any"
 
 
 def escrever_config_netplay_xbox360(caminho_executavel):

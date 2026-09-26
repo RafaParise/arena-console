@@ -1949,7 +1949,7 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
 
         # Xenia e RPCS3: mesma ideia do PCSX2 acima - video, controles (o
         # teclado no primeiro jogador sem controle) e, no Xenia, a placa
-        # (Vulkan nos jogos que travam no Direct3D 12).
+        # (Vulkan: o Direct3D 12 derrubava a placa - ver placa_do_xenia).
         elif jogo["externo"]["dados"]["nome"] == "Xenia":
             plataforma_360 = next((p for p in carregar_catalogo()
                                    if p["id"] == jogo.get("plataforma")), None)

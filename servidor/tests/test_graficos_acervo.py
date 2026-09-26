@@ -204,11 +204,10 @@ class TestGraficos(unittest.TestCase):
             self.assertIn("keyboard_mode = %s   # x" % modo, texto)
             self.assertIn("keyboard_user_index = %s   # y" % indice, texto)
 
-    def test_xenia_vulkan_so_nos_jogos_da_lista(self):
-        # Achado 26/09/2026: Left 4 Dead 2 travava no Direct3D 12.
-        plataforma = {"externo": {"jogos_vulkan": ["left 4 dead 2"]}}
-        self.assertEqual(self.mod.placa_do_xenia(plataforma, "Left 4 Dead 2"), "vulkan")
-        self.assertEqual(self.mod.placa_do_xenia(plataforma, "Gears of War"), "any")
+    def test_xenia_placa_do_console(self):
+        # Achado 26/09/2026: Direct3D 12 derrubava a placa (L4D2 e Gears).
+        self.assertEqual(self.mod.placa_do_xenia({"externo": {"placa": "vulkan"}}), "vulkan")
+        self.assertEqual(self.mod.placa_do_xenia({"externo": {}}), "any")
         exe = os.path.join(self.dir, "XV", "xenia_canary.exe")
         toml = os.path.join(self.dir, "XV", "xenia-canary.config.toml")
         os.makedirs(os.path.dirname(toml))
