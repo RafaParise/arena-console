@@ -59,6 +59,8 @@ def arquivos_do_git(revisao, pastas):
 # o ultimo commit deixaria uma mudanca se esconder de fase em fase.
 REVISAO_ANTES = "97ffe03"
 
+TITULOS_NOVOS_DE_PROPOSITO = {"Capcom Vs SNK 2 Millionaire Fighting 2001"}
+
 
 def sem_mudanca_de_proposito(chaves_override):
     """Tira as duas mudancas que valem para TODO jogo, de proposito (teste
@@ -236,6 +238,11 @@ def principal():
         for caso in sorted(agora):
             a, b = antes.get(caso), agora[caso]
             if a is None:
+                # Titulo que mudou DE PROPOSITO depois da versao de antes
+                # (25/09/2026: "disc.gdi" passou a ter o nome da pasta, "Disc"
+                # -> "Capcom Vs SNK 2..."). Sem par, nao da para comparar.
+                if caso.split(" | ")[0] in TITULOS_NOVOS_DE_PROPOSITO:
+                    continue
                 falhas.append("%s: nao existe na versao de antes" % caso)
                 continue
             mais_de_dois = (b["jogadores_max"] or 2) > 2 and b["status"] == 200

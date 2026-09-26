@@ -478,7 +478,8 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None,
             # escolha consciente. O ARENA nao muda nada sozinho - so conta.
             discorda = None
             if (id_plataforma != SEM_PASTA and extensao in (".iso", ".chd",
-                                                            ".cue", ".bin")):
+                                                            ".cue", ".bin",
+                                                            ".rvz", ".wia")):
                 try:
                     conteudo = identificador.identificar(
                         caminho_absoluto, list(por_id))

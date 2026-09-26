@@ -391,7 +391,7 @@ const MIDIA_POR_PLATAFORMA = {
     "ps1", "ps3", "saturn", "dreamcast", "segacd", "threedo", "cdi", "pcfx",
     "scummvm", "dos", "amiga", "spectrum",
   ],
-  caixa_dvd: ["ps2", "gamecube"],
+  caixa_dvd: ["ps2", "gamecube", "wii"],
   caixa_xbox: ["xbox360"],
   // UMD: disco pequeno numa caixinha propria, nem CD nem cartucho.
   umd: ["psp"],

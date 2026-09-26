@@ -850,6 +850,11 @@ NOMES_DOS_BOTOES = {
             "l": "L", "r": "R", "l2": "Z", "start": "Start"},
     "gamecube": {"b": "A", "a": "B", "y": "Y", "x": "X",
                  "l": "L", "r": "R", "r2": "Z", "start": "Start"},
+    # Wii pelo Dolphin: o que cada botao do controle vira (Wii Remote +
+    # Nunchuk), igual a escrever_config_dolphin.
+    "wii": {"b": "A", "a": "B (gatilho, no RT)", "y": "1", "x": "2",
+            "l": "C (Nunchuk)", "r": "Balançar", "l2": "Z (Nunchuk)",
+            "r2": "B (gatilho)", "start": "+", "select": "-"},
     "megadrive": {"b": "A", "a": "B", "y": "X", "x": "Y",
                   "l": "Z", "r": "C", "start": "Start", "select": "Mode"},
     "dreamcast": {"b": "A", "a": "B", "y": "X", "x": "Y",

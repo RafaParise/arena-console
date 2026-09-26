@@ -348,14 +348,13 @@
     },
     {
       "id": "gamecube",
-      "nome": "GameCube e Wii",
+      "nome": "GameCube",
       "descricao": "Exige maquina forte e placa de video decente.",
       "core": "dolphin_libretro.dll",
       "extensoes": [
         ".rvz",
         ".gcm",
         ".gcz",
-        ".wbfs",
         ".chd",
         ".iso"
       ],
@@ -366,7 +365,42 @@
       "apelidos": [
         "gamecube",
         "gc",
-        "ngc",
+        "ngc"
+      ],
+      "tamanho_max_mb": 9000,
+      "externo": {
+        "nome": "Dolphin",
+        "pasta": "Dolphin",
+        "obrigatorio": false,
+        "executaveis": [
+          "Dolphin.exe"
+        ],
+        "argumentos": [
+          "-b",
+          "-e",
+          "{jogo}"
+        ],
+        "site": "dolphin-emu.org/download",
+        "motivo": "Opcional. O núcleo do RetroArch abre, mas o Dolphin de verdade roda bem melhor GameCube e Wii."
+      },
+      "pasta": "GameCube"
+    },
+    {
+      "id": "wii",
+      "nome": "Nintendo Wii",
+      "descricao": "Pelo Dolphin, como o GameCube. Cada controle vira Wii Remote + Nunchuk. Exige maquina forte e placa de video decente.",
+      "core": "dolphin_libretro.dll",
+      "extensoes": [
+        ".rvz",
+        ".wbfs",
+        ".wia",
+        ".iso"
+      ],
+      "peso": "completo",
+      "arquivos_sistema": 0,
+      "custo": 5,
+      "pede_placar": false,
+      "apelidos": [
         "nintendo wii",
         "wii"
       ],
@@ -386,7 +420,7 @@
         "site": "dolphin-emu.org/download",
         "motivo": "Opcional. O núcleo do RetroArch abre, mas o Dolphin de verdade roda bem melhor GameCube e Wii."
       },
-      "pasta": "GameCube"
+      "pasta": "Wii"
     },
     {
       "id": "sg1000",
@@ -1119,6 +1153,7 @@
       "ps1",
       "psp",
       "gamecube",
+      "wii",
       "dreamcast",
       "threedo",
       "segacd"

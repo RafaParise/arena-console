@@ -91,7 +91,9 @@ console ele é.
 | `.mgw` | Game & Watch |
 | `.n64` `.z64` `.v64` | Nintendo 64 |
 | `.nds` | Nintendo DS |
-| `.rvz` `.gcm` `.gcz` `.wbfs` | GameCube e Wii |
+| `.gcm` `.gcz` | GameCube |
+| `.wbfs` `.wia` | Nintendo Wii |
+| `.rvz` | GameCube ou Wii — quem decide é a pasta (o ARENA avisa se o disco diz outra coisa) |
 | `.sg` | Sega SG-1000 |
 | `.md` `.gen` `.smd` `.sms` `.gg` | Mega Drive, Master System e Game Gear |
 | `.32x` | Sega 32X |
@@ -194,7 +196,8 @@ Você pode usar o nome que ele criou, ou qualquer apelido comum:
 | PlayStation Portable | `PSP` | `playstation portable` |
 | Nintendo 64 | `Nintendo 64` | `n64` |
 | Sega CD | `Sega CD` | `mega cd`, `scd` |
-| GameCube e Wii | `GameCube` | `wii`, `ngc` |
+| GameCube | `GameCube` | `gc`, `ngc` |
+| Nintendo Wii | `Wii` | `nintendo wii` |
 
 Funciona em qualquer nível: `Sony\PlayStation 2\Corrida` também é
 reconhecido.
@@ -261,8 +264,8 @@ máquina.
 #### Os 29 que não pedem nada
 
 Amstrad CPC · Atari 2600 · Atari 7800 · Atari Jaguar · Commodore 64 ·
-Game & Watch · Game Boy e Game Boy Color · Game Boy Advance · GameCube e
-Wii · LowRes NX · Mega Drive, Master System e Game Gear · MS-DOS ·
+Game & Watch · Game Boy e Game Boy Color · Game Boy Advance · GameCube ·
+Nintendo Wii · LowRes NX · Mega Drive, Master System e Game Gear · MS-DOS ·
 Neo Geo Pocket · Nintendo (NES) · Nintendo 64 · Nintendo DS · PC Engine ·
 PlayStation Portable · Pokémon mini · ScummVM · Sega SG-1000 ·
 Super Nintendo · TIC-80 · Uzebox · Vectrex · Virtual Boy · WASM-4 ·
@@ -415,7 +418,10 @@ Ao abrir um jogo, o aviso diz por qual programa: *"Abrindo Black pelo PCSX2"*.
 #### GameCube e Wii pelo Dolphin: controles e pasta
 
 Jogos de **Wii** vão em `jogos\pessoais\Wii`, e os de GameCube em
-`jogos\pessoais\GameCube`. Os dois abrem pelo Dolphin.
+`jogos\pessoais\GameCube`. Na lista do ARENA, cada um aparece no seu
+console (**GameCube** e **Nintendo Wii**). Os dois abrem pelo Dolphin, e o
+ARENA lê dentro do disco se ele é de Wii ou de GameCube: se um jogo estiver
+na pasta errada, aparece o aviso para mover.
 
 A cada jogo, o ARENA:
 

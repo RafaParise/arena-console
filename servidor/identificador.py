@@ -125,11 +125,18 @@ def _por_pasta(arquivo, descritor):
 
 
 def _por_assinatura(arquivo):
-    """GameCube e Wii tem numero magico fixo no cabecalho."""
+    """GameCube e Wii tem numero magico fixo no cabecalho.
+
+    .rvz/.wia (compactados do Dolphin): o tipo do disco fica no byte 0x48
+    (1 = GameCube, 2 = Wii), conforme docs/WiaAndRvz.md do Dolphin."""
+    arquivo.seek(0)
+    cabeca = arquivo.read(0x4C)
+    if cabeca[:3] in (b"RVZ", b"WIA") and len(cabeca) == 0x4C:
+        return {1: "gamecube", 2: "wii"}.get(int.from_bytes(cabeca[0x48:0x4C], "big"))
     arquivo.seek(0x18)
     wii = arquivo.read(4)
     if wii == b"\x5d\x1c\x9e\xa3":
-        return "gamecube"
+        return "wii"
     arquivo.seek(0x1C)
     gc = arquivo.read(4)
     if gc == b"\xc2\x33\x9f\x3d":

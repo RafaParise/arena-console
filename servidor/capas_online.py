@@ -30,6 +30,8 @@ REPO_POR_PLATAFORMA = {
     "gba": "Nintendo_-_Game_Boy_Advance",
     "nds": "Nintendo_-_Nintendo_DS",
     "gamecube": "Nintendo_-_GameCube",
+    # Conferido 25/09/2026: Mario Kart Wii (USA) (En,Fr,Es).png -> 200, PNG.
+    "wii": "Nintendo_-_Wii",
     "megadrive": "Sega_-_Mega_Drive_-_Genesis",
     "segacd": "Sega_-_Mega-CD_-_Sega_CD",
     "saturn": "Sega_-_Saturn",
