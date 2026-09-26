@@ -88,6 +88,39 @@ class TestIndexador(unittest.TestCase):
         self.assertIn("leia.txt", self.mod.IGNORAR)
         self.assertIn("thumbs.db", self.mod.IGNORAR)
 
+    def test_disco_em_trilhas_vira_um_jogo(self):
+        # Achado 25/09/2026: Saturn Bomberman aparecia 31 vezes (trilhas).
+        por_id, por_ext = self.mod.carregar_plataformas()
+        pessoais = os.path.join(self.mod.PASTA_JOGOS, "pessoais")
+        dc = os.path.join(pessoais, "Dreamcast", "Capcom vs. SNK 2 (English v1.2)")
+        sat = os.path.join(pessoais, "Sega Saturn", "Bomber")
+        ps1 = os.path.join(pessoais, "PS1")
+        for pasta in (dc, sat, ps1):
+            os.makedirs(pasta)
+
+        def criar(pasta, nome, texto="x"):
+            with open(os.path.join(pasta, nome), "w") as f:
+                f.write(texto)
+
+        criar(dc, "disc.gdi", '2\n1 0 4 2352 track01.bin 0\n2 600 0 2352 "track 02.raw" 0\n')
+        criar(dc, "track01.bin")
+        criar(dc, "track 02.raw")
+        criar(sat, "Bomber (USA).cue",
+              'FILE "Bomber (USA) (Track 01).bin" BINARY\n  TRACK 01 MODE1/2352\n'
+              'FILE "Bomber (USA) (Track 02).bin" BINARY\n  TRACK 02 AUDIO\n')
+        criar(sat, "Bomber (USA) (Track 01).bin")
+        criar(sat, "Bomber (USA) (Track 02).bin")
+        criar(ps1, "Jogo (USA).chd")
+        criar(ps1, "Jogo (USA).cue", 'FILE "Jogo (USA).bin" BINARY\n')
+        criar(ps1, "Jogo (USA).bin")
+        criar(pessoais, "neogeo.mame.zip")
+
+        achados = self.mod.varrer_pasta(pessoais, "pessoais", por_ext, por_id)
+        arquivos = sorted(os.path.basename(j["arquivo"]) for j in achados)
+        self.assertEqual(arquivos, ["Bomber (USA).cue", "Jogo (USA).chd", "disc.gdi"])
+        titulos = {os.path.basename(j["arquivo"]): j["titulo"] for j in achados}
+        self.assertEqual(titulos["disc.gdi"], "Capcom Vs SNK 2")
+
 
 # ============================================================================
 # 2. cheats.py

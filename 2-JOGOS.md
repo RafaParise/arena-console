@@ -131,6 +131,21 @@ PlayStation 2 foi lançado em CD**, com a mesma estrutura de um jogo de
 PlayStation 1. Nenhuma pista de tamanho ou de cabeçalho separa os dois.
 Chutar só fazia o jogo abrir no emulador errado.
 
+#### Jogo de CD em vários arquivos
+
+Muitos jogos de CD (Saturn, Dreamcast, PlayStation) vêm em várias
+**trilhas** (`Track 01.bin`, `Track 02.bin`...) mais um arquivo-índice
+(`.cue` ou `.gdi`) que diz quais trilhas formam o disco. O ARENA mostra
+**só o índice**, como um jogo; as trilhas ficam escondidas. Deixe tudo na
+mesma pasta, de preferência uma pasta com o nome do jogo.
+
+- Se o arquivo se chama só `disc.gdi` ou `track01.bin`, o nome do jogo vem
+  da **pasta**.
+- Se o mesmo jogo está em dois formatos na pasta (`.chd` e `.cue`), aparece
+  **uma vez só**, pelo `.chd` (um arquivo só, mais fácil de carregar).
+- A BIOS do Neo Geo (`neogeo.zip`) não aparece como jogo, mesmo se estiver
+  na pasta dos jogos.
+
 #### Passo 1 — Criar as pastas
 
 No ARENA, clique em **Criar pastas dos consoles**, embaixo da lista à

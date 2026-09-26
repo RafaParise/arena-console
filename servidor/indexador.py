@@ -55,6 +55,69 @@ ORIGENS = {
 IGNORAR = {"leia.txt", "leia-me.txt", "_console.txt", "readme.txt", "licenca.txt",
            "license.txt", "thumbs.db", "desktop.ini", ".gitkeep"}
 
+# BIOS que o aluno costuma deixar junto dos jogos (neogeo.zip,
+# neogeo.mame.zip...): nao e jogo, nao entra na lista.
+RE_BIOS_NA_PASTA = re.compile(r"^neogeo([ ._-].*)?\.zip$", re.I)
+
+# Jogo de CD em varios arquivos: o indice (.cue/.gdi) aponta as trilhas.
+# So o indice entra na lista; as trilhas ficam escondidas. E, se o mesmo
+# jogo esta em mais de um formato na pasta, fica um so -- o primeiro
+# desta ordem (arquivo unico primeiro). Achado 25/09/2026: o Saturn
+# Bomberman aparecia 31 vezes (30 trilhas + o .cue), o CTR 3 (.bin, .cue,
+# .chd).
+PREFERENCIA_DISCO = (".chd", ".gdi", ".cue", ".iso", ".bin")
+
+# Nome de arquivo que nao diz qual e o jogo ("disc.gdi", "track01.bin"):
+# o titulo vem da pasta.
+RE_NOME_GENERICO = re.compile(r"^(disc|disco|game|jogo|track ?\d*)$", re.I)
+
+
+def trilhas_dos_indices(pasta, arquivos):
+    """Nomes (minusculos) dos arquivos que algum .cue/.gdi da pasta usa."""
+    trilhas = set()
+    for nome in arquivos:
+        extensao = os.path.splitext(nome)[1].lower()
+        if extensao not in (".cue", ".gdi"):
+            continue
+        try:
+            with open(os.path.join(pasta, nome), "r", encoding="utf-8",
+                      errors="replace") as arquivo:
+                texto = arquivo.read(65536)
+        except OSError:
+            continue
+        if extensao == ".cue":
+            for achado in re.finditer(r'^\s*FILE\s+"?(.+?)"?\s+\S+\s*$', texto, re.M | re.I):
+                trilhas.add(os.path.basename(achado.group(1)).lower())
+        else:
+            # .gdi: "numero inicio tipo tamanho ARQUIVO deslocamento"; o nome
+            # pode vir entre aspas quando tem espaco.
+            for linha in texto.splitlines()[1:]:
+                achado = re.match(r'^\s*\d+\s+\d+\s+\d+\s+\d+\s+("[^"]+"|\S+)', linha)
+                if achado:
+                    trilhas.add(os.path.basename(achado.group(1).strip('"')).lower())
+    return trilhas
+
+
+def repetido_em_outro_formato(nome, arquivos_por_base):
+    """True se o mesmo jogo (mesmo nome) esta na pasta num formato melhor."""
+    base, extensao = os.path.splitext(nome)
+    extensao = extensao.lower()
+    if extensao not in PREFERENCIA_DISCO:
+        return False
+    irmas = arquivos_por_base.get(base.lower(), set())
+    melhores = PREFERENCIA_DISCO[:PREFERENCIA_DISCO.index(extensao)]
+    return any(melhor in irmas for melhor in melhores)
+
+
+def titulo_do_jogo(nome_arquivo, pasta_atual):
+    """Titulo pelo nome do arquivo; se o nome for generico, pela pasta."""
+    titulo = limpar_titulo(nome_arquivo)
+    if RE_NOME_GENERICO.match(titulo):
+        # O ".pasta" protege nome de pasta com ponto ("v1.2)"), que o
+        # limpar_titulo cortaria achando que e extensao.
+        titulo = limpar_titulo(os.path.basename(pasta_atual) + ".pasta")
+    return titulo
+
 
 # ---------------------------------------------------------------------------
 # BLOCO 2 - Tratamento de strings
@@ -368,10 +431,19 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None,
         # 'Sony\PlayStation 2\Corrida' tambem e atendido.
         caminho_relativo_pasta = os.path.relpath(pasta_atual, caminho_pasta)
         marcado = ler_marcacao(pasta_atual, por_id)
+        trilhas = trilhas_dos_indices(pasta_atual, arquivos)
+        arquivos_por_base = {}
+        for nome in arquivos:
+            base, extensao = os.path.splitext(nome)
+            arquivos_por_base.setdefault(base.lower(), set()).add(extensao.lower())
 
         for nome_arquivo in arquivos:
 
-            if nome_arquivo.lower() in IGNORAR:
+            if nome_arquivo.lower() in IGNORAR or RE_BIOS_NA_PASTA.match(nome_arquivo):
+                continue
+            if nome_arquivo.lower() in trilhas:
+                continue   # trilha de um .cue/.gdi desta pasta
+            if repetido_em_outro_formato(nome_arquivo, arquivos_por_base):
                 continue
 
             extensao = os.path.splitext(nome_arquivo)[1].lower()
@@ -420,7 +492,7 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None,
                               "pede_placar": False}
             else:
                 plataforma = por_id[id_plataforma]
-            titulo = limpar_titulo(nome_arquivo)
+            titulo = titulo_do_jogo(nome_arquivo, pasta_atual)
 
             # Quantos jogadores ESTE jogo aceita: quem diz e' o professor,
             # no dados\jogadores.txt (servidor\jogadores.py). Sem o arquivo
