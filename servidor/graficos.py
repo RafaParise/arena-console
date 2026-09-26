@@ -1191,13 +1191,12 @@ def escrever_config_pcsx2(caminho_executavel, ultra=False, nota=None,
     fixo = BLOCO_PCSX2[BLOCO_PCSX2.index("[InputSources]"):]
     texto = "\n".join(guardar + [""] + controles_pcsx2(jogadores, controles_xinput)
                       + fixo.splitlines() + extra) + "\n"
-    # Pastas e arquivos que o modo portatil precisa (sem eles, assistente).
-    pasta_bios = os.path.join(pasta, "bios")
-    bios = sorted(n for n in (os.listdir(pasta_bios) if os.path.isdir(pasta_bios) else [])
-                  if n.lower().endswith(EXTENSOES_BIOS))
+    # Pastas que o modo portatil precisa. A BIOS NAO e' escolhida pelo ARENA:
+    # com [Filenames] BIOS vazio o PCSX2 acha sozinho uma que serve. Forcar a
+    # primeira em ordem alfabetica (achado 26/09/2026, por eliminacao com
+    # fotos -- testes\teste_pcsx2_bissecao.py) pegava uma v1.60 com a qual o
+    # Crash Nitro Kart ficava em tela preta, "Velocidade 0%".
     texto = _trocar_chaves_ini(texto, "Folders", {"Bios": "bios", "MemoryCards": "memcards"})
-    if bios:
-        texto = _trocar_chaves_ini(texto, "Filenames", {"BIOS": bios[0]})
     texto = _trocar_chaves_ini(texto, "MemoryCards", {
         "Slot1_Enable": "true", "Slot1_Filename": cartoes[0],
         "Slot2_Enable": "true", "Slot2_Filename": cartoes[1]})
