@@ -921,6 +921,8 @@
         "c64",
         "commodore 64"
       ],
+      "netplay": false,
+      "netplay_motivo": "O núcleo do Commodore 64 (VICE) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Os 2 jogadores só valem no mesmo computador.",
       "pasta": "Commodore 64"
     },
     {
@@ -941,6 +943,8 @@
         "amiga",
         "commodore amiga"
       ],
+      "netplay": false,
+      "netplay_motivo": "O núcleo do Amiga (PUAE) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Os 2 jogadores só valem no mesmo computador.",
       "pasta": "Amiga"
     },
     {
