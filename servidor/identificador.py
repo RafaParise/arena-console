@@ -141,6 +141,19 @@ def _por_assinatura(arquivo):
     gc = arquivo.read(4)
     if gc == b"\xc2\x33\x9f\x3d":
         return "gamecube"
+    # PS3: o setor 1 do Blu-ray comeca com "PlayStation3" e o codigo do
+    # jogo. Achado 26/09/2026: um Dead Space 3 de PS3 (BLES-01733) estava
+    # na pasta do Xbox 360 e o Xenia so dizia "Failed to verify disc image".
+    arquivo.seek(0x800)
+    if arquivo.read(12) == b"PlayStation3":
+        return "ps3"
+    # Xbox 360: a marca do sistema de arquivos do disco fica 64 KB depois
+    # do inicio da particao de jogo, que muda com o tipo de disco (imagem so
+    # da particao, XGD2 e XGD3).
+    for inicio in (0, 0xFD90000, 0x2080000):
+        arquivo.seek(inicio + 0x10000)
+        if arquivo.read(20) == b"MICROSOFT*XBOX*MEDIA":
+            return "xbox360"
     return None
 
 

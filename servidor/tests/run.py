@@ -128,6 +128,24 @@ class TestIndexador(unittest.TestCase):
         titulos = {os.path.basename(j["arquivo"]): j["titulo"] for j in achados}
         self.assertEqual(titulos["disc.gdi"], "Capcom Vs SNK 2")
 
+    def test_identificador_reconhece_ps3_e_xbox360(self):
+        # Achado 26/09/2026: Dead Space 3 de PS3 na pasta do Xbox 360; o
+        # identificador nao conhecia nenhum dos dois e nao avisava.
+        import identificador
+        pasta = tempfile.mkdtemp()
+        try:
+            ps3 = os.path.join(pasta, "ps3.iso")
+            with open(ps3, "wb") as f:
+                f.write(b"\0" * 0x800 + b"PlayStation3\0\0\0\0BLES-01733" + b"\0" * 0x20000)
+            x360 = os.path.join(pasta, "x360.iso")
+            with open(x360, "wb") as f:
+                f.write(b"\0" * 0x10000 + b"MICROSOFT*XBOX*MEDIA" + b"\0" * 0x10000)
+            todos = ["ps2", "ps3", "xbox360"]
+            self.assertEqual(identificador.identificar(ps3, todos), "ps3")
+            self.assertEqual(identificador.identificar(x360, todos), "xbox360")
+        finally:
+            shutil.rmtree(pasta, ignore_errors=True)
+
 
 # ============================================================================
 # 2. cheats.py
