@@ -778,6 +778,21 @@
 </aside>
 
 <!-- ===================== JANELA DE PARTIDA A DOIS ===================== -->
+<div class="modal" id="modalJuntoLocal" hidden>
+  <div class="modal-caixa" role="dialog" aria-modal="true" aria-labelledby="tituloJuntoLocal">
+    <h2 id="tituloJuntoLocal">Jogar junto neste computador</h2>
+    <p class="explica" id="juntoLocalJogo"></p>
+    <p class="explica" id="juntoLocalMotivo"></p>
+    <h3 class="grupo-titulo">Como ligar os jogadores</h3>
+    <ol class="passos-junto" id="juntoLocalPassos"></ol>
+    <p class="explica" id="juntoLocalRede" hidden></p>
+    <div class="modal-acoes">
+      <button class="botao" data-fechar="modalJuntoLocal" type="button">Fechar</button>
+      <button class="botao botao--principal" id="btnAbrirJuntoLocal" type="button">Abrir o jogo</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal" id="modalPartida" hidden>
   <div class="modal-caixa" role="dialog" aria-modal="true" aria-labelledby="tituloPartida">
     <h2 id="tituloPartida">Jogar junto</h2>

@@ -1148,7 +1148,8 @@
         "motivo": "OBRIGATÓRIO. Não existe núcleo de Xbox 360 no RetroArch - só o Xenia emula este console, e só com placa de vídeo dedicada.",
         "executavel_netplay": "xenia_canary_netplay.exe",
         "jogos_netplay": [
-          "gears of war"
+          "gears of war",
+          "left 4 dead 2"
         ]
       },
       "pasta": "XBOX360"

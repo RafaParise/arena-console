@@ -549,6 +549,11 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None,
                 # para jogar de verdade neste console (limitado ao nucleo).
                 "jogadores_do_jogo": do_jogo,
                 "jogadores_max": ligacao["jogadores"],
+                # Jogo com rede PROPRIA (System Link do PS2/Xbox 360): a tela
+                # do Jogar Junto explica que da para ligar 2 computadores
+                # pelo menu de dentro do jogo.
+                "rede_propria": bool(graficos.jogo_tem_system_link_ps2(plataforma, titulo)
+                                     or graficos.jogo_tem_netplay_xbox360(plataforma, titulo)),
                 # Frase para o aluno quando o jogo aceita mais do que o
                 # emulador deste console permite (vazio no resto).
                 "motivo_jogadores": ligacao["motivo"],

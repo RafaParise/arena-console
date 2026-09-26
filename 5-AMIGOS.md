@@ -314,6 +314,26 @@ Testado de verdade com 4 jogadores juntos (hospedeiro + 3 convidados); o
 5º jogador ainda não foi confirmado em máquinas separadas — se você testar
 com 5 notebooks de verdade, veja se funciona e avise.
 
+**Console que só joga junto no mesmo computador.** Alguns consoles não
+conseguem deixar dois computadores iguais ao mesmo tempo: Nintendo 64,
+Dreamcast, PSP, Commodore 64 e Amiga (limite do emulador), e os que abrem
+por outro programa: PlayStation 2, PlayStation 3, Xbox 360, GameCube e Wii.
+Neles, **Jogar junto** abre uma janela curta que explica isso e mostra como
+ligar até 4 jogadores no mesmo computador:
+
+1. Ligue os controles **antes** de abrir o jogo: o 1º controle é o jogador
+   1, o 2º é o jogador 2...
+2. O teclado joga como o **primeiro jogador sem controle** (com 3 controles,
+   o teclado é o jogador 4).
+3. Dentro do jogo, escolha o modo de 2, 3 ou 4 jogadores.
+
+Alguns desses jogos têm **rede própria** (System Link), como Gears of War e
+Left 4 Dead 2 (Xbox 360) e Gran Turismo 4 (PS2). Neles, a janela avisa: com
+2 computadores, abra o jogo nos dois e use o menu de rede de **dentro** do
+jogo. No Left 4 Dead 2, 4 jogadores = 2 computadores com 2 jogadores em
+cada (tela dividida), ou 4 computadores; o próprio jogo não passa de 2 numa
+tela só.
+
 Os dois (ou mais) precisam do **mesmo arquivo de jogo**. Se um tiver a
 versão americana e o outro a japonesa, a partida nem começa.
 

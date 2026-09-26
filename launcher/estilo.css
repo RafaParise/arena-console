@@ -1703,3 +1703,7 @@ input::placeholder { color: var(--texto-apagado); }
   text-align: center;
   margin-top: 0;
 }
+
+/* Jogar junto no mesmo computador: passos numerados, faceis de ler. */
+.passos-junto { margin: 0.4rem 0 0.8rem 1.2rem; padding: 0; line-height: 1.5; }
+.passos-junto li { margin-bottom: 0.35rem; }

@@ -582,12 +582,11 @@ function desenharDetalhes() {
   capa.className = `detalhes-capa capa-${classeDaCapa(jogo.plataforma_nome)}`;
   prepararCapa(capa, jogo);
   jogarBotao.disabled = plataforma.estado !== "pronta";
-  const semRede = plataforma.netplay === false;
-  multiplayerBotao.disabled = plataforma.estado !== "pronta" || semRede;
-  // Mesmo lugar do motivo do N64: quando o jogo aceita mais jogadores do
-  // que o emulador deste console permite, a frase explica o limite.
-  multiplayerBotao.title = semRede
-    ? (plataforma.netplay_motivo || "Este console não tem jogo em rede disponível.")
+  // Console sem jogo entre computadores: o botao continua ativo e abre a
+  // explicacao de como jogar junto NO MESMO computador (pedido do Rafael).
+  multiplayerBotao.disabled = plataforma.estado !== "pronta";
+  multiplayerBotao.title = soNoMesmoComputador(jogo)
+    ? "Neste console, jogar junto é no mesmo computador. Clique para ver como."
     : (jogo.motivo_jogadores || "");
   gerirBotao.disabled = plataforma.estado !== "pronta";
   consoleBotao.hidden = jogo.plataforma !== "indefinido";
@@ -2104,6 +2103,53 @@ function desenharCartoes(lista) {
 // Partida a dois
 // --------------------------------------------------------------------------
 
+// Console que NAO joga entre computadores (o emulador nao tem o Jogar Junto,
+// ou e' emulador de fora como PCSX2/Dolphin/Xenia/RPCS3).
+function soNoMesmoComputador(jogo) {
+  const plataforma = estado.porPlataforma[jogo.plataforma] || {};
+  return plataforma.netplay === false || plataforma.aceita_partida === false;
+}
+
+function abrirJuntoLocal(jogo) {
+  const plataforma = estado.porPlataforma[jogo.plataforma] || {};
+  const n = Math.max(2, Number(jogo.jogadores_max) || 2);
+  $("#juntoLocalJogo").textContent = `${jogo.titulo} — até ${n} jogadores.`;
+  $("#juntoLocalMotivo").textContent = plataforma.aceita_partida === false
+    ? `Este console abre por outro programa (${plataforma.emulador}), que não ` +
+      "tem o Jogar Junto do ARENA. Por isso vocês jogam juntos no mesmo " +
+      "computador, cada um com seu controle."
+    : "Neste console, o emulador não consegue deixar dois computadores " +
+      "iguais ao mesmo tempo. Por isso vocês jogam juntos no mesmo " +
+      "computador, cada um com seu controle.";
+  const passos = [
+    "Ligue os controles antes de abrir o jogo. O 1º controle é o jogador 1, " +
+      "o 2º é o jogador 2, e assim por diante.",
+    "O teclado joga como o primeiro jogador sem controle " +
+      "(com 3 controles, o teclado é o jogador 4).",
+    `Dentro do jogo, escolha o modo de 2, 3 ou ${n} jogadores.`,
+    "Algum controle não responde ou está trocado? Feche o jogo, ligue os " +
+      "controles na ordem certa e abra de novo. Se precisar, veja " +
+      "Ajustes → Controles.",
+  ];
+  if (jogo.plataforma === "wii") {
+    passos.splice(2, 0, "No Wii, cada controle vira um Wii Remote com Nunchuk: " +
+      "o analógico esquerdo anda, o direito move a seta.");
+  }
+  const lista = $("#juntoLocalPassos");
+  lista.replaceChildren(...passos.map((texto) => {
+    const item = document.createElement("li");
+    item.textContent = texto;
+    return item;
+  }));
+  const rede = $("#juntoLocalRede");
+  rede.hidden = !jogo.rede_propria;
+  rede.textContent = jogo.rede_propria
+    ? "Este jogo também tem rede própria (System Link): com 2 computadores, " +
+      "abra o jogo nos dois e use o menu de rede DENTRO do jogo."
+    : "";
+  $("#modalJuntoLocal").hidden = false;
+}
+
 function abrirPartida(jogo) {
   estado.jogoDaPartida = jogo;
   estado.papelDaPartida = "hospedar";
@@ -2940,7 +2986,14 @@ function ligarEventos() {
     if (estado.jogoSelecionado) jogar(estado.jogoSelecionado);
   });
   $("#btnMultiplayerSelecionado").addEventListener("click", () => {
-    if (estado.jogoSelecionado) abrirPartida(estado.jogoSelecionado);
+    const jogo = estado.jogoSelecionado;
+    if (!jogo) return;
+    if (soNoMesmoComputador(jogo)) abrirJuntoLocal(jogo);
+    else abrirPartida(jogo);
+  });
+  $("#btnAbrirJuntoLocal").addEventListener("click", () => {
+    $("#modalJuntoLocal").hidden = true;
+    if (estado.jogoSelecionado) jogar(estado.jogoSelecionado);
   });
   $("#btnGerirSelecionado").addEventListener("click", () => {
     if (estado.jogoSelecionado) abrirGaveta_jogo(estado.jogoSelecionado);
