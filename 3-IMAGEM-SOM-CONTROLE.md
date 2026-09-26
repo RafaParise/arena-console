@@ -29,6 +29,11 @@ Assim ninguém briga pelo mesmo boneco, e quem não tem controle continua
 jogando sozinho no teclado. Plugou ou tirou um controle? Feche e abra o
 jogo de novo.
 
+Vale também nos emuladores de fora do RetroArch: PS2 (PCSX2), PS3
+(RPCS3), GameCube e Wii (Dolphin) e Xbox 360 (Xenia). No Xbox 360 o
+teclado usa as teclas do próprio Xenia (WASD anda, setas miram); com 4
+controles plugados ele fica desligado, porque o Xbox 360 só tem 4 jogadores.
+
 ---
 
 ### Regra número um
