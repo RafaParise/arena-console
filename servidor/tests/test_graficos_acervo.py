@@ -90,6 +90,23 @@ class TestGraficos(unittest.TestCase):
         self.assertIn('do_aluno = "sim"', texto)
         self.assertNotIn("duckstation_", texto)
 
+    def test_pcsx2_4_jogadores_liga_multitap(self):
+        # PCSX2 (Sio.cpp): multitap na porta 1 = Pad1, Pad3, Pad4, Pad5.
+        texto = "\n".join(self.mod.controles_pcsx2(4, 3))
+        self.assertIn("MultitapPort1 = true", texto)
+        self.assertIn("[Pad3]\nType = DualShock2", texto)
+        self.assertIn("Cross = SDL-1/A", texto)          # 2o controle no Pad3
+        self.assertIn("[Pad5]\nType = DualShock2", texto)
+        self.assertIn("Start = Keyboard/Return", texto)  # teclado: 4o jogador
+        self.assertIn("[Pad2]\nType = None", texto)
+
+    def test_pcsx2_2_jogadores_sem_multitap(self):
+        texto = "\n".join(self.mod.controles_pcsx2(2, 1))
+        self.assertIn("MultitapPort1 = false", texto)
+        self.assertIn("[Pad1]\nType = DualShock2", texto)
+        self.assertIn("Start = Keyboard/Return", texto)  # 1 controle: teclado no 2
+        self.assertIn("[Pad3]\nType = None", texto)
+
     def test_dolphin_portatil_e_controles(self):
         exe = os.path.join(self.dir, "Dolphin", "Dolphin.exe")
         os.makedirs(os.path.dirname(exe))

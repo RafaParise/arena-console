@@ -1909,9 +1909,12 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
                 ultra=bool(config.get("ultra_desempenho")),
                 nota=CAPACIDADE["nota"], nota_gpu=CAPACIDADE.get("nota_gpu"),
                 modesto=bool(config.get("modo_modesto")),
-                preset=None if preset == "automatico" else preset)
+                preset=None if preset == "automatico" else preset,
+                jogadores=jogo.get("jogadores_max", 2),
+                controles_ligados=controles.contar_controles())
             if escrito:
-                print("[ARENA] Controle e qualidade do PCSX2 configurados.")
+                print("[ARENA] Controle e qualidade do PCSX2 configurados "
+                      "(%s jogadores)." % jogo.get("jogadores_max", 2))
 
             plataforma_ps2 = next((p for p in carregar_catalogo()
                                    if p["id"] == jogo.get("plataforma")), None)

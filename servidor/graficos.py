@@ -992,8 +992,66 @@ ShutdownVM = Keyboard/F10
 """
 
 
+# Controles do PCSX2 por jogo. Conferido no codigo-fonte do PCSX2
+# (pcsx2/SIO/Sio.cpp, 25/09/2026): com o multitap na porta 1, os jogadores
+# 1 a 4 ficam em 1A, 1B, 1C, 1D = secoes Pad1, Pad3, Pad4, Pad5 (o Pad2 e' a
+# porta 2). A chave do adaptador e' [Pad] MultitapPort1 (Pad.cpp).
+PCSX2_BOTOES_SDL = [
+    ("Up", "DPadUp"), ("Down", "DPadDown"), ("Left", "DPadLeft"), ("Right", "DPadRight"),
+    ("Cross", "A"), ("Circle", "B"), ("Square", "X"), ("Triangle", "Y"),
+    ("L1", "LeftShoulder"), ("R1", "RightShoulder"),
+    ("L2", "+LeftTrigger"), ("R2", "+RightTrigger"),
+    ("L3", "LeftStick"), ("R3", "RightStick"), ("Select", "Back"), ("Start", "Start"),
+    ("LUp", "-LeftY"), ("LDown", "+LeftY"), ("LLeft", "-LeftX"), ("LRight", "+LeftX"),
+    ("RUp", "-RightY"), ("RDown", "+RightY"), ("RLeft", "-RightX"), ("RRight", "+RightX"),
+    ("LargeMotor", "LargeMotor"), ("SmallMotor", "SmallMotor"),
+]
+# Mesmas teclas do resto do ARENA (setas, X, Z, S, A, Q, W, Enter, Shift).
+PCSX2_BOTOES_TECLADO = [
+    ("Up", "Up"), ("Down", "Down"), ("Left", "Left"), ("Right", "Right"),
+    ("Cross", "Z"), ("Circle", "X"), ("Square", "A"), ("Triangle", "S"),
+    ("L1", "Q"), ("R1", "W"), ("L2", "E"), ("R2", "R"),
+    ("Select", "Shift"), ("Start", "Return"),
+]
+
+
+def controles_pcsx2(jogadores, controles_ligados):
+    """Blocos [Pad]/[PadN] do PCSX2 para esta partida.
+
+    Ate 2 jogadores: Pad1 e Pad2, sem adaptador. 3 ou mais: multitap na
+    porta 1, jogadores em Pad1, Pad3, Pad4, Pad5. Os controles entram na
+    ordem; o teclado e' o primeiro jogador sem controle (regra do ARENA)."""
+    multitap = int(jogadores or 2) > 2
+    secoes = [1, 3, 4, 5] if multitap else [1, 2]
+    linhas = ["[Pad]", "MultitapPort1 = %s" % ("true" if multitap else "false"),
+              "MultitapPort2 = false", ""]
+    teclado_usado = False
+    for n in range(1, 9):
+        linhas.append("[Pad%d]" % n)
+        if n not in secoes:
+            linhas += ["Type = None", ""]
+            continue
+        jogador = secoes.index(n)
+        if jogador < controles_ligados:
+            fonte = "SDL-%d/" % jogador
+            botoes = PCSX2_BOTOES_SDL
+        elif not teclado_usado:
+            teclado_usado = True
+            fonte = "Keyboard/"
+            botoes = PCSX2_BOTOES_TECLADO
+        else:
+            linhas += ["Type = None", ""]
+            continue
+        linhas += ["Type = DualShock2", "Deadzone = 0.10", "AxisScale = 1.33",
+                   "LargeMotorScale = 1.00", "SmallMotorScale = 1.00"]
+        linhas += ["%s = %s%s" % (botao, fonte, nome) for botao, nome in botoes]
+        linhas.append("")
+    return linhas
+
+
 def escrever_config_pcsx2(caminho_executavel, ultra=False, nota=None,
-                          nota_gpu=None, modesto=False, preset=None):
+                          nota_gpu=None, modesto=False, preset=None,
+                          jogadores=2, controles_ligados=2):
     """Escreve o bloco de controle, teclas e qualidade grafica do PCSX2.
 
     Preserva tudo o que ja estiver no arquivo fora desses blocos - em
@@ -1016,8 +1074,8 @@ def escrever_config_pcsx2(caminho_executavel, ultra=False, nota=None,
     pasta = os.path.dirname(caminho_executavel)
     destino = os.path.join(pasta, "inis", "PCSX2.ini")
 
-    nossos = {"[Pad1]", "[Pad2]", "[InputSources]", "[Hotkeys]",
-              "[EmuCore/GS]", "[UI]"}
+    nossos = {"[Pad]", "[InputSources]", "[Hotkeys]", "[EmuCore/GS]", "[UI]"}
+    nossos |= {"[Pad%d]" % n for n in range(1, 9)}
     guardar, bloco_atual = [], None
 
     try:
@@ -1066,7 +1124,10 @@ def escrever_config_pcsx2(caminho_executavel, ultra=False, nota=None,
         extra += ["", "[UI]", "StartFullscreen = true",
                   "ConfirmShutdown = false"]
 
-    texto = "\n".join(guardar + [""] + BLOCO_PCSX2.splitlines() + extra) + "\n"
+    # Os [Pad1]/[Pad2] fixos do BLOCO_PCSX2 dao lugar aos gerados por jogo.
+    fixo = BLOCO_PCSX2[BLOCO_PCSX2.index("[InputSources]"):]
+    texto = "\n".join(guardar + [""] + controles_pcsx2(jogadores, controles_ligados)
+                      + fixo.splitlines() + extra) + "\n"
 
     try:
         os.makedirs(os.path.dirname(destino), exist_ok=True)
