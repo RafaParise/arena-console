@@ -24,7 +24,7 @@ ESPERA = int(os.environ.get("ESPERA", "70"))
 def main():
     nome, exe, foto = sys.argv[1].lower(), sys.argv[2], sys.argv[3]
     extras = sys.argv[4:]
-    jogo = [j for j in glob.glob(os.path.join(RAIZ, "jogos", "pessoais", "XBOX360", "*.iso"))
+    jogo = [j for j in glob.glob(os.path.join(RAIZ, "jogos", "pessoais", "XBOX360", "**", "*.iso"), recursive=True)
             if nome in os.path.basename(j).lower()][0]
     log = os.path.join(PASTA, "xenia.log")
     processo = subprocess.Popen([os.path.join(PASTA, exe)] + extras + [jogo], cwd=PASTA)
