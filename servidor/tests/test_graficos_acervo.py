@@ -190,6 +190,20 @@ class TestGraficos(unittest.TestCase):
         self.assertTrue(self.mod.escrever_config_rpcn(exe, ligado=True))
         self.assertIn("Internet enabled: Connected", open(cfg, encoding="utf-8").read())
 
+    def test_xenia_teclado_no_primeiro_jogador_sem_controle(self):
+        exe = os.path.join(self.dir, "X", "xenia_canary.exe")
+        toml = os.path.join(self.dir, "X", "xenia-canary.config.toml")
+        os.makedirs(os.path.dirname(toml))
+        base = "keyboard_mode = 0   # x\nkeyboard_user_index = 0   # y\n"
+        for ligados, modo, indice in (([0, 1, 2], "1", "3"), ([], "1", "0"),
+                                      ([0, 2], "1", "1"), ([0, 1, 2, 3], "0", "0")):
+            with open(toml, "w", encoding="utf-8") as f:
+                f.write(base)
+            self.mod.escrever_config_xenia(exe, 3, controles_xinput=ligados)
+            texto = open(toml, encoding="utf-8").read()
+            self.assertIn("keyboard_mode = %s   # x" % modo, texto)
+            self.assertIn("keyboard_user_index = %s   # y" % indice, texto)
+
     def test_gravar_atomico(self):
         caminho = os.path.join(self.dir, "teste.txt")
         self.mod.gravar_atomico(caminho, "olá")

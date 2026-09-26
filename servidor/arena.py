@@ -1974,9 +1974,10 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
                 CAPACIDADE.get("nota_gpu"),
                 modesto=bool(config.get("modo_modesto")),
                 ultra=bool(config.get("ultra_desempenho")),
-                preset=None if preset == "automatico" else preset)
+                preset=None if preset == "automatico" else preset,
+                controles_xinput=controles.controles_xinput())
             if escrito:
-                print("[ARENA] Video do Xenia configurado.")
+                print("[ARENA] Video e teclado do Xenia configurados.")
         elif jogo["externo"]["dados"]["nome"] == "RPCS3":
             preset = config.get("preset_grafico_externo", "automatico")
             escrito = graficos.escrever_config_rpcs3(

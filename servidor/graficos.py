@@ -1526,14 +1526,19 @@ def _trocar_valor_toml(texto, chave, valor):
 
 
 def escrever_config_xenia(caminho_executavel, nota, nota_gpu=None, modesto=False,
-                          ultra=False, preset=None):
+                          ultra=False, preset=None, controles_xinput=None):
     """Escreve o bloco de video do Xenia (Xbox 360), preservando o resto.
 
     'preset' deixa a pessoa escolher na mao em vez de confiar na nota da
     maquina: "leve" (o mais leve possivel), "bonito" (o melhor que a
     placa aguentar) ou None/"automatico" (decide pela nota, o padrao).
 
-    NAO escreve mapeamento de controle: o formato dos 'keybind_*' do Xenia
+    'controles_xinput': numeros (0 a 3) dos controles ligados. Os controles
+    o Xenia ja aceita sozinho (jogador = numero do XInput); o ARENA so liga
+    o teclado no primeiro jogador sem controle (regra do ARENA). Sem
+    controle livre (4 ligados), o teclado fica desligado.
+
+    NAO troca as teclas: o formato dos 'keybind_*' do Xenia
     (codigo de tecla do Windows em hexadecimal, ou letra solta, ou um
     prefixo '^' cujo significado exato nao pude confirmar sem testar de
     verdade) e arriscado demais pra converter as cegas a partir do mapa
@@ -1601,6 +1606,11 @@ def escrever_config_xenia(caminho_executavel, nota, nota_gpu=None, modesto=False
             "postprocess_antialiasing": '"fxaa"',
             "postprocess_scaling_and_sharpening": '"bilinear"',
         })
+
+    if controles_xinput is not None:
+        livres = [n for n in range(4) if n not in set(controles_xinput)]
+        ajustes["keyboard_mode"] = "1" if livres else "0"
+        ajustes["keyboard_user_index"] = str(livres[0] if livres else 0)
 
     for chave, valor in ajustes.items():
         texto = _trocar_valor_toml(texto, chave, valor)
