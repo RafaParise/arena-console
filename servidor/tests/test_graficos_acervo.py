@@ -92,16 +92,16 @@ class TestGraficos(unittest.TestCase):
 
     def test_pcsx2_4_jogadores_liga_multitap(self):
         # PCSX2 (Sio.cpp): multitap na porta 1 = Pad1, Pad3, Pad4, Pad5.
-        texto = "\n".join(self.mod.controles_pcsx2(4, 3))
+        texto = "\n".join(self.mod.controles_pcsx2(4, [0, 2, 3]))
         self.assertIn("MultitapPort1 = true", texto)
         self.assertIn("[Pad3]\nType = DualShock2", texto)
-        self.assertIn("Cross = SDL-1/A", texto)          # 2o controle no Pad3
+        self.assertIn("Cross = XInput-2/A", texto)       # 2o controle (XInput 2) no Pad3
         self.assertIn("[Pad5]\nType = DualShock2", texto)
         self.assertIn("Start = Keyboard/Return", texto)  # teclado: 4o jogador
         self.assertIn("[Pad2]\nType = None", texto)
 
     def test_pcsx2_2_jogadores_sem_multitap(self):
-        texto = "\n".join(self.mod.controles_pcsx2(2, 1))
+        texto = "\n".join(self.mod.controles_pcsx2(2, [0]))
         self.assertIn("MultitapPort1 = false", texto)
         self.assertIn("[Pad1]\nType = DualShock2", texto)
         self.assertIn("Start = Keyboard/Return", texto)  # 1 controle: teclado no 2

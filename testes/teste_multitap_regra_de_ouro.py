@@ -61,6 +61,12 @@ REVISAO_ANTES = "97ffe03"
 
 TITULOS_NOVOS_DE_PROPOSITO = {"Capcom Vs SNK 2 Millionaire Fighting 2001"}
 
+# C64 (VICE) e Amiga (PUAE) passaram a recusar o Jogar Junto DE PROPOSITO
+# (25/09/2026): o nucleo nao tem netplay, confirmado tentando hospedar.
+# Antes o ARENA abria e o RetroArch falhava; agora o servidor responde 409.
+JOGAR_JUNTO_RECUSADO_DE_PROPOSITO = {"Alien Breed Disk1", "Top Gear 2 Disk2",
+                                     "INTKARAT", "Mule", "PRINCEOP"}
+
 
 def sem_mudanca_de_proposito(chaves_override):
     """Tira as duas mudancas que valem para TODO jogo, de proposito (teste
@@ -246,8 +252,12 @@ def principal():
                 falhas.append("%s: nao existe na versao de antes" % caso)
                 continue
             mais_de_dois = (b["jogadores_max"] or 2) > 2 and b["status"] == 200
+            titulo, _, modo = caso.partition(" | ")
+            if (b["status"] == 409 and modo in ("hospedar", "entrar")
+                    and titulo in JOGAR_JUNTO_RECUSADO_DE_PROPOSITO):
+                continue
             if not mais_de_dois:
-                ca, cb = sem_mudanca_de_proposito(chaves(a["override"])), sem_mudanca_de_proposito(chaves(b["override"]))
+                ca, cb =sem_mudanca_de_proposito(chaves(a["override"])), sem_mudanca_de_proposito(chaves(b["override"]))
                 if a["status"] != b["status"] or ca != cb:
                     dif = sorted(set(ca.items()) ^ set(cb.items()))
                     falhas.append("%s: MUDOU (status %s -> %s) %s" % (caso, a["status"], b["status"], dif[:6]))

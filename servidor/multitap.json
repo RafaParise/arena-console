@@ -159,12 +159,22 @@
 
     "fbneo_libretro.dll": {
       "console": "neogeo",
-      "jogadores_sem_adaptador": 2,
+      "jogadores_sem_adaptador": 4,
       "jogar_junto": true,
       "adaptador": {
         "tipo": "nenhum",
-        "motivo": "No arcade, o número de jogadores vem de cada jogo (BurnDrvGetMaxPlayers); os jogos de Neo Geo são de 2.",
+        "motivo": "No arcade, o número de jogadores vem de cada jogo (BurnDrvGetMaxPlayers): Neo Geo é de 2, mas o FBNeo também roda fliperamas de 4 (Turtles in Time, 26/09/2026). Quem diz o número de cada jogo é o dados\\jogadores.txt.",
         "fonte": "FBNeo src/burner/libretro/libretro.cpp linha 2020"
+      }
+    },
+
+    "mame_libretro.dll": {
+      "console": "arcade",
+      "jogadores_sem_adaptador": 4,
+      "jogar_junto": true,
+      "adaptador": {
+        "tipo": "nenhum",
+        "motivo": "No MAME cada máquina de fliperama já tem as entradas dos seus jogadores; não há adaptador. Quem diz o número de cada jogo é o dados\\jogadores.txt. Jogar Junto confirmado com o KOF 97 (26/09/2026)."
       }
     }
   },

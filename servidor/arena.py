@@ -1911,7 +1911,7 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
                 modesto=bool(config.get("modo_modesto")),
                 preset=None if preset == "automatico" else preset,
                 jogadores=jogo.get("jogadores_max", 2),
-                controles_ligados=controles.contar_controles())
+                controles_xinput=controles.controles_xinput())
             if escrito:
                 print("[ARENA] Controle e qualidade do PCSX2 configurados "
                       "(%s jogadores)." % jogo.get("jogadores_max", 2))

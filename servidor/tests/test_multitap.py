@@ -71,10 +71,12 @@ class TestJogadoresDoJogo(unittest.TestCase):
         self.assertEqual(r["motivo"], "")
 
     def test_limite_do_nucleo_vira_motivo(self):
-        r = self.ligar("fbneo_libretro.dll", 4)
-        self.assertEqual(r["jogadores"], 2)
+        # Era o FBNeo (limite 2). Em 26/09/2026 ele passou a 4: o FBNeo roda
+        # fliperamas de 4 (Turtles in Time). O PSP continua limitado (1).
+        r = self.ligar("ppsspp_libretro.dll", 4)
+        self.assertEqual(r["jogadores"], 1)
         self.assertEqual(r["cfg"], {})
-        self.assertIn("até 2", r["motivo"])
+        self.assertIn("até 1", r["motivo"])
         s = self.ligar("snes9x_libretro.dll", 8)   # pede mais que o adaptador
         self.assertEqual(s["jogadores"], 5)
         self.assertIn("até 5", s["motivo"])

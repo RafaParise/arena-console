@@ -978,7 +978,7 @@ SmallMotor = SDL-1/SmallMotor
 [InputSources]
 SDL = true
 SDLControllerEnhancedMode = true
-XInput = false
+XInput = true
 RawInput = false
 
 [Hotkeys]
@@ -1015,12 +1015,20 @@ PCSX2_BOTOES_TECLADO = [
 ]
 
 
-def controles_pcsx2(jogadores, controles_ligados):
+def controles_pcsx2(jogadores, controles_xinput):
     """Blocos [Pad]/[PadN] do PCSX2 para esta partida.
 
     Ate 2 jogadores: Pad1 e Pad2, sem adaptador. 3 ou mais: multitap na
     porta 1, jogadores em Pad1, Pad3, Pad4, Pad5. Os controles entram na
-    ordem; o teclado e' o primeiro jogador sem controle (regra do ARENA)."""
+    ordem; o teclado e' o primeiro jogador sem controle (regra do ARENA).
+
+    'controles_xinput': numeros (0 a 3) dos controles XInput ligados. Usa a
+    fonte XInput do PCSX2 ("XInput-N", N = numero do Windows) e nao a SDL:
+    o "SDL-N" muda quando um controle sem fio reconecta, e no Crash Nitro
+    Kart (25/09/2026) so o 1o controle funcionou. Nomes dos botoes
+    conferidos em pcsx2/Input/XInputSource.cpp (iguais aos da SDL)."""
+    controles_xinput = list(controles_xinput or [])
+    controles_ligados = len(controles_xinput)
     multitap = int(jogadores or 2) > 2
     secoes = [1, 3, 4, 5] if multitap else [1, 2]
     linhas = ["[Pad]", "MultitapPort1 = %s" % ("true" if multitap else "false"),
@@ -1033,7 +1041,7 @@ def controles_pcsx2(jogadores, controles_ligados):
             continue
         jogador = secoes.index(n)
         if jogador < controles_ligados:
-            fonte = "SDL-%d/" % jogador
+            fonte = "XInput-%d/" % controles_xinput[jogador]
             botoes = PCSX2_BOTOES_SDL
         elif not teclado_usado:
             teclado_usado = True
@@ -1051,7 +1059,7 @@ def controles_pcsx2(jogadores, controles_ligados):
 
 def escrever_config_pcsx2(caminho_executavel, ultra=False, nota=None,
                           nota_gpu=None, modesto=False, preset=None,
-                          jogadores=2, controles_ligados=2):
+                          jogadores=2, controles_xinput=(0, 1)):
     """Escreve o bloco de controle, teclas e qualidade grafica do PCSX2.
 
     Preserva tudo o que ja estiver no arquivo fora desses blocos - em
@@ -1126,7 +1134,7 @@ def escrever_config_pcsx2(caminho_executavel, ultra=False, nota=None,
 
     # Os [Pad1]/[Pad2] fixos do BLOCO_PCSX2 dao lugar aos gerados por jogo.
     fixo = BLOCO_PCSX2[BLOCO_PCSX2.index("[InputSources]"):]
-    texto = "\n".join(guardar + [""] + controles_pcsx2(jogadores, controles_ligados)
+    texto = "\n".join(guardar + [""] + controles_pcsx2(jogadores, controles_xinput)
                       + fixo.splitlines() + extra) + "\n"
 
     try:
