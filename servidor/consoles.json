@@ -654,8 +654,8 @@
     },
     {
       "id": "neogeo",
-      "nome": "Neo Geo",
-      "descricao": "Arcade domestico da SNK.",
+      "nome": "Neo Geo e fliperamas (FBNeo)",
+      "descricao": "Neo Geo e muitos fliperamas (Capcom, Konami...) pelo FBNeo, mais leve que o MAME.",
       "aviso_ao_abrir": "É fliperama: aperte Select (Back) para pôr uma ficha e depois Start. Sem ficha, o jogo fica na demonstração.",
       "core": "fbneo_libretro.dll",
       "extensoes": [
@@ -670,6 +670,7 @@
         "neo geo",
         "neo-geo",
         "neogeo",
+        "fbneo",
         "ng"
       ],
       "pasta": "Neo Geo"

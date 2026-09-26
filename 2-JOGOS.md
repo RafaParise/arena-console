@@ -154,7 +154,7 @@ São dois consoles diferentes no ARENA, cada um com o seu emulador:
 
 | Console | Pasta | Emulador | Serve para |
 |---|---|---|---|
-| **Neo Geo** | `jogos\pessoais\Neo Geo` | FBNeo | KOF, Metal Slug, Samurai Shodown... |
+| **Neo Geo e fliperamas (FBNeo)** | `jogos\pessoais\Neo Geo` | FBNeo | KOF, Metal Slug e muitos fliperamas da Capcom, Konami e outras (Turtles in Time, por exemplo). Mais leve que o MAME |
 | **Arcade (MAME)** | `jogos\pessoais\Arcade` | MAME (versão atual) | O resto dos fliperamas |
 
 Regras que valem para os dois (do guia oficial do libretro):
