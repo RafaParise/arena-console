@@ -1072,6 +1072,156 @@ def escrever_config_pcsx2(caminho_executavel, ultra=False, nota=None,
 
 
 # ---------------------------------------------------------------------------
+# Dolphin (GameCube e Wii): pasta portatil e controles
+# ---------------------------------------------------------------------------
+# Nomes conferidos no codigo-fonte do Dolphin (25/09/2026), nao inventados:
+#   XInput.cpp  -> "Button A", "Pad N", "Start", "Back", "Shoulder L",
+#                  "Trigger L", "Thumb L", "Guide", eixos "Left X"/"Left Y"
+#   GCPadEmu.h  -> grupos "Buttons", "Main Stick", "C-Stick", "Triggers",
+#                  "D-Pad"; botoes "A","B","X","Y","Z","Start"; "L","R",
+#                  "L-Analog","R-Analog"
+#   WiimoteEmu.h/Nunchuk.h -> "Buttons" A,B,1,2,-,+,Home; "D-Pad"; "Shake";
+#                  "IR"; Nunchuk "Buttons" C,Z e "Stick"
+#   Attachments.cpp -> "Extension = Nunchuk" e "Nunchuk/<grupo>/<botao>"
+#   SI_Device.h -> SIDEVICE_GC_CONTROLLER = 6, SIDEVICE_NONE = 0
+# Sem o portable.txt o Dolphin grava configuracao e saves em Documentos,
+# FORA da pasta do ARENA -- contra a regra do pen drive.
+
+DOLPHIN_ENTRADA_XINPUT = {
+    "A": "`Button A`", "B": "`Button B`", "X": "`Button X`", "Y": "`Button Y`",
+    "Start": "Start", "Back": "Back", "Guide": "Guide",
+    "LB": "`Shoulder L`", "RB": "`Shoulder R`", "LT": "`Trigger L`", "RT": "`Trigger R`",
+    "cima": "`Pad N`", "baixo": "`Pad S`", "esquerda": "`Pad W`", "direita": "`Pad E`",
+    "esq_cima": "`Left Y+`", "esq_baixo": "`Left Y-`",
+    "esq_esquerda": "`Left X-`", "esq_direita": "`Left X+`",
+    "dir_cima": "`Right Y+`", "dir_baixo": "`Right Y-`",
+    "dir_esquerda": "`Right X-`", "dir_direita": "`Right X+`",
+}
+
+# Mesmas teclas do resto do ARENA (setas, X, Z, S, A, Q, W, Enter, Shift).
+DOLPHIN_ENTRADA_TECLADO = {
+    "A": "X", "B": "Z", "X": "S", "Y": "A", "Start": "RETURN", "Back": "RSHIFT",
+    "Guide": "", "LB": "Q", "RB": "W", "LT": "E", "RT": "R",
+    "cima": "UP", "baixo": "DOWN", "esquerda": "LEFT", "direita": "RIGHT",
+    "esq_cima": "UP", "esq_baixo": "DOWN", "esq_esquerda": "LEFT", "esq_direita": "RIGHT",
+    "dir_cima": "I", "dir_baixo": "K", "dir_esquerda": "J", "dir_direita": "L",
+}
+
+
+def _linhas_gcpad(entrada):
+    """Controle de GameCube num controle comum (formato Xbox)."""
+    e = entrada
+    return [
+        "Buttons/A = " + e["A"], "Buttons/B = " + e["B"],
+        "Buttons/X = " + e["X"], "Buttons/Y = " + e["Y"],
+        "Buttons/Z = " + e["RB"], "Buttons/Start = " + e["Start"],
+        "Main Stick/Up = " + e["esq_cima"], "Main Stick/Down = " + e["esq_baixo"],
+        "Main Stick/Left = " + e["esq_esquerda"], "Main Stick/Right = " + e["esq_direita"],
+        "C-Stick/Up = " + e["dir_cima"], "C-Stick/Down = " + e["dir_baixo"],
+        "C-Stick/Left = " + e["dir_esquerda"], "C-Stick/Right = " + e["dir_direita"],
+        "Triggers/L = " + e["LT"], "Triggers/R = " + e["RT"],
+        "Triggers/L-Analog = " + e["LT"], "Triggers/R-Analog = " + e["RT"],
+        "D-Pad/Up = " + e["cima"], "D-Pad/Down = " + e["baixo"],
+        "D-Pad/Left = " + e["esquerda"], "D-Pad/Right = " + e["direita"],
+    ]
+
+
+def _linhas_wiimote(entrada):
+    """Wii Remote + Nunchuk num controle comum. O analogico esquerdo e' o
+    Nunchuk; o direito aponta (cursor dos menus); RB balanca o controle.
+    Serve para Mario Kart Wii, Smash Brawl e New Super Mario Bros. Wii --
+    os tres aceitam Wii Remote + Nunchuk, sem precisar apontar de verdade."""
+    e = entrada
+    return [
+        "Buttons/A = " + e["A"], "Buttons/B = " + e["RT"],
+        "Buttons/1 = " + e["X"], "Buttons/2 = " + e["Y"],
+        "Buttons/- = " + e["Back"], "Buttons/+ = " + e["Start"],
+        "Buttons/Home = " + e["Guide"],
+        "D-Pad/Up = " + e["cima"], "D-Pad/Down = " + e["baixo"],
+        "D-Pad/Left = " + e["esquerda"], "D-Pad/Right = " + e["direita"],
+        "IR/Up = " + e["dir_cima"], "IR/Down = " + e["dir_baixo"],
+        "IR/Left = " + e["dir_esquerda"], "IR/Right = " + e["dir_direita"],
+        "Shake/X = " + e["RB"], "Shake/Y = " + e["RB"], "Shake/Z = " + e["RB"],
+        "Extension = Nunchuk",
+        "Nunchuk/Buttons/C = " + e["LB"], "Nunchuk/Buttons/Z = " + e["LT"],
+        "Nunchuk/Stick/Up = " + e["esq_cima"], "Nunchuk/Stick/Down = " + e["esq_baixo"],
+        "Nunchuk/Stick/Left = " + e["esq_esquerda"], "Nunchuk/Stick/Right = " + e["esq_direita"],
+    ]
+
+
+def _trocar_chaves_ini(texto, secao, chaves):
+    """Troca (ou acrescenta) chaves numa secao de um .ini, mantendo o resto."""
+    linhas = texto.splitlines()
+    inicio = next((i for i, l in enumerate(linhas) if l.strip() == "[%s]" % secao), None)
+    if inicio is None:
+        linhas += ["", "[%s]" % secao] + ["%s = %s" % kv for kv in chaves.items()]
+        return "\n".join(linhas) + "\n"
+    fim = next((i for i in range(inicio + 1, len(linhas))
+                if linhas[i].strip().startswith("[")), len(linhas))
+    faltam = dict(chaves)
+    for i in range(inicio + 1, fim):
+        chave = linhas[i].split("=", 1)[0].strip()
+        if chave in faltam:
+            linhas[i] = "%s = %s" % (chave, faltam.pop(chave))
+    linhas[fim:fim] = ["%s = %s" % kv for kv in faltam.items()]
+    return "\n".join(linhas) + "\n"
+
+
+def escrever_config_dolphin(caminho_executavel, controles_xinput, teclado=True):
+    """Deixa o Dolphin portatil e escreve os controles de GameCube e Wii.
+
+    'controles_xinput': numeros (0 a 3) dos controles XInput ligados.
+    Cada um vira um jogador, na ordem; o teclado e' o primeiro jogador sem
+    controle (a mesma regra do resto do ARENA). Devolve a pasta de
+    configuracao, ou None se nao deu para gravar."""
+    pasta_exe = os.path.dirname(caminho_executavel)
+    pasta_config = os.path.join(pasta_exe, "User", "Config")
+    try:
+        portatil = os.path.join(pasta_exe, "portable.txt")
+        if not os.path.exists(portatil):
+            with open(portatil, "w", encoding="utf-8") as arquivo:
+                arquivo.write("Criado pelo ARENA: guarda tudo do Dolphin nesta pasta.\n")
+        os.makedirs(pasta_config, exist_ok=True)
+
+        jogadores = [("XInput/%d/Gamepad" % n, DOLPHIN_ENTRADA_XINPUT)
+                     for n in list(controles_xinput)[:4]]
+        if teclado and len(jogadores) < 4:
+            jogadores.append(("DInput/0/Keyboard Mouse", DOLPHIN_ENTRADA_TECLADO))
+
+        gcpad, wiimote, portas = [], [], {}
+        for porta in range(4):
+            gcpad.append("[GCPad%d]" % (porta + 1))
+            wiimote.append("[Wiimote%d]" % (porta + 1))
+            if porta < len(jogadores):
+                dispositivo, entrada = jogadores[porta]
+                gcpad += ["Device = " + dispositivo] + _linhas_gcpad(entrada)
+                wiimote += ["Source = 1", "Device = " + dispositivo] + _linhas_wiimote(entrada)
+                portas["SIDevice%d" % porta] = "6"   # controle de GameCube
+            else:
+                wiimote.append("Source = 0")          # sem Wii Remote
+                portas["SIDevice%d" % porta] = "0"   # porta vazia
+            gcpad.append("")
+            wiimote.append("")
+
+        cabecalho = ["# Gerado pelo ARENA a cada jogo (servidor\\graficos.py).", ""]
+        gravar_atomico(os.path.join(pasta_config, "GCPadNew.ini"),
+                       "\n".join(cabecalho + gcpad) + "\n")
+        gravar_atomico(os.path.join(pasta_config, "WiimoteNew.ini"),
+                       "\n".join(cabecalho + wiimote) + "\n")
+
+        arquivo_dolphin = os.path.join(pasta_config, "Dolphin.ini")
+        try:
+            with open(arquivo_dolphin, "r", encoding="utf-8", errors="replace") as arquivo:
+                texto = arquivo.read()
+        except OSError:
+            texto = ""
+        gravar_atomico(arquivo_dolphin, _trocar_chaves_ini(texto, "Core", portas))
+        return pasta_config
+    except OSError:
+        return None
+
+
+# ---------------------------------------------------------------------------
 # PS2 pela rede: "system link" original, via PCSX2 (DEV9)
 # ---------------------------------------------------------------------------
 # Diferente do RetroArch, o PS2 nao tem netplay generico: o PCSX2 emula a

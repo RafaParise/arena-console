@@ -1925,6 +1925,14 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
                     print("[ARENA] Rede do PS2 configurada so pra ENTRAR "
                          "(sem o driver Npcap, não dá pra hospedar).")
 
+        # Dolphin (GameCube e Wii): pasta portatil e controles de 4 jogadores
+        # -- XInput na ordem, teclado no primeiro jogador sem controle.
+        elif jogo["externo"]["dados"]["nome"] == "Dolphin":
+            pasta = graficos.escrever_config_dolphin(
+                jogo["externo"]["caminho"], controles.controles_xinput())
+            if pasta:
+                print("[ARENA] Controles do Dolphin configurados (GameCube e Wii).")
+
         # Xenia e RPCS3: mesma ideia do PCSX2 acima, mas so o video por
         # enquanto (ver o comentario em escrever_config_xenia/rpcs3 sobre
         # por que o controle ainda nao entra aqui).

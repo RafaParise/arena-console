@@ -371,19 +371,27 @@ def contar_controles():
             if winmm.joyGetPosEx(numero, ctypes.byref(info)) == 0:
                 pela_lista += 1
 
-        pelo_xinput = 0
+        return max(pela_lista, len(controles_xinput()))
+    except (AttributeError, OSError, ValueError):
+        return 0
+
+
+def controles_xinput():
+    """Numeros (0 a 3) dos controles XInput ligados agora -- Xbox, GameSir e
+    parecidos. E' o que o Dolphin chama de "XInput/N/Gamepad"."""
+    try:
+        import ctypes
         estado = (ctypes.c_ubyte * 16)()
         for nome in ("xinput1_4", "xinput1_3", "xinput9_1_0"):
             try:
                 xinput = getattr(ctypes.windll, nome)
             except OSError:
                 continue
-            pelo_xinput = sum(1 for n in range(4)
-                              if xinput.XInputGetState(n, ctypes.byref(estado)) == 0)
-            break
-        return max(pela_lista, pelo_xinput)
+            return [n for n in range(4)
+                    if xinput.XInputGetState(n, ctypes.byref(estado)) == 0]
     except (AttributeError, OSError, ValueError):
-        return 0
+        pass
+    return []
 
 
 def opcoes_do_teclado(dados, controles_ligados):

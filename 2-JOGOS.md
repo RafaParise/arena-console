@@ -412,6 +412,44 @@ cada um que ele encontrou.
 
 Ao abrir um jogo, o aviso diz por qual programa: *"Abrindo Black pelo PCSX2"*.
 
+#### GameCube e Wii pelo Dolphin: controles e pasta
+
+Jogos de **Wii** vão em `jogos\pessoais\Wii`, e os de GameCube em
+`jogos\pessoais\GameCube`. Os dois abrem pelo Dolphin.
+
+A cada jogo, o ARENA:
+
+- deixa o Dolphin **portátil** (cria o `portable.txt`): configuração e saves
+  ficam em `emuladores\Dolphin\...\User`. Sem isso, o Dolphin gravaria em
+  `Documentos`, fora do pen drive;
+- liga **até 4 controles**, na ordem em que o Windows os numera, e põe o
+  **teclado no primeiro jogador sem controle**, como no resto do ARENA.
+
+No **GameCube**, cada controle vira um controle de GameCube (RB é o Z,
+gatilhos são L e R, analógico direito é o C).
+
+No **Wii**, cada controle vira um **Wii Remote + Nunchuk**:
+
+| No controle | No Wii |
+|---|---|
+| Analógico esquerdo | Analógico do Nunchuk |
+| A | A |
+| RT (gatilho direito) | B (gatilho do Wii Remote) |
+| LT / LB | Z / C do Nunchuk |
+| X / Y | 1 / 2 |
+| Start / Back | + / − |
+| Analógico direito | Aponta (cursor dos menus) |
+| RB | Balançar o controle |
+
+Funciona nos jogos que aceitam Wii Remote + Nunchuk: Mario Kart Wii, Super
+Smash Bros. Brawl, New Super Mario Bros. Wii e muitos outros. **Limite:**
+jogo que exige apontar para a tela com precisão ou fazer o movimento de
+verdade (Wii Sports, por exemplo) não fica bom num controle comum.
+
+Hoje o ARENA liga no Dolphin os controles do tipo **Xbox** (XInput: Xbox,
+GameSir e parecidos). Controle de PlayStation ou genérico no Dolphin ainda
+precisa ser configurado pela tela do próprio Dolphin.
+
 #### PS3: falta mais um passo (o firmware)
 
 O RPCS3 sozinho não abre jogo nenhum. Ele precisa do **firmware** do PS3 —

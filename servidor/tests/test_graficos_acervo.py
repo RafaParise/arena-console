@@ -90,6 +90,38 @@ class TestGraficos(unittest.TestCase):
         self.assertIn('do_aluno = "sim"', texto)
         self.assertNotIn("duckstation_", texto)
 
+    def test_dolphin_portatil_e_controles(self):
+        exe = os.path.join(self.dir, "Dolphin", "Dolphin.exe")
+        os.makedirs(os.path.dirname(exe))
+        config = os.path.join(self.dir, "Dolphin", "User", "Config")
+        os.makedirs(config)
+        with open(os.path.join(config, "Dolphin.ini"), "w") as f:
+            f.write("[Core]\nCPUThread = True\nSIDevice0 = 0\n[Display]\nFullscreen = True\n")
+        pasta = self.mod.escrever_config_dolphin(exe, [0, 1, 2])
+        self.assertEqual(pasta, config)
+        self.assertTrue(os.path.exists(os.path.join(self.dir, "Dolphin", "portable.txt")))
+        gc = open(os.path.join(config, "GCPadNew.ini")).read()
+        wii = open(os.path.join(config, "WiimoteNew.ini")).read()
+        dolphin = open(os.path.join(config, "Dolphin.ini")).read()
+        self.assertIn("[GCPad3]\nDevice = XInput/2/Gamepad", gc)
+        self.assertIn("[GCPad4]\nDevice = DInput/0/Keyboard Mouse", gc)   # teclado: 1o livre
+        self.assertIn("Buttons/Start = Start", gc)
+        self.assertIn("Extension = Nunchuk", wii)
+        self.assertIn("Nunchuk/Stick/Up = `Left Y+`", wii)
+        for porta in range(4):
+            self.assertIn("SIDevice%d = 6" % porta, dolphin)
+        self.assertIn("CPUThread = True", dolphin)       # o resto fica
+        self.assertIn("Fullscreen = True", dolphin)
+
+    def test_dolphin_sem_controle_teclado_no_jogador_1(self):
+        exe = os.path.join(self.dir, "D", "Dolphin.exe")
+        os.makedirs(os.path.dirname(exe))
+        pasta = self.mod.escrever_config_dolphin(exe, [])
+        gc = open(os.path.join(pasta, "GCPadNew.ini")).read()
+        dolphin = open(os.path.join(pasta, "Dolphin.ini")).read()
+        self.assertIn("[GCPad1]\nDevice = DInput/0/Keyboard Mouse", gc)
+        self.assertIn("SIDevice1 = 0", dolphin)
+
     def test_gravar_atomico(self):
         caminho = os.path.join(self.dir, "teste.txt")
         self.mod.gravar_atomico(caminho, "olá")
