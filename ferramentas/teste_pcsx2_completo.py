@@ -80,8 +80,8 @@ def main():
 
         gs = ler_bloco_gs()
         print("Bloco [EmuCore/GS] gravado:", gs)
-        if gs.get("UpscaleMultiplier") not in ("1", "2", "4"):
-            print("FALHOU: UpscaleMultiplier ausente ou fora do esperado.")
+        if gs.get("upscale_multiplier") not in ("1", "2", "4"):
+            print("FALHOU: upscale_multiplier ausente ou fora do esperado.")
             return 1
 
         vivo = False

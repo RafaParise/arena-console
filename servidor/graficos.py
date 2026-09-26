@@ -1118,8 +1118,8 @@ def escrever_config_pcsx2(caminho_executavel, ultra=False, nota=None,
     tela de Configuracoes - abrir um jogo sozinho, mesmo rodando de
     verdade, nao cria o bloco (confirmado testando: 20s de corrida real
     sem nenhuma linha nova). Por isso este bloco e' escrito do zero, com
-    as mesmas chaves que o PCSX2 usa por dentro (UpscaleMultiplier,
-    MaxAnisotropy, TexturePreloading - conferidas no codigo-fonte do
+    as mesmas chaves que o PCSX2 2.8 usa por dentro (upscale_multiplier,
+    MaxAnisotropy, texture_preloading - conferidas no PCSX2.ini que ele gera; os nomes antigos do
     PCSX2, nao inventadas), em vez de so completar um arquivo existente
     como e' feito com o Xenia/RPCS3.
 
@@ -1131,7 +1131,7 @@ def escrever_config_pcsx2(caminho_executavel, ultra=False, nota=None,
     pasta = os.path.dirname(caminho_executavel)
     destino = os.path.join(pasta, "inis", "PCSX2.ini")
 
-    nossos = {"[Pad]", "[InputSources]", "[Hotkeys]", "[EmuCore/GS]", "[UI]"}
+    nossos = {"[Pad]", "[InputSources]", "[Hotkeys]", "[UI]"}
     nossos |= {"[Pad%d]" % n for n in range(1, 9)}
     guardar, bloco_atual = [], None
 
@@ -1166,17 +1166,20 @@ def escrever_config_pcsx2(caminho_executavel, ultra=False, nota=None,
         else:
             escala, aniso, pre_carga = "2", "4", "2"
 
-        linhas_gs += ["UpscaleMultiplier = " + escala,
+        # Nomes do PCSX2 2.8 (conferidos no PCSX2.ini que ele mesmo gera,
+        # 26/09/2026). Antes o ARENA escrevia "UpscaleMultiplier" e
+        # "TexturePreloading", que nao existem: o seletor nunca teve efeito.
+        linhas_gs += ["upscale_multiplier = " + escala,
                       "MaxAnisotropy = " + aniso,
-                      "TexturePreloading = " + pre_carga]
+                      "texture_preloading = " + pre_carga]
 
     if ultra:
-        linhas_gs += ["VsyncEnable = 1", "OsdShowMessages = false",
-                      "OsdShowSpeed = false"]
+        linhas_gs += ["VsyncEnable = true", "OsdShowSpeed = false"]
 
+    # [EmuCore/GS] nao e' mais apagado inteiro: so as chaves do ARENA mudam,
+    # o resto do que o PCSX2 guarda ali fica.
+    chaves_gs = dict(l.split(" = ", 1) for l in linhas_gs)
     extra = []
-    if linhas_gs:
-        extra = ["", "[EmuCore/GS]"] + linhas_gs
     # SetupWizardIncomplete = false sempre: no modo portatil, sem isto o
     # PCSX2 abre o assistente de primeira vez e fica esperando cliques.
     # SettingsVersion = 1: sem ela o PCSX2 acha que a configuracao e' de
@@ -1197,6 +1200,8 @@ def escrever_config_pcsx2(caminho_executavel, ultra=False, nota=None,
     # fotos -- testes\teste_pcsx2_bissecao.py) pegava uma v1.60 com a qual o
     # Crash Nitro Kart ficava em tela preta, "Velocidade 0%".
     texto = _trocar_chaves_ini(texto, "Folders", {"Bios": "bios", "MemoryCards": "memcards"})
+    if chaves_gs:
+        texto = _trocar_chaves_ini(texto, "EmuCore/GS", chaves_gs)
     texto = _trocar_chaves_ini(texto, "MemoryCards", {
         "Slot1_Enable": "true", "Slot1_Filename": cartoes[0],
         "Slot2_Enable": "true", "Slot2_Filename": cartoes[1]})

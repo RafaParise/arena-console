@@ -3,7 +3,7 @@
 
 Pra cada preset ("leve" e "bonito"), escreve o PCSX2.ini de verdade (via
 graficos.escrever_config_pcsx2) e confere duas coisas com um jogo real:
- 1. o arquivo ficou com os valores esperados (UpscaleMultiplier etc.);
+ 1. o arquivo ficou com os valores esperados (upscale_multiplier etc.);
  2. o PCSX2 abre e continua de pe com esses valores - se alguma chave
     estivesse errada ou fora do intervalo aceito, o esperado seria travar
     no assistente ou fechar sozinho, em vez de chegar no jogo.
@@ -30,8 +30,8 @@ ISO = os.path.join(RAIZ, "jogos", "pessoais", "PS2", "Crash Nitro Kart (USA).chd
 TITULO_JANELA = "Crash Nitro Kart"
 
 ESPERADO = {
-    "leve": {"UpscaleMultiplier": "1", "MaxAnisotropy": "0", "TexturePreloading": "0"},
-    "bonito": {"UpscaleMultiplier": "4", "MaxAnisotropy": "16", "TexturePreloading": "2"},
+    "leve": {"upscale_multiplier": "1", "MaxAnisotropy": "0", "texture_preloading": "0"},
+    "bonito": {"upscale_multiplier": "4", "MaxAnisotropy": "16", "texture_preloading": "2"},
 }
 
 
