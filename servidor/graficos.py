@@ -1167,13 +1167,44 @@ def _trocar_chaves_ini(texto, secao, chaves):
     return "\n".join(linhas) + "\n"
 
 
-def escrever_config_dolphin(caminho_executavel, controles_xinput, teclado=True):
+def console_do_disco_dolphin(caminho_jogo):
+    """'wii' ou 'gamecube', lido de dentro do arquivo (None se nao der).
+
+    .rvz/.wia: o tipo do disco fica no byte 0x48 (1 = GameCube, 2 = Wii),
+    conforme docs/WiaAndRvz.md do Dolphin -- conferido nos 5 jogos da pasta.
+    .iso/.gcm: a marca do Wii fica em 0x18, a do GameCube em 0x1C.
+    .wbfs: so existe para Wii."""
+    extensao = os.path.splitext(caminho_jogo)[1].lower()
+    if extensao == ".wbfs":
+        return "wii"
+    try:
+        with open(caminho_jogo, "rb") as arquivo:
+            cabeca = arquivo.read(0x50)
+    except OSError:
+        return None
+    if cabeca[:3] in (b"RVZ", b"WIA") and len(cabeca) >= 0x4C:
+        return {1: "gamecube", 2: "wii"}.get(int.from_bytes(cabeca[0x48:0x4C], "big"))
+    if cabeca[0x18:0x1C] == bytes.fromhex("5D1C9EA3"):
+        return "wii"
+    if cabeca[0x1C:0x20] == bytes.fromhex("C2339F3D"):
+        return "gamecube"
+    return None
+
+
+def escrever_config_dolphin(caminho_executavel, controles_xinput, teclado=True,
+                            console="gamecube"):
     """Deixa o Dolphin portatil e escreve os controles de GameCube e Wii.
 
     'controles_xinput': numeros (0 a 3) dos controles XInput ligados.
     Cada um vira um jogador, na ordem; o teclado e' o primeiro jogador sem
     controle (a mesma regra do resto do ARENA). Devolve a pasta de
-    configuracao, ou None se nao deu para gravar."""
+    configuracao, ou None se nao deu para gravar.
+
+    'console': 'wii' liga so os Wii Remotes; 'gamecube', so os controles de
+    GameCube. Os dois juntos NAO: achado com o Mario Kart Wii (25/09/2026),
+    que aceita controle de GameCube -- cada controle virava DOIS jogadores
+    (o G7 mexia o jogador 1 e o 3)."""
+    wii = console == "wii"
     pasta_exe = os.path.dirname(caminho_executavel)
     pasta_config = os.path.join(pasta_exe, "User", "Config")
     try:
@@ -1195,8 +1226,10 @@ def escrever_config_dolphin(caminho_executavel, controles_xinput, teclado=True):
             if porta < len(jogadores):
                 dispositivo, entrada = jogadores[porta]
                 gcpad += ["Device = " + dispositivo] + _linhas_gcpad(entrada)
-                wiimote += ["Source = 1", "Device = " + dispositivo] + _linhas_wiimote(entrada)
-                portas["SIDevice%d" % porta] = "6"   # controle de GameCube
+                wiimote += (["Source = %d" % (1 if wii else 0), "Device = " + dispositivo]
+                            + _linhas_wiimote(entrada))
+                # 6 = controle de GameCube; 0 = porta vazia (no Wii).
+                portas["SIDevice%d" % porta] = "0" if wii else "6"
             else:
                 wiimote.append("Source = 0")          # sem Wii Remote
                 portas["SIDevice%d" % porta] = "0"   # porta vazia

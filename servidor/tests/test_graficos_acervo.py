@@ -97,7 +97,7 @@ class TestGraficos(unittest.TestCase):
         os.makedirs(config)
         with open(os.path.join(config, "Dolphin.ini"), "w") as f:
             f.write("[Core]\nCPUThread = True\nSIDevice0 = 0\n[Display]\nFullscreen = True\n")
-        pasta = self.mod.escrever_config_dolphin(exe, [0, 1, 2])
+        pasta = self.mod.escrever_config_dolphin(exe, [0, 1, 2], console="gamecube")
         self.assertEqual(pasta, config)
         self.assertTrue(os.path.exists(os.path.join(self.dir, "Dolphin", "portable.txt")))
         gc = open(os.path.join(config, "GCPadNew.ini")).read()
@@ -112,6 +112,31 @@ class TestGraficos(unittest.TestCase):
             self.assertIn("SIDevice%d = 6" % porta, dolphin)
         self.assertIn("CPUThread = True", dolphin)       # o resto fica
         self.assertIn("Fullscreen = True", dolphin)
+
+    def test_dolphin_wii_liga_so_o_wii_remote(self):
+        # Achado 25/09/2026: com os dois ligados, o Mario Kart Wii via o
+        # mesmo controle como Wii Remote E como controle de GameCube.
+        exe = os.path.join(self.dir, "W", "Dolphin.exe")
+        os.makedirs(os.path.dirname(exe))
+        pasta = self.mod.escrever_config_dolphin(exe, [0, 1], console="wii")
+        wii = open(os.path.join(pasta, "WiimoteNew.ini")).read()
+        dolphin = open(os.path.join(pasta, "Dolphin.ini")).read()
+        self.assertIn("[Wiimote1]\nSource = 1", wii)
+        for porta in range(4):
+            self.assertIn("SIDevice%d = 0" % porta, dolphin)
+        gc = self.mod.escrever_config_dolphin(exe, [0, 1], console="gamecube")
+        self.assertIn("[Wiimote1]\nSource = 0", open(os.path.join(gc, "WiimoteNew.ini")).read())
+
+    def test_console_do_disco_dolphin(self):
+        rvz_wii = os.path.join(self.dir, "a.rvz")
+        with open(rvz_wii, "wb") as f:
+            f.write(b"RVZ\x01" + bytes(0x44) + (2).to_bytes(4, "big"))
+        iso_gc = os.path.join(self.dir, "b.iso")
+        with open(iso_gc, "wb") as f:
+            f.write(bytes(0x1C) + bytes.fromhex("C2339F3D"))
+        self.assertEqual(self.mod.console_do_disco_dolphin(rvz_wii), "wii")
+        self.assertEqual(self.mod.console_do_disco_dolphin(iso_gc), "gamecube")
+        self.assertEqual(self.mod.console_do_disco_dolphin("x.wbfs"), "wii")
 
     def test_dolphin_sem_controle_teclado_no_jogador_1(self):
         exe = os.path.join(self.dir, "D", "Dolphin.exe")

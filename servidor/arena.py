@@ -1928,10 +1928,15 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         # Dolphin (GameCube e Wii): pasta portatil e controles de 4 jogadores
         # -- XInput na ordem, teclado no primeiro jogador sem controle.
         elif jogo["externo"]["dados"]["nome"] == "Dolphin":
+            # Wii ou GameCube: pelo proprio disco; sem resposta, pela pasta.
+            console = graficos.console_do_disco_dolphin(caminho_jogo) or (
+                "wii" if "wii" in jogo["arquivo"].lower() else "gamecube")
             pasta = graficos.escrever_config_dolphin(
-                jogo["externo"]["caminho"], controles.controles_xinput())
+                jogo["externo"]["caminho"], controles.controles_xinput(),
+                console=console)
             if pasta:
-                print("[ARENA] Controles do Dolphin configurados (GameCube e Wii).")
+                print("[ARENA] Controles do Dolphin configurados (%s)."
+                      % ("Wii" if console == "wii" else "GameCube"))
 
         # Xenia e RPCS3: mesma ideia do PCSX2 acima, mas so o video por
         # enquanto (ver o comentario em escrever_config_xenia/rpcs3 sobre
