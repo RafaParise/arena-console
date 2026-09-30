@@ -207,8 +207,26 @@ def medir_servidor(dados):
         }
 
         proc = Processo(servidor.pid)
+        # Espera o servidor ASSENTAR antes de medir o parado. Achado de
+        # 30/09/2026: o Celeron mediu 8,4% de um nucleo "parado" contra
+        # 0,01% no i5; comecar a contar 10 s depois da abertura pode pegar
+        # trabalho de abrir (a tela carregando, a primeira volta do vigia).
+        # Fatias de 5 s ate uma ficar abaixo de 1% de um nucleo (no maximo
+        # 90 s); o que gastou ate ali vira "custo de assentar".
+        etapa("esperando o servidor assentar (ate 90 s)")
+        assentar = {"segundos": None, "cpu_s_de_um_nucleo": 0.0}
+        t_assentar, cpu_assentar = time.perf_counter(), proc.cpu_s()
+        while time.perf_counter() - t_assentar < 90:
+            fatia, _ = amostrar(proc, 5)
+            if fatia["cpu_pct_de_um_nucleo"] < 1.0:
+                assentar["segundos"] = round(time.perf_counter() - t_assentar, 1)
+                break
+        assentar["cpu_s_de_um_nucleo"] = round(proc.cpu_s() - cpu_assentar, 2)
+        if assentar["segundos"] is None:
+            assentar["nao_assentou_em_90_s"] = True
         etapa("servidor parado (30 s)")
         parado, _ = amostrar(proc, 30)
+        parado["assentar"] = assentar
 
         etapa("servidor em uso (20 s de pedidos seguidos)")
 
@@ -556,8 +574,14 @@ def escrever_resumo(d):
         L.append("  " + str(_v(s)))
     else:
         p, u = s["parado"], s["em_uso"]
-        L.append("  parado: %s%% da maquina, %s MB  [%s]" % (
-            p["cpu_pct_da_maquina"], p["ram_mb"], veredito(p["cpu_pct_da_maquina"], "cpu_parado")))
+        a = p.get("assentar") or {}
+        if a:
+            L.append("  assentou em %s s depois da tela pronta (gastou %s s de processador ate ali)" % (
+                a.get("segundos") if a.get("segundos") is not None else "mais de 90",
+                a.get("cpu_s_de_um_nucleo", "?")))
+        L.append("  parado: %s%% da maquina (%s%% de um nucleo), %s MB  [%s]" % (
+            p["cpu_pct_da_maquina"], p["cpu_pct_de_um_nucleo"], p["ram_mb"],
+            veredito(p["cpu_pct_da_maquina"], "cpu_parado")))
         L.append("  em uso: %s%% da maquina, %s pedidos, resposta media %s ms, pior 5%% %s ms  [%s]" % (
             u["cpu_pct_da_maquina"], u["pedidos"], u.get("resposta_media_ms", "?"),
             u.get("resposta_p95_ms", "?"), veredito(u.get("resposta_p95_ms"), "resposta_p95_ms")))
