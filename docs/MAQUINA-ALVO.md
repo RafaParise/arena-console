@@ -168,7 +168,7 @@ ainda**: cada um vira proposta nas próximas tarefas, com aprovação.
 
 ---
 
-## 7. Orçamentos — PROPOSTA de 30/09/2026, aguardando aprovação do Rafael
+## 7. Orçamentos — APROVADOS pelo Rafael em 30/09/2026
 
 **Teto** é o máximo aceitável **nesta máquina**. Se uma mudança fizer um
 número passar do teto, ela volta para o conserto antes de ir para a sala.
