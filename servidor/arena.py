@@ -155,6 +155,22 @@ def gravar_texto_atomico(caminho, texto):
 # apressado sobe duas janelas do RetroArch disputando o mesmo controle.
 JOGO_EM_ANDAMENTO = {"ativo": False, "titulo": ""}
 
+# A partida que ESTE computador esta hospedando agora (ou None). E' o que
+# faz o amigo ver "Fulano - partida aberta: Super Bomberman 4" na lista de
+# Entrar na partida. Vai no grito da descoberta (UDP) e na resposta de
+# /api/sinc/ola (TCP, o mesmo caminho dos recordes), e some quando o jogo
+# fecha. Bug relatado em 30/09/2026: a tela ja filtrava por
+# "partida_aberta", mas o servidor nunca mandava esse campo -- a lista do
+# convidado ficava sempre vazia e ninguem conseguia entrar pela tela.
+PARTIDA_ABERTA = {"partida": None}
+
+
+def partida_aberta_agora():
+    """Copia da partida hospedada agora, ou None."""
+    with TRAVA_JOGO:
+        atual = PARTIDA_ABERTA["partida"]
+        return dict(atual) if atual else None
+
 
 def agora_utc():
     """Data e hora em UTC, no formato ISO, COM microssegundos.
@@ -2171,6 +2187,7 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         with TRAVA_JOGO:
             JOGO_EM_ANDAMENTO["ativo"] = False
             JOGO_EM_ANDAMENTO["titulo"] = ""
+            PARTIDA_ABERTA["partida"] = None
 
 
 # ---------------------------------------------------------------------------
@@ -2545,6 +2562,71 @@ VIZINHOS = {}          # codigo do aparelho -> dados vistos
 TRAVA_VIZINHOS = threading.Lock()
 
 
+_FALANTES = {}   # endereco local -> socket UDP preso a ele
+
+
+def broadcast_da_rede(ip):
+    """Endereco de "todos desta rede" para um IP, sem saber a mascara.
+
+    Palpite pelas redes que a sala usa de verdade: /24 (roteador, ponto de
+    acesso do Windows 192.168.137.x, Android), /28 do iPhone (172.20.10.x)
+    e /16 do cabo direto (169.254.x.x). Errar aqui nao quebra nada: o
+    255.255.255.255 continua indo junto."""
+    partes = ip.split(".")
+    if len(partes) != 4:
+        return None
+    if ip.startswith("172.20.10."):
+        return "172.20.10.15"
+    if ip.startswith("169.254."):
+        return "169.254.255.255"
+    return "%s.%s.%s.255" % tuple(partes[:3])
+
+
+def gritar(pacote):
+    """Manda o grito por TODOS os adaptadores, nao so pelo principal.
+
+    Achado de 30/09/2026: o Windows manda o 255.255.255.255 so pelo
+    adaptador de rota principal (em geral o Wi-Fi). Com o ponto de acesso
+    do Windows ou do celular, o colega fica do outro lado e nunca ouvia.
+    Um socket preso ao endereco de cada adaptador faz o grito sair por ele.
+    """
+    # 127.0.0.1: outro ARENA neste mesmo computador (testes).
+    for destino in ("127.0.0.1", "255.255.255.255"):
+        falante = _FALANTES.get("")
+        try:
+            if falante is None:
+                falante = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                falante.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+                _FALANTES[""] = falante
+            falante.sendto(pacote, (destino, PORTA_DESCOBERTA))
+        except OSError:
+            pass
+
+    for endereco in enderecos_locais():
+        ip = endereco["ip"]
+        if ip.startswith("127.") or endereco["tipo"] in ("so_aqui", "virtual"):
+            continue
+        falante = _FALANTES.get(ip)
+        try:
+            if falante is None:
+                falante = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                falante.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+                falante.bind((ip, 0))
+                _FALANTES[ip] = falante
+            for destino in ("255.255.255.255", broadcast_da_rede(ip)):
+                if destino:
+                    falante.sendto(pacote, (destino, PORTA_DESCOBERTA))
+        except OSError:
+            # Adaptador sumiu (Wi-Fi desligado, hotspot fechado): esquece o
+            # socket; se o endereco voltar, cria outro.
+            velho = _FALANTES.pop(ip, None)
+            if velho is not None:
+                try:
+                    velho.close()
+                except OSError:
+                    pass
+
+
 def anunciar_e_escutar():
     """Fica gritando e ouvindo na rede local, em segundo plano."""
     try:
@@ -2564,9 +2646,6 @@ def anunciar_e_escutar():
               "ainda podem ser adicionados pelo endereço." % falha)
         return
 
-    falante = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    falante.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-
     ultimo_grito = 0.0
 
     while not VIGIA["encerrar"].is_set():
@@ -2581,21 +2660,21 @@ def anunciar_e_escutar():
             ultimo_grito = agora
             config = carregar_config()
             if config.get("permitir_rede"):
+                partida = partida_aberta_agora()
                 recado = json.dumps({
                     "apelido": config.get("apelido") or "sem apelido",
                     "id": config["dispositivo_id"],
                     "porta": PORTA,
-                }, ensure_ascii=False).encode("utf-8")[:400]
-                for destino in ("255.255.255.255", "127.0.0.1"):
-                    try:
-                        falante.sendto(MARCA_DESCOBERTA + recado,
-                                       (destino, PORTA_DESCOBERTA))
-                    except OSError:
-                        pass
+                    # Nome do jogo cortado: o pacote tem limite de tamanho.
+                    "partida": ({"jogo": partida["jogo"][:80],
+                                 "jogo_id": partida["jogo_id"][:120]}
+                                if partida else None),
+                }, ensure_ascii=False).encode("utf-8")
+                gritar(MARCA_DESCOBERTA + recado)
 
         # ---- escutar ----
         try:
-            pacote, remetente = ouvinte.recvfrom(1024)
+            pacote, remetente = ouvinte.recvfrom(2048)
         except (socket.timeout, OSError):
             continue
 
@@ -2626,6 +2705,7 @@ def anunciar_e_escutar():
                 "ip": remetente[0],
                 "porta": int(dados.get("porta") or PORTA),
                 "visto_em": time.monotonic(),
+                "partida": limpar_partida_recebida(dados.get("partida")),
             }
             # Some quem sumiu ha mais de um minuto.
             for chave in [k for k, v in VIZINHOS.items()
@@ -2633,8 +2713,19 @@ def anunciar_e_escutar():
                 VIZINHOS.pop(chave, None)
 
 
+def limpar_partida_recebida(partida):
+    """Partida anunciada por outro ARENA: so os campos esperados, curtos.
+    Vem da rede -- qualquer um pode mandar qualquer coisa."""
+    if not isinstance(partida, dict):
+        return None
+    jogo = str(partida.get("jogo") or "")[:80].strip()
+    if not jogo:
+        return None
+    return {"jogo": jogo, "jogo_id": str(partida.get("jogo_id") or "")[:120]}
+
+
 def colegas_na_rede():
-    """Quem esta gritando na rede agora, fora os que ja sao amigos."""
+    """Quem esta gritando na rede agora (amigos marcados com ja_e_amigo)."""
     config = carregar_config()
     conhecidos = {str(s.get("id", "")) for s in config.get("servidores", [])}
     conhecidos |= {normalizar_url(s.get("url", "")) for s in config.get("servidores", [])}
@@ -2652,8 +2743,79 @@ def colegas_na_rede():
             "codigo_amigo": vizinho["id"],
             "ja_e_amigo": vizinho["id"] in conhecidos or url in conhecidos,
             "ha_quantos_segundos": int(time.monotonic() - vizinho["visto_em"]),
+            "partida_aberta": bool(vizinho.get("partida")),
+            "jogo_partida": (vizinho.get("partida") or {}).get("jogo", ""),
+            "jogo_id_partida": (vizinho.get("partida") or {}).get("jogo_id", ""),
         })
     return saida
+
+
+def procurar_partidas(config):
+    """Quem tem partida aberta agora, por DOIS caminhos juntos:
+
+    1. o grito UDP da descoberta (colegas_na_rede), e
+    2. uma pergunta direta, por TCP, a cada amigo salvo (/api/sinc/ola) --
+       o mesmo caminho dos recordes. Bug de 30/09/2026: os recordes
+       passavam, mas o amigo aparecia "fora do ar" e a partida nao aparecia,
+       porque tudo dependia so do UDP (que o Firewall ou o ponto de acesso
+       podem barrar).
+
+    Devolve (lista, enderecos_corrigidos). Cada item: apelido, url, id,
+    ja_e_amigo, online, partida_aberta, jogo_partida, jogo_id_partida."""
+    achados = {}
+    for colega in colegas_na_rede():
+        achados[colega["url"]] = dict(colega, online=True)
+
+    amigos = config.get("servidores") or []
+    trava = threading.Lock()
+    mudou = [False]
+
+    def perguntar(amigo):
+        anterior = amigo.get("url", "")
+        url = normalizar_url(resolver_endereco_amigo(amigo))
+        if url != normalizar_url(anterior):
+            with trava:
+                mudou[0] = True
+        if not url:
+            return
+        try:
+            retorno = falar_com(url, "/api/sinc/ola", {}, "POST", 2)
+        except Exception:
+            return
+        partida = limpar_partida_recebida(retorno.get("partida"))
+        item = {
+            "apelido": amigo.get("apelido", ""),
+            "url": url,
+            "id": str(retorno.get("servidor_id") or amigo.get("id") or ""),
+            "codigo_amigo": str(retorno.get("servidor_id") or amigo.get("id") or ""),
+            "ja_e_amigo": True,
+            "online": True,
+            "partida_aberta": bool(partida),
+            "jogo_partida": (partida or {}).get("jogo", ""),
+            "jogo_id_partida": (partida or {}).get("jogo_id", ""),
+        }
+        with trava:
+            # O que veio por TCP e' mais novo que o grito (ate 5 s de atraso)
+            # e substitui o mesmo aparelho, mesmo com o endereco escrito de
+            # outro jeito (nome x IP): senao ele aparecia duas vezes, uma
+            # delas com a partida que ja tinha fechado.
+            for chave in [k for k, v in achados.items()
+                          if k == url or (item["id"] and v.get("id") == item["id"])]:
+                achados.pop(chave)
+            achados[url] = item
+
+    threads = [threading.Thread(target=perguntar, args=(a,), daemon=True)
+               for a in amigos[:20]]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join(timeout=3.0)
+
+    with trava:
+        lista = sorted(achados.values(),
+                       key=lambda c: (not c.get("partida_aberta"),
+                                      str(c.get("apelido", "")).lower()))
+    return lista, mudou[0]
 
 
 def resolver_endereco_amigo(amigo):
@@ -3592,6 +3754,18 @@ class Manipulador(BaseHTTPRequestHandler):
         if caminho == "/api/colegas":
             return self.responder_json({"colegas": colegas_na_rede()})
 
+        if caminho == "/api/partida/procurar":
+            # So deste computador (nao esta em ROTAS_REDE_EXTERNA): e' a tela
+            # do convidado perguntando "quem tem partida aberta agora?".
+            config = carregar_config()
+            lista, corrigidos = procurar_partidas(config)
+            if corrigidos:
+                salvar_config(config)
+            return self.responder_json({
+                "colegas": lista,
+                "minha_partida": partida_aberta_agora(),
+            })
+
         if caminho == "/api/mapeamento":
             dados_mapa = controles.ler()
             return self.responder_json({
@@ -4401,6 +4575,9 @@ class Manipulador(BaseHTTPRequestHandler):
                 # Antes lia /api/estado do colega, que desde a Fase 3 so
                 # responde a este computador (tem a configuracao inteira).
                 "versao": VERSAO,
+                # Partida hospedada aqui agora (ou null): o amigo acha a
+                # partida por aqui mesmo quando o grito UDP nao chega.
+                "partida": partida_aberta_agora(),
             })
 
         # ---- bibliotecas graficas sem instalar ------------------------------
@@ -4627,9 +4804,11 @@ class Manipulador(BaseHTTPRequestHandler):
                     config.get("avancado", {}).get("input_max_users", 2),
                     arquivo=os.path.join(RAIZ, jogo["arquivo"]))
 
-            if modo in ("hospedar", "entrar"):
+            # "assistir" entra na partida do amigo sem controlar nada. Antes
+            # ficava fora deste bloco e o jogo abria sozinho, sem conectar.
+            if modo in ("hospedar", "entrar", "assistir"):
                 hospedar = (modo == "hospedar")
-                assistir = False
+                assistir = (modo == "assistir")
                 endereco = ""
                 if not hospedar:
                     endereco = normalizar_url(dados.get("endereco", ""))
@@ -4658,7 +4837,9 @@ class Manipulador(BaseHTTPRequestHandler):
                         repasse=str(dados.get("repasse", "saopaulo")),
                         jogador=posicao),
                     "argumentos": graficos.argumentos_de_partida(hospedar, endereco),
-                    "papel": "jogador 1" if hospedar else "jogador %d" % posicao,
+                    "papel": ("jogador 1" if hospedar else
+                              "espectador" if assistir else
+                              "jogador %d" % posicao),
                 }
                 # Com 3+ jogadores, o padrao do RetroArch (3 conexoes)
                 # recusaria o ultimo colega. Com 1 ou 2, continua 3.
@@ -4676,6 +4857,16 @@ class Manipulador(BaseHTTPRequestHandler):
                     # forte demais pra revelar o custo que so pesa no
                     # Positivo fraco da escola.
                     partida["opcoes"]["netplay_check_frames"] = "0"
+
+            if modo == "hospedar" and partida:
+                with TRAVA_JOGO:
+                    PARTIDA_ABERTA["partida"] = {
+                        "jogo": jogo["titulo"],
+                        "jogo_id": jogo["id"],
+                        "console": plataforma.get("nome", ""),
+                        "jogadores": jogo["ligacao"]["jogadores"],
+                        "pela_internet": bool(dados.get("pela_internet")),
+                    }
 
             threading.Thread(
                 target=executar_jogo,

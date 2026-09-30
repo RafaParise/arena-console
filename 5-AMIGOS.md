@@ -562,19 +562,28 @@ que funciona bem até em Wi-Fi fraco — são poucos bytes por quadro.
 1. Ache o jogo na lista.
 2. Clique em **Jogar junto**.
 3. Escolha **Eu abro a partida**.
-4. **Começar**.
-5. Passe seu endereço para o amigo. Ele está em *Ajustes → Amigos → Meu
-   endereço*.
+4. **Começar**. A partida fica anunciada para os colegas enquanto o jogo
+   estiver aberto; fechou o jogo, o anúncio some.
 
 **No computador de quem vai entrar:**
 
 1. Ache **o mesmo jogo** na lista.
 2. Clique em **Jogar junto**.
-3. Escolha **Entrar na partida do amigo**.
-4. Cole o endereço que ele passou.
+3. Escolha **Entrar na partida do amigo** (ou **Só assistir**).
+4. Na lista **Amigo ou partida encontrada**, escolha a partida dele — por
+   exemplo *"Rafael · Super Bomberman 4"*. A lista se atualiza sozinha a
+   cada 4 segundos: se o amigo abrir a partida agora, ela aparece em
+   seguida, sem fechar a janela. Se aparecer **OUTRO JOGO**, vocês abriram
+   jogos diferentes.
 5. **Começar**.
 
 A tela abre e vocês estão jogando juntos.
+
+**Como o ARENA acha a partida do amigo.** Por dois caminhos ao mesmo tempo:
+o aviso automático na rede (o mesmo de "Colegas encontrados na rede") e uma
+pergunta direta a cada amigo salvo — o mesmo caminho que os recordes usam.
+Se os recordes passam, a partida também aparece. Os dois lados precisam de
+**Aceitar conexões da rede** ligado.
 
 ### Precisa ser o mesmo arquivo
 

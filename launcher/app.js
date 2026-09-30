@@ -205,6 +205,7 @@ async function carregarEstado() {
   estado.amigos = estado.config.servidores || [];
   const codigo = $("#meuCodigoAmigo");
   if (codigo) codigo.textContent = dados.codigo_amigo || "—";
+  estado.servidoresOnline = dados.servidores_online || [];
   desenharAmigos([]);
   preencherAmigosPartida();
 
@@ -217,6 +218,8 @@ async function carregarEstado() {
 
   // A descoberta local é automática; não expomos IP nem pedimos configuração.
   carregarColegas();
+  // Confere os amigos salvos direto (TCP), sem esperar o vigia do servidor.
+  procurarPartidas();
 
   $("#chaveDesempenho").setAttribute("aria-pressed",
     dados.config.modo_desempenho ? "true" : "false");
@@ -2185,7 +2188,11 @@ async function comecarPartida() {
     const escolha = $("#listaAmigosPartida").selectedOptions[0];
     corpo.endereco = escolha ? escolha.value : "";
     corpo.partida_token = escolha ? (escolha.dataset.token || "") : "";
-    if (!corpo.endereco) { recado("Nenhum amigo encontrado na rede local.", true); return; }
+    if (!corpo.endereco) {
+      recado("Escolha na lista a partida aberta do amigo. Se a lista estiver " +
+        "vazia, ele precisa clicar em “Eu abro a partida” primeiro.", true);
+      return;
+    }
   }
   if (estado.papelDaPartida === "entrar" && !$("#campoJogadorPartida").hidden) {
     corpo.jogador = Number($("#listaJogadorPartida").value) || 2;
@@ -2212,6 +2219,24 @@ async function comecarPartida() {
 // Amigos
 // --------------------------------------------------------------------------
 
+// "online" pode vir de três lugares: colegas achados na rede (objetos com
+// id/url), o resultado de Sincronizar (só apelidos) e o vigia do servidor
+// (estado.servidoresOnline, também apelidos). Bug de 30/09/2026: depois de
+// Sincronizar a lista recebia só apelidos, a comparação procurava id/url e
+// TODO amigo aparecia "Fora do ar" -- justamente quando a troca deu certo.
+function amigoEstaOnline(amigo, online) {
+  const apelidos = new Set(estado.servidoresOnline || []);
+  for (const item of online || []) {
+    if (typeof item === "string") {
+      apelidos.add(item);
+      continue;
+    }
+    if (item.online === false) continue;
+    if ((amigo.id && item.id === amigo.id) || item.url === amigo.url) return item;
+  }
+  return apelidos.has(amigo.apelido) ? {} : null;
+}
+
 function desenharAmigos(online) {
   const caixa = $("#listaAmigos");
 
@@ -2226,8 +2251,7 @@ function desenharAmigos(online) {
   const lote = document.createDocumentFragment();
 
   for (const amigo of estado.amigos) {
-    const colega = online.find((item) =>
-      (amigo.id && item.id === amigo.id) || item.url === amigo.url);
+    const colega = amigoEstaOnline(amigo, online);
     const ligado = Boolean(colega);
 
     const item = document.createElement("li");
@@ -2244,8 +2268,11 @@ function desenharAmigos(online) {
     const url = document.createElement("span");
     url.className = "amigo-url";
     url.textContent = colega && colega.partida_aberta
-      ? `Jogando agora: ${colega.jogo_partida || "partida aberta"}`
-      : amigo.codigo_amigo || "Fora da rede local";
+      ? `Partida aberta: ${colega.jogo_partida || "jogo"}`
+      : ligado
+      ? "Online agora" + (amigo.codigo_amigo || amigo.id
+        ? ` · ${amigo.codigo_amigo || amigo.id}` : "")
+      : amigo.codigo_amigo || amigo.id || "Fora da rede local";
 
     const remover = document.createElement("button");
     remover.type = "button";
@@ -2260,11 +2287,15 @@ function desenharAmigos(online) {
   caixa.replaceChildren(lote);
 }
 
+// Lista de "Entrar na partida do amigo": só quem está com partida ABERTA
+// agora. Vem de /api/partida/procurar, que junta a descoberta da rede (UDP)
+// com uma pergunta direta a cada amigo salvo (o mesmo caminho dos recordes).
 function preencherAmigosPartida() {
   const lista = $("#listaAmigosPartida");
   if (!lista) return;
 
-  const candidatos = (estado.colegasOnline || [])
+  const anterior = lista.value;
+  const candidatos = (estado.partidasEncontradas || [])
     .filter((colega) => colega.partida_aberta);
   const unicos = new Map();
   for (const colega of candidatos) {
@@ -2275,24 +2306,57 @@ function preencherAmigosPartida() {
   if (!unicos.size) {
     const opcao = document.createElement("option");
     opcao.value = "";
-    opcao.textContent = "Nenhum colega encontrado na rede local";
+    opcao.textContent = estado.procurandoPartidas
+      ? "Procurando partidas abertas…"
+      : "Nenhuma partida aberta ainda — o amigo clica em “Eu abro a partida”";
     lista.append(opcao);
     return;
   }
 
-  const primeiro = document.createElement("option");
-  primeiro.value = "";
-  primeiro.textContent = "Escolha um amigo encontrado";
-  lista.append(primeiro);
+  const meuJogo = estado.jogoDaPartida ? estado.jogoDaPartida.id : "";
   for (const colega of unicos.values()) {
     const opcao = document.createElement("option");
     opcao.value = colega.url;
     opcao.dataset.token = colega.partida_token || "";
-    const nome = colega.ja_e_amigo ? colega.apelido : "Arena na rede";
-    const jogo = colega.jogo_partida ? ` · ${colega.jogo_partida}` : "";
-    opcao.textContent = `${nome} · ${colega.codigo_amigo || "código local"}${jogo}`;
+    const nome = colega.apelido || "ARENA na rede";
+    const outroJogo = meuJogo && colega.jogo_id_partida && colega.jogo_id_partida !== meuJogo;
+    const jogo = colega.jogo_partida
+      ? ` · ${outroJogo ? "OUTRO JOGO: " : ""}${colega.jogo_partida}` : "";
+    opcao.textContent = `${nome}${jogo}`;
     lista.append(opcao);
   }
+  // Mantém a escolha do aluno quando a lista se atualiza sozinha.
+  if (anterior && unicos.has(anterior)) lista.value = anterior;
+}
+
+async function procurarPartidas() {
+  estado.procurandoPartidas = !(estado.partidasEncontradas || []).length;
+  try {
+    const dados = await pedir("/api/partida/procurar");
+    estado.partidasEncontradas = dados.colegas || [];
+    desenharAmigos(estado.partidasEncontradas);
+  } catch (falha) {
+    estado.partidasEncontradas = [];
+  } finally {
+    estado.procurandoPartidas = false;
+    preencherAmigosPartida();
+  }
+}
+
+// Enquanto a janela Jogar Junto está aberta como convidado, procura de novo a
+// cada 4 s: a partida do amigo aparece sozinha, sem fechar e abrir a janela.
+function vigiarPartidas(ligar) {
+  clearInterval(estado.vigiaPartidas);
+  estado.vigiaPartidas = null;
+  if (!ligar) return;
+  procurarPartidas();
+  estado.vigiaPartidas = setInterval(() => {
+    if ($("#modalPartida").hidden || estado.papelDaPartida === "hospedar") {
+      vigiarPartidas(false);
+      return;
+    }
+    procurarPartidas();
+  }, 4000);
 }
 
 async function adicionarAmigoCodigo() {
@@ -3341,6 +3405,7 @@ function ligarEventos() {
       $("#campoAmigoPartida").hidden = !entrando;
       $("#campoInternet").hidden = false;
       preencherAmigosPartida();
+      vigiarPartidas(entrando);
 
       // O jogo especifico pode aceitar mais jogadores que o console em
       // geral (Multitap, ex.: Super Bomberman) -- por isso o numero vem
