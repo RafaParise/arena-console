@@ -2,9 +2,12 @@
 r"""Medicoes do ARENA nesta maquina, para o perfil-alvo.
 
 Mede, sozinho:
-  1. abertura: do ARENA.bat ate o servidor responder e entregar os dados
-     que a tela desenha, e quanta memoria do Windows isso consome;
-  2. servidor parado (30 s) e em uso (20 s de pedidos): CPU, RAM, resposta;
+  1. abertura: de iniciar o arena.py (o Python que o ARENA.bat chama; as
+     conferencias do .bat e o desenho da tela ficam de fora) ate o servidor
+     responder e entregar os dados que a tela desenha, e quanta memoria do
+     Windows isso consome (servidor + janela do navegador);
+  2. servidor parado (30 s, com a tela aberta e ninguem mexendo) e em uso
+     (20 s de pedidos): CPU, RAM, resposta;
   3. indexacao: tempo para reler a pasta de jogos, e quantos sao;
   4. gravacoes em disco por minuto com o ARENA parado (120 s);
   5. um jogo de Super Nintendo por ~70 s: quadros por segundo, regularidade
