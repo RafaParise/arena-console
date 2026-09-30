@@ -163,16 +163,120 @@ ainda**: cada um vira proposta nas próximas tarefas, com aprovação.
 |---|---|---|
 | **O ARENA dá a mesma nota ao Celeron e ao Ryzen** | `hardware.capacidade()` conta só a quantidade de núcleos (4 = 3 pontos), memória (7,7 GB = 2), motor de vídeo (1 — no Windows 11 sempre, porque o `d3d11.dll` existe) e disco (1, se o disco do ARENA gravar a 45 MB/s ou mais — o SSD USB grava 237): **nota 4, placa 3, perfil "completo"**. O Ryzen 5 5600G também tira **nota 4, placa 3** (conta refeita em 30/09/2026 com a própria função). Só com um pen drive lento (menos de 45 MB/s) o Celeron cairia para 3 | O Celeron recebe os mesmos ajustes de imagem que o Ryzen. A nota não vê velocidade do processador, AVX nem memória em canal simples |
 | **O modo econômico não liga nesta máquina, com o ARENA no SSD USB** | Ele liga com perfil "leve", disco lento/médio (menos de 45 MB/s) ou mídia removível. Aqui o perfil é "completo" e o SSD USB é visto como disco fixo e rápido. Com um pen drive comum (visto como removível) ele ligaria | Vigia a cada 20 s em vez de 60 s, e cópia de segurança a cada jogo fechado |
-| **Servidor parado a 8,4% de um núcleo** | Medido: 2,09% da máquina, contra 0,01% no i5 com o mesmo medidor (no Ryzen, a auditoria mediu 0,02–0,04% com outro método) | Causa ainda não conhecida. Suspeitas a conferir (não presumir): o vigia a cada 20 s (item acima), a coleta na bateria, a leitura de endereços de rede |
+| **Servidor parado a 8,4% de um núcleo** | Medido: 2,09% da máquina, contra 0,01% no i5 com o mesmo medidor (no Ryzen, a auditoria mediu 0,02–0,04% com outro método) | Causa ainda não conhecida. **Descartado no Ryzen (30/09):** a tela carregando (cada abertura custa ~0,07 s ao servidor; nenhum pedido passa de 16 ms, nem com cache vencido) e o vigia assentado (0,05% de um núcleo). O medidor contava a partir de 10 s depois da abertura; agora espera assentar (commit `dba49f8`). Próximo passo: `ferramentas\medir_parado.py` no Celeron |
 | **Medidor de FPS quebrado** | Seção 3 | Corrigido (commit `95f783b`); falta medir de novo na escola |
 
 ---
 
-## 7. Orçamentos
+## 7. Orçamentos — PROPOSTA de 30/09/2026, aguardando aprovação do Rafael
 
-A preencher na tarefa 2 (teto de abertura, memória do servidor, processador
-parado, indexação, gravações por minuto e FPS do SNES), com o valor medido
-mais uma folga explicada.
+**Teto** é o máximo aceitável **nesta máquina**. Se uma mudança fizer um
+número passar do teto, ela volta para o conserto antes de ir para a sala.
+Pense na mochila com limite de peso: a folga é espaço para o lanche do dia,
+não para uma segunda mochila.
+
+### Resumo
+
+| # | Item | Medido no Celeron | Teto proposto |
+|---|---|---|---|
+| 1a | Abertura que o aluno sente (`ARENA.bat` até a tela pronta, pelo pen drive) | 8,55 s | **10 s** |
+| 1b | Abertura, parte do servidor (do `arena.py` até os dados da tela prontos) | 1,48 s | **2,3 s** |
+| 2 | Memória do servidor (pico) | 42,2 MB | **64 MB** |
+| 3 | Processador parado (depois de assentar, tela aberta) | 8,4% de um núcleo (medido do jeito antigo — suspeito) | **2% de um núcleo** |
+| 4 | Indexação ("Atualizar lista") | 1,23 s para 102 jogos | **1,9 s por 100 jogos** |
+| 5 | Gravações em disco com o ARENA parado | 0 por minuto | **no máximo 1 em 2 minutos, e 16 KB/min** |
+| 6 | FPS no Super Nintendo (piso, não teto) | não medido | **pelo menos 59,0 FPS; variação dos quadros até 5%** |
+
+### A regra da folga
+
+Para o que foi medido, a regra é: **teto = medido × 1,5**, arredondado para
+cima. O motivo: existe uma coleta só, e uma medição só não mostra quanto o
+número varia de um dia para outro (cache do Windows frio ou quente, bateria
+ou tomada, antivírus trabalhando). A folga de 50% cobre essa variação
+conhecida e ainda pega uma piora de verdade (quem dobra o trabalho passa de
+×1,5). **É uma estimativa, não medida:** com três coletas, a variação real
+fica conhecida e a regra passa a ser **pior coleta × 1,2**.
+
+Quatro itens fogem da regra, cada um pelo motivo dito abaixo.
+
+### Item por item
+
+**1a. Abertura que o aluno sente — 10 s** (medido 8,55 s, folga de 1,45 s,
+17%). Aqui a folga não vem da regra (daria 12,8 s): vem da pessoa. **10 s é
+o limite para manter a atenção de quem espera** (Jakob Nielsen, 1993). Passou
+disso, o aluno acha que travou e clica de novo no `ARENA.bat`, e o segundo
+clique dá "a porta já está em uso". A folga é pequena de propósito: qualquer
+peso novo na abertura aparece aqui primeiro. Medido à mão, no cronômetro, na
+coleta mensal da escola.
+
+**1b. Abertura, parte do servidor — 2,3 s** (medido 1,48 s × 1,5). É a
+parte que um teste automático consegue medir. Conferência: 8,55 − 1,48 =
+7,07 s são o `.bat` e o navegador; 2,3 + 7,07 = 9,4 s, ainda dentro dos
+10 s do item 1a.
+
+**2. Memória do servidor — 64 MB** (pico medido 42,2 MB × 1,5). Cobre a
+coleção crescer e a sincronização receber um lote grande de uma vez (até 500
+registros) sem alarme falso. Um vazamento de memória, que cresce sem parar,
+passa disso em pouco tempo. Para comparar: i5 40,5 MB, Ryzen 30,8 a
+35,8 MB.
+
+**3. Processador parado — 2% de um núcleo** (0,5% da máquina do Celeron).
+**Exceção à regra:** ×1,5 sobre 8,4% daria 12,6%, e transformaria um
+provável defeito em limite. A conta, a partir do que foi medido:
+- o i5 ficou em 0,12% de um núcleo parado, e o Ryzen em 0,05% depois de
+  assentar (30/09/2026);
+- o Celeron é 2,4 vezes mais fraco por núcleo, então o esperado lá é
+  ~0,1–0,3%;
+- mas a primeira volta do vigia depois de abrir custou 0,09 s no Ryzen
+  (≈0,23 s no Celeron) e pode cair dentro da janela de 30 s: sozinha, dá
+  ~0,8%;
+- folga de 2 vezes sobre isso: **2%**.
+
+**Hoje o Celeron estoura este teto 4 vezes.** Antes de qualquer conserto:
+medir de novo com o medidor que espera o servidor assentar (commit
+`dba49f8`) e, se continuar alto, achar a causa com
+`ferramentas\medir_parado.py`. No Ryzen, cada abertura da tela custou só
+0,07 s ao servidor; a tela sozinha não explica os 8,4%.
+
+**4. Indexação — 1,9 s por 100 jogos** (medido 1,23 s para 102 jogos ×
+1,5). O tempo cresce com o número de jogos e de pastas, por isso o teto é
+por 100 jogos: com 150 jogos, 2,85 s. É conservador, porque na prática o
+tempo cresce menos que o número de jogos (no Ryzen, 5.000 jogos de teste
+levaram só 11 vezes o tempo de 32).
+
+**5. Gravações parado — no máximo 1 em 2 minutos, e 16 KB/min** (medido 0).
+**Exceção:** ×1,5 sobre zero é zero, e zero absoluto reprovaria um evento
+legítimo isolado, como um recorde chegando de um colega. Uma gravação
+isolada passa; qualquer coisa **periódica** (uma vez por minuto ou mais)
+reprova. Os 16 KB/min são umas quatro páginas do banco de dados (4 KB cada):
+cabe um registro avulso, não cabe regravar um arquivo inteiro. É isso que desgasta pen drive e cartão SD, e cada gravação no pen
+drive pode fazer o jogo seguinte engasgar.
+
+**6. FPS no Super Nintendo — piso de 59,0 FPS de média e variação dos
+quadros até 5%** (não medido no Celeron). **Exceção:** não há medida. O SNES
+americano/japonês gera 60,1 quadros por segundo; abaixo de 59, perde pelo
+menos um quadro por segundo, o que já aparece como tranco na imagem ou
+estalo no som. Variação: o Ryzen mediu 3,2% em 25/09; 5% dá cerca de 50% de
+folga sobre ele. **Provisório** até a coleta nova no Celeron (jogo NTSC,
+janela visível, na tomada — seção 8).
+
+### Fora da lista, para decidir
+
+- **Memória tomada ao abrir (servidor + janela da tela): 488 MB** no
+  Celeron, contra 180 MB no i5. É o número que mais pesa numa máquina com
+  3,8 GB livres, mas a maior parte é do navegador, que o ARENA só controla
+  em parte (peso da página, fundos animados, capas). Sugestão: acompanhar
+  sem teto até ter três coletas.
+- **Resposta sob carga** (pior 5%: 124,6 ms). Folgada hoje; não precisa de
+  teto por enquanto.
+
+### Como o teste automático vai usar isto (tarefas 3 e 4)
+
+Os tetos estão em números **do Celeron**. O modo alvo roda no Ryzen, cujo
+núcleo é 2,3 vezes mais forte, então lá os valores saem menores. A tarefa 3
+vai propor como converter (limitar também a velocidade do processador, ou
+calibrar um fator por item medindo as duas máquinas) para o teste não
+passar só porque o Ryzen é forte.
 
 ---
 
@@ -181,8 +285,13 @@ mais uma folga explicada.
 1. No notebook da escola, **na tomada**, com o ARENA no pen drive:
    `COLETAR.bat`. São cerca de 25 minutos.
 2. Durante o jogo de SNES, deixe a janela do jogo **à frente** e olhe/ouça.
-3. Traga a pasta nova de `perfil\` e peça para atualizar este arquivo.
-4. Uma vez por mês, ou antes de cada versão nova. Notebook diferente na
+3. Se o "processador parado" passar do teto (seção 7, item 3), rode também
+   `servidor\python\python.exe ferramentas\medir_parado.py` com o ARENA
+   **fechado** (a ferramenta abre o ARENA sozinha), sem mexer no computador
+   por 2 minutos, e traga o que aparecer na janela preta: ela mostra o
+   gasto a cada 5 segundos.
+4. Traga a pasta nova de `perfil\` e peça para atualizar este arquivo.
+5. Uma vez por mês, ou antes de cada versão nova. Notebook diferente na
    escola: rode também, porque cada retrato ajuda a decidir.
 
 ---
@@ -195,6 +304,11 @@ mais uma folga explicada.
   <https://www.cpubenchmark.net/cpu.php?cpu=Intel+Celeron+N5100+%40+1.10GHz&id=4331>
 - PassMark, Ryzen 5 5600G (3.178 por núcleo, 19.621 total):
   <https://www.cpubenchmark.net/cpu.php?cpu=AMD+Ryzen+5+5600G&id=4325>
+- PassMark, Core i5-1345U da escola (3.279 por núcleo):
+  <https://www.cpubenchmark.net/cpu.php?cpu=Intel+Core+i5-1345U&id=5276>
+- Jakob Nielsen, "Response Times: The 3 Important Limits" (1993; 10 s é o
+  limite para manter a atenção de quem espera):
+  <https://www.nngroup.com/articles/response-times-3-important-limits/>
 - PCSX2, requisitos do sistema: <https://pcsx2.net/docs/setup/requirements>
 - Dolphin, requisitos (README oficial: "CPU with SSE2 support", recomenda
   "3 GHz and Dual Core"): <https://github.com/dolphin-emu/dolphin>
