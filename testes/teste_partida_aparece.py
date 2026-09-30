@@ -29,6 +29,7 @@ import sys
 import tempfile
 import threading
 import time
+import urllib.error
 import urllib.request
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -164,6 +165,22 @@ def main():
         confere("/api/sinc/ola de A (pedido de fora) informa a partida",
                 bool(ola.get("partida")))
 
+        # Codigo de aparelho repetido (laboratorio com imagem clonada): um
+        # segundo "amigo" com o MESMO codigo de A, noutro endereco. Os dois
+        # tem que aparecer -- a revisao de 30/09/2026 pegou um sumindo.
+        cfg = B.carregar_config()
+        salvos = list(cfg["servidores"])
+        cfg["servidores"] = salvos + [
+            {"apelido": "Clone de A", "url": "http://127.0.0.1:8791", "id": id_a}]
+        B.salvar_config(cfg)
+        r = pedir(8792, "/api/partida/procurar")
+        confere("codigo repetido: os dois aparecem, cada um no seu endereco",
+                bool(achar(r["colegas"], "Colega A")) and bool(achar(r["colegas"], "Clone de A")),
+                str(sorted(c.get("apelido") for c in r["colegas"])))
+        cfg = B.carregar_config()
+        cfg["servidores"] = salvos
+        B.salvar_config(cfg)
+
         # So agora liga o grito UDP de A (e o ouvinte de B), na porta de
         # teste. Depois disso B passa a usar o IP de rede de A, que aqui nao
         # responde (A so escuta em 127.0.0.1) -- por isso o TCP vem antes.
@@ -206,7 +223,31 @@ def main():
                 "--connect" in montada.get("argumentos", []) and
                 "10.0.0.9" in montada.get("argumentos", []), str(montada.get("argumentos")))
         confere("papel = espectador", resp.get("papel") == "espectador", str(resp.get("papel")))
+        confere("RetroArch recebe netplay_start_as_spectator = true",
+                (montada.get("opcoes") or {}).get("netplay_start_as_spectator") == "true")
         confere("assistir NAO anuncia partida aberta", A.partida_aberta_agora() is None)
+
+        print("\n6. Segurança e configuração")
+        try:
+            pedir(8791, "/api/partida/procurar", host="localhost")
+            recusou = False
+        except urllib.error.HTTPError as erro:
+            recusou = erro.code == 403
+        confere("/api/partida/procurar recusa pedido de outra máquina (403)", recusou)
+
+        # Corrigir o endereco de um amigo NAO pode apagar ajuste salvo nesse
+        # meio-tempo (achado na revisao de 30/09/2026).
+        velha = B.carregar_config()                  # quem testa le aqui...
+        agora = B.carregar_config()                  # ...e o aluno salva um ajuste
+        agora["apelido"] = "Mudei no meio"
+        B.salvar_config(agora)
+        velha["servidores"][0]["url"] = "http://10.1.2.3:8777"   # IP novo achado
+        B.gravar_enderecos_de_amigos(velha["servidores"])
+        final = B.carregar_config()
+        confere("endereço novo do amigo gravado",
+                final["servidores"][0]["url"] == "http://10.1.2.3:8777")
+        confere("ajuste salvo no meio-tempo continua lá",
+                final.get("apelido") == "Mudei no meio", repr(final.get("apelido")))
     except Exception as falha:
         import traceback
         traceback.print_exc()

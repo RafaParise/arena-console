@@ -2156,6 +2156,7 @@ function abrirJuntoLocal(jogo) {
 function abrirPartida(jogo) {
   estado.jogoDaPartida = jogo;
   estado.papelDaPartida = "hospedar";
+  estado.partidaEscolhida = "";
   $("#partidaJogo").textContent = jogo.titulo;
   $("#campoAmigoPartida").hidden = true;
   $("#campoJogadorPartida").hidden = true;
@@ -2224,15 +2225,27 @@ async function comecarPartida() {
 // (estado.servidoresOnline, também apelidos). Bug de 30/09/2026: depois de
 // Sincronizar a lista recebia só apelidos, a comparação procurava id/url e
 // TODO amigo aparecia "Fora do ar" -- justamente quando a troca deu certo.
+// A busca de partidas (UDP + TCP) é a fonte mais completa: vale junto com a
+// que chegou agora por até 60 s. Sem isso, quem desenhasse por último (a
+// descoberta, que só vê o UDP) apagava o "online" que a busca tinha achado.
 function amigoEstaOnline(amigo, online) {
   const apelidos = new Set(estado.servidoresOnline || []);
-  for (const item of online || []) {
-    if (typeof item === "string") {
-      apelidos.add(item);
-      continue;
-    }
-    if (item.online === false) continue;
-    if ((amigo.id && item.id === amigo.id) || item.url === amigo.url) return item;
+  const recente = (Date.now() - (estado.partidasEm || 0)) < 60000;
+  const fontes = recente ? [...(online || []), ...(estado.partidasEncontradas || [])]
+    : (online || []);
+  const objetos = [];
+  for (const item of fontes) {
+    if (typeof item === "string") apelidos.add(item);
+    else if (item.online !== false) objetos.push(item);
+  }
+  // Primeiro pelo endereço. O código do aparelho só vale se não se repetir:
+  // em laboratório com imagem clonada dois colegas podem ter o mesmo código,
+  // e um apareceria online (ou com partida) no lugar do outro.
+  const porEndereco = objetos.find((item) => item.url === amigo.url);
+  if (porEndereco) return porEndereco;
+  if (amigo.id) {
+    const mesmos = objetos.filter((item) => item.id === amigo.id);
+    if (new Set(mesmos.map((item) => item.url)).size === 1) return mesmos[0];
   }
   return apelidos.has(amigo.apelido) ? {} : null;
 }
@@ -2294,13 +2307,23 @@ function preencherAmigosPartida() {
   const lista = $("#listaAmigosPartida");
   if (!lista) return;
 
-  const anterior = lista.value;
+  // Só a escolha FEITA PELO ALUNO é mantida (evento "change"). A marcação
+  // automática de quando havia uma partida só não conta como escolha.
+  const escolhida = estado.partidaEscolhida || "";
   const candidatos = (estado.partidasEncontradas || [])
     .filter((colega) => colega.partida_aberta);
   const unicos = new Map();
   for (const colega of candidatos) {
     if (colega.url && !unicos.has(colega.url)) unicos.set(colega.url, colega);
   }
+
+  // A lista se atualiza a cada 4 s: só redesenha se algo mudou. Redesenhar
+  // sem mudança fecha a lista aberta no meio da escolha do aluno.
+  const assinatura = JSON.stringify([estado.procurandoPartidas,
+    [...unicos.values()].map((c) => [c.url, c.apelido, c.jogo_partida, c.jogo_id_partida]),
+    estado.jogoDaPartida ? estado.jogoDaPartida.id : ""]);
+  if (assinatura === lista.dataset.assinatura && lista.options.length) return;
+  lista.dataset.assinatura = assinatura;
 
   lista.replaceChildren();
   if (!unicos.size) {
@@ -2313,31 +2336,50 @@ function preencherAmigosPartida() {
     return;
   }
 
-  const meuJogo = estado.jogoDaPartida ? estado.jogoDaPartida.id : "";
+  // Com mais de uma partida aberta, o aluno escolhe: nenhuma vem marcada,
+  // senão um clique apressado em Começar entraria na partida errada.
+  if (unicos.size > 1) {
+    const escolha = document.createElement("option");
+    escolha.value = "";
+    escolha.textContent = `Escolha a partida (${unicos.size} abertas)`;
+    lista.append(escolha);
+  }
+
+  // Compara só o NOME do arquivo: o mesmo jogo pode estar em "pessoais" num
+  // computador e em "turma" no outro, e continua sendo o mesmo jogo.
+  const nomeDoArquivo = (id) => String(id || "").split("/").pop();
+  const meuJogo = estado.jogoDaPartida ? nomeDoArquivo(estado.jogoDaPartida.id) : "";
   for (const colega of unicos.values()) {
     const opcao = document.createElement("option");
     opcao.value = colega.url;
     opcao.dataset.token = colega.partida_token || "";
     const nome = colega.apelido || "ARENA na rede";
-    const outroJogo = meuJogo && colega.jogo_id_partida && colega.jogo_id_partida !== meuJogo;
+    const outroJogo = meuJogo && colega.jogo_id_partida &&
+      nomeDoArquivo(colega.jogo_id_partida) !== meuJogo;
     const jogo = colega.jogo_partida
       ? ` · ${outroJogo ? "OUTRO JOGO: " : ""}${colega.jogo_partida}` : "";
     opcao.textContent = `${nome}${jogo}`;
     lista.append(opcao);
   }
   // Mantém a escolha do aluno quando a lista se atualiza sozinha.
-  if (anterior && unicos.has(anterior)) lista.value = anterior;
+  if (escolhida && unicos.has(escolhida)) lista.value = escolhida;
 }
 
 async function procurarPartidas() {
+  // Uma busca por vez: amigo fora do ar faz a busca levar até 3 s, e a
+  // próxima (a cada 4 s) não pode empilhar em cima.
+  if (estado.buscandoPartidas) return;
+  estado.buscandoPartidas = true;
   estado.procurandoPartidas = !(estado.partidasEncontradas || []).length;
   try {
     const dados = await pedir("/api/partida/procurar");
     estado.partidasEncontradas = dados.colegas || [];
+    estado.partidasEm = Date.now();
     desenharAmigos(estado.partidasEncontradas);
   } catch (falha) {
     estado.partidasEncontradas = [];
   } finally {
+    estado.buscandoPartidas = false;
     estado.procurandoPartidas = false;
     preencherAmigosPartida();
   }
@@ -3391,6 +3433,10 @@ function ligarEventos() {
     } catch (falha) {
       recado(falha.message, true);
     }
+  });
+
+  $("#listaAmigosPartida").addEventListener("change", (evento) => {
+    estado.partidaEscolhida = evento.target.value;
   });
 
   document.querySelector("#modalPartida .perfis")

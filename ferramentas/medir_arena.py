@@ -294,11 +294,13 @@ def achar_jogo_snes():
     """Jogos de SNES da pasta, do menor para o maior (carrega mais rapido; o
     que se mede e' a maquina, nao o jogo), SEM os de Satellaview.
 
-    Achado de 30/09/2026: antes pegava so o menor, que nesta pasta e' o
-    "BS F-ZERO (J)" -- de Satellaview. O RetroArch fechava em 1 s sem abrir
-    o jogo, a conta dava 4.140.000 quadros por segundo e o resumo ainda
-    marcava [BOM]. O FPS do SNES nunca tinha sido medido, em maquina
-    nenhuma. Devolve (snes, lista); quem mede tenta um por um."""
+    Achado de 30/09/2026: antes pegava so o menor, que nesta pasta passou a
+    ser o "BS F-ZERO (J)" -- de Satellaview -- quando ele entrou, em 26/09.
+    O RetroArch fechava em 1 s sem abrir o jogo, a conta dava 4.140.000
+    quadros por segundo e o resumo ainda marcava [BOM]. As coletas da
+    escola (27 e 28/09) nao mediram o FPS do SNES; a referencia do Ryzen
+    (25/09) foi antes e vale. Devolve (snes, lista); quem mede tenta um
+    por um."""
     with open(os.path.join(RAIZ, "servidor", "consoles.json"), encoding="utf-8") as f:
         consoles = json.load(f)
     lista = consoles if isinstance(consoles, list) else consoles.get("plataformas", [])

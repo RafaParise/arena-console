@@ -2796,12 +2796,13 @@ def procurar_partidas(config):
         }
         with trava:
             # O que veio por TCP e' mais novo que o grito (ate 5 s de atraso)
-            # e substitui o mesmo aparelho, mesmo com o endereco escrito de
-            # outro jeito (nome x IP): senao ele aparecia duas vezes, uma
-            # delas com a partida que ja tinha fechado.
-            for chave in [k for k, v in achados.items()
-                          if k == url or (item["id"] and v.get("id") == item["id"])]:
-                achados.pop(chave)
+            # e substitui o do MESMO ENDERECO. Nunca juntar pelo codigo do
+            # aparelho: em laboratorio com imagem clonada (ou dois ARENAs no
+            # mesmo computador) o codigo se repete, e um colega sumia da
+            # lista escondido atras do outro -- achado na revisao de
+            # 30/09/2026, com tres ARENAs de teste. Mesmo motivo do "sou eu?"
+            # da descoberta usar endereco+porta. O endereco ja vem igual ao
+            # do grito: resolver_endereco_amigo usa o IP visto no grito.
             achados[url] = item
 
     threads = [threading.Thread(target=perguntar, args=(a,), daemon=True)
@@ -2843,6 +2844,31 @@ def resolver_endereco_amigo(amigo):
                 amigo["url"] = url_atual
             return url_atual
     return amigo.get("url", "")
+
+
+def gravar_enderecos_de_amigos(amigos_atualizados):
+    """Grava SO os enderecos novos dos amigos, relendo a configuracao agora.
+
+    Achado na revisao de 30/09/2026: quem testa os amigos (o vigia e a busca
+    de partidas) le a configuracao, espera ate 3 s pela rede e gravava a
+    configuracao INTEIRA de volta -- apagando o que tivesse sido salvo
+    nesses segundos (um ajuste, a lista de recentes do /api/jogar). Agora
+    relê na hora de gravar e so troca o endereco de quem mudou."""
+    novos = {}
+    for amigo in amigos_atualizados or []:
+        chave = str(amigo.get("id") or "") or "apelido:" + str(amigo.get("apelido", ""))
+        if amigo.get("url"):
+            novos[chave] = amigo["url"]
+    config = carregar_config()
+    mudou = False
+    for amigo in config.get("servidores") or []:
+        chave = str(amigo.get("id") or "") or "apelido:" + str(amigo.get("apelido", ""))
+        if chave in novos and amigo.get("url") != novos[chave]:
+            amigo["url"] = novos[chave]
+            mudou = True
+    if mudou:
+        salvar_config(config)
+    return mudou
 
 
 def servidor_alcancavel(url):
@@ -3233,7 +3259,7 @@ def rodar_vigia():
             config = carregar_config()
             online, enderecos_corrigidos = quem_esta_online(config)
             if enderecos_corrigidos:
-                salvar_config(config)
+                gravar_enderecos_de_amigos(config.get("servidores"))
             tem_internet = internet_disponivel()
             enderecos_locais(forcar=True)   # renova o cache fora da tela
 
@@ -3760,7 +3786,7 @@ class Manipulador(BaseHTTPRequestHandler):
             config = carregar_config()
             lista, corrigidos = procurar_partidas(config)
             if corrigidos:
-                salvar_config(config)
+                gravar_enderecos_de_amigos(config.get("servidores"))
             return self.responder_json({
                 "colegas": lista,
                 "minha_partida": partida_aberta_agora(),
