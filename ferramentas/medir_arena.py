@@ -277,9 +277,28 @@ def medir_servidor(dados):
 # Jogo de Super Nintendo
 # ---------------------------------------------------------------------------
 
+def e_satellaview(caminho):
+    """Jogo de Satellaview (BS-X): transmitido por satelite no Japao, precisa
+    da BIOS do BS-X e o snes9x recusa sem ela ("ROM loading failed")."""
+    nome = os.path.basename(caminho).lower()
+    return nome.startswith("bs ") or "satellaview" in nome or "(bs)" in nome
+
+
+def jogo_carregou(texto_do_registro):
+    """O registro do RetroArch mostra que o jogo abriu de verdade?"""
+    falhas = ("ROM loading failed", "Falha ao carregar o conte", "Failed to load content")
+    return bool(texto_do_registro) and not any(f in texto_do_registro for f in falhas)
+
+
 def achar_jogo_snes():
-    """O menor jogo de SNES da pasta (carrega mais rapido; o que se mede e' a
-    maquina, nao o jogo)."""
+    """Jogos de SNES da pasta, do menor para o maior (carrega mais rapido; o
+    que se mede e' a maquina, nao o jogo), SEM os de Satellaview.
+
+    Achado de 30/09/2026: antes pegava so o menor, que nesta pasta e' o
+    "BS F-ZERO (J)" -- de Satellaview. O RetroArch fechava em 1 s sem abrir
+    o jogo, a conta dava 4.140.000 quadros por segundo e o resumo ainda
+    marcava [BOM]. O FPS do SNES nunca tinha sido medido, em maquina
+    nenhuma. Devolve (snes, lista); quem mede tenta um por um."""
     with open(os.path.join(RAIZ, "servidor", "consoles.json"), encoding="utf-8") as f:
         consoles = json.load(f)
     lista = consoles if isinstance(consoles, list) else consoles.get("plataformas", [])
@@ -290,9 +309,18 @@ def achar_jogo_snes():
     extensoes = tuple("." + e.lstrip(".").lower() for e in snes.get("extensoes", ["sfc", "smc"]))
     candidatos = [c for c in glob.glob(os.path.join(pasta, "*"))
                   if os.path.isfile(c) and c.lower().endswith(extensoes)]
-    if not candidatos:
-        return snes, None
-    return snes, min(candidatos, key=os.path.getsize)
+    # Versao europeia (PAL) roda a 50 quadros por segundo, nao 60: medida
+    # assim nao compara com a regua. Vai para o fim da fila.
+    candidatos = sorted((c for c in candidatos if not e_satellaview(c)),
+                        key=lambda c: (e_pal(c), os.path.getsize(c)))
+    return snes, candidatos
+
+
+def e_pal(caminho):
+    """Versao europeia do jogo (50 Hz): (E), (Europe), (Germany)..."""
+    nome = os.path.basename(caminho).lower()
+    return any(marca in nome for marca in (
+        "(e)", "(europe", "(eur", "(germany", "(france", "(spain", "(italy", "(uk)", "(pal"))
 
 
 def rodar_quadros(core, opcoes_cfg, extra_cfg, jogo, quadros, log):
@@ -328,10 +356,11 @@ def rodar_quadros(core, opcoes_cfg, extra_cfg, jogo, quadros, log):
 
 def medir_jogo(dados):
     etapa("jogo de Super Nintendo (~70 s, com imagem e som -- pode olhar)")
-    snes, jogo = achar_jogo_snes()
+    snes, candidatos = achar_jogo_snes()
     core = os.path.join(RAIZ, "retroarch", "cores", (snes or {}).get("core", "snes9x_libretro.dll"))
-    if not jogo:
-        dados["jogo"] = falhou("nenhum jogo de Super Nintendo na pasta jogos\\pessoais")
+    if not candidatos:
+        dados["jogo"] = falhou("nenhum jogo de Super Nintendo na pasta jogos\\pessoais "
+                               "(os de Satellaview, 'BS ...', nao servem)")
         return
     if not (os.path.isfile(RETROARCH) and os.path.isfile(core)):
         dados["jogo"] = falhou("RetroArch ou nucleo do Super Nintendo ausente")
@@ -366,15 +395,43 @@ def medir_jogo(dados):
                     # variacao dos quadros so sai com o registro detalhado.
                     'log_verbosity = "true"\nfrontend_log_level = "0"\n' % (temp, temp, temp))
 
-        curto, _ = rodar_quadros(core, opcoes_cfg, extra_cfg, jogo, QUADROS_CURTO,
-                                 os.path.join(temp, "curto.log"))
+        # A rodada curta tambem serve de prova: so segue com o jogo que o
+        # registro mostra que abriu. Tenta ate 3 da lista.
+        jogo, curto, recusados = None, None, []
+        for candidato in candidatos[:3]:
+            log_curto = os.path.join(temp, "curto.log")
+            if os.path.isfile(log_curto):
+                os.remove(log_curto)
+            segundos, _ = rodar_quadros(core, opcoes_cfg, extra_cfg, candidato,
+                                        QUADROS_CURTO, log_curto)
+            texto_curto = (open(log_curto, encoding="utf-8", errors="replace").read()
+                           if os.path.isfile(log_curto) else "")
+            if jogo_carregou(texto_curto):
+                jogo, curto = candidato, segundos
+                break
+            recusados.append(os.path.basename(candidato))
+        if not jogo:
+            dados["jogo"] = falhou("o RetroArch nao conseguiu abrir nenhum destes jogos: %s"
+                                   % ", ".join(recusados))
+            return
+
         log = os.path.join(temp, "longo.log")
         longo, amostras = rodar_quadros(core, opcoes_cfg, extra_cfg, jogo, QUADROS_LONGO, log)
+        texto = open(log, encoding="utf-8", errors="replace").read() if os.path.isfile(log) else ""
+        # 4200 quadros a 60 por segundo sao ~70 s. Se a rodada longa nao
+        # durou nem 30 s a mais que a curta, o jogo fechou antes da hora:
+        # nao ha FPS para contar (nunca mais um 4.140.000 marcado [BOM]).
+        if not jogo_carregou(texto) or (longo - curto) < 30:
+            dados["jogo"] = falhou("a rodada longa fechou antes da hora (%.1f s; "
+                                   "esperado ~70 s)" % longo)
+            return
 
         resultado = {"jogo": os.path.basename(jogo), "modo_modesto": bool(config.get("modo_modesto")),
                      "quadros": QUADROS_LONGO,
-                     "fps_medio": round((QUADROS_LONGO - QUADROS_CURTO) / max(longo - curto, 0.001), 1),
+                     "fps_medio": round((QUADROS_LONGO - QUADROS_CURTO) / (longo - curto), 1),
                      "tempo_de_abrir_s": round(curto, 1)}
+        if recusados:
+            resultado["jogos_que_nao_abriram"] = recusados
         cpu = [a[0] for a in amostras[2:]] or [a[0] for a in amostras]
         ram = [a[1] for a in amostras]
         if cpu:
@@ -382,7 +439,6 @@ def medir_jogo(dados):
             resultado["cpu_pico_pct_da_maquina"] = round(max(cpu), 1)
         if ram:
             resultado["ram_pico_mb"] = round(max(ram), 1)
-        texto = open(log, encoding="utf-8", errors="replace").read() if os.path.isfile(log) else ""
         m = re.search(r"Average monitor Hz:\s*([\d.]+)\s*Hz\.\s*\(([\d.]+)\s*%\s*frame time deviation", texto)
         if m:
             resultado["monitor_hz_medido"] = float(m.group(1))
