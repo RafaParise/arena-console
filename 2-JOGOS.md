@@ -583,9 +583,13 @@ falta a peça que acorda tudo.
 **PCSX2:** o ARENA copia uma BIOS de PS2 sozinho (de `retroarch\system`) na
 primeira vez que você abre um jogo por ele, sem precisar mexer em nada. Se
 você já colocou uma BIOS na pasta do PCSX2 antes, o ARENA não mexe nela.
+Sem nenhuma BIOS de PS2 (um `.bin` de 4 MB), o cartão do PS2 fica
+**amarelo** e diz o que falta — antes de abrir, não depois.
 
-**Dolphin:** ainda pede a BIOS pela tela dele mesmo, na primeira vez que
-abre. Siga o que o programa pedir.
+**PS3 (RPCS3):** precisa do firmware oficial instalado nele (ver "PS3: falta
+mais um passo"). Sem ele, o cartão também fica amarelo, com o caminho.
+
+**Dolphin:** não precisa de BIOS — GameCube e Wii abrem sem ela.
 
 #### Abrir só a BIOS, sem jogo nenhum
 

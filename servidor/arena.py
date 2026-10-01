@@ -1808,7 +1808,15 @@ def avaliar_plataformas(forcar=False):
         # sumia da lista em PC fraco - o aluno nem sabia que existia. Agora
         # ele abre normal e a etiqueta vermelha "Capenga" avisa antes.
         # Quem quer tentar, tenta. O ARENA so nao mente sobre o resultado.
-        if caminho_externo:
+        falta_externo = (graficos.falta_para_o_externo(dados_externo["nome"], caminho_externo)
+                         if caminho_externo else "")
+        if caminho_externo and falta_externo:
+            # Emulador de fora instalado, mas sem o que ele precisa para
+            # abrir um jogo (BIOS do PS2, firmware do PS3): cartao amarelo
+            # com o motivo, em vez de "pronto" que so falha depois.
+            estado = "falta_sistema"
+            motivo = falta_externo
+        elif caminho_externo:
             # Com o emulador de fora instalado, nem nucleo nem arquivo de
             # sistema do RetroArch importam: quem manda e ele.
             estado = "pronta"

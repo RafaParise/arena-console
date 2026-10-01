@@ -446,8 +446,8 @@ se estiverem abertos.
 Um degrau acima do modo desempenho. Em **Ajustes → Máquina → Ultra
 desempenho**.
 
-**O que ele faz, e cada item é real** (conferido pelo próprio Windows no
-teste `testes\teste_ultra_promessas.py`):
+**O que ele faz, e cada item é real** (conferido pelo próprio Windows num
+teste automático do ARENA):
 
 - tudo o que o modo desempenho faz (acima): o ARENA cede a vez e o emulador
   fica fora da economia de energia;

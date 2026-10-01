@@ -427,7 +427,15 @@ def falta_para_o_externo(nome_externo, caminho_executavel):
     RPCS3 (revisao pos-auditoria): sem o firmware oficial do PS3 instalado
     nele, o RPCS3 desiste em 1 segundo ("Missing Firmware" no log dele) e o
     jogo so "pisca e fecha" -- testado com Borderlands 2. O firmware e' o
-    arquivo oficial da Sony; o ARENA nao fornece, so avisa."""
+    arquivo oficial da Sony; o ARENA nao fornece, so avisa.
+
+    PCSX2 (01/10/2026, versao dos alunos, que vem sem BIOS): sem BIOS de
+    PS2 o cartao aparecia "pronto" e o PCSX2 abria so para reclamar dela.
+    Agora o ARENA avisa antes, e o cartao fica amarelo com este motivo."""
+    if nome_externo == "PCSX2" and caminho_executavel and not tem_bios_pcsx2(caminho_executavel):
+        return ("O PS2 precisa da BIOS do PlayStation 2 (um arquivo .bin de 4 MB), e ela "
+                "ainda não está aqui. Peça ao professor: o arquivo vai em retroarch\\system, "
+                "e o ARENA leva para o PCSX2 sozinho.")
     if nome_externo == "RPCS3" and caminho_executavel:
         firmware = os.path.join(os.path.dirname(caminho_executavel),
                                 "dev_flash", "sys", "external", "liblv2.sprx")
@@ -541,6 +549,22 @@ def opcoes_de_bios(nome_curto_core, arquivo):
 # BIOS de PS1 (512 KB) e do "rom1.bin" que acompanha algumas delas (so o
 # modulo de DVD, nao a BIOS principal). Da pra separar sem ler CRC32.
 TAMANHO_BIOS_PS2 = 4194304
+
+
+def tem_bios_pcsx2(caminho_executavel, pasta_sistema=None):
+    """Ha uma BIOS de PS2 que o PCSX2 vai achar? Na pasta bios\\ dele, ou
+    uma de 4 MB em retroarch\\system (preparar_bios_pcsx2 copia na hora)."""
+    pasta_sistema = pasta_sistema or os.path.join(PASTA_RETROARCH, "system")
+    propria = os.path.join(os.path.dirname(caminho_executavel), "bios")
+    try:
+        if os.path.isdir(propria) and any(nome.lower().endswith(EXTENSOES_BIOS)
+                                          for nome in os.listdir(propria)):
+            return True
+        return any(nome.lower().endswith(".bin")
+                   and os.path.getsize(os.path.join(pasta_sistema, nome)) == TAMANHO_BIOS_PS2
+                   for nome in os.listdir(pasta_sistema))
+    except OSError:
+        return False
 
 
 def preparar_bios_pcsx2(caminho_executavel, pasta_sistema):
