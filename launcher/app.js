@@ -240,8 +240,11 @@ async function carregarEstado() {
   }
 
   desenharControles(dados.controles || []);
-  prepararBotoes(dados.consoles_botoes || []);
-  prepararMapa(dados.consoles_botoes || []);
+  // A aba Controles so e' montada quando o aluno a abre (achado de
+  // 01/10/2026: montar na abertura custava 8 pedidos ao servidor -- botoes
+  // 3x, perfis de controle 3x, mapeamento 2x -- para uma aba escondida).
+  estado.consolesBotoes = dados.consoles_botoes || [];
+  if (estado.controlesMontados) montarAbaControles();
   desenharExternos(dados.externos || []);
   desenharBios(dados.bios_consoles || [], dados.bios_disponiveis || []);
   desenharCartoes(dados.memory_cards || []);
@@ -468,6 +471,43 @@ function classeDaCapa(plataforma) {
     .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "retro";
 }
 
+// Miniaturas das capas (achado de 01/10/2026): a lista pedia as capas em
+// tamanho cheio -- 21 MB e ~130 MB de imagem na memoria so para abrir.
+// Agora: so carrega a capa que esta perto da tela (loading="lazy"); pede a
+// miniatura ao servidor (mini=280, ou 480 em tela de alta densidade, 4K);
+// e, se ainda nao existe, este navegador mesmo reduz a capa e manda para o
+// servidor guardar. Da segunda vez em diante, vem so a miniatura.
+const LARGURA_MINIATURA = (window.devicePixelRatio || 1) >= 1.5 ? 480 : 280;
+const filaMiniaturas = [];
+let fazendoMiniatura = false;
+
+function pedirMiniatura(imagem, arquivo) {
+  // Ja e' pequena (ou ja e' a miniatura): nada a fazer.
+  if (!arquivo || imagem.naturalWidth <= LARGURA_MINIATURA * 1.25) return;
+  filaMiniaturas.push({ imagem, arquivo });
+  if (!fazendoMiniatura) setTimeout(proximaMiniatura, 400);
+  fazendoMiniatura = true;
+}
+
+async function proximaMiniatura() {
+  const item = filaMiniaturas.shift();
+  if (!item) { fazendoMiniatura = false; return; }
+  try {
+    const { imagem, arquivo } = item;
+    const tela = document.createElement("canvas");
+    tela.width = LARGURA_MINIATURA;
+    tela.height = Math.max(1, Math.round(imagem.naturalHeight * LARGURA_MINIATURA / imagem.naturalWidth));
+    const pincel = tela.getContext("2d");
+    pincel.imageSmoothingQuality = "high";
+    pincel.drawImage(imagem, 0, 0, tela.width, tela.height);
+    await pedir("/api/capa/miniatura", "POST",
+      { arquivo, largura: LARGURA_MINIATURA, imagem: tela.toDataURL("image/webp", 0.82) });
+  } catch (falha) {
+    // Sem miniatura, a capa cheia continua valendo: nada para o aluno ver.
+  }
+  setTimeout(proximaMiniatura, 30);
+}
+
 function prepararCapa(elemento, jogo) {
   const iniciais = iniciaisDaCapa(jogo.titulo);
   elemento.textContent = iniciais;
@@ -477,15 +517,21 @@ function prepararCapa(elemento, jogo) {
   const imagem = document.createElement("img");
   imagem.className = "capa-imagem";
   imagem.alt = `Capa de ${jogo.titulo}`;
+  imagem.loading = "lazy";
+  imagem.decoding = "async";
   let indice = 0;
+  let arquivoAtual = "";
   const tentar = () => {
     if (indice >= urls.length) {
       imagem.remove();
       return;
     }
-    imagem.src = urls[indice++];
+    const url = urls[indice++];
+    arquivoAtual = new URL(url, location.href).searchParams.get("arquivo") || "";
+    imagem.src = `${url}&mini=${LARGURA_MINIATURA}`;
   };
   imagem.addEventListener("error", tentar);
+  imagem.addEventListener("load", () => pedirMiniatura(imagem, arquivoAtual));
   elemento.append(imagem);
   tentar();
 }
@@ -1511,6 +1557,12 @@ function aplicarPerfil(perfil) {
                               : "Este console não tinha vibração.");
 }
 
+function montarAbaControles() {
+  estado.controlesMontados = true;
+  prepararBotoes(estado.consolesBotoes || []);
+  prepararMapa(estado.consolesBotoes || []);
+}
+
 function prepararMapa(consoles) {
   const lista = $("#mapaConsole");
   const lote = document.createDocumentFragment();
@@ -1524,7 +1576,8 @@ function prepararMapa(consoles) {
   }
   lista.replaceChildren(lote);
 
-  // Lista de controles que o aluno pode ter.
+  // Lista de controles que o aluno pode ter; o mapa e' desenhado UMA vez,
+  // depois dela (antes era desenhado duas: aqui e no fim desta funcao).
   pedir("/api/perfis-controle?tipo=xbox360&console=ps1").then((perfil) => {
     const tipos = document.createDocumentFragment();
     for (const t of perfil.tipos) {
@@ -1535,8 +1588,13 @@ function prepararMapa(consoles) {
       tipos.append(item);
     }
     $("#mapaTipo").replaceChildren(tipos);
-    desenharMapa();
-  }).catch(() => {});
+  }).catch(() => {}).then(() => desenharMapa());
+
+  // Os botoes abaixo ganham o clique uma vez so: esta funcao roda de novo
+  // quando a tela recarrega o estado (amigo novo, comecar do zero), e cada
+  // volta somava mais um ouvinte -- cada clique virava varios pedidos.
+  if (estado.mapaLigado) return;
+  estado.mapaLigado = true;
 
   lista.onchange = () => desenharMapa();
   $("#mapaJogador").onchange = () => desenharMapa();
@@ -1574,8 +1632,6 @@ function prepararMapa(consoles) {
       recado(falha.message, true);
     }
   });
-
-  desenharMapa();
 }
 
 async function desenharMapa() {
@@ -3763,6 +3819,7 @@ function ligarEventos() {
       const aba = evento.target.closest(".aba");
       if (!aba) return;
       const gaveta = grupo.closest(".gaveta");
+      if (aba.dataset.aba === "controles" && !estado.controlesMontados) montarAbaControles();
       for (const outra of grupo.querySelectorAll(".aba")) {
         outra.classList.toggle("ativo", outra === aba);
       }

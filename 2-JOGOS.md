@@ -33,8 +33,13 @@ jogos\pessoais\PS1\capas\Twisted Metal 2.png
 ```
 
 Sem capa, aparecem as duas primeiras letras do título. Não tem limite de
-tamanho de imagem além do bom senso — o ARENA não redimensiona a capa do
-jogo (diferente da foto de perfil, que é sempre pequena).
+tamanho de imagem além do bom senso: a sua capa fica como está. Para a
+lista abrir leve, na primeira vez que uma capa aparece o próprio navegador
+faz uma **cópia pequena** dela (280 px de largura, ou 480 em tela 4K), que
+o ARENA guarda em `dados\miniaturas` e usa dali em diante — e só carrega as
+capas que estão perto da tela. Medido: a lista passou de 21 MB para menos
+de 1 MB ao abrir. Pode apagar `dados\miniaturas` quando quiser; ela se
+refaz sozinha.
 
 **Buscar automático:** com o jogo selecionado, o painel de detalhes tem
 os botões **Buscar capa** (procura no banco de miniaturas do próprio

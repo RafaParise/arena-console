@@ -147,6 +147,7 @@ class Navegador:
         self.proc = None
         self.ws = None
         self.n = 0
+        self.eventos = []     # avisos do navegador (Network.*, Page.*...)
 
     def __enter__(self):
         self.proc = subprocess.Popen(
@@ -194,6 +195,15 @@ class Navegador:
                 if "error" in msg:
                     raise OSError("%s: %s" % (metodo, msg["error"].get("message")))
                 return msg.get("result", {})
+            if "method" in msg:
+                self.eventos.append(msg)      # ex.: Network.requestWillBeSent
+
+    def esperar(self, segundos):
+        """Espera e depois recolhe o que o navegador avisou nesse tempo (os
+        eventos ficam em self.eventos): um comando qualquer faz ler tudo o
+        que chegou antes da resposta dele."""
+        time.sleep(segundos)
+        self.comando("Runtime.evaluate", expression="1")
 
     def abrir(self, url, largura=1366, altura=768, escala=1, espera=2.5, tema=None):
         """Abre a pagina numa tela de largura x altura (pontos CSS) com a

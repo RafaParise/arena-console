@@ -20,6 +20,7 @@ import base64
 import binascii
 import contextlib
 import errno
+import hashlib
 import json
 import os
 import shutil
@@ -1289,6 +1290,100 @@ def gravar_foto_perfil(imagem_base64):
             os.fsync(arquivo.fileno())
         os.replace(temporario, destino)
     return destino
+
+
+# ---------------------------------------------------------------------------
+# Miniaturas das capas
+# ---------------------------------------------------------------------------
+# Achado de 01/10/2026 (medido com testes\tela_sem_janela.py): a tela pedia
+# as capas em TAMANHO CHEIO (~450 KB, ~1000 px de largura) para cartoes de
+# ~220 px -- 21 MB e ~130 MB de imagem aberta na memoria so para mostrar a
+# lista. Agora, na primeira vez, o PROPRIO NAVEGADOR reduz a capa (e' nativo
+# e rapido; em Python puro levaria segundos por imagem) e manda a
+# miniatura; o servidor guarda em dados\miniaturas e entrega ela dali em
+# diante. 280 px para tela comum, 480 px para tela de alta densidade (4K).
+
+PASTA_MINIATURAS_CAPA = os.path.join(PASTA_DADOS, "miniaturas")
+LARGURAS_MINIATURA = (280, 480)
+LIMITE_MINIATURA = 200 * 1024
+MAXIMO_MINIATURAS = 4000
+
+
+def capa_permitida(pedido):
+    """Caminho da capa pedida pela tela, ou None. So arte dentro da pasta
+    de jogos OU das miniaturas baixadas (retroarch\\thumbnails): sem isto,
+    bastaria pedir ../../dados/config.json para ler o que nao devia."""
+    alvo = os.path.join(RAIZ, str(pedido or "").replace("/", os.sep))
+    if not (dentro_da_pasta(alvo, PASTA_JOGOS) or dentro_da_pasta(alvo, PASTA_MINIATURAS)):
+        return None
+    if not os.path.isfile(alvo) or not alvo.lower().endswith((".png", ".jpg", ".jpeg", ".webp")):
+        return None
+    return alvo
+
+
+def base_da_miniatura(alvo, largura):
+    """dados\\miniaturas\\<codigo> (sem extensao). O codigo muda quando a
+    capa muda (tamanho ou data): miniatura velha nunca aparece."""
+    estado = os.stat(alvo)
+    texto = "%s|%d|%d|%d" % (os.path.relpath(alvo, RAIZ).lower(), estado.st_size,
+                             int(estado.st_mtime), largura)
+    return os.path.join(PASTA_MINIATURAS_CAPA, hashlib.sha1(texto.encode("utf-8")).hexdigest()[:24])
+
+
+def miniatura_pronta(alvo, largura):
+    try:
+        base = base_da_miniatura(alvo, largura)
+    except OSError:
+        return None
+    for extensao in (".webp", ".jpg", ".png"):
+        if os.path.isfile(base + extensao):
+            return base + extensao
+    return None
+
+
+def gravar_miniatura(alvo, largura, imagem_base64):
+    """Guarda a miniatura que a tela fez. Confere o tipo pelos bytes (nao
+    confia no que o navegador disse) e o tamanho."""
+    texto = str(imagem_base64 or "")
+    if "," in texto:
+        texto = texto.split(",", 1)[1]
+    try:
+        brutos = base64.b64decode(texto, validate=True)
+    except (binascii.Error, ValueError):
+        raise ValueError("Miniatura inválida.")
+    if not brutos or len(brutos) > LIMITE_MINIATURA:
+        raise ValueError("Miniatura grande demais.")
+    tipo = _tipo_da_imagem(brutos)
+    extensao = TIPOS_FOTO_PERFIL.get(tipo)
+    if not extensao:
+        raise ValueError("Miniatura em formato não aceito.")
+    os.makedirs(PASTA_MINIATURAS_CAPA, exist_ok=True)
+    destino = base_da_miniatura(alvo, largura) + extensao
+    temporario = "%s.%d.tmp" % (destino, threading.get_ident())
+    with open(temporario, "wb") as arquivo:
+        arquivo.write(brutos)
+    os.replace(temporario, destino)
+    limpar_miniaturas_antigas()
+    return destino
+
+
+def limpar_miniaturas_antigas():
+    """Teto de MAXIMO_MINIATURAS arquivos: passou, apaga as mais antigas
+    (sao so copias pequenas; a capa de verdade continua onde estava)."""
+    try:
+        arquivos = [e for e in os.scandir(PASTA_MINIATURAS_CAPA) if e.is_file()]
+    except OSError:
+        return 0
+    if len(arquivos) <= MAXIMO_MINIATURAS:
+        return 0
+    arquivos.sort(key=lambda e: e.stat().st_mtime)
+    sobra = arquivos[:len(arquivos) - int(MAXIMO_MINIATURAS * 0.9)]
+    for entrada in sobra:
+        try:
+            os.remove(entrada.path)
+        except OSError:
+            pass
+    return len(sobra)
 
 
 def apagar_foto_perfil():
@@ -3893,17 +3988,18 @@ class Manipulador(BaseHTTPRequestHandler):
             parametros = urllib.parse.parse_qs(
                 urllib.parse.urlparse(self.path).query)
             pedido = (parametros.get("arquivo") or [""])[0]
-            alvo = os.path.join(RAIZ, pedido.replace("/", os.sep))
-
-            # So arte dentro da pasta de jogos OU das miniaturas baixadas
-            # (retroarch/thumbnails). Sem isto, bastaria pedir
-            # ../../dados/config.json para ler o que nao devia.
-            permitido = (dentro_da_pasta(alvo, PASTA_JOGOS) or
-                        dentro_da_pasta(alvo, PASTA_MINIATURAS))
-            if not permitido or not os.path.isfile(alvo):
+            alvo = capa_permitida(pedido)
+            if not alvo:
                 return self.erro("Capa não encontrada.", 404)
-            if not alvo.lower().endswith((".png", ".jpg", ".jpeg", ".webp")):
-                return self.erro("Não é imagem.", 404)
+            # mini=280/480: a miniatura guardada, se ja existir (ver
+            # gravar_miniatura). Senao, a capa cheia -- e a tela faz a
+            # miniatura dela.
+            try:
+                largura = int((parametros.get("mini") or ["0"])[0])
+            except ValueError:
+                largura = 0
+            if largura in LARGURAS_MINIATURA:
+                alvo = miniatura_pronta(alvo, largura) or alvo
 
             tipos = {".png": "image/png", ".jpg": "image/jpeg",
                      ".jpeg": "image/jpeg", ".webp": "image/webp"}
@@ -4695,6 +4791,20 @@ class Manipulador(BaseHTTPRequestHandler):
             return self.responder_json({"ok": True})
 
         # ---- perfil (apelido + foto, permanente) ---------------------------
+        if caminho == "/api/capa/miniatura":
+            alvo = capa_permitida(dados.get("arquivo"))
+            if not alvo:
+                return self.erro("Capa não encontrada.", 404)
+            if dados.get("largura") not in LARGURAS_MINIATURA:
+                return self.erro("Largura de miniatura inválida.")
+            try:
+                gravar_miniatura(alvo, dados["largura"], dados.get("imagem"))
+            except ValueError as falha:
+                return self.erro(str(falha))
+            except OSError as falha:
+                return self.erro(traduzir_erro_do_sistema(falha, "guardar a miniatura da capa"))
+            return self.responder_json({"ok": True})
+
         if caminho == "/api/perfil/foto":
             if dados.get("remover"):
                 apagar_foto_perfil()
