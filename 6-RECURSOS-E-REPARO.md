@@ -491,18 +491,23 @@ O **`COLETAR.bat`**, na raiz, tira um retrato da máquina e mede como o
 ARENA roda nela. Serve para comparar os notebooks da escola e decidir o que
 o ARENA precisa melhorar para o mais fraco.
 
-1. Feche o ARENA, se estiver aberto.
-2. Dois cliques em **`COLETAR.bat`**. Leva uns 5 minutos.
+1. Feche o ARENA, se estiver aberto, e ligue o notebook **na tomada** (na
+   bateria o resultado não vale).
+2. Dois cliques em **`COLETAR.bat`**. Leva uns 6 minutos.
 3. No meio, um jogo de Super Nintendo abre sozinho por uns 70 segundos. É
-   de propósito: olhe se o som e a imagem ficam lisos.
-4. No fim, responda as 5 perguntas (uma tecla e Enter).
+   de propósito: deixe a janela dele **na frente** e olhe se o som e a
+   imagem ficam lisos. (Sem jogo de Super Nintendo na pasta, essa parte é
+   pulada.)
+4. No fim, responda as 6 perguntas (uma tecla e Enter) — e mais algumas,
+   se você já jogou outros consoles nesse notebook: o ARENA compara o que
+   ele diz de cada console com o que você viu.
 
 O resultado fica em `perfil\<código>_<data-hora>\`:
 
 | Arquivo | Para quê |
 |---|---|
-| `maquina.txt` | Retrato da máquina em português: processador, memória (e quantos pentes), discos (com velocidade e o que o Windows diz deles), vídeo, Windows, rede, de onde o ARENA roda, e **o que deixa essa máquina lenta**, com o que fazer |
-| `arena.txt` | O ARENA nessa máquina: tempo para abrir, servidor, lista de jogos, gravações em disco e o jogo de SNES (quadros por segundo), com BOM / NO LIMITE / RUIM |
+| `maquina.txt` | Retrato da máquina em português: processador (com a velocidade medida de um núcleo e se tem AVX), memória (e quantos pentes), discos (com velocidade e o que o Windows diz deles), vídeo, Windows, rede, de onde o ARENA roda, **o que o ARENA diria de cada console** nela, e **o que deixa essa máquina lenta**, com o que fazer |
+| `arena.txt` | O ARENA nessa máquina: tempo para abrir, servidor, lista de jogos, gravações em disco e o jogo de SNES (quadros por segundo), com BOM / NO LIMITE / RUIM, e no fim a **tabela de orçamentos**: medido × teto do notebook-alvo, passou ou não |
 | `maquina.json`, `arena.json` | Os mesmos números, para análise |
 
 **Não coleta nada pessoal.** Nem nome da máquina, nem usuário, nem endereço
