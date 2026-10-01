@@ -171,6 +171,16 @@ TIPOS_DISCO = {
 }
 
 
+# Divisas das classes de disco (MB/s de gravacao), as mesmas de disco().
+DIVISAS_DISCO = (15.0, 45.0, 150.0)
+
+
+def perto_da_divisa(mbs, margem=0.3):
+    """A velocidade medida esta a menos de 30% de uma divisa de classe?"""
+    return any(divisa * (1 - margem) <= mbs <= divisa * (1 + margem)
+               for divisa in DIVISAS_DISCO)
+
+
 def medir_velocidade(pasta, amostras=3):
     """Mede a velocidade real de escrita e leitura na pasta do ARENA.
 
@@ -184,20 +194,22 @@ def medir_velocidade(pasta, amostras=3):
          arquivo no fechamento, e isso entra na conta. Estavamos medindo o
          antivirus, nao o disco.
 
-    Agora: grava 2 MB em blocos, cronometra SO a gravacao, faz o fsync
-    depois e cronometra separado. Repete algumas vezes e fica com a MELHOR
-    amostra - a pior sempre e ruido de outro programa mexendo no disco.
+    Agora: grava ate 8 MB em blocos de 1 MB, com o fsync na conta, e fica
+    com a MELHOR amostra - a pior sempre e ruido de outro programa mexendo
+    no disco. Disco lento para cedo (2 MB bastam), e so se repete a amostra
+    quando ela cai perto de uma divisa de classe (perto_da_divisa).
     """
     caminho = os.path.join(pasta, ".arena_teste_velocidade")
     bloco = os.urandom(1024 * 1024)
-    blocos = 8                       # 8 MB por amostra
-    megabytes = (len(bloco) * blocos) / (1024.0 * 1024.0)
+    blocos = 8                       # ate 8 MB por amostra
+    um_mb = 1024.0 * 1024.0
 
-    melhor_escrita = melhor_leitura = None
+    melhor = None                    # (MB/s, segundos, MB) da melhor amostra
+    melhor_leitura = None            # MB/s
     latencia = None
 
     try:
-        for tentativa in range(max(1, amostras)):
+        for _tentativa in range(max(1, amostras)):
             # ---- escrita ----
             # O fsync ENTRA na conta de proposito. Sem ele mediriamos a
             # memoria do Windows, nao o disco: 8 MB cabem no cache e
@@ -205,30 +217,42 @@ def medir_velocidade(pasta, amostras=3):
             # fixo do fsync se dilui e sobra a velocidade de verdade.
             with open(caminho, "wb", buffering=0) as arquivo:
                 inicio = time.perf_counter()
+                escritos = 0
                 for _ in range(blocos):
                     arquivo.write(bloco)
+                    escritos += 1
+                    # Disco lento: 2 MB em mais de 0,25 s ja dizem que e'
+                    # lento. Gravar os 8 MB custava 1,6 s (e 8 MB do pen
+                    # drive) a cada abertura num pen drive de 5 MB/s.
+                    if escritos >= 2 and time.perf_counter() - inicio > 0.25:
+                        break
                 so_escrita = time.perf_counter() - inicio
                 os.fsync(arquivo.fileno())
                 escrita = time.perf_counter() - inicio
                 espera = (escrita - so_escrita) * 1000
+            megabytes = escritos * len(bloco) / um_mb
+            mbs = megabytes / max(escrita, 1e-6)
 
             # ---- leitura ----
             inicio = time.perf_counter()
             with open(caminho, "rb", buffering=0) as arquivo:
                 while arquivo.read(len(bloco)):
                     pass
-            leitura = time.perf_counter() - inicio
+            leitura = megabytes / max(time.perf_counter() - inicio, 1e-6)
 
-            if melhor_escrita is None or escrita < melhor_escrita:
-                melhor_escrita, latencia = escrita, espera
-            if melhor_leitura is None or leitura < melhor_leitura:
+            if melhor is None or mbs > melhor[0]:
+                melhor, latencia = (mbs, escrita, megabytes), espera
+            if melhor_leitura is None or leitura > melhor_leitura:
                 melhor_leitura = leitura
 
-            # Ja ficou claro que e rapido: nao precisa insistir.
-            if tentativa == 0 and escrita < 0.08:
-                continue
-            # Ja ficou claro que e lento: parar poupa o pen drive.
-            if escrita > 1.2:
+            # Achado de 01/10/2026: aqui havia um "continue" onde o
+            # comentario dizia "nao precisa insistir" -- o disco rapido
+            # fazia as 3 amostras, e o pen drive comum (15 a 40 MB/s)
+            # tambem: ate 24 MB gravados e mais de 1 s a cada abertura do
+            # ARENA, so para medir. Agora a segunda e a terceira amostra so
+            # acontecem quando a primeira cai PERTO de uma divisa de classe
+            # (15, 45 ou 150 MB/s), onde o ruido poderia trocar a classe.
+            if not perto_da_divisa(mbs):
                 break
     except OSError:
         return None
@@ -239,9 +263,10 @@ def medir_velocidade(pasta, amostras=3):
             pass
 
     return {
-        "escrita_mbs": round(megabytes / max(melhor_escrita, 1e-6), 1),
-        "leitura_mbs": round(megabytes / max(melhor_leitura, 1e-6), 1),
-        "escrita_ms": round(melhor_escrita * 1000, 1),
+        "escrita_mbs": round(melhor[0], 1),
+        "leitura_mbs": round(melhor_leitura, 1),
+        "escrita_ms": round(melhor[1] * 1000, 1),
+        "amostra_mb": round(melhor[2], 1),
         # Quanto o disco demora para CONFIRMAR uma gravacao. Alto aqui com
         # velocidade alta acima e normal: e barreira, nao lentidao.
         "confirmacao_ms": round(latencia, 1) if latencia is not None else None,
