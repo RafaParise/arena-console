@@ -27,6 +27,7 @@ import os
 import shutil
 import socket
 import sqlite3
+import stat
 import subprocess
 import sys
 import threading
@@ -1587,7 +1588,8 @@ def remapeamento_da_partida(opcoes, caminho_core, caminho_jogo):
             break
     linhas += ['%s = "%s"' % (c, tipos[c]) for c in sorted(tipos)]
 
-    shutil.rmtree(PASTA_REMAP_PARTIDA, ignore_errors=True)
+    if os.path.isdir(PASTA_REMAP_PARTIDA):
+        apagar_pasta_toda(PASTA_REMAP_PARTIDA)
     pasta_nucleo = os.path.join(PASTA_REMAP_PARTIDA, nome_nucleo)
     os.makedirs(pasta_nucleo, exist_ok=True)
     gravar_texto_atomico(os.path.join(pasta_nucleo, nome_jogo + ".rmp"), "\n".join(linhas) + "\n")
@@ -2493,6 +2495,26 @@ COPIAS_MANTIDAS = 3
 LOGS_MANTIDOS = 10
 
 
+def apagar_pasta_toda(caminho):
+    """shutil.rmtree que tambem apaga o que esta marcado "somente leitura".
+
+    Achado de 01/10/2026: o RetroArch cria saves\\.netplay com o atributo
+    somente leitura. A copia de seguranca herdava o atributo; o rmtree com
+    ignore_errors apagava os arquivos e desistia da pasta, sem dizer nada.
+    Resultado: o rodizio de 3 copias deixava um esqueleto de pastas por
+    backup (209 nesta maquina em duas semanas), e cada backup novo tentava
+    apagar todos de novo -- mais lento a cada dia, num pen drive.
+    Devolve True se a pasta sumiu."""
+    def tirar_trava(funcao, alvo, _erro):
+        try:
+            os.chmod(alvo, stat.S_IWRITE)
+            funcao(alvo)
+        except OSError:
+            pass
+    shutil.rmtree(caminho, onexc=tirar_trava)
+    return not os.path.exists(caminho)
+
+
 def traduzir_erro_do_sistema(falha, acao):
     """Troca o texto cru do Windows/Python por uma frase que o aluno entende:
     o que aconteceu + o que fazer agora."""
@@ -2592,16 +2614,21 @@ def fazer_backup():
                 shutil.copy2(origem, os.path.join(destino, nome))
 
         # Saves comuns sao pequenos (alguns KB) e sao o que doi perder.
+        # Fica de fora o saves\.netplay: e' a pasta descartavel que o
+        # RetroArch usa so enquanto o aluno e' convidado numa partida (para
+        # o save do colega nao cobrir o dele) -- e vem somente leitura.
         if os.path.isdir(PASTA_SAVES):
             shutil.copytree(PASTA_SAVES, os.path.join(destino, "saves"),
-                            dirs_exist_ok=True)
+                            dirs_exist_ok=True,
+                            ignore=shutil.ignore_patterns(".netplay"))
 
-        # Mantem so as copias mais recentes.
+        # Mantem so as copias mais recentes (as pastas com nome de data;
+        # o .zip do "Exportar" e as copias avulsas ficam).
         copias = sorted(
             d for d in os.listdir(PASTA_BACKUP)
             if os.path.isdir(os.path.join(PASTA_BACKUP, d)))
         for antiga in copias[:-COPIAS_MANTIDAS]:
-            shutil.rmtree(os.path.join(PASTA_BACKUP, antiga), ignore_errors=True)
+            apagar_pasta_toda(os.path.join(PASTA_BACKUP, antiga))
 
         return destino
     except OSError as falha:

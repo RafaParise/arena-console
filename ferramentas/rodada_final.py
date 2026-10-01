@@ -21,6 +21,8 @@ import time
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PYTHON = os.path.join(RAIZ, "servidor", "python", "python.exe")
+sys.path.insert(0, os.path.join(RAIZ, "testes"))
+import limpeza  # noqa: E402  (pastas que um teste esquece no Temp)
 LIMITE_S = 900  # 15 min por script; o mais lento (5 RetroArch) leva bem menos
 
 # Ferramentas de investigacao que moram em testes\ mas pedem arquivos de uma
@@ -41,6 +43,7 @@ for _saida in (sys.stdout, sys.stderr):
 
 
 def rodar(caminho_relativo):
+    antes = set(limpeza.pastas_de_teste())
     inicio = time.time()
     # Sem abrir a tela do ARENA a cada servidor que um teste sobe. Saida em
     # UTF-8 e sem espera (PYTHONUNBUFFERED): um teste que morre de vez
@@ -63,8 +66,18 @@ def rodar(caminho_relativo):
         print("      codigo de saida: %s" % codigo, flush=True)
         for linha in ultimas:
             print("      " + linha, flush=True)
+    # Teste que deixa pasta no Temp: aponta e apaga (achado de 01/10/2026:
+    # 2,9 GB esquecidos neste computador).
+    sobras = [c for c in limpeza.pastas_de_teste() if c not in antes]
+    sujeira = sum(limpeza.tamanho(c) for c in sobras)
+    presas = [c for c in sobras if not limpeza.apagar_pasta(c)]
+    if sobras:
+        print("      [sujeira] deixou %d pasta(s) no Temp (%.1f MB)%s" % (
+            len(sobras), sujeira / 1024 ** 2, "; %d nao saiu(ram)" % len(presas) if presas else ": apagadas"),
+              flush=True)
     return {"script": caminho_relativo, "codigo_saida": codigo, "segundos": duracao,
-            "ultimas_linhas": ultimas}
+            "ultimas_linhas": ultimas, "pastas_esquecidas_no_temp": len(sobras),
+            "mb_esquecidos": round(sujeira / 1024 ** 2, 1)}
 
 
 def principal():

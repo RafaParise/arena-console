@@ -27,7 +27,6 @@ Uso nos testes:
 import base64
 import json
 import os
-import shutil
 import socket
 import struct
 import subprocess
@@ -35,6 +34,9 @@ import sys
 import tempfile
 import time
 import urllib.request
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import limpeza  # noqa: E402
 
 _LOCAL = os.environ.get("LOCALAPPDATA", "")
 CANDIDATOS = [
@@ -177,14 +179,56 @@ class Navegador:
     def __exit__(self, *_):
         if self.ws:
             self.ws.fechar()
+        # Achado de 01/10/2026: 128 processos do Edge de teste vivos desde a
+        # madrugada (1,8 GB de memoria) e 12 perfis no Temp (2,2 GB). O
+        # processo que este script abre e' so um lancador: entrega para o
+        # Edge de verdade e morre -- kill() e taskkill /T nao alcancam os
+        # filhos. Agora: (1) o proprio navegador fecha tudo (Browser.close,
+        # pelo endereco do navegador inteiro, nao da aba); (2) se nao der,
+        # encerra os processos que usam ESTE perfil (nunca o Edge do usuario).
+        self._fechar_navegador()
+        if self._processos_do_perfil(encerrar=False):
+            self._processos_do_perfil(encerrar=True)
         if self.proc:
-            self.proc.kill()
             try:
-                self.proc.wait(10)
+                self.proc.wait(5)
             except subprocess.TimeoutExpired:
+                self.proc.kill()
+        limpeza.apagar_pasta(self.perfil, segundos=15)
+
+    def _fechar_navegador(self):
+        try:
+            with urllib.request.urlopen("http://127.0.0.1:%d/json/version" % self.porta, timeout=2) as r:
+                endereco = json.loads(r.read())["webSocketDebuggerUrl"]
+            ws = _WebSocket(endereco)
+            ws.enviar(json.dumps({"id": 1, "method": "Browser.close"}))
+            try:
+                ws.receber()
+            except (OSError, ValueError):
                 pass
-        time.sleep(0.3)
-        shutil.rmtree(self.perfil, ignore_errors=True)
+            ws.fechar()
+        except (OSError, ValueError, KeyError):
+            return False
+        fim = time.monotonic() + 10       # espera o navegador sair de vez
+        while time.monotonic() < fim and self._processos_do_perfil(encerrar=False):
+            time.sleep(0.3)
+        return True
+
+    def _processos_do_perfil(self, encerrar):
+        """Quantos processos do navegador usam o perfil DESTE teste (e, com
+        encerrar=True, encerra esses -- so esses)."""
+        if encerrar:
+            acao = "| ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }; 0"
+        else:
+            acao = "| Measure-Object | Select-Object -ExpandProperty Count"
+        comando = ("Get-CimInstance Win32_Process -Filter \"Name = '%s'\" | Where-Object "
+                   "{ $_.CommandLine -like '*%s*' } %s" % (os.path.basename(self.exe), self.perfil, acao))
+        try:
+            saida = subprocess.run(["powershell", "-NoProfile", "-NonInteractive", "-Command", comando],
+                                   capture_output=True, text=True, timeout=30).stdout.strip()
+            return int(saida.splitlines()[-1]) if saida else 0
+        except (OSError, ValueError, subprocess.TimeoutExpired):
+            return 0
 
     def comando(self, metodo, **parametros):
         self.n += 1
