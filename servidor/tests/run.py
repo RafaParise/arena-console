@@ -461,6 +461,48 @@ class TestHardware(unittest.TestCase):
         finally:
             arena.CAPACIDADE = original
 
+    def test_etiqueta_por_maquina_medida(self):
+        # Avaliacao nova (30/09/2026): a etiqueta vem da velocidade MEDIDA de
+        # um nucleo e das instrucoes do processador, nao da nota (que dava 4
+        # ao Celeron e ao Ryzen e chamava o PS2 de "Capenga" nos dois).
+        import arena
+        consoles = {p["id"]: p for p in arena.carregar_catalogo()}
+        celeron = {"velocidade": {"relativa_ao_alvo": 1.0},
+                   "instrucoes": {"avx": False, "avx2": False}, "gpu": {"integrada": True}}
+        ryzen = {"velocidade": {"relativa_ao_alvo": 2.28},
+                 "instrucoes": {"avx": True, "avx2": True}, "gpu": {"integrada": True}}
+        dedicada = {"velocidade": {"relativa_ao_alvo": 3.2},
+                    "instrucoes": {"avx": True, "avx2": True}, "gpu": {"integrada": False}}
+
+        def chave(console, maquina):
+            return arena.classificar_plataforma(consoles[console], maquina)["chave"]
+
+        # Celeron N5100 otimizado: o que o Rafael jogou de verdade.
+        self.assertEqual(chave("snes", celeron), "bem")
+        self.assertEqual(chave("psp", celeron), "ajustes")     # God of War, abaixo de 60
+        self.assertEqual(chave("ps2", celeron), "ajustes")     # PS2 com 4 jogadores
+        self.assertEqual(chave("ps3", celeron), "pesado")      # sem AVX2, 4 threads
+        self.assertEqual(chave("xbox360", celeron), "nao_abre")
+        detalhe = arena.classificar_plataforma(consoles["xbox360"], celeron)["detalhe"]
+        self.assertIn("AVX", detalhe)
+        self.assertIn("Xenia", detalhe)
+        # Ryzen 5 5600G: PS2/PS3/Xbox 360 rodam (placa integrada -> "com ajustes").
+        self.assertEqual(chave("psp", ryzen), "bem")
+        self.assertEqual(chave("ps2", ryzen), "ajustes")
+        self.assertEqual(chave("ps3", ryzen), "ajustes")
+        self.assertEqual(chave("xbox360", ryzen), "ajustes")
+        # Placa dedicada forte: aqui sim "Roda bem" no PS2.
+        self.assertEqual(chave("ps2", dedicada), "bem")
+        # Sem medicao (Windows antigo, falha): cai na regra antiga, sem erro.
+        self.assertIn(chave("ps2", {}), ("bem", "ajustes", "pesado"))
+
+    def test_velocidade_e_instrucoes_medidas(self):
+        import hardware
+        v = hardware.velocidade_de_um_nucleo(rodadas=3, tamanho=20000)
+        self.assertGreater(v["operacoes_por_segundo"], 0)
+        self.assertGreater(v["relativa_ao_alvo"], 0)
+        self.assertIn("avx", hardware.instrucoes())
+
     def test_driver_video(self):
         import hardware
         driver = hardware.driver_video()

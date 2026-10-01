@@ -790,12 +790,16 @@ CLASSES = {
 
 
 def classificar(custo):
-    """Diz como a plataforma vai se comportar nesta maquina.
+    """Perfil grafico automatico do RetroArch (Qualidade x Desempenho).
 
-    Regra:
-      capacidade acima do custo  -> sobra folga  -> Bonito e lisinho
-      capacidade igual ao custo  -> da conta justo -> Feio mas lisinho
-      capacidade abaixo do custo -> nao da conta   -> Capenga
+    ATENCAO (30/09/2026): desde a avaliacao nova, isto decide SO o perfil
+    grafico -- a etiqueta que o aluno ve no cartao vem de
+    classificar_plataforma(), abaixo. Ficou separado de proposito: trocar
+    a etiqueta nao pode mudar sozinho a imagem dos jogos que ja rodam bem.
+
+    Regra (antiga, mantida para o perfil):
+      capacidade acima do custo  -> sobra folga  -> Qualidade
+      capacidade igual ou abaixo -> Desempenho
     """
     nota = CAPACIDADE["nota"]
     if nota >= custo + 1:
@@ -805,6 +809,106 @@ def classificar(custo):
     else:
         chave = "ruim"
     return dict(CLASSES[chave], chave=chave)
+
+
+# ---------------------------------------------------------------------------
+# Etiqueta de cada console NESTA maquina (o selo colorido do cartao)
+# ---------------------------------------------------------------------------
+# Achado de 30/09/2026: a etiqueta antiga comparava a nota (que conta
+# nucleos, nao velocidade) com o custo. O Celeron N5100 e o Ryzen 5 5600G
+# tiravam a mesma nota 4, e o PS2 (custo 5) aparecia "Capenga: vai travar"
+# nos DOIS -- mas o Rafael jogou PS2 com 4 jogadores no Celeron otimizado
+# (Crash Nitro Kart, Marvel Ultimate Alliance, Naruto Ultimate Ninja 4). E o
+# Xbox 360 aparecia "Capenga" no Celeron, quando la ele nem ABRE (sem AVX).
+#
+# Agora a etiqueta usa o que foi MEDIDO (hardware.py): a velocidade de um
+# nucleo, em "vezes o notebook-alvo", e as instrucoes do processador.
+
+CLASSES_ETIQUETA = {
+    "bem": {
+        "rotulo": "Roda bem",
+        "cor": "verde",
+        "detalhe": "Sobra máquina para este console.",
+    },
+    "ajustes": {
+        "rotulo": "Roda com ajustes",
+        "cor": "azul",
+        "detalhe": ("Roda, com a imagem que o ARENA escolhe para este PC. "
+                    "Se engasgar, ligue o Gráfico original."),
+    },
+    "pesado": {
+        "rotulo": "Pode travar",
+        "cor": "vermelho",
+        "detalhe": ("Este PC está abaixo do que este console pede. Dá para "
+                    "tentar com o Gráfico original e o Ultra desempenho ligados."),
+    },
+    "nao_abre": {
+        "rotulo": "Não abre neste PC",
+        "cor": "cinza",
+        "detalhe": "",
+    },
+}
+
+# Velocidade minima de um nucleo, em vezes o notebook-alvo, para "Roda com
+# ajustes" e para "Roda bem", pelo custo do console (consoles.json).
+# Calibrado com o que foi jogado de verdade no Celeron N5100 otimizado
+# (velocidade 1,0 por definicao): PS2 (custo 5) roda -> 0,9 basta para
+# "com ajustes"; PSP (custo 3) roda abaixo de 60 -> "com ajustes", nao
+# "bem". Console pode trocar estes numeros com "requisitos.velocidade".
+VELOCIDADE_POR_CUSTO = {
+    1: (0.25, 0.5),
+    2: (0.35, 0.7),
+    3: (0.6, 1.3),
+    4: (0.8, 1.6),
+    5: (0.9, 2.0),
+}
+
+
+def classificar_plataforma(plataforma, maquina=None):
+    """Etiqueta do console nesta maquina: dict com chave, rotulo, cor e
+    detalhe. Ordem: o que impede de ABRIR, depois a velocidade, depois a
+    placa de video. 'maquina' existe para os testes (padrao: MAQUINA)."""
+    maquina = MAQUINA if maquina is None else maquina
+    custo = int(plataforma.get("custo", 3) or 3)
+    requisitos = plataforma.get("requisitos") or {}
+    instr = maquina.get("instrucoes") or {}
+
+    def etiqueta(chave, detalhe=None):
+        resultado = dict(CLASSES_ETIQUETA[chave], chave=chave)
+        if detalhe:
+            resultado["detalhe"] = detalhe
+        return resultado
+
+    # 1. O que impede de abrir (o emulador fecha na hora, sem explicar).
+    if requisitos.get("avx") and instr.get("avx") is False:
+        nome = (plataforma.get("externo") or {}).get("nome") or "o emulador"
+        return etiqueta("nao_abre",
+                        "O processador deste PC não tem AVX, que o %s exige. "
+                        "Não é configuração: é o processador." % nome)
+
+    # 2. Velocidade de um nucleo, medida.
+    velocidade = (maquina.get("velocidade") or {}).get("relativa_ao_alvo")
+    if not isinstance(velocidade, (int, float)):
+        # Nao deu para medir: cai na regra antiga (nota x custo).
+        antiga = classificar(custo)["chave"]
+        return etiqueta({"otimo": "bem", "bom": "ajustes"}.get(antiga, "pesado"))
+    minimo, folgado = requisitos.get("velocidade") or VELOCIDADE_POR_CUSTO.get(
+        max(1, min(5, custo)))
+    if velocidade >= folgado:
+        chave = "bem"
+    elif velocidade >= minimo:
+        chave = "ajustes"
+    else:
+        chave = "pesado"
+
+    # 3. Sem AVX2, o RPCS3 avisa que vai mal (requisitos dele); e console
+    # 3D pesado em placa integrada nunca e' "Roda bem": o ARENA abaixa a
+    # imagem sozinho, e a etiqueta conta isso.
+    if requisitos.get("avx2_recomendado") and instr.get("avx2") is False:
+        chave = "pesado"
+    if chave == "bem" and custo >= 5 and (maquina.get("gpu") or {}).get("integrada", True):
+        chave = "ajustes"
+    return etiqueta(chave)
 
 
 def ajustar_para_driver(opcoes, driver, perfil):
@@ -1561,7 +1665,8 @@ def avaliar_plataformas(forcar=False):
             estado = "pronta"
             motivo = ""
 
-        classe = classificar(plataforma.get("custo", 3))
+        classe = classificar(plataforma.get("custo", 3))      # perfil grafico
+        etiqueta = classificar_plataforma(plataforma)          # selo do cartao
         resultado.append({
             "id": plataforma["id"],
             "nome": plataforma["nome"],
@@ -1574,11 +1679,12 @@ def avaliar_plataformas(forcar=False):
             "netplay_motivo": plataforma.get("netplay_motivo", ""),
             "estado": estado,
             "motivo": motivo,
-            # Como vai rodar nesta maquina: verde, azul ou vermelho.
-            "classe": classe["chave"],
-            "classe_rotulo": classe["rotulo"],
-            "classe_cor": classe["cor"],
-            "classe_detalhe": classe["detalhe"],
+            # Como vai rodar nesta maquina (medido): verde, azul, vermelho
+            # ou cinza (nao abre). Ver classificar_plataforma().
+            "classe": etiqueta["chave"],
+            "classe_rotulo": etiqueta["rotulo"],
+            "classe_cor": etiqueta["cor"],
+            "classe_detalhe": etiqueta["detalhe"],
             "emulador": (dados_externo["nome"] if caminho_externo
                          else "RetroArch"),
             # Partida a dois e coisa do RetroArch. Emulador de fora tem
@@ -1623,7 +1729,7 @@ def montar_catalogo():
         "peso": "leve", "pasta": "", "custo": 1,
         "estado": "sem_pasta",
         "motivo": "Este arquivo serve a mais de um console. Diga qual e.",
-        "classe": "bom", "classe_rotulo": "", "classe_cor": "azul",
+        "classe": "ajustes", "classe_rotulo": "", "classe_cor": "azul",
         "classe_detalhe": "", "perfil_sugerido": "",
         "emulador": "-", "externo_sugerido": None,
     }

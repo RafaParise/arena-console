@@ -790,6 +790,7 @@ input::placeholder { color: var(--texto-apagado); }
 .desempenho--verde    { background: #17402f; color: #6ee7a8; }
 .desempenho--azul     { background: var(--azul-escuro); color: var(--azul-claro); }
 .desempenho--vermelho { background: #40201e; color: #f0908b; }
+.desempenho--cinza    { background: #2e2e36; color: #c9c9d4; }   /* nao abre neste PC */
 
 /* ========================= PAINEL DE DETALHES ========================= */
 .detalhes-jogo {
@@ -1344,6 +1345,7 @@ input::placeholder { color: var(--texto-apagado); }
 .desempenho--verde    { background: #17402f; color: #6ee7a8; }
 .desempenho--azul     { background: var(--azul-escuro); color: var(--azul-claro); }
 .desempenho--vermelho { background: #40201e; color: #f0908b; }
+.desempenho--cinza    { background: #2e2e36; color: #c9c9d4; }   /* nao abre neste PC */
 
 /* ========================= LISTA DE AMIGOS ========================= */
 

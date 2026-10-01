@@ -1109,7 +1109,14 @@
         "site": "rpcs3.net/download",
         "motivo": "OBRIGATÓRIO. Não existe núcleo de PlayStation 3 no RetroArch - só o RPCS3 emula este console, e só em computador forte."
       },
-      "pasta": "PS3"
+      "pasta": "PS3",
+      "requisitos": {
+        "avx2_recomendado": true,
+        "velocidade": [
+          2.0,
+          3.0
+        ]
+      }
     },
     {
       "id": "xbox360",
@@ -1154,7 +1161,14 @@
         ],
         "placa": "vulkan"
       },
-      "pasta": "XBOX360"
+      "pasta": "XBOX360",
+      "requisitos": {
+        "avx": true,
+        "velocidade": [
+          2.0,
+          3.0
+        ]
+      }
     }
   ],
   "preferencia": {

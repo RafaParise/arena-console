@@ -178,17 +178,33 @@ async function carregarEstado() {
     : "sem internet — tudo continua funcionando e sobe depois";
   $("#hwSistema").textContent = m.sistema;
   $("#hwMotor").textContent = estado.efetivas.video_driver || m.driver_video;
-  $("#hwPerfil").textContent = m.perfil_maquina === "completo"
-    ? "Completo — todos os consoles liberados"
-    : "Leve — consoles pesados ficam ocultos";
+  // O que o perfil muda de verdade: o modo econômico (rede e cópias de
+  // segurança mais espaçadas). Nenhum console some da lista -- a frase
+  // antiga ("consoles pesados ficam ocultos") não valia mais desde que o
+  // selo "Pode travar" passou a avisar em vez de esconder.
+  $("#hwPerfil").textContent = dados.economico
+    ? "Econômico — rede e cópias de segurança mais espaçadas, para poupar a máquina"
+    : "Normal — todos os consoles na lista, com o selo de cada um";
   $("#hwRuntime").textContent = m.runtime_ok
     ? "Visual C++ presente"
     : "Visual C++ AUSENTE — os jogos não vão abrir";
   $("#blocoRuntime").hidden = m.runtime_ok;
 
-  const nota = dados.capacidade.nota;
-  $("#hwCapacidade").textContent =
-    `${nota} de 5 — ${["", "muito modesta", "modesta", "boa", "forte", "muito forte"][nota]}`;
+  // Capacidade MEDIDA: velocidade de um núcleo em "vezes o notebook mais
+  // fraco da escola" e as instruções que decidem se um emulador abre. A nota
+  // antiga contava núcleos e dava o mesmo 4 ao Celeron e ao Ryzen.
+  const vel = (m.velocidade || {}).relativa_ao_alvo;
+  const instr = m.instrucoes || {};
+  if (typeof vel === "number") {
+    const avx = instr.avx2 ? "AVX2" : instr.avx ? "AVX (sem AVX2)"
+      : instr.avx === false ? "sem AVX (Xbox 360 não abre)" : "AVX não conferido";
+    $("#hwCapacidade").textContent =
+      `${vel.toLocaleString("pt-BR")}× o notebook mais fraco da escola, por núcleo · ${avx}`;
+  } else {
+    const nota = dados.capacidade.nota;
+    $("#hwCapacidade").textContent =
+      `${nota} de 5 — ${["", "muito modesta", "modesta", "boa", "forte", "muito forte"][nota]}`;
+  }
 
   desenharControles(dados.controles || []);
   prepararBotoes(dados.consoles_botoes || []);
@@ -532,6 +548,8 @@ function linhaDoJogo(jogo) {
     const selo = document.createElement("span");
     selo.className = `desempenho desempenho--${plataforma.classe_cor}`;
     selo.textContent = plataforma.classe_rotulo;
+    // O porquê, ao parar o mouse: "não abre" sem motivo não ajuda ninguém.
+    if (plataforma.classe_detalhe) selo.title = plataforma.classe_detalhe;
     abrir.append(selo);
   }
 

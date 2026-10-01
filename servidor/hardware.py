@@ -81,6 +81,76 @@ def processador():
     return " ".join(nome.split())
 
 
+# Instrucoes do processador que decidem se um emulador ABRE. Codigos da
+# funcao IsProcessorFeaturePresent, da documentacao da Microsoft (os mesmos
+# do ferramentas\coletar_maquina.py). Sem AVX o Xenia (Xbox 360) fecha na
+# hora -- a mensagem esta dentro do proprio xenia_canary.exe.
+CODIGOS_INSTRUCOES = {"avx": 39, "avx2": 40}
+
+
+def instrucoes():
+    """{'avx': bool, 'avx2': bool}; None se nao der para perguntar."""
+    if not sys.platform.startswith("win"):
+        return {"avx": None, "avx2": None}
+    resultado = {}
+    for nome, codigo in CODIGOS_INSTRUCOES.items():
+        try:
+            resultado[nome] = bool(ctypes.windll.kernel32.IsProcessorFeaturePresent(codigo))
+        except Exception:
+            resultado[nome] = None
+    return resultado
+
+
+# Velocidade de UM nucleo, MEDIDA -- nao adivinhada pela quantidade de
+# nucleos. Achado de 30/09/2026: a nota antiga dava o mesmo 4 ao Celeron
+# N5100 da escola e ao Ryzen 5 5600G do professor, e por isso chamava o PS2
+# de "Capenga" nos dois (no Celeron otimizado ele roda com 4 jogadores).
+#
+# Unidade: quantas vezes o notebook-alvo (docs\MAQUINA-ALVO.md). 1,0 = a
+# mesma velocidade dele; 2,0 = duas vezes mais rapido.
+#
+# PROVISORIO: o numero do alvo foi tirado do Ryzen (7,5 milhoes) vezes a
+# proporcao do PassMark por nucleo (1.361 / 3.178 = 0,43). O COLETAR.bat
+# passa a medir o valor de verdade no Celeron; ai este numero e' trocado.
+OPERACOES_DO_NOTEBOOK_ALVO = 3_200_000
+REFERENCIA_PROVISORIA = True
+
+
+def _carga_de_medicao(tamanho):
+    """Conta, tabela e texto: o que um programa Python faz o tempo todo.
+    O resultado e' devolvido so para o trabalho nao ser jogado fora."""
+    total = 0
+    tabela = {}
+    texto = ""
+    for i in range(tamanho):
+        total += (i * 7) ^ (i >> 3)
+        tabela[i & 255] = total
+        if i % 50 == 0:
+            texto = str(total)[-6:]
+    return total, len(tabela), texto
+
+
+def velocidade_de_um_nucleo(rodadas=7, tamanho=60000):
+    """Mede a velocidade de um nucleo (operacoes por segundo).
+
+    Roda a mesma carga varias vezes e fica com a MAIS RAPIDA: as outras
+    perderam tempo com o Windows atendendo outra coisa no meio. Assim o
+    numero diz do que o processador e' capaz -- quanto o Windows esta
+    pesando hoje e' outra pergunta, respondida pelas barreiras.
+    No Ryzen leva uns 0,06 s; no Celeron, uns 0,15 s."""
+    melhor = None
+    for _ in range(rodadas):
+        inicio = time.perf_counter()
+        _carga_de_medicao(tamanho)
+        gasto = time.perf_counter() - inicio
+        if melhor is None or gasto < melhor:
+            melhor = gasto
+    operacoes = tamanho / max(melhor, 1e-6)
+    return {"operacoes_por_segundo": int(operacoes),
+            "relativa_ao_alvo": round(operacoes / OPERACOES_DO_NOTEBOOK_ALVO, 2),
+            "referencia_provisoria": REFERENCIA_PROVISORIA}
+
+
 def nucleos():
     """Nucleos logicos. E o numero que importa para decidir o perfil."""
     return os.cpu_count() or 2
@@ -504,6 +574,8 @@ def resumo(pasta_raiz):
     return {
         "cpu": processador(),
         "gpu": gpu,
+        "instrucoes": instrucoes(),
+        "velocidade": velocidade_de_um_nucleo(),
         "nucleos": total_nucleos,
         "ram_total_gb": ram["total_gb"],
         "ram_livre_gb": ram["livre_gb"],

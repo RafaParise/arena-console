@@ -342,14 +342,22 @@ Cada jogo tem uma etiqueta dizendo como vai rodar **no seu computador**:
 
 | Etiqueta | O que esperar |
 |---|---|
-| **Bonito e lisinho** | Seu PC sobra. Roda com a melhor imagem |
-| **Feio mas lisinho** | Roda liso, sem os enfeites |
-| **Capenga** | Vai travar |
+| **Roda bem** (verde) | Sobra máquina para este console |
+| **Roda com ajustes** (azul) | Roda, com a imagem que o ARENA escolhe para este PC. Se engasgar, ligue o **Gráfico original** |
+| **Pode travar** (vermelho) | O PC está abaixo do que o console pede. Dá para tentar com o Gráfico original e o Ultra desempenho |
+| **Não abre neste PC** (cinza) | Falta algo no processador (ex.: o Xbox 360 exige AVX). Não é configuração. Pare o mouse em cima da etiqueta para ver o motivo |
 
-**Capenga não impede de jogar.** O ARENA só avisa antes, para você não achar
-que quebrou. Se quiser tentar, tente — o botão funciona igual.
+**"Pode travar" não impede de jogar.** O ARENA só avisa antes, para você não
+achar que quebrou. Se quiser tentar, tente — o botão funciona igual.
 
-Detalhes de como o ARENA decide isso: **documento 6**.
+O ARENA **mede** o computador ao abrir (a velocidade de um núcleo do
+processador e se ele tem AVX) em vez de adivinhar pela quantidade de
+núcleos. A conta usa o notebook mais fraco da escola como régua: em
+**Ajustes → Máquina → Capacidade** aparece, por exemplo, "2,3× o notebook
+mais fraco da escola". Quanto o Windows está pesando hoje (programas
+abertos, bateria) é outra coisa: aparece na mesma aba e na hora de jogar.
+
+Mais detalhes: **documento 3**, parte "O selo de cada jogo".
 
 ---
 

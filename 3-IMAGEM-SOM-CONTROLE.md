@@ -593,14 +593,21 @@ limite da máquina — e o ARENA já está no mínimo.
 
 Cada jogo na lista mostra como vai rodar aqui:
 
-| Selo | O que esperar | Perfil que o ARENA usa |
-|---|---|---|
-| **Bonito e lisinho** (verde) | Sobra máquina | Qualidade |
-| **Feio mas lisinho** (azul) | Roda liso, imagem simples | Desempenho |
-| **Capenga** (vermelho) | Vai travar | Desempenho |
+| Selo | O que esperar |
+|---|---|
+| **Roda bem** (verde) | Sobra máquina |
+| **Roda com ajustes** (azul) | Roda com a imagem que o ARENA escolhe para este PC |
+| **Pode travar** (vermelho) | Abaixo do que o console pede: tente com Gráfico original e Ultra |
+| **Não abre neste PC** (cinza) | Falta algo no processador (o motivo aparece ao parar o mouse) |
 
 Vermelho não impede de tentar. Só avisa antes, para você não achar que
 quebrou.
+
+O selo vem de uma **medição**: a velocidade de um núcleo do processador
+(comparada com o notebook mais fraco da escola) e as instruções que ele
+tem (sem AVX, o Xbox 360 nem abre). O **perfil de imagem automático**
+(Qualidade ou Desempenho, por console) é escolhido à parte e não mudou —
+assim os jogos que já rodavam bem continuam com a mesma imagem.
 
 ### Escolher na mão
 
@@ -1075,7 +1082,9 @@ Faça na ordem. Uma coisa por vez, testando entre elas.
 | 5 | Ajustes → Avançado → **Fila de imagens** para 3 |
 
 Se depois de tudo isso ainda travar, aquele console é grande demais para
-essa máquina. A etiqueta vermelha **Capenga** já avisava.
+essa máquina. A etiqueta vermelha **Pode travar** já avisava. E vale
+olhar Ajustes → Máquina: muitas vezes quem pesa é o Windows (programas
+abertos, bateria), não o computador.
 
 ---
 
