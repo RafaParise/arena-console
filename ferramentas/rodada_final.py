@@ -23,8 +23,9 @@ LIMITE_S = 900  # 15 min por script; o mais lento (5 RetroArch) leva bem menos
 def rodar(caminho_relativo):
     inicio = time.time()
     try:
+        # Sem abrir a tela do ARENA a cada servidor que um teste sobe.
         r = subprocess.run([PYTHON, caminho_relativo], cwd=RAIZ, capture_output=True,
-                           timeout=LIMITE_S)
+                           timeout=LIMITE_S, env=dict(os.environ, ARENA_SEM_JANELA="1"))
         codigo = r.returncode
         saida = (r.stdout + r.stderr).decode("utf-8", "replace")
     except subprocess.TimeoutExpired:

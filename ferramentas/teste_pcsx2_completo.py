@@ -46,9 +46,23 @@ def ler_bloco_gs():
     return valores
 
 
+# Corrigido em 01/10/2026: a versao anterior APAGAVA a pasta de BIOS do
+# PCSX2 para ver o ARENA copiar uma sozinho. Agora a pasta de verdade e'
+# guardada ao lado (bios.guardada-pelo-teste) e volta no fim, como estava.
+GUARDADA = PASTA_BIOS_PCSX2 + ".guardada-pelo-teste"
+
+
+def devolver_bios():
+    if os.path.isdir(GUARDADA):
+        if os.path.isdir(PASTA_BIOS_PCSX2):
+            shutil.rmtree(PASTA_BIOS_PCSX2)     # a copia que o teste fez
+        os.rename(GUARDADA, PASTA_BIOS_PCSX2)
+
+
 def main():
+    devolver_bios()          # sobra de um teste interrompido: devolve antes
     if os.path.isdir(PASTA_BIOS_PCSX2):
-        shutil.rmtree(PASTA_BIOS_PCSX2)
+        os.rename(PASTA_BIOS_PCSX2, GUARDADA)
 
     servidor_proc = subprocess.Popen(
         [os.path.join(RAIZ, "servidor", "python", "python.exe"),
@@ -107,6 +121,8 @@ def main():
             servidor_proc.wait(timeout=5)
         except subprocess.TimeoutExpired:
             servidor_proc.kill()
+        time.sleep(1)        # o PCSX2 solta os arquivos da BIOS
+        devolver_bios()
 
 
 if __name__ == "__main__":

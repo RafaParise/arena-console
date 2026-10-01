@@ -21,9 +21,23 @@ import internet_archive  # noqa: E402
 PASTA_BAIXADA = os.path.join(RAIZ, "jogos", "livres", "Internet Archive")
 
 
+def arquivos_baixados():
+    """Os arquivos que ja estavam na pasta da biblioteca online."""
+    achados = set()
+    for pasta, _sub, nomes in os.walk(PASTA_BAIXADA):
+        achados.update(os.path.join(pasta, n) for n in nomes)
+    return achados
+
+
+# Corrigido em 01/10/2026: a versao anterior APAGAVA a pasta
+# jogos\livres\Internet Archive inteira, no comeco e no fim -- os jogos
+# que o aluno baixou pela biblioteca online iam junto. Agora apaga so o que
+# ESTE teste baixou.
+ANTES = set()
+
+
 def main():
-    if os.path.isdir(PASTA_BAIXADA):
-        shutil.rmtree(PASTA_BAIXADA)
+    ANTES.update(arquivos_baixados())
 
     itens = internet_archive.buscar("game")
     print("Achou %d item(ns) buscando 'game'." % len(itens))
@@ -57,5 +71,10 @@ if __name__ == "__main__":
     try:
         sys.exit(main())
     finally:
-        if os.path.isdir(PASTA_BAIXADA):
-            shutil.rmtree(PASTA_BAIXADA)
+        for caminho in arquivos_baixados() - ANTES:
+            try:
+                os.remove(caminho)
+            except OSError:
+                pass
+        if os.path.isdir(PASTA_BAIXADA) and not os.listdir(PASTA_BAIXADA) and not ANTES:
+            shutil.rmtree(PASTA_BAIXADA, ignore_errors=True)
