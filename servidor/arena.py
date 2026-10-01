@@ -5606,6 +5606,22 @@ def trocar_escuta_de_rede():
     return True
 
 
+def conferir_vulkan():
+    """O automatico escolheu Vulkan porque o vulkan-1.dll carrega; se o
+    Vulkan nao enxergar placa nenhuma, troca para d3d11 (ou glcore) antes
+    do primeiro jogo -- senao o jogo abre e fecha sem explicar."""
+    if MAQUINA.get("driver_video") != "vulkan":
+        return
+    if hardware.vulkan_tem_placa() is False:
+        try:
+            ctypes_ok = __import__("ctypes").CDLL("d3d11.dll") is not None
+        except OSError:
+            ctypes_ok = False
+        MAQUINA["driver_video"] = "d3d11" if ctypes_ok else "glcore"
+        print("[ARENA] O Vulkan desta maquina nao enxerga placa de video: "
+              "motor automatico trocado para %s." % MAQUINA["driver_video"])
+
+
 def principal():
     print("=" * 62)
     print("  ARENA %s - servidor local" % VERSAO)
@@ -5731,6 +5747,9 @@ def principal():
 
     threading.Thread(target=rodar_vigia, daemon=True).start()
     threading.Thread(target=anunciar_e_escutar, daemon=True).start()
+    # Vulkan de verdade? (hardware.vulkan_tem_placa): pergunta em segundo
+    # plano, num processo a parte, depois que a tela ja abriu.
+    threading.Thread(target=conferir_vulkan, daemon=True).start()
     # ARENA_SEM_JANELA=1: so o servidor, sem abrir a tela (testes
     # automaticos -- a rodada completa abria dezenas de janelas -- e quem
     # quiser abrir a tela de outro computador).

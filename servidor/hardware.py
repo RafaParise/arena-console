@@ -568,6 +568,56 @@ def driver_video():
     return "glcore"
 
 
+# Pergunta ao Vulkan, num processo SEPARADO, quantas placas ele enxerga.
+# Por que (achado de 01/10/2026): driver_video() escolhe Vulkan so porque o
+# vulkan-1.dll CARREGA -- e esse arquivo pode ter sobrado de outra placa (o
+# registro do PC do Rafael ainda lembra de uma GeForce 210 que ja saiu).
+# Vulkan sem placa = jogo que abre e fecha na hora. Processo separado porque
+# driver de video velho pode derrubar quem pergunta: cai o ajudante, nao o
+# ARENA. Custa ~0,2 s (Ryzen, frio), por isso roda depois que a tela abriu.
+_PERGUNTA_VULKAN = r"""
+import ctypes
+class Info(ctypes.Structure):
+    _fields_ = [("sType", ctypes.c_int), ("pNext", ctypes.c_void_p), ("flags", ctypes.c_uint32),
+                ("pApplicationInfo", ctypes.c_void_p), ("enabledLayerCount", ctypes.c_uint32),
+                ("ppEnabledLayerNames", ctypes.c_void_p), ("enabledExtensionCount", ctypes.c_uint32),
+                ("ppEnabledExtensionNames", ctypes.c_void_p)]
+vk = ctypes.WinDLL("vulkan-1.dll")
+vk.vkCreateInstance.argtypes = [ctypes.POINTER(Info), ctypes.c_void_p, ctypes.POINTER(ctypes.c_void_p)]
+vk.vkEnumeratePhysicalDevices.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint32), ctypes.c_void_p]
+vk.vkDestroyInstance.argtypes = [ctypes.c_void_p, ctypes.c_void_p]
+inst = ctypes.c_void_p()
+n = ctypes.c_uint32(0)
+if vk.vkCreateInstance(ctypes.byref(Info(sType=1)), None, ctypes.byref(inst)) == 0:
+    vk.vkEnumeratePhysicalDevices(inst, ctypes.byref(n), None)
+    vk.vkDestroyInstance(inst, None)
+print("placas=%d" % n.value)
+"""
+
+
+def vulkan_tem_placa(limite=10):
+    """True/False: o Vulkan enxerga alguma placa de video? None = nao deu
+    para saber (sem Windows, demorou demais) -- quem chama nao muda nada."""
+    if not sys.platform.startswith("win"):
+        return None
+    try:
+        import subprocess
+        r = subprocess.run([sys.executable, "-c", _PERGUNTA_VULKAN], capture_output=True,
+                           text=True, timeout=limite,
+                           creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+    except Exception:          # nao abriu, demorou demais (TimeoutExpired)...
+        return None
+    saida = (r.stdout or "").strip()
+    if saida.startswith("placas="):
+        try:
+            return int(saida.split("=", 1)[1]) > 0
+        except ValueError:
+            return None
+    # Sem resposta: o ajudante caiu dentro do driver (codigo de erro do
+    # Windows) -- Vulkan nao serve nesta maquina.
+    return False if r.returncode != 0 else None
+
+
 def runtime_visual_c():
     """Confere se o Visual C++ Runtime esta presente.
 
