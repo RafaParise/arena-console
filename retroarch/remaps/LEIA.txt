@@ -1,1 +1,2 @@
-Botoes trocados por jogo. Criado pelo RetroArch quando voce salva um remapeamento.
+﻿Botões trocados por jogo. O RetroArch cria quando você salva um
+remapeamento pelo menu dele (Esc).

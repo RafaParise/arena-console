@@ -1,2 +1,5 @@
-Coloque aqui os arquivos de sistema exigidos por algumas plataformas.
-O ARENA nao lista, nao nomeia e nao baixa esses arquivos.
+﻿Arquivos de sistema (BIOS) que alguns consoles exigem: PlayStation 1 e 2,
+Sega CD, Saturn, Neo Geo e outros. A BIOS vem do console de verdade; o
+ARENA não lista, não nomeia e não baixa esses arquivos.
+O cartão do console fica amarelo e diz o que falta. Guia 2-JOGOS.md,
+"A BIOS".

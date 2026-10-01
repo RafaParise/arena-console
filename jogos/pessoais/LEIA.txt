@@ -1,1 +1,3 @@
-Seus jogos. O que voce colocar aqui fica so no seu pendrive.
+﻿Seus jogos. Cada console tem a sua pasta (as pastas já estão aqui).
+O que você colocar aqui fica só no seu pen drive.
+Guia 2-JOGOS.md: que arquivo vai em qual pasta.

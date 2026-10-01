@@ -52,8 +52,9 @@ espalha sozinha por quem está conectado.
 
 ### Passo 1 — Escolha seu apelido
 
-No topo da tela, em **Jogando como**. É por ele que os colegas vão te
-reconhecer.
+Na primeira vez que o ARENA abre, ele pergunta. Para trocar: botão
+**Perfil**, no alto da tela → **Meu perfil** → **Salvar apelido** (ali
+também aparece *Jogando como*). É por ele que os colegas vão te reconhecer.
 
 Apelido, nunca nome completo.
 

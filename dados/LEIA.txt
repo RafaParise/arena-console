@@ -1,1 +1,3 @@
-Arquivos gerados pelo ARENA: banco de recordes, configuracao e catalogo.
+﻿Arquivos que o ARENA cria sozinho: recordes (arena.db), configuração,
+mapa dos controles, lista de jogos e miniaturas das capas.
+Não apague: é aqui que ficam seus recordes e seus ajustes.

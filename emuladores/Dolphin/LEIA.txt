@@ -1,17 +1,12 @@
-DOLPHIN - GameCube e Wii   (opcional)
-=====================================
+﻿DOLPHIN - GameCube e Wii
+========================
 
-O nucleo do RetroArch abre esses consoles, mas o Dolphin de verdade roda
-bem melhor. So instale se voce for jogar GameCube ou Wii.
+O Dolphin já vem nesta pasta (emuladores\Dolphin\Dolphin-x64\Dolphin.exe)
+e não precisa de BIOS. O ARENA configura os controles (até 4 jogadores) e
+a imagem antes de cada jogo.
 
-Atencao: esses dois consoles pedem placa de video boa. Em computador com
-placa integrada, mesmo com o Dolphin, muitos jogos vao ficar lentos.
+ATENÇÃO: esses dois consoles pedem placa de vídeo boa. Com placa
+integrada, muitos jogos ficam lentos.
 
-1. Baixe em:  dolphin-emu.org/download
-2. Pegue a versao Windows x64 (arquivo .7z), nao o instalador.
-3. Descompacte AQUI DENTRO desta pasta.
-
-Tem que ficar assim:
-   emuladores\Dolphin\Dolphin.exe
-
-4. Feche e abra o ARENA.
+Para trocar por uma versão nova: dolphin-emu.org/download, a versão
+portátil (.7z), descompactada aqui dentro.

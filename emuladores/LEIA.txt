@@ -1,14 +1,18 @@
-EMULADORES DE FORA
+﻿EMULADORES DE FORA
 ==================
 
-O ARENA usa o RetroArch para quase tudo. So dois consoles pedem programa
-proprio, e ja existe uma pasta esperando por cada um.
+O ARENA usa o RetroArch para quase tudo. Cinco consoles usam programa
+próprio (são quatro programas), e eles já vêm aqui dentro, prontos:
 
-PCSX2  -> OBRIGATORIO para PlayStation 2
-Dolphin -> opcional, para GameCube e Wii
+  PCSX2    PlayStation 2   (precisa da BIOS do PS2 em retroarch\system)
+  Dolphin  GameCube e Wii
+  RPCS3    PlayStation 3   (precisa do firmware oficial instalado nele)
+  Xenia    Xbox 360        (precisa de processador com AVX)
 
-Baixe sempre a versao PORTATIL (.7z ou .zip), nunca o instalador. Assim
-continua tudo dentro da pasta do ARENA, sem instalar nada no Windows e sem
-senha de administrador.
+Todos ficam "portáteis": guardam configuração e saves aqui dentro, sem
+instalar nada no Windows e sem senha de administrador. O ARENA escreve a
+configuração deles antes de cada jogo (controles, imagem, rede).
 
-Veja o documento 4 para o passo a passo.
+Para trocar por uma versão nova: baixe sempre a versão PORTÁTIL (.7z ou
+.zip), nunca o instalador. Guia 2-JOGOS.md, "Consoles que pedem programa
+próprio".

@@ -1,1 +1,1 @@
-Os 10 save states de cada jogo ficam aqui.
+﻿Os save states (F2 salva, F4 volta) ficam aqui: 10 por jogo.

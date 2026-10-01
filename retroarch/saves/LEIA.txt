@@ -1,1 +1,3 @@
-Os saves proprios dos jogos ficam aqui.
+﻿Os saves dos próprios jogos (o "salvar" de dentro do jogo e os cartões de
+memória) ficam aqui. É o que dói perder: o ARENA copia esta pasta para
+backup\ quando você fecha um jogo.

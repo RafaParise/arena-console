@@ -13,7 +13,8 @@ pasta para outro computador, levou tudo junto.
 Abre uma janela preta. **Não feche ela.** É ela que faz o ARENA funcionar.
 
 **2.** O ARENA abre sozinho na tela.
-Escreva seu apelido lá em cima, onde diz *Jogando como*.
+Na primeira vez, ele pergunta seu apelido (é o nome dos seus recordes).
+Para trocar depois: botão **Perfil**, no alto, → **Meu perfil**.
 
 **3.** Clique num jogo.
 Ele abre em alguns segundos.

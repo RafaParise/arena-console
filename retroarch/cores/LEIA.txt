@@ -1,1 +1,1 @@
-Os nucleos (.dll) do RetroArch ficam aqui.
+﻿Os núcleos (.dll) do RetroArch: um por console. Não apague nem renomeie.

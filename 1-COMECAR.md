@@ -333,8 +333,10 @@ ARENA\
 │   ├── diagnostico.py      verificar e consertar
 │   └── python\             runtime que viaja junto
 ├── emuladores\
-│   ├── PCSX2\              PlayStation 2 (obrigatório)
-│   └── Dolphin\            GameCube e Wii (opcional)
+│   ├── PCSX2\              PlayStation 2 (precisa da BIOS do PS2)
+│   ├── Dolphin\            GameCube e Wii
+│   ├── RPCS3\              PlayStation 3 (precisa do firmware)
+│   └── Xenia\              Xbox 360 (precisa de AVX)
 ├── retroarch\
 │   ├── cores\              emuladores
 │   ├── system\             BIOS (documento 2)

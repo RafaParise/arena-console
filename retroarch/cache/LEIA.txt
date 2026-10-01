@@ -1,2 +1,2 @@
-Pasta temporária que o RetroArch usa para descompactar jogos em .zip.
+﻿Pasta temporária do RetroArch (descompactar jogo em .zip, por exemplo).
 Pode ser esvaziada a qualquer momento sem perder nada.

@@ -427,69 +427,37 @@ servidor da sala.
 
 ## Parte B — Consoles que pedem programa próprio
 
-O PlayStation 2 não abre pelo RetroArch. Isso não é defeito do ARENA nem do
-seu computador.
+Cinco consoles não abrem pelo RetroArch, e sim por um programa próprio — o
+mesmo que a comunidade de cada console mantém. **Os quatro programas já vêm
+na pasta do ARENA**, prontos: o ARENA chama cada um sozinho e escreve a
+configuração dele antes de cada jogo (controles, imagem, rede).
 
----
+| Console | Programa | O que mais precisa |
+|---|---|---|
+| PlayStation 2 | PCSX2 | a BIOS do PS2 em `retroarch\system` (ver "A BIOS") |
+| GameCube e Wii | Dolphin | nada |
+| PlayStation 3 | RPCS3 | o firmware oficial, instalado uma vez (abaixo) |
+| Xbox 360 | Xenia Canary | processador com AVX e computador forte |
 
-### O que está acontecendo
+Ao abrir um jogo, o aviso diz por qual programa: *"Abrindo Black pelo
+PCSX2"*. Em **Ajustes → Emuladores** você vê a lista, com "em uso" ao lado
+de cada um — e o que falta, se faltar. Enquanto falta a BIOS do PS2 ou o
+firmware do PS3, o cartão do console fica **amarelo** e diz o que fazer.
 
-O RetroArch roda cada console através de um "núcleo". A maioria é excelente.
-O núcleo de PlayStation 2 é a exceção: é pouco mantido, exige a BIOS numa
-pasta específica e, quando algo não bate, **fecha sem dizer nada**.
+**Por que não pelo RetroArch?** O núcleo de PS2 dele é pouco mantido e fecha
+sem dizer nada quando algo não bate; PS3 e Xbox 360 nem têm núcleo.
+PlayStation 1 e PSP continuam pelo RetroArch (o PS1 pelo **SwanStation**,
+que nasceu do DuckStation — por isso esse nome aparece em alguns lugares).
 
-É exatamente o sintoma: você clica, aparece "Abrindo...", e nada acontece.
+#### Trocar por uma versão nova
 
-A solução é usar o **PCSX2 de verdade** — o programa que a própria equipe do
-PlayStation 2 mantém. O ARENA passa a chamar ele sozinho.
-
----
-
-### Passo a passo
-
-#### 1. Baixe o emulador
-
-**Só dois.** O RetroArch dá conta de todo o resto, inclusive PlayStation 1
-(o núcleo dele é o **SwanStation** — nasceu como um fork do DuckStation,
-por isso o nome aparece em alguns lugares, mas quem roda o jogo é o
-SwanStation) e PSP.
-
-| Console | Programa | Precisa? | Onde |
-|---|---|---|---|
-| **PlayStation 2** | PCSX2 | **Sim, obrigatório** | `pcsx2.net/downloads` |
-| GameCube e Wii | Dolphin | Opcional | `dolphin-emu.org/download` |
-
-**Pegue sempre a versão portátil** (`.7z` ou `.zip`), nunca o instalador.
-Assim continua tudo dentro da pasta do ARENA, sem instalar nada no Windows
-e sem senha de administrador.
-
-No PCSX2, o arquivo certo é o **Windows 64-bit AVX2 — Portable**.
-
-#### 2. Descompacte na pasta que já existe
-
-O ARENA já criou as pastas, cada uma com um `LEIA.txt` dizendo o que baixar:
-
-```
-ARENA\emuladores\PCSX2\
-ARENA\emuladores\Dolphin\
-```
-
-Descompacte dentro. Tem que ficar assim:
-
-```
-ARENA\emuladores\PCSX2\pcsx2-qt.exe
-ARENA\emuladores\Dolphin\Dolphin.exe
-```
-
-Se o programa vier dentro de uma subpasta com o número da versão, tudo bem —
-o ARENA procura um nível abaixo também.
-
-#### 3. Feche e abra o ARENA
-
-Pronto. Em **Ajustes → Emuladores** você vê a lista, com "em uso" ao lado de
-cada um que ele encontrou.
-
-Ao abrir um jogo, o aviso diz por qual programa: *"Abrindo Black pelo PCSX2"*.
+Baixe sempre a versão **portátil** (`.7z` ou `.zip`), nunca o instalador, e
+descompacte por cima da pasta que já existe (`emuladores\PCSX2\`,
+`emuladores\Dolphin\`, `emuladores\RPCS3\`, `emuladores\Xenia\`). Se
+vier dentro de uma subpasta com o número da versão, tudo bem: o ARENA
+procura um nível abaixo também. Feche e abra o ARENA. Assim continua tudo
+dentro da pasta do ARENA, sem instalar nada no Windows e sem senha de
+administrador.
 
 #### GameCube e Wii pelo Dolphin: controles e pasta
 

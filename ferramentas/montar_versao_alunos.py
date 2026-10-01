@@ -267,32 +267,35 @@ def montar(destino, com_bios=False):
         with open(os.path.join(xenia, "portable.txt"), "w", encoding="utf-8") as f:
             f.write("Criado pelo ARENA: guarda tudo do Xenia nesta pasta.\n")
 
-    # 5. Uma folha de rosto.
-    with open(os.path.join(destino, "LEIA-PRIMEIRO.txt"), "w", encoding="utf-8") as f:
-        f.write(FOLHA_DE_ROSTO.format(bios="ja vem com as BIOS que o professor escolheu incluir" if com_bios
-                                      else "NAO vem com BIOS nem firmware (sao da Sony, Sega, SNK...)"))
+    # 5. Uma folha de rosto (UTF-8 com marca: o Bloco de Notas antigo
+    # tambem mostra os acentos).
+    with open(os.path.join(destino, "LEIA-PRIMEIRO.txt"), "w", encoding="utf-8-sig") as f:
+        f.write(FOLHA_DE_ROSTO.format(bios=BIOS_INCLUIDA if com_bios else BIOS_FORA))
     return usados
 
 
-FOLHA_DE_ROSTO = """ARENA - versao para os alunos
-==============================
+BIOS_FORA = "Esta versão NÃO vem com BIOS nem firmware (são da Sony, da Sega, da SNK...)."
+BIOS_INCLUIDA = "Esta versão já vem com as BIOS que o professor escolheu incluir."
+FOLHA_DE_ROSTO = """ARENA — versão para os alunos
+=============================
 
 1. Copie esta pasta inteira para o pen drive (formatado em exFAT) ou para o
    computador. Pode renomear a pasta para ARENA.
-2. Abra o ARENA.bat. Na primeira vez o Windows pode perguntar se deixa o
-   Python usar a rede: so precisa para jogar com os colegas.
-3. Coloque seus jogos em jogos\\pessoais\\<console> (as pastas ja estao la).
+2. Abra o ARENA.bat. Na primeira vez, o Windows pode perguntar se deixa o
+   Python usar a rede: só precisa para jogar com os colegas.
+3. Coloque seus jogos em jogos\\pessoais\\<console> (as pastas já estão lá).
    O guia 2-JOGOS.md explica cada console.
 
-Esta versao {bios}. Consoles que precisam de BIOS (PlayStation 1 e 2, Sega
-CD, Saturn, Neo Geo...) mostram na tela o que falta. Os arquivos vao em
-retroarch\\system (guia 2-JOGOS.md, "BIOS"). PS3: o firmware vai pelo
-proprio RPCS3 (File > Install Firmware).
+{bios}
+Os consoles que precisam de BIOS (PlayStation 1 e 2, Sega CD, Saturn,
+Neo Geo...) mostram na tela o que falta. Os arquivos vão em
+retroarch\\system (guia 2-JOGOS.md, "A BIOS"). PS3: o firmware vai pelo
+próprio RPCS3 (File > Install Firmware).
 
-Nao vem nada de quem preparou: nem jogos, nem saves, nem recordes, nem
-amigos, nem configuracao. Cada aluno comeca do zero.
+Não vem nada de quem preparou: nem jogos, nem saves, nem recordes, nem
+amigos, nem configuração. Cada aluno começa do zero.
 
-Problema? VERIFICAR.bat confere e conserta. Duvida? LEIA-ME.md.
+Problema? O VERIFICAR.bat confere e conserta. Dúvida? LEIA-ME.md.
 """
 
 

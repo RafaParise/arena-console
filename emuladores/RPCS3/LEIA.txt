@@ -1,28 +1,12 @@
-RPCS3 - PlayStation 3   (OBRIGATORIO para PS3)
-===============================================
+﻿RPCS3 - PlayStation 3
+=====================
 
-Nao existe nucleo de PlayStation 3 no RetroArch. Sem o RPCS3, jogo de
-PS3 nem aparece como pronto para jogar.
+O RPCS3 já vem nesta pasta (emuladores\RPCS3\RPCS3\rpcs3.exe). Não existe
+núcleo de PS3 no RetroArch: só o RPCS3 emula este console.
 
-ATENCAO: PS3 exige computador FORTE. Nao roda em maquina fraca
-(Celeron, 4 GB de RAM, placa de video integrada fraca).
+Falta o firmware oficial do PS3 (arquivo PS3UPDAT.PUP, do site da
+PlayStation), instalado UMA vez pela tela do próprio RPCS3:
+File > Install Firmware. Sem ele, o cartão do PS3 fica amarelo.
 
-1. Baixe em:  rpcs3.net/download
-2. Pegue a versao para Windows (.7z ou .zip, portatil).
-3. Descompacte AQUI DENTRO desta pasta.
-
-Tem que ficar assim:
-   emuladores\RPCS3\rpcs3.exe
-
-Se vier dentro de uma subpasta, tudo bem:
-   emuladores\RPCS3\RPCS3-vX.X.X\rpcs3.exe
-
-4. Feche e abra o ARENA. Em Ajustes > Emuladores vai aparecer "em uso".
-
-A primeira vez que o RPCS3 abre, ele pede o firmware da PS3 (arquivo
-PS3UPDAT.PUP) - baixe pelo site oficial da Sony e instale pela tela do
-proprio RPCS3, na opcao "Install Firmware".
-
-AVISO: o comando que o ARENA usa para abrir o jogo pelo RPCS3 ainda nao
-foi testado contra o programa de verdade - vem da documentacao publica
-dele. Se o jogo nao abrir do jeito esperado, avise para ajustar.
+ATENÇÃO: PS3 exige computador forte. Em notebook com Celeron e placa
+integrada, não roda.
