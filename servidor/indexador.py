@@ -66,6 +66,80 @@ RE_BIOS_NA_PASTA = re.compile(
     r"([ ._-].*)?\.(zip|7z)$", re.I)
 
 
+# ---------------------------------------------------------------------------
+# Jogo de varios discos (ou disquetes) vira um jogo so
+# ---------------------------------------------------------------------------
+# "Final Fantasy VII (USA) (Disc 1).chd", "(Disc 2)", "(Disc 3)" apareciam
+# como tres jogos, e trocar de disco no meio exigia sair. Agora: um cartao
+# so, e na hora de abrir o ARENA monta uma lista .m3u (o jeito do RetroArch
+# de trocar de disco sem sair: menu -> Controle de disco). So nos consoles
+# cujo nucleo aceita .m3u (conferido no .info do nucleo); nos outros, cada
+# disco continua sendo um jogo.
+# "Disk1", "Disc 2", "(Disco 1 de 3)", "CD 2"; "CD32" e "Sonic CD" nao contam.
+RE_DISCO = re.compile(
+    r"^(?P<base>.*?)[\s_\-]*[\(\[]?\s*(?:(?:disk|disc|disco)[\s_\-]*|cd[\s_\-]+)(?P<n>[1-9]|1[0-9])"
+    r"(?!\d)(?:\s*(?:of|de)\s*\d{1,2})?\s*[\)\]]?(?P<resto>.*)$", re.I)
+_m3u_por_nucleo = {}
+
+
+def nucleo_aceita_m3u(core):
+    """O nucleo diz, no proprio .info, que abre lista de discos (.m3u)?"""
+    core = (core or "").lower()
+    if core not in _m3u_por_nucleo:
+        info = os.path.join(RAIZ, "retroarch", "info", os.path.splitext(core)[0] + ".info")
+        aceita = False
+        try:
+            for linha in open(info, encoding="utf-8", errors="replace"):
+                if linha.strip().startswith("supported_extensions"):
+                    lista = linha.split("=", 1)[1].strip().strip('"').lower().split("|")
+                    aceita = "m3u" in lista
+                    break
+        except OSError:
+            pass
+        _m3u_por_nucleo[core] = aceita
+    return _m3u_por_nucleo[core]
+
+
+def agrupar_discos(itens, por_id):
+    """Junta, NA MESMA PASTA, os discos do mesmo jogo num cartao so (o do
+    menor disco, que passa a ter "discos": a lista). Devolve a lista nova."""
+    grupos = {}
+    for item in itens:
+        plataforma = por_id.get(item["plataforma"]) or {}
+        if plataforma.get("externo") or not nucleo_aceita_m3u(plataforma.get("core")):
+            continue
+        base = os.path.splitext(os.path.basename(item["arquivo"]))[0]
+        m = RE_DISCO.match(base)
+        if not m:
+            continue
+        # "Disc 1.chd" dentro da pasta do jogo: nome vazio, o titulo ja veio
+        # da pasta (titulo_do_jogo) e continua valendo.
+        nome = (m.group("base").strip(" _-.") + " " + m.group("resto").strip()).strip()
+        chave = (item["plataforma"], nome.lower(), os.path.splitext(item["arquivo"])[1].lower())
+        grupos.setdefault(chave, []).append((int(m.group("n")), item, nome))
+    sai = set()
+    for membros in grupos.values():
+        membros.sort(key=lambda x: x[0])
+        numeros = [n for n, _i, _nome in membros]
+        _n, primeiro, nome = membros[0]
+        titulo = limpar_titulo(nome + ".x") if nome else primeiro["titulo"]
+        avisos = primeiro.setdefault("avisos", [])
+        if len(membros) >= 2:
+            primeiro["discos"] = [i["arquivo"] for _n, i, _m in membros]
+            primeiro["titulo"] = titulo
+            primeiro["ordenacao"] = chave_ordenacao(titulo)
+            primeiro["tamanho_mb"] = round(sum(i.get("tamanho_mb", 0) for _n, i, _m in membros), 1)
+            for _n, outro, _m in membros[1:]:
+                sai.add(id(outro))
+        faltam = [n for n in range(1, max(numeros) + 1) if n not in numeros]
+        if faltam:
+            avisos.append({"texto": "Falta o disco %s deste jogo na pasta. %s" % (
+                ", ".join(str(n) for n in faltam),
+                "O jogo começa pelo disco 1." if 1 in faltam else
+                "Na hora de trocar de disco, ele não vai estar lá.")})
+    return [i for i in itens if id(i) not in sai]
+
+
 def discos_de_fliperama_zipados(pasta_atual, arquivos):
     """{romset: arquivo.zip} dos .zip que so tem .chd dentro (kinst-chd.zip
     -> {"kinst": "kinst-chd.zip"}). So abre zip com "chd" no nome: ler o
@@ -134,9 +208,10 @@ def chd_de_fliperama(pasta_atual):
 # .chd).
 PREFERENCIA_DISCO = (".chd", ".gdi", ".cue", ".iso", ".bin")
 
-# Nome de arquivo que nao diz qual e o jogo ("disc.gdi", "track01.bin"):
-# o titulo vem da pasta.
-RE_NOME_GENERICO = re.compile(r"^(disc|disco|game|jogo|track ?\d*)$", re.I)
+# Nome de arquivo que nao diz qual e o jogo ("disc.gdi", "track01.bin",
+# "Disc 2.chd", "CD1.cue" -- os dois ultimos, comuns em jogo de varios
+# discos, entraram em 01/10/2026): o titulo vem da pasta.
+RE_NOME_GENERICO = re.compile(r"^(dis[ck]|disco|game|jogo|track|cd) ?\d{0,2}$", re.I)
 
 
 def trilhas_dos_indices(pasta, arquivos):
@@ -293,7 +368,7 @@ def arquivo_de_jogadores():
 # (ex.: o jogo de CD em trilhas virar um jogo so) nao valia num ARENA que ja
 # tinha a lista salva, ate alguma pasta mudar. 2 = nomes de fliperama pelos
 # bancos do RetroArch + avisos do jogo.
-VERSAO_INDICE = 3     # 3 = tamanho com mais casas nos jogos pequenos
+VERSAO_INDICE = 4     # 4 = discos do mesmo jogo num cartao so
 
 
 def assinatura_das_pastas():
@@ -531,6 +606,7 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None,
         if chd_de_fliperama(pasta_atual):
             continue   # disco de um romset de fliperama, nao um jogo
         trilhas = trilhas_dos_indices(pasta_atual, arquivos)
+        inicio_da_pasta = len(encontrados)
         # Disco (.chd) de fliperama zipado: kinst-chd.zip com o kinst.chd
         # dentro. Nao e' um jogo -- e o MAME nao le .chd de dentro de .zip.
         # Sai da lista e vira aviso no jogo dele (o kinst.zip).
@@ -693,6 +769,9 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None,
                 # romset montado de um jeito que o emulador nao le.
                 "avisos": avisos,
             })
+
+        # Discos do mesmo jogo, nesta pasta: um cartao so.
+        encontrados[inicio_da_pasta:] = agrupar_discos(encontrados[inicio_da_pasta:], por_id)
 
     return encontrados
 

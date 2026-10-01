@@ -677,9 +677,15 @@ function desenharDetalhes() {
   desenharAvisosDoJogo(jogo);
   $("#detalhesTitulo").textContent = jogo.titulo;
   $("#detalhesConsole").textContent = jogo.plataforma_nome;
-  $("#detalhesDescricao").textContent = plataforma.descricao || "Jogo da biblioteca do ARENA.";
+  // Jogo de varios discos (um cartao so, servidor\indexador.py): o aluno
+  // precisa saber como trocar de disco sem sair do jogo.
+  const discos = Array.isArray(jogo.discos) ? jogo.discos.length : 0;
+  $("#detalhesDescricao").textContent = discos > 1
+    ? `Jogo de ${discos} discos. Quando ele pedir o próximo, aperte Esc e use ` +
+      "Controle de disco: ejetar, escolher o disco e inserir — sem sair do jogo."
+    : (plataforma.descricao || "Jogo da biblioteca do ARENA.");
   $("#detalhesPlataforma").textContent = jogo.plataforma_nome;
-  $("#detalhesTamanho").textContent = formatarMb(jogo.tamanho_mb);
+  $("#detalhesTamanho").textContent = formatarMb(jogo.tamanho_mb) + (discos > 1 ? ` · ${discos} discos` : "");
   $("#detalhesOrigem").textContent = jogo.origem_rotulo;
   const capa = $("#detalhesCapa");
   capa.className = `detalhes-capa capa-${classeDaCapa(jogo.plataforma_nome)}`;

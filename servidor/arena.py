@@ -21,6 +21,7 @@ import binascii
 import contextlib
 import errno
 import hashlib
+import ipaddress
 import json
 import os
 import shutil
@@ -2296,6 +2297,12 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
 
         print("[ARENA] Abrindo pelo %s" % jogo["externo"]["dados"]["nome"])
     else:
+        # Jogo de varios discos: a lista .m3u (indexador.agrupar_discos).
+        # Na partida a dois, nao: abre o disco 1 como sempre (o caminho
+        # testado). Trocar de disco no meio dessincroniza os dois lados, e
+        # jogo de varios discos e' quase sempre de um jogador so (RPG).
+        if not partida:
+            caminho_jogo = lista_de_discos(jogo, caminho_jogo)
         extra = dict(partida["opcoes"]) if partida else None
         # Mais de 2 jogadores (graficos.jogadores_do_jogo, calculado no
         # /api/jogar). Entra POR ULTIMO, depois das opcoes de controle:
@@ -3151,6 +3158,10 @@ def gravar_enderecos_de_amigos(amigos_atualizados):
     return mudou
 
 
+ENDERECO_ESTRANHO = ("Esse endereço não parece certo. Use o que aparece no "
+                     "ARENA dele, como 192.168.0.15:8777.")
+
+
 def servidor_alcancavel(url):
     """Testa se o servidor da sala responde, sem travar a interface."""
     url = normalizar_url(url)
@@ -3161,7 +3172,7 @@ def servidor_alcancavel(url):
         with socket.create_connection(
                 (partes.hostname, partes.port or PORTA_PADRAO), timeout=1.2):
             return True
-    except OSError:
+    except (OSError, UnicodeError, ValueError):
         return False
 
 
@@ -3235,15 +3246,49 @@ def marcar_enviados(placares, sessoes):
                                 [(s["uuid"],) for s in sessoes])
 
 
+def nome_de_maquina_valido(nome):
+    """IP ou nome de computador que da para procurar na rede.
+
+    Achado de 01/10/2026 (fuzz): um "endereco" de 2 MB chegava ate o
+    socket, que estourava com erro de codificacao do nome (cada pedaco
+    entre pontos tem no maximo 63 letras) -- erro interno na tela. Aceita
+    letra de qualquer lingua, numero, - e _ (nome de computador do Windows
+    pode ter _)."""
+    nome = (nome or "").rstrip(".")
+    if not nome or len(nome) > 253:
+        return False
+    try:
+        ipaddress.ip_address(nome)
+        return True
+    except ValueError:
+        pass
+    for parte in nome.split("."):
+        if not 1 <= len(parte) <= 63 or parte[0] == "-" or parte[-1] == "-":
+            return False
+        if not all(c.isalnum() or c in "-_" for c in parte):
+            return False
+    return True
+
+
 def normalizar_url(url):
-    """Aceita '192.168.0.15', '192.168.0.15:8777' ou o endereco completo."""
-    url = (url or "").strip().rstrip("/")
-    if not url:
+    """Aceita '192.168.0.15', '192.168.0.15:8777' ou o endereco completo.
+
+    Endereco que nao da para usar -- nome com espaco ou gigante, porta que
+    nao e' numero, texto que nem e' texto -- vira "", e quem chama ja trata
+    "" como "sem endereco"."""
+    url = (url if isinstance(url, str) else "").strip().rstrip("/")
+    if not url or len(url) > 300:
         return ""
     if not url.startswith(("http://", "https://")):
         url = "http://" + url
-    partes = urllib.parse.urlsplit(url)
-    if ":" not in partes.netloc:
+    try:
+        partes = urllib.parse.urlsplit(url)
+        porta = partes.port         # porta que nao e' numero: ValueError
+    except ValueError:
+        return ""
+    if not nome_de_maquina_valido(partes.hostname):
+        return ""
+    if porta is None:
         url = "%s://%s:%d" % (partes.scheme, partes.netloc, PORTA_PADRAO)
     return url
 
@@ -3785,9 +3830,14 @@ class Manipulador(BaseHTTPRequestHandler):
         para achar a causa, mas com o "o que fazer" na frente."""
         if isinstance(falha, (OSError, urllib.error.URLError)):
             return self.erro(traduzir_erro_do_sistema(falha, "concluir o pedido"), 500)
-        print("[ARENA] Erro interno: %r" % (falha,))
+        # Curto: um erro que carrega o pedido inteiro (2 MB, no fuzz de
+        # 01/10/2026) enchia a janela preta e a tela.
+        detalhe = repr(falha)
+        if len(detalhe) > 300:
+            detalhe = detalhe[:300] + "..."
+        print("[ARENA] Erro interno: %s" % detalhe)
         return self.erro("Algo deu errado aqui dentro do ARENA. Tente de novo; "
-                         "se continuar, chame o professor e mostre isto: %s" % falha, 500)
+                         "se continuar, chame o professor e mostre isto: %s" % detalhe, 500)
 
     LIMITE_CORPO = 4 * 1024 * 1024
 
@@ -4452,7 +4502,8 @@ class Manipulador(BaseHTTPRequestHandler):
 
         # ---- conferir se a partida a dois tem caminho ---------------------
         if caminho == "/api/partida/testar":
-            alvo = normalizar_url(str(dados.get("endereco", "")))
+            bruto = str(dados.get("endereco", "")).strip()
+            alvo = normalizar_url(bruto)
             partes = urllib.parse.urlsplit(alvo)
             endereco = partes.hostname or ""
             # A porta vem do endereco que o colega passou. Usar a porta
@@ -4460,7 +4511,7 @@ class Manipulador(BaseHTTPRequestHandler):
             # o mesmo - e a resposta seria sempre "sim".
             porta_dele = partes.port or PORTA
             if not endereco:
-                return self.erro("Informe o endereço do colega.")
+                return self.erro(ENDERECO_ESTRANHO if bruto else "Informe o endereço do colega.")
 
             resultado = {"endereco": endereco, "arena": False,
                          "partida": False, "arquivo": None}
@@ -4475,7 +4526,7 @@ class Manipulador(BaseHTTPRequestHandler):
             # reusando o IP, o custo de um endereco ruim cai pela metade.
             try:
                 ip = socket.gethostbyname(endereco)
-            except OSError:
+            except (OSError, UnicodeError):
                 resultado["diagnostico"] = (
                     "Não alcanço o computador dele. Confira o endereço, e se "
                     "ele ligou 'Aceitar conexões da rede' e reabriu o ARENA.")
@@ -4880,6 +4931,10 @@ class Manipulador(BaseHTTPRequestHandler):
                 return self.erro("Escreva o apelido do amigo.")
             if not url:
                 return self.erro("Escreva o endereço do ARENA dele.")
+            if not normalizar_url(url):
+                # Antes gravava qualquer coisa, e o amigo ficava "fora do
+                # ar" para sempre, sem dizer por que.
+                return self.erro(ENDERECO_ESTRANHO)
             if len(config["servidores"]) >= 20:
                 return self.erro("Limite de 20 amigos.")
             if any(a["apelido"].lower() == apelido.lower()
@@ -4910,9 +4965,10 @@ class Manipulador(BaseHTTPRequestHandler):
                                         "servidores": config["servidores"]})
 
         if caminho == "/api/amigo/testar":
-            url = normalizar_url(str(dados.get("url", "")))
+            bruto = str(dados.get("url", "")).strip()
+            url = normalizar_url(bruto)
             if not url:
-                return self.erro("Endereço vazio.")
+                return self.erro(ENDERECO_ESTRANHO if bruto else "Endereço vazio.")
             try:
                 retorno = falar_com(url, "/api/sinc/ola", {}, "POST", 4)
             except Exception:
@@ -5173,7 +5229,8 @@ class Manipulador(BaseHTTPRequestHandler):
                 assistir = (modo == "assistir")
                 endereco = ""
                 if not hospedar:
-                    endereco = normalizar_url(dados.get("endereco", ""))
+                    bruto = str(dados.get("endereco", "") or "").strip()
+                    endereco = normalizar_url(bruto)
                     endereco = urllib.parse.urlsplit(endereco).hostname or ""
                     if not endereco:
                         # Ja marcamos a trava acima: soltar antes de sair,
@@ -5181,7 +5238,8 @@ class Manipulador(BaseHTTPRequestHandler):
                         with TRAVA_JOGO:
                             JOGO_EM_ANDAMENTO["ativo"] = False
                             JOGO_EM_ANDAMENTO["titulo"] = ""
-                        return self.erro("Informe o endereço de quem está "
+                        return self.erro(ENDERECO_ESTRANHO if bruto else
+                                         "Informe o endereço de quem está "
                                          "hospedando a partida.")
                 pela_internet = bool(dados.get("pela_internet"))
                 # Quantos cabem vem da ligacao acima: o que o jogo aceita,
@@ -5656,6 +5714,33 @@ def trocar_escuta_de_rede():
 
     threading.Thread(target=encerrar_depois_da_resposta, daemon=True).start()
     return True
+
+
+PASTA_M3U = os.path.join(PASTA_DADOS, "m3u")
+
+
+def lista_de_discos(jogo, caminho_jogo):
+    """Jogo de varios discos ("discos" no indice): grava dados\\m3u\\<nome do
+    disco 1>.m3u com os discos, um por linha, e abre ELA -- o RetroArch troca
+    de disco sem sair do jogo (menu -> Controle de disco).
+
+    O nome e' o do disco 1 de proposito: o save e o memory card ficam com o
+    MESMO nome de quando o aluno abria o disco 1 sozinho, entao nada some.
+    Nucleo que nao aceita .m3u, ou disco que sumiu: abre o disco 1 como
+    antes."""
+    discos = jogo.get("discos") or []
+    if len(discos) < 2 or not indexador.nucleo_aceita_m3u(jogo.get("core")):
+        return caminho_jogo
+    caminhos = [os.path.join(RAIZ, d) for d in discos]
+    if not all(os.path.isfile(c) and dentro_da_pasta(c, PASTA_JOGOS) for c in caminhos):
+        return caminho_jogo
+    destino = os.path.join(PASTA_M3U, os.path.splitext(os.path.basename(caminhos[0]))[0] + ".m3u")
+    try:
+        os.makedirs(PASTA_M3U, exist_ok=True)
+        gravar_texto_atomico(destino, "\n".join(caminhos) + "\n")
+    except OSError:
+        return caminho_jogo
+    return destino
 
 
 def conferir_vulkan():

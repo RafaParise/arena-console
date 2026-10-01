@@ -208,6 +208,30 @@ def main():
             problemas.append("F text/plain foi aceito (%s)" % status)
         confere("F. metodo, caminho e cabecalho estranhos: tratados", len(problemas) == antes,
                 "; ".join(problemas[antes:antes + 4]))
+
+        # G. Endereco estranho nas rotas que procuram outro computador. O C
+        # pula essas rotas (demoram: vao para a rede), e foi por ai que
+        # passou o achado do fuzz de 01/10/2026: 2 MB ou emoji no endereco =
+        # erro 500. Agora sao recusados ANTES da rede, entao sao rapidos.
+        antes = len(problemas)
+        estranhos = ["a" * 2_000_000, "\U0001F3AE" * 300, "olá mundo", "[::1", "192.168.0.5:abc",
+                     "192.168.0.5:99999", "-pc-", "a..b", "x" * 64 + ".com", "@", "pc\x00lab", "a b:8777"]
+        for caminho, campo, resto in (("/api/partida/testar", "endereco", {}),
+                                      ("/api/amigo/testar", "url", {}),
+                                      ("/api/amigo/adicionar", "url", {"apelido": "Estranho"})):
+            for ruim in estranhos:
+                inicio = time.time()
+                status, texto = pedido("POST", caminho, dict(resto, **{campo: ruim}))
+                rotulo = "G %s %s=%r" % (caminho, campo, ruim[:15])
+                julgar(rotulo, status, texto)
+                if status is not None and status < 400:
+                    problemas.append("%s: aceito (%s)" % (rotulo, status))
+                if time.time() - inicio > 2:
+                    problemas.append("%s: levou %.1f s (devia recusar na hora)" % (rotulo, time.time() - inicio))
+        if any(a.get("apelido") == "Estranho" for a in arena.carregar_config().get("servidores", [])):
+            problemas.append("G amigo com endereco estranho foi gravado")
+        confere("G. %d enderecos estranhos em 3 rotas de rede: recusados na hora, sem erro 500"
+                % len(estranhos), len(problemas) == antes, "; ".join(problemas[antes:antes + 4]))
         confere("o servidor continua de pe no fim", vivo())
     finally:
         if servidor:

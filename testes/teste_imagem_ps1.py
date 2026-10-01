@@ -58,6 +58,9 @@ def gravar_cfg(caminho, chaves):
 
 
 def main():
+    if len(sys.argv) < 5:
+        print(__doc__)     # ferramenta de investigacao: sem os arquivos, so o uso
+        return 2
     partida, opcoes, jogo, saida = sys.argv[1:5]
     jogo = os.path.abspath(jogo)   # o RetroArch roda dentro de retroarch\
     if not os.path.isfile(jogo):

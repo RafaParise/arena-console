@@ -153,6 +153,26 @@ mesma pasta, de preferência uma pasta com o nome do jogo.
 - A BIOS do Neo Geo (`neogeo.zip`) não aparece como jogo, mesmo se estiver
   na pasta dos jogos.
 
+#### Jogo de vários discos
+
+Jogo que saiu em mais de um disco — `Final Fantasy VII (USA) (Disc 1).chd`,
+`(Disc 2)`, `(Disc 3)`; ou disquetes, `Jogo_Disk1.adf`, `Jogo_Disk2.adf` —
+aparece **uma vez só**, com "3 discos" ao lado do tamanho. Ao abrir, o ARENA
+entrega os discos todos ao emulador. Quando o jogo pedir o próximo:
+**Esc → Controle de disco → ejetar, escolher o disco e inserir**, sem sair
+do jogo.
+
+- Os discos precisam estar **na mesma pasta**, com o mesmo nome e o mesmo
+  formato, mudando só o número (`Disc 1`, `Disk 2`, `Disco 3`, `CD 2`).
+- Se faltar um disco, o jogo mostra o aviso "Falta o disco 2...".
+- O save continua com o nome do disco 1: quem já jogava o disco 1 sozinho
+  não perde nada.
+- Vale nos consoles cujo emulador aceita lista de discos: PlayStation,
+  Sega CD, Saturn, Dreamcast, PC Engine CD, Amiga, Commodore 64, MSX,
+  Amstrad e DOS. Nos outros (3DO, PC-FX), cada disco continua sendo um jogo.
+- No **Jogar Junto** abre só o disco 1: trocar de disco no meio da partida
+  desencontra os dois computadores.
+
 #### Fliperama: Neo Geo e Arcade (MAME)
 
 São dois consoles diferentes no ARENA, cada um com o seu emulador:
