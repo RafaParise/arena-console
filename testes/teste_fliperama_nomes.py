@@ -78,6 +78,13 @@ def main():
     if os.path.isfile(os.path.join(nomes_arcade.PASTA_RDB, "MAME.rdb")):
         confere("kinst.zip = Killer Instinct (banco do MAME)",
                 nomes_arcade.nome_do_romset("kinst.zip", "mame") == "Killer Instinct (v1.0)")
+        # Colecao grande: passa de LIMITE_SOLTAS buscas e o banco vira indice.
+        dados = open(os.path.join(nomes_arcade.PASTA_RDB, "MAME.rdb"), "rb").read()
+        indice = nomes_arcade._indexar(dados)
+        confere("indice inteiro do MAME da o mesmo nome da busca solta",
+                indice.get("kinst.zip") == "Killer Instinct (v1.0)" and len(indice) > 1000, str(len(indice)))
+        confere("banco cortado no meio nao derruba (vira None)",
+                nomes_arcade._indexar(dados[:len(dados) // 2 + 7]) is not None)
     confere("nome com espaco nao e' romset (nem procura)",
             nomes_arcade.nome_do_romset("Super Mario World (USA).zip", "fbneo") is None)
     confere("nucleo de fliperama pelo .dll",

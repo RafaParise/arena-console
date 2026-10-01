@@ -105,32 +105,71 @@ def _carregar(nome_rdb):
     if not dados.startswith(b"RARCHDB\x00"):
         return None
     _cache[nome_rdb] = (marca, dados)
+    # Banco novo (o RetroArch atualizou): o indice velho nao vale mais.
+    _indices.pop(nome_rdb, None)
+    _consultas.pop(nome_rdb, None)
     return dados
 
 
 def _procurar(dados, rom):
-    """Nome completo do registro cujo rom_name e' 'rom', ou None."""
+    """Nome completo do registro cujo rom_name e' 'rom', ou None.
+
+    Do fim do "name" ate o "rom_name" so pode haver pares chave/valor
+    inteiros (outros campos do MESMO registro): se a conta nao fechar, o
+    "name" achado era de outro registro (ver _procurar_em)."""
     alvo = _CHAVE_ROM + _empacotar_texto(rom)
     posicao = dados.find(alvo)
     while posicao != -1:
-        inicio = dados.rfind(_CHAVE_NOME, max(0, posicao - 4096), posicao)
-        if inicio != -1:
-            nome, i = _ler_texto(dados, inicio + len(_CHAVE_NOME))
-            # Do fim do "name" ate o "rom_name": so pares chave/valor
-            # inteiros (outro campo do MESMO registro). Se a conta nao
-            # fechar, o "name" achado era de outro registro.
-            while nome is not None and i is not None and i < posicao:
-                i = _pular(dados, i)               # chave
-                i = _pular(dados, i) if i is not None and i < posicao else None
-            if nome and i == posicao:
-                return nome
+        nome = _procurar_em(dados, posicao, rom)
+        if nome:
+            return nome
         posicao = dados.find(alvo, posicao + 1)
     return None
 
 
+_RE_ROM = re.compile(rb"\xa8rom_name([\xa0-\xbf])")
+_indices = {}         # nome do .rdb -> {rom: nome}, so para colecao grande
+_consultas = {}       # nome do .rdb -> quantas buscas soltas ja fez
+LIMITE_SOLTAS = 40    # passou disso, vale ler o banco inteiro de uma vez
+
+
+def _indexar(dados):
+    """{rom: nome} de todos os registros, numa passada so pelo banco.
+    Medido em 01/10/2026: 3.000 buscas soltas no banco do MAME custavam
+    2,3 s no Ryzen; o indice inteiro sai mais barato que isso."""
+    indice = {}
+    for m in _RE_ROM.finditer(dados):
+        tamanho = m.group(1)[0] & 0x1f
+        inicio = m.end()
+        rom = dados[inicio:inicio + tamanho].decode("utf-8", "replace")
+        if rom not in indice:
+            indice[rom] = None
+            nome = _procurar_em(dados, m.start(), rom)
+            if nome:
+                indice[rom] = nome
+    return indice
+
+
+def _procurar_em(dados, posicao, rom):
+    """O "name" do registro cujo rom_name comeca em 'posicao' (ou None).
+    Registro cortado (banco pela metade) tambem vira None."""
+    inicio = dados.rfind(_CHAVE_NOME, max(0, posicao - 4096), posicao)
+    if inicio == -1:
+        return None
+    try:
+        nome, i = _ler_texto(dados, inicio + len(_CHAVE_NOME))
+        while nome is not None and i is not None and i < posicao:
+            i = _pular(dados, i)
+            i = _pular(dados, i) if i is not None and i < posicao else None
+    except (IndexError, struct.error):
+        return None
+    return nome if (nome and i == posicao) else None
+
+
 def nome_do_romset(arquivo, nucleo):
     """Nome completo do jogo de fliperama pelo arquivo (ex.: "mslugx.zip"),
-    ou None. 'nucleo': "fbneo" ou "mame" (decide qual banco vem primeiro)."""
+    ou None. 'nucleo': "fbneo" ou "mame" (decide qual banco vem primeiro).
+    Banco quebrado ou cortado nunca derruba a lista: vira None."""
     base = os.path.splitext(os.path.basename(arquivo or ""))[0].lower()
     if not base or not re.match(r"^[a-z0-9_]+$", base):
         return None          # romset tem nome curto, sem espaco nem acento
@@ -139,8 +178,21 @@ def nome_do_romset(arquivo, nucleo):
         for nome_rdb in BANCOS.get(nucleo, BANCOS["fbneo"]):
             chave = (nome_rdb, rom)
             if chave not in _nomes:
-                dados = _carregar(nome_rdb)
-                _nomes[chave] = _procurar(dados, rom) if dados else None
+                try:
+                    dados = _carregar(nome_rdb)
+                    if not dados:
+                        _nomes[chave] = None
+                    elif nome_rdb in _indices:
+                        _nomes[chave] = _indices[nome_rdb].get(rom)
+                    else:
+                        _consultas[nome_rdb] = _consultas.get(nome_rdb, 0) + 1
+                        if _consultas[nome_rdb] > LIMITE_SOLTAS:
+                            _indices[nome_rdb] = _indexar(dados)
+                            _nomes[chave] = _indices[nome_rdb].get(rom)
+                        else:
+                            _nomes[chave] = _procurar(dados, rom)
+                except (IndexError, ValueError, struct.error, UnicodeError):
+                    _nomes[chave] = None
             if _nomes[chave]:
                 return _nomes[chave]
     return None
