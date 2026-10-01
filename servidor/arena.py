@@ -4608,7 +4608,10 @@ class Manipulador(BaseHTTPRequestHandler):
             if not VIGIA["internet"]:
                 return self.erro("Sem internet agora. Essa busca precisa de conexão.", 503)
 
-            nome_base = os.path.splitext(os.path.basename(jogo["arquivo"]))[0]
+            # Fliperama: o nome completo do banco ("Metal Slug X - Super
+            # Vehicle-001 (NGM-2500)(NGH-2500)") e' o que o banco de capas usa.
+            nome_base = (jogo.get("nome_banco")
+                         or os.path.splitext(os.path.basename(jogo["arquivo"]))[0])
             ok, motivo = capas_online.buscar_e_baixar(
                 jogo["plataforma"], jogo["titulo"], nome_base)
             if not ok:
@@ -5591,7 +5594,11 @@ def principal():
 
     threading.Thread(target=rodar_vigia, daemon=True).start()
     threading.Thread(target=anunciar_e_escutar, daemon=True).start()
-    threading.Timer(1.0, lambda: abrir_janela(local)).start()
+    # ARENA_SEM_JANELA=1: so o servidor, sem abrir a tela (testes
+    # automaticos -- a rodada completa abria dezenas de janelas -- e quem
+    # quiser abrir a tela de outro computador).
+    if os.environ.get("ARENA_SEM_JANELA") != "1":
+        threading.Timer(1.0, lambda: abrir_janela(local)).start()
 
     try:
         with TRAVA_REDE:

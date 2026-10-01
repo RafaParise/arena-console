@@ -822,6 +822,20 @@ input::placeholder { color: var(--texto-apagado); }
 .detalhes-kicker { color: var(--azul-claro); font-size: var(--t-micro); text-transform: uppercase; letter-spacing: .08em; }
 .detalhes-corpo h2 { margin: .3rem 0 .5rem; font: 600 var(--t-med) var(--fonte-titulo); }
 .detalhes-descricao { color: var(--texto-fraco); font-size: var(--t-peq); }
+/* Aviso do jogo (pasta errada, romset que nao abre): borda forte a esquerda
+   E texto -- cor sozinha nao serve para quem nao distingue cores. */
+.detalhes-aviso {
+  margin: .6rem 0 0;
+  padding: .55rem .7rem;
+  border: 1px solid var(--borda-forte);
+  border-left: 4px solid var(--erro);
+  border-radius: var(--raio);
+  background: var(--painel-alto);
+  display: grid;
+  gap: .45rem;
+}
+.detalhes-aviso p { margin: 0; font-size: var(--t-peq); color: var(--texto); }
+.detalhes-aviso .botao { width: 100%; }
 .detalhes-meta { display: grid; gap: .6rem; margin: 1rem 0; }
 .detalhes-meta div { border-top: 1px solid var(--borda); padding-top: .45rem; }
 .detalhes-meta dt { color: var(--texto-apagado); font-size: var(--t-micro); }

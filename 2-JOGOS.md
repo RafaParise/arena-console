@@ -176,6 +176,21 @@ Regras que valem para os dois (do guia oficial do libretro):
 
 O MAME atual é pesado: em máquina fraca, prefira os jogos de Neo Geo.
 
+**O nome do jogo na lista** vem do banco de dados do próprio RetroArch
+(`retroarch\database\rdb`), não do nome do arquivo: `mslugx.zip` aparece
+como **Metal Slug X - Super Vehicle-001**, `kinst.zip` como **Killer
+Instinct**. É também esse nome que o botão **Buscar capa** usa. Na lista de
+jogadores (`dados\jogadores.txt`), vale escrever o nome completo ou o curto
+(`Tmnt2 = 4` continua valendo).
+
+**O ARENA avisa, na tela do jogo, o que impede um fliperama de abrir:**
+
+| Aviso | O que fazer |
+|---|---|
+| O disco (`.chd`) está dentro de um `.zip` (ex.: `kinst-chd.zip`) | Extraia o `.chd` para a subpasta com o nome do jogo (`Arcade\kinst\kinst.chd`). O emulador não lê disco de dentro de `.zip` |
+| Os arquivos estão dentro de uma pasta no `.zip` | Compacte de novo só os arquivos, sem a pasta |
+| O `.zip` está corrompido | Baixe ou copie o jogo de novo |
+
 #### Passo 1 — Criar as pastas
 
 No ARENA, clique em **Criar pastas dos consoles**, embaixo da lista à
@@ -458,6 +473,15 @@ Jogos de **Wii** vão em `jogos\pessoais\Wii`, e os de GameCube em
 console (**GameCube** e **Nintendo Wii**). Os dois abrem pelo Dolphin, e o
 ARENA lê dentro do disco se ele é de Wii ou de GameCube: se um jogo estiver
 na pasta errada, aparece o aviso para mover.
+
+#### Aviso de disco na pasta errada
+
+Quando dá para ler dentro do disco de qual console ele é (PS1 × PS2, PSP,
+GameCube × Wii, PS3, Xbox 360) e isso não bate com a pasta, a tela do jogo
+mostra um **quadro de aviso** e o botão **Mover para...**, que leva o
+arquivo para a pasta certa com um clique. O ARENA nunca move sozinho. Disco
+de CD que pode ser de vários consoles (Sega CD, Saturn, PS1...) não gera
+aviso: o cabeçalho dele não diz qual é, e a pasta decide.
 
 A cada jogo, o ARENA:
 

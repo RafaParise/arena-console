@@ -253,11 +253,22 @@ def formato_do_chd(caminho):
     return None, None
 
 
-def _por_chd(caminho, candidatos):
-    """Escolhe a plataforma de um CHD pelo formato do disco original."""
+def _por_chd(caminho, candidatos, palpite=False):
+    """Escolhe a plataforma de um CHD pelo formato do disco original.
+
+    'palpite': com mais de um console possivel, devolve o primeiro (serve de
+    SUGESTAO na tela de escolher o console). Sem ele, devolve None -- o aviso
+    de "disco na pasta errada" so pode falar o que e' certo."""
     formato, megabytes = formato_do_chd(caminho)
     if not formato:
         return None
+    # Achado de 01/10/2026: CHD de PS2 feito com o "createcd" do chdman (o
+    # jeito antigo, antes de existir o createdvd) diz "CD" no cabecalho --
+    # com 5 GB. CD de verdade nao passa de ~900 MB (99 minutos): maior que
+    # isso o disco era DVD, qualquer que seja o formato do CHD. Antes, 19
+    # jogos de PS2 da pasta saiam como "conteudo de PlayStation 1".
+    if formato == CD and megabytes and megabytes > 900:
+        formato = DVD
 
     DE_CD = ["ps1", "segacd", "saturn", "dreamcast", "pcfx", "cdi", "threedo"]
     DE_DVD = ["ps2", "psp", "gamecube"]
@@ -274,19 +285,26 @@ def _por_chd(caminho, candidatos):
     if formato == DVD and megabytes and megabytes > 1900 and "ps2" in permitidos:
         return "ps2"
 
-    return permitidos[0]
+    # Mais de um console possivel (CD de PS1, Sega CD, Saturn...): o
+    # cabecalho do CHD nao diz qual. Achado de 01/10/2026: o Sonic CD da
+    # pasta do Sega CD saia como "conteudo de PlayStation 1" -- o primeiro
+    # da lista, nao uma leitura do disco.
+    return permitidos[0] if palpite else None
 
 
 # ---------------------------------------------------------------------------
 # Porta de entrada
 # ---------------------------------------------------------------------------
 
-def identificar(caminho, candidatos):
+def identificar(caminho, candidatos, palpite=False):
     """Diz de qual console e o arquivo, olhando dentro dele.
 
     Devolve o id da plataforma, ou None quando nao deu para afirmar.
     So responde algo que esteja entre os candidatos: se a extensao nem
     serve para PS2, nao adianta o arquivo parecer PS2.
+
+    'palpite': aceita um chute quando o arquivo nao diz qual e' (so o CHD de
+    CD tem esse caso). Para SUGESTAO na tela, nunca para aviso.
     """
     if not candidatos:
         return None
@@ -303,7 +321,7 @@ def identificar(caminho, candidatos):
     # CHD e compactado: nao da para abrir por dentro, mas o cabecalho
     # entrega o formato do disco, o que ja resolve quase tudo.
     if caminho.lower().endswith(".chd"):
-        return _por_chd(caminho, candidatos)
+        return _por_chd(caminho, candidatos, palpite)
 
     try:
         with open(caminho, "rb") as arquivo:

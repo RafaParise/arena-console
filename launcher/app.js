@@ -589,11 +589,13 @@ function desenharDetalhes() {
     gerirBotao.disabled = true;
     consoleBotao.hidden = true;
     $("#btnAtualizarCapa").disabled = true;
+    $("#detalhesAviso").hidden = true;
     return;
   }
   $("#btnAtualizarCapa").disabled = false;
   const plataforma = estado.porPlataforma[jogo.plataforma] || {};
   painel.classList.remove("detalhes--vazio");
+  desenharAvisosDoJogo(jogo);
   $("#detalhesTitulo").textContent = jogo.titulo;
   $("#detalhesConsole").textContent = jogo.plataforma_nome;
   $("#detalhesDescricao").textContent = plataforma.descricao || "Jogo da biblioteca do ARENA.";
@@ -688,6 +690,26 @@ function desenharJogos() {
 // --------------------------------------------------------------------------
 // Mover um jogo para a pasta de outro console
 // --------------------------------------------------------------------------
+
+// Avisos que o indexador acha olhando o arquivo: disco na pasta de outro
+// console (com o botao de mover) e romset de fliperama que o emulador nao
+// le. Achado de 01/10/2026: o servidor ja calculava o "disco na pasta
+// errada" (o Dead Space 3 de PS3 na pasta do Xbox 360), mas a tela nunca
+// mostrava -- o jogo so fechava sem explicar.
+function desenharAvisosDoJogo(jogo) {
+  const avisos = Array.isArray(jogo.avisos) ? jogo.avisos : [];
+  $("#detalhesAviso").hidden = avisos.length === 0;
+  $("#detalhesAvisoTexto").textContent = avisos.map((a) => a.texto).join(" ");
+  const mover = avisos.find((a) => a.mover_para);
+  const botao = $("#btnMoverSugerido");
+  botao.hidden = !mover;
+  botao.onclick = null;
+  if (mover) {
+    const destino = estado.porPlataforma[mover.mover_para];
+    botao.textContent = `Mover para ${destino ? destino.nome : "a pasta certa"}`;
+    botao.onclick = () => moverJogo(jogo.id, mover.mover_para);
+  }
+}
 
 async function moverJogo(jogoId, plataformaId) {
   const jogo = acharJogo(jogoId);

@@ -27,6 +27,8 @@ import unicodedata
 import graficos
 import identificador
 import jogadores
+import nomes_arcade
+import zipfile
 
 # ---------------------------------------------------------------------------
 # BLOCO 1 - Onde estamos no disco
@@ -62,6 +64,57 @@ RE_BIOS_NA_PASTA = re.compile(
     r"^(neogeo|pgm|naomi|naomi2|naomigd|awbios|stvbios|skns|cpzn1|cpzn2|hng64|"
     r"nss|playch10|megatech|megaplay|decocass|konamigv|taitogn|isgsm|qsound)"
     r"([ ._-].*)?\.(zip|7z)$", re.I)
+
+
+def discos_de_fliperama_zipados(pasta_atual, arquivos):
+    """{romset: arquivo.zip} dos .zip que so tem .chd dentro (kinst-chd.zip
+    -> {"kinst": "kinst-chd.zip"}). So abre zip com "chd" no nome: ler o
+    indice de um zip e' rapido, mas nao precisa abrir todos."""
+    achados = {}
+    for nome in arquivos:
+        minusculo = nome.lower()
+        if not minusculo.endswith(".zip") or "chd" not in minusculo:
+            continue
+        try:
+            with zipfile.ZipFile(os.path.join(pasta_atual, nome)) as compactado:
+                dentro = [n for n in compactado.namelist() if not n.endswith("/")]
+        except (OSError, zipfile.BadZipFile, ValueError):
+            continue
+        if dentro and all(n.lower().endswith(".chd") for n in dentro):
+            romset = os.path.splitext(os.path.basename(dentro[0]))[0].lower()
+            achados[romset] = nome
+    return achados
+
+
+def avisos_do_romset(caminho, romset, discos_zipados):
+    """O que impede um romset de fliperama de abrir, que da para ver sem
+    abrir o jogo. Cada aviso diz o que fazer."""
+    avisos = []
+    if romset in discos_zipados:
+        avisos.append({"texto": (
+            "O disco deste jogo (%s.chd) está dentro de %s, e o emulador não lê "
+            "disco de dentro de .zip. Extraia o %s.chd para a pasta %s\\%s\\ "
+            "(ao lado do %s)." % (romset, discos_zipados[romset], romset,
+                                  os.path.basename(os.path.dirname(caminho)), romset,
+                                  os.path.basename(caminho)))})
+    if caminho.lower().endswith(".zip"):
+        try:
+            with zipfile.ZipFile(caminho) as compactado:
+                dentro = [n for n in compactado.namelist() if not n.endswith("/")]
+        except (OSError, zipfile.BadZipFile, ValueError):
+            return avisos + [{"texto": "Este .zip está corrompido (não deu para ler o que tem dentro)."}]
+        pastas = {n.replace("\\", "/").split("/", 1)[0] for n in dentro if "/" in n.replace("\\", "/")}
+        # Leia-me, imagem e atalho que vem junto nao sao parte do jogo
+        # (o kof2002.zip da pasta tem um readme.html solto e os 16 arquivos
+        # do jogo dentro da pasta "king").
+        soltos = [n for n in dentro if "/" not in n.replace("\\", "/")
+                  and not re.search(r"\.(txt|html?|nfo|diz|url|jpe?g|png|gif|pdf|doc)$", n, re.I)]
+        if dentro and not soltos and len(pastas) == 1:
+            avisos.append({"texto": (
+                "Os arquivos deste jogo estão dentro da pasta \"%s\" no .zip, e o "
+                "emulador procura na raiz do .zip. Compacte de novo só os arquivos, "
+                "sem a pasta." % next(iter(pastas)))})
+    return avisos
 
 
 def chd_de_fliperama(pasta_atual):
@@ -235,13 +288,27 @@ def arquivo_de_jogadores():
     return os.path.join(PASTA_DADOS, jogadores.NOME)
 
 
+# Muda quando o indexador passa a montar a lista de outro jeito. Achado de
+# 01/10/2026: a assinatura so olhava as pastas -- correcao nova do indexador
+# (ex.: o jogo de CD em trilhas virar um jogo so) nao valia num ARENA que ja
+# tinha a lista salva, ate alguma pasta mudar. 2 = nomes de fliperama pelos
+# bancos do RetroArch + avisos do jogo.
+VERSAO_INDICE = 2
+
+
 def assinatura_das_pastas():
     """Resume o estado atual das pastas de jogos em um texto curto.
 
     Se nenhuma pasta foi criada, apagada ou teve arquivo alterado, a
     assinatura continua a mesma e a varredura inteira pode ser pulada.
+    Tambem entram a versao do indexador e o consoles.json (extensao nova,
+    console novo): mudou um dos dois, a lista e' refeita.
     """
-    partes = []
+    partes = ["indice|%d" % VERSAO_INDICE]
+    try:
+        partes.append("consoles|%d" % os.path.getmtime(ARQUIVO_CONSOLES))
+    except OSError:
+        pass
     for origem in ORIGENS:
         caminho = os.path.join(PASTA_JOGOS, origem)
         if not os.path.isdir(caminho):
@@ -283,7 +350,7 @@ CAPAS_EXTENSOES = (".png", ".jpg", ".jpeg", ".webp")
 PASTA_CAPAS = "capas"
 
 
-def capas_do_jogo(caminho_absoluto, pasta_atual, titulo):
+def capas_do_jogo(caminho_absoluto, pasta_atual, titulo, nome_banco=None):
     """Procura a arte do jogo em tres lugares, do mais especifico ao geral.
 
     1. Um arquivo com o MESMO nome do jogo, na mesma pasta:
@@ -304,12 +371,20 @@ def capas_do_jogo(caminho_absoluto, pasta_atual, titulo):
                 achados.append(candidato)
 
     # Miniatura do RetroArch: thumbnails/<sistema>/Named_Boxarts/<titulo>.png
+    # Fliperama: o RetroArch nomeia pelo nome COMPLETO do banco ("Metal Slug
+    # X - Super Vehicle-001 (NGM-2500)(NGH-2500)"), com & * / : ` < > ? \ |
+    # " trocados por _ -- a mesma regra do capas_online.
+    nomes = [titulo]
+    if nome_banco:
+        nomes.append(re.sub(r'[&*/:`<>?\\|"]', "_", nome_banco))
     miniaturas = os.path.join(RAIZ, "retroarch", "thumbnails")
     if os.path.isdir(miniaturas):
         for sistema in os.listdir(miniaturas):
-            arte = os.path.join(miniaturas, sistema, "Named_Boxarts",
-                                titulo + ".png")
-            if os.path.isfile(arte):
+            arte = next((os.path.join(miniaturas, sistema, "Named_Boxarts", n + ".png")
+                         for n in nomes
+                         if os.path.isfile(os.path.join(miniaturas, sistema, "Named_Boxarts", n + ".png"))),
+                        None)
+            if arte:
                 achados.append(arte)
                 break
 
@@ -415,7 +490,7 @@ def escolher_plataforma(candidatos, por_id, nome_pasta, marcado, tamanho_mb,
     sugestao = None
     if caminho_absoluto:
         try:
-            sugestao = identificador.identificar(caminho_absoluto, candidatos)
+            sugestao = identificador.identificar(caminho_absoluto, candidatos, palpite=True)
         except Exception:
             sugestao = None
     if not sugestao and tamanho_mb:
@@ -448,6 +523,10 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None,
         if chd_de_fliperama(pasta_atual):
             continue   # disco de um romset de fliperama, nao um jogo
         trilhas = trilhas_dos_indices(pasta_atual, arquivos)
+        # Disco (.chd) de fliperama zipado: kinst-chd.zip com o kinst.chd
+        # dentro. Nao e' um jogo -- e o MAME nao le .chd de dentro de .zip.
+        # Sai da lista e vira aviso no jogo dele (o kinst.zip).
+        discos_zipados = discos_de_fliperama_zipados(pasta_atual, arquivos)
         arquivos_por_base = {}
         for nome in arquivos:
             base, extensao = os.path.splitext(nome)
@@ -459,6 +538,8 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None,
                 continue
             if nome_arquivo.lower() in trilhas:
                 continue   # trilha de um .cue/.gdi desta pasta
+            if nome_arquivo in discos_zipados.values():
+                continue   # disco de fliperama dentro de zip: vira aviso
             if repetido_em_outro_formato(nome_arquivo, arquivos_por_base):
                 continue
 
@@ -511,6 +592,25 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None,
                 plataforma = por_id[id_plataforma]
             titulo = titulo_do_jogo(nome_arquivo, pasta_atual)
 
+            # Fliperama: o nome do arquivo e' o do romset ("mslugx"). O nome
+            # de verdade vem dos bancos do RetroArch (servidor\nomes_arcade.py).
+            romset = nome_banco = None
+            avisos = []
+            nucleo_arcade = nomes_arcade.nucleo_de(plataforma.get("core"))
+            if nucleo_arcade and extensao in (".zip", ".7z"):
+                romset = os.path.splitext(nome_arquivo)[0].lower()
+                nome_banco = nomes_arcade.nome_do_romset(nome_arquivo, nucleo_arcade)
+                if nome_banco:
+                    titulo = nomes_arcade.titulo_para_a_tela(nome_banco)
+                avisos += avisos_do_romset(caminho_absoluto, romset, discos_zipados)
+            if discorda:
+                avisos.append({
+                    "texto": "O conteúdo deste arquivo é de %s, mas ele está na pasta de %s. "
+                             "Assim ele não abre: mova para a pasta certa."
+                             % (por_id[discorda]["nome"] if discorda in por_id else discorda,
+                                plataforma.get("nome", "outro console")),
+                    "mover_para": discorda})
+
             # Quantos jogadores ESTE jogo aceita: quem diz e' o professor,
             # no dados\jogadores.txt (servidor\jogadores.py). Sem o arquivo
             # (so na primeira vez, antes de o ARENA cria-lo), vale o que
@@ -522,7 +622,10 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None,
                 usa_multitap = any(nome.lower() in titulo.lower() for nome in lista_multitap)
                 do_jogo = 5 if usa_multitap else int(plataforma.get("jogadores_max", 2) or 2)
             else:
-                do_jogo = jogadores.numero_do_jogo(titulo, regras)
+                # O nome curto do romset tambem vale ("Tmnt2 = 4" continua
+                # valendo depois que o titulo virou o nome completo).
+                do_jogo = jogadores.numero_do_jogo(titulo, regras,
+                                                   outros_nomes=(romset,) if romset else ())
             # O que o jogo aceita, limitado ao que o nucleo permite
             # (servidor\multitap.json). O mesmo calculo do /api/jogar.
             ligacao = graficos.jogadores_do_jogo(
@@ -571,7 +674,14 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None,
                 "sugestao": sugestao,
                 # Artes encontradas na pasta. A tela usa a primeira que
                 # carregar; sem nenhuma, ela desenha as iniciais do titulo.
-                "capas": capas_do_jogo(caminho_absoluto, pasta_atual, titulo),
+                "capas": capas_do_jogo(caminho_absoluto, pasta_atual, titulo, nome_banco),
+                # Fliperama: o nome curto do arquivo e o nome completo do
+                # banco (a busca de capa usa o completo).
+                "romset": romset,
+                "nome_banco": nome_banco,
+                # Avisos para o aluno, na tela do jogo: disco na pasta errada,
+                # romset montado de um jeito que o emulador nao le.
+                "avisos": avisos,
             })
 
     return encontrados

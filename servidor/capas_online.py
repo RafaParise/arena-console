@@ -38,8 +38,13 @@ REPO_POR_PLATAFORMA = {
     "dreamcast": "Sega_-_Dreamcast",
     "ps1": "Sony_-_PlayStation",
     "psp": "Sony_-_PlayStation_Portable",
-    "neogeo": "SNK_-_Neo_Geo",
-    "arcade": "MAME",
+    # Fliperama: o banco do FBNeo tem tambem os fliperamas que nao sao Neo
+    # Geo (TMNT2...); o nome que vale e' o COMPLETO do banco de dados do
+    # RetroArch (servidor\nomes_arcade.py). Conferido 01/10/2026: "Metal Slug
+    # X - Super Vehicle-001 (NGM-2500)(NGH-2500).png" -> 200 no FBNeo e no
+    # MAME; "Killer Instinct (v1.0).png" -> 200 no MAME.
+    "neogeo": ("FBNeo_-_Arcade_Games", "SNK_-_Neo_Geo"),
+    "arcade": ("MAME", "FBNeo_-_Arcade_Games"),
 }
 
 
@@ -84,9 +89,11 @@ def buscar_e_baixar(plataforma_id, titulo_limpo, nome_base_arquivo):
 
     Devolve (ok, motivo).
     """
-    repo = REPO_POR_PLATAFORMA.get(plataforma_id)
-    if not repo:
+    repos = REPO_POR_PLATAFORMA.get(plataforma_id)
+    if not repos:
         return False, "Este console ainda não tem esse banco de capas."
+    if isinstance(repos, str):
+        repos = (repos,)
 
     candidatos = []
     if nome_base_arquivo and nome_base_arquivo != titulo_limpo:
@@ -96,7 +103,7 @@ def buscar_e_baixar(plataforma_id, titulo_limpo, nome_base_arquivo):
         for tag in TAGS_REGIAO:
             candidatos.append("%s %s" % (titulo_limpo, tag))
 
-    for nome in candidatos:
+    for repo, nome in ((r, n) for r in repos for n in candidatos):
         nome_arquivo = _limpar_nome_arquivo(nome) + ".png"
         url = ("https://raw.githubusercontent.com/libretro-thumbnails/%s/"
               "master/Named_Boxarts/%s" %

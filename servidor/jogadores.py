@@ -78,16 +78,21 @@ def ler(caminho=None):
     return regras
 
 
-def numero_do_jogo(titulo, regras):
+def numero_do_jogo(titulo, regras, outros_nomes=()):
     """O numero do jogo pelo arquivo. Nome inteiro igual ganha; senao, o
     pedaco de nome mais comprido que aparece no titulo (o mais especifico);
-    senao, 2."""
-    titulo = (titulo or "").lower()
+    senao, 2.
+
+    'outros_nomes': outros nomes do MESMO jogo que tambem valem -- o nome
+    curto do romset de fliperama ("tmnt2"), para a linha "Tmnt2 = 4" que o
+    arquivo ja tem continuar valendo depois que o titulo virou o nome
+    completo ("Teenage Mutant Ninja Turtles - Turtles in Time")."""
+    nomes = [(titulo or "").lower()] + [(n or "").lower() for n in outros_nomes if n]
     melhor = None
     for nome, numero in regras or []:
-        if nome == titulo:
+        if nome in nomes:
             return numero
-        if nome in titulo and (melhor is None or len(nome) > len(melhor[0])):
+        if any(nome in n for n in nomes) and (melhor is None or len(nome) > len(melhor[0])):
             melhor = (nome, numero)
     return melhor[1] if melhor else PADRAO
 
