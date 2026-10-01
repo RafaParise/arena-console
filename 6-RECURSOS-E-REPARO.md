@@ -99,11 +99,12 @@ Por onde o jogo fala com a placa de vídeo.
 #### Filtro de tela
 
 O mais perto de um ReShade que existe aqui — e feito para emulador, então
-bem mais leve.
+bem mais leve. Ligado, os consoles 2D ganham o **pixel nítido**: todo
+pixel do mesmo tamanho, sem borrão, em qualquer tela (até 4K). Consoles 3D
+ficam sem filtro.
 
-Precisa do pacote de shaders: abra o RetroArch por fora, *Atualizador
-Online → Baixar Shaders Slang*. Sem ele, o ARENA desliga o filtro sozinho e
-o jogo abre normal.
+Usa o pacote de shaders que já vem em `retroarch\shaders\shaders_slang`.
+Sem ele, o ARENA desliga o filtro sozinho e o jogo abre normal.
 
 #### Escala inteira
 

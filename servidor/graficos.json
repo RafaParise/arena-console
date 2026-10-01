@@ -16,10 +16,44 @@
     "quebra o HUD de um jogo especifico."
   ],
   "shaders": {
-    "_leia": "Filtro de tela aplicado por cima do jogo. Custa GPU, nao disco.",
-    "3": "shaders/shaders_slang/interpolation/shaders/pixellate.slangp",
-    "4": "shaders/shaders_slang/handheld/console-border/gbc-lcd-grid-v2.slangp",
-    "5": "shaders/shaders_slang/crt/crt-geom.slangp"
+    "_leia": "Filtro de tela por cima do jogo, pela placa de video. Vale so quando o perfil ou o aluno liga o 'Filtro de tela', e so nos consoles de desenho 2D (pixel): deixa todo pixel do mesmo tamanho e nitido em qualquer tela, de 1366x768 a 4K, quase sem custo. Console 3D ganha definicao pela resolucao interna e fica sem filtro. Achado de 01/10/2026: o RetroArch 1.22 ignora a chave video_shader do arquivo de configuracao, entao o ARENA passa o filtro pela linha de comando (--set-shader). Antes, nenhum filtro chegava a aparecer -- e o da nota 4 era uma grade de Game Boy Color, que mudaria a cor de qualquer jogo.",
+    "pixel": "shaders/shaders_slang/pixel-art-scaling/sharp-bilinear-simple.slangp",
+    "plataformas": [
+      "tic80",
+      "wasm4",
+      "lowresnx",
+      "uzebox",
+      "atari2600",
+      "atari5200",
+      "atari7800",
+      "lynx",
+      "nes",
+      "snes",
+      "gameboy",
+      "gba",
+      "virtualboy",
+      "pokemini",
+      "sg1000",
+      "megadrive",
+      "sega32x",
+      "segacd",
+      "neogeo",
+      "ngp",
+      "arcade",
+      "pcengine",
+      "pcfx",
+      "wonderswan",
+      "odyssey2",
+      "colecovision",
+      "intellivision",
+      "msx",
+      "c64",
+      "amiga",
+      "spectrum",
+      "amstrad",
+      "dos",
+      "scummvm"
+    ]
   },
   "nucleos": {
     "swanstation": {

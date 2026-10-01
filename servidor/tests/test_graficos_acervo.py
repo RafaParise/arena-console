@@ -243,12 +243,26 @@ class TestGraficos(unittest.TestCase):
         self.mod.carregar_graficos()  # resetar cache
         self.assertEqual(self.mod.opcoes_do_nucleo("inexistente", 3), {})
 
-    def test_shader_para_nenhum(self):
+    # Era test_shader_para_nenhum: shader_para(nota) saiu em 01/10/2026 --
+    # o filtro agora e' escolhido pelo console (so os de desenho 2D), e o
+    # RetroArch nunca aplicava o que vinha pela nota (ver filtro_de_tela).
+    def test_filtro_de_tela_nenhum(self):
         with open(os.path.join(self.dir, "graficos.json"), "w",
                   encoding="utf-8") as f:
             f.write('{"nucleos": {}, "shaders": {}}')
         self.mod.carregar_graficos()
-        self.assertEqual(self.mod.shader_para(1), "")
+        self.assertEqual(self.mod.filtro_de_tela("snes"), "")
+
+    def test_filtro_de_tela_so_console_da_lista(self):
+        with open(os.path.join(self.dir, "graficos.json"), "w",
+                  encoding="utf-8") as f:
+            f.write('{"nucleos": {}, "shaders": {"pixel": "nao/existe.slangp", '
+                    '"plataformas": ["snes"]}}')
+        self.mod.carregar_graficos()
+        # Arquivo que nao existe: nada (senao a tela ficaria preta).
+        self.assertEqual(self.mod.filtro_de_tela("snes"), "")
+        self.assertEqual(self.mod.filtro_de_tela("ps1"), "")
+        self.assertEqual(self.mod.filtro_de_tela(None), "")
 
 
 class TestAcervo(unittest.TestCase):

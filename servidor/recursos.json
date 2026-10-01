@@ -188,10 +188,10 @@
       "grupo": "imagem",
       "nome": "Filtro de tela",
       "tipo": "bool",
-      "custo": "alto",
+      "custo": "baixo",
       "nota_minima": 3,
-      "explica": "Efeito por cima do jogo: cara de TV de tubo, grade de LCD, cor melhorada.",
-      "exemplo": "E o que o ReShade faz em jogos de PC, so que feito para emulador e bem mais leve. Precisa baixar o pacote de shaders pelo RetroArch."
+      "explica": "Nos consoles 2D, deixa todo pixel do mesmo tamanho e nitido em qualquer tela, ate 4K. Console 3D fica sem filtro.",
+      "exemplo": "E o que o ReShade faz em jogos de PC, so que feito para emulador e bem mais leve. Sem ele, esticar um jogo de Super Nintendo deixa uns quadradinhos mais largos que outros."
     },
     {
       "chave": "video_vsync",

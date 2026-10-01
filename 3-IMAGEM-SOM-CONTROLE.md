@@ -951,18 +951,28 @@ assim. O que o RetroArch tem no lugar é o **sistema de shaders**, que faz a
 mesma coisa — melhora cor, nitidez e aparência — mas foi feito para
 emulador, é mais leve e não precisa injetar nada em lugar nenhum.
 
-O ARENA liga o shader sozinho quando a máquina é nota 3 ou mais:
+O ARENA liga um shader só, o **pixel nítido** (sharp-bilinear), e só nos
+consoles de desenho 2D — NES, Super Nintendo, Mega Drive, Neo Geo,
+fliperama, Game Boy, PC Engine, computadores antigos e parecidos:
 
-| Nota | Filtro |
+| O que faz | Por que |
 |---|---|
-| 3 | Pixellate — deixa o pixel quadrado e limpo, custa quase nada |
-| 4 | Grade de LCD — cara de tela de portátil |
-| 5 | CRT Geom — cara de TV de tubo, com curvatura |
+| Deixa **todo pixel do mesmo tamanho** e com borda limpa | Esticar 2D numa tela que não é múltipla exata (1366×768, 1080p, 4K) deixa uns pixels mais largos que outros, ou borra tudo |
+| Custa quase nada | Uma conta só por ponto da tela: roda até na placa do Celeron |
 
-**Para os filtros funcionarem, você precisa do pacote de shaders.** Abra o
-RetroArch por fora, vá em *Atualizador Online → Baixar Shaders Slang*. Se
-não baixar, o ARENA desliga o filtro em silêncio — o jogo abre normal, só
-sem o efeito.
+Ele entra quando o **Filtro de tela** está ligado — sozinho no nível
+Qualidade, ou na mão em **Ajustes → Avançado → Imagem**. Console 3D (PS1,
+N64, PSP, Dreamcast...) fica sem filtro: ele ganha definição pela
+resolução interna, que já é ajustada pela placa.
+
+Até 01/10/2026 o filtro **nunca chegava ao jogo**: o ARENA o escrevia num
+lugar que o RetroArch atual ignora. Agora vai pela linha de comando
+(`--set-shader`). TV de tubo (CRT) e grade de LCD continuam no menu do
+RetroArch (`Esc` → Shaders), para quem quiser.
+
+**O filtro precisa do pacote de shaders** (`retroarch\shaders\shaders_slang`,
+que já vem no ARENA). Se a pasta sumir, o ARENA desliga o filtro em
+silêncio — o jogo abre normal, só sem o efeito.
 
 ---
 
@@ -1142,7 +1152,7 @@ abertos, bateria), não o computador.
 ### O que pesa mais, na ordem
 
 1. **Resolução interna** — dobrar é quatro vezes mais trabalho
-2. **Filtro de tela (shader)** — CRT pesa muito, Pixellate quase nada
+2. **Filtro de tela (shader)** — o pixel nítido do ARENA quase não pesa; CRT do menu pesa muito
 3. **Filtro de textura** — xBR e xBRZ pesam, Bilinear é barato
 4. **Anisotrópico** — barato em placa moderna
 5. **Mipmap** — praticamente de graça, e melhora a imagem

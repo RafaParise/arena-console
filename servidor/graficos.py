@@ -303,23 +303,28 @@ def gravar_opcoes_dos_nucleos(nota, extras=None, nota_gpu=None, modesto=False):
     return len(linhas) - 2 - (1 if do_aluno else 0) - len(do_aluno)
 
 
-def shader_para(nota):
-    """Filtro de tela adequado a maquina, se o arquivo existir.
+def filtro_de_tela(plataforma):
+    """Caminho do filtro de tela (shader) para este console, ou "".
 
-    Shader e o mais perto de um 'ReShade' que faz sentido aqui: melhora a
-    aparencia usando a placa de video, sem tocar no disco. Mas so entra se
-    o pacote de shaders do RetroArch estiver instalado - senao o jogo
-    abriria com a tela preta.
+    So os consoles de desenho 2D (graficos.json -> shaders -> plataformas)
+    recebem filtro: o "pixel nitido" (sharp-bilinear), que deixa todo pixel
+    do mesmo tamanho em qualquer tela -- 1366x768 ou 4K -- quase sem custo.
+    Console 3D ganha definicao pela resolucao interna, sem filtro.
+
+    So entra se o arquivo existir: sem o pacote de shaders, ligar o filtro
+    deixaria a tela preta.
+
+    Achado de 01/10/2026: a versao anterior escolhia o filtro pela nota da
+    placa e o ARENA o escrevia como video_shader no arquivo extra -- que o
+    RetroArch 1.22 IGNORA (o registro dizia "Loading stock shader"). Nenhum
+    filtro chegou a aparecer. Agora vai pela linha de comando (--set-shader).
     """
     tabela = carregar_graficos().get("shaders", {})
-    escolhido = ""
-    for limite in sorted(k for k in tabela if k.isdigit()):
-        if nota >= int(limite):
-            escolhido = tabela[limite]
-
+    if plataforma not in (tabela.get("plataformas") or []):
+        return ""
+    escolhido = tabela.get("pixel") or ""
     if not escolhido:
         return ""
-
     caminho = os.path.join(PASTA_RETROARCH, escolhido.replace("/", os.sep))
     return caminho if os.path.isfile(caminho) else ""
 

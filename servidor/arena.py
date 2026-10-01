@@ -1097,6 +1097,15 @@ def ler_config_do_disco():
         validas = recursos_por_chave()
         for chave, valor in salvo["avancado"].items():
             if chave in validas or chave in AVANCADO_PADRAO:
+                # config.json mexido a mao (ou de versao antiga) pode trazer
+                # true/false do JSON: no arquivo do RetroArch isso viraria
+                # "True", que ele nao entende. Lista e objeto nao servem.
+                if isinstance(valor, bool):
+                    valor = "true" if valor else "false"
+                elif isinstance(valor, (int, float)):
+                    valor = str(valor)
+                elif not isinstance(valor, str):
+                    continue
                 config["avancado"][chave] = valor
     config["apelido"] = str(salvo.get("apelido", ""))[:24]
     config["permitir_rede"] = bool(salvo.get("permitir_rede", False))
@@ -1321,16 +1330,8 @@ def opcoes_efetivas(config, custo=None):
     opcoes.update(controles.opcoes_do_retroarch(
         controles_ligados=controles.contar_controles()))
 
-    # Filtro de tela: so entra se o perfil pedir E o arquivo existir.
-    if opcoes.get("video_shader_enable") == "true":
-        caminho = graficos.shader_para(CAPACIDADE.get("nota_gpu", CAPACIDADE["nota"]))
-        if caminho:
-            opcoes["video_shader"] = caminho
-        else:
-            # Sem o pacote de shaders instalado, ligar o filtro deixaria a
-            # tela preta. Melhor desligar em silencio.
-            opcoes["video_shader_enable"] = "false"
-
+    # Filtro de tela: o perfil (ou o aluno) diz se quer; QUAL filtro e' se
+    # o console aceita, so se sabe com o jogo na mao -- gravar_override().
     return opcoes
 
 
@@ -1458,12 +1459,17 @@ def remapeamento_da_partida(opcoes, caminho_core, caminho_jogo):
 
 
 def gravar_override(config, custo=None, extras=None, em_partida=False,
-                    opcoes_de_nucleo=None, remapear=None):
+                    opcoes_de_nucleo=None, remapear=None, plataforma=None,
+                    devolver_filtro=False):
     """Monta o arquivo de configuracao extra que o RetroArch vai ler.
 
     'opcoes_de_nucleo': caminho de uma COPIA do arquivo de opcoes de nucleo
     (partida de 3+ jogadores no PS1/Saturn, que ligam o adaptador por opcao
-    do nucleo). Sem ele, vale o arquivo de sempre."""
+    do nucleo). Sem ele, vale o arquivo de sempre.
+
+    'plataforma' + 'devolver_filtro': devolve (arquivo, filtro de tela) --
+    o filtro vai na linha de comando (--set-shader), porque o RetroArch
+    ignora video_shader vindo de arquivo (ver graficos.filtro_de_tela)."""
     opcoes = opcoes_efetivas(config, custo)
 
     if not em_partida:
@@ -1576,11 +1582,22 @@ def gravar_override(config, custo=None, extras=None, em_partida=False,
     # deixar nada fora dela.
     opcoes["cache_directory"] = PASTA_CACHE
 
+    # Filtro de tela: so com o perfil (ou o aluno) pedindo, e so se este
+    # console tiver filtro. Sem filtro, a chave vai "false": nada de filtro
+    # velho salvo no menu do RetroArch aparecendo por cima.
+    filtro = ""
+    if opcoes.get("video_shader_enable") == "true":
+        filtro = graficos.filtro_de_tela(plataforma)
+        if not filtro:
+            opcoes["video_shader_enable"] = "false"
+
     linhas = ["# Gerado pelo ARENA. Nao edite a mao: sera reescrito."]
     linhas += ['%s = "%s"' % (c, opcoes[c]) for c in sorted(opcoes)]
 
     os.makedirs(PASTA_DADOS, exist_ok=True)
     gravar_texto_atomico(ARQUIVO_OVERRIDE, "\n".join(linhas) + "\n")
+    if devolver_filtro:
+        return ARQUIVO_OVERRIDE, filtro
     return ARQUIVO_OVERRIDE
 
 
@@ -2180,14 +2197,18 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         # exatamente o sintoma relatado.
         #
         # Agora: retroarch -L core --appendconfig X --host JOGO
+        override, filtro = gravar_override(
+            config, custo, opcoes_jogo,
+            em_partida=bool(partida), opcoes_de_nucleo=copia_nucleo,
+            remapear=(os.path.join(PASTA_CORES, jogo["core"]), caminho_jogo),
+            plataforma=jogo.get("plataforma"), devolver_filtro=True)
         comando = [
             EXECUTAVEL_RETROARCH,
             "-L", os.path.join(PASTA_CORES, jogo["core"]),
-            "--appendconfig", gravar_override(
-                config, custo, opcoes_jogo,
-                em_partida=bool(partida), opcoes_de_nucleo=copia_nucleo,
-                remapear=(os.path.join(PASTA_CORES, jogo["core"]), caminho_jogo)),
+            "--appendconfig", override,
         ]
+        if filtro:
+            comando += ["--set-shader", filtro]
         if partida:
             comando += partida["argumentos"]
         comando.append(caminho_jogo)
@@ -3742,7 +3763,7 @@ class Manipulador(BaseHTTPRequestHandler):
                     for p in carregar_catalogo()
                     if p["arquivos_sistema"] > 0],
                 "shader": os.path.basename(
-                    graficos.shader_para(CAPACIDADE["nota"])) or None,
+                    graficos.filtro_de_tela("snes")) or None,
                 "porta_partida": graficos.PORTA_PARTIDA,
                 "recursos": recursos_visiveis(),
                 "grupos": carregar_recursos()["grupos"],
@@ -5520,12 +5541,12 @@ def principal():
     try:
         quantas = graficos.gravar_opcoes_dos_nucleos(
             CAPACIDADE["nota"], None, CAPACIDADE.get("nota_gpu"))
-        shader = graficos.shader_para(CAPACIDADE.get("nota_gpu", CAPACIDADE["nota"]))
+        shader = graficos.filtro_de_tela("snes")
         print("  Video:    %s%s" % (MAQUINA["gpu"]["nome"],
                                     " (integrada)" if MAQUINA["gpu"]["integrada"] else ""))
         print("  Imagem:   nota %d/5, placa %d/5, %d ajustes%s"
               % (CAPACIDADE["nota"], CAPACIDADE.get("nota_gpu", 0), quantas,
-                 ", filtro %s" % os.path.basename(shader) if shader else ""))
+                 ", filtro de pixel nitido nos consoles 2D" if shader else ""))
     except OSError as falha:
         print("  Imagem:   nao consegui gravar os ajustes (%s)" % falha)
 
