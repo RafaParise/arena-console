@@ -24,10 +24,12 @@ sys.path.insert(0, os.path.join(RAIZ, "servidor"))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import graficos  # noqa: E402
 import protege_cfg  # noqa: E402
+import jogos_de_teste  # noqa: E402  (acha o jogo tambem em subpasta)
 
 RETROARCH = os.path.join(RAIZ, "retroarch", "retroarch.exe")
 NUCLEO = os.path.join(RAIZ, "retroarch", "cores", "pcsx_rearmed_libretro.dll")
-JOGO = os.path.join(RAIZ, "jogos", "pessoais", "PS1", "CTR - Crash Team Racing (USA).cue")
+JOGO = (jogos_de_teste.achar("PS1", "CTR - Crash Team Racing (USA).cue")
+        or os.path.join(RAIZ, "jogos", "pessoais", "PS1", "CTR - Crash Team Racing (USA).cue"))
 
 
 def abrir(pasta, com_copia):

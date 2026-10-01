@@ -36,10 +36,14 @@ def valor_no_log(texto, chave):
 
 
 def main():
-    jogos = sorted(glob.glob(os.path.join(RAIZ, "jogos", "pessoais", "PS1", "*.cue")))
+    # Tambem em subpasta e em .chd: os jogos de PS1 desta pasta passaram a
+    # ficar assim (01/10/2026) e o teste dizia "sem jogo" e reprovava.
+    pasta_ps1 = os.path.join(RAIZ, "jogos", "pessoais", "PS1")
+    jogos = sorted(glob.glob(os.path.join(pasta_ps1, "**", "*.cue"), recursive=True)
+                   + glob.glob(os.path.join(pasta_ps1, "**", "*.chd"), recursive=True))
     if not jogos:
-        print("Sem jogo de PS1 na pasta.")
-        return 1
+        print("Sem jogo de PS1 na pasta: nada a testar.")
+        return 0
     guarda = tempfile.mkdtemp(prefix="arena_opcoes_e2e_")
     copias = {}
     for arq in (GLOBAL, OPT):

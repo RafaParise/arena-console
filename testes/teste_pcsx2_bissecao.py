@@ -47,6 +47,9 @@ def secoes_do_arena():
 
 
 def main():
+    if len(sys.argv) < 3:
+        print(__doc__)     # ferramenta de investigacao: sem os arquivos, so o uso
+        return 2
     base, foto, pedidas = sys.argv[1], sys.argv[2], sys.argv[3:]
     shutil.copy2(base, INI)
     arena = secoes_do_arena()

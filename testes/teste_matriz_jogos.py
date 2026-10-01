@@ -30,6 +30,8 @@ RETROARCH = os.path.join(RAIZ, "retroarch", "retroarch.exe")
 PORTA_COMANDO = 55355
 
 sys.path.insert(0, os.path.join(RAIZ, "servidor"))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import jogos_de_teste  # noqa: E402  (acha o jogo tambem em subpasta)
 spec_a = importlib.util.spec_from_file_location("arena_matriz", os.path.join(RAIZ, "servidor", "arena.py"))
 arena = importlib.util.module_from_spec(spec_a)
 spec_a.loader.exec_module(arena)
@@ -47,7 +49,8 @@ JOGOS = [
     ("PlayStation", "swanstation_libretro.dll",
      os.path.join(RAIZ, "jogos", "pessoais", "PS1", "CTR - Crash Team Racing (USA).bin")),
     ("Dreamcast", "flycast_libretro.dll",
-     os.path.join(RAIZ, "jogos", "pessoais", "Dreamcast", "Marvel vs. Capcom 2 (USA).cue")),
+     os.path.join(RAIZ, "jogos", "pessoais", "Dreamcast",
+                  "Marvel vs. Capcom 2 - New Age of Heroes (Europe).cue")),
     ("Neo Geo", "fbneo_libretro.dll",
      os.path.join(RAIZ, "jogos", "pessoais", "Neo Geo", "kof97.zip")),
     ("PSP", "ppsspp_libretro.dll",
@@ -107,6 +110,9 @@ def enviar_comando(texto):
 
 def testar_jogo(console, core_nome, caminho_jogo):
     resultado = {"console": console, "jogo": os.path.basename(caminho_jogo)}
+    # Jogo que o professor moveu para uma subpasta continua valendo.
+    caminho_jogo = jogos_de_teste.achar(os.path.basename(os.path.dirname(caminho_jogo)),
+                                        os.path.basename(caminho_jogo)) or caminho_jogo
     if not os.path.isfile(caminho_jogo):
         resultado["erro"] = "arquivo nao encontrado"
         return resultado

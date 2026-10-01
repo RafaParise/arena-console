@@ -49,7 +49,7 @@ Sonic the Hedgehog 3 = 4
 CTR = 4
 Saturn Bomberman = 10
 GoldenEye = 4
-Kof97 = 4
+Kof97 = 6
 """
 
 # (titulo no catalogo, modo, chaves esperadas no arquivo da partida,
@@ -81,7 +81,10 @@ CASOS = [
      {"beetle_saturn_multitap_port1": "enabled", "beetle_saturn_multitap_port2": "enabled"}, 10, ""),
     ("GoldenEye 007", "sozinho",
      {"input_max_users": "4", "input_libretro_device_p3": "1", "input_libretro_device_p4": "1"}, {}, 4, ""),
-    ("Kof97", "sozinho", {"input_max_users": "2"}, {}, 2, "até 2"),
+    # FBNeo: desde 26/09/2026 aceita ate 4 (fliperama de 4, como o Turtles in
+    # Time); o numero de cada jogo vem do jogadores.txt. Pedindo 6, o nucleo
+    # limita a 4 e o cartao explica (antes: Neo Geo limitado a 2).
+    ("Kof97", "sozinho", {"input_max_users": "4"}, {}, 4, "até 4"),
 ]
 
 

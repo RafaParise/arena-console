@@ -87,16 +87,28 @@ def main():
         processo = subprocess.Popen(
             [os.path.join(RAIZ, "servidor", "python", "python.exe"),
              os.path.join(destino, "servidor", "arena.py")],
-            cwd=destino, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        time.sleep(2)
+            cwd=destino, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            env=dict(os.environ, ARENA_SEM_JANELA="1"))
+        # Espera o ARENA responder de verdade (antes: 2 s fixos). Achado de
+        # 01/10/2026: com a maquina ocupada (rodada completa), o ARENA ainda
+        # nao escutava quando a rajada saiu, e so 14 de 30 chegavam.
+        for _ in range(150):
+            try:
+                urllib.request.urlopen("http://127.0.0.1:8777/api/estado", timeout=2).read()
+                break
+            except OSError:
+                time.sleep(0.2)
 
-        print("Disparando %d maquinas falsas anunciando..." % N_MAQUINAS)
-        threads = [threading.Thread(target=anunciar_maquina_falsa, args=(i, PORTA_DESCOBERTA)) for i in range(N_MAQUINAS)]
-        t_inicio = time.monotonic()
-        for t in threads:
-            t.start()
-        for t in threads:
-            t.join()
+        print("Disparando %d maquinas falsas anunciando (3 vezes, como na sala:"
+              " cada ARENA repete o anuncio a cada 5 s)..." % N_MAQUINAS)
+        for _rodada in range(3):
+            threads = [threading.Thread(target=anunciar_maquina_falsa, args=(i, PORTA_DESCOBERTA))
+                       for i in range(N_MAQUINAS)]
+            for t in threads:
+                t.start()
+            for t in threads:
+                t.join()
+            time.sleep(1.0)
 
         print("Esperando o ARENA processar e medindo CPU por 8s...")
         cpu_pct = medir_cpu(processo.pid, 8.0)

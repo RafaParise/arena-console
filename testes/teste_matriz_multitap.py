@@ -34,6 +34,7 @@ RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(RAIZ, "servidor"))
 import protege_cfg  # noqa: E402
+import jogos_de_teste  # noqa: E402  (acha o jogo tambem em subpasta)
 
 spec = importlib.util.spec_from_file_location("arena_matriz_mt", os.path.join(RAIZ, "servidor", "arena.py"))
 arena = importlib.util.module_from_spec(spec)
@@ -53,7 +54,7 @@ JOGOS = [
     ("Nintendo 64", "Nintendo 64", "GoldenEye 007 (USA).z64", "mupen64plus_next", "mupen64plus_next"),
     ("PlayStation", "PS1", "CTR - Crash Team Racing (USA).cue", "swanstation", "pcsx_rearmed"),
     ("Sega Saturn", "Sega Saturn", "Saturn Bomberman (USA) (1S) (Track 01).bin", "mednafen_saturn", "mednafen_saturn"),
-    ("Dreamcast", "Dreamcast", "Marvel vs. Capcom 2 (USA) (Track 3).bin", "flycast", "flycast"),
+    ("Dreamcast", "Dreamcast", "Marvel vs. Capcom 2 - New Age of Heroes (Europe).cue", "flycast", "flycast"),
     ("PSP", "PSP", "Killzone - Liberation (USA) (En,Fr,De,Es,It,Nl,Pl,Ru).iso", "ppsspp", "ppsspp"),
     ("Neo Geo", "Neo Geo", "kof97.zip", "fbneo", "fbneo"),
 ]
@@ -173,7 +174,7 @@ def main():
     resultados = []
     try:
         for i, (console, pasta, arquivo, sozinho, junto) in enumerate(JOGOS):
-            jogo = os.path.join(P, pasta, arquivo)
+            jogo = jogos_de_teste.achar(pasta, arquivo) or os.path.join(P, pasta, arquivo)
             linha = {"console": console, "jogo": arquivo}
             if not os.path.isfile(jogo):
                 linha["erro"] = "arquivo nao esta na pasta"
