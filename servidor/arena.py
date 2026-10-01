@@ -1956,11 +1956,16 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             # Wii ou GameCube: pelo proprio disco; sem resposta, pela pasta.
             console = graficos.console_do_disco_dolphin(caminho_jogo) or (
                 "wii" if "wii" in jogo["arquivo"].lower() else "gamecube")
+            preset = config.get("preset_grafico_externo", "automatico")
             pasta = graficos.escrever_config_dolphin(
                 jogo["externo"]["caminho"], controles.controles_xinput(),
-                console=console)
+                console=console,
+                nota=CAPACIDADE["nota"], nota_gpu=CAPACIDADE.get("nota_gpu"),
+                modesto=bool(config.get("modo_modesto")),
+                ultra=bool(config.get("ultra_desempenho")),
+                preset=None if preset == "automatico" else preset)
             if pasta:
-                print("[ARENA] Controles do Dolphin configurados (%s)."
+                print("[ARENA] Controles e imagem do Dolphin configurados (%s)."
                       % ("Wii" if console == "wii" else "GameCube"))
 
         # Xenia e RPCS3: mesma ideia do PCSX2 acima - video, controles (o

@@ -457,7 +457,19 @@ A cada jogo, o ARENA:
   ficam em `emuladores\Dolphin\...\User`. Sem isso, o Dolphin gravaria em
   `Documentos`, fora do pen drive;
 - liga **até 4 controles**, na ordem em que o Windows os numera, e põe o
-  **teclado no primeiro jogador sem controle**, como no resto do ARENA.
+  **teclado no primeiro jogador sem controle**, como no resto do ARENA;
+- ajusta a **imagem**, do mesmo jeito que no PS2:
+  - **compilação de efeitos híbrida**: o Dolphin, sozinho, para o jogo a
+    cada efeito novo enquanto prepara o desenho (a "travadinha" na
+    primeira explosão, no primeiro menu). Com o híbrido, ele mostra uma
+    versão provisória enquanto prepara a definitiva, e o jogo não para;
+  - **resolução**: nativa do console em placa integrada, no **Gráfico
+    original** e em "Mais leve"; 2x em placa dedicada forte ou em "Mais
+    bonito" (Ajustes → Emuladores);
+  - **Dual Core** ligado (dois núcleos do processador para o jogo);
+  - **Ultra desempenho**: abre em tela cheia e sem a pergunta "parar o
+    jogo?". Desligou o ultra, volta o que estava antes: se você mesmo tinha
+    ligado a tela cheia pela tela do Dolphin, ela continua.
 
 No **GameCube**, cada controle vira um controle de GameCube (RB é o Z,
 gatilhos são L e R, analógico direito é o C).

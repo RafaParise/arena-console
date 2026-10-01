@@ -1334,9 +1334,113 @@ def console_do_disco_dolphin(caminho_jogo):
     return None
 
 
+def opcoes_de_imagem_dolphin(nota=None, nota_gpu=None, modesto=False, ultra=False,
+                             preset=None):
+    """O que o ARENA ajusta no Dolphin, por arquivo e secao.
+
+    Achado de 30/09/2026: o Dolphin externo (GameCube e Wii) so recebia
+    controles -- o GFX.ini estava VAZIO, e o modo grafico original e o ultra
+    nao chegavam nele. Nomes conferidos no codigo-fonte do Dolphin
+    (Config/GraphicsSettings.cpp, Config/MainSettings.cpp e
+    VideoCommon/VideoConfig.h) e no Dolphin.exe da pasta (5.0-12188):
+      - ShaderCompilationMode: 0 sincrono (PADRAO do Dolphin: trava a cada
+        efeito novo, enquanto compila), 1 so ubershaders, 2 hibrido
+        (ubershader enquanto compila o definitivo), 3 pula o desenho. Vai o
+        2, a mesma decisao ja tomada para o nucleo do Dolphin no RetroArch
+        ("async_uber, nao sync_uber" -- CLAUDE.md, secao 5).
+      - InternalResolution: 1 = nativa do console; 2 = 2x.
+      - MaxAnisotropy: 0 = 1x (sem filtro); 2 = 4x.
+      - CPUThread ("Dual Core"): ligado. Ja era o padrao desta versao, mas o
+        Dolphin 2509 (setembro de 2025) passou a vir DESLIGADO no computador;
+        fixar aqui impede que uma atualizacao deixe o GameCube com um nucleo
+        so no Celeron. Os jogos que precisam de um nucleo so continuam
+        protegidos: as regras por jogo do proprio Dolphin valem por cima.
+    Mesma escolha por placa do PCSX2/Xenia/RPCS3: 'preset' da aba
+    Emuladores ("leve"/"bonito") ou, no automatico, a nota da placa."""
+    gfx_settings = {"ShaderCompilationMode": "2"}
+    gfx_melhorias = {}
+    alvo = nota_gpu if nota_gpu is not None else nota
+    if alvo is not None or modesto or preset in ("leve", "bonito"):
+        if preset == "leve":
+            forte = False
+        elif preset == "bonito":
+            forte = True
+        else:
+            forte = (alvo or 0) >= 4 and not modesto
+        gfx_settings["InternalResolution"] = "2" if forte else "1"
+        gfx_settings["MSAA"] = "1"
+        gfx_settings["SSAA"] = "False"
+        gfx_melhorias["MaxAnisotropy"] = "2" if forte else "0"
+    # Ultra: tela cheia e sem a pergunta "parar o jogo?". Sem ultra, nada
+    # aqui: o que a pessoa escolheu na tela do Dolphin fica (a volta do que
+    # o ultra mudou e' feita em escrever_config_dolphin, pela anotacao).
+    principal = {"Core": {"CPUThread": "True"}}
+    if ultra:
+        principal["Display"] = {"Fullscreen": "True"}
+        principal["Interface"] = {"ConfirmStop": "False"}
+    gfx = {"Settings": gfx_settings}
+    if gfx_melhorias:
+        gfx["Enhancements"] = gfx_melhorias
+    return {"GFX.ini": gfx, "Dolphin.ini": principal}
+
+
+ANOTACAO_ULTRA_DOLPHIN = "arena_ultra_antes.json"
+CHAVES_ULTRA_DOLPHIN = (("Display", "Fullscreen", "False"),
+                        ("Interface", "ConfirmStop", "True"))   # padrao do Dolphin
+
+
+def _anotar_ou_devolver_ultra_dolphin(pasta_config, ultra, secoes):
+    """Ultra liga a tela cheia do Dolphin; desligado, devolve o que a pessoa
+    tinha antes -- nem fica grudado, nem apaga escolha feita na tela dele.
+
+    Ao ligar, anota os valores de antes (so na primeira vez: ligado de novo,
+    a anotacao original continua). Ao desligar, se houver anotacao, poe os
+    valores anotados em 'secoes' e apaga a anotacao."""
+    anotacao = os.path.join(pasta_config, ANOTACAO_ULTRA_DOLPHIN)
+    if ultra:
+        if os.path.exists(anotacao):
+            return
+        try:
+            with open(os.path.join(pasta_config, "Dolphin.ini"), encoding="utf-8",
+                      errors="replace") as arquivo:
+                texto = arquivo.read()
+        except OSError:
+            texto = ""
+        antes = {}
+        for secao, chave, padrao in CHAVES_ULTRA_DOLPHIN:
+            antes[chave] = _valor_ini(texto, secao, chave) or padrao
+        gravar_atomico(anotacao, json.dumps(antes, ensure_ascii=False))
+        return
+    try:
+        with open(anotacao, encoding="utf-8") as arquivo:
+            antes = json.load(arquivo)
+    except (OSError, ValueError):
+        return
+    for secao, chave, padrao in CHAVES_ULTRA_DOLPHIN:
+        secoes.setdefault(secao, {})[chave] = str(antes.get(chave) or padrao)
+    try:
+        os.remove(anotacao)
+    except OSError:
+        pass
+
+
+def _valor_ini(texto, secao, chave):
+    """Valor de uma chave numa secao de um .ini (ou None)."""
+    dentro = False
+    for linha in texto.splitlines():
+        limpo = linha.strip()
+        if limpo.startswith("[") and limpo.endswith("]"):
+            dentro = limpo == "[%s]" % secao
+        elif dentro and "=" in limpo and limpo.split("=", 1)[0].strip() == chave:
+            return limpo.split("=", 1)[1].strip()
+    return None
+
+
 def escrever_config_dolphin(caminho_executavel, controles_xinput, teclado=True,
-                            console="gamecube"):
-    """Deixa o Dolphin portatil e escreve os controles de GameCube e Wii.
+                            console="gamecube", nota=None, nota_gpu=None,
+                            modesto=False, ultra=False, preset=None):
+    """Deixa o Dolphin portatil e escreve os controles de GameCube e Wii,
+    e a imagem (ver opcoes_de_imagem_dolphin).
 
     'controles_xinput': numeros (0 a 3) dos controles XInput ligados.
     Cada um vira um jogador, na ordem; o teclado e' o primeiro jogador sem
@@ -1385,13 +1489,20 @@ def escrever_config_dolphin(caminho_executavel, controles_xinput, teclado=True,
         gravar_atomico(os.path.join(pasta_config, "WiimoteNew.ini"),
                        "\n".join(cabecalho + wiimote) + "\n")
 
-        arquivo_dolphin = os.path.join(pasta_config, "Dolphin.ini")
-        try:
-            with open(arquivo_dolphin, "r", encoding="utf-8", errors="replace") as arquivo:
-                texto = arquivo.read()
-        except OSError:
-            texto = ""
-        gravar_atomico(arquivo_dolphin, _trocar_chaves_ini(texto, "Core", portas))
+        imagem = opcoes_de_imagem_dolphin(nota, nota_gpu, modesto, ultra, preset)
+        imagem["Dolphin.ini"].setdefault("Core", {}).update(portas)
+        _anotar_ou_devolver_ultra_dolphin(pasta_config, ultra, imagem["Dolphin.ini"])
+        for nome_arquivo, secoes in imagem.items():
+            caminho = os.path.join(pasta_config, nome_arquivo)
+            try:
+                with open(caminho, "r", encoding="utf-8", errors="replace") as arquivo:
+                    texto = arquivo.read()
+            except OSError:
+                texto = ""
+            # So as chaves do ARENA mudam; o resto do arquivo fica.
+            for secao, chaves in secoes.items():
+                texto = _trocar_chaves_ini(texto, secao, chaves)
+            gravar_atomico(caminho, texto)
         return pasta_config
     except OSError:
         return None
