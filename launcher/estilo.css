@@ -190,6 +190,7 @@ code {
 .marca-sub {
   font-size: var(--t-micro);
   color: var(--texto-apagado);
+  white-space: nowrap;
 }
 
 .leitura {
@@ -198,7 +199,13 @@ code {
   margin: 0;
   padding-left: var(--gap-g);
   border-left: 1px solid var(--borda);
+  /* Encolhe antes dos botoes: em 1366x768 (o notebook da escola) o botao
+     Ajustes saia da tela. */
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
 }
+.leitura > div { min-width: 0; }
 
 .leitura dt {
   font-size: var(--t-micro);
@@ -210,6 +217,9 @@ code {
   font-family: var(--fonte-numero);
   font-size: var(--t-peq);
   color: var(--texto-fraco);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .topo-acoes {
@@ -217,6 +227,15 @@ code {
   display: flex;
   align-items: center;
   gap: var(--gap);
+  flex-shrink: 0;
+}
+
+/* Telas de ate 1500 px (1366x768, 1280x720): no topo, so processador e
+   memoria; motor e quantidade de jogos ficam em Ajustes -> Maquina. */
+@media (max-width: 1500px) {
+  .leitura > div:nth-child(n+3) { display: none; }
+  .topo-acoes { gap: .45rem; }
+  .topo-acoes > .botao { padding-left: .7rem; padding-right: .7rem; }
 }
 
 input[type="text"],
@@ -822,6 +841,11 @@ input::placeholder { color: var(--texto-apagado); }
 .detalhes-kicker { color: var(--azul-claro); font-size: var(--t-micro); text-transform: uppercase; letter-spacing: .08em; }
 .detalhes-corpo h2 { margin: .3rem 0 .5rem; font: 600 var(--t-med) var(--fonte-titulo); }
 .detalhes-descricao { color: var(--texto-fraco); font-size: var(--t-peq); }
+
+/* Botao do perfil no topo: foto pequena redonda + apelido. */
+.botao--perfil { display: inline-flex; align-items: center; gap: .4rem; max-width: 12rem; }
+.botao--perfil span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.perfil-mini { width: 1.4rem; height: 1.4rem; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
 /* Aviso do jogo (pasta errada, romset que nao abre): borda forte a esquerda
    E texto -- cor sozinha nao serve para quem nao distingue cores. */
 .detalhes-aviso {

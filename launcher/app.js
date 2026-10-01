@@ -47,7 +47,33 @@ function formatarBytes(valor) {
     tamanho /= 1024;
     indice += 1;
   }
-  return `${tamanho.toFixed(indice ? 1 : 0)} ${unidades[indice]}`;
+  return `${tamanho.toFixed(indice ? 1 : 0).replace(".", ",")} ${unidades[indice]}`;
+}
+
+// Tamanho do jogo, que o servidor manda em MB: "4,3 MB", "120 KB", "4,9 GB"
+// (antes: "4.3 MB" e "0 MB" nos jogos pequenos de Atari e Commodore).
+function formatarMb(mb) {
+  return formatarBytes((Number(mb) || 0) * 1024 * 1024);
+}
+
+// 11.8 -> "11,8" (a tela e' em portugues).
+function numeroBr(valor) {
+  return typeof valor === "number" ? valor.toLocaleString("pt-BR") : String(valor ?? "—");
+}
+
+// "AMD Ryzen 5 5600G with Radeon Graphics" -> "Ryzen 5 5600G";
+// "Intel Celeron N5100 @ 1.10GHz" -> "Celeron N5100";
+// "13th Gen Intel Core i5-1345U" -> "Core i5-1345U".
+function nomeCurtoDoProcessador(nome) {
+  const curto = String(nome || "")
+    .replace(/\s*@.*$/, "")
+    .replace(/\s+with\s+.*graphics.*$/i, "")
+    .replace(/\b\d+(st|nd|rd|th)\s+Gen\s+/i, "")
+    .replace(/^(Intel|AMD)\s+/i, "")
+    .replace(/\s+Processor\b/i, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  return curto || String(nome || "");
 }
 
 function atualizarBotaoTema() {
@@ -153,9 +179,12 @@ async function carregarEstado() {
   const m = dados.maquina;
   estado.maquina = m;
 
-  // Barra do topo: o essencial. O detalhe fica na aba Máquina.
-  $("#lidoCpu").textContent = m.cpu;
-  $("#lidoRam").textContent = `${m.ram_total_gb} GB`;
+  // Barra do topo: o essencial. O detalhe fica na aba Máquina. Nome curto
+  // do processador (o completo fica no "title"): em 1366x768, "AMD Ryzen 5
+  // 5600G with Radeon Graphics" quebrava em tres linhas e empurrava a tela.
+  $("#lidoCpu").textContent = nomeCurtoDoProcessador(m.cpu);
+  $("#lidoCpu").title = m.cpu;
+  $("#lidoRam").textContent = `${numeroBr(m.ram_total_gb)} GB`;
   $("#lidoDriver").textContent = estado.efetivas.video_driver || m.driver_video;
   if (!estado.config.apelido) {
     $("#modalApelido").hidden = false;
@@ -165,7 +194,7 @@ async function carregarEstado() {
   // Aba Máquina
   $("#hwCpu").textContent = m.cpu;
   $("#hwNucleos").textContent = `${m.nucleos} núcleos lógicos`;
-  $("#hwRam").textContent = `${m.ram_total_gb} GB (${m.ram_livre_gb} GB livres)`;
+  $("#hwRam").textContent = `${numeroBr(m.ram_total_gb)} GB (${numeroBr(m.ram_livre_gb)} GB livres)`;
   $("#hwDisco").textContent = `${m.disco.descricao} · unidade ${m.disco.unidade}`;
 
   $("#hwEspaco").textContent = m.disco.livre_gb
@@ -250,6 +279,7 @@ async function carregarEstado() {
   desenharFechamentos(dados.fechamentos || []);
 
   $("#perfilApelido").textContent = dados.config.apelido || "(sem apelido)";
+  mostrarApelido(dados.config.apelido);
   $("#perfilCodigo").textContent = dados.config.dispositivo_id || "—";
   $("#perfilRecordes").textContent = `${dados.pendentes} aguardando envio`;
   desenharPacotes(dados.pacotes || []);
@@ -543,7 +573,7 @@ function linhaDoJogo(jogo) {
   meta.className = "jogo-meta";
   // Quantos jogam juntos: o número do arquivo do professor, já limitado
   // ao que o emulador deste console permite (servidor\jogadores.py).
-  meta.textContent = `${jogo.plataforma_nome} · ${jogo.tamanho_mb} MB · ${textoJogadores(jogo.jogadores_max)}`;
+  meta.textContent = `${jogo.plataforma_nome} · ${formatarMb(jogo.tamanho_mb)} · ${textoJogadores(jogo.jogadores_max)}`;
 
   abrir.append(titulo, meta);
 
@@ -603,7 +633,7 @@ function desenharDetalhes() {
   $("#detalhesConsole").textContent = jogo.plataforma_nome;
   $("#detalhesDescricao").textContent = plataforma.descricao || "Jogo da biblioteca do ARENA.";
   $("#detalhesPlataforma").textContent = jogo.plataforma_nome;
-  $("#detalhesTamanho").textContent = `${jogo.tamanho_mb} MB`;
+  $("#detalhesTamanho").textContent = formatarMb(jogo.tamanho_mb);
   $("#detalhesOrigem").textContent = jogo.origem_rotulo;
   const capa = $("#detalhesCapa");
   capa.className = `detalhes-capa capa-${classeDaCapa(jogo.plataforma_nome)}`;
@@ -731,6 +761,38 @@ function explicarFundoAnimado() {
   } else {
     ajuda.textContent = "O céu (tema escuro) e o campo (tema claro) atrás da tela. Parado não gasta nada.";
   }
+}
+
+// --------------------------------------------------------------------------
+// Perfil: quem sou eu (foto, apelido) e meus amigos -- tarefa 6 do Rafael.
+// --------------------------------------------------------------------------
+
+function abrirPerfil(aba) {
+  abrirGaveta("gavetaPerfil");
+  const botao = document.querySelector(`#gavetaPerfil .aba[data-aba="${aba}"]`);
+  if (botao) botao.click();
+}
+
+// O apelido aparece em tres lugares: no botao do topo, no campo de trocar e
+// em "Jogando como".
+function mostrarApelido(apelido) {
+  $("#perfilMiniNome").textContent = apelido || "Perfil";
+  const campo = $("#campoApelido");
+  if (campo && document.activeElement !== campo) campo.value = apelido || "";
+}
+
+async function trocarApelido() {
+  const valor = $("#campoApelido").value.trim();
+  if (!valor) { recado("Escreva um apelido antes de salvar.", true); return; }
+  await salvarConfig({ apelido: valor });
+  // O servidor limpa o que nao pode ir para o arquivo do emulador (aspas,
+  // por exemplo): vale o que ele guardou.
+  const guardado = estado.config.apelido || valor;
+  $("#perfilApelido").textContent = guardado;
+  $("#campoApelido").value = guardado;
+  mostrarApelido(guardado);
+  recado(guardado === valor ? `Apelido trocado: ${guardado}.`
+                            : `Apelido trocado: ${guardado} (sem aspas e barras, que o emulador não aceita).`);
 }
 
 async function moverJogo(jogoId, plataformaId) {
@@ -1210,6 +1272,10 @@ function atualizarFotoPerfil(temFoto) {
     vazia.hidden = false;
     remover.hidden = true;
   }
+  // A mesma foto, pequena, no botao do perfil la no topo.
+  const mini = $("#perfilMini");
+  mini.hidden = !temFoto;
+  if (temFoto) mini.src = img.src;
 }
 
 function redimensionarFotoPerfil(arquivo) {
@@ -1298,7 +1364,7 @@ function desenharPacotes(lista) {
     const linha = document.createElement("li");
 
     const nome = document.createElement("span");
-    nome.textContent = `${pacote.quando} · ${pacote.tamanho_mb} MB`;
+    nome.textContent = `${pacote.quando} · ${formatarMb(pacote.tamanho_mb)}`;
 
     const trazer = document.createElement("button");
     trazer.type = "button";
@@ -3221,10 +3287,12 @@ function ligarEventos() {
       recado(falha.message, true);
     }
   });
-  $("#btnAmigos").addEventListener("click", () => {
-    abrirGaveta("gavetaAjustes");
-    const aba = document.querySelector('#gavetaAjustes .aba[data-aba="rede"]');
-    if (aba) aba.click();
+  $("#btnAmigos").addEventListener("click", () => abrirPerfil("rede"));
+  $("#btnPerfil").addEventListener("click", () => abrirPerfil("perfil"));
+  $("#btnTrocarApelido").addEventListener("click", () =>
+    trocarApelido().catch((falha) => recado(falha.message, true)));
+  $("#campoApelido").addEventListener("keydown", (evento) => {
+    if (evento.key === "Enter") trocarApelido().catch((falha) => recado(falha.message, true));
   });
   $("#btnRecordes").addEventListener("click", () => {
     abrirGaveta("gavetaRecordes");
@@ -3679,8 +3747,9 @@ function ligarEventos() {
     if (!valor) { recado("Escolha um apelido para começar.", true); return; }
     await salvarConfig({ apelido: valor });
     $("#modalApelido").hidden = true;
-    $("#perfilApelido").textContent = valor;
-    recado(`Tudo certo, ${valor}!`);
+    $("#perfilApelido").textContent = estado.config.apelido || valor;
+    mostrarApelido(estado.config.apelido || valor);
+    recado(`Tudo certo, ${estado.config.apelido || valor}!`);
   }
   $("#btnSalvarApelido").addEventListener("click", () =>
     salvarApelidoInicial().catch((falha) => recado(falha.message, true)));

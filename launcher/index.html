@@ -26,6 +26,10 @@
   </dl>
 
   <div class="topo-acoes">
+    <button class="botao botao--perfil" id="btnPerfil" type="button" aria-label="Abrir o seu perfil">
+      <img id="perfilMini" class="perfil-mini" alt="" hidden>
+      <span id="perfilMiniNome">Perfil</span>
+    </button>
     <button class="botao" id="btnAmigos" type="button">Amigos</button>
     <button class="botao" id="btnRecordes" type="button">Recordes</button>
     <button class="botao" id="btnConquistas" type="button">Conquistas</button>
@@ -126,88 +130,75 @@
   </aside>
 </main>
 
-<!-- ===================== ACERVO AUTORIZADO ===================== -->
-<aside class="gaveta" id="gavetaAcervo" hidden aria-labelledby="tituloAcervo">
+<!-- ===================== PERFIL: QUEM SOU EU E MEUS AMIGOS ===================== -->
+<!-- Pedido do Rafael (tarefa 6): o perfil com a aba de amigos e a de trocar o
+     apelido. Antes, as duas eram abas dos Ajustes e o apelido so podia ser
+     escolhido na primeira vez. -->
+<aside class="gaveta" id="gavetaPerfil" hidden aria-labelledby="tituloPerfil">
   <div class="gaveta-cabeca">
-    <h2 id="tituloAcervo">Biblioteca online</h2>
-    <button class="botao botao--fechar" data-fechar="gavetaAcervo" type="button">Fechar</button>
-  </div>
-  <div class="aba-conteudo">
-    <p class="explica">Pesquise e instale jogos gratuitos.</p>
-    <label class="campo acervo-busca">
-      <span>Pesquisar jogo</span>
-      <input id="campoBuscaOnline" type="search" maxlength="80" placeholder="ex.: Quattris, Pong, aventura" autocomplete="off">
-    </label>
-    <p class="explica" id="bibliotecaOnlineStatus">Digite o nome de um jogo.</p>
-    <ul class="controles" id="listaBibliotecaOnline"></ul>
-    <h3 class="grupo-titulo">Jogos já instalados</h3>
-    <label class="campo acervo-busca">
-      <span>Filtrar os instalados</span>
-      <input id="campoBuscaAcervo" type="search" maxlength="80"
-             placeholder="nome, console ou licença" autocomplete="off">
-    </label>
-    <div class="acervo-fontes" id="listaFontesAcervo"></div>
-    <ul class="controles" id="listaAcervo"></ul>
-    <button class="botao" id="btnNovoAcervo" type="button" hidden>Gerenciar catálogo</button>
-    <p class="explica" id="acervoVazio">
-      Nenhum jogo encontrado. Tente outro nome.
-    </p>
-  </div>
-</aside>
-
-<!-- ===================== GAVETA DE AJUSTES ===================== -->
-<aside class="gaveta" id="gavetaAjustes" hidden aria-labelledby="tituloAjustes">
-  <div class="gaveta-cabeca">
-    <h2 id="tituloAjustes">Ajustes</h2>
-    <button class="botao botao--fechar" data-fechar="gavetaAjustes" type="button">Fechar</button>
+    <h2 id="tituloPerfil">Perfil</h2>
+    <button class="botao botao--fechar" data-fechar="gavetaPerfil" type="button">Fechar</button>
   </div>
 
   <div class="abas" role="tablist">
-    <button class="aba ativo" role="tab" data-aba="simples" type="button">Simples</button>
-    <button class="aba" role="tab" data-aba="avancado" type="button">Avançado</button>
+    <button class="aba ativo" role="tab" data-aba="perfil" type="button">Meu perfil</button>
     <button class="aba" role="tab" data-aba="rede" type="button">Amigos</button>
-    <button class="aba" role="tab" data-aba="maquina" type="button">Máquina</button>
-    <button class="aba" role="tab" data-aba="perfil" type="button">Perfil</button>
-    <button class="aba" role="tab" data-aba="controles" type="button">Controles</button>
-    <button class="aba" role="tab" data-aba="emuladores" type="button">Emuladores</button>
   </div>
 
-  <!-- Aba simples -->
-  <div class="aba-conteudo" data-painel="simples">
-    <p class="explica">Automático é o recomendado.</p>
-    <div class="perfis" id="listaPerfis"></div>
-
-    <div class="opcao">
-      <span class="opcao-rotulo">Fundo animado</span>
-      <select class="opcao-controle" id="listaFundoAnimado" aria-label="Fundo animado"
-              aria-describedby="ajudaFundoAnimado">
-        <option value="automatico">Automático (recomendado)</option>
-        <option value="sempre">Sempre animado</option>
-        <option value="parado">Parado</option>
-      </select>
-      <span class="opcao-ajuda" id="ajudaFundoAnimado">O céu (tema escuro) e o campo (tema claro) atrás da tela. Parado não gasta nada.</span>
-    </div>
-
-    <div class="onde">
-      <h3>Onde ficam suas coisas</h3>
+  <div class="aba-conteudo" data-painel="perfil">
+    <div>
+      <h3 class="grupo-titulo">Este ARENA agora</h3>
+      <p class="explica">
+        Fica sempre igual, mesmo se o computador ou o pen drive mudar de
+        lugar. É como os colegas te reconhecem.
+      </p>
+      <div class="perfil-box">
+        <img id="perfilFoto" class="perfil-foto" alt="Sua foto de perfil" hidden>
+        <div id="perfilFotoVazia" class="perfil-foto perfil-foto--vazia" aria-hidden="true">?</div>
+        <div class="perfil-box-info">
+          <div class="perfil-box-botoes">
+            <label class="botao" for="perfilFotoArquivo">Escolher foto</label>
+            <input id="perfilFotoArquivo" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+            <button class="botao" id="btnRemoverFotoPerfil" type="button" hidden>Remover foto</button>
+          </div>
+          <span class="opcao-ajuda">PNG, JPG ou WEBP, até 2 MB.</span>
+        </div>
+      </div>
+      <div class="cheat-form">
+        <label class="campo">
+          <span>Seu apelido</span>
+          <input id="campoApelido" type="text" maxlength="24" autocomplete="off"
+                 spellcheck="false" aria-describedby="ajudaApelido">
+        </label>
+        <button class="botao botao--principal" id="btnTrocarApelido" type="button">Salvar apelido</button>
+      </div>
+      <span class="opcao-ajuda" id="ajudaApelido">É o nome dos seus recordes e o que os amigos veem. Recorde antigo continua com o apelido da época.</span>
       <ul class="onde-lista">
-        <li><span>Jogos salvos</span><code id="camSaves">—</code></li>
-        <li><span>Fotos da tela</span><code id="camCapturas">—</code></li>
-        <li><span>Seus jogos</span><code id="camJogos">—</code></li>
-        <li><span>Arquivos de sistema</span><code id="camSistema">—</code></li>
+        <li><span>Jogando como</span><code id="perfilApelido">—</code></li>
+        <li><span>Código deste ARENA</span><code id="perfilCodigo">—</code></li>
+        <li><span>Recordes guardados</span><code id="perfilRecordes">—</code></li>
       </ul>
-      <p class="explica">Tudo fica dentro da pasta do ARENA.</p>
+    </div>
+
+    <div>
+      <h3 class="grupo-titulo">Começar do zero</h3>
+      <p class="explica">Apaga o perfil e as configurações. Os jogos ficam.</p>
+
+      <div class="opcao">
+        <span class="opcao-rotulo">Apagar também os saves e cheats</span>
+        <button class="chave opcao-controle" id="chaveApagarSaves"
+                aria-pressed="false" aria-label="Apagar saves e cheats"></button>
+        <span class="opcao-ajuda">
+          Desligado, seus saves ficam.
+        </span>
+      </div>
+
+      <button class="botao botao--perigo" id="btnNovoPerfil" type="button">
+        Começar do zero
+      </button>
     </div>
   </div>
 
-  <!-- Aba avancada -->
-  <div class="aba-conteudo" data-painel="avancado" hidden>
-    <p class="explica">Ajustes avançados do emulador.</p>
-    <div class="avancado" id="listaAvancado"></div>
-    <button class="botao" id="btnRestaurar" type="button">Voltar tudo ao padrão</button>
-  </div>
-
-  <!-- Aba amigos -->
   <div class="aba-conteudo" data-painel="rede" hidden>
     <div>
       <h3 class="grupo-titulo">Meus amigos</h3>
@@ -300,6 +291,88 @@
     <p class="explica rede-automatica">Descoberta local automática. IPs ficam ocultos.</p>
   </div>
 
+</aside>
+
+<!-- ===================== ACERVO AUTORIZADO ===================== -->
+<aside class="gaveta" id="gavetaAcervo" hidden aria-labelledby="tituloAcervo">
+  <div class="gaveta-cabeca">
+    <h2 id="tituloAcervo">Biblioteca online</h2>
+    <button class="botao botao--fechar" data-fechar="gavetaAcervo" type="button">Fechar</button>
+  </div>
+  <div class="aba-conteudo">
+    <p class="explica">Pesquise e instale jogos gratuitos.</p>
+    <label class="campo acervo-busca">
+      <span>Pesquisar jogo</span>
+      <input id="campoBuscaOnline" type="search" maxlength="80" placeholder="ex.: Quattris, Pong, aventura" autocomplete="off">
+    </label>
+    <p class="explica" id="bibliotecaOnlineStatus">Digite o nome de um jogo.</p>
+    <ul class="controles" id="listaBibliotecaOnline"></ul>
+    <h3 class="grupo-titulo">Jogos já instalados</h3>
+    <label class="campo acervo-busca">
+      <span>Filtrar os instalados</span>
+      <input id="campoBuscaAcervo" type="search" maxlength="80"
+             placeholder="nome, console ou licença" autocomplete="off">
+    </label>
+    <div class="acervo-fontes" id="listaFontesAcervo"></div>
+    <ul class="controles" id="listaAcervo"></ul>
+    <button class="botao" id="btnNovoAcervo" type="button" hidden>Gerenciar catálogo</button>
+    <p class="explica" id="acervoVazio">
+      Nenhum jogo encontrado. Tente outro nome.
+    </p>
+  </div>
+</aside>
+
+<!-- ===================== GAVETA DE AJUSTES ===================== -->
+<aside class="gaveta" id="gavetaAjustes" hidden aria-labelledby="tituloAjustes">
+  <div class="gaveta-cabeca">
+    <h2 id="tituloAjustes">Ajustes</h2>
+    <button class="botao botao--fechar" data-fechar="gavetaAjustes" type="button">Fechar</button>
+  </div>
+
+  <div class="abas" role="tablist">
+    <button class="aba ativo" role="tab" data-aba="simples" type="button">Simples</button>
+    <button class="aba" role="tab" data-aba="avancado" type="button">Avançado</button>
+    <button class="aba" role="tab" data-aba="maquina" type="button">Máquina</button>
+    <button class="aba" role="tab" data-aba="controles" type="button">Controles</button>
+    <button class="aba" role="tab" data-aba="emuladores" type="button">Emuladores</button>
+  </div>
+
+  <!-- Aba simples -->
+  <div class="aba-conteudo" data-painel="simples">
+    <p class="explica">Automático é o recomendado.</p>
+    <div class="perfis" id="listaPerfis"></div>
+
+    <div class="opcao">
+      <span class="opcao-rotulo">Fundo animado</span>
+      <select class="opcao-controle" id="listaFundoAnimado" aria-label="Fundo animado"
+              aria-describedby="ajudaFundoAnimado">
+        <option value="automatico">Automático (recomendado)</option>
+        <option value="sempre">Sempre animado</option>
+        <option value="parado">Parado</option>
+      </select>
+      <span class="opcao-ajuda" id="ajudaFundoAnimado">O céu (tema escuro) e o campo (tema claro) atrás da tela. Parado não gasta nada.</span>
+    </div>
+
+    <div class="onde">
+      <h3>Onde ficam suas coisas</h3>
+      <ul class="onde-lista">
+        <li><span>Jogos salvos</span><code id="camSaves">—</code></li>
+        <li><span>Fotos da tela</span><code id="camCapturas">—</code></li>
+        <li><span>Seus jogos</span><code id="camJogos">—</code></li>
+        <li><span>Arquivos de sistema</span><code id="camSistema">—</code></li>
+      </ul>
+      <p class="explica">Tudo fica dentro da pasta do ARENA.</p>
+    </div>
+  </div>
+
+  <!-- Aba avancada -->
+  <div class="aba-conteudo" data-painel="avancado" hidden>
+    <p class="explica">Ajustes avançados do emulador.</p>
+    <div class="avancado" id="listaAvancado"></div>
+    <button class="botao" id="btnRestaurar" type="button">Voltar tudo ao padrão</button>
+  </div>
+
+  <!-- Aba amigos -->
   <!-- Aba máquina -->
   <div class="aba-conteudo" data-painel="maquina" hidden>
     <dl class="maquina">
@@ -408,51 +481,6 @@
   </div>
 
   <!-- Aba perfil -->
-  <div class="aba-conteudo" data-painel="perfil" hidden>
-    <div>
-      <h3 class="grupo-titulo">Este ARENA agora</h3>
-      <p class="explica">
-        Fica sempre igual, mesmo se o computador ou o pen drive mudar de
-        lugar. É como os colegas te reconhecem.
-      </p>
-      <div class="perfil-box">
-        <img id="perfilFoto" class="perfil-foto" alt="Sua foto de perfil" hidden>
-        <div id="perfilFotoVazia" class="perfil-foto perfil-foto--vazia" aria-hidden="true">?</div>
-        <div class="perfil-box-info">
-          <div class="perfil-box-botoes">
-            <label class="botao" for="perfilFotoArquivo">Escolher foto</label>
-            <input id="perfilFotoArquivo" type="file" accept="image/png,image/jpeg,image/webp" hidden>
-            <button class="botao" id="btnRemoverFotoPerfil" type="button" hidden>Remover foto</button>
-          </div>
-          <span class="opcao-ajuda">PNG, JPG ou WEBP, até 2 MB.</span>
-        </div>
-      </div>
-      <ul class="onde-lista">
-        <li><span>Jogando como</span><code id="perfilApelido">—</code></li>
-        <li><span>Código deste ARENA</span><code id="perfilCodigo">—</code></li>
-        <li><span>Recordes guardados</span><code id="perfilRecordes">—</code></li>
-      </ul>
-    </div>
-
-    <div>
-      <h3 class="grupo-titulo">Começar do zero</h3>
-      <p class="explica">Apaga o perfil e as configurações. Os jogos ficam.</p>
-
-      <div class="opcao">
-        <span class="opcao-rotulo">Apagar também os saves e cheats</span>
-        <button class="chave opcao-controle" id="chaveApagarSaves"
-                aria-pressed="false" aria-label="Apagar saves e cheats"></button>
-        <span class="opcao-ajuda">
-          Desligado, seus saves ficam.
-        </span>
-      </div>
-
-      <button class="botao botao--perigo" id="btnNovoPerfil" type="button">
-        Começar do zero
-      </button>
-    </div>
-  </div>
-
   <!-- Aba controles -->
   <div class="aba-conteudo" data-painel="controles" hidden>
     <p class="explica">Conecte o controle antes de abrir o jogo.</p>

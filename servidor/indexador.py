@@ -293,7 +293,7 @@ def arquivo_de_jogadores():
 # (ex.: o jogo de CD em trilhas virar um jogo so) nao valia num ARENA que ja
 # tinha a lista salva, ate alguma pasta mudar. 2 = nomes de fliperama pelos
 # bancos do RetroArch + avisos do jogo.
-VERSAO_INDICE = 2
+VERSAO_INDICE = 3     # 3 = tamanho com mais casas nos jogos pequenos
 
 
 def assinatura_das_pastas():
@@ -660,7 +660,9 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None,
                 # Frase para o aluno quando o jogo aceita mais do que o
                 # emulador deste console permite (vazio no resto).
                 "motivo_jogadores": ligacao["motivo"],
-                "tamanho_mb": round(tamanho_mb, 1),
+                # Jogo pequeno (Atari, Commodore: poucos KB) com mais casas,
+                # senao a tela mostrava "0 MB".
+                "tamanho_mb": round(tamanho_mb, 1) if tamanho_mb >= 1 else round(tamanho_mb, 4),
                 # Quando houve desempate, a tela oferece a correcao.
                 "ambiguo": incerto,
                 # Console que o conteudo do arquivo indica, quando difere

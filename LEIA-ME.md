@@ -77,7 +77,7 @@ Detalhes no documento 2.
 
 ## Recebeu esta pasta de outra pessoa?
 
-**Ajustes → Perfil → Começar do zero.**
+**Perfil → Meu perfil → Começar do zero.**
 
 Apaga o apelido, os recordes, a lista de amigos, o mapeamento de controle e
 as configurações de quem te passou. **Os jogos ficam.** Você escolhe se quer

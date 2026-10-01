@@ -11,11 +11,22 @@ Ver a pontuação dos colegas e jogar junto, com ou sem Wi-Fi.
 
 ### Meu perfil
 
-Em **Ajustes → Amigos**, no topo, tem **Meu perfil**: apelido e uma foto
-opcional (PNG, JPG ou WEBP, até 2 MB — o ARENA recorta e reduz sozinho
-pra 256×256, bem leve). Fica salvo em `dados\perfil\`, permanente —
-sobrevive a fechar e abrir o ARENA, trocar de pen drive não perde nada
-se a pasta `dados` for junto.
+O botão com o **seu apelido**, no topo da tela, abre a gaveta **Perfil**,
+com duas abas:
+
+| Aba | O que tem |
+|---|---|
+| **Meu perfil** | Foto opcional (PNG, JPG ou WEBP, até 2 MB — o ARENA recorta e reduz sozinho pra 256×256, bem leve), **o apelido, que dá para trocar a qualquer hora** (campo + **Salvar apelido**), o código deste ARENA, os recordes guardados e o **Começar do zero** |
+| **Amigos** | Seu código de amigo, a lista de amigos, **Aceitar conexões da rede**, seus endereços, a atividade na rede e a troca pelo pen drive. O botão **Amigos** do topo abre direto aqui |
+
+Tudo fica salvo em `dados\` (a foto em `dados\perfil\`), permanente —
+sobrevive a fechar e abrir o ARENA, e trocar de pen drive não perde nada se
+a pasta `dados` for junto.
+
+Trocar o apelido vale para os recordes **dali em diante**: os antigos
+continuam com o apelido da época. Aspas e barra invertida não entram (o
+apelido vai para o arquivo do emulador na partida a dois, e uma aspa
+quebraria a linha).
 
 ## Parte A — Servidor da sala e amigos
 
@@ -96,7 +107,7 @@ seu pacote.
 
 Se não dá para ligar as máquinas de jeito nenhum, os recordes ainda viajam.
 
-1. No seu ARENA: **Ajustes → Amigos → Trocar pelo pen drive**.
+1. No seu ARENA: **Perfil → Amigos → Trocar pelo pen drive**.
 2. Leve o pen drive até a máquina do colega.
 3. No ARENA dele, o mesmo botão.
 4. Volte e clique de novo no seu.
@@ -126,7 +137,7 @@ controle do roteador da escola.
 
 ### Passo 3 — Deixe o colega te achar
 
-**Ajustes → Amigos → Aceitar conexões da rede.**
+**Perfil → Amigos → Aceitar conexões da rede.**
 
 Ligue. **Vale na hora**: não precisa fechar o ARENA. (Até setembro de 2026
 precisava fechar e abrir; se o seu ARENA for mais antigo, ainda precisa.)
@@ -165,7 +176,7 @@ Na primeira vez o Windows pergunta se o Python pode se comunicar na rede.
 
 #### O jeito fácil: deixe o ARENA achar
 
-Em **Ajustes → Amigos**, logo abaixo da sua lista, tem **Colegas
+Em **Perfil → Amigos**, logo abaixo da sua lista, tem **Colegas
 encontrados na rede**.
 
 O ARENA avisa "estou aqui" na rede a cada cinco segundos e escuta quem mais
@@ -191,7 +202,7 @@ porta. Não leva recorde, não leva nome, não sai da rede local.
 
 #### O jeito manual
 
-**Ajustes → Amigos.**
+**Perfil → Amigos.**
 
 1. **Apelido do amigo** — o apelido dele.
 2. **Endereço que ele te passou** — pode digitar só o número; o ARENA
@@ -398,7 +409,7 @@ conexão.
 **O ARENA resolve sozinho na primeira abertura.** O código passou a nascer
 da própria máquina, não do arquivo copiado.
 
-Para conferir: **Ajustes → Amigos → Código deste ARENA**. Dois colegas com o
+Para conferir: **Perfil → Meu perfil → Código deste ARENA**. Dois colegas com o
 mesmo código é sinal de problema.
 
 E se mesmo assim dois computadores saírem iguais — acontece em laboratório

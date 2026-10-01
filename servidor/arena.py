@@ -1055,6 +1055,18 @@ def config_padrao():
 
 _config_cache = {"quando": 0.0, "valor": None}
 
+
+def limpar_apelido(texto):
+    """Apelido que pode ir para qualquer lugar: tela, banco, sincronizacao
+    e o arquivo do RetroArch (netplay_nickname = "...").
+
+    Achado de 01/10/2026: o apelido ia cru para esse arquivo. Uma aspa
+    digitada pelo aluno (Joao "o brabo") quebrava a linha, e uma quebra de
+    linha poderia enfiar outra opcao do emulador. Fica sem aspas, sem barra
+    invertida e sem caractere de controle; espacos repetidos viram um so."""
+    limpo = "".join(c for c in str(texto or "") if c.isprintable() and c not in '"\\')
+    return " ".join(limpo.split())[:24]
+
 # Jeitos de mostrar o fundo da tela (launcher\field-background.js e
 # galaxy-background.js leem body[data-fundo-animado]).
 FUNDOS_ANIMADOS = ("automatico", "sempre", "parado")
@@ -1115,7 +1127,7 @@ def ler_config_do_disco():
                 elif not isinstance(valor, str):
                     continue
                 config["avancado"][chave] = valor
-    config["apelido"] = str(salvo.get("apelido", ""))[:24]
+    config["apelido"] = limpar_apelido(salvo.get("apelido", ""))
     config["permitir_rede"] = bool(salvo.get("permitir_rede", False))
     config["nome_dispositivo"] = str(salvo.get("nome_dispositivo", ""))[:40]
 
@@ -1602,7 +1614,10 @@ def gravar_override(config, custo=None, extras=None, em_partida=False,
             opcoes["video_shader_enable"] = "false"
 
     linhas = ["# Gerado pelo ARENA. Nao edite a mao: sera reescrito."]
-    linhas += ['%s = "%s"' % (c, opcoes[c]) for c in sorted(opcoes)]
+    # Nenhum valor pode quebrar a linha nem fechar as aspas antes da hora:
+    # seria outra opcao entrando escondida no emulador.
+    linhas += ['%s = "%s"' % (c, str(opcoes[c]).replace('"', "'").replace("\r", " ").replace("\n", " "))
+               for c in sorted(opcoes)]
 
     os.makedirs(PASTA_DADOS, exist_ok=True)
     gravar_texto_atomico(ARQUIVO_OVERRIDE, "\n".join(linhas) + "\n")
@@ -4862,7 +4877,7 @@ class Manipulador(BaseHTTPRequestHandler):
                     config["modo_desempenho"] = True
 
             if "apelido" in dados:
-                config["apelido"] = str(dados["apelido"]).strip()[:24]
+                config["apelido"] = limpar_apelido(dados["apelido"])
 
             rede_mudou = False
             if "permitir_rede" in dados:
@@ -4930,7 +4945,7 @@ class Manipulador(BaseHTTPRequestHandler):
                                    "dados": dados_externo}
 
             config = carregar_config()
-            apelido = (dados.get("apelido") or config["apelido"] or "convidado")[:24]
+            apelido = limpar_apelido(dados.get("apelido") or config["apelido"]) or "convidado"
 
             # Conferir e marcar DENTRO DA MESMA TRAVA. Em travas separadas
             # abre-se uma janela em que varios pedidos passam juntos, e o
@@ -5121,7 +5136,7 @@ class Manipulador(BaseHTTPRequestHandler):
                                  "Clique em Atualizar lista e tente de novo.", 404)
 
             config = carregar_config()
-            apelido = (dados.get("apelido") or config["apelido"] or "convidado")[:24]
+            apelido = limpar_apelido(dados.get("apelido") or config["apelido"]) or "convidado"
 
             with TRAVA_BANCO, banco() as conexao:
                 inserir_placar(conexao, uuid.uuid4().hex, apelido, jogo["id"],
