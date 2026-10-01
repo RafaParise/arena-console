@@ -421,9 +421,19 @@ quando sair da janela*, e deixe desligado.
 
 Em **Ajustes → Máquina → Dar prioridade ao jogo**.
 
-Enquanto o jogo roda, o Windows dá preferência a ele. O ARENA e o navegador
-ficam em segundo plano até você fechar. **Não fecha nada de ninguém** — só
-muda quem tem preferência na fila do processador.
+Enquanto o jogo roda:
+
+- o **ARENA cede a vez** ao jogo: prioridade "abaixo do normal" e memória
+  de prioridade baixa (se a memória acabar, o Windows tira do ARENA, não do
+  jogo);
+- o **emulador fica fora da economia de energia** do Windows: o Windows 11
+  freia programas que acha que você não está usando (por exemplo, o jogo na
+  TV pelo HDMI com o foco na tela do notebook) — com isto, nunca freia o
+  jogo.
+
+Todo jogo, com ou sem este modo, já abre com prioridade "acima do normal".
+**Não fecha nada de ninguém** — só muda quem tem preferência na fila. O
+navegador continua como está: feche as abas que não estiver usando.
 
 Recomendado em computador modesto. Para ajudar ainda mais, antes de jogar
 feche as abas do navegador que não estiver usando, e o Teams ou o OneDrive
@@ -436,14 +446,18 @@ se estiverem abertos.
 Um degrau acima do modo desempenho. Em **Ajustes → Máquina → Ultra
 desempenho**.
 
-**O que ele faz, e cada item é real:**
+**O que ele faz, e cada item é real** (conferido pelo próprio Windows no
+teste `testes\teste_ultra_promessas.py`):
 
-- o emulador sobe para prioridade alta e o ARENA cai para a mais baixa;
+- tudo o que o modo desempenho faz (acima): o ARENA cede a vez e o emulador
+  fica fora da economia de energia;
 - o ARENA **para de vigiar a rede** enquanto você joga — nenhuma tarefa de
-  fundo disputando o processador;
+  fundo disputando o processador. Volta sozinho ao fechar o jogo, inclusive
+  se o jogo nem chegar a abrir;
 - a placa de som passa a ser do jogo, sem o misturador do Windows no meio;
 - tela cheia sem borda (não a exclusiva — em placa de vídeo integrada a
-  exclusiva às vezes engasga a troca de tela e o menu não aparece);
+  exclusiva às vezes engasga a troca de tela e o menu não aparece); no PS2
+  (PCSX2) e no GameCube/Wii (Dolphin) também abre em tela cheia;
 - filtros, voltar no tempo e resposta instantânea saem de cena.
 
 **O que ele não faz**, e não adianta prometer:
@@ -453,6 +467,13 @@ desempenho**.
   na máquina da escola;
 - **não fecha programa de ninguém.** Se o Teams estiver aberto, continua
   aberto: só perde a vez na fila do processador;
+- **não põe o emulador em prioridade "alta".** Num processador de 4
+  núcleos com o jogo usando todos, a "alta" pode deixar o próprio Windows
+  engasgado (mouse e teclado atrasando). Fica como teste para fazer no
+  notebook da escola antes de virar padrão;
+- **não muda o modo de energia do Windows** ("Alto desempenho"): seria uma
+  mudança gravada no Windows, que ficaria trocada se o ARENA fechasse no
+  meio do jogo;
 - **não prende o teclado.** O `Esc` sempre abre o menu do RetroArch com o
   Ultra desempenho ligado sozinho. Prender o teclado é outra chave, veja
   abaixo.

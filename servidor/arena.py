@@ -19,7 +19,6 @@ Nenhum 'pip install'. Nenhuma conexao com a internet.
 import base64
 import binascii
 import contextlib
-import ctypes
 import errno
 import json
 import os
@@ -59,6 +58,7 @@ import capas_online     # noqa: E402
 import graficos    # noqa: E402
 import hardware    # noqa: E402
 import indexador   # noqa: E402  (precisam vir depois do ajuste de sys.path)
+import processos   # noqa: E402  (prioridade e economia de energia -- 30/09/2026)
 
 PASTA_LAUNCHER = os.path.join(RAIZ, "launcher")
 PASTA_DADOS = os.path.join(RAIZ, "dados")
@@ -1332,7 +1332,10 @@ def opcoes_efetivas(config, custo=None):
 # ---------------------------------------------------------------------------
 # O que este modo FAZ, e cada item e real:
 #
-#   - o emulador sobe para prioridade alta e o ARENA cai para a mais baixa;
+#   - o ARENA cede a vez (prioridade abaixo do normal, memoria de prioridade
+#     baixa) e o emulador fica fora da economia de energia do Windows --
+#     o mesmo do modo desempenho (ver executar_jogo e servidor\processos.py;
+#     ate 30/09/2026 a "prioridade alta" prometida aqui nunca acontecia);
 #   - o ARENA para de vigiar a rede e de anunciar na rede enquanto o jogo
 #     roda, entao nao ha nenhuma tarefa de fundo disputando o processador;
 #   - a placa de som passa a ser do jogo em modo exclusivo (WASAPI), o que
@@ -2186,30 +2189,32 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
                          agora_utc(), config["dispositivo_id"])
 
         inicio = time.monotonic()
+        # Modo desempenho (e o ultra, que o liga junto): enquanto o jogo roda,
+        # o ARENA cede a vez -- prioridade abaixo do normal, memoria com
+        # prioridade baixa (se faltar memoria, o Windows tira do servidor, nao
+        # do jogo) -- e o emulador fica fora da economia de energia do Windows.
+        # Nao fecha nada de ninguem: so muda quem tem preferencia na fila.
+        # Achado de 30/09/2026 (ver servidor\processos.py): antes, nenhuma das
+        # mudancas de prioridade acontecia de verdade.
+        acelerar = bool(config.get("modo_desempenho") or config.get("ultra_desempenho"))
         try:
-            # Prioridade acima do normal: o jogo ganha a CPU na frente do
+            # Todo jogo abre "acima do normal": ganha a CPU na frente do
             # navegador e do resto. Faz diferenca real em maquina de 2 nucleos.
+            # A "alta" NAO entra: ela nunca chegou a valer (as duas juntas, o
+            # Windows aplica a acima do normal) e, numa maquina de 4 nucleos
+            # com o emulador usando todos, pode deixar o proprio Windows
+            # engasgado -- fica para teste no notebook da escola.
             extras = {}
             if sys.platform.startswith("win"):
-                extras["creationflags"] = getattr(
-                    subprocess, "ABOVE_NORMAL_PRIORITY_CLASS", 0)
-            # Modo desempenho: o emulador entra com prioridade alta e o
-            # ARENA cai para baixa enquanto o jogo roda. O Windows passa a
-            # dar o processador para quem esta jogando, e nao para o
-            # navegador nem para o servidor. Nao fecha nada de ninguem -
-            # so muda quem tem preferencia na fila.
-            acelerar = (config.get("modo_desempenho")
-                        or config.get("ultra_desempenho"))
-            if acelerar and sys.platform.startswith("win"):
-                extras["creationflags"] = extras.get("creationflags", 0) | 0x00000080
-                try:
-                    ctypes.windll.kernel32.SetPriorityClass(
-                        ctypes.windll.kernel32.GetCurrentProcess(), 0x00004000)
-                except Exception:
-                    pass
+                extras["creationflags"] = processos.ACIMA_DO_NORMAL
+            if acelerar:
+                processos.prioridade_do_arena(processos.ABAIXO_DO_NORMAL)
+                processos.memoria_do_arena(processos.MEMORIA_BAIXA)
 
             # No modo ultra, o ARENA para de vigiar a rede e de se
-            # anunciar enquanto o jogo roda. Volta sozinho ao fechar.
+            # anunciar enquanto o jogo roda. Volta sozinho ao fechar (no
+            # finally la embaixo: antes, se o emulador nem abria, o vigia
+            # ficava parado ate reabrir o ARENA).
             if config.get("ultra_desempenho"):
                 VIGIA["suspenso"] = True
 
@@ -2230,6 +2235,8 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             cache_antes = graficos.preparar_cache_ps1(placa) if cuidar_cache_ps1 else -1
 
             processo = subprocess.Popen(comando, cwd=pasta_trabalho, **extras)
+            if acelerar and processos.tirar_da_economia_de_energia(processo.pid):
+                print("[ARENA] Emulador fora da economia de energia do Windows.")
             codigo = processo.wait()
 
             # Partida de 3+ jogadores: o que foi so dela nao pode ficar no
@@ -2249,24 +2256,18 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             # 10). Agora roda tambem aqui, ao fim de cada jogo.
             limpar_logs_antigos()
 
-            VIGIA["suspenso"] = False
-
-            # Devolve a prioridade do ARENA ao normal.
-            acelerar = (config.get("modo_desempenho")
-                        or config.get("ultra_desempenho"))
-            if acelerar and sys.platform.startswith("win"):
-                try:
-                    ctypes.windll.kernel32.SetPriorityClass(
-                        ctypes.windll.kernel32.GetCurrentProcess(), 0x00000020)
-                except Exception:
-                    pass
-
             # Fechou sozinho? Guarda o motivo, para o aluno nao ficar sem
             # explicacao e para dar o que investigar depois.
             if codigo not in (0, None):
                 registrar_fechamento(jogo, codigo, comando)
         except OSError as falha:
             print("[ARENA] Nao foi possivel abrir o RetroArch: %s" % falha)
+        finally:
+            # Volta tudo ao normal, abrindo o jogo ou nao.
+            VIGIA["suspenso"] = False
+            if acelerar:
+                processos.prioridade_do_arena(processos.NORMAL)
+                processos.memoria_do_arena(processos.MEMORIA_NORMAL)
 
         duracao = int(time.monotonic() - inicio)
 
