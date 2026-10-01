@@ -38,7 +38,11 @@ def requisicao(metodo, caminho, corpo=None):
 
 
 def main():
-    destino = tempfile.mkdtemp(prefix="arena_rede_")
+    # O ARENA isolado numa SUBPASTA do temporario: a mala do pen drive vai
+    # para a pasta de cima (caminho_da_mala), e com o ARENA direto no Temp
+    # ela ficava esquecida no Temp do Windows (achado de 01/10/2026).
+    destino = os.path.join(tempfile.mkdtemp(prefix="arena_rede_"), "ARENA")
+    os.makedirs(destino)
     try:
         for pasta in ("servidor", "dados", "launcher"):
             shutil.copytree(os.path.join(RAIZ, pasta), os.path.join(destino, pasta),
@@ -112,7 +116,7 @@ def main():
         return 0 if ok else 1
     finally:
         sys.path = [p for p in sys.path if not p.startswith(destino)]
-        shutil.rmtree(destino, ignore_errors=True)
+        shutil.rmtree(os.path.dirname(destino), ignore_errors=True)
 
 
 if __name__ == "__main__":

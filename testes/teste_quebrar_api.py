@@ -107,7 +107,11 @@ def main():
             except ValueError:
                 problemas.append("%s: %d nao e' JSON" % (rotulo, status))
 
-    destino = tempfile.mkdtemp(prefix="arena_quebrar_")
+    # O ARENA isolado numa SUBPASTA do temporario: a mala do pen drive vai
+    # para a pasta de cima (caminho_da_mala), e com o ARENA direto no Temp
+    # ela ficava esquecida no Temp do Windows (achado de 01/10/2026).
+    destino = os.path.join(tempfile.mkdtemp(prefix="arena_quebrar_"), "ARENA")
+    os.makedirs(destino)
     servidor = None
     try:
         jogo_id = fuzz_rotas.preparar_ambiente(destino)
@@ -238,7 +242,7 @@ def main():
             servidor.shutdown()
             servidor.server_close()
         sys.path = [p for p in sys.path if not p.startswith(destino)]
-        shutil.rmtree(destino, ignore_errors=True)
+        shutil.rmtree(os.path.dirname(destino), ignore_errors=True)
 
     print()
     if problemas:

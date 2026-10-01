@@ -191,6 +191,33 @@ def _powershell_fatos(limite=40):
     return json.loads(texto[inicio:]) if inicio >= 0 else {}
 
 
+def tamanho_no_disco(caminho):
+    """Quanto o arquivo ocupa DE VERDADE no disco.
+
+    Achado de 01/10/2026: o RPCS3 deixa no Temp um arquivo "esparso" de
+    memoria virtual (rpcs3_vm_sparse.tmp) que DIZ ter 32 GB e ocupa quase
+    nada. Somando o tamanho de fachada, o verificador acusava "35 GB em
+    arquivos temporarios" numa pasta de 0,5 GB -- e mandava o aluno limpar
+    a toa. Para arquivo esparso (ou comprimido), pergunta ao Windows o
+    tamanho ocupado (GetCompressedFileSizeW, sem administrador)."""
+    try:
+        info = os.stat(caminho)
+    except OSError:
+        return 0
+    atributos = getattr(info, "st_file_attributes", 0)
+    if os.name == "nt" and atributos & 0xA00:     # ESPARSO (0x200) ou COMPRIMIDO (0x800)
+        import ctypes
+        from ctypes import wintypes
+        funcao = ctypes.windll.kernel32.GetCompressedFileSizeW
+        funcao.argtypes = [wintypes.LPCWSTR, ctypes.POINTER(wintypes.DWORD)]
+        funcao.restype = wintypes.DWORD
+        alto = wintypes.DWORD(0)
+        baixo = funcao(caminho, ctypes.byref(alto))
+        if baixo != 0xFFFFFFFF or ctypes.GetLastError() == 0:
+            return (alto.value << 32) + baixo
+    return info.st_size
+
+
 def _memoria_e_energia(rapido=False):
     """Memoria, bateria e tempo ligado (instantaneo, ctypes) e, fora do modo
     rapido, disco do Windows e pasta temporaria (a pasta pode levar ate 3 s)."""
@@ -237,10 +264,7 @@ def _memoria_e_energia(rapido=False):
         total, inicio = 0, time.time()
         for atual, _s, arquivos in os.walk(temp):
             for n in arquivos:
-                try:
-                    total += os.path.getsize(os.path.join(atual, n))
-                except OSError:
-                    pass
+                total += tamanho_no_disco(os.path.join(atual, n))
             if time.time() - inicio > 3:        # pasta enorme: para de contar
                 fatos["temp_contagem_parcial"] = True
                 break
