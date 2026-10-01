@@ -206,8 +206,12 @@ Quatro itens fogem da regra, cada um pelo motivo dito abaixo.
 o limite para manter a atenção de quem espera** (Jakob Nielsen, 1993). Passou
 disso, o aluno acha que travou e clica de novo no `ARENA.bat`, e o segundo
 clique dá "a porta já está em uso". A folga é pequena de propósito: qualquer
-peso novo na abertura aparece aqui primeiro. Medido à mão, no cronômetro, na
-coleta mensal da escola.
+peso novo na abertura aparece aqui primeiro. Os 8,55 s foram medidos à mão,
+no cronômetro, até a lista aparecer. Desde 01/10/2026 o `COLETAR.bat` mede
+sozinho do `ARENA.bat` até a janela da tela ganhar o título "ARENA" (a
+página chegou); a lista e as capas vêm logo depois, então o número
+automático sai um pouco menor que o do cronômetro (no Ryzen: 1,76 s). A
+pergunta do fim ("quanto tempo até a lista aparecer?") cobre essa diferença.
 
 **1b. Abertura, parte do servidor — 2,3 s** (medido 1,48 s × 1,5). É a
 parte que um teste automático consegue medir. Conferência: 8,55 − 1,48 =
@@ -283,15 +287,26 @@ passar só porque o Ryzen é forte.
 ## 8. Como refazer este retrato
 
 1. No notebook da escola, **na tomada**, com o ARENA no pen drive:
-   `COLETAR.bat`. São cerca de 25 minutos.
+   `COLETAR.bat`. São cerca de 7 minutos, sem cronômetro: desde 01/10/2026
+   o coletor abre o ARENA pelo próprio `ARENA.bat` e mede sozinho até a
+   janela da tela aparecer (item 1a).
 2. Durante o jogo de SNES, deixe a janela do jogo **à frente** e olhe/ouça.
-3. Se o "processador parado" passar do teto (seção 7, item 3), rode também
-   `servidor\python\python.exe ferramentas\medir_parado.py` com o ARENA
-   **fechado** (a ferramenta abre o ARENA sozinha), sem mexer no computador
-   por 2 minutos, e traga o que aparecer na janela preta: ela mostra o
-   gasto a cada 5 segundos.
-4. Traga a pasta nova de `perfil\` e peça para atualizar este arquivo.
-5. Uma vez por mês, ou antes de cada versão nova. Notebook diferente na
+   O coletor anota quanto tempo a janela ficou à frente; abaixo de 90%, o
+   resumo avisa que o FPS pode ter saído pior que o real.
+3. No fim, responda também como foram os outros consoles que você já jogou
+   **naquele notebook** (PS2, PSP, GameCube...). O resumo compara com o
+   selo que o ARENA mostra ("ARENA diz Pode travar; você viu rodou bem →
+   DISCORDA, pessimista"). É isso que calibra a avaliação.
+4. O `arena.txt` termina na **tabela de orçamentos**: item, medido, teto,
+   PASSOU/ESTOUROU. A curva do "processador parado" (a cada 5 s, até
+   assentar) já vem nele; o `ferramentas\medir_parado.py` só é preciso para
+   olhar mais tempo (2 minutos ou mais).
+5. O `maquina.txt` traz a **velocidade de um núcleo medida** (operações por
+   segundo) e o selo que o ARENA daria a cada console. A primeira coleta do
+   Celeron com esta versão troca a referência provisória
+   (`hardware.OPERACOES_DO_NOTEBOOK_ALVO = 3.200.000`) pelo número medido.
+6. Traga a pasta nova de `perfil\` e peça para atualizar este arquivo.
+7. Uma vez por mês, ou antes de cada versão nova. Notebook diferente na
    escola: rode também, porque cada retrato ajuda a decidir.
 
 ---

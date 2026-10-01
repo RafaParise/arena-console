@@ -2,17 +2,24 @@
 r"""Medicoes do ARENA nesta maquina, para o perfil-alvo.
 
 Mede, sozinho:
-  1. abertura: de iniciar o arena.py (o Python que o ARENA.bat chama; as
-     conferencias do .bat e o desenho da tela ficam de fora) ate o servidor
-     responder e entregar os dados que a tela desenha, e quanta memoria do
-     Windows isso consome (servidor + janela do navegador);
-  2. servidor parado (30 s, com a tela aberta e ninguem mexendo) e em uso
-     (20 s de pedidos): CPU, RAM, resposta;
+  1. abertura, pelo proprio ARENA.bat (como o aluno abre): ate a janela da
+     tela aparecer (o "abrir que o aluno sente", teto 1a) e, do arena.py ate
+     o servidor entregar os dados que a tela desenha (teto 1b); e quanta
+     memoria do Windows isso consome (servidor + janela do navegador);
+  2. servidor parado (depois de assentar, 30 s, tela aberta, ninguem
+     mexendo) e em uso (20 s de pedidos): CPU, RAM, resposta;
   3. indexacao: tempo para reler a pasta de jogos, e quantos sao;
   4. gravacoes em disco por minuto com o ARENA parado (120 s);
   5. um jogo de Super Nintendo por ~70 s: quadros por segundo, regularidade
-     dos quadros, CPU e RAM do RetroArch.
-No fim, perguntas rapidas sobre o que so uma pessoa olhando ve.
+     dos quadros, CPU e RAM do RetroArch, e se a janela do jogo ficou a
+     frente (janela coberta: o Windows segura o ritmo e o FPS nao vale).
+No fim, perguntas rapidas sobre o que so uma pessoa olhando ve -- inclusive
+como foram os consoles que ela ja jogou nesta maquina, para comparar com o
+selo que o ARENA mostra.
+
+Cada numero e' julgado pelos TETOS APROVADOS pelo Rafael em 30/09/2026
+(docs\MAQUINA-ALVO.md, secao 7): o resumo termina na tabela "medido, teto,
+passou ou nao".
 
 Nao muda nada do ARENA: o jogo roda com as opcoes REAIS do ARENA, mas
 geradas numa pasta temporaria, com saves e estados tambem temporarios.
@@ -33,7 +40,6 @@ Uso:
 import ctypes
 import datetime
 import glob
-import importlib.util
 import json
 import os
 import re
@@ -49,6 +55,7 @@ import urllib.request
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PYTHON = os.path.join(RAIZ, "servidor", "python", "python.exe")
 ARENA_PY = os.path.join(RAIZ, "servidor", "arena.py")
+ARENA_BAT = os.path.join(RAIZ, "ARENA.bat")
 RETROARCH = os.path.join(RAIZ, "retroarch", "retroarch.exe")
 ENDERECO = "http://127.0.0.1:8777"
 NAO_MEDIU = "nao_foi_possivel_medir"
@@ -94,6 +101,7 @@ class Processo:
         self.k.GetProcessTimes.argtypes = [ctypes.c_void_p] + [ctypes.POINTER(ctypes.c_ulonglong)] * 4
         self.k.GetProcessIoCounters.argtypes = [ctypes.c_void_p, ctypes.POINTER(_IO)]
         self.k.K32GetProcessMemoryInfo.argtypes = [ctypes.c_void_p, ctypes.POINTER(_MEM), ctypes.c_ulong]
+        self.k.GetSystemTimePreciseAsFileTime.argtypes = [ctypes.POINTER(ctypes.c_ulonglong)]
         self.k.CloseHandle.argtypes = [ctypes.c_void_p]
         self.h = self.k.OpenProcess(0x1000, False, pid)   # QUERY_LIMITED_INFORMATION
         if not self.h:
@@ -115,8 +123,122 @@ class Processo:
         self.k.GetProcessIoCounters(self.h, ctypes.byref(io))
         return io.WriteOperationCount, io.WriteTransferCount
 
+    def idade_s(self):
+        """Ha quantos segundos o processo foi criado (relogio do Windows)."""
+        t = [ctypes.c_ulonglong() for _ in range(4)]
+        self.k.GetProcessTimes(self.h, *[ctypes.byref(x) for x in t])
+        agora = ctypes.c_ulonglong()
+        self.k.GetSystemTimePreciseAsFileTime(ctypes.byref(agora))
+        return (agora.value - t[0].value) / 1e7
+
     def fechar(self):
         self.k.CloseHandle(self.h)
+
+
+class _ENTRADA_PROCESSO(ctypes.Structure):
+    _fields_ = [("dwSize", ctypes.c_ulong), ("cntUsage", ctypes.c_ulong),
+                ("th32ProcessID", ctypes.c_ulong), ("th32DefaultHeapID", ctypes.c_size_t),
+                ("th32ModuleID", ctypes.c_ulong), ("cntThreads", ctypes.c_ulong),
+                ("th32ParentProcessID", ctypes.c_ulong), ("pcPriClassBase", ctypes.c_long),
+                ("dwFlags", ctypes.c_ulong), ("szExeFile", ctypes.c_wchar * 260)]
+
+
+def processos_abertos():
+    """{pid: (pid do pai, nome do .exe)} de todos os processos, pela "foto"
+    de processos do Windows (CreateToolhelp32Snapshot, sem administrador)."""
+    k = ctypes.WinDLL("kernel32", use_last_error=True)
+    k.CreateToolhelp32Snapshot.restype = ctypes.c_void_p
+    k.CreateToolhelp32Snapshot.argtypes = [ctypes.c_ulong, ctypes.c_ulong]
+    k.Process32FirstW.argtypes = [ctypes.c_void_p, ctypes.POINTER(_ENTRADA_PROCESSO)]
+    k.Process32NextW.argtypes = [ctypes.c_void_p, ctypes.POINTER(_ENTRADA_PROCESSO)]
+    k.CloseHandle.argtypes = [ctypes.c_void_p]
+    foto = k.CreateToolhelp32Snapshot(0x2, 0)          # TH32CS_SNAPPROCESS
+    if not foto or foto == ctypes.c_void_p(-1).value:
+        return {}
+    achados = {}
+    try:
+        e = _ENTRADA_PROCESSO()
+        e.dwSize = ctypes.sizeof(e)
+        ok = k.Process32FirstW(foto, ctypes.byref(e))
+        while ok:
+            achados[e.th32ProcessID] = (e.th32ParentProcessID, e.szExeFile.lower())
+            ok = k.Process32NextW(foto, ctypes.byref(e))
+    finally:
+        k.CloseHandle(foto)
+    return achados
+
+
+def filho_chamado(pid_pai, exe):
+    """Pid do processo 'exe' aberto por 'pid_pai' (ou None)."""
+    for pid, (pai, nome) in processos_abertos().items():
+        if pai == pid_pai and nome == exe:
+            return pid
+    return None
+
+
+# ---------------------------------------------------------------------------
+# Janelas: a tela do ARENA apareceu? A janela do jogo esta a frente?
+# ---------------------------------------------------------------------------
+
+NAVEGADORES_EXE = ("msedge.exe", "chrome.exe", "firefox.exe", "brave.exe", "opera.exe")
+
+
+def _user32():
+    u = ctypes.WinDLL("user32", use_last_error=True)
+    u.IsWindowVisible.argtypes = [ctypes.c_void_p]
+    u.GetWindowTextLengthW.argtypes = [ctypes.c_void_p]
+    u.GetWindowTextW.argtypes = [ctypes.c_void_p, ctypes.c_wchar_p, ctypes.c_int]
+    u.GetWindowThreadProcessId.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_ulong)]
+    u.GetForegroundWindow.restype = ctypes.c_void_p
+    u.PostMessageW.argtypes = [ctypes.c_void_p, ctypes.c_uint, ctypes.c_void_p, ctypes.c_void_p]
+    return u
+
+
+def pid_da_janela(u, hwnd):
+    pid = ctypes.c_ulong()
+    u.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
+    return pid.value
+
+
+def janelas_do_arena():
+    """Janelas visiveis de navegador com o titulo da tela do ARENA.
+
+    O <title> do launcher\\index.html e' "ARENA", e o ARENA abre a tela como
+    janela de aplicativo (--app) do Edge ou do Chrome: a janela ganha
+    exatamente esse nome quando a pagina chega. So o nome EXATO conta: uma
+    aba comum chamada "ARENA - Claude - ... - Microsoft Edge" (visto em
+    01/10/2026, no PC do Rafael) nao e' a tela. A janela preta do ARENA.bat
+    ("ARENA - servidor local") nao e' de navegador: o programa e' conferido."""
+    u = _user32()
+    exes = {pid: nome for pid, (_pai, nome) in processos_abertos().items()}
+    achadas = set()
+    TIPO = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_void_p, ctypes.c_void_p)
+
+    def cada(hwnd, _):
+        if u.IsWindowVisible(hwnd):
+            n = u.GetWindowTextLengthW(hwnd)
+            if 0 < n < 200:
+                texto = ctypes.create_unicode_buffer(n + 1)
+                u.GetWindowTextW(hwnd, texto, n + 1)
+                if texto.value.strip() == "ARENA":
+                    if exes.get(pid_da_janela(u, hwnd)) in NAVEGADORES_EXE:
+                        achadas.add(hwnd)
+        return True
+    u.EnumWindows(TIPO(cada), 0)
+    return achadas
+
+
+def fechar_janelas(janelas):
+    """Pede para fechar (WM_CLOSE, como o X da janela)."""
+    u = _user32()
+    for hwnd in janelas:
+        u.PostMessageW(hwnd, 0x0010, None, None)
+
+
+def janela_da_frente_e_de(pid):
+    u = _user32()
+    hwnd = u.GetForegroundWindow()
+    return bool(hwnd) and pid_da_janela(u, hwnd) == pid
 
 
 def amostrar(proc, segundos, trabalho=None):
@@ -164,8 +286,24 @@ def porta_ocupada():
         s.close()
 
 
+def porta_responde():
+    """O servidor ja aceita conexao? Tentativa CURTA de proposito: no Windows,
+    conectar numa porta fechada do proprio computador leva ~1 s (o Windows
+    insiste antes de desistir), e o cronometro da abertura ficaria com esse
+    "relogio" grosso."""
+    import socket
+    s = socket.socket()
+    s.settimeout(0.1)
+    try:
+        return s.connect_ex(("127.0.0.1", 8777)) == 0
+    except OSError:
+        return False
+    finally:
+        s.close()
+
+
 def medir_servidor(dados):
-    """Etapas 1 a 4. Abre o ARENA de verdade e fecha no fim."""
+    """Etapas 1 a 4. Abre o ARENA pelo ARENA.bat, de verdade, e fecha no fim."""
     if porta_ocupada():
         motivo = "o ARENA ja estava aberto -- feche a janela preta e rode de novo"
         for chave in ("abertura", "servidor", "indexacao", "gravacoes_parado"):
@@ -173,51 +311,96 @@ def medir_servidor(dados):
         print("  ! " + motivo)
         return
 
-    etapa("abrindo o ARENA (como o ARENA.bat)")
+    etapa("abrindo o ARENA pelo ARENA.bat (como o aluno abre)")
     memoria_antes = coletar_maquina.memoria_agora()["livre_mb"]
+    janelas_antes = janelas_do_arena()
     saida = open(os.path.join(PASTA, "arena_janela_preta.txt"), "w", encoding="utf-8", errors="replace")
     inicio = time.perf_counter()
-    servidor = subprocess.Popen([PYTHON, ARENA_PY], cwd=RAIZ, stdin=subprocess.DEVNULL,
-                                stdout=saida, stderr=subprocess.STDOUT)
+    # Sem janela propria (CREATE_NO_WINDOW): o "title" do .bat mudaria o
+    # nome da janela do COLETAR, e o "pause" do fim sai sozinho (sem teclado).
+    bat = subprocess.Popen(["cmd.exe", "/d", "/c", ARENA_BAT], cwd=RAIZ, stdin=subprocess.DEVNULL,
+                           stdout=saida, stderr=subprocess.STDOUT,
+                           creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+    novas = set()
     try:
-        pronto = None
-        while time.perf_counter() - inicio < 120:
+        # Tres coisas ao mesmo tempo: achar o Python que o .bat abriu, o
+        # servidor responder (os pedidos vao numa linha a parte, para nao
+        # atrasar o resto) e a janela da tela aparecer.
+        marcas = {}
+
+        def pedir_dados():
             try:
-                urllib.request.urlopen(ENDERECO + "/", timeout=1).read()
-                pronto = time.perf_counter() - inicio
+                urllib.request.urlopen(ENDERECO + "/", timeout=30).read()
+                marcas["responde"] = time.perf_counter() - inicio
+                pedir("/api/estado")
+                pedir("/api/catalogo")
+                marcas["dados"] = time.perf_counter() - inicio
+            except Exception as falha:
+                marcas["falha"] = str(falha)[:200]
+
+        import threading
+        pedidos = None
+        python_pid, janela = None, None
+        while time.perf_counter() - inicio < 120:
+            if python_pid is None:
+                python_pid = filho_chamado(bat.pid, "python.exe")
+            if pedidos is None and porta_responde():
+                pedidos = threading.Thread(target=pedir_dados, daemon=True)
+                pedidos.start()
+            if janela is None:
+                novas = janelas_do_arena() - janelas_antes
+                if novas:
+                    janela = time.perf_counter() - inicio
+            prontos = pedidos is not None and not pedidos.is_alive()
+            if prontos and (janela is not None or time.perf_counter() - inicio - marcas.get("dados", 0) > 60):
+                break       # a janela nao veio em 60 s depois dos dados: segue sem ela
+            if bat.poll() is not None:
                 break
-            except (urllib.error.URLError, OSError):
-                if servidor.poll() is not None:
-                    break
-                time.sleep(0.05)
-        if pronto is None:
-            dados["abertura"] = falhou("o servidor nao respondeu em 120 s (veja arena_janela_preta.txt)")
+            time.sleep(0.05)
+        if pedidos is not None:
+            pedidos.join(30)
+        if "dados" not in marcas:
+            dados["abertura"] = falhou(marcas.get("falha") or "o servidor nao respondeu em 120 s "
+                                       "(veja arena_janela_preta.txt)")
             return
-        pedir("/api/estado")
-        catalogo = pedir("/api/catalogo")
-        dados_prontos = time.perf_counter() - inicio
-        time.sleep(10)          # a janela do navegador abrir e assentar
+        if not python_pid:
+            dados["abertura"] = falhou("nao achei o Python que o ARENA.bat abriu")
+            return
+        proc = Processo(python_pid)
+        # Quando o .bat chamou o Python (relogio do Windows): separa o tempo
+        # das conferencias do .bat do tempo do servidor (teto 1b).
+        python_nasceu = (time.perf_counter() - inicio) - proc.idade_s()
+        espera = marcas["dados"] + 10 - (time.perf_counter() - inicio)
+        if espera > 0:
+            time.sleep(espera)  # a janela do navegador abrir e assentar
         memoria_depois = coletar_maquina.memoria_agora()["livre_mb"]
         dados["abertura"] = {
-            "servidor_responde_s": round(pronto, 2),
-            "dados_da_tela_prontos_s": round(dados_prontos, 2),
+            "janela_da_tela_s": round(janela, 2) if janela is not None else falhou(
+                "a janela da tela nao apareceu (navegador nao achado, ou titulo diferente de 'ARENA')"),
+            "bat_ate_o_python_s": round(max(0.0, python_nasceu), 2),
+            "servidor_responde_s": round(marcas["responde"] - python_nasceu, 2),
+            "dados_da_tela_prontos_s": round(marcas["dados"] - python_nasceu, 2),
             "memoria_consumida_mb": memoria_antes - memoria_depois,
-            "nota": "memoria_consumida = RAM livre do Windows antes - depois de abrir "
-                    "(servidor + janela do navegador). O desenho da tela em si nao e' medido.",
+            "nota": "janela_da_tela = do ARENA.bat ate a janela do navegador ganhar o titulo "
+                    "ARENA (a pagina chegou; a lista e as capas vem logo depois). servidor_responde "
+                    "e dados_da_tela_prontos contam do Python aberto pelo .bat. memoria_consumida "
+                    "= RAM livre do Windows antes - depois (servidor + janela do navegador).",
         }
 
-        proc = Processo(servidor.pid)
         # Espera o servidor ASSENTAR antes de medir o parado. Achado de
         # 30/09/2026: o Celeron mediu 8,4% de um nucleo "parado" contra
         # 0,01% no i5; comecar a contar 10 s depois da abertura pode pegar
         # trabalho de abrir (a tela carregando, a primeira volta do vigia).
         # Fatias de 5 s ate uma ficar abaixo de 1% de um nucleo (no maximo
-        # 90 s); o que gastou ate ali vira "custo de assentar".
+        # 90 s); o que gastou ate ali vira "custo de assentar". As fatias
+        # ficam guardadas: sao a mesma curva do ferramentas\medir_parado.py,
+        # sem precisar rodar outra ferramenta.
         etapa("esperando o servidor assentar (ate 90 s)")
-        assentar = {"segundos": None, "cpu_s_de_um_nucleo": 0.0}
+        assentar = {"segundos": None, "cpu_s_de_um_nucleo": 0.0, "fatias_pct_de_um_nucleo": []}
         t_assentar, cpu_assentar = time.perf_counter(), proc.cpu_s()
         while time.perf_counter() - t_assentar < 90:
             fatia, _ = amostrar(proc, 5)
+            assentar["fatias_pct_de_um_nucleo"].append(fatia["cpu_pct_de_um_nucleo"])
             if fatia["cpu_pct_de_um_nucleo"] < 1.0:
                 assentar["segundos"] = round(time.perf_counter() - t_assentar, 1)
                 break
@@ -290,7 +473,13 @@ def medir_servidor(dados):
         for chave in ("abertura", "servidor", "indexacao", "gravacoes_parado"):
             dados.setdefault(chave, falhou(falha))
     finally:
-        subprocess.run(["taskkill", "/PID", str(servidor.pid), "/T", "/F"], capture_output=True)
+        # A janela da tela primeiro (senao ela fica aberta mostrando "nao foi
+        # possivel conectar"), depois o .bat com tudo o que ele abriu.
+        try:
+            fechar_janelas(novas | (janelas_do_arena() - janelas_antes))
+        except Exception:
+            pass
+        subprocess.run(["taskkill", "/PID", str(bat.pid), "/T", "/F"], capture_output=True)
         saida.close()
 
 
@@ -363,8 +552,12 @@ def rodar_quadros(core, opcoes_cfg, extra_cfg, jogo, quadros, log):
             if p.poll() is not None:
                 break
             agora_cpu, agora_t = proc.cpu_s(), time.perf_counter()
+            try:
+                a_frente = janela_da_frente_e_de(p.pid)
+            except Exception:
+                a_frente = None
             amostras.append((100 * (agora_cpu - ultimo_cpu) / (agora_t - ultimo_t) / ncpu,
-                             proc.ram_mb()[0]))
+                             proc.ram_mb()[0], a_frente))
             ultimo_cpu, ultimo_t = agora_cpu, agora_t
             if agora_t - inicio > quadros / 60 * 4 + 60:
                 p.kill()          # travou: nunca deixa a coleta presa
@@ -395,10 +588,7 @@ def medir_jogo(dados):
         # temporaria: o gravar_override e o arquivo de opcoes dos nucleos
         # leem o caminho de destino na hora, entao basta apontar os dois
         # para ca. Os arquivos do ARENA nao sao tocados.
-        sys.path.insert(0, os.path.join(RAIZ, "servidor"))
-        spec = importlib.util.spec_from_file_location("arena_medicao", ARENA_PY)
-        arena = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(arena)
+        arena = coletar_maquina.carregar_arena()
         import graficos
         arena.ARQUIVO_OVERRIDE = os.path.join(temp, "arena_override.cfg")
         graficos.ARQUIVO_OPCOES_CORE = os.path.join(temp, "retroarch-core-options.cfg")
@@ -462,6 +652,12 @@ def medir_jogo(dados):
             resultado["cpu_pico_pct_da_maquina"] = round(max(cpu), 1)
         if ram:
             resultado["ram_pico_mb"] = round(max(ram), 1)
+        # Regra 8 do MAQUINA-ALVO.md: FPS so vale com a janela do jogo a
+        # vista. Janela coberta, o Windows segura o ritmo (achado de 30/09:
+        # 51,7 FPS no Ryzen com o Rafael usando o navegador por cima).
+        frente = [a[2] for a in amostras if a[2] is not None]
+        if frente:
+            resultado["janela_do_jogo_a_frente_pct"] = round(100.0 * sum(frente) / len(frente))
         m = re.search(r"Average monitor Hz:\s*([\d.]+)\s*Hz\.\s*\(([\d.]+)\s*%\s*frame time deviation", texto)
         if m:
             resultado["monitor_hz_medido"] = float(m.group(1))
@@ -481,7 +677,6 @@ def medir_jogo(dados):
     except Exception as falha:
         dados["jogo"] = falhou(falha)
     finally:
-        sys.path = [p for p in sys.path if not p.endswith("servidor")] + [os.path.join(RAIZ, "servidor")]
         shutil.rmtree(temp, ignore_errors=True)
 
 
@@ -491,13 +686,37 @@ def medir_jogo(dados):
 
 PERGUNTAS = [
     ("tela_inteira", "A tela do ARENA abriu inteira, com a lista de jogos?", {"s": "sim", "n": "nao", "x": "nao vi"}),
-    ("tempo_tela", "Quanto tempo a tela do ARENA levou para aparecer?",
-     {"1": "rapido (menos de 5 s)", "2": "uns segundos (5 a 15 s)", "3": "demorou (mais de 15 s)", "x": "nao vi"}),
+    ("tempo_tela", "Quanto tempo ate a LISTA DE JOGOS aparecer? (o teto e' 10 s)",
+     {"1": "menos de 5 s", "2": "de 5 a 10 s", "3": "mais de 10 s", "x": "nao vi"}),
     ("som_picotou", "No jogo de Super Nintendo, o som picotou ou chiou?", {"s": "sim", "n": "nao", "x": "nao ouvi"}),
     ("imagem_engasgou", "A imagem do jogo engasgou ou ficou lenta?", {"s": "sim", "n": "nao", "x": "nao vi"}),
     ("controle", "Se tinha controle ou teclado a mao: respondeu na hora?",
      {"s": "sim", "n": "nao", "x": "nao testei"}),
 ]
+
+# Consoles pesados, em que o selo do ARENA mais precisa acertar. A resposta
+# de quem jogou de verdade NESTA maquina e' o que calibra a avaliacao
+# (arena.classificar_plataforma): sem isso, a regua e' so estimativa.
+CONSOLES_PERGUNTADOS = [
+    ("ps2", "PlayStation 2"), ("gamecube", "GameCube"), ("wii", "Wii"),
+    ("psp", "PSP"), ("n64", "Nintendo 64"), ("ps1", "PlayStation 1"),
+    ("dreamcast", "Dreamcast"), ("saturn", "Saturn"), ("nds", "Nintendo DS"),
+    ("ps3", "PlayStation 3"), ("xbox360", "Xbox 360"),
+]
+OPCOES_CONSOLE = {"b": "rodou bem", "e": "rodou com engasgos", "t": "travou ou lento demais",
+                  "n": "nao abriu", "x": "nao testei"}
+
+
+def _perguntar(texto, opcoes):
+    legenda = "  ".join("[%s] %s" % (k, v) for k, v in opcoes.items())
+    while True:
+        try:
+            r = input("  %s\n     %s\n     > " % (texto, legenda)).strip().lower()
+        except (EOFError, KeyboardInterrupt):
+            r = "x" if "x" in opcoes else list(opcoes)[-1]
+        if r in opcoes:
+            return opcoes[r]
+        print("     (digite so uma das letras entre colchetes)")
 
 
 def perguntar(dados):
@@ -505,47 +724,141 @@ def perguntar(dados):
         dados["respostas"] = "ninguem no teclado: perguntas puladas"
         return
     print()
-    print("Faltam so %d perguntas rapidas (uma tecla e Enter):" % len(PERGUNTAS))
+    print("Faltam so %d perguntas rapidas (uma tecla e Enter):" % (len(PERGUNTAS) + 1))
     respostas = {}
     for chave, texto, opcoes in PERGUNTAS:
-        legenda = "  ".join("[%s] %s" % (k, v) for k, v in opcoes.items())
-        while True:
-            try:
-                r = input("  %s\n     %s\n     > " % (texto, legenda)).strip().lower()
-            except (EOFError, KeyboardInterrupt):
-                r = "x"
-            if r in opcoes:
-                respostas[chave] = opcoes[r]
-                break
-            print("     (digite so uma das letras entre colchetes)")
+        respostas[chave] = _perguntar(texto, opcoes)
+    jogou = _perguntar("Ja jogou outro console NESTE notebook (PS2, PSP, GameCube...)?",
+                       {"s": "sim", "n": "nao"})
+    if jogou == "sim":
+        print("  Para cada console, como foi NESTE notebook:")
+        consoles = {}
+        for chave, nome in CONSOLES_PERGUNTADOS:
+            consoles[chave] = _perguntar(nome, OPCOES_CONSOLE)
+        respostas["consoles"] = consoles
     dados["respostas"] = respostas
 
 
 # ---------------------------------------------------------------------------
-# Resumo em portugues, com veredito
+# O que o ARENA diz de cada console x o que a pessoa viu
 # ---------------------------------------------------------------------------
 
-# Limites do veredito (bom / no limite). Acima do segundo = ruim. Escritos
-# aqui para todo mundo ver de onde vem o sinal. PROVISORIOS: sao estimativa,
-# nao medida -- a ideia e' recalibrar com os numeros do Celeron da escola.
-# (Referencia: num Ryzen 5 5600G a variacao dos quadros deu 3,2%, com o SNES
-# pedindo 60,10 quadros para um monitor de 60 Hz.)
-LIMITES = {
-    "servidor_responde_s": (3, 8), "dados_da_tela_prontos_s": (4, 10),
-    "memoria_consumida_mb": (400, 800), "cpu_parado": (1, 5),
-    "resposta_p95_ms": (300, 1000), "indexacao_s": (5, 20), "gravacoes_min": (5, 30),
-    "variacao_quadros_pct": (5, 10),
+def etiquetas_do_arena():
+    """{id: {rotulo, etiqueta}} com o MESMO codigo do selo da tela."""
+    try:
+        arena = coletar_maquina.carregar_arena()
+        return {p["id"]: {"etiqueta": p.get("classe"), "rotulo": p.get("classe_rotulo"),
+                          "estado": p.get("estado")}
+                for p in arena.avaliar_plataformas(forcar=True)}
+    except Exception as falha:
+        return falhou(falha)
+
+
+# Para cada selo, as respostas que mostram o ARENA errando -- e para que lado.
+DISCORDANCIAS = {
+    "bem": {"travou ou lento demais": "otimista demais", "nao abriu": "otimista demais",
+            "rodou com engasgos": "um pouco otimista"},
+    "ajustes": {"travou ou lento demais": "otimista", "nao abriu": "otimista demais"},
+    "pesado": {"rodou bem": "pessimista"},
+    "nao_abre": {"rodou bem": "errou: abriu", "rodou com engasgos": "errou: abriu",
+                 "travou ou lento demais": "errou: abriu"},
 }
 
 
-def veredito(valor, chave, maior_e_melhor=False):
-    if not isinstance(valor, (int, float)):
-        return "?"
-    if maior_e_melhor:        # FPS
-        return "BOM" if valor >= 58 else "NO LIMITE" if valor >= 50 else "RUIM"
-    bom, limite = LIMITES[chave]
-    return "BOM" if valor < bom else "NO LIMITE" if valor < limite else "RUIM"
+def comparar_consoles(etiquetas, respostas):
+    """Lista de {console, arena_diz, voce_viu, leitura} para os consoles que a
+    pessoa disse ter testado. Vazia se nao testou nenhum."""
+    if not isinstance(etiquetas, dict) or etiquetas.get(NAO_MEDIU):
+        return []
+    vistos = (respostas or {}).get("consoles") if isinstance(respostas, dict) else None
+    saida = []
+    for chave, nome in CONSOLES_PERGUNTADOS:
+        viu = (vistos or {}).get(chave)
+        if not viu or viu == "nao testei" or chave not in etiquetas:
+            continue
+        selo = etiquetas[chave]
+        leitura = DISCORDANCIAS.get(selo.get("etiqueta"), {}).get(viu, "concorda")
+        saida.append({"console": nome, "arena_diz": selo.get("rotulo"), "voce_viu": viu,
+                      "leitura": leitura})
+    return saida
 
+
+# ---------------------------------------------------------------------------
+# Tetos (orcamentos) APROVADOS pelo Rafael em 30/09/2026
+# ---------------------------------------------------------------------------
+# A regua oficial: docs\MAQUINA-ALVO.md, secao 7. Os numeros valem para o
+# notebook-alvo (Celeron N5100); numa maquina mais forte e' normal passar
+# com folga. Mudou o teto la? Muda aqui tambem.
+
+TETOS = {
+    "1a": {"item": "Abertura sentida (ARENA.bat ate a janela da tela)", "teto": 10.0, "unidade": "s"},
+    "1b": {"item": "Abertura do servidor (arena.py ate os dados da tela)", "teto": 2.3, "unidade": "s"},
+    "2": {"item": "Memoria do servidor (pico)", "teto": 64.0, "unidade": "MB"},
+    "3": {"item": "Processador parado (de UM nucleo)", "teto": 2.0, "unidade": "%"},
+    "4": {"item": "Indexacao (1,9 s por 100 jogos)", "teto": 1.9, "unidade": "s"},
+    "5a": {"item": "Gravacoes com o ARENA parado (por minuto)", "teto": 0.5, "unidade": "/min"},
+    "5b": {"item": "Gravacoes com o ARENA parado (volume)", "teto": 16.0, "unidade": "KB/min"},
+    "6a": {"item": "FPS do Super Nintendo (piso)", "teto": 59.0, "unidade": "FPS", "piso": True},
+    "6b": {"item": "Variacao dos quadros no SNES", "teto": 5.0, "unidade": "%"},
+}
+
+
+def teto_da_indexacao(total):
+    """1,9 s por 100 jogos. Abaixo de 100 jogos fica em 1,9 s: o custo fixo
+    de olhar as pastas dos consoles nao encolhe com a colecao."""
+    return round(TETOS["4"]["teto"] * max(1.0, (total or 0) / 100.0), 2)
+
+
+def _numero(valor):
+    return valor if isinstance(valor, (int, float)) and not isinstance(valor, bool) else None
+
+
+def orcamentos(d):
+    """A tabela que o Rafael pediu: item, medido, teto, passou ou nao."""
+    a = d.get("abertura") or {}
+    s = d.get("servidor") or {}
+    i = d.get("indexacao") or {}
+    g = d.get("gravacoes_parado") or {}
+    j = d.get("jogo") or {}
+    parado = (s.get("parado") or {}) if isinstance(s, dict) else {}
+    medidos = {
+        "1a": a.get("janela_da_tela_s"),
+        "1b": a.get("dados_da_tela_prontos_s"),
+        "2": s.get("ram_pico_mb"),
+        "3": parado.get("cpu_pct_de_um_nucleo"),
+        "4": i.get("segundos"),
+        "5a": g.get("por_minuto"),
+        "5b": g.get("kb_por_minuto"),
+        "6a": j.get("fps_medio"),
+        "6b": j.get("variacao_dos_quadros_pct"),
+    }
+    linhas = []
+    for chave, regra in TETOS.items():
+        teto = teto_da_indexacao(i.get("total")) if chave == "4" else regra["teto"]
+        medido = _numero(medidos[chave])
+        if medido is None:
+            passou = None
+        elif regra.get("piso"):
+            passou = medido >= teto
+        else:
+            passou = medido <= teto
+        linhas.append({"chave": chave, "item": regra["item"], "unidade": regra["unidade"],
+                       "medido": medido, "teto": teto, "piso": bool(regra.get("piso")),
+                       "passou": passou})
+    return linhas
+
+
+def selo(linha):
+    if linha["passou"] is None:
+        return "nao medido"
+    if linha["passou"]:
+        return "PASSOU"
+    return "ABAIXO DO PISO" if linha["piso"] else "ESTOUROU"
+
+
+# ---------------------------------------------------------------------------
+# Resumo em portugues
+# ---------------------------------------------------------------------------
 
 def _v(valor):
     if isinstance(valor, dict) and valor.get(NAO_MEDIU):
@@ -553,20 +866,42 @@ def _v(valor):
     return valor
 
 
+def _br(numero):
+    """3.5 -> "3,5" (o resumo e' lido por gente, em portugues)."""
+    return str(numero).replace(".", ",") if isinstance(numero, (int, float)) else str(numero)
+
+
 def escrever_resumo(d):
+    tabela = {linha["chave"]: linha for linha in d.get("orcamentos") or orcamentos(d)}
+
+    def contra(chave):
+        linha = tabela.get(chave)
+        if not linha:
+            return ""
+        return "  [%s; %s %s %s]" % (selo(linha), "piso" if linha["piso"] else "teto",
+                                     _br(linha["teto"]), linha["unidade"])
+
     L = ["MEDICOES DO ARENA NESTA MAQUINA",
-         "Codigo da maquina: %s    Medido em: %s" % (d["codigo_maquina"], d["medido_em"]), ""]
+         "Codigo da maquina: %s    Medido em: %s" % (d["codigo_maquina"], d["medido_em"])]
+    e = d.get("energia") or {}
+    if e.get("na_tomada") is False:
+        L.append("! MEDIDO NA BATERIA (%s%%): os numeros de desempenho NAO decidem nada "
+                 "(MAQUINA-ALVO.md, regra 8). Repita na tomada." % e.get("bateria_pct", "?"))
+    L.append("")
     a = d.get("abertura", {})
-    L.append("ABRIR O ARENA")
+    L.append("ABRIR O ARENA (pelo ARENA.bat, como o aluno abre)")
     if a.get(NAO_MEDIU):
         L.append("  " + str(_v(a)))
     else:
-        L.append("  servidor respondeu em %s s  [%s]" % (a["servidor_responde_s"],
-                 veredito(a["servidor_responde_s"], "servidor_responde_s")))
-        L.append("  dados da tela prontos em %s s  [%s]" % (a["dados_da_tela_prontos_s"],
-                 veredito(a["dados_da_tela_prontos_s"], "dados_da_tela_prontos_s")))
-        L.append("  memoria que o ARENA tomou do Windows: %s MB  [%s]" % (
-            a["memoria_consumida_mb"], veredito(a["memoria_consumida_mb"], "memoria_consumida_mb")))
+        janela = a.get("janela_da_tela_s")
+        L.append("  janela da tela apareceu em %s s%s" % (
+            _br(janela) if not isinstance(janela, dict) else _v(janela), contra("1a")))
+        L.append("    (a lista e as capas vem logo depois; o .bat levou %s s ate abrir o Python)"
+                 % _br(a.get("bat_ate_o_python_s", "?")))
+        L.append("  servidor respondeu em %s s" % _br(a["servidor_responde_s"]))
+        L.append("  dados da tela prontos em %s s%s" % (_br(a["dados_da_tela_prontos_s"]), contra("1b")))
+        L.append("  memoria que o ARENA tomou do Windows: %s MB  [sem teto: acompanhar]"
+                 % a["memoria_consumida_mb"])
     L.append("")
     s = d.get("servidor", {})
     L.append("SERVIDOR")
@@ -574,25 +909,29 @@ def escrever_resumo(d):
         L.append("  " + str(_v(s)))
     else:
         p, u = s["parado"], s["em_uso"]
-        a = p.get("assentar") or {}
-        if a:
+        ass = p.get("assentar") or {}
+        if ass:
             L.append("  assentou em %s s depois da tela pronta (gastou %s s de processador ate ali)" % (
-                a.get("segundos") if a.get("segundos") is not None else "mais de 90",
-                a.get("cpu_s_de_um_nucleo", "?")))
-        L.append("  parado: %s%% da maquina (%s%% de um nucleo), %s MB  [%s]" % (
-            p["cpu_pct_da_maquina"], p["cpu_pct_de_um_nucleo"], p["ram_mb"],
-            veredito(p["cpu_pct_da_maquina"], "cpu_parado")))
-        L.append("  em uso: %s%% da maquina, %s pedidos, resposta media %s ms, pior 5%% %s ms  [%s]" % (
-            u["cpu_pct_da_maquina"], u["pedidos"], u.get("resposta_media_ms", "?"),
-            u.get("resposta_p95_ms", "?"), veredito(u.get("resposta_p95_ms"), "resposta_p95_ms")))
+                _br(ass.get("segundos")) if ass.get("segundos") is not None else "mais de 90",
+                _br(ass.get("cpu_s_de_um_nucleo", "?"))))
+            fatias = ass.get("fatias_pct_de_um_nucleo") or []
+            if len(fatias) > 1:
+                L.append("    curva (%% de um nucleo, a cada 5 s): %s" % ", ".join(_br(f) for f in fatias))
+        L.append("  parado: %s%% de um nucleo (%s%% da maquina)%s" % (
+            _br(p["cpu_pct_de_um_nucleo"]), _br(p["cpu_pct_da_maquina"]), contra("3")))
+        L.append("  memoria: %s MB parado, pico %s MB%s" % (_br(p["ram_mb"]), _br(s.get("ram_pico_mb")),
+                                                          contra("2")))
+        L.append("  em uso: %s%% da maquina, %s pedidos, resposta media %s ms, pior 5%% %s ms"
+                 "  [sem teto: acompanhar]" % (
+                     _br(u["cpu_pct_da_maquina"]), u["pedidos"], _br(u.get("resposta_media_ms", "?")),
+                     _br(u.get("resposta_p95_ms", "?"))))
     L.append("")
     i = d.get("indexacao", {})
     L.append("LISTA DE JOGOS")
     if i.get(NAO_MEDIU):
         L.append("  " + str(_v(i)))
     else:
-        L.append("  %s jogos, relidos em %s s  [%s]" % (i["total"], i["segundos"],
-                 veredito(i["segundos"], "indexacao_s")))
+        L.append("  %s jogos, relidos em %s s%s" % (i["total"], _br(i["segundos"]), contra("4")))
         L.append("  por console: " + ", ".join("%s %d" % kv for kv in i["por_console"].items()))
     L.append("")
     g = d.get("gravacoes_parado", {})
@@ -600,8 +939,10 @@ def escrever_resumo(d):
     if g.get(NAO_MEDIU):
         L.append("  " + str(_v(g)))
     else:
-        L.append("  %s por minuto (%s KB/min)  [%s]" % (g["por_minuto"], g["kb_por_minuto"],
-                 veredito(g["por_minuto"], "gravacoes_min")))
+        L.append("  %s por minuto%s" % (_br(g["por_minuto"]), contra("5a")))
+        L.append("  %s KB por minuto%s" % (_br(g["kb_por_minuto"]), contra("5b")))
+        if g.get("arquivos_de_dados_que_mudaram"):
+            L.append("  arquivos que mudaram: %s" % ", ".join(g["arquivos_de_dados_que_mudaram"]))
     L.append("")
     j = d.get("jogo", {})
     L.append("JOGO DE SUPER NINTENDO")
@@ -609,15 +950,19 @@ def escrever_resumo(d):
         L.append("  " + str(_v(j)))
     else:
         L.append("  %s%s" % (j["jogo"], " (modo modesto)" if j["modo_modesto"] else ""))
-        L.append("  %s quadros por segundo em media (o normal e' 60)  [%s]" % (
-            j["fps_medio"], veredito(j["fps_medio"], None, maior_e_melhor=True)))
+        L.append("  %s quadros por segundo em media (o normal e' 60)%s" % (_br(j["fps_medio"]), contra("6a")))
         var = j.get("variacao_dos_quadros_pct")
         L.append("  variacao do tempo de cada quadro: %s%s" % (
-            _v(var) if isinstance(var, dict) else "%s%%" % var,
-            "" if isinstance(var, dict) else "  [%s]" % veredito(var, "variacao_quadros_pct")))
+            _v(var) if isinstance(var, dict) else "%s%%" % _br(var),
+            "" if isinstance(var, dict) else contra("6b")))
+        frente = j.get("janela_do_jogo_a_frente_pct")
+        if isinstance(frente, (int, float)):
+            L.append("  janela do jogo a frente em %d%% do tempo%s" % (
+                frente, "" if frente >= 90 else
+                "  ! coberta parte do tempo: o FPS e a variacao podem estar piores que o real"))
         L.append("  RetroArch: CPU media %s%% da maquina (pico %s%%), RAM %s MB, abriu em %s s, video %s" % (
-            j.get("cpu_media_pct_da_maquina", "?"), j.get("cpu_pico_pct_da_maquina", "?"),
-            j.get("ram_pico_mb", "?"), j["tempo_de_abrir_s"], j.get("driver_de_video", "?")))
+            _br(j.get("cpu_media_pct_da_maquina", "?")), _br(j.get("cpu_pico_pct_da_maquina", "?")),
+            _br(j.get("ram_pico_mb", "?")), _br(j["tempo_de_abrir_s"]), j.get("driver_de_video", "?")))
     L.append("")
     r = d.get("respostas")
     L.append("O QUE VOCE VIU")
@@ -627,9 +972,26 @@ def escrever_resumo(d):
     else:
         L.append("  " + str(r))
     L.append("")
-    L.append("BOM / NO LIMITE / RUIM: limites PROVISORIOS (estimativa, ainda nao calibrada")
-    L.append("com o Celeron), escritos em LIMITES, dentro de medir_arena.py.")
-    L.append("Tempo total: %s s" % d["duracao_s"])
+    comparacao = d.get("consoles_comparados") or []
+    if comparacao:
+        L.append("O SELO DO ARENA x O QUE VOCE VIU NESTE NOTEBOOK")
+        for c in comparacao:
+            L.append("  %-14s ARENA diz \"%s\"; voce viu \"%s\"  -> %s" % (
+                c["console"], c["arena_diz"], c["voce_viu"],
+                "ok" if c["leitura"] == "concorda" else "DISCORDA (" + c["leitura"] + ")"))
+        L.append("")
+    L.append("ORCAMENTOS (docs\\MAQUINA-ALVO.md, secao 7) -- tetos do notebook-alvo")
+    L.append("  %-55s %10s %10s  %s" % ("item", "medido", "teto", "resultado"))
+    for linha in tabela.values():
+        L.append("  %-55s %10s %10s  %s" % (
+            linha["item"], "-" if linha["medido"] is None else "%s %s" % (_br(linha["medido"]), linha["unidade"]),
+            "%s%s %s" % (">=" if linha["piso"] else "<=", _br(linha["teto"]), linha["unidade"]),
+            selo(linha)))
+    estourados = [linha for linha in tabela.values() if linha["passou"] is False]
+    if estourados:
+        L.append("  -> %d fora do teto: antes de qualquer conserto, achar a causa." % len(estourados))
+    L.append("")
+    L.append("Tempo total: %s s" % _br(d["duracao_s"]))
     return "\n".join(L) + "\n"
 
 
@@ -664,12 +1026,22 @@ def medir(pedida=None, pular_perguntas=False):
     dados = {"versao_coletor": coletar_maquina.VERSAO_COLETOR,
              "codigo_maquina": coletar_maquina.codigo_da_maquina(),
              "medido_em": datetime.datetime.now().isoformat(timespec="seconds")}
+    try:
+        dados["energia"] = coletar_maquina.energia_agora()
+    except (OSError, AttributeError) as falha:
+        dados["energia"] = falhou(falha)
+    if dados["energia"].get("na_tomada") is False:
+        print("  ! O notebook esta NA BATERIA: o resultado vai valer pouco. Se der, ligue o")
+        print("    carregador agora (a medicao comeca do mesmo jeito).", flush=True)
     medir_servidor(dados)
     medir_jogo(dados)
     if pular_perguntas:
         dados["respostas"] = "perguntas puladas (--sem-perguntas)"
     else:
         perguntar(dados)
+    dados["etiquetas_do_arena"] = etiquetas_do_arena()
+    dados["consoles_comparados"] = comparar_consoles(dados["etiquetas_do_arena"], dados.get("respostas"))
+    dados["orcamentos"] = orcamentos(dados)
     dados["duracao_s"] = round(time.time() - inicio, 1)
     with open(os.path.join(PASTA, "arena.json"), "w", encoding="utf-8") as f:
         json.dump(dados, f, ensure_ascii=False, indent=2)

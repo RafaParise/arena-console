@@ -20,11 +20,14 @@ cd /d "%~dp0"
 echo.
 echo   ARENA - COLETA DO PERFIL DESTA MAQUINA
 echo.
-echo   Leva uns 6 minutos. No meio, um jogo de Super Nintendo abre sozinho
-echo   por uns 70 segundos: e de proposito, pode olhar. No fim, 5 perguntas
-echo   rapidas sobre o que voce viu.
+echo   Leva uns 6 minutos. O ARENA abre e fecha sozinho, e no meio um jogo
+echo   de Super Nintendo roda por uns 70 segundos: e de proposito. Deixe a
+echo   janela do jogo NA FRENTE e nao use o computador ate o fim. No fim,
+echo   6 perguntas rapidas (e mais algumas, se voce ja jogou outros
+echo   consoles neste notebook).
 echo.
-echo   Antes de comecar: FECHE o ARENA, se estiver aberto.
+echo   Antes de comecar: FECHE o ARENA, se estiver aberto, e ligue o
+echo   notebook NA TOMADA (na bateria o resultado nao vale).
 echo   Nada pessoal e coletado (nem nome, nem usuario).
 echo.
 pause
@@ -68,7 +71,8 @@ echo   ======================================================================
 echo   Pronto. Os resultados ficaram em:
 echo     %~dp0perfil\%PASTA%
 echo.
-echo   maquina.txt e arena.txt = resumo em portugues, para ler agora.
+echo   maquina.txt e arena.txt = resumo em portugues, para ler agora
+echo   (o arena.txt termina na tabela de tetos: medido, teto, passou).
 echo   maquina.json e arena.json = para analise depois.
 echo   Leve a pasta perfil inteira no pen drive.
 echo   ======================================================================

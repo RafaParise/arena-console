@@ -36,7 +36,9 @@ import urllib.request
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PASTA_PERFIL = os.path.join(RAIZ, "perfil")
-VERSAO_COLETOR = 1
+# 2 (01/10/2026): velocidade de um nucleo MEDIDA e o que o ARENA diria de
+# cada console; o medir_arena.py julga pelos tetos aprovados.
+VERSAO_COLETOR = 2
 NAO_MEDIU = "nao_foi_possivel_medir"
 NO_WINDOWS = sys.platform.startswith("win")
 
@@ -431,6 +433,19 @@ class _POWER_STATUS(ctypes.Structure):
                 ("BatteryLifeTime", ctypes.c_ulong), ("BatteryFullLifeTime", ctypes.c_ulong)]
 
 
+def energia_agora():
+    """Tomada ou bateria neste instante (o medir_arena.py avisa: numero de
+    desempenho medido na bateria nao decide nada -- MAQUINA-ALVO.md, regra 8)."""
+    estado = _POWER_STATUS()
+    if not ctypes.windll.kernel32.GetSystemPowerStatus(ctypes.byref(estado)):
+        raise OSError("GetSystemPowerStatus falhou")
+    return {"na_tomada": {0: False, 1: True}.get(estado.ACLineStatus, NAO_MEDIU),
+            "bateria_pct": (estado.BatteryLifePercent
+                            if estado.BatteryLifePercent != 255 else "sem bateria"),
+            # Modo "economia de bateria" do Windows ligado.
+            "economia_de_bateria": bool(estado.SystemStatusFlag & 1)}
+
+
 def coletar_sistema():
     etapa("sistema e energia")
     chave = r"SOFTWARE\Microsoft\Windows NT\CurrentVersion"
@@ -455,15 +470,8 @@ def coletar_sistema():
     except (OSError, AttributeError) as falha:
         resultado["usuario_e_administrador"] = falhou(falha)
 
-    energia = {}
     try:
-        estado = _POWER_STATUS()
-        if ctypes.windll.kernel32.GetSystemPowerStatus(ctypes.byref(estado)):
-            energia["na_tomada"] = {0: False, 1: True}.get(estado.ACLineStatus, NAO_MEDIU)
-            energia["bateria_pct"] = (estado.BatteryLifePercent
-                                      if estado.BatteryLifePercent != 255 else "sem bateria")
-            # Modo "economia de bateria" do Windows ligado.
-            energia["economia_de_bateria"] = bool(estado.SystemStatusFlag & 1)
+        energia = energia_agora()
     except (OSError, AttributeError) as falha:
         energia = falhou(falha)
     try:
@@ -647,6 +655,62 @@ def coletar_barreiras(dados):
 
 
 # ---------------------------------------------------------------------------
+# O que o ARENA diria desta maquina (o mesmo codigo da tela)
+# ---------------------------------------------------------------------------
+
+# Ordem em que as etiquetas aparecem no resumo (a mesma do selo do cartao).
+ORDEM_ETIQUETAS = ("bem", "ajustes", "pesado", "nao_abre")
+
+
+def carregar_arena():
+    """Importa o servidor\\arena.py como a abertura do ARENA faz: ele mede a
+    maquina (hardware.resumo) e calcula a nota. Nao sobe o servidor, nao
+    abre janela e nao grava nada alem do teste de velocidade do disco que
+    toda abertura do ARENA ja faz."""
+    sys.path.insert(0, os.path.join(RAIZ, "servidor"))
+    import arena
+    return arena
+
+
+def coletar_avaliacao():
+    """Velocidade de um nucleo, instrucoes e a etiqueta de cada console --
+    com o MESMO codigo que desenha o selo na tela (arena.avaliar_plataformas),
+    para o retrato e o ARENA nunca discordarem.
+
+    A velocidade e' o numero que recalibra a regua: hoje a referencia do
+    notebook-alvo (hardware.OPERACOES_DO_NOTEBOOK_ALVO) e' PROVISORIA, tirada
+    do Ryzen pela proporcao do PassMark. Este coletor guarda as operacoes
+    por segundo medidas, que e' o que falta para troca-la."""
+    etapa("velocidade de um nucleo e o que o ARENA diria de cada console")
+    try:
+        arena = carregar_arena()
+    except Exception as falha:
+        return falhou(falha)
+    maquina = arena.MAQUINA
+    gpu = maquina.get("gpu") or {}
+    resultado = {
+        "velocidade": maquina.get("velocidade") or falhou("sem medida"),
+        "instrucoes": maquina.get("instrucoes") or falhou("sem medida"),
+        "placa": {"nome": gpu.get("nome"), "integrada": gpu.get("integrada")},
+        "nota_antiga": {"geral": arena.CAPACIDADE.get("nota"),
+                        "placa": arena.CAPACIDADE.get("nota_gpu")},
+        "modo_economico": bool(arena.ECONOMICO),
+        "referencia_do_alvo_ops": getattr(arena.hardware, "OPERACOES_DO_NOTEBOOK_ALVO", None),
+    }
+    try:
+        consoles = []
+        for p in arena.avaliar_plataformas(forcar=True):
+            consoles.append({"id": p["id"], "nome": p["nome"], "custo": p.get("custo"),
+                             "etiqueta": p.get("classe"), "rotulo": p.get("classe_rotulo"),
+                             "detalhe": p.get("classe_detalhe"),
+                             "estado": p.get("estado"), "motivo": p.get("motivo") or ""})
+        resultado["consoles"] = consoles
+    except Exception as falha:
+        resultado["consoles"] = falhou(falha)
+    return resultado
+
+
+# ---------------------------------------------------------------------------
 # Resumo em portugues
 # ---------------------------------------------------------------------------
 
@@ -656,6 +720,35 @@ def _v(valor, sufixo=""):
     if valor == NAO_MEDIU:
         return "nao foi possivel medir"
     return "%s%s" % (valor, sufixo)
+
+
+def resumo_da_avaliacao(av):
+    """Linhas do resumo: o selo que cada console ganha nesta maquina."""
+    L = ["O QUE O ARENA DIRIA DE CADA CONSOLE NESTA MAQUINA (o selo do cartao)"]
+    if not isinstance(av, dict) or av.get(NAO_MEDIU):
+        return L + ["  " + _v(av if av is not None else falhou("nao coletado")), ""]
+    consoles = av.get("consoles")
+    if not isinstance(consoles, list):
+        return L + ["  " + _v(consoles), ""]
+    nota = av.get("nota_antiga") or {}
+    L.append("  (nota antiga, que conta nucleos: geral %s, placa %s; modo economico %s)" % (
+        nota.get("geral", "?"), nota.get("placa", "?"),
+        "LIGADO" if av.get("modo_economico") else "desligado"))
+    for chave in ORDEM_ETIQUETAS:
+        grupo = [c for c in consoles if c.get("etiqueta") == chave]
+        if not grupo:
+            continue
+        L.append("  %s (%d): %s" % (grupo[0].get("rotulo") or chave, len(grupo),
+                                    ", ".join(c["nome"] for c in grupo)))
+        if chave == "nao_abre":
+            for c in grupo:
+                L.append("      %s: %s" % (c["nome"], c.get("detalhe") or "-"))
+    faltando = [c for c in consoles if c.get("estado") not in (None, "pronta")]
+    if faltando:
+        L.append("  Falta arquivo (nao e' a maquina): %s" % ", ".join(
+            "%s (%s)" % (c["nome"], c.get("motivo") or c.get("estado")) for c in faltando))
+    L.append("")
+    return L
 
 
 def escrever_resumo(dados):
@@ -679,6 +772,13 @@ def escrever_resumo(dados):
             L.append("  ! Sem AVX2: emuladores pesados (PS2, PS3, Xbox 360) podem nem abrir.")
     if c.get("instrucoes_aviso"):
         L.append("  ! " + c["instrucoes_aviso"])
+    av = dados.get("avaliacao") or {}
+    vel = av.get("velocidade") if isinstance(av, dict) else None
+    if isinstance(vel, dict) and "operacoes_por_segundo" in vel:
+        L.append("  Velocidade de UM nucleo (medida): %s operacoes/s = %s vezes o notebook-alvo%s" % (
+            "{:,}".format(vel["operacoes_por_segundo"]).replace(",", "."),
+            str(vel.get("relativa_ao_alvo")).replace(".", ","),
+            " (referencia PROVISORIA)" if vel.get("referencia_provisoria") else ""))
     L.append("")
 
     m = dados["memoria"]
@@ -810,6 +910,7 @@ def escrever_resumo(dados):
     if b.get("nao_deu_para_ler"):
         L.append("  nao deu para ler: %s" % "; ".join(b["nao_deu_para_ler"]))
     L.append("")
+    L.extend(resumo_da_avaliacao(dados.get("avaliacao")))
     L.append("Tempo da coleta: %s s" % dados["duracao_s"])
     return "\n".join(L) + "\n"
 
@@ -836,6 +937,7 @@ def coletar(pasta=None):
     dados["rede"] = coletar_rede()
     dados["instalacao"] = coletar_instalacao()
     dados["barreiras"] = coletar_barreiras(dados)
+    dados["avaliacao"] = coletar_avaliacao()
     dados["duracao_s"] = round(time.time() - inicio, 1)
 
     with open(os.path.join(pasta, "maquina.json"), "w", encoding="utf-8") as f:
