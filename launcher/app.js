@@ -59,6 +59,7 @@ function atualizarBotaoTema() {
   // isto para se desligar sozinhos no modo modesto -- computador fraco
   // nao precisa gastar quadro nenhum com decoracao.
   document.body.dataset.modoModesto = estado.config.modo_modesto ? "true" : "false";
+  document.body.dataset.fundoAnimado = estado.config.fundo_animado || "automatico";
   botao.textContent = escuro ? "☀ Claro" : "☾ Escuro";
   botao.setAttribute("aria-label", escuro ? "Usar modo claro" : "Usar modo escuro");
 }
@@ -139,6 +140,8 @@ async function carregarEstado() {
   $("#listaPresetGrafico").value = dados.config.preset_grafico_externo || "automatico";
   atualizarExplicaPreset();
   $("#listaMotorPs2").value = dados.config.motor_ps2 || "automatico";
+  $("#listaFundoAnimado").value = dados.config.fundo_animado || "automatico";
+  explicarFundoAnimado();
   desenharRedePs2(dados.rede_ps2 || {});
 
   desenharEnderecos(dados.enderecos || []);
@@ -708,6 +711,25 @@ function desenharAvisosDoJogo(jogo) {
     const destino = estado.porPlataforma[mover.mover_para];
     botao.textContent = `Mover para ${destino ? destino.nome : "a pasta certa"}`;
     botao.onclick = () => moverJogo(jogo.id, mover.mover_para);
+  }
+}
+
+// O Windows em "melhor desempenho" (animacoes desligadas) faz o navegador
+// pedir menos movimento: no automatico, o fundo fica parado. Achado de
+// 01/10/2026 -- era o motivo de "os fundos animados nao funcionam mais".
+function explicarFundoAnimado() {
+  const ajuda = $("#ajudaFundoAnimado");
+  if (!ajuda) return;
+  const pedeMenos = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const escolha = $("#listaFundoAnimado").value;
+  if (escolha === "automatico" && pedeMenos) {
+    ajuda.textContent = "As animações do Windows estão desligadas neste computador, então o " +
+      "fundo fica parado. Escolha \"Sempre animado\" para ver o movimento.";
+  } else if (escolha === "automatico" && estado.config && estado.config.modo_modesto) {
+    ajuda.textContent = "Com o Gráfico igual ao console original ligado, o fundo fica parado " +
+      "(não gasta nada). Escolha \"Sempre animado\" para ver o movimento.";
+  } else {
+    ajuda.textContent = "O céu (tema escuro) e o campo (tema claro) atrás da tela. Parado não gasta nada.";
   }
 }
 
@@ -3420,6 +3442,16 @@ function ligarEventos() {
       await salvarConfig({ preset_grafico_externo: evento.target.value });
       atualizarExplicaPreset();
       recado("Pronto. Vale no próximo jogo que você abrir pelo PCSX2, RPCS3 ou Xenia.");
+    } catch (falha) {
+      recado(falha.message, true);
+    }
+  });
+
+  $("#listaFundoAnimado").addEventListener("change", async (evento) => {
+    try {
+      await salvarConfig({ fundo_animado: evento.target.value });
+      atualizarBotaoTema();
+      explicarFundoAnimado();
     } catch (falha) {
       recado(falha.message, true);
     }

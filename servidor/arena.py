@@ -1035,6 +1035,10 @@ def config_padrao():
         # Motor de video do PCSX2 (PS2): "automatico" deixa o PCSX2 escolher
         # (no 2.8 ele escolhe DirectX 12 em placa Intel e AMD com nivel 12).
         "motor_ps2": "automatico",
+        # Fundo animado da tela (ceu e campo): "automatico" anima, a nao ser
+        # com o modo modesto ou o Windows pedindo menos movimento; "sempre";
+        # "parado" (desenha a cena uma vez so).
+        "fundo_animado": "automatico",
         "rpcn_ativo": False,
         # Interface: tema, jogos marcados e os ultimos abertos.
         "tema": "claro",
@@ -1050,6 +1054,10 @@ def config_padrao():
 
 
 _config_cache = {"quando": 0.0, "valor": None}
+
+# Jeitos de mostrar o fundo da tela (launcher\field-background.js e
+# galaxy-background.js leem body[data-fundo-animado]).
+FUNDOS_ANIMADOS = ("automatico", "sempre", "parado")
 
 
 def carregar_config():
@@ -1141,6 +1149,8 @@ def ler_config_do_disco():
     # erro de "unhashable" e derrubaria a leitura da config inteira.
     if salvo.get("motor_ps2") in tuple(graficos.MOTORES_PCSX2):
         config["motor_ps2"] = salvo["motor_ps2"]
+    if salvo.get("fundo_animado") in FUNDOS_ANIMADOS:
+        config["fundo_animado"] = salvo["fundo_animado"]
 
     if salvo.get("tema") in ("claro", "escuro"):
         config["tema"] = salvo["tema"]
@@ -4817,6 +4827,8 @@ class Manipulador(BaseHTTPRequestHandler):
                 config["preset_grafico_externo"] = dados["preset_grafico_externo"]
             if dados.get("motor_ps2") in tuple(graficos.MOTORES_PCSX2):
                 config["motor_ps2"] = dados["motor_ps2"]
+            if dados.get("fundo_animado") in FUNDOS_ANIMADOS:
+                config["fundo_animado"] = dados["fundo_animado"]
             if dados.get("tema") in ("claro", "escuro"):
                 config["tema"] = dados["tema"]
 

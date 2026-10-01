@@ -558,6 +558,33 @@ crescer, o ARENA o marca como somente leitura. Se o pen drive for para outro
 computador, o ARENA apaga esse cache e o emulador monta outro, próprio da
 placa de vídeo daquele computador.
 
+### Fundo da tela: céu e campo
+
+Atrás da lista de jogos há uma cena em pixel art: o **céu** no tema escuro
+(lua, aurora, constelação, planeta com anel, borboletas de luz, cometa,
+chuva de meteoros, satélite, OVNI e, de vez em quando, um foguete) e o
+**campo** no tema claro (sol, nuvens, girassóis, borboletas de várias
+cores, abelhas, passarinhos, sementes ao vento, joaninha, coelho e balão).
+
+Em **Ajustes → Simples → Fundo animado**:
+
+| Opção | O que faz |
+|---|---|
+| **Automático** (padrão) | Anima. Fica **parado** com o Gráfico igual ao console original ligado ou quando o Windows pede menos movimento |
+| **Sempre animado** | Anima sempre |
+| **Parado** | Desenha a cena uma vez e não gasta mais nada |
+
+**"Os fundos não se mexem"**: o Windows em *Ajustar para obter melhor
+desempenho* (ou com *Efeitos de animação* desligado, em Acessibilidade)
+avisa o navegador que a pessoa prefere menos movimento. No automático, o
+ARENA respeita e deixa a cena parada — a tela de Ajustes avisa quando é
+isso. Quer o movimento mesmo assim? **Sempre animado**.
+
+Custo: a cena tem só 160 × 90 pontos esticados (por isso fica nítida até em
+4K), o que nunca muda é desenhado uma vez só, e ela anda a 30 quadros por
+segundo. Medido no Ryzen: cerca de 2% de um núcleo animada, zero parada.
+Quando o jogo cobre a janela do ARENA, o navegador para de desenhar.
+
 ### O que está deixando o computador lento
 
 Em **Ajustes → Máquina**, o botão **Verificar agora** olha o Windows (leva
