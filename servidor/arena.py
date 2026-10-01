@@ -38,6 +38,18 @@ import webbrowser
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
+# A janela preta nunca pode derrubar o servidor. Achado de 01/10/2026
+# (testes\teste_quebrar_api.py): com a saida redirecionada para arquivo --
+# o COLETAR.bat faz isso -- o Windows usa a pagina de codigo antiga
+# (cp1252), e um print com emoji ou japones (apelido de colega, nome de
+# jogo, pedido de fora) dava erro DENTRO do tratamento de erro: o pedido
+# ficava sem resposta. Agora o caractere que nao cabe vira "?" e segue.
+for _saida in (sys.stdout, sys.stderr):
+    try:
+        _saida.reconfigure(errors="replace")
+    except (AttributeError, ValueError):
+        pass
+
 # ---------------------------------------------------------------------------
 # BLOCO 1 - Caminhos (tudo relativo, nada preso a letra de drive)
 # ---------------------------------------------------------------------------
@@ -3673,9 +3685,22 @@ ROTAS_REDE_EXTERNA = frozenset((
 ))
 
 
+def _sem_nan(texto):
+    """json.loads aceitaria NaN e Infinity (nao sao JSON de verdade): numero
+    que nao e' numero nao entra em placar nem em configuracao."""
+    raise ValueError("numero invalido: %s" % texto)
+
+
 class Manipulador(BaseHTTPRequestHandler):
 
     protocol_version = "HTTP/1.1"
+    # Tempo maximo esperando o outro lado (achado de 01/10/2026, tentando
+    # quebrar o ARENA): sem isto, uma conexao parada -- ou um pedido que
+    # promete 1 MB e manda 10 bytes -- prendia uma linha de execucao do
+    # servidor PARA SEMPRE. Com "Aceitar conexoes da rede", qualquer colega
+    # podia travar o ARENA abrindo conexoes assim. 30 s nao atrapalha
+    # ninguem: e' tempo SEM receber nada, nao tempo de processar.
+    timeout = 30
 
     def log_message(self, formato, *args):
         pass
@@ -3761,6 +3786,17 @@ class Manipulador(BaseHTTPRequestHandler):
     LIMITE_CORPO = 4 * 1024 * 1024
 
     def ler_corpo(self):
+        """Le o JSON enviado. Devolve (dados, erro); o codigo HTTP do erro
+        fica em self.status_corpo (413 grande demais, 400 o resto)."""
+        self.status_corpo = 400
+        dados, erro = self._ler_corpo()
+        if erro is None and not isinstance(dados, dict):
+            # [] ou "texto" no lugar de {...}: antes chegava nas rotas e
+            # virava erro 500 (dados.get de uma lista).
+            return {}, "O conteúdo enviado precisa ser um objeto JSON ({...})."
+        return dados, erro
+
+    def _ler_corpo(self):
         """Le o JSON enviado. Devolve (dados, erro).
 
         Quando o corpo passa do limite, o servidor precisa ESVAZIAR a
@@ -3777,6 +3813,7 @@ class Manipulador(BaseHTTPRequestHandler):
             return {}, None
 
         if tamanho > self.LIMITE_CORPO:
+            self.status_corpo = 413
             # Descarta o que veio, em pedacos, para nao guardar tudo na
             # memoria so para jogar fora.
             restante = tamanho
@@ -3790,8 +3827,17 @@ class Manipulador(BaseHTTPRequestHandler):
                         % (tamanho / 1048576.0, self.LIMITE_CORPO // 1048576))
 
         try:
-            return json.loads(self.rfile.read(tamanho).decode("utf-8")), None
-        except (ValueError, UnicodeDecodeError):
+            bruto = self.rfile.read(tamanho)
+        except (TimeoutError, OSError):
+            # O outro lado prometeu mais do que mandou e parou (ver o
+            # 'timeout' da classe). A conexao fica inutil: fecha.
+            self.close_connection = True
+            self.status_corpo = 408
+            return {}, "O envio parou no meio (tempo esgotado)."
+        try:
+            return json.loads(bruto.decode("utf-8"), parse_constant=_sem_nan), None
+        except (ValueError, UnicodeDecodeError, RecursionError):
+            # RecursionError: [[[[...]]]] com milhares de niveis.
             return {}, "O conteúdo enviado não é um JSON válido."
 
     # -- GET --------------------------------------------------------------
@@ -4133,7 +4179,7 @@ class Manipulador(BaseHTTPRequestHandler):
                     "Content-Type precisa ser application/json.", 415)
             dados, falha_corpo = self.ler_corpo()
             if falha_corpo:
-                return self.erro(falha_corpo, 413)
+                return self.erro(falha_corpo, self.status_corpo)
             return self.api_post(caminho, dados)
         except Exception as falha:
             return self.erro_interno(falha)
