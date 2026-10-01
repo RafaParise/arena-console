@@ -1108,7 +1108,7 @@ def controles_pcsx2(jogadores, controles_xinput):
 def escrever_config_pcsx2(caminho_executavel, ultra=False, nota=None,
                           nota_gpu=None, modesto=False, preset=None,
                           jogadores=2, controles_xinput=(0, 1),
-                          cartoes=("Mcd001.ps2", "Mcd002.ps2")):
+                          cartoes=("Mcd001.ps2", "Mcd002.ps2"), integrada=None):
     """Escreve o bloco de controle, teclas e qualidade grafica do PCSX2.
 
     Preserva tudo o que ja estiver no arquivo fora desses blocos - em
@@ -1157,12 +1157,24 @@ def escrever_config_pcsx2(caminho_executavel, ultra=False, nota=None,
             fraco = modesto or alvo_nota <= 2
             forte = alvo_nota >= 4 and not modesto
 
+        # Placa INTEGRADA no automatico (decisao do Rafael, 30/09/2026): o
+        # Celeron otimizado roda PS2 com 4 jogadores, mas com graficos
+        # piscando/distorcendo -- e a placa integrada recebia 2x de
+        # resolucao, filtro 4x e a mistura de cores que estivesse no
+        # arquivo (estava "Maxima", 5, escolhida na tela do PCSX2). Agora:
+        # resolucao nativa e mistura "Basica" (o padrao do proprio PCSX2).
+        # Placa dedicada e o preset "Mais bonito" continuam como eram.
+        integrada_auto = (integrada is True and preset not in ("leve", "bonito")
+                          and not fraco and not forte)
+
         if fraco:
             # Resolucao nativa do PS2, sem suavizar nada - o mais leve
             # possivel, para quando ate o perfil normal engasga.
             escala, aniso, pre_carga = "1", "0", "0"
         elif forte:
             escala, aniso, pre_carga = "4", "16", "2"
+        elif integrada_auto:
+            escala, aniso, pre_carga = "1", "0", "2"
         else:
             escala, aniso, pre_carga = "2", "4", "2"
 
@@ -1172,6 +1184,12 @@ def escrever_config_pcsx2(caminho_executavel, ultra=False, nota=None,
         linhas_gs += ["upscale_multiplier = " + escala,
                       "MaxAnisotropy = " + aniso,
                       "texture_preloading = " + pre_carga]
+        # Mistura de cores (accurate_blending_unit: 0 minima, 1 basica --
+        # padrao do PCSX2 --, 2 media, 3 alta, 4 total, 5 maxima): "Basica" no
+        # leve, no grafico original e na placa integrada automatica. Fora
+        # disso o ARENA nao mexe: vale o que estiver na tela do PCSX2.
+        if fraco or integrada_auto:
+            linhas_gs.append("accurate_blending_unit = 1")
 
     if ultra:
         linhas_gs += ["VsyncEnable = true", "OsdShowSpeed = false"]

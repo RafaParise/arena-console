@@ -2042,7 +2042,8 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
                 preset=None if preset == "automatico" else preset,
                 jogadores=jogo.get("jogadores_max", 2),
                 controles_xinput=controles.controles_xinput(),
-                cartoes=cartoes_ps2)
+                cartoes=cartoes_ps2,
+                integrada=bool(MAQUINA["gpu"].get("integrada", True)))
             if escrito:
                 print("[ARENA] Controle e qualidade do PCSX2 configurados "
                       "(%s jogadores)." % jogo.get("jogadores_max", 2))

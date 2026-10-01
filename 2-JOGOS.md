@@ -577,19 +577,27 @@ o relógio volta para 1 de janeiro toda vez.
 
 ---
 
-### Qualidade gráfica do PCSX2, RPCS3 e Xenia
+### Qualidade gráfica do PCSX2, Dolphin, RPCS3 e Xenia
 
 Em **Ajustes → Emuladores** tem o seletor **Automático / Mais leve / Mais
-bonito**, com um exemplo de cada opção. Vale para os três emuladores de
-fora que têm imagem ajustável (PS2, PS3, Xbox 360).
+bonito**, com um exemplo de cada opção. Vale para os emuladores de fora
+que têm imagem ajustável (PS2, GameCube/Wii, PS3, Xbox 360).
 
 | Opção | O que faz |
 |---|---|
-| **Automático** | O padrão. Decide pela nota da placa de vídeo desta máquina — mesma lógica do resto do ARENA |
+| **Automático** | O padrão. Decide pela placa de vídeo desta máquina — mesma lógica do resto do ARENA |
 | **Mais leve** | Sempre resolução original do console, sem suavizar nada |
 | **Mais bonito** | Sempre a resolução mais alta e o melhor acabamento que o ARENA sabe pedir |
 
-O Dolphin (GameCube) não entra nessa lista ainda.
+**No PS2, com placa de vídeo integrada** (a dos notebooks da escola, e
+também a do Ryzen do professor), o Automático usa a **resolução original**
+e a **mistura de cores "Básica"** (o padrão do próprio PCSX2). Foi o que
+acabou com o peso nos notebooks: antes ia 2x de resolução, filtro 4x e a
+mistura que estivesse escolhida na tela do PCSX2 (estava na "Máxima", a
+mais pesada). Quer a imagem mais bonita numa máquina boa? Escolha **Mais
+bonito**: aí a mistura que você escolheu na tela do PCSX2 é respeitada. O
+**Gráfico original** (Ajustes → Máquina) também usa resolução original e
+mistura "Básica".
 
 **Xbox 360 abre sempre no Vulkan.** No modo de vídeo padrão do Xenia
 (Direct3D 12), a placa integrada "caía" no meio do jogo — tela preta,
