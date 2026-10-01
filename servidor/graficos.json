@@ -107,7 +107,7 @@
       "_nome": "PlayStation Portable",
       "_leia": "Sem aumento de textura por xBRZ: era ele que enchia a tela de pontinhos pretos. O ganho de imagem vem da resolucao interna, que nao cria defeito nenhum.",
       "sempre": {
-        "ppsspp_frameskip": "0",
+        "ppsspp_frameskip": "disabled",
         "ppsspp_auto_frameskip": "disabled",
         "ppsspp_io_timing_method": "Host",
         "ppsspp_texture_scaling_level": "off",
@@ -376,7 +376,10 @@
       "ppsspp_texture_filtering": "Nearest",
       "ppsspp_texture_anisotropic_filtering": "off",
       "ppsspp_texture_scaling_level": "off",
-      "ppsspp_skip_buffer_effects": "disabled"
+      "ppsspp_skip_buffer_effects": "disabled",
+      "ppsspp_frameskip": "1",
+      "ppsspp_frameskiptype": "Number of frames",
+      "ppsspp_auto_frameskip": "enabled"
     },
     "mupen64plus_next": {
       "mupen64plus-EnableNativeResFactor": "1",

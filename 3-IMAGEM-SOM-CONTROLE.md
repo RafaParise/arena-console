@@ -1025,6 +1025,36 @@ interna**, que multiplica o desenho sem inventar nada:
 Se você quiser mesmo o xBRZ de volta, é em `servidor\graficos.json`, na
 chave `ppsspp_texture_scaling_level`.
 
+#### PSP lento (abaixo de 60)
+
+Com o **Gráfico original** ligado, o PSP também ganha o **pulo de quadros
+automático**: quando o computador atrasa, o emulador deixa de desenhar um
+quadro para o jogo e o som não ficarem lentos. A imagem fica um pouco
+menos lisa nesses momentos; com folga, nada muda. Fora do Gráfico
+original, ele fica desligado (imagem sempre completa).
+
+---
+
+### PS2: imagem piscando ou distorcendo
+
+O PS2 roda no PCSX2, que tem o próprio motor de vídeo. Em **Ajustes →
+Emuladores → Motor de vídeo do PS2**:
+
+| Opção | O que faz |
+|---|---|
+| **Automático** (padrão) | O PCSX2 escolhe. Na versão que vem no ARENA, placa Intel e AMD recebem **DirectX 12** |
+| **DirectX 11** | O motor mais antigo e mais testado do PCSX2. Primeira tentativa quando a imagem pisca |
+| **DirectX 12** | Pesa menos no processador quando o driver da placa é bom |
+| **Vulkan** | Alternativa quando os dois DirectX dão problema |
+
+Se a imagem piscar ou distorcer em movimento rápido (visto no notebook
+Celeron da escola, com 4 jogadores), troque para **DirectX 11**, abra o
+mesmo jogo e compare. Ficou pior ou mais lento? Volte para
+**Automático**. Vale no próximo jogo de PS2 que abrir.
+
+Em placa integrada o ARENA já deixa o PS2 em resolução original e com a
+mistura de cores "Básica" (a mais leve que ainda desenha certo).
+
 ---
 
 ### Mipmap, texturas e anisotrópico

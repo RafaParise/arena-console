@@ -1105,10 +1105,21 @@ def controles_pcsx2(jogadores, controles_xinput):
     return linhas
 
 
+# Motor de video do PCSX2: chave "Renderer" de [EmuCore/GS], com os numeros
+# do proprio PCSX2 (enum GSRendererType, pcsx2/Config.h: Auto = -1,
+# DX11 = 3, VK = 14, DX12 = 15). No automatico, o PCSX2 2.8 escolhe
+# DirectX 12 em placa Intel ou AMD com nivel de recurso 12_0
+# (D3D::GetPreferredRenderer, conferido no codigo-fonte em 01/10/2026) --
+# suspeito dos graficos piscando no Celeron (Intel UHD, driver de 2021):
+# a escolha fica na tela do ARENA para testar em um clique.
+MOTORES_PCSX2 = {"automatico": "-1", "d3d11": "3", "d3d12": "15", "vulkan": "14"}
+
+
 def escrever_config_pcsx2(caminho_executavel, ultra=False, nota=None,
                           nota_gpu=None, modesto=False, preset=None,
                           jogadores=2, controles_xinput=(0, 1),
-                          cartoes=("Mcd001.ps2", "Mcd002.ps2"), integrada=None):
+                          cartoes=("Mcd001.ps2", "Mcd002.ps2"), integrada=None,
+                          motor="automatico"):
     """Escreve o bloco de controle, teclas e qualidade grafica do PCSX2.
 
     Preserva tudo o que ja estiver no arquivo fora desses blocos - em
@@ -1193,6 +1204,9 @@ def escrever_config_pcsx2(caminho_executavel, ultra=False, nota=None,
 
     if ultra:
         linhas_gs += ["VsyncEnable = true", "OsdShowSpeed = false"]
+    # O ARENA manda no motor de video: "automatico" grava -1 (o PCSX2
+    # escolhe), para a volta ao automatico pela tela do ARENA valer.
+    linhas_gs.append("Renderer = " + MOTORES_PCSX2.get(motor, "-1"))
 
     # [EmuCore/GS] nao e' mais apagado inteiro: so as chaves do ARENA mudam,
     # o resto do que o PCSX2 guarda ali fica.

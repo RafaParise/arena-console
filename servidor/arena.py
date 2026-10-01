@@ -1032,6 +1032,9 @@ def config_padrao():
         # "automatico" (decide pela nota da maquina), "leve" ou "bonito".
         # Vale para os emuladores externos (PCSX2, RPCS3, Xenia).
         "preset_grafico_externo": "automatico",
+        # Motor de video do PCSX2 (PS2): "automatico" deixa o PCSX2 escolher
+        # (no 2.8 ele escolhe DirectX 12 em placa Intel e AMD com nivel 12).
+        "motor_ps2": "automatico",
         "rpcn_ativo": False,
         # Interface: tema, jogos marcados e os ultimos abertos.
         "tema": "claro",
@@ -1125,6 +1128,10 @@ def ler_config_do_disco():
     config["rpcn_ativo"] = bool(salvo.get("rpcn_ativo"))
     if salvo.get("preset_grafico_externo") in ("automatico", "leve", "bonito"):
         config["preset_grafico_externo"] = salvo["preset_grafico_externo"]
+    # tuple(): um valor que nao e' texto (lista, por exemplo) num dict daria
+    # erro de "unhashable" e derrubaria a leitura da config inteira.
+    if salvo.get("motor_ps2") in tuple(graficos.MOTORES_PCSX2):
+        config["motor_ps2"] = salvo["motor_ps2"]
 
     if salvo.get("tema") in ("claro", "escuro"):
         config["tema"] = salvo["tema"]
@@ -2043,7 +2050,8 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
                 jogadores=jogo.get("jogadores_max", 2),
                 controles_xinput=controles.controles_xinput(),
                 cartoes=cartoes_ps2,
-                integrada=bool(MAQUINA["gpu"].get("integrada", True)))
+                integrada=bool(MAQUINA["gpu"].get("integrada", True)),
+                motor=config.get("motor_ps2", "automatico"))
             if escrito:
                 print("[ARENA] Controle e qualidade do PCSX2 configurados "
                       "(%s jogadores)." % jogo.get("jogadores_max", 2))
@@ -4783,6 +4791,8 @@ class Manipulador(BaseHTTPRequestHandler):
                 config["modo_desempenho"] = bool(dados["modo_desempenho"])
             if dados.get("preset_grafico_externo") in ("automatico", "leve", "bonito"):
                 config["preset_grafico_externo"] = dados["preset_grafico_externo"]
+            if dados.get("motor_ps2") in tuple(graficos.MOTORES_PCSX2):
+                config["motor_ps2"] = dados["motor_ps2"]
             if dados.get("tema") in ("claro", "escuro"):
                 config["tema"] = dados["tema"]
 

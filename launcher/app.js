@@ -138,6 +138,7 @@ async function carregarEstado() {
 
   $("#listaPresetGrafico").value = dados.config.preset_grafico_externo || "automatico";
   atualizarExplicaPreset();
+  $("#listaMotorPs2").value = dados.config.motor_ps2 || "automatico";
   desenharRedePs2(dados.rede_ps2 || {});
 
   desenharEnderecos(dados.enderecos || []);
@@ -3397,6 +3398,15 @@ function ligarEventos() {
       await salvarConfig({ preset_grafico_externo: evento.target.value });
       atualizarExplicaPreset();
       recado("Pronto. Vale no próximo jogo que você abrir pelo PCSX2, RPCS3 ou Xenia.");
+    } catch (falha) {
+      recado(falha.message, true);
+    }
+  });
+
+  $("#listaMotorPs2").addEventListener("change", async (evento) => {
+    try {
+      await salvarConfig({ motor_ps2: evento.target.value });
+      recado("Pronto. Vale no próximo jogo de PS2.");
     } catch (falha) {
       recado(falha.message, true);
     }
