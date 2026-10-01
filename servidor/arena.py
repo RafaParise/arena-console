@@ -1119,6 +1119,8 @@ def ler_config_do_disco():
             salvo = json.load(arquivo)
     except (OSError, ValueError):
         salvo = {}
+    if not isinstance(salvo, dict):
+        salvo = {}     # [] ou "texto" no lugar de {...}: vale o padrao
 
     if salvo.get("perfil_grafico") in list(PERFIS_GRAFICOS) + ["automatico"]:
         config["perfil_grafico"] = salvo["perfil_grafico"]
@@ -1145,7 +1147,11 @@ def ler_config_do_disco():
     config["nome_dispositivo"] = str(salvo.get("nome_dispositivo", ""))[:40]
 
     servidores = []
-    for item in (salvo.get("servidores") or []):
+    # So lista: "servidores": 5 (config.json mexido a mao) derrubava a
+    # leitura da config -- e a abertura do ARENA junto (achado de 01/10/2026,
+    # fuzz do config.json).
+    lista = salvo.get("servidores")
+    for item in (lista if isinstance(lista, list) else []):
         if not isinstance(item, dict) or not item.get("url"):
             continue
         servidores.append({

@@ -26,7 +26,8 @@ def ler_itens():
     try:
         with open(ARQUIVO, "r", encoding="utf-8") as arquivo:
             dados = json.load(arquivo)
-        return dados if isinstance(dados, list) else []
+        # So os itens que sao objeto: um [1, "x"] no arquivo nao derruba a aba.
+        return [i for i in dados if isinstance(i, dict)] if isinstance(dados, list) else []
     except (OSError, ValueError):
         return []
 

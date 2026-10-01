@@ -331,11 +331,19 @@ def assinatura_das_pastas():
 
 
 def ler_manifesto_salvo():
+    """A lista salva, ou None. So vale se tiver o formato certo: um
+    manifesto.json que virou [] ou "texto" (pen drive arrancado, mexido a
+    mao) derrubava a lista de jogos inteira (achado de 01/10/2026)."""
     try:
         with open(ARQUIVO_MANIFESTO, "r", encoding="utf-8") as arquivo:
-            return json.load(arquivo)
+            salvo = json.load(arquivo)
     except (OSError, ValueError):
         return None
+    if not isinstance(salvo, dict) or not isinstance(salvo.get("jogos"), list):
+        return None
+    if not all(isinstance(j, dict) for j in salvo["jogos"]):
+        return None
+    return salvo
 
 
 # ---------------------------------------------------------------------------

@@ -233,6 +233,8 @@ def ler():
             dados = json.load(arquivo)
     except (OSError, ValueError):
         return _vazio()
+    if not isinstance(dados, dict):
+        return _vazio()      # [] ou "texto" no lugar de {...}
 
     limpo = _vazio()
     for jogador in JOGADORES:
