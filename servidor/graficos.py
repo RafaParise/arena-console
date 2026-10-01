@@ -153,20 +153,30 @@ def corrigir_caminhos_retroarch_cfg():
                 linhas[i] = certo
                 trocados += 1
             continue
+        if chave_da_linha in CHAVES_SEMPRE_DENTRO_DO_ARENA:
+            # Achado de 01/10/2026: ao fechar, o RetroArch regrava esta chave
+            # na forma DELE, ":\cache" (a pasta do proprio RetroArch, ja
+            # dentro do ARENA). So o caminho C:\... era reconhecido: a
+            # chave "nao existia" e ganhava uma linha nova a cada abertura
+            # (5 iguais neste PC). Agora a forma ":\" vale, e a repetida sai.
+            if chave_da_linha in achadas:
+                linhas[i] = ""
+                trocados += 1
+                continue
+            achadas.add(chave_da_linha)
+            valor = linha.split("=", 1)[1].strip().strip('"') if "=" in linha else ""
+            if valor.startswith((":\\", ":/")):
+                continue
+            certo = os.path.join(RAIZ, CHAVES_SEMPRE_DENTRO_DO_ARENA[chave_da_linha])
+            if valor != certo:
+                linhas[i] = '%s = "%s"\n' % (chave_da_linha, certo)
+                trocados += 1
+            continue
         m = _PADRAO_LINHA_CAMINHO.match(linha.rstrip("\n"))
         if not m:
             continue
         prefixo, caminho_velho = m.group(1), m.group(2)
         chave = prefixo.split("=", 1)[0].strip()
-
-        if chave in CHAVES_SEMPRE_DENTRO_DO_ARENA:
-            achadas.add(chave)
-            certo = os.path.join(RAIZ, CHAVES_SEMPRE_DENTRO_DO_ARENA[chave])
-            if caminho_velho == certo:
-                continue
-            linhas[i] = '%s"%s"\n' % (prefixo, certo)
-            trocados += 1
-            continue
 
         if caminho_velho.lower().startswith(raiz_baixo):
             continue  # ja aponta pra pasta certa
