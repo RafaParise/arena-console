@@ -5163,12 +5163,25 @@ PALAVRAS_VPN = ("vpn", "tap-windows", "wireguard", "wintun", "openvpn",
                 "pangp", "globalprotect", "juniper", "sonicwall", "hamachi",
                 "radmin", "nordlynx", "windscribe", "warp")
 
-_adaptadores = {"quando": 0.0, "mapa": {}, "buscando": False}
+_adaptadores = {"quando": 0.0, "mapa": {}, "buscando": False, "falhas": 0}
+
+# Quanto tempo o mapa de nomes vale, e de quanto em quanto tempo se pode
+# perguntar de novo por um endereco que nao veio na resposta.
+VALIDADE_ADAPTADORES = 600.0
+REPERGUNTA_ADAPTADORES = 60.0
 
 
 def atualizar_adaptadores():
     """Pergunta ao Windows o nome de cada adaptador (nao pede administrador).
-    Demora ~2,5 s: roda em segundo plano e fica guardado por 10 minutos."""
+    Demora ~2,5 s: roda em segundo plano e fica guardado por 10 minutos.
+
+    Achado de 01/10/2026 (reproduzido): quando o PowerShell falhava (modo
+    restrito, bloqueado pela escola, ou mais de 15 s para responder num
+    notebook fraco) ou nao trazia um dos enderecos do computador, o ARENA o
+    abria DE NOVO a cada consulta de endereco -- o grito na rede, a cada
+    5 s, e o vigia. 24 PowerShell em 12 s no teste: num Celeron, um nucleo
+    inteiro ocupado so com isso. Agora: falhou, espera (1, 2, 4... ate 10
+    minutos); endereco que nao veio, pergunta no maximo 1 vez por minuto."""
     mapa = {}
     try:
         comando = ("Get-NetIPAddress -AddressFamily IPv4 | ForEach-Object { "
@@ -5186,11 +5199,25 @@ def atualizar_adaptadores():
     except (OSError, subprocess.SubprocessError):
         pass
     with TRAVA_CACHE:
+        mudou = bool(mapa) and mapa != _adaptadores["mapa"]
         if mapa:
             _adaptadores["mapa"] = mapa
+            _adaptadores["falhas"] = 0
+        else:
+            _adaptadores["falhas"] += 1
         _adaptadores["quando"] = time.time()
         _adaptadores["buscando"] = False
-        _cache_enderecos["quando"] = 0.0  # a proxima consulta ja usa os nomes
+        if mudou:
+            _cache_enderecos["quando"] = 0.0  # a proxima consulta ja usa os nomes
+
+
+def espera_dos_adaptadores():
+    """Segundos ate poder perguntar de novo, depois de falhas seguidas:
+    60, 120, 240, 480 e, dali em diante, 600 (o mesmo prazo do mapa bom)."""
+    falhas = _adaptadores["falhas"]
+    if not falhas:
+        return REPERGUNTA_ADAPTADORES
+    return min(VALIDADE_ADAPTADORES, REPERGUNTA_ADAPTADORES * (2 ** (falhas - 1)))
 
 
 def nome_do_adaptador(ip):
@@ -5199,7 +5226,11 @@ def nome_do_adaptador(ip):
     em segundo plano -- nunca faz a tela esperar."""
     with TRAVA_CACHE:
         mapa = _adaptadores["mapa"]
-        velho = (time.time() - _adaptadores["quando"]) > 600 or ip not in mapa
+        idade = time.time() - _adaptadores["quando"]
+        if _adaptadores["falhas"] or ip not in mapa:
+            velho = idade > espera_dos_adaptadores()
+        else:
+            velho = idade > VALIDADE_ADAPTADORES
         if velho and not _adaptadores["buscando"] and sys.platform.startswith("win"):
             _adaptadores["buscando"] = True
             threading.Thread(target=atualizar_adaptadores, daemon=True).start()
