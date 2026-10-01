@@ -639,6 +639,34 @@ def runtime_visual_c():
 # Resumo completo
 # ---------------------------------------------------------------------------
 
+def altura_da_tela():
+    """Linhas da tela principal em pixels de verdade -- 768, 1080, 2160 --,
+    sem a escala de 150% ou 200% do Windows. 0 se nao der para saber.
+
+    Serve para o degrau "tela 4K" das opcoes de imagem (graficos.json ->
+    tela_4k). DESKTOPVERTRES (117) do GetDeviceCaps nao depende da escala
+    do Windows. Os tipos vao declarados (a alca de 64 bits cortada pela
+    metade ja foi bug aqui: SetPriorityClass sem tipos), numa copia propria
+    da user32 para nao mexer em quem mais usa a mesma funcao."""
+    if os.name != "nt":
+        return 0
+    try:
+        usuario, gdi = ctypes.WinDLL("user32"), ctypes.WinDLL("gdi32")
+        usuario.GetDC.restype = ctypes.c_void_p
+        usuario.GetDC.argtypes = [ctypes.c_void_p]
+        usuario.ReleaseDC.argtypes = [ctypes.c_void_p, ctypes.c_void_p]
+        gdi.GetDeviceCaps.argtypes = [ctypes.c_void_p, ctypes.c_int]
+        dc = usuario.GetDC(None)
+        if not dc:
+            return 0
+        try:
+            return max(0, int(gdi.GetDeviceCaps(dc, 117)))
+        finally:
+            usuario.ReleaseDC(None, dc)
+    except (OSError, AttributeError, ValueError):
+        return 0
+
+
 def resumo(pasta_raiz):
     """Junta tudo num dicionario so, pronto para a tela."""
     ram = memoria()

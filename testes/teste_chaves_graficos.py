@@ -37,6 +37,9 @@ def chaves_por_nucleo(dados):
     for nucleo, excecao in dados.get("excecoes", {}).items():
         for bloco in excecao.get("por_nota", []) if isinstance(excecao, dict) else []:
             anotar(nucleo, bloco.get("opcoes", {}), "excecao nota %s" % bloco.get("nota_minima"))
+    # Degrau "tela 4K" (01/10/2026): chave errada ali nao faria nada, calada.
+    for nucleo, opcoes in dados.get("tela_4k", {}).get("nucleos", {}).items():
+        anotar(nucleo, opcoes, "tela 4K")
     return saida
 
 

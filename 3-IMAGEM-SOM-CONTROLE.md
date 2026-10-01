@@ -399,6 +399,26 @@ Aparece também a **confirmação em milissegundos**, separada da velocidade.
 Confirmação alta com velocidade alta é normal: é o disco avisando que
 gravou, não lentidão.
 
+### Tela 4K
+
+Com **placa de vídeo dedicada** e uma tela (ou TV) de **4K**, o ARENA sobe
+sozinho a resolução interna dos consoles de 3D mais leves, para a imagem
+ficar perto da resolução da tela em vez de parar em 1440p:
+
+| Console | Tela comum | Tela 4K + placa dedicada |
+|---|---|---|
+| PlayStation | 6x (1440p) | 9x (4K) |
+| PSP | 1920×1088 | 2880×1632 |
+| Dreamcast | até 1920×1440 | 2880×2160 |
+| Nintendo 64 | tamanho original | 2x |
+
+O ARENA confere a tela na hora de abrir o jogo: ligar a TV 4K depois já
+vale. Placa integrada não entra (a imagem continua como antes), e o
+**Gráfico igual ao console original** continua vencendo tudo. PS2, GameCube,
+Wii, PS3 e Xbox 360 ficam no que a placa aguenta: 4K neles derruba qualquer
+placa média. Os consoles 2D já ficam nítidos em qualquer tela pelo filtro
+de pixel nítido.
+
 ---
 
 ### Se o jogo ficar avançando um quadro por vez

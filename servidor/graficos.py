@@ -245,13 +245,34 @@ def opcoes_do_nucleo(nome_curto, nota):
     return opcoes
 
 
-def gravar_opcoes_dos_nucleos(nota, extras=None, nota_gpu=None, modesto=False):
+def tela_4k_vale(nota_gpu, altura_tela):
+    """O degrau "tela 4K" (graficos.json -> tela_4k) vale nesta maquina?
+    So com placa DEDICADA (a integrada nao passa da nota 3) e tela de 4K de
+    verdade. Sem a nota da placa (chamada antiga), nunca."""
+    regra = carregar_graficos().get("tela_4k", {})
+    if nota_gpu is None or not regra.get("nucleos"):
+        return False
+    return (nota_gpu >= regra.get("nota_gpu_minima", 4)
+            and (altura_tela or 0) >= regra.get("altura_minima", 2000))
+
+
+def gravar_opcoes_dos_nucleos(nota, extras=None, nota_gpu=None, modesto=False, altura_tela=None):
     """Monta retroarch-core-options.cfg com o ajuste de todos os emuladores.
 
     Vale a pena escrever tudo de uma vez, e nao so do jogo que vai abrir:
     o arquivo e pequeno, e assim o aluno pode abrir o RetroArch por fora
     que os ajustes continuam valendo.
+
+    'altura_tela': linhas da tela (hardware.altura_da_tela); sem ela, o
+    ARENA mede na hora -- e instantaneo, e pega a TV 4K ligada depois.
     """
+    if altura_tela is None:
+        try:
+            import hardware
+            altura_tela = hardware.altura_da_tela()
+        except Exception:
+            altura_tela = 0
+    tela_4k = tela_4k_vale(nota_gpu, altura_tela)
     linhas = ["# Gerado pelo ARENA conforme a potencia desta maquina.",
               "# Para mudar, edite servidor/graficos.json - nao este arquivo."]
 
@@ -278,6 +299,10 @@ def gravar_opcoes_dos_nucleos(nota, extras=None, nota_gpu=None, modesto=False):
                                 key=lambda b: b.get("nota_minima", 0)):
                 if alvo >= bloco.get("nota_minima", 0):
                     opcoes.update(bloco.get("opcoes", {}))
+            # Tela 4K com placa dedicada: os 3D leves desenham perto da
+            # resolucao da tela (graficos.json -> tela_4k).
+            if tela_4k:
+                opcoes.update(dados.get("tela_4k", {}).get("nucleos", {}).get(nome_curto, {}))
         if not opcoes:
             continue
         for chave in sorted(opcoes):

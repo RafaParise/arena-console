@@ -394,6 +394,25 @@
       ]
     }
   },
+  "tela_4k": {
+    "_leia": "Tela de 4K (2.000 linhas ou mais, em pixels de verdade) E placa de video dedicada (nota da placa 4 ou 5): os consoles de 3D leves desenham perto da resolucao da tela, em vez de parar em 1440p. Os pesados (PS2, GameCube, Wii, PS3, Xbox 360) ficam no que a placa aguenta: 4K neles derruba placa media. Valores conferidos no proprio nucleo (o SwanStation diz '9x (for 4K)'). PSP em 6x e N64 em 2x, nao no maximo: estabilidade antes de nitidez.",
+    "altura_minima": 2000,
+    "nota_gpu_minima": 4,
+    "nucleos": {
+      "swanstation": {
+        "swanstation_GPU_ResolutionScale": "9"
+      },
+      "ppsspp": {
+        "ppsspp_internal_resolution": "2880x1632"
+      },
+      "flycast": {
+        "reicast_internal_resolution": "2880x2160"
+      },
+      "mupen64plus_next": {
+        "mupen64plus-parallel-rdp-upscaling": "2x"
+      }
+    }
+  },
   "modesto": {
     "_leia": "Resolucao nativa do console e nada mais. Para quando o modo leve ainda esta pesado. Vale para qualquer nota de maquina.",
     "swanstation": {
