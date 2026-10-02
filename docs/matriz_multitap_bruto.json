@@ -5,20 +5,16 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 97479,
-      "segundos": 10.6,
+      "segundos": 10.9,
       "travou": false,
-      "erros": [
-        "[ERROR] [MMDevice] Failed to initialize default eRender device."
-      ]
+      "erros": []
     },
     "jogar_junto": {
       "conectou": true,
       "convidado_diz": "Você se juntou como jogador 2",
       "recusa_do_nucleo": "",
       "hospedeiro_vivo": true,
-      "erros": [
-        "[ERROR] [MMDevice] Failed to initialize default eRender device."
-      ]
+      "erros": []
     }
   },
   {
@@ -27,20 +23,16 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 235564,
-      "segundos": 10.6,
+      "segundos": 11.2,
       "travou": false,
-      "erros": [
-        "[ERROR] [MMDevice] Failed to initialize default eRender device."
-      ]
+      "erros": []
     },
     "jogar_junto": {
       "conectou": true,
-      "convidado_diz": null,
+      "convidado_diz": "Você se juntou como jogador 2",
       "recusa_do_nucleo": "",
       "hospedeiro_vivo": true,
-      "erros": [
-        "[ERROR] [MMDevice] Failed to initialize default eRender device."
-      ]
+      "erros": []
     }
   },
   {
@@ -49,11 +41,10 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 336143,
-      "segundos": 10.6,
+      "segundos": 11.1,
       "travou": false,
       "erros": [
-        "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented.",
-        "[ERROR] [MMDevice] Failed to initialize default eRender device."
+        "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented."
       ]
     },
     "jogar_junto": {
@@ -62,8 +53,7 @@
       "recusa_do_nucleo": "",
       "hospedeiro_vivo": true,
       "erros": [
-        "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented.",
-        "[ERROR] [MMDevice] Failed to initialize default eRender device."
+        "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented."
       ]
     }
   },
@@ -73,20 +63,16 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 40997,
-      "segundos": 10.5,
+      "segundos": 11.1,
       "travou": false,
-      "erros": [
-        "[ERROR] [MMDevice] Failed to initialize default eRender device."
-      ]
+      "erros": []
     },
     "jogar_junto": {
       "conectou": true,
       "convidado_diz": "Você se juntou como jogador 2",
       "recusa_do_nucleo": "",
       "hospedeiro_vivo": true,
-      "erros": [
-        "[ERROR] [MMDevice] Failed to initialize default eRender device."
-      ]
+      "erros": []
     }
   },
   {
@@ -95,20 +81,16 @@
     "abre": {
       "abre_e_mostra_imagem": false,
       "foto_bytes": 1796,
-      "segundos": 10.5,
+      "segundos": 11.0,
       "travou": false,
-      "erros": [
-        "[ERROR] [MMDevice] Failed to initialize default eRender device."
-      ]
+      "erros": []
     },
     "jogar_junto": {
       "conectou": true,
       "convidado_diz": "Você se juntou como jogador 2",
       "recusa_do_nucleo": "",
       "hospedeiro_vivo": true,
-      "erros": [
-        "[ERROR] [MMDevice] Failed to initialize default eRender device."
-      ]
+      "erros": []
     }
   },
   {
@@ -116,12 +98,10 @@
     "jogo": "GoldenEye 007 (USA).z64",
     "abre": {
       "abre_e_mostra_imagem": true,
-      "foto_bytes": 435421,
-      "segundos": 12.6,
+      "foto_bytes": 50874,
+      "segundos": 11.5,
       "travou": false,
-      "erros": [
-        "[ERROR] [MMDevice] Failed to initialize default eRender device."
-      ]
+      "erros": []
     },
     "jogar_junto": {
       "conectou": false,
@@ -130,8 +110,7 @@
       "hospedeiro_vivo": true,
       "erros": [
         "[ERROR] [Netplay] O núcleo não tem suporte para Netplay.",
-        "[ERROR] [Netplay] Falha em inicializar a Netplay.",
-        "[ERROR] [MMDevice] Failed to initialize default eRender device."
+        "[ERROR] [Netplay] Falha em inicializar a Netplay."
       ]
     }
   },
@@ -140,21 +119,17 @@
     "jogo": "CTR - Crash Team Racing (USA).cue",
     "abre": {
       "abre_e_mostra_imagem": true,
-      "foto_bytes": 43950,
-      "segundos": 12.1,
+      "foto_bytes": 29288,
+      "segundos": 12.5,
       "travou": false,
-      "erros": [
-        "[ERROR] [MMDevice] Failed to initialize default eRender device."
-      ]
+      "erros": []
     },
     "jogar_junto": {
       "conectou": true,
       "convidado_diz": "Você se juntou como jogador 2",
       "recusa_do_nucleo": "",
       "hospedeiro_vivo": true,
-      "erros": [
-        "[ERROR] [MMDevice] Failed to initialize default eRender device."
-      ]
+      "erros": []
     }
   },
   {
@@ -181,29 +156,32 @@
   },
   {
     "console": "Dreamcast",
-    "jogo": "Marvel vs. Capcom 2 (USA) (Track 3).bin",
+    "jogo": "Marvel vs. Capcom 2 - New Age of Heroes (Europe).cue",
     "abre": {
-      "abre_e_mostra_imagem": false,
-      "foto_bytes": 0,
-      "segundos": 0.2,
+      "abre_e_mostra_imagem": true,
+      "foto_bytes": 245053,
+      "segundos": 12.5,
       "travou": false,
       "erros": [
         "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
         "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
+        "[libretro INFO] [BOOT] USA region not supported. Using Europe instead",
         "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
-        "[ERROR] [Content] Falha ao carregar o conteúdo."
+        "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value."
       ]
     },
     "jogar_junto": {
       "conectou": false,
       "convidado_diz": null,
-      "recusa_do_nucleo": "",
-      "hospedeiro_vivo": false,
+      "recusa_do_nucleo": "[libretro INFO] [BOOT] USA region not supported. Using Europe instead",
+      "hospedeiro_vivo": true,
       "erros": [
         "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
         "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
-        "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
-        "[ERROR] [Content] Falha ao carregar o conteúdo."
+        "[libretro INFO] [BOOT] USA region not supported. Using Europe instead",
+        "[ERROR] [Netplay] O núcleo não tem suporte para Netplay.",
+        "[ERROR] [Netplay] Falha em inicializar a Netplay.",
+        "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value."
       ]
     }
   },
@@ -212,11 +190,10 @@
     "jogo": "Killzone - Liberation (USA) (En,Fr,De,Es,It,Nl,Pl,Ru).iso",
     "abre": {
       "abre_e_mostra_imagem": true,
-      "foto_bytes": 6595,
-      "segundos": 11.3,
+      "foto_bytes": 7933,
+      "segundos": 11.4,
       "travou": false,
       "erros": [
-        "[ERROR] [MMDevice] Failed to initialize default eRender device.",
         "[libretro WARN] [sceDisplay] Video out requested, not supported: mode=0 size=512,272"
       ]
     },
@@ -227,8 +204,7 @@
       "hospedeiro_vivo": true,
       "erros": [
         "[ERROR] [Netplay] O núcleo não tem suporte para Netplay.",
-        "[ERROR] [Netplay] Falha em inicializar a Netplay.",
-        "[ERROR] [MMDevice] Failed to initialize default eRender device."
+        "[ERROR] [Netplay] Falha em inicializar a Netplay."
       ]
     }
   },
@@ -237,24 +213,17 @@
     "jogo": "kof97.zip",
     "abre": {
       "abre_e_mostra_imagem": true,
-      "foto_bytes": 95210,
-      "segundos": 10.8,
+      "foto_bytes": 28984,
+      "segundos": 11.7,
       "travou": false,
-      "erros": [
-        "[libretro ERROR] [FBNeo] ROM at index 165 with name sm1.sm1 and CRC 0x94416d67 is required",
-        "[ERROR] [MMDevice] Failed to initialize default eRender device."
-      ]
+      "erros": []
     },
     "jogar_junto": {
-      "conectou": false,
-      "convidado_diz": null,
+      "conectou": true,
+      "convidado_diz": "Você se juntou como jogador 2",
       "recusa_do_nucleo": "",
       "hospedeiro_vivo": true,
-      "erros": [
-        "[libretro ERROR] [FBNeo] ROM at index 165 with name sm1.sm1 and CRC 0x94416d67 is required",
-        "[ERROR] [Netplay] Falha em inicializar a Netplay.",
-        "[ERROR] [MMDevice] Failed to initialize default eRender device."
-      ]
+      "erros": []
     }
   }
 ]

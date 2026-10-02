@@ -1209,7 +1209,7 @@
     "rota": "/api/partida/testar",
     "metodo": "POST",
     "categoria": "texto_gigante",
-    "status": 500,
+    "status": 400,
     "ok": true,
     "motivo": "ok",
     "extra": "campo=endereco"
@@ -1218,7 +1218,7 @@
     "rota": "/api/partida/testar",
     "metodo": "POST",
     "categoria": "emoji",
-    "status": 500,
+    "status": 400,
     "ok": true,
     "motivo": "ok",
     "extra": "campo=endereco"
@@ -2271,7 +2271,7 @@
     "rota": "/api/placar",
     "metodo": "POST",
     "categoria": "tipo_errado",
-    "status": 500,
+    "status": 200,
     "ok": true,
     "motivo": "ok",
     "extra": "campo=apelido"
