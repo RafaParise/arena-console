@@ -23,13 +23,13 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 235564,
-      "segundos": 11.2,
+      "segundos": 10.9,
       "travou": false,
       "erros": []
     },
     "jogar_junto": {
       "conectou": true,
-      "convidado_diz": "Você se juntou como jogador 2",
+      "convidado_diz": null,
       "recusa_do_nucleo": "",
       "hospedeiro_vivo": true,
       "erros": []
@@ -41,7 +41,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 336143,
-      "segundos": 11.1,
+      "segundos": 10.9,
       "travou": false,
       "erros": [
         "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented."
@@ -63,7 +63,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 40997,
-      "segundos": 11.1,
+      "segundos": 10.8,
       "travou": false,
       "erros": []
     },
@@ -81,7 +81,7 @@
     "abre": {
       "abre_e_mostra_imagem": false,
       "foto_bytes": 1796,
-      "segundos": 11.0,
+      "segundos": 10.8,
       "travou": false,
       "erros": []
     },
@@ -99,7 +99,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 50874,
-      "segundos": 11.5,
+      "segundos": 11.3,
       "travou": false,
       "erros": []
     },
@@ -191,7 +191,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 7933,
-      "segundos": 11.4,
+      "segundos": 11.2,
       "travou": false,
       "erros": [
         "[libretro WARN] [sceDisplay] Video out requested, not supported: mode=0 size=512,272"
@@ -214,7 +214,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 28984,
-      "segundos": 11.7,
+      "segundos": 11.4,
       "travou": false,
       "erros": []
     },
