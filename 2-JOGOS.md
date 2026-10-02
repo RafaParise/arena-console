@@ -112,6 +112,96 @@ console ele é.
 
 ---
 
+### Colocar um jogo seu: console por console
+
+A ideia central: **cada console tem a sua prateleira** — uma pasta dentro de
+`jogos\pessoais`. O jogo vai na prateleira certa, do jeito que aquele
+aparelho "lê". No ARENA, o botão **Como colocar jogos** (barra da esquerda)
+mostra tudo isto para o console que você escolher, diz se a BIOS já está na
+pasta e tem o botão **Abrir a pasta**.
+
+1. Ache a pasta do console na tabela abaixo (ou clique em **Criar pastas dos
+   consoles**, que cria todas).
+2. Arraste o arquivo do jogo para dentro.
+3. Clique em **Atualizar lista**.
+
+**Pode ser `.zip`?** Depende do tipo de jogo:
+
+| Tipo | Regra | Por quê |
+|---|---|---|
+| Cartucho e computador antigo | **Pode** ser `.zip` com **um** jogo dentro | O RetroArch abre o jogo de dentro do zip (conferido com um jogo de SNES zipado) |
+| CD e DVD (PS1, Sega CD, Saturn, Dreamcast, PSP...) | **Não** | Disco é o `.chd` (um arquivo só — o melhor) ou o `.cue` **junto** com os `.bin` na mesma pasta. De dentro do zip o emulador não acha as trilhas |
+| Fliperama (MAME, Neo Geo) | **Tem que ser** `.zip` | O jogo **é** o zip, com o nome curto que o emulador conhece (`mslugx.zip`). Não descompacte nem troque o nome |
+| PS2, GameCube, Wii, PS3, Xbox 360 | **Não** | Esses emuladores não abrem zip: descompacte antes |
+| MS-DOS | **Pode** | O DOSBox abre o zip direto (ou a pasta do jogo com o `.exe`) |
+
+**BIOS** é o "programa de fábrica" de alguns consoles. Vai em
+`retroarch\system` (a do Dreamcast numa pasta `dc` lá dentro). O nome do
+arquivo tem que ser **exatamente** o da tabela.
+
+| Console | Pasta (em `jogos\pessoais`) | Arquivos que servem | `.zip`? | BIOS |
+|---|---|---|---|---|
+| 3DO | `3DO` | `.iso` `.cue` `.chd` | **não** | uma de: `panafz10.bin`, `panafz1.bin`, `goldstar.bin` |
+| Amstrad CPC | `Amstrad CPC` | `.cdt` `.sna` `.dsk` | pode | não precisa |
+| Arcade (MAME) | `Arcade` | `.zip` `.7z` | **tem que ser** | não precisa |
+| Atari 2600 | `Atari 2600` | `.a26` | pode | não precisa |
+| Atari 5200 | `Atari 5200` | `.a52` | pode | `5200.rom` |
+| Atari 7800 | `Atari 7800` | `.a78` | pode | não precisa |
+| Atari Jaguar | `Atari Jaguar` | `.j64` `.jag` | pode | não precisa |
+| Atari Lynx | `Atari Lynx` | `.lnx` | pode | `lynxboot.img` |
+| ColecoVision | `ColecoVision` | `.col` | pode | `colecovision.rom` |
+| Commodore 64 | `Commodore 64` | `.d64` `.t64` `.prg` `.crt` | pode | não precisa |
+| Commodore Amiga | `Amiga` | `.adf` `.hdf` `.ipf` | pode | uma de: `kick34005.A500`, `kick40068.A1200` |
+| Game & Watch | `Game and Watch` | `.mgw` | pode | não precisa |
+| Game Boy Advance | `Game Boy Advance` | `.gba` | pode | não precisa |
+| Game Boy e Game Boy Color | `Game Boy` | `.gb` `.gbc` | pode | não precisa |
+| GameCube | `GameCube` | `.rvz` `.gcm` `.gcz` `.chd` `.iso` | **não** | não precisa |
+| Intellivision | `Intellivision` | `.int` | pode | `exec.bin`, `grom.bin` |
+| Java ME (celular antigo) | `J2ME` | `.jar` `.jad` | pode | não precisa |
+| LowRes NX | `LowRes NX` | `.nx` | pode | não precisa |
+| Magnavox Odyssey 2 | `Odyssey 2` | `.bin` | pode | `o2rom.bin` |
+| Mega Drive, Master System e Game Gear | `Mega Drive` | `.md` `.gen` `.smd` `.sms` `.gg` | pode | não precisa |
+| MS-DOS | `MS-DOS` | `.exe` `.com` `.bat` `.conf` | pode | não precisa |
+| MSX | `MSX` | `.rom` `.dsk` `.cas` | pode | `Machines`, `Databases` |
+| Neo Geo e fliperamas (FBNeo) | `Neo Geo` | `.zip` `.7z` | **tem que ser** | `neogeo.zip` |
+| Neo Geo Pocket | `Neo Geo Pocket` | `.ngp` `.ngc` | pode | não precisa |
+| Nintendo (NES) | `NES` | `.nes` `.fds` `.unf` `.unif` | pode | não precisa |
+| Nintendo 64 | `Nintendo 64` | `.n64` `.z64` `.v64` | pode | não precisa |
+| Nintendo DS | `Nintendo DS` | `.nds` | pode | não precisa |
+| Nintendo Wii | `Wii` | `.rvz` `.wbfs` `.wia` `.iso` | **não** | não precisa |
+| PC Engine | `PC Engine` | `.pce` `.sgx` | pode | não precisa |
+| PC-FX | `PC-FX` | `.cue` `.chd` | **não** | `pcfx.rom` |
+| Philips CD-i | `CD-i` | `.chd` `.cue` | **não** | `same_cdi\bios\cdimono1.zip` |
+| PlayStation | `PS1` | `.pbp` `.m3u` `.cue` `.chd` `.iso` | **não** | uma de: `scph5501.bin`, `scph5500.bin`, `scph5502.bin`, `scph1001.bin` |
+| PlayStation 2 | `PS2` | `.iso` `.chd` | **não** | Uma BIOS de PS2 (um arquivo .bin de 4 MB) em retroarch\system |
+| PlayStation 3 | `PS3` | `.iso` `.pkg` | **não** | O firmware oficial do PS3 (PS3UPDAT.PUP), instalado UMA vez pelo próprio RPCS3 |
+| PlayStation Portable | `PSP` | `.cso` `.iso` `.chd` | **não** | não precisa |
+| Pokemon mini | `Pokemon mini` | `.min` | pode | não precisa |
+| ScummVM | `ScummVM` | `.scummvm` `.svm` | **não** | não precisa |
+| Sega 32X | `Sega 32X` | `.32x` | pode | não precisa |
+| Sega CD | `Sega CD` | `.cue` `.chd` `.iso` | **não** | uma de: `bios_CD_U.bin`, `bios_CD_E.bin`, `bios_CD_J.bin` |
+| Sega Dreamcast | `Dreamcast` | `.gdi` `.cdi` `.chd` `.iso` | **não** | `dc\dc_boot.bin` |
+| Sega Saturn | `Sega Saturn` | `.cue` `.chd` | **não** | uma de: `sega_101.bin`, `mpr-17933.bin` |
+| Sega SG-1000 | `SG-1000` | `.sg` | pode | não precisa |
+| Super Nintendo | `Super Nintendo` | `.sfc` `.smc` `.swc` `.fig` `.bs` | pode | não precisa |
+| Tamagotchi | `Tamagotchi` | `.b` `.bin` | pode | não precisa |
+| TIC-80 | `TIC-80` | `.tic` | pode | não precisa |
+| Uzebox | `Uzebox` | `.uze` | pode | não precisa |
+| Vectrex | `Vectrex` | `.vec` | pode | não precisa |
+| Virtual Boy | `Virtual Boy` | `.vb` `.vboy` | pode | não precisa |
+| WASM-4 | `WASM-4` | `.wasm` | pode | não precisa |
+| WonderSwan | `WonderSwan` | `.ws` `.wsc` | pode | não precisa |
+| Xbox 360 | `XBOX360` | `.iso` `.xex` | **não** | não precisa |
+| ZX Spectrum | `ZX Spectrum` | `.tzx` `.tap` `.z80` `.szx` | pode | não precisa |
+
+Jogo de **vários discos** (PS1, Saturn...): deixe todos na mesma pasta, com
+`(Disc 1)`, `(Disc 2)` no nome — o ARENA junta num jogo só e troca o disco
+pelo menu. **PS3** precisa do firmware oficial instalado uma vez pelo RPCS3
+(menu *File → Install Firmware*). **Xbox 360** precisa de processador com
+AVX.
+
+---
+
 ### Como o ARENA reconhece cada console
 
 | Final do arquivo | Console |

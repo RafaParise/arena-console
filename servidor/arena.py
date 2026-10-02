@@ -76,6 +76,7 @@ import indexador   # noqa: E402  (precisam vir depois do ajuste de sys.path)
 import integridade  # noqa: E402  (zip de fliperama danificado)
 import processos   # noqa: E402  (prioridade e economia de energia -- 30/09/2026)
 import janela_preta  # noqa: E402  (servidor que caia ou travava -- 02/10/2026)
+import como_colocar  # noqa: E402  (como colocar os jogos de cada console -- 02/10/2026)
 
 PASTA_LAUNCHER = os.path.join(RAIZ, "launcher")
 PASTA_DADOS = os.path.join(RAIZ, "dados")
@@ -4163,6 +4164,20 @@ class Manipulador(BaseHTTPRequestHandler):
             return self.responder_json(marca)
 
         # ---- acervo de jogos livres ---------------------------------------
+        if caminho == "/api/como-colocar":
+            # O que falta aos emuladores de fora (BIOS do PS2, firmware do
+            # PS3) vem da mesma conta que o cartao do jogo usa.
+            falta = {}
+            for plataforma in carregar_catalogo():
+                if plataforma.get("externo"):
+                    caminho_externo, dados_externo = graficos.achar_externo(plataforma)
+                    falta[plataforma["id"]] = (
+                        graficos.falta_para_o_externo(dados_externo["nome"], caminho_externo)
+                        if caminho_externo else "o emulador não está na pasta")
+            return self.responder_json({
+                "ok": True, "pasta_bios": "retroarch\\system",
+                "consoles": como_colocar.guia(carregar_catalogo(), PASTA_SISTEMA, PASTA_JOGOS, falta)})
+
         if caminho == "/api/capas/progresso":
             return self.responder_json(dict(ok=True, **situacao_das_capas()))
 
@@ -4781,6 +4796,24 @@ class Manipulador(BaseHTTPRequestHandler):
                 "emulador": dados_externo["nome"] if caminho_externo else "RetroArch"})
 
         # ---- criar as pastas dos consoles ---------------------------------
+        # Abre a pasta do console no Explorador do Windows ("Como colocar
+        # jogos" -> Abrir a pasta). So deste computador (nao esta em
+        # ROTAS_REDE_EXTERNA) e so pasta de console da lista.
+        if caminho == "/api/pasta/abrir":
+            plataforma = next((p for p in carregar_catalogo()
+                               if p["id"] == str(dados.get("plataforma", ""))), None)
+            if not plataforma:
+                return self.erro("Console desconhecido. Escolha um console da lista.")
+            alvo = os.path.join(PASTA_JOGOS, "pessoais", plataforma["pasta"])
+            try:
+                os.makedirs(alvo, exist_ok=True)
+                if not hasattr(os, "startfile"):
+                    return self.erro("Abrir a pasta só funciona no Windows. Ela fica em %s." % alvo)
+                os.startfile(alvo)
+            except OSError as falha:
+                return self.erro(traduzir_erro_do_sistema(falha, "abrir a pasta"))
+            return self.responder_json({"ok": True, "pasta": os.path.relpath(alvo, RAIZ)})
+
         if caminho == "/api/pastas/criar":
             criadas = []
             base = os.path.join(PASTA_JOGOS, "pessoais")

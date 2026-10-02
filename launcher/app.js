@@ -3152,6 +3152,83 @@ async function carregarAcervo() {
 let atrasoBiblioteca = null;
 let atrasoAcervo = null;
 
+// Como colocar jogos (pedido do Rafael, 02/10/2026): console por console,
+// que arquivo serve, onde vai, se pode ser .zip e se precisa de BIOS.
+async function abrirComoColocar() {
+  abrirGaveta("gavetaComoColocar");
+  const lista = $("#listaComoColocar");
+  try {
+    const dados = await pedir("/api/como-colocar");
+    estado.comoColocar = dados.consoles || [];
+    estado.pastaBios = dados.pasta_bios || "retroarch\\system";
+    const escolhido = lista.value || (estado.filtroPlataforma || "");
+    const ordem = [...estado.comoColocar].sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+    lista.replaceChildren(...ordem.map((console) => {
+      const opcao = document.createElement("option");
+      opcao.value = console.id;
+      opcao.textContent = console.nome;
+      return opcao;
+    }));
+    if (escolhido && estado.comoColocar.some((c) => c.id === escolhido)) lista.value = escolhido;
+    desenharComoColocar();
+  } catch (falha) {
+    recado(falha.message, true);
+  }
+}
+
+function desenharComoColocar() {
+  const console = (estado.comoColocar || []).find((c) => c.id === $("#listaComoColocar").value);
+  const cartao = $("#cartaoComoColocar");
+  if (!console) { cartao.replaceChildren(); return; }
+  const lista = document.createElement("dl");
+  const linha = (rotulo, ...conteudo) => {
+    const termo = document.createElement("dt");
+    termo.textContent = rotulo;
+    const valor = document.createElement("dd");
+    valor.append(...conteudo);
+    lista.append(termo, valor);
+  };
+  const codigo = (texto) => { const c = document.createElement("code"); c.textContent = texto; return c; };
+
+  const abrir = document.createElement("button");
+  abrir.className = "botao";
+  abrir.type = "button";
+  abrir.textContent = "Abrir a pasta";
+  abrir.addEventListener("click", async () => {
+    try {
+      await pedir("/api/pasta/abrir", "POST", { plataforma: console.id });
+      recado("Pasta aberta. Arraste o jogo para dentro e clique em Atualizar lista.");
+    } catch (falha) {
+      recado(falha.message, true);
+    }
+  });
+  linha("Pasta", codigo(console.pasta), " ", abrir);
+  linha("Arquivos que servem", console.formatos.join("  ") || "—");
+  linha("Como guardar", console.como);
+  linha(console.zip_titulo, console.zip_texto);
+  if (console.bios) {
+    const itens = document.createElement("ul");
+    for (const arquivo of console.bios.arquivos || []) {
+      const item = document.createElement("li");
+      item.className = arquivo.tem ? "bios-ok" : "bios-falta";
+      item.textContent = `${arquivo.tem ? "✔" : "✘"} ${arquivo.arquivo} ${arquivo.tem ? "(já está)" : "(falta)"}`;
+      itens.append(item);
+    }
+    const situacao = document.createElement("strong");
+    situacao.className = console.bios.tem ? "bios-ok" : "bios-falta";
+    situacao.textContent = console.bios.tem ? " Já está pronta." : " Ainda falta.";
+    linha("BIOS", console.bios.texto, situacao,
+          (console.bios.arquivos || []).length ? itens : "",
+          (console.bios.arquivos || []).length ? `Fica em ${estado.pastaBios}.` : "");
+  } else {
+    linha("BIOS", "Não precisa.");
+  }
+  linha("Exemplo", codigo(console.exemplo));
+  if (console.emulador) linha("Emulador", `${console.emulador} (já vem no ARENA)`);
+  if (console.dica) linha("Dica", console.dica);
+  cartao.replaceChildren(lista);
+}
+
 // Capas de todos os jogos que estão sem (pedido do Rafael, 02/10/2026). O
 // servidor busca em segundo plano; a tela só acompanha. Clicar de novo para.
 async function buscarCapasQueFaltam() {
@@ -3253,7 +3330,7 @@ async function carregarBibliotecaOnline() {
       : `Nenhum jogo livre com "${consulta}" no nome. A biblioteca online só tem jogos de ` +
         `${consoles} que os autores deixam distribuir de graça. Mario, Sonic, Pokémon e outros ` +
         "jogos de empresas não são livres: se você tem o jogo, veja como colocar no ARENA " +
-        "(Ajustes → Jogos → Como colocar jogos, ou o documento 2-JOGOS).";
+        "(botão Como colocar jogos, na barra da esquerda).";
   } catch (falha) {
     status.textContent = "A biblioteca online está indisponível no momento.";
     recado(falha.message, true);
@@ -3389,6 +3466,8 @@ function ligarEventos() {
   });
 
   $("#btnBuscarCapas").addEventListener("click", buscarCapasQueFaltam);
+  $("#btnComoColocar").addEventListener("click", abrirComoColocar);
+  $("#listaComoColocar").addEventListener("change", desenharComoColocar);
   $("#btnAjustes").addEventListener("click", () => abrirGaveta("gavetaAjustes"));
   $("#btnTema").addEventListener("click", async () => {
     const tema = estado.config.tema === "escuro" ? "claro" : "escuro";

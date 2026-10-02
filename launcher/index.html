@@ -76,6 +76,7 @@
       <span class="trilho-conta" id="contaTodos">0</span>
     </button>
     <ul class="trilho-lista" id="listaPlataformas"></ul>
+    <button class="botao botao--largo" id="btnComoColocar" type="button">Como colocar jogos</button>
     <button class="botao botao--largo" id="btnCriarPastas" type="button">Criar pastas dos consoles</button>
     <button class="botao botao--largo" id="btnAtualizar" type="button">Atualizar lista</button>
     <button class="botao botao--largo" id="btnBuscarCapas" type="button"
@@ -104,6 +105,7 @@
         <p id="vazioTexto">
           Jogue seus arquivos na pasta <code>jogos\pessoais</code> e clique em
           Atualizar lista. O ARENA descobre sozinho de qual console é cada um.
+          Não sabe que arquivo serve? Clique em <strong>Como colocar jogos</strong>.
         </p>
       </div>
     </div>
@@ -300,6 +302,34 @@
     <p class="explica rede-automatica">Descoberta local automática. IPs ficam ocultos.</p>
   </div>
 
+</aside>
+
+<!-- ===================== COMO COLOCAR JOGOS ===================== -->
+<!-- Pedido do Rafael (02/10/2026): instrucoes claras, console por console.
+     Os dados vem do servidor (servidor\como_colocar.py + consoles.json). -->
+<aside class="gaveta" id="gavetaComoColocar" hidden aria-labelledby="tituloComoColocar">
+  <div class="gaveta-cabeca">
+    <h2 id="tituloComoColocar">Como colocar jogos</h2>
+    <button class="botao botao--fechar" data-fechar="gavetaComoColocar" type="button">Fechar</button>
+  </div>
+  <div class="aba-conteudo">
+    <p class="explica">
+      Cada console tem a sua <strong>prateleira</strong>: uma pasta dentro de
+      <code>jogos\pessoais</code>. O jogo vai na prateleira certa, do jeito que
+      aquele aparelho lê: cartucho é um arquivo; CD é um disco; fliperama é o
+      <code>.zip</code> inteiro.
+    </p>
+    <ol class="passos-junto">
+      <li>Escolha o console aqui embaixo e veja que arquivo serve.</li>
+      <li>Clique em <strong>Abrir a pasta</strong> e arraste o jogo para dentro.</li>
+      <li>Volte e clique em <strong>Atualizar lista</strong>.</li>
+    </ol>
+    <label class="campo">
+      <span>Console</span>
+      <select id="listaComoColocar"></select>
+    </label>
+    <div class="como-colocar" id="cartaoComoColocar" aria-live="polite"></div>
+  </div>
 </aside>
 
 <!-- ===================== ACERVO AUTORIZADO ===================== -->
