@@ -1104,13 +1104,35 @@ Emuladores → Motor de vídeo do PS2**:
 | **DirectX 12** | Pesa menos no processador quando o driver da placa é bom |
 | **Vulkan** | Alternativa quando os dois DirectX dão problema |
 
-Se a imagem piscar ou distorcer em movimento rápido (visto no notebook
-Celeron da escola, com 4 jogadores), troque para **DirectX 11**, abra o
-mesmo jogo e compare. Ficou pior ou mais lento? Volte para
+Deixe no **Automático** sempre que der: o próprio PCSX2 avisa que escolher
+o motor na mão *"pode causar problemas de performance e problemas
+gráficos"*. Se a imagem piscar ou distorcer em movimento rápido (visto no
+notebook Celeron da escola, com 4 jogadores), troque para **DirectX 11**,
+abra o mesmo jogo e compare. Ficou pior ou mais lento? Volte para
 **Automático**. Vale no próximo jogo de PS2 que abrir.
 
 Em placa integrada o ARENA já deixa o PS2 em resolução original e com a
 mistura de cores "Básica" (a mais leve que ainda desenha certo).
+
+#### Ajustes que o ARENA não deixa estragar
+
+Alguns ajustes da tela do próprio PCSX2 deixam o jogo **desenhado errado**,
+e o PCSX2 avisa no registro dele a cada jogo. O ARENA grava o valor certo
+toda vez que abre um jogo de PS2, em qualquer qualidade:
+
+| Ajuste do PCSX2 | Fica em | Se mudar, o PCSX2 avisa |
+|---|---|---|
+| Mipmapping | ligado | "pode prejudicar a renderização em alguns jogos" |
+| Filtragem trilinear | automática | "pode quebrar a renderização em alguns jogos" |
+| Filtro de textura | Bilinear (PS2) | "vai quebrar a renderização em alguns jogos" |
+| Leitura da placa (Hardware Download) | Precisa | "pode quebrar a renderização em alguns jogos" |
+| Pré-carga de texturas | Completa | "pode reduzir o desempenho" — desligar deixa **mais lento** |
+| Mistura de cores | nunca abaixo da Básica | "pode quebrar efeitos em alguns jogos" |
+
+Foi o que aconteceu com o **Crash Nitro Kart a 3 jogadores** (02/10/2026):
+mipmapping e trilinear tinham sido desligados na tela do PCSX2, e o "P1" em
+cima do kart da frente virava blocos vermelhos e pretos. A tela 16:9 e as
+outras escolhas que não estragam a imagem continuam como você deixou.
 
 ---
 

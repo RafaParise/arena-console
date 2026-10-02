@@ -34,7 +34,12 @@ LIMITES_ESPECIAIS = {
 # sozinho se mudar (o protege_cfg dos testes nao devolve quando o teste e'
 # morto por tempo); os de dados\ so sao apontados -- o ARENA de verdade pode
 # estar aberto durante a rodada.
-VIGIADOS = [os.path.join("retroarch", "retroarch.cfg")] + [
+# Os que a rodada DEVOLVE quando um teste muda. O PCSX2.ini entrou em
+# 02/10/2026: o teste_pcsx2_inicia gravava nele e nao devolvia (o PS2 do
+# Rafael ficava com 2x e Direct3D 12 ate o proximo jogo pelo ARENA).
+DEVOLVIDOS = [os.path.join("retroarch", "retroarch.cfg"),
+              os.path.join("emuladores", "PCSX2", "PCSX2", "inis", "PCSX2.ini")]
+VIGIADOS = DEVOLVIDOS + [
     os.path.join("dados", nome) for nome in ("arena.db", "config.json", "controles.json", "jogadores.txt",
                                              "consoles_manuais.json")]
 
@@ -60,12 +65,12 @@ for _saida in (sys.stdout, sys.stderr):
 
 
 def retrato_dos_vigiados():
-    """O retroarch.cfg inteiro (para devolver) e tamanho+data dos de dados\\."""
+    """Os DEVOLVIDOS inteiros (para devolver) e tamanho+data dos de dados\\."""
     retrato = {}
     for relativo in VIGIADOS:
         caminho = os.path.join(RAIZ, relativo)
         try:
-            if relativo.endswith("retroarch.cfg"):
+            if relativo in DEVOLVIDOS:
                 with open(caminho, "rb") as arquivo:
                     retrato[relativo] = arquivo.read()
             else:
@@ -77,18 +82,20 @@ def retrato_dos_vigiados():
 
 
 def conferir_vigiados(antes):
-    """Aponta o que o teste mudou de verdade; devolve o retroarch.cfg."""
+    """Aponta o que o teste mudou de verdade; devolve os DEVOLVIDOS."""
     depois = retrato_dos_vigiados()
     mexidos = [r for r in VIGIADOS if depois.get(r) != antes.get(r)]
-    cfg = os.path.join("retroarch", "retroarch.cfg")
-    if cfg in mexidos and antes.get(cfg) is not None:
-        provisorio = os.path.join(RAIZ, cfg + ".rodada.tmp")
-        with open(provisorio, "wb") as arquivo:
-            arquivo.write(antes[cfg])
-        os.replace(provisorio, os.path.join(RAIZ, cfg))
+    devolvidos = []
+    for relativo in DEVOLVIDOS:
+        if relativo in mexidos and antes.get(relativo) is not None:
+            provisorio = os.path.join(RAIZ, relativo + ".rodada.tmp")
+            with open(provisorio, "wb") as arquivo:
+                arquivo.write(antes[relativo])
+            os.replace(provisorio, os.path.join(RAIZ, relativo))
+            devolvidos.append(os.path.basename(relativo))
     if mexidos:
         print("      [dado real] mexeu em: %s%s" % (", ".join(mexidos),
-              " (o retroarch.cfg foi devolvido)" if cfg in mexidos else ""), flush=True)
+              " (devolvido: %s)" % ", ".join(devolvidos) if devolvidos else ""), flush=True)
     return mexidos
 
 

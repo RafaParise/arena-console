@@ -1179,6 +1179,12 @@ def controles_pcsx2(jogadores, controles_xinput):
 MOTORES_PCSX2 = {"automatico": "-1", "d3d11": "3", "d3d12": "15", "vulkan": "14"}
 
 
+# Os valores-padrao do PCSX2 para o que ele mesmo avisa que "pode quebrar a
+# renderizacao" quando muda (ver escrever_config_pcsx2): mipmapping ligado,
+# trilinear automatico, filtro bilinear do PS2, leitura da placa "Precisa".
+PCSX2_SEGUROS = {"hw_mipmap": "true", "TriFilter": "-1", "filter": "2", "HWDownloadMode": "0"}
+
+
 def escrever_config_pcsx2(caminho_executavel, ultra=False, nota=None,
                           nota_gpu=None, modesto=False, preset=None,
                           jogadores=2, controles_xinput=(0, 1),
@@ -1242,16 +1248,22 @@ def escrever_config_pcsx2(caminho_executavel, ultra=False, nota=None,
         integrada_auto = (integrada is True and preset not in ("leve", "bonito")
                           and not fraco and not forte)
 
+        # Pre-carga de texturas sempre "Completa" (2), o padrao do PCSX2.
+        # Ate 02/10/2026 o "Mais leve" gravava 0 ("Nenhuma"), achando que
+        # aliviava -- e o proprio PCSX2 descreve a completa assim: "Melhora o
+        # desempenho na maioria dos jogos" (avisa "Texture Preloading is not
+        # Full, this may reduce performance").
+        pre_carga = "2"
         if fraco:
             # Resolucao nativa do PS2, sem suavizar nada - o mais leve
             # possivel, para quando ate o perfil normal engasga.
-            escala, aniso, pre_carga = "1", "0", "0"
+            escala, aniso = "1", "0"
         elif forte:
-            escala, aniso, pre_carga = "4", "16", "2"
+            escala, aniso = "4", "16"
         elif integrada_auto:
-            escala, aniso, pre_carga = "1", "0", "2"
+            escala, aniso = "1", "0"
         else:
-            escala, aniso, pre_carga = "2", "4", "2"
+            escala, aniso = "2", "4"
 
         # Nomes do PCSX2 2.8 (conferidos no PCSX2.ini que ele mesmo gera,
         # 26/09/2026). Antes o ARENA escrevia "UpscaleMultiplier" e
@@ -1265,6 +1277,23 @@ def escrever_config_pcsx2(caminho_executavel, ultra=False, nota=None,
         # disso o ARENA nao mexe: vale o que estiver na tela do PCSX2.
         if fraco or integrada_auto:
             linhas_gs.append("accurate_blending_unit = 1")
+
+    # Valores que o PROPRIO PCSX2 chama de seguros, gravados sempre, em
+    # qualquer qualidade. Achado de 02/10/2026 (Rafael, Crash Nitro Kart a
+    # 3: o mapa do quarto quadro coberto de lixo e o "P1" em cima do kart
+    # virando blocos vermelhos e pretos). Mipmapping e trilinear tinham sido
+    # mudados na tela do PCSX2, e o registro dele avisava a cada jogo: "O
+    # mapeamento de mip esta desativado. Isso pode prejudicar a
+    # renderizacao em alguns jogos" e "A filtragem trilinear nao esta
+    # definida como automatica. Isto pode quebrar a renderizacao". O Crash
+    # Nitro Kart e' "perfeito" no banco de jogos do PCSX2 -- com estes
+    # valores. Os avisos que o PCSX2 da' estao em testes\teste_pcsx2_seguro.py.
+    linhas_gs += ["%s = %s" % par for par in PCSX2_SEGUROS.items()]
+    if "accurate_blending_unit = 1" not in linhas_gs and re.search(
+            r"^accurate_blending_unit = 0\s*$", "\n".join(guardar), re.M):
+        # "Minima" (0): "Blending Accuracy is below Basic, this may break
+        # effects in some games". Abaixo da basica, nunca.
+        linhas_gs.append("accurate_blending_unit = 1")
 
     if ultra:
         linhas_gs += ["VsyncEnable = true", "OsdShowSpeed = false"]

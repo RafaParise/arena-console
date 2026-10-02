@@ -75,10 +75,21 @@ def rodar(nome, opcoes):
 
 
 def main():
-    so = sys.argv[1:] or [n for n, _ in VARIANTES]
-    for nome, opcoes in VARIANTES:
-        if nome in so:
-            rodar(nome, opcoes)
+    # Grava no PCSX2.ini de verdade (precisa: e' o PCSX2 da pasta que abre),
+    # mas devolve o original no fim. Achado de 02/10/2026: sem isto o PS2
+    # ficava com a ultima variante (2x, Direct3D 12) ate o proximo jogo.
+    ini = os.path.join(os.path.dirname(EXE), "inis", "PCSX2.ini")
+    with open(ini, "rb") as arquivo:
+        original = arquivo.read()
+    try:
+        so = sys.argv[1:] or [n for n, _ in VARIANTES]
+        for nome, opcoes in VARIANTES:
+            if nome in so:
+                rodar(nome, opcoes)
+    finally:
+        with open(ini + ".teste.tmp", "wb") as arquivo:
+            arquivo.write(original)
+        os.replace(ini + ".teste.tmp", ini)
     return 0
 
 
