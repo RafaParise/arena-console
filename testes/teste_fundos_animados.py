@@ -15,7 +15,11 @@ servidor de verdade:
     fotos iguais); sem o pedido = ANIMADA (duas fotos diferentes);
   - "sempre" anima mesmo com o pedido; "parado" nunca anima;
   - modo modesto + automatico = parada;
-  - parada nao gasta processador; nenhum erro no console.
+  - parada nao gasta processador; nenhum erro no console;
+  - 02/10/2026 (Rafael): as visitas de jogos famosos (F-Zero, Kirby, Space
+    Invaders e Arwing no ceu; Mario, Sonic, Duck Hunt e Kirby no campo)
+    aparecem e VAO EMBORA sozinhas (a primeira versao do Kirby nunca ia), e o
+    fundo animado, com visita na tela, gasta pouco processador.
 
 Uso: servidor\python\python.exe testes\teste_fundos_animados.py
 """
@@ -103,6 +107,31 @@ def main():
                 outro = "galaxyCanvas" if tema == "claro" else "fieldCanvas"
                 confere("%s: o fundo do outro tema fica escondido" % tema,
                         nav.avaliar("getComputedStyle(document.getElementById('%s')).display" % outro) == "none")
+
+                # Visitas de jogos famosos: cada uma aparece e vai embora sozinha.
+                gancho = "window.__fundoEscuro" if tema == "escuro" else "window.__fundoClaro"
+                confere("%s: os sprites carregaram (pixel-sprites.js)" % tema,
+                        nav.avaliar("!!(window.SpritesRetro && %s)" % gancho) is True)
+                nomes = nav.avaliar("%s.visitas" % gancho) or []
+                for nome in nomes:
+                    nav.avaliar("%s.chamar('%s'); %s.velocidade(8); 1" % (gancho, nome, gancho))
+                    foi_embora = False
+                    for _ in range(60):
+                        time.sleep(0.25)
+                        if not nav.avaliar("%s.rodando()" % gancho):
+                            foi_embora = True
+                            break
+                    nav.avaliar("%s.velocidade(1); 1" % gancho)
+                    confere("%s: a visita '%s' aparece e vai embora sozinha" % (tema, nome), foi_embora)
+                # Quanto o fundo gasta animando, com a visita mais cheia na tela.
+                nav.avaliar("%s.chamar('%s'); 1" % (gancho, "fzero" if tema == "escuro" else "mario"))
+                time.sleep(0.5)
+                m0 = {x["name"]: x["value"] for x in nav.comando("Performance.getMetrics")["metrics"]}
+                time.sleep(4)
+                m1 = {x["name"]: x["value"] for x in nav.comando("Performance.getMetrics")["metrics"]}
+                gasto = (m1.get("ScriptDuration", 0) - m0.get("ScriptDuration", 0)) * 1000
+                confere("%s: animado, com visita na tela, gasta pouco (%.0f ms de script em 4 s = %.1f%% "
+                        "de um nucleo)" % (tema, gasto, gasto / 40.0), gasto < 240)
 
                 ajustar(tema, "automatico", menos_movimento=True)
                 foto, mexeu = anda()

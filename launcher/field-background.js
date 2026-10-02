@@ -20,11 +20,18 @@
 // (animacoes desligadas) faz o navegador avisar "prefira menos movimento",
 // e desde 23/09 o fundo, nesse caso, nao desenhava NADA. Agora a cena
 // aparece sempre; o que muda e' so se ela se mexe.
+//
+// 02/10/2026 (Rafael): a joaninha era "so uma barrinha preta e vermelha" e
+// o coelho "nao mostra mexendo as pernas pulando" -- os dois ganharam
+// desenho de verdade. E o campo recebe visitas de jogos famosos de 8 e 16
+// bits, uma de cada vez: Mario e o Goomba, o Sonic, os patos e o cachorro
+// do Duck Hunt e o Kirby flutuando. Desenhos em launcher\pixel-sprites.js.
 // ==========================================================================
 (function () {
   const canvas = document.getElementById('fieldCanvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
+  const S = window.SpritesRetro;
 
   const W = 160, H = 90;
   const HORIZONTE = 52;
@@ -331,49 +338,100 @@
     }
   }
 
-  // Coelho: atravessa a grama aos pulinhos, bem de vez em quando
+  // Coelho aos pulos de verdade (02/10/2026: antes o corpo subia e descia
+  // inteiro, sem perna nenhuma). Cada pulo: agacha, estica as pernas no ar
+  // e cai agachado de novo.
+  const PALETA_COELHO = { E: '#e8ddd0', H: '#f2ece4', B: '#e8ddd0', K: '#2b1c12', n: '#ff8fb0', T: '#ffffff',
+                          F: '#d8ccbc' };
+  const QUADROS_COELHO = S.quadros([
+    ['......E.E.',          // agachado (antes e depois do pulo)
+     '......E.E.',
+     '.....HHHH.',
+     '..BBBHKHH.',
+     '.BBBBBHHn.',
+     'TBBBBBBH..',
+     '.BBBBBBB..',
+     '..FF...FF.'],
+    ['.......EE.',          // no ar: pernas de tras esticadas, as da frente na frente
+     '......HEE.',
+     '.....HKHH.',
+     'TBBBBBHHn.',
+     '.BBBBBBH..',
+     'FF......F.']
+  ], PALETA_COELHO);
   let coelho = null;
-  let esperaCoelho = 1500 + sorteio() * 1800;
+  let esperaCoelho = 900 + sorteio() * 1200;
 
   function desenharCoelho(passo) {
     if (!coelho) {
       esperaCoelho -= passo;
       if (esperaCoelho <= 0) {
         const dir = aleatorio() < 0.5 ? 1 : -1;
-        coelho = { dir: dir, x: dir === 1 ? -6 : W + 6, chao: H - 9 - Math.floor(aleatorio() * 6) };
+        coelho = { dir: dir, x: dir === 1 ? -10 : W + 2, chao: H - 4 - Math.floor(aleatorio() * 5), fase: 0 };
       }
       return;
     }
-    coelho.x += coelho.dir * 0.55 * passo;
-    const pulo = Math.abs(Math.sin(t * 0.09)) * 4;
-    const x = Math.round(coelho.x), y = Math.round(coelho.chao - pulo);
-    ctx.fillStyle = '#f2ece4';
-    ctx.fillRect(x - 2, y, 4, 2);                          // corpo
-    ctx.fillRect(x + (coelho.dir === 1 ? 1 : -2), y - 2, 2, 2);  // cabeca
-    ctx.fillRect(x + (coelho.dir === 1 ? 1 : -1), y - 4, 1, 2);  // orelha
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(x + (coelho.dir === 1 ? -3 : 2), y, 1, 1);      // rabinho
-    ctx.fillStyle = '#2b1c12';
-    ctx.fillRect(x + (coelho.dir === 1 ? 2 : -2), y - 2, 1, 1);  // olho
-    if (coelho.x < -10 || coelho.x > W + 10) {
+    coelho.fase += passo;
+    const ciclo = 46;                                  // um pulo a cada ~0,8 s
+    const p = (coelho.fase % ciclo) / ciclo;
+    let quadro = QUADROS_COELHO[0], altura = 0;
+    if (p >= 0.3) {                                    // no ar
+      quadro = QUADROS_COELHO[1];
+      altura = Math.sin(((p - 0.3) / 0.7) * Math.PI) * 6;
+      coelho.x += coelho.dir * 0.9 * passo;
+    }
+    S.colar(ctx, quadro, coelho.x, coelho.chao - quadro.h - altura, coelho.dir);
+    if (coelho.x < -14 || coelho.x > W + 4) {
       coelho = null;
-      esperaCoelho = 2400 + aleatorio() * 2400;
+      esperaCoelho = 2000 + aleatorio() * 2400;
     }
   }
 
-  // Joaninha andando devagar na beira da grama
-  const joaninha = { x: sorteio() * W, dir: 1 };
+  // Joaninha (02/10/2026: era "so uma barrinha preta e vermelha que passa
+  // de um lado para o outro"). Agora com casco de pintas, cabeca e
+  // perninhas que andam; de vez em quando abre as asas e voa para outro
+  // lugar do campo.
+  const QUADROS_JOANINHA = S.quadros([
+    ['..RRR..',
+     '.RKRKRK',
+     'RRRRRRK',
+     'RKRRKRK',
+     '.l.l.l.'],
+    ['..RRR..',
+     '.RKRKRK',
+     'RRRRRRK',
+     'RKRRKRK',
+     'l.l.l..'],
+    ['w.RRR.w',
+     'wRKRKRK',
+     '.RRRRRK',
+     '..RRKR.']
+  ], { R: '#e53935', K: '#1a1a1a', l: '#1a1a1a', w: 'rgba(255,255,255,0.85)' });
+  const joaninha = { x: 10 + sorteio() * (W - 30), y: HORIZONTE + 2, dir: 1, voo: null,
+                     espera: 600 + sorteio() * 900 };
 
   function desenharJoaninha(passo) {
-    joaninha.x += joaninha.dir * 0.06 * passo;
-    if (joaninha.x > W - 4) joaninha.dir = -1;
-    if (joaninha.x < 4) joaninha.dir = 1;
-    const x = Math.round(joaninha.x), y = HORIZONTE + 1;
-    ctx.fillStyle = '#e53935';
-    ctx.fillRect(x, y, 2, 1);
-    ctx.fillStyle = '#1a1a1a';
-    ctx.fillRect(x + (joaninha.dir === 1 ? 2 : -1), y, 1, 1);
-    if (Math.floor(t / 30) % 2 === 0) ctx.fillRect(x, y, 1, 1);  // pintinha
+    const j = joaninha;
+    if (j.voo) {
+      j.voo.p = Math.min(1, j.voo.p + passo / j.voo.duracao);
+      j.x = j.voo.x0 + (j.voo.x1 - j.voo.x0) * j.voo.p;
+      j.y = j.voo.y0 + (j.voo.y1 - j.voo.y0) * j.voo.p - Math.sin(j.voo.p * Math.PI) * 14;
+      S.colar(ctx, QUADROS_JOANINHA[2], j.x, j.y - 4, j.dir);
+      if (j.voo.p >= 1) j.voo = null;
+      return;
+    }
+    j.x += j.dir * 0.07 * passo;
+    if (j.x > W - 10) j.dir = -1;
+    if (j.x < 3) j.dir = 1;
+    j.espera -= passo;
+    if (j.espera <= 0) {                  // abre as asas e vai para outro canto
+      const x1 = 6 + aleatorio() * (W - 20);
+      j.dir = x1 > j.x ? 1 : -1;
+      j.voo = { p: 0, x0: j.x, y0: j.y, x1: x1, y1: HORIZONTE + 2 + Math.floor(aleatorio() * 3),
+                duracao: 90 + Math.abs(x1 - j.x) * 1.2 };
+      j.espera = 900 + aleatorio() * 1200;
+    }
+    S.colar(ctx, QUADROS_JOANINHA[Math.floor(t / 8) % 2], j.x, j.y - 4, j.dir);
   }
 
   // Sementes de dente-de-leao: vao com o vento
@@ -480,6 +538,198 @@
     }
   }
 
+  // ------------------------------------------------------------------
+  // Visitas de jogos famosos de 8 e 16 bits (pedido do Rafael, 02/10/2026).
+  // Uma de cada vez, a cada 20 a 35 s; a primeira e' o Mario.
+  // ------------------------------------------------------------------
+  const CHAO = H - 4;              // onde pisa quem anda na grama
+
+  // Super Mario Bros. (NES, 1985): o Mario corre e pula por cima do Goomba.
+  const PALETA_MARIO = { R: '#d82800', H: '#8a4b00', S: '#ffb070', E: '#000000', O: '#2038ec' };
+  const MARIO = S.quadros([
+    ['..RRRR..', '.RRRRRRR', '.HHSSES.', 'HSHSSSSS', 'HSHHSSSH', '.SSSSSS.',
+     '.RROORR.', 'RROOOORR', 'SSOOOOSS', '.OO..OO.', 'HH....HH'],
+    ['..RRRR..', '.RRRRRRR', '.HHSSES.', 'HSHSSSSS', 'HSHHSSSH', '.SSSSSS.',
+     '..RORR..', '.RROORR.', '.SOOOOS.', '..OOOO..', '..HHHH..'],
+    ['..RRRR.S', '.RRRRRRS', '.HHSSESR', 'HSHSSSSS', 'HSHHSSSH', '.SSSSSS.',      // pulo
+     'RROORRR.', 'SROOOOR.', '.OOOOOO.', 'OO...OO.', 'H.....HH']
+  ], PALETA_MARIO);
+  const GOOMBA = S.quadros([
+    ['..GGGG..', '.GGGGGG.', 'GWKGGKWG', 'GGGGGGGG', '.TTTTTT.', '..TTTT..', '.BB..BB.'],
+    ['..GGGG..', '.GGGGGG.', 'GWKGGKWG', 'GGGGGGGG', '.TTTTTT.', '..TTTT..', 'BB....BB']
+  ], { G: '#a0522d', W: '#ffffff', K: '#000000', T: '#f2c38a', B: '#3b2412' });
+
+  function iniciarMario() {
+    const dir = aleatorio() < 0.5 ? 1 : -1;
+    return { dir: dir, x: dir === 1 ? -10 : W + 2, altura: 0, vy: 0, noAr: false,
+             goomba: dir === 1 ? W + 2 : -10, desenhar: desenharMario };
+  }
+
+  function desenharMario(passo) {
+    this.x += this.dir * 0.55 * passo;
+    this.goomba -= this.dir * 0.12 * passo;
+    const perto = this.dir === 1 ? this.goomba - this.x : this.x - this.goomba;
+    if (!this.noAr && perto > 0 && perto < 16) { this.noAr = true; this.vy = 1.6; }
+    if (this.noAr) {
+      this.altura += this.vy * passo;
+      this.vy -= 0.11 * passo;
+      if (this.altura <= 0) { this.altura = 0; this.noAr = false; }
+    }
+    S.colar(ctx, GOOMBA[Math.floor(t / 14) % 2], this.goomba, CHAO - 7, -this.dir);
+    const quadro = this.noAr ? MARIO[2] : MARIO[Math.floor(t / 5) % 2];
+    S.colar(ctx, quadro, this.x, CHAO - quadro.h - this.altura, this.dir);
+    const marioFora = this.dir === 1 ? this.x > W + 2 : this.x < -10;
+    const goombaFora = this.dir === 1 ? this.goomba < -10 : this.goomba > W + 2;
+    return !(marioFora && goombaFora);
+  }
+
+  // Sonic the Hedgehog (Mega Drive, 1991): passa correndo, pula em bola e
+  // pega o anel dourado no meio do campo.
+  const PALETA_SONIC = { b: '#2251ff', s: '#ffcc99', w: '#ffffff', k: '#000000', r: '#e8202a' };
+  const SONIC = S.quadros([
+    ['bbb.......', '.bbbbb....', 'bbbbbbbw..', '.bbbbbwkw.', 'bbbbbsss..', '.bbbssss..',
+     '..bbss.ww.', '..bbbb....', '.rr..rr...', 'rr....rr..'],
+    ['bbb.......', '.bbbbb....', 'bbbbbbbw..', '.bbbbbwkw.', 'bbbbbsss..', '.bbbssss..',
+     '..bbss.ww.', '..bbbb....', '..rrrr....', '...rr.....']
+  ], PALETA_SONIC);
+  const SONIC_BOLA = S.fazer(['..bbbb..', '.bbwbbb.', 'bbbbbwbb', 'bwbbbbbb', 'bbbbbbwb', 'bbwbbbbb',
+                              '.bbbwbb.', '..bbbb..'], { b: '#2251ff', w: '#7fa6ff' });
+  const ANEL = S.fazer(['.YYY.', 'Y...Y', 'Y...Y', 'Y...Y', '.YYY.'], { Y: '#ffd23f' });
+
+  function iniciarSonic() {
+    const dir = aleatorio() < 0.5 ? 1 : -1;
+    return { dir: dir, x: dir === 1 ? -12 : W + 2, altura: 0, vy: 0, noAr: false,
+             anel: { x: 50 + aleatorio() * 60, pego: -1 }, poeira: [], desenhar: desenharSonic };
+  }
+
+  function desenharSonic(passo) {
+    this.x += this.dir * 0.85 * passo;       // rapido, mas da para ver quem e'
+    const ate = this.dir === 1 ? this.anel.x - this.x : this.x - this.anel.x;
+    if (!this.noAr && this.anel.pego < 0 && ate > 0 && ate < 22) { this.noAr = true; this.vy = 1.9; }
+    if (this.noAr) {
+      this.altura += this.vy * passo;
+      this.vy -= 0.13 * passo;
+      if (this.altura <= 0) { this.altura = 0; this.noAr = false; }
+    }
+    if (this.anel.pego < 0 && Math.abs(this.x + 4 - this.anel.x) < 4 && this.altura > 6) this.anel.pego = 0;
+    if (this.anel.pego < 0) {
+      S.colar(ctx, ANEL, this.anel.x, CHAO - 22 + Math.round(Math.sin(t * 0.1)), 1);
+    } else if (this.anel.pego < 30) {                 // brilhinho de anel pego
+      this.anel.pego += passo;
+      ctx.fillStyle = 'rgba(255,240,140,' + (1 - this.anel.pego / 30).toFixed(2) + ')';
+      const r = 2 + this.anel.pego / 6;
+      for (let i = 0; i < 6; i++) {
+        const a = i * Math.PI / 3;
+        ctx.fillRect(Math.round(this.anel.x + 2 + Math.cos(a) * r), Math.round(CHAO - 20 + Math.sin(a) * r), 1, 1);
+      }
+    }
+    if (passo && !this.noAr && aleatorio() < 0.6) {
+      this.poeira.push({ x: this.x + (this.dir === 1 ? 0 : 9), y: CHAO - 1, vida: 1 });
+    }
+    for (const p of this.poeira) { p.vida -= 0.05 * passo; p.y -= 0.05 * passo; }
+    this.poeira = this.poeira.filter(function (p) { return p.vida > 0; });
+    for (const p of this.poeira) {
+      ctx.fillStyle = 'rgba(255,255,255,' + (p.vida * 0.6).toFixed(2) + ')';
+      ctx.fillRect(Math.round(p.x), Math.round(p.y), 1, 1);
+    }
+    const quadro = this.noAr ? SONIC_BOLA : SONIC[Math.floor(t / 3) % 2];
+    S.colar(ctx, quadro, this.x, CHAO - quadro.h - this.altura, this.dir);
+    return this.dir === 1 ? this.x < W + 4 || this.poeira.length > 0 : this.x > -14 || this.poeira.length > 0;
+  }
+
+  // Duck Hunt (NES, 1984): dois patos sobem batendo as asas, e depois o
+  // cachorro aparece no meio da grama dando risada.
+  const PALETA_PATO = { W: '#e8d8b0', G: '#1f8f3a', K: '#000000', Y: '#f2b400', B: '#5a3a1a', n: '#ffffff' };
+  const PATO = S.quadros([
+    ['...WW.....', '..WWW...GG', '.WWW...GGKY', 'BBBBBBBnn.', 'BBBBBBBB..', '.BBBBB....'],
+    ['..........', '.......GG.', '......GGKY', 'BBBBBBBnn.', 'BBWWWBBB..', '.WWWBB....', '..WW......']
+  ], PALETA_PATO);
+  const CACHORRO = S.quadros([
+    ['LL....LL', 'LBBBBBBL', 'LBKBBKBL', '.BBWWBB.', '.BWKKWB.', '.BWrrWB.', '..BWWB..', '...BB...'],
+    ['LL....LL', 'LBBBBBBL', 'LBKBBKBL', '.BBWWBB.', '.BWKKWB.', '.BWWWWB.', '..BWWB..', '...BB...']
+  ], { L: '#6b3d1a', B: '#b07040', K: '#000000', W: '#f2e0c0', r: '#e8204a' });
+
+  function iniciarDuckHunt() {
+    const dir = aleatorio() < 0.5 ? 1 : -1;
+    const x = dir === 1 ? 20 + aleatorio() * 30 : W - 50 - aleatorio() * 30;
+    return { dir: dir, patos: [{ x: x, y: HORIZONTE }, { x: x - dir * 12, y: HORIZONTE + 8 }],
+             cachorro: -1, cachorroX: 40 + aleatorio() * 80, desenhar: desenharDuckHunt };
+  }
+
+  function desenharDuckHunt(passo) {
+    if (this.cachorro < 0) {
+      for (const [i, p] of this.patos.entries()) {
+        p.x += this.dir * 0.5 * passo;
+        p.y -= 0.32 * passo;
+        S.colar(ctx, PATO[Math.floor((t + i * 4) / 6) % 2], p.x, p.y + Math.sin(t * 0.1 + i) * 1.5, this.dir);
+      }
+      if (this.patos.every(function (p) { return p.y < -10 || p.x < -14 || p.x > W + 4; })) this.cachorro = 0;
+      return true;
+    }
+    this.cachorro += passo;                           // sobe, ri e desce (uns 3 s)
+    const subida = Math.min(1, this.cachorro / 20, (180 - this.cachorro) / 20);
+    if (subida <= 0) return false;
+    const quadro = CACHORRO[Math.floor(this.cachorro / 7) % 2];
+    S.colar(ctx, quadro, this.cachorroX, CHAO + 2 - quadro.h * subida, 1);
+    return true;
+  }
+
+  // Kirby (Kirby's Dream Land, Game Boy 1992): flutua estufado pelo ceu,
+  // levado pela brisa.
+  const KIRBY = S.fazer(['..ppppp..', '.ppppppp.', 'apKpppKpa', 'apKpppKpa', '.pcppppc.', '.ppppppp.',
+                         '..ppppp..', '.rr...rr.'],
+                        { p: '#ff9ccf', a: '#ff9ccf', K: '#1a1a3a', c: '#ff5c8a', r: '#e8204a' });
+
+  function iniciarKirby() {
+    const dir = aleatorio() < 0.5 ? 1 : -1;
+    return { dir: dir, x: dir === 1 ? -10 : W + 2, base: 14 + aleatorio() * 16, desenhar: desenharKirby };
+  }
+
+  function desenharKirby(passo) {
+    this.x += this.dir * 0.22 * vento * passo;
+    S.colar(ctx, KIRBY, this.x, this.base + Math.sin(t * 0.04) * 3, this.dir);
+    return this.dir === 1 ? this.x < W + 2 : this.x > -10;
+  }
+
+  const VISITAS = { mario: iniciarMario, sonic: iniciarSonic, duckhunt: iniciarDuckHunt, kirby: iniciarKirby };
+  let filaDeVisitas = ['mario'];
+  let visita = null;
+  let esperaVisita = 420;       // ~7 s depois de abrir
+
+  function proximaVisita() {
+    if (!filaDeVisitas.length) {
+      filaDeVisitas = Object.keys(VISITAS);
+      for (let i = filaDeVisitas.length - 1; i > 0; i--) {          // embaralha
+        const j = Math.floor(aleatorio() * (i + 1));
+        const troca = filaDeVisitas[i];
+        filaDeVisitas[i] = filaDeVisitas[j];
+        filaDeVisitas[j] = troca;
+      }
+    }
+    return VISITAS[filaDeVisitas.shift()]();
+  }
+
+  function desenharVisitas(passo) {
+    if (!visita) {
+      esperaVisita -= passo;
+      if (esperaVisita <= 0) visita = proximaVisita();
+      return;
+    }
+    if (!visita.desenhar(passo)) {
+      visita = null;
+      esperaVisita = 1200 + aleatorio() * 900;      // 20 a 35 s
+    }
+  }
+
+  // Para os testes chamarem uma visita na hora (testes\\teste_fundos_animados.py).
+  window.__fundoClaro = {
+    visitas: Object.keys(VISITAS),
+    chamar: function (nome) { if (VISITAS[nome]) visita = VISITAS[nome](); return !!visita; },
+    rodando: function () { return !!visita; },
+    velocidade: function (v) { velocidade = Math.max(1, Math.min(16, Number(v) || 1)); return velocidade; },
+    soltarCoelho: function () { esperaCoelho = 0; return true; }
+  };
+
   // Um quadro completo
   function desenharQuadro(passo) {
     passo = passo || 0;
@@ -491,6 +741,7 @@
     desenharGirassois();
     desenharJoaninha(passo);
     desenharCoelho(passo);
+    desenharVisitas(passo);
     desenharAbelhas(passo);
     for (const b of borboletas) {
       if (passo) atualizarBorboleta(b, passo);
@@ -527,6 +778,7 @@
   }
 
   const INTERVALO = 1000 / 30;
+  let velocidade = 1;   // so os testes aceleram (__fundoClaro.velocidade)
   let geracao = 0;      // cada laco novo ganha um numero; o velho para sozinho
   let ultimo = 0;       // hora do ultimo quadro desenhado
   let modoAtual = null;
@@ -538,7 +790,7 @@
       if (minha !== geracao) return;      // laco antigo: morre aqui
       requestAnimationFrame(quadro);
       if (ultimo && agora - ultimo < INTERVALO - 2) return;
-      const passo = ultimo ? Math.min(4, (agora - ultimo) / (1000 / 60)) : 1;
+      const passo = (ultimo ? Math.min(4, (agora - ultimo) / (1000 / 60)) : 1) * velocidade;
       ultimo = agora;
       t += passo;
       // Vento: rajada de vez em quando, sobe e desce suave.

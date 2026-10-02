@@ -9,11 +9,19 @@
 // Achado de 01/10/2026: antes, o ceu desenhava ~5.000 quadradinhos de
 // fundo a cada quadro (60 por segundo). Agora eles vivem na camada fixa e
 // custam uma operacao so por quadro.
+//
+// 02/10/2026 (Rafael): as "borboletas de luz" nao tinham nada a ver com o
+// espaco -- viraram Metroides (do Metroid, NES). E o ceu ganhou visitas de
+// jogos famosos de 8 e 16 bits, uma de cada vez: a corrida das quatro
+// maquinas do F-Zero (SNES), o Kirby na Warp Star (NES), os Space Invaders
+// e a Arwing do Star Fox (SNES). Os desenhos usam launcher\pixel-sprites.js
+// (escritos como texto, pintados uma vez, so colados a cada quadro).
 // ==========================================================================
 (function () {
   const canvas = document.getElementById('galaxyCanvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
+  const S = window.SpritesRetro;
 
   const W = 160, H = 90;
   canvas.width = W;
@@ -175,56 +183,100 @@
     ctx.fillRect(x - 3, y + 1, 7, 1);
   }
 
-  // Borboletas de luz: brilham, deixam faiscas e voam em oito.
-  const borboletasLuz = [];
-  const coresLuz = [['#7ff7ff', '127,247,255'], ['#ff8ff0', '255,143,240'], ['#ffe27a', '255,226,122']];
-  for (let i = 0; i < 3; i++) {
-    borboletasLuz.push({ cor: coresLuz[i], fase: sorteio() * 6.28, cx: 30 + i * 48, cy: 46 + sorteio() * 12,
-                         raioX: 18 + sorteio() * 14, raioY: 8 + sorteio() * 6, vel: 0.006 + sorteio() * 0.004,
-                         x: 0, y: 0, faiscas: [] });
+  // Metroides (do Metroid, NES 1986): criaturas do espaco que flutuam em oito,
+  // brilhando -- no lugar das "borboletas de luz" (02/10/2026: o Rafael viu
+  // que borboleta nao tinha nada a ver com o espaco). A membrana pulsa e as
+  // presas abrem e fecham.
+  const PALETA_METROIDE = { G: '#7dff8a', m: 'rgba(150,255,160,0.45)', R: '#ff4060', b: '#a08a3a', W: '#fff1c2' };
+  const QUADROS_METROIDE = S.quadros([
+    ['...GGGGG...',
+     '..GmmmmmG..',
+     '.GmRRmRRmG.',
+     'GmmRRmRRmmG',
+     'GmmmmRRmmmG',
+     'GmmmmRRmmmG',
+     '.GGGGGGGGG.',
+     '..WbbbbbW..',
+     '.WW.W.W.WW.',
+     '.W..W.W..W.'],
+    ['...........',
+     '...GGGGG...',
+     '.GGmRRmRGG.',
+     'GmmmRRmRRmG',
+     'GmmRRmmmmmG',
+     'GmmmmRRmmmG',
+     '.GGGGGGGGG.',
+     '..WbbbbbW..',
+     '..WW.W.WW..',
+     '...W.W.W...']
+  ], PALETA_METROIDE);
+
+  // O brilho em volta: uma bolha verde transparente, pintada uma vez.
+  const halo = document.createElement('canvas');
+  halo.width = 17;
+  halo.height = 15;
+  (function () {
+    const c = halo.getContext('2d');
+    for (let y = 0; y < 15; y++) {
+      for (let x = 0; x < 17; x++) {
+        const d = Math.sqrt(Math.pow((x - 8) / 8.5, 2) + Math.pow((y - 7) / 7.5, 2));
+        if (d < 1) {
+          c.fillStyle = 'rgba(125,255,138,' + (0.22 * (1 - d)).toFixed(3) + ')';
+          c.fillRect(x, y, 1, 1);
+        }
+      }
+    }
+  })();
+
+  const metroides = [];
+  for (let i = 0; i < 2; i++) {
+    metroides.push({ fase: sorteio() * 6.28, cx: 40 + i * 72, cy: 31 + sorteio() * 8,
+                     raioX: 18 + sorteio() * 12, raioY: 7 + sorteio() * 5, vel: 0.005 + sorteio() * 0.003,
+                     x: 0, y: 0, esporos: [] });
   }
 
-  function desenharBorboletasLuz(passo) {
-    for (const b of borboletasLuz) {
-      const a = t * b.vel + b.fase;
-      b.x = b.cx + Math.sin(a) * b.raioX;
-      b.y = b.cy + Math.sin(a * 2) * b.raioY;
-      if (passo && aleatorio() < 0.25 * passo) {
-        b.faiscas.push({ x: b.x, y: b.y + 1, vida: 1 });
+  function desenharMetroides(passo) {
+    for (const m of metroides) {
+      const a = t * m.vel + m.fase;
+      m.x = m.cx + Math.sin(a) * m.raioX;
+      m.y = m.cy + Math.sin(a * 2) * m.raioY;
+      // Esporos: pontinhos verdes que ficam para tras e somem.
+      if (passo && aleatorio() < 0.12 * passo) {
+        m.esporos.push({ x: m.x + (aleatorio() - 0.5) * 6, y: m.y + 4, vida: 1 });
       }
-      for (const f of b.faiscas) f.vida -= 0.025 * passo;
-      b.faiscas = b.faiscas.filter(function (f) { return f.vida > 0; });
-      for (const f of b.faiscas) {
-        ctx.fillStyle = rgba(b.cor[1], f.vida * 0.6);
-        ctx.fillRect(Math.round(f.x), Math.round(f.y), 1, 1);
+      for (const e of m.esporos) { e.vida -= 0.02 * passo; e.y += 0.04 * passo; }
+      m.esporos = m.esporos.filter(function (e) { return e.vida > 0; });
+      for (const e of m.esporos) {
+        ctx.fillStyle = rgba('125,255,138', e.vida * 0.5);
+        ctx.fillRect(Math.round(e.x), Math.round(e.y), 1, 1);
       }
-      const bx = Math.round(b.x), by = Math.round(b.y);
-      const onda = Math.abs(Math.sin(t * 0.3 + b.fase));
-      const pose = POSES_BORBOLETA[onda > 0.66 ? 0 : onda > 0.33 ? 1 : 2];
-      // Brilho: a mesma forma, apagadinha, um ponto para cada lado.
-      ctx.fillStyle = rgba(b.cor[1], 0.2);
-      for (const p of pose) {
-        if (p[2] === 'C') continue;
-        ctx.fillRect(bx + p[0] - 1, by + p[1], 3, 1);
-        ctx.fillRect(bx + p[0], by + p[1] - 1, 1, 3);
-      }
-      for (const p of pose) {
-        ctx.fillStyle = p[2] === 'C' ? '#ffffff' : (p[2] === 'P' ? '#ffffff' : b.cor[0]);
-        ctx.fillRect(bx + p[0], by + p[1], 1, 1);
-      }
+      const quadro = QUADROS_METROIDE[Math.floor((t + m.fase * 40) / 18) % 2];
+      ctx.globalAlpha = 0.7 + 0.3 * Math.sin(t * 0.08 + m.fase);
+      ctx.drawImage(halo, Math.round(m.x - 8.5), Math.round(m.y - 7.5));
+      ctx.globalAlpha = 1;
+      S.colar(ctx, quadro, m.x - quadro.w / 2, m.y - quadro.h / 2, 1);
     }
   }
 
-  // Borboleta em 5 x 4 pontos (o mesmo desenho do campo): asas abertas,
-  // meio caminho, fechadas pra cima. A = asa, P = ponta, C = corpo.
-  const POSES_BORBOLETA = [
-    [[-2, -1, 'P'], [-1, -1, 'A'], [1, -1, 'A'], [2, -1, 'P'],
-     [-2, 0, 'A'], [-1, 0, 'A'], [1, 0, 'A'], [2, 0, 'A'],
-     [-1, 1, 'A'], [1, 1, 'A'], [0, -1, 'C'], [0, 0, 'C'], [0, 1, 'C']],
-    [[-1, -2, 'P'], [1, -2, 'P'], [-1, -1, 'A'], [1, -1, 'A'],
-     [-1, 0, 'A'], [1, 0, 'A'], [0, -1, 'C'], [0, 0, 'C'], [0, 1, 'C']],
-    [[0, -3, 'P'], [0, -2, 'A'], [0, -1, 'C'], [0, 0, 'C'], [0, 1, 'C']]
-  ];
+  // Galaxia espiral, la no fundo, dando uma volta a cada ~3 minutos.
+  const galaxia = { x: 94, y: 30, pontos: [] };
+  for (let braco = 0; braco < 2; braco++) {
+    for (let k = 0; k < 16; k++) {
+      galaxia.pontos.push({ ang: braco * Math.PI + k * 0.38, raio: 0.8 + k * 0.42, brilho: 1 - k / 18 });
+    }
+  }
+
+  function desenharGalaxia() {
+    ctx.fillStyle = rgba('255,240,255', 0.6);
+    ctx.fillRect(galaxia.x, galaxia.y, 1, 1);
+    const giro = t * 0.0006;
+    for (const p of galaxia.pontos) {
+      const a = p.ang + giro;
+      ctx.fillStyle = rgba('205,185,255', 0.1 + p.brilho * 0.32);
+      ctx.fillRect(Math.round(galaxia.x + Math.cos(a) * p.raio * 1.7),
+                   Math.round(galaxia.y + Math.sin(a) * p.raio * 0.7), 1, 1);
+    }
+  }
 
   // Cometa (de 10 em 10 a 20 s)
   let cometa = null;
@@ -395,6 +447,262 @@
     if (foguete.y < -10) foguete = null;
   }
 
+  // ------------------------------------------------------------------
+  // Visitas de jogos famosos de 8 e 16 bits (pedido do Rafael, 02/10/2026).
+  // Uma de cada vez, a cada 20 a 35 s; a primeira e' a corrida do F-Zero.
+  // ------------------------------------------------------------------
+
+  // F-Zero (SNES, 1990): as quatro maquinas da primeira copa, de lado.
+  // b = corpo, k = faixa, c = cabine, F = aleta, E = turbina, N = bico,
+  // r = brilho de levitacao.
+  const MAQUINAS = [
+    S.fazer(['FF............',          // Blue Falcon (Captain Falcon)
+             'FBb.....cc....',
+             '.BbbbbbcccbB..',
+             'EbbbbbbbbbbbbN',
+             'EkkkkkkkkkkkN.',
+             '.bbbbbbbbbB...',
+             '..r......r....'],
+            { F: '#2f5bff', b: '#2f5bff', B: '#1c3aa8', k: '#ffd23f', c: '#9cf0ff', E: '#ff7a29',
+              N: '#ff3b3b', r: 'rgba(255,90,60,0.7)' }),
+    S.fazer(['YY............',          // Golden Fox (Dr. Stewart)
+             'YYY.......cc..',
+             'EbbbbbbbbbccbN',
+             'EkkkkkkkkkkkN.',
+             '.bbbbbbbbbb...',
+             '..r.......r...'],
+            { Y: '#c79200', b: '#ffcc33', k: '#2f5bff', c: '#9cf0ff', E: '#ff7a29', N: '#ffffff',
+              r: 'rgba(255,90,60,0.7)' }),
+    S.fazer(['F.F...........',          // Wild Goose (Pico)
+             'FFFF....ccc...',
+             'EbbbbbbbcccbB.',
+             'EbbbbbbbbbbbbN',
+             'EkkkkkkkkkkkbN',
+             '.bbbbbbbbbbbb.',
+             '..r.......r...'],
+            { F: '#24803a', b: '#3cbf55', B: '#24803a', k: '#ffffff', c: '#ffe066', E: '#ff7a29',
+              N: '#ffd23f', r: 'rgba(255,90,60,0.7)' }),
+    S.fazer(['.FF.FF.........',         // Fire Stingray (Samurai Goroh)
+             'FFFFFFF..cc....',
+             'EbbbbbbbbccbBB.',
+             'EkkkkkkkkkkkkkN',
+             'EbbbbbbbbbbbB..',
+             '.bbbbbbbbB.....',
+             '..r.....r......'],
+            { F: '#b02a6e', b: '#ff4fa0', B: '#b02a6e', k: '#ffffff', c: '#ffe066', E: '#ff7a29',
+              N: '#ffd23f', r: 'rgba(255,90,60,0.7)' })
+  ];
+  const PISTA = 69;            // altura da pista de luz (abaixo dos Metroides e do planeta)
+
+  function iniciarFzero() {
+    const dir = aleatorio() < 0.5 ? 1 : -1;
+    const pilotos = MAQUINAS.map(function (sprite, i) {
+      return { sprite: sprite, x: dir === 1 ? -16 - i * 20 : W + 2 + i * 20, faixa: i % 2,
+               vel: 0.33 + aleatorio() * 0.05, fase: aleatorio() * 6, rastro: [] };
+    });
+    return { dir: dir, pilotos: pilotos, pista: 0, desenhar: desenharFzero };
+  }
+
+  function desenharFzero(passo) {
+    const ev = this;
+    const naTela = ev.pilotos.some(function (p) { return p.x > -20 && p.x < W + 20; });
+    const chegaram = ev.pilotos.every(function (p) { return ev.dir === 1 ? p.x > W + 2 : p.x < -18; });
+    ev.pista = Math.max(0, Math.min(1, ev.pista + (chegaram ? -0.03 : 0.03) * passo));
+    // A pista: duas grades de energia, piscando em tracinhos que correm.
+    if (ev.pista > 0) {
+      for (let x = 0; x < W; x += 2) {
+        const aceso = Math.floor((x - t * 0.9 * ev.dir) / 6) % 2 === 0;
+        ctx.fillStyle = rgba(aceso ? '255,220,90' : '120,200,255', ev.pista * (aceso ? 0.55 : 0.25));
+        ctx.fillRect(x, PISTA - 9, 1, 1);
+        ctx.fillRect(x, PISTA + 3, 1, 1);
+      }
+      ctx.fillStyle = rgba('120,140,255', ev.pista * 0.08);
+      ctx.fillRect(0, PISTA - 8, W, 11);
+    }
+    for (const p of ev.pilotos) {
+      // Cada maquina acelera e alivia um pouco: elas trocam de posicao.
+      p.x += ev.dir * (p.vel + 0.06 * Math.sin(t * 0.025 + p.fase)) * passo;
+      const y = PISTA - p.sprite.h + p.faixa * 3 + Math.round(Math.sin(t * 0.12 + p.fase) * 0.6);
+      const traseira = ev.dir === 1 ? p.x - 1 : p.x + p.sprite.w;
+      if (passo && aleatorio() < 0.8) p.rastro.push({ x: traseira, y: y + 3 + Math.floor(aleatorio() * 2), vida: 1 });
+      for (const r of p.rastro) r.vida -= 0.05 * passo;
+      p.rastro = p.rastro.filter(function (r) { return r.vida > 0; });
+      for (const r of p.rastro) {
+        ctx.fillStyle = rgba('255,160,80', r.vida * 0.45);
+        ctx.fillRect(Math.round(r.x), Math.round(r.y), 1, 1);
+      }
+      // Chama da turbina, piscando.
+      ctx.fillStyle = Math.floor(t / 2 + p.fase) % 2 === 0 ? '#ffe066' : '#ff7a29';
+      ctx.fillRect(Math.round(ev.dir === 1 ? p.x - 2 : p.x + p.sprite.w), y + 3, 2, 2);
+      S.colar(ctx, p.sprite, p.x, y, ev.dir);
+    }
+    // Acaba quando as quatro passaram E a pista terminou de apagar.
+    return !(chegaram && ev.pista <= 0) || naTela;
+  }
+
+  // Kirby na Warp Star (Kirby's Adventure, NES 1993): cruza o ceu em curva,
+  // deixando um rastro de estrelinhas coloridas.
+  const KIRBY_ESTRELA = S.fazer(['...ppp...',
+                                 '..ppppp..',
+                                 '..pKpKp..',
+                                 '..ppppp..',
+                                 '...r.r...',
+                                 '....Y....',
+                                 '...YYY...',
+                                 'YYYYYYYYY',
+                                 '.YYYYYYY.',
+                                 '..YY.YY..',
+                                 '.YY...YY.'],
+                                { p: '#ff9ccf', K: '#1a1a3a', r: '#e8204a', Y: '#ffe14a' });
+  const CORES_ARCO = ['255,90,90', '255,180,60', '255,240,90', '110,240,130', '110,190,255', '200,140,255'];
+
+  function iniciarKirby() {
+    const dir = aleatorio() < 0.5 ? 1 : -1;
+    return { dir: dir, x: dir === 1 ? -12 : W + 12, base: 18 + aleatorio() * 14, rastro: [], desenhar: desenharKirby };
+  }
+
+  function desenharKirby(passo) {
+    this.x += this.dir * 0.7 * passo;
+    const y = this.base + Math.sin(this.x * 0.04) * 8;
+    const naTela = this.x > -14 && this.x < W + 14;
+    if (passo && naTela) {           // fora da tela, para de soltar estrelinhas
+      this.rastro.push({ x: this.x + (this.dir === 1 ? 0 : 8), y: y + 8, vida: 1, cor: CORES_ARCO[Math.floor(t) % 6] });
+    }
+    for (const r of this.rastro) { r.vida -= 0.03 * passo; r.y += 0.05 * passo; }
+    this.rastro = this.rastro.filter(function (r) { return r.vida > 0; });
+    for (const r of this.rastro) {
+      ctx.fillStyle = rgba(r.cor, r.vida * 0.8);
+      ctx.fillRect(Math.round(r.x), Math.round(r.y), 1, 1);
+    }
+    S.colar(ctx, KIRBY_ESTRELA, this.x, y, this.dir);
+    const voltando = this.dir === 1 ? this.x < W + 14 : this.x > -14;
+    return voltando || this.rastro.length > 0;
+  }
+
+  // Space Invaders (1978): tres invasores marcham la em cima, passo a
+  // passo, trocando de pose a cada passo -- e vao embora.
+  const INVASOR = S.quadros([
+    ['..I.....I..',
+     '...I...I...',
+     '..IIIIIII..',
+     '.II.III.II.',
+     'IIIIIIIIIII',
+     'I.IIIIIII.I',
+     'I.I.....I.I',
+     '...II.II...'],
+    ['..I.....I..',
+     'I..I...I..I',
+     'I.IIIIIII.I',
+     'III.III.III',
+     'IIIIIIIIIII',
+     '.IIIIIIIII.',
+     '..I.....I..',
+     '.I.......I.']
+  ], { I: '#7dff8a' });
+
+  function iniciarInvasores() {
+    const dir = aleatorio() < 0.5 ? 1 : -1;
+    return { dir: dir, x: dir === 1 ? -50 : W + 4, y: 4, passoMarcha: 0, pose: 0, desenhar: desenharInvasores };
+  }
+
+  function desenharInvasores(passo) {
+    this.passoMarcha += passo;
+    if (this.passoMarcha >= 14) {        // a marcha: um passo de 3 pontos
+      this.passoMarcha = 0;
+      this.x += this.dir * 3;
+      this.pose = 1 - this.pose;
+    }
+    for (let i = 0; i < 3; i++) {
+      S.colar(ctx, INVASOR[this.pose], this.x + i * 15, this.y, 1);
+    }
+    return this.dir === 1 ? this.x < W + 4 : this.x > -50;
+  }
+
+  // Arwing (Star Fox, SNES 1993): duas naves em formacao; a da frente da'
+  // um giro completo no meio do caminho ("do a barrel roll!").
+  const ARWING = S.quadros([
+    ['BB.........',
+     'BBWW.......',
+     '..WWWW.....',
+     'EEWWWWWccN.',
+     '..WWWW.....',
+     'BBWW.......',
+     'BB.........'],
+    ['...........',
+     '...........',
+     'B.WWWW.....',
+     'EEWWWWWccN.',
+     'B.WWWW.....',
+     '...........',
+     '...........']
+  ], { B: '#3d7dff', W: '#e8edf5', c: '#46c8ff', E: '#ff9a3c', N: '#c9ced8' });
+
+  function iniciarArwing() {
+    const dir = aleatorio() < 0.5 ? 1 : -1;
+    return { dir: dir, x: dir === 1 ? -14 : W + 14, y: 30 + aleatorio() * 10, giro: -1, tiros: [],
+             desenhar: desenharArwing };
+  }
+
+  function desenharArwing(passo) {
+    this.x += this.dir * 0.55 * passo;
+    if (this.giro < 0 && Math.abs(this.x - W / 2) < 2) this.giro = 0;
+    let pose = 0;
+    if (this.giro >= 0 && this.giro < 1) {
+      this.giro += 0.03 * passo;
+      pose = Math.floor(this.giro * 6) % 2;            // aberta, de lado, aberta, de lado...
+    }
+    if (passo && aleatorio() < 0.02 * passo) this.tiros.push({ x: this.x + (this.dir === 1 ? 11 : -2), y: this.y + 3 });
+    for (const tiro of this.tiros) tiro.x += this.dir * 2.4 * passo;
+    this.tiros = this.tiros.filter(function (tiro) { return tiro.x > -4 && tiro.x < W + 4; });
+    ctx.fillStyle = '#7dff8a';
+    for (const tiro of this.tiros) ctx.fillRect(Math.round(tiro.x), Math.round(tiro.y), 2, 1);
+    const fogo = Math.floor(t / 3) % 2 === 0 ? '#ffe066' : '#ff9a3c';
+    for (const [dx, dy, quadro] of [[0, 0, pose], [-16 * this.dir, 6, 0]]) {   // lider e ala
+      ctx.fillStyle = fogo;
+      ctx.fillRect(Math.round(this.x + dx + (this.dir === 1 ? -1 : 11)), Math.round(this.y + dy + 3), 1, 1);
+      S.colar(ctx, ARWING[quadro], this.x + dx, this.y + dy, this.dir);
+    }
+    return this.dir === 1 ? this.x < W + 30 : this.x > -30;
+  }
+
+  const VISITAS = { fzero: iniciarFzero, kirby: iniciarKirby, invasores: iniciarInvasores, arwing: iniciarArwing };
+  let filaDeVisitas = ['fzero'];
+  let visita = null;
+  let esperaVisita = 420;       // ~7 s depois de abrir
+
+  function proximaVisita() {
+    if (!filaDeVisitas.length) {
+      filaDeVisitas = Object.keys(VISITAS);
+      for (let i = filaDeVisitas.length - 1; i > 0; i--) {          // embaralha
+        const j = Math.floor(aleatorio() * (i + 1));
+        const troca = filaDeVisitas[i];
+        filaDeVisitas[i] = filaDeVisitas[j];
+        filaDeVisitas[j] = troca;
+      }
+    }
+    return VISITAS[filaDeVisitas.shift()]();
+  }
+
+  function desenharVisitas(passo) {
+    if (!visita) {
+      esperaVisita -= passo;
+      if (esperaVisita <= 0) visita = proximaVisita();
+      return;
+    }
+    if (!visita.desenhar(passo)) {
+      visita = null;
+      esperaVisita = 1200 + aleatorio() * 900;      // 20 a 35 s
+    }
+  }
+
+  // Para os testes chamarem uma visita na hora (testes\\teste_fundos_animados.py).
+  window.__fundoEscuro = {
+    visitas: Object.keys(VISITAS),
+    chamar: function (nome) { if (VISITAS[nome]) visita = VISITAS[nome](); return !!visita; },
+    rodando: function () { return !!visita; },
+    velocidade: function (v) { velocidade = Math.max(1, Math.min(16, Number(v) || 1)); return velocidade; }
+  };
+
   function desenharCeu(passo) {
     for (const faixa of aurora) {
       const brilho = 0.06 + 0.08 * ((Math.sin(t * faixa.pulso + faixa.fase) + 1) / 2);
@@ -448,12 +756,14 @@
     passo = passo || 0;
     ctx.drawImage(fixa, 0, 0);
     desenharCeu(passo);
+    desenharGalaxia();
     desenharPlaneta(passo);
     desenharSatelite(passo);
     desenharMeteoros(passo);
     desenharCometa(passo);
     desenharOvni(passo);
-    desenharBorboletasLuz(passo);
+    desenharVisitas(passo);
+    desenharMetroides(passo);
     desenharFoguete(passo);
   }
 
@@ -473,6 +783,7 @@
   }
 
   const INTERVALO = 1000 / 30;
+  let velocidade = 1;   // so os testes aceleram (__fundoEscuro.velocidade)
   let geracao = 0;
   let ultimo = 0;
   let modoAtual = null;
@@ -484,7 +795,7 @@
       if (minha !== geracao) return;
       requestAnimationFrame(quadro);
       if (ultimo && agora - ultimo < INTERVALO - 2) return;
-      const passo = ultimo ? Math.min(4, (agora - ultimo) / (1000 / 60)) : 1;
+      const passo = (ultimo ? Math.min(4, (agora - ultimo) / (1000 / 60)) : 1) * velocidade;
       ultimo = agora;
       t += passo;
       try {

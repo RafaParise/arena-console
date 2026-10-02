@@ -629,10 +629,27 @@ placa de vídeo daquele computador.
 ### Fundo da tela: céu e campo
 
 Atrás da lista de jogos há uma cena em pixel art: o **céu** no tema escuro
-(lua, aurora, constelação, planeta com anel, borboletas de luz, cometa,
-chuva de meteoros, satélite, OVNI e, de vez em quando, um foguete) e o
-**campo** no tema claro (sol, nuvens, girassóis, borboletas de várias
-cores, abelhas, passarinhos, sementes ao vento, joaninha, coelho e balão).
+(lua, aurora, constelação, galáxia espiral girando, planeta com anel,
+Metroides flutuando, cometa, chuva de meteoros, satélite, OVNI e, de vez em
+quando, um foguete) e o **campo** no tema claro (sol, nuvens, girassóis,
+borboletas de várias cores, abelhas, passarinhos, sementes ao vento,
+joaninha que anda e voa, coelho pulando e balão).
+
+De 20 em 20 a 35 s passa uma **visita de um jogo famoso de 8 ou 16 bits**,
+uma de cada vez:
+
+| Céu (tema escuro) | Campo (tema claro) |
+|---|---|
+| **F-Zero** (SNES): as quatro máquinas — Blue Falcon, Golden Fox, Wild Goose e Fire Stingray — correndo numa pista de luz, uns 8 s para cruzar a tela. É a primeira visita, uns 7 s depois de abrir | **Super Mario Bros.** (NES): o Mario corre e pula por cima do Goomba. É a primeira visita do campo |
+| **Kirby na Warp Star** (NES): cruza o céu deixando estrelinhas coloridas | **Sonic** (Mega Drive): passa correndo, pula em bola e pega o anel |
+| **Space Invaders**: três invasores marchando lá em cima | **Duck Hunt** (NES): dois patos sobem e o cachorro aparece rindo na grama |
+| **Arwing** (Star Fox, SNES): duas naves em formação; a da frente gira no meio do caminho | **Kirby** (Game Boy): flutua estufado pelo céu, levado pela brisa |
+
+Os personagens são desenhos próprios, pequenos, em homenagem aos jogos (não
+são os sprites tirados dos jogos). Cada desenho está escrito como texto em
+`launcher\pixel-sprites.js`, `galaxy-background.js` e `field-background.js`
+— uma letra por ponto, dá para "ver" o personagem lendo o arquivo — e é
+pintado uma vez só; a cada quadro o fundo só cola a figura pronta.
 
 Em **Ajustes → Simples → Fundo animado**:
 
@@ -650,7 +667,8 @@ isso. Quer o movimento mesmo assim? **Sempre animado**.
 
 Custo: a cena tem só 160 × 90 pontos esticados (por isso fica nítida até em
 4K), o que nunca muda é desenhado uma vez só, e ela anda a 30 quadros por
-segundo. Medido no Ryzen: cerca de 2% de um núcleo animada, zero parada.
+segundo. Medido no Ryzen (02/10/2026), com visita na tela: 0,6% de um
+núcleo no campo e 1,1% no céu; parada, zero.
 Quando o jogo cobre a janela do ARENA, o navegador para de desenhar.
 
 ### O que está deixando o computador lento

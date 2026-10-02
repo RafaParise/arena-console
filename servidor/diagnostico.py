@@ -38,6 +38,7 @@ PASTAS = [
 PROGRAMA = [
     "ARENA.bat", "LEIA-ME.md",
     "launcher/index.html", "launcher/estilo.css", "launcher/app.js",
+    "launcher/pixel-sprites.js", "launcher/galaxy-background.js", "launcher/field-background.js",
     "servidor/arena.py", "servidor/indexador.py", "servidor/identificador.py",
     "servidor/hardware.py", "servidor/cheats.py", "servidor/graficos.py",
     "servidor/controles.py", "servidor/acervo.py", "servidor/barreiras.py",
