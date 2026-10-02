@@ -59,7 +59,9 @@ ARQUIVOS_DA_RAIZ = ["ARENA.bat", "VERIFICAR.bat", "PARTIDA.bat", "COLETAR.bat", 
 FERRAMENTAS = ["coletar_maquina.py", "medir_arena.py"]
 # Jogo pequeno do proprio projeto para conferir que o RetroArch da versao
 # abre e desenha (usado so na copia temporaria da conferencia).
-JOGO_DE_PROVA = (os.path.join("jogos", "pessoais", "NES", "Contra (USA).nes"), "NES", "fceumm")
+JOGO_DE_PROVA = (os.path.join("jogos", "pessoais", "NES", "Contra (USA).nes"), "fceumm")
+# Com BIOS: um jogo de PS1, que so liga com a BIOS (a da versao).
+JOGO_PS1 = (os.path.join("jogos", "pessoais", "PS1", "Crash Bandicoot (USA).chd"), "swanstation")
 LIXO_SEMPRE = ["__pycache__", "*.pyc", "*.pyo", "*.log", "*.tmp", "Thumbs.db", "desktop.ini", "*.bak",
                "*.antes-*", "*.antes_*"]
 
@@ -210,12 +212,33 @@ def montar(destino, com_bios=False):
             copiar_arquivo(origem, os.path.join(RA_D, "database", "rdb", rdb))
     for rel in ("system", "saves", "states", "screenshots", "cheats", "remaps", "controles", "cache"):
         copiar_leia(os.path.join("retroarch", rel), destino)
+    levadas = []          # o que foi de BIOS, para a folha de rosto
     if com_bios:
+        # So os arquivos soltos de retroarch\system: as subpastas sao cache
+        # (swanstation\vulkan_pipelines.bin, 171 MB), configuracao que o
+        # nucleo cria (config\fbneo64.ini) ou SAVE (dc\vmu_save_*.bin).
         sistema = os.path.join(RA, "system")
         for nome in os.listdir(sistema):
             caminho = os.path.join(sistema, nome)
             if os.path.isfile(caminho) and any(fnmatch.fnmatch(nome, p) for p in PADROES_BIOS):
                 copiar_arquivo(caminho, os.path.join(RA_D, "system", nome))
+                levadas.append(nome)
+        # Dreamcast: so a BIOS de dentro de system\dc (nunca os cartoes VMU).
+        for nome in ("dc_boot.bin", "dc_flash.bin"):
+            caminho = os.path.join(sistema, "dc", nome)
+            if os.path.isfile(caminho):
+                copiar_arquivo(caminho, os.path.join(RA_D, "system", "dc", nome))
+                levadas.append(nome)
+        # BIOS de fliperama que mora na pasta dos jogos (neogeo.zip ao lado
+        # dos jogos do Neo Geo): a lista de jogos nao mostra.
+        pessoais = os.path.join(RAIZ, "jogos", "pessoais")
+        for pasta in sorted(set(pastas_de_console)):
+            origem = os.path.join(pessoais, pasta)
+            for nome in (os.listdir(origem) if os.path.isdir(origem) else []):
+                if fnmatch.fnmatch(nome.lower(), "neogeo*.zip"):
+                    copiar_arquivo(os.path.join(origem, nome),
+                                   os.path.join(destino, "jogos", "pessoais", pasta, nome))
+                    levadas.append("%s\\%s" % (pasta, nome))
 
     # 4. Emuladores de fora: so o programa e a configuracao que o ARENA completa.
     E, E_D = os.path.join(RAIZ, "emuladores"), os.path.join(destino, "emuladores")
@@ -239,6 +262,10 @@ def montar(destino, com_bios=False):
 
     programa(os.path.join("PCSX2", "PCSX2"), ["*.exe", "*.dll", "qt.conf", "portable.txt"],
              ["D3D12", "QtPlugins", "resources", "translations", "docs"], fora=["updater.exe"])
+    bios_ps2 = os.path.join(E, "PCSX2", "PCSX2", "bios")
+    if com_bios and os.path.isdir(bios_ps2):
+        copiar_arvore(bios_ps2, os.path.join(E_D, "PCSX2", "PCSX2", "bios"))
+        levadas.append("PCSX2\\bios")
     ini = os.path.join(E, "PCSX2", "PCSX2", "inis", "PCSX2.ini")
     if os.path.isfile(ini):
         os.makedirs(os.path.join(E_D, "PCSX2", "PCSX2", "inis"), exist_ok=True)
@@ -259,6 +286,7 @@ def montar(destino, com_bios=False):
         os.makedirs(os.path.join(E_D, "RPCS3", "RPCS3", "config", "input_configs", "global"), exist_ok=True)
         if com_bios and os.path.isdir(os.path.join(rpcs3, "dev_flash")):
             copiar_arvore(os.path.join(rpcs3, "dev_flash"), os.path.join(E_D, "RPCS3", "RPCS3", "dev_flash"))
+            levadas.append("firmware do PS3")
     programa(os.path.join("Xenia", "Xenia"), ["xenia_canary.exe", "xenia_canary_netplay.exe", "LICENSE",
                                                "xenia-canary.config.toml", "xenia-canary-netplay.config.toml",
                                                "portable.txt"], [])
@@ -273,12 +301,30 @@ def montar(destino, com_bios=False):
     # 5. Uma folha de rosto (UTF-8 com marca: o Bloco de Notas antigo
     # tambem mostra os acentos).
     with open(os.path.join(destino, "LEIA-PRIMEIRO.txt"), "w", encoding="utf-8-sig") as f:
-        f.write(FOLHA_DE_ROSTO.format(bios=BIOS_INCLUIDA if com_bios else BIOS_FORA))
+        f.write(FOLHA_DE_ROSTO.format(bios=frase_das_bios(levadas) if com_bios else BIOS_FORA))
     return usados
 
 
 BIOS_FORA = "Esta versão NÃO vem com BIOS nem firmware (são da Sony, da Sega, da SNK...)."
-BIOS_INCLUIDA = "Esta versão já vem com as BIOS que o professor escolheu incluir."
+
+
+def frase_das_bios(levadas):
+    """Quais consoles ja vem prontos, pelo que foi copiado de BIOS."""
+    texto = " ".join(levadas).lower()
+    consoles = []
+    if "scph1001" in texto or "scph5501" in texto or "scph7001" in texto:
+        consoles.append("PlayStation")
+    if "pcsx2" in texto or "ps2" in texto or "scph-70004" in texto or "scph39001" in texto:
+        consoles.append("PlayStation 2")
+    if "firmware do ps3" in texto:
+        consoles.append("PlayStation 3 (firmware já instalado)")
+    if "neogeo" in texto:
+        consoles.append("Neo Geo")
+    if "dc_boot" in texto:
+        consoles.append("Dreamcast")
+    if not consoles:
+        return "Esta versão já vem com as BIOS que o professor tinha."
+    return "Esta versão já vem com as BIOS de: %s." % ", ".join(consoles)
 FOLHA_DE_ROSTO = """ARENA — versão para os alunos
 =============================
 
@@ -290,10 +336,9 @@ FOLHA_DE_ROSTO = """ARENA — versão para os alunos
    O guia 2-JOGOS.md explica cada console.
 
 {bios}
-Os consoles que precisam de BIOS (PlayStation 1 e 2, Sega CD, Saturn,
-Neo Geo...) mostram na tela o que falta. Os arquivos vão em
-retroarch\\system (guia 2-JOGOS.md, "A BIOS"). PS3: o firmware vai pelo
-próprio RPCS3 (File > Install Firmware).
+Console que ainda pedir BIOS (Sega CD, Saturn...) mostra no cartão o que
+falta. Os arquivos vão em retroarch\\system (guia 2-JOGOS.md, "A BIOS").
+PS3: o firmware vai pelo próprio RPCS3 (File > Install Firmware).
 
 Não vem nada de quem preparou: nem jogos, nem saves, nem recordes, nem
 amigos, nem configuração. Cada aluno começa do zero.
@@ -315,7 +360,7 @@ def porta_livre(porta=8777):
         s.close()
 
 
-def conferir(destino):
+def conferir(destino, com_bios=False):
     problemas = []
     # Nada de caminho da maquina de quem montou, em arquivo de texto nenhum.
     alvo = RAIZ.lower().replace("/", "\\")
@@ -386,13 +431,19 @@ def conferir(destino):
                 print("  (sem nucleo tambem aqui, nao e' falha da versao: %s)" % ", ".join(sem_nucleo))
             if len(prontas) < 30:
                 problemas.append("so %d consoles prontos (faltou nucleo?)" % len(prontas))
+            if com_bios:
+                faltando = [p for p in ("ps1", "ps2", "ps3", "neogeo") if p not in prontas]
+                if faltando:
+                    problemas.append("com as BIOS, ainda nao ficaram prontos: %s" % ", ".join(faltando))
     finally:
         servidor.kill()
         servidor.wait()
         time.sleep(0.5)
     # O RetroArch DA VERSAO abre um jogo e desenha (o retroarch.cfg dela ja
     # foi corrigido para a pasta da copia pelo servidor, acima).
-    problemas += prova_do_retroarch(copia)
+    problemas += prova_do_retroarch(copia, *JOGO_DE_PROVA)
+    if com_bios:
+        problemas += prova_do_retroarch(copia, *JOGO_PS1, quadros=900, nome="jogo de PS1", com_bios=True)
     if not apagar_pasta(os.path.dirname(copia)):
         print("  (aviso: a copia temporaria nao saiu toda do Temp: %s)" % os.path.dirname(copia))
     return problemas
@@ -413,15 +464,14 @@ def apagar_pasta(caminho):
     return not os.path.exists(caminho)
 
 
-def prova_do_retroarch(copia):
-    relativo, pasta_console, nucleo = JOGO_DE_PROVA
+def prova_do_retroarch(copia, relativo, nucleo, quadros=300, nome="jogo de prova", com_bios=False):
+    """O RetroArch DA VERSAO abre um jogo daqui (sem copiar o jogo) e desenha.
+    com_bios: o registro tem que mostrar a BIOS da versao sendo usada."""
     jogo = os.path.join(RAIZ, relativo)
     if not os.path.isfile(jogo):
-        print("  (sem o jogo de prova %s: RetroArch nao conferido)" % relativo)
+        print("  (sem o %s %s: nao conferido)" % (nome, relativo))
         return []
-    destino_jogo = os.path.join(copia, "jogos", "pessoais", pasta_console, os.path.basename(jogo))
-    copiar_arquivo(jogo, destino_jogo)
-    pasta = os.path.join(copia, "prova")
+    pasta = os.path.join(copia, "prova_" + nucleo)
     os.makedirs(pasta)
     foto, registro = os.path.join(pasta, "foto.png"), os.path.join(pasta, "ra.log")
     extra = os.path.join(pasta, "prova.cfg")
@@ -432,23 +482,27 @@ def prova_do_retroarch(copia):
     retroarch = os.path.join(copia, "retroarch", "retroarch.exe")
     try:
         subprocess.run([retroarch, "-L", os.path.join(copia, "retroarch", "cores", nucleo + "_libretro.dll"),
-                        "--appendconfig", extra, "--verbose", "--log-file", registro, "--max-frames=300",
-                        "--max-frames-ss", "--max-frames-ss-path=" + foto, destino_jogo],
-                       cwd=os.path.dirname(retroarch), timeout=90,
+                        "--appendconfig", extra, "--verbose", "--log-file", registro,
+                        "--max-frames=%d" % quadros, "--max-frames-ss", "--max-frames-ss-path=" + foto, jogo],
+                       cwd=os.path.dirname(retroarch), timeout=180,
                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     except subprocess.TimeoutExpired:
-        return ["o RetroArch da versao travou abrindo o jogo de prova"]
+        return ["o RetroArch da versao travou abrindo o %s" % nome]
     texto = open(registro, encoding="utf-8", errors="replace").read() if os.path.isfile(registro) else ""
-    idioma = "Carregando" in texto or "Redirecionando" in texto     # menu e mensagens em portugues
+    idioma = "Carregando" in texto or "Redirecionando" in texto     # mensagens em portugues
+    bios = os.path.join(copia, "retroarch", "system").lower() in texto.lower() and "bios" in texto.lower()
     tamanho_foto = os.path.getsize(foto) if os.path.isfile(foto) else 0
-    print("  RetroArch da versao: jogo de prova %s (foto de %d KB, mensagens em portugues: %s)"
-          % ("abriu e desenhou" if tamanho_foto > 2000 else "NAO desenhou", tamanho_foto // 1024,
-             "sim" if idioma else "nao"), flush=True)
+    print("  RetroArch da versao, %s: %s (foto de %d KB, em portugues: %s%s)"
+          % (nome, "abriu e desenhou" if tamanho_foto > 2000 else "NAO desenhou", tamanho_foto // 1024,
+             "sim" if idioma else "nao", (", BIOS da versao: %s" % ("sim" if bios else "NAO")) if com_bios else ""),
+          flush=True)
     problemas = []
     if tamanho_foto <= 2000:
-        problemas.append("o RetroArch da versao nao mostrou imagem do jogo de prova")
+        problemas.append("o RetroArch da versao nao mostrou imagem do %s" % nome)
     if not idioma:
         problemas.append("o RetroArch da versao nao esta em portugues")
+    if com_bios and not bios:
+        problemas.append("o %s nao usou a BIOS da versao" % nome)
     return problemas
 
 
@@ -461,7 +515,7 @@ def principal():
     print("Montando a versao dos alunos em %s%s..." % (destino, " (com BIOS)" if com_bios else ""), flush=True)
     usados = montar(destino, com_bios)
     print("Conferindo (abre a versao numa copia temporaria)...", flush=True)
-    problemas = conferir(destino)
+    problemas = conferir(destino, com_bios)
     total = tamanho(destino)
     print()
     print("Versao dos alunos: %.2f GB, %d nucleos, em %.0f s." % (total / 1024 ** 3, len(usados), time.time() - inicio))
