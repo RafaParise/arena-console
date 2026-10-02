@@ -208,7 +208,9 @@ def tamanho_no_disco(caminho):
     if os.name == "nt" and atributos & 0xA00:     # ESPARSO (0x200) ou COMPRIMIDO (0x800)
         import ctypes
         from ctypes import wintypes
-        funcao = ctypes.windll.kernel32.GetCompressedFileSizeW
+        # WinDLL proprio: os tipos declarados aqui nao mudam o kernel32 que
+        # os outros modulos do servidor usam.
+        funcao = ctypes.WinDLL("kernel32").GetCompressedFileSizeW
         funcao.argtypes = [wintypes.LPCWSTR, ctypes.POINTER(wintypes.DWORD)]
         funcao.restype = wintypes.DWORD
         alto = wintypes.DWORD(0)
@@ -235,7 +237,7 @@ def _memoria_e_energia(rapido=False):
                     ("BatteryLifeTime", ctypes.c_ulong), ("BatteryFullLifeTime", ctypes.c_ulong)]
 
     fatos = {}
-    k = ctypes.windll.kernel32
+    k = ctypes.WinDLL("kernel32")   # proprio: o restype abaixo nao vaza para outros modulos
     m = MEM()
     m.dwLength = ctypes.sizeof(m)
     if k.GlobalMemoryStatusEx(ctypes.byref(m)):

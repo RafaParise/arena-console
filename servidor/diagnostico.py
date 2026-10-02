@@ -42,6 +42,11 @@ PROGRAMA = [
     "servidor/hardware.py", "servidor/cheats.py", "servidor/graficos.py",
     "servidor/controles.py", "servidor/acervo.py", "servidor/barreiras.py",
     "servidor/internet_archive.py", "servidor/capas_online.py",
+    # Os cinco abaixo faltavam (achado de 02/10/2026): sem qualquer um o
+    # ARENA nem abre. servidor\tests\test_janela_preta.py confere esta
+    # lista contra o que o arena.py importa de verdade.
+    "servidor/integridade.py", "servidor/janela_preta.py", "servidor/jogadores.py",
+    "servidor/nomes_arcade.py", "servidor/processos.py",
     "servidor/consoles.json", "servidor/graficos.json", "servidor/recursos.json",
     "servidor/perfis_controle.json",
 ]

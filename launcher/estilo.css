@@ -296,6 +296,8 @@ input::placeholder { color: var(--texto-apagado); }
   flex-shrink: 0;
 }
 .aviso p { margin: 0; font-size: var(--t-peq); color: #e8cfa4; }
+.aviso--sem-servidor { background: #3a1a1d; border-bottom-color: var(--erro); }
+.aviso--sem-servidor p { color: #ffd6d9; }
 
 /* ============ O QUE DEIXA O COMPUTADOR LENTO (Ajustes > Maquina) ============ */
 /* A gravidade vai na cor da borda E escrita no selo: cor sozinha nao serve

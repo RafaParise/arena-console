@@ -102,6 +102,7 @@ async function pedir(rota, metodo = "GET", corpo = null) {
   try {
     resposta = await fetch(rota, opcoes);
   } catch (falha) {
+    perderContato();
     const erro = new Error(
       "O servidor do Arena não está acessível. Abra o ARENA pela janela preta e tente novamente."
     );
@@ -114,6 +115,44 @@ async function pedir(rota, metodo = "GET", corpo = null) {
     throw new Error(dados.erro || "O servidor não respondeu como esperado.");
   }
   return dados;
+}
+
+// Servidor fora do ar: a tela espera e volta sozinha.
+// Achado de 02/10/2026: o servidor caiu (o Windows fechou o Python, sem
+// mensagem) e a tela ficava parada -- cada botao dizia "não está acessível"
+// e o aluno fechava tudo e abria de novo. Agora o ARENA.bat reabre o
+// servidor sozinho, e a tela pergunta a cada 2 s se ele voltou; quando
+// volta, ela recarrega (catálogo, ajustes e recordes como estão agora).
+let semServidorDesde = 0;
+
+function perderContato() {
+  if (semServidorDesde) return;
+  semServidorDesde = Date.now();
+  $("#semServidor").hidden = false;
+  esperarServidorVoltar();
+}
+
+async function esperarServidorVoltar() {
+  for (;;) {
+    await new Promise((pronto) => setTimeout(pronto, 2000));
+    const controle = new AbortController();
+    const limite = setTimeout(() => controle.abort(), 3000);
+    try {
+      const resposta = await fetch("/api/estado", { signal: controle.signal, cache: "no-store" });
+      if (resposta.ok) {
+        location.reload();
+        return;
+      }
+    } catch (falha) {
+      // ainda fora do ar: tenta de novo daqui a 2 s
+    } finally {
+      clearTimeout(limite);
+    }
+    const segundos = Math.round((Date.now() - semServidorDesde) / 1000);
+    $("#semServidorTempo").textContent = segundos >= 30
+      ? ` Já são ${segundos} s. Se não voltar, feche a janela preta e abra o ARENA.bat de novo.`
+      : "";
+  }
 }
 
 // --------------------------------------------------------------------------

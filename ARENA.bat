@@ -69,9 +69,37 @@ if not exist "%~dp0retroarch\retroarch.exe" (
 )
 
 REM --- 4. Sobe o servidor. Ele abre o navegador sozinho -----------------------
+REM  Se o servidor CAIR -- o Windows fecha o Python por uma falha grave, sem
+REM  mensagem nenhuma (aconteceu duas vezes em 26/09/2026, com jogo aberto) --
+REM  esta janela reabre o servidor sozinha, ate 3 vezes. A tela que ja estava
+REM  aberta se reconecta sozinha; por isso a reabertura nao abre outra janela
+REM  (ARENA_REABERTO=1). O motivo da queda fica em dados\logs.
+REM  Codigo 0 = fechou do jeito normal; 1 = erro com explicacao na tela
+REM  (repetir nao adianta). Qualquer outro numero = queda.
+set "QUEDAS=0"
+
+:abrirServidor
 "%PYTHON%" "%~dp0servidor\arena.py"
 set "SAIDA=%errorlevel%"
+if "%SAIDA%"=="0" goto :fimServidor
+if "%SAIDA%"=="1" goto :fimServidor
+set /a QUEDAS+=1
+echo.
+echo   [QUEDA] O servidor do ARENA caiu - codigo %SAIDA%.
+echo           O motivo ficou anotado em dados\logs\queda-do-servidor.txt
+if %QUEDAS% GTR 3 goto :desistiu
+echo           Reabrindo sozinho, tentativa %QUEDAS% de 3. A tela volta sozinha.
+echo.
+set "ARENA_REABERTO=1"
+REM  Espera 2 s (o ping e' o jeito de esperar que funciona ate sem teclado).
+ping -n 3 127.0.0.1 >nul 2>&1
+goto :abrirServidor
 
+:desistiu
+echo           Caiu %QUEDAS% vezes seguidas: nao vou reabrir de novo.
+echo           Feche esta janela e abra o ARENA.bat outra vez.
+
+:fimServidor
 echo.
 if not "%SAIDA%"=="0" (
     echo   O ARENA fechou com erro. A mensagem acima explica o motivo.

@@ -372,9 +372,11 @@ def sistema_de_arquivos(pasta):
     try:
         raiz = os.path.splitdrive(os.path.abspath(pasta))[0] + "\\"
         nome_buffer = ctypes.create_unicode_buffer(256)
+        # O tamanho vai em LETRAS, nao em bytes (documentacao da
+        # Microsoft): sizeof dava 512 para um espaco de 256 letras.
         ok = ctypes.windll.kernel32.GetVolumeInformationW(
             ctypes.c_wchar_p(raiz), None, 0, None, None, None,
-            nome_buffer, ctypes.sizeof(nome_buffer))
+            nome_buffer, len(nome_buffer))
         return nome_buffer.value if ok else None
     except Exception:
         return None

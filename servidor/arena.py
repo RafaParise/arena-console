@@ -75,6 +75,7 @@ import hardware    # noqa: E402
 import indexador   # noqa: E402  (precisam vir depois do ajuste de sys.path)
 import integridade  # noqa: E402  (zip de fliperama danificado)
 import processos   # noqa: E402  (prioridade e economia de energia -- 30/09/2026)
+import janela_preta  # noqa: E402  (servidor que caia ou travava -- 02/10/2026)
 
 PASTA_LAUNCHER = os.path.join(RAIZ, "launcher")
 PASTA_DADOS = os.path.join(RAIZ, "dados")
@@ -5842,6 +5843,9 @@ def conferir_vulkan():
 
 
 def principal():
+    # Janela preta: registro da queda, Edicao Rapida desligada e recados que
+    # nunca travam o servidor (servidor\janela_preta.py, achado de 02/10/2026).
+    janela_preta.preparar(os.path.join(PASTA_DADOS, "logs"), VERSAO)
     print("=" * 62)
     print("  ARENA %s - servidor local" % VERSAO)
     print("=" * 62)
@@ -5974,7 +5978,13 @@ def principal():
     # ARENA_SEM_JANELA=1: so o servidor, sem abrir a tela (testes
     # automaticos -- a rodada completa abria dezenas de janelas -- e quem
     # quiser abrir a tela de outro computador).
-    if os.environ.get("ARENA_SEM_JANELA") != "1":
+    # ARENA_REABERTO=1: o ARENA.bat reabriu o servidor depois de uma queda.
+    # A tela que ja estava aberta se reconecta sozinha; abrir outra janela
+    # so deixaria duas.
+    if os.environ.get("ARENA_REABERTO") == "1":
+        print("  Reaberto sozinho depois de uma queda. A tela que ja estava")
+        print("  aberta volta sozinha em poucos segundos.")
+    elif os.environ.get("ARENA_SEM_JANELA") != "1":
         threading.Timer(1.0, lambda: abrir_janela(local)).start()
 
     try:
@@ -6015,6 +6025,7 @@ def principal():
         servidor.server_close()
         fechar_banco()
         print("  Pronto. Pode retirar o pen drive com seguranca.")
+        sys.stdout.flush()   # a fila da janela preta entrega o ultimo recado
 
 
 if __name__ == "__main__":

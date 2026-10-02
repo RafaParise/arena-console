@@ -177,6 +177,7 @@ sem áudio e sem sair do computador.
 | Trava ou o som falha | Documento 2 |
 | O computador todo está lento | Ajustes → Máquina → **Verificar agora**. Diz o que pesa e o que fazer. Documento 3 |
 | Diz que já tem um jogo aberto | Feche o outro com F10 |
+| A tela diz "O servidor do ARENA parou de responder" | Espere uns segundos: a janela preta reabre o servidor sozinha e a tela volta sozinha. Se não voltar, feche a janela preta e abra o `ARENA.bat` de novo. Documento 1 |
 | Não sei o que houve, só sei que quebrou | Dois cliques em **`VERIFICAR.bat`**. Documento 6 |
 
 ---

@@ -348,6 +348,13 @@ TECLADO_PADRAO = {
 }
 
 
+# Uma contagem por vez. Raw Input e XInput aguentam chamadas juntas, mas a
+# contagem antiga (joyGetPosEx) era a principal suspeita das quedas do
+# servidor de 26/09/2026 -- chamada por varios pedidos ao mesmo tempo, com
+# controle sem fio ligando e desligando. Fila de um custa nada.
+_TRAVA_CONTAGEM = threading.Lock()
+
+
 def contar_controles():
     """Quantos controles de jogo estao ligados agora, de qualquer tipo.
 
@@ -362,7 +369,8 @@ def contar_controles():
     WINDOWS ABERTAS quando o controle esta desligado (24 por contagem;
     181.570 em 3 minutos de pedidos). Raw Input nao abre nada."""
     try:
-        return controles_sem_xinput() + len(controles_xinput())
+        with _TRAVA_CONTAGEM:
+            return controles_sem_xinput() + len(controles_xinput())
     except (AttributeError, OSError, ValueError):
         return 0
 

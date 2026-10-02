@@ -47,6 +47,13 @@
   <p id="avisoTexto"></p>
 </div>
 
+<!-- ===================== SERVIDOR FORA DO AR ===================== -->
+<!-- Aparece quando o servidor para de responder e some sozinho quando ele
+     volta (o ARENA.bat reabre o servidor; ver perderContato no app.js). -->
+<div class="aviso aviso--sem-servidor" id="semServidor" hidden role="status" aria-live="polite">
+  <p>O servidor do ARENA parou de responder. Esperando ele voltar…<span id="semServidorTempo"></span></p>
+</div>
+
 <!-- ===================== TECLAS DO JOGO ===================== -->
 <!-- Aparece quando um jogo abre e fica ate ele fechar. A mensagem nao da
      para aparecer DENTRO do jogo com seguranca (ver faixaTeclas no app.js),

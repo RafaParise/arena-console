@@ -369,6 +369,24 @@ ARENA\
 | Janela preta abre e fecha na hora | Antivírus bloqueou | Libere a pasta do ARENA no antivírus (veja abaixo) |
 | ARENA abre mas nenhum jogo inicia | Falta o Visual C++ | Passo 4b |
 | Tudo lento na primeira abertura no pen drive | Varredura inicial | Normal. Depois o catálogo é reaproveitado |
+| `[QUEDA] O servidor do ARENA caiu` | O Windows fechou o Python por uma falha grave | Nada: a janela preta reabre o servidor sozinha (até 3 vezes) e a tela volta sozinha. Leve o arquivo `dados\logs\queda-do-servidor.txt` para o professor: ele diz onde foi |
+
+#### Quando o servidor cai ou trava
+
+O servidor é o programa da janela preta. Duas coisas o derrubavam ou
+travavam "sem motivo", e as duas têm proteção desde 02/10/2026:
+
+- **Queda.** Às vezes o Windows fecha o Python por uma falha grave, sem
+  mensagem nenhuma. Agora a janela preta percebe, escreve
+  `[QUEDA] O servidor do ARENA caiu` e **reabre o servidor sozinha** (até 3
+  vezes seguidas). A tela do ARENA mostra "parou de responder" por uns
+  segundos e **volta sozinha**, sem fechar nada. O motivo da queda fica
+  anotado em `dados\logs\queda-do-servidor.txt`: é o arquivo que conta em
+  que parte do programa foi.
+- **Clique na janela preta.** No Windows 10, clicar dentro da janela preta
+  começa uma seleção de texto (a "Edição Rápida") e o programa **para** até
+  alguém apertar uma tecla. O ARENA desliga isso na janela dele. Se mesmo
+  assim aparecer "Selecionar" no título da janela, aperte **Esc**.
 
 #### "O Windows protegeu o seu computador" (SmartScreen)
 
