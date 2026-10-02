@@ -97,6 +97,13 @@ def main():
             ("POST", "/api/mala", {}),
             ("GET", "/api/estado", None),
             ("GET", "/api/catalogo", None),
+            # Rotas novas de 02/10/2026: abrir pasta no Explorador e buscar
+            # capas -- so deste computador.
+            ("POST", "/api/pasta/abrir", {"plataforma": "snes"}),
+            ("POST", "/api/capas/buscar-faltando", {}),
+            ("POST", "/api/capas/parar", {}),
+            ("GET", "/api/capas/progresso", None),
+            ("GET", "/api/como-colocar", None),
         ]:
             status, resp = requisicao(metodo, caminho, corpo)
             passou = status == 403
