@@ -194,7 +194,8 @@
         ".sfc",
         ".smc",
         ".swc",
-        ".fig"
+        ".fig",
+        ".bs"
       ],
       "peso": "leve",
       "arquivos_sistema": 0,

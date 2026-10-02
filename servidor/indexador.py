@@ -100,6 +100,16 @@ def nucleo_aceita_m3u(core):
     return _m3u_por_nucleo[core]
 
 
+def tem_bios_do_satellaview():
+    """A BIOS do Satellaview (BS-X) esta na pasta de BIOS? E' o nome que o
+    proprio Snes9x procura (BS-X.bin ou BS-X.bios)."""
+    try:
+        nomes = {n.lower() for n in os.listdir(os.path.join(RAIZ, "retroarch", "system"))}
+    except OSError:
+        return False
+    return bool(nomes & {"bs-x.bin", "bs-x.bios"})
+
+
 def agrupar_discos(itens, por_id):
     """Junta, NA MESMA PASTA, os discos do mesmo jogo num cartao so (o do
     menor disco, que passa a ter "discos": a lista). Devolve a lista nova."""
@@ -368,7 +378,7 @@ def arquivo_de_jogadores():
 # (ex.: o jogo de CD em trilhas virar um jogo so) nao valia num ARENA que ja
 # tinha a lista salva, ate alguma pasta mudar. 2 = nomes de fliperama pelos
 # bancos do RetroArch + avisos do jogo.
-VERSAO_INDICE = 4     # 4 = discos do mesmo jogo num cartao so
+VERSAO_INDICE = 5     # 5 = aviso do Satellaview sem a BIOS BS-X
 
 
 def assinatura_das_pastas():
@@ -687,6 +697,17 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None,
                 if nome_banco:
                     titulo = nomes_arcade.titulo_para_a_tela(nome_banco)
                 avisos += avisos_do_romset(caminho_absoluto, romset, discos_zipados)
+            # Satellaview (o "BS" do nome, ou .bs): o Snes9x so abre com a
+            # BIOS do Satellaview (BS-X) na pasta de BIOS. Sem ela, "falha ao
+            # carregar o conteudo" e o cartao nao dizia nada (achado de
+            # 02/10/2026: os 5 BS F-ZERO da pasta nao abriam).
+            if (plataforma.get("core") == "snes9x_libretro.dll"
+                    and (nome_arquivo.startswith("BS ") or extensao == ".bs")
+                    and not tem_bios_do_satellaview()):
+                avisos.append({
+                    "texto": "Jogo de Satellaview (o \"BS\" do nome): o Super Nintendo só "
+                             "abre esse tipo com a BIOS do Satellaview (BS-X) em "
+                             "retroarch\\system. Sem ela, o jogo não abre."})
             if discorda:
                 avisos.append({
                     "texto": "O conteúdo deste arquivo é de %s, mas ele está na pasta de %s. "

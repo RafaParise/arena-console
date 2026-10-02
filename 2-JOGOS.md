@@ -329,6 +329,14 @@ máquina.
 | Sega Dreamcast | 1 |
 | Sega Saturn | 1 |
 
+Dois casos à parte:
+
+- **Dreamcast:** a maioria dos jogos abre mesmo sem a BIOS — o emulador
+  simula uma. Alguns só abrem com a BIOS de verdade (o Marvel vs. Capcom 1
+  trava com a simulada).
+- **Super Nintendo:** só os jogos de **Satellaview** (os que têm "BS" no
+  começo do nome) pedem a BIOS dele (BS-X). O cartão do jogo avisa.
+
 #### Os 29 que não pedem nada
 
 Amstrad CPC · Atari 2600 · Atari 7800 · Atari Jaguar · Commodore 64 ·
