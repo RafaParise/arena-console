@@ -122,9 +122,12 @@ def limpar_retroarch_cfg(origem, destino):
                 "cheevos_username", "cheevos_password", "cheevos_token", "discord_app_id",
                 "netplay_mitm_server_custom", "rgui_browser_directory", "last_start_directory"}
     raiz_barra = RAIZ.replace("/", "\\")
-    saida = []
+    saida, vistas = [], set()
     for linha in open(origem, encoding="utf-8", errors="replace"):
         chave = linha.split("=", 1)[0].strip()
+        if "=" in linha and chave in vistas:
+            continue          # chave repetida (o cache_directory chegou a 5): fica a primeira
+        vistas.add(chave)
         if chave in pessoais:
             linha = '%s = ""\n' % chave
         elif raiz_barra.lower() in linha.lower():
