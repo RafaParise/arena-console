@@ -1046,6 +1046,10 @@ def config_padrao():
         "modo_desempenho": False,
         "ultra_desempenho": False,
         "modo_modesto": False,
+        # Abaixo do grafico original (02/10/2026): "" (nao), "leve" ou
+        # "minimo" -- imagem feia, roda em maquina mais fraca. Ligado, vale
+        # como se o modo_modesto tambem estivesse (ver grafico_original).
+        "abaixo_do_original": "",
         # "automatico" (decide pela nota da maquina), "leve" ou "bonito".
         # Vale para os emuladores externos (PCSX2, RPCS3, Xenia).
         "preset_grafico_externo": "automatico",
@@ -1177,6 +1181,8 @@ def ler_config_do_disco():
     config["modo_desempenho"] = bool(salvo.get("modo_desempenho"))
     config["ultra_desempenho"] = bool(salvo.get("ultra_desempenho"))
     config["modo_modesto"] = bool(salvo.get("modo_modesto"))
+    if salvo.get("abaixo_do_original") in graficos.NIVEIS_ABAIXO:
+        config["abaixo_do_original"] = salvo["abaixo_do_original"]
     config["rpcn_ativo"] = bool(salvo.get("rpcn_ativo"))
     if salvo.get("preset_grafico_externo") in ("automatico", "leve", "bonito"):
         config["preset_grafico_externo"] = salvo["preset_grafico_externo"]
@@ -1435,6 +1441,19 @@ def perfil_para(config, custo=None):
     return classificar(custo)["perfil"]
 
 
+def nivel_abaixo(config):
+    """"leve" ou "minimo" quando o aluno escolheu ABAIXO do grafico original;
+    "" fora disso (pedido do Rafael, 02/10/2026)."""
+    valor = config.get("abaixo_do_original")
+    return valor if valor in graficos.NIVEIS_ABAIXO else ""
+
+
+def grafico_original(config):
+    """O grafico igual ao console original vale -- ligado direto ou porque
+    o aluno escolheu um nivel ABAIXO dele (que comeca no original)."""
+    return bool(config.get("modo_modesto")) or bool(nivel_abaixo(config))
+
+
 def opcoes_efetivas(config, custo=None, controles_ligados=None):
     """Junta base + perfil + ajustes avancados na ordem certa.
 
@@ -1647,7 +1666,7 @@ def gravar_override(config, custo=None, extras=None, em_partida=False,
             "video_font_enable": "true",
         })
 
-    if config.get("modo_modesto"):
+    if grafico_original(config):
         # Resolucao nativa vale pouco se o RetroArch ainda desenha filtro
         # por cima. Aqui morre tudo o que sobra.
         opcoes.update({
@@ -1663,9 +1682,15 @@ def gravar_override(config, custo=None, extras=None, em_partida=False,
             "savestate_thumbnail_enable": "false",
             "menu_driver": "rgui",
         })
-
     if config.get("ultra_desempenho"):
         opcoes.update(ULTRA_DESEMPENHO)
+
+    if nivel_abaixo(config) == "minimo":
+        # Bonecos de papelao: o computador atrasa mais vezes, e o pulo de
+        # quadros dos nucleos olha a folga do som. Mais folga = som sem
+        # picote. Vem DEPOIS do ultra de proposito: o ultra pede 32 ms (som
+        # mais rapido), e no minimo o som que nao picota vale mais.
+        opcoes["audio_latency"] = "128"
 
     if config.get("travar_teclas"):
         # Prende o teclado no jogo: Alt+Tab e a tecla Windows passam a ser
@@ -2182,7 +2207,7 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
                     extras_controle[chave % n] = extras_controle[chave % 1]
         graficos.gravar_opcoes_dos_nucleos(
             CAPACIDADE["nota"], extras_core, CAPACIDADE.get("nota_gpu"),
-            modesto=bool(config.get("modo_modesto")))
+            modesto=grafico_original(config), abaixo=nivel_abaixo(config))
     except OSError as falha:
         print("[ARENA] Nao consegui gravar as opcoes de imagem: %s" % falha)
 
@@ -2215,7 +2240,7 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
                 jogo["externo"]["caminho"],
                 ultra=bool(config.get("ultra_desempenho")),
                 nota=CAPACIDADE["nota"], nota_gpu=CAPACIDADE.get("nota_gpu"),
-                modesto=bool(config.get("modo_modesto")),
+                modesto=grafico_original(config), abaixo=nivel_abaixo(config),
                 preset=None if preset == "automatico" else preset,
                 jogadores=jogo.get("jogadores_max", 2),
                 controles_xinput=controles.controles_xinput(),
@@ -2249,7 +2274,7 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
                 jogo["externo"]["caminho"], controles.controles_xinput(),
                 console=console,
                 nota=CAPACIDADE["nota"], nota_gpu=CAPACIDADE.get("nota_gpu"),
-                modesto=bool(config.get("modo_modesto")),
+                modesto=grafico_original(config), abaixo=nivel_abaixo(config),
                 ultra=bool(config.get("ultra_desempenho")),
                 preset=None if preset == "automatico" else preset)
             if pasta:
@@ -2281,7 +2306,7 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             escrito = graficos.escrever_config_xenia(
                 jogo["externo"]["caminho"], CAPACIDADE["nota"],
                 CAPACIDADE.get("nota_gpu"),
-                modesto=bool(config.get("modo_modesto")),
+                modesto=grafico_original(config),
                 ultra=bool(config.get("ultra_desempenho")),
                 preset=None if preset == "automatico" else preset,
                 controles_xinput=controles.controles_xinput(),
@@ -2293,7 +2318,7 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             escrito = graficos.escrever_config_rpcs3(
                 jogo["externo"]["caminho"], CAPACIDADE["nota"],
                 CAPACIDADE.get("nota_gpu"),
-                modesto=bool(config.get("modo_modesto")),
+                modesto=grafico_original(config), abaixo=nivel_abaixo(config),
                 ultra=bool(config.get("ultra_desempenho")),
                 preset=None if preset == "automatico" else preset)
             if escrito:
@@ -5116,15 +5141,20 @@ class Manipulador(BaseHTTPRequestHandler):
                 elif achar_jogo(alvo):
                     config["favoritos"] = ([alvo] + config["favoritos"])[:200]
 
-            if "modo_modesto" in dados:
-                config["modo_modesto"] = bool(dados["modo_modesto"])
+            if "abaixo_do_original" in dados:
+                valor = dados["abaixo_do_original"]
+                config["abaixo_do_original"] = (
+                    valor if isinstance(valor, str) and valor in graficos.NIVEIS_ABAIXO else "")
+            if "modo_modesto" in dados or "abaixo_do_original" in dados:
+                if "modo_modesto" in dados:
+                    config["modo_modesto"] = bool(dados["modo_modesto"])
                 # Regravar os ajustes dos nucleos AGORA. Eles ficam num
                 # arquivo separado do override, e sem isto a mudanca so
                 # valeria no jogo seguinte ao seguinte.
                 try:
                     graficos.gravar_opcoes_dos_nucleos(
                         CAPACIDADE["nota"], None, CAPACIDADE.get("nota_gpu"),
-                        modesto=config["modo_modesto"])
+                        modesto=grafico_original(config), abaixo=nivel_abaixo(config))
                 except OSError:
                     pass
             if "travar_teclas" in dados:

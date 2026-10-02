@@ -40,6 +40,10 @@ def chaves_por_nucleo(dados):
     # Degrau "tela 4K" (01/10/2026): chave errada ali nao faria nada, calada.
     for nucleo, opcoes in dados.get("tela_4k", {}).get("nucleos", {}).items():
         anotar(nucleo, opcoes, "tela 4K")
+    # Abaixo do grafico original (02/10/2026): leve e minimo.
+    for nivel in ("leve", "minimo"):
+        for nucleo, opcoes in dados.get("abaixo_do_original", {}).get(nivel, {}).items():
+            anotar(nucleo, opcoes, "abaixo do original (%s)" % nivel)
     return saida
 
 

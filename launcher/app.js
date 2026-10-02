@@ -196,8 +196,8 @@ async function carregarEstado() {
     ? "Ligado. Os colegas já podem te achar."
     : "Desligado, só este computador acessa.";
 
-  $("#chaveModesto").setAttribute("aria-pressed",
-    dados.config.modo_modesto ? "true" : "false");
+  $("#listaNivelGrafico").value = nivelDoGrafico(dados.config);
+  explicarNivelGrafico();
 
   $("#chaveRpcn").setAttribute("aria-pressed",
     dados.config.rpcn_ativo ? "true" : "false");
@@ -1338,6 +1338,47 @@ const EXPLICA_PRESET_GRAFICO = {
     "sabe pedir. Ex.: um jogo de Xbox 360 fica bem mais nítido, mas pode " +
     "cair de quadros por segundo em computador fraco.",
 };
+
+// Nível do gráfico (Ajustes -> Máquina). Pedido do Rafael, 02/10/2026:
+// "modos abaixo do gráfico de console original, mesmo que o gráfico fique
+// muito feio, bonecos de papelão -- a ideia é que, se configurar
+// corretamente, pode rodar em qualquer máquina". No servidor são duas
+// chaves: modo_modesto (o original) e abaixo_do_original ("leve"/"minimo").
+const EXPLICA_NIVEL_GRAFICO = {
+  normal: "O ARENA escolhe pela força do computador: em máquina boa, a imagem fica " +
+    "melhor que a do console de verdade.",
+  original: "Exatamente a resolução do aparelho de verdade, sem enfeite. No PlayStation " +
+    "vira 1x com desenho pelo processador; no PSP, 480×272; no Nintendo 64, resolução " +
+    "nativa. Use se o jogo trava mesmo com o modo Desempenho.",
+  leve: "Imagem PIOR que a do console, para o jogo rodar: o Dreamcast desenha pela metade " +
+    "(320×240), PSP e Nintendo 64 pulam quadros e efeitos quando o computador atrasa, " +
+    "Mega Drive, GBA, fliperama e outros pulam quadros se precisar. PS2, GameCube e Wii " +
+    "rodam com o processador do console mais devagar (em cena pesada, o jogo pode ficar " +
+    "lento); o PS3 desenha a 50%. SNES, NES e Game Boy ficam iguais: já são leves.",
+  minimo: "Bonecos de papelão: tudo do leve e mais. Dreamcast sem neblina e sem sombra, " +
+    "PSP e Nintendo 64 pulam mais, PS2 com a mistura de cores mínima, GameCube sem " +
+    "neblina, PS3 a 25%. Alguns jogos desenham errado (sombra, transparência, mira) — " +
+    "use quando nada mais roda.",
+};
+const RECADO_NIVEL_GRAFICO = {
+  normal: "Gráfico normal.",
+  original: "Gráfico igual ao console original.",
+  leve: "Abaixo do original: leve.",
+  minimo: "Abaixo do original: mínimo (bonecos de papelão).",
+};
+
+function nivelDoGrafico(config) {
+  if (!config) return "normal";
+  if (config.abaixo_do_original === "leve" || config.abaixo_do_original === "minimo") {
+    return config.abaixo_do_original;
+  }
+  return config.modo_modesto ? "original" : "normal";
+}
+
+function explicarNivelGrafico() {
+  const valor = $("#listaNivelGrafico").value;
+  $("#explicaNivelGrafico").textContent = EXPLICA_NIVEL_GRAFICO[valor] || EXPLICA_NIVEL_GRAFICO.normal;
+}
 
 function atualizarExplicaPreset() {
   const valor = $("#listaPresetGrafico").value;
@@ -3550,16 +3591,17 @@ function ligarEventos() {
     }
   });
 
-  $("#chaveModesto").addEventListener("click", async (evento) => {
-    const botao = evento.currentTarget;
-    const novo = botao.getAttribute("aria-pressed") !== "true";
+  $("#listaNivelGrafico").addEventListener("change", async (evento) => {
+    const lista = evento.currentTarget;
+    const nivel = lista.value;
+    const abaixo = (nivel === "leve" || nivel === "minimo") ? nivel : "";
     try {
-      await salvarConfig({ modo_modesto: novo });
-      botao.setAttribute("aria-pressed", novo ? "true" : "false");
-      recado(novo
-        ? "Gráfico igual ao console original. Vale no próximo jogo."
-        : "Voltou ao gráfico melhorado.");
+      await salvarConfig({ modo_modesto: nivel !== "normal", abaixo_do_original: abaixo });
+      explicarNivelGrafico();
+      recado(RECADO_NIVEL_GRAFICO[nivel] + " Vale no próximo jogo.");
     } catch (falha) {
+      lista.value = nivelDoGrafico(estado.config);
+      explicarNivelGrafico();
       recado(falha.message, true);
     }
   });

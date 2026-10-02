@@ -480,5 +480,72 @@
     "gambatte": {
       "gambatte_mix_frames": "disabled"
     }
+  },
+  "abaixo_do_original": {
+    "_leia": "Pedido do Rafael (02/10/2026): modos ABAIXO do grafico original -- a imagem fica feia (bonecos de papelao), mas o jogo roda em maquina mais fraca. Entram por cima do bloco 'modesto' (o grafico original); 'minimo' entra por cima do 'leve'. Valores conferidos no codigo-fonte de cada nucleo (libretro_core_options.h) e as chaves dentro de cada .dll (testes/teste_chaves_graficos.py). Pulo de quadros 'auto': o nucleo deixa de DESENHAR um quadro quando a maquina atrasa -- o jogo e o som seguem na velocidade certa. SNES, NES e Game Boy nao tem pulo de quadros nesta versao (e sao leves). PS1 fica no original: o desenho por processador ja e' o mais leve, e trocar de nucleo esconderia os saves.",
+    "leve": {
+      "flycast": {
+        "reicast_internal_resolution": "320x240",
+        "reicast_auto_skip_frame": "some",
+        "reicast_alpha_sorting": "per-strip (fast, least accurate)",
+        "reicast_anisotropic_filtering": "off",
+        "reicast_mipmapping": "disabled",
+        "reicast_texupscale": "1"
+      },
+      "ppsspp": {
+        "ppsspp_auto_frameskip": "enabled",
+        "ppsspp_frameskip": "2",
+        "ppsspp_frameskiptype": "Number of frames",
+        "ppsspp_skip_buffer_effects": "enabled",
+        "ppsspp_lower_resolution_for_effects": "Aggressive",
+        "ppsspp_spline_quality": "Low",
+        "ppsspp_lazy_texture_caching": "enabled"
+      },
+      "mupen64plus_next": {
+        "mupen64plus-FrameDuping": "True",
+        "mupen64plus-EnableLODEmulation": "False",
+        "mupen64plus-EnableCopyColorToRDRAM": "Off",
+        "mupen64plus-EnableCopyDepthToRDRAM": "Off"
+      },
+      "pcsx_rearmed": {
+        "pcsx_rearmed_frameskip_type": "auto"
+      },
+      "mgba": {
+        "mgba_frameskip": "auto"
+      },
+      "genesis_plus_gx": {
+        "genesis_plus_gx_frameskip": "auto"
+      },
+      "picodrive": {
+        "picodrive_frameskip": "auto"
+      },
+      "handy": {
+        "handy_frameskip": "auto"
+      },
+      "mednafen_wswan": {
+        "wswan_frameskip": "auto"
+      },
+      "virtualjaguar": {
+        "virtualjaguar_frameskip": "auto"
+      },
+      "fbneo": {
+        "fbneo-frameskip-type": "Auto"
+      }
+    },
+    "minimo": {
+      "flycast": {
+        "reicast_auto_skip_frame": "more",
+        "reicast_frame_skipping": "1",
+        "reicast_fog": "disabled",
+        "reicast_volume_modifier_enable": "disabled"
+      },
+      "ppsspp": {
+        "ppsspp_frameskip": "3",
+        "ppsspp_skip_gpu_readbacks": "enabled"
+      },
+      "mupen64plus_next": {
+        "mupen64plus-CountPerOp": "3"
+      }
+    }
   }
 }

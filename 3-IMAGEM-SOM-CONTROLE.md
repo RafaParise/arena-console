@@ -421,6 +421,54 @@ de pixel nítido.
 
 ---
 
+### Nível do gráfico: do normal aos bonecos de papelão
+
+Em **Ajustes → Máquina → Nível do gráfico**. A ideia central: **quanto pior
+a imagem, menos o computador trabalha**. Bem configurado, o jogo roda até
+em máquina muito fraca, mesmo que fique feio.
+
+Analogia: é como desenhar o mesmo jogo com menos traços. No normal, o ARENA
+desenha com caneta fina e cor; no mínimo, com giz de cera grosso e pulando
+alguns desenhos quando a mão cansa. O jogo continua o mesmo, na mesma
+velocidade, só que mais feio.
+
+| Nível | Para quem | O que muda |
+|---|---|---|
+| **Normal** (padrão) | Quase todo mundo | O ARENA escolhe pela força do computador. Em máquina boa, a imagem fica melhor que a do console de verdade |
+| **Igual ao console original** | Jogo travando mesmo com o modo Desempenho | Exatamente a resolução do aparelho de verdade, sem enfeite |
+| **Abaixo do original: leve** | Ainda trava no original | Imagem **pior** que a do console. Pula quadros quando o computador atrasa |
+| **Abaixo do original: mínimo** | Nada mais roda | Bonecos de papelão: tudo do leve e mais. Alguns jogos desenham errado |
+
+O que cada console faz nos dois níveis abaixo do original:
+
+| Console | Leve | Mínimo (soma ao leve) |
+|---|---|---|
+| Dreamcast | Desenha pela metade (320×240), pula quadros se precisar, transparência rápida | Pula mais, sem neblina, sem sombra |
+| PSP | Pula até 2 quadros, pula efeitos de tela, curvas simples | Pula até 3 quadros |
+| Nintendo 64 | Repete quadro quando atrasa, sem cópia de imagem para o jogo | Processador do console mais devagar |
+| PS2 | Processador do PS2 a 75% e com pulo de ciclos | Processador a 60%, mistura de cores mínima, quadro repetido não é redesenhado |
+| GameCube e Wii | Processador do console a 80% | A 60%, sem neblina, objeto aparece só quando o desenho dele fica pronto |
+| PS3 | Desenha a 50% | Desenha a 25% |
+| Mega Drive, GBA, 32X, Lynx, WonderSwan, Jaguar, fliperama (FBNeo) | Pulam quadros se o computador atrasar | Igual ao leve |
+| SNES, NES, Game Boy | Igual ao original: já são leves (e o emulador não pula quadros) | Igual |
+| PlayStation | Igual ao original: o desenho pelo processador já é o mais leve | Igual |
+| Xbox 360 | Igual ao original: o emulador não desenha abaixo disso | Igual |
+
+**Pular quadro** quer dizer: quando o computador atrasa, o emulador deixa de
+desenhar um quadro, mas o jogo e o som seguem na velocidade certa. Fica
+menos liso, não mais lento.
+
+**Processador do console mais devagar** (PS2, GameCube, Wii, N64 no
+mínimo) é diferente: o computador aguenta, mas em cena pesada **o próprio
+jogo** pode ficar mais lento (como o console de verdade quando tinha muita
+coisa na tela). Se isso incomodar, volte um nível.
+
+Como escolher: comece no **Normal**. Travou? **Igual ao original**. Ainda
+trava? **Leve**. Só então **Mínimo**. Vale no próximo jogo que abrir. Para
+voltar, escolha o nível de novo: o ARENA desfaz tudo o que mudou.
+
+---
+
 ### Se o jogo ficar avançando um quadro por vez
 
 Sintoma: o jogo carrega, sai do menu inicial, e daí em diante só anda quando
@@ -665,7 +713,7 @@ Cada jogo na lista mostra como vai rodar aqui:
 |---|---|
 | **Roda bem** (verde) | Sobra máquina |
 | **Roda com ajustes** (azul) | Roda com a imagem que o ARENA escolhe para este PC |
-| **Pode travar** (vermelho) | Abaixo do que o console pede: tente com Gráfico original e Ultra |
+| **Pode travar** (vermelho) | Abaixo do que o console pede: tente o Nível do gráfico **Abaixo do original** e o Ultra |
 | **Não abre neste PC** (cinza) | Falta algo no processador (o motivo aparece ao parar o mouse) |
 
 Vermelho não impede de tentar. Só avisa antes, para você não achar que

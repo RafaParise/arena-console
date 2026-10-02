@@ -266,7 +266,24 @@ def tela_4k_vale(nota_gpu, altura_tela):
             and (altura_tela or 0) >= regra.get("altura_minima", 2000))
 
 
-def gravar_opcoes_dos_nucleos(nota, extras=None, nota_gpu=None, modesto=False, altura_tela=None):
+# Niveis ABAIXO do grafico original (pedido do Rafael, 02/10/2026: "mesmo que
+# o grafico fique muito feio, bonecos de papelao -- a ideia e' que, se
+# configurar corretamente, pode rodar em qualquer maquina"). O "minimo"
+# inclui tudo do "leve". Valores por emulador: graficos.json ->
+# abaixo_do_original (nucleos do RetroArch) e escrever_config_pcsx2,
+# opcoes_de_imagem_dolphin e escrever_config_rpcs3 (emuladores de fora).
+NIVEIS_ABAIXO = ("leve", "minimo")
+
+
+def niveis_abaixo_ate(abaixo):
+    """("leve",) para "leve", ("leve", "minimo") para "minimo", () fora disso."""
+    if abaixo not in NIVEIS_ABAIXO:
+        return ()
+    return NIVEIS_ABAIXO[:NIVEIS_ABAIXO.index(abaixo) + 1]
+
+
+def gravar_opcoes_dos_nucleos(nota, extras=None, nota_gpu=None, modesto=False, altura_tela=None,
+                              abaixo=""):
     """Monta retroarch-core-options.cfg com o ajuste de todos os emuladores.
 
     Vale a pena escrever tudo de uma vez, e nao so do jogo que vai abrir:
@@ -275,7 +292,13 @@ def gravar_opcoes_dos_nucleos(nota, extras=None, nota_gpu=None, modesto=False, a
 
     'altura_tela': linhas da tela (hardware.altura_da_tela); sem ela, o
     ARENA mede na hora -- e instantaneo, e pega a TV 4K ligada depois.
+
+    'abaixo': "leve" ou "minimo" -- abaixo do grafico original, por cima do
+    bloco modesto (graficos.json -> abaixo_do_original).
     """
+    niveis = niveis_abaixo_ate(abaixo)
+    if niveis:
+        modesto = True    # abaixo do original comeca no original
     if altura_tela is None:
         try:
             import hardware
@@ -288,8 +311,12 @@ def gravar_opcoes_dos_nucleos(nota, extras=None, nota_gpu=None, modesto=False, a
 
     dados = carregar_graficos()
     da_placa = set(dados.get("_usa_nota_gpu", []))
+    bloco_abaixo = dados.get("abaixo_do_original", {})
+    # Nucleos que so aparecem no bloco abaixo do original (o pulo de quadros
+    # do Lynx, do 32X...) entram na lista so quando o nivel esta ligado.
+    com_abaixo = {nucleo for nivel in niveis for nucleo in bloco_abaixo.get(nivel, {})}
 
-    for nome_curto in sorted(dados["nucleos"]):
+    for nome_curto in sorted(set(dados["nucleos"]) | com_abaixo):
         # Resolucao interna, filtro de textura e anti-serrilhado dependem
         # da PLACA de video. Num PC com placa integrada, esses consoles
         # usam a nota menor mesmo que o processador seja bom.
@@ -303,6 +330,10 @@ def gravar_opcoes_dos_nucleos(nota, extras=None, nota_gpu=None, modesto=False, a
         # Celeron de dois nucleos com grafico integrado.
         if modesto:
             opcoes.update(dados.get("modesto", {}).get(nome_curto, {}))
+            # Abaixo do original: por cima do original, o "minimo" por cima
+            # do "leve".
+            for nivel in niveis:
+                opcoes.update(bloco_abaixo.get(nivel, {}).get(nome_curto, {}))
         else:
             excecao = dados.get("excecoes", {}).get(nome_curto, {})
             for bloco in sorted(excecao.get("por_nota", []),
@@ -848,10 +879,20 @@ def chaves_gerenciadas_pelo_arena():
         for bloco in nucleo.get("por_nota", []):
             chaves.update(bloco.get("opcoes", {}))
     for opcoes in dados.get("modesto", {}).values():
-        chaves.update(opcoes)
+        if isinstance(opcoes, dict):          # o "_leia" e' texto
+            chaves.update(opcoes)
     for excecao in dados.get("excecoes", {}).values():
         for bloco in excecao.get("por_nota", []):
             chaves.update(bloco.get("opcoes", {}))
+    # Achado de 02/10/2026: as chaves da tela 4K e as de abaixo do original
+    # nao estavam aqui -- e chave que nao esta aqui conta como "mudada pelo
+    # aluno no menu" e FICA no arquivo. Saiu da TV 4K, o N64 continuava em
+    # 2x; saiu do minimo, o Dreamcast continuaria em 320x240.
+    for opcoes in dados.get("tela_4k", {}).get("nucleos", {}).values():
+        chaves.update(opcoes)
+    for nivel in NIVEIS_ABAIXO:
+        for opcoes in dados.get("abaixo_do_original", {}).get(nivel, {}).values():
+            chaves.update(opcoes)
     for lista in CHAVE_BIOS.values():
         chaves.update(lista)
     chaves.add("swanstation_MemoryCards_Card1Type")
@@ -1189,7 +1230,7 @@ def escrever_config_pcsx2(caminho_executavel, ultra=False, nota=None,
                           nota_gpu=None, modesto=False, preset=None,
                           jogadores=2, controles_xinput=(0, 1),
                           cartoes=("Mcd001.ps2", "Mcd002.ps2"), integrada=None,
-                          motor="automatico"):
+                          motor="automatico", abaixo=""):
     """Escreve o bloco de controle, teclas e qualidade grafica do PCSX2.
 
     Preserva tudo o que ja estiver no arquivo fora desses blocos - em
@@ -1237,6 +1278,8 @@ def escrever_config_pcsx2(caminho_executavel, ultra=False, nota=None,
         else:
             fraco = modesto or alvo_nota <= 2
             forte = alvo_nota >= 4 and not modesto
+        if abaixo in NIVEIS_ABAIXO:
+            fraco, forte = True, False      # abaixo do original comeca no mais leve
 
         # Placa INTEGRADA no automatico (decisao do Rafael, 30/09/2026): o
         # Celeron otimizado roda PS2 com 4 jogadores, mas com graficos
@@ -1289,11 +1332,17 @@ def escrever_config_pcsx2(caminho_executavel, ultra=False, nota=None,
     # Nitro Kart e' "perfeito" no banco de jogos do PCSX2 -- com estes
     # valores. Os avisos que o PCSX2 da' estao em testes\teste_pcsx2_seguro.py.
     linhas_gs += ["%s = %s" % par for par in PCSX2_SEGUROS.items()]
-    if "accurate_blending_unit = 1" not in linhas_gs and re.search(
+    if abaixo == "minimo":
+        # Bonecos de papelao: a mistura de cores "Minima" (0) erra efeitos de
+        # transparencia, mas e' a que menos pesa na placa.
+        linhas_gs.append("accurate_blending_unit = 0")
+    elif "accurate_blending_unit = 1" not in linhas_gs and re.search(
             r"^accurate_blending_unit = 0\s*$", "\n".join(guardar), re.M):
         # "Minima" (0): "Blending Accuracy is below Basic, this may break
-        # effects in some games". Abaixo da basica, nunca.
+        # effects in some games". Fora do minimo, abaixo da basica nunca.
         linhas_gs.append("accurate_blending_unit = 1")
+    # Quadro repetido nao e' redesenhado (so no minimo; o padrao e' desligado).
+    linhas_gs.append("SkipDuplicateFrames = %s" % ("true" if abaixo == "minimo" else "false"))
 
     if ultra:
         linhas_gs += ["VsyncEnable = true", "OsdShowSpeed = false"]
@@ -1327,6 +1376,18 @@ def escrever_config_pcsx2(caminho_executavel, ultra=False, nota=None,
     texto = _trocar_chaves_ini(texto, "Folders", {"Bios": "bios", "MemoryCards": "memcards"})
     if chaves_gs:
         texto = _trocar_chaves_ini(texto, "EmuCore/GS", chaves_gs)
+    # Abaixo do original: o processador do PS2 emulado anda mais devagar
+    # (EECycleRate -1 = 75%, -2 = 60%; EECycleSkip 1 e 2 = "subclock" leve e
+    # moderado). O computador fraco aguenta; em cena pesada o JOGO pode ficar
+    # mais lento (nao a imagem). Fora disso, sempre o padrao (0), para a
+    # volta ao normal valer -- e o aviso do PCSX2 ("pode travar ou deixar o
+    # jogo lento") so fica desligado nesses dois niveis, que a tela do ARENA
+    # ja explica.
+    ciclos = {"leve": ("-1", "1"), "minimo": ("-2", "2")}.get(abaixo, ("0", "0"))
+    texto = _trocar_chaves_ini(texto, "EmuCore/Speedhacks",
+                               {"EECycleRate": ciclos[0], "EECycleSkip": ciclos[1]})
+    texto = _trocar_chaves_ini(texto, "EmuCore", {
+        "WarnAboutUnsafeSettings": "false" if abaixo in NIVEIS_ABAIXO else "true"})
     texto = _trocar_chaves_ini(texto, "MemoryCards", {
         "Slot1_Enable": "true", "Slot1_Filename": cartoes[0],
         "Slot2_Enable": "true", "Slot2_Filename": cartoes[1]})
@@ -1460,7 +1521,7 @@ def console_do_disco_dolphin(caminho_jogo):
 
 
 def opcoes_de_imagem_dolphin(nota=None, nota_gpu=None, modesto=False, ultra=False,
-                             preset=None):
+                             preset=None, abaixo=""):
     """O que o ARENA ajusta no Dolphin, por arquivo e secao.
 
     Achado de 30/09/2026: o Dolphin externo (GameCube e Wii) so recebia
@@ -1481,12 +1542,29 @@ def opcoes_de_imagem_dolphin(nota=None, nota_gpu=None, modesto=False, ultra=Fals
         so no Celeron. Os jogos que precisam de um nucleo so continuam
         protegidos: as regras por jogo do proprio Dolphin valem por cima.
     Mesma escolha por placa do PCSX2/Xenia/RPCS3: 'preset' da aba
-    Emuladores ("leve"/"bonito") ou, no automatico, a nota da placa."""
-    gfx_settings = {"ShaderCompilationMode": "2"}
+    Emuladores ("leve"/"bonito") ou, no automatico, a nota da placa.
+
+    'abaixo' ("leve"/"minimo", 02/10/2026), nomes conferidos no Dolphin.exe:
+      - Core/OverclockEnable + Overclock: o processador do GameCube emulado
+        a 80% (leve) ou 60% (minimo). O computador aguenta; em cena pesada o
+        JOGO pode ficar mais lento.
+      - minimo: Settings/DisableFog (sem neblina), Hacks/EFBAccessEnable =
+        False (pula a leitura da imagem pelo processador -- erra mira e
+        efeitos em alguns jogos) e ShaderCompilationMode 3 (o objeto ainda
+        sem desenho pronto nao aparece, em vez de travar).
+    Fora desses niveis, sempre os padroes do Dolphin, para a volta valer."""
+    niveis = niveis_abaixo_ate(abaixo)
+    gfx_settings = {"ShaderCompilationMode": "3" if "minimo" in niveis else "2",
+                    "DisableFog": "True" if "minimo" in niveis else "False"}
     gfx_melhorias = {}
+    gfx_truques = {"EFBAccessEnable": "False" if "minimo" in niveis else "True"}
     alvo = nota_gpu if nota_gpu is not None else nota
+    if niveis:
+        modesto = True
     if alvo is not None or modesto or preset in ("leve", "bonito"):
-        if preset == "leve":
+        if niveis:
+            forte = False
+        elif preset == "leve":
             forte = False
         elif preset == "bonito":
             forte = True
@@ -1499,11 +1577,13 @@ def opcoes_de_imagem_dolphin(nota=None, nota_gpu=None, modesto=False, ultra=Fals
     # Ultra: tela cheia e sem a pergunta "parar o jogo?". Sem ultra, nada
     # aqui: o que a pessoa escolheu na tela do Dolphin fica (a volta do que
     # o ultra mudou e' feita em escrever_config_dolphin, pela anotacao).
-    principal = {"Core": {"CPUThread": "True"}}
+    principal = {"Core": {"CPUThread": "True",
+                          "OverclockEnable": "True" if niveis else "False",
+                          "Overclock": {"leve": "0.8", "minimo": "0.6"}.get(abaixo, "1.0")}}
     if ultra:
         principal["Display"] = {"Fullscreen": "True"}
         principal["Interface"] = {"ConfirmStop": "False"}
-    gfx = {"Settings": gfx_settings}
+    gfx = {"Settings": gfx_settings, "Hacks": gfx_truques}
     if gfx_melhorias:
         gfx["Enhancements"] = gfx_melhorias
     return {"GFX.ini": gfx, "Dolphin.ini": principal}
@@ -1563,7 +1643,7 @@ def _valor_ini(texto, secao, chave):
 
 def escrever_config_dolphin(caminho_executavel, controles_xinput, teclado=True,
                             console="gamecube", nota=None, nota_gpu=None,
-                            modesto=False, ultra=False, preset=None):
+                            modesto=False, ultra=False, preset=None, abaixo=""):
     """Deixa o Dolphin portatil e escreve os controles de GameCube e Wii,
     e a imagem (ver opcoes_de_imagem_dolphin).
 
@@ -1614,7 +1694,7 @@ def escrever_config_dolphin(caminho_executavel, controles_xinput, teclado=True,
         gravar_atomico(os.path.join(pasta_config, "WiimoteNew.ini"),
                        "\n".join(cabecalho + wiimote) + "\n")
 
-        imagem = opcoes_de_imagem_dolphin(nota, nota_gpu, modesto, ultra, preset)
+        imagem = opcoes_de_imagem_dolphin(nota, nota_gpu, modesto, ultra, preset, abaixo)
         imagem["Dolphin.ini"].setdefault("Core", {}).update(portas)
         _anotar_ou_devolver_ultra_dolphin(pasta_config, ultra, imagem["Dolphin.ini"])
         for nome_arquivo, secoes in imagem.items():
@@ -1951,7 +2031,7 @@ def _trocar_valor_yaml(texto, secao, chave, valor):
 
 
 def escrever_config_rpcs3(caminho_executavel, nota, nota_gpu=None, modesto=False,
-                          ultra=False, preset=None):
+                          ultra=False, preset=None, abaixo=""):
     """Escreve o bloco de video do RPCS3 (PlayStation 3), preservando o resto.
 
     Mesma logica do Xenia: so mexe se o RPCS3 ja criou o config.yml dele
@@ -2003,6 +2083,16 @@ def escrever_config_rpcs3(caminho_executavel, nota, nota_gpu=None, modesto=False
             "Frame limit": "Auto",
         }
     video["VSync Mode"] = "Disabled"  # o RetroArch e o Xenia ja cuidam disso melhor
+    # Abaixo do original (02/10/2026): o PS3 desenhado a 50% (leve) ou 25%
+    # (minimo) dos 720p dele -- o RPCS3 aceita de 25 a 800 (system_config.h,
+    # cfg::uint<25, 800>) -- e a contagem de pixels escondidos (ZCULL)
+    # relaxada. Fora disso, os padroes do RPCS3, para a volta valer.
+    niveis = niveis_abaixo_ate(abaixo)
+    if niveis:
+        video.update({"Resolution Scale": "25" if "minimo" in niveis else "50",
+                      "Anisotropic Filter Override": "0", "MSAA": "Disabled"})
+    video["Relaxed ZCULL Sync"] = "true" if niveis else "false"
+    video["Accurate ZCULL stats"] = "false" if niveis else "true"
 
     for chave, valor in video.items():
         texto = _trocar_valor_yaml(texto, "Video", chave, valor)

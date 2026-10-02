@@ -399,8 +399,8 @@ Cada jogo tem uma etiqueta dizendo como vai rodar **no seu computador**:
 | Etiqueta | O que esperar |
 |---|---|
 | **Roda bem** (verde) | Sobra máquina para este console |
-| **Roda com ajustes** (azul) | Roda, com a imagem que o ARENA escolhe para este PC. Se engasgar, ligue o **Gráfico original** |
-| **Pode travar** (vermelho) | O PC está abaixo do que o console pede. Dá para tentar com o Gráfico original e o Ultra desempenho |
+| **Roda com ajustes** (azul) | Roda, com a imagem que o ARENA escolhe para este PC. Se engasgar, escolha o Nível do gráfico **Igual ao console original** |
+| **Pode travar** (vermelho) | O PC está abaixo do que o console pede. Dá para tentar o Nível do gráfico **Abaixo do original** (leve ou mínimo) e o Ultra desempenho. Documento 3 |
 | **Não abre neste PC** (cinza) | Falta algo no processador (ex.: o Xbox 360 exige AVX). Não é configuração. Pare o mouse em cima da etiqueta para ver o motivo |
 
 **"Pode travar" não impede de jogar.** O ARENA só avisa antes, para você não

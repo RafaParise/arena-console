@@ -422,22 +422,20 @@
       <h3 class="grupo-titulo">Computador modesto</h3>
       <p class="explica">
         Mesmo o modo leve deixa a imagem melhor que o console original — e
-        isso pesa. Aqui o jogo roda exatamente na resolução do aparelho de
-        verdade, sem nenhum enfeite.
+        isso pesa. Aqui você escolhe até onde a imagem pode piorar para o
+        jogo rodar. Vale para todos os consoles, inclusive PS2, GameCube,
+        Wii e PS3.
       </p>
       <div class="opcao">
-        <span class="opcao-rotulo">Gráfico igual ao console original</span>
-        <button class="chave opcao-controle" id="chaveModesto"
-                aria-pressed="false" aria-label="Modo computador modesto"></button>
-        <span class="opcao-ajuda">
-          Ligue se o jogo trava mesmo no modo Desempenho. É o mais leve que
-          existe.
-        </span>
+        <span class="opcao-rotulo">Nível do gráfico</span>
+        <select class="opcao-controle" id="listaNivelGrafico" aria-label="Nível do gráfico">
+          <option value="normal">Normal (o ARENA escolhe pela máquina)</option>
+          <option value="original">Igual ao console original</option>
+          <option value="leve">Abaixo do original: leve</option>
+          <option value="minimo">Abaixo do original: mínimo (bonecos de papelão)</option>
+        </select>
       </div>
-      <p class="explica">
-        No PlayStation vira 1x com desenho por processador; no PSP, 480×272;
-        no Nintendo 64, resolução nativa.
-      </p>
+      <p class="explica" id="explicaNivelGrafico"></p>
     </div>
 
     <div>
