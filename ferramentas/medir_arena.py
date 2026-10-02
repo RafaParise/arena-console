@@ -673,6 +673,24 @@ def medir_jogo(dados):
         # "Game FPS > Monitor FPS": o jogo quer um pouco mais de 60 quadros
         # que o monitor mostra. Normal no SNES (60,10); anotado para leitura.
         resultado["jogo_mais_rapido_que_o_monitor"] = "Game FPS > Monitor FPS" in texto
+        # FPS abaixo do piso: e' a maquina ou a SAIDA DE SOM? Achado de
+        # 02/10/2026 neste Ryzen: 52 FPS e 22% de variacao com o som num
+        # headset sem fio (desligado de madrugada) -- o RetroArch segue o
+        # ritmo em que a placa de som consome o audio, e o receptor do
+        # headset consumia devagar. Sem a sincronia pelo som: 60,1 FPS. Mede
+        # de novo assim (so quando sai baixo) e anota qual dos dois foi.
+        if resultado["fps_medio"] < TETOS["6a"]["teto"]:
+            sem_som_cfg = os.path.join(temp, "medicao_sem_sincronia_do_som.cfg")
+            with open(extra_cfg, encoding="utf-8") as origem, open(sem_som_cfg, "w", encoding="utf-8") as f:
+                f.write(origem.read() + 'audio_sync = "false"\n')
+            curto2, _ = rodar_quadros(core, opcoes_cfg, sem_som_cfg, jogo, QUADROS_CURTO,
+                                      os.path.join(temp, "curto_sem_som.log"))
+            longo2, _ = rodar_quadros(core, opcoes_cfg, sem_som_cfg, jogo, QUADROS_LONGO,
+                                      os.path.join(temp, "longo_sem_som.log"))
+            if longo2 - curto2 >= 30:
+                fps2 = round((QUADROS_LONGO - QUADROS_CURTO) / (longo2 - curto2), 1)
+                resultado["fps_sem_sincronia_pelo_som"] = fps2
+                resultado["som_segura_o_ritmo"] = fps2 >= TETOS["6a"]["teto"]
         dados["jogo"] = resultado
     except Exception as falha:
         dados["jogo"] = falhou(falha)
@@ -960,6 +978,15 @@ def escrever_resumo(d):
             L.append("  janela do jogo a frente em %d%% do tempo%s" % (
                 frente, "" if frente >= 90 else
                 "  ! coberta parte do tempo: o FPS e a variacao podem estar piores que o real"))
+        if "fps_sem_sincronia_pelo_som" in j:
+            if j.get("som_segura_o_ritmo"):
+                L.append("  ! sem seguir o ritmo da saida de SOM: %s quadros por segundo. Quem segurou o jogo"
+                         % _br(j["fps_sem_sincronia_pelo_som"]))
+                L.append("    foi a saida de som (fone sem fio desligado ou dormindo? troque a saida"
+                         " no icone de som do Windows), nao o processador.")
+            else:
+                L.append("  sem seguir o ritmo da saida de som: %s quadros por segundo (nao e' o som)"
+                         % _br(j["fps_sem_sincronia_pelo_som"]))
         L.append("  RetroArch: CPU media %s%% da maquina (pico %s%%), RAM %s MB, abriu em %s s, video %s" % (
             _br(j.get("cpu_media_pct_da_maquina", "?")), _br(j.get("cpu_pico_pct_da_maquina", "?")),
             _br(j.get("ram_pico_mb", "?")), _br(j["tempo_de_abrir_s"]), j.get("driver_de_video", "?")))

@@ -274,13 +274,38 @@ janela visível, na tomada — seção 8).
 - **Resposta sob carga** (pior 5%: 124,6 ms). Folgada hoje; não precisa de
   teto por enquanto.
 
-### Como o teste automático vai usar isto (tarefas 3 e 4)
+### Como o teste automático usa isto (tarefas 3 e 4 — feitas em 02/10/2026)
 
 Os tetos estão em números **do Celeron**. O modo alvo roda no Ryzen, cujo
-núcleo é 2,3 vezes mais forte, então lá os valores saem menores. A tarefa 3
-vai propor como converter (limitar também a velocidade do processador, ou
-calibrar um fator por item medindo as duas máquinas) para o teste não
-passar só porque o Ryzen é forte.
+núcleo é 2,3 vezes mais forte. Como ficou:
+
+- **Modo alvo** (`ferramentas\modo_alvo.py`): o ARENA, e tudo o que ele abrir,
+  dentro de uma "caixa" do Windows (Job Object, documentação oficial da
+  Microsoft, sem administrador): **2 processadores**, teto de processador
+  (cada um a ~43% do Ryzen), **3,8 GB** de memória para tudo e prioridade
+  abaixo do normal. Medido: trabalho de um núcleo fica ~1,7× mais lento (o
+  Celeron é ~2,3×) — é aproximação. **Não imita:** disco lento, placa de
+  vídeo fraca, falta de AVX, o Windows de lá. Uso: `servidor\python\python.exe
+  ferramentas\modo_alvo.py` abre o ARENA na caixa.
+- **Teste que reprova** (`testes\teste_orcamentos_modo_alvo.py`, também no
+  `RODAR_TESTES.bat`, e na rodada completa): roda as mesmas medições do
+  COLETAR dentro da caixa e mostra a tabela medido × teto. O item 3
+  (processador parado) é multiplicado por 2,3 antes de comparar (a caixa
+  deixa o trabalho mais lento, não mais caro). **Não vale** (e não reprova):
+  janela do jogo coberta, notebook na bateria, e — achado de 02/10 — a
+  **saída de som segurando o ritmo**: com um headset sem fio desligado, o
+  SNES deu 52 FPS e 22% de variação; sem seguir o som, 60. O COLETAR agora
+  mede de novo sem a sincronia pelo som quando o FPS sai baixo e diz qual
+  dos dois foi.
+- **Primeiro resultado (02/10/2026):** reprovou a memória do servidor (64,4 MB,
+  teto 64). Causa: o índice de títulos de fliperama criado no mesmo dia (+13
+  MB). Consertado (busca direta no banco, bancos soltos depois da lista):
+  43,9 MB. Depois: nenhum orçamento estourado.
+
+**O que mudou na régua do projeto:** ela deixou de depender só da coleta na
+escola — toda mudança agora pode ser medida aqui, com os limites do
+notebook-alvo, por um teste que reprova sozinho e aponta o orçamento
+estourado (e diz quando a medida não vale).
 
 ---
 

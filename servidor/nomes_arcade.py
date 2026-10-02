@@ -108,7 +108,6 @@ def _carregar(nome_rdb):
     # Banco novo (o RetroArch atualizou): o indice velho nao vale mais.
     _indices.pop(nome_rdb, None)
     _consultas.pop(nome_rdb, None)
-    _titulos.pop(nome_rdb, None)
     return dados
 
 
@@ -214,7 +213,6 @@ RE_PARENTESES = re.compile(r"\s*[\(\[][^\)\]]*[\)\]]")
 _RE_NAO_ALFANUMERICO = re.compile(r"[^a-z0-9]+")
 # Copia que nao e' o jogo original: na duvida entre parecidos, fica o original.
 _COPIAS = ("bootleg", "hack", "prototype", "demo", "alt", "set 2", "set 3")
-_titulos = {}         # nome do .rdb -> ({titulo normalizado: [(rom, nome)]}, [(rom, nome, palavras)])
 
 
 def _normalizar(nome):
@@ -241,39 +239,57 @@ def romset_pelo_titulo(titulo, nucleo):
         mesmas palavras ("Metal Slug X" -> "Metal Slug X - Super
         Vehicle-001"), este como palpite ('exato' False);
       - entre os parecidos, fica o original: sem "bootleg"/"hack" no nome,
-        o igual antes do palpite, e o nome curto mais curto."""
-    alvo = _normalizar(titulo)
+        o igual antes do palpite, e o nome curto mais curto.
+    Uma busca so no banco, sem guardar indice: a primeira versao guardava os
+    37 mil titulos do MAME e custava 13 MB ao servidor -- o orcamento de
+    memoria do notebook-alvo estourou no modo alvo (02/10/2026)."""
     palavras = _palavras(titulo)
+    alvo = "".join(palavras)
     if not alvo:
         return None, False
+    # O inicio do "name" no banco com as mesmas palavras, sem diferenciar
+    # maiuscula; entre as palavras, qualquer pontuacao ou espaco.
+    padrao = re.compile(rb"\xa4name(?:[\xa0-\xbf]|\xd9.)" + rb"[^a-z0-9]*".join(
+        re.escape(p.encode("utf-8")) for p in palavras) + rb"(?![a-z0-9])", re.I | re.S)
     with _trava:
         for nome_rdb in BANCOS.get(nucleo, BANCOS["fbneo"]):
             try:
                 dados = _carregar(nome_rdb)
                 if not dados:
                     continue
-                if nome_rdb not in _titulos:
-                    if nome_rdb not in _indices:
-                        _indices[nome_rdb] = _indexar(dados)
-                    por_titulo, lista = {}, []
-                    for rom, nome in _indices[nome_rdb].items():
-                        if nome and rom.lower().endswith(".zip"):
-                            por_titulo.setdefault(_normalizar(nome), []).append((rom, nome))
-                            lista.append((rom, nome, _palavras(nome)))
-                    _titulos[nome_rdb] = (por_titulo, lista)
-                por_titulo, lista = _titulos[nome_rdb]
+                candidatos = []
+                for achado in padrao.finditer(dados):
+                    nome, fim_nome = _ler_texto(dados, achado.start() + len(_CHAVE_NOME))
+                    if not nome:
+                        continue
+                    posicao = dados.find(_CHAVE_ROM, fim_nome, fim_nome + 4096)
+                    if posicao == -1:
+                        continue
+                    rom, _depois = _ler_texto(dados, posicao + len(_CHAVE_ROM))
+                    # O rom_name tem de ser do MESMO registro (a mesma conta
+                    # da busca pelo romset, de tras para frente).
+                    if not rom or not rom.lower().endswith(".zip") or _procurar_em(dados, posicao, rom) != nome:
+                        continue
+                    candidatos.append((rom, nome, _normalizar(nome) == alvo))
             except (IndexError, ValueError, struct.error, UnicodeError):
                 continue
-            candidatos = [(rom, nome, True) for rom, nome in por_titulo.get(alvo, [])]
-            if len(palavras) >= 2:
-                candidatos += [(rom, nome, False) for rom, nome, suas in lista
-                               if suas[:len(palavras)] == palavras and _normalizar(nome) != alvo]
             if candidatos:
                 candidatos.sort(key=lambda c: (any(x in c[1].lower() for x in _COPIAS), not c[2],
                                                len(c[0]), c[0]))
                 rom, _nome, exato = candidatos[0]
                 return os.path.splitext(rom)[0], exato
     return None, False
+
+
+def liberar():
+    """Solta os bancos da memoria (7,8 MB) e os indices; fica so o que ja
+    foi respondido. A lista de jogos chama no fim de cada montagem: o banco
+    so e' preciso enquanto ela procura os nomes (orcamento de memoria do
+    notebook-alvo, 02/10/2026). Na proxima montagem, le de novo do disco."""
+    with _trava:
+        _cache.clear()
+        _indices.clear()
+        _consultas.clear()
 
 
 def titulo_para_a_tela(nome):

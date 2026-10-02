@@ -878,11 +878,17 @@ def indexar(forcar=False):
     manuais = ler_manuais()
     regras = jogadores.ler(arquivo_de_jogadores())
     jogos = []
-    for origem in ORIGENS:
-        jogos.extend(
-            varrer_pasta(os.path.join(PASTA_JOGOS, origem), origem,
-                         por_extensao, por_id, manuais, regras)
-        )
+    try:
+        for origem in ORIGENS:
+            jogos.extend(
+                varrer_pasta(os.path.join(PASTA_JOGOS, origem), origem,
+                             por_extensao, por_id, manuais, regras)
+            )
+    finally:
+        # Os bancos de nomes de fliperama (7,8 MB) so servem enquanto a lista
+        # procura os nomes: soltos aqui, o servidor volta a caber no
+        # orcamento de memoria do notebook-alvo (02/10/2026).
+        nomes_arcade.liberar()
 
     # Primeira vez: cria o dados\jogadores.txt com os jogos da pasta e o
     # numero que cada um aceitava ate aqui (nada muda para ninguem).
