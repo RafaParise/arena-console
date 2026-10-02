@@ -3152,6 +3152,37 @@ async function carregarAcervo() {
 let atrasoBiblioteca = null;
 let atrasoAcervo = null;
 
+// Capas de todos os jogos que estão sem (pedido do Rafael, 02/10/2026). O
+// servidor busca em segundo plano; a tela só acompanha. Clicar de novo para.
+async function buscarCapasQueFaltam() {
+  const botao = $("#btnBuscarCapas");
+  if (estado.buscandoCapas) {
+    try { await pedir("/api/capas/parar", "POST", {}); } catch (falha) { /* já acabou */ }
+    return;
+  }
+  estado.buscandoCapas = true;
+  botao.textContent = "Parar a busca de capas";
+  try {
+    let situacao = await pedir("/api/capas/buscar-faltando", "POST", {});
+    while (situacao.rodando) {
+      const conta = situacao.total
+        ? ` ${situacao.feitos} de ${situacao.total} (${situacao.achados} achada(s))` : "";
+      recado(`Buscando capas…${conta}${situacao.atual ? " — " + situacao.atual : ""}`, false, 2500);
+      await new Promise((pronto) => setTimeout(pronto, 1000));
+      situacao = await pedir("/api/capas/progresso");
+    }
+    await carregarCatalogo();
+    recado(situacao.total
+      ? `Capas: achei ${situacao.achados} das ${situacao.total} que faltavam.`
+      : "Todos os jogos já têm capa.");
+  } catch (falha) {
+    recado(falha.message, true);
+  } finally {
+    estado.buscandoCapas = false;
+    botao.textContent = "Buscar capas que faltam";
+  }
+}
+
 async function carregarBibliotecaOnline() {
   const consulta = $("#campoBuscaOnline").value.trim();
   const lista = $("#listaBibliotecaOnline");
@@ -3357,6 +3388,7 @@ function ligarEventos() {
     }
   });
 
+  $("#btnBuscarCapas").addEventListener("click", buscarCapasQueFaltam);
   $("#btnAjustes").addEventListener("click", () => abrirGaveta("gavetaAjustes"));
   $("#btnTema").addEventListener("click", async () => {
     const tema = estado.config.tema === "escuro" ? "claro" : "escuro";
@@ -3391,9 +3423,9 @@ function ligarEventos() {
     if (!jogo) return;
     recado("Procurando capa…");
     try {
-      await pedir("/api/capa/atualizar", "POST", { jogo_id: jogo.id });
+      const resposta = await pedir("/api/capa/atualizar", "POST", { jogo_id: jogo.id });
       await carregarCatalogo();
-      recado("Capa encontrada!");
+      recado(resposta.fonte ? `Capa encontrada: ${resposta.fonte}.` : "Capa encontrada!");
     } catch (falha) {
       recado(falha.message, true);
     }

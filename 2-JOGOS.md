@@ -32,6 +32,15 @@ jogos\pessoais\PS1\Twisted Metal 2.chd
 jogos\pessoais\PS1\capas\Twisted Metal 2.png
 ```
 
+Se o jogo está **sozinho numa pasta dele** (o jeito comum de jogo de PS3 e
+Xbox 360), uma imagem chamada `Cover`, `folder`, `boxart`, `capa` ou
+`front` nessa pasta também vale:
+
+```
+jogos\pessoais\XBOX360\Gears Of War - Judgment\Gears of War Judgment.iso
+jogos\pessoais\XBOX360\Gears Of War - Judgment\Cover.jpg
+```
+
 Sem capa, aparecem as duas primeiras letras do título. Não tem limite de
 tamanho de imagem além do bom senso: a sua capa fica como está. Para a
 lista abrir leve, na primeira vez que uma capa aparece o próprio navegador
@@ -41,14 +50,26 @@ capas que estão perto da tela. Medido: a lista passou de 21 MB para menos
 de 1 MB ao abrir. Pode apagar `dados\miniaturas` quando quiser; ela se
 refaz sozinha.
 
-**Buscar automático:** com o jogo selecionado, o painel de detalhes tem
-os botões **Buscar capa** (procura no banco de miniaturas do próprio
-RetroArch — libretro-thumbnails — o mesmo que o RetroArch usa no
-Atualizador Online dele; precisa de internet) e **Enviar capa** (escolhe
-um arquivo do computador na hora, sem precisar navegar até a pasta).
-Cobre bem os consoles emulados pelo RetroArch (SNES, N64, Mega Drive,
-PS1, Dreamcast, Neo Geo, PSP, entre outros); PS2, PS3 e Xbox 360 não têm
-banco de capas bom nessa fonte — para esses, o jeito é enviar manual.
+**Buscar automático:** o botão **Buscar capas que faltam** (embaixo de
+"Atualizar lista") procura a capa de **todos** os jogos que estão sem, de
+uma vez; clicar de novo para. Com um jogo selecionado, o painel de
+detalhes tem **Buscar capa** (só aquele) e **Enviar capa** (escolhe um
+arquivo do computador na hora).
+
+De onde a capa vem:
+
+| Console | Fonte |
+|---|---|
+| Quase todos (NES ao PS2, fliperama, MSX, Amiga, DOS...) | O banco de capas do próprio RetroArch (libretro-thumbnails, o do Atualizador Online dele). O ARENA baixa a lista do console e acha o jogo pelo nome **parecido**, na região do arquivo |
+| PS3 e PSP | Se o banco não tiver: o **ícone que vem dentro do disco** (`.iso`). Funciona **sem internet** |
+| Xbox 360 | Se o banco não tiver: a capa oficial do servidor do Xbox 360 (Microsoft), pelo código do jogo que fica no disco |
+| GameCube e Wii | Se o banco não tiver: o GameTDB, de onde o próprio Dolphin baixa as capas, pelo código do disco |
+| Uzebox, Tamagotchi e Java ME | Não existe banco: só a capa que você colocar |
+
+Precisa de internet (menos o ícone do PS3/PSP). A lista de capas de cada
+console fica guardada por 30 dias em `retroarch\thumbnails`, então a
+segunda busca é bem mais rápida. Em teste com os jogos da pasta do
+professor, a busca achou 68 das 78 capas que faltavam.
 
 ### Parte A — Adicionar jogos
 

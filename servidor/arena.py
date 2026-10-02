@@ -1973,6 +1973,50 @@ def limpar_caches():
         _cache["resposta"] = (0.0, None)
 
 
+# Capas para todos os jogos sem capa (botao "Buscar capas que faltam",
+# pedido do Rafael em 02/10/2026). Uma busca por vez, em segundo plano; a
+# lista e' refeita UMA vez, no fim (refazer a cada capa custava segundos
+# cada uma no notebook-alvo).
+BUSCA_DE_CAPAS = {"rodando": False, "total": 0, "feitos": 0, "achados": 0, "atual": "", "parar": False}
+TRAVA_CAPAS = threading.Lock()
+
+
+def situacao_das_capas():
+    with TRAVA_CAPAS:
+        return dict(BUSCA_DE_CAPAS)
+
+
+def buscar_capas_que_faltam():
+    """Tenta a capa de cada jogo que nao tem (roda em segundo plano)."""
+    try:
+        jogos = [j for j in manifesto().get("jogos", []) if not j.get("capas")]
+        with TRAVA_CAPAS:
+            BUSCA_DE_CAPAS.update(total=len(jogos), feitos=0, achados=0)
+        for jogo in jogos:
+            with TRAVA_CAPAS:
+                if BUSCA_DE_CAPAS["parar"]:
+                    break
+                BUSCA_DE_CAPAS["atual"] = jogo["titulo"]
+            nome_base = (jogo.get("nome_banco")
+                         or os.path.splitext(os.path.basename(jogo["arquivo"]))[0])
+            try:
+                achou, _motivo = capas_online.buscar_e_baixar(
+                    jogo["plataforma"], jogo["titulo"], nome_base,
+                    caminho_jogo=os.path.join(RAIZ, jogo["arquivo"]),
+                    com_internet=bool(VIGIA["internet"]))
+            except Exception:     # um jogo estranho nao para a busca dos outros
+                achou = False
+            with TRAVA_CAPAS:
+                BUSCA_DE_CAPAS["feitos"] += 1
+                BUSCA_DE_CAPAS["achados"] += 1 if achou else 0
+        if situacao_das_capas()["achados"]:
+            limpar_caches()
+            manifesto(forcar=True)
+    finally:
+        with TRAVA_CAPAS:
+            BUSCA_DE_CAPAS.update(rodando=False, atual="", parar=False)
+
+
 def achar_jogo(jogo_id):
     return next((j for j in manifesto()["jogos"] if j["id"] == jogo_id), None)
 
@@ -4119,6 +4163,9 @@ class Manipulador(BaseHTTPRequestHandler):
             return self.responder_json(marca)
 
         # ---- acervo de jogos livres ---------------------------------------
+        if caminho == "/api/capas/progresso":
+            return self.responder_json(dict(ok=True, **situacao_das_capas()))
+
         if caminho == "/api/acervo":
             return self.responder_json({
                 "itens": acervo.listar(),
@@ -4898,20 +4945,38 @@ class Manipulador(BaseHTTPRequestHandler):
             if not jogo:
                 return self.erro("Jogo não está no catálogo. Clique em Atualizar lista.", 404)
             if not VIGIA["internet"]:
-                return self.erro("Sem internet agora. Essa busca precisa de conexão.", 503)
+                if jogo.get("plataforma") not in ("ps3", "psp"):
+                    return self.erro("Sem internet agora. Essa busca precisa de conexão.", 503)
 
             # Fliperama: o nome completo do banco ("Metal Slug X - Super
             # Vehicle-001 (NGM-2500)(NGH-2500)") e' o que o banco de capas usa.
             nome_base = (jogo.get("nome_banco")
                          or os.path.splitext(os.path.basename(jogo["arquivo"]))[0])
             ok, motivo = capas_online.buscar_e_baixar(
-                jogo["plataforma"], jogo["titulo"], nome_base)
+                jogo["plataforma"], jogo["titulo"], nome_base,
+                caminho_jogo=os.path.join(RAIZ, jogo["arquivo"]),
+                com_internet=bool(VIGIA["internet"]))
             if not ok:
                 return self.erro(motivo or "Não consegui achar a capa.", 404)
 
             limpar_caches()
             manifesto(forcar=True)
-            return self.responder_json({"ok": True})
+            return self.responder_json({"ok": True, "fonte": motivo or ""})
+
+        if caminho == "/api/capas/buscar-faltando":
+            with TRAVA_CAPAS:
+                ja_rodando = BUSCA_DE_CAPAS["rodando"]
+                if not ja_rodando:
+                    BUSCA_DE_CAPAS.update(rodando=True, parar=False, total=0, feitos=0, achados=0, atual="")
+            if not ja_rodando:
+                threading.Thread(target=buscar_capas_que_faltam, daemon=True).start()
+            return self.responder_json(dict(ok=True, **situacao_das_capas()))
+
+        if caminho == "/api/capas/parar":
+            with TRAVA_CAPAS:
+                if BUSCA_DE_CAPAS["rodando"]:
+                    BUSCA_DE_CAPAS["parar"] = True
+            return self.responder_json(dict(ok=True, **situacao_das_capas()))
 
         if caminho == "/api/capa/enviar":
             jogo = achar_jogo(str(dados.get("jogo_id", "")))

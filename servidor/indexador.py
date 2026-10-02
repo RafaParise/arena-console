@@ -460,14 +460,21 @@ CAPAS_EXTENSOES = (".png", ".jpg", ".jpeg", ".webp")
 PASTA_CAPAS = "capas"
 
 
-def capas_do_jogo(caminho_absoluto, pasta_atual, titulo, nome_banco=None):
-    """Procura a arte do jogo em tres lugares, do mais especifico ao geral.
+# Capa com nome generico que vem dentro da pasta de um jogo (pacote de
+# jogo de PS3 e Xbox 360, por exemplo: "Gears Of War - Judgment\Cover.jpg").
+CAPAS_DA_PASTA = ("cover", "folder", "boxart", "capa", "front")
+
+
+def capas_do_jogo(caminho_absoluto, pasta_atual, titulo, nome_banco=None, sozinho_na_pasta=False):
+    """Procura a arte do jogo em quatro lugares, do mais especifico ao geral.
 
     1. Um arquivo com o MESMO nome do jogo, na mesma pasta:
          Mario Kart 64.z64  ->  Mario Kart 64.png
     2. Uma subpasta 'capas' ao lado:
          capas/Mario Kart 64.png
-    3. As miniaturas que o proprio RetroArch baixa, se existirem.
+    3. Se o jogo esta SOZINHO numa pasta dele: Cover.jpg, folder.png...
+       (02/10/2026: o Gears of War Judgment veio assim e ficava sem capa).
+    4. As miniaturas que o proprio RetroArch baixa, se existirem.
 
     Devolve caminhos que a tela pede ao servidor, nunca ao disco direto.
     """
@@ -479,6 +486,16 @@ def capas_do_jogo(caminho_absoluto, pasta_atual, titulo, nome_banco=None):
             candidato = os.path.join(onde, base + extensao)
             if os.path.isfile(candidato):
                 achados.append(candidato)
+    if sozinho_na_pasta and not achados:
+        try:
+            nomes = {nome.casefold(): nome for nome in os.listdir(pasta_atual)}
+        except OSError:
+            nomes = {}
+        for generico in CAPAS_DA_PASTA:
+            nome = next((nomes[generico + e] for e in CAPAS_EXTENSOES if generico + e in nomes), None)
+            if nome:
+                achados.append(os.path.join(pasta_atual, nome))
+                break
 
     # Miniatura do RetroArch: thumbnails/<sistema>/Named_Boxarts/<titulo>.png
     # Fliperama: o RetroArch nomeia pelo nome COMPLETO do banco ("Metal Slug
@@ -489,16 +506,26 @@ def capas_do_jogo(caminho_absoluto, pasta_atual, titulo, nome_banco=None):
         nomes.append(re.sub(r'[&*/:`<>?\\|"]', "_", nome_banco))
     miniaturas = os.path.join(RAIZ, "retroarch", "thumbnails")
     if os.path.isdir(miniaturas):
+        # .jpg tambem: a capa oficial do Xbox 360 vem assim (02/10/2026).
         for sistema in os.listdir(miniaturas):
-            arte = next((os.path.join(miniaturas, sistema, "Named_Boxarts", n + ".png")
-                         for n in nomes
-                         if os.path.isfile(os.path.join(miniaturas, sistema, "Named_Boxarts", n + ".png"))),
+            arte = next((os.path.join(miniaturas, sistema, "Named_Boxarts", n + extensao)
+                         for n in nomes for extensao in (".png", ".jpg")
+                         if os.path.isfile(os.path.join(miniaturas, sistema, "Named_Boxarts", n + extensao))),
                         None)
             if arte:
                 achados.append(arte)
                 break
 
     return [os.path.relpath(a, RAIZ).replace("\\", "/") for a in achados[:3]]
+
+
+def sozinho_na_pasta(pasta_atual, caminho_pasta, nome_arquivo, arquivos):
+    """O jogo esta numa pasta SO DELE (abaixo da pasta do console, sem outro
+    arquivo do mesmo tipo)? So ai a Cover.jpg generica e' dele."""
+    if os.path.normcase(os.path.abspath(pasta_atual)) == os.path.normcase(os.path.abspath(caminho_pasta)):
+        return False
+    extensao = os.path.splitext(nome_arquivo)[1].lower()
+    return sum(1 for nome in arquivos if nome.lower().endswith(extensao)) == 1
 
 
 def ler_manuais():
@@ -814,7 +841,9 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None,
                 "sugestao": sugestao,
                 # Artes encontradas na pasta. A tela usa a primeira que
                 # carregar; sem nenhuma, ela desenha as iniciais do titulo.
-                "capas": capas_do_jogo(caminho_absoluto, pasta_atual, titulo, nome_banco),
+                "capas": capas_do_jogo(caminho_absoluto, pasta_atual, titulo, nome_banco,
+                                       sozinho_na_pasta=sozinho_na_pasta(pasta_atual, caminho_pasta,
+                                                                         nome_arquivo, arquivos)),
                 # Fliperama: o nome curto do arquivo e o nome completo do
                 # banco (a busca de capa usa o completo).
                 "romset": romset,

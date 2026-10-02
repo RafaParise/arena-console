@@ -46,7 +46,7 @@ PROGRAMA = [
     # ARENA nem abre. servidor\tests\test_janela_preta.py confere esta
     # lista contra o que o arena.py importa de verdade.
     "servidor/integridade.py", "servidor/janela_preta.py", "servidor/jogadores.py",
-    "servidor/nomes_arcade.py", "servidor/processos.py",
+    "servidor/nomes_arcade.py", "servidor/processos.py", "servidor/capas_do_disco.py",
     "servidor/consoles.json", "servidor/graficos.json", "servidor/recursos.json",
     "servidor/perfis_controle.json",
 ]
