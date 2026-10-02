@@ -67,12 +67,20 @@ ARENA entra nelas.
 
 #### Biblioteca online
 
-Em **Ajustes → Biblioteca** dá para buscar e baixar direto para
-`jogos\livres`, sem precisar copiar nada na mão. A busca só olha
-coleções do Internet Archive com curadoria de verdade e licença livre
-confirmada (hoje: shareware de MS-DOS) — não é a internet inteira, é só
-o que pode ser distribuído sem problema nenhum. Precisa de internet;
-sem ela, o acervo que já está na pasta continua funcionando normal.
+No botão **Biblioteca** (no topo) dá para buscar e baixar sem copiar nada
+na mão. A busca só olha coleções do Internet Archive com curadoria de
+verdade e licença livre confirmada — hoje, **shareware de MS-DOS** (jogos
+que os autores deixaram distribuir de graça, como Commander Keen e Jazz
+Jackrabbit). Não é a internet inteira: é só o que pode ser distribuído sem
+problema nenhum.
+
+- A busca é **pelo nome do jogo**: todas as palavras precisam estar no nome.
+- O jogo baixado vai para `jogos\livres\MS-DOS` e já aparece como MS-DOS.
+- **Mario, Sonic, Pokémon** e outros jogos de empresas **não estão lá**:
+  eles não são livres. Procurar "Mario" traz só jogos de DOS que têm Mario
+  no nome. Se você tem o jogo, veja "Colocar um jogo seu" (abaixo).
+- Precisa de internet; sem ela, os jogos que já estão na pasta continuam
+  funcionando normal.
 
 #### Passo 3 — Atualize a lista
 

@@ -18,7 +18,7 @@ RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(RAIZ, "servidor"))
 import internet_archive  # noqa: E402
 
-PASTA_BAIXADA = os.path.join(RAIZ, "jogos", "livres", "Internet Archive")
+PASTA_BAIXADA = os.path.join(RAIZ, "jogos", "livres", "MS-DOS")   # desde 02/10/2026 (era "Internet Archive")
 
 
 def arquivos_baixados():

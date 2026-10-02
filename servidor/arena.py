@@ -4130,13 +4130,15 @@ class Manipulador(BaseHTTPRequestHandler):
                 urllib.parse.urlparse(self.path).query)
             consulta = (parametros.get("q") or [""])[0].strip()
             if len(consulta) < 2:
-                return self.responder_json({"itens": []})
+                return self.responder_json({"itens": [],
+                                            "consoles": internet_archive.consoles_da_biblioteca()})
             if not VIGIA["internet"]:
                 return self.erro("Sem internet agora. A busca online precisa "
                                  "de conexão; o acervo local continua "
                                  "funcionando.", 503)
             try:
-                return self.responder_json({"itens": internet_archive.buscar(consulta)})
+                return self.responder_json({"itens": internet_archive.buscar(consulta),
+                                            "consoles": internet_archive.consoles_da_biblioteca()})
             except Exception as falha:
                 return self.erro(traduzir_erro_do_sistema(falha, "pesquisar"), 502)
 

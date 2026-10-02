@@ -83,7 +83,7 @@ def main():
         except ValueError as e:
             print("OK, recusado:", e)
             caso2_ok = "sha-1" in str(e).lower() or "seguranca" in str(e).lower()
-        alvo_final = os.path.join(destino_livres, "Internet Archive", "jogo.zip")
+        alvo_final = os.path.join(destino_livres, "MS-DOS", "jogo.zip")   # a pasta do console da colecao (02/10/2026)
         caso2_sem_arquivo = not os.path.isfile(alvo_final)
         print("Arquivo NAO instalado (esperado):", caso2_sem_arquivo)
 

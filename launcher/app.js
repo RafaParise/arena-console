@@ -3165,6 +3165,8 @@ async function carregarBibliotecaOnline() {
   try {
     const dados = await pedir("/api/biblioteca-online?q=" + encodeURIComponent(consulta));
     const itens = dados.itens || [];
+    const consoles = (dados.consoles || []).join(", ") || "MS-DOS";
+    $("#consolesDaBiblioteca").textContent = consoles;
     const lote = document.createDocumentFragment();
     for (const item of itens) {
       const linha = document.createElement("li");
@@ -3212,9 +3214,15 @@ async function carregarBibliotecaOnline() {
       lote.append(linha);
     }
     lista.replaceChildren(lote);
+    // Achado de 02/10/2026: o Rafael procurou "Mario" para o Super Nintendo
+    // e voltou "um monte de coisa aleatória" (a busca olhava a descrição).
+    // Agora a busca é só no nome, e o vazio explica o porquê.
     status.textContent = itens.length
-      ? `${itens.length} jogo(s) encontrado(s).`
-      : "Nenhum jogo autorizado encontrado com esse nome.";
+      ? `${itens.length} jogo(s) encontrado(s), todos com "${consulta}" no nome.`
+      : `Nenhum jogo livre com "${consulta}" no nome. A biblioteca online só tem jogos de ` +
+        `${consoles} que os autores deixam distribuir de graça. Mario, Sonic, Pokémon e outros ` +
+        "jogos de empresas não são livres: se você tem o jogo, veja como colocar no ARENA " +
+        "(Ajustes → Jogos → Como colocar jogos, ou o documento 2-JOGOS).";
   } catch (falha) {
     status.textContent = "A biblioteca online está indisponível no momento.";
     recado(falha.message, true);

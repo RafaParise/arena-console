@@ -36,9 +36,14 @@ HOST = "archive.org"
 # propria curadoria "Software Library" do Internet Archive, confirmada
 # uma por uma - por isso comeca curta. Nunca "mediatype:software"
 # sozinho, que pega qualquer coisa.
-COLECOES_LIVRES = (
-    "softwarelibrary_msdos_shareware",
-)
+#
+# Cada colecao diz o console dos jogos dela e a PASTA onde o jogo baixado
+# fica. Achado de 02/10/2026: tudo ia para jogos\livres\Internet Archive,
+# e la um .zip de DOS virava "Precisa escolher o console" -- o indexador
+# decide o console pela pasta ("a pasta manda"), e a pasta nao dizia nada.
+COLECOES_LIVRES = {
+    "softwarelibrary_msdos_shareware": {"plataforma": "dos", "nome": "MS-DOS", "pasta": "MS-DOS"},
+}
 
 LIMITE = 4 * 1024 * 1024 * 1024
 EXTENSOES = (".zip", ".7z", ".lha", ".gz", ".exe", ".com", ".dsk", ".img", ".iso")
@@ -59,13 +64,38 @@ def _texto(valor):
 
 
 def _colecao_permitida(meta):
-    """Confere se o item pertence a uma das colecoes livres - a mesma
-    checagem vale na busca (query) e de novo aqui, na hora de instalar,
-    pra ninguem baixar um item que so apareceu buscando errado."""
+    """A colecao livre a que o item pertence (o nome dela), ou None. A
+    mesma checagem vale na busca (query) e de novo aqui, na hora de
+    instalar, pra ninguem baixar um item que so apareceu buscando errado."""
     colecoes = meta.get("metadata", {}).get("collection", [])
     if isinstance(colecoes, str):
         colecoes = [colecoes]
-    return any(c in COLECOES_LIVRES for c in colecoes)
+    return next((c for c in colecoes if c in COLECOES_LIVRES), None)
+
+
+def consoles_da_biblioteca():
+    """Os consoles que a busca online cobre hoje (para a tela dizer)."""
+    vistos = []
+    for info in COLECOES_LIVRES.values():
+        if info["nome"] not in vistos:
+            vistos.append(info["nome"])
+    return vistos
+
+
+def palavras_da_busca(consulta):
+    """As palavras que o titulo do jogo precisa ter (no maximo 6), em
+    minusculas: "OR", "AND" e "NOT" so viram comando da busca do Internet
+    Archive em maiusculas -- assim nada que o aluno digita vira comando."""
+    return [p.lower() for p in re.findall(r"\w+", str(consulta or ""), flags=re.UNICODE)[:6]]
+
+
+def consulta_do_archive(palavras, colecoes):
+    """O texto de busca do Internet Archive: so dentro das colecoes livres e
+    so no TITULO, com TODAS as palavras. Achado de 02/10/2026 (Rafael
+    procurou "Mario"): a busca tambem olhava a descricao, e voltava jogo de
+    DOS que so citava o Mario no texto -- "um monte de coisa aleatoria"."""
+    filtro_colecoes = " OR ".join("collection:%s" % c for c in colecoes)
+    return "(%s) AND title:(%s)" % (filtro_colecoes, " AND ".join(palavras))
 
 
 def _arquivo(meta):
@@ -89,13 +119,12 @@ def buscar(consulta):
     consulta = str(consulta or "").strip()
     if len(consulta) < 2:
         return []
-    termo = re.sub(r'[^\w .+\-]', " ", consulta, flags=re.UNICODE).strip()[:80]
-    if not termo:
+    palavras = palavras_da_busca(consulta[:80])
+    if not palavras:
         return []
 
-    filtro_colecoes = " OR ".join("collection:%s" % c for c in COLECOES_LIVRES)
     parametros = urllib.parse.urlencode([
-        ("q", '(%s) AND (title:"%s" OR description:"%s")' % (filtro_colecoes, termo, termo)),
+        ("q", consulta_do_archive(palavras, COLECOES_LIVRES)),
         ("fl[]", "identifier"), ("fl[]", "title"), ("fl[]", "description"),
         ("fl[]", "creator"), ("fl[]", "collection"), ("rows", "30"), ("output", "json"),
     ])
@@ -112,7 +141,8 @@ def buscar(consulta):
             continue
         try:
             meta = _ler("https://archive.org/metadata/" + urllib.parse.quote(identificador))
-            if not _colecao_permitida(meta):
+            colecao = _colecao_permitida(meta)
+            if not colecao:
                 continue
             arquivo = _arquivo(meta)
             if not arquivo:
@@ -120,9 +150,16 @@ def buscar(consulta):
         except (OSError, ValueError, urllib.error.URLError, subprocess.SubprocessError):
             continue
 
+        titulo = _texto(meta.get("metadata", {}).get("title") or documento.get("title"))[:160]
+        # Confere aqui tambem: toda palavra pedida precisa estar no titulo.
+        if not all(palavra.casefold() in titulo.casefold() for palavra in palavras):
+            continue
+        info = COLECOES_LIVRES[colecao]
         resultado.append({
             "id": identificador,
-            "titulo": _texto(meta.get("metadata", {}).get("title") or documento.get("title"))[:160],
+            "titulo": titulo,
+            "plataforma": info["plataforma"],
+            "plataforma_nome": info["nome"],
             "criador": _texto(meta.get("metadata", {}).get("creator") or documento.get("creator"))[:120],
             "descricao": _texto(meta.get("metadata", {}).get("description"))[:300],
             "arquivo": arquivo[0],
@@ -147,8 +184,10 @@ def instalar(identificador, nome_arquivo, plataforma=""):
             "Não consegui falar com o Internet Archive agora. Confira a "
             "internet e tente de novo.")
 
-    if not _colecao_permitida(meta):
+    colecao = _colecao_permitida(meta)
+    if not colecao:
         raise ValueError("Este item não está numa coleção de distribuição livre.")
+    info = COLECOES_LIVRES[colecao]
 
     arquivo = next((item for item in meta.get("files", [])
                     if str(item.get("name", "")) == str(nome_arquivo)), None)
@@ -164,7 +203,9 @@ def instalar(identificador, nome_arquivo, plataforma=""):
         raise ValueError("Arquivo grande demais para o Arena.")
 
     nome_seguro = re.sub(r"[^A-Za-z0-9._()\- ]", "_", os.path.basename(str(nome_arquivo)))
-    destino = os.path.abspath(os.path.join(PASTA_LIVRES, "Internet Archive", nome_seguro))
+    # Na pasta do console da colecao (jogos\livres\MS-DOS): e' a pasta que
+    # diz o console. O 'plataforma' que vem da tela nao manda aqui.
+    destino = os.path.abspath(os.path.join(PASTA_LIVRES, info["pasta"], nome_seguro))
     livres = os.path.abspath(PASTA_LIVRES)
 
     if os.path.commonpath([destino, livres]) != livres:
@@ -220,4 +261,5 @@ def instalar(identificador, nome_arquivo, plataforma=""):
             except OSError:
                 pass
 
-    return {"titulo": meta.get("metadata", {}).get("title", identificador), "tamanho": tamanho}
+    return {"titulo": meta.get("metadata", {}).get("title", identificador), "tamanho": tamanho,
+            "plataforma_nome": info["nome"]}
