@@ -87,6 +87,25 @@ def main():
                 nomes_arcade._indexar(dados[:len(dados) // 2 + 7]) is not None)
     confere("nome com espaco nao e' romset (nem procura)",
             nomes_arcade.nome_do_romset("Super Mario World (USA).zip", "fbneo") is None)
+
+    # 1b. Nome de TITULO no lugar do romset (02/10/2026: "The King Of
+    # Fighters 2002.zip" na pasta Arcade, e o cartao nao dizia nada).
+    if os.path.isfile(os.path.join(nomes_arcade.PASTA_RDB, "MAME.rdb")):
+        for titulo, nucleo, certo, exato in (
+                ("The King Of Fighters 2002", "mame", "kof2002", True),
+                ("Metal Slug X", "fbneo", "mslugx", False),      # o banco diz "... - Super Vehicle-001"
+                ("Metal Slug", "fbneo", "mslug", False),         # o igual e' um hack: fica o original
+                ("Metal Slug 3", "mame", "mslug3", True),        # e nao "256" (arquivo solto no banco)
+                ("Killer Instinct", "mame", "kinst", True),
+                ("Jogo Que Nao Existe", "mame", None, False)):
+            achado = nomes_arcade.romset_pelo_titulo(titulo, nucleo)
+            confere("titulo '%s' (%s) -> %s" % (titulo, nucleo, certo), achado == (certo, exato), str(achado))
+        aviso = indexador.aviso_de_nome_de_fliperama("The King Of Fighters 2002", ".zip", "mame")
+        confere("o cartao diz o nome certo para renomear",
+                "kof2002.zip" in aviso["texto"] and "MAME" in aviso["texto"], aviso["texto"])
+        aviso = indexador.aviso_de_nome_de_fliperama("Metal Slug X", ".zip", "fbneo")
+        confere("... e avisa quando e' palpite", "mslugx.zip" in aviso["texto"] and "confira" in aviso["texto"],
+                aviso["texto"])
     confere("nucleo de fliperama pelo .dll",
             nomes_arcade.nucleo_de("fbneo_libretro.dll") == "fbneo"
             and nomes_arcade.nucleo_de("mame_libretro.dll") == "mame"
@@ -136,6 +155,18 @@ def main():
         avisos = indexador.avisos_do_romset(os.path.join(arcade, "quebrado.zip"), "quebrado", discos)
         confere("zip corrompido avisa (sem derrubar a lista)",
                 len(avisos) == 1 and "corrompido" in avisos[0]["texto"], str(avisos))
+
+        # 3b. Disco (.chd) de fliperama SEM o .zip do romset ao lado (o Kinst
+        # da pasta do Rafael, 02/10/2026): vira jogo que nao abre, e avisa.
+        por_id, por_extensao = indexador.carregar_plataformas()
+        outra = os.path.join(pasta, "outra")
+        os.makedirs(os.path.join(outra, por_id["arcade"]["pasta"], "kinst"))
+        chd_falso(os.path.join(outra, por_id["arcade"]["pasta"], "kinst", "kinst.chd"), b"cdlz", 90, 2448)
+        jogos = indexador.varrer_pasta(outra, "pessoais", por_extensao, por_id)
+        sozinho = [j for j in jogos if j["arquivo"].lower().endswith("kinst.chd")]
+        confere("disco de fliperama sem o .zip: o cartao diz que falta o kinst.zip",
+                len(sozinho) == 1 and any("kinst.zip" in a["texto"] for a in sozinho[0].get("avisos", [])),
+                str([(j["plataforma"], j.get("avisos")) for j in jogos]))
 
         # 4. Identificador: certeza x palpite.
         todos = ["ps1", "ps2", "psp", "segacd", "saturn", "dreamcast", "gamecube"]

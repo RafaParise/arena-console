@@ -213,8 +213,16 @@ jogadores (`dados\jogadores.txt`), vale escrever o nome completo ou o curto
 | Aviso | O que fazer |
 |---|---|
 | O disco (`.chd`) está dentro de um `.zip` (ex.: `kinst-chd.zip`) | Extraia o `.chd` para a subpasta com o nome do jogo (`Arcade\kinst\kinst.chd`). O emulador não lê disco de dentro de `.zip` |
+| O disco (`.chd`) está sozinho, sem o `.zip` do jogo ao lado | Ponha o `.zip` do romset (ex.: `kinst.zip`) na pasta de cima. O jogo abre pelo `.zip`; o `.chd` é só o disco dele |
+| O emulador não conhece o nome do arquivo (ex.: `The King Of Fighters 2002.zip`) | Renomeie para o nome curto do romset. O aviso já diz qual, procurando o título no banco do RetroArch (ex.: **kof2002.zip**); quando é só um palpite pelo começo do título, ele diz "confira" |
 | Os arquivos estão dentro de uma pasta no `.zip` | Compacte de novo só os arquivos, sem a pasta |
 | O `.zip` está corrompido | Baixe ou copie o jogo de novo |
+| **O arquivo está danificado: a parte X não confere** | Copie o jogo de novo, de uma cópia boa. Foi o caso do Metal Slug X com personagens de cor estranha: uma parte do gráfico dos personagens estava estragada dentro do `.zip`, e o FBNeo abria assim mesmo |
+
+A conferência de "arquivo danificado" descompacta o `.zip` inteiro, então o
+ARENA faz uma vez só por arquivo, em segundo plano, logo depois de abrir
+(e de novo só se você trocar o arquivo). O resultado fica em
+`dados\zips_conferidos.json`.
 
 #### Passo 1 — Criar as pastas
 

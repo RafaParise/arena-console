@@ -108,6 +108,7 @@ def _carregar(nome_rdb):
     # Banco novo (o RetroArch atualizou): o indice velho nao vale mais.
     _indices.pop(nome_rdb, None)
     _consultas.pop(nome_rdb, None)
+    _titulos.pop(nome_rdb, None)
     return dados
 
 
@@ -210,6 +211,69 @@ def nucleo_de(core):
 
 
 RE_PARENTESES = re.compile(r"\s*[\(\[][^\)\]]*[\)\]]")
+_RE_NAO_ALFANUMERICO = re.compile(r"[^a-z0-9]+")
+# Copia que nao e' o jogo original: na duvida entre parecidos, fica o original.
+_COPIAS = ("bootleg", "hack", "prototype", "demo", "alt", "set 2", "set 3")
+_titulos = {}         # nome do .rdb -> ({titulo normalizado: [(rom, nome)]}, [(rom, nome, palavras)])
+
+
+def _normalizar(nome):
+    """'The King of Fighters 2002 (NGM-2650)' -> 'thekingoffighters2002'."""
+    return _RE_NAO_ALFANUMERICO.sub("", titulo_para_a_tela(nome or "").lower())
+
+
+def _palavras(nome):
+    """'Metal Slug X - Super Vehicle-001' -> ['metal', 'slug', 'x', 'super', ...]."""
+    return re.findall(r"[a-z0-9]+", titulo_para_a_tela(nome or "").lower())
+
+
+def romset_pelo_titulo(titulo, nucleo):
+    """(nome curto do romset, exato) pelo TITULO do jogo -- ("kof2002", True)
+    --, ou (None, False).
+
+    Achado de 02/10/2026 (tarefa 7, "o fliperama nao e' reconhecido"): o
+    jogo chega com o nome do titulo ("The King Of Fighters 2002.zip"), e o
+    MAME e o FBNeo so reconhecem o nome curto do romset (kof2002.zip). O
+    titulo e' procurado nos mesmos bancos do RetroArch:
+      - so registros de romset (.zip): o banco do MAME tambem lista arquivos
+        soltos de dentro dos romsets ("256.p2", "201-c4.c4");
+      - vale o titulo igual e tambem o titulo do banco que COMECA com as
+        mesmas palavras ("Metal Slug X" -> "Metal Slug X - Super
+        Vehicle-001"), este como palpite ('exato' False);
+      - entre os parecidos, fica o original: sem "bootleg"/"hack" no nome,
+        o igual antes do palpite, e o nome curto mais curto."""
+    alvo = _normalizar(titulo)
+    palavras = _palavras(titulo)
+    if not alvo:
+        return None, False
+    with _trava:
+        for nome_rdb in BANCOS.get(nucleo, BANCOS["fbneo"]):
+            try:
+                dados = _carregar(nome_rdb)
+                if not dados:
+                    continue
+                if nome_rdb not in _titulos:
+                    if nome_rdb not in _indices:
+                        _indices[nome_rdb] = _indexar(dados)
+                    por_titulo, lista = {}, []
+                    for rom, nome in _indices[nome_rdb].items():
+                        if nome and rom.lower().endswith(".zip"):
+                            por_titulo.setdefault(_normalizar(nome), []).append((rom, nome))
+                            lista.append((rom, nome, _palavras(nome)))
+                    _titulos[nome_rdb] = (por_titulo, lista)
+                por_titulo, lista = _titulos[nome_rdb]
+            except (IndexError, ValueError, struct.error, UnicodeError):
+                continue
+            candidatos = [(rom, nome, True) for rom, nome in por_titulo.get(alvo, [])]
+            if len(palavras) >= 2:
+                candidatos += [(rom, nome, False) for rom, nome, suas in lista
+                               if suas[:len(palavras)] == palavras and _normalizar(nome) != alvo]
+            if candidatos:
+                candidatos.sort(key=lambda c: (any(x in c[1].lower() for x in _COPIAS), not c[2],
+                                               len(c[0]), c[0]))
+                rom, _nome, exato = candidatos[0]
+                return os.path.splitext(rom)[0], exato
+    return None, False
 
 
 def titulo_para_a_tela(nome):

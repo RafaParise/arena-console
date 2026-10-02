@@ -28,6 +28,7 @@ import graficos
 import identificador
 import jogadores
 import nomes_arcade
+import integridade
 import zipfile
 
 # ---------------------------------------------------------------------------
@@ -148,6 +149,22 @@ def agrupar_discos(itens, por_id):
                 "O jogo começa pelo disco 1." if 1 in faltam else
                 "Na hora de trocar de disco, ele não vai estar lá.")})
     return [i for i in itens if id(i) not in sai]
+
+
+def aviso_de_nome_de_fliperama(titulo, extensao, nucleo_arcade):
+    """Fliperama com nome que o emulador nao conhece. Quase sempre e' o nome
+    do titulo no lugar do nome curto do romset; quando o titulo esta no
+    banco do RetroArch, o aviso ja diz o nome certo para renomear."""
+    emulador = "MAME" if nucleo_arcade == "mame" else "FBNeo"
+    certo, exato = nomes_arcade.romset_pelo_titulo(titulo, nucleo_arcade)
+    if certo:
+        return {"texto": "O %s só reconhece o jogo de fliperama pelo nome curto do romset: "
+                         "renomeie este arquivo para %s%s%s." % (
+                             emulador, certo, extensao,
+                             "" if exato else " (o mais provável pelo título; confira)")}
+    return {"texto": "O %s não conhece este nome de arquivo. Jogo de fliperama precisa do nome "
+                     "curto do romset (como mslugx.zip ou kof97.zip), e da mesma versão do "
+                     "emulador." % emulador}
 
 
 def discos_de_fliperama_zipados(pasta_atual, arquivos):
@@ -378,7 +395,7 @@ def arquivo_de_jogadores():
 # (ex.: o jogo de CD em trilhas virar um jogo so) nao valia num ARENA que ja
 # tinha a lista salva, ate alguma pasta mudar. 2 = nomes de fliperama pelos
 # bancos do RetroArch + avisos do jogo.
-VERSAO_INDICE = 5     # 5 = aviso do Satellaview sem a BIOS BS-X
+VERSAO_INDICE = 7     # 7 = aviso de zip de fliperama danificado
 
 
 def assinatura_das_pastas():
@@ -696,7 +713,23 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None,
                 nome_banco = nomes_arcade.nome_do_romset(nome_arquivo, nucleo_arcade)
                 if nome_banco:
                     titulo = nomes_arcade.titulo_para_a_tela(nome_banco)
+                else:
+                    avisos.append(aviso_de_nome_de_fliperama(titulo, extensao, nucleo_arcade))
                 avisos += avisos_do_romset(caminho_absoluto, romset, discos_zipados)
+                # Zip com parte danificada (o mslugx.zip: personagens com cor
+                # estranha). A lista so LE o resultado ja conferido -- quem
+                # descompacta e' a conferencia de fundo (arena.py) ou o Jogar.
+                ruim = integridade.parte_danificada(caminho_absoluto, conferir=False)
+                if ruim:
+                    avisos.append({"texto": integridade.texto_do_aviso(ruim)})
+            elif nucleo_arcade and extensao == ".chd":
+                # Disco de fliperama sem o .zip do romset ao lado (o Kinst
+                # da pasta): sozinho ele nao abre (achado de 02/10/2026).
+                pasta_do_disco = os.path.basename(pasta_atual).lower()
+                avisos.append({"texto": "Este é o disco (.chd) de um jogo de fliperama: o emulador abre "
+                                        "o jogo pelo %s.zip (o romset), com este disco numa subpasta %s "
+                                        "ao lado dele. Falta o %s.zip na pasta."
+                                        % (pasta_do_disco, pasta_do_disco, pasta_do_disco)})
             # Satellaview (o "BS" do nome, ou .bs): o Snes9x so abre com a
             # BIOS do Satellaview (BS-X) na pasta de BIOS. Sem ela, "falha ao
             # carregar o conteudo" e o cartao nao dizia nada (achado de

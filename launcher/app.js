@@ -874,7 +874,7 @@ const acharJogo = (id) => estado.jogos.find((jogo) => jogo.id === id);
 async function jogar(jogo) {
   const apelido = apelidoAtual();
   if (!apelido) {
-    recado("Escreva seu apelido lá em cima antes de jogar.", true);
+    recado("Escolha seu apelido antes de jogar.", true);
     $("#campoApelidoInicial").focus();
     return;
   }

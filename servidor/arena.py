@@ -73,6 +73,7 @@ import capas_online     # noqa: E402
 import graficos    # noqa: E402
 import hardware    # noqa: E402
 import indexador   # noqa: E402  (precisam vir depois do ajuste de sys.path)
+import integridade  # noqa: E402  (zip de fliperama danificado)
 import processos   # noqa: E402  (prioridade e economia de energia -- 30/09/2026)
 
 PASTA_LAUNCHER = os.path.join(RAIZ, "launcher")
@@ -5191,6 +5192,15 @@ class Manipulador(BaseHTTPRequestHandler):
                 if falta:
                     return self.erro(falta, 409)
 
+            # Fliperama com zip danificado: abre (as vezes da para jogar),
+            # mas avisa o motivo dos graficos errados. Conferido uma vez so.
+            aviso_arquivo = ""
+            if jogo.get("romset"):
+                ruim = integridade.parte_danificada(caminho_rom)
+                if ruim:
+                    frase = integridade.texto_do_aviso(ruim)
+                    aviso_arquivo = "Atenção: " + frase[:1].lower() + frase[1:]
+
             jogo = dict(jogo)
             jogo["core"] = plataforma["core"]
             if caminho_externo:
@@ -5375,6 +5385,8 @@ class Manipulador(BaseHTTPRequestHandler):
             if plataforma.get("aviso_ao_abrir"):
                 resposta["aviso"] = (resposta.get("aviso", "") + " " +
                                      plataforma["aviso_ao_abrir"]).strip()
+            if aviso_arquivo:
+                resposta["aviso"] = (aviso_arquivo + " " + resposta.get("aviso", "")).strip()
             return self.responder_json(resposta)
 
         if caminho == "/api/placar":
@@ -5778,6 +5790,37 @@ def lista_de_discos(jogo, caminho_jogo):
     return destino
 
 
+def conferir_fliperamas():
+    """Confere, em segundo plano, se algum zip de fliperama esta danificado
+    (servidor\\integridade.py: o mslugx.zip abria com personagens de cor
+    estranha). Cada zip uma vez so (o resultado fica guardado); devagar, e
+    parado enquanto um jogo esta aberto. Achou defeito novo: refaz a lista,
+    para o cartao do jogo avisar."""
+    time.sleep(8.0)                       # a tela abre primeiro
+    try:
+        jogos = [j for j in manifesto()["jogos"] if j.get("romset")]
+    except Exception:
+        return
+    achou = False
+    for jogo in jogos:
+        caminho = os.path.join(RAIZ, jogo["arquivo"])
+        if integridade.parte_danificada(caminho, conferir=False) is not None:
+            continue                      # ja conferido (ou nao e' .zip)
+        while JOGO_EM_ANDAMENTO["ativo"] and not VIGIA["encerrar"].is_set():
+            time.sleep(5.0)
+        if VIGIA["encerrar"].is_set():
+            return
+        try:
+            if integridade.parte_danificada(caminho):
+                achou = True
+        except Exception:
+            continue
+        time.sleep(1.0 if ECONOMICO else 0.2)
+    if achou:
+        limpar_caches()
+        manifesto(forcar=True)
+
+
 def conferir_vulkan():
     """O automatico escolheu Vulkan porque o vulkan-1.dll carrega; se o
     Vulkan nao enxergar placa nenhuma, troca para d3d11 (ou glcore) antes
@@ -5922,6 +5965,8 @@ def principal():
     # Vulkan de verdade? (hardware.vulkan_tem_placa): pergunta em segundo
     # plano, num processo a parte, depois que a tela ja abriu.
     threading.Thread(target=conferir_vulkan, daemon=True).start()
+    # Zip de fliperama danificado: confere cada um uma vez, devagar.
+    threading.Thread(target=conferir_fliperamas, daemon=True).start()
     # ARENA_SEM_JANELA=1: so o servidor, sem abrir a tela (testes
     # automaticos -- a rodada completa abria dezenas de janelas -- e quem
     # quiser abrir a tela de outro computador).
