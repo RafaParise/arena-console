@@ -130,6 +130,11 @@ def main():
                     % (console, chave, ESPERADO_4K[chave], time.monotonic() - inicio),
                     bool(leu) and tamanho > 2000 and not travou,
                     {"leu": bool(leu), "foto": tamanho, "travou": travou, "erros": base.erros_importantes(log)[:2]})
+            if nucleo == "flycast":
+                # Aproveita o Dreamcast aberto: o DCNet (internet com
+                # desconhecidos) tem que sair desligado (graficos.json).
+                confere("Dreamcast: o nucleo leu reicast_dcnet = disabled",
+                        'GET_VARIABLE: reicast_dcnet = "disabled"' in log)
     finally:
         limpeza.apagar_pasta(pasta)
 
