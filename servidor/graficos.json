@@ -177,10 +177,12 @@
     },
     "flycast": {
       "_nome": "Dreamcast",
+      "_leia": "DCNet (internet do Dreamcast, servidor dcnet.flyca.st) desligado em toda partida: vinha ligado de fabrica, e e' jogo online com desconhecidos -- aluno menor de idade. Mesmo criterio do RPCN do PS3: so o professor liga.",
       "sempre": {
         "reicast_mipmapping": "enabled",
         "reicast_enable_rttb": "disabled",
-        "reicast_threaded_rendering": "enabled"
+        "reicast_threaded_rendering": "enabled",
+        "reicast_dcnet": "disabled"
       },
       "por_nota": [
         {

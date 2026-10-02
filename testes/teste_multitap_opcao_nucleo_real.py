@@ -25,6 +25,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import graficos  # noqa: E402
 import protege_cfg  # noqa: E402
 import jogos_de_teste  # noqa: E402  (acha o jogo tambem em subpasta)
+import limpeza  # noqa: E402
 
 RETROARCH = os.path.join(RAIZ, "retroarch", "retroarch.exe")
 NUCLEO = os.path.join(RAIZ, "retroarch", "cores", "pcsx_rearmed_libretro.dll")
@@ -64,8 +65,11 @@ def main():
             print("PULADO: falta %s" % caminho)
             return 0
     pasta = tempfile.mkdtemp(prefix="arena_multitap_real_")
-    com = abrir(pasta, True)
-    sem = abrir(pasta, False)
+    try:
+        com = abrir(pasta, True)
+        sem = abrir(pasta, False)
+    finally:
+        limpeza.apagar_pasta(pasta)     # antes ficava no Temp
     ligou_com = "multitap: 1 0" in com
     ligou_sem = "multitap: 1" in sem
     print("Com a copia apontada: registro diz 'multitap: 1 0'?", ligou_com)

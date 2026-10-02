@@ -676,6 +676,17 @@ tela do próprio RPCS3. A conta continua salva; é só religar a chave.
 Motivo: com o RPCN ligado, o **Minecraft** dá "falhou no carregamento" ao
 criar o mundo — desligado, funciona com 4 jogadores.
 
+### Dreamcast online (DCNet): desligado
+
+O emulador do Dreamcast vem de fábrica com o **DCNet** ligado — um serviço
+na nuvem que deixa os jogos online do Dreamcast (Phantasy Star Online,
+Quake III...) jogarem pela internet com qualquer pessoa. Pelo mesmo motivo
+do RPCN (aluno menor de idade, jogo online com desconhecidos), **o ARENA
+desliga o DCNet em toda partida**. Jogar com vários controles no mesmo
+computador continua normal (o Dreamcast não tem Jogar Junto entre
+computadores: o núcleo recusa). Se o professor quiser ligar, é uma linha em
+`servidor\graficos.json` (`reicast_dcnet`).
+
 ### Como a tela fica em cada um
 
 Isto costuma surpreender, então vale explicar antes.
