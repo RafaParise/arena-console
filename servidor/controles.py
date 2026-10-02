@@ -351,31 +351,76 @@ TECLADO_PADRAO = {
 def contar_controles():
     """Quantos controles de jogo estao ligados agora, de qualquer tipo.
 
-    Le a lista de joysticks do Windows (winmm: pega Xbox, PlayStation,
-    fliperama e generico) e o XInput; fica com o maior. Sem administrador.
-    Fora do Windows, ou se der erro, responde 0 (teclado no jogador 1)."""
+    Controle XInput (Xbox, GameSir e parecidos) pelo proprio XInput; os
+    outros (PlayStation, fliperama, generico) pela lista de dispositivos do
+    Windows (Raw Input), sem contar duas vezes os XInput -- o nome deles
+    tem "IG_", o jeito que a Microsoft documenta para separar os dois. Sem
+    administrador. Fora do Windows, ou se der erro, responde 0.
+
+    Achado de 02/10/2026 (teste de longa duracao): a versao anterior usava o
+    joyGetPosEx do winmm, 16 vezes por contagem -- e ele DEIXA ALCAS DO
+    WINDOWS ABERTAS quando o controle esta desligado (24 por contagem;
+    181.570 em 3 minutos de pedidos). Raw Input nao abre nada."""
     try:
-        import ctypes
-        from ctypes import wintypes
-
-        class JOYINFOEX(ctypes.Structure):
-            _fields_ = [(nome, wintypes.DWORD) for nome in (
-                "dwSize", "dwFlags", "dwXpos", "dwYpos", "dwZpos", "dwRpos",
-                "dwUpos", "dwVpos", "dwButtons", "dwButtonNumber", "dwPOV",
-                "dwReserved1", "dwReserved2")]
-
-        winmm = ctypes.windll.winmm
-        pela_lista = 0
-        for numero in range(16):
-            info = JOYINFOEX()
-            info.dwSize = ctypes.sizeof(JOYINFOEX)
-            info.dwFlags = 0xFF
-            if winmm.joyGetPosEx(numero, ctypes.byref(info)) == 0:
-                pela_lista += 1
-
-        return max(pela_lista, len(controles_xinput()))
+        return controles_sem_xinput() + len(controles_xinput())
     except (AttributeError, OSError, ValueError):
         return 0
+
+
+def controles_sem_xinput():
+    """Controles de jogo HID (joystick ou gamepad) que NAO sao XInput."""
+    import ctypes
+    from ctypes import wintypes
+
+    class LISTA(ctypes.Structure):
+        _fields_ = [("hDevice", wintypes.HANDLE), ("dwType", wintypes.DWORD)]
+
+    class HID(ctypes.Structure):
+        _fields_ = [("dwVendorId", wintypes.DWORD), ("dwProductId", wintypes.DWORD),
+                    ("dwVersionNumber", wintypes.DWORD), ("usUsagePage", wintypes.USHORT),
+                    ("usUsage", wintypes.USHORT)]
+
+    class QUALQUER(ctypes.Union):
+        _fields_ = [("hid", HID), ("_espaco", ctypes.c_byte * 24)]   # mouse/teclado ocupam 24
+
+    class INFO(ctypes.Structure):
+        _fields_ = [("cbSize", wintypes.DWORD), ("dwType", wintypes.DWORD), ("u", QUALQUER)]
+
+    user32 = ctypes.WinDLL("user32")
+    lista_de = user32.GetRawInputDeviceList
+    lista_de.argtypes = [ctypes.c_void_p, ctypes.POINTER(wintypes.UINT), wintypes.UINT]
+    lista_de.restype = wintypes.UINT
+    info_de = user32.GetRawInputDeviceInfoW
+    info_de.argtypes = [wintypes.HANDLE, wintypes.UINT, ctypes.c_void_p, ctypes.POINTER(wintypes.UINT)]
+    info_de.restype = wintypes.UINT
+    RIM_TYPEHID, RIDI_DEVICENAME, RIDI_DEVICEINFO = 2, 0x20000007, 0x2000000B
+
+    quantos = wintypes.UINT(0)
+    if lista_de(None, ctypes.byref(quantos), ctypes.sizeof(LISTA)) == 0xFFFFFFFF or not quantos.value:
+        return 0
+    dispositivos = (LISTA * quantos.value)()
+    lidos = lista_de(dispositivos, ctypes.byref(quantos), ctypes.sizeof(LISTA))
+    if lidos == 0xFFFFFFFF:
+        return 0
+    contagem = 0
+    for dispositivo in dispositivos[:lidos]:
+        if dispositivo.dwType != RIM_TYPEHID:
+            continue
+        info = INFO()
+        info.cbSize = ctypes.sizeof(INFO)
+        tamanho = wintypes.UINT(ctypes.sizeof(INFO))
+        if info_de(dispositivo.hDevice, RIDI_DEVICEINFO, ctypes.byref(info), ctypes.byref(tamanho)) in (0, 0xFFFFFFFF):
+            continue
+        if info.u.hid.usUsagePage != 1 or info.u.hid.usUsage not in (4, 5):    # joystick ou gamepad
+            continue
+        letras = wintypes.UINT(0)
+        info_de(dispositivo.hDevice, RIDI_DEVICENAME, None, ctypes.byref(letras))
+        nome = ctypes.create_unicode_buffer(letras.value + 1)
+        info_de(dispositivo.hDevice, RIDI_DEVICENAME, nome, ctypes.byref(letras))
+        if "IG_" in nome.value.upper():
+            continue                     # e' XInput: o XInput ja conta
+        contagem += 1
+    return contagem
 
 
 def controles_xinput():

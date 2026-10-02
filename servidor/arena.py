@@ -1434,7 +1434,7 @@ def perfil_para(config, custo=None):
     return classificar(custo)["perfil"]
 
 
-def opcoes_efetivas(config, custo=None):
+def opcoes_efetivas(config, custo=None, controles_ligados=None):
     """Junta base + perfil + ajustes avancados na ordem certa.
 
     O perfil entra primeiro; o ajuste manual do aluno entra por cima e
@@ -1463,10 +1463,12 @@ def opcoes_efetivas(config, custo=None):
     opcoes["log_dir"] = PASTA_DADOS
 
     # Teclas e botoes que o aluno definiu na tela do ARENA, entrando por
-    # ultimo. O teclado vai para o primeiro jogador sem controle: por isso
-    # conta os controles ligados AGORA, na hora de abrir o jogo.
+    # ultimo. O teclado vai para o primeiro jogador sem controle: quem abre
+    # o jogo conta os controles ligados AGORA e passa o numero. Achado de
+    # 02/10/2026: contava em TODA chamada -- a cada /api/estado e a cada
+    # ajuste salvo --, e a contagem antiga deixava alcas do Windows abertas.
     opcoes.update(controles.opcoes_do_retroarch(
-        controles_ligados=controles.contar_controles()))
+        controles_ligados=controles_ligados or 0))
 
     # Filtro de tela: o perfil (ou o aluno) diz se quer; QUAL filtro e' se
     # o console aceita, so se sabe com o jogo na mao -- gravar_override().
@@ -1599,7 +1601,7 @@ def remapeamento_da_partida(opcoes, caminho_core, caminho_jogo):
 
 def gravar_override(config, custo=None, extras=None, em_partida=False,
                     opcoes_de_nucleo=None, remapear=None, plataforma=None,
-                    devolver_filtro=False):
+                    devolver_filtro=False, controles_ligados=None):
     """Monta o arquivo de configuracao extra que o RetroArch vai ler.
 
     'opcoes_de_nucleo': caminho de uma COPIA do arquivo de opcoes de nucleo
@@ -1609,7 +1611,7 @@ def gravar_override(config, custo=None, extras=None, em_partida=False,
     'plataforma' + 'devolver_filtro': devolve (arquivo, filtro de tela) --
     o filtro vai na linha de comando (--set-shader), porque o RetroArch
     ignora video_shader vindo de arquivo (ver graficos.filtro_de_tela)."""
-    opcoes = opcoes_efetivas(config, custo)
+    opcoes = opcoes_efetivas(config, custo, controles_ligados)
 
     if not em_partida:
         # Fora da partida, desligar a rede EXPLICITAMENTE. Nao basta deixar
@@ -2357,7 +2359,8 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             config, custo, opcoes_jogo,
             em_partida=bool(partida), opcoes_de_nucleo=copia_nucleo,
             remapear=(os.path.join(PASTA_CORES, jogo["core"]), caminho_jogo),
-            plataforma=jogo.get("plataforma"), devolver_filtro=True)
+            plataforma=jogo.get("plataforma"), devolver_filtro=True,
+            controles_ligados=controles.contar_controles())
         comando = [
             EXECUTAVEL_RETROARCH,
             "-L", os.path.join(PASTA_CORES, jogo["core"]),
@@ -4682,7 +4685,8 @@ class Manipulador(BaseHTTPRequestHandler):
                 except OSError:
                     pass
                 comando = [EXECUTAVEL_RETROARCH, "-L", core,
-                           "--appendconfig", gravar_override(config)]
+                           "--appendconfig", gravar_override(
+                               config, controles_ligados=controles.contar_controles())]
                 pasta = PASTA_RETROARCH
 
             def rodar():
