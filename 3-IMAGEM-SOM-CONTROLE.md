@@ -1177,6 +1177,13 @@ notebook Celeron da escola, com 4 jogadores), troque para **DirectX 11**,
 abra o mesmo jogo e compare. Ficou pior ou mais lento? Volte para
 **Automático**. Vale no próximo jogo de PS2 que abrir.
 
+Antes de trocar o motor, confira a versão no topo da tela: desde a
+2026.10.02.2 o ARENA grava sozinho os ajustes de textura que deixavam o
+Crash Nitro Kart com o "P1" em blocos e lixo no mapa (ver "Ajustes que o
+ARENA não deixa estragar", logo abaixo). O padrão continua no Automático
+porque é o que o próprio PCSX2 escolhe para essas placas (conferido no
+código dele em 03/10/2026); a troca na mão é para o caso que ainda piscar.
+
 Em placa integrada o ARENA já deixa o PS2 em resolução original e com a
 mistura de cores "Básica" (a mais leve que ainda desenha certo).
 
