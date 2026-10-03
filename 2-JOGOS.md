@@ -71,6 +71,26 @@ console fica guardada por 30 dias em `retroarch\thumbnails`, então a
 segunda busca é bem mais rápida. Em teste com os jogos da pasta do
 professor, a busca achou 68 das 78 capas que faltavam.
 
+A busca também acerta estes casos (achados com os jogos da pasta do
+professor, 02/10/2026):
+
+- **Disquete com número no nome** (`Alien Breed_Disk1.adf`): a capa é a do
+  jogo (*Alien Breed*); o "(AGA)" no nome do arquivo escolhe a versão AGA.
+- **Commodore 64 e Amiga da coleção GameBase**, com o nome cortado em 8
+  letras (`INTKARAT.D64`): o nome de verdade vem do `VERSION.NFO` da pasta
+  do jogo (*International Karate*). A capa já baixada com o nome antigo
+  continua valendo.
+- **Nome com `&` ou `:`** (`Sonic & Knuckles`): o banco grava a capa com
+  `_` no lugar desses sinais, e a lista agora acha.
+- **Jogo que nunca teve caixa** (Satellaview, que chegava por satélite):
+  vem a **tela de título** do jogo (ou, por último, uma foto dele), e a
+  busca avisa.
+- **Jogo de PS1 na pasta do PS2**: a capa vem do banco do PS1, com o aviso
+  de que o PCSX2 não abre jogo de PS1. Mova o arquivo para a pasta `PS1`.
+
+Com isso, das 10 capas que ainda faltavam na pasta do professor, a busca
+achou 9 (ficou a do *BS F-ZERO*, que nem o banco tem).
+
 ### Parte A — Adicionar jogos
 
 #### Passo 1 — Escolha a pasta

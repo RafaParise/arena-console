@@ -517,7 +517,8 @@ PASTA_CAPAS = "capas"
 CAPAS_DA_PASTA = ("cover", "folder", "boxart", "capa", "front")
 
 
-def capas_do_jogo(caminho_absoluto, pasta_atual, titulo, nome_banco=None, sozinho_na_pasta=False):
+def capas_do_jogo(caminho_absoluto, pasta_atual, titulo, nome_banco=None, sozinho_na_pasta=False,
+                  outros_titulos=()):
     """Procura a arte do jogo em quatro lugares, do mais especifico ao geral.
 
     1. Um arquivo com o MESMO nome do jogo, na mesma pasta:
@@ -553,7 +554,13 @@ def capas_do_jogo(caminho_absoluto, pasta_atual, titulo, nome_banco=None, sozinh
     # Fliperama: o RetroArch nomeia pelo nome COMPLETO do banco ("Metal Slug
     # X - Super Vehicle-001 (NGM-2500)(NGH-2500)"), com & * / : ` < > ? \ |
     # " trocados por _ -- a mesma regra do capas_online.
-    nomes = [titulo]
+    # O titulo tambem com os caracteres trocados: a busca de capa grava
+    # "Sonic _ Knuckles + Sonic the Hedgehog 2.png" (achado de 02/10/2026: a
+    # capa estava baixada e a lista nao achava).
+    nomes = [titulo, re.sub(r'[&*/:`<>?\\|"]', "_", titulo)]
+    # O titulo de antes (do nome do arquivo), quando o .nfo do GameBase deu
+    # um melhor: a capa ja baixada com o nome antigo continua valendo.
+    nomes += [n for n in outros_titulos if n]
     if nome_banco:
         nomes.append(re.sub(r'[&*/:`<>?\\|"]', "_", nome_banco))
     miniaturas = os.path.join(RAIZ, "retroarch", "thumbnails")
@@ -569,6 +576,28 @@ def capas_do_jogo(caminho_absoluto, pasta_atual, titulo, nome_banco=None, sozinh
                 break
 
     return [os.path.relpath(a, RAIZ).replace("\\", "/") for a in achados[:3]]
+
+
+RE_NOME_DO_GAMEBASE = re.compile(r"^Name:[ \t]*(\S.*?)\s*$", re.M)
+
+
+def nome_do_gamebase(pasta_atual, arquivos):
+    """O nome do jogo no VERSION.NFO da colecao GameBase (C64, Amiga,
+    Spectrum...): "INTKARAT.D64" e' o "International Karate" (achado de
+    02/10/2026: com o nome cortado em 8 letras, a capa nunca era achada).
+    So o .nfo que e' mesmo do GameBase (tem a linha "GB-Version:")."""
+    for nome in arquivos:
+        if not nome.lower().endswith(".nfo"):
+            continue
+        try:
+            with open(os.path.join(pasta_atual, nome), "rb") as arquivo:
+                texto = arquivo.read(8192).decode("latin-1")
+        except OSError:
+            continue
+        achado = RE_NOME_DO_GAMEBASE.search(texto)
+        if "GB-Version:" in texto and achado:
+            return achado.group(1).strip()[:80]
+    return None
 
 
 def sozinho_na_pasta(pasta_atual, caminho_pasta, nome_arquivo, arquivos):
@@ -781,6 +810,9 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None,
             else:
                 plataforma = por_id[id_plataforma]
             titulo = titulo_do_jogo(nome_arquivo, pasta_atual)
+            titulo_do_arquivo = titulo
+            if sozinho_na_pasta(pasta_atual, caminho_pasta, nome_arquivo, arquivos):
+                titulo = nome_do_gamebase(pasta_atual, arquivos) or titulo
 
             # Fliperama: o nome do arquivo e' o do romset ("mslugx"). O nome
             # de verdade vem dos bancos do RetroArch (servidor\nomes_arcade.py).
@@ -902,7 +934,9 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None,
                 # carregar; sem nenhuma, ela desenha as iniciais do titulo.
                 "capas": capas_do_jogo(caminho_absoluto, pasta_atual, titulo, nome_banco,
                                        sozinho_na_pasta=sozinho_na_pasta(pasta_atual, caminho_pasta,
-                                                                         nome_arquivo, arquivos)),
+                                                                         nome_arquivo, arquivos),
+                                       outros_titulos=(titulo_do_arquivo,) if titulo_do_arquivo != titulo
+                                       else ()),
                 # Fliperama: o nome curto do arquivo e o nome completo do
                 # banco (a busca de capa usa o completo).
                 "romset": romset,

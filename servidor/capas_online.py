@@ -135,17 +135,19 @@ def _ler_lista(caminho):
         return []
 
 
-def lista_do_banco(plataforma_id, repo):
+def lista_do_banco(plataforma_id, repo, tipo="Named_Boxarts"):
     """Os nomes das capas do banco (sem o .png), da lista oficial guardada
-    por 30 dias. Sem internet, a lista velha ainda serve; sem nenhuma, []."""
+    por 30 dias. Sem internet, a lista velha ainda serve; sem nenhuma, [].
+    'tipo': Named_Boxarts (a caixa), Named_Titles (a tela de titulo) ou
+    Named_Snaps (uma foto do jogo)."""
     pasta = os.path.join(PASTA_MINIATURAS, plataforma_id)
-    guardada = os.path.join(pasta, "_lista_%s.txt" % repo)
+    guardada = os.path.join(pasta, "_lista_%s%s.txt" % (repo, "" if tipo == "Named_Boxarts" else "_" + tipo))
     try:
         if time.time() - os.path.getmtime(guardada) < VALIDADE_DA_LISTA:
             return _ler_lista(guardada)
     except OSError:
         pass
-    url = "%s/%s/Named_Boxarts/" % (SERVIDOR_MINIATURAS, urllib.parse.quote(sistema_do_banco(repo)))
+    url = "%s/%s/%s/" % (SERVIDOR_MINIATURAS, urllib.parse.quote(sistema_do_banco(repo)), tipo)
     temporario = guardada + ".baixando"
     try:
         os.makedirs(pasta, exist_ok=True)
@@ -190,6 +192,33 @@ def limpar_nome_de_cena(titulo):
     return str(titulo or "")[:max(achado.start() - 1, 0)].strip() if achado else str(titulo or "")
 
 
+# "Alien Breed_Disk1", "Top Gear 2 (AGA)_Disk2", "(Disk 1 of 2)", "Disc 2",
+# "CD 2": o numero do disco nao e' parte do nome do jogo (a capa e' uma so).
+# "Sonic CD" e "CD32" ficam (a mesma regra do indexador.RE_DISCO).
+RE_DISCO_NO_NOME = re.compile(r"[\s_\-]*[\(\[]?\s*(?:(?:disk|disc|disco)[\s_\-]*|cd[\s_\-]+)\d{1,2}(?!\d)"
+                              r"(?:\s*(?:of|de)\s*\d{1,2})?\s*[\)\]]?", re.I)
+
+
+def sem_disco(nome):
+    """O nome sem o "Disk1"/"(Disc 2 of 3)"."""
+    return RE_ESPACOS_REPETIDOS.sub(" ", RE_DISCO_NO_NOME.sub(" ", str(nome or ""))).strip()
+
+
+RE_ESPACOS_REPETIDOS = re.compile(r"\s+")
+
+
+def _palavras(nome):
+    """As palavras do nome (sem regiao, sem pontuacao, sem "the")."""
+    nome = re.sub(r"\([^)]*\)|\[[^\]]*\]", " ", str(nome or "")).casefold().replace("&", " and ")
+    return [p for p in re.split(r"[\W_]+", nome) if p and p != "the"]
+
+
+def _em_ordem(curtas, longas):
+    """Todas as palavras de 'curtas' aparecem em 'longas', na mesma ordem?"""
+    sobra = iter(longas)
+    return all(p in sobra for p in curtas)
+
+
 def _prefixo_seguro(curta, longa):
     """'longa' e' 'curta' + subtitulo SEM numero ("Street Fighter II Turbo" +
     "Hyper Fighting")? Com numero no resto, nao: "Crash Bandicoot" nao e'
@@ -209,6 +238,8 @@ def escolher_capa(nomes, titulo, nome_base=""):
     por_chave = {}
     for nome in nomes:
         por_chave.setdefault(_chave(nome), []).append(nome)
+    # O numero do disco sai do nome ("Alien Breed Disk1" e' o "Alien Breed").
+    titulo, nome_base = sem_disco(titulo), sem_disco(nome_base)
     alvos = [c for c in (_chave(nome_base), _chave(titulo), _chave(limpar_nome_de_cena(titulo))) if c]
     candidatos = next((por_chave[c] for c in alvos if c in por_chave), None)
     if not candidatos and alvos:
@@ -216,6 +247,29 @@ def escolher_capa(nomes, titulo, nome_base=""):
             parecidos = [c for c in por_chave if _prefixo_seguro(c, alvo) or _prefixo_seguro(alvo, c)]
             if parecidos:
                 candidatos = por_chave[min(parecidos, key=lambda c: abs(len(c) - len(alvo)))]
+                break
+    if not candidatos:
+        # Todas as palavras do titulo, na ordem, em UM jogo so do banco:
+        # "BS F-ZERO Grand Prix Knight League" e' o "BS F-Zero Grand Prix -
+        # Dai-1-shuu - Knight League". Numero a mais no nome do banco so vale
+        # com titulo bem especifico (5 palavras ou mais): "Donkey Kong
+        # Country" nunca pega a capa do "Donkey Kong Country 2".
+        for alvo in (_palavras(titulo), _palavras(nome_base)):
+            if len(alvo) < 2:
+                continue
+            grupos = []
+            for chave, lista in por_chave.items():
+                palavras = _palavras(lista[0])
+                if not _em_ordem(alvo, palavras):
+                    continue
+                sobra = list(palavras)
+                for p in alvo:
+                    sobra.remove(p)
+                if len(alvo) < 5 and any(re.search(r"\d|^(?:ii|iii|iv|vi|vii|viii|ix)$", p) for p in sobra):
+                    continue
+                grupos.append(chave)
+            if len(grupos) == 1:
+                candidatos = por_chave[grupos[0]]
                 break
     if not candidatos and alvos:
         perto = difflib.get_close_matches(alvos[-1], list(por_chave), n=1, cutoff=0.9)
@@ -238,17 +292,17 @@ def escolher_capa(nomes, titulo, nome_base=""):
     return sorted(candidatos, key=ordem)[0]
 
 
-def _baixar_capa(repo, nome, destino):
+def _baixar_capa(repo, nome, destino, tipo="Named_Boxarts"):
     """Baixa a capa 'nome' do banco para 'destino' (PNG de verdade ou nada):
     do servidor de miniaturas e, se ele falhar, do GitHub do libretro."""
     arquivo = urllib.parse.quote(nome + ".png")
     temporario = destino + ".baixando"
     try:
         os.makedirs(os.path.dirname(destino), exist_ok=True)
-        for url in ("%s/%s/Named_Boxarts/%s" % (SERVIDOR_MINIATURAS,
-                                                 urllib.parse.quote(sistema_do_banco(repo)), arquivo),
-                    "https://raw.githubusercontent.com/libretro-thumbnails/%s/master/Named_Boxarts/%s"
-                    % (repo, arquivo)):
+        for url in ("%s/%s/%s/%s" % (SERVIDOR_MINIATURAS,
+                                      urllib.parse.quote(sistema_do_banco(repo)), tipo, arquivo),
+                    "https://raw.githubusercontent.com/libretro-thumbnails/%s/master/%s/%s"
+                    % (repo, tipo, arquivo)):
             if _baixar(url, temporario) and _e_png_de_verdade(temporario):
                 os.replace(temporario, destino)
                 return True
@@ -290,6 +344,19 @@ def _e_png_de_verdade(caminho):
 # exatamente essa revisao), tentar as tags mais comuns aumenta bastante
 # a chance de achar sem precisar adivinhar o nome exato.
 TAGS_REGIAO = ("(USA)", "(World)", "(Europe)", "(Japan)", "(USA, Europe)")
+
+# Banco de OUTRO console, tentado por ultimo, com o recado do que isso quer
+# dizer. Achado de 02/10/2026: o "Crash Bandicoot 3 - Warped" estava na pasta
+# do PS2 e e' jogo de PS1 -- o banco do PS2 nao tem a capa, e o PCSX2 nem abre
+# jogo de PS1.
+OUTRO_CONSOLE = {
+    "ps2": ("Sony_-_PlayStation", "o banco do PlayStation 1. Este jogo parece ser de PS1, e o PCSX2 "
+                                  "não abre jogo de PS1: ponha o arquivo na pasta PS1"),
+}
+# Jogo sem caixa no banco (Satellaview era baixado por satelite: nunca teve
+# caixa): a tela de titulo, e por ultimo uma foto do jogo.
+SEM_CAIXA = (("Named_Titles", "a tela de título do jogo (o banco não tem a caixa dele)"),
+             ("Named_Snaps", "uma foto do jogo (o banco não tem a caixa dele)"))
 
 
 def _guardar(dados, destino):
@@ -381,6 +448,21 @@ def buscar_e_baixar(plataforma_id, titulo_limpo, nome_base_arquivo, caminho_jogo
     fonte = capa_pelo_disco(plataforma_id, titulo_limpo, caminho_jogo)
     if fonte:
         return True, fonte
+    # O jogo e' de outro console (o PS1 na pasta do PS2)?
+    if plataforma_id in OUTRO_CONSOLE:
+        repo, recado = OUTRO_CONSOLE[plataforma_id]
+        nomes = lista_do_banco(plataforma_id, repo)
+        escolhido = escolher_capa(nomes, titulo_limpo, nome_base_arquivo) if nomes else None
+        if escolhido and _baixar_capa(repo, escolhido, destino):
+            return True, recado
+    # Sem caixa no banco: a tela de titulo (e, por ultimo, uma foto do jogo).
+    for tipo, recado in SEM_CAIXA:
+        for repo in repos:
+            nomes = lista_do_banco(plataforma_id, repo, tipo)
+            achou_lista = achou_lista or bool(nomes)
+            escolhido = escolher_capa(nomes, titulo_limpo, nome_base_arquivo) if nomes else None
+            if escolhido and _baixar_capa(repo, escolhido, destino, tipo):
+                return True, recado
     if achou_lista:
         return False, "Não achei capa pra esse jogo nesse banco."
 
