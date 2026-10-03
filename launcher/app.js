@@ -2429,10 +2429,19 @@ function abrirJuntoLocal(jogo) {
       "o 2º é o jogador 2, e assim por diante.",
     "O teclado joga como o primeiro jogador sem controle " +
       "(com 3 controles, o teclado é o jogador 4).",
-    `Dentro do jogo, escolha o modo de 2, 3 ou ${n} jogadores.`,
+    n > 2
+      ? `Dentro do jogo, escolha quantos vão jogar (de 2 a ${n}).`
+      : "Dentro do jogo, escolha o modo de 2 jogadores.",
     "Algum controle não responde ou está trocado? Feche o jogo, ligue os " +
       "controles na ordem certa e abra de novo. Se precisar, veja " +
       "Ajustes → Controles.",
+    // De onde vem o numero (02/10/2026: o Rafael ligou o multitap pelo
+    // menu do PCSX2 e o ARENA desligava de novo a cada jogo).
+    "O jogo aceita mais jogadores do que aparece aqui? O professor escreve " +
+      `o número no arquivo dados\\jogadores.txt (uma linha: ${jogo.titulo} = 4). ` +
+      "O ARENA liga o adaptador de controles (multitap) sozinho a partir " +
+      "desse número. Ligar pelo menu do emulador pode não valer: o ARENA " +
+      "arruma a configuração dos controles a cada jogo.",
   ];
   if (jogo.plataforma === "wii") {
     passos.splice(2, 0, "No Wii, cada controle vira um Wii Remote com Nunchuk: " +

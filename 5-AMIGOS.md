@@ -337,7 +337,20 @@ ligar até 4 jogadores no mesmo computador:
    1, o 2º é o jogador 2...
 2. O teclado joga como o **primeiro jogador sem controle** (com 3 controles,
    o teclado é o jogador 4).
-3. Dentro do jogo, escolha o modo de 2, 3 ou 4 jogadores.
+3. Dentro do jogo, escolha quantos vão jogar.
+
+**Quantos jogadores cada jogo aceita** vem da lista `dados\jogadores.txt`,
+uma linha por jogo (`Crash Nitro Kart = 4`; basta um pedaço do nome). É
+dela que sai o número do cartão, e é com ela que o ARENA liga sozinho o
+adaptador de controles (multitap) do PS2 e do Super Nintendo. Jogo que não
+está na lista usa o que o ARENA já sabe: os jogos testados com os controles
+na mão (Crash Nitro Kart, Champions of Norrath, Marvel Ultimate Alliance,
+CTR, Mario Kart Double Dash e Wii, Smash Bros...) já vêm com o número certo
+em qualquer cópia do ARENA; o resto fica com o número do console ou 2.
+
+**Ligar o multitap pelo menu do PCSX2 não adianta:** o ARENA refaz a
+configuração dos controles a cada jogo, pelo número da lista. Para mudar,
+escreva o número na lista e salve; a lista de jogos se atualiza sozinha.
 
 Alguns desses jogos têm **rede própria** (System Link), como Gears of War e
 Left 4 Dead 2 (Xbox 360) e Gran Turismo 4 (PS2). Neles, a janela avisa: com

@@ -1,5 +1,5 @@
 {
-  "_leia": "Catalogo de plataformas do ARENA, ate a geracao do PlayStation 2. 'custo' vai de 1 (trivial) a 5 (pesadissimo) e e comparado com a capacidade medida da maquina para classificar o desempenho. 'peso' decide se a plataforma aparece em maquina fraca. 'arquivos_sistema' e apenas a QUANTIDADE esperada na pasta system: o ARENA nunca lista, nomeia nem baixa esses arquivos. 'apelidos' sao os nomes de pasta que apontam para esta plataforma. 'tamanho_max_mb' e o tamanho maximo da midia original, usado para desempatar extensao ambigua. 'externo' e o emulador de fora que o ARENA prefere quando encontra a pasta em emuladores/. Se nao encontrar, usa o nucleo do RetroArch normalmente. 'pasta' e o nome da pasta oficial daquele console dentro de jogos/. A pasta e quem decide o console de arquivos com extensao ambigua.",
+  "_leia": "Catalogo de plataformas do ARENA, ate a geracao do PlayStation 2. 'custo' vai de 1 (trivial) a 5 (pesadissimo) e e comparado com a capacidade medida da maquina para classificar o desempenho. 'peso' decide se a plataforma aparece em maquina fraca. 'arquivos_sistema' e apenas a QUANTIDADE esperada na pasta system: o ARENA nunca lista, nomeia nem baixa esses arquivos. 'apelidos' sao os nomes de pasta que apontam para esta plataforma. 'tamanho_max_mb' e o tamanho maximo da midia original, usado para desempatar extensao ambigua. 'externo' e o emulador de fora que o ARENA prefere quando encontra a pasta em emuladores/. Se nao encontrar, usa o nucleo do RetroArch normalmente. 'pasta' e o nome da pasta oficial daquele console dentro de jogos/. A pasta e quem decide o console de arquivos com extensao ambigua. 'jogadores_por_jogo' e' quantos jogadores aceitam os jogos ja conferidos (pedaco do nome -> numero; palavra inteira, sem pontuacao): vale quando o jogo nao esta no dados\\jogadores.txt do professor, e e' com ele que esse arquivo nasce. Mora aqui, no programa, para valer em qualquer copia (antes so existia nos dados de quem montou).",
   "plataformas": [
     {
       "id": "tic80",
@@ -384,7 +384,13 @@
         "site": "dolphin-emu.org/download",
         "motivo": "Opcional. O núcleo do RetroArch abre, mas o Dolphin de verdade roda bem melhor GameCube e Wii."
       },
-      "pasta": "GameCube"
+      "pasta": "GameCube",
+      "jogadores_por_jogo": {
+        "Mario Kart Double Dash": 4,
+        "Mario Party": 4,
+        "Super Smash Bros Melee": 4,
+        "F Zero GX": 4
+      }
     },
     {
       "id": "wii",
@@ -421,7 +427,12 @@
         "site": "dolphin-emu.org/download",
         "motivo": "Opcional. O núcleo do RetroArch abre, mas o Dolphin de verdade roda bem melhor GameCube e Wii."
       },
-      "pasta": "Wii"
+      "pasta": "Wii",
+      "jogadores_por_jogo": {
+        "Mario Kart Wii": 4,
+        "Super Smash Bros Brawl": 4,
+        "New Super Mario Bros Wii": 4
+      }
     },
     {
       "id": "sg1000",
@@ -468,7 +479,11 @@
         "sms"
       ],
       "netplay": true,
-      "pasta": "Mega Drive"
+      "pasta": "Mega Drive",
+      "jogadores_por_jogo": {
+        "Mega Bomberman": 4,
+        "Micro Machines 2 Turbo Tournament": 4
+      }
     },
     {
       "id": "sega32x",
@@ -532,7 +547,10 @@
         "ss"
       ],
       "tamanho_max_mb": 800,
-      "pasta": "Sega Saturn"
+      "pasta": "Sega Saturn",
+      "jogadores_por_jogo": {
+        "Saturn Bomberman": 10
+      }
     },
     {
       "id": "dreamcast",
@@ -557,7 +575,13 @@
       "tamanho_max_mb": 1400,
       "netplay": false,
       "netplay_motivo": "O núcleo do Dreamcast (Flycast) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Multiplayer só vale no mesmo computador.",
-      "pasta": "Dreamcast"
+      "pasta": "Dreamcast",
+      "jogadores_por_jogo": {
+        "Armada": 4,
+        "Gauntlet Legends": 4,
+        "GigaWing 2": 4,
+        "Giga Wing 2": 4
+      }
     },
     {
       "id": "ps1",
@@ -586,7 +610,10 @@
         "psx"
       ],
       "tamanho_max_mb": 800,
-      "pasta": "PS1"
+      "pasta": "PS1",
+      "jogadores_por_jogo": {
+        "Crash Team Racing": 4
+      }
     },
     {
       "id": "ps2",
@@ -628,7 +655,12 @@
           "gran turismo 4"
         ]
       },
-      "pasta": "PS2"
+      "pasta": "PS2",
+      "jogadores_por_jogo": {
+        "Crash Nitro Kart": 4,
+        "Champions of Norrath": 4,
+        "Marvel Ultimate Alliance": 4
+      }
     },
     {
       "id": "psp",
@@ -674,7 +706,13 @@
         "fbneo",
         "ng"
       ],
-      "pasta": "Neo Geo"
+      "pasta": "Neo Geo",
+      "jogadores_por_jogo": {
+        "Turtles in Time": 4,
+        "tmnt2": 4,
+        "Captain Commando": 4,
+        "captcomm": 4
+      }
     },
     {
       "id": "ngp",
@@ -714,7 +752,13 @@
         "fliperama",
         "mame"
       ],
-      "pasta": "Arcade"
+      "pasta": "Arcade",
+      "jogadores_por_jogo": {
+        "Turtles in Time": 4,
+        "tmnt2": 4,
+        "Captain Commando": 4,
+        "captcomm": 4
+      }
     },
     {
       "id": "pcengine",
@@ -1117,6 +1161,11 @@
           2.0,
           3.0
         ]
+      },
+      "jogadores_por_jogo": {
+        "Rayman Legends": 4,
+        "Minecraft": 4,
+        "Diablo III": 4
       }
     },
     {
@@ -1169,6 +1218,9 @@
           2.0,
           3.0
         ]
+      },
+      "jogadores_por_jogo": {
+        "Left 4 Dead 2": 4
       }
     }
   ],

@@ -7,8 +7,17 @@ bloco de notas:
     Super Bomberman 4 = 5
     GoldenEye = 4
 
-Basta um pedaco do nome (sem diferenca de maiuscula). Jogo que nao aparece
-no arquivo aceita 2. Linha que comeca com # e' comentario.
+Basta um pedaco do nome (sem diferenca de maiuscula). Linha que comeca com
+# e' comentario.
+
+Jogo que nao aparece no arquivo: vale o que o ARENA ja sabe dele
+(numero_sem_regra) -- os jogos conferidos com os controles na mao
+(consoles.json -> jogadores_por_jogo), a lista de Multitap do console e o
+numero do console (N64: 4); senao, 2. Achado de 02/10/2026: o Crash Nitro
+Kart com 4 so funcionava na pasta de quem montou, porque o 4 estava SO no
+dados\\jogadores.txt dele; na versao dos alunos o arquivo nasceu antes de os
+jogos de PS2 entrarem, o jogo ficou com 2, e o ARENA desligava o multitap do
+PCSX2 a cada abertura.
 
 O ARENA cria o arquivo sozinho na primeira vez, ja com todos os jogos da
 pasta e o numero que cada um aceitava antes deste arquivo existir (decisao
@@ -25,6 +34,7 @@ num jogo de Super Nintendo mostra "ate 5", com o motivo no botao.
 import os
 import re
 import time
+import unicodedata
 
 PASTA_SERVIDOR = os.path.dirname(os.path.abspath(__file__))
 RAIZ = os.path.dirname(PASTA_SERVIDOR)
@@ -35,13 +45,15 @@ ARQUIVO = os.path.join(RAIZ, "dados", NOME)
 
 PADRAO = 2
 MAXIMO = 16  # ninguem precisa de mais; barra numero absurdo digitado errado
+MULTITAP = 5  # o mesmo graficos.JOGADORES_MULTITAP (Super Nintendo com o adaptador)
 
 CABECALHO = """\
 # QUANTOS JOGADORES CADA JOGO ACEITA
 #
 # Uma linha por jogo:   nome do jogo = número
 # Basta um pedaço do nome. Exemplo:  Bomberman = 5
-# Jogo que não estiver aqui aceita 2.
+# Jogo que não estiver aqui: vale o número que o ARENA já conhece
+# (jogos testados com os controles) ou 2.
 # Linha que começa com # é só comentário.
 #
 # O ARENA liga sozinho o adaptador de controles (multitap) quando o número
@@ -78,10 +90,10 @@ def ler(caminho=None):
     return regras
 
 
-def numero_do_jogo(titulo, regras, outros_nomes=()):
-    """O numero do jogo pelo arquivo. Nome inteiro igual ganha; senao, o
-    pedaco de nome mais comprido que aparece no titulo (o mais especifico);
-    senao, 2.
+def regra_do_arquivo(titulo, regras, outros_nomes=()):
+    """O numero que o arquivo do professor da' a este jogo, ou None se
+    nenhuma linha serve. Nome inteiro igual ganha; senao, o pedaco de nome
+    mais comprido que aparece no titulo (o mais especifico).
 
     'outros_nomes': outros nomes do MESMO jogo que tambem valem -- o nome
     curto do romset de fliperama ("tmnt2"), para a linha "Tmnt2 = 4" que o
@@ -94,7 +106,61 @@ def numero_do_jogo(titulo, regras, outros_nomes=()):
             return numero
         if any(nome in n for n in nomes) and (melhor is None or len(nome) > len(melhor[0])):
             melhor = (nome, numero)
-    return melhor[1] if melhor else PADRAO
+    return melhor[1] if melhor else None
+
+
+def numero_do_jogo(titulo, regras, outros_nomes=()):
+    """O numero do jogo pelo arquivo; sem linha que sirva, 2."""
+    numero = regra_do_arquivo(titulo, regras, outros_nomes)
+    return PADRAO if numero is None else numero
+
+
+def _palavras(texto):
+    """'F-Zero GX (USA)' -> ' f zero gx usa ': sem acento e sem pontuacao,
+    com espaco nas pontas, para comparar PALAVRA inteira ('Mule' nao pode
+    valer para 'Formule 1')."""
+    texto = unicodedata.normalize("NFKD", texto or "")
+    texto = "".join(c for c in texto if not unicodedata.combining(c))
+    return " %s " % " ".join(re.findall(r"[a-z0-9]+", texto.lower()))
+
+
+def numero_conhecido(plataforma, titulo, outros_nomes=()):
+    """O que o ARENA ja sabe deste jogo: consoles.json -> jogadores_por_jogo
+    do console, numeros conferidos com os controles na mao. A lista vem com o
+    PROGRAMA (nao com os dados de quem montou), por isso vale em qualquer
+    copia. Palavra inteira, sem pontuacao ('F-Zero GX' = 'F Zero GX'); o
+    nome mais comprido que servir ganha. None se o jogo nao esta la."""
+    nomes = [_palavras(titulo)] + [_palavras(n) for n in outros_nomes if n]
+    melhor = None
+    for nome, numero in ((plataforma or {}).get("jogadores_por_jogo") or {}).items():
+        chave = _palavras(nome)
+        if chave.strip() and any(chave in n for n in nomes) \
+                and (melhor is None or len(chave) > len(melhor[0])):
+            melhor = (chave, numero)
+    if not melhor:
+        return None
+    try:
+        return max(1, min(int(melhor[1]), MAXIMO))
+    except (TypeError, ValueError):
+        return None
+
+
+def numero_sem_regra(plataforma, titulo, outros_nomes=()):
+    """Jogo sem linha no arquivo do professor (ou antes de o arquivo existir):
+    o numero que o ARENA ja conhece; senao a lista de Multitap do console
+    (Super Bomberman: 5); senao o numero do console (N64: 4); senao 2.
+    E' com isso que o arquivo nasce preenchido."""
+    plataforma = plataforma or {}
+    conhecido = numero_conhecido(plataforma, titulo, outros_nomes)
+    if conhecido:
+        return conhecido
+    titulo_min = (titulo or "").lower()
+    if any(nome.lower() in titulo_min for nome in plataforma.get("jogos_multitap", [])):
+        return MULTITAP
+    try:
+        return max(1, min(int(plataforma.get("jogadores_max", PADRAO) or PADRAO), MAXIMO))
+    except (TypeError, ValueError):
+        return PADRAO
 
 
 def criar(jogos, caminho=None):

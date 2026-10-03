@@ -447,7 +447,7 @@ def arquivo_de_jogadores():
 # (ex.: o jogo de CD em trilhas virar um jogo so) nao valia num ARENA que ja
 # tinha a lista salva, ate alguma pasta mudar. 2 = nomes de fliperama pelos
 # bancos do RetroArch + avisos do jogo.
-VERSAO_INDICE = 7     # 7 = aviso de zip de fliperama danificado
+VERSAO_INDICE = 8     # 8 = jogadores dos jogos testados vem com o programa
 
 
 def assinatura_das_pastas():
@@ -868,20 +868,18 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None,
                     "mover_para": discorda})
 
             # Quantos jogadores ESTE jogo aceita: quem diz e' o professor,
-            # no dados\jogadores.txt (servidor\jogadores.py). Sem o arquivo
-            # (so na primeira vez, antes de o ARENA cria-lo), vale o que
-            # valia antes dele: a lista de Multitap do consoles.json (5) e
-            # o numero do console (N64: 4) -- e' com isso que o arquivo
-            # nasce preenchido.
-            if regras is None:
-                lista_multitap = plataforma.get("jogos_multitap", [])
-                usa_multitap = any(nome.lower() in titulo.lower() for nome in lista_multitap)
-                do_jogo = 5 if usa_multitap else int(plataforma.get("jogadores_max", 2) or 2)
-            else:
-                # O nome curto do romset tambem vale ("Tmnt2 = 4" continua
-                # valendo depois que o titulo virou o nome completo).
-                do_jogo = jogadores.numero_do_jogo(titulo, regras,
-                                                   outros_nomes=(romset,) if romset else ())
+            # no dados\jogadores.txt (servidor\jogadores.py). Jogo que nao
+            # esta no arquivo (ou antes de o ARENA cria-lo): o que o ARENA
+            # ja sabe -- jogos testados (consoles.json -> jogadores_por_jogo),
+            # lista de Multitap (5), numero do console (N64: 4). E' com isso
+            # que o arquivo nasce preenchido. O nome curto do romset tambem
+            # vale ("Tmnt2 = 4" continua valendo depois que o titulo virou o
+            # nome completo).
+            outros_nomes = tuple(n for n in (romset, titulo_do_arquivo if titulo_do_arquivo != titulo else None)
+                                 if n)
+            do_jogo = jogadores.regra_do_arquivo(titulo, regras, outros_nomes)
+            if do_jogo is None:
+                do_jogo = jogadores.numero_sem_regra(plataforma, titulo, outros_nomes)
             # O que o jogo aceita, limitado ao que o nucleo permite
             # (servidor\multitap.json). O mesmo calculo do /api/jogar.
             ligacao = graficos.jogadores_do_jogo(

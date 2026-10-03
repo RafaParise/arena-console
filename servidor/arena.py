@@ -74,6 +74,7 @@ import graficos    # noqa: E402
 import hardware    # noqa: E402
 import indexador   # noqa: E402  (precisam vir depois do ajuste de sys.path)
 import integridade  # noqa: E402  (zip de fliperama danificado)
+import jogadores   # noqa: E402  (quantos jogadores cada jogo aceita)
 import processos   # noqa: E402  (prioridade e economia de energia -- 30/09/2026)
 import janela_preta  # noqa: E402  (servidor que caia ou travava -- 02/10/2026)
 import como_colocar  # noqa: E402  (como colocar os jogos de cada console -- 02/10/2026)
@@ -2265,13 +2266,11 @@ def jogadores_pedidos(plataforma, jogo):
 
     Vem do indice (indexador), que le o dados\\jogadores.txt do professor --
     o MESMO numero que o cartao mostra. Indice antigo, de antes do arquivo
-    existir: a regra de antes (lista de Multitap = 5, numero do console,
-    senao 2)."""
+    existir: o que o ARENA ja sabe (jogos testados, lista de Multitap = 5,
+    numero do console, senao 2 -- jogadores.numero_sem_regra)."""
     if jogo.get("jogadores_do_jogo"):
         return int(jogo["jogadores_do_jogo"])
-    if graficos.jogo_suporta_multitap(plataforma, jogo.get("titulo")):
-        return graficos.JOGADORES_MULTITAP
-    return int(plataforma.get("jogadores_max", 2) or 2)
+    return jogadores.numero_sem_regra(plataforma, jogo.get("titulo"))
 
 
 def executar_jogo(jogo, apelido, config, custo=None, partida=None):
