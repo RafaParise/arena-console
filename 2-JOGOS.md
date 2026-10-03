@@ -303,6 +303,16 @@ mesma pasta, de preferência uma pasta com o nome do jogo.
 - A BIOS do Neo Geo (`neogeo.zip`) não aparece como jogo, mesmo se estiver
   na pasta dos jogos.
 
+#### Jogo de CD baixado em .zip
+
+O emulador não abre jogo de CD de dentro de um `.zip` (o `.cue` precisa dos
+`.bin` ao lado, soltos). Se você puser o `.zip` na pasta do console, o
+cartão avisa e traz o botão **Arrumar: descompactar**: o ARENA descompacta
+numa pasta com o nome do jogo, em segundo plano (um CD tem até 700 MB: o
+botão mostra quanto já foi), conferindo antes se cabe. O `.zip` fica — pode
+apagar depois, para liberar espaço. Com `.7z` o ARENA não consegue: use o
+7-Zip ou o Explorador do Windows.
+
 #### Jogo de vários discos
 
 Jogo que saiu em mais de um disco — `Final Fantasy VII (USA) (Disc 1).chd`,
@@ -368,19 +378,25 @@ Instinct**. É também esse nome que o botão **Buscar capa** usa. Na lista de
 jogadores (`dados\jogadores.txt`), vale escrever o nome completo ou o curto
 (`Tmnt2 = 4` continua valendo).
 
-**O ARENA avisa, na tela do jogo, o que impede um fliperama de abrir:**
+**O ARENA avisa, na tela do jogo, o que impede um fliperama de abrir.**
+Quando só existe um jeito certo, o aviso vem com o botão **Arrumar**, que
+faz o conserto no clique (o ARENA nunca mexe no arquivo do jogo sozinho, e
+nunca apaga nem passa por cima de nada):
 
 | Aviso | O que fazer |
 |---|---|
-| O disco (`.chd`) está dentro de um `.zip` (ex.: `kinst-chd.zip`) | Extraia o `.chd` para a subpasta com o nome do jogo (`Arcade\kinst\kinst.chd`). O emulador não lê disco de dentro de `.zip` |
-| O disco (`.chd`) está sozinho, sem o `.zip` do jogo ao lado | Ponha o `.zip` do romset (ex.: `kinst.zip`) na pasta de cima. O jogo abre pelo `.zip`; o `.chd` é só o disco dele |
+| O disco (`.chd`) está dentro de um `.zip` (ex.: `kinst-chd.zip`) | **Arrumar** tira o `.chd` para a subpasta com o nome do jogo (`Arcade\kinst\kinst.chd`); o `.zip` fica. O emulador não lê disco de dentro de `.zip` |
+| O disco (`.chd`) está solto, ao lado do `.zip` (`Arcade\kinst.chd`) | **Arrumar** cria a pasta `kinst` e põe o disco dentro |
+| O disco (`.chd`) está numa pasta com outro nome (`Arcade\Killer Instinct\kinst.chd`) | **Arrumar** leva o disco para a pasta com o nome do `.zip` (`Arcade\kinst`) |
+| O disco (`.chd`) está sozinho, sem o `.zip` do jogo | Ponha o `.zip` do romset (ex.: `kinst.zip`) na pasta: o jogo abre pelo `.zip`; o `.chd` é só o disco dele |
+| O jogo não abriu porque falta o disco (o MAME diz qual) | O ARENA cria a pasta onde ele vai (`Arcade\kinst`), com um `LEIA.txt` dizendo o nome do arquivo: é só pôr lá |
 | O emulador não conhece o nome do arquivo (ex.: `The King Of Fighters 2002.zip`) | Renomeie para o nome curto do romset. O aviso já diz qual, procurando o título no banco do RetroArch (ex.: **kof2002.zip**); quando é só um palpite pelo começo do título, ele diz "confira" |
-| Os arquivos estão dentro de uma pasta no `.zip` | Compacte de novo só os arquivos, sem a pasta |
+| Os arquivos estão dentro de uma pasta no `.zip` | **Arrumar** refaz o `.zip` sem a pasta; o original fica guardado em `backup\originais` |
 | O `.zip` está corrompido | Baixe ou copie o jogo de novo |
 | **O arquivo está danificado: a parte X não confere** | Copie o jogo de novo, de uma cópia boa. Foi o caso do Metal Slug X com personagens de cor estranha: uma parte do gráfico dos personagens estava estragada dentro do `.zip`, e o FBNeo abria assim mesmo |
-| A BIOS do Neo Geo está com outro nome (ex.: `neogeo.mame.zip`) | Renomeie para `neogeo.zip`, na mesma pasta |
-| Jogo de Neo Geo na pasta `Arcade` sem o `neogeo.zip` ao lado | Ponha o `neogeo.zip` na pasta `Arcade`: o MAME só procura ali |
-| O `.zip` está dentro da pasta do disco (`Arcade\kinst\kinst.zip`) | Tire o `.zip` dessa pasta e ponha na pasta de cima; dentro dela fica só o `.chd` |
+| A BIOS do Neo Geo está com outro nome (ex.: `neogeo.mame.zip`) | **Arrumar** renomeia para `neogeo.zip` |
+| Jogo de Neo Geo na pasta `Arcade` sem o `neogeo.zip` ao lado | **Arrumar** põe uma cópia do `neogeo.zip` da pasta `BIOS` ao lado do jogo: o MAME só procura ali |
+| O `.zip` está dentro da pasta do disco (`Arcade\kinst\kinst.zip`) | **Arrumar** tira o `.zip` dessa pasta e põe na pasta de cima; dentro dela fica só o `.chd` |
 
 A conferência de "arquivo danificado" descompacta o `.zip` inteiro, então o
 ARENA faz uma vez só por arquivo, em segundo plano, logo depois de abrir

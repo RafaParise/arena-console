@@ -195,7 +195,7 @@ def analisar(texto, caminho_jogo, nucleo=""):
     # causa, e o emulador diz qual arquivo (03/10/2026).
     texto_bios = motivo_da_bios(texto, caminho_jogo, quem)
     if texto_bios:
-        return {"texto": texto_bios, "faltando": [], "renomear": None}
+        return {"texto": texto_bios, "faltando": [], "renomear": None, "discos": []}
 
     pasta = os.path.dirname(caminho_jogo or "")
     nome_zip = os.path.basename(caminho_jogo or "")
@@ -226,10 +226,18 @@ def analisar(texto, caminho_jogo, nucleo=""):
         # Nao esta em BIOS nenhuma da pasta, mas e' nome da BIOS do Neo Geo.
         if not achou and bios_certa in ("", "neogeo.zip") and RE_BIOS_NEOGEO.match(nome):
             sem_zip.append(nome)
-    do_jogo = [n for n in faltando if n not in da_bios and n not in sem_zip]
+    # O disco (.chd) que falta nao fica DENTRO do zip: fica numa pasta com o
+    # nome do zip, ao lado dele ("kinst.chd NOT FOUND (tried in kinst)").
+    discos = [n for n in faltando if n.lower().endswith(".chd")]
+    do_jogo = [n for n in faltando if n not in da_bios and n not in sem_zip and n not in discos]
     bios_nome = bios_certa or "neogeo.zip"
 
     partes = []
+    if discos:
+        romset_do_zip = os.path.splitext(nome_zip)[0]
+        partes.append("Falta o disco deste jogo (%s): ele fica na pasta %s, ao lado do %s. Ponha o "
+                      "arquivo lá e abra de novo."
+                      % (_lista(discos), os.path.join(os.path.basename(pasta), romset_do_zip), nome_zip))
     if renomear:
         partes.append("A BIOS está na pasta, mas com o nome errado: renomeie %s para %s "
                       "(o emulador só procura por esse nome)." % renomear)
@@ -280,4 +288,4 @@ def analisar(texto, caminho_jogo, nucleo=""):
 
     abertura = "%s não abriu este jogo." % quem
     return {"texto": abertura + " " + " ".join(partes), "faltando": faltando,
-            "renomear": renomear}
+            "renomear": renomear, "discos": discos}

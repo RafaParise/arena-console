@@ -1287,6 +1287,195 @@
     "extra": "falhas=0/20"
   },
   {
+    "rota": "/api/bios",
+    "metodo": "GET",
+    "categoria": "dados_corretos",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/bios",
+    "metodo": "GET",
+    "categoria": "dados_faltando",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/bios",
+    "metodo": "GET",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/bios/conferir",
+    "metodo": "POST",
+    "categoria": "dados_corretos",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/bios/conferir",
+    "metodo": "POST",
+    "categoria": "dados_faltando",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/bios/conferir",
+    "metodo": "POST",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/jogo/arrumar",
+    "metodo": "POST",
+    "categoria": "dados_corretos",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/jogo/arrumar",
+    "metodo": "POST",
+    "categoria": "dados_faltando",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/jogo/arrumar",
+    "metodo": "POST",
+    "categoria": "tipo_errado",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=jogo_id"
+  },
+  {
+    "rota": "/api/jogo/arrumar",
+    "metodo": "POST",
+    "categoria": "tipo_errado",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=acao"
+  },
+  {
+    "rota": "/api/jogo/arrumar",
+    "metodo": "POST",
+    "categoria": "texto_gigante",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=jogo_id"
+  },
+  {
+    "rota": "/api/jogo/arrumar",
+    "metodo": "POST",
+    "categoria": "texto_gigante",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=acao"
+  },
+  {
+    "rota": "/api/jogo/arrumar",
+    "metodo": "POST",
+    "categoria": "emoji",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=jogo_id"
+  },
+  {
+    "rota": "/api/jogo/arrumar",
+    "metodo": "POST",
+    "categoria": "emoji",
+    "status": 400,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=acao"
+  },
+  {
+    "rota": "/api/jogo/arrumar",
+    "metodo": "POST",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
+    "rota": "/api/arrumar/progresso",
+    "metodo": "GET",
+    "categoria": "dados_corretos",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/arrumar/progresso",
+    "metodo": "GET",
+    "categoria": "dados_faltando",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": ""
+  },
+  {
+    "rota": "/api/arrumar/progresso",
+    "metodo": "GET",
+    "categoria": "tipo_errado",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=tarefa"
+  },
+  {
+    "rota": "/api/arrumar/progresso",
+    "metodo": "GET",
+    "categoria": "texto_gigante",
+    "status": 414,
+    "ok": true,
+    "motivo": "414 recusado pelo http.server (esperado)",
+    "extra": "campo=tarefa"
+  },
+  {
+    "rota": "/api/arrumar/progresso",
+    "metodo": "GET",
+    "categoria": "emoji",
+    "status": 404,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "campo=tarefa"
+  },
+  {
+    "rota": "/api/arrumar/progresso",
+    "metodo": "GET",
+    "categoria": "repeticao_rapida",
+    "status": 200,
+    "ok": true,
+    "motivo": "ok",
+    "extra": "falhas=0/20"
+  },
+  {
     "rota": "/api/pastas/criar",
     "metodo": "POST",
     "categoria": "dados_corretos",

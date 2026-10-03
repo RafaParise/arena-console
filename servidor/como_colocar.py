@@ -43,7 +43,8 @@ TIPOS = {
     },
     "disco": {
         "zip": "nao",
-        "regra_zip": "NÃO use .zip: disco de CD dentro de zip não abre. Descompacte antes.",
+        "regra_zip": ("NÃO use .zip: disco de CD dentro de zip não abre. Descompacte antes (se já "
+                      "pôs o .zip, o botão Arrumar, no painel do jogo, descompacta)."),
         "como": ("Um arquivo por disco. O melhor é o .chd (um arquivo só, menor). Se veio como "
                  ".cue + .bin, deixe os dois JUNTOS na mesma pasta — a lista mostra só o .cue. "
                  "Jogo de vários discos: deixe todos na mesma pasta com (Disc 1), (Disc 2) no "
@@ -54,8 +55,9 @@ TIPOS = {
         "regra_zip": ("O jogo É o .zip, com o nome curto que o emulador conhece (mslugx.zip, "
                       "kof97.zip). NÃO descompacte e NÃO troque o nome."),
         "como": ("Um .zip por jogo. Jogo com disco (.chd): numa pasta com o mesmo nome do zip, ao "
-                 "lado dele (kinst.zip e a pasta kinst com o kinst.chd). Na hora de jogar, a ficha "
-                 "é o Select."),
+                 "lado dele (kinst.zip e a pasta kinst com o kinst.chd). Fora do lugar, o painel do "
+                 "jogo mostra o botão Arrumar, que põe cada arquivo onde vai. Na hora de jogar, a "
+                 "ficha é o Select."),
     },
     "externo": {
         "zip": "nao",

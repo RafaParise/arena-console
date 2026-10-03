@@ -833,6 +833,46 @@ function desenharAvisosDoJogo(jogo) {
     botao.textContent = `Mover para ${destino ? destino.nome : "a pasta certa"}`;
     botao.onclick = () => moverJogo(jogo.id, mover.mover_para);
   }
+  // "Arrumar": o arquivo fora do lugar que so tem um jeito certo (pedido do
+  // Rafael, 03/10/2026 -- o kinst.zip dentro da pasta do disco, o disco
+  // solto...). Quem faz e' o servidor (servidor/arrumar.py), so no clique.
+  const botoes = avisos.filter((a) => a.arrumar).map((a) => {
+    const b = document.createElement("button");
+    b.className = "botao";
+    b.type = "button";
+    b.textContent = a.arrumar.rotulo;
+    b.addEventListener("click", () => arrumarJogo(jogo.id, a.arrumar.acao, b));
+    return b;
+  });
+  $("#detalhesArrumar").replaceChildren(...botoes);
+}
+
+async function arrumarJogo(jogoId, acao, botao) {
+  botao.disabled = true;
+  try {
+    let dados = await pedir("/api/jogo/arrumar", "POST", { jogo_id: jogoId, acao });
+    recado(dados.mensagem);
+    // Descompactar demora (um CD tem 700 MB): o servidor faz em segundo
+    // plano e a tela mostra quanto ja foi.
+    if (dados.tarefa) {
+      const tarefa = encodeURIComponent(dados.tarefa);
+      const texto = botao.textContent;
+      for (;;) {
+        await new Promise((pronto) => setTimeout(pronto, 1000));
+        dados = await pedir(`/api/arrumar/progresso?tarefa=${tarefa}`);
+        if (dados.estado !== "rodando") break;
+        const parte = dados.total ? Math.floor((100 * dados.feito) / dados.total) : 0;
+        botao.textContent = `Descompactando... ${parte}%`;
+      }
+      botao.textContent = texto;
+      recado(dados.mensagem, dados.estado === "erro");
+    }
+    await carregarCatalogo();
+  } catch (falha) {
+    recado(falha.message, true);
+  } finally {
+    botao.disabled = false;
+  }
 }
 
 // O Windows em "melhor desempenho" (animacoes desligadas) faz o navegador

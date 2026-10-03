@@ -862,6 +862,8 @@ input::placeholder { color: var(--texto-apagado); }
 }
 .detalhes-aviso p { margin: 0; font-size: var(--t-peq); color: var(--texto); }
 .detalhes-aviso .botao { width: 100%; }
+.detalhes-arrumar { display: grid; gap: 0.4rem; }
+.detalhes-arrumar:empty { display: none; }
 .detalhes-meta { display: grid; gap: .6rem; margin: 1rem 0; }
 .detalhes-meta div { border-top: 1px solid var(--borda); padding-top: .45rem; }
 .detalhes-meta dt { color: var(--texto-apagado); font-size: var(--t-micro); }

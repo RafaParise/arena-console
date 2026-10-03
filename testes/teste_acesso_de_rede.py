@@ -108,6 +108,9 @@ def main():
             ("GET", "/api/bios", None),
             ("POST", "/api/bios/conferir", {}),
             ("POST", "/api/bios/pasta", {}),
+            # O botao Arrumar (03/10/2026): mexe em arquivo de jogo.
+            ("POST", "/api/jogo/arrumar", {"jogo_id": "x", "acao": "disco_solto"}),
+            ("GET", "/api/arrumar/progresso?tarefa=x", None),
         ]:
             status, resp = requisicao(metodo, caminho, corpo)
             passou = status == 403

@@ -80,6 +80,7 @@ import janela_preta  # noqa: E402  (servidor que caia ou travava -- 02/10/2026)
 import como_colocar  # noqa: E402  (como colocar os jogos de cada console -- 02/10/2026)
 import motivo_do_erro  # noqa: E402  (por que o jogo nao abriu, pelo registro -- 02/10/2026)
 import bios        # noqa: E402  (nome, pasta e versao certa de cada BIOS -- 03/10/2026)
+import arrumar     # noqa: E402  (o botao Arrumar: o arquivo do jogo no lugar certo -- 03/10/2026)
 
 PASTA_LAUNCHER = os.path.join(RAIZ, "launcher")
 PASTA_DADOS = os.path.join(RAIZ, "dados")
@@ -2237,6 +2238,12 @@ def anotar_motivo_do_erro(jogo, desde):
         resultado = motivo_do_erro.analisar(motivo_do_erro.ler(registro), caminho,
                                            jogo.get("core", ""))
         problemas = ler_problemas()
+        if resultado and resultado.get("discos"):
+            # Faltou o disco (.chd) de um fliperama: a pasta onde ele vai
+            # (Arcade\kinst, ao lado do kinst.zip) passa a existir, com um
+            # LEIA dizendo o que por la -- guia quem nao sabe onde fica.
+            if arrumar.pasta_do_disco(caminho, resultado["discos"], PASTA_JOGOS):
+                resultado["texto"] += " O ARENA criou essa pasta, com um LEIA dentro."
         if resultado:
             problemas[jogo["id"]] = {"texto": resultado["texto"], "quando": agora_utc(),
                                      "assinatura": assinatura_do_arquivo(caminho)}
@@ -4280,6 +4287,14 @@ class Manipulador(BaseHTTPRequestHandler):
         # As BIOS de cada console, como estao agora (Ajustes -> Emuladores ->
         # BIOS dos consoles): ativa, de outra versao ou falta, e onde fica a
         # prateleira de cada uma (a pasta BIOS do ARENA, servidor\bios.py).
+        # Andamento do "Arrumar" demorado (descompactar um jogo de CD).
+        if caminho == "/api/arrumar/progresso":
+            parametros = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+            tarefa = arrumar.progresso((parametros.get("tarefa") or [""])[0][:40])
+            if not tarefa:
+                return self.erro("Essa tarefa não existe mais. Clique em Atualizar lista.", 404)
+            return self.responder_json(dict(ok=True, **tarefa))
+
         if caminho == "/api/bios":
             itens = bios.situacao(RAIZ)
             return self.responder_json({"ok": True, "pasta": bios.NOME_DA_PASTA, "itens": itens,
@@ -5030,6 +5045,59 @@ class Manipulador(BaseHTTPRequestHandler):
                 "pasta": plataforma["pasta"],
             })
 
+        # ---- arrumar o arquivo de um jogo (botao Arrumar do cartao) --------
+        # Conserto de posicao com um jeito certo so (servidor\arrumar.py): o
+        # kinst.zip dentro da pasta do disco, o disco solto ao lado do zip, a
+        # BIOS do Neo Geo na pasta do jogo... So no clique da pessoa (o ARENA
+        # nunca move arquivo de jogo sozinho); confere de novo antes de fazer.
+        # So deste computador (nao esta em ROTAS_REDE_EXTERNA).
+        if caminho == "/api/jogo/arrumar":
+            jogo = achar_jogo(str(dados.get("jogo_id", "")))
+            if not jogo:
+                return self.erro("Jogo não encontrado. Ele pode ter sido movido ou apagado. "
+                                 "Clique em Atualizar lista e tente de novo.", 404)
+            origem = os.path.join(RAIZ, jogo["arquivo"])
+            if not dentro_da_pasta(origem, PASTA_JOGOS) or not os.path.exists(origem):
+                return self.erro("O arquivo do jogo não está mais no lugar. Clique em Atualizar lista.", 404)
+            with TRAVA_JOGO:
+                if JOGO_EM_ANDAMENTO["ativo"]:
+                    return self.erro("Feche o jogo aberto antes de arrumar os arquivos.", 409)
+            acao = str(dados.get("acao", ""))
+            if acao in arrumar.DEMORADAS:
+                # Descompactar demora (um CD tem 700 MB): em segundo plano; a
+                # tela acompanha por /api/arrumar/progresso.
+                disco_zipado = None
+                if acao == "extrair_disco":
+                    pasta_do_jogo = os.path.dirname(origem)
+                    try:
+                        zipados = indexador.discos_de_fliperama_zipados(pasta_do_jogo, os.listdir(pasta_do_jogo))
+                    except OSError:
+                        zipados = {}
+                    romset = os.path.splitext(os.path.basename(origem))[0].lower()
+                    if romset in zipados:
+                        disco_zipado = os.path.join(pasta_do_jogo, zipados[romset])
+
+                def refazer_a_lista():
+                    limpar_caches()
+                    manifesto(forcar=True)
+                try:
+                    tarefa, mensagem = arrumar.iniciar(acao, origem, PASTA_JOGOS, refazer_a_lista, disco_zipado)
+                except arrumar.NaoDa as falha:
+                    return self.erro(str(falha))
+                except OSError as falha:
+                    return self.erro(traduzir_erro_do_sistema(falha, "descompactar o jogo"))
+                return self.responder_json({"ok": True, "mensagem": mensagem, "tarefa": tarefa})
+            try:
+                mensagem, _novo = arrumar.aplicar(acao, origem, PASTA_JOGOS, RAIZ, indexador.neogeo_do_arena())
+            except arrumar.NaoDa as falha:
+                return self.erro(str(falha))
+            except OSError as falha:
+                return self.erro(traduzir_erro_do_sistema(falha, "arrumar o arquivo"))
+            limpar_caches()
+            manifesto(forcar=True)
+            print("[ARENA] Arrumado: %s" % mensagem)
+            return self.responder_json({"ok": True, "mensagem": mensagem})
+
         # ---- corrigir o console de um jogo ---------------------------------
         if caminho == "/api/jogo/console":
             jogo_id = str(dados.get("jogo_id", ""))
@@ -5446,6 +5514,12 @@ class Manipulador(BaseHTTPRequestHandler):
                                if p["id"] == jogo["plataforma"]), None)
             if not plataforma:
                 return self.erro("Plataforma desconhecida.")
+            # Jogo de CD dentro de .zip: o emulador nao abre assim (o RetroArch
+            # tira um arquivo so do zip, e o .cue precisa dos .bin ao lado).
+            # O problema e' o arquivo: diz isso antes de olhar o emulador.
+            if any(a.get("descompactar") for a in jogo.get("avisos") or []):
+                return self.erro("Este jogo de CD está dentro de um .zip, e o emulador não abre assim. "
+                                 "Clique no botão Arrumar, no painel do jogo: o ARENA descompacta.")
 
             # Emulador de fora tem prioridade. Se ele existe, o RetroArch
             # nem precisa estar instalado para esta plataforma.

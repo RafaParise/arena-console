@@ -164,6 +164,12 @@ def montar_rotas(jogo_id_real):
         ("POST", "/api/amigo/codigo", {"codigo": "abc123"}, []),
         ("POST", "/api/partida/testar", {"endereco": "192.168.0.5"}, []),
         ("POST", "/api/bios/abrir", {"plataforma": "ps1"}, []),
+        # 03/10/2026: a pasta BIOS e o botao Arrumar. A /api/bios/pasta fica
+        # de fora de proposito: com o corpo vazio ela abre o Explorador.
+        ("GET", "/api/bios", {}, []),
+        ("POST", "/api/bios/conferir", {}, []),
+        ("POST", "/api/jogo/arrumar", {"jogo_id": jogo_id_real or "abc", "acao": "disco_solto"}, []),
+        ("GET", "/api/arrumar/progresso", {"tarefa": "abc"}, []),
         ("POST", "/api/pastas/criar", {}, []),
         ("POST", "/api/jogo/console", {"jogo_id": jogo_id_real or "abc", "plataforma": "nes"}, []),
         ("POST", "/api/estado/apagar", {"jogo_id": jogo_id_real or "abc", "espaco": 0}, []),

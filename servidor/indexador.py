@@ -24,7 +24,9 @@ import re
 import threading
 import unicodedata
 
+import arrumar
 import bios
+import como_colocar
 import graficos
 import identificador
 import jogadores
@@ -207,11 +209,34 @@ def aviso_da_bios_neo_geo(pasta, nucleo):
         return None
     errado = next((n for n in sorted(nomes) if re.match(r"^neogeo[ ._-].+\.(zip|7z)$", n, re.I)), None)
     if errado:
-        return {"texto": "A BIOS do Neo Geo desta pasta está como %s, e o emulador só procura "
-                         "neogeo.zip. Renomeie para neogeo.zip (na mesma pasta)." % errado}
+        aviso = {"texto": "A BIOS do Neo Geo desta pasta está como %s, e o emulador só procura "
+                          "neogeo.zip. Renomeie para neogeo.zip (na mesma pasta)." % errado}
+        if errado.lower().endswith(".zip"):
+            aviso["arrumar"] = arrumar.conserto("bios_neogeo_nome", atual=errado)
+        return aviso
     if nucleo == "mame":
-        return {"texto": "Jogo de Neo Geo: o MAME precisa da BIOS neogeo.zip na mesma pasta do "
-                         "jogo (ela não aparece na lista)."}
+        # Com a BIOS na pasta BIOS do ARENA, o botao Arrumar poe uma copia aqui.
+        aviso = {"texto": "Jogo de Neo Geo: o MAME precisa da BIOS neogeo.zip na mesma pasta do "
+                          "jogo (ela não aparece na lista)."}
+        if neogeo_do_arena():
+            aviso["arrumar"] = arrumar.conserto("bios_neogeo")
+        return aviso
+    return None
+
+
+def tipo_de_console(id_plataforma, plataforma):
+    """'cartucho', 'disco', 'fliperama', 'externo'... (servidor\\como_colocar.py):
+    decide se o console abre jogo de dentro de .zip."""
+    tipo = (como_colocar.CONSOLES.get(id_plataforma) or {}).get("tipo")
+    return tipo or ("externo" if (plataforma or {}).get("externo") else "cartucho")
+
+
+def neogeo_do_arena():
+    """O neogeo.zip que o ARENA ja tem (retroarch\\system ou a pasta BIOS), ou None."""
+    for caminho in (os.path.join(RAIZ, "retroarch", "system", "neogeo.zip"),
+                    os.path.join(RAIZ, "BIOS", "Neo Geo", "neogeo.zip")):
+        if os.path.isfile(caminho):
+            return caminho
     return None
 
 
@@ -225,24 +250,25 @@ def avisos_do_romset(caminho, romset, discos_zipados, nucleo=""):
             "disco de dentro de .zip. Extraia o %s.chd para a pasta %s\\%s\\ "
             "(ao lado do %s)." % (romset, discos_zipados[romset], romset,
                                   os.path.basename(os.path.dirname(caminho)), romset,
-                                  os.path.basename(caminho)))})
+                                  os.path.basename(caminho))),
+            "arrumar": arrumar.conserto("extrair_disco", disco=romset + ".chd", zip=discos_zipados[romset])})
     if caminho.lower().endswith(".zip"):
         try:
             with zipfile.ZipFile(caminho) as compactado:
                 dentro = [n for n in compactado.namelist() if not n.endswith("/")]
         except (OSError, zipfile.BadZipFile, ValueError):
             return avisos + [{"texto": "Este .zip está corrompido (não deu para ler o que tem dentro)."}]
-        pastas = {n.replace("\\", "/").split("/", 1)[0] for n in dentro if "/" in n.replace("\\", "/")}
         # Leia-me, imagem e atalho que vem junto nao sao parte do jogo
         # (o kof2002.zip da pasta tem um readme.html solto e os 16 arquivos
-        # do jogo dentro da pasta "king").
-        soltos = [n for n in dentro if "/" not in n.replace("\\", "/")
-                  and not re.search(r"\.(txt|html?|nfo|diz|url|jpe?g|png|gif|pdf|doc)$", n, re.I)]
-        if dentro and not soltos and len(pastas) == 1:
+        # do jogo dentro da pasta "king"). Quem confere e' o arrumar.py --
+        # o mesmo que refaz o zip no botao Arrumar.
+        pasta_interna = arrumar.pasta_dentro_do_zip(caminho)
+        if pasta_interna:
             avisos.append({"texto": (
                 "Os arquivos deste jogo estão dentro da pasta \"%s\" no .zip, e o "
                 "emulador procura na raiz do .zip. Compacte de novo só os arquivos, "
-                "sem a pasta." % next(iter(pastas)))})
+                "sem a pasta." % pasta_interna),
+                "arrumar": arrumar.conserto("pasta_dentro_do_zip", zip=os.path.basename(caminho))})
         if dentro and parece_neo_geo(dentro):
             aviso = aviso_da_bios_neo_geo(os.path.dirname(caminho), nucleo)
             if aviso:
@@ -252,20 +278,38 @@ def avisos_do_romset(caminho, romset, discos_zipados, nucleo=""):
     # ("unknown option: kinst"); com Arcade\kinst.zip + Arcade\kinst\kinst.chd,
     # abre e desenha.
     pasta = os.path.dirname(caminho)
-    if os.path.basename(pasta).lower() == romset and os.path.isfile(os.path.join(pasta, romset + ".chd")):
+    nome_zip = os.path.basename(caminho)
+    if arrumar.zip_na_pasta_do_disco(caminho):
         avisos.append({"texto": (
-            "O %s.zip está dentro da pasta %s, junto do disco, e assim o emulador não abre. "
-            "Tire o %s.zip dessa pasta e ponha na pasta de cima (%s): dentro da pasta %s fica "
-            "só o %s.chd." % (romset, romset, romset, os.path.basename(os.path.dirname(pasta)),
-                             romset, romset))})
+            "O %s está dentro da pasta %s, junto do disco, e assim o emulador não abre. "
+            "Tire o %s dessa pasta e ponha na pasta de cima (%s): dentro da pasta %s fica "
+            "só o disco (.chd)." % (nome_zip, os.path.basename(pasta), nome_zip,
+                                    os.path.basename(os.path.dirname(pasta)), os.path.basename(pasta))),
+            "arrumar": arrumar.conserto("zip_na_pasta_do_disco", zip=nome_zip, pasta=os.path.basename(pasta))})
+    # O disco solto AO LADO do zip (Arcade\kinst.chd + Arcade\kinst.zip): o
+    # MAME procura o disco numa pasta com o nome do zip.
+    solto = arrumar.disco_solto(caminho)
+    if solto:
+        disco = os.path.basename(solto[0])
+        avisos.append({"texto": (
+            "O disco deste jogo (%s) está solto, ao lado do %s, e o emulador só procura o disco "
+            "dentro de uma pasta com o nome do zip: %s\\%s." % (disco, nome_zip, os.path.basename(pasta),
+                                                               os.path.basename(solto[1]))),
+            "arrumar": arrumar.conserto("disco_solto", disco=disco, pasta=os.path.basename(solto[1]))})
     return avisos
 
 
-def chd_de_fliperama(pasta_atual):
+def chd_de_fliperama(pasta_atual, console_da_pasta=None, por_id=None):
     """True se a pasta e' a do disco (.chd) de um jogo de fliperama: o guia
     do libretro manda por o CHD numa subpasta com o nome do romset, ao lado
     do .zip (ex.: Arcade\\kinst.zip + Arcade\\kinst\\kinst.chd). Esse .chd
-    nao e' um jogo sozinho -- e' parte do kinst.zip."""
+    nao e' um jogo sozinho -- e' parte do kinst.zip.
+
+    So nas pastas de fliperama (achado de 03/10/2026, testando o "Arrumar"):
+    o jogo de PS1 descompactado em PS1\\Crash, ao lado do PS1\\Crash.zip,
+    sumia da lista -- a pasta parecia a do disco de um fliperama."""
+    if por_id is not None and tipo_de_console(console_da_pasta, por_id.get(console_da_pasta)) != "fliperama":
+        return False
     nome = os.path.basename(pasta_atual)
     pai = os.path.dirname(pasta_atual)
     return any(os.path.isfile(os.path.join(pai, nome + ext)) for ext in (".zip", ".7z"))
@@ -729,7 +773,8 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None,
         # 'Sony\PlayStation 2\Corrida' tambem e atendido.
         caminho_relativo_pasta = os.path.relpath(pasta_atual, caminho_pasta)
         marcado = ler_marcacao(pasta_atual, por_id)
-        if chd_de_fliperama(pasta_atual):
+        console_da_pasta = marcado or plataforma_pelo_nome(caminho_relativo_pasta, por_id, list(por_id))
+        if chd_de_fliperama(pasta_atual, console_da_pasta, por_id):
             continue   # disco de um romset de fliperama, nao um jogo
         trilhas = trilhas_dos_indices(pasta_atual, arquivos)
         inicio_da_pasta = len(encontrados)
@@ -834,17 +879,44 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None,
                 # Disco de fliperama sem o .zip do romset ao lado (o Kinst
                 # da pasta): sozinho ele nao abre (achado de 02/10/2026).
                 pasta_do_disco = os.path.basename(pasta_atual).lower()
+                base_do_disco = os.path.splitext(nome_arquivo)[0].lower()
                 if any(n.lower() in (pasta_do_disco + ".zip", pasta_do_disco + ".7z") for n in arquivos):
                     # O zip esta AQUI, junto do disco (kinst\kinst.zip): o
                     # cartao e' o do zip, e e' nele que vai o aviso do arranjo.
                     continue
-                nome_banco = nomes_arcade.nome_do_romset(pasta_do_disco + ".zip", nucleo_arcade)
-                if nome_banco:
-                    titulo = nomes_arcade.titulo_para_a_tela(nome_banco)
-                avisos.append({"texto": "Este é o disco (.chd) de um jogo de fliperama: o emulador abre "
-                                        "o jogo pelo %s.zip (o romset), com este disco numa subpasta %s "
-                                        "ao lado dele. Falta o %s.zip na pasta."
-                                        % (pasta_do_disco, pasta_do_disco, pasta_do_disco)})
+                if any(n.lower() in (base_do_disco + ".zip", base_do_disco + ".7z") for n in arquivos):
+                    # O disco solto AO LADO do zip dele (kinst.chd + kinst.zip):
+                    # o cartao e' o do zip, com o aviso e o botao Arrumar.
+                    continue
+                em_outra_pasta = arrumar.disco_em_outra_pasta(caminho_absoluto)
+                if em_outra_pasta:
+                    # Arcade\Killer Instinct\kinst.chd com o Arcade\kinst.zip.
+                    zip_irmao, pasta_certa = em_outra_pasta
+                    nome_banco = nomes_arcade.nome_do_romset(os.path.basename(zip_irmao), nucleo_arcade)
+                    if nome_banco:
+                        titulo = nomes_arcade.titulo_para_a_tela(nome_banco)
+                    avisos.append({"texto": "Este disco (%s) é do %s, mas está na pasta %s: o emulador só "
+                                            "procura o disco numa pasta com o nome do zip (%s), ao lado dele."
+                                            % (nome_arquivo, os.path.basename(zip_irmao),
+                                               os.path.basename(pasta_atual), os.path.basename(pasta_certa)),
+                                   "arrumar": arrumar.conserto_do_disco(caminho_absoluto)})
+                elif os.sep not in os.path.relpath(pasta_atual, caminho_pasta):
+                    # Solto na pasta do console, sem o zip: nao da para saber de
+                    # que jogo e' (achado de 03/10/2026: o aviso dizia "falta o
+                    # arcade.zip", o nome da PASTA do console).
+                    avisos.append({"texto": "Este é o disco (.chd) de um jogo de fliperama, e ele não abre "
+                                            "sozinho: o jogo abre pelo .zip dele (o nome curto, o romset), e "
+                                            "o disco vai numa pasta com o mesmo nome do zip, ao lado dele "
+                                            "(ex.: kinst.zip e a pasta kinst com o kinst.chd dentro). Falta o "
+                                            ".zip deste jogo."})
+                else:
+                    nome_banco = nomes_arcade.nome_do_romset(pasta_do_disco + ".zip", nucleo_arcade)
+                    if nome_banco:
+                        titulo = nomes_arcade.titulo_para_a_tela(nome_banco)
+                    avisos.append({"texto": "Este é o disco (.chd) de um jogo de fliperama: o emulador abre "
+                                            "o jogo pelo %s.zip (o romset), com este disco numa subpasta %s "
+                                            "ao lado dele. Falta o %s.zip na pasta."
+                                            % (pasta_do_disco, pasta_do_disco, pasta_do_disco)})
             # A BIOS que ESTE jogo usa e que nao esta na pasta (servidor\bios.py):
             # Sega CD e Saturn pela regiao do jogo, Dreamcast (sem ela, alguns
             # travam) e Satellaview (o "BS" do nome). Achados: em 02/10/2026 os
@@ -855,6 +927,29 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None,
                                             plataforma.get("nome", ""), caminho_absoluto)
             if aviso_bios:
                 avisos.append({"texto": aviso_bios})
+            # Jogo de CD dentro de .zip (o emulador nao abre CD de dentro de
+            # zip): o cartao explica, e o botao Arrumar descompacta numa pasta
+            # com o nome do jogo (servidor\arrumar.py). Ja descompactado, o
+            # jogo e' o da pasta: o zip que ficou nao entra na lista de novo.
+            tipo_do_console = tipo_de_console(id_plataforma, plataforma)
+            if extensao in (".zip", ".7z") and tipo_do_console in ("disco", "externo"):
+                if extensao == ".7z":
+                    avisos.append({"texto": "Este .7z precisa ser descompactado: o emulador não abre jogo de "
+                                            "CD de dentro de arquivo compactado. Descompacte com o 7-Zip (ou o "
+                                            "Explorador do Windows) numa pasta com o nome do jogo, aqui mesmo, "
+                                            "e clique em Atualizar lista."})
+                elif os.path.isdir(arrumar.pasta_do_descompactado(caminho_absoluto)) \
+                        and arrumar.discos_do_zip(caminho_absoluto):
+                    continue
+                elif arrumar.precisa_descompactar(caminho_absoluto, tipo_do_console):
+                    dentro = [os.path.basename(i.filename) for i in arrumar.discos_do_zip(caminho_absoluto)]
+                    avisos.append({"texto": "Este .zip tem um jogo de CD dentro (%s), e o emulador não abre "
+                                            "CD de dentro de .zip. Ele precisa ser descompactado numa pasta "
+                                            "com o nome do jogo: o botão Arrumar faz isso (o .zip fica)."
+                                            % (", ".join(dentro[:2]) + (" e mais %d" % (len(dentro) - 2)
+                                                                        if len(dentro) > 2 else "")),
+                                   "arrumar": arrumar.conserto("descompactar", zip=nome_arquivo),
+                                   "descompactar": True})
             if discorda:
                 avisos.append({
                     "texto": "O conteúdo deste arquivo é de %s, mas ele está na pasta de %s. "
