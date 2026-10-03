@@ -4953,13 +4953,21 @@ class Manipulador(BaseHTTPRequestHandler):
             entradas = bios.catalogo.por_id()
             alvo_id = str(dados.get("id", "") or "")
             console = str(dados.get("console", "") or "")
+            # 'pasta': o nome de uma pasta de console do catalogo ("Super
+            # Nintendo (Sufami Turbo)") -- so nome da lista, nunca caminho.
+            pasta_pedida = str(dados.get("pasta", "") or "")
+            pastas_do_catalogo = {e["pasta"] for e in bios.catalogo.CATALOGO}
             if alvo_id and alvo_id not in entradas:
                 return self.erro("BIOS desconhecida. Escolha uma da lista.")
+            if pasta_pedida and pasta_pedida not in pastas_do_catalogo:
+                return self.erro("Pasta desconhecida. Escolha uma da lista.")
             do_console = bios.catalogo.do_console(console) if console else []
             if console and not do_console:
                 return self.erro("Este console não usa BIOS. Escolha um console da lista.")
             if alvo_id:
                 alvo = bios.prateleira(RAIZ, entradas[alvo_id])
+            elif pasta_pedida:
+                alvo = os.path.join(RAIZ, bios.NOME_DA_PASTA, pasta_pedida)
             elif do_console:
                 alvo = os.path.join(RAIZ, bios.NOME_DA_PASTA, do_console[0]["pasta"])
             else:

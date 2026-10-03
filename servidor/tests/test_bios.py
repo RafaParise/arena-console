@@ -241,6 +241,15 @@ class TestOrganizar(ArenaDeMentira):
         self.organizar()
         self.assertFalse(os.path.isfile(na_prateleira))
 
+    def test_arena_copiado_sem_a_pasta_bios(self):
+        """Quem copia o ARENA sem a pasta BIOS (dados\\ vai junto): as
+        prateleiras se enchem de novo -- o "ja copiei" era da outra pasta."""
+        self.gravar(os.path.join(self.sistema, "bios_CD_E.bin"), SEGACD_E)
+        self.organizar()
+        shutil.rmtree(os.path.join(self.raiz, "BIOS"))
+        self.organizar()
+        self.assertTrue(os.path.isfile(os.path.join(self.raiz, "BIOS", "Sega CD", "Europa", "bios_CD_E.bin")))
+
     def test_playstation_pelo_conteudo_e_basta_uma_regiao(self):
         self.gravar(os.path.join(self.raiz, "BIOS", "PS1", "Japão", "psx jp.bin"), ps1_de_mentira("J"))
         feito = self.organizar()

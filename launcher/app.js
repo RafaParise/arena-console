@@ -2466,14 +2466,19 @@ function desenharBiosConsoles(dados) {
       detalhes.append(li);
     }
 
+    // Um botao por pasta do console (o Super Nintendo tem a do Satellaview e
+    // a do Sufami Turbo); dentro dela ficam as das regioes.
     const acoes = document.createElement("div");
     acoes.className = "controle-acoes";
-    const abrir = document.createElement("button");
-    abrir.className = "botao";
-    abrir.type = "button";
-    abrir.textContent = `Abrir a pasta ${doConsole[0].pasta.split("\\").slice(0, 2).join("\\")}`;
-    abrir.addEventListener("click", () => abrirPastaDaBios({ console: consoleId }));
-    acoes.append(abrir);
+    const pastas = [...new Set(doConsole.map((i) => i.pasta.split("\\")[1]))];
+    for (const pasta of pastas) {
+      const abrir = document.createElement("button");
+      abrir.className = "botao";
+      abrir.type = "button";
+      abrir.textContent = `Abrir a pasta BIOS\\${pasta}`;
+      abrir.addEventListener("click", () => abrirPastaDaBios({ pasta }));
+      acoes.append(abrir);
+    }
 
     linha.append(titulo, selo, detalhes, acoes);
     lote.append(linha);

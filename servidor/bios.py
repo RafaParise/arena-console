@@ -1414,12 +1414,17 @@ def organizar(raiz=None, pasta_info=None):
     pasta_info = pasta_info or lugar["info"]
     with _trava_organizar:
         feito = {"instaladas": [], "copiadas": [], "avisos": []}
+        pasta_nova = not os.path.isdir(lugar["bios"])
         criar_prateleiras(raiz)
         arquivo_conferidos = os.path.join(lugar["dados"], ARQUIVO_CONFERIDOS)
         conferidos = _ler_conferidos(arquivo_conferidos)
         antes = json.dumps(conferidos, sort_keys=True)
         arquivos = conferidos.setdefault("arquivos", {})
         copiadas = conferidos.setdefault("copiadas", {})
+        if pasta_nova:
+            # A pasta BIOS acabou de nascer (ARENA copiado sem ela, ou a
+            # primeira vez): o "ja copiei" de antes era de outra pasta.
+            copiadas.clear()
         candidatos = _candidatos(raiz, arquivos, pasta_info, feito["avisos"])
         _instalar(raiz, candidatos, pasta_info, feito)
         _instalar_pastas(raiz, feito)

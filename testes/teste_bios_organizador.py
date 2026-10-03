@@ -132,6 +132,8 @@ def main():
             confere("BIOS inventada: recusa", status == 400, status)
             status, _r = servidor_de_teste.pedir(porta, "POST", "/api/bios/pasta", {"console": "megadrive"})
             confere("console sem BIOS: recusa", status == 400, status)
+            status, _r = servidor_de_teste.pedir(porta, "POST", "/api/bios/pasta", {"pasta": "..\\..\\Windows"})
+            confere("pasta fora da lista: recusa", status == 400, status)
 
             print("5. A tela")
             with tela_sem_janela.Navegador() as nav:
