@@ -35,7 +35,17 @@ versao, e nenhum caminho da maquina do professor sobra nela.
 
 Uso:
     servidor\python\python.exe ferramentas\montar_versao_alunos.py [--com-bios] [--destino PASTA]
+    servidor\python\python.exe ferramentas\montar_versao_alunos.py --atualizar [--destino PASTA]
+
+TRAVA (02/10/2026): montar APAGA a pasta de destino e faz de novo. Se ela ja
+foi usada (jogos, dados, saves, recordes...), a montagem recusa -- o Rafael
+estava jogando na ARENA-alunos, com 3,7 GB de jogos dele, quando a versao
+precisou de conserto. Para esse caso existe o --atualizar: troca SO o
+programa do ARENA (servidor, tela, guias, .bat e as ferramentas do COLETAR) e
+nao encosta em jogos, dados, saves, estados, capas, cartoes de memoria nem
+nos emuladores. Confere antes e depois que nada de quem usou mudou.
 """
+import filecmp
 import fnmatch
 import json
 import os
@@ -65,6 +75,18 @@ JOGO_PS1 = (os.path.join("jogos", "pessoais", "PS1", "Crash Bandicoot (USA).chd"
 LIXO_SEMPRE = ["__pycache__", "*.pyc", "*.pyo", "*.log", "*.tmp", "Thumbs.db", "desktop.ini", "*.bak",
                "*.antes-*", "*.antes_*"]
 
+# Onde mora o que e' de quem USOU a versao (a montagem so poe LEIA.txt e,
+# com --com-bios, o neogeo.zip). Achou outra coisa: a versao esta em uso.
+PASTAS_DE_QUEM_USOU = ["dados", "jogos", "backup",
+                       os.path.join("retroarch", "saves"), os.path.join("retroarch", "states"),
+                       os.path.join("retroarch", "screenshots"), os.path.join("retroarch", "thumbnails"),
+                       os.path.join("retroarch", "remaps"),
+                       os.path.join("emuladores", "PCSX2", "PCSX2", "memcards"),
+                       os.path.join("emuladores", "PCSX2", "PCSX2", "sstates"),
+                       os.path.join("emuladores", "Dolphin", "Dolphin-x64", "User"),
+                       os.path.join("emuladores", "RPCS3", "RPCS3", "dev_hdd0"),
+                       os.path.join("emuladores", "Xenia", "Xenia", "content")]
+
 # BIOS que o ARENA conhece (retroarch\system): o resto da pasta e' apoio.
 PADROES_BIOS = ["*.bin", "*.BIN", "*.rom", "*.ROM*", "*.MEC", "*.NVM", "*.EROM", "neogeo*.zip", "*.sfx", "*.sp1",
                 "*.sm1", "*.lo", "dc", "bios*", "*.chd"]
@@ -91,6 +113,138 @@ def copiar_leia(rel, destino_raiz):
     os.makedirs(os.path.join(destino_raiz, rel), exist_ok=True)
     if os.path.isfile(origem):
         copiar_arquivo(origem, os.path.join(destino_raiz, rel, "LEIA.txt"))
+
+
+def coisas_de_quem_usou(destino):
+    """Arquivos que a montagem NAO poe e que sao de quem usou a versao."""
+    achados = []
+    for rel in PASTAS_DE_QUEM_USOU:
+        for atual, _sub, arquivos in os.walk(os.path.join(destino, rel)):
+            for nome in arquivos:
+                if nome == "LEIA.txt" or fnmatch.fnmatch(nome.lower(), "neogeo*.zip"):
+                    continue
+                achados.append(os.path.relpath(os.path.join(atual, nome), destino))
+    return sorted(achados)
+
+
+def retrato(destino, arquivos):
+    """Nome -> (tamanho, data) de cada arquivo: para provar que nada mudou."""
+    marcas = {}
+    for rel in arquivos:
+        try:
+            info = os.stat(os.path.join(destino, rel))
+            marcas[rel] = (info.st_size, info.st_mtime_ns)
+        except OSError:
+            marcas[rel] = None
+    return marcas
+
+
+def mudou(origem, alvo):
+    """O arquivo do programa e' diferente do que esta na versao (ou falta)?"""
+    return not os.path.isfile(alvo) or not filecmp.cmp(origem, alvo, shallow=False)
+
+
+def espelhar(origem, destino, extra=()):
+    """Deixa 'destino' igual a 'origem' (com as mesmas regras de lixo da
+    montagem): copia o que mudou e tira o que nao existe mais no programa.
+    So para pasta de PROGRAMA (servidor, launcher): nelas nao mora dado de
+    quem usa. Devolve (copiados, tirados)."""
+    padroes = LIXO_SEMPRE + list(extra)
+    lixo = lambda nome: any(fnmatch.fnmatch(nome, p) for p in padroes)  # noqa: E731
+    queridos, pastas, copiados, tirados = set(), set(), [], []
+    for atual, subpastas, arquivos in os.walk(origem):
+        subpastas[:] = [s for s in subpastas if not lixo(s)]
+        pastas.add(os.path.normcase(os.path.relpath(atual, origem)))
+        for nome in arquivos:
+            if lixo(nome):
+                continue
+            rel = os.path.relpath(os.path.join(atual, nome), origem)
+            queridos.add(os.path.normcase(rel))
+            alvo = os.path.join(destino, rel)
+            if mudou(os.path.join(atual, nome), alvo):
+                copiar_arquivo(os.path.join(atual, nome), alvo)
+                copiados.append(rel)
+    for atual, subpastas, arquivos in os.walk(destino, topdown=False):
+        for nome in arquivos:
+            rel = os.path.relpath(os.path.join(atual, nome), destino)
+            if os.path.normcase(rel) not in queridos:
+                os.remove(os.path.join(atual, nome))
+                tirados.append(rel)
+        # Pasta vazia que o programa nao tem mais sai; a que ele tem, fica.
+        if atual != destino and not os.listdir(atual) \
+                and os.path.normcase(os.path.relpath(atual, destino)) not in pastas:
+            os.rmdir(atual)
+    return copiados, tirados
+
+
+def atualizar(destino):
+    """Troca so o programa do ARENA numa versao que ja esta em uso.
+    Devolve (copiados, tirados, quantos arquivos de quem usou, problemas)."""
+    de_quem_usou = coisas_de_quem_usou(destino)
+    antes = retrato(destino, de_quem_usou)
+    copiados, tirados = [], []
+    for nome in ARQUIVOS_DA_RAIZ:
+        origem, alvo = os.path.join(RAIZ, nome), os.path.join(destino, nome)
+        if mudou(origem, alvo):
+            copiar_arquivo(origem, alvo)
+            copiados.append(nome)
+    for pasta, extra in (("servidor", ["tests"]), ("launcher", [])):
+        c, r = espelhar(os.path.join(RAIZ, pasta), os.path.join(destino, pasta), extra)
+        copiados += [os.path.join(pasta, x) for x in c]
+        tirados += [os.path.join(pasta, x) for x in r]
+    for nome in FERRAMENTAS:
+        origem, alvo = os.path.join(RAIZ, "ferramentas", nome), os.path.join(destino, "ferramentas", nome)
+        if mudou(origem, alvo):
+            copiar_arquivo(origem, alvo)
+            copiados.append(os.path.join("ferramentas", nome))
+    problemas = []
+    depois = retrato(destino, de_quem_usou)
+    if depois != antes or coisas_de_quem_usou(destino) != de_quem_usou:
+        problemas.append("algo de quem usou mudou durante a atualizacao (nao devia)")
+    return copiados, tirados, len(de_quem_usou), problemas
+
+
+def prova_do_programa(destino):
+    """O servidor da versao atualizada abre e diz a versao certa -- numa copia
+    temporaria SO do programa (dados vazios): os dados de quem usa ficam
+    intocados."""
+    if not porta_livre():
+        return ["nao deu para conferir: o ARENA de verdade esta aberto (porta 8777)"]
+    copia = os.path.join(tempfile.mkdtemp(prefix="arena_atualizacao_"), "ARENA")
+    for pasta in ("servidor", "launcher"):
+        shutil.copytree(os.path.join(destino, pasta), os.path.join(copia, pasta))
+    for nome in ARQUIVOS_DA_RAIZ:
+        shutil.copy2(os.path.join(destino, nome), os.path.join(copia, nome))
+    os.makedirs(os.path.join(copia, "dados"))
+    servidor = subprocess.Popen([os.path.join(copia, "servidor", "python", "python.exe"),
+                                 os.path.join(copia, "servidor", "arena.py")], cwd=copia,
+                                env=dict(os.environ, ARENA_SEM_JANELA="1"),
+                                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    problemas, estado = [], None
+    try:
+        for _ in range(300):
+            try:
+                with urllib.request.urlopen("http://127.0.0.1:8777/api/estado", timeout=2) as r:
+                    estado = json.loads(r.read())
+                break
+            except OSError:
+                time.sleep(0.2)
+    finally:
+        servidor.kill()
+        servidor.wait()
+        time.sleep(0.5)
+    with open(os.path.join(RAIZ, "servidor", "arena.py"), encoding="utf-8") as arquivo:
+        versao = re.search(r'^VERSAO = "([^"]+)"', arquivo.read(), re.M)
+    if not estado:
+        problemas.append("o servidor atualizado nao respondeu")
+    elif versao and estado.get("versao") != versao.group(1):
+        problemas.append("o servidor atualizado diz a versao %s (devia ser %s)"
+                         % (estado.get("versao"), versao.group(1)))
+    else:
+        print("  servidor atualizado abriu: versao %s" % estado.get("versao"), flush=True)
+    if not apagar_pasta(os.path.dirname(copia)):
+        print("  (aviso: a copia temporaria nao saiu toda do Temp: %s)" % os.path.dirname(copia))
+    return problemas
 
 
 def tamanho(pasta):
@@ -161,6 +315,14 @@ def montar(destino, com_bios=False):
     if os.path.basename(os.path.normpath(destino)) != NOME_DESTINO:
         raise SystemExit("Por seguranca, o destino tem que se chamar %s." % NOME_DESTINO)
     if os.path.isdir(destino):
+        de_quem_usou = coisas_de_quem_usou(destino)
+        if de_quem_usou:
+            raise SystemExit(
+                "A pasta %s ja esta em uso: tem %d arquivo(s) de quem usou (jogos, dados, saves...),\n"
+                "por exemplo %s. Montar de novo APAGARIA tudo isso. Nada foi mexido.\n"
+                "  - Para so trocar o programa, mantendo tudo:  --atualizar\n"
+                "  - Para montar do zero em outro lugar:        --destino <outra pasta>\\%s"
+                % (destino, len(de_quem_usou), de_quem_usou[0], NOME_DESTINO))
         shutil.rmtree(destino)        # e' a saida desta ferramenta, sempre refeita
     os.makedirs(destino)
     usados, pastas_de_console = nucleos_usados()
@@ -528,6 +690,27 @@ def principal():
     if "--destino" in sys.argv:
         destino = os.path.abspath(sys.argv[sys.argv.index("--destino") + 1])
     inicio = time.time()
+    if "--atualizar" in sys.argv:
+        if os.path.basename(os.path.normpath(destino)) != NOME_DESTINO or not os.path.isdir(destino):
+            print("Nao achei a versao dos alunos em %s." % destino)
+            return 1
+        print("Atualizando so o programa da versao em %s (jogos, dados e saves ficam)..." % destino,
+              flush=True)
+        copiados, tirados, quantos, problemas = atualizar(destino)
+        for rel in copiados:
+            print("  trocado: %s" % rel)
+        for rel in tirados:
+            print("  tirado (nao existe mais no programa): %s" % rel)
+        print("  %d arquivo(s) de quem usou: intocados" % quantos, flush=True)
+        problemas += prova_do_programa(destino)
+        if problemas:
+            print("PROBLEMAS:")
+            for p in problemas:
+                print("  - " + p)
+            return 1
+        print("Atualizada em %.0f s: %d trocado(s), %d tirado(s)." % (time.time() - inicio, len(copiados),
+                                                                     len(tirados)))
+        return 0
     print("Montando a versao dos alunos em %s%s..." % (destino, " (com BIOS)" if com_bios else ""), flush=True)
     usados = montar(destino, com_bios)
     print("Conferindo (abre a versao numa copia temporaria)...", flush=True)
