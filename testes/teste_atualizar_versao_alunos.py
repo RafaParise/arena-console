@@ -40,6 +40,9 @@ DE_QUEM_USOU = {
     os.path.join("retroarch", "states", "Contra (USA).state1"): b"\x03" * 512,
     os.path.join("emuladores", "PCSX2", "PCSX2", "memcards", "Mcd001.ps2"): b"\x04" * 1024,
     os.path.join("backup", "copia.zip"): b"PK\x05\x06" + b"\x00" * 18,
+    # A correcao do som do KOF 2002 convertido (03/10/2026) e o original guardado.
+    os.path.join("retroarch", "system", "fbneo", "patched", "kof2k2fd.zip"): b"PK\x05\x06" + b"\x00" * 18,
+    os.path.join("backup", "originais", "kof2002.zip"): b"PK\x05\x06" + b"\x00" * 18,
 }
 # Nem do programa nem das pastas de quem usou (emulador, nucleo, a
 # configuracao do RetroArch): o --atualizar tambem nao encosta.
