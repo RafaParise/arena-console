@@ -115,7 +115,7 @@ ARQUIVO_OVERRIDE = os.path.join(PASTA_DADOS, "arena_override.cfg")
 # Serve para uma coisa so: acabar com a duvida de "sera que estou testando
 # a versao corrigida?". Quando algo nao bate com o esperado, o primeiro
 # passo e comparar este numero.
-VERSAO = "2026.10.03"   # KOF 2002 convertido (kof2k2fd), rodizio do backup, capa do original
+VERSAO = "2026.10.03.2"   # pasta BIOS (uma por console, ativa em Emuladores) e o botao Arrumar
 
 PORTA = 8777
 
