@@ -66,6 +66,28 @@ class TestEscolherCapa(unittest.TestCase):
             capas_online.PASTA_MINIATURAS = antiga
             shutil.rmtree(pasta, ignore_errors=True)
 
+    def test_entre_capas_do_mesmo_jogo_fica_a_do_original(self):
+        # 02/10/2026: o KOF 2002 "Fully Decrypted" pegava a capa do bootleg
+        # (o nome mais curto). Lista de verdade do banco do FBNeo.
+        nomes = ["The King of Fighters 2002 (NGM-2650 ~ NGH-2650)",
+                 "The King of Fighters 2002 (NGM-2650)(NGH-2650)",
+                 "The King of Fighters 2002 (bootleg)",
+                 "The King of Fighters 2002 Plus (bootleg set 1)"]
+        self.assertEqual(capas_online.escolher_capa(nomes, "The King of Fighters 2002",
+                                                    "The King of Fighters 2002 (Fully Decrypted)"),
+                         "The King of Fighters 2002 (NGM-2650)(NGH-2650)")
+        # A regiao continua mandando primeiro, e copia so desempata.
+        self.assertEqual(capas_online.escolher_capa(["Jogo (Japan)", "Jogo (USA) (Beta)"], "Jogo", "Jogo"),
+                         "Jogo (USA) (Beta)")
+        self.assertEqual(capas_online.escolher_capa(["Jogo (USA) (Beta)", "Jogo (USA) (Rev 1)"], "Jogo", "Jogo"),
+                         "Jogo (USA) (Rev 1)")
+
+    def test_nome_do_conjunto_que_o_banco_nao_tem(self):
+        import nomes_arcade
+        self.assertEqual(nomes_arcade.nome_do_romset("kof2k2fd.zip", "fbneo"),
+                         "The King of Fighters 2002 (Fully Decrypted)")
+        self.assertIsNone(nomes_arcade.nome_do_romset("kof2k2fd.zip", "mame"))   # o MAME nao tem
+
     def test_ps1_na_pasta_do_ps2_avisa(self):
         self.assertIn("ps2", capas_online.OUTRO_CONSOLE)
         repo, recado = capas_online.OUTRO_CONSOLE["ps2"]

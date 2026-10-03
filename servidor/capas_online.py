@@ -100,6 +100,11 @@ SERVIDOR_MINIATURAS = "https://thumbnails.libretro.com"
 VALIDADE_DA_LISTA = 30 * 24 * 3600
 # Quando ha capa de varias regioes e o arquivo nao diz a dele.
 PREFERENCIA_DE_REGIAO = ("(usa", "(world", "(europe", "(brazil", "(japan")
+# Copia que nao e' o jogo original (dito entre parenteses no nome do banco):
+# entre capas do MESMO jogo, fica a do original. Achado de 02/10/2026: o KOF
+# 2002 "Fully Decrypted" pegava a capa do "(bootleg)", a de nome mais curto.
+RE_COPIA = re.compile(r"[\(\[][^\)\]]*\b(?:bootleg|hack|prototype|proto|beta|demo|sample|pirate)\b[^\)\]]*[\)\]]",
+                      re.I)
 
 
 def sistema_do_banco(repo):
@@ -288,7 +293,7 @@ def escolher_capa(nomes, titulo, nome_base=""):
     def ordem(nome):
         baixo = nome.casefold()
         return (next((i for i, r in enumerate(PREFERENCIA_DE_REGIAO) if r in baixo),
-                     len(PREFERENCIA_DE_REGIAO)), len(nome))
+                     len(PREFERENCIA_DE_REGIAO)), bool(RE_COPIA.search(nome)), len(nome))
     return sorted(candidatos, key=ordem)[0]
 
 

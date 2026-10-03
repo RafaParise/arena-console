@@ -398,6 +398,38 @@ disse. O aviso some quando o jogo abre ou quando você troca o arquivo. Os
 consoles que abrem por outro programa (PS2, PS3, Xbox 360 e, com o Dolphin
 na pasta, GameCube e Wii) ficam de fora: o ARENA não lê o registro deles.
 
+**Zip "decriptado" de emulador antigo (Kawaks, Nebula).** Muito zip de
+fliperama que circula foi feito para emulador de 20 anos atrás: as partes
+já vêm decriptadas e com outros nomes (`kof2k2_c1.rom`...). O MAME e o
+FBNeo de hoje pedem as partes originais e recusam. Para alguns jogos, o
+FBNeo tem um conjunto **"Fully Decrypted"** feito exatamente dessas partes,
+e a ferramenta `ferramentas\converter_fliperama_decriptado.py` converte:
+
+```
+servidor\python\python.exe ferramentas\converter_fliperama_decriptado.py           (só mostra)
+servidor\python\python.exe ferramentas\converter_fliperama_decriptado.py --fazer   (converte)
+```
+
+Ela reconhece cada parte pela **marca** (o CRC), não pelo nome, e confere a
+marca do resultado antes de gravar: faltou ou não bateu alguma parte, não
+mexe em nada. Hoje ela sabe converter o **The King of Fighters 2002**
+(`kof2002.zip` decriptado → `kof2k2fd.zip`, na pasta **Neo Geo**). Foi o
+que aconteceu com o KOF 2002 da pasta do professor (03/10/2026, nas duas
+pastas):
+
+| O que | Onde ficou |
+|---|---|
+| O jogo (13 partes, as do som juntadas de 2 em 2) | `jogos\pessoais\Neo Geo\kof2k2fd.zip`; na lista: **The King of Fighters 2002** |
+| O programa de som (é de outra versão da que o FBNeo espera para este conjunto; o próprio FBNeo usa essa versão num conjunto parecido) | `retroarch\system\fbneo\patched\kof2k2fd.zip` — a pasta de **correções** do FBNeo: ali ele aceita a parte pelo nome e pelo tamanho, sem conferir a marca (opção "Allow patched romsets", ligada por padrão) |
+| O `.zip` de antes, intacto | `backup\originais\kof2002.zip` (fora do rodízio das cópias de segurança) |
+
+Conferido abrindo de verdade: demonstração e tela de título, com as cores
+certas (`testes\teste_kof2002_convertido.py`). Para levar esse jogo para
+outro ARENA, copie os **dois** primeiros arquivos: sem a correção, o FBNeo
+diz que falta o `265-m1d.m1`. Zip de outro jogo que a ferramenta não
+conhece continua precisando de uma cópia feita para o MAME ou o FBNeo
+desta versão.
+
 #### Passo 1 — Criar as pastas
 
 No ARENA, clique em **Criar pastas dos consoles**, embaixo da lista à

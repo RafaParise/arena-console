@@ -34,6 +34,17 @@ BANCOS = {
     "mame": ("MAME.rdb", "FBNeo - Arcade Games.rdb"),
 }
 
+# Conjuntos que o FBNeo DESTA pasta conhece e o banco do RetroArch nao lista
+# (o banco veio de outra versao do FBNeo). Sem isto, o cartao chamaria o jogo
+# de "Kof2k2fd" e mandaria renomear um arquivo que esta certo. So entra nome
+# conferido no proprio nucleo (texto dentro do fbneo_libretro.dll) e aberto
+# de verdade. 02/10/2026: o KOF 2002 do professor, que era um zip
+# "decriptado para emulador antigo", virou este conjunto
+# (ferramentas\converter_fliperama_decriptado.py).
+NOMES_FORA_DO_BANCO = {
+    "fbneo": {"kof2k2fd.zip": "The King of Fighters 2002 (Fully Decrypted)"},
+}
+
 _CHAVE_NOME = b"\xa4name"
 _CHAVE_ROM = b"\xa8rom_name"
 
@@ -195,7 +206,7 @@ def nome_do_romset(arquivo, nucleo):
                     _nomes[chave] = None
             if _nomes[chave]:
                 return _nomes[chave]
-    return None
+    return NOMES_FORA_DO_BANCO.get(nucleo, {}).get(rom)
 
 
 def nucleo_de(core):
