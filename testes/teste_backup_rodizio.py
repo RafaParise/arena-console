@@ -15,6 +15,11 @@ Confere: sobram exatamente 3 copias, os esqueletos sumiram, nenhuma copia
 leva o .netplay, o save comum esta em todas, e o .zip do Exportar (que nao
 e' pasta de data) continua la.
 
+02/10/2026: pasta que NAO tem nome de data (backup\originais, onde a
+conversao de fliperama guarda o jogo original) fica e nao toma vaga de
+copia -- antes o rodizio contava qualquer pasta, e uma de nome "menor" que
+as datas ("0-guardar") seria apagada.
+
 Uso: servidor\python\python.exe testes\teste_backup_rodizio.py
 """
 import os
@@ -70,13 +75,16 @@ def main():
             os.makedirs(esqueleto)
             somente_leitura(esqueleto)
         open(os.path.join(arena.PASTA_BACKUP, "meu-progresso-2026-09-27_2311.zip"), "wb").write(b"PK")
+        for avulsa in ("originais", "0-guardar"):
+            os.makedirs(os.path.join(arena.PASTA_BACKUP, avulsa))
+            open(os.path.join(arena.PASTA_BACKUP, avulsa, "jogo.zip"), "wb").write(b"PK")
 
         for _ in range(4):
             arena.fazer_backup()
             time.sleep(1.05)      # o nome da copia e' a data com segundos
 
         copias = sorted(d for d in os.listdir(arena.PASTA_BACKUP)
-                        if os.path.isdir(os.path.join(arena.PASTA_BACKUP, d)))
+                        if os.path.isdir(os.path.join(arena.PASTA_BACKUP, d)) and arena.e_pasta_de_copia(d))
         confere("sobram exatamente %d copias" % arena.COPIAS_MANTIDAS,
                 len(copias) == arena.COPIAS_MANTIDAS, copias)
         confere("os 5 esqueletos velhos sumiram", not any(c.startswith("2026-09-20") for c in copias), copias)
@@ -87,6 +95,11 @@ def main():
                     for c in copias))
         confere("o .zip do Exportar continua la",
                 os.path.isfile(os.path.join(arena.PASTA_BACKUP, "meu-progresso-2026-09-27_2311.zip")))
+        confere("pastas sem nome de data (originais, 0-guardar) ficam, com o que tem dentro",
+                all(os.path.isfile(os.path.join(arena.PASTA_BACKUP, a, "jogo.zip")) for a in ("originais", "0-guardar")))
+        confere("e nao tomam vaga: sao 3 copias de data alem delas",
+                len([d for d in os.listdir(arena.PASTA_BACKUP)
+                     if os.path.isdir(os.path.join(arena.PASTA_BACKUP, d))]) == arena.COPIAS_MANTIDAS + 2)
         confere("o .netplay de verdade (em saves) nao foi mexido",
                 os.path.isfile(os.path.join(netplay, "do_colega.srm")))
     finally:

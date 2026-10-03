@@ -2754,6 +2754,15 @@ def limpar_logs_antigos():
     return apagados
 
 
+def e_pasta_de_copia(nome):
+    """'2026-10-02_170059' (o carimbo do fazer_backup)? So essas giram."""
+    try:
+        time.strptime(nome, "%Y-%m-%d_%H%M%S")
+        return True
+    except ValueError:
+        return False
+
+
 def fazer_backup():
     """Guarda banco, configuracao e saves comuns na pasta backup."""
     import shutil
@@ -2783,11 +2792,15 @@ def fazer_backup():
                             dirs_exist_ok=True,
                             ignore=shutil.ignore_patterns(".netplay"))
 
-        # Mantem so as copias mais recentes (as pastas com nome de data;
-        # o .zip do "Exportar" e as copias avulsas ficam).
+        # Mantem so as copias mais recentes. Giram SO as pastas com nome de
+        # data (o carimbo acima): o .zip do "Exportar" e as pastas avulsas
+        # ficam. Achado de 02/10/2026: o comentario ja dizia isso, mas o
+        # codigo contava qualquer pasta -- backup\originais (o jogo original
+        # guardado pela conversao de fliperama) tomaria a vaga de uma copia,
+        # e uma pasta de nome "menor" que as datas seria apagada.
         copias = sorted(
             d for d in os.listdir(PASTA_BACKUP)
-            if os.path.isdir(os.path.join(PASTA_BACKUP, d)))
+            if os.path.isdir(os.path.join(PASTA_BACKUP, d)) and e_pasta_de_copia(d))
         for antiga in copias[:-COPIAS_MANTIDAS]:
             apagar_pasta_toda(os.path.join(PASTA_BACKUP, antiga))
 

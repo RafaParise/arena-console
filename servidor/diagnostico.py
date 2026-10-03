@@ -18,6 +18,7 @@ import os
 import shutil
 import sqlite3
 import sys
+import time
 
 PASTA_SERVIDOR = os.path.dirname(os.path.abspath(__file__))
 RAIZ = os.path.dirname(PASTA_SERVIDOR)
@@ -437,8 +438,16 @@ pasta_backup = caminho("backup")
 copias = []
 pacotes = []
 if os.path.isdir(pasta_backup):
-    copias = [d for d in os.listdir(pasta_backup)
-              if os.path.isdir(os.path.join(pasta_backup, d))]
+    # So as pastas com nome de data sao copias automaticas (backup\originais,
+    # por exemplo, e' outra coisa -- 02/10/2026).
+    copias = []
+    for d in os.listdir(pasta_backup):
+        try:
+            time.strptime(d, "%Y-%m-%d_%H%M%S")
+        except ValueError:
+            continue
+        if os.path.isdir(os.path.join(pasta_backup, d)):
+            copias.append(d)
     pacotes = [d for d in os.listdir(pasta_backup) if d.endswith(".zip")]
 print("  %d copia(s) automatica(s), %d pacote(s) de progresso"
       % (len(copias), len(pacotes)))

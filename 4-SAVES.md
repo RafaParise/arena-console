@@ -289,7 +289,11 @@ jogar.
 
 Toda vez que você fecha um jogo, o ARENA copia sozinho para a pasta
 `backup`: os recordes, o seu perfil e os saves dos jogos. As 3 cópias mais
-recentes ficam guardadas.
+recentes ficam guardadas. Só giram as pastas com nome de data
+(`backup\2026-10-02_170059`): o resto que estiver em `backup` fica onde
+está — os pacotes `.zip` do **Exportar**, a cópia do banco feita antes de
+uma limpeza e a pasta `backup\originais`, onde a conversão de fliperama
+guarda o jogo de antes (guia 2).
 
 **Save state não entra na cópia.** Um estado de PlayStation passa de 1 MB, e
 são 10 por jogo — copiar isso a cada partida acabaria com um pen drive em
