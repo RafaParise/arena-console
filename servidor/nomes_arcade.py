@@ -209,6 +209,36 @@ def nome_do_romset(arquivo, nucleo):
     return NOMES_FORA_DO_BANCO.get(nucleo, {}).get(rom)
 
 
+_CHAVE_CRC = b"\xa3crc\xc4\x04"
+
+
+def nome_pela_marca(nome_rdb, marca):
+    """Nome do registro do banco 'nome_rdb' (ex.: "Nintendo - Satellaview.rdb")
+    cuja marca (CRC32 do arquivo do jogo) e' 'marca', ou None.
+
+    Para a busca de capa: arquivo com nome fora do padrao e' reconhecido
+    pelo CONTEUDO, do jeito que o "Escanear" do RetroArch reconhece os jogos.
+    Achado de 03/10/2026: o "BS F-ZERO (J).smc" e' o "F-Zero (Japan) (7-10)"
+    do Satellaview. Le o banco e solta (nao guarda em memoria: e' raro, so
+    quando o nome nao achou a capa). A mesma conta do _procurar_em: entre o
+    "name" e o "crc" so pode haver campos inteiros do MESMO registro."""
+    try:
+        with open(os.path.join(PASTA_RDB, nome_rdb), "rb") as arquivo:
+            dados = arquivo.read()
+    except OSError:
+        return None
+    if not dados.startswith(b"RARCHDB\x00"):
+        return None
+    alvo = _CHAVE_CRC + struct.pack(">I", marca & 0xffffffff)
+    posicao = dados.find(alvo)
+    while posicao != -1:
+        nome = _procurar_em(dados, posicao, None)
+        if nome:
+            return nome
+        posicao = dados.find(alvo, posicao + 1)
+    return None
+
+
 def nucleo_de(core):
     """"fbneo" ou "mame" pelo nome do .dll do nucleo; None se nao for
     fliperama."""

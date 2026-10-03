@@ -68,8 +68,9 @@ De onde a capa vem:
 
 Precisa de internet (menos o ícone do PS3/PSP). A lista de capas de cada
 console fica guardada por 30 dias em `retroarch\thumbnails`, então a
-segunda busca é bem mais rápida. Em teste com os jogos da pasta do
-professor, a busca achou 68 das 78 capas que faltavam.
+segunda busca é bem mais rápida. Na primeira versão da busca, ela achou
+68 das 78 capas que faltavam na pasta do professor; com os casos abaixo,
+achou todas.
 
 A busca também acerta estes casos (achados com os jogos da pasta do
 professor, 02/10/2026):
@@ -87,9 +88,18 @@ professor, 02/10/2026):
   busca avisa.
 - **Jogo de PS1 na pasta do PS2**: a capa vem do banco do PS1, com o aviso
   de que o PCSX2 não abre jogo de PS1. Mova o arquivo para a pasta `PS1`.
+- **Nome que não lembra nada** (`BS F-ZERO (J).smc`): quando nenhum nome
+  acha, a busca reconhece o jogo pelo **conteúdo** do arquivo — a marca
+  (CRC), no banco de dados do próprio RetroArch
+  (`retroarch\database\rdb`), do jeito que o "Escanear" do RetroArch faz.
+  Esse arquivo é o *F-Zero (Japan) (7-10)* do Satellaview, e a tela de
+  título dele veio certa. Só para arquivo de até 64 MB (cartucho,
+  disquete, fita) e só quando o banco do console está na pasta: a pasta
+  completa do RetroArch tem todos; a versão dos alunos leva só os de
+  fliperama, para não pesar no pen drive (lá, o nome já acha quase tudo).
 
-Com isso, das 10 capas que ainda faltavam na pasta do professor, a busca
-achou 9 (ficou a do *BS F-ZERO*, que nem o banco tem).
+Com isso, a busca achou a capa de **todos** os jogos: 129 de 129 na pasta
+do professor e 53 de 53 na versão dos alunos (03/10/2026).
 
 ### Parte A — Adicionar jogos
 

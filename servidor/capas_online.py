@@ -15,8 +15,11 @@ import re
 import subprocess
 import time
 import urllib.parse
+import zipfile
+import zlib
 
 import capas_do_disco
+import nomes_arcade
 
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -420,6 +423,46 @@ def capa_pelo_disco(plataforma_id, titulo_limpo, caminho_jogo, com_internet=True
     return None
 
 
+# Reconhecer o jogo pela MARCA so em arquivo pequeno (cartucho, disquete,
+# fita): ler um disco de 4 GB para isso travaria a busca.
+TAMANHO_MAXIMO_MARCA = 64 * 1024 * 1024
+RECADO_MARCA = "o banco de dados do RetroArch, pelo conteúdo do arquivo"
+
+
+def nomes_pela_marca(repos, caminho_jogo):
+    """{banco de capas: nome do jogo} reconhecido pela MARCA (CRC32) no banco
+    de dados do RetroArch de cada banco de capas -- o banco de capas
+    "Nintendo_-_Satellaview" tem o banco "Nintendo - Satellaview.rdb", e os
+    nomes dos dois sao os mesmos (No-Intro). Achado de 03/10/2026: o "BS
+    F-ZERO (J).smc" e' o "F-Zero (Japan) (7-10)", e o nome do arquivo nunca
+    acharia. Arquivo .zip: as marcas que o proprio zip guarda (sem
+    descompactar). .smc com os 512 bytes de cabecalho de copiadora: a marca
+    sem eles tambem. Sem o banco na pasta, ou arquivo grande: {}."""
+    marcas = []
+    try:
+        if not caminho_jogo or os.path.getsize(caminho_jogo) > TAMANHO_MAXIMO_MARCA:
+            return {}
+        if caminho_jogo.lower().endswith(".zip"):
+            with zipfile.ZipFile(caminho_jogo) as z:
+                marcas = [i.CRC for i in z.infolist() if not i.is_dir()]
+        else:
+            with open(caminho_jogo, "rb") as arquivo:
+                dados = arquivo.read()
+            marcas = [zlib.crc32(dados) & 0xffffffff]
+            if len(dados) % 1024 == 512:
+                marcas.append(zlib.crc32(dados[512:]) & 0xffffffff)
+    except (OSError, zipfile.BadZipFile, ValueError):
+        return {}
+    achados = {}
+    for repo in repos:
+        for marca in marcas:
+            nome = nomes_arcade.nome_pela_marca(sistema_do_banco(repo) + ".rdb", marca)
+            if nome:
+                achados[repo] = nome
+                break
+    return achados
+
+
 def buscar_e_baixar(plataforma_id, titulo_limpo, nome_base_arquivo, caminho_jogo=None, com_internet=True):
     """Tenta achar a capa por varios nomes candidatos, do mais especifico
     (nome do ARQUIVO, com a tag de regiao de verdade) ao mais generico
@@ -448,6 +491,14 @@ def buscar_e_baixar(plataforma_id, titulo_limpo, nome_base_arquivo, caminho_jogo
         escolhido = escolher_capa(nomes, titulo_limpo, nome_base_arquivo) if nomes else None
         if escolhido and _baixar_capa(repo, escolhido, destino):
             return True, None
+    # O nome nao achou: o jogo pela marca, com o nome do banco do RetroArch
+    # (o mesmo das capas).
+    pela_marca = nomes_pela_marca(repos, caminho_jogo)
+    for repo, nome_do_banco in pela_marca.items():
+        nomes = lista_do_banco(plataforma_id, repo)
+        escolhido = escolher_capa(nomes, nome_do_banco, nome_do_banco) if nomes else None
+        if escolhido and _baixar_capa(repo, escolhido, destino):
+            return True, RECADO_MARCA
     # PS3 e Xbox 360 quase nao tem no banco; GameCube e Wii, nem tudo: o
     # proprio disco ajuda.
     fonte = capa_pelo_disco(plataforma_id, titulo_limpo, caminho_jogo)
@@ -466,6 +517,8 @@ def buscar_e_baixar(plataforma_id, titulo_limpo, nome_base_arquivo, caminho_jogo
             nomes = lista_do_banco(plataforma_id, repo, tipo)
             achou_lista = achou_lista or bool(nomes)
             escolhido = escolher_capa(nomes, titulo_limpo, nome_base_arquivo) if nomes else None
+            if not escolhido and nomes and repo in pela_marca:
+                escolhido = escolher_capa(nomes, pela_marca[repo], pela_marca[repo])
             if escolhido and _baixar_capa(repo, escolhido, destino, tipo):
                 return True, recado
     if achou_lista:

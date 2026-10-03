@@ -5,10 +5,12 @@ desenvolvimento. Cada teste e' um dos casos de verdade, sem internet."""
 
 import os
 import shutil
+import struct
 import sys
 import tempfile
 import unittest
 import zipfile
+import zlib
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if RAIZ not in sys.path:
@@ -93,6 +95,67 @@ class TestEscolherCapa(unittest.TestCase):
         repo, recado = capas_online.OUTRO_CONSOLE["ps2"]
         self.assertEqual(repo, "Sony_-_PlayStation")
         self.assertIn("PCSX2 não abre jogo de PS1", recado)
+
+
+class TestCapaPelaMarca(unittest.TestCase):
+    """03/10/2026: o "BS F-ZERO (J).smc" so foi achado pela MARCA (CRC) no
+    banco de dados do RetroArch ("F-Zero (Japan) (7-10)", no Satellaview):
+    nenhum nome do arquivo bate com o do banco de capas. Banco de mentira,
+    no mesmo formato do de verdade."""
+
+    def setUp(self):
+        import nomes_arcade
+        self.nomes_arcade = nomes_arcade
+        self.dir = tempfile.mkdtemp(prefix="arena_capa_marca_")
+        self.antigo = nomes_arcade.PASTA_RDB
+        nomes_arcade.PASTA_RDB = self.dir
+        self.dados = b"\x11" * 2048
+        self.jogo = os.path.join(self.dir, "BS F-ZERO (J).smc")
+        with open(self.jogo, "wb") as f:
+            f.write(self.dados)
+        marca = zlib.crc32(self.dados) & 0xffffffff
+        texto = nomes_arcade._empacotar_texto
+        outro = (b"\x82\xa4name" + texto("Outro Jogo (Japan)") + b"\xa3crc\xc4\x04" + struct.pack(">I", 0x12345678))
+        certo = (b"\x83\xa4name" + texto("F-Zero (Japan) (7-10)") + b"\xa4size\xce" + struct.pack(">I", 2048)
+                 + b"\xa3crc\xc4\x04" + struct.pack(">I", marca))
+        self.rdb = os.path.join(self.dir, "Nintendo - Satellaview.rdb")
+        with open(self.rdb, "wb") as f:
+            f.write(b"RARCHDB\x00" + b"\x00" * 8 + outro + certo)
+        self.repos = ("Nintendo_-_Super_Nintendo_Entertainment_System", "Nintendo_-_Satellaview")
+
+    def tearDown(self):
+        self.nomes_arcade.PASTA_RDB = self.antigo
+        shutil.rmtree(self.dir, ignore_errors=True)
+
+    def test_acha_pelo_conteudo_do_arquivo(self):
+        esperado = {"Nintendo_-_Satellaview": "F-Zero (Japan) (7-10)"}
+        self.assertEqual(capas_online.nomes_pela_marca(self.repos, self.jogo), esperado)
+        # .smc com os 512 bytes de cabecalho de copiadora: tambem.
+        com_cabecalho = os.path.join(self.dir, "com cabecalho.smc")
+        with open(com_cabecalho, "wb") as f:
+            f.write(b"\x00" * 512 + self.dados)
+        self.assertEqual(capas_online.nomes_pela_marca(self.repos, com_cabecalho), esperado)
+        # Dentro de um .zip: a marca que o proprio zip guarda.
+        compactado = os.path.join(self.dir, "jogo.zip")
+        with zipfile.ZipFile(compactado, "w") as z:
+            z.writestr("qualquer nome.sfc", self.dados)
+        self.assertEqual(capas_online.nomes_pela_marca(self.repos, compactado), esperado)
+        # E o nome do banco acha a capa na lista do banco de capas.
+        self.assertEqual(capas_online.escolher_capa(
+            ["BS F-Zero Grand Prix 2 - Practice (Japan) (10-23)", "F-Zero (Japan)"],
+            "F-Zero (Japan) (7-10)", "F-Zero (Japan) (7-10)"), "F-Zero (Japan)")
+
+    def test_sem_banco_arquivo_grande_ou_desconhecido(self):
+        os.remove(self.rdb)
+        self.assertEqual(capas_online.nomes_pela_marca(self.repos, self.jogo), {})
+        self.assertEqual(capas_online.nomes_pela_marca(self.repos, None), {})
+        antigo = capas_online.TAMANHO_MAXIMO_MARCA
+        try:
+            capas_online.TAMANHO_MAXIMO_MARCA = 1024        # disco grande: nem le
+            self.assertEqual(capas_online.nomes_pela_marca(self.repos, self.jogo), {})
+        finally:
+            capas_online.TAMANHO_MAXIMO_MARCA = antigo
+        self.assertIsNone(self.nomes_arcade.nome_pela_marca("Nintendo - Satellaview.rdb", 0xdeadbeef))
 
 
 class TestIndiceAchaACapa(unittest.TestCase):
