@@ -78,6 +78,9 @@ LIXO_SEMPRE = ["__pycache__", "*.pyc", "*.pyo", "*.log", "*.tmp", "Thumbs.db", "
 # Onde mora o que e' de quem USOU a versao (a montagem so poe LEIA.txt e,
 # com --com-bios, o neogeo.zip). Achou outra coisa: a versao esta em uso.
 PASTAS_DE_QUEM_USOU = ["dados", "jogos", "backup",
+                       # A pasta BIOS (03/10/2026): o ARENA cria ao abrir, e o
+                       # que vai dentro sao as BIOS de quem usa.
+                       "BIOS",
                        os.path.join("retroarch", "saves"), os.path.join("retroarch", "states"),
                        os.path.join("retroarch", "screenshots"), os.path.join("retroarch", "thumbnails"),
                        os.path.join("retroarch", "remaps"),
@@ -399,6 +402,27 @@ def montar(destino, com_bios=False):
             if os.path.isfile(caminho):
                 copiar_arquivo(caminho, os.path.join(RA_D, "system", "dc", nome))
                 levadas.append(nome)
+        # As do catalogo de BIOS (servidor\bios_catalogo.py) que os padroes
+        # acima nao pegam: syscard3.pce, kick34005.A500, Mupen64plus\IPL.n64,
+        # same_cdi\bios\cdimono1.zip, as pastas Machines e Databases do MSX.
+        # A pasta BIOS (as prateleiras) o proprio ARENA monta ao abrir.
+        if os.path.join(RAIZ, "servidor") not in sys.path:
+            sys.path.insert(0, os.path.join(RAIZ, "servidor"))
+        import bios_catalogo
+        for entrada in bios_catalogo.CATALOGO:
+            relativo = entrada.get("destino")
+            if not relativo:
+                continue
+            origem = os.path.join(sistema, *relativo.split("/"))
+            alvo = os.path.join(RA_D, "system", *relativo.split("/"))
+            if os.path.exists(alvo):
+                continue
+            if os.path.isfile(origem):
+                copiar_arquivo(origem, alvo)
+                levadas.append(os.path.basename(relativo))
+            elif os.path.isdir(origem) and entrada.get("e_pasta"):
+                copiar_arvore(origem, alvo)
+                levadas.append(relativo)
         # BIOS de fliperama que mora na pasta dos jogos (neogeo.zip ao lado
         # dos jogos do Neo Geo): a lista de jogos nao mostra.
         pessoais = os.path.join(RAIZ, "jogos", "pessoais")
@@ -496,8 +520,14 @@ def frase_das_bios(levadas):
         consoles.append("PlayStation 3 (firmware já instalado)")
     if "neogeo" in texto:
         consoles.append("Neo Geo")
+    if "bios_cd_" in texto:
+        consoles.append("Sega CD")
+    if "mpr-17933" in texto or "sega_101" in texto:
+        consoles.append("Sega Saturn")
     if "dc_boot" in texto:
         consoles.append("Dreamcast")
+    if "bs-x" in texto:
+        consoles.append("Satellaview (os jogos \"BS\" do Super Nintendo)")
     if not consoles:
         return "Esta versão já vem com as BIOS que o professor tinha."
     return "Esta versão já vem com as BIOS de: %s." % ", ".join(consoles)
@@ -512,8 +542,11 @@ FOLHA_DE_ROSTO = """ARENA — versão para os alunos
    O guia 2-JOGOS.md explica cada console.
 
 {bios}
-Console que ainda pedir BIOS (Sega CD, Saturn...) mostra no cartão o que
-falta. Os arquivos vão em retroarch\\system (guia 2-JOGOS.md, "A BIOS").
+Console que ainda pedir BIOS mostra no cartão o que falta. Na primeira vez
+que o ARENA abre, ele cria a pasta BIOS, uma pasta por console: ponha a BIOS
+na pasta do console (com qualquer nome, ou o .zip em que ela veio) e clique
+em Conferir, em Ajustes → Emuladores. O arquivo "LEIA - O QUE FALTA.txt" de
+lá diz quantas e quais faltam (guia 2-JOGOS.md, "A BIOS").
 PS3: o firmware vai pelo próprio RPCS3 (File > Install Firmware).
 
 Não vem nada de quem preparou: nem jogos, nem saves, nem recordes, nem

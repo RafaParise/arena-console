@@ -2228,12 +2228,17 @@ function desenharExternos(lista) {
 
 function desenharBios(consoles, arquivos) {
   const caixa = $("#listaBios");
+  // So os consoles em que o emulador deixa ESCOLHER a BIOS; nos outros ele
+  // acha a certa sozinho (a lista "BIOS dos consoles", acima, mostra quais
+  // estao ativas).
+  consoles = consoles.filter((c) => (c.escolhiveis || []).length > 0);
 
-  if (arquivos.length === 0) {
+  if (arquivos.length === 0 || consoles.length === 0) {
     const vazio = document.createElement("p");
     vazio.className = "explica";
-    vazio.textContent =
-      "Nenhum arquivo em retroarch\\system ainda. Coloque lá e volte aqui.";
+    vazio.textContent = arquivos.length === 0
+      ? "Nenhuma BIOS no ARENA ainda. Veja a lista \"BIOS dos consoles\", acima."
+      : "Nenhum console daqui deixa escolher com as BIOS que estão no ARENA: o emulador escolhe sozinho.";
     caixa.replaceChildren(vazio);
     return;
   }
@@ -2249,19 +2254,10 @@ function desenharBios(consoles, arquivos) {
     rotulo.className = "opcao-rotulo";
     rotulo.textContent = c.nome;
 
-    // O emulador deste console nao deixa escolher (ele confere o conteudo
-    // de cada arquivo e acha a BIOS certa sozinho). Oferecer uma lista aqui
-    // seria prometer uma escolha que nao acontece.
+    // So chega aqui console que deixa escolher (filtrado acima): oferecer
+    // uma lista onde o emulador acha sozinho seria prometer uma escolha que
+    // nao acontece.
     const escolhiveis = c.escolhiveis || [];
-    if (escolhiveis.length === 0) {
-      const sozinho = document.createElement("span");
-      sozinho.className = "opcao-ajuda";
-      sozinho.textContent =
-        "O emulador acha a BIOS certa sozinho, pelo conteúdo do arquivo. Não precisa escolher.";
-      linha.append(rotulo, sozinho);
-      lote.append(linha);
-      continue;
-    }
 
     const lista = document.createElement("select");
     lista.className = "opcao-controle";
@@ -2300,6 +2296,180 @@ function desenharBios(consoles, arquivos) {
   }
 
   caixa.replaceChildren(lote);
+}
+
+// --------------------------------------------------------------------------
+// BIOS dos consoles (pedido do Rafael, 03/10/2026): a pasta BIOS do ARENA,
+// console por console, com cada BIOS "ativa" (como o PCSX2 mostra a dele),
+// de outra versao ou faltando. Quem confere e instala e' o servidor
+// (servidor/bios.py); a tela so mostra e tem os botoes.
+// --------------------------------------------------------------------------
+
+async function carregarBios(conferir = false) {
+  try {
+    const dados = conferir
+      ? await pedir("/api/bios/conferir", "POST", {})
+      : await pedir("/api/bios");
+    estado.bios = dados;
+    desenharBiosConsoles(dados);
+    return dados;
+  } catch (falha) {
+    $("#biosResumo").textContent = falha.message;
+    return null;
+  }
+}
+
+function situacaoDoConsole(itens) {
+  // PS1 e PS2: basta uma, de qualquer regiao.
+  if (itens.some((i) => i.grupo === "uma")) {
+    return itens.some((i) => i.ativa) ? ["ativa", "selo-ok"] : ["falta", "selo-falta"];
+  }
+  const precisa = itens.filter((i) => i.nivel === "precisa");
+  if (precisa.length) {
+    const faltam = precisa.filter((i) => !i.ativa).length;
+    if (faltam === 0) return ["ativa", "selo-ok"];
+    return [faltam === precisa.length ? "falta" : `falta ${faltam} de ${precisa.length}`, "selo-falta"];
+  }
+  if (itens.some((i) => i.ativa)) return ["ativa", "selo-ok"];
+  return itens.every((i) => i.nivel === "melhor")
+    ? ["opcional", "selo-neutro"] : ["só para alguns jogos", "selo-neutro"];
+}
+
+function fraseDaBios(item, itens) {
+  if (item.estado === "outra") {
+    return ["bios-outra", "⚠ Ativa, mas de outra versão: pode funcionar; se der problema, troque pela recomendada."];
+  }
+  if (item.ativa) {
+    let frase = "✔ Ativa";
+    if (item.detalhe) frase += ` — ${item.detalhe}`;
+    if (item.em_uso) frase += " · é com esta que o PCSX2 liga";
+    const outras = (item.todas || []).filter((t) => !t.em_uso && t.arquivo !== (item.arquivo || "").split("\\").pop());
+    if (outras.length) frase += ` (também: ${outras.map((t) => t.versao).join("; ")})`;
+    return ["bios-ok", frase];
+  }
+  if (item.grupo === "uma" && itens.some((i) => i.ativa)) {
+    return ["bios-nada", "– Não está (não faz falta: a de outra região já serve)."];
+  }
+  if (item.nivel === "melhor") return ["bios-nada", `○ Opcional, não está (${item.sem_ela}).`];
+  if (item.nivel === "alguns") return ["bios-nada", `○ Não está — ${item.sem_ela}.`];
+  return ["bios-falta", `✘ Falta: ${item.sem_ela}.`];
+}
+
+// As linhas de um console: no PS1 e no PS2 (basta uma regiao), uma linha so
+// quando nenhuma esta; o nome de cada linha e' a regiao ("EUA") ou, quando
+// duas dividem a mesma pasta, o que ela e'.
+function linhasDoConsole(doConsole) {
+  if (doConsole.some((i) => i.grupo === "uma")) {
+    const ativas = doConsole.filter((i) => i.ativa);
+    if (!ativas.length) {
+      return [["bios-falta", "✘ Falta: basta uma, de qualquer região (EUA, Europa ou Japão). Sem ela, os jogos não abrem."]];
+    }
+    const linhas = ativas.map((i) => {
+      const [classe, frase] = fraseDaBios(i, doConsole);
+      return [classe, `${i.sub}: ${frase}`];
+    });
+    if (ativas.length < doConsole.length) {
+      linhas.push(["bios-nada", `Outras regiões: não fazem falta (a de ${ativas[0].sub} já abre os jogos de todas).`]);
+    }
+    return linhas;
+  }
+  const subs = doConsole.map((i) => i.sub);
+  return doConsole.map((item) => {
+    const [classe, frase] = fraseDaBios(item, doConsole);
+    let nome = "";
+    if (doConsole.length > 1) {
+      const unico = item.sub && subs.filter((s) => s === item.sub).length === 1;
+      nome = unico ? item.sub : item.o_que.charAt(0).toUpperCase() + item.o_que.slice(1);
+      nome += ": ";
+    }
+    return [classe, nome + frase];
+  });
+}
+
+function desenharBiosConsoles(dados) {
+  const itens = dados.itens || [];
+  const contas = dados.resumo || {};
+  const parte = (nivel, nome) => {
+    const [ativas, total] = contas[nivel] || [0, 0];
+    return `${nome}: ${ativas} de ${total}`;
+  };
+  $("#biosResumo").textContent =
+    `Ativas — ${parte("precisa", "as que os jogos precisam")} · ${parte("alguns", "só para alguns jogos")}` +
+    ` · ${parte("melhor", "opcionais")}. (PS1 e PS2 contam uma vez: basta uma de qualquer região.)`;
+
+  // Um console por linha, na ordem do catalogo.
+  const porConsole = new Map();
+  for (const item of itens) {
+    if (!porConsole.has(item.console)) porConsole.set(item.console, []);
+    porConsole.get(item.console).push(item);
+  }
+  const lote = document.createDocumentFragment();
+  for (const [consoleId, doConsole] of porConsole) {
+    const linha = document.createElement("li");
+    linha.className = "controle bios-console";
+
+    const titulo = document.createElement("span");
+    titulo.className = "controle-nome";
+    titulo.textContent = doConsole[0].nome_console;
+
+    const [textoSelo, classeSelo] = situacaoDoConsole(doConsole);
+    const selo = document.createElement("span");
+    selo.className = `controle-tipo ${classeSelo}`;
+    selo.textContent = textoSelo;
+
+    const detalhes = document.createElement("ul");
+    detalhes.className = "bios-itens";
+    for (const [classe, frase] of linhasDoConsole(doConsole)) {
+      const li = document.createElement("li");
+      li.className = classe;
+      li.textContent = frase;
+      detalhes.append(li);
+    }
+
+    const acoes = document.createElement("div");
+    acoes.className = "controle-acoes";
+    const abrir = document.createElement("button");
+    abrir.className = "botao";
+    abrir.type = "button";
+    abrir.textContent = `Abrir a pasta ${doConsole[0].pasta.split("\\").slice(0, 2).join("\\")}`;
+    abrir.addEventListener("click", () => abrirPastaDaBios({ console: consoleId }));
+    acoes.append(abrir);
+
+    linha.append(titulo, selo, detalhes, acoes);
+    lote.append(linha);
+  }
+  $("#listaBiosConsoles").replaceChildren(lote);
+}
+
+async function abrirPastaDaBios(qual = {}) {
+  try {
+    const dados = await pedir("/api/bios/pasta", "POST", qual);
+    recado(`Pasta ${dados.pasta} aberta. Ponha a BIOS lá e clique em Conferir.`);
+  } catch (falha) {
+    recado(falha.message, true);
+  }
+}
+
+async function conferirBios() {
+  const botao = $("#btnBiosConferir");
+  botao.disabled = true;
+  botao.textContent = "Conferindo…";
+  try {
+    const dados = await carregarBios(true);
+    if (!dados) return;
+    const novas = dados.instaladas || [];
+    if (novas.length) {
+      const nomes = [...new Set(novas.map((n) => (dados.itens.find((i) => i.id === n.id) || {}).rotulo || n.arquivo))];
+      recado(`Pronto: ${nomes.length === 1 ? "ficou ativa" : "ficaram ativas"} ${nomes.join(", ")}.`);
+    } else {
+      recado("Conferido. Nenhuma BIOS nova nas pastas.");
+    }
+    // O servidor ja refez a lista: o cartao do console deixa de pedir a BIOS.
+    if (novas.length) await carregarCatalogo();
+  } finally {
+    botao.disabled = false;
+    botao.textContent = "Conferir";
+  }
 }
 
 // --------------------------------------------------------------------------
@@ -3199,7 +3369,7 @@ async function abrirComoColocar() {
   try {
     const dados = await pedir("/api/como-colocar");
     estado.comoColocar = dados.consoles || [];
-    estado.pastaBios = dados.pasta_bios || "retroarch\\system";
+    estado.pastaBios = dados.pasta_bios || "BIOS";
     const escolhido = lista.value || (estado.filtroPlataforma || "");
     const ordem = [...estado.comoColocar].sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
     lista.replaceChildren(...ordem.map((console) => {
@@ -3246,19 +3416,53 @@ function desenharComoColocar() {
   linha("Como guardar", console.como);
   linha(console.zip_titulo, console.zip_texto);
   if (console.bios) {
+    // O servidor confere a marca de cada BIOS (servidor/bios.py): certa,
+    // de outra versao (pode funcionar), presente (marca desconhecida) ou falta.
+    const ESTADOS_BIOS = {
+      certa: ["bios-ok", "✔", "(ativa, versão certa)"],
+      testada: ["bios-ok", "✔", "(ativa, versão testada)"],
+      presente: ["bios-ok", "✔", "(ativa)"],
+      outra: ["bios-outra", "⚠", "(ativa, mas é outra versão: pode funcionar; se der problema, troque pela certa)"],
+      falta: ["bios-falta", "✘", "(falta)"],
+    };
     const itens = document.createElement("ul");
     for (const arquivo of console.bios.arquivos || []) {
       const item = document.createElement("li");
-      item.className = arquivo.tem ? "bios-ok" : "bios-falta";
-      item.textContent = `${arquivo.tem ? "✔" : "✘"} ${arquivo.arquivo} ${arquivo.tem ? "(já está)" : "(falta)"}`;
+      const [classe, sinal, texto] = ESTADOS_BIOS[arquivo.estado] ||
+        (arquivo.tem ? ESTADOS_BIOS.presente : ESTADOS_BIOS.falta);
+      item.className = classe;
+      item.textContent = `${sinal} ${arquivo.arquivo} ${texto}`;
       itens.append(item);
     }
     const situacao = document.createElement("strong");
-    situacao.className = console.bios.tem ? "bios-ok" : "bios-falta";
-    situacao.textContent = console.bios.tem ? " Já está pronta." : " Ainda falta.";
+    situacao.className = console.bios.tem ? "bios-ok" : console.bios.opcional ? "" : "bios-falta";
+    situacao.textContent = console.bios.tem ? " Ativa."
+      : console.bios.opcional ? " Não está (o console abre sem ela)."
+      : console.bios.so_para_alguns ? " Falta (só esses jogos precisam)." : " Ainda falta.";
+    // Onde por: a prateleira do console na pasta BIOS do ARENA. O ARENA
+    // reconhece a versao pela marca e instala onde o emulador procura.
+    const prateleira = console.bios.prateleira || estado.pastaBios;
+    const ondeFica = document.createElement("span");
+    ondeFica.append(" Fica na pasta ", codigo(prateleira), console.bios.tem ? "." :
+      ": ponha o arquivo lá (com qualquer nome, ou o .zip em que ele veio) e clique em Conferir.");
+    const botaoPasta = document.createElement("button");
+    botaoPasta.className = "botao";
+    botaoPasta.type = "button";
+    botaoPasta.textContent = "Abrir a pasta da BIOS";
+    botaoPasta.addEventListener("click", () => abrirPastaDaBios({ console: console.id }));
+    const botaoConferir = document.createElement("button");
+    botaoConferir.className = "botao";
+    botaoConferir.type = "button";
+    botaoConferir.textContent = "Conferir";
+    botaoConferir.addEventListener("click", async () => {
+      await conferirBios();
+      await abrirComoColocar();      // redesenha com a situacao nova
+    });
+    const acoes = document.createElement("div");
+    acoes.className = "controle-acoes";
+    acoes.append(botaoPasta, botaoConferir);
     linha("BIOS", console.bios.texto, situacao,
-          (console.bios.arquivos || []).length ? itens : "",
-          (console.bios.arquivos || []).length ? `Fica em ${estado.pastaBios}.` : "");
+          (console.bios.arquivos || []).length ? itens : "", ondeFica, acoes);
   } else {
     linha("BIOS", "Não precisa.");
   }
@@ -3875,6 +4079,9 @@ function ligarEventos() {
     }
   });
 
+  $("#btnBiosPasta").addEventListener("click", () => abrirPastaDaBios());
+  $("#btnBiosConferir").addEventListener("click", () => conferirBios());
+
   $("#btnAbrirBios").addEventListener("click", async () => {
     try {
       const dados = await pedir("/api/bios/abrir", "POST",
@@ -4065,6 +4272,7 @@ function ligarEventos() {
       if (!aba) return;
       const gaveta = grupo.closest(".gaveta");
       if (aba.dataset.aba === "controles" && !estado.controlesMontados) montarAbaControles();
+      if (aba.dataset.aba === "emuladores") carregarBios();
       for (const outra of grupo.querySelectorAll(".aba")) {
         outra.classList.toggle("ativo", outra === aba);
       }

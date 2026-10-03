@@ -18,7 +18,8 @@ De onde vem cada informacao:
     indexador usa -- a tela nunca fica desatualizada);
   - nome das BIOS: as listas "firmware" dos proprios nucleos
     (retroarch\info\*.info), resumidas aqui ao que importa para o aluno;
-  - "ja esta na pasta?": conferido na hora em retroarch\system.
+  - "ja esta na pasta?": conferido na hora em retroarch\system (servidor\bios.py);
+    a pessoa poe a BIOS na pasta BIOS do ARENA, uma por console.
 
 Regra de .zip conferida em 02/10/2026: nenhum nucleo desta pasta pede o
 .zip intacto ("block_extract") -- o RetroArch abre o zip de cartucho
@@ -89,14 +90,17 @@ CONSOLES = {
                         "sega_101.bin (Japão) ou mpr-17933.bin (EUA e Europa).")},
     "dreamcast": {"tipo": "disco", "exemplo": "Marvel vs. Capcom 2 (USA).chd",
                   "bios": ("uma", ["dc/dc_boot.bin"],
-                           "Recomendada: dc_boot.bin dentro de uma pasta dc (retroarch\\system\\dc). "
-                           "Sem ela alguns jogos travam (ex.: Marvel vs. Capcom 1)."),
+                           "Recomendada: dc_boot.bin. Sem ela alguns jogos travam (ex.: Marvel vs. Capcom 1)."),
                   "dica": "Também abre .gdi (com as trilhas na mesma pasta) e .cdi."},
     "pcfx": {"tipo": "disco", "bios": ("todas", ["pcfx.rom"], "pcfx.rom.")},
     "threedo": {"tipo": "disco", "bios": ("uma", ["panafz10.bin", "panafz1.bin", "goldstar.bin"],
                                           "Uma BIOS de 3DO (panafz10.bin é a mais comum).")},
     "cdi": {"tipo": "disco", "bios": ("todas", ["same_cdi/bios/cdimono1.zip"],
-                                      "cdimono1.zip dentro de retroarch\\system\\same_cdi\\bios.")},
+                                      "cdimono1.zip (o .zip inteiro, sem descompactar).")},
+    "pcengine": {"tipo": "cartucho", "exemplo": "Bonk's Adventure (USA).pce",
+                 "bios": ("alguns", ["syscard3.pce"],
+                          "Só para os jogos em CD: syscard3.pce (o System Card 3). Os de cartão não precisam."),
+                 "dica": "Jogo em CD do PC Engine: .cue com os .bin juntos, ou .chd."},
     "psp": {"tipo": "disco", "exemplo": "Burnout Legends (Europe).iso",
             "dica": "O .cso é o .iso comprimido (menor). PSP não precisa de BIOS."},
     "arcade": {"tipo": "fliperama", "exemplo": "kinst.zip",
@@ -104,10 +108,11 @@ CONSOLES = {
                         "cartão avisa qual. Placas com BIOS própria (ex.: neogeo.zip) vão na mesma pasta.")},
     "neogeo": {"tipo": "fliperama", "exemplo": "mslugx.zip",
                "bios": ("todas", ["neogeo.zip"],
-                        "neogeo.zip, na mesma pasta dos jogos (ou em retroarch\\system).")},
+                        "neogeo.zip (o .zip inteiro, sem descompactar). O ARENA põe uma cópia também "
+                        "na pasta Arcade, onde o MAME procura.")},
     "ps2": {"tipo": "externo", "exemplo": "Crash Nitro Kart (USA).iso",
-            "bios": ("ps2", [], "Uma BIOS de PS2 (um arquivo .bin de 4 MB) em retroarch\\system: o "
-                               "ARENA copia para o PCSX2 sozinho."),
+            "bios": ("ps2", [], "Uma BIOS de PS2 (um arquivo .bin de 4 MB), de qualquer região: o "
+                               "ARENA passa para o PCSX2 sozinho."),
             "dica": "Também abre .chd."},
     "gamecube": {"tipo": "externo", "exemplo": "Super Smash Bros. Melee (USA).rvz",
                  "dica": "O .rvz é o melhor (comprimido, sem perder nada). GameCube não precisa de BIOS."},
@@ -124,7 +129,7 @@ CONSOLES = {
     "scummvm": {"tipo": "scummvm", "exemplo": "Monkey Island\\monkey.scummvm"},
     "msx": {"tipo": "computador", "exemplo": "Nome do Jogo.rom",
             "bios": ("todas", ["Machines", "Databases"],
-                     "As pastas Machines e Databases do blueMSX dentro de retroarch\\system.")},
+                     "As pastas Machines e Databases do blueMSX (as pastas inteiras).")},
     "amiga": {"tipo": "computador", "exemplo": "Alien Breed.adf",
               "bios": ("uma", ["kick34005.A500", "kick40068.A1200"],
                        "Um Kickstart (kick34005.A500 serve para a maioria dos jogos).")},
@@ -133,18 +138,34 @@ CONSOLES = {
     "amstrad": {"tipo": "computador", "exemplo": "Nome do Jogo.dsk"},
     "megadrive": {"tipo": "cartucho", "exemplo": "Sonic The Hedgehog 3 (USA).md",
                   "dica": "Master System (.sms) e Game Gear (.gg) também vão nesta pasta."},
-    "atari5200": {"tipo": "cartucho", "bios": ("uma", ["5200.rom"], "Recomendada: 5200.rom.")},
-    "lynx": {"tipo": "cartucho", "bios": ("uma", ["lynxboot.img"], "Recomendada: lynxboot.img.")},
+    "atari5200": {"tipo": "cartucho", "bios": ("opcional", ["5200.rom"], "Opcional: 5200.rom.")},
+    "atari7800": {"tipo": "cartucho", "bios": ("opcional", ["7800 BIOS (U).rom"], "Opcional: 7800 BIOS (U).rom.")},
+    "lynx": {"tipo": "cartucho", "bios": ("opcional", ["lynxboot.img"], "Opcional: lynxboot.img.")},
+    "pokemini": {"tipo": "cartucho", "bios": ("opcional", ["bios.min"], "Opcional: bios.min.")},
     "odyssey2": {"tipo": "cartucho", "bios": ("todas", ["o2rom.bin"], "o2rom.bin.")},
     "colecovision": {"tipo": "cartucho", "bios": ("todas", ["colecovision.rom"], "colecovision.rom.")},
     "intellivision": {"tipo": "cartucho", "bios": ("todas", ["exec.bin", "grom.bin"], "exec.bin e grom.bin.")},
-    "nes": {"tipo": "cartucho", "exemplo": "Contra (USA).nes"},
-    "snes": {"tipo": "cartucho", "exemplo": "Donkey Kong Country (USA).sfc"},
+    "nes": {"tipo": "cartucho", "exemplo": "Contra (USA).nes",
+            "bios": ("alguns", ["disksys.rom"],
+                     "Só para os jogos de disquete do Famicom Disk System (.fds): disksys.rom. Os de "
+                     "cartucho não precisam.")},
+    "snes": {"tipo": "cartucho", "exemplo": "Donkey Kong Country (USA).sfc",
+             "bios": ("alguns", ["BS-X.bin"],
+                      "Só para os jogos de Satellaview (o \"BS\" no nome): BS-X.bin, que é o cartucho "
+                      "\"BS-X - Sore wa Namae o Nusumareta Machi no Monogatari (Japan)\" com esse nome. "
+                      "Os outros jogos não precisam de BIOS.")},
     "gameboy": {"tipo": "cartucho", "exemplo": "Tetris (World).gb",
+                "bios": ("opcional", ["gb_bios.bin", "gbc_bios.bin"],
+                         "Opcional: gb_bios.bin e gbc_bios.bin (só mostram a abertura do aparelho)."),
                 "dica": "Game Boy Color (.gbc) também vai nesta pasta."},
-    "gba": {"tipo": "cartucho", "exemplo": "Nome do Jogo (USA).gba"},
-    "n64": {"tipo": "cartucho", "exemplo": "GoldenEye 007 (USA).z64"},
-    "nds": {"tipo": "cartucho", "exemplo": "Nome do Jogo (USA).nds"},
+    "gba": {"tipo": "cartucho", "exemplo": "Nome do Jogo (USA).gba",
+            "bios": ("opcional", ["gba_bios.bin"], "Opcional: gba_bios.bin (mais fiel ao aparelho).")},
+    "n64": {"tipo": "cartucho", "exemplo": "GoldenEye 007 (USA).z64",
+            "bios": ("alguns", ["Mupen64plus/IPL.n64"],
+                     "Só para os jogos de disco do 64DD: IPL.n64. Os de cartucho não precisam.")},
+    "nds": {"tipo": "cartucho", "exemplo": "Nome do Jogo (USA).nds",
+            "bios": ("opcional", ["bios7.bin", "bios9.bin", "firmware.bin"],
+                     "Opcional: bios7.bin, bios9.bin e firmware.bin (mais fiel ao aparelho).")},
     "j2me": {"tipo": "cartucho", "exemplo": "Nome do Jogo.jar"},
 }
 
@@ -179,14 +200,27 @@ def guia(plataformas, pasta_sistema, pasta_jogos, falta_externo=None):
         exemplo = info.get("exemplo") or "Nome do Jogo%s" % (formatos[0] if formatos else "")
         bios = None
         if info.get("bios"):
+            import bios as conferir_bios
             regra, arquivos, texto = info["bios"]
+            # A prateleira do console na pasta BIOS do ARENA (servidor\bios.py):
+            # e' la que a pessoa poe a BIOS; o ARENA instala onde o emulador procura.
+            prateleira = conferir_bios.prateleira_do_console(plataforma["id"], arquivos)
             if regra in ("ps2", "ps3"):
                 presentes = [] if falta_externo.get(plataforma["id"]) else ["ok"]
-                bios = {"texto": texto, "arquivos": [], "tem": bool(presentes)}
+                bios = {"texto": texto, "arquivos": [], "tem": bool(presentes), "prateleira": prateleira}
             else:
-                lista = [{"arquivo": a.replace("/", "\\"), "tem": _tem(pasta_sistema, a)} for a in arquivos]
-                tem = (any if regra == "uma" else all)(item["tem"] for item in lista)
-                bios = {"texto": texto, "arquivos": lista, "tem": tem, "regra": regra}
+                # O estado vem da marca (servidor\bios.py): "certa", "testada"
+                # (outra versao, testada aqui), "outra" (pode funcionar),
+                # "presente" (o ARENA nao conhece a marca) ou "falta".
+                lista = []
+                for arquivo in arquivos:
+                    situacao = conferir_bios.estado(pasta_sistema, arquivo)
+                    lista.append({"arquivo": os.path.basename(arquivo), "tem": situacao != "falta",
+                                  "estado": situacao})
+                tem = (all if regra == "todas" else any)(item["tem"] for item in lista)
+                bios = {"texto": texto, "arquivos": lista, "tem": tem, "regra": regra,
+                        "so_para_alguns": regra == "alguns", "opcional": regra == "opcional",
+                        "prateleira": prateleira}
         saida.append({
             "id": plataforma["id"],
             "nome": plataforma.get("nome", plataforma["id"]),

@@ -206,6 +206,8 @@ Está tudo aqui dentro, comentado em português.
 | `servidor\\arena.py` | O servidor, o banco e a conversa com os amigos |
 | `servidor\\cheats.py` | Os saves e os códigos |
 | `servidor\\graficos.py` | Imagem, BIOS, memory card e partida a dois |
+| `servidor\\bios.py` | A pasta BIOS: reconhece cada BIOS e põe onde o emulador procura |
+| `servidor\\bios_catalogo.py` | Todas as BIOS que os consoles do ARENA usam |
 | `servidor\\controles.py` | Mapeamento de teclas e botões |
 | `servidor\\perfis_controle.json` | O que cada controle e cada console têm |
 | `servidor\\recursos.json` | Os 50 recursos da aba Avançado |

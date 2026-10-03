@@ -518,80 +518,124 @@ do arquivo — trocou o nome, perdeu o save. Escolha o nome antes.
 
 ---
 
-### Parte B — Consoles amarelos
+### Parte B — Consoles amarelos: a BIOS
 
 #### O que é
 
-Alguns consoles não funcionam só com o emulador. Eles precisam dos arquivos
-que vinham gravados de fábrica dentro do aparelho.
+Alguns consoles não funcionam só com o emulador: precisam da **BIOS**, o
+programinha que vinha gravado de fábrica dentro do aparelho e que liga ele
+por dentro. Ela pertence à empresa que fabricou o console — **o ARENA não
+baixa BIOS**. Quem tem o aparelho original pode extrair da própria máquina.
 
-**O ARENA não fornece esses arquivos, não diz quais são e não baixa nada.**
-Eles pertencem às empresas que fabricaram os consoles. Se você tem o
-aparelho original, existem procedimentos para extrair da sua própria
-máquina.
+#### A pasta BIOS: uma pasta por console
 
-#### Quais consoles pedem
+Na primeira vez que abre, o ARENA cria a pasta `BIOS`, ao lado da pasta
+`jogos`. Dentro dela há uma pasta para cada console que usa BIOS — com o
+mesmo nome da pasta de jogos dele — e, quando cada região tem a sua BIOS,
+uma pasta por região:
 
-| Console | Quantos arquivos |
-|---|---|
-| 3DO | 1 |
-| Arcade (MAME) | 1 |
-| Atari 5200 | 1 |
-| Atari Lynx | 1 |
-| ColecoVision | 1 |
-| Commodore Amiga | 1 |
-| Intellivision | 1 |
-| Magnavox Odyssey 2 | 1 |
-| MSX | 1 |
-| Neo Geo | 1 |
-| PC-FX | 1 |
-| Philips CD-i | 1 |
-| PlayStation | 1 |
-| PlayStation 2 | 1 |
-| Sega 32X | 1 |
-| **Sega CD** | **3** |
-| Sega Dreamcast | 1 |
-| Sega Saturn | 1 |
+```
+ARENA\BIOS\
+├── LEIA - O QUE FALTA.txt          ← quantas são, quais estão ativas e quais faltam
+├── PS1\EUA · Europa · Japão        ← basta UMA, de qualquer região
+├── PS2\EUA · Europa · Japão        ← basta UMA (o ARENA passa ao PCSX2)
+├── PS3                             ← o firmware (PS3UPDAT.PUP)
+├── Sega CD\EUA · Europa · Japão    ← uma por região: o jogo europeu só abre com a europeia
+├── Sega Saturn\EUA e Europa · Japão · Cartuchos
+├── Dreamcast
+├── Neo Geo
+├── Super Nintendo (Satellaview)
+└── ... (uma pasta para cada um dos outros)
+```
 
-Dois casos à parte:
-
-- **Dreamcast:** a maioria dos jogos abre mesmo sem a BIOS — o emulador
-  simula uma. Alguns só abrem com a BIOS de verdade (o Marvel vs. Capcom 1
-  trava com a simulada).
-- **Super Nintendo:** só os jogos de **Satellaview** (os que têm "BS" no
-  começo do nome) pedem a BIOS dele (BS-X). O cartão do jogo avisa.
-
-#### Os 29 que não pedem nada
-
-Amstrad CPC · Atari 2600 · Atari 7800 · Atari Jaguar · Commodore 64 ·
-Game & Watch · Game Boy e Game Boy Color · Game Boy Advance · GameCube ·
-Nintendo Wii · LowRes NX · Mega Drive, Master System e Game Gear · MS-DOS ·
-Neo Geo Pocket · Nintendo (NES) · Nintendo 64 · Nintendo DS · PC Engine ·
-PlayStation Portable · Pokémon mini · ScummVM · Sega SG-1000 ·
-Super Nintendo · TIC-80 · Uzebox · Vectrex · Virtual Boy · WASM-4 ·
-WonderSwan · ZX Spectrum
+Cada pasta tem um `LEIA.txt` que diz o que vai ali, se já está **ativa** e o
+que acontece sem ela. A mesma lista aparece na tela, em **Ajustes →
+Emuladores → BIOS dos consoles**, com um botão para abrir a pasta de cada
+console.
 
 #### Passo a passo
 
-**1.** Veja a bolinha da plataforma, do lado esquerdo:
+**1.** Ponha o arquivo na pasta do console. **O nome não importa**, e pode
+ser o `.zip` em que ele veio (até um zip dentro de outro zip, como vêm os
+pacotes da internet).
+
+**2.** Clique em **Conferir**, em **Ajustes → Emuladores → BIOS dos
+consoles** (ou feche e abra o ARENA).
+
+**3.** Pronto: a BIOS aparece como **Ativa**. O ARENA reconheceu o arquivo
+pela marca da versão certa (o MD5 que o próprio RetroArch publica) ou, no
+PlayStation, pela região que vem gravada dentro dela, e instalou onde o
+emulador procura (`retroarch\system`), com o nome exato que ele exige.
+
+Arquivo na pasta certa, com o tamanho certo, mas de marca desconhecida fica
+**ativo, de outra versão**: pode funcionar; se algum jogo der problema,
+troque pela recomendada (o `LEIA.txt` da pasta traz a marca dela). Quando a
+recomendada chega, o ARENA troca sozinho e guarda a antiga em
+`backup\bios-trocadas`. **O ARENA nunca apaga BIOS.** Arquivo que ele não
+reconhece fica listado no `LEIA.txt` da pasta ("não reconheceu").
+
+Também vale pôr a BIOS direto em `retroarch\system`, como os tutoriais do
+RetroArch ensinam — solta ou no pacote `.zip`: o ARENA acha e põe uma cópia
+na pasta `BIOS`, para lá mostrar tudo o que existe. E a BIOS deixada junto
+dos jogos (o `SCPH1001.BIN` na pasta do PS1) não aparece como jogo: o ARENA
+reconhece e leva para o lugar certo.
+
+#### Quais consoles pedem
+
+| Os jogos precisam (sem ela, não abrem) | O que vai |
+|---|---|
+| PlayStation | uma BIOS de qualquer região |
+| PlayStation 2 | uma BIOS de qualquer região (um `.bin` de 4 MB) |
+| PlayStation 3 | o firmware `PS3UPDAT.PUP`, instalado uma vez pelo RPCS3 |
+| Sega CD | uma por região: `bios_CD_U.bin` (EUA), `bios_CD_E.bin` (Europa), `bios_CD_J.bin` (Japão) |
+| Sega Saturn | `mpr-17933.bin` (EUA e Europa) e `sega_101.bin` (Japão) |
+| Neo Geo | `neogeo.zip` inteiro — o mesmo serve ao FBNeo e ao MAME (o ARENA põe uma cópia na pasta Arcade) |
+| PC-FX | `pcfx.rom` |
+| 3DO | uma BIOS de 3DO (`panafz10.bin` é a mais comum) |
+| Philips CD-i | `cdimono1.zip` inteiro |
+| Magnavox Odyssey 2 | `o2rom.bin` |
+| ColecoVision | `colecovision.rom` |
+| Intellivision | `exec.bin` e `grom.bin` |
+| MSX | as pastas `Machines` e `Databases` do blueMSX |
+| Commodore Amiga | `kick34005.A500` (Kickstart 1.3) |
+
+**Só para alguns jogos:** Dreamcast (`dc_boot.bin` — a maioria abre sem ela,
+mas alguns travam, como o Marvel vs. Capcom 1) · Satellaview, os jogos "BS"
+do Super Nintendo (`BS-X.bin`) · Sufami Turbo (`STBIOS.bin`) · Famicom Disk
+System, os jogos `.fds` (`disksys.rom`) · PC Engine em CD (`syscard3.pce`) ·
+64DD (`IPL.n64`) · Videopac+ (`g7400.bin`) · Amiga 1200 e CD32 · os dois
+cartuchos do Saturn (o do The King of Fighters '95 e o do Ultraman).
+
+**Opcionais (o console abre sem; com ela, fica mais fiel):** Atari 5200 ·
+Atari 7800 · Atari Lynx · Game Boy e Game Boy Color · Game Boy Advance ·
+Nintendo DS · Pokémon mini.
+
+**Fliperama (MAME e FBNeo):** cada placa tem a sua BIOS em `.zip`
+(`neogeo.zip`, `pgm.zip`, `naomi.zip`...), que vai na mesma pasta dos jogos
+dela. O cartão do jogo avisa qual falta.
+
+**Satellaview:** o ARENA reconhece o jogo de Satellaview pelo cabeçalho do
+cartucho, do mesmo jeito que o emulador (não só pelo "BS" do nome): o BS
+F-Zero Deluxe, por exemplo, é uma versão feita para abrir sozinha e não pede
+a BIOS. Com o BS-X, os jogos BS ligam pela tela do BS-X.
+
+#### Os que não pedem nada
+
+Amstrad CPC · Atari 2600 · Atari Jaguar · Commodore 64 · Game & Watch ·
+GameCube · Java ME (celular antigo) · LowRes NX · Mega Drive, Master System
+e Game Gear · MS-DOS · Neo Geo Pocket · Nintendo Wii · PlayStation Portable ·
+ScummVM · Sega 32X · Sega SG-1000 · Tamagotchi · TIC-80 · Uzebox · Vectrex ·
+Virtual Boy · WASM-4 · WonderSwan · Xbox 360 · ZX Spectrum. Também não pedem
+o NES, o Super Nintendo, o Nintendo 64 e o PC Engine (só as partes que
+aparecem na lista de cima).
+
+#### A bolinha do console
 
 | Cor | Quer dizer |
 |---|---|
 | Azul | Pronto, é só clicar |
-| Amarelo | Falta arquivo de sistema |
+| Amarelo | Falta a BIOS (a linha diz qual) |
 | Cinza | Falta baixar o emulador desse console |
-
-**2.** Se estiver amarela, a linha mostra **quantos** arquivos faltam.
-
-**3.** Coloque os arquivos em:
-
-```
-ARENA\retroarch\system\
-```
-
-Direto nessa pasta. Sem criar subpasta, sem renomear.
-
-**4.** Feche e abra o ARENA. A bolinha vira azul sozinha.
 
 ---
 
@@ -780,14 +824,18 @@ falta a peça que acorda tudo.
 
 #### Pelos emuladores de fora
 
-**PCSX2:** o ARENA copia uma BIOS de PS2 sozinho (de `retroarch\system`) na
-primeira vez que você abre um jogo por ele, sem precisar mexer em nada. Se
+**PCSX2:** o ARENA copia uma BIOS de PS2 sozinho (a da pasta `BIOS\PS2`,
+instalada em `retroarch\system`) na primeira vez que você abre um jogo por
+ele, sem precisar mexer em nada. Em **Ajustes → Emuladores → BIOS dos
+consoles**, a do PS2 mostra a região e a versão de cada uma, como o PCSX2
+mostra, e qual é a que ele usa para ligar. Se
 você já colocou uma BIOS na pasta do PCSX2 antes, o ARENA não mexe nela.
 Sem nenhuma BIOS de PS2 (um `.bin` de 4 MB), o cartão do PS2 fica
 **amarelo** e diz o que falta — antes de abrir, não depois.
 
 **PS3 (RPCS3):** precisa do firmware oficial instalado nele (ver "PS3: falta
-mais um passo"). Sem ele, o cartão também fica amarelo, com o caminho.
+mais um passo"; o arquivo pode ficar guardado na pasta `BIOS\PS3`). Sem ele,
+o cartão também fica amarelo, com o caminho.
 
 **Dolphin:** não precisa de BIOS — GameCube e Wii abrem sem ela.
 
@@ -808,21 +856,19 @@ para aquele console.
 
 #### Pelo RetroArch: escolher qual usar
 
-Em **Ajustes → Emuladores** tem a lista **Qual BIOS usar em cada console**.
-
-Aparecem ali os arquivos que você já colocou em `retroarch\system`. O ARENA
-não fornece, não indica onde conseguir e não baixa nada.
+Em **Ajustes → Emuladores** tem **Escolher a BIOS e abrir a tela do
+console**.
 
 **Na maioria dos consoles não precisa escolher.** O emulador confere o
-conteúdo de cada arquivo e acha a BIOS certa sozinho. Nesses, a tela
-escreve isso em vez de mostrar uma lista.
+conteúdo de cada arquivo e acha a BIOS certa sozinho. Esses nem aparecem na
+lista.
 
 A escolha só aparece onde o emulador deixa escolher de verdade:
 
 | Console | O que dá para escolher |
 |---|---|
 | PlayStation 1 | Só arquivos com um destes nomes: `scph5500.bin`, `scph5501.bin`, `scph5502.bin`, `psxonpsp660.bin`, `ps1_rom.bin`, `openbios.bin`. Com outro nome (por exemplo `SCPH1001.BIN`), o emulador ignora a escolha, então a tela nem oferece. Ele acha esse arquivo sozinho do mesmo jeito |
-| 3DO | Qualquer arquivo da pasta |
+| 3DO | Só as BIOS de 3DO que o emulador conhece (`panafz10.bin`, `panafz1.bin`, `goldstar.bin`...) |
 
 **Por que fixar uma, quando dá:** o console guarda a data, a hora e as
 preferências *dentro* da BIOS. Se cada jogo abrir com um arquivo diferente,

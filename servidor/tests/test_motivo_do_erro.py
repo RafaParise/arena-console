@@ -127,7 +127,10 @@ class TestMotivoDoErro(unittest.TestCase):
         r = motivo_do_erro.analisar(
             "[libretro ERROR] [Core] Unsupported ROM format\n[ERROR] [Content] Falha ao carregar o conteúdo.\n",
             os.path.join(self.dir, "jogo.sfc"), "snes9x_libretro.dll")
-        self.assertIn("O emulador não conseguiu abrir este arquivo", r["texto"])
+        # 03/10/2026: "<emulador> nao abriu este jogo. O arquivo pode estar..."
+        # (antes repetia o nome do emulador nas duas frases).
+        self.assertTrue(r["texto"].startswith("O emulador do Super Nintendo não abriu este jogo. O arquivo pode "
+                                              "estar danificado"), r["texto"])
         self.assertIn("Unsupported ROM format", r["texto"])
 
     def test_registro_da_partida_e_o_mais_novo_depois_de_abrir(self):
@@ -144,6 +147,45 @@ class TestMotivoDoErro(unittest.TestCase):
         open(novo, "w").close()
         open(os.path.join(dados, "outro.log"), "w").close()
         self.assertEqual(motivo_do_erro.registro_da_partida(dados, time.time() - 60), novo)
+
+
+class TestMotivoDaBios(unittest.TestCase):
+    """03/10/2026: as linhas que cada emulador escreveu de verdade quando
+    faltava a BIOS (antes de as BIOS do Rafael irem para o lugar)."""
+
+    FALHOU = "[ERROR] [Content] Falha ao carregar o conteúdo.\n"
+
+    def test_sega_cd(self):
+        texto = ('[libretro ERROR] Unable to open CD BIOS: "C:\\Projetos\\ARENA\\retroarch\\system\\bios_CD_E.bin".\n'
+                 + self.FALHOU)
+        r = motivo_do_erro.analisar(texto, "C:\\jogos\\Sonic CD (Europe).chd", "genesis_plus_gx_libretro.dll")
+        self.assertIn("falta a BIOS bios_CD_E.bin (a do Sega CD da Europa).", r["texto"])
+        # Onde por: a prateleira dela na pasta BIOS do ARENA (servidor\bios.py).
+        self.assertIn("pasta BIOS\\Sega CD\\Europa", r["texto"])
+        self.assertIn(".zip em que ele veio", r["texto"])
+
+    def test_saturn(self):
+        texto = ('[libretro ERROR] Cannot open BIOS file "C:\\Projetos\\ARENA\\retroarch\\system\\mpr-17933.bin".\n'
+                 + self.FALHOU)
+        r = motivo_do_erro.analisar(texto, "C:\\jogos\\Saturn Bomberman (USA) (1S).cue", "mednafen_saturn_libretro.dll")
+        self.assertTrue(r["texto"].startswith("O emulador do Saturn não abriu este jogo: falta a BIOS mpr-17933.bin"))
+        self.assertIn("(a do Saturn dos EUA e da Europa)", r["texto"])
+        self.assertIn("pasta BIOS\\Sega Saturn\\EUA e Europa", r["texto"])
+
+    def test_naomi_no_flycast(self):
+        texto = "[libretro ERROR] [BOOT] Erro: Não foi possível carregar a Bios da naomi.zip\n" + self.FALHOU
+        r = motivo_do_erro.analisar(texto, "C:\\jogos\\jogo.zip", "flycast_libretro.dll")
+        self.assertIn("naomi.zip, dentro da pasta retroarch\\system\\dc", r["texto"])
+
+    def test_satellaview(self):
+        texto = "[libretro ERROR] ROM loading failed...\n" + self.FALHOU
+        r = motivo_do_erro.analisar(texto, "C:\\jogos\\BS F-ZERO (J).smc", "snes9x_libretro.dll")
+        self.assertIn("Satellaview", r["texto"])
+        self.assertIn("BS-X.bin", r["texto"])
+        self.assertIn("pasta BIOS\\Super Nintendo (Satellaview)", r["texto"])
+        # Jogo comum que nao abriu: nao fala de BIOS.
+        r = motivo_do_erro.analisar(texto, "C:\\jogos\\Contra (USA).sfc", "snes9x_libretro.dll")
+        self.assertNotIn("BS-X", r["texto"])
 
 
 class TestServidorGuardaOMotivo(unittest.TestCase):

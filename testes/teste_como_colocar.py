@@ -88,7 +88,10 @@ def main():
         guia = {c["id"]: c for c in como_colocar.guia(plataformas, sistema, os.path.join(pasta, "jogos"))}
         confere("PS1 com UMA das BIOS (em maiusculas): pronta", guia["ps1"]["bios"]["tem"] is True)
         confere("Intellivision com so uma das duas: ainda falta", guia["intellivision"]["bios"]["tem"] is False)
-        confere("console sem BIOS: o guia diz que nao precisa", guia["snes"]["bios"] is None)
+        confere("console sem BIOS: o guia diz que nao precisa", guia["megadrive"]["bios"] is None)
+        # 03/10/2026: o SNES ganhou a BIOS do Satellaview, so para os jogos "BS".
+        confere("SNES: BIOS so para alguns jogos (Satellaview)",
+                (guia["snes"]["bios"] or {}).get("so_para_alguns") is True, guia["snes"]["bios"])
 
         print("3. O zip de cartucho, de verdade")
         if "--sem-retroarch" in sys.argv:
@@ -176,8 +179,8 @@ def main():
                         and "jogos\\pessoais\\PS1" in textos["ps1"], textos["ps1"][:300])
                 confere("Arcade: tem que ser .zip, com o nome curto", "Tem que ser .zip" in textos["arcade"]
                         and "nome curto" in textos["arcade"], textos["arcade"][:300])
-                confere("SNES: pode ser .zip, BIOS nao precisa", "Pode ser .zip" in textos["snes"]
-                        and "Não precisa" in textos["snes"], textos["snes"][:300])
+                confere("SNES: pode ser .zip, BIOS so para os jogos de Satellaview", "Pode ser .zip" in textos["snes"]
+                        and "Satellaview" in textos["snes"] and "BS-X.bin" in textos["snes"], textos["snes"][:300])
                 confere("PS2: diz o emulador e a BIOS de 4 MB", "PCSX2" in textos["ps2"] and "4 MB" in textos["ps2"],
                         textos["ps2"][:300])
                 nav.foto(os.path.join(pasta, "como_colocar_jogos.png"))

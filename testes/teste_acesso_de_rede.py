@@ -104,6 +104,10 @@ def main():
             ("POST", "/api/capas/parar", {}),
             ("GET", "/api/capas/progresso", None),
             ("GET", "/api/como-colocar", None),
+            # A pasta BIOS (03/10/2026): ver, conferir (instala) e abrir a pasta.
+            ("GET", "/api/bios", None),
+            ("POST", "/api/bios/conferir", {}),
+            ("POST", "/api/bios/pasta", {}),
         ]:
             status, resp = requisicao(metodo, caminho, corpo)
             passou = status == 403

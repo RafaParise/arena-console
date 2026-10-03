@@ -79,6 +79,7 @@ import processos   # noqa: E402  (prioridade e economia de energia -- 30/09/2026
 import janela_preta  # noqa: E402  (servidor que caia ou travava -- 02/10/2026)
 import como_colocar  # noqa: E402  (como colocar os jogos de cada console -- 02/10/2026)
 import motivo_do_erro  # noqa: E402  (por que o jogo nao abriu, pelo registro -- 02/10/2026)
+import bios        # noqa: E402  (nome, pasta e versao certa de cada BIOS -- 03/10/2026)
 
 PASTA_LAUNCHER = os.path.join(RAIZ, "launcher")
 PASTA_DADOS = os.path.join(RAIZ, "dados")
@@ -1867,8 +1868,14 @@ def avaliar_plataformas(forcar=False):
                 motivo = "Núcleo não instalado. Baixe pelo RetroArch."
         elif precisa_sistema and not tem_sistema:
             estado = "falta_sistema"
-            motivo = ("Precisa de %d arquivo(s) de sistema em "
-                      "retroarch\\system." % plataforma["arquivos_sistema"])
+            motivo = ("Precisa da BIOS do console. Veja o que falta em Ajustes → Emuladores → BIOS "
+                      "dos consoles (a pasta é a BIOS, na pasta do ARENA).")
+        elif bios.falta_para_o_console(plataforma["id"], PASTA_SISTEMA):
+            # Sega CD e Saturn nao abrem jogo nenhum sem a BIOS deles. Antes
+            # (ate 03/10/2026) so ficavam "falta" com a pasta system VAZIA:
+            # com a BIOS do PS1 la, apareciam prontos e o jogo nao abria.
+            estado = "falta_sistema"
+            motivo = bios.falta_para_o_console(plataforma["id"], PASTA_SISTEMA)
         else:
             estado = "pronta"
             motivo = ""
@@ -4267,8 +4274,16 @@ class Manipulador(BaseHTTPRequestHandler):
                         graficos.falta_para_o_externo(dados_externo["nome"], caminho_externo)
                         if caminho_externo else "o emulador não está na pasta")
             return self.responder_json({
-                "ok": True, "pasta_bios": "retroarch\\system",
+                "ok": True, "pasta_bios": bios.NOME_DA_PASTA,
                 "consoles": como_colocar.guia(carregar_catalogo(), PASTA_SISTEMA, PASTA_JOGOS, falta)})
+
+        # As BIOS de cada console, como estao agora (Ajustes -> Emuladores ->
+        # BIOS dos consoles): ativa, de outra versao ou falta, e onde fica a
+        # prateleira de cada uma (a pasta BIOS do ARENA, servidor\bios.py).
+        if caminho == "/api/bios":
+            itens = bios.situacao(RAIZ)
+            return self.responder_json({"ok": True, "pasta": bios.NOME_DA_PASTA, "itens": itens,
+                                        "resumo": bios.resumo(itens), "sem_bios": bios.consoles_sem_bios()})
 
         if caminho == "/api/capas/progresso":
             return self.responder_json(dict(ok=True, **situacao_das_capas()))
@@ -4898,6 +4913,44 @@ class Manipulador(BaseHTTPRequestHandler):
                 return self.erro("Console desconhecido. Escolha um console da lista.")
             alvo = os.path.join(PASTA_JOGOS, "pessoais", plataforma["pasta"])
             try:
+                os.makedirs(alvo, exist_ok=True)
+                if not hasattr(os, "startfile"):
+                    return self.erro("Abrir a pasta só funciona no Windows. Ela fica em %s." % alvo)
+                os.startfile(alvo)
+            except OSError as falha:
+                return self.erro(traduzir_erro_do_sistema(falha, "abrir a pasta"))
+            return self.responder_json({"ok": True, "pasta": os.path.relpath(alvo, RAIZ)})
+
+        # ---- BIOS: conferir agora e abrir a prateleira -------------------
+        # Conferir: o mesmo que o ARENA faz ao abrir (servidor\bios.py), na
+        # hora -- quem acabou de por a BIOS na pasta ve ela ficar ativa sem
+        # fechar o ARENA. So deste computador (nao esta em ROTAS_REDE_EXTERNA).
+        if caminho == "/api/bios/conferir":
+            feito = organizar_bios(esperar=0)
+            if feito is None:
+                return self.erro("Não consegui conferir as BIOS agora. Feche os jogos abertos e tente de novo.")
+            return self.responder_json({
+                "ok": True, "instaladas": feito["instaladas"], "copiadas": feito["copiadas"],
+                "avisos": feito["avisos"], "itens": feito["itens"], "resumo": feito["resumo"],
+                "sem_bios": bios.consoles_sem_bios()})
+
+        if caminho == "/api/bios/pasta":
+            entradas = bios.catalogo.por_id()
+            alvo_id = str(dados.get("id", "") or "")
+            console = str(dados.get("console", "") or "")
+            if alvo_id and alvo_id not in entradas:
+                return self.erro("BIOS desconhecida. Escolha uma da lista.")
+            do_console = bios.catalogo.do_console(console) if console else []
+            if console and not do_console:
+                return self.erro("Este console não usa BIOS. Escolha um console da lista.")
+            if alvo_id:
+                alvo = bios.prateleira(RAIZ, entradas[alvo_id])
+            elif do_console:
+                alvo = os.path.join(RAIZ, bios.NOME_DA_PASTA, do_console[0]["pasta"])
+            else:
+                alvo = os.path.join(RAIZ, bios.NOME_DA_PASTA)
+            try:
+                bios.criar_prateleiras(RAIZ)
                 os.makedirs(alvo, exist_ok=True)
                 if not hasattr(os, "startfile"):
                     return self.erro("Abrir a pasta só funciona no Windows. Ela fica em %s." % alvo)
@@ -6048,6 +6101,30 @@ def conferir_fliperamas():
         manifesto(forcar=True)
 
 
+def organizar_bios(esperar=3.0):
+    """A pasta BIOS do ARENA (servidor\\bios.py): cria as prateleiras de cada
+    console, instala em retroarch\\system o que a pessoa pos nelas (ou nos
+    pacotes .zip deixados em retroarch\\system) com o nome que o emulador
+    procura, e escreve os LEIA de cada uma. Em segundo plano, logo ao abrir
+    (e no botao Conferir, Ajustes -> Emuladores); nunca troca nem apaga
+    nada. Instalou: refaz a lista, para o console e os cartoes deixarem de
+    pedir a BIOS."""
+    time.sleep(esperar)                   # a tela abre primeiro
+    try:
+        feito = bios.organizar(RAIZ)
+    except Exception as falha:            # noqa: BLE001 -- e' ajuda, nunca derruba
+        print("[ARENA] Nao consegui conferir as BIOS: %s" % falha)
+        return None
+    for item in feito["instaladas"]:
+        print("[ARENA] BIOS %s instalada (tirada de %s)." % (item["arquivo"], item["de"]))
+    for aviso in feito["avisos"]:
+        print("[ARENA] %s" % aviso)
+    if feito["instaladas"]:
+        limpar_caches()
+        manifesto(forcar=True)
+    return feito
+
+
 def conferir_vulkan():
     """O automatico escolheu Vulkan porque o vulkan-1.dll carrega; se o
     Vulkan nao enxergar placa nenhuma, troca para d3d11 (ou glcore) antes
@@ -6197,6 +6274,9 @@ def principal():
     threading.Thread(target=conferir_vulkan, daemon=True).start()
     # Zip de fliperama danificado: confere cada um uma vez, devagar.
     threading.Thread(target=conferir_fliperamas, daemon=True).start()
+    # A pasta BIOS: prateleiras, LEIA e a BIOS posta la vai para onde o
+    # emulador procura, com o nome certo (servidor\bios.py).
+    threading.Thread(target=organizar_bios, daemon=True).start()
     # ARENA_SEM_JANELA=1: so o servidor, sem abrir a tela (testes
     # automaticos -- a rodada completa abria dezenas de janelas -- e quem
     # quiser abrir a tela de outro computador).

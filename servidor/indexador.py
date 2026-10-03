@@ -24,6 +24,7 @@ import re
 import threading
 import unicodedata
 
+import bios
 import graficos
 import identificador
 import jogadores
@@ -102,16 +103,6 @@ def nucleo_aceita_m3u(core):
             pass
         _m3u_por_nucleo[core] = aceita
     return _m3u_por_nucleo[core]
-
-
-def tem_bios_do_satellaview():
-    """A BIOS do Satellaview (BS-X) esta na pasta de BIOS? E' o nome que o
-    proprio Snes9x procura (BS-X.bin ou BS-X.bios)."""
-    try:
-        nomes = {n.lower() for n in os.listdir(os.path.join(RAIZ, "retroarch", "system"))}
-    except OSError:
-        return False
-    return bool(nomes & {"bs-x.bin", "bs-x.bios"})
 
 
 def agrupar_discos(itens, por_id):
@@ -788,6 +779,12 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None,
                     candidatos, por_id, caminho_relativo_pasta, marcado,
                     tamanho_mb, caminho_absoluto)
                 incerto = (id_plataforma == SEM_PASTA)
+            # A BIOS deixada junto dos jogos (o SCPH1001.BIN na pasta do PS1)
+            # nao e' jogo: sai da lista, e o ARENA a leva para a pasta BIOS e
+            # para onde o emulador procura (servidor\bios.py). So pela marca
+            # ou pelo conteudo -- um jogo de Super Nintendo tem o tamanho do BS-X.
+            if id_plataforma != SEM_PASTA and bios.e_bios_na_pasta_de_jogos(caminho_absoluto, id_plataforma):
+                continue
             # A pasta decide, sempre. Mas quando da para abrir o arquivo e
             # ele diz outra coisa, vale avisar: Gran Turismo 2 de 660 MB na
             # pasta do Magnavox Odyssey 2 e arquivo arrastado errado, nao
@@ -848,17 +845,16 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None,
                                         "o jogo pelo %s.zip (o romset), com este disco numa subpasta %s "
                                         "ao lado dele. Falta o %s.zip na pasta."
                                         % (pasta_do_disco, pasta_do_disco, pasta_do_disco)})
-            # Satellaview (o "BS" do nome, ou .bs): o Snes9x so abre com a
-            # BIOS do Satellaview (BS-X) na pasta de BIOS. Sem ela, "falha ao
-            # carregar o conteudo" e o cartao nao dizia nada (achado de
-            # 02/10/2026: os 5 BS F-ZERO da pasta nao abriam).
-            if (plataforma.get("core") == "snes9x_libretro.dll"
-                    and (nome_arquivo.startswith("BS ") or extensao == ".bs")
-                    and not tem_bios_do_satellaview()):
-                avisos.append({
-                    "texto": "Jogo de Satellaview (o \"BS\" do nome): o Super Nintendo só "
-                             "abre esse tipo com a BIOS do Satellaview (BS-X) em "
-                             "retroarch\\system. Sem ela, o jogo não abre."})
+            # A BIOS que ESTE jogo usa e que nao esta na pasta (servidor\bios.py):
+            # Sega CD e Saturn pela regiao do jogo, Dreamcast (sem ela, alguns
+            # travam) e Satellaview (o "BS" do nome). Achados: em 02/10/2026 os
+            # 5 BS F-ZERO nao abriam e o cartao nao dizia nada; em 03/10, o Sega
+            # CD e o Saturn apareciam "prontos" sem BIOS nenhuma.
+            aviso_bios = bios.aviso_do_jogo(id_plataforma, nome_arquivo,
+                                            os.path.join(RAIZ, "retroarch", "system"),
+                                            plataforma.get("nome", ""), caminho_absoluto)
+            if aviso_bios:
+                avisos.append({"texto": aviso_bios})
             if discorda:
                 avisos.append({
                     "texto": "O conteúdo deste arquivo é de %s, mas ele está na pasta de %s. "

@@ -1757,8 +1757,19 @@ input::placeholder { color: var(--texto-apagado); }
 .como-colocar dt { font-weight: 600; color: var(--texto-fraco); }
 .como-colocar dd { margin: 0; overflow-wrap: anywhere; }
 .como-colocar code { font-size: 0.92em; }
-.como-colocar .bios-ok { color: var(--ok, #2ed573); }
-.como-colocar .bios-falta { color: var(--erro); }
+.como-colocar .bios-ok, .lista-bios .bios-ok { color: var(--ok, #2ed573); }
+.como-colocar .bios-falta, .lista-bios .bios-falta { color: var(--erro); }
+.como-colocar .bios-outra, .lista-bios .bios-outra { color: var(--aviso, #e0a030); }
+.lista-bios .bios-nada { color: var(--texto-apagado); }
+
+/* BIOS dos consoles (03/10/2026): um console por linha, cada BIOS com a
+   situacao dela; o selo resume o console (ativa / falta / opcional). */
+.bios-resumo { font-weight: 600; }
+.bios-itens { list-style: none; margin: 0.15rem 0 0; padding: 0; font-size: var(--t-micro); line-height: 1.45; }
+.bios-itens li { overflow-wrap: anywhere; }
+.controle-tipo.selo-ok { background: #1e5b3c; color: #b9f5d2; }
+.controle-tipo.selo-falta { background: #6b2430; color: #ffd0d8; }
+.controle-tipo.selo-neutro { background: var(--borda); color: var(--texto-fraco); }
 .como-colocar ul { margin: 0.2rem 0 0 1.1rem; padding: 0; }
 @media (max-width: 560px) {
   .como-colocar dl { grid-template-columns: 1fr; }

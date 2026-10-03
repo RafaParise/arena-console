@@ -108,3 +108,7 @@ dados/*
 
 # Coletas do perfil-alvo (COLETAR.bat): dados de maquinas, nao vao para o git
 perfil/
+
+# A pasta BIOS (servidor\bios.py): o ARENA cria as pastas e os LEIA sozinho
+# ao abrir; o que vai dentro sao as BIOS de quem usa. Nada dela vai para o git.
+BIOS/

@@ -1,5 +1,7 @@
-﻿Arquivos de sistema (BIOS) que alguns consoles exigem: PlayStation 1 e 2,
-Sega CD, Saturn, Neo Geo e outros. A BIOS vem do console de verdade; o
-ARENA não lista, não nomeia e não baixa esses arquivos.
-O cartão do console fica amarelo e diz o que falta. Guia 2-JOGOS.md,
-"A BIOS".
+﻿Aqui é onde os emuladores procuram as BIOS, cada uma com o nome exato
+que o emulador exige. Não precisa mexer aqui: ponha a BIOS na pasta BIOS
+do ARENA (uma pasta por console, com qualquer nome, ou o .zip em que ela
+veio) e o ARENA instala aqui sozinho. O arquivo "LEIA - O QUE FALTA.txt"
+de lá diz quais faltam. Pôr aqui direto também vale.
+A BIOS vem do console de verdade: o ARENA não baixa BIOS.
+Guia 2-JOGOS.md, "Consoles amarelos: a BIOS".

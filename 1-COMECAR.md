@@ -298,7 +298,9 @@ copiada com caminho fixo — refaça a cópia.
 #### Antes de distribuir para a turma
 
 - [ ] `jogos\pessoais` está vazia
-- [ ] `retroarch\system` está vazia
+- [ ] `retroarch\system` e a pasta `BIOS` só têm as BIOS que você decidiu levar
+      (a versão dos alunos do `ferramentas\montar_versao_alunos.py --com-bios`
+      já vem com elas)
 - [ ] `dados\arena.db` foi apagado (senão os recordes de teste vão junto)
 - [ ] `dados\config.json` foi apagado (senão todos os alunos ficam com a
       mesma identificação e os recordes se misturam)

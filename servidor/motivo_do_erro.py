@@ -53,7 +53,51 @@ RE_BIOS_NEOGEO = re.compile(
 # Arquivo que nao e' parte do jogo (vem junto em muito zip).
 RE_NAO_E_ROM = re.compile(r"\.(txt|html?|nfo|diz|url|jpg|png)$", re.I)
 
-NOME_DO_NUCLEO = {"mame": "MAME", "fbneo": "FBNeo"}
+NOME_DO_NUCLEO = {"mame": "MAME", "fbneo": "FBNeo", "genesis_plus_gx": "O emulador do Sega CD",
+                  "mednafen_saturn": "O emulador do Saturn", "flycast": "O emulador do Dreamcast",
+                  "snes9x": "O emulador do Super Nintendo", "swanstation": "O emulador do PlayStation",
+                  "pcsx_rearmed": "O emulador do PlayStation"}
+
+# BIOS que falta, nas palavras de cada emulador (registros de 03/10/2026):
+#   Genesis Plus GX: Unable to open CD BIOS: "...\retroarch\system\bios_CD_E.bin".
+#   Beetle Saturn:   Cannot open BIOS file "...\retroarch\system\mpr-17933.bin".
+#   Flycast:         Erro: Nao foi possivel carregar a Bios da naomi.zip
+RE_BIOS_FALTA = re.compile(r'(?:Unable to open CD BIOS|Cannot open BIOS file|Could not (?:open|load) BIOS'
+                           r'(?: file)?|Failed to (?:open|load) BIOS(?: file)?)\W*"?([^"\r\n]+?)"?\.?\s*$',
+                           re.I | re.M)
+RE_BIOS_FLYCAST = re.compile(r"(?:carregar a Bios da|load (?:the )?BIOS (?:from )?)\s*(\S+\.zip)", re.I)
+REGIAO_DA_BIOS = {"bios_cd_e.bin": " (a do Sega CD da Europa)", "bios_cd_u.bin": " (a do Sega CD dos EUA)",
+                  "bios_cd_j.bin": " (a do Sega CD do Japão)", "mpr-17933.bin": " (a do Saturn dos EUA e da Europa)",
+                  "sega_101.bin": " (a do Saturn do Japão)"}
+
+
+def _dica_da_bios(nome_arquivo):
+    """Onde por a BIOS: a prateleira dela na pasta BIOS do ARENA (servidor\\bios.py)."""
+    import bios
+    return bios.como_colocar_a_bios(bios.prateleira_da_bios(nome_arquivo))
+
+
+def motivo_da_bios(texto, caminho_jogo, quem):
+    """A explicacao quando o que faltou foi a BIOS, ou None."""
+    achado = RE_BIOS_FALTA.search(texto)
+    if achado:
+        caminho = achado.group(1).strip().strip('"')
+        nome = os.path.basename(caminho.replace("\\", "/"))
+        return ("%s não abriu este jogo: falta a BIOS %s%s. %s"
+                % (quem, nome, REGIAO_DA_BIOS.get(nome.lower(), ""), _dica_da_bios(nome)))
+    achado = RE_BIOS_FLYCAST.search(texto)
+    if achado:
+        # BIOS de placa de fliperama (naomi.zip...): nao tem prateleira; vai
+        # onde o Flycast procura.
+        return ("%s não abriu este jogo: ele é de fliperama (Naomi ou Atomiswave) e precisa da BIOS %s, "
+                "dentro da pasta retroarch\\system\\dc (o .zip inteiro, sem descompactar)."
+                % (quem, achado.group(1)))
+    nome = os.path.basename(caminho_jogo or "")
+    if "ROM loading failed" in texto and (nome.startswith("BS ") or nome.lower().endswith(".bs")):
+        return ("%s não abriu este jogo de Satellaview (o \"BS\" do nome): ele precisa da BIOS BS-X.bin "
+                "(o cartucho \"BS-X - Sore wa Namae o Nusumareta Machi no Monogatari\"). %s"
+                % (quem, _dica_da_bios("BS-X.bin")))
+    return None
 MOSTRAR = 3   # quantos nomes de arquivo cabem numa frase sem virar lista
 
 
@@ -147,6 +191,11 @@ def analisar(texto, caminho_jogo, nucleo=""):
     desconhecido = "Romset is unknown" in texto
     if not (falhou or desconhecido):
         return None
+    # Faltou a BIOS (Sega CD, Saturn, Dreamcast/Naomi, Satellaview...): e' a
+    # causa, e o emulador diz qual arquivo (03/10/2026).
+    texto_bios = motivo_da_bios(texto, caminho_jogo, quem)
+    if texto_bios:
+        return {"texto": texto_bios, "faltando": [], "renomear": None}
 
     pasta = os.path.dirname(caminho_jogo or "")
     nome_zip = os.path.basename(caminho_jogo or "")
@@ -209,10 +258,12 @@ def analisar(texto, caminho_jogo, nucleo=""):
                       "de outra versão." % (_plural(len(errados), "arquivo está", "arquivos estão"),
                                            _lista(errados)))
     if desconhecido and not partes:
-        partes.append("O %s não conhece este jogo (%s): ou o nome do zip não é o do romset (no "
+        # "O FBNeo", "O MAME"; quem ja vem com o artigo ("O emulador do ...") fica como esta.
+        sujeito = quem if quem.startswith("O ") else "O " + quem
+        partes.append("%s não conhece este jogo (%s): ou o nome do zip não é o do romset (no "
                       "fliperama, o nome curto, ex.: kof2002.zip, sem espaços), ou este emulador "
                       "não tem esse jogo -- aí, ponha o zip na pasta Arcade (MAME)."
-                      % (quem if quem != "O emulador" else "emulador", nome_zip))
+                      % (sujeito, nome_zip))
     # O zip dentro da pasta de mesmo nome (Arcade\kinst\kinst.zip, junto do
     # disco): o MAME so diz "unknown option: kinst" (provado em 02/10/2026).
     romset = os.path.splitext(nome_zip)[0].lower()
@@ -222,8 +273,7 @@ def analisar(texto, caminho_jogo, nucleo=""):
                       % (nome_zip, romset, nome_zip, romset, romset))
     if not partes:
         ultimo = RE_ERRO_DO_NUCLEO.findall(texto)
-        frase = ("%s não conseguiu abrir este arquivo: pode estar danificado, ser de outra versão "
-                 "ou de outro console." % quem)
+        frase = "O arquivo pode estar danificado, ser de outra versão ou de outro console."
         if ultimo:
             frase += " (O emulador disse: “%s”.)" % ultimo[-1].strip()[:140]
         partes.append(frase)

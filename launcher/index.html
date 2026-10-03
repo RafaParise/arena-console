@@ -681,6 +681,18 @@
     <p class="explica">Coloque cada emulador na pasta <code>emuladores</code>.</p>
 
     <div>
+      <h3 class="grupo-titulo">BIOS dos consoles</h3>
+      <p class="explica"><strong>BIOS</strong> é o programinha que vem de fábrica dentro do console de verdade e liga ele por dentro. Alguns consoles não abrem jogo nenhum sem ela; outros só precisam dela para alguns jogos.</p>
+      <p class="explica">Cada console tem a sua pasta dentro da pasta <code>BIOS</code> do ARENA (o mesmo nome da pasta de jogos dele; quando cada região tem a sua BIOS, uma pasta por região). Ponha o arquivo na pasta do console — com qualquer nome, ou o .zip em que ele veio — e clique em <strong>Conferir</strong>: o ARENA reconhece a versão, põe onde o emulador procura e a BIOS fica <strong>ativa</strong>.</p>
+      <p class="explica bios-resumo" id="biosResumo">Conferindo…</p>
+      <div class="controle-acoes">
+        <button class="botao" id="btnBiosPasta" type="button">Abrir a pasta BIOS</button>
+        <button class="botao botao--principal" id="btnBiosConferir" type="button">Conferir</button>
+      </div>
+      <ul class="controles lista-bios" id="listaBiosConsoles"></ul>
+    </div>
+
+    <div>
       <h3 class="grupo-titulo">Qualidade gráfica nesses emuladores</h3>
       <p class="explica">
         Vale para PCSX2, Dolphin, RPCS3 e Xenia. O ARENA ajusta resolução,
@@ -757,9 +769,8 @@
     </div>
 
     <div>
-      <h3 class="grupo-titulo">Qual BIOS usar em cada console</h3>
-      <p class="explica"><strong>BIOS</strong> é o programinha que vem de fábrica dentro do console de verdade e liga ele por dentro. Sem uma cópia dele, o emulador não sabe nem começar.</p>
-      <p class="explica">Escolha uma BIOS instalada em <code>retroarch\system</code>.</p>
+      <h3 class="grupo-titulo">Escolher a BIOS e abrir a tela do console</h3>
+      <p class="explica">Só onde o emulador deixa escolher. Nos outros consoles, ele acha a BIOS certa sozinho, pelo conteúdo do arquivo.</p>
       <div class="avancado" id="listaBios"></div>
 
       <div class="opcao">

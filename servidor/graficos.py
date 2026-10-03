@@ -500,15 +500,17 @@ def falta_para_o_externo(nome_externo, caminho_executavel):
     Agora o ARENA avisa antes, e o cartao fica amarelo com este motivo."""
     if nome_externo == "PCSX2" and caminho_executavel and not tem_bios_pcsx2(caminho_executavel):
         return ("O PS2 precisa da BIOS do PlayStation 2 (um arquivo .bin de 4 MB), e ela "
-                "ainda não está aqui. Peça ao professor: o arquivo vai em retroarch\\system, "
-                "e o ARENA leva para o PCSX2 sozinho.")
+                "ainda não está aqui. Peça ao professor: o arquivo vai na pasta BIOS\\PS2 do "
+                "ARENA (Ajustes → Emuladores → BIOS dos consoles), e o ARENA leva para o "
+                "PCSX2 sozinho.")
     if nome_externo == "RPCS3" and caminho_executavel:
         firmware = os.path.join(os.path.dirname(caminho_executavel),
                                 "dev_flash", "sys", "external", "liblv2.sprx")
         if not os.path.isfile(firmware):
             return ("O PS3 precisa do firmware oficial da Sony instalado no RPCS3, "
-                    "e ele ainda não está. Peça ao professor: no RPCS3, menu File > "
-                    "Install Firmware, com o arquivo PS3UPDAT.PUP do site da PlayStation.")
+                    "e ele ainda não está. Peça ao professor: ponha o PS3UPDAT.PUP (do site "
+                    "da PlayStation) na pasta BIOS\\PS3 do ARENA e, no RPCS3, use o menu "
+                    "File > Install Firmware com esse arquivo.")
     return ""
 
 
@@ -567,6 +569,11 @@ CHAVE_BIOS = {
 BIOS_ACEITAS = {
     "swanstation": ("scph5500.bin", "scph5501.bin", "scph5502.bin",
                     "psxonpsp660.bin", "ps1_rom.bin", "openbios.bin"),
+    # 3DO: so os nomes da lista "firmware" do opera_libretro.info (antes a
+    # tela oferecia QUALQUER arquivo da pasta -- ate a BIOS do PS2).
+    "opera": ("panafz10.bin", "panafz1.bin", "panafz10-norsa.bin", "panafz10e-anvil.bin",
+              "panafz10e-anvil-norsa.bin", "goldstar.bin", "sanyotry.bin", "3do_arcade_saot.bin",
+              "panafz1j.bin", "panafz1j-norsa.bin"),
 }
 
 
