@@ -463,6 +463,7 @@ O recorde que estava no banco voltou intacto.
 | Falta emulador de algum console | Documento 3, parte C |
 | Falta arquivo de sistema | Documento 3, parte B |
 | Jogo no console errado | Documento 3 |
+| Jogo volta para a lista sem abrir | O motivo aparece no alto da tela e no painel do jogo ("Da última vez") — `2-JOGOS.md`, "Quando o jogo não abre" |
 | Jogo travando | Documento 5 |
 | Controle não funciona | Documento 4 |
 | Amigo não conecta | Documento 7 |

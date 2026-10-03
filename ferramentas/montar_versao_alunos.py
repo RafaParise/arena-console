@@ -218,9 +218,14 @@ def montar(destino, com_bios=False):
         # (swanstation\vulkan_pipelines.bin, 171 MB), configuracao que o
         # nucleo cria (config\fbneo64.ini) ou SAVE (dc\vmu_save_*.bin).
         sistema = os.path.join(RA, "system")
+        tem_neogeo = os.path.isfile(os.path.join(sistema, "neogeo.zip"))
         for nome in os.listdir(sistema):
             caminho = os.path.join(sistema, nome)
             if os.path.isfile(caminho) and any(fnmatch.fnmatch(nome, p) for p in PADROES_BIOS):
+                # Copia da BIOS do Neo Geo com outro nome (neogeo.mame.zip): o
+                # FBNeo usa o neogeo.zip daqui e o MAME nem procura nesta pasta.
+                if tem_neogeo and nome.lower() != "neogeo.zip" and fnmatch.fnmatch(nome.lower(), "neogeo*.zip"):
+                    continue
                 copiar_arquivo(caminho, os.path.join(RA_D, "system", nome))
                 levadas.append(nome)
         # Dreamcast: so a BIOS de dentro de system\dc (nunca os cartoes VMU).
@@ -232,13 +237,19 @@ def montar(destino, com_bios=False):
         # BIOS de fliperama que mora na pasta dos jogos (neogeo.zip ao lado
         # dos jogos do Neo Geo): a lista de jogos nao mostra.
         pessoais = os.path.join(RAIZ, "jogos", "pessoais")
+        # Vai SEMPRE como neogeo.zip, o unico nome que o emulador procura (o
+        # neogeo.mame.zip da pasta Arcade ia com esse nome e o MAME nao achava:
+        # "000-lo.lo NOT FOUND", provado em 02/10/2026).
         for pasta in sorted(set(pastas_de_console)):
             origem = os.path.join(pessoais, pasta)
-            for nome in (os.listdir(origem) if os.path.isdir(origem) else []):
-                if fnmatch.fnmatch(nome.lower(), "neogeo*.zip"):
-                    copiar_arquivo(os.path.join(origem, nome),
-                                   os.path.join(destino, "jogos", "pessoais", pasta, nome))
-                    levadas.append("%s\\%s" % (pasta, nome))
+            nomes = sorted(os.listdir(origem)) if os.path.isdir(origem) else []
+            bios = [n for n in nomes if fnmatch.fnmatch(n.lower(), "neogeo*.zip")]
+            certa = next((n for n in bios if n.lower() == "neogeo.zip"), bios[0] if bios else None)
+            if certa:
+                copiar_arquivo(os.path.join(origem, certa),
+                               os.path.join(destino, "jogos", "pessoais", pasta, "neogeo.zip"))
+                levadas.append("%s\\neogeo.zip%s" % (pasta, "" if certa.lower() == "neogeo.zip"
+                                                        else " (era %s)" % certa))
 
     # 4. Emuladores de fora: so o programa e a configuracao que o ARENA completa.
     E, E_D = os.path.join(RAIZ, "emuladores"), os.path.join(destino, "emuladores")
@@ -379,6 +390,11 @@ def conferir(destino, com_bios=False):
                     problemas.append("dado de quem montou (%s) em %s" % (
                         "caminho" if "\\" in achado else "nome",
                         os.path.relpath(os.path.join(atual, n), destino)))
+    for atual, _sub, arquivos in os.walk(os.path.join(destino, "jogos")):
+        for n in arquivos:
+            if fnmatch.fnmatch(n.lower(), "neogeo?*.zip"):
+                problemas.append("BIOS do Neo Geo com nome que o emulador nao procura: %s"
+                                 % os.path.relpath(os.path.join(atual, n), destino))
     for sobra in ("docs", "testes", "perfil", ".git", os.path.join("servidor", "tests")):
         if os.path.exists(os.path.join(destino, sobra)):
             problemas.append("pasta de desenvolvimento na versao: %s" % sobra)

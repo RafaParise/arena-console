@@ -136,14 +136,15 @@ pasta e tem o botão **Abrir a pasta**.
 | MS-DOS | **Pode** | O DOSBox abre o zip direto (ou a pasta do jogo com o `.exe`) |
 
 **BIOS** é o "programa de fábrica" de alguns consoles. Vai em
-`retroarch\system` (a do Dreamcast numa pasta `dc` lá dentro). O nome do
-arquivo tem que ser **exatamente** o da tabela.
+`retroarch\system` (a do Dreamcast numa pasta `dc` lá dentro; a do
+fliperama no MAME, na pasta dos próprios jogos). O nome do arquivo tem que
+ser **exatamente** o da tabela.
 
 | Console | Pasta (em `jogos\pessoais`) | Arquivos que servem | `.zip`? | BIOS |
 |---|---|---|---|---|
 | 3DO | `3DO` | `.iso` `.cue` `.chd` | **não** | uma de: `panafz10.bin`, `panafz1.bin`, `goldstar.bin` |
 | Amstrad CPC | `Amstrad CPC` | `.cdt` `.sna` `.dsk` | pode | não precisa |
-| Arcade (MAME) | `Arcade` | `.zip` `.7z` | **tem que ser** | não precisa |
+| Arcade (MAME) | `Arcade` | `.zip` `.7z` | **tem que ser** | só jogo de Neo Geo: `neogeo.zip` **na própria pasta `Arcade`** |
 | Atari 2600 | `Atari 2600` | `.a26` | pode | não precisa |
 | Atari 5200 | `Atari 5200` | `.a52` | pode | `5200.rom` |
 | Atari 7800 | `Atari 7800` | `.a78` | pode | não precisa |
@@ -306,14 +307,24 @@ Regras que valem para os dois (do guia oficial do libretro):
 - **O jogo é o `.zip` inteiro, com o nome original** (`kof97.zip`,
   `mslugx.zip`). Não descompacte e não renomeie: nome trocado não abre.
 - **O `.zip` precisa ser da versão que o emulador espera.** Cópia antiga ou
-  "desprotegida" (arquivos com nomes inventados, subpastas dentro do `.zip`)
-  não abre. O próprio emulador mostra uma tela dizendo quais arquivos faltam.
-- **BIOS:** o `neogeo.zip` fica em `retroarch\system` (e pode ficar também na
-  pasta dos jogos, o ARENA não o mostra como jogo).
+  feita para outro emulador (arquivos com outros nomes, como `kof2k2_c1.rom`
+  no lugar de `265-c1.c1`, ou subpastas dentro do `.zip`) não abre. O
+  RetroArch só diz "Falha ao carregar o conteúdo"; o que falta fica no
+  registro do emulador, e o ARENA lê e explica (veja **Quando o jogo não
+  abre**, abaixo).
+- **BIOS dos jogos de Neo Geo:** o arquivo tem que se chamar exatamente
+  **`neogeo.zip`**. Com outro nome (`neogeo.mame.zip`, por exemplo), o
+  emulador não acha. Onde ele fica:
+  - **Neo Geo (FBNeo):** em `retroarch\system` ou na pasta dos jogos;
+  - **Arcade (MAME):** **na mesma pasta do jogo** (`Arcade\neogeo.zip`). O
+    MAME não procura em `retroarch\system` (conferido no registro dele).
+
+  O ARENA não mostra a BIOS como jogo.
 - **Jogo com disco rígido ou CD** (Killer Instinct, por exemplo) precisa
   também de um `.chd`, numa subpasta com o nome do jogo:
   `Arcade\kinst.zip` + `Arcade\kinst\kinst.chd`. Esse `.chd` não aparece na
-  lista como jogo separado.
+  lista como jogo separado. O `.zip` fica **fora** da subpasta: com
+  `Arcade\kinst\kinst.zip`, junto do disco, o MAME não abre.
 - **Ficha:** fliperama abre em demonstração ("CREDIT 00"). Aperte **Select**
   (no controle Xbox, **Back**) para pôr uma ficha e depois **Start**. O
   ARENA lembra disso toda vez que abre um jogo de fliperama.
@@ -337,11 +348,35 @@ jogadores (`dados\jogadores.txt`), vale escrever o nome completo ou o curto
 | Os arquivos estão dentro de uma pasta no `.zip` | Compacte de novo só os arquivos, sem a pasta |
 | O `.zip` está corrompido | Baixe ou copie o jogo de novo |
 | **O arquivo está danificado: a parte X não confere** | Copie o jogo de novo, de uma cópia boa. Foi o caso do Metal Slug X com personagens de cor estranha: uma parte do gráfico dos personagens estava estragada dentro do `.zip`, e o FBNeo abria assim mesmo |
+| A BIOS do Neo Geo está com outro nome (ex.: `neogeo.mame.zip`) | Renomeie para `neogeo.zip`, na mesma pasta |
+| Jogo de Neo Geo na pasta `Arcade` sem o `neogeo.zip` ao lado | Ponha o `neogeo.zip` na pasta `Arcade`: o MAME só procura ali |
+| O `.zip` está dentro da pasta do disco (`Arcade\kinst\kinst.zip`) | Tire o `.zip` dessa pasta e ponha na pasta de cima; dentro dela fica só o `.chd` |
 
 A conferência de "arquivo danificado" descompacta o `.zip` inteiro, então o
 ARENA faz uma vez só por arquivo, em segundo plano, logo depois de abrir
 (e de novo só se você trocar o arquivo). O resultado fica em
 `dados\zips_conferidos.json`.
+
+**Quando o jogo não abre.** Algumas coisas só o emulador descobre na hora
+de abrir: se o `.zip` é da versão certa, se falta algum arquivo dentro
+dele. Quando um jogo volta para a lista sem abrir, o ARENA lê o registro do
+emulador daquela partida e explica o motivo **no alto da tela** e no
+**painel do jogo** ("Da última vez: ..."), com o nome dos arquivos. Foi o
+caso do KOF 2002 da pasta do professor:
+
+> MAME não abriu este jogo. A BIOS está na pasta, mas com o nome errado:
+> renomeie neogeo.mame.zip para neogeo.zip (o emulador só procura por esse
+> nome). Faltam 13 arquivos do jogo dentro do kof2002.zip (265-p1.p1,
+> 265-p2.sp2, 265-m1.m1 e mais 10). Este zip é de outra versão ou feito
+> para outro emulador: dentro dele há kof2k2_c1.rom, kof2k2_c2.rom,
+> kof2k2_c3.rom e mais 13. Troque por um kof2002.zip feito para o MAME
+> desta versão do ARENA.
+
+Vale para todo jogo que abre pelo RetroArch, não só fliperama: quando o
+registro não traz uma frase conhecida, o ARENA repete o que o emulador
+disse. O aviso some quando o jogo abre ou quando você troca o arquivo. Os
+consoles que abrem por outro programa (PS2, PS3, Xbox 360 e, com o Dolphin
+na pasta, GameCube e Wii) ficam de fora: o ARENA não lê o registro deles.
 
 #### Passo 1 — Criar as pastas
 

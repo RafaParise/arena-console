@@ -77,6 +77,7 @@ import integridade  # noqa: E402  (zip de fliperama danificado)
 import processos   # noqa: E402  (prioridade e economia de energia -- 30/09/2026)
 import janela_preta  # noqa: E402  (servidor que caia ou travava -- 02/10/2026)
 import como_colocar  # noqa: E402  (como colocar os jogos de cada console -- 02/10/2026)
+import motivo_do_erro  # noqa: E402  (por que o jogo nao abriu, pelo registro -- 02/10/2026)
 
 PASTA_LAUNCHER = os.path.join(RAIZ, "launcher")
 PASTA_DADOS = os.path.join(RAIZ, "dados")
@@ -1945,9 +1946,16 @@ def montar_catalogo():
     # JSON bem maior. A tela ja recebe a lista de plataformas: basta ela
     # cruzar pelo 'plataforma' que cada jogo ja carrega.
     jogos = []
+    problemas = ler_problemas()
     for jogo in manifesto()["jogos"]:
         if jogo["plataforma"] not in por_id:
             continue
+        problema = problemas.get(jogo["id"])
+        if problema and problema.get("assinatura") == assinatura_do_arquivo(
+                os.path.join(RAIZ, jogo["arquivo"])):
+            jogo = dict(jogo)
+            jogo["avisos"] = list(jogo.get("avisos") or []) + [
+                {"texto": "Da última vez: " + problema["texto"], "ultima_vez": True}]
         if jogo.get("capas"):
             # A tela nunca le o disco direto: pede a arte ao servidor, que
             # confere se o caminho esta mesmo dentro da pasta de jogos.
@@ -2032,6 +2040,11 @@ def nome_curto_do_core(arquivo_core):
 
 
 ARQUIVO_QUEDAS = os.path.join(PASTA_DADOS, "fechamentos.json")
+# Por que cada jogo nao abriu da ultima vez (servidor\motivo_do_erro.py).
+ARQUIVO_PROBLEMAS = os.path.join(PASTA_DADOS, "problemas_dos_jogos.json")
+PROBLEMAS_GUARDADOS = 50
+# O do ultimo jogo aberto, para a tela mostrar assim que o aluno volta.
+ULTIMO_PROBLEMA = {}
 
 
 # ---------------------------------------------------------------------------
@@ -2176,6 +2189,66 @@ def registrar_fechamento(jogo, codigo, comando):
               % (jogo.get("titulo", "o jogo"), codigo))
     except Exception:
         pass
+
+
+def assinatura_do_arquivo(caminho):
+    """Tamanho e data do arquivo: trocou o arquivo, o motivo antigo some."""
+    try:
+        info = os.stat(caminho)
+        return "%d|%d" % (info.st_size, int(info.st_mtime))
+    except OSError:
+        return ""
+
+
+def ler_problemas():
+    """{id do jogo: {"texto", "quando", "assinatura"}} -- vazio se nao ha."""
+    try:
+        with open(ARQUIVO_PROBLEMAS, "r", encoding="utf-8") as arquivo:
+            dados = json.load(arquivo)
+    except (OSError, ValueError):
+        return {}
+    if not isinstance(dados, dict):
+        return {}
+    return {k: v for k, v in dados.items()
+            if isinstance(v, dict) and isinstance(v.get("texto"), str)}
+
+
+def anotar_motivo_do_erro(jogo, desde):
+    """Depois do jogo: le o registro DESTA partida e guarda por que ele nao
+    abriu -- ou apaga o motivo antigo, se agora abriu.
+
+    Achado de 02/10/2026: o Rafael abriu o KOF 2002 quatro vezes; nas quatro
+    o MAME escreveu no registro o que faltava, e o ARENA nao dizia nada (o
+    RetroArch so mostra "Falha ao carregar o conteudo"). Nunca atrapalha o
+    resto: qualquer falha aqui e' ignorada."""
+    try:
+        registro = motivo_do_erro.registro_da_partida(PASTA_DADOS, desde)
+        if not registro:
+            return None
+        caminho = os.path.join(RAIZ, jogo["arquivo"])
+        resultado = motivo_do_erro.analisar(motivo_do_erro.ler(registro), caminho,
+                                           jogo.get("core", ""))
+        problemas = ler_problemas()
+        if resultado:
+            problemas[jogo["id"]] = {"texto": resultado["texto"], "quando": agora_utc(),
+                                     "assinatura": assinatura_do_arquivo(caminho)}
+            ULTIMO_PROBLEMA.clear()
+            ULTIMO_PROBLEMA.update({"jogo_id": jogo["id"], "titulo": jogo.get("titulo", ""),
+                                    "texto": resultado["texto"]})
+            print("[ARENA] %s nao abriu: %s" % (jogo.get("titulo", "o jogo"), resultado["texto"]))
+        elif jogo["id"] in problemas:
+            del problemas[jogo["id"]]          # agora abriu: o motivo antigo sai
+        else:
+            return None
+        guardados = sorted(problemas.items(), key=lambda item: item[1].get("quando", ""))
+        gravar_texto_atomico(ARQUIVO_PROBLEMAS, json.dumps(
+            dict(guardados[-PROBLEMAS_GUARDADOS:]), ensure_ascii=False, indent=1))
+        with TRAVA_CACHE:
+            _cache["resposta"] = (0.0, None)   # o cartao mostra o motivo novo
+        return resultado
+    except Exception as falha:   # noqa: BLE001 -- explicar e' bonus, nunca derruba
+        print("[ARENA] Nao consegui ler o motivo do jogo: %s" % falha)
+        return None
 
 
 def ler_fechamentos():
@@ -2494,6 +2567,8 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             placa = str(MAQUINA["gpu"].get("nome", ""))
             cache_antes = graficos.preparar_cache_ps1(placa) if cuidar_cache_ps1 else -1
 
+            ULTIMO_PROBLEMA.clear()
+            aberto_em = time.time()
             processo = subprocess.Popen(comando, cwd=pasta_trabalho, **extras)
             if acelerar and processos.tirar_da_economia_de_energia(processo.pid):
                 print("[ARENA] Emulador fora da economia de energia do Windows.")
@@ -2520,6 +2595,10 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             # explicacao e para dar o que investigar depois.
             if codigo not in (0, None):
                 registrar_fechamento(jogo, codigo, comando)
+            # Nao abriu? O registro do RetroArch diz por que (MAME e FBNeo
+            # dizem ate o nome de cada arquivo que falta).
+            if not jogo.get("externo"):
+                anotar_motivo_do_erro(jogo, aberto_em)
         except OSError as falha:
             print("[ARENA] Nao foi possivel abrir o RetroArch: %s" % falha)
         finally:
@@ -4100,6 +4179,7 @@ class Manipulador(BaseHTTPRequestHandler):
                 "recursos": recursos_visiveis(),
                 "grupos": carregar_recursos()["grupos"],
                 "jogo_em_andamento": dict(JOGO_EM_ANDAMENTO),
+                "ultimo_problema": dict(ULTIMO_PROBLEMA) or None,
                 "pendentes": contar_pendentes(),
                 "mala": {
                     "caminho": caminho_da_mala(),

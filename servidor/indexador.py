@@ -90,11 +90,14 @@ def nucleo_aceita_m3u(core):
         info = os.path.join(RAIZ, "retroarch", "info", os.path.splitext(core)[0] + ".info")
         aceita = False
         try:
-            for linha in open(info, encoding="utf-8", errors="replace"):
-                if linha.strip().startswith("supported_extensions"):
-                    lista = linha.split("=", 1)[1].strip().strip('"').lower().split("|")
-                    aceita = "m3u" in lista
-                    break
+            # "with": o "break" no meio deixava o arquivo aberto (achado em
+            # 02/10/2026 pelo aviso do Python nos testes).
+            with open(info, encoding="utf-8", errors="replace") as arquivo:
+                for linha in arquivo:
+                    if linha.strip().startswith("supported_extensions"):
+                        lista = linha.split("=", 1)[1].strip().strip('"').lower().split("|")
+                        aceita = "m3u" in lista
+                        break
         except OSError:
             pass
         _m3u_por_nucleo[core] = aceita
@@ -187,7 +190,41 @@ def discos_de_fliperama_zipados(pasta_atual, arquivos):
     return achados
 
 
-def avisos_do_romset(caminho, romset, discos_zipados):
+def parece_neo_geo(nomes):
+    """Os arquivos de um cartucho de Neo Geo: programa (p1), som (m1) e
+    grafico (c1). Vale para o romset do MAME (265-p1.p1) e para copia feita
+    para outro emulador (kof2k2_p1.rom)."""
+    base = [os.path.basename(n).lower() for n in nomes]
+
+    def tem(parte):
+        return any(re.search(r"(^|[-_.])%s([._]|$)" % parte, n) for n in base)
+    return tem("p1") and tem("m1") and tem("c1")
+
+
+def aviso_da_bios_neo_geo(pasta, nucleo):
+    """Jogo de Neo Geo precisa da BIOS neogeo.zip. O MAME so procura na pasta
+    do jogo e so por esse nome (provado em 02/10/2026: com neogeo.mame.zip ao
+    lado, "000-lo.lo NOT FOUND"; renomeado para neogeo.zip, achou). O FBNeo
+    tambem acha em retroarch\\system. None se esta tudo certo."""
+    try:
+        nomes = os.listdir(pasta)
+    except OSError:
+        return None
+    if any(n.lower() == "neogeo.zip" for n in nomes):
+        return None
+    if nucleo == "fbneo" and os.path.isfile(os.path.join(RAIZ, "retroarch", "system", "neogeo.zip")):
+        return None
+    errado = next((n for n in sorted(nomes) if re.match(r"^neogeo[ ._-].+\.(zip|7z)$", n, re.I)), None)
+    if errado:
+        return {"texto": "A BIOS do Neo Geo desta pasta está como %s, e o emulador só procura "
+                         "neogeo.zip. Renomeie para neogeo.zip (na mesma pasta)." % errado}
+    if nucleo == "mame":
+        return {"texto": "Jogo de Neo Geo: o MAME precisa da BIOS neogeo.zip na mesma pasta do "
+                         "jogo (ela não aparece na lista)."}
+    return None
+
+
+def avisos_do_romset(caminho, romset, discos_zipados, nucleo=""):
     """O que impede um romset de fliperama de abrir, que da para ver sem
     abrir o jogo. Cada aviso diz o que fazer."""
     avisos = []
@@ -215,6 +252,21 @@ def avisos_do_romset(caminho, romset, discos_zipados):
                 "Os arquivos deste jogo estão dentro da pasta \"%s\" no .zip, e o "
                 "emulador procura na raiz do .zip. Compacte de novo só os arquivos, "
                 "sem a pasta." % next(iter(pastas)))})
+        if dentro and parece_neo_geo(dentro):
+            aviso = aviso_da_bios_neo_geo(os.path.dirname(caminho), nucleo)
+            if aviso:
+                avisos.append(aviso)
+    # O zip dentro da pasta do proprio disco (Arcade\kinst\kinst.zip, ao lado
+    # do kinst.chd): provado com o MAME em 02/10/2026 -- assim ele nao abre
+    # ("unknown option: kinst"); com Arcade\kinst.zip + Arcade\kinst\kinst.chd,
+    # abre e desenha.
+    pasta = os.path.dirname(caminho)
+    if os.path.basename(pasta).lower() == romset and os.path.isfile(os.path.join(pasta, romset + ".chd")):
+        avisos.append({"texto": (
+            "O %s.zip está dentro da pasta %s, junto do disco, e assim o emulador não abre. "
+            "Tire o %s.zip dessa pasta e ponha na pasta de cima (%s): dentro da pasta %s fica "
+            "só o %s.chd." % (romset, romset, romset, os.path.basename(os.path.dirname(pasta)),
+                             romset, romset))})
     return avisos
 
 
@@ -742,7 +794,7 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None,
                     titulo = nomes_arcade.titulo_para_a_tela(nome_banco)
                 else:
                     avisos.append(aviso_de_nome_de_fliperama(titulo, extensao, nucleo_arcade))
-                avisos += avisos_do_romset(caminho_absoluto, romset, discos_zipados)
+                avisos += avisos_do_romset(caminho_absoluto, romset, discos_zipados, nucleo_arcade)
                 # Zip com parte danificada (o mslugx.zip: personagens com cor
                 # estranha). A lista so LE o resultado ja conferido -- quem
                 # descompacta e' a conferencia de fundo (arena.py) ou o Jogar.
@@ -753,6 +805,13 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None,
                 # Disco de fliperama sem o .zip do romset ao lado (o Kinst
                 # da pasta): sozinho ele nao abre (achado de 02/10/2026).
                 pasta_do_disco = os.path.basename(pasta_atual).lower()
+                if any(n.lower() in (pasta_do_disco + ".zip", pasta_do_disco + ".7z") for n in arquivos):
+                    # O zip esta AQUI, junto do disco (kinst\kinst.zip): o
+                    # cartao e' o do zip, e e' nele que vai o aviso do arranjo.
+                    continue
+                nome_banco = nomes_arcade.nome_do_romset(pasta_do_disco + ".zip", nucleo_arcade)
+                if nome_banco:
+                    titulo = nomes_arcade.titulo_para_a_tela(nome_banco)
                 avisos.append({"texto": "Este é o disco (.chd) de um jogo de fliperama: o emulador abre "
                                         "o jogo pelo %s.zip (o romset), com este disco numa subpasta %s "
                                         "ao lado dele. Falta o %s.zip na pasta."

@@ -919,6 +919,7 @@ async function jogar(jogo) {
   }
   try {
     const dados = await pedir("/api/jogar", "POST", { jogo_id: jogo.id, apelido });
+    marcarJogoAberto(jogo.id);
     const recentes = [jogo.id, ...(estado.config.recentes || []).filter((id) => id !== jogo.id)].slice(0, 20);
     salvarConfig({ recentes }).then(() => desenharJogos()).catch(() => {});
     // O aviso do servidor (ficha do fliperama, rede do PS2/Xbox 360) nao
@@ -1052,9 +1053,37 @@ async function conferirFaixaTeclas() {
         estado.avisoDaMaquina = false;
         aviso("");
       }
+      mostrarPorQueNaoAbriu(dados.ultimo_problema);
     }
   } catch (falha) {
     // sem resposta: deixa a faixa como esta, confere na proxima volta
+  }
+}
+
+// O jogo nao abriu? O servidor leu o registro do emulador e diz por que
+// (servidor/motivo_do_erro.py). Achado de 02/10/2026: o KOF 2002 nao abria,
+// o MAME dizia no registro cada arquivo que faltava, e a tela ficava calada.
+// A explicacao fica no alto ate o proximo jogo e tambem no painel do jogo.
+function mostrarPorQueNaoAbriu(problema) {
+  if (!problema || problema.jogo_id !== estado.jogoAberto) return;
+  estado.jogoAberto = null;
+  estado.avisoDoJogo = true;
+  aviso(`${problema.titulo}: ${problema.texto}`);
+  const jogo = acharJogo(problema.jogo_id);
+  if (jogo) {
+    jogo.avisos = (Array.isArray(jogo.avisos) ? jogo.avisos : [])
+      .filter((a) => !a.ultima_vez)
+      .concat([{ texto: "Da última vez: " + problema.texto, ultima_vez: true }]);
+    if (estado.jogoSelecionado && estado.jogoSelecionado.id === jogo.id) desenharAvisosDoJogo(jogo);
+  }
+}
+
+// Abriu um jogo: a explicacao do anterior sai do alto.
+function marcarJogoAberto(id) {
+  estado.jogoAberto = id;
+  if (estado.avisoDoJogo) {
+    estado.avisoDoJogo = false;
+    aviso("");
   }
 }
 
@@ -2472,6 +2501,7 @@ async function comecarPartida() {
 
   try {
     const dados = await pedir("/api/jogar", "POST", corpo);
+    marcarJogoAberto(corpo.jogo_id);
     $("#modalPartida").hidden = true;
     const porRepasse = dados.pela_internet ? " (pela internet, com repasse)" : "";
     const texto = estado.papelDaPartida === "hospedar"
