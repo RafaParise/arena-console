@@ -178,6 +178,18 @@ class TestOrganizar(ArenaDeMentira):
         self.assertIn("ATIVA", self.leia("Sega CD", "Europa", bios.ARQUIVO_LEIA))
         self.assertIn("FALTA", self.leia("Sega CD", "Japão", bios.ARQUIVO_LEIA))
 
+    def test_pacote_na_pasta_do_console_vai_solto_para_a_regiao(self):
+        """O pacote do Rafael ficou em BIOS\\Sega CD (com as 3 regioes): cada
+        pasta de regiao recebe a sua BIOS solta, para mostrar o que tem."""
+        os.makedirs(os.path.join(self.raiz, "BIOS", "Sega CD"))
+        with zipfile.ZipFile(os.path.join(self.raiz, "BIOS", "Sega CD", "pacote.zip"), "w") as z:
+            z.writestr("Mega-CD (E).bin", SEGACD_E)
+            z.writestr("Sega CD (U).bin", SEGACD_U)
+        self.organizar()
+        self.assertTrue(os.path.isfile(os.path.join(self.sistema, "bios_CD_E.bin")))
+        self.assertTrue(os.path.isfile(os.path.join(self.raiz, "BIOS", "Sega CD", "Europa", "bios_CD_E.bin")))
+        self.assertTrue(os.path.isfile(os.path.join(self.raiz, "BIOS", "Sega CD", "EUA", "bios_CD_U.bin")))
+
     def test_qualquer_nome_na_prateleira(self):
         self.gravar(os.path.join(self.raiz, "BIOS", "ColecoVision", "Coleco BIOS (1982).rom"), COLECO)
         feito = self.organizar()

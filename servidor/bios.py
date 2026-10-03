@@ -1158,10 +1158,17 @@ def _copiar_para_as_prateleiras(raiz, candidatos, copiadas, feito):
     """A BIOS que ja estava instalada vai para a prateleira dela (passo 4) --
     uma vez por arquivo: quem apaga da prateleira nao ve ela voltar.
     'copiadas': {arquivo instalado: marca} do que ja foi copiado."""
+    # So conta o que esta na pasta DAQUELA BIOS: o pacote com as 3 regioes do
+    # Sega CD, deixado em BIOS\Sega CD, nao poe a europeia em BIOS\Sega CD\Europa
+    # -- a copia solta vai para la (a pasta de cada regiao mostra a dela).
+    entradas = catalogo.por_id()
     na_prateleira = {}
     for candidato in candidatos:
-        if candidato["origem"] == "prateleira":
-            for achado in candidato["achados"]:
+        if candidato["origem"] != "prateleira":
+            continue
+        for achado in candidato["achados"]:
+            entrada = entradas.get(achado["id"])
+            if entrada and candidato["folha"] == os.path.normcase(prateleira(raiz, entrada)):
                 na_prateleira.setdefault(achado["id"], set()).add(candidato["md5"])
     lugar = caminhos(raiz)
     pares = []
