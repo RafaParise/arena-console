@@ -7,10 +7,15 @@ entao nao podem rodar juntos). Anota codigo de saida e tempo de cada um em
 docs\rodada_final_bruta.json.
 
 Uso:
-    servidor\python\python.exe ferramentas\rodada_final.py [pedaco do nome ...]
+    servidor\python\python.exe ferramentas\rodada_final.py [pedaco do nome ...] [--saida=<arquivo.json>] [--continuar]
 
 Com pedacos de nome, roda so os scripts que tem algum deles no nome (para
 repetir os que falharam sem esperar a rodada inteira).
+
+--saida (auditoria 3, 07/10/2026): grava o resultado nesse arquivo DEPOIS DE
+CADA script, e nao so no fim -- em 02/10 e 03/10 a rodada foi morta no meio
+por falta de memoria e tudo o que ja tinha passado se perdeu. Com
+--continuar, pula os scripts que ja estao no arquivo (retoma de onde parou).
 """
 import glob
 import json
@@ -155,23 +160,44 @@ def principal():
                os.path.join("ferramentas", "teste_aceite_pasta_movida.py")]
     scripts += sorted(os.path.relpath(c, RAIZ)
                       for c in glob.glob(os.path.join(RAIZ, "testes", "teste_*.py")))
-    pedacos = [p.lower() for p in sys.argv[1:]]
+    pedacos = [p.lower() for p in sys.argv[1:] if not p.startswith("--")]
     if pedacos:
         scripts = [s for s in scripts if any(p in s.lower() for p in pedacos)]
+    saida = next((a.split("=", 1)[1] for a in sys.argv[1:] if a.startswith("--saida=")), "")
+    if saida and not os.path.isabs(saida):
+        saida = os.path.join(RAIZ, saida)
     resultados = []
+    if saida and "--continuar" in sys.argv and os.path.isfile(saida):
+        with open(saida, encoding="utf-8") as f:
+            resultados = json.load(f)
+        feitos = {r["script"] for r in resultados}
+        print("Continuando: %d script(s) ja estao em %s" % (len(feitos), saida), flush=True)
+        scripts = [s for s in scripts if s not in feitos]
+
+    def gravar(destino):
+        os.makedirs(os.path.dirname(destino), exist_ok=True)
+        temporario = destino + ".tmp"
+        with open(temporario, "w", encoding="utf-8") as f:
+            json.dump(resultados, f, ensure_ascii=False, indent=2)
+        os.replace(temporario, destino)
+
     for script in scripts:
         if script in FORA_DA_RODADA:
             print("[fora] %s (%s)" % (script, FORA_DA_RODADA[script]), flush=True)
             continue
         resultados.append(rodar(script))
+        if saida:
+            gravar(saida)
     falhas = [r for r in resultados if r["codigo_saida"] != 0]
     print(f"\n{len(resultados) - len(falhas)} de {len(resultados)} passaram.")
+    if saida:
+        print("Resultado salvo em", saida)
+        return 1 if falhas else 0
     if pedacos:
         print("(rodada parcial: o docs\\rodada_final_bruta.json nao foi trocado)")
         return 1 if falhas else 0
     destino = os.path.join(RAIZ, "docs", "rodada_final_bruta.json")
-    with open(destino, "w", encoding="utf-8") as f:
-        json.dump(resultados, f, ensure_ascii=False, indent=2)
+    gravar(destino)
     print("Resultado salvo em", destino)
     return 1 if falhas else 0
 

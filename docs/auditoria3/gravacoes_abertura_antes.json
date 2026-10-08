@@ -1,0 +1,40 @@
+{
+  "janela_s": 60,
+  "ate_o_servidor_responder": {
+    "operacoes": 43,
+    "kb": 8264.3
+  },
+  "ate_o_fim": {
+    "operacoes": 45,
+    "kb": 9793.4
+  },
+  "arquivos_que_mudaram_ou_nasceram": [
+    "backup\\2026-10-07_215510\\arena.db",
+    "backup\\2026-10-07_215510\\config.json",
+    "backup\\2026-10-07_215510\\controles.json",
+    "backup\\2026-10-07_215510\\retroarch.cfg",
+    "backup\\2026-10-07_215510\\saves\\2048\\2048.srm",
+    "backup\\2026-10-07_215510\\saves\\FinalBurn Neo\\fbneo\\kof97.fs",
+    "backup\\2026-10-07_215510\\saves\\FinalBurn Neo\\fbneo\\mslugx.fs",
+    "backup\\2026-10-07_215510\\saves\\LEIA.txt",
+    "backup\\2026-10-07_215510\\saves\\MAME\\mame\\cfg\\default.cfg",
+    "backup\\2026-10-07_215510\\saves\\MAME\\mame\\cfg\\kinst.cfg",
+    "backup\\2026-10-07_215510\\saves\\MAME\\mame\\diff\\kinst.dif",
+    "backup\\2026-10-07_215510\\saves\\PCSX-ReARMed\\pcsx-card2.mcd",
+    "backup\\2026-10-07_215510\\saves\\PPSSPP\\PSP\\SYSTEM\\CACHE\\UCUS98653.vkshadercache",
+    "backup\\2026-10-07_215510\\saves\\PPSSPP\\PSP\\SYSTEM\\CACHE\\ULUS10277.vkshadercache",
+    "backup\\2026-10-07_215510\\saves\\PPSSPP\\PSP\\SYSTEM\\CACHE\\ULUS10490.vkshadercache",
+    "backup\\2026-10-07_215510\\saves\\Snes9x\\BS F-ZERO Grand Prix 2 (J) [h1].srm",
+    "backup\\2026-10-07_215510\\saves\\SwanStation\\BloodRayne (USA).srm",
+    "backup\\2026-10-07_215510\\saves\\SwanStation\\CTR - Crash Team Racing (USA).srm",
+    "backup\\2026-10-07_215510\\saves\\SwanStation\\Crash Bandicoot (USA).srm",
+    "backup\\2026-10-07_215510\\saves\\SwanStation\\Legacy of Kain - Soul Reaver (USA).srm",
+    "backup\\2026-10-07_215510\\saves\\SwanStation\\Metal Slug X (USA).srm",
+    "backup\\2026-10-07_215510\\saves\\SwanStation\\Twisted Metal 2 (USA).srm",
+    "backup\\2026-10-07_215510\\saves\\SwanStation\\Vigilante 8 (Europe).srm",
+    "dados\\arena_override.cfg",
+    "dados\\logs\\queda-do-servidor.txt",
+    "retroarch\\retroarch-core-options.cfg"
+  ],
+  "kb_dos_arquivos": 1601.1
+}

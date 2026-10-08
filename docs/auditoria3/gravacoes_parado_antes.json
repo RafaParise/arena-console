@@ -1,0 +1,27 @@
+{
+  "janela_s": 3600,
+  "com_tela": true,
+  "operacoes_de_gravacao": 0,
+  "kb_gravados": 0.0,
+  "operacoes_por_hora": 0,
+  "kb_por_hora": 0.0,
+  "arquivos_que_mudaram": [
+    "docs\\auditoria3\\inventario_antes.json",
+    "docs\\varredura_fase2_css_bruta.json",
+    "ferramentas\\__pycache__\\rodada_final.cpython-313.pyc",
+    "ferramentas\\rodada_final.py",
+    "testes\\inventario.py"
+  ],
+  "arquivos_que_nasceram": [
+    "docs\\RELATORIO-QUALIDADE.md",
+    "docs\\auditoria3\\inventario_antes.md",
+    "docs\\auditoria3\\varredura_fase1.json",
+    "servidor\\tests\\__pycache__\\test_portados_auditoria3.cpython-313.pyc",
+    "servidor\\tests\\test_portados_auditoria3.py",
+    "testes\\__pycache__\\teste_descoberta_pacote_torto.cpython-313.pyc",
+    "testes\\medir_fundos.py",
+    "testes\\teste_descoberta_pacote_torto.py",
+    "testes\\varredura_auditoria3.py"
+  ],
+  "arquivos_que_sumiram": []
+}

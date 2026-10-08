@@ -29,7 +29,7 @@
     },
     "jogar_junto": {
       "conectou": true,
-      "convidado_diz": null,
+      "convidado_diz": "Você se juntou como jogador 2",
       "recusa_do_nucleo": "",
       "hospedeiro_vivo": true,
       "erros": []
@@ -41,7 +41,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 336143,
-      "segundos": 10.9,
+      "segundos": 10.8,
       "travou": false,
       "erros": [
         "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented."
@@ -99,7 +99,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 50874,
-      "segundos": 11.3,
+      "segundos": 11.2,
       "travou": false,
       "erros": []
     },
@@ -120,7 +120,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 29288,
-      "segundos": 12.5,
+      "segundos": 12.4,
       "travou": false,
       "erros": []
     },
@@ -137,21 +137,17 @@
     "jogo": "Saturn Bomberman (USA) (1S) (Track 01).bin",
     "abre": {
       "abre_e_mostra_imagem": false,
-      "foto_bytes": 0,
-      "segundos": 0.1,
+      "foto_bytes": 1848,
+      "segundos": 10.8,
       "travou": false,
-      "erros": [
-        "[ERROR] [Content] Falha ao carregar o conteúdo."
-      ]
+      "erros": []
     },
     "jogar_junto": {
-      "conectou": false,
-      "convidado_diz": null,
+      "conectou": true,
+      "convidado_diz": "Você se juntou como jogador 2",
       "recusa_do_nucleo": "",
-      "hospedeiro_vivo": false,
-      "erros": [
-        "[ERROR] [Content] Falha ao carregar o conteúdo."
-      ]
+      "hospedeiro_vivo": true,
+      "erros": []
     }
   },
   {
@@ -159,8 +155,8 @@
     "jogo": "Marvel vs. Capcom 2 - New Age of Heroes (Europe).cue",
     "abre": {
       "abre_e_mostra_imagem": true,
-      "foto_bytes": 245053,
-      "segundos": 12.5,
+      "foto_bytes": 243674,
+      "segundos": 13.2,
       "travou": false,
       "erros": [
         "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",

@@ -1,30 +1,22 @@
 [
  {
   "console": "Arcade (MAME)",
-  "titulo": "Kinst",
+  "titulo": "Killer Instinct",
   "jogadores": 2,
   "abrir": {
-   "abre_e_mostra_imagem": false,
-   "foto_bytes": 0,
-   "segundos": 1.8,
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 203940,
+   "segundos": 12.7,
    "travou": false,
-   "erros": [
-    "[ERROR] [Content] Falha ao carregar o conteúdo."
-   ]
-  }
- },
- {
-  "console": "Arcade (MAME)",
-  "titulo": "The King of Fighters 2002",
-  "jogadores": 2,
-  "abrir": {
-   "abre_e_mostra_imagem": false,
-   "foto_bytes": 0,
-   "segundos": 1.4,
-   "travou": false,
-   "erros": [
-    "[ERROR] [Content] Falha ao carregar o conteúdo."
-   ]
+   "erros": []
+  },
+  "foto": "000 Arcade (MAME) - Killer Instinct.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": []
   }
  },
  {
@@ -33,12 +25,12 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 4729,
+   "foto_bytes": 4874,
    "segundos": 10.9,
    "travou": false,
    "erros": []
   },
-  "foto": "002 Atari 2600 - Combat.png",
+  "foto": "001 Atari 2600 - Combat.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -54,11 +46,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 8699,
-   "segundos": 10.9,
+   "segundos": 10.8,
    "travou": false,
    "erros": []
   },
-  "foto": "003 Atari 2600 - Warlords.png",
+  "foto": "002 Atari 2600 - Warlords.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -78,7 +70,7 @@
    "travou": false,
    "erros": []
   },
-  "foto": "004 ColecoVision - Slither.png",
+  "foto": "003 ColecoVision - Slither.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -89,7 +81,7 @@
  },
  {
   "console": "Commodore 64",
-  "titulo": "INTKARAT",
+  "titulo": "International Karate",
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
@@ -98,7 +90,7 @@
    "travou": false,
    "erros": []
   },
-  "foto": "005 Commodore 64 - INTKARAT.png",
+  "foto": "004 Commodore 64 - International Karate.png",
   "jogar_junto": {
    "pulado": "O núcleo do Commodore 64 (VICE) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Os 2 jogadores só valem no mesmo computador."
   }
@@ -114,14 +106,14 @@
    "travou": false,
    "erros": []
   },
-  "foto": "006 Commodore 64 - Mule.png",
+  "foto": "005 Commodore 64 - Mule.png",
   "jogar_junto": {
    "pulado": "O núcleo do Commodore 64 (VICE) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Os 2 jogadores só valem no mesmo computador."
   }
  },
  {
   "console": "Commodore 64",
-  "titulo": "PRINCEOP",
+  "titulo": "Prince of Persia",
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
@@ -130,7 +122,7 @@
    "travou": false,
    "erros": []
   },
-  "foto": "007 Commodore 64 - PRINCEOP.png",
+  "foto": "006 Commodore 64 - Prince of Persia.png",
   "jogar_junto": {
    "pulado": "O núcleo do Commodore 64 (VICE) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Os 2 jogadores só valem no mesmo computador."
   }
@@ -142,11 +134,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 4101,
-   "segundos": 12.9,
+   "segundos": 13.1,
    "travou": false,
    "erros": []
   },
-  "foto": "008 Commodore Amiga - Alien Breed Disk1.png",
+  "foto": "007 Commodore Amiga - Alien Breed Disk1.png",
   "jogar_junto": {
    "pulado": "O núcleo do Amiga (PUAE) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Os 2 jogadores só valem no mesmo computador."
   }
@@ -158,11 +150,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 67668,
-   "segundos": 12.9,
+   "segundos": 13.1,
    "travou": false,
    "erros": []
   },
-  "foto": "009 Commodore Amiga - Top Gear 2 Disk2.png",
+  "foto": "008 Commodore Amiga - Top Gear 2 Disk2.png",
   "jogar_junto": {
    "pulado": "O núcleo do Amiga (PUAE) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Os 2 jogadores só valem no mesmo computador."
   }
@@ -204,11 +196,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 457257,
-   "segundos": 11.2,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
-  "foto": "015 Mega Drive, Master S - Golden Axe.png",
+  "foto": "014 Mega Drive, Master S - Golden Axe.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -224,11 +216,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 40997,
-   "segundos": 11.2,
+   "segundos": 10.8,
    "travou": false,
    "erros": []
   },
-  "foto": "016 Mega Drive, Master S - Mega Bomberman.png",
+  "foto": "015 Mega Drive, Master S - Mega Bomberman.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -248,7 +240,7 @@
    "travou": false,
    "erros": []
   },
-  "foto": "017 Mega Drive, Master S - Micro Machines 2 Turbo Tournament.png"
+  "foto": "016 Mega Drive, Master S - Micro Machines 2 Turbo Tournament.png"
  },
  {
   "console": "Mega Drive, Master System e Game Gear",
@@ -257,11 +249,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 212480,
-   "segundos": 10.9,
+   "segundos": 10.8,
    "travou": false,
    "erros": []
   },
-  "foto": "018 Mega Drive, Master S - Sonic & Knuckles + Sonic the Hedgehog 2.png",
+  "foto": "017 Mega Drive, Master S - Sonic & Knuckles + Sonic the Hedgehog 2.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -277,11 +269,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 464201,
-   "segundos": 11.0,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
-  "foto": "019 Mega Drive, Master S - Sonic the Hedgehog 3.png",
+  "foto": "018 Mega Drive, Master S - Sonic the Hedgehog 3.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -297,11 +289,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 152297,
-   "segundos": 10.9,
+   "segundos": 10.8,
    "travou": false,
    "erros": []
   },
-  "foto": "020 Mega Drive, Master S - Streets of Rage 2.png",
+  "foto": "019 Mega Drive, Master S - Streets of Rage 2.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -321,7 +313,7 @@
    "travou": false,
    "erros": []
   },
-  "foto": "021 Neo Geo e fliperamas - Metal Slug X - Super Vehicle-001.png",
+  "foto": "020 Neo Geo e fliperamas - Metal Slug X - Super Vehicle-001.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -341,7 +333,7 @@
    "travou": false,
    "erros": []
   },
-  "foto": "022 Neo Geo e fliperamas - Teenage Mutant Ninja Turtles - Turtles i.png",
+  "foto": "021 Neo Geo e fliperamas - Teenage Mutant Ninja Turtles - Turtles i.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -357,11 +349,31 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 28984,
-   "segundos": 11.5,
+   "segundos": 11.2,
    "travou": false,
    "erros": []
   },
-  "foto": "023 Neo Geo e fliperamas - The King of Fighters '97.png",
+  "foto": "022 Neo Geo e fliperamas - The King of Fighters '97.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": []
+  }
+ },
+ {
+  "console": "Neo Geo e fliperamas (FBNeo)",
+  "titulo": "The King of Fighters 2002",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 30273,
+   "segundos": 11.3,
+   "travou": false,
+   "erros": []
+  },
+  "foto": "023 Neo Geo e fliperamas - The King of Fighters 2002.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -401,7 +413,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 78748,
-   "segundos": 11.2,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
@@ -417,7 +429,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 324806,
-   "segundos": 12.0,
+   "segundos": 11.9,
    "travou": false,
    "erros": []
   },
@@ -433,7 +445,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 954050,
-   "segundos": 12.0,
+   "segundos": 11.9,
    "travou": false,
    "erros": []
   },
@@ -461,7 +473,7 @@
  {
   "console": "Nintendo 64",
   "titulo": "Mario Kart 64",
-  "jogadores": 2,
+  "jogadores": 4,
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 225364,
@@ -481,7 +493,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 37075,
-   "segundos": 11.1,
+   "segundos": 11.4,
    "travou": false,
    "erros": []
   },
@@ -531,7 +543,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 29288,
-   "segundos": 22.0,
+   "segundos": 21.7,
    "travou": false,
    "erros": []
   },
@@ -566,6 +578,26 @@
  },
  {
   "console": "PlayStation",
+  "titulo": "Crash Bandicoot 3 Warped",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 42018,
+   "segundos": 18.7,
+   "travou": false,
+   "erros": []
+  },
+  "foto": "037 PlayStation - Crash Bandicoot 3 Warped.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": []
+  }
+ },
+ {
+  "console": "PlayStation",
   "titulo": "Legacy of Kain Soul Reaver",
   "jogadores": 2,
   "abrir": {
@@ -575,10 +607,10 @@
    "travou": false,
    "erros": []
   },
-  "foto": "037 PlayStation - Legacy of Kain Soul Reaver.png",
+  "foto": "038 PlayStation - Legacy of Kain Soul Reaver.png",
   "jogar_junto": {
    "conectou": true,
-   "convidado_diz": null,
+   "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
    "erros": []
@@ -591,11 +623,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 29288,
-   "segundos": 12.0,
+   "segundos": 11.9,
    "travou": false,
    "erros": []
   },
-  "foto": "038 PlayStation - Metal Slug X.png",
+  "foto": "039 PlayStation - Metal Slug X.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -611,11 +643,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 29288,
-   "segundos": 23.1,
+   "segundos": 22.9,
    "travou": false,
    "erros": []
   },
-  "foto": "039 PlayStation - Twisted Metal 2.png",
+  "foto": "040 PlayStation - Twisted Metal 2.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -631,11 +663,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 42018,
-   "segundos": 13.2,
+   "segundos": 13.3,
    "travou": false,
    "erros": []
   },
-  "foto": "040 PlayStation - Vigilante 8.png",
+  "foto": "041 PlayStation - Vigilante 8.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -684,12 +716,6 @@
   "console": "PlayStation 2",
   "titulo": "Champions of Norrath",
   "jogadores": 4,
-  "situacao": "emulador de fora (PCSX2): testar com o professor"
- },
- {
-  "console": "PlayStation 2",
-  "titulo": "Crash Bandicoot 3 Warped",
-  "jogadores": 2,
   "situacao": "emulador de fora (PCSX2): testar com o professor"
  },
  {
@@ -915,7 +941,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 430246,
-   "segundos": 12.0,
+   "segundos": 11.9,
    "travou": false,
    "erros": []
   },
@@ -947,7 +973,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 120104,
-   "segundos": 11.2,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -962,7 +988,7 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 7933,
+   "foto_bytes": 7945,
    "segundos": 11.2,
    "travou": false,
    "erros": [
@@ -981,7 +1007,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 84025,
-   "segundos": 11.2,
+   "segundos": 11.1,
    "travou": false,
    "erros": [
     "[libretro WARN] [sceDisplay] Video out requested, not supported: mode=0 size=512,272"
@@ -999,7 +1025,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 1416699,
-   "segundos": 17.8,
+   "segundos": 17.6,
    "travou": false,
    "erros": []
   },
@@ -1015,7 +1041,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 449206,
-   "segundos": 11.3,
+   "segundos": 11.2,
    "travou": false,
    "erros": []
   },
@@ -1031,7 +1057,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 47656,
-   "segundos": 12.9,
+   "segundos": 13.0,
    "travou": false,
    "erros": []
   },
@@ -1071,7 +1097,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 427566,
-   "segundos": 11.4,
+   "segundos": 11.3,
    "travou": false,
    "erros": []
   },
@@ -1089,13 +1115,19 @@
   "titulo": "Sonic CD",
   "jogadores": 2,
   "abrir": {
-   "abre_e_mostra_imagem": false,
-   "foto_bytes": 0,
-   "segundos": 0.1,
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 405363,
+   "segundos": 13.0,
    "travou": false,
-   "erros": [
-    "[ERROR] [Content] Falha ao carregar o conteúdo."
-   ]
+   "erros": []
+  },
+  "foto": "095 Sega CD - Sonic CD.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": []
   }
  },
  {
@@ -1104,8 +1136,8 @@
   "jogadores": 4,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 455956,
-   "segundos": 22.5,
+   "foto_bytes": 331250,
+   "segundos": 14.9,
    "travou": false,
    "erros": [
     "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
@@ -1125,8 +1157,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 77349,
-   "segundos": 12.1,
+   "foto_bytes": 67492,
+   "segundos": 12.9,
    "travou": false,
    "erros": [
     "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
@@ -1146,8 +1178,8 @@
   "jogadores": 4,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 240180,
-   "segundos": 17.3,
+   "foto_bytes": 291001,
+   "segundos": 14.1,
    "travou": false,
    "erros": [
     "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
@@ -1168,8 +1200,8 @@
   "jogadores": 4,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 149231,
-   "segundos": 12.7,
+   "foto_bytes": 817138,
+   "segundos": 16.8,
    "travou": false,
    "erros": [
     "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
@@ -1189,8 +1221,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 245053,
-   "segundos": 12.4,
+   "foto_bytes": 243674,
+   "segundos": 13.1,
    "travou": false,
    "erros": [
     "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
@@ -1230,13 +1262,19 @@
   "titulo": "Saturn Bomberman",
   "jogadores": 10,
   "abrir": {
-   "abre_e_mostra_imagem": false,
-   "foto_bytes": 0,
-   "segundos": 0.5,
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 46473,
+   "segundos": 11.5,
    "travou": false,
-   "erros": [
-    "[ERROR] [Content] Falha ao carregar o conteúdo."
-   ]
+   "erros": []
+  },
+  "foto": "102 Sega Saturn - Saturn Bomberman.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": []
   }
  },
  {
@@ -1244,13 +1282,19 @@
   "titulo": "BS F ZERO",
   "jogadores": 2,
   "abrir": {
-   "abre_e_mostra_imagem": false,
-   "foto_bytes": 0,
-   "segundos": 0.1,
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 185997,
+   "segundos": 11.0,
    "travou": false,
-   "erros": [
-    "[ERROR] [Content] Falha ao carregar o conteúdo."
-   ]
+   "erros": []
+  },
+  "foto": "103 Super Nintendo - BS F ZERO.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": []
   }
  },
  {
@@ -1258,55 +1302,39 @@
   "titulo": "BS F ZERO Grand Prix 2",
   "jogadores": 2,
   "abrir": {
-   "abre_e_mostra_imagem": false,
-   "foto_bytes": 0,
-   "segundos": 0.1,
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 185997,
+   "segundos": 10.8,
    "travou": false,
-   "erros": [
-    "[ERROR] [Content] Falha ao carregar o conteúdo."
-   ]
+   "erros": []
+  },
+  "foto": "104 Super Nintendo - BS F ZERO Grand Prix 2.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": []
   }
  },
  {
   "console": "Super Nintendo",
-  "titulo": "BS F ZERO Grand Prix Ace League",
+  "titulo": "BS F Zero Deluxe",
   "jogadores": 2,
   "abrir": {
-   "abre_e_mostra_imagem": false,
-   "foto_bytes": 0,
-   "segundos": 0.1,
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 346224,
+   "segundos": 10.9,
    "travou": false,
-   "erros": [
-    "[ERROR] [Content] Falha ao carregar o conteúdo."
-   ]
-  }
- },
- {
-  "console": "Super Nintendo",
-  "titulo": "BS F ZERO Grand Prix King League",
-  "jogadores": 2,
-  "abrir": {
-   "abre_e_mostra_imagem": false,
-   "foto_bytes": 0,
-   "segundos": 0.1,
-   "travou": false,
-   "erros": [
-    "[ERROR] [Content] Falha ao carregar o conteúdo."
-   ]
-  }
- },
- {
-  "console": "Super Nintendo",
-  "titulo": "BS F ZERO Grand Prix Knight League",
-  "jogadores": 2,
-  "abrir": {
-   "abre_e_mostra_imagem": false,
-   "foto_bytes": 0,
-   "segundos": 0.1,
-   "travou": false,
-   "erros": [
-    "[ERROR] [Content] Falha ao carregar o conteúdo."
-   ]
+   "erros": []
+  },
+  "foto": "105 Super Nintendo - BS F Zero Deluxe.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": []
   }
  },
  {
@@ -1316,11 +1344,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 404304,
-   "segundos": 11.0,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
-  "foto": "108 Super Nintendo - Biker Mice From Mars.png",
+  "foto": "106 Super Nintendo - Biker Mice From Mars.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1340,7 +1368,7 @@
    "travou": false,
    "erros": []
   },
-  "foto": "109 Super Nintendo - Donkey Kong Country.png",
+  "foto": "107 Super Nintendo - Donkey Kong Country.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1356,11 +1384,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 267243,
-   "segundos": 13.0,
+   "segundos": 12.9,
    "travou": false,
    "erros": []
   },
-  "foto": "110 Super Nintendo - Donkey Kong Country 2 Diddy's Kong Quest.png",
+  "foto": "108 Super Nintendo - Donkey Kong Country 2 Diddy's Kong Quest.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1376,11 +1404,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 347705,
-   "segundos": 13.1,
+   "segundos": 13.0,
    "travou": false,
    "erros": []
   },
-  "foto": "111 Super Nintendo - Donkey Kong Country 3 Dixie Kong's Doubl.png",
+  "foto": "109 Super Nintendo - Donkey Kong Country 3 Dixie Kong's Doubl.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1400,7 +1428,7 @@
    "travou": false,
    "erros": []
   },
-  "foto": "112 Super Nintendo - F ZERO.png",
+  "foto": "110 Super Nintendo - F ZERO.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1420,7 +1448,7 @@
    "travou": false,
    "erros": []
   },
-  "foto": "113 Super Nintendo - Goof Troop.png",
+  "foto": "111 Super Nintendo - Goof Troop.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1436,11 +1464,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 158161,
-   "segundos": 10.9,
+   "segundos": 10.8,
    "travou": false,
    "erros": []
   },
-  "foto": "114 Super Nintendo - Killer Instinct.png",
+  "foto": "112 Super Nintendo - Killer Instinct.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1460,7 +1488,7 @@
    "travou": false,
    "erros": []
   },
-  "foto": "115 Super Nintendo - Mickey To Donald Magical Adventure 3.png",
+  "foto": "113 Super Nintendo - Mickey To Donald Magical Adventure 3.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1476,11 +1504,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 103061,
-   "segundos": 12.9,
+   "segundos": 12.8,
    "travou": false,
    "erros": []
   },
-  "foto": "116 Super Nintendo - Mortal Kombat 3.png",
+  "foto": "114 Super Nintendo - Mortal Kombat 3.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1496,11 +1524,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 103061,
-   "segundos": 11.1,
+   "segundos": 10.8,
    "travou": false,
    "erros": []
   },
-  "foto": "117 Super Nintendo - Mortal Kombat 3.png",
+  "foto": "115 Super Nintendo - Mortal Kombat 3.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1520,7 +1548,7 @@
    "travou": false,
    "erros": []
   },
-  "foto": "118 Super Nintendo - Ninja Gaiden Trilogy.png",
+  "foto": "116 Super Nintendo - Ninja Gaiden Trilogy.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1536,11 +1564,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 2073,
-   "segundos": 12.8,
+   "segundos": 12.9,
    "travou": false,
    "erros": []
   },
-  "foto": "119 Super Nintendo - Rock N' Roll Racing.png",
+  "foto": "117 Super Nintendo - Rock N' Roll Racing.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1560,7 +1588,7 @@
    "travou": false,
    "erros": []
   },
-  "foto": "120 Super Nintendo - Street Fighter II Turbo Hyper Fighting.png",
+  "foto": "118 Super Nintendo - Street Fighter II Turbo Hyper Fighting.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1580,7 +1608,7 @@
    "travou": false,
    "erros": []
   },
-  "foto": "121 Super Nintendo - Super Bomberman 4.png",
+  "foto": "119 Super Nintendo - Super Bomberman 4.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1600,7 +1628,7 @@
    "travou": false,
    "erros": []
   },
-  "foto": "122 Super Nintendo - Super Mario Kart.png",
+  "foto": "120 Super Nintendo - Super Mario Kart.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1620,7 +1648,7 @@
    "travou": false,
    "erros": []
   },
-  "foto": "123 Super Nintendo - Super Mario World.png",
+  "foto": "121 Super Nintendo - Super Mario World.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1640,7 +1668,7 @@
    "travou": false,
    "erros": []
   },
-  "foto": "124 Super Nintendo - Top Gear 3000.png",
+  "foto": "122 Super Nintendo - Top Gear 3000.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1674,16 +1702,16 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 11185,
-   "segundos": 13.0,
+   "segundos": 12.9,
    "travou": false,
    "erros": [
     "[ERROR] [Disc] Failed to set initial disc index. Expected #1 \"\", Detected #1 \"\"."
    ]
   },
-  "foto": "128 ZX Spectrum - Match Day II.png",
+  "foto": "126 ZX Spectrum - Match Day II.png",
   "jogar_junto": {
    "conectou": true,
-   "convidado_diz": null,
+   "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
    "erros": [

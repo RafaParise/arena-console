@@ -12,7 +12,7 @@
   },
   {
     "cenario": "duas_partidas_simultaneas",
-    "partida_A_ok": true,
+    "partida_A_ok": false,
     "partida_B_ok": false,
     "misturou": true
   }
