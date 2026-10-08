@@ -13,6 +13,7 @@ import difflib
 import os
 import re
 import subprocess
+import threading
 import time
 import urllib.parse
 import zipfile
@@ -100,6 +101,9 @@ REPO_POR_PLATAFORMA = {
 # thumbnails\<console>\_lista_<banco>.txt por 30 dias (a de PS2 tem 8.501
 # nomes; baixar de novo a cada capa seria 2 MB por clique).
 SERVIDOR_MINIATURAS = "https://thumbnails.libretro.com"
+# A copia do mesmo banco no GitHub (os testes de internet ruim apontam os
+# dois para um servidor falso: testes\teste_internet_ruim.py).
+GITHUB_MINIATURAS = "https://raw.githubusercontent.com/libretro-thumbnails"
 VALIDADE_DA_LISTA = 30 * 24 * 3600
 # Quando ha capa de varias regioes e o arquivo nao diz a dele.
 PREFERENCIA_DE_REGIAO = ("(usa", "(world", "(europe", "(brazil", "(japan")
@@ -116,6 +120,23 @@ def sistema_do_banco(repo):
     return repo.replace("_-_", " - ").replace("_", " ")
 
 
+# O que deu errado na busca de capa em andamento (uma por linha de execucao:
+# o "Buscar capas que faltam" roda em segundo plano). Achado da rodada da
+# auditoria 3 (07/10/2026): o GameTDB nao respondeu, e a tela diria "Nao
+# achei capa" -- escondendo que foi a rede. Codigos do curl que sao da REDE
+# (o 22 e' "o servidor respondeu: nao existe"): 5/6 nome que nao resolve,
+# 7 conexao recusada, 28 tempo esgotado, 35 seguranca (https), 52/55/56 a
+# conexao caiu no meio.
+_FALHAS = threading.local()
+CODIGOS_DE_REDE = {5, 6, 7, 28, 35, 52, 55, 56}
+
+
+def _anotar_falha(tipo):
+    contagem = getattr(_FALHAS, "contagem", None)
+    if contagem is not None:
+        contagem[tipo] = contagem.get(tipo, 0) + 1
+
+
 def _baixar(url, destino, segundos=15):
     """Baixa com o curl do Windows (sem instalar nada). True se chegou."""
     try:
@@ -123,9 +144,35 @@ def _baixar(url, destino, segundos=15):
             ["curl.exe", "--fail", "--silent", "--show-error", "--location",
              "--max-time", str(segundos), "-A", "ARENA/1.0", "-o", destino, url],
             capture_output=True)
-        return resultado.returncode == 0 and os.path.isfile(destino) and os.path.getsize(destino) > 0
     except (OSError, subprocess.SubprocessError):
+        _anotar_falha("rede")
         return False
+    if resultado.returncode in CODIGOS_DE_REDE:
+        _anotar_falha("rede")
+    return resultado.returncode == 0 and os.path.isfile(destino) and os.path.getsize(destino) > 0
+
+
+def _parece_pagina_de_login(caminho):
+    """O arquivo baixado e' uma pagina HTML (o login do Wi-Fi da escola)?"""
+    try:
+        with open(caminho, "rb") as arquivo:
+            comeco = arquivo.read(512).lstrip().lower()
+    except OSError:
+        return False
+    return comeco.startswith((b"<!doctype", b"<html", b"<head", b"<meta", b"<script"))
+
+
+def mensagem_sem_capa():
+    """A frase de "nao veio capa", dizendo a causa (rede, login ou nao ha)."""
+    contagem = getattr(_FALHAS, "contagem", None) or {}
+    if contagem.get("login"):
+        return ("A rede pediu login: chegou a página do Wi-Fi no lugar da capa. Abra o navegador, "
+                "entre na rede e clique em Buscar capa de novo.")
+    if contagem.get("rede"):
+        return ("Um servidor de capas não respondeu (pode ser a internet). Clique em Buscar capa de "
+                "novo daqui a pouco; se continuar, envie uma capa sua (botão Enviar capa).")
+    return ("Não achei capa para esse jogo no banco de capas. Você pode pôr a sua: botão Enviar "
+            "capa.")
 
 
 def _apagar(caminho):
@@ -164,6 +211,8 @@ def lista_do_banco(plataforma_id, repo, tipo="Named_Boxarts"):
                 pagina = arquivo.read()
             nomes = sorted({urllib.parse.unquote(href)[:-4]
                             for href in re.findall(r'href="([^"/?]+\.png)"', pagina)})
+            if not nomes and "index of" not in pagina.lower():
+                _anotar_falha("login")      # a lista e' um "Index of"; outra pagina e' o login do Wi-Fi
             if nomes:
                 with open(temporario, "w", encoding="utf-8") as arquivo:
                     arquivo.write("\n".join(nomes) + "\n")
@@ -309,11 +358,13 @@ def _baixar_capa(repo, nome, destino, tipo="Named_Boxarts"):
         os.makedirs(os.path.dirname(destino), exist_ok=True)
         for url in ("%s/%s/%s/%s" % (SERVIDOR_MINIATURAS,
                                       urllib.parse.quote(sistema_do_banco(repo)), tipo, arquivo),
-                    "https://raw.githubusercontent.com/libretro-thumbnails/%s/master/%s/%s"
-                    % (repo, tipo, arquivo)):
-            if _baixar(url, temporario) and _e_png_de_verdade(temporario):
-                os.replace(temporario, destino)
-                return True
+                    "%s/%s/master/%s/%s" % (GITHUB_MINIATURAS, repo, tipo, arquivo)):
+            if _baixar(url, temporario):
+                if _e_png_de_verdade(temporario):
+                    os.replace(temporario, destino)
+                    return True
+                if _parece_pagina_de_login(temporario):
+                    _anotar_falha("login")
             _apagar(temporario)
     except OSError:
         pass
@@ -388,6 +439,8 @@ def _baixar_imagem(urls, destino, assinatura):
                 if comeco == assinatura and os.path.getsize(temporario) > 1024:
                     os.replace(temporario, destino)
                     return True
+                if _parece_pagina_de_login(temporario):
+                    _anotar_falha("login")
             _apagar(temporario)
     except OSError:
         pass
@@ -477,12 +530,14 @@ def buscar_e_baixar(plataforma_id, titulo_limpo, nome_base_arquivo, caminho_jogo
         return False, "Este console não tem banco de capas (nem no RetroArch). Envie a capa à mão."
     if isinstance(repos, str):
         repos = (repos,)
+    _FALHAS.contagem = {}          # o que falhar nesta busca (mensagem_sem_capa)
 
     destino = os.path.join(PASTA_MINIATURAS, plataforma_id, "Named_Boxarts",
                            _limpar_nome_arquivo(titulo_limpo) + ".png")
     if not com_internet:
         fonte = capa_pelo_disco(plataforma_id, titulo_limpo, caminho_jogo, com_internet=False)
-        return (True, fonte) if fonte else (False, "Sem internet agora. Essa busca precisa de conexão.")
+        return (True, fonte) if fonte else (False, "Sem internet agora. Ligue o computador na internet "
+                                                   "e clique em Buscar capa de novo.")
     # Pela lista oficial de cada banco (nome parecido, regiao certa).
     achou_lista = False
     for repo in repos:
@@ -504,6 +559,12 @@ def buscar_e_baixar(plataforma_id, titulo_limpo, nome_base_arquivo, caminho_jogo
     fonte = capa_pelo_disco(plataforma_id, titulo_limpo, caminho_jogo)
     if fonte:
         return True, fonte
+    # A rede ja falhou duas vezes: o resto (outros bancos, tela de titulo, o
+    # GitHub) falharia igual, cada tentativa esperando (no Windows, ~2 s por
+    # conexao recusada; ate 15 s por servidor mudo). A capa de dentro do disco
+    # (PS3, PSP), que nao usa a rede, ja foi tentada logo acima.
+    if _FALHAS.contagem.get("rede", 0) + _FALHAS.contagem.get("login", 0) >= 2:
+        return False, mensagem_sem_capa()
     # O jogo e' de outro console (o PS1 na pasta do PS2)?
     if plataforma_id in OUTRO_CONSOLE:
         repo, recado = OUTRO_CONSOLE[plataforma_id]
@@ -522,7 +583,7 @@ def buscar_e_baixar(plataforma_id, titulo_limpo, nome_base_arquivo, caminho_jogo
             if escolhido and _baixar_capa(repo, escolhido, destino, tipo):
                 return True, recado
     if achou_lista:
-        return False, "Não achei capa pra esse jogo nesse banco."
+        return False, mensagem_sem_capa()
 
     # Sem lista nenhuma (servidor de miniaturas fora do ar): o jeito antigo,
     # tentando o nome exato no GitHub do libretro.
@@ -534,11 +595,14 @@ def buscar_e_baixar(plataforma_id, titulo_limpo, nome_base_arquivo, caminho_jogo
         for tag in TAGS_REGIAO:
             candidatos.append("%s %s" % (titulo_limpo, tag))
 
+    contagem = _FALHAS.contagem
     for repo, nome in ((r, n) for r in repos for n in candidatos):
+        # A rede ja falhou duas vezes nesta busca: os outros nomes tambem
+        # falhariam (cada um esperando ate 15 s, com a tela parada).
+        if contagem.get("rede", 0) + contagem.get("login", 0) >= 2:
+            break
         nome_arquivo = _limpar_nome_arquivo(nome) + ".png"
-        url = ("https://raw.githubusercontent.com/libretro-thumbnails/%s/"
-              "master/Named_Boxarts/%s" %
-              (repo, urllib.parse.quote(nome_arquivo)))
+        url = "%s/%s/master/Named_Boxarts/%s" % (GITHUB_MINIATURAS, repo, urllib.parse.quote(nome_arquivo))
 
         destino_pasta = os.path.join(PASTA_MINIATURAS, plataforma_id, "Named_Boxarts")
         destino = os.path.join(destino_pasta, _limpar_nome_arquivo(titulo_limpo) + ".png")
@@ -546,21 +610,15 @@ def buscar_e_baixar(plataforma_id, titulo_limpo, nome_base_arquivo, caminho_jogo
 
         try:
             os.makedirs(destino_pasta, exist_ok=True)
-            resultado = subprocess.run(
-                ["curl.exe", "--fail", "--silent", "--show-error", "--location",
-                 "--max-time", "15", "-A", "ARENA/1.0", "-o", temporario, url],
-                capture_output=True)
-            if resultado.returncode == 0 and os.path.isfile(temporario) and \
-                    os.path.getsize(temporario) > 0 and _e_png_de_verdade(temporario):
-                os.replace(temporario, destino)
-                return True, None
-        except (OSError, subprocess.SubprocessError):
+            if _baixar(url, temporario):
+                if _e_png_de_verdade(temporario):
+                    os.replace(temporario, destino)
+                    return True, None
+                if _parece_pagina_de_login(temporario):
+                    _anotar_falha("login")
+        except OSError:
             pass
         finally:
-            if os.path.exists(temporario):
-                try:
-                    os.remove(temporario)
-                except OSError:
-                    pass
+            _apagar(temporario)
 
-    return False, "Não achei capa pra esse jogo nesse banco."
+    return False, mensagem_sem_capa()

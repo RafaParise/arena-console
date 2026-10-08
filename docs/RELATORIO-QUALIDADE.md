@@ -461,3 +461,52 @@ parado nenhum laço roda (antes e depois).
 jogo: aí sim nasce uma cópia (e só uma, se nada mudou depois). No tema
 escuro com o fundo animado, o céu continua se mexendo (20 quadros por
 segundo).
+
+---
+
+## Fase 3 — Servidor e API (08/10/2026)
+
+### O que foi conferido, e o resultado
+
+| Item do roteiro | Como | Resultado |
+|---|---|---|
+| Todas as rotas com dados certos, faltando, tipo errado, texto gigante, acento e emoji, `..\..\`, pedidos repetidos | `testes\fuzz_rotas.py` (64 pares rota + método) | **279 checagens, 0 falhas** |
+| Pedidos que tentam derrubar o servidor (corpo torto, conexão presa, 200 conexões paradas, cabeçalhos estranhos) | `testes\teste_quebrar_api.py` | 10 de 10; com 200 conexões paradas, a tela ainda responde em 0,01 s |
+| Sair da pasta pela rota da capa | `testes\teste_travessia_capa.py` | 6 tentativas (`..\`, `../`, caminho absoluto), todas bloqueadas |
+| 50 pedidos ao mesmo tempo | `testes\teste_concorrencia.py` | 0 respostas 5xx; `config.json` e `controles.json` válidos; `arena.db` íntegro (`PRAGMA integrity_check`) |
+| Longa duração (acelerada) | `testes\teste_longa_duracao.py` | 45.626 pedidos, 0 falhas de conexão; memória +0,4 MB e alças +2 depois de aquecer |
+| Quem da rede chama o quê (a) | `testes\teste_acesso_de_rede.py` | Só as 8 rotas da partida e da sincronização atendem outro computador; as outras (inclusive as 5 novas de 03/10: BIOS e Arrumar) respondem 403, e a configuração não muda |
+| Site qualquer mandando comando (b): outra origem e DNS rebinding | `testes\teste_dns_rebinding.py` + `Content-Type` obrigatório | Host de site estranho: 403; a configuração não muda |
+| "Aceitar conexões da rede" sem reabrir | `testes\teste_rede_sem_reabrir.py` | Liga e desliga na hora, aguenta 12 cliques colados |
+| Acervo com SHA-256 errado | `testes\teste_acervo_sha256.py` | Recusado |
+| Sem internet | As funções locais não usam a rede (inventário da Fase 0, "O que depende de internet"); o vigia marca "sem internet" e as online avisam | — |
+| **Internet ruim** (DNS que falha, servidor mudo, conexão recusada, a página de login do Wi-Fi) | **Novo:** `testes\teste_internet_ruim.py`, com um servidor falso neste computador | **13 de 13** depois dos consertos abaixo |
+
+### Achados e consertos
+
+| # | Defeito | Prova | Conserto |
+|---|---|---|---|
+| A1 | **A tela inteira parava enquanto o ARENA relia os jogos** ("Atualizar lista", ou depois de baixar/mover/arrumar um jogo): a releitura segurava, do começo ao fim, a mesma trava que a leitura da configuração usa — e quase toda rota lê a configuração | **Novo** `testes\teste_tela_responde_indexando.py` (5.000 jogos falsos numa cópia isolada): durante a releitura de 3,4 s, o único pedido da tela esperou **3,30 s** | A releitura ganhou a sua própria trava; a da configuração só é segurada para ler e gravar o resultado. Depois: **17 pedidos atendidos durante a releitura, o mais lento em 0,02 s**. No Celeron, com muitos jogos, a releitura passa de 15 s: era tela congelada esse tempo todo |
+| A2 | **Biblioteca online: "nenhum resultado" quando a rede tinha falhado** — inclusive quando a rede da escola devolvia a página de login do Wi-Fi no lugar dos dados (o vigia testa a internet pela porta 53, que o portal costuma deixar passar) | Leitura do código: `buscar()` devolvia `[]` em qualquer erro | Falha de rede e página de login viram frase própria: "Não consegui falar com o Internet Archive agora (a internet caiu ou está muito lenta)..." e "A rede pediu login: chegou a página do Wi-Fi... Abra o navegador, entre na rede e tente de novo." |
+| A3 | **Biblioteca online: uma rede lenta prendia a tela por minutos** — as fichas dos jogos eram pedidas uma de cada vez, até 30 pedidos de até 20 s | Teste: 12 fichas de 1 s cada | As fichas vêm ao mesmo tempo (10 por vez, 10 s cada): **12 s → 2,1 s**. Servidor mudo: desiste no tempo-limite, sem travar |
+| A4 | **Download da biblioteca e do acervo: a página de login no lugar do jogo** dizia só "SHA diferente" | Teste com o portal falso | Frase do login (e nada fica na pasta de jogos, nem pela metade) |
+| A5 | **Capa: "Não achei capa" quando foi a rede** (o caso do GameCube na rodada de referência) | Teste: conexão recusada e portal | A busca anota as falhas de rede e de login e diz a causa certa; com a rede caída, desiste depois de duas falhas (**18 s → 6 s**), sem deixar de tentar antes a capa de dentro do disco (PS3, PSP), que não usa rede |
+| A6 | **Mensagens de erro sem "o que fazer"**: 25 do servidor, 3 da tela (em 4 lugares) e mais 38 frases dos outros módulos (acervo, Internet Archive, cheats, controles, capas, barreiras, foto do perfil, pacote de progresso) | `servidor\tests\test_mensagens_de_erro.py` (6 testes na bateria) lê o código e reprova a frase nova sem verbo de ação ("clique", "escolha", "tente", "peça"...) — com a lista das internas que o aluno não vê, cada uma com o motivo | Todas reescritas com as duas partes. Ex.: "Limite de 20 amigos." → "Você já tem 20 amigos, o máximo. Remova um (Perfil → Amigos) para adicionar outro."; "Arquivo grande demais para o Arena." → "O arquivo passa de 4 GB, o limite do ARENA. Escolha outro jogo." |
+
+**Limite que fica (vai para o roteiro de sala):** a descoberta de colegas não
+tem autenticação (ver Fase 1, C5), e os testes que sobem o servidor usam a
+porta 8777 fixa em 25 scripts (a rodada exige o ARENA fechado).
+
+### Resultado da Fase 3
+
+| | |
+|---|---|
+| Bateria | **252**, todos passando (6 novos das mensagens) |
+| Testes de servidor e API (`rodada_final.py`, 23 scripts) | **23 de 23** |
+
+**Como testar (o professor):** com o ARENA aberto e uma pasta de jogos
+grande, clique em **Atualizar lista** e, enquanto ele relê, abra os Ajustes:
+a tela responde na hora. Na biblioteca online, sem internet (Wi-Fi
+desligado), procure "pac": a tela diz que a internet caiu, não que não há
+jogos. Num Wi-Fi com página de login, antes de fazer o login, a busca diz
+que a rede pediu login.

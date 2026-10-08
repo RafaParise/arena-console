@@ -1323,14 +1323,14 @@ def gravar_foto_perfil(imagem_base64):
     try:
         brutos = base64.b64decode(imagem_base64, validate=True)
     except (binascii.Error, ValueError):
-        raise ValueError("Imagem inválida.")
+        raise ValueError("Não consegui ler essa imagem. Escolha outra foto (PNG, JPG ou WEBP).")
 
     if not brutos or len(brutos) > LIMITE_FOTO_PERFIL:
-        raise ValueError("Foto grande demais (limite de 2 MB).")
+        raise ValueError("Foto grande demais: o limite é 2 MB. Escolha uma foto menor.")
 
     tipo = _tipo_da_imagem(brutos)
     if tipo not in TIPOS_FOTO_PERFIL:
-        raise ValueError("Formato de imagem não aceito (use PNG, JPG ou WEBP).")
+        raise ValueError("Esse formato de imagem não serve. Escolha uma foto PNG, JPG ou WEBP.")
 
     os.makedirs(PASTA_PERFIL, exist_ok=True)
     antiga = foto_perfil_caminho()
@@ -1831,14 +1831,30 @@ def carregar_catalogo():
     return _cache["catalogo"]
 
 
+# Uma releitura dos jogos por vez. Separada da TRAVA_CACHE de proposito:
+# achado da auditoria 3 (08/10/2026, testes\teste_tela_responde_indexando.py)
+# -- a releitura segurava a TRAVA_CACHE do comeco ao fim, e essa trava e' a
+# mesma da configuracao, que quase toda rota le. Enquanto o ARENA relia
+# 5.000 jogos (7 s no Ryzen, ~16 s no Celeron), a tela inteira esperava.
+TRAVA_RELEITURA = threading.Lock()
+
+
 def manifesto(forcar=False):
     """Catalogo de jogos, com cache curto em memoria."""
     with TRAVA_CACHE:
         idade, salvo = _cache["manifesto"]
         if not forcar and salvo and (time.time() - idade) < VALIDADE_CACHE:
             return salvo
+    with TRAVA_RELEITURA:
+        if not forcar:
+            # Quem esperou a releitura de outro pedido usa o resultado dela.
+            with TRAVA_CACHE:
+                idade, salvo = _cache["manifesto"]
+                if salvo and (time.time() - idade) < VALIDADE_CACHE:
+                    return salvo
         resultado = indexador.indexar(forcar=forcar)
-        _cache["manifesto"] = (time.time(), resultado)
+        with TRAVA_CACHE:
+            _cache["manifesto"] = (time.time(), resultado)
         return resultado
 
 
@@ -2976,7 +2992,7 @@ def importar_saves(nome_arquivo):
 
     caminho = os.path.join(PASTA_BACKUP, os.path.basename(str(nome_arquivo)))
     if not dentro_da_pasta(caminho, PASTA_BACKUP) or not os.path.isfile(caminho):
-        return None, "Pacote não encontrado na pasta backup."
+        return None, ("Não achei o pacote na pasta backup. Copie o arquivo meu-progresso (o .zip) para a pasta backup e tente de novo.")
 
     destinos = {"saves": PASTA_SAVES, "states": PASTA_STATES,
                 "cheats": PASTA_CHEATS, "remaps": PASTA_REMAPS,
@@ -3014,7 +3030,7 @@ def importar_saves(nome_arquivo):
                             pass
                 trazidos += 1
     except (zipfile.BadZipFile, OSError) as falha:
-        return None, "Pacote danificado ou ilegivel (%s)." % falha
+        return None, ("O pacote está danificado ou não dá para ler (%s). No outro computador, clique em Montar meu pacote de novo e tente outra vez." % falha)
 
     return {"trazidos": trazidos, "ja_existiam": pulados}, None
 
@@ -4438,10 +4454,10 @@ class Manipulador(BaseHTTPRequestHandler):
             achado = next((j for j in manifesto()["jogos"]
                            if j["titulo"].lower() == titulo), None)
             if not achado:
-                return self.erro("Não tenho esse jogo.", 404)
+                return self.erro("Este computador não tem esse jogo. Para jogar junto, os dois precisam do mesmo arquivo de jogo: copie o jogo para a pasta jogos\\pessoais do outro computador.", 404)
             marca = impressao_do_jogo(achado)
             if not marca:
-                return self.erro("Não consegui ler o arquivo.", 404)
+                return self.erro("Não consegui ler o arquivo do jogo para comparar. Feche o jogo, se estiver aberto, e tente de novo.", 404)
             return self.responder_json(marca)
 
         # ---- acervo de jogos livres ---------------------------------------
@@ -4492,12 +4508,16 @@ class Manipulador(BaseHTTPRequestHandler):
                 return self.responder_json({"itens": [],
                                             "consoles": internet_archive.consoles_da_biblioteca()})
             if not VIGIA["internet"]:
-                return self.erro("Sem internet agora. A busca online precisa "
-                                 "de conexão; o acervo local continua "
+                return self.erro("Sem internet agora. Ligue o computador na internet para buscar; "
+                                 "os jogos da pasta e o acervo local continuam "
                                  "funcionando.", 503)
             try:
                 return self.responder_json({"itens": internet_archive.buscar(consulta),
                                             "consoles": internet_archive.consoles_da_biblioteca()})
+            except internet_archive.FalhaDeRede as falha:
+                # A rede falhou ou pediu login: a frase ja diz o que fazer
+                # (antes a tela dizia "nenhum resultado").
+                return self.erro(str(falha), 502)
             except Exception as falha:
                 return self.erro(traduzir_erro_do_sistema(falha, "pesquisar"), 502)
 
@@ -4864,7 +4884,7 @@ class Manipulador(BaseHTTPRequestHandler):
         # ---- comecar do zero: novo perfil ---------------------------------
         if caminho == "/api/perfil/novo":
             if str(dados.get("confirmar")) != "sim":
-                return self.erro("Falta confirmar.")
+                return self.erro("Falta confirmar. Clique em Começar do zero de novo e confirme.")
 
             with TRAVA_JOGO:
                 if JOGO_EM_ANDAMENTO["ativo"]:
@@ -5057,7 +5077,7 @@ class Manipulador(BaseHTTPRequestHandler):
                     with TRAVA_JOGO:
                         JOGO_EM_ANDAMENTO["ativo"] = False
                         JOGO_EM_ANDAMENTO["titulo"] = ""
-                    return self.erro("Este console não tem emulador instalado.")
+                    return self.erro("Este console não tem emulador instalado. Veja em Como colocar jogos (barra da esquerda) o que falta para ele.")
                 # Sem jogo no comando: o console abre na tela inicial, que
                 # e onde ficam o relogio, os ajustes e o memory card.
                 extras = {}
@@ -5105,7 +5125,7 @@ class Manipulador(BaseHTTPRequestHandler):
             try:
                 os.makedirs(alvo, exist_ok=True)
                 if not hasattr(os, "startfile"):
-                    return self.erro("Abrir a pasta só funciona no Windows. Ela fica em %s." % alvo)
+                    return self.erro("Abrir a pasta só funciona no Windows. Ela fica em %s: abra pelo gerenciador de arquivos." % alvo)
                 os.startfile(alvo)
             except OSError as falha:
                 return self.erro(traduzir_erro_do_sistema(falha, "abrir a pasta"))
@@ -5151,7 +5171,7 @@ class Manipulador(BaseHTTPRequestHandler):
                 bios.criar_prateleiras(RAIZ)
                 os.makedirs(alvo, exist_ok=True)
                 if not hasattr(os, "startfile"):
-                    return self.erro("Abrir a pasta só funciona no Windows. Ela fica em %s." % alvo)
+                    return self.erro("Abrir a pasta só funciona no Windows. Ela fica em %s: abra pelo gerenciador de arquivos." % alvo)
                 os.startfile(alvo)
             except OSError as falha:
                 return self.erro(traduzir_erro_do_sistema(falha, "abrir a pasta"))
@@ -5187,7 +5207,7 @@ class Manipulador(BaseHTTPRequestHandler):
 
             origem = os.path.join(RAIZ, jogo["arquivo"])
             if not dentro_da_pasta(origem, PASTA_JOGOS) or not os.path.isfile(origem):
-                return self.erro("O arquivo do jogo não está mais no lugar.", 404)
+                return self.erro("O arquivo do jogo não está mais no lugar (foi movido ou apagado). Clique em Atualizar lista.", 404)
 
             with TRAVA_JOGO:
                 if JOGO_EM_ANDAMENTO["ativo"]:
@@ -5206,7 +5226,7 @@ class Manipulador(BaseHTTPRequestHandler):
                      "plataforma_nome": plataforma["nome"]})
             if os.path.exists(destino):
                 return self.erro(
-                    "Já existe um arquivo com esse nome em %s." % plataforma["pasta"])
+                    "Já existe um arquivo com esse nome em %s. Apague ou renomeie o repetido e tente de novo." % plataforma["pasta"])
 
             try:
                 os.makedirs(pasta_destino, exist_ok=True)
@@ -5365,7 +5385,7 @@ class Manipulador(BaseHTTPRequestHandler):
             anterior = ultima_copia()
             destino = fazer_backup()
             if not destino:
-                return self.erro("Não foi possível gravar a cópia.")
+                return self.erro("Não consegui gravar a cópia de segurança: o pen drive pode estar cheio ou só de leitura. Libere espaço e tente de novo.")
             return self.responder_json(
                 {"ok": True, "pasta": os.path.basename(destino),
                  # Nada mudou desde a ultima: ela continua valendo (L3).
@@ -5378,7 +5398,7 @@ class Manipulador(BaseHTTPRequestHandler):
                 return self.erro("Jogo não está no catálogo. Clique em Atualizar lista.", 404)
             if not VIGIA["internet"]:
                 if jogo.get("plataforma") not in ("ps3", "psp"):
-                    return self.erro("Sem internet agora. Essa busca precisa de conexão.", 503)
+                    return self.erro("Sem internet agora. Ligue o computador na internet e clique em Buscar capa de novo.", 503)
 
             # Fliperama: o nome completo do banco ("Metal Slug X - Super
             # Vehicle-001 (NGM-2500)(NGH-2500)") e' o que o banco de capas usa.
@@ -5417,7 +5437,7 @@ class Manipulador(BaseHTTPRequestHandler):
 
             imagem = str(dados.get("imagem", ""))
             if not imagem:
-                return self.erro("Nenhuma imagem enviada.")
+                return self.erro("Nenhuma imagem chegou. Escolha a imagem e tente de novo.")
             if "," in imagem:
                 imagem = imagem.split(",", 1)[1]
             try:
@@ -5425,14 +5445,14 @@ class Manipulador(BaseHTTPRequestHandler):
             except (binascii.Error, ValueError):
                 return self.erro("Essa imagem não abriu. Use um arquivo .png, .jpg ou .webp.")
             if not brutos or len(brutos) > 6 * 1024 * 1024:
-                return self.erro("Imagem grande demais (limite de 6 MB).")
+                return self.erro("Imagem grande demais: o limite é 6 MB. Escolha uma imagem menor.")
             tipo = _tipo_da_imagem(brutos)
             if not tipo:
                 return self.erro("Formato de imagem não aceito (use PNG, JPG ou WEBP).")
 
             caminho_rom = os.path.join(RAIZ, jogo["arquivo"])
             if not dentro_da_pasta(caminho_rom, PASTA_JOGOS) or not os.path.isfile(caminho_rom):
-                return self.erro("O arquivo do jogo não está mais no lugar.", 404)
+                return self.erro("O arquivo do jogo não está mais no lugar (foi movido ou apagado). Clique em Atualizar lista.", 404)
 
             extensoes = {"image/png": ".png", "image/jpeg": ".jpg", "image/webp": ".webp"}
             pasta_jogo = os.path.dirname(caminho_rom)
@@ -5480,7 +5500,7 @@ class Manipulador(BaseHTTPRequestHandler):
 
             imagem = str(dados.get("imagem", ""))
             if not imagem:
-                return self.erro("Nenhuma imagem enviada.")
+                return self.erro("Nenhuma imagem chegou. Escolha a imagem e tente de novo.")
             try:
                 gravar_foto_perfil(imagem)
             except ValueError as falha:
@@ -5501,10 +5521,10 @@ class Manipulador(BaseHTTPRequestHandler):
                 # ar" para sempre, sem dizer por que.
                 return self.erro(ENDERECO_ESTRANHO)
             if len(config["servidores"]) >= 20:
-                return self.erro("Limite de 20 amigos.")
+                return self.erro("Você já tem 20 amigos, o máximo. Remova um (Perfil → Amigos) para adicionar outro.")
             if any(a["apelido"].lower() == apelido.lower()
                    for a in config["servidores"]):
-                return self.erro("Já existe um amigo com esse apelido.")
+                return self.erro("Já existe um amigo com esse apelido. Escolha outro apelido para ele.")
 
             config["servidores"].append({
                 "apelido": apelido, "url": url,
@@ -5699,7 +5719,7 @@ class Manipulador(BaseHTTPRequestHandler):
             plataforma = next((p for p in carregar_catalogo()
                                if p["id"] == jogo["plataforma"]), None)
             if not plataforma:
-                return self.erro("Plataforma desconhecida.")
+                return self.erro("Não sei de que console é este jogo. Clique em Atualizar lista; se continuar, ponha o jogo na pasta do console certo.")
             # Jogo de CD dentro de .zip: o emulador nao abre assim (o RetroArch
             # tira um arquivo so do zip, e o .cue precisa dos .bin ao lado).
             # O problema e' o arquivo: diz isso antes de olhar o emulador.
@@ -5714,18 +5734,18 @@ class Manipulador(BaseHTTPRequestHandler):
             if not caminho_externo:
                 if not os.path.isfile(EXECUTAVEL_RETROARCH):
                     return self.erro(
-                        "retroarch.exe não foi encontrado na pasta retroarch.")
+                        "Não achei o retroarch.exe na pasta retroarch. A pasta tem que se chamar retroarch (guia 1); rode o VERIFICAR.bat para conferir.")
                 if not os.path.isfile(os.path.join(PASTA_CORES, plataforma["core"])):
                     sugestao = ""
                     if dados_externo:
                         sugestao = (" Ou instale o %s na pasta emuladores."
                                     % dados_externo["nome"])
                     return self.erro(
-                        "O núcleo desta plataforma não está instalado." + sugestao)
+                        "Falta o núcleo deste console na pasta retroarch\\cores. Rode o VERIFICAR.bat (guia 6)." + sugestao)
 
             caminho_rom = os.path.join(RAIZ, jogo["arquivo"])
             if not dentro_da_pasta(caminho_rom, PASTA_JOGOS) or not os.path.isfile(caminho_rom):
-                return self.erro("O arquivo do jogo não está mais no lugar.", 404)
+                return self.erro("O arquivo do jogo não está mais no lugar (foi movido ou apagado). Clique em Atualizar lista.", 404)
 
             if caminho_externo:
                 falta = graficos.falta_para_o_externo(dados_externo["nome"], caminho_externo)
@@ -5771,7 +5791,7 @@ class Manipulador(BaseHTTPRequestHandler):
                     JOGO_EM_ANDAMENTO["titulo"] = ""
                 return self.erro(
                     "Jogar junto só funciona pelo RetroArch. Esta plataforma "
-                    "está usando o %s, que tem rede própria."
+                    "está usando o %s, que tem rede própria: use o menu de rede do próprio jogo (guia 5)."
                     % dados_externo["nome"], 409)
             if modo and not plataforma.get("netplay", True):
                 with TRAVA_JOGO:
@@ -5792,7 +5812,7 @@ class Manipulador(BaseHTTPRequestHandler):
                         JOGO_EM_ANDAMENTO["ativo"] = False
                         JOGO_EM_ANDAMENTO["titulo"] = ""
                     return self.erro(
-                        "Falta o núcleo %s para jogar em rede neste console."
+                        "Falta o núcleo %s para jogar em rede neste console. Sozinho dá para jogar; rode o VERIFICAR.bat para conferir os núcleos."
                         % plataforma["core_netplay"], 409)
                 jogo["core"] = plataforma["core_netplay"]
                 aviso_netplay = plataforma.get("netplay_aviso", "")
@@ -5933,9 +5953,9 @@ class Manipulador(BaseHTTPRequestHandler):
             try:
                 pontos = int(dados.get("pontos"))
             except (TypeError, ValueError):
-                return self.erro("Informe a pontuacao usando apenas números.")
+                return self.erro("Escreva a pontuação só com números, sem pontos nem letras.")
             if not 0 <= pontos <= 99999999:
-                return self.erro("Pontuacao fora da faixa aceita.")
+                return self.erro("Essa pontuação não vale: escreva um número de 0 a 99.999.999.")
 
             jogo = achar_jogo(dados.get("jogo_id"))
             if not jogo:

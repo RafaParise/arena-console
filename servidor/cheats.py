@@ -127,7 +127,7 @@ def listar_estados(jogo):
 def apagar_estado(jogo, espaco):
     """Apaga um espaco especifico."""
     if not 0 <= int(espaco) < TOTAL_ESPACOS:
-        raise ValueError("Espaço fora da faixa de 0 a 9.")
+        raise ValueError("Escolha um espaço de 0 a 9.")
     espaco = int(espaco)
     sufixo = ".state" if espaco == 0 else ".state%d" % espaco
     caminho = os.path.join(PASTA_STATES, base_do_jogo(jogo) + sufixo)
@@ -197,7 +197,7 @@ def validar_codigo(codigo):
     if not codigo:
         return None, "Digite o código."
     if len(codigo) > 2000:
-        return None, "Código grande demais."
+        return None, "Código grande demais: confira se copiou só o código."
     if not RE_CODIGO.match(codigo):
         return None, ("Código inválido. Use apenas números e as letras de A a F, "
                       "separando as linhas por espaço ou dois-pontos.")
@@ -246,7 +246,7 @@ def adicionar_cheat(jogo, descricao, codigo, ligado=False):
 
     cheats = ler_cheats(jogo)
     if len(cheats) >= 60:
-        return None, "Limite de 60 codigos por jogo."
+        return None, "Este jogo já tem 60 códigos, o máximo. Apague um para pôr outro."
 
     cheats.append({"descricao": descricao, "codigo": codigo_limpo,
                    "ligado": bool(ligado)})
@@ -257,7 +257,7 @@ def adicionar_cheat(jogo, descricao, codigo, ligado=False):
 def alterar_cheat(jogo, indice, ligado=None, apagar=False):
     cheats = ler_cheats(jogo)
     if not 0 <= indice < len(cheats):
-        return None, "Código não encontrado."
+        return None, "Esse código não está mais na lista. Feche e abra a janela de códigos."
     if apagar:
         cheats.pop(indice)
     elif ligado is not None:

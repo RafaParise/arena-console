@@ -1973,7 +1973,7 @@ function wizardAguardar() {
       encerrar();
       gravaWizard("teclado", tecla);
     } else {
-      recado("Essa tecla o RetroArch não reconhece.", true);
+      recado("Essa tecla o RetroArch não reconhece. Escolha outra tecla.", true);
     }
   }
 
@@ -2101,7 +2101,7 @@ function capturar(linha, valor, botaoDefinir, jogador, botao) {
     evento.stopPropagation();
     if (evento.key === "Escape") { encerrar(); desenharMapa(); return; }
     const tecla = traduzirTecla(evento);
-    if (!tecla) { recado("Essa tecla o RetroArch não reconhece.", true); return; }
+    if (!tecla) { recado("Essa tecla o RetroArch não reconhece. Escolha outra tecla.", true); return; }
     gravar("teclado", tecla);
   }
 
@@ -3803,7 +3803,7 @@ function ligarEventos() {
     evento.target.value = "";
     if (!jogo || !arquivo) return;
     if (arquivo.size > 6 * 1024 * 1024) {
-      recado("Imagem grande demais (limite de 6 MB).", true);
+      recado("Imagem grande demais: o limite é 6 MB. Escolha uma imagem menor.", true);
       return;
     }
     recado("Enviando capa…");
@@ -4018,7 +4018,7 @@ function ligarEventos() {
     evento.target.value = "";
     if (!arquivo) return;
     if (arquivo.size > 2 * 1024 * 1024) {
-      recado("Foto grande demais (limite de 2 MB).", true);
+      recado("Foto grande demais: o limite é 2 MB. Escolha uma foto menor.", true);
       return;
     }
     try {

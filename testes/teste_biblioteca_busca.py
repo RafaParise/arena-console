@@ -87,7 +87,7 @@ def main():
                                      "files": [{"name": "outro.zip", "size": "10"}]},
         }
 
-        def ler_falso(url):
+        def ler_falso(url, *_segundos):     # _ler(url, segundos) desde a auditoria 3
             chave = "advancedsearch" if "advancedsearch" in url else url.rsplit("/", 1)[-1]
             return json.loads(json.dumps(respostas[chave]))
         ia._ler = ler_falso
