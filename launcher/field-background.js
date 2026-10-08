@@ -9,7 +9,13 @@
 //  2. O que nunca se mexe (ceu, morros, grama, florzinhas) e' desenhado UMA
 //     vez numa "camada fixa" escondida. A cada quadro so se cola essa
 //     camada (1 operacao) e se desenha por cima o que se mexe.
-//  3. 30 quadros por segundo bastam para 160 x 90: metade do trabalho de 60.
+//  3. 20 quadros por segundo bastam para 160 x 90, contados por relogio
+//     (setTimeout), e nao a cada quadro da tela (requestAnimationFrame, 60
+//     por segundo). Auditoria 3 (08/10/2026), medido com a tela parada, 6
+//     amostras: a 30 quadros acordando a cada quadro da tela, 7,7% de um
+//     nucleo do Ryzen; a 20 por relogio, 5,0% (-35%). No Celeron da escola
+//     e' de ~18% para ~11% de um nucleo, so com o menu aberto. (A 30 por
+//     relogio ficou PIOR: 10%. Por isso os 20.)
 //  4. Tres jeitos de mostrar (body[data-fundo-animado], escolha do aluno em
 //     Ajustes -> Simples): "automatico" anima, a nao ser que o modo modesto
 //     esteja ligado ou o Windows peca menos movimento; "sempre" anima
@@ -777,7 +783,7 @@
     return 'animado';
   }
 
-  const INTERVALO = 1000 / 30;
+  const INTERVALO = 1000 / 20;   // 20 quadros por segundo (ver o item 3, no topo)
   let velocidade = 1;   // so os testes aceleram (__fundoClaro.velocidade)
   let geracao = 0;      // cada laco novo ganha um numero; o velho para sozinho
   let ultimo = 0;       // hora do ultimo quadro desenhado
@@ -786,10 +792,12 @@
   function iniciarLaco() {
     const minha = ++geracao;
     ultimo = 0;
-    function quadro(agora) {
+    function quadro() {
       if (minha !== geracao) return;      // laco antigo: morre aqui
-      requestAnimationFrame(quadro);
-      if (ultimo && agora - ultimo < INTERVALO - 2) return;
+      setTimeout(quadro, INTERVALO);
+      // Janela escondida (minimizada, ou o jogo por cima): nao desenha.
+      if (document.visibilityState !== 'visible') return;
+      const agora = performance.now();
       const passo = (ultimo ? Math.min(4, (agora - ultimo) / (1000 / 60)) : 1) * velocidade;
       ultimo = agora;
       t += passo;
@@ -803,7 +811,7 @@
         console.error('Fundo de campo: erro num quadro, seguindo pro proximo.', e);
       }
     }
-    requestAnimationFrame(quadro);
+    setTimeout(quadro, 0);
   }
 
   function pararLaco() {

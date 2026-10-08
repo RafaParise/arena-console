@@ -273,8 +273,86 @@ def medir_velocidade(pasta, amostras=3):
     }
 
 
-def disco(pasta):
-    """Tipo, velocidade e espaco do disco onde o ARENA esta rodando."""
+# A medida do disco vale por 7 dias para o mesmo computador e o mesmo
+# disco (numero de serie do volume). Achado da auditoria 3 (Fase 0): a
+# cada abertura o ARENA gravava ate 8 MB no pen drive so para medir
+# (e, num pen drive lento, isso era meio segundo a mais na abertura).
+VALIDADE_DA_MEDIDA_S = 7 * 24 * 3600
+MEDIDAS_GUARDADAS = 64        # uma por computador da sala, com folga
+
+
+def numero_do_volume(pasta):
+    """Numero de serie do disco (volume) onde a pasta esta, ou None.
+    Muda quando o ARENA vai para outro pen drive ou outro disco."""
+    if not sys.platform.startswith("win"):
+        return None
+    try:
+        unidade = os.path.splitdrive(os.path.abspath(pasta))[0]
+        if not unidade:
+            return None
+        serie = ctypes.c_uint32(0)
+        ok = ctypes.windll.kernel32.GetVolumeInformationW(
+            ctypes.c_wchar_p(unidade + "\\"), None, 0, ctypes.byref(serie), None, None, None, 0)
+        return "%08X" % serie.value if ok else None
+    except (AttributeError, OSError, ValueError):
+        return None
+
+
+def medir_velocidade_guardada(pasta, arquivo, agora=None):
+    """medir_velocidade(), mas guardada em `arquivo` (dados\\disco_medido.json)
+    por computador + disco, por VALIDADE_DA_MEDIDA_S. Sem computador ou sem
+    numero do disco conhecidos, mede sempre (como antes)."""
+    import json
+    agora = time.time() if agora is None else agora
+    maquina, volume = identidade_da_maquina(), numero_do_volume(pasta)
+    if not maquina or not volume:
+        return medir_velocidade(pasta)
+    chave = "%s|%s" % (maquina, volume)
+    try:
+        with open(arquivo, encoding="utf-8") as entrada:
+            guardadas = json.load(entrada)
+        if not isinstance(guardadas, dict):
+            guardadas = {}
+    except (OSError, ValueError):
+        guardadas = {}
+    item = guardadas.get(chave)
+    try:
+        if (isinstance(item, dict) and isinstance(item.get("medida"), dict)
+                and 0 <= agora - float(item.get("quando", 0)) < VALIDADE_DA_MEDIDA_S
+                and float(item["medida"].get("escrita_mbs", 0)) > 0):
+            return dict(item["medida"], guardada=True)
+    except (TypeError, ValueError):
+        pass
+    medida = medir_velocidade(pasta)
+    if medida is None:
+        return None
+    guardadas[chave] = {"quando": agora, "medida": medida}
+    # So as mais recentes (o pen drive passa por muitos computadores).
+    if len(guardadas) > MEDIDAS_GUARDADAS:
+        def quando(k):
+            try:
+                return float(guardadas[k].get("quando", 0))
+            except (AttributeError, TypeError, ValueError):
+                return 0.0
+        for velha in sorted(guardadas, key=quando)[:-MEDIDAS_GUARDADAS]:
+            guardadas.pop(velha, None)
+    temporario = "%s.%d.tmp" % (arquivo, os.getpid())
+    try:
+        os.makedirs(os.path.dirname(arquivo), exist_ok=True)
+        with open(temporario, "w", encoding="utf-8") as saida:
+            json.dump(guardadas, saida, ensure_ascii=False, indent=1)
+        os.replace(temporario, arquivo)
+    except OSError:
+        try:
+            os.remove(temporario)
+        except OSError:
+            pass
+    return medida
+
+
+def disco(pasta, guardar_em=None):
+    """Tipo, velocidade e espaco do disco onde o ARENA esta rodando.
+    Com guardar_em, a velocidade vem da medida guardada (ver acima)."""
     tipo = "desconhecido"
     unidade = ""
 
@@ -286,7 +364,8 @@ def disco(pasta):
         except Exception:
             pass
 
-    medida = medir_velocidade(pasta)
+    medida = (medir_velocidade_guardada(pasta, guardar_em) if guardar_em
+              else medir_velocidade(pasta))
 
     # Classificacao por VELOCIDADE, em MB/s. A versao anterior classificava
     # por tempo total incluindo o fsync, e por isso chamava um NVMe de
@@ -672,7 +751,7 @@ def altura_da_tela():
 def resumo(pasta_raiz):
     """Junta tudo num dicionario so, pronto para a tela."""
     ram = memoria()
-    info_disco = disco(pasta_raiz)
+    info_disco = disco(pasta_raiz, guardar_em=os.path.join(pasta_raiz, "dados", "disco_medido.json"))
     total_nucleos = nucleos()
 
     gpu = placa_video()

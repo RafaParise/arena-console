@@ -2812,34 +2812,91 @@ def e_pasta_de_copia(nome):
         return False
 
 
+# Pastas de saves que a copia nao leva: o saves\.netplay e' a pasta
+# descartavel que o RetroArch usa so enquanto o aluno e' convidado numa
+# partida (para o save do colega nao cobrir o dele) -- e vem somente
+# leitura; CACHE e' o que o emulador refaz sozinho (os sombreadores do PSP,
+# saves\PPSSPP\PSP\SYSTEM\CACHE -- achado da auditoria 3, Fase 0).
+FORA_DA_COPIA = {".netplay", "cache"}
+
+
+def arquivos_da_copia():
+    """(origem, caminho dentro da copia) de tudo o que a copia leva: a
+    configuracao do RetroArch (e' ela que guarda o mapeamento dos
+    controles), o banco, a configuracao e os controles do ARENA, e os saves
+    comuns (pequenos -- alguns KB -- e o que doi perder)."""
+    itens = []
+    origem_cfg = os.path.join(PASTA_RETROARCH, "retroarch.cfg")
+    if os.path.isfile(origem_cfg):
+        itens.append((origem_cfg, "retroarch.cfg"))
+    for nome in ARQUIVOS_DE_BACKUP:
+        origem = os.path.join(PASTA_DADOS, nome)
+        if os.path.isfile(origem):
+            itens.append((origem, nome))
+    if os.path.isdir(PASTA_SAVES):
+        for atual, pastas, arquivos in os.walk(PASTA_SAVES):
+            pastas[:] = sorted(p for p in pastas if p.lower() not in FORA_DA_COPIA)
+            for nome in sorted(arquivos):
+                origem = os.path.join(atual, nome)
+                itens.append((origem, os.path.join("saves", os.path.relpath(origem, PASTA_SAVES))))
+    return itens
+
+
+def ultima_copia():
+    """A pasta da copia de seguranca mais recente, ou None."""
+    try:
+        copias = sorted(d for d in os.listdir(PASTA_BACKUP)
+                        if os.path.isdir(os.path.join(PASTA_BACKUP, d)) and e_pasta_de_copia(d))
+    except OSError:
+        return None
+    return os.path.join(PASTA_BACKUP, copias[-1]) if copias else None
+
+
+def copia_igual(pasta_da_copia, itens):
+    """A copia guardada ja tem tudo o que uma nova levaria, igual?
+
+    Tamanho diferente: mudou. Mesmo tamanho e a mesma data (a copia guarda a
+    data do original): igual. Mesmo tamanho e data diferente: compara o
+    conteudo -- o save de cartucho tem SEMPRE o mesmo tamanho, e o FAT32
+    guarda a hora de 2 em 2 segundos (a copia pode ficar com outra hora sem
+    nada ter mudado). Os arquivos sao pequenos (KB)."""
+    import filecmp
+    if not pasta_da_copia or not itens:
+        return False
+    for origem, relativo in itens:
+        guardado = os.path.join(pasta_da_copia, relativo)
+        try:
+            atual, antes = os.stat(origem), os.stat(guardado)
+            if atual.st_size != antes.st_size:
+                return False
+            if atual.st_mtime_ns != antes.st_mtime_ns and not filecmp.cmp(origem, guardado, shallow=False):
+                return False
+        except OSError:
+            return False
+    return True
+
+
 def fazer_backup():
-    """Guarda banco, configuracao e saves comuns na pasta backup."""
+    """Guarda banco, configuracao e saves comuns na pasta backup.
+
+    So quando algo mudou desde a ultima copia. Achado da auditoria 3 (Fase
+    0): copias iguais umas as outras (uma a cada abertura, uma a cada volta
+    da internet) faziam o rodizio de 3 jogar fora as copias de momentos
+    diferentes. Nada mudou: devolve a ultima copia, que ja guarda tudo."""
     import shutil
     try:
         os.makedirs(PASTA_BACKUP, exist_ok=True)
+        itens = arquivos_da_copia()
+        anterior = ultima_copia()
+        if copia_igual(anterior, itens):
+            return anterior
         carimbo = time.strftime("%Y-%m-%d_%H%M%S")
         destino = os.path.join(PASTA_BACKUP, carimbo)
         os.makedirs(destino, exist_ok=True)
-
-        # A configuracao do RetroArch entra na copia: e ela que guarda o
-        # mapeamento dos controles.
-        origem_cfg = os.path.join(PASTA_RETROARCH, "retroarch.cfg")
-        if os.path.isfile(origem_cfg):
-            shutil.copy2(origem_cfg, os.path.join(destino, "retroarch.cfg"))
-
-        for nome in ARQUIVOS_DE_BACKUP:
-            origem = os.path.join(PASTA_DADOS, nome)
-            if os.path.isfile(origem):
-                shutil.copy2(origem, os.path.join(destino, nome))
-
-        # Saves comuns sao pequenos (alguns KB) e sao o que doi perder.
-        # Fica de fora o saves\.netplay: e' a pasta descartavel que o
-        # RetroArch usa so enquanto o aluno e' convidado numa partida (para
-        # o save do colega nao cobrir o dele) -- e vem somente leitura.
-        if os.path.isdir(PASTA_SAVES):
-            shutil.copytree(PASTA_SAVES, os.path.join(destino, "saves"),
-                            dirs_exist_ok=True,
-                            ignore=shutil.ignore_patterns(".netplay"))
+        for origem, relativo in itens:
+            alvo = os.path.join(destino, relativo)
+            os.makedirs(os.path.dirname(alvo), exist_ok=True)
+            shutil.copy2(origem, alvo)
 
         # Mantem so as copias mais recentes. Giram SO as pastas com nome de
         # data (o carimbo acima): o .zip do "Exportar" e as pastas avulsas
@@ -3184,12 +3241,11 @@ def gritar(pacote):
 # computador ja acontece nos testes).
 LIMITE_VIZINHOS = 200
 LIMITE_POR_ENDERECO = 4
-# Um ARENA grita uma vez a cada 5 s (uma por adaptador de rede). Mais de 10
-# gritos no mesmo segundo vindos do mesmo endereco e' enxurrada: o resto
-# daquele segundo e' ignorado sem nem ler o pacote.
-LIMITE_GRITOS_POR_SEGUNDO = 10
+# (Sem limite de gritos por segundo por endereco, de proposito: a revisao
+# de seguranca de 08/10/2026 mostrou que, com o endereco de origem
+# falsificado, alguem gastaria a cota de um colega de verdade e o faria
+# sumir da lista -- e contar o pacote custa quase o mesmo que le-lo.)
 _PODA_DOS_VIZINHOS = {"ultima": 0.0, "aviso": 0.0}
-_GRITOS_POR_ENDERECO = {}       # endereco -> [segundo, quantos gritos nele]
 
 
 def receber_grito(pacote, remetente, meus=None, agora=None):
@@ -3208,15 +3264,6 @@ def receber_grito(pacote, remetente, meus=None, agora=None):
     if not pacote.startswith(MARCA_DESCOBERTA):
         return False
     ip = str(remetente[0])
-    segundo = int(agora)
-    conta = _GRITOS_POR_ENDERECO.get(ip)
-    if conta is None or conta[0] != segundo:
-        if len(_GRITOS_POR_ENDERECO) > 4096:      # enderecos inventados: recomeca
-            _GRITOS_POR_ENDERECO.clear()
-        conta = _GRITOS_POR_ENDERECO[ip] = [segundo, 0]
-    conta[1] += 1
-    if conta[1] > LIMITE_GRITOS_POR_SEGUNDO:
-        return False
     try:
         dados = json.loads(pacote[len(MARCA_DESCOBERTA):].decode("utf-8"))
     except (ValueError, UnicodeDecodeError):
@@ -5315,11 +5362,14 @@ class Manipulador(BaseHTTPRequestHandler):
             return self.responder_json(dict(ok=True, **resultado))
 
         if caminho == "/api/backup":
+            anterior = ultima_copia()
             destino = fazer_backup()
             if not destino:
                 return self.erro("Não foi possível gravar a cópia.")
             return self.responder_json(
-                {"ok": True, "pasta": os.path.basename(destino)})
+                {"ok": True, "pasta": os.path.basename(destino),
+                 # Nada mudou desde a ultima: ela continua valendo (L3).
+                 "nada_mudou": bool(anterior) and os.path.normcase(destino) == os.path.normcase(anterior)})
 
         # ---- capa do jogo, buscada sob pedido -------------------------------
         if caminho == "/api/capa/atualizar":
@@ -6508,7 +6558,11 @@ def principal():
         print("  Reaberto sozinho depois de uma queda. A tela que ja estava")
         print("  aberta volta sozinha em poucos segundos.")
     elif os.environ.get("ARENA_SEM_JANELA") != "1":
-        threading.Timer(1.0, lambda: abrir_janela(local)).start()
+        # Sem espera: a porta ja escuta desde o Servidor(...) acima, e o
+        # pedido da janela fica na fila do Windows ate o serve_forever logo
+        # abaixo. Havia 1,0 s de espera fixa aqui, sem motivo registrado
+        # (auditoria 3, Fase 2: a abertura ficou 1 s mais curta).
+        threading.Thread(target=abrir_janela, args=(local,), daemon=True).start()
 
     try:
         with TRAVA_REDE:

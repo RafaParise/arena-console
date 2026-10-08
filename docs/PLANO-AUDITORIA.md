@@ -471,7 +471,7 @@ Comece só pela Fase 0.
 
 - [x] Fase 0 — Linha de base e inventário (07/10/2026) — rodada de referência 87 de 92 (as 5 falhas analisadas)
 - [x] Fase 1 — Varredura e limpeza (debloat) (08/10/2026) — C1 a C7, R1 a R5; bateria 232
-- [ ] Fase 2 — Leveza e desempenho
+- [x] Fase 2 — Leveza e desempenho (08/10/2026) — abertura 2,57→1,63 s; 8.264→72 KB por abertura; fundo animado 7,7→5,0% de um núcleo; bateria 246
 - [ ] Fase 3 — Servidor e API
 - [ ] Fase 4 — Jogar Junto
 - [ ] Fase 5 — Matriz de jogos

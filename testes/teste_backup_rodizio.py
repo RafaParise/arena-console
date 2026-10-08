@@ -79,10 +79,30 @@ def main():
             os.makedirs(os.path.join(arena.PASTA_BACKUP, avulsa))
             open(os.path.join(arena.PASTA_BACKUP, avulsa, "jogo.zip"), "wb").write(b"PK")
 
-        for _ in range(4):
+        # O aluno joga entre uma copia e outra: o save muda (desde a auditoria
+        # 3, Fase 2, sem mudanca nenhuma nao sai copia nova -- ver abaixo).
+        for n in range(4):
+            open(os.path.join(arena.PASTA_SAVES, "SwanStation", "CTR.srm"), "wb").write(b"save%d" % n * 100)
             arena.fazer_backup()
             time.sleep(1.05)      # o nome da copia e' a data com segundos
 
+        copias = sorted(d for d in os.listdir(arena.PASTA_BACKUP)
+                        if os.path.isdir(os.path.join(arena.PASTA_BACKUP, d)) and arena.e_pasta_de_copia(d))
+        # Auditoria 3, Fase 2: sem mudanca nenhuma, a copia de agora seria
+        # igual a ultima -- e o rodizio jogaria fora uma de outro momento.
+        ultima = os.path.join(arena.PASTA_BACKUP, copias[-1]) if copias else None
+        de_novo = arena.fazer_backup()
+        confere("sem mudanca nenhuma, nao sai copia nova (a ultima continua valendo)",
+                de_novo and os.path.normcase(de_novo) == os.path.normcase(ultima or ""), (de_novo, ultima))
+        cache = os.path.join(arena.PASTA_SAVES, "PPSSPP", "PSP", "SYSTEM", "CACHE")
+        os.makedirs(cache)
+        open(os.path.join(cache, "JOGO.vkshadercache"), "wb").write(b"c" * 50)
+        time.sleep(1.05)
+        com_cache = arena.fazer_backup()
+        confere("o cache do PSP nao entra na copia (o emulador refaz), e mudar so ele nao gera copia nova",
+                com_cache and os.path.normcase(com_cache) == os.path.normcase(ultima or "")
+                and not os.path.exists(os.path.join(com_cache, "saves", "PPSSPP", "PSP", "SYSTEM", "CACHE")),
+                (com_cache, ultima))
         copias = sorted(d for d in os.listdir(arena.PASTA_BACKUP)
                         if os.path.isdir(os.path.join(arena.PASTA_BACKUP, d)) and arena.e_pasta_de_copia(d))
         confere("sobram exatamente %d copias" % arena.COPIAS_MANTIDAS,

@@ -335,14 +335,20 @@ ampliado):
   novo espera vagar (quem some sai em 1 minuto);
 - um código que **já está no ar em outro endereço** não é tomado; o computador
   que mudou de endereço de verdade volta em até 1 minuto (e o de dois
-  adaptadores de rede para de trocar de endereço a cada grito);
-- mais de **10 gritos no mesmo segundo** do mesmo endereço: o resto do segundo
-  é ignorado sem ler o pacote (um ARENA grita 1 vez a cada 5 s).
+  adaptadores de rede para de trocar de endereço a cada grito).
 
-**Limite que fica (sem conserto possível sem senha):** a descoberta não tem
+Uma terceira proteção (no máximo 10 gritos por segundo por endereço) entrou e
+**saiu** no mesmo dia: a segunda revisão de segurança mostrou que, com o
+endereço de origem falsificado, alguém gastaria a cota de um colega de
+verdade e o faria sumir da lista — e contar o pacote custa quase o mesmo que
+lê-lo. Há um teste na bateria para isso não voltar.
+
+**Limites que ficam (sem conserto possível sem senha):** a descoberta não tem
 autenticação. Na mesma rede, alguém pode anunciar com o código de outro aluno
-**enquanto esse aluno está desligado**, e a lista mostraria o endereço errado.
-Vai para o roteiro de sala de segurança (Fase 3).
+**enquanto esse aluno está desligado** (e a lista mostraria o endereço
+errado), e uma enxurrada de pacotes na porta 55436 gasta processador (como em
+qualquer programa que escuta a rede). Vai para o roteiro de sala de segurança
+(Fase 3).
 
 ### Testes consertados (higiene)
 
@@ -381,3 +387,77 @@ abra o `ARENA.bat` — a tela abre, e a janela preta avisa "nao consegui criar a
 pasta backup". Os scripts da fase: `testes\teste_comecar_do_zero.py`,
 `testes\teste_descoberta_pacote_torto.py`, `testes\teste_descoberta_30_maquinas.py`
 e `testes\teste_multitap_regra_de_ouro.py`.
+
+---
+
+## Fase 2 — Leveza e desempenho (08/10/2026)
+
+Medido no Ryzen (a régua é o Celeron N5100: por núcleo, ele tem 43% do
+Ryzen, então 1 ponto daqui vale ~2,3 pontos lá — `docs\MAQUINA-ALVO.md`).
+Números brutos em `docs\auditoria3\` (`*_fase2_antes.json`,
+`*_fase2_depois.json`, `fundos_antes.json`, `fundos_depois.json`).
+
+### O que mudou, com número antes e depois
+
+| # | O quê | Antes | Depois | Como foi medido |
+|---|---|---|---|---|
+| L1 | **Abertura até a tela pronta** | 2,57 s (1,0 s era uma espera fixa antes de abrir a janela, sem motivo registrado: a porta já escutava) | **1,63 s** (−37%) | `testes\linha_base.py`, antes e depois |
+| L2 | **Gravação no disco a cada abertura** | 43 operações, **8.264 KB** (o teste de velocidade do disco gravava até 8 MB no pen drive a cada abertura) | 35 operações, **72 KB** (−99%): a medida do disco vale 7 dias para o mesmo computador e o mesmo disco (`dados\disco_medido.json`, até 64 computadores) | `testes\medir_gravacoes_parado.py 60 --abertura` |
+| L3 | **Cópia de segurança** | Uma cópia a cada chamada, mesmo sem nada mudado (o rodízio de 3 jogava fora as de outros momentos), com o cache de sombreadores do PSP junto | Só quando algo mudou (tamanho, data e, na dúvida, o conteúdo: o save de cartucho tem sempre o mesmo tamanho e o FAT32 guarda a hora de 2 em 2 s); sem `CACHE` e sem `.netplay`. O botão "Fazer cópia" diz quando nada mudou | `testes\teste_backup_rodizio.py` 12 de 12; 7 testes na bateria |
+| L4 | **Fundo animado** (tela parada, cópias isoladas) | **7,7%** de um núcleo (média de 6 amostras): 30 quadros/s, acordando a cada quadro da tela (`requestAnimationFrame`, 60 por segundo) | **5,0%** (−35%): 20 quadros/s por relógio (`setTimeout`), sem desenhar com a janela escondida. No Celeron: de ~18% para ~11,5% de um núcleo, só com o menu aberto | `testes\medir_fundos.py --variante=...` |
+| — | A tela parada com a configuração do Rafael (fundo "Sempre", a lista de jogos de verdade) | 9,35% | **7,64%** | `testes\linha_base.py` |
+
+**As variantes do fundo** (% de um núcleo, claro Automático / escuro Sempre):
+
+| Variante | Amostras | Média |
+|---|---|---|
+| Como era: 30 quadros, `requestAnimationFrame` | 6 | 7,72% |
+| 30 quadros por relógio | 2 | 9,56% — **pior** (por isso não 30) |
+| 20 quadros, `requestAnimationFrame` | 6 | 6,03% |
+| **20 quadros por relógio (escolhida)** | 6 | **4,99%** |
+
+Os casos "parado" (Automático com o Windows pedindo menos movimento, modo
+modesto, "Parado") deram de 0,3% a 2,2% nas medidas de depois, mais que
+antes (0,3% a 0,45%) — mas a segunda repetição pegou a janela **escondida**
+num dos casos (o computador estava em uso, com outra janela por cima), e o
+que decide é o `testes\teste_fundos_animados.py`: "parado não gasta
+processador (0,1 ms de script em 4 s)", 29 de 29 com o código novo. No
+parado nenhum laço roda (antes e depois).
+
+### Conferido, sem mudança
+
+| Item | Resultado |
+|---|---|
+| Processador com o servidor parado | 0,03% de um núcleo (nada a fazer) |
+| Registros (logs) | O do RetroArch gira (ficam 10); o de quedas tem teto (128 KB, com rodízio); os de tempo de jogo (`.lrtl`) têm 130 bytes por jogo |
+| CSS sem uso | 29 classes parecem sem uso, mas todas são montadas por pedaço no JavaScript (8 prefixos: `midia--`, `jogo--`, `sinal--`, `capa-`...). Nenhuma sai |
+| JavaScript sem uso | Nenhuma função definida e nunca chamada (`app.js` e os fundos) |
+| `id` da tela sem uso | 14: 11 são alvo de `aria-labelledby`/`aria-describedby` (acessibilidade) e 3 são inofensivos (elementos com classe própria). Ficam |
+| Imagens da tela | Nenhuma: a tela tem 6 arquivos, 340 KB ao todo (`app.js` 169 KB) |
+| **Estresse do catálogo** | 5.000 jogos falsos em 3 consoles: **5.125 jogos indexados em 7,07 s** (0,14 s por 100 jogos; o teto do notebook-alvo é 1,9 s por 100), releitura pelo cache em 0,05 s, tudo apagado no fim. A auditoria 1 deu 1,48 s: o indexador cresceu (capas, nomes de fliperama, BIOS, aviso de disco na pasta errada). Se a tela continua respondendo durante a indexação: Fase 3 (concorrência) |
+| Fundos no computador fraco | No Automático, o fundo para sozinho com o modo modesto ou com o Windows pedindo menos animação (o "Sempre" é escolha do aluno e anima mesmo assim) |
+| Orçamentos no modo alvo | Nenhum estourou. Uma passada deu 8,3% de variação dos quadros do SNES (teto 5%); repetida em seguida, **2,99%** e 60,0 FPS: interferência do momento (rodou logo depois do teste dos fundos, de madrugada), não da mudança — a medida do SNES usa as opções do ARENA, que a Fase 2 não toca |
+
+### Também nesta fase
+
+- **Segunda revisão de segurança da descoberta** (ver Fase 1, C5): o limite de
+  10 gritos por segundo por endereço saiu.
+- **Guias:** o guia 1 tinha 4 frases com a referência faltando desde a base
+  de setembro ("pule para o deste documento", "veja o **neste mesmo
+  documento**") e o guia 5, uma; o LEIA-ME mostrava `jogos\\pessoais` com
+  barra dupla (17 trechos de código); o LEIA-ME e o guia 2 falavam em 47
+  pastas de console (são 52).
+
+### Resultado da Fase 2
+
+| | |
+|---|---|
+| Bateria | **246**, todos passando |
+| Testes da área (`rodada_final.py`: fundos, rodízio, Começar do zero, orçamentos, estresse, pasta movida, somente leitura, arquivos corrompidos, servidor que cai, fase 7) | 11 de 11 (as 2 falhas da primeira passada: o rodízio — defeito real do L3, consertado — e a variação do SNES, repetida e normal) |
+
+**Como testar (o professor):** abra o `ARENA.bat` — a tela aparece cerca de
+1 segundo mais cedo. Abra e feche o ARENA duas vezes e confira a pasta
+`backup`: nenhuma cópia nova nasce só por abrir. Jogue, salve, feche o
+jogo: aí sim nasce uma cópia (e só uma, se nada mudou depois). No tema
+escuro com o fundo animado, o céu continua se mexendo (20 quadros por
+segundo).

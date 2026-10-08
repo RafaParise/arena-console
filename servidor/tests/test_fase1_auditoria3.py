@@ -172,7 +172,6 @@ class TestReceberGrito(unittest.TestCase):
             self.guardados = dict(arena.VIZINHOS)
             arena.VIZINHOS.clear()
         arena._PODA_DOS_VIZINHOS["ultima"] = 0.0
-        arena._GRITOS_POR_ENDERECO.clear()
 
     def tearDown(self):
         with arena.TRAVA_VIZINHOS:
@@ -240,11 +239,15 @@ class TestReceberGrito(unittest.TestCase):
                                    ip="192.168.0.66", agora=1061.0))
         self.assertEqual(arena.VIZINHOS["lucas-1"]["ip"], "192.168.0.66")
 
-    def test_enxurrada_de_um_endereco_e_cortada_no_segundo(self):
-        aceitos = sum(self.grito({"id": "rapido", "porta": 8777}, agora=2000.0 + n / 1000) for n in range(50))
-        self.assertEqual(aceitos, arena.LIMITE_GRITOS_POR_SEGUNDO)
-        # No segundo seguinte, volta a ouvir.
-        self.assertTrue(self.grito({"id": "rapido", "porta": 8777}, agora=2001.2))
+    def test_enxurrada_com_o_endereco_do_colega_nao_o_tira_da_lista(self):
+        # Revisao de seguranca (08/10/2026): um limite de gritos por segundo
+        # por endereco deixaria alguem, com o endereco do colega falsificado,
+        # gastar a cota dele. Sem esse limite, o colega sempre se renova.
+        self.grito({"id": "colega", "porta": 8777}, ip="192.168.0.77", agora=2000.0)
+        for n in range(500):
+            self.grito({"id": "falso-%d" % n, "porta": 8777}, ip="192.168.0.77", agora=2000.1 + n / 10000)
+        self.assertTrue(self.grito({"id": "colega", "porta": 8777}, ip="192.168.0.77", agora=2000.2))
+        self.assertIn("colega", arena.VIZINHOS)
 
     def test_quem_sumiu_ha_mais_de_um_minuto_sai(self):
         self.grito({"id": "velho", "porta": 8777}, agora=100.0)
