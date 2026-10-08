@@ -3184,7 +3184,12 @@ def gritar(pacote):
 # computador ja acontece nos testes).
 LIMITE_VIZINHOS = 200
 LIMITE_POR_ENDERECO = 4
+# Um ARENA grita uma vez a cada 5 s (uma por adaptador de rede). Mais de 10
+# gritos no mesmo segundo vindos do mesmo endereco e' enxurrada: o resto
+# daquele segundo e' ignorado sem nem ler o pacote.
+LIMITE_GRITOS_POR_SEGUNDO = 10
 _PODA_DOS_VIZINHOS = {"ultima": 0.0, "aviso": 0.0}
+_GRITOS_POR_ENDERECO = {}       # endereco -> [segundo, quantos gritos nele]
 
 
 def receber_grito(pacote, remetente, meus=None, agora=None):
@@ -3195,10 +3200,22 @@ def receber_grito(pacote, remetente, meus=None, agora=None):
     auditoria 3 (07/10/2026): um pacote torto -- um JSON que nao e'
     objeto, ou "porta": "abc" -- levantava erro fora do try e MATAVA a
     linha que escuta: a descoberta de colegas acabava ate fechar o ARENA.
-    E a lista nao tinha teto. Agora tudo o que chega e' conferido.
+    E a lista nao tinha teto. Agora tudo o que chega e' conferido, e uma
+    enxurrada (de um computador, ou com enderecos inventados) nao tira da
+    lista os colegas que ja estao nela.
     """
     agora = time.monotonic() if agora is None else agora
     if not pacote.startswith(MARCA_DESCOBERTA):
+        return False
+    ip = str(remetente[0])
+    segundo = int(agora)
+    conta = _GRITOS_POR_ENDERECO.get(ip)
+    if conta is None or conta[0] != segundo:
+        if len(_GRITOS_POR_ENDERECO) > 4096:      # enderecos inventados: recomeca
+            _GRITOS_POR_ENDERECO.clear()
+        conta = _GRITOS_POR_ENDERECO[ip] = [segundo, 0]
+    conta[1] += 1
+    if conta[1] > LIMITE_GRITOS_POR_SEGUNDO:
         return False
     try:
         dados = json.loads(pacote[len(MARCA_DESCOBERTA):].decode("utf-8"))
@@ -3220,7 +3237,6 @@ def receber_grito(pacote, remetente, meus=None, agora=None):
         return False
     if not 1 <= porta_dele <= 65535:
         return False
-    ip = str(remetente[0])
     # "Sou eu?" nao da para responder pelo codigo: em laboratorio com
     # maquinas clonadas o codigo pode se repetir, e ai o ARENA ignoraria o
     # colega achando que e o proprio eco. Quem responde e o par
@@ -3236,12 +3252,22 @@ def receber_grito(pacote, remetente, meus=None, agora=None):
             _PODA_DOS_VIZINHOS["ultima"] = agora
             for chave in [k for k, v in VIZINHOS.items() if agora - v["visto_em"] > 60]:
                 VIZINHOS.pop(chave, None)
-        if identificacao not in VIZINHOS:
-            do_mesmo = [k for k, v in VIZINHOS.items() if v["ip"] == ip]
-            if len(do_mesmo) >= LIMITE_POR_ENDERECO:
-                VIZINHOS.pop(min(do_mesmo, key=lambda k: VIZINHOS[k]["visto_em"]), None)
-            elif len(VIZINHOS) >= LIMITE_VIZINHOS:
-                VIZINHOS.pop(min(VIZINHOS, key=lambda k: VIZINHOS[k]["visto_em"]), None)
+        atual = VIZINHOS.get(identificacao)
+        if atual is None:
+            # Lista cheia (no total, ou deste endereco): quem ja esta fica, e
+            # o novo espera vagar (quem some sai em 1 minuto). A primeira
+            # versao tirava o mais antigo -- e uma enxurrada de codigos
+            # inventados empurrava para fora os colegas de verdade.
+            do_mesmo = sum(1 for v in VIZINHOS.values() if v["ip"] == ip)
+            if do_mesmo >= LIMITE_POR_ENDERECO or len(VIZINHOS) >= LIMITE_VIZINHOS:
+                return False
+        elif atual["ip"] != ip and agora - atual["visto_em"] <= 60:
+            # O codigo ja esta no ar em outro endereco: quem chega com o
+            # codigo de outro nao toma o lugar dele. O computador que mudou
+            # de endereco de verdade volta em ate 1 minuto, quando o
+            # endereco antigo some (e o de dois adaptadores de rede para de
+            # trocar de endereco a cada grito).
+            return False
         VIZINHOS[identificacao] = {
             "id": identificacao,
             "apelido": limpar_apelido(dados.get("apelido", "")),

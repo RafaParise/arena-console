@@ -172,6 +172,7 @@ class TestReceberGrito(unittest.TestCase):
             self.guardados = dict(arena.VIZINHOS)
             arena.VIZINHOS.clear()
         arena._PODA_DOS_VIZINHOS["ultima"] = 0.0
+        arena._GRITOS_POR_ENDERECO.clear()
 
     def tearDown(self):
         with arena.TRAVA_VIZINHOS:
@@ -214,6 +215,36 @@ class TestReceberGrito(unittest.TestCase):
             self.grito({"id": "c%d" % n, "porta": 8777}, ip="10.0.%d.%d" % (n // 250, n % 250 + 1),
                        agora=1000.0 + n / 1000)
         self.assertLessEqual(len(arena.VIZINHOS), arena.LIMITE_VIZINHOS)
+
+    def test_lista_cheia_nao_tira_quem_ja_esta(self):
+        # Revisao de seguranca (08/10/2026): a primeira versao tirava o mais
+        # antigo para dar lugar ao novo -- enderecos inventados empurravam os
+        # colegas de verdade para fora da lista.
+        self.grito({"id": "colega-de-verdade", "porta": 8777}, ip="192.168.0.77", agora=1000.0)
+        for n in range(arena.LIMITE_VIZINHOS + 50):
+            self.grito({"id": "inventado-%d" % n, "porta": 8777}, ip="10.1.%d.%d" % (n // 250, n % 250 + 1),
+                       agora=1000.0 + n / 1000)
+        self.assertIn("colega-de-verdade", arena.VIZINHOS)
+        self.assertLessEqual(len(arena.VIZINHOS), arena.LIMITE_VIZINHOS)
+        # E o colega de verdade continua se renovando com a lista cheia.
+        self.assertTrue(self.grito({"id": "colega-de-verdade", "porta": 8777}, ip="192.168.0.77", agora=1005.0))
+
+    def test_codigo_no_ar_nao_e_tomado_por_outro_endereco(self):
+        self.grito({"id": "lucas-1", "apelido": "Lucas", "porta": 8777}, ip="192.168.0.50", agora=1000.0)
+        self.assertFalse(self.grito({"id": "lucas-1", "apelido": "Falso", "porta": 8777},
+                                    ip="192.168.0.66", agora=1010.0))
+        self.assertEqual(arena.VIZINHOS["lucas-1"]["ip"], "192.168.0.50")
+        # O computador que mudou de endereco de verdade: depois de 1 minuto sem
+        # o endereco antigo, o novo vale.
+        self.assertTrue(self.grito({"id": "lucas-1", "apelido": "Lucas", "porta": 8777},
+                                   ip="192.168.0.66", agora=1061.0))
+        self.assertEqual(arena.VIZINHOS["lucas-1"]["ip"], "192.168.0.66")
+
+    def test_enxurrada_de_um_endereco_e_cortada_no_segundo(self):
+        aceitos = sum(self.grito({"id": "rapido", "porta": 8777}, agora=2000.0 + n / 1000) for n in range(50))
+        self.assertEqual(aceitos, arena.LIMITE_GRITOS_POR_SEGUNDO)
+        # No segundo seguinte, volta a ouvir.
+        self.assertTrue(self.grito({"id": "rapido", "porta": 8777}, agora=2001.2))
 
     def test_quem_sumiu_ha_mais_de_um_minuto_sai(self):
         self.grito({"id": "velho", "porta": 8777}, agora=100.0)

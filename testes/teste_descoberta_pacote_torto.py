@@ -51,9 +51,12 @@ def marca_de_verdade():
     return MARCA
 
 
-def gritar(marca, dados):
+def gritar(marca, dados, de="127.0.0.1"):
+    """Manda um grito saindo do endereco `de` (o Windows aceita qualquer
+    127.x.y.z como "este computador": cada um faz as vezes de um colega)."""
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
+        s.bind((de, 0))
         corpo = dados if isinstance(dados, bytes) else json.dumps(dados).encode("utf-8")
         s.sendto(marca + corpo, ("127.0.0.1", PORTA_UDP))
     finally:
@@ -129,7 +132,11 @@ def main():
             vistos = ids_na_lista(porta)
             inventados = [i for i in vistos if i.startswith("inventado")]
             confere("a lista nao encheu (no maximo 4 deste endereco)", len(inventados) <= 4, len(inventados))
-            gritar(marca, {"id": "colega-final", "apelido": "Final", "porta": 9003})
+            confere("e os colegas que ja estavam continuam", {"colega-antes", "colega-depois"} <= vistos,
+                    sorted(vistos))
+            # O colega novo chega de OUTRO computador (o endereco da enxurrada
+            # ficou com a cota cheia de proposito).
+            gritar(marca, {"id": "colega-final", "apelido": "Final", "porta": 9003}, de="127.0.0.2")
             time.sleep(1.5)
             confere("e um colega novo ainda entra", "colega-final" in ids_na_lista(porta))
         finally:

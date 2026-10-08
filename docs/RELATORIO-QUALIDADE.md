@@ -324,6 +324,26 @@ muitos jogos de uma vez").
 | C6 | **Achado no caminho:** um ARQUIVO com o nome de uma pasta do ARENA (`backup`, `saves`, `dados`...) derrubava o ARENA na abertura, com o erro cru do Windows, antes de a tela abrir | Reproduzido ao portar o teste da cópia que falha: `FileExistsError` em `os.makedirs` de `arena.principal()` | A pasta que não dá para criar vira aviso na janela preta ("renomeie o arquivo e abra o ARENA de novo") e o ARENA abre; quem precisa da pasta explica depois (a cópia de segurança diz "Nada foi apagado") |
 | C7 | **Achado no caminho:** a foto do perfil antiga era apagada ANTES de a nova estar gravada (pen drive cheio = aluno sem foto nenhuma); e um temporário de gravação interrompida (`foto.png.1234.tmp`) podia ser servido como se fosse a foto | Leitura do código ao portar o `teste_perfil_foto`; os dois casos reproduzidos na bateria (`TestFotoDoPerfil`) | A antiga só sai depois que a nova está inteira no lugar; a foto é procurada só pelos nomes certos (`foto.png`, `foto.jpg`, `foto.webp`) |
 
+**Revisão de segurança do C5 (08/10/2026, depois do commit da fase).** Um
+revisor automático de segurança apontou "negação de serviço / limite
+contornável" na descoberta. Conferido: a primeira versão do C5, com a lista
+cheia, **tirava o colega mais antigo** para dar lugar ao novo — e gritos com
+endereços inventados empurrariam para fora os colegas de verdade. Endurecido
+(commit próprio, com 3 testes novos na bateria e o `teste_descoberta_pacote_torto`
+ampliado):
+- lista cheia (200 no total ou 4 do mesmo endereço): **quem já está fica**, e o
+  novo espera vagar (quem some sai em 1 minuto);
+- um código que **já está no ar em outro endereço** não é tomado; o computador
+  que mudou de endereço de verdade volta em até 1 minuto (e o de dois
+  adaptadores de rede para de trocar de endereço a cada grito);
+- mais de **10 gritos no mesmo segundo** do mesmo endereço: o resto do segundo
+  é ignorado sem ler o pacote (um ARENA grita 1 vez a cada 5 s).
+
+**Limite que fica (sem conserto possível sem senha):** a descoberta não tem
+autenticação. Na mesma rede, alguém pode anunciar com o código de outro aluno
+**enquanto esse aluno está desligado**, e a lista mostraria o endereço errado.
+Vai para o roteiro de sala de segurança (Fase 3).
+
 ### Testes consertados (higiene)
 
 | Teste | O que estava errado | Conserto |
