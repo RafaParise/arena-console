@@ -156,7 +156,7 @@ sem áudio e sem sair do computador.
 | **Fechar** | Fecha o painel lateral. A tecla `Esc` faz o mesmo |
 | **Cancelar** | Sai da janelinha sem salvar nada |
 | **Mostrar mais** | A lista carrega 200 jogos por vez. Clique para ver os próximos |
-| **Criar pastas dos consoles** | Cria as 47 pastas em `jogos\\pessoais` |
+| **Criar pastas dos consoles** | Cria as 52 pastas em `jogos\pessoais` |
 | **Atualizar lista** | Relê as pastas depois que você mexeu nos arquivos |
 
 ---
@@ -184,7 +184,7 @@ sem áudio e sem sair do computador.
 
 ## Três regras
 
-**1. Não passe jogo comercial para os colegas.** A pasta `jogos\\pessoais` é
+**1. Não passe jogo comercial para os colegas.** A pasta `jogos\pessoais` é
 sua e fica no seu pen drive.
 
 **2. Use apelido, nunca seu nome completo.**
@@ -201,24 +201,24 @@ Está tudo aqui dentro, comentado em português.
 
 | Arquivo | O que faz |
 |---|---|
-| `servidor\\indexador.py` | Procura os jogos nas pastas |
-| `servidor\\hardware.py` | Descobre como é o seu computador |
-| `servidor\\arena.py` | O servidor, o banco e a conversa com os amigos |
-| `servidor\\cheats.py` | Os saves e os códigos |
-| `servidor\\graficos.py` | Imagem, BIOS, memory card e partida a dois |
-| `servidor\\bios.py` | A pasta BIOS: reconhece cada BIOS e põe onde o emulador procura |
-| `servidor\\bios_catalogo.py` | Todas as BIOS que os consoles do ARENA usam |
-| `servidor\\controles.py` | Mapeamento de teclas e botões |
-| `servidor\\perfis_controle.json` | O que cada controle e cada console têm |
-| `servidor\\recursos.json` | Os 50 recursos da aba Avançado |
-| `servidor\\graficos.json` | Ajuste fino de imagem de cada emulador |
-| `launcher\\` | A tela que você está usando |
+| `servidor\indexador.py` | Procura os jogos nas pastas |
+| `servidor\hardware.py` | Descobre como é o seu computador |
+| `servidor\arena.py` | O servidor, o banco e a conversa com os amigos |
+| `servidor\cheats.py` | Os saves e os códigos |
+| `servidor\graficos.py` | Imagem, BIOS, memory card e partida a dois |
+| `servidor\bios.py` | A pasta BIOS: reconhece cada BIOS e põe onde o emulador procura |
+| `servidor\bios_catalogo.py` | Todas as BIOS que os consoles do ARENA usam |
+| `servidor\controles.py` | Mapeamento de teclas e botões |
+| `servidor\perfis_controle.json` | O que cada controle e cada console têm |
+| `servidor\recursos.json` | Os 50 recursos da aba Avançado |
+| `servidor\graficos.json` | Ajuste fino de imagem de cada emulador |
+| `launcher\` | A tela que você está usando |
 
 Comece por aqui, do mais fácil para o mais difícil:
 
-1. `launcher\\estilo.css` — as cores estão todas no topo. Mude uma e recarregue.
-2. `servidor\\consoles.json` — acrescente uma extensão e veja a lista mudar.
-3. `servidor\\indexador.py`, na função `limpar_titulo` — mude como o nome do
+1. `launcher\estilo.css` — as cores estão todas no topo. Mude uma e recarregue.
+2. `servidor\consoles.json` — acrescente uma extensão e veja a lista mudar.
+3. `servidor\indexador.py`, na função `limpar_titulo` — mude como o nome do
    jogo aparece.
 
 Se estragar tudo, é só copiar a pasta original de novo.

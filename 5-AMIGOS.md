@@ -367,7 +367,7 @@ versão americana e o outro a japonesa, a partida nem começa.
 Pela rede não passa vídeo nem som, só *"o jogador 2 apertou soco"*. Por isso
 funciona bem até em cabo direto entre dois computadores fracos.
 
-Detalhes no **neste mesmo documento**.
+Detalhes na **Parte B — Jogar a dois e assistir**, mais abaixo neste documento.
 
 ---
 

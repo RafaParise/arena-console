@@ -13,8 +13,8 @@ Preparar a mídia e montar o ARENA. Faça uma vez; depois é copiar e colar.
 
 Faça isto antes de instalar o ARENA. Cinco minutos.
 
-Se você vai usar o ARENA só no disco `C:` do computador, **pule para o
-deste documento**. Nada aqui é obrigatório.
+Se você vai usar o ARENA só no disco `C:` do computador, **pule para a
+Parte B** deste documento. Nada aqui é obrigatório.
 
 ---
 
@@ -93,7 +93,7 @@ problema com nome de arquivo comprido, que ainda existe no Windows.
 
 ### Passo 4 — Instalar
 
-Continue no **deste documento — Instalação**.
+Continue na **Parte B — Instalação**, logo abaixo.
 
 ---
 
@@ -169,7 +169,7 @@ Crie `C:\ARENA` e copie tudo deste pacote para dentro.
 Monte primeiro no disco `C:`. É mais rápido para montar e testar. Só depois
 copie para o pen drive ou o SSD.
 
-Se você já preparou a mídia pelo **neste mesmo documento**, pode montar direto nela.
+Se você já preparou a mídia pela **Parte A** deste documento, pode montar direto nela.
 
 ---
 
@@ -276,7 +276,7 @@ Dois cliques em **`ARENA.bat`**. A janela preta deve mostrar:
 ```
 
 O navegador abre no ARENA. A lista fica vazia — está certo, ainda não há
-jogos. Para adicionar, veja o **neste mesmo documento**.
+jogos. Para adicionar, veja o **documento 2** (`2-JOGOS.md`).
 
 **Se aparecer `[ERRO] O Python nao foi encontrado`:** volte ao passo 2.
 
@@ -284,7 +284,7 @@ jogos. Para adicionar, veja o **neste mesmo documento**.
 
 ### Passo 6 — Copiar para o pen drive ou SSD
 
-A mídia precisa estar em exFAT — veja o **neste mesmo documento**.
+A mídia precisa estar em exFAT — veja a **Parte A**, passo 2, deste documento.
 
 1. Formate a mídia em **exFAT**. Aceita arquivo maior que 4 GB e é lida em
    qualquer computador. NTFS funciona, mas cria permissões que atrapalham

@@ -472,7 +472,7 @@ desta versão.
 No ARENA, clique em **Criar pastas dos consoles**, embaixo da lista à
 esquerda.
 
-Ele cria as 47 pastas dentro de `jogos\pessoais`:
+Ele cria as 52 pastas dentro de `jogos\pessoais` (uma por console):
 
 ```
 ARENA\jogos\pessoais\PS1\
