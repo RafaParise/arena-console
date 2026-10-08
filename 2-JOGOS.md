@@ -140,6 +140,17 @@ No ARENA, clique em **Atualizar lista**, no canto inferior esquerdo.
 Pronto. O ARENA olha o final do nome do arquivo e descobre sozinho de qual
 console ele é.
 
+**Para o professor — conferir muitos jogos de uma vez.** Antes de levar jogo
+novo para a sala, dá para ver a lista inteira, console por console, com o
+nome que o ARENA vai mostrar, o arquivo e quantos jogadores ele aceita:
+
+```
+servidor\python\python.exe ferramentas\inventario_jogos.py
+```
+
+Serve para pegar cedo um jogo na pasta do console errado ou uma trilha de CD
+aparecendo como se fosse um jogo sozinho.
+
 ---
 
 ### Colocar um jogo seu: console por console

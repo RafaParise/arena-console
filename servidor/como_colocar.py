@@ -174,19 +174,6 @@ CONSOLES = {
 LEGENDA_ZIP = {"pode": "Pode ser .zip", "nao": "Não pode ser .zip", "obrigatorio": "Tem que ser .zip"}
 
 
-def _tem(pasta_sistema, relativo):
-    """O arquivo (ou pasta) de BIOS existe em retroarch\\system? Sem
-    diferenca de maiuscula e minuscula, como o Windows."""
-    caminho = os.path.join(pasta_sistema, *relativo.split("/"))
-    if os.path.exists(caminho):
-        return True
-    pasta, nome = os.path.split(caminho)
-    try:
-        return nome.lower() in {n.lower() for n in os.listdir(pasta)}
-    except OSError:
-        return False
-
-
 def guia(plataformas, pasta_sistema, pasta_jogos, falta_externo=None):
     """O guia de cada console, na ordem do consoles.json.
 

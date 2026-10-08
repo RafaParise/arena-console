@@ -280,11 +280,37 @@ removido sem a prova") vale item a item.
 | R2 | `como_colocar._tem()` (`como_colocar.py:177`) | Nenhuma chamada desde que a BIOS passou para `bios.py` (03/10) | Nada |
 | R3 | Ferramentas de uso único que já rodaram ("Roda uma vez só" no próprio arquivo) e que ninguém cita fora dos relatórios: `aplicar_protege_cfg.py`, `corrigir_chaves_graficos.py`, `montar_relatorio_aud2.py`, `trocar_testdb.py`; e `limpar_retroarch_cfg.py` (o montador tem a sua própria `limpar_retroarch_cfg`) | Nenhuma é importada nem chamada por `.bat`; ficam no histórico do git | Nada |
 | R4 | `emuladores\Xenia\Xenia\xenia-canary.config.toml.11580.tmp` | Temporário do `gravar_atomico` (o número é o da thread) de 26/09 21:00 que nunca virou o arquivo final; a configuração de verdade é de 21:02 e está inteira | Nada |
-| R5 | Os testes antigos de `ferramentas\teste_*.py` (20), que a rodada não roda | Rodar todos: os que passam e cobrem o que `testes\` não cobre (rede do Xbox 360, amigo que muda de IP, cópia que falha e cancela o apagamento, `netplay_check_frames`, núcleos com e sem Jogar Junto, rede do PS2) vão para `testes\` e entram na rodada; os repetidos ou que não rodam mais saem | Nada (a cobertura só aumenta) |
+| R5 | Os testes antigos de `ferramentas\teste_*.py` (20), que a rodada não roda | Cada um, abaixo: o que só ele conferia veio para a bateria ou para `testes\` (numa cópia isolada, sem tocar no ARENA de verdade); o resto já era conferido por outro teste | Nada (a cobertura só aumenta) |
 
+**R5, um por um** (todos subiam o servidor na porta 8777 da pasta de
+verdade ou mexiam em dado real; os de Jogar Junto deixavam sessões
+"hospedeiro" no `arena.db` do professor — a origem do
+`ferramentas\limpar_registros_de_teste.py`):
+
+| Teste antigo | Onde o que ele conferia está agora |
+|---|---|
+| `teste_amigo_ip_muda` | bateria, `test_portados_auditoria3.TestAmigoQueMudouDeIp` (3 testes) |
+| `teste_controle_neogeo` | bateria, `TestControleDoNeoGeo` |
+| `teste_netplay_xbox360` | bateria, `TestSystemlinkXbox360` (2) |
+| `teste_rede_ps2_gt4` | bateria, `TestRedePs2` (2) |
+| `teste_rodizio_logs` | bateria, `TestRodizioDosRegistros` |
+| `teste_perfil_foto` | bateria, `TestFotoDoPerfil` (6; trouxe o achado C7) |
+| `teste_backup_falha_cancela_apagamento` | `testes\teste_comecar_do_zero.py` (8 checagens, cópia isolada, porta livre; trouxe o achado C6) |
+| `teste_biblioteca_online` | `testes\teste_biblioteca_busca.py` e `teste_internet_archive_download.py` |
+| `teste_capa_online` (o que apagava as capas de verdade) | `testes\teste_capas_todos_os_consoles.py`, parte 6 (capa baixada de verdade) |
+| `teste_correcao_caminhos` | `testes\teste_caminho_fora_no_cfg.py`, `teste_cfg_sem_linha_repetida.py` e `ferramentas\teste_aceite_pasta_movida.py` |
+| `teste_netplay_megadrive`, `_neogeo`, `_ps1`, `teste_pcsx_rearmed_basico` | `testes\teste_abrir_todos.py`: hospeda e conecta CADA jogo do RetroArch (47 conectaram na rodada), o PS1 com o PCSX ReARMed |
+| `teste_netplay_suporte_nucleos` | `teste_abrir_todos.py` (os 25 "núcleo sem rede") e `consoles.json` (`netplay: false` com o motivo) |
+| `teste_netplay_check_frames` | Investigação de 21/09 (a decisão está no CLAUDE.md); o valor (`0` no PCSX ReARMed) é conferido pelo `teste_multitap_regra_de_ouro`, que compara o arquivo da partida de cada jogo |
+| `teste_memory_card_ps1` | Investigação do limite conhecido (o cartão de quem hospeda não vai para o convidado), registrada no CLAUDE.md; a partida inteira até salvar fica no roteiro de sala (Fase 5) |
+| `teste_pcsx2_completo`, `teste_qualidade_pcsx2` | `testes\teste_pcsx2_inicia.py`, `teste_pcsx2_seguro.py`, `teste_pcsx2_placa.py`, `teste_abaixo_do_original.py` (PCSX2 de verdade) |
+| `teste_rpcn` | bateria, `test_graficos_acervo.test_rpcn_segue_a_chave_nos_dois_sentidos` |
+
+Fica em `ferramentas\` só o `teste_aceite_pasta_movida.py` (a rodada o roda).
 `ferramentas\acentuar_textos.py` fica até a Fase 7 (serve para o
 `recursos.json`). `ferramentas\inventario_jogos.py` (útil, ninguém citava)
-fica e passa a ser citado no `2-JOGOS.md`.
+fica e passou a ser citado no `2-JOGOS.md` ("Para o professor — conferir
+muitos jogos de uma vez").
 
 ### Correções
 
@@ -293,5 +319,45 @@ fica e passa a ser citado no `2-JOGOS.md`.
 | C1 | Toda abertura faz uma cópia em `backup\` e, com o rodízio de 3, três aberturas apagam as cópias anteriores | Visto na Fase 0: `backup\2026-10-07_204120`, `_205024`, `_205356` nasceram 20–25 s depois de cada abertura das medições, e as de 05/10 sumiram. Causa: `VIGIA["internet_estava_fora"]` começa `True` (`arena.py:3747`) e a primeira checagem com internet conta como "voltou" (`arena.py:3811`) | Começa "não sei" (`None`): só conta como "voltou" depois de ter estado fora de verdade |
 | C2 | Importar o pacote de progresso grava o save direto no nome final (`arena.py:2908`): se cair no meio, fica um save cortado, e a próxima importação o pula ("já existe") | Leitura do código | Temporário ao lado + `os.replace` |
 | C3 | Quando a configuração do PCSX2, do Dolphin, do Xenia ou do RPCS3 não grava (pasta somente leitura, disco cheio), o emulador abre com a configuração velha (controle, qualidade) e ninguém fica sabendo por quê | `graficos.escrever_config_*` devolve `None` e `arena.py:2381/2437/2449` só fala quando dá certo | Aviso na janela preta dizendo o que não gravou e por quê |
-| C4 | Opção avançada com nota mínima que a máquina não alcança volta a valer quando o pen drive vem de um PC mais forte: a "Resposta instantânea" ligada num i5 religa no Celeron por cima da trava da `arena.py:1484` | `arena.py:1486` aplica `config["avancado"]` inteiro depois da trava; a tela só esconde a opção (`arena.py:999`) | As opções avançadas acima da nota desta máquina não entram (vale para as 9 com `nota_minima`) |
-| C5 | Descoberta de colegas: um pacote UDP torto (porta que não é número, JSON que não é objeto) derruba a linha que escuta a 55436, e a lista de vizinhos não tem limite (pacotes com códigos inventados a enchem) | `int(dados.get("porta") ...)` fora do `try` em `anunciar_e_escutar`; poda só por tempo (60 s). A confirmar reproduzindo | Função separada que trata o pacote (testável), tudo o que vem da rede conferido, limite de vizinhos e poda no máximo uma vez por segundo |
+| C4 | Opção avançada com nota mínima que a máquina não alcança volta a valer quando o pen drive vem de um PC mais forte: a "Resposta instantânea" ligada num i5 religa no Celeron por cima da trava da `arena.py:1484` | `arena.py:1486` aplica `config["avancado"]` inteiro depois da trava; a tela só esconde a opção (`arena.py:999`) | As opções avançadas acima da nota desta máquina voltam ao padrão do ARENA (`AVANCADO_PADRAO`, sempre o desligado) e, as que não têm padrão, ficam com o que o perfil de imagem manda (vale para as 8 com `nota_minima`). Só tirar a opção não bastava — a primeira versão do conserto fazia isso, e o `teste_multitap_regra_de_ouro` pegou: três delas (`run_ahead_frames`, `run_ahead_secondary_instance`, `rewind_buffer_size`) nenhum perfil escreve, e o RetroArch guarda no `retroarch.cfg`, ao fechar, o valor que recebeu no PC forte (`config_save_on_exit`). Com o padrão, o arquivo da partida de toda máquina com a configuração padrão fica igual ao de antes |
+| C5 | Descoberta de colegas: um pacote UDP torto (porta que não é número, JSON que não é objeto) derruba a linha que escuta a 55436, e a lista de vizinhos não tem limite (pacotes com códigos inventados a enchem) | `int(dados.get("porta") ...)` fora do `try` em `anunciar_e_escutar`; poda só por tempo (60 s). **Reproduzido** pelo `testes\teste_descoberta_pacote_torto.py` na rodada de referência: depois dos pacotes tortos, nenhum colega novo entrava mais | `receber_grito()` separada (testável), tudo o que vem da rede conferido (porta só de 1 a 65535 — sem porta vale a padrão, mas porta `0`, texto ou `true` recusa), no máximo 4 colegas por endereço e 200 no total, poda no máximo uma vez por segundo, apelido limpo como o resto do ARENA. Depois: 6 de 6 |
+| C6 | **Achado no caminho:** um ARQUIVO com o nome de uma pasta do ARENA (`backup`, `saves`, `dados`...) derrubava o ARENA na abertura, com o erro cru do Windows, antes de a tela abrir | Reproduzido ao portar o teste da cópia que falha: `FileExistsError` em `os.makedirs` de `arena.principal()` | A pasta que não dá para criar vira aviso na janela preta ("renomeie o arquivo e abra o ARENA de novo") e o ARENA abre; quem precisa da pasta explica depois (a cópia de segurança diz "Nada foi apagado") |
+| C7 | **Achado no caminho:** a foto do perfil antiga era apagada ANTES de a nova estar gravada (pen drive cheio = aluno sem foto nenhuma); e um temporário de gravação interrompida (`foto.png.1234.tmp`) podia ser servido como se fosse a foto | Leitura do código ao portar o `teste_perfil_foto`; os dois casos reproduzidos na bateria (`TestFotoDoPerfil`) | A antiga só sai depois que a nova está inteira no lugar; a foto é procurada só pelos nomes certos (`foto.png`, `foto.jpg`, `foto.webp`) |
+
+### Testes consertados (higiene)
+
+| Teste | O que estava errado | Conserto |
+|---|---|---|
+| `teste_ps2_sem_bios`, `teste_multitap_regra_de_ouro`, `teste_kof2002_convertido` | Esperavam o ARENA de antes de 03/10 (ver "Rodada completa", Fase 0) | Expectativa nova, com o motivo comentado em cada um |
+| `teste_pcsx2_portatil` | Gravava no `PCSX2.ini` de verdade e não devolvia (a rodada devolvia) | Guarda e devolve, como o `teste_pcsx2_inicia`; jogo pelo `jogos_de_teste.achar` |
+| `teste_fase7`, `teste_pasta_somente_leitura`, `teste_sinc_migracao_e_lotes` | `shutil.rmtree(..., ignore_errors=True)` desistia calado de arquivo somente leitura ou preso: pasta esquecida no Temp | `limpeza.apagar_pasta` |
+| `teste_netplay_isolamento` | Devolvia "passou" SEMPRE, sem conferir nada; e não apagava a pasta | Confere que o hospedeiro viu o jogador 5 entrar; apaga a pasta |
+| `teste_netplay_5_jogadores` | Deixava a pasta de propósito ("rode de novo para limpar") | Guarda os registros só quando falha |
+| `teste_sinc_migracao_e_lotes` | O `with sqlite3.connect(...)` do próprio teste não fecha a conexão (no Python ele só confirma a transação): o `arena.db` da cópia ficava preso e a pasta não saía do Temp | `contextlib.closing` |
+| `teste_descoberta_30_maquinas` | Mandava os 30 "computadores" do mesmo endereço (127.0.0.1); com o C5 (no máximo 4 por endereço) só 4 entravam | Cada máquina falsa sai do seu próprio 127.0.0.N, como na sala (cada computador com o seu endereço): 30 de 30 |
+
+**Não feito, com o motivo:** 25 scripts de `testes\` usam a porta 8777 fixa
+(a do ARENA de verdade). Trocar todos por porta livre é uma reforma grande
+dos testes, sem ganho para o aluno; a rodada já exige o ARENA fechado
+(memória "rodada completa"). O teste novo desta fase (`teste_comecar_do_zero`)
+já nasce com porta livre.
+
+### Resultado da Fase 1 (08/10/2026)
+
+| | Antes | Depois |
+|---|---|---|
+| Bateria (`servidor\tests\run.py`) | 203 (212 com os 9 trazidos) | **232**, todos passando |
+| Testes da área mexida (20 scripts, `rodada_final.py` com pedaços de nome) | — | **20 de 20** (18 na primeira passada; as 2 falhas eram o C4 incompleto e o teste dos 30 computadores, os dois acertados e repetidos) |
+| `fuzz_rotas` | 279 checagens, 0 falhas | 279 checagens, 0 falhas |
+| `teste_descoberta_pacote_torto` | 2 de 6 (o defeito C5) | 6 de 6 |
+| Arquivos em `ferramentas\` | 44 | 19 |
+| O que saiu | | `graficos.jogo_suporta_multitap` e `como_colocar._tem` (22 linhas); 25 arquivos de ferramenta e teste antigos (2.700 linhas), cobertos por 15 testes novos na bateria e 1 script em `testes\` (mais 14 testes das correções C1 a C5) |
+| Programa (`arena.py`, `graficos.py`, `como_colocar.py`) | | +184 / −83 linhas (as correções C1 a C7, quase tudo comentário e conferência do que vem da rede) |
+
+**Como testar (o professor):** `RODAR_TESTES.bat` (a bateria: 232 testes,
+~8 s). Para ver o C6 com os próprios olhos: numa CÓPIA do ARENA, crie um
+arquivo de texto chamado `backup` (sem extensão) no lugar da pasta `backup` e
+abra o `ARENA.bat` — a tela abre, e a janela preta avisa "nao consegui criar a
+pasta backup". Os scripts da fase: `testes\teste_comecar_do_zero.py`,
+`testes\teste_descoberta_pacote_torto.py`, `testes\teste_descoberta_30_maquinas.py`
+e `testes\teste_multitap_regra_de_ouro.py`.

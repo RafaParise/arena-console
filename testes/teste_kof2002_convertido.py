@@ -84,8 +84,12 @@ def main():
         confere("o FBNeo achou a correcao do som", "Patched romset found" in texto and "kof2k2fd" in texto)
         confere("e nao pediu parte nenhuma", "is required" not in texto,
                 [l for l in texto.splitlines() if "is required" in l][:3])
+        # Tela preta: ~2 KB (os outros testes usam 2 KB como limite). Achado
+        # da rodada da auditoria 3 (07/10/2026): o limite era 50 KB, e a foto
+        # de 50 s veio com 29 KB -- olhada, era a tela de titulo (logotipo
+        # sobre fundo preto, que comprime muito), com as cores certas.
         confere("mostrou o jogo (fotos de %d e %d KB)" % (fotos[1800] // 1024, fotos[3000] // 1024),
-                fotos[1800] > 50000 and fotos[3000] > 50000, fotos)
+                fotos[1800] > 20000 and fotos[3000] > 20000, fotos)
         print("3. O motivo de 'nao abriu'")
         confere("o ARENA nao acha motivo nenhum no registro",
                 motivo_do_erro.analisar(texto, jogo, "fbneo_libretro.dll") is None)

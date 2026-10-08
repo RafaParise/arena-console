@@ -56,8 +56,15 @@ def anunciar_maquina_falsa(indice, porta_ouvinte):
     # nao os descarta, testando o que interessa aqui: a LISTA com 30
     # entradas, nao o transporte UDP em si (que ja e' testado pelo uso
     # real, entre maquinas de verdade).
+    #
+    # Auditoria 3 (C5, 08/10/2026): o ARENA passou a aceitar no maximo 4
+    # colegas por endereco (um computador inventando codigos nao enche mais a
+    # lista). Na sala, cada computador tem o seu endereco -- e aqui tambem:
+    # cada maquina falsa sai do seu proprio 127.0.0.N (o Windows aceita
+    # qualquer 127.x.y.z como "este computador").
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+    s.bind(("127.0.0.%d" % (indice + 2), 0))
     recado = json.dumps({
         "apelido": "Aluno%02d" % indice,
         "id": "maquinafalsa%02d" % indice,

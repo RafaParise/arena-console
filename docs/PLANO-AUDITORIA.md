@@ -469,8 +469,8 @@ Comece só pela Fase 0.
 
 ### Progresso da auditoria 3
 
-- [ ] Fase 0 — Linha de base e inventário
-- [ ] Fase 1 — Varredura e limpeza (debloat)
+- [x] Fase 0 — Linha de base e inventário (07/10/2026) — rodada de referência 87 de 92 (as 5 falhas analisadas)
+- [x] Fase 1 — Varredura e limpeza (debloat) (08/10/2026) — C1 a C7, R1 a R5; bateria 232
 - [ ] Fase 2 — Leveza e desempenho
 - [ ] Fase 3 — Servidor e API
 - [ ] Fase 4 — Jogar Junto

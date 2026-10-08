@@ -1,0 +1,2175 @@
+{
+  "funcoes_python_mortas": [
+    {
+      "funcao": "_tem",
+      "arquivo": "servidor\\como_colocar.py",
+      "linha": 177
+    },
+    {
+      "funcao": "jogo_suporta_multitap",
+      "arquivo": "servidor\\graficos.py",
+      "linha": 2280
+    }
+  ],
+  "funcoes_python_so_dos_testes": [
+    {
+      "funcao": "numero_do_jogo",
+      "arquivo": "servidor\\jogadores.py",
+      "linha": 112,
+      "usada_por": [
+        "servidor\\tests\\test_jogadores.py",
+        "testes\\teste_fliperama_nomes.py"
+      ]
+    },
+    {
+      "funcao": "prioridade_de",
+      "arquivo": "servidor\\processos.py",
+      "linha": 93,
+      "usada_por": [
+        "testes\\teste_ultra_promessas.py"
+      ]
+    },
+    {
+      "funcao": "economia_de_energia_de",
+      "arquivo": "servidor\\processos.py",
+      "linha": 131,
+      "usada_por": [
+        "testes\\teste_ultra_promessas.py"
+      ]
+    },
+    {
+      "funcao": "memoria_de",
+      "arquivo": "servidor\\processos.py",
+      "linha": 165,
+      "usada_por": [
+        "testes\\teste_ultra_promessas.py"
+      ]
+    }
+  ],
+  "funcoes_js_mortas": [],
+  "chaves_json_sem_leitor": {
+    "consoles.json": {
+      "captcomm": "/plataformas[]/jogadores_por_jogo"
+    },
+    "graficos.json": {
+      "mupen64plus_next": "/nucleos",
+      "ppsspp": "/nucleos",
+      "ppsspp_frameskip": "/nucleos/ppsspp/sempre",
+      "ppsspp_auto_frameskip": "/nucleos/ppsspp/sempre",
+      "ppsspp_io_timing_method": "/nucleos/ppsspp/sempre",
+      "ppsspp_texture_scaling_level": "/nucleos/ppsspp/sempre",
+      "ppsspp_texture_deposterize": "/nucleos/ppsspp/sempre",
+      "ppsspp_lower_resolution_for_effects": "/nucleos/ppsspp/sempre",
+      "ppsspp_skip_gpu_readbacks": "/nucleos/ppsspp/sempre",
+      "ppsspp_internal_resolution": "/nucleos/ppsspp/por_nota[]/opcoes",
+      "ppsspp_texture_filtering": "/nucleos/ppsspp/por_nota[]/opcoes",
+      "ppsspp_skip_buffer_effects": "/nucleos/ppsspp/por_nota[]/opcoes",
+      "ppsspp_texture_anisotropic_filtering": "/nucleos/ppsspp/por_nota[]/opcoes",
+      "reicast_mipmapping": "/nucleos/flycast/sempre",
+      "reicast_enable_rttb": "/nucleos/flycast/sempre",
+      "reicast_threaded_rendering": "/nucleos/flycast/sempre",
+      "reicast_dcnet": "/nucleos/flycast/sempre",
+      "reicast_internal_resolution": "/nucleos/flycast/por_nota[]/opcoes",
+      "reicast_anisotropic_filtering": "/nucleos/flycast/por_nota[]/opcoes",
+      "reicast_texupscale": "/nucleos/flycast/por_nota[]/opcoes",
+      "pcsx2_fastboot": "/nucleos/pcsx2/sempre",
+      "pcsx2_upscale_multiplier": "/nucleos/pcsx2/por_nota[]/opcoes",
+      "pcsx2_texture_filtering": "/nucleos/pcsx2/por_nota[]/opcoes",
+      "pcsx2_anisotropic_filtering": "/nucleos/pcsx2/por_nota[]/opcoes",
+      "dolphin": "/nucleos",
+      "dolphin_shader_compilation_mode": "/nucleos/dolphin/sempre",
+      "dolphin_cheats_enabled": "/nucleos/dolphin/sempre",
+      "dolphin_wait_for_shaders": "/nucleos/dolphin/sempre",
+      "dolphin_efb_scale": "/nucleos/dolphin/por_nota[]/opcoes",
+      "dolphin_max_anisotropy": "/nucleos/dolphin/por_nota[]/opcoes",
+      "dolphin_efb_to_texture": "/nucleos/dolphin/por_nota[]/opcoes",
+      "beetle_saturn_cdimagecache": "/nucleos/mednafen_saturn/sempre",
+      "beetle_saturn_horizontal_overscan": "/nucleos/mednafen_saturn/por_nota[]/opcoes",
+      "beetle_saturn_autortc": "/nucleos/mednafen_saturn/por_nota[]/opcoes",
+      "genesis_plus_gx_lcd_filter": "/nucleos/genesis_plus_gx/sempre",
+      "genesis_plus_gx_overscan": "/nucleos/genesis_plus_gx/sempre",
+      "genesis_plus_gx_blargg_ntsc_filter": "/nucleos/genesis_plus_gx/por_nota[]/opcoes",
+      "genesis_plus_gx_render": "/nucleos/genesis_plus_gx/por_nota[]/opcoes",
+      "snes9x_overscan": "/nucleos/snes9x/sempre",
+      "snes9x_blargg": "/nucleos/snes9x/por_nota[]/opcoes",
+      "snes9x_gfx_clip": "/nucleos/snes9x/por_nota[]/opcoes",
+      "snes9x_gfx_transp": "/nucleos/snes9x/por_nota[]/opcoes",
+      "fceumm": "/nucleos",
+      "fceumm_overscan_h": "/nucleos/fceumm/sempre",
+      "fceumm_ntsc_filter": "/nucleos/fceumm/por_nota[]/opcoes",
+      "fceumm_palette": "/nucleos/fceumm/por_nota[]/opcoes",
+      "mgba": "/nucleos",
+      "mgba_frameskip": "/nucleos/mgba/sempre",
+      "mgba_color_correction": "/nucleos/mgba/por_nota[]/opcoes",
+      "mgba_interframe_blending": "/nucleos/mgba/por_nota[]/opcoes",
+      "gambatte": "/nucleos",
+      "gambatte_gbc_color_correction": "/nucleos/gambatte/por_nota[]/opcoes",
+      "gambatte_mix_frames": "/nucleos/gambatte/por_nota[]/opcoes",
+      "melonds": "/nucleos",
+      "melonds_threaded_renderer": "/nucleos/melonds/sempre",
+      "melonds_opengl_renderer": "/nucleos/melonds/por_nota[]/opcoes",
+      "melonds_opengl_resolution": "/nucleos/melonds/por_nota[]/opcoes",
+      "melonds_opengl_better_polygons": "/nucleos/melonds/por_nota[]/opcoes",
+      "ppsspp_frameskiptype": "/modesto/ppsspp",
+      "reicast_auto_skip_frame": "/abaixo_do_original/leve/flycast",
+      "reicast_alpha_sorting": "/abaixo_do_original/leve/flycast",
+      "ppsspp_spline_quality": "/abaixo_do_original/leve/ppsspp",
+      "ppsspp_lazy_texture_caching": "/abaixo_do_original/leve/ppsspp",
+      "pcsx_rearmed_frameskip_type": "/abaixo_do_original/leve/pcsx_rearmed",
+      "genesis_plus_gx_frameskip": "/abaixo_do_original/leve/genesis_plus_gx",
+      "picodrive": "/abaixo_do_original/leve",
+      "picodrive_frameskip": "/abaixo_do_original/leve/picodrive",
+      "handy": "/abaixo_do_original/leve",
+      "handy_frameskip": "/abaixo_do_original/leve/handy",
+      "mednafen_wswan": "/abaixo_do_original/leve",
+      "wswan_frameskip": "/abaixo_do_original/leve/mednafen_wswan",
+      "virtualjaguar": "/abaixo_do_original/leve",
+      "virtualjaguar_frameskip": "/abaixo_do_original/leve/virtualjaguar",
+      "reicast_frame_skipping": "/abaixo_do_original/minimo/flycast",
+      "reicast_fog": "/abaixo_do_original/minimo/flycast",
+      "reicast_volume_modifier_enable": "/abaixo_do_original/minimo/flycast"
+    },
+    "multitap.json": {
+      "versao_conferida": "/retroarch",
+      "limite_jogar_junto": "/retroarch",
+      "padrao": "/retroarch/limite_jogar_junto",
+      "teto_do_codigo": "/retroarch/limite_jogar_junto",
+      "controles_no_mesmo_computador": "/retroarch",
+      "padrao_do_retroarch": "/retroarch/controles_no_mesmo_computador",
+      "padrao_do_arena": "/retroarch/controles_no_mesmo_computador",
+      "nao_confirmado": "/retroarch/controles_no_mesmo_computador",
+      "jogar_junto": "/nucleos/snes9x_libretro.dll",
+      "nome_no_nucleo": "/nucleos/snes9x_libretro.dll/adaptador",
+      "observacao": "/nucleos/snes9x_libretro.dll/adaptador",
+      "uso": "/nucleos/pcsx_rearmed_libretro.dll",
+      "pcsx_rearmed_multitap": "/nucleos/pcsx_rearmed_libretro.dll/adaptador/chaves",
+      "valores_possiveis": "/nucleos/pcsx_rearmed_libretro.dll/adaptador",
+      "beetle_saturn_multitap_port1": "/nucleos/mednafen_saturn_libretro.dll/adaptador/chaves",
+      "beetle_saturn_multitap_port2": "/nucleos/mednafen_saturn_libretro.dll/adaptador/segundo_adaptador/chaves",
+      "motivo_sem_jogar_junto": "/nucleos/mupen64plus_next_libretro.dll"
+    },
+    "perfis_controle.json": {
+      "gatilhos_analogicos": "/tipos/xbox360",
+      "botao_central": "/tipos/xbox360",
+      "xboxone": "/tipos",
+      "xboxelite": "/tipos",
+      "ps4": "/tipos",
+      "ps5": "/tipos",
+      "switchpro": "/tipos",
+      "joycon": "/tipos",
+      "generico12": "/tipos",
+      "generico10": "/tipos"
+    }
+  },
+  "arquivos_sem_citacao": [
+    "testes\\varredura_auditoria3.py"
+  ],
+  "arquivos_repetidos": [
+    [
+      "docs\\auditoria2\\medir_fase0\\arena_janela_preta.txt",
+      "docs\\auditoria2\\medir_fase8\\arena_janela_preta.txt",
+      "servidor\\tests\\__init__.py"
+    ]
+  ],
+  "guias_citando_o_que_nao_existe": [
+    {
+      "guia": "1-COMECAR.md",
+      "cita": "python.exe"
+    },
+    {
+      "guia": "1-COMECAR.md",
+      "cita": "config.json"
+    },
+    {
+      "guia": "1-COMECAR.md",
+      "cita": "controles.json"
+    },
+    {
+      "guia": "2-JOGOS.md",
+      "cita": "zips_conferidos.json"
+    },
+    {
+      "guia": "2-JOGOS.md",
+      "cita": "python.exe"
+    },
+    {
+      "guia": "2-JOGOS.md",
+      "cita": "rpcs3.exe"
+    },
+    {
+      "guia": "3-IMAGEM-SOM-CONTROLE.md",
+      "cita": "controles.json"
+    },
+    {
+      "guia": "3-IMAGEM-SOM-CONTROLE.md",
+      "cita": "config.json"
+    },
+    {
+      "guia": "4-SAVES.md",
+      "cita": "config.json"
+    },
+    {
+      "guia": "5-AMIGOS.md",
+      "cita": "ARENA-troca.json"
+    },
+    {
+      "guia": "6-RECURSOS-E-REPARO.md",
+      "cita": "python.exe"
+    },
+    {
+      "guia": "6-RECURSOS-E-REPARO.md",
+      "cita": "config.json"
+    },
+    {
+      "guia": "6-RECURSOS-E-REPARO.md",
+      "cita": "manifesto.json"
+    },
+    {
+      "guia": "6-RECURSOS-E-REPARO.md",
+      "cita": "maquina.json"
+    }
+  ],
+  "restos_de_funcoes_removidas": {
+    "gravacao de video / transmissao": [
+      "servidor\\arena.py:616: # --- Gravacao e transmissao: desligadas de verdade -------------------",
+      "servidor\\arena.py:622: \"video_record_quality\": \"0\",",
+      "servidor\\arena.py:623: \"video_record_threads\": \"1\",",
+      "servidor\\arena.py:626: \"streaming_mode\": \"0\",",
+      "servidor\\arena.py:627: \"video_stream_quality\": \"0\",",
+      "servidor\\arena.py:629: \"quick_menu_show_start_streaming\": \"false\",",
+      "servidor\\arena.py:631: \"input_streaming_toggle\": \"nul\",",
+      "servidor\\arena.py:635: \"notification_show_streaming\": \"false\",",
+      "4-SAVES.md:85: #### Gravação e transmissão: desligadas",
+      "servidor\\recursos.json:166: \"exemplo\": \"Igual apertar o botao de tela cheia no YouTube. Desligado, o jogo fica numa janelinha que voce pode arrastar.\""
+    ],
+    "so assistir": [
+      "servidor\\arena.py:1649: \"netplay_start_as_spectator\": \"false\",",
+      "servidor\\arena.py:5610: if modo in (\"hospedar\", \"entrar\", \"assistir\") and plataforma.get(\"core_netplay\"):",
+      "servidor\\arena.py:5632: # \"assistir\" entra na partida do amigo sem controlar nada. Antes",
+      "servidor\\arena.py:5634: if modo in (\"hospedar\", \"entrar\", \"assistir\"):",
+      "servidor\\arena.py:5636: assistir = (modo == \"assistir\")",
+      "servidor\\arena.py:5662: apelido, hospedar, assistir=assistir,",
+      "servidor\\arena.py:5668: \"espectador\" if assistir else",
+      "servidor\\graficos.py:2292: def opcoes_de_partida(apelido, hospedar, atraso=0, assistir=False,",
+      "servidor\\graficos.py:2295: \"\"\"Opcoes do RetroArch para hospedar, entrar ou assistir uma partida.",
+      "servidor\\graficos.py:2297: Assistir e o mesmo caminho de entrar numa partida, so que sem pegar",
+      "servidor\\graficos.py:2303: Por isso o amigo precisa ter o mesmo jogo para assistir. Sem o jogo,",
+      "servidor\\graficos.py:2324: \"netplay_start_as_spectator\": \"true\" if assistir else \"false\",",
+      "servidor\\graficos.py:2345: \"true\" if (not assistir and n == posicao) else \"false\")",
+      "launcher\\app.js:2733: : estado.papelDaPartida === \"assistir\"",
+      "launcher\\app.js:2734: ? \"Entrando para assistir. Você vê a tela dele, sem controlar nada.\"",
+      "launcher\\index.html:918: <button class=\"perfil\" data-papel=\"assistir\" type=\"button\">",
+      "launcher\\index.html:919: <span class=\"perfil-nome\">Só assistir</span>",
+      "2-JOGOS.md:988: | Jogar junto e assistir | Sim | Não. Ele tem rede própria |",
+      "5-AMIGOS.md:8: - Parte B — Jogar a dois e assistir",
+      "5-AMIGOS.md:566: ## Parte B — Jogar a dois e assistir",
+      "5-AMIGOS.md:597: 3. Escolha **Entrar na partida do amigo** (ou **Só assistir**)."
+    ],
+    "DuckStation": [
+      "servidor\\graficos.py:555: # antes a lista tinha \"swanstation_BIOS_Path\" e \"duckstation_BIOS.Path\" (nao",
+      "servidor\\graficos.py:804: \"duckstation_*\" nem existem no SwanStation. Na pratica, todo save de",
+      "servidor\\graficos.py:929: cima, o arquivo global atual. Chaves \"duckstation_*\" (lixo antigo, o",
+      "servidor\\graficos.py:942: if k not in gerenciadas and not k.startswith(\"duckstation_\")}",
+      "2-JOGOS.md:742: que nasceu do DuckStation — por isso esse nome aparece em alguns lugares)."
+    ],
+    "Scroll Lock": []
+  },
+  "excecoes_engolidas": [
+    {
+      "arquivo": "servidor\\acervo.py",
+      "linha": 227,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "os.remove(temporario)"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 52,
+      "captura": "(AttributeError, ValueError)",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "_saida.reconfigure(errors=\"replace\")"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 416,
+      "captura": "sqlite3.Error",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "conexao.execute(\"PRAGMA wal_checkpoint(TRUNCATE)\")"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 1275,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "return os.path.join(PASTA_PERFIL, nome)"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 1369,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "base = base_da_miniatura(alvo, largura)"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 1408,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return 0",
+      "trecho": "arquivos = [e for e in os.scandir(PASTA_MINIATURAS_CAPA) if e.is_file()]"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 1601,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "break"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 1817,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return 0",
+      "trecho": ")"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 2162,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "fim = b\"\""
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 2199,
+      "captura": "Exception",
+      "largo": true,
+      "faz": "pass",
+      "trecho": "% (jogo.get(\"titulo\", \"o jogo\"), codigo))"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 2208,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return ''",
+      "trecho": "return \"%d|%d\" % (info.st_size, int(info.st_mtime))"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 2757,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return 0",
+      "trecho": "if nome.startswith(\"retroarch__\") and nome.endswith(\".log\"))"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 2776,
+      "captura": "ValueError",
+      "largo": false,
+      "faz": "return False",
+      "trecho": "return True"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 2966,
+      "captura": "(OSError, ValueError)",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "dados = json.load(arquivo)"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 3390,
+      "captura": "(OSError, UnicodeError, ValueError)",
+      "largo": false,
+      "faz": "return False",
+      "trecho": "return True"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 3478,
+      "captura": "ValueError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "return True"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 3502,
+      "captura": "ValueError",
+      "largo": false,
+      "faz": "return ''",
+      "trecho": "porta = partes.port         # porta que nao e' numero: ValueError"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 3929,
+      "captura": "ValueError",
+      "largo": false,
+      "faz": "return False",
+      "trecho": "return os.path.commonpath([alvo, base]) == base"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 5889,
+      "captura": "(OSError, subprocess.SubprocessError)",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "mapa[partes[0]] = (partes[1] + \" \" + partes[2]).lower()"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 5989,
+      "captura": "(OSError, socket.gaierror)",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "achados[dado[4][0]] = True"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 6164,
+      "captura": "Exception",
+      "largo": true,
+      "faz": "return",
+      "trecho": "jogos = [j for j in manifesto()[\"jogos\"] if j.get(\"romset\")]"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 1314,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "os.remove(antiga)"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 1417,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "os.remove(entrada.path)"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 1427,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "os.remove(caminho)"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 2687,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "funcao(alvo)"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 2766,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "apagados += 1"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 2933,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "continue",
+      "trecho": "})"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 3104,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "falante.sendto(pacote, (destino, PORTA_DESCOBERTA))"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 3180,
+      "captura": "(socket.timeout, OSError)",
+      "largo": false,
+      "faz": "continue",
+      "trecho": "pacote, remetente = ouvinte.recvfrom(2048)"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 3187,
+      "captura": "(ValueError, UnicodeDecodeError)",
+      "largo": false,
+      "faz": "continue",
+      "trecho": "dados = json.loads(pacote[len(MARCA_DESCOBERTA):].decode(\"utf-8\"))"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 3285,
+      "captura": "Exception",
+      "largo": true,
+      "faz": "return",
+      "trecho": "retorno = falar_com(url, \"/api/sinc/ola\", {}, \"POST\", 2)"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 6002,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "continue",
+      "trecho": "achados[teste.getsockname()[0]] = True"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 6046,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "continue",
+      "trecho": "return True"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 6178,
+      "captura": "Exception",
+      "largo": true,
+      "faz": "continue",
+      "trecho": "achou = True"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 6248,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "orfaos += 1"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 3142,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "ouvinte.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 3440,
+      "captura": "(KeyError, TypeError, ValueError, sqlite3.Error)",
+      "largo": false,
+      "faz": "continue",
+      "trecho": "str(p[\"dispositivo\"])[:40], enviado=1)"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 3449,
+      "captura": "(KeyError, TypeError, ValueError, sqlite3.Error)",
+      "largo": false,
+      "faz": "continue",
+      "trecho": "str(s[\"dispositivo\"])[:40])"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 3893,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "copiadas.append(biblioteca)"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 4790,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "resultado[\"arena\"] = True"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 4799,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "resultado[\"partida\"] = True"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 6086,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "continue",
+      "trecho": "return"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 6348,
+      "captura": "(EOFError, KeyboardInterrupt)",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "input(\"\\n  Pressione Enter para fechar. \")"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 173,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "os.remove(temporario)"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 357,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "os.remove(ARQUIVO_BANCO + sufixo)"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 4897,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "CAPACIDADE[\"nota\"], extras, CAPACIDADE.get(\"nota_gpu\"))"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 5479,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "modesto=grafico_original(config), abaixo=nivel_abaixo(config))"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 3128,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "velho.close()"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 4725,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "apagados.append(arquivo)"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 4994,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "criadas.append(plataforma[\"pasta\"])"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 4737,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "apagados.append(arquivo)"
+    },
+    {
+      "arquivo": "servidor\\arrumar.py",
+      "linha": 122,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "nomes = os.listdir(pai)"
+    },
+    {
+      "arquivo": "servidor\\arrumar.py",
+      "linha": 136,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "nomes = sorted(os.listdir(pasta))"
+    },
+    {
+      "arquivo": "servidor\\arrumar.py",
+      "linha": 154,
+      "captura": "(OSError, zipfile.BadZipFile, ValueError)",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "nomes = [n.replace(\"\\\\\", \"/\") for n in z.namelist() if not n.endswith(\"/\")]"
+    },
+    {
+      "arquivo": "servidor\\arrumar.py",
+      "linha": 292,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "arquivo.write(texto)"
+    },
+    {
+      "arquivo": "servidor\\arrumar.py",
+      "linha": 414,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return",
+      "trecho": "livre = shutil.disk_usage(pasta).free"
+    },
+    {
+      "arquivo": "servidor\\arrumar.py",
+      "linha": 509,
+      "captura": "Exception",
+      "largo": true,
+      "faz": "pass",
+      "trecho": "aoterminar()"
+    },
+    {
+      "arquivo": "servidor\\barreiras.py",
+      "linha": 205,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return 0",
+      "trecho": "info = os.stat(caminho)"
+    },
+    {
+      "arquivo": "servidor\\barreiras.py",
+      "linha": 262,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "fatos[\"disco_windows_livre_pct\"] = round(100.0 * uso.free / uso.total, 1)"
+    },
+    {
+      "arquivo": "servidor\\barreiras.py",
+      "linha": 305,
+      "captura": "ValueError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "fatos[\"processador_maximo_bateria\"] = int(str(brutos[1]), 16)"
+    },
+    {
+      "arquivo": "servidor\\bios.py",
+      "linha": 207,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "info = os.stat(caminho)"
+    },
+    {
+      "arquivo": "servidor\\bios.py",
+      "linha": 222,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "marca = _md5(_ler(caminho))"
+    },
+    {
+      "arquivo": "servidor\\bios.py",
+      "linha": 249,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "dados = _ler(caminho)"
+    },
+    {
+      "arquivo": "servidor\\bios.py",
+      "linha": 313,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "return os.path.join(pasta, existente)"
+    },
+    {
+      "arquivo": "servidor\\bios.py",
+      "linha": 387,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "escolhida = linha.split(\"=\", 1)[1].strip()"
+    },
+    {
+      "arquivo": "servidor\\bios.py",
+      "linha": 393,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "nomes = sorted(os.listdir(pasta), key=str.lower)"
+    },
+    {
+      "arquivo": "servidor\\bios.py",
+      "linha": 407,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return False",
+      "trecho": "return any(True for _item in itens)"
+    },
+    {
+      "arquivo": "servidor\\bios.py",
+      "linha": 416,
+      "captura": "(OSError, zipfile.BadZipFile, ValueError, RuntimeError)",
+      "largo": false,
+      "faz": "return False",
+      "trecho": "return catalogo.PARTES_NEOGEO <= {i.CRC for i in z.infolist()}"
+    },
+    {
+      "arquivo": "servidor\\bios.py",
+      "linha": 426,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return False",
+      "trecho": "alvos += [os.path.join(base, n) for n in os.listdir(base) if os.path.isdir(os.path.join(base, n))]"
+    },
+    {
+      "arquivo": "servidor\\bios.py",
+      "linha": 706,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return False",
+      "trecho": "tamanho = os.path.getsize(caminho)"
+    },
+    {
+      "arquivo": "servidor\\bios.py",
+      "linha": 836,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "os.replace(temporario, caminho)"
+    },
+    {
+      "arquivo": "servidor\\bios.py",
+      "linha": 902,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "fontes.append((caminho, \"sistema\", None))"
+    },
+    {
+      "arquivo": "servidor\\bios.py",
+      "linha": 1216,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "return False"
+    },
+    {
+      "arquivo": "servidor\\bios.py",
+      "linha": 1224,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return False",
+      "trecho": "return True"
+    },
+    {
+      "arquivo": "servidor\\bios.py",
+      "linha": 160,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "continue",
+      "trecho": "texto = arquivo.read()"
+    },
+    {
+      "arquivo": "servidor\\bios.py",
+      "linha": 356,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "continue",
+      "trecho": "nomes = sorted(os.listdir(pasta), key=str.lower)"
+    },
+    {
+      "arquivo": "servidor\\bios.py",
+      "linha": 789,
+      "captura": "(zipfile.BadZipFile, ValueError, RuntimeError, OSError)",
+      "largo": false,
+      "faz": "continue",
+      "trecho": "yield nome, lugar + [item.filename], z.read(item)"
+    },
+    {
+      "arquivo": "servidor\\bios.py",
+      "linha": 930,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "continue",
+      "trecho": "info = os.stat(caminho)"
+    },
+    {
+      "arquivo": "servidor\\bios.py",
+      "linha": 1065,
+      "captura": "(OSError, zipfile.BadZipFile, KeyError, ValueError, RuntimeError)",
+      "largo": false,
+      "faz": "continue",
+      "trecho": "_gravar(destino, _ler_de_dentro(candidato[\"arquivo\"], candidato[\"dentro\"]))"
+    },
+    {
+      "arquivo": "servidor\\bios.py",
+      "linha": 1201,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "continue",
+      "trecho": "shutil.copy2(caminho, os.path.join(pasta, nome))"
+    },
+    {
+      "arquivo": "servidor\\bios.py",
+      "linha": 774,
+      "captura": "(zipfile.BadZipFile, ValueError, RuntimeError, OSError, zipfile.LargeZipFile)",
+      "largo": false,
+      "faz": "continue",
+      "trecho": "dados_zip = z.read(item)"
+    },
+    {
+      "arquivo": "servidor\\bios.py",
+      "linha": 782,
+      "captura": "(zipfile.BadZipFile, ValueError, RuntimeError, OSError)",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "yield from _itens_do_zip(interno, lugar + [item.filename], profundidade + 1)"
+    },
+    {
+      "arquivo": "servidor\\bios.py",
+      "linha": 858,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "criadas += 1"
+    },
+    {
+      "arquivo": "servidor\\bios.py",
+      "linha": 1028,
+      "captura": "(OSError, zipfile.BadZipFile, KeyError, ValueError, RuntimeError)",
+      "largo": false,
+      "faz": "continue",
+      "trecho": "_gravar(os.path.join(sistema, nome), _ler_de_dentro(candidato[\"arquivo\"], candidato[\"dentro\"]))"
+    },
+    {
+      "arquivo": "servidor\\bios.py",
+      "linha": 1047,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "continue",
+      "trecho": "shutil.copy2(instalada, os.path.join(guarda, os.path.basename(instalada)))"
+    },
+    {
+      "arquivo": "servidor\\bios.py",
+      "linha": 1097,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "continue",
+      "trecho": "shutil.copy2(instalada, os.path.join(pasta, nome))"
+    },
+    {
+      "arquivo": "servidor\\bios.py",
+      "linha": 924,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "fontes.append((caminho, \"jogos\", None))"
+    },
+    {
+      "arquivo": "servidor\\bios.py",
+      "linha": 1150,
+      "captura": "(OSError, zipfile.BadZipFile, ValueError, RuntimeError)",
+      "largo": false,
+      "faz": "continue",
+      "trecho": "copiados += 1"
+    },
+    {
+      "arquivo": "servidor\\bios.py",
+      "linha": 948,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "continue",
+      "trecho": "dados = _ler(caminho)"
+    },
+    {
+      "arquivo": "servidor\\bios.py",
+      "linha": 1128,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "copiados += 1"
+    },
+    {
+      "arquivo": "servidor\\bios_catalogo.py",
+      "linha": 273,
+      "captura": "(zipfile.BadZipFile, ValueError, RuntimeError, OSError)",
+      "largo": false,
+      "faz": "return False",
+      "trecho": "return PARTES_NEOGEO <= {i.CRC for i in z.infolist()}"
+    },
+    {
+      "arquivo": "servidor\\capas_do_disco.py",
+      "linha": 76,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "return None"
+    },
+    {
+      "arquivo": "servidor\\capas_do_disco.py",
+      "linha": 140,
+      "captura": "(OSError, struct.error)",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "return None"
+    },
+    {
+      "arquivo": "servidor\\capas_do_disco.py",
+      "linha": 169,
+      "captura": "(OSError, UnicodeDecodeError)",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "codigo = arquivo.read(6).decode(\"ascii\")"
+    },
+    {
+      "arquivo": "servidor\\capas_online.py",
+      "linha": 127,
+      "captura": "(OSError, subprocess.SubprocessError)",
+      "largo": false,
+      "faz": "return False",
+      "trecho": "return resultado.returncode == 0 and os.path.isfile(destino) and os.path.getsize(destino) > 0"
+    },
+    {
+      "arquivo": "servidor\\capas_online.py",
+      "linha": 134,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "os.remove(caminho)"
+    },
+    {
+      "arquivo": "servidor\\capas_online.py",
+      "linha": 156,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "return _ler_lista(guardada)"
+    },
+    {
+      "arquivo": "servidor\\capas_online.py",
+      "linha": 172,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "return nomes"
+    },
+    {
+      "arquivo": "servidor\\capas_online.py",
+      "linha": 318,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "_apagar(temporario)"
+    },
+    {
+      "arquivo": "servidor\\capas_online.py",
+      "linha": 346,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return False",
+      "trecho": "return arquivo.read(len(_ASSINATURA_PNG)) == _ASSINATURA_PNG"
+    },
+    {
+      "arquivo": "servidor\\capas_online.py",
+      "linha": 392,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "_apagar(temporario)"
+    },
+    {
+      "arquivo": "servidor\\capas_online.py",
+      "linha": 557,
+      "captura": "(OSError, subprocess.SubprocessError)",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "return True, None"
+    },
+    {
+      "arquivo": "servidor\\capas_online.py",
+      "linha": 563,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "os.remove(temporario)"
+    },
+    {
+      "arquivo": "servidor\\cheats.py",
+      "linha": 137,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return False",
+      "trecho": "return True"
+    },
+    {
+      "arquivo": "servidor\\cheats.py",
+      "linha": 120,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "item[\"tamanho_kb\"] = round(dados.st_size / 1024, 1)"
+    },
+    {
+      "arquivo": "servidor\\cheats.py",
+      "linha": 52,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "os.remove(temporario)"
+    },
+    {
+      "arquivo": "servidor\\como_colocar.py",
+      "linha": 186,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return False",
+      "trecho": "return nome.lower() in {n.lower() for n in os.listdir(pasta)}"
+    },
+    {
+      "arquivo": "servidor\\controles.py",
+      "linha": 374,
+      "captura": "(AttributeError, OSError, ValueError)",
+      "largo": false,
+      "faz": "return 0",
+      "trecho": "return controles_sem_xinput() + len(controles_xinput())"
+    },
+    {
+      "arquivo": "servidor\\controles.py",
+      "linha": 447,
+      "captura": "(AttributeError, OSError, ValueError)",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "if xinput.XInputGetState(n, ctypes.byref(estado)) == 0]"
+    },
+    {
+      "arquivo": "servidor\\controles.py",
+      "linha": 443,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "continue",
+      "trecho": "xinput = getattr(ctypes.windll, nome)"
+    },
+    {
+      "arquivo": "servidor\\controles.py",
+      "linha": 268,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "os.remove(temporario)"
+    },
+    {
+      "arquivo": "servidor\\diagnostico.py",
+      "linha": 356,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "ok.append(\"espaco em disco suficiente\")"
+    },
+    {
+      "arquivo": "servidor\\diagnostico.py",
+      "linha": 467,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "livre = False"
+    },
+    {
+      "arquivo": "servidor\\diagnostico.py",
+      "linha": 148,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "print(\"  caminhos    corrigi  acrescentei a linha '..'\")"
+    },
+    {
+      "arquivo": "servidor\\diagnostico.py",
+      "linha": 447,
+      "captura": "ValueError",
+      "largo": false,
+      "faz": "continue",
+      "trecho": "time.strptime(d, \"%Y-%m-%d_%H%M%S\")"
+    },
+    {
+      "arquivo": "servidor\\diagnostico.py",
+      "linha": 385,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "continue",
+      "trecho": "cortados.append(os.path.relpath(caminho_arquivo, RAIZ))"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 141,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return 0",
+      "trecho": "linhas = arquivo.readlines()"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 607,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "})"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 639,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return False",
+      "trecho": "for nome in os.listdir(pasta_sistema))"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 674,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "return escolhida"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 704,
+      "captura": "(AttributeError, OSError)",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "antigo = os.path.join(caminho.value, \"PCSX2\")   # 5 = Meus Documentos"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 794,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "return usados"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 874,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return False",
+      "trecho": "return True"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 920,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "opcoes[m.group(1)] = m.group(2)"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 1406,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "return destino"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 1519,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "cabeca = arquivo.read(0x50)"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 1629,
+      "captura": "(OSError, ValueError)",
+      "largo": false,
+      "faz": "return",
+      "trecho": "antes = json.load(arquivo)"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 1635,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "os.remove(anotacao)"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 1719,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "return pasta_config"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 1780,
+      "captura": "(OSError, subprocess.SubprocessError)",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "capture_output=True, text=True, timeout=10)"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 1833,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "gravar_atomico(destino, texto)"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 1887,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "texto = arquivo.read()"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 1946,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "return destino"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 2005,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return False",
+      "trecho": "texto = arquivo.read()"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 2013,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return False",
+      "trecho": "return True"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 2059,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "texto = arquivo.read()"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 2114,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "return destino"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 2188,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "return destino"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 2223,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return False",
+      "trecho": "texto = arquivo.read()"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 2234,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return False",
+      "trecho": "return True"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 2399,
+      "captura": "(OSError, TypeError)",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "topo = arquivo.read(0x200)"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 2513,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "valores[chave] = valor.strip().strip('\"')"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 2529,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return 0",
+      "trecho": "linhas = arquivo.readlines()"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 715,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "nomes[i] = achado.group(1).strip()"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 744,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "continue",
+      "trecho": "candidatos.append((pasta, nome))"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 758,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "continue",
+      "trecho": "time.localtime(os.path.getmtime(caminho)))"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 60,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "os.remove(temporario)"
+    },
+    {
+      "arquivo": "servidor\\hardware.py",
+      "linha": 257,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "break"
+    },
+    {
+      "arquivo": "servidor\\hardware.py",
+      "linha": 314,
+      "captura": "Exception",
+      "largo": true,
+      "faz": "pass",
+      "trecho": "usado_pct = round(100.0 * (uso.total - uso.free) / max(uso.total, 1))"
+    },
+    {
+      "arquivo": "servidor\\hardware.py",
+      "linha": 381,
+      "captura": "Exception",
+      "largo": true,
+      "faz": "return None",
+      "trecho": "return nome_buffer.value if ok else None"
+    },
+    {
+      "arquivo": "servidor\\hardware.py",
+      "linha": 414,
+      "captura": "ValueError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "nome = nome.replace(\"10\", \"11\")"
+    },
+    {
+      "arquivo": "servidor\\hardware.py",
+      "linha": 450,
+      "captura": "Exception",
+      "largo": true,
+      "faz": "pass",
+      "trecho": "pedacos.append(socket.gethostname())"
+    },
+    {
+      "arquivo": "servidor\\hardware.py",
+      "linha": 463,
+      "captura": "Exception",
+      "largo": true,
+      "faz": "pass",
+      "trecho": "pedacos.append(\"%012x\" % no)"
+    },
+    {
+      "arquivo": "servidor\\hardware.py",
+      "linha": 498,
+      "captura": "(AttributeError, OSError, ValueError)",
+      "largo": false,
+      "faz": "return ''",
+      "trecho": "return ligada"
+    },
+    {
+      "arquivo": "servidor\\hardware.py",
+      "linha": 610,
+      "captura": "Exception",
+      "largo": true,
+      "faz": "return None",
+      "trecho": "creationflags=getattr(subprocess, \"CREATE_NO_WINDOW\", 0))"
+    },
+    {
+      "arquivo": "servidor\\hardware.py",
+      "linha": 668,
+      "captura": "(OSError, AttributeError, ValueError)",
+      "largo": false,
+      "faz": "return 0",
+      "trecho": "usuario.ReleaseDC(None, dc)"
+    },
+    {
+      "arquivo": "servidor\\hardware.py",
+      "linha": 262,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "os.remove(caminho)"
+    },
+    {
+      "arquivo": "servidor\\hardware.py",
+      "linha": 286,
+      "captura": "Exception",
+      "largo": true,
+      "faz": "pass",
+      "trecho": "tipo = TIPOS_DISCO.get(codigo, \"desconhecido\")"
+    },
+    {
+      "arquivo": "servidor\\hardware.py",
+      "linha": 568,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "continue",
+      "trecho": "return motor"
+    },
+    {
+      "arquivo": "servidor\\hardware.py",
+      "linha": 616,
+      "captura": "ValueError",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "return int(saida.split(\"=\", 1)[1]) > 0"
+    },
+    {
+      "arquivo": "servidor\\hardware.py",
+      "linha": 635,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return False",
+      "trecho": "ctypes.CDLL(biblioteca)"
+    },
+    {
+      "arquivo": "servidor\\hardware.py",
+      "linha": 531,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "continue",
+      "trecho": "winreg.CloseKey(sub)"
+    },
+    {
+      "arquivo": "servidor\\identificador.py",
+      "linha": 251,
+      "captura": "(OSError, struct.error)",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "return DVD, megabytes"
+    },
+    {
+      "arquivo": "servidor\\identificador.py",
+      "linha": 314,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "tamanho = os.path.getsize(caminho)"
+    },
+    {
+      "arquivo": "servidor\\identificador.py",
+      "linha": 342,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "return achado"
+    },
+    {
+      "arquivo": "servidor\\indexador.py",
+      "linha": 204,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "nomes = os.listdir(pasta)"
+    },
+    {
+      "arquivo": "servidor\\indexador.py",
+      "linha": 499,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "partes.append(\"consoles|%d\" % os.path.getmtime(ARQUIVO_CONSOLES))"
+    },
+    {
+      "arquivo": "servidor\\indexador.py",
+      "linha": 516,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "partes.append(\"mapa|%d\" % os.path.getmtime(graficos.ARQUIVO_MAPA_MULTITAP))"
+    },
+    {
+      "arquivo": "servidor\\indexador.py",
+      "linha": 529,
+      "captura": "(OSError, ValueError)",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "salvo = json.load(arquivo)"
+    },
+    {
+      "arquivo": "servidor\\indexador.py",
+      "linha": 686,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "escrito = arquivo.read().strip().lower()"
+    },
+    {
+      "arquivo": "servidor\\indexador.py",
+      "linha": 104,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "break"
+    },
+    {
+      "arquivo": "servidor\\indexador.py",
+      "linha": 178,
+      "captura": "(OSError, zipfile.BadZipFile, ValueError)",
+      "largo": false,
+      "faz": "continue",
+      "trecho": "dentro = [n for n in compactado.namelist() if not n.endswith(\"/\")]"
+    },
+    {
+      "arquivo": "servidor\\indexador.py",
+      "linha": 342,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "continue",
+      "trecho": "texto = arquivo.read(65536)"
+    },
+    {
+      "arquivo": "servidor\\indexador.py",
+      "linha": 630,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "continue",
+      "trecho": "texto = arquivo.read(8192).decode(\"latin-1\")"
+    },
+    {
+      "arquivo": "servidor\\indexador.py",
+      "linha": 1114,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "assinatura = assinatura_das_pastas()"
+    },
+    {
+      "arquivo": "servidor\\indexador.py",
+      "linha": 509,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "continue",
+      "trecho": "partes.append(\"%s|%d\" % (pasta_atual, os.path.getmtime(pasta_atual)))"
+    },
+    {
+      "arquivo": "servidor\\indexador.py",
+      "linha": 809,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "continue",
+      "trecho": "tamanho = os.path.getsize(caminho_absoluto)"
+    },
+    {
+      "arquivo": "servidor\\indexador.py",
+      "linha": 1070,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "os.remove(temporario)"
+    },
+    {
+      "arquivo": "servidor\\integridade.py",
+      "linha": 84,
+      "captura": "(zipfile.BadZipFile, OSError)",
+      "largo": false,
+      "faz": "return '(o zip inteiro)'",
+      "trecho": "return parte.filename"
+    },
+    {
+      "arquivo": "servidor\\integridade.py",
+      "linha": 97,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "estado = os.stat(caminho)"
+    },
+    {
+      "arquivo": "servidor\\integridade.py",
+      "linha": 115,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "_gravar(dados)"
+    },
+    {
+      "arquivo": "servidor\\integridade.py",
+      "linha": 80,
+      "captura": "NotImplementedError",
+      "largo": false,
+      "faz": "continue",
+      "trecho": "pass"
+    },
+    {
+      "arquivo": "servidor\\internet_archive.py",
+      "linha": 150,
+      "captura": "(OSError, ValueError, urllib.error.URLError, subprocess.SubprocessError)",
+      "largo": false,
+      "faz": "continue",
+      "trecho": "continue"
+    },
+    {
+      "arquivo": "servidor\\internet_archive.py",
+      "linha": 261,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "os.remove(temporario)"
+    },
+    {
+      "arquivo": "servidor\\janela_preta.py",
+      "linha": 76,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "return caminho"
+    },
+    {
+      "arquivo": "servidor\\janela_preta.py",
+      "linha": 108,
+      "captura": "(AttributeError, OSError, ValueError)",
+      "largo": false,
+      "faz": "return False",
+      "trecho": "return bool(k.SetConsoleMode(entrada, novo))"
+    },
+    {
+      "arquivo": "servidor\\janela_preta.py",
+      "linha": 200,
+      "captura": "(AttributeError, OSError)",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "k.SetErrorMode(k.GetErrorMode() | SEM_JANELA_DE_FALHA)"
+    },
+    {
+      "arquivo": "servidor\\janela_preta.py",
+      "linha": 67,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "os.replace(caminho, caminho[:-4] + \".anterior.txt\")"
+    },
+    {
+      "arquivo": "servidor\\janela_preta.py",
+      "linha": 151,
+      "captura": "(OSError, ValueError, UnicodeError)",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "destino.flush()"
+    },
+    {
+      "arquivo": "servidor\\janela_preta.py",
+      "linha": 227,
+      "captura": "(OSError, ValueError)",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "destino.flush()"
+    },
+    {
+      "arquivo": "servidor\\jogadores.py",
+      "linha": 75,
+      "captura": "FileNotFoundError",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "linhas = arquivo.read().splitlines()"
+    },
+    {
+      "arquivo": "servidor\\jogadores.py",
+      "linha": 144,
+      "captura": "(TypeError, ValueError)",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "return max(1, min(int(melhor[1]), MAXIMO))"
+    },
+    {
+      "arquivo": "servidor\\jogadores.py",
+      "linha": 199,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return 'sem-jogadores'",
+      "trecho": "return \"%s|%d\" % (caminho, os.path.getmtime(caminho))"
+    },
+    {
+      "arquivo": "servidor\\motivo_do_erro.py",
+      "linha": 111,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "nomes = os.listdir(pasta_dados)"
+    },
+    {
+      "arquivo": "servidor\\motivo_do_erro.py",
+      "linha": 137,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return ''",
+      "trecho": "return arquivo.read().decode(\"utf-8\", errors=\"replace\")"
+    },
+    {
+      "arquivo": "servidor\\motivo_do_erro.py",
+      "linha": 212,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "pass",
+      "trecho": "bios_da_pasta[nome] = {n.lower() for n in _nomes_no_zip(os.path.join(pasta, nome))}"
+    },
+    {
+      "arquivo": "servidor\\motivo_do_erro.py",
+      "linha": 119,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "continue",
+      "trecho": "info = os.stat(caminho)"
+    },
+    {
+      "arquivo": "servidor\\nomes_arcade.py",
+      "linha": 105,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "estado = os.stat(caminho)"
+    },
+    {
+      "arquivo": "servidor\\nomes_arcade.py",
+      "linha": 114,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "dados = arquivo.read()"
+    },
+    {
+      "arquivo": "servidor\\nomes_arcade.py",
+      "linha": 175,
+      "captura": "(IndexError, struct.error)",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "i = _pular(dados, i) if i is not None and i < posicao else None"
+    },
+    {
+      "arquivo": "servidor\\nomes_arcade.py",
+      "linha": 228,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return None",
+      "trecho": "dados = arquivo.read()"
+    },
+    {
+      "arquivo": "servidor\\nomes_arcade.py",
+      "linha": 315,
+      "captura": "(IndexError, ValueError, struct.error, UnicodeError)",
+      "largo": false,
+      "faz": "continue",
+      "trecho": "candidatos.append((rom, nome, _normalizar(nome) == alvo))"
+    },
+    {
+      "arquivo": "servidor\\partida.py",
+      "linha": 62,
+      "captura": "Exception",
+      "largo": true,
+      "faz": "return None",
+      "trecho": "return json.loads(resposta.read().decode(\"utf-8\"))"
+    },
+    {
+      "arquivo": "servidor\\partida.py",
+      "linha": 70,
+      "captura": "OSError",
+      "largo": false,
+      "faz": "return False",
+      "trecho": "return True"
+    },
+    {
+      "arquivo": "servidor\\partida.py",
+      "linha": 91,
+      "captura": "Exception",
+      "largo": true,
+      "faz": "return None",
+      "trecho": "return saida or None"
+    },
+    {
+      "arquivo": "servidor\\processos.py",
+      "linha": 89,
+      "captura": "(OSError, AttributeError)",
+      "largo": false,
+      "faz": "return False",
+      "trecho": "return bool(k.SetPriorityClass(k.GetCurrentProcess(), classe))"
+    },
+    {
+      "arquivo": "servidor\\processos.py",
+      "linha": 127,
+      "captura": "(OSError, AttributeError)",
+      "largo": false,
+      "faz": "return False",
+      "trecho": "k.CloseHandle(h)"
+    },
+    {
+      "arquivo": "servidor\\processos.py",
+      "linha": 161,
+      "captura": "(OSError, AttributeError)",
+      "largo": false,
+      "faz": "return False",
+      "trecho": "ctypes.byref(info), ctypes.sizeof(info)))"
+    }
+  ],
+  "abertos_sem_fechar": [
+    {
+      "arquivo": "servidor\\janela_preta.py",
+      "linha": 69,
+      "trecho": "arquivo = open(caminho, \"a\", encoding=\"utf-8\", errors=\"replace\")"
+    }
+  ],
+  "gravacoes_nao_atomicas": [
+    {
+      "arquivo": "servidor\\acervo.py",
+      "linha": 38,
+      "atomica_perto": true,
+      "trecho": "with open(temporario, \"w\", encoding=\"utf-8\") as arquivo:"
+    },
+    {
+      "arquivo": "servidor\\acervo.py",
+      "linha": 210,
+      "atomica_perto": true,
+      "trecho": "with open(temporario, \"wb\") as arquivo:"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 148,
+      "atomica_perto": true,
+      "trecho": "with open(temporario, \"w\", encoding=\"utf-8\") as arquivo:"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 1320,
+      "atomica_perto": true,
+      "trecho": "with open(temporario, \"wb\") as arquivo:"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 1396,
+      "atomica_perto": true,
+      "trecho": "with open(temporario, \"wb\") as arquivo:"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 2908,
+      "atomica_perto": false,
+      "trecho": "with pacote.open(item) as origem, open(alvo, \"wb\") as saida:"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 5271,
+      "atomica_perto": true,
+      "trecho": "with open(temporario, \"wb\") as arquivo:"
+    },
+    {
+      "arquivo": "servidor\\arrumar.py",
+      "linha": 256,
+      "atomica_perto": true,
+      "trecho": "with velho.open(item) as de, refeito.open(resto, \"w\") as para:"
+    },
+    {
+      "arquivo": "servidor\\arrumar.py",
+      "linha": 290,
+      "atomica_perto": false,
+      "trecho": "with open(leia, \"w\", encoding=\"utf-8-sig\", newline=\"\") as arquivo:"
+    },
+    {
+      "arquivo": "servidor\\arrumar.py",
+      "linha": 385,
+      "atomica_perto": false,
+      "trecho": "with z.open(item) as de, open(destino, \"wb\") as para:"
+    },
+    {
+      "arquivo": "servidor\\arrumar.py",
+      "linha": 480,
+      "atomica_perto": true,
+      "trecho": "with z.open(item) as de, open(alvo + \".descompactando\", \"wb\") as para:"
+    },
+    {
+      "arquivo": "servidor\\bios.py",
+      "linha": 813,
+      "atomica_perto": true,
+      "trecho": "with open(temporario, \"wb\") as arquivo:"
+    },
+    {
+      "arquivo": "servidor\\bios.py",
+      "linha": 833,
+      "atomica_perto": true,
+      "trecho": "with open(temporario, \"w\", encoding=\"utf-8\") as arquivo:"
+    },
+    {
+      "arquivo": "servidor\\bios.py",
+      "linha": 1146,
+      "atomica_perto": true,
+      "trecho": "with z.open(item) as de, open(final + \".instalando\", \"wb\") as para:"
+    },
+    {
+      "arquivo": "servidor\\bios.py",
+      "linha": 1220,
+      "atomica_perto": true,
+      "trecho": "with open(caminho + \".tmp\", \"w\", encoding=\"utf-8-sig\", newline=\"\") as arquivo:"
+    },
+    {
+      "arquivo": "servidor\\capas_online.py",
+      "linha": 168,
+      "atomica_perto": true,
+      "trecho": "with open(temporario, \"w\", encoding=\"utf-8\") as arquivo:"
+    },
+    {
+      "arquivo": "servidor\\capas_online.py",
+      "linha": 374,
+      "atomica_perto": true,
+      "trecho": "with open(temporario, \"wb\") as arquivo:"
+    },
+    {
+      "arquivo": "servidor\\cheats.py",
+      "linha": 43,
+      "atomica_perto": true,
+      "trecho": "with open(temporario, \"w\", encoding=\"utf-8\") as arquivo:"
+    },
+    {
+      "arquivo": "servidor\\controles.py",
+      "linha": 259,
+      "atomica_perto": true,
+      "trecho": "with open(temporario, \"w\", encoding=\"utf-8\") as arquivo:"
+    },
+    {
+      "arquivo": "servidor\\diagnostico.py",
+      "linha": 144,
+      "atomica_perto": false,
+      "trecho": "with open(caminhos, \"a\", encoding=\"utf-8\") as arquivo:"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 51,
+      "atomica_perto": true,
+      "trecho": "with open(temporario, \"w\", encoding=\"utf-8\") as arquivo:"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 694,
+      "atomica_perto": false,
+      "trecho": "with open(portatil, \"w\", encoding=\"utf-8\"):"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 1672,
+      "atomica_perto": false,
+      "trecho": "with open(portatil, \"w\", encoding=\"utf-8\") as arquivo:"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 2496,
+      "atomica_perto": true,
+      "trecho": "with open(temporario, \"w\", encoding=\"utf-8\", newline=\"\\n\") as arquivo:"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 2545,
+      "atomica_perto": true,
+      "trecho": "with open(temporario, \"w\", encoding=\"utf-8\", newline=\"\") as arquivo:"
+    },
+    {
+      "arquivo": "servidor\\hardware.py",
+      "linha": 218,
+      "atomica_perto": false,
+      "trecho": "with open(caminho, \"wb\", buffering=0) as arquivo:"
+    },
+    {
+      "arquivo": "servidor\\indexador.py",
+      "linha": 1061,
+      "atomica_perto": true,
+      "trecho": "with open(temporario, \"w\", encoding=\"utf-8\") as arquivo:"
+    },
+    {
+      "arquivo": "servidor\\integridade.py",
+      "linha": 57,
+      "atomica_perto": true,
+      "trecho": "with open(provisorio, \"w\", encoding=\"utf-8\") as arquivo:"
+    },
+    {
+      "arquivo": "servidor\\janela_preta.py",
+      "linha": 69,
+      "atomica_perto": true,
+      "trecho": "arquivo = open(caminho, \"a\", encoding=\"utf-8\", errors=\"replace\")"
+    },
+    {
+      "arquivo": "servidor\\jogadores.py",
+      "linha": 188,
+      "atomica_perto": true,
+      "trecho": "with open(temporario, \"w\", encoding=\"utf-8-sig\", newline=\"\\r\\n\") as arquivo:"
+    }
+  ],
+  "caminhos_absolutos": [
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 3878,
+      "texto": "\"C:\\Windows\""
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 6054,
+      "texto": "\"C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe\""
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 6055,
+      "texto": "\"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe\""
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 6056,
+      "texto": "\"C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe\""
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linha": 1760,
+      "texto": "\"C:\\\\Windows\""
+    }
+  ],
+  "ingles_na_tela": [
+    "launcher\\index.html:52: volta (o ARENA.bat reabre o servidor; ver perderContato no app.js). -->",
+    "launcher\\index.html:59: para aparecer DENTRO do jogo com seguranca (ver faixaTeclas no app.js),",
+    "launcher\\index.html:62: No jogo:",
+    "launcher\\index.html:64: F4  volta ao save",
+    "launcher\\index.html:89: <input id=\"campoBusca\" type=\"search\" placeholder=\"Procurar por nome do jogo\"",
+    "launcher\\index.html:358: <input id=\"campoBuscaAcervo\" type=\"search\" maxlength=\"80\"",
+    "launcher\\index.html:449: O ARENA procura o que pesa no Windows: programas que abrem sozinhos,",
+    "launcher\\index.html:744: <a href=\"https://npcap.com/#download\" target=\"_blank\"",
+    "launcher\\index.html:761: que chega no seu e-mail. O ARENA nunca cria essa conta sozinho —",
+    "launcher\\index.html:798: Agora no computador  —",
+    "launcher\\index.html:842: Save states",
+    "launcher\\index.html:855: Troque se o jogo abrir no emulador errado.",
+    "launcher\\index.html:859: 10 slots de save state. F2 salva e F4 carrega.",
+    "launcher\\app.js:1157: Escreva seu apelido no topo primeiro."
+  ]
+}

@@ -59,7 +59,15 @@ def arquivos_do_git(revisao, pastas):
 # o ultimo commit deixaria uma mudanca se esconder de fase em fase.
 REVISAO_ANTES = "97ffe03"
 
-TITULOS_NOVOS_DE_PROPOSITO = {"Capcom Vs SNK 2 Millionaire Fighting 2001"}
+# Titulos que mudaram DE PROPOSITO depois da versao de antes (sem par, nao
+# da para comparar):
+#  - 25/09/2026: "disc.gdi" passou a ter o nome da pasta ("Disc" -> "Capcom
+#    Vs SNK 2...");
+#  - 03/10/2026: o KOF 2002 do professor virou o kof2k2fd.zip do FBNeo, e o
+#    nome vem de nomes_arcade.NOMES_FORA_DO_BANCO (a versao de antes nao tem
+#    nomes de fliperama e o chamaria pelo nome do arquivo).
+TITULOS_NOVOS_DE_PROPOSITO = {"Capcom Vs SNK 2 Millionaire Fighting 2001",
+                              "The King of Fighters 2002"}
 
 # C64 (VICE) e Amiga (PUAE) passaram a recusar o Jogar Junto DE PROPOSITO
 # (25/09/2026): o nucleo nao tem netplay, confirmado tentando hospedar.

@@ -1233,6 +1233,15 @@ MOTORES_PCSX2 = {"automatico": "-1", "d3d11": "3", "d3d12": "15", "vulkan": "14"
 PCSX2_SEGUROS = {"hw_mipmap": "true", "TriFilter": "-1", "filter": "2", "HWDownloadMode": "0"}
 
 
+def aviso_sem_gravar(emulador, falha):
+    """A configuracao do emulador nao gravou (pasta somente leitura, disco
+    cheio...): ele abre com a que ja tinha, e a janela preta diz por que.
+    Antes o ARENA ficava calado -- e o controle ou a imagem do jogo
+    "nao obedeciam" sem ninguem saber o motivo (auditoria 3, 07/10/2026)."""
+    print("[ARENA] AVISO: nao consegui gravar a configuracao do %s (%s). "
+          "Ele abre com a que ja tinha." % (emulador, falha))
+
+
 def escrever_config_pcsx2(caminho_executavel, ultra=False, nota=None,
                           nota_gpu=None, modesto=False, preset=None,
                           jogadores=2, controles_xinput=(0, 1),
@@ -1403,7 +1412,8 @@ def escrever_config_pcsx2(caminho_executavel, ultra=False, nota=None,
         os.makedirs(os.path.dirname(destino), exist_ok=True)
         gravar_atomico(destino, texto)
         return destino
-    except OSError:
+    except OSError as falha:
+        aviso_sem_gravar("PCSX2", falha)
         return None
 
 
@@ -1716,7 +1726,8 @@ def escrever_config_dolphin(caminho_executavel, controles_xinput, teclado=True,
                 texto = _trocar_chaves_ini(texto, secao, chaves)
             gravar_atomico(caminho, texto)
         return pasta_config
-    except OSError:
+    except OSError as falha:
+        aviso_sem_gravar("Dolphin", falha)
         return None
 
 
@@ -1943,7 +1954,8 @@ def escrever_config_xenia(caminho_executavel, nota, nota_gpu=None, modesto=False
     try:
         gravar_atomico(destino, texto)
         return destino
-    except OSError:
+    except OSError as falha:
+        aviso_sem_gravar("Xenia", falha)
         return None
 
 
@@ -2111,7 +2123,8 @@ def escrever_config_rpcs3(caminho_executavel, nota, nota_gpu=None, modesto=False
     try:
         gravar_atomico(destino, texto)
         return destino
-    except OSError:
+    except OSError as falha:
+        aviso_sem_gravar("RPCS3", falha)
         return None
 
 
@@ -2275,18 +2288,6 @@ JOGADORES_MAXIMO_NETPLAY = 8  # limite de seguranca; nenhum console cadastrado p
 DISPOSITIVO_MULTITAP_SNES = 257
 JOGADORES_MULTITAP = 5          # jogador 1 na porta 1 + 4 no adaptador da porta 2
 NETPLAY_CONEXOES_PADRAO = 3     # o mesmo padrao do RetroArch (netplay_max_connections)
-
-
-def jogo_suporta_multitap(plataforma, titulo):
-    """Confere se ESTE jogo (pelo titulo) esta na lista curada de jogos que
-    aceitam o adaptador Multitap (consoles.json -> jogos_multitap). Lista
-    curta de proposito, do mesmo jeito que o PS2 com 'system link': so
-    cresce testando com jogo real, nunca por suposicao -- a maioria dos
-    jogos de um console nao usa multitap, e mostrar "Jogador 3/4/5" pra
-    eles confundiria o aluno a toa."""
-    lista = plataforma.get("jogos_multitap", [])
-    titulo_normalizado = (titulo or "").lower()
-    return any(nome.lower() in titulo_normalizado for nome in lista)
 
 
 def opcoes_de_partida(apelido, hospedar, atraso=0, assistir=False,

@@ -999,6 +999,32 @@ def recursos_visiveis():
             if nota >= r.get("nota_minima", 0)]
 
 
+def avancado_desta_maquina(config):
+    """As opcoes avancadas que valem NESTA maquina.
+
+    A configuracao viaja no pen drive. Uma opcao pesada (nota_minima no
+    recursos.json) ligada num PC forte nao pode voltar a valer no
+    notebook fraco: aqui a tela nem a mostra (recursos_visiveis). Achado
+    da auditoria 3 (07/10/2026): a "Resposta instantanea" ligada num i5
+    religava no Celeron por cima da trava de opcoes_efetivas.
+
+    Fora da nota, a opcao volta ao padrao do ARENA (AVANCADO_PADRAO, sempre
+    o desligado); sem padrao, vale o que o perfil de imagem manda (os perfis
+    sempre escrevem filtro, voltar no tempo, resposta instantanea e quadro
+    preto). Tirar a opcao nao bastava: o RetroArch guarda no retroarch.cfg,
+    ao fechar, o que recebeu -- e o valor do PC forte voltaria por la."""
+    nota = CAPACIDADE["nota"]
+    pesadas = {r["chave"] for r in carregar_recursos()["recursos"]
+               if nota < r.get("nota_minima", 0)}
+    desta = {}
+    for chave, valor in (config.get("avancado") or {}).items():
+        if chave not in pesadas:
+            desta[chave] = valor
+        elif chave in AVANCADO_PADRAO:
+            desta[chave] = AVANCADO_PADRAO[chave]
+    return desta
+
+
 def recursos_por_chave():
     return {r["chave"]: r for r in carregar_recursos()["recursos"]}
 
@@ -1267,13 +1293,13 @@ LIMITE_FOTO_PERFIL = 2 * 1024 * 1024
 
 def foto_perfil_caminho():
     """Acha o arquivo da foto atual, seja qual for a extensao - ou None
-    se ninguem colocou foto ainda."""
-    try:
-        for nome in os.listdir(PASTA_PERFIL):
-            if nome.startswith("foto."):
-                return os.path.join(PASTA_PERFIL, nome)
-    except OSError:
-        pass
+    se ninguem colocou foto ainda. So os nomes certos (foto.png, foto.jpg,
+    foto.webp): o temporario de uma gravacao interrompida tambem comeca com
+    "foto." (foto.png.1234.tmp) e nao pode passar por foto (auditoria 3)."""
+    for extensao in TIPOS_FOTO_PERFIL.values():
+        caminho = os.path.join(PASTA_PERFIL, "foto" + extensao)
+        if os.path.isfile(caminho):
+            return caminho
     return None
 
 
@@ -1308,20 +1334,29 @@ def gravar_foto_perfil(imagem_base64):
 
     os.makedirs(PASTA_PERFIL, exist_ok=True)
     antiga = foto_perfil_caminho()
-    if antiga:
+    destino = os.path.join(PASTA_PERFIL, "foto" + TIPOS_FOTO_PERFIL[tipo])
+    temporario = "%s.%d.tmp" % (destino, threading.get_ident())
+    try:
+        with TRAVA_ARQUIVO:
+            with open(temporario, "wb") as arquivo:
+                arquivo.write(brutos)
+                arquivo.flush()
+                os.fsync(arquivo.fileno())
+            os.replace(temporario, destino)
+    finally:
+        if os.path.exists(temporario):
+            try:
+                os.remove(temporario)
+            except OSError:
+                pass
+    # A antiga (de outra extensao) so sai depois que a nova esta inteira no
+    # lugar. Achado da auditoria 3: saia ANTES, e uma gravacao que falhasse
+    # (pen drive cheio) deixava o aluno sem foto nenhuma.
+    if antiga and os.path.normcase(antiga) != os.path.normcase(destino):
         try:
             os.remove(antiga)
         except OSError:
             pass
-
-    destino = os.path.join(PASTA_PERFIL, "foto" + TIPOS_FOTO_PERFIL[tipo])
-    temporario = "%s.%d.tmp" % (destino, threading.get_ident())
-    with TRAVA_ARQUIVO:
-        with open(temporario, "wb") as arquivo:
-            arquivo.write(brutos)
-            arquivo.flush()
-            os.fsync(arquivo.fileno())
-        os.replace(temporario, destino)
     return destino
 
 
@@ -1483,7 +1518,7 @@ def opcoes_efetivas(config, custo=None, controles_ligados=None):
     if CAPACIDADE["nota"] < 4:
         opcoes["run_ahead_enabled"] = "false"
 
-    opcoes.update(config.get("avancado", {}))
+    opcoes.update(avancado_desta_maquina(config))
     opcoes["video_driver"] = driver
     opcoes["log_dir"] = PASTA_DADOS
 
@@ -2879,6 +2914,7 @@ def importar_saves(nome_arquivo):
     maquina, seu save continua valendo. O que vem de fora so preenche o
     que estava faltando. Assim ninguem perde progresso por engano.
     """
+    import shutil
     import zipfile
 
     caminho = os.path.join(PASTA_BACKUP, os.path.basename(str(nome_arquivo)))
@@ -2905,8 +2941,20 @@ def importar_saves(nome_arquivo):
                     pulados += 1
                     continue
                 os.makedirs(os.path.dirname(alvo), exist_ok=True)
-                with pacote.open(item) as origem, open(alvo, "wb") as saida:
-                    saida.write(origem.read())
+                # Pelo temporario: se o pen drive sair no meio, nao fica um
+                # save cortado com o nome certo -- a proxima importacao o
+                # pularia por "ja existir". Achado da auditoria 3.
+                temporario = alvo + ".importando"
+                try:
+                    with pacote.open(item) as origem, open(temporario, "wb") as saida:
+                        shutil.copyfileobj(origem, saida)
+                    os.replace(temporario, alvo)
+                finally:
+                    if os.path.exists(temporario):
+                        try:
+                            os.remove(temporario)
+                        except OSError:
+                            pass
                 trazidos += 1
     except (zipfile.BadZipFile, OSError) as falha:
         return None, "Pacote danificado ou ilegivel (%s)." % falha
@@ -3129,6 +3177,82 @@ def gritar(pacote):
                     pass
 
 
+# Teto da lista de colegas vistos: numa sala cabem uns 40. Cada computador
+# da rede pode mandar o que quiser na porta da descoberta; sem teto, quem
+# inventasse codigos enchia a lista (e a poda, a cada pacote, ficava
+# cada vez mais lenta). Por endereco, ate 4 (dois ARENAs no mesmo
+# computador ja acontece nos testes).
+LIMITE_VIZINHOS = 200
+LIMITE_POR_ENDERECO = 4
+_PODA_DOS_VIZINHOS = {"ultima": 0.0, "aviso": 0.0}
+
+
+def receber_grito(pacote, remetente, meus=None, agora=None):
+    """Trata um grito recebido na porta da descoberta. Devolve True se o
+    colega entrou (ou foi renovado) na lista.
+
+    Vem da rede: qualquer computador pode mandar qualquer coisa. Achado da
+    auditoria 3 (07/10/2026): um pacote torto -- um JSON que nao e'
+    objeto, ou "porta": "abc" -- levantava erro fora do try e MATAVA a
+    linha que escuta: a descoberta de colegas acabava ate fechar o ARENA.
+    E a lista nao tinha teto. Agora tudo o que chega e' conferido.
+    """
+    agora = time.monotonic() if agora is None else agora
+    if not pacote.startswith(MARCA_DESCOBERTA):
+        return False
+    try:
+        dados = json.loads(pacote[len(MARCA_DESCOBERTA):].decode("utf-8"))
+    except (ValueError, UnicodeDecodeError):
+        return False
+    if not isinstance(dados, dict):
+        return False
+    identificacao = str(dados.get("id") or "")[:32]
+    if not identificacao:
+        return False
+    # Sem porta no grito: a padrao. Porta que nao e' numero de 1 a 65535
+    # (0, "abc", true, [1]...): o grito nao vale.
+    porta_bruta = dados.get("porta")
+    if isinstance(porta_bruta, bool):
+        return False
+    try:
+        porta_dele = PORTA if porta_bruta in (None, "") else int(porta_bruta)
+    except (TypeError, ValueError, OverflowError):
+        return False
+    if not 1 <= porta_dele <= 65535:
+        return False
+    ip = str(remetente[0])
+    # "Sou eu?" nao da para responder pelo codigo: em laboratorio com
+    # maquinas clonadas o codigo pode se repetir, e ai o ARENA ignoraria o
+    # colega achando que e o proprio eco. Quem responde e o par
+    # endereco+porta, que e unico de verdade.
+    if meus is None:
+        meus = {e["ip"] for e in enderecos_locais()} | {"127.0.0.1"}
+    if porta_dele == PORTA and ip in meus:
+        return False
+    with TRAVA_VIZINHOS:
+        # Some quem sumiu ha mais de um minuto -- no maximo uma vez por
+        # segundo (com pacote chegando sem parar, era a cada pacote).
+        if agora - _PODA_DOS_VIZINHOS["ultima"] >= 1.0:
+            _PODA_DOS_VIZINHOS["ultima"] = agora
+            for chave in [k for k, v in VIZINHOS.items() if agora - v["visto_em"] > 60]:
+                VIZINHOS.pop(chave, None)
+        if identificacao not in VIZINHOS:
+            do_mesmo = [k for k, v in VIZINHOS.items() if v["ip"] == ip]
+            if len(do_mesmo) >= LIMITE_POR_ENDERECO:
+                VIZINHOS.pop(min(do_mesmo, key=lambda k: VIZINHOS[k]["visto_em"]), None)
+            elif len(VIZINHOS) >= LIMITE_VIZINHOS:
+                VIZINHOS.pop(min(VIZINHOS, key=lambda k: VIZINHOS[k]["visto_em"]), None)
+        VIZINHOS[identificacao] = {
+            "id": identificacao,
+            "apelido": limpar_apelido(dados.get("apelido", "")),
+            "ip": ip,
+            "porta": porta_dele,
+            "visto_em": agora,
+            "partida": limpar_partida_recebida(dados.get("partida")),
+        }
+    return True
+
+
 def anunciar_e_escutar():
     """Fica gritando e ouvindo na rede local, em segundo plano."""
     try:
@@ -3180,39 +3304,13 @@ def anunciar_e_escutar():
         except (socket.timeout, OSError):
             continue
 
-        if not pacote.startswith(MARCA_DESCOBERTA):
-            continue
+        # Vem da rede: nada do que chega pode derrubar quem escuta.
         try:
-            dados = json.loads(pacote[len(MARCA_DESCOBERTA):].decode("utf-8"))
-        except (ValueError, UnicodeDecodeError):
-            continue
-
-        identificacao = str(dados.get("id", ""))[:32]
-        if not identificacao:
-            continue
-
-        # "Sou eu?" nao da para responder pelo codigo: em laboratorio com
-        # maquinas clonadas o codigo pode se repetir, e ai o ARENA
-        # ignoraria o colega achando que e o proprio eco. Quem responde e
-        # o par endereco+porta, que e unico de verdade.
-        porta_dele = int(dados.get("porta") or PORTA)
-        meus = {e["ip"] for e in enderecos_locais()} | {"127.0.0.1"}
-        if porta_dele == PORTA and remetente[0] in meus:
-            continue
-
-        with TRAVA_VIZINHOS:
-            VIZINHOS[identificacao] = {
-                "id": identificacao,
-                "apelido": str(dados.get("apelido", ""))[:24],
-                "ip": remetente[0],
-                "porta": int(dados.get("porta") or PORTA),
-                "visto_em": time.monotonic(),
-                "partida": limpar_partida_recebida(dados.get("partida")),
-            }
-            # Some quem sumiu ha mais de um minuto.
-            for chave in [k for k, v in VIZINHOS.items()
-                          if time.monotonic() - v["visto_em"] > 60]:
-                VIZINHOS.pop(chave, None)
+            receber_grito(pacote, remetente)
+        except Exception as falha:   # noqa: BLE001 -- defeito nosso, nao do pacote
+            if time.monotonic() - _PODA_DOS_VIZINHOS["aviso"] > 60:
+                _PODA_DOS_VIZINHOS["aviso"] = time.monotonic()
+                print("[ARENA] Descoberta de colegas: pacote ignorado (%s)." % falha)
 
 
 def limpar_partida_recebida(partida):
@@ -3744,7 +3842,11 @@ VIGIA = {
     "ultimo_backup": 0.0,
     "ultimo_backup_local": 0.0,
     "estava_offline": True,
-    "internet_estava_fora": True,
+    # None = "ainda nao sei". Comecava True, e a primeira checagem (20 s
+    # depois de abrir) contava como "a internet voltou": uma copia de
+    # seguranca a CADA abertura -- e, com o rodizio de 3, tres aberturas
+    # apagavam as copias de antes. Achado da auditoria 3 (07/10/2026).
+    "internet_estava_fora": None,
     "encerrar": threading.Event(),
     # Ligado durante o jogo no modo ultra: as tarefas de fundo param de
     # vez, para nao roubar processador nem tocar no disco enquanto o
@@ -6231,10 +6333,21 @@ def principal():
     print("  ARENA %s - servidor local" % VERSAO)
     print("=" * 62)
 
+    # Pasta que nao da para criar nao derruba a abertura. Achado da auditoria
+    # 3 (08/10/2026): um ARQUIVO chamado "backup" na pasta do ARENA (ou
+    # "saves", "dados"...) fazia o ARENA cair aqui, com o erro cru do Windows,
+    # antes de abrir a tela. Agora avisa na janela preta e segue; quem
+    # precisar da pasta (a copia de seguranca, por exemplo) explica depois.
     for pasta in (PASTA_DADOS, PASTA_SISTEMA, PASTA_SAVES, PASTA_STATES,
                   PASTA_CAPTURAS, PASTA_CORES, PASTA_CHEATS, PASTA_BACKUP,
                   PASTA_REMAPS, PASTA_CONTROLES):
-        os.makedirs(pasta, exist_ok=True)
+        try:
+            os.makedirs(pasta, exist_ok=True)
+        except OSError as falha:
+            print("[ARENA] AVISO: nao consegui criar a pasta %s (%s). Se ha um "
+                  "arquivo com esse nome na pasta do ARENA, renomeie o arquivo "
+                  "e abra o ARENA de novo." % (os.path.relpath(pasta, RAIZ),
+                                               getattr(falha, "strerror", None) or falha))
 
     # Um desligamento abrupto (pen drive retirado, queda de energia) pode
     # deixar arquivos temporarios para tras. Limpa na abertura.
