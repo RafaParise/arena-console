@@ -136,6 +136,9 @@ Dos 46 itens que o RetroArch mostra por padrão, o ARENA deixa **12**.
 Cada jogo tem 10 espaços, numerados de **0 a 9**. Cada espaço guarda o jogo
 exatamente como estava: posição, vida, itens, tudo.
 
+Todo jogo abre no espaço **0**. Para usar outro, escolha com `F6`/`F7`
+antes do `F2`. Assim um `F2` distraído nunca grava por cima do espaço 9.
+
 Diferente do save do próprio jogo, que só grava nos pontos que o jogo
 permite. O save state grava em qualquer lugar, até no meio de um chefe.
 

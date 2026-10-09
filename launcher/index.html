@@ -933,6 +933,11 @@
       <select id="listaAmigosPartida">
         <option value="">Procurando colegas na rede…</option>
       </select>
+      <span class="opcao-ajuda" id="dicaSemPartida" hidden>
+        Não apareceu? Quem abre a partida precisa ligar “Aceitar conexões da rede”
+        (botão Amigos, no alto) e os dois precisam estar na mesma rede. Se mesmo
+        assim não aparecer, rode o PARTIDA.bat nos dois computadores.
+      </span>
     </label>
 
     <label class="campo" id="campoJogadorPartida" hidden>
@@ -987,7 +992,7 @@
       <label class="campo"><span>Licença/autorização</span><input id="acervoLicenca" maxlength="160" placeholder="CC0, domínio público ou autorização do autor"></label>
       <label class="campo"><span>Fonte pública</span><input id="acervoFonte" maxlength="240" placeholder="https://github.com/..." inputmode="url"></label>
       <label class="campo acervo-formulario--inteiro"><span>URL HTTPS do arquivo</span><input id="acervoUrl" maxlength="500" placeholder="https://raw.githubusercontent.com/..." inputmode="url"></label>
-      <label class="campo"><span>Arquivo dentro de jogos\\livres</span><input id="acervoDestino" maxlength="240" placeholder="NES/Meu jogo.nes"></label>
+      <label class="campo"><span>Arquivo dentro de jogos\livres</span><input id="acervoDestino" maxlength="240" placeholder="NES/Meu jogo.nes"></label>
       <label class="campo"><span>SHA-256 do arquivo</span><input id="acervoSha256" maxlength="64" placeholder="64 caracteres hexadecimais" autocomplete="off" spellcheck="false"></label>
     </div>
     <label class="opcao acervo-autorizacao">

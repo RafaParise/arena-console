@@ -473,7 +473,7 @@ Comece só pela Fase 0.
 - [x] Fase 1 — Varredura e limpeza (debloat) (08/10/2026) — C1 a C7, R1 a R5; bateria 232
 - [x] Fase 2 — Leveza e desempenho (08/10/2026) — abertura 2,57→1,63 s; 8.264→72 KB por abertura; fundo animado 7,7→5,0% de um núcleo; bateria 246
 - [x] Fase 3 — Servidor e API (08/10/2026) — a tela não congela mais na releitura (3,3 s → 0,02 s); internet ruim com frase certa (teste novo, 13/13); 66+ mensagens com "o que fazer"; bateria 252
-- [ ] Fase 4 — Jogar Junto
+- [x] Fase 4 — Jogar Junto (08–09/10/2026) — a porta da partida ia com o nome errado (os testes de rede ruim e de duas partidas nunca mediram o que diziam: refeitos); 8 chaves mortas do RetroArch; sexto jogador e rede Pública com explicação; bateria 261
 - [ ] Fase 5 — Matriz de jogos
 - [ ] Fase 6 — Portabilidade e robustez
 - [ ] Fase 7 — Clareza para todos

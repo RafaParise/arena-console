@@ -158,6 +158,29 @@ def _plural(n, um, varios):
     return "%d %s" % (n, um if n == 1 else varios)
 
 
+# Jogar Junto: o que o RetroArch escreve quando NAO deu para entrar na partida
+# de um colega (pt-BR, a lingua do menu do ARENA, e o ingles, por garantia).
+FALHOU_AO_CONECTAR = ("Falha ao conectar ao host", "Failed to connect to host")
+
+
+def motivo_da_partida(texto, jogadores_max=None):
+    """Por que nao deu para ENTRAR na partida de um colega, ou None.
+
+    Achado da auditoria 3 (08/10/2026, testes\\teste_netplay_sexto_jogador.py):
+    o sexto jogador numa partida de 5 recebe do RetroArch so "Falha ao
+    conectar ao host" -- e acha que e' a rede. Pode ser a partida cheia ou a
+    rede barrando; a frase diz as duas e o que fazer em cada uma."""
+    if not any(f in texto for f in FALHOU_AO_CONECTAR):
+        return None
+    if jogadores_max:
+        cheia = "Ela pode estar cheia: este jogo aceita até %d jogadores. " % int(jogadores_max)
+    else:
+        cheia = "Ela pode estar cheia. "
+    return ("Não deu para entrar na partida. " + cheia + "Pergunte a quem hospeda quantos já "
+            "entraram; se ainda tem vaga, rode o PARTIDA.bat nos dois computadores para ver o que "
+            "a rede está barrando.")
+
+
 def analisar(texto, caminho_jogo, nucleo=""):
     """Le o registro de uma partida e diz por que o jogo nao abriu.
 

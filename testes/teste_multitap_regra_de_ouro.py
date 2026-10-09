@@ -76,18 +76,37 @@ JOGAR_JUNTO_RECUSADO_DE_PROPOSITO = {"Alien Breed Disk1", "Top Gear 2 Disk2",
                                      "INTKARAT", "Mule", "PRINCEOP"}
 
 
+# Auditoria 3 (08/10/2026, Fase 4, J2): chaves que o RetroArch desta pasta
+# nao conhece -- com o nome errado (o certo ao lado) ou que nao existem mais.
+# Valem para TODO jogo, de proposito; os nomes velhos e os novos ficam fora
+# da comparacao (servidor\tests\test_chaves_do_retroarch.py confere os novos).
+CHAVES_RENOMEADAS_NA_AUDITORIA_3 = {
+    "savestate_slot", "state_slot",
+    "menu_rgui_color_theme", "rgui_menu_color_theme",
+    "rgui_full_width_layout", "menu_rgui_full_width_layout",
+    "content_show_add", "content_show_add_entry",
+    "input_bsv_record_toggle", "input_record_replay", "input_play_replay", "input_halt_replay",
+    "netplay_port", "netplay_ip_port",
+    "quick_menu_show_cheevos", "notification_show_recording", "notification_show_streaming",
+    "netplay_stateless_mode",
+}
+
+
 def sem_mudanca_de_proposito(chaves_override):
-    """Tira as duas mudancas que valem para TODO jogo, de proposito (teste
+    """Tira as mudancas que valem para TODO jogo, de proposito (teste
     com os controles na mao, 25/09/2026):
       - botao/eixo de controle nao definido pelo aluno vai "nul" (numero
         velho no retroarch.cfg punha o Start no R3);
       - input_remapping_directory aponta para o .rmp da partida (o RetroArch
         ignora o tipo de porta vindo do --appendconfig);
       - o teclado de todos os jogadores vai escrito (o teclado e' o primeiro
-        jogador sem controle; pedido do Rafael, 25/09/2026)."""
+        jogador sem controle; pedido do Rafael, 25/09/2026);
+      - as chaves com nome errado, renomeadas ou tiradas na auditoria 3
+        (CHAVES_RENOMEADAS_NA_AUDITORIA_3)."""
     teclado = r"^input_player\d+_(up|down|left|right|a|b|x|y|l|r|l2|r2|l3|r3|start|select)$"
     return {c: v for c, v in chaves_override.items()
             if c != "input_remapping_directory"
+            and c not in CHAVES_RENOMEADAS_NA_AUDITORIA_3
             and not re.match(teclado, c)
             and not (v == "nul" and re.match(r"^input_player\d+_\w+_(btn|axis)$", c))}
 

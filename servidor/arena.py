@@ -533,7 +533,14 @@ BASE_COMUM = {
     "input_toggle_fullscreen": "f",
 
     # --- Save states -------------------------------------------------------
-    "savestate_slot": "0",
+    # Todo jogo abre no espaco 0, "o de sempre" (guia 4). O RetroArch desta
+    # pasta ja volta ao 0 sozinho a cada jogo aberto -- conferido em
+    # 08/10/2026 com a configuracao pedindo o espaco 3. A chave fica, agora
+    # com o nome certo (era "savestate_slot", que nao existe: auditoria 3,
+    # servidor\tests\test_chaves_do_retroarch.py), para o caso de uma versao
+    # nova do RetroArch passar a lembrar o espaco -- e o proximo F2 regravar
+    # o 9, o "seguro" do guia.
+    "state_slot": "0",
     "savestate_max_keep": "0",     # 0 = nao apaga estado antigo sozinho
     "quick_menu_show_save_load_state": "true",
     "quick_menu_show_undo_save_load_state": "true",
@@ -556,11 +563,15 @@ BASE_COMUM = {
     # que e grego - e o menu abria em grego, com as letras que o aluno nao
     # le. Erro simples, efeito devastador.
     "user_language": "7",
-    "menu_rgui_color_theme": "27",              # tema escuro sobrio
+    # Verde classico (o 4 do RetroArch): letra branca no fundo verde-escuro,
+    # o que os alunos sempre viram. O ARENA pedia o 27 (Solarized escuro),
+    # mas com o nome errado ("menu_rgui_color_theme") -- nunca valeu, e
+    # trocar agora seria surpresa para quem ja conhece o menu.
+    "rgui_menu_color_theme": "4",
     "rgui_background_filler_thickness_enable": "false",
     "rgui_border_filler_enable": "true",
     "rgui_border_filler_thickness_enable": "false",
-    "rgui_full_width_layout": "true",
+    "menu_rgui_full_width_layout": "true",
     "rgui_inline_thumbnails": "false",
     "rgui_particle_effect": "0",                # sem animacao de fundo
     "rgui_show_start_screen": "false",
@@ -569,7 +580,7 @@ BASE_COMUM = {
     "menu_show_reboot": "false",
     "menu_show_shutdown": "false",
     "menu_show_legacy_thumbnail_updater": "false",
-    "content_show_add": "false",
+    "content_show_add_entry": "0",              # "Importar conteudo": escondido
     "content_show_images": "false",
     "content_show_music": "false",
     "content_show_video": "false",
@@ -578,11 +589,9 @@ BASE_COMUM = {
     "content_show_explore": "false",
     "quick_menu_show_take_screenshot": "true",
     "quick_menu_show_options": "true",
-    # Itens que so confundem quem quer salvar e voltar ao jogo.
-    "quick_menu_show_save_load_state": "true",
-    "quick_menu_show_undo_save_load_state": "true",
+    # Itens que so confundem quem quer salvar e voltar ao jogo. (As
+    # conquistas nem aparecem: cheevos_enable fica no padrao, desligado.)
     "quick_menu_show_replay": "false",
-    "quick_menu_show_cheevos": "false",
     "menu_show_core_updater": "false",
     "menu_show_online_updater": "false",
     "menu_show_load_content_animation": "false",
@@ -629,10 +638,13 @@ BASE_COMUM = {
     "quick_menu_show_start_streaming": "false",
     "input_recording_toggle": "nul",
     "input_streaming_toggle": "nul",
-    "input_bsv_record_toggle": "nul",
+    # Gravar e repetir a partida (replay, so os botoes): o atalho tinha o
+    # nome antigo ("input_bsv_record_toggle") e nao valia; o padrao do
+    # RetroArch ja e' sem tecla, e aqui fica garantido.
+    "input_record_replay": "nul",
+    "input_play_replay": "nul",
+    "input_halt_replay": "nul",
     "input_grab_mouse_toggle": "nul",
-    "notification_show_recording": "false",
-    "notification_show_streaming": "false",
     "settings_show_user_interface": "false",
     "settings_show_file_browser": "false",
 
@@ -680,32 +692,13 @@ BASE_COMUM = {
     # Consulta o controle o mais tarde possivel dentro do quadro: e o
     # ajuste que mais reduz atraso de comando sem custar desempenho.
     "input_poll_type_behavior": "2",
-    "input_autodetect_enable": "true",
 
-    # --- Analogico E direcional funcionando juntos ------------------------
-    # Valor 1 faz o analogico esquerdo tambem valer como direcional, SEM
-    # desligar o direcional de verdade. Os dois funcionam ao mesmo tempo,
-    # em qualquer controle - e o aluno usa o que preferir sem configurar
-    # nada. Num jogo de PlayStation 1 sem suporte a analogico, e a
-    # diferenca entre o controle funcionar ou nao.
-    "input_player1_analog_dpad_mode": "1",
-    "input_player2_analog_dpad_mode": "1",
-    "input_player3_analog_dpad_mode": "1",
-    "input_player4_analog_dpad_mode": "1",
-
-    # --- Vibracao --------------------------------------------------------
-    # Funciona em Xbox, PS4, PS5 e Switch Pro por cabo. Em controle
-    # generico depende do modelo.
-    "input_rumble_gain": "100",
-    "input_auto_game_focus": "0",
     "video_black_frame_insertion": "0",
     "savestate_auto_save": "false",
     "savestate_auto_load": "false",
     "savestate_thumbnail_enable": "false",
     "content_show_favorites": "false",
     "content_show_history": "false",
-    "menu_show_online_updater": "false",
-    "menu_show_core_updater": "false",
     "check_firmware_before_loading": "false",
     "video_font_enable": "false",
     "fps_show": "false",
@@ -2273,21 +2266,34 @@ def ler_problemas():
             if isinstance(v, dict) and isinstance(v.get("texto"), str)}
 
 
-def anotar_motivo_do_erro(jogo, desde):
+def anotar_motivo_do_erro(jogo, desde, partida=None):
     """Depois do jogo: le o registro DESTA partida e guarda por que ele nao
     abriu -- ou apaga o motivo antigo, se agora abriu.
 
     Achado de 02/10/2026: o Rafael abriu o KOF 2002 quatro vezes; nas quatro
     o MAME escreveu no registro o que faltava, e o ARENA nao dizia nada (o
     RetroArch so mostra "Falha ao carregar o conteudo"). Nunca atrapalha o
-    resto: qualquer falha aqui e' ignorada."""
+    resto: qualquer falha aqui e' ignorada.
+
+    Jogar Junto (auditoria 3): quem tentou ENTRAR na partida de um colega e
+    nao conseguiu ve, ao voltar, o porque (partida cheia ou rede barrando).
+    Isso nao marca o jogo como "com problema": o jogo abre."""
     try:
         registro = motivo_do_erro.registro_da_partida(PASTA_DADOS, desde)
         if not registro:
             return None
+        texto_do_registro = motivo_do_erro.ler(registro)
+        if partida and not partida.get("hospedar") and not partida.get("assistir"):
+            recado = motivo_do_erro.motivo_da_partida(
+                texto_do_registro, (jogo.get("ligacao") or {}).get("jogadores"))
+            if recado:
+                ULTIMO_PROBLEMA.clear()
+                ULTIMO_PROBLEMA.update({"jogo_id": jogo["id"], "titulo": jogo.get("titulo", ""),
+                                        "texto": recado})
+                print("[ARENA] Jogar junto: %s" % recado)
+                return None
         caminho = os.path.join(RAIZ, jogo["arquivo"])
-        resultado = motivo_do_erro.analisar(motivo_do_erro.ler(registro), caminho,
-                                           jogo.get("core", ""))
+        resultado = motivo_do_erro.analisar(texto_do_registro, caminho, jogo.get("core", ""))
         problemas = ler_problemas()
         if resultado and resultado.get("discos"):
             # Faltou o disco (.chd) de um fliperama: a pasta onde ele vai
@@ -2662,7 +2668,7 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             # Nao abriu? O registro do RetroArch diz por que (MAME e FBNeo
             # dizem ate o nome de cada arquivo que falta).
             if not jogo.get("externo"):
-                anotar_motivo_do_erro(jogo, aberto_em)
+                anotar_motivo_do_erro(jogo, aberto_em, partida)
         except OSError as falha:
             print("[ARENA] Nao foi possivel abrir o RetroArch: %s" % falha)
         finally:
@@ -3437,6 +3443,57 @@ def colegas_na_rede():
             "jogo_id_partida": (vizinho.get("partida") or {}).get("jogo_id", ""),
         })
     return saida
+
+
+# A rede que o Windows marcou como Publica (auditoria 3, Fase 4). O Firewall
+# fecha bem mais nela, e a caixa "Permitir que este app se comunique" pede
+# senha de administrador -- o aluno nao consegue aprovar, e ninguem entra na
+# partida dele. O PARTIDA.bat ja dizia isso; agora a tela avisa quem ABRE a
+# partida, na hora, com as saidas que nao pedem senha: outro computador abre
+# (quem entra so faz conexao de saida), ou o repasse pela internet ("Estamos
+# em casas diferentes": os dois so fazem conexoes de saida).
+_CATEGORIA_DA_REDE = {"valor": None, "quando": 0.0, "perguntando": False}
+VALIDADE_DA_CATEGORIA = 300.0
+AVISO_REDE_PUBLICA = (
+    "Atenção: o Windows marcou esta rede como Pública, e o Firewall pode barrar quem tentar "
+    "entrar (a caixa de permissão pede senha de administrador). Se ninguém conseguir entrar, "
+    "peça para outro computador abrir a partida, ou liguem “Estamos em casas diferentes” nos dois.")
+
+
+def _perguntar_categoria_da_rede():
+    """"Public", "Private", "DomainAuthenticated" ou None (so LER a categoria
+    nao pede administrador). Leva ~1 s (PowerShell): nunca no caminho de
+    abrir o jogo."""
+    try:
+        resultado = subprocess.run(
+            ["powershell.exe", "-NoProfile", "-NonInteractive", "-Command",
+             "(Get-NetConnectionProfile | Select-Object -First 1 -ExpandProperty NetworkCategory)"],
+            capture_output=True, text=True, timeout=10,
+            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+        return resultado.stdout.strip() or None
+    except (OSError, subprocess.SubprocessError):
+        return None
+    finally:
+        _CATEGORIA_DA_REDE["perguntando"] = False
+
+
+def preparar_categoria_da_rede():
+    """Pergunta em segundo plano, se a resposta guardada ja passou de 5 min."""
+    if not sys.platform.startswith("win") or _CATEGORIA_DA_REDE["perguntando"]:
+        return
+    if time.monotonic() - _CATEGORIA_DA_REDE["quando"] < VALIDADE_DA_CATEGORIA and _CATEGORIA_DA_REDE["quando"]:
+        return
+    _CATEGORIA_DA_REDE["perguntando"] = True
+
+    def perguntar():
+        _CATEGORIA_DA_REDE["valor"] = _perguntar_categoria_da_rede()
+        _CATEGORIA_DA_REDE["quando"] = time.monotonic()
+    threading.Thread(target=perguntar, daemon=True).start()
+
+
+def aviso_da_rede_para_quem_hospeda():
+    """O aviso da rede Publica, ou "" (sem resposta guardada: nao espera)."""
+    return AVISO_REDE_PUBLICA if _CATEGORIA_DA_REDE["valor"] == "Public" else ""
 
 
 def procurar_partidas(config):
@@ -4594,6 +4651,10 @@ class Manipulador(BaseHTTPRequestHandler):
         if caminho == "/api/partida/procurar":
             # So deste computador (nao esta em ROTAS_REDE_EXTERNA): e' a tela
             # do convidado perguntando "quem tem partida aberta agora?".
+            # A janela de Jogar junto abriu: ja pergunta ao Windows (em
+            # segundo plano) se a rede e' Publica, para o aviso de quem abre
+            # a partida nao atrasar o "Comecar".
+            preparar_categoria_da_rede()
             config = carregar_config()
             lista, corrigidos = procurar_partidas(config)
             if corrigidos:
@@ -5862,6 +5923,8 @@ class Manipulador(BaseHTTPRequestHandler):
                         repasse=str(dados.get("repasse", "saopaulo")),
                         jogador=posicao),
                     "argumentos": graficos.argumentos_de_partida(hospedar, endereco),
+                    "hospedar": hospedar,
+                    "assistir": assistir,
                     "papel": ("jogador 1" if hospedar else
                               "espectador" if assistir else
                               "jogador %d" % posicao),
@@ -5913,6 +5976,10 @@ class Manipulador(BaseHTTPRequestHandler):
                 resposta["porta"] = graficos.PORTA_PARTIDA
             if aviso_netplay:
                 resposta["aviso"] = aviso_netplay
+            if partida and partida.get("hospedar"):
+                aviso_rede = aviso_da_rede_para_quem_hospeda()
+                if aviso_rede:
+                    resposta["aviso"] = (resposta.get("aviso", "") + " " + aviso_rede).strip()
             # Na hora de jogar, o que pode travar o jogo AGORA: memoria quase
             # cheia, notebook na bateria, economia de bateria (~10 ms, sem
             # PowerShell). A tela avisa junto com "Abrindo...".

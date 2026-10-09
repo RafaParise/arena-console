@@ -2316,7 +2316,11 @@ def opcoes_de_partida(apelido, hospedar, atraso=0, assistir=False,
     # caminho que funciona de casa para casa.
     opcoes = {
         "netplay_nickname": (apelido or "jogador")[:24],
-        "netplay_port": str(PORTA_PARTIDA),
+        # A porta vale por AQUI: o "--port" da linha de comando e' ignorado
+        # pelo RetroArch desta pasta. Ate 08/10/2026 a chave ia com o nome
+        # errado ("netplay_port") e so funcionava porque a porta padrao do
+        # RetroArch e' a mesma (auditoria 3, Fase 4).
+        "netplay_ip_port": str(PORTA_PARTIDA),
         # Nunca anunciar a partida na lista publica: quem entra e quem foi
         # convidado, e ninguem mais.
         "netplay_public_announce": "false",
@@ -2332,7 +2336,6 @@ def opcoes_de_partida(apelido, hospedar, atraso=0, assistir=False,
         "netplay_input_latency_frames_range": "6" if pela_internet else "0",
         "netplay_check_frames": "900" if pela_internet else "600",
         "netplay_nat_traversal": "true" if pela_internet else "false",
-        "netplay_stateless_mode": "false",
     }
 
     posicao = 1 if hospedar else int(jogador or JOGADORES_PADRAO_NETPLAY)
@@ -2552,9 +2555,10 @@ def devolver_valores_no_retroarch_cfg(antes):
 def argumentos_de_partida(hospedar, endereco=None, porta=None):
     """Parametros de linha de comando para abrir o jogo em rede.
 
-    A porta vai explicita aqui, alem de estar no arquivo de configuracao.
-    Cinto e suspensorio: se por algum motivo o arquivo de configuracao nao
-    for lido a tempo, a porta da linha de comando ainda vale.
+    A porta vai aqui tambem, mas quem manda e' a chave netplay_ip_port do
+    arquivo (opcoes_de_partida): o RetroArch desta pasta ignora o "--port"
+    -- provado em 08/10/2026, com dois hospedeiros pedindo 55437 e 55438 e
+    os dois escutando na 55435 (testes\\teste_cenarios_sala.py, cenario 3).
     """
     porta = int(porta or PORTA_PARTIDA)
     if hospedar:

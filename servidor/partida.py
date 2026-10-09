@@ -169,10 +169,13 @@ if categoria == "Public":
         "O Windows marcou esta rede como PUBLICA.",
         "O Firewall do Windows fecha bem mais numa rede publica, e a caixa "
         "'Permitir que este app se comunique' pede senha de administrador -- "
-        "um aluno comum nao consegue aprovar sozinho. Peca para o professor "
-        "(com a senha de admin) trocar a rede para 'Privada' em "
-        "Configuracoes > Rede e Internet > Wi-Fi > Propriedades, ou aprove "
-        "a caixa do Firewall quando ela aparecer.")
+        "um aluno comum nao consegue aprovar sozinho. Saidas SEM senha: "
+        "(1) outro computador abre a partida e este ENTRA (quem entra so faz "
+        "conexao de saida, que o Firewall deixa); (2) liguem 'Estamos em casas "
+        "diferentes' nos dois (o repasse pela internet: os dois so fazem "
+        "conexoes de saida). Com a senha de admin, o professor pode trocar a "
+        "rede para 'Privada' em Configuracoes > Rede e Internet > Wi-Fi > "
+        "Propriedades, ou aprovar a caixa do Firewall quando ela aparecer.")
 elif categoria:
     certo("rede categorizada como %s (nao e publica)" % categoria)
 else:
@@ -199,8 +202,11 @@ if colega:
 
     if not porta_aberta(colega, PORTA):
         torto("Nao alcanco o ARENA dele.",
-              "Confira o endereco, se ele ligou 'Aceitar conexoes' e "
-              "se voces estao na mesma rede.")
+              "Confira o endereco, se ele ligou 'Aceitar conexoes' e se voces "
+              "estao na mesma rede. Se estao no mesmo Wi-Fi e mesmo assim nao "
+              "alcanca, o Wi-Fi pode estar isolando os aparelhos (comum na "
+              "escola): liguem o ponto de acesso de um celular e conectem os "
+              "dois nele, ou liguem um cabo direto entre os dois computadores.")
     else:
         certo("o ARENA dele responde")
 

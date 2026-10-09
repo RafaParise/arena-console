@@ -5,7 +5,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 97479,
-      "segundos": 10.9,
+      "segundos": 10.8,
       "travou": false,
       "erros": []
     },
@@ -99,7 +99,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 50874,
-      "segundos": 11.2,
+      "segundos": 11.0,
       "travou": false,
       "erros": []
     },
@@ -120,7 +120,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 29288,
-      "segundos": 12.4,
+      "segundos": 12.9,
       "travou": false,
       "erros": []
     },
@@ -138,7 +138,7 @@
     "abre": {
       "abre_e_mostra_imagem": false,
       "foto_bytes": 1848,
-      "segundos": 10.8,
+      "segundos": 10.9,
       "travou": false,
       "erros": []
     },
@@ -156,7 +156,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 243674,
-      "segundos": 13.2,
+      "segundos": 13.6,
       "travou": false,
       "erros": [
         "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
@@ -187,7 +187,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 7933,
-      "segundos": 11.2,
+      "segundos": 11.3,
       "travou": false,
       "erros": [
         "[libretro WARN] [sceDisplay] Video out requested, not supported: mode=0 size=512,272"

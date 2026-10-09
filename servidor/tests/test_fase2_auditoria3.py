@@ -180,5 +180,35 @@ class TestCopiaSoQuandoMuda(unittest.TestCase):
         self.assertFalse(os.path.exists(os.path.join(destino, "saves", ".netplay")))
 
 
+class TestAvisoDaRedePublica(unittest.TestCase):
+    """Fase 4: quem ABRE a partida numa rede Publica ve o aviso, com as saidas
+    que nao pedem senha (e a tela nunca espera o PowerShell para isso)."""
+
+    def setUp(self):
+        self.guardado = dict(arena._CATEGORIA_DA_REDE)
+
+    def tearDown(self):
+        arena._CATEGORIA_DA_REDE.clear()
+        arena._CATEGORIA_DA_REDE.update(self.guardado)
+
+    def test_rede_publica_avisa_com_as_saidas(self):
+        arena._CATEGORIA_DA_REDE.update(valor="Public", quando=1.0)
+        aviso = arena.aviso_da_rede_para_quem_hospeda()
+        self.assertIn("Pública", aviso)
+        self.assertIn("outro computador abrir a partida", aviso)
+        self.assertIn("Estamos em casas diferentes", aviso)
+
+    def test_rede_privada_ou_sem_resposta_nao_avisa(self):
+        for valor in ("Private", "DomainAuthenticated", None):
+            arena._CATEGORIA_DA_REDE.update(valor=valor)
+            self.assertEqual(arena.aviso_da_rede_para_quem_hospeda(), "")
+
+    def test_preparar_nao_pergunta_de_novo_antes_de_5_minutos(self):
+        arena._CATEGORIA_DA_REDE.update(valor="Private", quando=__import__("time").monotonic(), perguntando=False)
+        with mock.patch.object(arena.threading, "Thread") as linha:
+            arena.preparar_categoria_da_rede()
+        linha.assert_not_called()
+
+
 if __name__ == "__main__":
     unittest.main()

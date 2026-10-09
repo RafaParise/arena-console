@@ -2851,6 +2851,11 @@ function preencherAmigosPartida() {
   lista.dataset.assinatura = assinatura;
 
   lista.replaceChildren();
+  // "Meu amigo não aparece na lista" (auditoria 3, Fase 4, J5; uma das
+  // tarefas da Fase 7): sem partida, a dica diz o que conferir antes de
+  // chamar o professor.
+  const dica = $("#dicaSemPartida");
+  if (dica) dica.hidden = Boolean(unicos.size) || Boolean(estado.procurandoPartidas);
   if (!unicos.size) {
     const opcao = document.createElement("option");
     opcao.value = "";
@@ -4226,7 +4231,11 @@ function ligarEventos() {
   $("#btnBackup").addEventListener("click", async () => {
     try {
       const dados = await pedir("/api/backup", "POST");
-      recado(`Cópia guardada na pasta backup, em ${dados.pasta}`);
+      // Nada mudou desde a última cópia: ela continua valendo, e o rodízio
+      // não joga fora uma cópia de outro momento (auditoria 3, Fase 2).
+      recado(dados.nada_mudou
+        ? `Nada mudou desde a última cópia (pasta backup, em ${dados.pasta}): ela continua valendo.`
+        : `Cópia guardada na pasta backup, em ${dados.pasta}`);
     } catch (falha) {
       recado(falha.message, true);
     }
