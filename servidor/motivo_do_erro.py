@@ -159,8 +159,17 @@ def _plural(n, um, varios):
 
 
 # Jogar Junto: o que o RetroArch escreve quando NAO deu para entrar na partida
-# de um colega (pt-BR, a lingua do menu do ARENA, e o ingles, por garantia).
-FALHOU_AO_CONECTAR = ("Falha ao conectar ao host", "Failed to connect to host")
+# de um colega. Sao TRES casos diferentes (textos do retroarch.exe; o menu do
+# ARENA e' em portugues, o ingles fica por garantia):
+#  - o anfitriao disse que esta cheio;
+CHEIA = ("Host de netplay cheio", "Netplay host full")
+#  - a conexao abriu, mas a entrada falhou (o sexto jogador de uma partida de
+#    5 recebe esta: o anfitriao fecha a porta na cara dele);
+ENTRADA_RECUSADA = ("Falha ao conectar ao host.", "Failed to connect to host.")
+#  - nem chegou a conectar: ninguem atendeu no endereco (o jogo do anfitriao
+#    ainda nao tinha aberto, ou o Firewall/o Wi-Fi barrou). Revisao da Fase 4:
+#    antes este caso tambem dizia "pode estar cheia" -- impossivel ali.
+NAO_ALCANCOU = re.compile(r"Failed to connect to host \S+ on port \S+")
 
 
 def motivo_da_partida(texto, jogadores_max=None):
@@ -168,17 +177,22 @@ def motivo_da_partida(texto, jogadores_max=None):
 
     Achado da auditoria 3 (08/10/2026, testes\\teste_netplay_sexto_jogador.py):
     o sexto jogador numa partida de 5 recebe do RetroArch so "Falha ao
-    conectar ao host" -- e acha que e' a rede. Pode ser a partida cheia ou a
-    rede barrando; a frase diz as duas e o que fazer em cada uma."""
-    if not any(f in texto for f in FALHOU_AO_CONECTAR):
-        return None
-    if jogadores_max:
-        cheia = "Ela pode estar cheia: este jogo aceita até %d jogadores. " % int(jogadores_max)
-    else:
-        cheia = "Ela pode estar cheia. "
-    return ("Não deu para entrar na partida. " + cheia + "Pergunte a quem hospeda quantos já "
-            "entraram; se ainda tem vaga, rode o PARTIDA.bat nos dois computadores para ver o que "
-            "a rede está barrando.")
+    conectar ao host" -- e acha que e' a rede. Cada caso tem a sua frase, com
+    o que fazer."""
+    limite = ("este jogo aceita até %d jogadores. " % int(jogadores_max)) if jogadores_max else ""
+    if NAO_ALCANCOU.search(texto):
+        return ("Não deu para entrar: o computador de quem abriu a partida não respondeu. "
+                "Confira se o jogo dele já está aberto na tela e tente de novo. Se continuar, a rede "
+                "pode estar barrando (Firewall numa rede Pública, ou Wi-Fi que isola os aparelhos): "
+                "rode o PARTIDA.bat nos dois computadores.")
+    if any(f in texto for f in CHEIA):
+        return ("Não deu para entrar: a partida está cheia (%s). Espere alguém sair, ou abram "
+                "outra partida." % (limite.rstrip(". ") or "não cabe mais ninguém"))
+    if any(f in texto for f in ENTRADA_RECUSADA):
+        return ("Não deu para entrar na partida. Ela pode estar cheia" + (": " + limite if limite else ". ")
+                + "Pergunte a quem hospeda quantos já entraram; se ainda tem vaga, rode o PARTIDA.bat "
+                  "nos dois computadores para ver o que a rede está barrando.")
+    return None
 
 
 def analisar(texto, caminho_jogo, nucleo=""):

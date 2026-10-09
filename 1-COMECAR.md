@@ -70,6 +70,11 @@ Leva menos de um minuto.
 
 FAT32 não serve porque um jogo de PlayStation 2 passa de 4 GB.
 
+Se o ARENA estiver num pen drive em FAT32, ele avisa: o botão **Como colocar
+jogos** mostra "Atenção" nos consoles de jogo grande (PlayStation 2 e 3, Wii
+e Xbox 360), antes de você copiar. E um jogo que chegou cortado no limite de
+4 GB ganha, no cartão, a explicação do que houve.
+
 NTFS funciona, mas grava dono e permissão em cada arquivo. Quando o pen
 drive passa de mão em mão, o Windows do colega às vezes recusa acesso. É um
 problema que só aparece na hora errada — evite.

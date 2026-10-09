@@ -579,7 +579,6 @@ BASE_COMUM = {
     "menu_show_help": "false",
     "menu_show_reboot": "false",
     "menu_show_shutdown": "false",
-    "menu_show_legacy_thumbnail_updater": "false",
     "content_show_add_entry": "0",              # "Importar conteudo": escondido
     "content_show_images": "false",
     "content_show_music": "false",
@@ -3449,28 +3448,35 @@ def colegas_na_rede():
 # fecha bem mais nela, e a caixa "Permitir que este app se comunique" pede
 # senha de administrador -- o aluno nao consegue aprovar, e ninguem entra na
 # partida dele. O PARTIDA.bat ja dizia isso; agora a tela avisa quem ABRE a
-# partida, na hora, com as saidas que nao pedem senha: outro computador abre
-# (quem entra so faz conexao de saida), ou o repasse pela internet ("Estamos
-# em casas diferentes": os dois so fazem conexoes de saida).
+# partida, na hora, com a saida que nao pede senha: outro computador abre e
+# este entra (quem entra so faz conexao de saida, que o Firewall deixa).
+# O "Estamos em casas diferentes" NAO e' saida: testado em 09/10/2026, com
+# ele o anfitriao vai pelo repasse da internet e nao atende na rede local, e
+# o convidado (que o ARENA manda para o endereco local) nao entra.
 _CATEGORIA_DA_REDE = {"valor": None, "quando": 0.0, "perguntando": False}
 VALIDADE_DA_CATEGORIA = 300.0
 AVISO_REDE_PUBLICA = (
     "Atenção: o Windows marcou esta rede como Pública, e o Firewall pode barrar quem tentar "
     "entrar (a caixa de permissão pede senha de administrador). Se ninguém conseguir entrar, "
-    "peça para outro computador abrir a partida, ou liguem “Estamos em casas diferentes” nos dois.")
+    "troquem: outro computador abre a partida e este entra — quem entra não precisa dessa permissão.")
 
 
 def _perguntar_categoria_da_rede():
     """"Public", "Private", "DomainAuthenticated" ou None (so LER a categoria
     nao pede administrador). Leva ~1 s (PowerShell): nunca no caminho de
-    abrir o jogo."""
+    abrir o jogo. Com duas redes ligadas (o cabo direto e o Wi-Fi), basta
+    uma ser Publica: a partida pode estar passando justo por ela (revisao da
+    Fase 4 -- antes valia so a primeira da lista)."""
     try:
         resultado = subprocess.run(
             ["powershell.exe", "-NoProfile", "-NonInteractive", "-Command",
-             "(Get-NetConnectionProfile | Select-Object -First 1 -ExpandProperty NetworkCategory)"],
+             "(Get-NetConnectionProfile).NetworkCategory"],
             capture_output=True, text=True, timeout=10,
             creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
-        return resultado.stdout.strip() or None
+        categorias = [c.strip() for c in resultado.stdout.splitlines() if c.strip()]
+        if "Public" in categorias:
+            return "Public"
+        return categorias[0] if categorias else None
     except (OSError, subprocess.SubprocessError):
         return None
     finally:
@@ -3491,9 +3497,13 @@ def preparar_categoria_da_rede():
     threading.Thread(target=perguntar, daemon=True).start()
 
 
-def aviso_da_rede_para_quem_hospeda():
-    """O aviso da rede Publica, ou "" (sem resposta guardada: nao espera)."""
-    return AVISO_REDE_PUBLICA if _CATEGORIA_DA_REDE["valor"] == "Public" else ""
+def aviso_da_rede_para_quem_hospeda(agora=None):
+    """O aviso da rede Publica, ou "" (sem resposta recente: nao espera, e
+    nem usa resposta velha -- a rede pode ter mudado de categoria ou de
+    lugar desde entao). Quem chama ja pede outra pergunta para a proxima."""
+    agora = time.monotonic() if agora is None else agora
+    recente = _CATEGORIA_DA_REDE["quando"] and agora - _CATEGORIA_DA_REDE["quando"] < 2 * VALIDADE_DA_CATEGORIA
+    return AVISO_REDE_PUBLICA if recente and _CATEGORIA_DA_REDE["valor"] == "Public" else ""
 
 
 def procurar_partidas(config):
@@ -4528,8 +4538,12 @@ class Manipulador(BaseHTTPRequestHandler):
                     falta[plataforma["id"]] = (
                         graficos.falta_para_o_externo(dados_externo["nome"], caminho_externo)
                         if caminho_externo else "o emulador não está na pasta")
+            # O formato do disco do ARENA: no FAT32 nao cabe arquivo maior que
+            # 4 GB, e a tela avisa nos consoles de jogo grande ANTES de alguem
+            # copiar (auditoria 3, Fase 6; antes so o VERIFICAR.bat dizia).
             return self.responder_json({
                 "ok": True, "pasta_bios": bios.NOME_DA_PASTA,
+                "formato_do_disco": hardware.sistema_de_arquivos(RAIZ) or "",
                 "consoles": como_colocar.guia(carregar_catalogo(), PASTA_SISTEMA, PASTA_JOGOS, falta)})
 
         # As BIOS de cada console, como estao agora (Ajustes -> Emuladores ->
@@ -4651,10 +4665,13 @@ class Manipulador(BaseHTTPRequestHandler):
         if caminho == "/api/partida/procurar":
             # So deste computador (nao esta em ROTAS_REDE_EXTERNA): e' a tela
             # do convidado perguntando "quem tem partida aberta agora?".
-            # A janela de Jogar junto abriu: ja pergunta ao Windows (em
-            # segundo plano) se a rede e' Publica, para o aviso de quem abre
-            # a partida nao atrasar o "Comecar".
-            preparar_categoria_da_rede()
+            # Com ?rede=1 (a janela de Jogar junto abriu), ja pergunta ao
+            # Windows, em segundo plano, se a rede e' Publica -- para o aviso
+            # de quem abre a partida nao atrasar o "Comecar". Sem ele (a busca
+            # de quando a tela abre), nao: seria um PowerShell a mais em toda
+            # abertura do ARENA, no Celeron (revisao da Fase 4).
+            if "rede=1" in urllib.parse.urlparse(self.path).query:
+                preparar_categoria_da_rede()
             config = carregar_config()
             lista, corrigidos = procurar_partidas(config)
             if corrigidos:
@@ -5977,9 +5994,13 @@ class Manipulador(BaseHTTPRequestHandler):
             if aviso_netplay:
                 resposta["aviso"] = aviso_netplay
             if partida and partida.get("hospedar"):
+                # Vai separado do "aviso": a tela o deixa fixo no alto ate o
+                # jogo fechar -- um recado sumiria atras da janela do jogo antes
+                # de alguem tentar entrar (revisao da Fase 4).
                 aviso_rede = aviso_da_rede_para_quem_hospeda()
                 if aviso_rede:
-                    resposta["aviso"] = (resposta.get("aviso", "") + " " + aviso_rede).strip()
+                    resposta["aviso_rede"] = aviso_rede
+                preparar_categoria_da_rede()
             # Na hora de jogar, o que pode travar o jogo AGORA: memoria quase
             # cheia, notebook na bateria, economia de bateria (~10 ms, sem
             # PowerShell). A tela avisa junto com "Abrindo...".

@@ -82,12 +82,16 @@ def categoria_de_rede():
     se nao deu pra descobrir (comando indisponivel, por exemplo)."""
     import subprocess
     try:
+        # Todas as redes ligadas, nao so a primeira: com o cabo direto E o
+        # Wi-Fi, basta uma ser Publica (revisao da Fase 4 da auditoria 3).
         resultado = subprocess.run(
             ["powershell.exe", "-NoProfile", "-NonInteractive", "-Command",
-             "(Get-NetConnectionProfile | Select-Object -First 1 -ExpandProperty NetworkCategory)"],
+             "(Get-NetConnectionProfile).NetworkCategory"],
             capture_output=True, text=True, timeout=5)
-        saida = resultado.stdout.strip()
-        return saida or None
+        categorias = [c.strip() for c in resultado.stdout.splitlines() if c.strip()]
+        if "Public" in categorias:
+            return "Public"
+        return categorias[0] if categorias else None
     except Exception:
         return None
 
@@ -169,13 +173,12 @@ if categoria == "Public":
         "O Windows marcou esta rede como PUBLICA.",
         "O Firewall do Windows fecha bem mais numa rede publica, e a caixa "
         "'Permitir que este app se comunique' pede senha de administrador -- "
-        "um aluno comum nao consegue aprovar sozinho. Saidas SEM senha: "
-        "(1) outro computador abre a partida e este ENTRA (quem entra so faz "
-        "conexao de saida, que o Firewall deixa); (2) liguem 'Estamos em casas "
-        "diferentes' nos dois (o repasse pela internet: os dois so fazem "
-        "conexoes de saida). Com a senha de admin, o professor pode trocar a "
-        "rede para 'Privada' em Configuracoes > Rede e Internet > Wi-Fi > "
-        "Propriedades, ou aprovar a caixa do Firewall quando ela aparecer.")
+        "um aluno comum nao consegue aprovar sozinho. Saida SEM senha: "
+        "outro computador abre a partida e este ENTRA (quem entra so faz "
+        "conexao de saida, que o Firewall deixa). Com a senha de admin, o "
+        "professor pode trocar a rede para 'Privada' em Configuracoes > Rede e "
+        "Internet > Wi-Fi > Propriedades, ou aprovar a caixa do Firewall quando "
+        "ela aparecer.")
 elif categoria:
     certo("rede categorizada como %s (nao e publica)" % categoria)
 else:

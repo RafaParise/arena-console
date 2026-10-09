@@ -191,17 +191,25 @@ class TestAvisoDaRedePublica(unittest.TestCase):
         arena._CATEGORIA_DA_REDE.clear()
         arena._CATEGORIA_DA_REDE.update(self.guardado)
 
-    def test_rede_publica_avisa_com_as_saidas(self):
-        arena._CATEGORIA_DA_REDE.update(valor="Public", quando=1.0)
-        aviso = arena.aviso_da_rede_para_quem_hospeda()
+    def test_rede_publica_avisa_com_a_saida(self):
+        arena._CATEGORIA_DA_REDE.update(valor="Public", quando=1000.0)
+        aviso = arena.aviso_da_rede_para_quem_hospeda(agora=1010.0)
         self.assertIn("Pública", aviso)
-        self.assertIn("outro computador abrir a partida", aviso)
-        self.assertIn("Estamos em casas diferentes", aviso)
+        self.assertIn("outro computador abre a partida e este entra", aviso)
+        # Revisao da Fase 4: com o repasse ligado o convidado NAO entra
+        # (testado com o RetroArch de verdade) -- nao e' saida.
+        self.assertNotIn("casas diferentes", aviso)
+
+    def test_resposta_velha_nao_vale(self):
+        # A rede pode ter mudado de categoria (o professor trocou para
+        # Privada) ou de lugar desde a ultima pergunta.
+        arena._CATEGORIA_DA_REDE.update(valor="Public", quando=1000.0)
+        self.assertEqual(arena.aviso_da_rede_para_quem_hospeda(agora=1000.0 + 3 * arena.VALIDADE_DA_CATEGORIA), "")
 
     def test_rede_privada_ou_sem_resposta_nao_avisa(self):
         for valor in ("Private", "DomainAuthenticated", None):
-            arena._CATEGORIA_DA_REDE.update(valor=valor)
-            self.assertEqual(arena.aviso_da_rede_para_quem_hospeda(), "")
+            arena._CATEGORIA_DA_REDE.update(valor=valor, quando=1000.0)
+            self.assertEqual(arena.aviso_da_rede_para_quem_hospeda(agora=1001.0), "")
 
     def test_preparar_nao_pergunta_de_novo_antes_de_5_minutos(self):
         arena._CATEGORIA_DA_REDE.update(valor="Private", quando=__import__("time").monotonic(), perguntando=False)

@@ -102,11 +102,15 @@ def main():
                   if ("%s se juntou" % p["papel"]["apelido"]).lower() in texto_host]
         confere("os 5 primeiros entraram (hospedeiro + 4)", len(juntou) == 4, juntou)
         confere("o sexto NAO entrou como jogador", entrou_o_sexto is None, entrou_o_sexto)
-        motivo = [l for l in linhas_do_sexto if any(p in l.lower() for p in (
-            "cheio", "full", "vaga", "slot", "recus", "refus", "desconect", "disconnect", "não foi possível",
-            "nao foi possivel", "falh", "fail", "rejeit", "reject"))]
-        confere("o registro do sexto diz o porque (servidor cheio / sem vaga / recusado)", bool(motivo),
-                linhas_do_sexto[-6:])
+        # A frase que o ARENA mostra ao sexto quando ele volta (revisao da Fase 4:
+        # conferir a palavra solta "falh" ou "slot" no registro nao provava que
+        # o aluno ia ler o porque -- confere-se a frase de verdade).
+        sys.path.insert(0, os.path.join(os.path.dirname(AQUI), "servidor"))
+        import motivo_do_erro
+        frase = motivo_do_erro.motivo_da_partida(texto_sexto, 5)
+        print("\nO que o ARENA mostra ao sexto, ao voltar:\n    %s" % frase)
+        diz_cheia = bool(frase) and "cheia" in frase and ("PARTIDA.bat" in frase or "Espere alguém sair" in frase)
+        confere("o sexto ve o porque, em portugues, com 'cheia' e o que fazer", diz_cheia, linhas_do_sexto[-6:])
         vivos = [p["papel"]["nome"] for p in processos[:5] if p["processo"].poll() is None]
         confere("o hospedeiro e os 4 convidados continuam abertos depois da tentativa", len(vivos) == 5, vivos)
         manter_pasta = bool(falhas)

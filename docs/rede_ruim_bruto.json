@@ -6,17 +6,9 @@
     "com_simulador": false,
     "conectou": true,
     "entrou_em_s": 0.8,
-    "quadros_por_segundo": {
-      "hospedeiro": 61.0,
-      "convidado": 58.4
-    },
-    "menor_fps_no_titulo": {
-      "hospedeiro": 60.0,
-      "convidado": 59.9
-    },
-    "ping_ms": 10,
-    "desconectou": false,
-    "avisos_de_dessincronia": 0
+    "ping_ms": 28,
+    "caiu_depois_de_entrar": false,
+    "os_dois_abertos_no_fim": true
   },
   {
     "cenario": "so atraso 50ms",
@@ -25,19 +17,14 @@
     "com_simulador": true,
     "conectou": true,
     "entrou_em_s": 1.0,
-    "quadros_por_segundo": {
-      "hospedeiro": 61.0,
-      "convidado": 59.7
-    },
-    "menor_fps_no_titulo": {
-      "hospedeiro": 59.0,
-      "convidado": 60.0
-    },
     "ping_ms": 128,
-    "desconectou": false,
-    "avisos_de_dessincronia": 0,
-    "passou_pelo_simulador": true,
-    "pedacos_no_simulador": "{'cliente->host': 735, 'host->cliente': 746}"
+    "caiu_depois_de_entrar": false,
+    "os_dois_abertos_no_fim": true,
+    "pedacos_no_simulador": {
+      "cliente->host": 855,
+      "host->cliente": 866
+    },
+    "passou_pelo_simulador": true
   },
   {
     "cenario": "so atraso 100ms",
@@ -46,19 +33,14 @@
     "com_simulador": true,
     "conectou": true,
     "entrou_em_s": 1.3,
-    "quadros_por_segundo": {
-      "hospedeiro": 61.0,
-      "convidado": 61.0
+    "ping_ms": 228,
+    "caiu_depois_de_entrar": false,
+    "os_dois_abertos_no_fim": true,
+    "pedacos_no_simulador": {
+      "cliente->host": 835,
+      "host->cliente": 857
     },
-    "menor_fps_no_titulo": {
-      "hospedeiro": 59.9,
-      "convidado": 60.0
-    },
-    "ping_ms": 210,
-    "desconectou": false,
-    "avisos_de_dessincronia": 0,
-    "passou_pelo_simulador": true,
-    "pedacos_no_simulador": "{'cliente->host': 717, 'host->cliente': 736}"
+    "passou_pelo_simulador": true
   },
   {
     "cenario": "so atraso 200ms",
@@ -67,19 +49,14 @@
     "com_simulador": true,
     "conectou": true,
     "entrou_em_s": 1.8,
-    "quadros_por_segundo": {
-      "hospedeiro": 61.0,
-      "convidado": 61.0
+    "ping_ms": 428,
+    "caiu_depois_de_entrar": false,
+    "os_dois_abertos_no_fim": true,
+    "pedacos_no_simulador": {
+      "cliente->host": 802,
+      "host->cliente": 839
     },
-    "menor_fps_no_titulo": {
-      "hospedeiro": 60.0,
-      "convidado": 60.0
-    },
-    "ping_ms": 411,
-    "desconectou": false,
-    "avisos_de_dessincronia": 0,
-    "passou_pelo_simulador": true,
-    "pedacos_no_simulador": "{'cliente->host': 681, 'host->cliente': 718}"
+    "passou_pelo_simulador": true
   },
   {
     "cenario": "perda 1% (com 50ms de base)",
@@ -88,19 +65,15 @@
     "com_simulador": true,
     "conectou": true,
     "entrou_em_s": 1.0,
-    "quadros_por_segundo": {
-      "hospedeiro": 61.0,
-      "convidado": 59.7
+    "ping_ms": 112,
+    "caiu_depois_de_entrar": false,
+    "os_dois_abertos_no_fim": true,
+    "pedacos_no_simulador": {
+      "cliente->host": 856,
+      "host->cliente": 867,
+      "perdidos": 17
     },
-    "menor_fps_no_titulo": {
-      "hospedeiro": 60.0,
-      "convidado": 60.0
-    },
-    "ping_ms": 111,
-    "desconectou": false,
-    "avisos_de_dessincronia": 0,
-    "passou_pelo_simulador": true,
-    "pedacos_no_simulador": "{'cliente->host': 735, 'host->cliente': 746, 'perdidos': 16}"
+    "passou_pelo_simulador": true
   },
   {
     "cenario": "perda 5% (com 50ms de base)",
@@ -109,18 +82,14 @@
     "com_simulador": true,
     "conectou": true,
     "entrou_em_s": 1.0,
-    "quadros_por_segundo": {
-      "hospedeiro": 60.9,
-      "convidado": 59.7
-    },
-    "menor_fps_no_titulo": {
-      "hospedeiro": 59.9,
-      "convidado": 59.9
-    },
     "ping_ms": 112,
-    "desconectou": false,
-    "avisos_de_dessincronia": 0,
-    "passou_pelo_simulador": true,
-    "pedacos_no_simulador": "{'cliente->host': 730, 'host->cliente': 740, 'perdidos': 67}"
+    "caiu_depois_de_entrar": false,
+    "os_dois_abertos_no_fim": true,
+    "pedacos_no_simulador": {
+      "cliente->host": 839,
+      "host->cliente": 868,
+      "perdidos": 78
+    },
+    "passou_pelo_simulador": true
   }
 ]

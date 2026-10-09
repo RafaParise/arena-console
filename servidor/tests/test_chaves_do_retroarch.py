@@ -14,9 +14,12 @@ state, o "Importar conteudo" escondido, o atalho de gravar a partida.
 O arquivo de opcoes e' gerado de verdade (gravar_override), numa pasta
 temporaria, com cada perfil, motor grafico, modo e tipo de partida, e com
 todas as opcoes avancadas do recursos.json ligadas. A referencia e' o
-proprio RetroArch: as chaves do retroarch.cfg (ele grava todas ao fechar)
-e os textos do retroarch.exe. Sem os dois (copia sem o RetroArch, como a
-do GitHub), o teste e' pulado.
+retroarch.cfg: o RetroArch grava nele TODAS as chaves que le, ao fechar.
+(Os textos do retroarch.exe nao servem de referencia: la tambem estao os
+nomes internos dos itens do menu, como "netplay_tcp_udp_port", que parecem
+chave e nao sao -- achado da revisao da Fase 4.) Sem o retroarch.cfg (copia
+sem o RetroArch, como a do GitHub), esse teste e' pulado; os que nao
+precisam do RetroArch ficam em outra classe e rodam sempre.
 """
 import os
 import re
@@ -37,30 +40,32 @@ PASTA_RETROARCH = os.path.join(os.path.dirname(PASTA_SERVIDOR), "retroarch")
 CFG = os.path.join(PASTA_RETROARCH, "retroarch.cfg")
 EXE = os.path.join(PASTA_RETROARCH, "retroarch.exe")
 
-# Chave com o numero do jogador ou da porta: o RetroArch monta o nome na
-# hora ("input_player%u_..."), entao o texto no programa vem sem o numero.
-NUMERO_DO_JOGADOR = re.compile(r"(?<=player)\d+(?=_)|(?<=_p)\d+$")
+# Chave com o numero do jogador: o retroarch.cfg traz todas as do jogador 1
+# ("input_player1_..."); a do jogador 5 vale se a do 1 existe.
+NUMERO_DO_JOGADOR = re.compile(r"(?<=player)\d+(?=_)")
+
+# Escritas pelo ARENA de proposito, e que o RetroArch NAO le do arquivo de
+# opcoes (por isso nao estao no retroarch.cfg) -- com o motivo:
+FORA_DO_CFG_DE_PROPOSITO = {
+    # O tipo de controle de cada porta: o RetroArch ignora vindo do
+    # --appendconfig; quem vale e' o .rmp da partida, montado A PARTIR destas
+    # chaves (arena.remapeamento_da_partida, achado do Multitap de 25/09).
+    "input_libretro_device_p": "vai para o .rmp da partida",
+}
 
 
 def chaves_que_o_retroarch_conhece():
-    conhecidas = set()
-    if os.path.isfile(CFG):
-        with open(CFG, encoding="utf-8", errors="replace") as arquivo:
-            conhecidas |= set(re.findall(r"^([a-z0-9_]+) = ", arquivo.read(), re.M))
-    if os.path.isfile(EXE):
-        with open(EXE, "rb") as arquivo:
-            conhecidas |= {m.group(0).decode("ascii")
-                           for m in re.finditer(rb"[a-z][a-z0-9_]{3,}", arquivo.read())}
-    return conhecidas
+    with open(CFG, encoding="utf-8", errors="replace") as arquivo:
+        return set(re.findall(r"^([a-z0-9_]+) = ", arquivo.read(), re.M))
 
 
 def conhecida(chave, conhecidas):
-    candidatas = {chave, NUMERO_DO_JOGADOR.sub("1", chave), NUMERO_DO_JOGADOR.sub("", chave)}
-    return bool(candidatas & conhecidas)
+    if chave in conhecidas or NUMERO_DO_JOGADOR.sub("1", chave) in conhecidas:
+        return True
+    return any(re.fullmatch(re.escape(base) + r"\d+", chave) for base in FORA_DO_CFG_DE_PROPOSITO)
 
 
-@unittest.skipUnless(os.path.isfile(CFG) and os.path.isfile(EXE),
-                     "sem o RetroArch nesta copia (retroarch.cfg e retroarch.exe)")
+@unittest.skipUnless(os.path.isfile(CFG), "sem o RetroArch nesta copia (retroarch.cfg)")
 class TestChavesDoRetroArch(unittest.TestCase):
 
     def setUp(self):
@@ -115,12 +120,17 @@ class TestChavesDoRetroArch(unittest.TestCase):
                          "O RetroArch ignora estas chaves (nome errado ou que nao existe mais): %s"
                          % ", ".join(desconhecidas))
 
+class TestAPortaDaPartida(unittest.TestCase):
+    """Fora da classe de cima de proposito: nao precisa do RetroArch, entao
+    roda tambem numa copia sem ele (a do GitHub). Revisao da Fase 4."""
+
     def test_a_porta_da_partida_vai_no_nome_certo(self):
         # O "--port" da linha de comando e' ignorado pelo RetroArch desta
         # pasta (provado em 08/10/2026: os dois hospedeiros escutavam na
         # 55435 pedindo 55437 e 55438); quem manda e' a chave do arquivo.
         opcoes = graficos.opcoes_de_partida("x", True)
-        self.assertEqual(opcoes.get("netplay_ip_port"), str(graficos.PORTA_PARTIDA))
+        self.assertEqual(opcoes.get("netplay_ip_port"), "55435")
+        self.assertEqual(graficos.PORTA_PARTIDA, 55435)     # a porta que o guia 5 e o PARTIDA.bat ensinam
         self.assertNotIn("netplay_port", opcoes)
 
 

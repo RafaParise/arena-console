@@ -741,6 +741,11 @@ residencial brasileira usa CGNAT — o aluno não tem endereço próprio na
 internet, então não existe porta para o amigo alcançar. Não é limitação do
 ARENA; é como a internet de casa funciona aqui.
 
+A chave **"Estamos em casas diferentes"** saiu da tela (09/10/2026). Ela
+ligava o repasse da internet do RetroArch, mas, testado de verdade, o
+colega nunca entrava: o ARENA ainda não passa para ele o "código da sala"
+do repasse. Ela volta quando isso funcionar.
+
 Se as máquinas da escola não se enxergam, é isolamento de cliente no
 roteador. As saídas estão na Parte A deste mesmo documento.
 
@@ -750,7 +755,7 @@ roteador. As saídas estão na Parte A deste mesmo documento.
 |---|---|
 | Não conecta | Confira se os dois têm o mesmo arquivo de jogo |
 | "Aguardando" e não sai disso | O endereço está errado, ou o firewall bloqueou a porta 55435 |
-| Conectou mas está travando | Ligue a chave "casas diferentes", que já entra com folga. Ou, no jogo: `Esc → Rede → Atraso de Entrada` |
+| Conectou mas está travando | No jogo: `Esc → Rede → Atraso de Entrada`, e suba um ou dois |
 | Está lento em máquina fraca | Normal: partida a dois custa o dobro. O ARENA já desliga filtros e efeitos durante a partida |
 | Os dois controlam o jogador 1 | Quem entrou não pediu o jogador 2. Fechem e abram de novo |
 | Dessincronizou no meio | `Esc → Rede → Desconectar` e entrem de novo |

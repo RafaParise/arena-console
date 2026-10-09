@@ -76,20 +76,39 @@ JOGAR_JUNTO_RECUSADO_DE_PROPOSITO = {"Alien Breed Disk1", "Top Gear 2 Disk2",
                                      "INTKARAT", "Mule", "PRINCEOP"}
 
 
-# Auditoria 3 (08/10/2026, Fase 4, J2): chaves que o RetroArch desta pasta
-# nao conhece -- com o nome errado (o certo ao lado) ou que nao existem mais.
-# Valem para TODO jogo, de proposito; os nomes velhos e os novos ficam fora
-# da comparacao (servidor\tests\test_chaves_do_retroarch.py confere os novos).
-CHAVES_RENOMEADAS_NA_AUDITORIA_3 = {
-    "savestate_slot", "state_slot",
-    "menu_rgui_color_theme", "rgui_menu_color_theme",
-    "rgui_full_width_layout", "menu_rgui_full_width_layout",
-    "content_show_add", "content_show_add_entry",
-    "input_bsv_record_toggle", "input_record_replay", "input_play_replay", "input_halt_replay",
-    "netplay_port", "netplay_ip_port",
-    "quick_menu_show_cheevos", "notification_show_recording", "notification_show_streaming",
-    "netplay_stateless_mode",
+# Auditoria 3 (Fase 4, J2, e a revisao dela): chaves que o RetroArch desta
+# pasta nao conhece. As de nome errado sao COMPARADAS pelo nome certo (a
+# versao de antes passa pelo mapa) -- assim uma mudanca futura nelas nao se
+# esconde; as que nao existem mais saem dos dois lados.
+NOME_CERTO_DESDE_A_AUDITORIA_3 = {
+    "savestate_slot": "state_slot",
+    "menu_rgui_color_theme": "rgui_menu_color_theme",
+    "rgui_full_width_layout": "menu_rgui_full_width_layout",
+    "content_show_add": "content_show_add_entry",
+    "input_bsv_record_toggle": "input_record_replay",
+    "netplay_port": "netplay_ip_port",
 }
+TIRADAS_NA_AUDITORIA_3 = {"quick_menu_show_cheevos", "notification_show_recording",
+                          "notification_show_streaming", "netplay_stateless_mode",
+                          "menu_show_legacy_thumbnail_updater"}
+# Novas de proposito (o atalho de repetir/parar a gravacao da partida, sem tecla).
+NOVAS_NA_AUDITORIA_3 = {"input_play_replay", "input_halt_replay"}
+# Valor que mudou de proposito junto com o nome: o tema pedia o 27 e nunca
+# valeu (fica o 4, o que os alunos sempre viram); "Importar conteudo" escondido
+# era "false" no nome velho e e' "0" no novo.
+VALOR_NOVO_DE_PROPOSITO = {("rgui_menu_color_theme", "27"): "4", ("content_show_add_entry", "false"): "0"}
+
+
+def com_nomes_certos(chaves_override):
+    """A versao de antes, falando a lingua de hoje (nomes certos e valores que
+    mudaram de proposito, nada mais)."""
+    traduzido = {}
+    for chave, valor in chaves_override.items():
+        if chave in TIRADAS_NA_AUDITORIA_3:
+            continue
+        chave = NOME_CERTO_DESDE_A_AUDITORIA_3.get(chave, chave)
+        traduzido[chave] = VALOR_NOVO_DE_PROPOSITO.get((chave, valor), valor)
+    return traduzido
 
 
 def sem_mudanca_de_proposito(chaves_override):
@@ -101,12 +120,12 @@ def sem_mudanca_de_proposito(chaves_override):
         ignora o tipo de porta vindo do --appendconfig);
       - o teclado de todos os jogadores vai escrito (o teclado e' o primeiro
         jogador sem controle; pedido do Rafael, 25/09/2026);
-      - as chaves com nome errado, renomeadas ou tiradas na auditoria 3
-        (CHAVES_RENOMEADAS_NA_AUDITORIA_3)."""
+      - as chaves novas da auditoria 3 (NOVAS_NA_AUDITORIA_3); as renomeadas
+        sao comparadas pelo nome certo (com_nomes_certos)."""
     teclado = r"^input_player\d+_(up|down|left|right|a|b|x|y|l|r|l2|r2|l3|r3|start|select)$"
-    return {c: v for c, v in chaves_override.items()
+    return {c: v for c, v in com_nomes_certos(chaves_override).items()
             if c != "input_remapping_directory"
-            and c not in CHAVES_RENOMEADAS_NA_AUDITORIA_3
+            and c not in NOVAS_NA_AUDITORIA_3
             and not re.match(teclado, c)
             and not (v == "nul" and re.match(r"^input_player\d+_\w+_(btn|axis)$", c))}
 

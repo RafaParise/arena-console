@@ -569,6 +569,28 @@ def porta_livre(porta=8777):
         s.close()
 
 
+def marcas_de_quem_montou():
+    """O que identifica quem monta, descoberto NA HORA (o nome de ninguem
+    fica escrito neste arquivo, que e' publico no GitHub): o e-mail do git
+    (a parte antes do @; no e-mail privado do GitHub, o nome depois do +) e
+    o apelido do ARENA de quem monta (dados\\config.json)."""
+    marcas = set()
+    try:
+        email = subprocess.run(["git", "-C", RAIZ, "config", "user.email"], capture_output=True,
+                               text=True, timeout=10).stdout.strip().lower()
+    except (OSError, subprocess.SubprocessError):
+        email = ""
+    nome = email.split("@", 1)[0]
+    marcas.add(nome.split("+", 1)[-1])
+    try:
+        with open(os.path.join(RAIZ, "dados", "config.json"), encoding="utf-8") as arquivo:
+            marcas.add(str(json.load(arquivo).get("apelido") or "").strip().lower())
+    except (OSError, ValueError, AttributeError):
+        pass
+    # Curto demais pegaria palavra comum ("ana", "rafa"): so nome com 6 letras ou mais.
+    return sorted(m for m in marcas if len(m) >= 6)
+
+
 def conferir(destino, com_bios=False):
     problemas = []
     # Nada de caminho da maquina de quem montou, em arquivo de texto nenhum.
@@ -576,7 +598,7 @@ def conferir(destino, com_bios=False):
     # A pasta do usuario do Windows de quem montou (C:\Users\<nome>) tambem
     # nao pode aparecer: seria um caminho fora da pasta do ARENA.
     usuario = os.path.expanduser("~").lower().replace("/", "\\")
-    marcas = [alvo, usuario + "\\", "passospariserafael", "rafaparise"]
+    marcas = [alvo, usuario + "\\"] + marcas_de_quem_montou()
     for atual, _sub, arquivos in os.walk(destino):
         if os.sep + "python" + os.sep in atual + os.sep:
             continue

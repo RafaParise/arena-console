@@ -1,22 +1,28 @@
 # -*- coding: utf-8 -*-
 """Fase 4: o Jogar Junto (SNES, Super Bomberman 4) passando pelo simulador
-de rede ruim (proxy_rede_ruim.py), em varios niveis de atraso e perda, e o
-que o jogador sente: quanto tempo o convidado leva para entrar, o ping que
-o RetroArch mede, e a que velocidade a partida anda nos dois computadores
-(quadros por segundo, lidos do titulo da janela do RetroArch: 60 = normal).
+de rede ruim (proxy_rede_ruim.py), em varios niveis de atraso e perda:
+o convidado entra? quanto tempo leva? que ping o RetroArch mede? a conexao
+cai depois de entrar?
 
 Auditoria 3 (08/10/2026): ate aqui o convidado NUNCA passou pelo
 simulador. O RetroArch ignora o "--port" da linha de comando, e a chave do
 arquivo ia com o nome errado ("netplay_port"); o convidado caia direto no
 hospedeiro, na 55435 -- por isso o ping ficava em ~11 ms com 200 ms de
-atraso pedido. Agora a porta vai na chave certa (netplay_ip_port), e o
-teste confere que o simulador recebeu a conexao (senao, reprova).
+atraso pedido. Agora a porta vai na chave certa (netplay_ip_port).
+
+Revisao da Fase 4 (09/10/2026): o teste reprova se um cenario nao conectar,
+ou se o simulador nao repassou dados NOS DOIS SENTIDOS (so aceitar a
+conexao nao prova que a partida passou por ele). E saiu daqui o que nao
+provava nada: o FPS do titulo da janela (enquanto o Jogar Junto espera a
+rede, o RetroArch redesenha o ultimo quadro, e o contador continua em 60)
+e a contagem de "dessincronia" (com netplay_check_frames positivo, o
+RetroArch corrige a diferenca calado, sem escrever no registro).
 
 Limite (vai para o roteiro de sala): os jogadores ficam parados -- sem
 botao apertado, o "volta no tempo" do Jogar Junto (rollback) quase nao
-trabalha. O soluco de quando os dois apertam ao mesmo tempo so a sala mede.
+trabalha. O que o jogador sente com os botoes, so a sala mede.
 """
-import ctypes
+import ast
 import importlib.util
 import json
 import os
@@ -26,7 +32,6 @@ import subprocess
 import sys
 import tempfile
 import time
-from ctypes import wintypes
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 JOGO = os.path.join(RAIZ, "jogos", "pessoais", "Super Nintendo",
@@ -35,36 +40,13 @@ RETROARCH = os.path.join(RAIZ, "retroarch", "retroarch.exe")
 CORE = os.path.join(RAIZ, "retroarch", "cores", "snes9x_libretro.dll")
 PYTHON = os.path.join(RAIZ, "servidor", "python", "python.exe")
 PORTA_HOST = 55435
-SEGUNDOS_MEDINDO = 12
+SEGUNDOS_JOGANDO = 12
 
 sys.path.insert(0, os.path.join(RAIZ, "servidor"))
 spec_a = importlib.util.spec_from_file_location("arena_rede_ruim", os.path.join(RAIZ, "servidor", "arena.py"))
 arena = importlib.util.module_from_spec(spec_a)
 spec_a.loader.exec_module(arena)
 graficos = arena.graficos
-
-user32 = ctypes.WinDLL("user32", use_last_error=True)
-_PROCURAR = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
-user32.GetWindowThreadProcessId.argtypes = [wintypes.HWND, ctypes.POINTER(wintypes.DWORD)]
-user32.GetWindowTextW.argtypes = [wintypes.HWND, wintypes.LPWSTR, ctypes.c_int]
-
-
-def fps_e_quadros(pid):
-    """O titulo da janela do RetroArch: "... || FPS:  60.00 || Quadros: 256"."""
-    achado = []
-
-    def cada(hwnd, _):
-        dono = wintypes.DWORD()
-        user32.GetWindowThreadProcessId(hwnd, ctypes.byref(dono))
-        if dono.value == pid:
-            texto = ctypes.create_unicode_buffer(512)
-            user32.GetWindowTextW(hwnd, texto, 512)
-            m = re.search(r"FPS:\s*([\d.]+)\s*\|\|\s*\w+:\s*(\d+)", texto.value)
-            if m:
-                achado.append((float(m.group(1)), int(m.group(2))))
-        return True
-    user32.EnumWindows(_PROCURAR(cada), 0)
-    return achado[0] if achado else None
 
 
 def montar_override(destino_cfg, pasta_instancia, opcoes_partida):
@@ -84,10 +66,6 @@ def montar_override(destino_cfg, pasta_instancia, opcoes_partida):
     opcoes["frontend_log_level"] = "0"
     opcoes["video_fullscreen"] = "false"
     opcoes["menu_driver"] = "rgui"
-    # O FPS e os quadros no titulo da janela, atualizados a cada meio segundo.
-    opcoes["fps_show"] = "true"
-    opcoes["framecount_show"] = "true"
-    opcoes["fps_update_interval"] = "30"
     opcoes["config_save_on_exit"] = "false"
     linhas = ["# teste rede ruim"] + ['%s = "%s"' % (c, opcoes[c]) for c in sorted(opcoes)]
     with open(destino_cfg, "w", encoding="utf-8") as f:
@@ -116,29 +94,13 @@ def ler_log(pasta):
         return f.read()
 
 
-def medir_velocidade(processos, segundos):
-    """Quadros por segundo de verdade em cada processo (quadros andados /
-    tempo) e o menor FPS que o titulo mostrou."""
-    primeiro, ultimo, menor = {}, {}, {}
-    fim = time.monotonic() + segundos
-    while time.monotonic() < fim:
-        agora = time.monotonic()
-        for nome, processo in processos.items():
-            lido = fps_e_quadros(processo.pid)
-            if lido:
-                fps, quadros = lido
-                primeiro.setdefault(nome, (agora, quadros))
-                ultimo[nome] = (agora, quadros)
-                menor[nome] = min(menor.get(nome, 999.0), fps)
-        time.sleep(0.25)
-    velocidade = {}
-    for nome in processos:
-        if nome in primeiro and ultimo[nome][0] > primeiro[nome][0]:
-            (t0, q0), (t1, q1) = primeiro[nome], ultimo[nome]
-            velocidade[nome] = round((q1 - q0) / (t1 - t0), 1)
-        else:
-            velocidade[nome] = None
-    return velocidade, {n: round(v, 1) for n, v in menor.items()}
+def pedacos_do_simulador(registro):
+    """A ultima contagem que o simulador imprimiu: {sentido: pedacos}."""
+    contagens = re.findall(r"\[proxy\] pedacos: (\{.*\})", registro)
+    try:
+        return ast.literal_eval(contagens[-1]) if contagens else {}
+    except (ValueError, SyntaxError):
+        return {}
 
 
 def rodar_cenario(nome, atraso_ms, perda_pct, porta_proxy):
@@ -178,29 +140,22 @@ def rodar_cenario(nome, atraso_ms, perda_pct, porta_proxy):
         resultado["conectou"] = entrou_em is not None
         resultado["entrou_em_s"] = entrou_em
 
-        if entrou_em is not None:
-            velocidade, menor_fps = medir_velocidade({"hospedeiro": p_host, "convidado": p_conv},
-                                                     SEGUNDOS_MEDINDO)
-            resultado["quadros_por_segundo"] = velocidade
-            resultado["menor_fps_no_titulo"] = menor_fps
-
+        # Jogando (parados) um tempo, para ver se a conexao aguenta.
+        time.sleep(SEGUNDOS_JOGANDO)
         texto_host = ler_log(pasta_host).lower()
-        texto_conv = ler_log(pasta_convidado).lower()
         ping_m = re.search(r"ping:\s*(\d+)\s*ms", texto_host)
         resultado["ping_ms"] = int(ping_m.group(1)) if ping_m else None
-        resultado["desconectou"] = bool(re.search(r"desconect|disconnect", texto_host))
-        # Dessincronia: o RetroArch confere o estado dos dois de tempos em
-        # tempos (netplay_check_frames) e avisa quando difere.
-        resultado["avisos_de_dessincronia"] = len(re.findall(
-            r"crcs? mismatch|prepare for desync|dessincron", texto_host + texto_conv))
+        resultado["caiu_depois_de_entrar"] = bool(re.search(r"desconect|disconnect", texto_host))
+        resultado["os_dois_abertos_no_fim"] = p_host.poll() is None and p_conv.poll() is None
 
         if com_simulador:
+            time.sleep(2.5)            # a proxima contagem do simulador
             proxy_saida.flush()
             with open(os.path.join(raiz_teste, "proxy.log"), encoding="utf-8", errors="replace") as f:
-                registro_proxy = f.read()
-            resultado["passou_pelo_simulador"] = "nova conexao aceita" in registro_proxy
-            contagens = re.findall(r"\[proxy\] pedacos: (\{.*\})", registro_proxy)
-            resultado["pedacos_no_simulador"] = contagens[-1] if contagens else ""
+                pedacos = pedacos_do_simulador(f.read())
+            resultado["pedacos_no_simulador"] = pedacos
+            resultado["passou_pelo_simulador"] = (pedacos.get("cliente->host", 0) > 0
+                                                  and pedacos.get("host->cliente", 0) > 0)
 
         print("  " + json.dumps(resultado, ensure_ascii=False))
         return resultado
@@ -255,12 +210,13 @@ def main():
         json.dump(resultados, f, ensure_ascii=False, indent=2)
 
     falhas = []
-    referencia = resultados[0]
-    if not referencia.get("conectou"):
-        falhas.append("sem simulador, o convidado nao entrou")
-    for r in resultados[1:]:
-        if not r.get("passou_pelo_simulador"):
-            falhas.append("%s: o convidado NAO passou pelo simulador" % r["cenario"])
+    for r in resultados:
+        if not r.get("conectou"):
+            falhas.append("%s: o convidado nao entrou" % r["cenario"])
+        elif r.get("caiu_depois_de_entrar") or not r.get("os_dois_abertos_no_fim"):
+            falhas.append("%s: a partida caiu depois de entrar" % r["cenario"])
+        if r["com_simulador"] and not r.get("passou_pelo_simulador"):
+            falhas.append("%s: a partida NAO passou pelo simulador nos dois sentidos" % r["cenario"])
     for falha in falhas:
         print("[FALHOU]", falha)
     print("\nRESULTADO:", "PASSOU" if not falhas else "FALHOU")

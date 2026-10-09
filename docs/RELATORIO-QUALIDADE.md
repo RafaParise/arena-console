@@ -535,20 +535,26 @@ Números brutos em `docs\rede_ruim_bruto.json`, `docs\cenarios_sala_bruto.json`,
 
 ### Rede ruim: o que o jogador sente
 
-Jogadores parados (sem botão apertado), 12 s medindo depois de entrar. Os
-quadros por segundo saem do título da janela de cada RetroArch.
+Jogadores parados (sem botão apertado), 12 s jogando depois de entrar
+(`docs\rede_ruim_bruto.json`, depois da revisão).
 
-| Rede entre os dois | Entrar na partida | Ping que o RetroArch mostra | Quadros/s (hospedeiro / convidado) | Avisos de dessincronia |
+| Rede entre os dois | Entrar na partida | Ping que o RetroArch mostra | A partida caiu? | Pedaços pelo simulador (ida / volta) |
 |---|---|---|---|---|
-| Direta (referência) | 0,8 s | 11 ms | ~60 / ~60 | 0 |
-| 50 ms de atraso | 1,0 s | 111 ms | ~60 / ~60 | 0 |
-| 100 ms | 1,3 s | 211 ms | ~60 / ~60 | 0 |
-| 200 ms | 1,8 s | 428 ms | ~60 / ~60 | 0 |
-| 50 ms + 1% de perda | 1,0 s | 128 ms | ~60 / ~60 | 0 |
-| 50 ms + 5% de perda | 1,0 s | 112 ms | ~60 / ~60 | 0 |
+| Direta (referência) | 0,8 s | 28 ms | não | — |
+| 50 ms de atraso | 1,0 s | 128 ms | não | 855 / 866 |
+| 100 ms | 1,3 s | 228 ms | não | 835 / 857 |
+| 200 ms | 1,8 s | 428 ms | não | 802 / 839 |
+| 50 ms + 1% de perda | 1,0 s | 112 ms | não | 856 / 867 (17 "perdidos") |
+| 50 ms + 5% de perda | 1,0 s | 112 ms | não | 839 / 868 (78 "perdidos") |
 
-O ping é ida e volta (2 × o atraso). **Medido:** nenhuma rede ruim travou
-nem dessincronizou a partida; o atraso aparece na hora de entrar e no ping.
+O ping é ida e volta (2 × o atraso). **Medido:** em todas as redes ruins o
+convidado entrou e a partida não caiu; o atraso aparece na hora de entrar e
+no ping. **Não dá para medir aqui** (a revisão da Fase 4 pegou, e as duas
+medidas saíram do teste): os quadros por segundo da janela não mostram
+travada (enquanto o Jogar Junto espera a rede, o RetroArch redesenha o
+último quadro e o contador segue em 60), e a dessincronia não aparece no
+registro (com a conferência a cada 600 quadros, o RetroArch corrige a
+diferença calado).
 **O que se espera com botões** (pelo jeito que o Jogar Junto do RetroArch
 funciona; só a sala confirma): o seu boneco responde na hora; o do amigo
 chega atrasado e o RetroArch "volta no tempo" para corrigir, e ele dá um
@@ -563,10 +569,11 @@ curto, de uns 0,3 s.
 | # | Defeito | Prova | Conserto |
 |---|---|---|---|
 | J1 | **A porta da partida ia com o nome errado** (`netplay_port`; o do RetroArch é `netplay_ip_port`), e o `--port` da linha de comando é ignorado. Na escola não estragava nada (a porta padrão é a mesma, 55435), mas **dois testes nunca mediram o que diziam**: o convidado do teste de rede ruim ia direto ao hospedeiro (por isso o ping ficava em ~11 ms com 200 ms de atraso pedido, nas auditorias 1 e 3), e as duas partidas do teste de sala caíam na mesma porta | `netstat` com dois hospedeiros pedindo 55437 e 55438: os dois escutando na **55435** (o Windows deixa dois programas na mesma porta); os dois convidados entraram no mesmo hospedeiro | A chave certa no arquivo da partida; os dois testes põem a porta em cada RetroArch e conferem: o de rede ruim reprova se o simulador não receber a conexão, o de sala reprova se um cenário falhar |
-| J2 | **Mais 8 chaves que o RetroArch não conhece**, todas ignoradas em silêncio: o espaço inicial do save state (`savestate_slot`; o certo é `state_slot`), o tema do menu do Esc (pedia o 27, valia o verde clássico do RetroArch), a largura do menu, o "Importar conteúdo" escondido, o atalho de gravar a partida (replay) e 4 que não existem mais. **Efeito na tela: nenhum** — conferido no RetroArch de verdade: ele já volta ao espaço 0 a cada jogo aberto (até com a configuração pedindo o 3), e o resto já era o padrão dele. É código que mentia sobre o que fazia | **Novo** `servidor\tests\test_chaves_do_retroarch.py`: gera o arquivo de opções de verdade com cada perfil, motor gráfico, modo e tipo de partida, com as 50 opções avançadas, e confere cada chave contra o `retroarch.cfg` (o RetroArch grava todas ao fechar) e o `retroarch.exe`. O espaço: SNES aberto 3 vezes com cópias da configuração (espaço 3 na principal, no arquivo extra, nos dois): o save caiu no espaço 0 nas três | Nome certo: `state_slot` = 0 (fica por garantia: se um RetroArch novo passar a lembrar o espaço, o próximo F2 regravaria o 9, o "seguro" do guia 4); `rgui_menu_color_theme` = **4**, o verde clássico que os alunos sempre viram (o 27 nunca valeu, e trocar agora seria surpresa); `menu_rgui_full_width_layout`; `content_show_add_entry` = 0; `input_record_replay`/`input_play_replay`/`input_halt_replay` = sem tecla. **Saíram** (não existem no RetroArch desta pasta, nem no programa nem no `retroarch.cfg`): `quick_menu_show_cheevos` (as conquistas já ficam desligadas), `notification_show_recording`, `notification_show_streaming` (a gravação já está desligada) e `netplay_stateless_mode` (o modo saiu do RetroArch) |
+| J2 | **Mais 8 chaves que o RetroArch não conhece**, todas ignoradas em silêncio: o espaço inicial do save state (`savestate_slot`; o certo é `state_slot`), o tema do menu do Esc (pedia o 27, valia o verde clássico do RetroArch), a largura do menu, o "Importar conteúdo" escondido, o atalho de gravar a partida (replay) e 4 que não existem mais. **Efeito na tela: nenhum** — conferido no RetroArch de verdade: ele já volta ao espaço 0 a cada jogo aberto (até com a configuração pedindo o 3), e o resto já era o padrão dele. É código que mentia sobre o que fazia | **Novo** `servidor\tests\test_chaves_do_retroarch.py`: gera o arquivo de opções de verdade com cada perfil, motor gráfico, modo e tipo de partida, com as 50 opções avançadas, e confere cada chave contra o `retroarch.cfg` (o RetroArch grava nele todas as que lê, ao fechar; os textos do `retroarch.exe` deixaram de valer na revisão, porque lá também estão os nomes internos do menu). O espaço: SNES aberto 3 vezes com cópias da configuração (espaço 3 na principal, no arquivo extra, nos dois): o save caiu no espaço 0 nas três | Nome certo: `state_slot` = 0 (fica por garantia: se um RetroArch novo passar a lembrar o espaço, o próximo F2 regravaria o 9, o "seguro" do guia 4); `rgui_menu_color_theme` = **4**, o verde clássico que os alunos sempre viram (o 27 nunca valeu, e trocar agora seria surpresa); `menu_rgui_full_width_layout`; `content_show_add_entry` = 0; `input_record_replay`/`input_play_replay`/`input_halt_replay` = sem tecla. **Saíram** (não existem no RetroArch desta pasta, nem no programa nem no `retroarch.cfg`): `quick_menu_show_cheevos` (as conquistas já ficam desligadas), `notification_show_recording`, `notification_show_streaming` (a gravação já está desligada) `netplay_stateless_mode` (o modo saiu do RetroArch) e, achada na revisão, `menu_show_legacy_thumbnail_updater` (o atualizador inteiro já fica escondido) |
 | J2b | **11 chaves repetidas** no `BASE_COMUM` (blocos inteiros colados duas vezes, com os mesmos valores): a próxima mudança numa das cópias não valeria | O mesmo teste novo: lê todos os dicionários do servidor | Ficou uma de cada |
-| J3 | **Sexto jogador sem explicação**: só "Falha ao conectar ao host", e o aluno acha que é a rede | `teste_netplay_sexto_jogador.py` | `motivo_do_erro.motivo_da_partida`: "Não deu para entrar na partida. Ela pode estar cheia: este jogo aceita até 5 jogadores. Pergunte a quem hospeda quantos já entraram; se ainda tem vaga, rode o PARTIDA.bat nos dois computadores..." (no alto da tela, ao voltar) |
-| J4 | **Rede Pública: só o PARTIDA.bat percebia**, e só se o aluno rodasse | Leitura do código | Ao procurar partidas, o ARENA pergunta ao Windows a categoria da rede (sem administrador, em segundo plano, vale 5 min); quem **abre** a partida numa rede Pública vê o aviso com as saídas que não pedem senha: outro computador abre e este entra (quem entra só faz conexão de saída), ou "Estamos em casas diferentes" nos dois. O PARTIDA.bat diz o mesmo. 3 testes na bateria |
+| J3 | **Sexto jogador sem explicação**: só "Falha ao conectar ao host", e o aluno acha que é a rede | `teste_netplay_sexto_jogador.py` (que agora confere a frase que o ARENA mostra) | `motivo_do_erro.motivo_da_partida`, no alto da tela ao voltar, com uma frase para cada caso que o RetroArch escreve: o anfitrião disse que está cheio ("a partida está cheia (este jogo aceita até 5 jogadores). Espere alguém sair, ou abram outra partida"); a entrada foi recusada, o caso do sexto ("Ela pode estar cheia: este jogo aceita até 5 jogadores. Pergunte a quem hospeda quantos já entraram; se ainda tem vaga, rode o PARTIDA.bat..."); ninguém atendeu no endereço ("o computador de quem abriu a partida não respondeu. Confira se o jogo dele já está aberto na tela... a rede pode estar barrando... PARTIDA.bat") |
+| J4 | **Rede Pública: só o PARTIDA.bat percebia**, e só se o aluno rodasse | Leitura do código | Com a janela do Jogar Junto aberta, o ARENA pergunta ao Windows a categoria de todas as redes ligadas (sem administrador, em segundo plano; resposta de mais de 10 min não vale). Quem **abre** a partida numa rede Pública vê, fixo no alto da tela até o jogo fechar, o aviso com a saída que não pede senha: outro computador abre e este entra (quem entra só faz conexão de saída). O PARTIDA.bat diz o mesmo. 4 testes na bateria |
+| J8 | **"Estamos em casas diferentes" nunca funcionou** (achado da revisão desta fase). Com a chave, o anfitrião vai pelo repasse da internet e deixa de atender na rede local; o convidado, que o ARENA manda para o endereço do anfitrião, nunca chega ao repasse. A primeira versão do aviso da rede Pública (J4) indicava a chave como saída | RetroArch de verdade: anfitrião com o repasse, convidado como o ARENA o abre: a 55435 não escuta e o convidado recebe "Failed to connect to host 127.0.0.1 on port 55435" | A chave saiu da tela (o código ficou) até o convidado entrar pelo repasse de verdade: o RetroArch tem `--mitm-session` para entrar numa sala do repasse, e falta o ARENA passar o "código da sala" de um para o outro, com teste entre duas casas (pendência). O aviso e o PARTIDA.bat não a indicam mais; o guia 5 explica, e perdeu a dica "ligue casas diferentes, que entra com folga" |
 | J5 | **Wi-Fi que isola os aparelhos**: o PARTIDA.bat dizia só "confira se estão na mesma rede" | Leitura | Agora: "Se estão no mesmo Wi-Fi e mesmo assim não alcança, o Wi-Fi pode estar isolando os aparelhos (comum na escola): liguem o ponto de acesso de um celular e conectem os dois nele, ou liguem um cabo direto". Na tela, quando nenhuma partida aparece, a dica do que conferir (`#dicaSemPartida`) |
 | J6 | **O simulador de rede ruim atrasava de 1 a 2 vezes o pedido** (dormia o atraso na mesma linha que lia) | Leitura do código | Uma linha lê, outra entrega cada pedaço no instante chegada + atraso, em ordem; a "perda" é o reenvio do TCP (uma volta + 200 ms, segurando o que vem atrás) |
 | J7 | **O teste da mala deixava `ARENA-troca.json` solto no Temp do Windows** (com os recordes da cópia) a cada rodada | O arquivo no Temp, de 16h27 (a rodada da Fase 4) | O ARENA de teste numa subpasta, como os outros testes; a sobra foi apagada |
@@ -585,7 +592,7 @@ O que entra de novo nesta fase:
 
 1. **Rede Pública.** No notebook que vai abrir a partida, confira em
    Configurações → Rede e Internet se a rede é "Pública". Abra a partida:
-   o ARENA tem que avisar e dar as duas saídas. Anote se outro notebook
+   o ARENA tem que avisar, fixo no alto da tela, e dar a saída. Anote se outro notebook
    consegue entrar mesmo assim (o Firewall pode pedir senha de
    administrador: anote o que aparece). Depois troque quem abre: um
    notebook que só ENTRA tem que conseguir.
@@ -606,13 +613,34 @@ O que entra de novo nesta fase:
 **Como testar (o professor):** em 2 notebooks na mesma rede, os dois com
 "Aceitar conexões da rede" ligado, um abre a partida e o outro entra.
 Para ver o aviso de rede Pública, abra a partida num notebook com a rede
-marcada como Pública (Configurações → Rede e Internet): o ARENA avisa e
-dá as duas saídas. Com 5 jogando o Super Bomberman 4, um sexto que tenta
-entrar vê, ao voltar, a frase de que a partida pode estar cheia.
+marcada como Pública (Configurações → Rede e Internet): o ARENA avisa, fixo
+no alto da tela, e dá a saída (outro computador abre e este entra). Com 5
+jogando o Super Bomberman 4, um sexto que tenta entrar vê, ao voltar, a
+frase de que a partida pode estar cheia.
+
+### Revisão independente da Fase 4 (09/10/2026)
+
+Três revisores (as chaves do RetroArch, os testes, o código novo de produto)
+leram o commit da fase sem rodar nada, e cada achado foi conferido aqui (o
+verificador automático caiu no limite de uso). **Os 15 eram reais**, e todos
+foram consertados:
+
+| Achado | O que mudou |
+|---|---|
+| O teste das chaves aceitava como "conhecida" qualquer palavra do `retroarch.exe`, inclusive os nomes internos do menu (ex.: `netplay_tcp_udp_port`, que parece a porta e não é) — e por isso deixava passar uma chave morta: `menu_show_legacy_thumbnail_updater` | A referência é só o `retroarch.cfg`; a chave saiu (J2) |
+| O aviso da rede Pública indicava "Estamos em casas diferentes" — que não funciona | J8 |
+| "Failed to connect to host 192.168.0.12 on port 55435" (ninguém atendeu) também dizia "pode estar cheia"; "Host de netplay cheio" não dizia nada | Três frases (J3) |
+| O aviso da rede Pública ia num recado de 9 s, que some atrás da janela do jogo | Fixo no alto até o jogo fechar |
+| A pergunta ao Windows (PowerShell) rodava em toda abertura do ARENA, e a resposta valia para sempre | Só com a janela do Jogar Junto aberta; resposta de mais de 10 min não vale |
+| Só a primeira rede da lista era olhada (cabo direto + Wi-Fi) | Todas; basta uma ser Pública (no ARENA e no PARTIDA.bat) |
+| O teste de rede ruim só reprovava se o simulador não aceitasse a conexão; os "60 quadros/s" e "0 dessincronia" não provavam nada | Reprova se não conectar, se cair ou se os dados não passarem pelo simulador nos dois sentidos; as duas medidas saíram (ver "Rede ruim") |
+| O teste do sexto jogador aceitava qualquer "falh" ou "slot" no registro | Confere a frase que o ARENA mostra |
+| A regra de ouro tirava da comparação os nomes novos para sempre (uma troca futura da porta passaria calada) | Compara pelo nome certo (a versão antiga passa por um mapa) |
+| O teste da porta era pulado sem o RetroArch (a cópia do GitHub) | Em classe própria, roda sempre |
 
 ### Resultado da Fase 4
 
 | | |
 |---|---|
-| Bateria | **261**, todos passando (3 novos: as chaves do RetroArch, a porta, as chaves repetidas) |
-| Testes do Jogar Junto (`rodada_final.py`) | 23 de 23 antes dos consertos J1–J2. Depois: **21 de 22**; a falha foi a `teste_multitap_regra_de_ouro`, que compara cada jogo com a versão de antes do multitap e pegou exatamente as chaves renomeadas de propósito (J2) — elas entraram na lista de mudanças de propósito do teste, com o motivo, e ele passou ("nenhuma diferença fora do esperado"). O de sala passou a conferir as duas partidas de verdade (3 de 3) e o de rede ruim, o simulador no caminho |
+| Bateria | **267**, todos passando (novos: as chaves do RetroArch, a porta, as chaves repetidas, as três frases da partida, a resposta velha da rede, o FAT32 da Fase 6) |
+| Testes do Jogar Junto (`rodada_final.py`) | 23 de 23 antes dos consertos J1–J2. Depois: **21 de 22**; a falha foi a `teste_multitap_regra_de_ouro`, que compara cada jogo com a versão de antes do multitap e pegou exatamente as chaves renomeadas de propósito (J2). Depois da revisão: regra de ouro, sexto jogador e rede ruim, **3 de 3**. O de sala passou a conferir as duas partidas de verdade (3 de 3) e o de rede ruim, o simulador no caminho |

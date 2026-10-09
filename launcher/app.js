@@ -2686,7 +2686,15 @@ function abrirPartida(jogo) {
   $("#campoJogadorPartida").hidden = true;
   preencherAmigosPartida();
   carregarColegas();
-  $("#campoInternet").hidden = false;
+  // Ja pergunta ao Windows se a rede e' Publica (em segundo plano), para o
+  // aviso de quem abre a partida sair certo no "Comecar".
+  procurarPartidas(true);
+  // "Estamos em casas diferentes" ESCONDIDA (auditoria 3, revisao da Fase 4,
+  // 09/10/2026): testado com o RetroArch de verdade, com ela o anfitriao vai
+  // pelo repasse da internet e nao atende na rede local, e o convidado -- que
+  // o ARENA manda para o endereco do anfitriao, sem o codigo da sala do
+  // repasse -- nunca entra. Volta quando o convidado entrar pelo repasse.
+  $("#campoInternet").hidden = true;
   $("#chaveInternet").setAttribute("aria-pressed", "false");
   $("#resultadoTeste").textContent = "";
 
@@ -2733,9 +2741,15 @@ async function comecarPartida() {
       : estado.papelDaPartida === "assistir"
       ? "Entrando para assistir. Você vê a tela dele, sem controlar nada."
       : `Entrando como ${dados.papel}. Aguarde a tela abrir.`;
-    const aviso = dados.aviso ? " " + dados.aviso : "";
-    recado(texto + aviso, false, aviso ? 9000 : 4500);
+    const complemento = dados.aviso ? " " + dados.aviso : "";
+    recado(texto + complemento, false, complemento ? 9000 : 4500);
     mostrarFaixaTeclas();
+    if (dados.aviso_rede) {
+      // Rede Pública: fica na barra do alto até o jogo fechar. O recado
+      // sumiria atrás da janela do jogo antes de alguém tentar entrar.
+      estado.avisoDaMaquina = true;
+      aviso(dados.aviso_rede);
+    }
   } catch (falha) {
     recado(falha.message, true);
   }
@@ -2895,14 +2909,16 @@ function preencherAmigosPartida() {
   if (escolhida && unicos.has(escolhida)) lista.value = escolhida;
 }
 
-async function procurarPartidas() {
+async function procurarPartidas(janelaAberta = false) {
   // Uma busca por vez: amigo fora do ar faz a busca levar até 3 s, e a
   // próxima (a cada 4 s) não pode empilhar em cima.
   if (estado.buscandoPartidas) return;
   estado.buscandoPartidas = true;
   estado.procurandoPartidas = !(estado.partidasEncontradas || []).length;
   try {
-    const dados = await pedir("/api/partida/procurar");
+    // Com a janela do Jogar Junto aberta, o servidor também pergunta ao
+    // Windows se a rede é Pública; na busca de quando a tela abre, não.
+    const dados = await pedir("/api/partida/procurar" + (janelaAberta ? "?rede=1" : ""));
     estado.partidasEncontradas = dados.colegas || [];
     estado.partidasEm = Date.now();
     desenharAmigos(estado.partidasEncontradas);
@@ -2921,13 +2937,13 @@ function vigiarPartidas(ligar) {
   clearInterval(estado.vigiaPartidas);
   estado.vigiaPartidas = null;
   if (!ligar) return;
-  procurarPartidas();
+  procurarPartidas(true);
   estado.vigiaPartidas = setInterval(() => {
     if ($("#modalPartida").hidden || estado.papelDaPartida === "hospedar") {
       vigiarPartidas(false);
       return;
     }
-    procurarPartidas();
+    procurarPartidas(true);
   }, 4000);
 }
 
@@ -3420,6 +3436,7 @@ async function abrirComoColocar() {
     const dados = await pedir("/api/como-colocar");
     estado.comoColocar = dados.consoles || [];
     estado.pastaBios = dados.pasta_bios || "BIOS";
+    estado.formatoDoDisco = (dados.formato_do_disco || "").toUpperCase();
     const escolhido = lista.value || (estado.filtroPlataforma || "");
     const ordem = [...estado.comoColocar].sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
     lista.replaceChildren(...ordem.map((console) => {
@@ -3465,6 +3482,16 @@ function desenharComoColocar() {
   linha("Arquivos que servem", console.formatos.join("  ") || "—");
   linha("Como guardar", console.como);
   linha(console.zip_titulo, console.zip_texto);
+  // FAT32 não guarda arquivo maior que 4 GB: o aviso vem ANTES de copiar,
+  // só nos consoles de jogo grande (auditoria 3, Fase 6).
+  if (console.jogo_grande && estado.formatoDoDisco === "FAT32") {
+    const aviso = document.createElement("strong");
+    aviso.className = "bios-falta";
+    aviso.textContent = "Este pen drive está em FAT32, que não guarda arquivo maior que 4 GB — e muitos " +
+      "jogos deste console passam disso: a cópia para no meio ou o Windows recusa. Para eles, o pen " +
+      "drive precisa estar em exFAT (guia 1-COMECAR.md, Parte A, passo 2: formatar apaga tudo, copie antes).";
+    linha("Atenção", aviso);
+  }
   if (console.bios) {
     // O servidor confere a marca de cada BIOS (servidor/bios.py): certa,
     // de outra versao (pode funcionar), presente (marca desconhecida) ou falta.
@@ -4157,7 +4184,8 @@ function ligarEventos() {
       }
       const entrando = estado.papelDaPartida !== "hospedar";
       $("#campoAmigoPartida").hidden = !entrando;
-      $("#campoInternet").hidden = false;
+      // "Estamos em casas diferentes" fica escondida (ver abrirPartida).
+      $("#campoInternet").hidden = true;
       preencherAmigosPartida();
       vigiarPartidas(entrando);
 
