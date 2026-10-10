@@ -1,58 +1,34 @@
-# CLAUDE.md - ARENA
+# CLAUDE.md (dentro do repositório)
 
-## Objeto do Projeto
-Console/launcher de jogos retrô portátil e sem instalação, baseado em RetroArch. Roda de uma pasta única (disco local ou pen drive), com cerca de 47 consoles emulados (NES ao PS2).
+**Não substitua este arquivo inteiro.** Ele é lido por todo assistente que
+abre o ARENA (Claude Code no computador ou na nuvem, Hermes e outros):
+acrescente na seção certa e mantenha o que os outros escreveram.
 
-## Estado Atual da Auditoria 3
+## Onde estão as instruções do projeto
 
-**ÚLTIMA SESSÃO CONCLUÍDA (2026-10-10)**
+A memória completa do ARENA (o que é, para quem, as restrições que não se
+negociam, as decisões e o porquê de cada uma, o histórico de defeitos e o
+"Estado atual") ainda está no `CLAUDE.md` da pasta de cima (`..\CLAUDE.md`),
+fora do git. Ela vem para cá, inteira, quando o ARENA for publicado no
+GitHub, no fim da auditoria 3.
 
-Progresso:
-- Fase 0 (linha de base): CONCLUÍDA ✓
-- Fase 1 (limpeza código): CONCLUÍDA ✓  
-- Fase 2 (leveza/desempenho): CONCLUÍDA ✓
-- Fase 3 (servidor/API): CONCLUÍDA ✓
-- Fase 4 (rede Publica, FAT32): CONCLUÍDA ✓
-- Fase 5 (matriz jogos): A INICIAR
-- Fase 6 (portabilidade): PENDÊNCIA
-- Fase 7 (clareza/usabilidade): PENDÊNCIA
-- Fase 8 (relatório final): PENDÊNCIA
+Até lá, valem as regras do `AGENTS.md` (nesta pasta) e do
+`docs\SINCRONIZAR-COM-O-GITHUB.md`. As que mais importam agora:
 
-## Último Commit
-**08aaac7** - "Sincronização: Arquivos para sync entre computadores e assistentes"
+- **Nunca `git add -A` nem `git add .`**: só os arquivos que você mudou.
+  Mais de um assistente trabalha nesta pasta, às vezes ao mesmo tempo.
+- Sincronizar só com o `SINCRONIZAR.bat` (ou `git pull --ff-only` /
+  `git push`). Os scripts antigos (`sync_github.py`, `sincronizador.py`,
+  `SINCRONIZAR_ARENA.bat`) foram trocados por ele em 10/10/2026: juntavam
+  tudo num commit "Backup automático" e procuravam a pasta sem o acento.
+- O repositório vai ser público: nada de e-mail, senha ou token em arquivo.
 
-## Status de Sincronização
-⚠️ **CRÍTICO:** Repositório GitHub não autenticado. Precisa de `gh auth login`.
+## Estado atual (resumo; o detalhe está em docs\RELATORIO-QUALIDADE.md)
 
-## Sincronização entre Assistentes
-- **Hermes (este):** passospariserafael@gmail.com
-- **Claude Code (1):** passospariserafael@gmail.com  
-- **Claude Code (2):** (conta institucional do professor)
-
-## Arquivos de Sincronização Criados
-- `SYNC_STATUS.md` - Status atualizado automaticamente
-- `SINCRONIZACAO_CROSS.md` - Instruções para sincronização
-- `ESTADO_ATUAL.md` - Estado da auditoria
-- `RESUMO_SYNC.md` - Resumo de sincronização
-- `sync_github.py` - Script de sincronização automática
-
-## Pendência de Sincronização
-O outro computador não completou o push para o GitHub.
-- Precisa: `gh auth login` → `git push origin auditoria`
-- Este computador: aguardando autenticação
-
-## Como Continuar
-
-### Se for sincronizar agora:
-1. `python sync_github.py --sync`
-2. Resolver eventuais conflitos
-3. Continuar com Fase 5: Matriz de jogos
-
-### Se for trabalhar localmente:
-Continuar com Fase 5 (Matriz de jogos) conforme o PLANO-AUDITORIA.md
-
-## Contato
-Email: passospariserafael@gmail.com
-
----
-*Este CLAUDE.md é atualizado automaticamente após cada sessão de trabalho*
+Auditoria 3, ramo `auditoria`. Fases 0 a 4 em commit. A Fase 5 (matriz de
+jogos) entrou no commit `b2fdf44` junto com textos da Fase 7 (a mensagem
+dele fala de sincronização, mas o conteúdo é esse); a acessibilidade da tela
+(Fase 7) no `b2e45f8`. Faltam: fechar a Fase 5 (revisão independente),
+Fase 6 (portabilidade), o resto da Fase 7, a Fase 8 (relatório final, rodada
+completa, juntar ao `main`, atualizar a versão dos alunos) e a publicação no
+GitHub.

@@ -1,9 +1,0 @@
-PASSO A PASSO PARA GERAR O TOKEN:
-
-1. Acesse: https://github.com/settings/tokens
-2. Clique em "Generate new token"
-3. Nome: "ARENA Sync"
-4. Scopes: repo, public_repo, workflow
-5. Gere e copie o token
-6. No terminal: gh auth login --with-token
-7. Cole o token e pressione Enter
