@@ -104,7 +104,7 @@ async function pedir(rota, metodo = "GET", corpo = null) {
   } catch (falha) {
     perderContato();
     const erro = new Error(
-      "O servidor do Arena não está acessível. Abra o ARENA pela janela preta e tente novamente."
+      "O ARENA parou de responder. Espere uns segundos: ele costuma voltar sozinho. Se não voltar, feche a janela preta e abra o ARENA.bat de novo."
     );
     erro.causa = falha;
     throw erro;
@@ -700,6 +700,12 @@ function desenharDetalhes() {
   const multiplayerBotao = $("#btnMultiplayerSelecionado");
   const gerirBotao = $("#btnGerirSelecionado");
   const consoleBotao = $("#btnEscolherConsole");
+  // Registrar pontos: so nos consoles que pedem placar (os de fantasia, onde a
+  // turma faz os proprios jogos). A janela e a rota sempre existiram; o botao
+  // nao existia nesta versao (auditoria 3, Fase 7) -- o ranking de pontos so
+  // recebia o que vinha dos amigos.
+  const placarBotao = $("#btnPlacarSelecionado");
+  placarBotao.hidden = !(jogo && jogo.pede_placar);
   if (!jogo) {
     painel.classList.add("detalhes--vazio");
     jogarBotao.disabled = true;
@@ -1420,10 +1426,12 @@ const EXPLICA_NIVEL_GRAFICO = {
     "vira 1x com desenho pelo processador; no PSP, 480×272; no Nintendo 64, resolução " +
     "nativa. Use se o jogo trava mesmo com o modo Desempenho.",
   leve: "Imagem PIOR que a do console, para o jogo rodar: o Dreamcast desenha pela metade " +
-    "(320×240), PSP e Nintendo 64 pulam quadros e efeitos quando o computador atrasa, " +
-    "Mega Drive, GBA, fliperama e outros pulam quadros se precisar. PS2, GameCube e Wii " +
-    "rodam com o processador do console mais devagar (em cena pesada, o jogo pode ficar " +
-    "lento); o PS3 desenha a 50%. SNES, NES e Game Boy ficam iguais: já são leves.",
+    "do tamanho (320×240). PSP e Nintendo 64 pulam quadros e efeitos quando o computador " +
+    "atrasa. Pular quadros é como aquele desenho animado no canto do caderno, com algumas " +
+    "folhas a menos: o movimento fica menos liso, mas não para. Mega Drive, GBA, fliperama " +
+    "e outros pulam quadros só se precisar. PS2, GameCube e Wii: o processador (o cérebro) " +
+    "do console imitado trabalha mais devagar. Em cena pesada, o jogo pode ficar lento. " +
+    "PS3: a imagem cai para a metade (50%). SNES, NES e Game Boy ficam iguais: já são leves.",
   minimo: "Bonecos de papelão: tudo do leve e mais. Dreamcast sem neblina e sem sombra, " +
     "PSP e Nintendo 64 pulam mais, PS2 com a mistura de cores mínima, GameCube sem " +
     "neblina, PS3 a 25%. Alguns jogos desenham errado (sombra, transparência, mira) — " +
@@ -2636,8 +2644,9 @@ function abrirJuntoLocal(jogo) {
     ? `Este console abre por outro programa (${plataforma.emulador}), que não ` +
       "tem o Jogar Junto do ARENA. Por isso vocês jogam juntos no mesmo " +
       "computador, cada um com seu controle."
-    : "Neste console, o emulador não consegue deixar dois computadores " +
-      "iguais ao mesmo tempo. Por isso vocês jogam juntos no mesmo " +
+    : "Para jogar em dois computadores, o jogo precisa ficar igualzinho nos dois, " +
+      "como dois relógios acertados. O emulador deste console (o programa que imita " +
+      "o console) não consegue isso. Por isso vocês jogam juntos no mesmo " +
       "computador, cada um com seu controle.";
   const passos = [
     "Ligue os controles antes de abrir o jogo. O 1º controle é o jogador 1, " +
@@ -2652,10 +2661,10 @@ function abrirJuntoLocal(jogo) {
       "Ajustes → Controles.",
     // De onde vem o numero (02/10/2026: o Rafael ligou o multitap pelo
     // menu do PCSX2 e o ARENA desligava de novo a cada jogo).
-    "O jogo aceita mais jogadores do que aparece aqui? O professor escreve " +
-      `o número no arquivo dados\\jogadores.txt (uma linha: ${jogo.titulo} = 4). ` +
-      "O ARENA liga o adaptador de controles (multitap) sozinho a partir " +
-      "desse número. Ligar pelo menu do emulador pode não valer: o ARENA " +
+    "Para o professor: o jogo aceita mais jogadores do que aparece aqui? " +
+      `Escreva o número no arquivo dados\\jogadores.txt, numa linha assim: ${jogo.titulo} = 4. ` +
+      "Com esse número, o ARENA liga sozinho o multitap (o adaptador que deixa ligar mais " +
+      "controles no console). Ligar pelo menu do emulador pode não funcionar, porque o ARENA " +
       "arruma a configuração dos controles a cada jogo.",
   ];
   if (jogo.plataforma === "wii") {
@@ -3331,7 +3340,8 @@ async function carregarRanking() {
     const dados = await pedir("/api/ranking");
     desenharRanking("#rankingPontos", dados.placar,
       (e) => e.pontos.toLocaleString("pt-BR"),
-      "Ninguém registrou pontuação ainda. Jogue e clique em Registrar pontos.");
+      "Ninguém registrou pontuação ainda. Jogue um jogo de TIC-80, WASM-4 ou LowRes NX e, no " +
+      "painel do jogo, clique em Registrar pontos. O botão Enviar recordes, no alto, traz os dos amigos.");
     desenharRanking("#rankingTempo", dados.tempo,
       (e) => `${formatarTempo(e.segundos)} · ${e.partidas} partidas`,
       "Nenhuma partida registrada ainda. Partidas de menos de 30 segundos não contam.");
@@ -3487,9 +3497,12 @@ function desenharComoColocar() {
   if (console.jogo_grande && estado.formatoDoDisco === "FAT32") {
     const aviso = document.createElement("strong");
     aviso.className = "bios-falta";
-    aviso.textContent = "Este pen drive está em FAT32, que não guarda arquivo maior que 4 GB — e muitos " +
-      "jogos deste console passam disso: a cópia para no meio ou o Windows recusa. Para eles, o pen " +
-      "drive precisa estar em exFAT (guia 1-COMECAR.md, Parte A, passo 2: formatar apaga tudo, copie antes).";
+    aviso.textContent = "Este pen drive está em FAT32 (o jeito como ele organiza os arquivos). " +
+      "No FAT32, nenhum arquivo passa de 4 GB: é como uma gaveta onde caixa grande não entra. " +
+      "Muitos jogos deste console são maiores: a cópia para no meio ou o Windows recusa. " +
+      "Para eles, o pen drive precisa estar em exFAT, um jeito sem esse limite. Para mudar, " +
+      "é preciso formatar. Formatar apaga tudo: copie seus arquivos antes. Passo a passo: " +
+      "guia 1-COMECAR.md, Parte A, passo 2.";
     linha("Atenção", aviso);
   }
   if (console.bios) {
@@ -3813,6 +3826,9 @@ function ligarEventos() {
   });
   $("#btnGerirSelecionado").addEventListener("click", () => {
     if (estado.jogoSelecionado) abrirGaveta_jogo(estado.jogoSelecionado);
+  });
+  $("#btnPlacarSelecionado").addEventListener("click", () => {
+    if (estado.jogoSelecionado) abrirPlacar(estado.jogoSelecionado);
   });
   $("#btnEscolherConsole").addEventListener("click", () => {
     if (estado.jogoSelecionado) abrirEscolhaConsole(estado.jogoSelecionado);

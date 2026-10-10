@@ -131,6 +131,7 @@
         <button class="botao botao--principal" id="btnJogarSelecionado" type="button" disabled>Jogar agora</button>
         <button class="botao" id="btnMultiplayerSelecionado" type="button" disabled>Jogar multiplayer</button>
         <button class="botao" id="btnGerirSelecionado" type="button" disabled>Saves e cheats</button>
+        <button class="botao" id="btnPlacarSelecionado" type="button" hidden>Registrar pontos</button>
         <button class="botao" id="btnEscolherConsole" type="button" hidden>Escolher console</button>
       </div>
       <div class="detalhes-acoes">
@@ -267,7 +268,10 @@
       </div>
       <p class="explica">
         Vale na hora: <b>não precisa fechar o ARENA</b>. Na primeira vez, o
-        Windows pode perguntar se deixa o Python usar a rede.
+        Windows pode perguntar se o Python (o programa que faz o ARENA
+        funcionar) pode usar a rede. Quem pergunta é o firewall, o porteiro do
+        Windows. Clique em <b>Permitir acesso</b>. Se pedir senha de
+        administrador, chame o professor ou o TI.
       </p>
 
       <h3 class="grupo-titulo">Meus endereços</h3>
@@ -459,10 +463,10 @@
     <div>
       <h3 class="grupo-titulo">Computador modesto</h3>
       <p class="explica">
-        Mesmo o modo leve deixa a imagem melhor que o console original — e
-        isso pesa. Aqui você escolhe até onde a imagem pode piorar para o
-        jogo rodar. Vale para todos os consoles, inclusive PS2, GameCube,
-        Wii e PS3.
+        Mesmo o perfil Desempenho, da aba Simples, deixa a imagem melhor que
+        a do console original. E imagem melhor dá mais trabalho ao computador.
+        Aqui você escolhe quanto a imagem pode piorar para o jogo rodar. Vale
+        para todos os consoles, inclusive PS2, GameCube, Wii e PS3.
       </p>
       <div class="opcao">
         <span class="opcao-rotulo">Nível do gráfico</span>
@@ -536,10 +540,12 @@
         <option value="dinput">dinput — PS3, arcade stick, genérico antigo</option>
       </select>
       <span class="opcao-ajuda">
-        Deixe em xinput: ele também reconhece PS4, PS5 e genéricos. Use
-        dinput só se TODOS os controles ligados forem PS3, arcade stick ou
-        genérico antigo — no dinput, controle do tipo Xbox (Xbox, GameSir e
-        parecidos) aparece duas vezes e os jogadores se embaralham.
+        O xinput e o dinput são dois jeitos de o computador ler o controle,
+        como duas línguas. Deixe em xinput: ele também entende PS4, PS5 e
+        genéricos. Use dinput só se TODOS os controles ligados forem PS3,
+        arcade stick ou genérico antigo. No dinput, controle do tipo Xbox
+        (Xbox, GameSir e parecidos) aparece duas vezes, e os jogadores se
+        embaralham.
       </span>
     </div>
     <div>
@@ -634,8 +640,9 @@
       </div>
       <p class="explica" id="mapaResumo">—</p>
       <p class="explica">
-        "Mapear sozinho" preenche tudo pelo número de cada botão; vale no
-        próximo jogo.
+        “Voltar ao reconhecimento automático” apaga os botões do controle que
+        você definiu para este jogador. O controle volta a ser reconhecido
+        sozinho. As teclas do teclado ficam. Vale no próximo jogo.
       </p>
       <p class="explica" id="mapaWatacao" hidden>Para controles genéricos, clique em "Configurar com assistente" e pressione cada botão quando pedido.</p>
     </div>
@@ -684,7 +691,12 @@
     <div>
       <h3 class="grupo-titulo">BIOS dos consoles</h3>
       <p class="explica"><strong>BIOS</strong> é o programinha que vem de fábrica dentro do console de verdade e liga ele por dentro. Alguns consoles não abrem jogo nenhum sem ela; outros só precisam dela para alguns jogos.</p>
-      <p class="explica">Cada console tem a sua pasta dentro da pasta <code>BIOS</code> do ARENA (o mesmo nome da pasta de jogos dele; quando cada região tem a sua BIOS, uma pasta por região). Ponha o arquivo na pasta do console — com qualquer nome, ou o .zip em que ele veio — e clique em <strong>Conferir</strong>: o ARENA reconhece a versão, põe onde o emulador procura e a BIOS fica <strong>ativa</strong>.</p>
+      <p class="explica">Cada console tem a sua pasta dentro da pasta <code>BIOS</code> do ARENA, com o mesmo nome da pasta de jogos dele. Quando o console tem uma BIOS para cada região (EUA, Europa, Japão), há uma pasta para cada região.</p>
+      <ol class="passos-junto">
+        <li>Ponha o arquivo da BIOS na pasta do console. Pode ser com qualquer nome, ou o .zip do jeito que veio.</li>
+        <li>Clique em <strong>Conferir</strong>. O ARENA reconhece a versão e coloca a BIOS onde o emulador (o programa que imita o console) procura.</li>
+        <li>Pronto: a BIOS fica <strong>ativa</strong>.</li>
+      </ol>
       <p class="explica bios-resumo" id="biosResumo">Conferindo…</p>
       <div class="controle-acoes">
         <button class="botao" id="btnBiosPasta" type="button">Abrir a pasta BIOS</button>
@@ -864,7 +876,8 @@
   <!-- Cheats -->
   <div class="aba-conteudo" data-painel="cheats" hidden>
     <h3 class="jogo-nome" id="jogoNomeCheats">—</h3>
-    <p class="explica">Adicione códigos e ative-os durante o jogo.</p>
+    <p class="explica">Cadastre os códigos com o jogo fechado. Dentro do jogo, ligue e desligue
+      cada um pelo menu: Esc → Cheats.</p>
     <ul class="cheats-lista" id="listaCheats"></ul>
 
     <div class="cheat-form">
@@ -909,7 +922,7 @@
     <div class="perfis">
       <button class="perfil" data-papel="hospedar" type="button">
         <span class="perfil-nome">Eu abro a partida</span>
-        <span class="perfil-resumo">Cria uma partida.</span>
+        <span class="perfil-resumo">Seu computador recebe os amigos, como uma festa na sua casa: eles vêm até você.</span>
       </button>
       <button class="perfil" data-papel="entrar" type="button">
         <span class="perfil-nome">Entrar na partida do amigo</span>

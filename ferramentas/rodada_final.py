@@ -33,6 +33,9 @@ LIMITES_ESPECIAIS = {
     # Abre CADA jogo do catalogo, e o catalogo cresceu (62 jogos em 25/09,
     # 129 em 01/10): ~45 s por jogo nos consoles com Jogar Junto.
     os.path.join("testes", "teste_abrir_todos.py"): 3600,
+    # Abre CADA jogo de PS2 da pasta (37 em 10/10/2026), ~20 s cada, mais os
+    # niveis de qualidade em 3 jogos; o jogo que nao comeca espera 60 s.
+    os.path.join("testes", "teste_ps2_todos_os_jogos.py"): 2700,
 }
 
 # Arquivos DE VERDADE que nenhum teste deveria mudar. O retroarch.cfg volta

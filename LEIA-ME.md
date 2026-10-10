@@ -14,7 +14,9 @@ Abre uma janela preta. **Não feche ela.** É ela que faz o ARENA funcionar.
 
 **2.** O ARENA abre sozinho na tela.
 Na primeira vez, ele pergunta seu apelido (é o nome dos seus recordes).
-Para trocar depois: botão **Perfil**, no alto, → **Meu perfil**.
+Para trocar depois, clique no seu apelido, no alto da tela (é o botão do
+perfil). Na aba **Meu perfil**, mude o apelido e clique em
+**Salvar apelido**.
 
 **3.** Clique num jogo.
 Ele abre em alguns segundos.
@@ -37,8 +39,9 @@ Para desligar o ARENA, feche a janela preta.
 
 Atenção: **Esc não fecha o jogo, abre o menu.** Para fechar é F10.
 
-Não precisa decorar: enquanto o jogo está aberto, o ARENA mostra essas
-teclas numa faixa no alto da janela dele. Deu Alt+Tab, elas estão lá.
+Não precisa decorar. Enquanto o jogo está aberto, a tela do ARENA mostra
+essas teclas numa faixa, no alto. Para ver a faixa, use **Alt+Tab**. Segure
+**Alt** e aperte **Tab** até chegar na janela do ARENA. Depois, solte.
 
 ---
 
@@ -78,7 +81,9 @@ Detalhes no documento 2.
 
 ## Recebeu esta pasta de outra pessoa?
 
-**Perfil → Meu perfil → Começar do zero.**
+Clique no botão do perfil, no alto da tela. Ele mostra o apelido de quem te
+passou a pasta (ou a palavra **Perfil**). Na aba **Meu perfil**, clique em
+**Começar do zero**.
 
 Apaga o apelido, os recordes, a lista de amigos, o mapeamento de controle e
 as configurações de quem te passou. **Os jogos ficam.** Você escolhe se quer
@@ -96,10 +101,16 @@ voltar.
 
 Em **Ajustes → Controles**, o ARENA mapeia com os nomes do seu console.
 
-**Plugou e quer jogar agora?** Só abra o jogo: Xbox, PlayStation 3, 4 e 5,
-Switch Pro, fliperamas e muitos genéricos são reconhecidos sozinhos. O
-teclado joga como o primeiro jogador sem controle. Se mexer nos botões e
-piorar, clique em **Voltar ao reconhecimento automático**.
+**Plugou e quer jogar agora?** Só abra o jogo. O ARENA reconhece sozinho
+controles de Xbox, PlayStation 3, 4 e 5, Switch Pro, fliperama e muitos
+controles genéricos (os paralelos, sem marca famosa).
+
+O teclado fica com a primeira vaga de jogador sem controle. Exemplo: com 3
+controles ligados, o teclado é o jogador 4. Sem nenhum controle, o teclado
+é o jogador 1.
+
+Mexeu nos botões e piorou? Clique em
+**Voltar ao reconhecimento automático**.
 
 Para ajustar um botão específico: escolha o console, escolha o jogador,
 clique em **Definir** e **aperte a tecla ou o botão** — ele reconhece
@@ -127,12 +138,20 @@ teimoso:
 | O celular vira a rede | Nem precisa de internet nele |
 | **A mala do pen drive** | Sem rede de jeito nenhum |
 
-A mala é o último recurso e nunca falha: você leva o pen drive até a máquina
-do colega, clica em *Trocar pelo pen drive* nos dois, e os recordes se
-juntam. Documento 5.
+A mala do pen drive é o último recurso, e nunca falha. Ela é como um caderno
+de recados que passa de mão em mão: cada computador deixa nele os recordes
+novos e copia os que ainda não tinha.
 
-E para jogar de casa, cada um na sua, tem a chave **Estamos em casas
-diferentes** na janela de Jogar junto.
+1. No seu ARENA, clique em **Amigos**, no alto. Depois, em
+   **Trocar pelo pen drive**.
+2. Leve o pen drive até o computador do colega.
+3. No ARENA dele, clique no mesmo botão.
+4. Volte e clique de novo no seu.
+
+Pronto: os dois ficam com os recordes dos dois. Detalhes no documento 5.
+
+De uma casa para outra, pela internet, ainda não dá para jogar junto: a
+chave que tentava isso nunca funcionou e saiu da tela (documento 5).
 
 ---
 
@@ -171,10 +190,10 @@ sem áudio e sem sair do computador.
 | Diz que a porta 8777 está em uso | O ARENA já está aberto. Procure a outra janela preta |
 | Diz que faltou o RetroArch | A pasta tem que se chamar `retroarch`. Documento 1 |
 | A lista está vazia | Clique em Atualizar lista. Documento 2 |
-| Nenhum jogo abre | Ajustes → Máquina → botão de copiar as bibliotecas |
+| Nenhum jogo abre | Podem faltar as bibliotecas gráficas: arquivos do Windows que os emuladores usam. Vá em Ajustes → Máquina e clique em **Copiar para a pasta do ARENA**. Esse botão só aparece quando elas faltam. Não precisa de senha de administrador |
 | Jogo de PlayStation 2 não abre | Documento 2, parte B. Precisa do PCSX2 |
-| O jogo abre e fecha na hora | Documento 2 (falta arquivo) ou 4 (motor gráfico) |
-| Trava ou o som falha | Documento 2 |
+| O jogo abre e fecha na hora | 1. Em Ajustes → Avançado → Imagem, deixe o **Motor gráfico** no automático. O motor gráfico é por onde o jogo fala com a placa de vídeo. Documento 3. 2. Não resolveu? Pode faltar um arquivo de sistema, como a BIOS (o programa de fábrica que liga o console). Documento 2 |
+| O jogo trava ou o som falha | Em Ajustes → Simples, escolha **Desempenho**. A imagem fica mais simples, mas o jogo fica leve. Documento 3 |
 | O computador todo está lento | Ajustes → Máquina → **Verificar agora**. Diz o que pesa e o que fazer. Documento 3 |
 | Diz que já tem um jogo aberto | Feche o outro com F10 |
 | A tela diz "O servidor do ARENA parou de responder" | Espere uns segundos: a janela preta reabre o servidor sozinha e a tela volta sozinha. Se não voltar, feche a janela preta e abra o `ARENA.bat` de novo. Documento 1 |

@@ -342,6 +342,61 @@ class TestAvisos(unittest.TestCase):
         finally:
             shutil.rmtree(vazia, ignore_errors=True)
 
+    def test_console_que_so_abre_com_a_bios(self):
+        """Auditoria 3, Fase 5: o ColecoVision sem a BIOS abria com a tela
+        preta e nem o cartao nem o console diziam nada. Agora os consoles com
+        BIOS de nivel "precisa" (fora os que ja tinham aviso proprio) avisam
+        no cartao e ficam "falta_sistema" na lista."""
+        vazia = tempfile.mkdtemp(prefix="arena_bios_precisa_")
+        try:
+            aviso = bios.aviso_do_jogo("colecovision", "Slither (1983)(Coleco).col", vazia, "ColecoVision")
+            self.assertIn("colecovision.rom", aviso)
+            self.assertIn("BIOS\\ColecoVision", aviso)
+            self.assertIn("tela preta", aviso)
+            self.assertIn("Conferir", aviso)               # o que fazer
+            self.assertEqual(bios.falta_para_o_console("colecovision", vazia), aviso)
+            # O outro nome que o Gearcoleco aceita tambem vale.
+            with open(os.path.join(vazia, "coleco.rom"), "wb") as arquivo:
+                arquivo.write(b"\0" * 8192)
+            self.assertIsNone(bios.aviso_do_jogo("colecovision", "Slither.col", vazia))
+            self.assertEqual(bios.falta_para_o_console("colecovision", vazia), "")
+
+            # Intellivision: as duas sao obrigatorias; com uma, o aviso cita so a outra.
+            with open(os.path.join(vazia, "exec.bin"), "wb") as arquivo:
+                arquivo.write(b"\0" * 8192)
+            aviso = bios.aviso_do_jogo("intellivision", "Astrosmash.int", vazia)
+            self.assertIn("grom.bin", aviso)
+            self.assertNotIn("exec.bin", aviso)
+
+            # MSX: a BIOS sao duas PASTAS (Machines e Databases), com algo dentro.
+            aviso = bios.aviso_do_jogo("msx", "Penguin Adventure.rom", vazia)
+            self.assertIn("Machines", aviso)
+            self.assertIn("Databases", aviso)
+            self.assertIn("Ponha as pastas", aviso)
+            for pasta in ("Machines", "Databases"):
+                os.makedirs(os.path.join(vazia, pasta))
+            self.assertIn("Machines", bios.aviso_do_jogo("msx", "Penguin Adventure.rom", vazia))  # vazias
+            for pasta, arquivo in (("Machines", "Shared Roms"), ("Databases", "msxromdb.xml")):
+                with open(os.path.join(vazia, pasta, arquivo), "w") as feito:
+                    feito.write("x")
+            self.assertIsNone(bios.aviso_do_jogo("msx", "Penguin Adventure.rom", vazia))
+
+            # 3DO: qualquer uma das versoes aceitas basta.
+            self.assertIn("panafz10.bin", bios.aviso_do_jogo("threedo", "Gex.chd", vazia))
+            with open(os.path.join(vazia, "panafz1.bin"), "wb") as arquivo:
+                arquivo.write(b"\0" * 1048576)
+            self.assertIsNone(bios.aviso_do_jogo("threedo", "Gex.chd", vazia))
+
+            # Os que ja tem aviso proprio, ou abrem sem (Amiga, pelo substituto
+            # embutido do PUAE), nao ganham esta frase.
+            self.assertIsNone(bios.aviso_do_jogo("amiga", "Alien Breed Disk1.adf", vazia))
+            self.assertEqual(bios.falta_para_o_console("amiga", vazia), "")
+            self.assertIsNone(bios.aviso_do_jogo("ps1", "CTR.chd", vazia))
+            self.assertEqual(bios.falta_para_o_console("ps1", vazia), "")
+            self.assertEqual(bios.falta_para_o_console("nes", vazia), "")
+        finally:
+            shutil.rmtree(vazia, ignore_errors=True)
+
     def test_prateleira_da_bios_pelo_nome(self):
         self.assertEqual(bios.prateleira_da_bios("mpr-17933.bin"), "BIOS\\Sega Saturn\\EUA e Europa")
         self.assertEqual(bios.prateleira_da_bios("BS-X.bin"), "BIOS\\Super Nintendo (Satellaview)")

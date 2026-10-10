@@ -96,7 +96,11 @@ NOVAS_NA_AUDITORIA_3 = {"input_play_replay", "input_halt_replay"}
 # Valor que mudou de proposito junto com o nome: o tema pedia o 27 e nunca
 # valeu (fica o 4, o que os alunos sempre viram); "Importar conteudo" escondido
 # era "false" no nome velho e e' "0" no novo.
-VALOR_NOVO_DE_PROPOSITO = {("rgui_menu_color_theme", "27"): "4", ("content_show_add_entry", "false"): "0"}
+VALOR_NOVO_DE_PROPOSITO = {("rgui_menu_color_theme", "27"): "4", ("content_show_add_entry", "false"): "0",
+                           # Fase 5 da auditoria 3: o perfil Qualidade nao liga mais
+                           # sozinho o voltar no tempo e a resposta instantanea (o N64
+                           # caia para 30 quadros/s; o PS1 gastava 5x o processador).
+                           ("rewind_enable", "true"): "false", ("run_ahead_enabled", "true"): "false"}
 
 
 def com_nomes_certos(chaves_override):

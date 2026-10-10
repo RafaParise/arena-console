@@ -131,8 +131,10 @@ CATALOGO = [
     {"id": "odyssey2-g7400", "console": "odyssey2", "pasta": "Odyssey 2", "sub": "Videopac+", "destino": "g7400.bin",
      "nivel": "alguns", "tamanho": 1024, "o_que": "a BIOS do Videopac+ (G7400)",
      "sem_ela": "os jogos do Videopac+ não abrem"},
+    # coleco.rom: o outro nome que o Gearcoleco aceita (o registro dele, na
+    # matriz da auditoria 3: "BIOS not found: colecovision.rom or coleco.rom").
     {"id": "colecovision", "console": "colecovision", "pasta": "ColecoVision", "sub": "", "destino": "colecovision.rom",
-     "nivel": "precisa", "tamanho": 8192, "o_que": "a BIOS do ColecoVision"},
+     "nivel": "precisa", "tamanho": 8192, "alternativas": ["coleco.rom"], "o_que": "a BIOS do ColecoVision"},
     {"id": "intv-exec", "console": "intellivision", "pasta": "Intellivision", "sub": "", "destino": "exec.bin",
      "nivel": "precisa", "tamanho": 8192, "o_que": "a Executive ROM do Intellivision (exec.bin)"},
     {"id": "intv-grom", "console": "intellivision", "pasta": "Intellivision", "sub": "", "destino": "grom.bin",

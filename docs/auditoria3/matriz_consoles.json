@@ -1,0 +1,582 @@
+[
+ {
+  "console": "Arcade (MAME)",
+  "jogo": "Killer Instinct",
+  "nucleo": "mame",
+  "normal": {
+   "abre": true,
+   "ate_o_1o_quadro_s": 3.0,
+   "quadros_por_segundo": 59.8,
+   "menor_fps": 58.8,
+   "processador_pct_de_um_nucleo": 14.4,
+   "salva_estado": true,
+   "carrega_estado": true,
+   "foto_kb": 25.2,
+   "mostra_imagem": true,
+   "fecha_certo": true,
+   "save_do_jogo": [
+    "MAME\\mame\\cfg\\default.cfg",
+    "MAME\\mame\\cfg\\kinst.cfg",
+    "MAME\\mame\\diff\\kinst.dif"
+   ]
+  },
+  "modesto": {
+   "abre": true,
+   "ate_o_1o_quadro_s": 1.3,
+   "quadros_por_segundo": 56.1,
+   "menor_fps": 58.9,
+   "processador_pct_de_um_nucleo": 15.2,
+   "salva_estado": true,
+   "carrega_estado": true,
+   "foto_kb": 15.6,
+   "mostra_imagem": true,
+   "fecha_certo": true,
+   "save_do_jogo": [
+    "MAME\\mame\\cfg\\default.cfg",
+    "MAME\\mame\\cfg\\kinst.cfg",
+    "MAME\\mame\\diff\\kinst.dif"
+   ]
+  }
+ },
+ {
+  "console": "Atari 2600",
+  "jogo": "Combat",
+  "nucleo": "stella",
+  "normal": {
+   "abre": true,
+   "ate_o_1o_quadro_s": 1.5,
+   "quadros_por_segundo": 59.8,
+   "menor_fps": 59.9,
+   "processador_pct_de_um_nucleo": 6.6,
+   "salva_estado": true,
+   "carrega_estado": true,
+   "foto_kb": 3.3,
+   "mostra_imagem": true,
+   "fecha_certo": true,
+   "save_do_jogo": []
+  },
+  "modesto": {
+   "abre": true,
+   "ate_o_1o_quadro_s": 1.3,
+   "quadros_por_segundo": 59.8,
+   "menor_fps": 59.9,
+   "processador_pct_de_um_nucleo": 4.9,
+   "salva_estado": true,
+   "carrega_estado": true,
+   "foto_kb": 2.8,
+   "mostra_imagem": true,
+   "fecha_certo": true,
+   "save_do_jogo": []
+  }
+ },
+ {
+  "console": "ColecoVision",
+  "jogo": "Slither",
+  "nucleo": "gearcoleco",
+  "sem_bios": "Falta a BIOS deste console (o programa de fábrica dele): a BIOS do ColecoVision (colecovision.rom). Sem ela, os jogos não abrem ou ficam com a tela preta. Ponha o arquivo na pasta BIOS\\ColecoVision do ARENA (com qualquer nome, ou o .zip em que ele veio) e clique em Conferir, em Ajustes → Emuladores (ou abra o ARENA de novo): ele reconhece a versão e instala sozinho.",
+  "normal": {
+   "abre": true,
+   "ate_o_1o_quadro_s": 1.3,
+   "quadros_por_segundo": 59.8,
+   "menor_fps": 59.8,
+   "processador_pct_de_um_nucleo": 3.1,
+   "salva_estado": true,
+   "carrega_estado": true,
+   "foto_kb": 3.1,
+   "mostra_imagem": true,
+   "fecha_certo": true,
+   "save_do_jogo": []
+  },
+  "modesto": {
+   "abre": true,
+   "ate_o_1o_quadro_s": 1.3,
+   "quadros_por_segundo": 59.8,
+   "menor_fps": 59.8,
+   "processador_pct_de_um_nucleo": 2.9,
+   "salva_estado": true,
+   "carrega_estado": true,
+   "foto_kb": 1.9,
+   "mostra_imagem": false,
+   "fecha_certo": true,
+   "save_do_jogo": []
+  }
+ },
+ {
+  "console": "Commodore 64",
+  "jogo": "International Karate",
+  "nucleo": "vice_x64",
+  "normal": {
+   "abre": true,
+   "ate_o_1o_quadro_s": 1.8,
+   "quadros_por_segundo": 52.0,
+   "menor_fps": 50.0,
+   "processador_pct_de_um_nucleo": 5.2,
+   "salva_estado": true,
+   "carrega_estado": true,
+   "foto_kb": 11.9,
+   "mostra_imagem": true,
+   "fecha_certo": true,
+   "save_do_jogo": []
+  },
+  "modesto": {
+   "abre": true,
+   "ate_o_1o_quadro_s": 1.5,
+   "quadros_por_segundo": 48.6,
+   "menor_fps": 50.0,
+   "processador_pct_de_um_nucleo": 4.7,
+   "salva_estado": true,
+   "carrega_estado": true,
+   "foto_kb": 5.6,
+   "mostra_imagem": true,
+   "fecha_certo": true,
+   "save_do_jogo": []
+  }
+ },
+ {
+  "console": "Commodore Amiga",
+  "jogo": "Alien Breed Disk1",
+  "nucleo": "puae",
+  "normal": {
+   "abre": true,
+   "ate_o_1o_quadro_s": 1.3,
+   "quadros_por_segundo": 48.3,
+   "menor_fps": 49.9,
+   "processador_pct_de_um_nucleo": 13.9,
+   "salva_estado": true,
+   "carrega_estado": true,
+   "foto_kb": 4.0,
+   "mostra_imagem": true,
+   "fecha_certo": true,
+   "save_do_jogo": []
+  },
+  "modesto": {
+   "abre": true,
+   "ate_o_1o_quadro_s": 1.3,
+   "quadros_por_segundo": 48.6,
+   "menor_fps": 49.9,
+   "processador_pct_de_um_nucleo": 11.5,
+   "salva_estado": true,
+   "carrega_estado": true,
+   "foto_kb": 4.0,
+   "mostra_imagem": true,
+   "fecha_certo": true,
+   "save_do_jogo": []
+  }
+ },
+ {
+  "console": "Mega Drive, Master System e Game Gear",
+  "jogo": "Sonic the Hedgehog 3",
+  "nucleo": "genesis_plus_gx",
+  "normal": {
+   "abre": true,
+   "ate_o_1o_quadro_s": 1.3,
+   "quadros_por_segundo": 59.5,
+   "menor_fps": 59.7,
+   "processador_pct_de_um_nucleo": 7.7,
+   "salva_estado": true,
+   "carrega_estado": true,
+   "foto_kb": 435.1,
+   "mostra_imagem": true,
+   "fecha_certo": true,
+   "save_do_jogo": [
+    "Genesis Plus GX\\Sonic The Hedgehog 3 (USA).srm"
+   ]
+  },
+  "modesto": {
+   "abre": true,
+   "ate_o_1o_quadro_s": 1.3,
+   "quadros_por_segundo": 59.8,
+   "menor_fps": 59.9,
+   "processador_pct_de_um_nucleo": 5.6,
+   "salva_estado": true,
+   "carrega_estado": true,
+   "foto_kb": 30.2,
+   "mostra_imagem": true,
+   "fecha_certo": true,
+   "save_do_jogo": [
+    "Genesis Plus GX\\Sonic The Hedgehog 3 (USA).srm"
+   ]
+  }
+ },
+ {
+  "console": "Neo Geo e fliperamas (FBNeo)",
+  "jogo": "Metal Slug X - Super Vehicle-001",
+  "nucleo": "fbneo",
+  "normal": {
+   "abre": true,
+   "ate_o_1o_quadro_s": 2.0,
+   "quadros_por_segundo": 56.1,
+   "menor_fps": 59.0,
+   "processador_pct_de_um_nucleo": 7.8,
+   "salva_estado": true,
+   "carrega_estado": true,
+   "foto_kb": 215.6,
+   "mostra_imagem": true,
+   "fecha_certo": true,
+   "save_do_jogo": [
+    "FinalBurn Neo\\fbneo\\mslugx.fs"
+   ]
+  },
+  "modesto": {
+   "abre": true,
+   "ate_o_1o_quadro_s": 1.5,
+   "quadros_por_segundo": 59.8,
+   "menor_fps": 59.0,
+   "processador_pct_de_um_nucleo": 5.8,
+   "salva_estado": true,
+   "carrega_estado": true,
+   "foto_kb": 31.7,
+   "mostra_imagem": true,
+   "fecha_certo": true,
+   "save_do_jogo": [
+    "FinalBurn Neo\\fbneo\\mslugx.fs"
+   ]
+  }
+ },
+ {
+  "console": "Nintendo (NES)",
+  "jogo": "Contra",
+  "nucleo": "fceumm",
+  "normal": {
+   "abre": true,
+   "ate_o_1o_quadro_s": 1.3,
+   "quadros_por_segundo": 59.8,
+   "menor_fps": 60.0,
+   "processador_pct_de_um_nucleo": 6.0,
+   "salva_estado": true,
+   "carrega_estado": true,
+   "foto_kb": 487.5,
+   "mostra_imagem": true,
+   "fecha_certo": true,
+   "save_do_jogo": []
+  },
+  "modesto": {
+   "abre": true,
+   "ate_o_1o_quadro_s": 1.3,
+   "quadros_por_segundo": 59.8,
+   "menor_fps": 60.0,
+   "processador_pct_de_um_nucleo": 4.5,
+   "salva_estado": true,
+   "carrega_estado": true,
+   "foto_kb": 15.0,
+   "mostra_imagem": true,
+   "fecha_certo": true,
+   "save_do_jogo": []
+  }
+ },
+ {
+  "console": "Nintendo 64",
+  "jogo": "Bomberman 64",
+  "nucleo": "mupen64plus_next",
+  "normal": {
+   "abre": true,
+   "ate_o_1o_quadro_s": 1.5,
+   "quadros_por_segundo": 59.8,
+   "menor_fps": 59.7,
+   "processador_pct_de_um_nucleo": 48.5,
+   "salva_estado": true,
+   "carrega_estado": true,
+   "foto_kb": 541.5,
+   "mostra_imagem": true,
+   "fecha_certo": true,
+   "save_do_jogo": [
+    "Mupen64Plus-Next\\Bomberman 64 (USA).srm"
+   ]
+  },
+  "modesto": {
+   "abre": true,
+   "ate_o_1o_quadro_s": 3.5,
+   "quadros_por_segundo": 59.8,
+   "menor_fps": 58.7,
+   "processador_pct_de_um_nucleo": 49.0,
+   "salva_estado": true,
+   "carrega_estado": true,
+   "foto_kb": 6.8,
+   "mostra_imagem": true,
+   "fecha_certo": true,
+   "save_do_jogo": [
+    "Mupen64Plus-Next\\Bomberman 64 (USA).srm"
+   ]
+  }
+ },
+ {
+  "console": "PlayStation",
+  "jogo": "CTR Crash Team Racing",
+  "nucleo": "swanstation",
+  "normal": {
+   "abre": true,
+   "ate_o_1o_quadro_s": 11.3,
+   "quadros_por_segundo": 59.8,
+   "menor_fps": 59.7,
+   "processador_pct_de_um_nucleo": 7.8,
+   "salva_estado": true,
+   "carrega_estado": true,
+   "foto_kb": 48.5,
+   "mostra_imagem": true,
+   "fecha_certo": true,
+   "save_do_jogo": [
+    "SwanStation\\CTR - Crash Team Racing (USA).srm"
+   ]
+  },
+  "modesto": {
+   "abre": true,
+   "ate_o_1o_quadro_s": 10.8,
+   "quadros_por_segundo": 59.8,
+   "menor_fps": 59.7,
+   "processador_pct_de_um_nucleo": 8.8,
+   "salva_estado": true,
+   "carrega_estado": true,
+   "foto_kb": 12.5,
+   "mostra_imagem": true,
+   "fecha_certo": true,
+   "save_do_jogo": [
+    "SwanStation\\CTR - Crash Team Racing (USA).srm"
+   ]
+  }
+ },
+ {
+  "console": "PlayStation Portable",
+  "jogo": "Burnout Legends",
+  "nucleo": "ppsspp",
+  "normal": {
+   "abre": true,
+   "ate_o_1o_quadro_s": 1.5,
+   "quadros_por_segundo": 59.8,
+   "menor_fps": 59.8,
+   "processador_pct_de_um_nucleo": 7.4,
+   "salva_estado": true,
+   "carrega_estado": true,
+   "foto_kb": 901.7,
+   "mostra_imagem": true,
+   "fecha_certo": true,
+   "save_do_jogo": [
+    "PPSSPP\\PSP\\SYSTEM\\CACHE\\ULES00125.vkshadercache"
+   ]
+  },
+  "modesto": {
+   "abre": true,
+   "ate_o_1o_quadro_s": 1.5,
+   "quadros_por_segundo": 59.8,
+   "menor_fps": 59.8,
+   "processador_pct_de_um_nucleo": 11.1,
+   "salva_estado": true,
+   "carrega_estado": true,
+   "foto_kb": 173.2,
+   "mostra_imagem": true,
+   "fecha_certo": true,
+   "save_do_jogo": [
+    "PPSSPP\\PSP\\SYSTEM\\CACHE\\ULES00125.vkshadercache"
+   ]
+  },
+  "observacao": "refeito em 10/10/2026 depois da rodada: a matriz passou a esperar a foto terminar de ser gravada (P9 no relatorio)"
+ },
+ {
+  "console": "Sega 32X",
+  "jogo": "Knuckles' Chaotix",
+  "nucleo": "picodrive",
+  "normal": {
+   "abre": true,
+   "ate_o_1o_quadro_s": 1.3,
+   "quadros_por_segundo": 48.6,
+   "menor_fps": 49.9,
+   "processador_pct_de_um_nucleo": 3.3,
+   "salva_estado": true,
+   "carrega_estado": true,
+   "foto_kb": 30.7,
+   "mostra_imagem": true,
+   "fecha_certo": true,
+   "save_do_jogo": []
+  },
+  "modesto": {
+   "abre": true,
+   "ate_o_1o_quadro_s": 1.3,
+   "quadros_por_segundo": 48.6,
+   "menor_fps": 49.9,
+   "processador_pct_de_um_nucleo": 4.5,
+   "salva_estado": true,
+   "carrega_estado": true,
+   "foto_kb": 14.9,
+   "mostra_imagem": true,
+   "fecha_certo": true,
+   "save_do_jogo": []
+  }
+ },
+ {
+  "console": "Sega CD",
+  "jogo": "Sonic CD",
+  "nucleo": "genesis_plus_gx",
+  "normal": {
+   "abre": true,
+   "ate_o_1o_quadro_s": 1.3,
+   "quadros_por_segundo": 48.6,
+   "menor_fps": 49.6,
+   "processador_pct_de_um_nucleo": 6.0,
+   "salva_estado": true,
+   "carrega_estado": true,
+   "foto_kb": 374.5,
+   "mostra_imagem": true,
+   "fecha_certo": true,
+   "save_do_jogo": [
+    "Genesis Plus GX\\4Mbit_cart.brm",
+    "Genesis Plus GX\\scd_E.brm"
+   ]
+  },
+  "modesto": {
+   "abre": true,
+   "ate_o_1o_quadro_s": 1.3,
+   "quadros_por_segundo": 48.6,
+   "menor_fps": 49.6,
+   "processador_pct_de_um_nucleo": 5.1,
+   "salva_estado": true,
+   "carrega_estado": true,
+   "foto_kb": 27.1,
+   "mostra_imagem": true,
+   "fecha_certo": true,
+   "save_do_jogo": [
+    "Genesis Plus GX\\4Mbit_cart.brm",
+    "Genesis Plus GX\\scd_E.brm"
+   ]
+  }
+ },
+ {
+  "console": "Sega Dreamcast",
+  "jogo": "Armada",
+  "nucleo": "flycast",
+  "normal": {
+   "abre": true,
+   "ate_o_1o_quadro_s": 1.5,
+   "quadros_por_segundo": 48.6,
+   "menor_fps": 52.1,
+   "processador_pct_de_um_nucleo": 36.0,
+   "salva_estado": true,
+   "carrega_estado": true,
+   "foto_kb": 207.3,
+   "mostra_imagem": true,
+   "fecha_certo": true,
+   "save_do_jogo": [],
+   "repetida": {
+    "abre": true,
+    "mostra_imagem": false,
+    "salva_estado": false,
+    "carrega_estado": false,
+    "fecha_certo": true
+   }
+  },
+  "modesto": {
+   "abre": true,
+   "ate_o_1o_quadro_s": 1.5,
+   "quadros_por_segundo": 48.6,
+   "menor_fps": 52.0,
+   "processador_pct_de_um_nucleo": 37.6,
+   "salva_estado": true,
+   "carrega_estado": true,
+   "foto_kb": 209.2,
+   "mostra_imagem": true,
+   "fecha_certo": true,
+   "save_do_jogo": []
+  }
+ },
+ {
+  "console": "Sega Saturn",
+  "jogo": "Saturn Bomberman",
+  "nucleo": "mednafen_saturn",
+  "normal": {
+   "abre": true,
+   "ate_o_1o_quadro_s": 1.5,
+   "quadros_por_segundo": 59.8,
+   "menor_fps": 59.6,
+   "processador_pct_de_um_nucleo": 34.4,
+   "salva_estado": true,
+   "carrega_estado": true,
+   "foto_kb": 6.1,
+   "mostra_imagem": true,
+   "fecha_certo": true,
+   "save_do_jogo": [
+    "Beetle Saturn\\Saturn Bomberman (USA) (1S).smpc",
+    "Beetle Saturn\\Saturn Bomberman (USA) (1S).srm"
+   ]
+  },
+  "modesto": {
+   "abre": true,
+   "ate_o_1o_quadro_s": 1.3,
+   "quadros_por_segundo": 59.8,
+   "menor_fps": 59.6,
+   "processador_pct_de_um_nucleo": 39.5,
+   "salva_estado": true,
+   "carrega_estado": true,
+   "foto_kb": 6.1,
+   "mostra_imagem": true,
+   "fecha_certo": true,
+   "save_do_jogo": [
+    "Beetle Saturn\\Saturn Bomberman (USA) (1S).smpc",
+    "Beetle Saturn\\Saturn Bomberman (USA) (1S).srm"
+   ]
+  }
+ },
+ {
+  "console": "Super Nintendo",
+  "jogo": "Super Bomberman 4",
+  "nucleo": "snes9x",
+  "normal": {
+   "abre": true,
+   "ate_o_1o_quadro_s": 1.3,
+   "quadros_por_segundo": 59.8,
+   "menor_fps": 58.6,
+   "processador_pct_de_um_nucleo": 9.5,
+   "salva_estado": true,
+   "carrega_estado": true,
+   "foto_kb": 45.0,
+   "mostra_imagem": true,
+   "fecha_certo": true,
+   "save_do_jogo": []
+  },
+  "modesto": {
+   "abre": true,
+   "ate_o_1o_quadro_s": 1.3,
+   "quadros_por_segundo": 59.8,
+   "menor_fps": 60.0,
+   "processador_pct_de_um_nucleo": 7.0,
+   "salva_estado": true,
+   "carrega_estado": true,
+   "foto_kb": 11.1,
+   "mostra_imagem": true,
+   "fecha_certo": true,
+   "save_do_jogo": []
+  }
+ },
+ {
+  "console": "ZX Spectrum",
+  "jogo": "Match Day II",
+  "nucleo": "fuse",
+  "normal": {
+   "abre": true,
+   "ate_o_1o_quadro_s": 1.3,
+   "quadros_por_segundo": 48.6,
+   "menor_fps": 46.6,
+   "processador_pct_de_um_nucleo": 5.8,
+   "salva_estado": true,
+   "carrega_estado": true,
+   "foto_kb": 9.7,
+   "mostra_imagem": true,
+   "fecha_certo": true,
+   "save_do_jogo": [
+    "Fuse\\Match Day II (1987)(The Hit Squad)[re-release].ldci"
+   ]
+  },
+  "modesto": {
+   "abre": true,
+   "ate_o_1o_quadro_s": 1.3,
+   "quadros_por_segundo": 48.6,
+   "menor_fps": 46.5,
+   "processador_pct_de_um_nucleo": 6.2,
+   "salva_estado": true,
+   "carrega_estado": true,
+   "foto_kb": 4.3,
+   "mostra_imagem": true,
+   "fecha_certo": true,
+   "save_do_jogo": [
+    "Fuse\\Match Day II (1987)(The Hit Squad)[re-release].ldci"
+   ]
+  }
+ }
+]

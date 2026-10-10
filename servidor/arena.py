@@ -175,7 +175,14 @@ def gravar_texto_atomico(caminho, texto):
 
 # Guarda contra abrir dois jogos ao mesmo tempo. Sem isso, um duplo clique
 # apressado sobe duas janelas do RetroArch disputando o mesmo controle.
-JOGO_EM_ANDAMENTO = {"ativo": False, "titulo": ""}
+JOGO_EM_ANDAMENTO = {"ativo": False, "titulo": "", "id": ""}
+# Os codigos do jogo aberto nao mudam pela tela: ao fechar o jogo, o
+# RetroArch grava por cima do .cht a lista que ele carregou (registro dele:
+# "Save game-specific cheatfile"), e a mudanca feita no meio se perderia.
+MENSAGEM_CHEAT_COM_JOGO_ABERTO = (
+    "Este jogo está aberto agora. Feche o jogo (F10) antes de mudar os códigos dele: quando o jogo "
+    "fecha, o RetroArch grava por cima a lista de códigos que ele tem aberta, e a sua mudança se "
+    "perderia.")
 
 # A partida que ESTE computador esta hospedando agora (ou None). E' o que
 # faz o amigo ver "Fulano - partida aberta: Super Bomberman 4" na lista de
@@ -764,12 +771,20 @@ PERFIS_GRAFICOS = {
             "menu_show_load_content_animation": "true",
             "audio_latency": "32",
             "audio_resampler_quality": "5",
-            "rewind_enable": "true",
-            # Resposta instantanea: o emulador roda um quadro escondido e
-            # devolve o resultado na hora, tirando o atraso que o console
-            # de verdade tinha. So no perfil mais pesado, e so em maquina
-            # que aguenta - por isso a checagem de nota logo abaixo.
-            "run_ahead_enabled": "true",
+            # "Voltar no tempo" e "Resposta instantanea" NAO entram sozinhas
+            # (auditoria 3, Fase 5, 09/10/2026). O Qualidade e' o que o
+            # automatico escolhe para todo console de custo ate 3 numa
+            # maquina de nota 4 -- e o Celeron N5100 da escola tira nota 4,
+            # igual ao Ryzen (a nota conta nucleos). Medido no Ryzen, com o
+            # jogo aberto (testes da Fase 5): o voltar no tempo derrubava o
+            # N64 de 60 para 30 quadros/s; a resposta instantanea fazia o
+            # ZX Spectrum gastar 12x o processador (55% contra 4,7% de um
+            # nucleo), e as duas juntas, o PS1 5x (46,7% contra 8,7%, e 57
+            # quadros/s). No Celeron (43% da velocidade de um nucleo do
+            # Ryzen) o PS1 passaria de um nucleo inteiro. As duas continuam
+            # em Ajustes -> Avancado para quem quiser ligar.
+            "rewind_enable": "false",
+            "run_ahead_enabled": "false",
         },
     },
 }
@@ -1504,9 +1519,11 @@ def opcoes_efetivas(config, custo=None, controles_ligados=None):
         driver = MAQUINA["driver_video"]
     ajustar_para_driver(opcoes, driver, nome_perfil)
 
-    # Trava de seguranca: resposta instantanea custa quase o dobro de
-    # processador. Em maquina abaixo de nota 4, ela transforma um jogo que
-    # rodava liso num jogo que engasga. Melhor nem oferecer.
+    # Trava de seguranca: resposta instantanea custa de 4 a 12 vezes o
+    # processador do emulador (medido na Fase 5 da auditoria 3: PS1 e ZX
+    # Spectrum). Em maquina abaixo de nota 4, ela transforma um jogo que
+    # rodava liso num jogo que engasga. Melhor nem oferecer. (Nenhum perfil
+    # liga sozinho; so o aluno, em Ajustes -> Avancado.)
     if CAPACIDADE["nota"] < 4:
         opcoes["run_ahead_enabled"] = "false"
 
@@ -1918,6 +1935,9 @@ def avaliar_plataformas(forcar=False):
             # Sega CD e Saturn nao abrem jogo nenhum sem a BIOS deles. Antes
             # (ate 03/10/2026) so ficavam "falta" com a pasta system VAZIA:
             # com a BIOS do PS1 la, apareciam prontos e o jogo nao abria.
+            # Desde a auditoria 3 (Fase 5), tambem os que so abrem com a BIOS
+            # do catalogo (ColecoVision, MSX, 3DO, Intellivision, PC-FX, CD-i,
+            # Odyssey 2): o ColecoVision abria com a tela preta, calado.
             estado = "falta_sistema"
             motivo = bios.falta_para_o_console(plataforma["id"], PASTA_SISTEMA)
         else:
@@ -2080,6 +2100,20 @@ def buscar_capas_que_faltam():
 
 def achar_jogo(jogo_id):
     return next((j for j in manifesto()["jogos"] if j["id"] == jogo_id), None)
+
+
+def nucleo_das_pastas(jogo):
+    """'Snes9x': a subpasta do nucleo deste jogo dentro de retroarch\\saves,
+    states e cheats -- onde o RetroArch guarda tudo dele (servidor\\cheats.py).
+    None para console sem nucleo do RetroArch (emulador de fora)."""
+    plataforma = next((p for p in carregar_catalogo() if p["id"] == jogo.get("plataforma")), None)
+    return cheats.nome_do_nucleo((plataforma or {}).get("core"), os.path.join(PASTA_RETROARCH, "info"))
+
+
+def jogo_aberto_agora(jogo):
+    """Este jogo esta aberto no emulador agora?"""
+    with TRAVA_JOGO:
+        return JOGO_EM_ANDAMENTO["ativo"] and JOGO_EM_ANDAMENTO.get("id") == jogo["id"]
 
 
 # ---------------------------------------------------------------------------
@@ -2529,6 +2563,15 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         # jogo de varios discos e' quase sempre de um jogador so (RPG).
         if not partida:
             caminho_jogo = lista_de_discos(jogo, caminho_jogo)
+            # Codigo de cheat cadastrado antes da auditoria 3 ficava num
+            # lugar em que o RetroArch nao procura (servidor\cheats.py): vai
+            # para o lugar certo antes de abrir. Na partida a dois o
+            # RetroArch nao usa cheat nenhum.
+            try:
+                if cheats.levar_do_lugar_antigo(jogo, cheats.nome_do_nucleo(jogo.get("core"))):
+                    print("[ARENA] Codigos de cheat deste jogo levados para a pasta que o RetroArch le.")
+            except OSError as falha:
+                print("[ARENA] Nao consegui levar os codigos de cheat para a pasta certa: %s" % falha)
         extra = dict(partida["opcoes"]) if partida else None
         # Mais de 2 jogadores (graficos.jogadores_do_jogo, calculado no
         # /api/jogar). Entra POR ULTIMO, depois das opcoes de controle:
@@ -4721,9 +4764,9 @@ class Manipulador(BaseHTTPRequestHandler):
                     key=lambda p: p["nome"]),
                 "sugestao": jogo.get("sugestao"),
                 "pasta_atual": os.path.dirname(jogo["arquivo"]),
-                "estados": cheats.listar_estados(jogo),
-                "tem_save": cheats.tem_save(jogo),
-                "cheats": cheats.ler_cheats(jogo),
+                "estados": cheats.listar_estados(jogo, nucleo_das_pastas(jogo)),
+                "tem_save": cheats.tem_save(jogo, nucleo_das_pastas(jogo)),
+                "cheats": cheats.ler_cheats(jogo, nucleo_das_pastas(jogo)),
             })
 
         return self.erro("Rota não encontrada.", 404)
@@ -5142,6 +5185,7 @@ class Manipulador(BaseHTTPRequestHandler):
                     return self.erro("Feche o jogo aberto antes.", 409)
                 JOGO_EM_ANDAMENTO["ativo"] = True
                 JOGO_EM_ANDAMENTO["titulo"] = "BIOS do %s" % plataforma["nome"]
+                JOGO_EM_ANDAMENTO["id"] = ""
 
             config = carregar_config()
             caminho_externo, dados_externo = graficos.achar_externo(plataforma)
@@ -5409,13 +5453,13 @@ class Manipulador(BaseHTTPRequestHandler):
                 return self.erro("Jogo não encontrado. Ele pode ter sido movido ou apagado. "
                                  "Clique em Atualizar lista e tente de novo.", 404)
             try:
-                apagou = cheats.apagar_estado(jogo, dados.get("espaco"))
+                apagou = cheats.apagar_estado(jogo, dados.get("espaco"), nucleo_das_pastas(jogo))
             except (TypeError, ValueError):
                 return self.erro("Esse número de espaço não existe. Escolha um dos que "
                                  "aparecem na lista de saves do jogo.")
             return self.responder_json({
                 "ok": True, "apagou": apagou,
-                "estados": cheats.listar_estados(jogo)})
+                "estados": cheats.listar_estados(jogo, nucleo_das_pastas(jogo))})
 
         # ---- cheats ------------------------------------------------------
         if caminho == "/api/cheat/adicionar":
@@ -5423,9 +5467,11 @@ class Manipulador(BaseHTTPRequestHandler):
             if not jogo:
                 return self.erro("Jogo não encontrado. Ele pode ter sido movido ou apagado. "
                                  "Clique em Atualizar lista e tente de novo.", 404)
+            if jogo_aberto_agora(jogo):
+                return self.erro(MENSAGEM_CHEAT_COM_JOGO_ABERTO, 409)
             lista, erro = cheats.adicionar_cheat(
                 jogo, str(dados.get("descricao", ""))[:120],
-                str(dados.get("codigo", "")), bool(dados.get("ligado")))
+                str(dados.get("codigo", "")), bool(dados.get("ligado")), nucleo_das_pastas(jogo))
             if erro:
                 return self.erro(erro)
             return self.responder_json({"ok": True, "cheats": lista})
@@ -5440,8 +5486,10 @@ class Manipulador(BaseHTTPRequestHandler):
             except (TypeError, ValueError):
                 return self.erro("Esse código não está mais na lista de cheats. "
                                  "Reabra o painel do jogo e tente de novo.")
+            if jogo_aberto_agora(jogo):
+                return self.erro(MENSAGEM_CHEAT_COM_JOGO_ABERTO, 409)
             lista, erro = cheats.alterar_cheat(
-                jogo, indice, dados.get("ligado"), bool(dados.get("apagar")))
+                jogo, indice, dados.get("ligado"), bool(dados.get("apagar")), nucleo_das_pastas(jogo))
             if erro:
                 return self.erro(erro, 404)
             return self.responder_json({"ok": True, "cheats": lista})
@@ -5859,6 +5907,10 @@ class Manipulador(BaseHTTPRequestHandler):
                         "de abrir outro." % JOGO_EM_ANDAMENTO["titulo"], 409)
                 JOGO_EM_ANDAMENTO["ativo"] = True
                 JOGO_EM_ANDAMENTO["titulo"] = jogo["titulo"]
+                # O id: a gaveta "Saves e cheats" nao deixa mudar os codigos
+                # do jogo que esta aberto (o RetroArch grava a lista dele
+                # por cima ao fechar).
+                JOGO_EM_ANDAMENTO["id"] = jogo["id"]
 
             # Partida a dois, se pedida.
             partida = None

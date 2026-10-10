@@ -55,8 +55,12 @@ A resposta instantânea faz o emulador rodar esses quadros **escondido** e
 mostrar o resultado já pronto. Na prática: **o soco sai mais rápido do que
 saía no aparelho original**.
 
-Custa quase o dobro de processador. O ARENA só liga em máquina nota 4 ou 5,
-e nem mostra a opção abaixo disso.
+Custa caro: medido com o jogo aberto, de **4 a 12 vezes** o processador que
+o emulador gastaria sem ela (no PS1, de 8,7% para 35,8% de um núcleo; no ZX
+Spectrum, de 4,7% para 55%). Por isso o ARENA **não liga sozinho** em perfil
+nenhum: só você, aqui, e a opção nem aparece em máquina abaixo da nota 4.
+(Até a auditoria 3, o nível **Qualidade** ligava sozinho — e o notebook da
+escola tira nota 4, igual a um PC forte.)
 
 #### Quando ler o controle
 
@@ -186,6 +190,10 @@ Come memória o tempo todo em que está ligado, mesmo sem você usar. Em
 *Quanto dá para voltar* você define quantos megabytes reservar — 20 MB dão
 uns 10 segundos em jogo 16 bits, bem menos em jogo 3D.
 
+Em console 3D ele pesa muito: no Nintendo 64, o jogo caiu de 60 para 30
+quadros por segundo, num PC forte. O ARENA **não liga sozinho** (até a
+auditoria 3, o nível Qualidade ligava). Ligue aqui só em jogo 2D, se quiser.
+
 #### Avanço rápido
 
 Quantas vezes mais rápido quando você segura o avanço.
@@ -214,12 +222,17 @@ Guarda uma imagem junto de cada save, para você reconhecer qual é qual.
 
 ### Grupo 6 — Sistema
 
-#### Pausar ao trocar de janela
+#### Pausar quando sair da janela
 
-O jogo para sozinho quando você clica em outra coisa.
+Ligado, o jogo para sozinho quando a janela dele não está na frente.
 
-**Deixe ligado na escola.** Evita continuar jogando por engano quando o
-professor chama.
+**Deixe desligado.** Em muitos computadores de escola, o emulador acha que
+a janela dele nunca está na frente. É como a luz com sensor de presença
+que não enxerga você: você está ali, e ela apaga mesmo assim. O jogo fica
+parado e só anda um quadro (uma imagem) a cada `Alt`+`Tab`.
+
+Ligue só se quiser mesmo que o jogo pare quando você troca de janela (por
+exemplo, quando o professor chama).
 
 #### Conferir arquivos antes
 
@@ -458,15 +471,15 @@ O recorde que estava no banco voltou intacto.
 
 | Problema | Onde resolver |
 |---|---|
-| Falta o Python | Documento 1, passo 2 |
-| Falta o RetroArch | Documento 1, passo 3 |
-| Falta emulador de algum console | Documento 3, parte C |
-| Falta arquivo de sistema | Documento 3, parte B |
-| Jogo no console errado | Documento 3 |
+| Falta o Python | Documento 1, Parte B, passo 2 |
+| Falta o RetroArch | Documento 1, Parte B, passo 3 |
+| Falta emulador de algum console | Documento 2, "Parte C — Consoles cinzas" (PS2, PS3, Xbox 360, GameCube e Wii: "Parte B — Consoles que pedem programa próprio") |
+| Falta arquivo de sistema (a BIOS) | Documento 2, "Parte B — Consoles amarelos: a BIOS" |
+| Jogo no console errado | Documento 2, "Como o ARENA reconhece cada console" e "Aviso de disco na pasta errada" |
 | Jogo volta para a lista sem abrir | O motivo aparece no alto da tela e no painel do jogo ("Da última vez") — `2-JOGOS.md`, "Quando o jogo não abre" |
-| Jogo travando | Documento 5 |
-| Controle não funciona | Documento 4 |
-| Amigo não conecta | Documento 7 |
+| Jogo travando | Documento 3, "Quando travar" |
+| Controle não funciona | Documento 3, "Se o controle não aparecer" |
+| Amigo não conecta | Documento 5, "Quando não conecta" |
 
 ---
 

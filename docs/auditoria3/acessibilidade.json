@@ -1,0 +1,266 @@
+{
+ "escuro": {
+  "principal": {
+   "semNome": [],
+   "soIcone": [],
+   "camposSemRotulo": [],
+   "imagensSemAlt": [],
+   "tabindexPositivo": [],
+   "contrasteBaixo": [
+    "#seloPendentes.selo 45 -> 2.86:1 (rgb(28, 21, 8) sobre rgb(55, 66, 250))",
+    "#.jogo-motivo Núcleo não instalado. Baixe pelo RetroAr -> 3.06:1 (rgb(55, 66, 250) sobre rgb(11, 13, 23))"
+   ],
+   "menorLetra": 10.56,
+   "menorLetraOnde": "#.desempenho Roda bem",
+   "textosVistos": 100
+  },
+  "gavetaPerfil": {
+   "semNome": [],
+   "soIcone": [],
+   "camposSemRotulo": [],
+   "imagensSemAlt": [],
+   "tabindexPositivo": [],
+   "contrasteBaixo": [
+    "#seloPendentes.selo 45 -> 2.86:1 (rgb(28, 21, 8) sobre rgb(55, 66, 250))",
+    "#.jogo-motivo Núcleo não instalado. Baixe pelo RetroAr -> 3.06:1 (rgb(55, 66, 250) sobre rgb(11, 13, 23))"
+   ],
+   "menorLetra": 10.56,
+   "menorLetraOnde": "#.desempenho Roda bem",
+   "textosVistos": 161
+  },
+  "gavetaComoColocar": {
+   "semNome": [],
+   "soIcone": [],
+   "camposSemRotulo": [],
+   "imagensSemAlt": [],
+   "tabindexPositivo": [],
+   "contrasteBaixo": [
+    "#seloPendentes.selo 45 -> 2.86:1 (rgb(28, 21, 8) sobre rgb(55, 66, 250))",
+    "#.jogo-motivo Núcleo não instalado. Baixe pelo RetroAr -> 3.06:1 (rgb(55, 66, 250) sobre rgb(11, 13, 23))"
+   ],
+   "menorLetra": 10.56,
+   "menorLetraOnde": "#.desempenho Roda bem",
+   "textosVistos": 112
+  },
+  "gavetaAcervo": {
+   "semNome": [],
+   "soIcone": [],
+   "camposSemRotulo": [],
+   "imagensSemAlt": [],
+   "tabindexPositivo": [],
+   "contrasteBaixo": [
+    "#seloPendentes.selo 45 -> 2.86:1 (rgb(28, 21, 8) sobre rgb(55, 66, 250))",
+    "#.jogo-motivo Núcleo não instalado. Baixe pelo RetroAr -> 3.06:1 (rgb(55, 66, 250) sobre rgb(11, 13, 23))"
+   ],
+   "menorLetra": 10.56,
+   "menorLetraOnde": "#.desempenho Roda bem",
+   "textosVistos": 109
+  },
+  "gavetaAjustes": {
+   "semNome": [],
+   "soIcone": [],
+   "camposSemRotulo": [
+    "#listaPresetGrafico.opcao-controle Automático (recomendado)\n          Mais "
+   ],
+   "imagensSemAlt": [],
+   "tabindexPositivo": [],
+   "contrasteBaixo": [
+    "#seloPendentes.selo 45 -> 2.86:1 (rgb(28, 21, 8) sobre rgb(55, 66, 250))",
+    "#.jogo-motivo Núcleo não instalado. Baixe pelo RetroAr -> 3.06:1 (rgb(55, 66, 250) sobre rgb(11, 13, 23))",
+    "#.custo pesa -> 2.13:1 (rgb(55, 66, 250) sobre rgb(59, 44, 22))"
+   ],
+   "menorLetra": 9.6,
+   "menorLetraOnde": "#.custo pesa",
+   "textosVistos": 485
+  },
+  "gavetaConquistas": {
+   "semNome": [],
+   "soIcone": [],
+   "camposSemRotulo": [],
+   "imagensSemAlt": [],
+   "tabindexPositivo": [],
+   "contrasteBaixo": [
+    "#seloPendentes.selo 45 -> 2.86:1 (rgb(28, 21, 8) sobre rgb(55, 66, 250))",
+    "#.jogo-motivo Núcleo não instalado. Baixe pelo RetroAr -> 3.06:1 (rgb(55, 66, 250) sobre rgb(11, 13, 23))"
+   ],
+   "menorLetra": 10.56,
+   "menorLetraOnde": "#.desempenho Roda bem",
+   "textosVistos": 103
+  },
+  "gavetaRecordes": {
+   "semNome": [],
+   "soIcone": [],
+   "camposSemRotulo": [],
+   "imagensSemAlt": [],
+   "tabindexPositivo": [],
+   "contrasteBaixo": [
+    "#seloPendentes.selo 45 -> 2.86:1 (rgb(28, 21, 8) sobre rgb(55, 66, 250))",
+    "#.jogo-motivo Núcleo não instalado. Baixe pelo RetroAr -> 3.06:1 (rgb(55, 66, 250) sobre rgb(11, 13, 23))"
+   ],
+   "menorLetra": 10.56,
+   "menorLetraOnde": "#.desempenho Roda bem",
+   "textosVistos": 104
+  },
+  "gavetaJogo": {
+   "semNome": [],
+   "soIcone": [],
+   "camposSemRotulo": [],
+   "imagensSemAlt": [],
+   "tabindexPositivo": [],
+   "contrasteBaixo": [
+    "#seloPendentes.selo 45 -> 2.86:1 (rgb(28, 21, 8) sobre rgb(55, 66, 250))",
+    "#.jogo-motivo Núcleo não instalado. Baixe pelo RetroAr -> 3.06:1 (rgb(55, 66, 250) sobre rgb(11, 13, 23))"
+   ],
+   "menorLetra": 10.56,
+   "menorLetraOnde": "#.desempenho Roda bem",
+   "textosVistos": 111
+  }
+ },
+ "claro": {
+  "principal": {
+   "semNome": [],
+   "soIcone": [],
+   "camposSemRotulo": [],
+   "imagensSemAlt": [],
+   "tabindexPositivo": [],
+   "contrasteBaixo": [
+    "#.marca-sub console da turma v2026.10.03.2 -> 3.63:1 (rgb(117, 99, 77) sobre color(srgb 1 1 1 / 0.94))",
+    "#versao. v2026.10.03.2 -> 3.63:1 (rgb(117, 99, 77) sobre color(srgb 1 1 1 / 0.94))",
+    "#lidoCpu. Ryzen 5 5600G -> 3.66:1 (rgb(122, 98, 78) sobre color(srgb 1 1 1 / 0.94))",
+    "#seloPendentes.selo 45 -> 2.86:1 (rgb(28, 21, 8) sobre rgb(55, 66, 250))",
+    "#.trilho-nome Nintendo (NES) -> 3.66:1 (rgb(122, 98, 78) sobre color(srgb 1 1 1 / 0.82))"
+   ],
+   "menorLetra": 10.56,
+   "menorLetraOnde": "#.desempenho Roda bem",
+   "textosVistos": 100
+  },
+  "gavetaPerfil": {
+   "semNome": [],
+   "soIcone": [],
+   "camposSemRotulo": [],
+   "imagensSemAlt": [],
+   "tabindexPositivo": [],
+   "contrasteBaixo": [
+    "#.marca-sub console da turma v2026.10.03.2 -> 3.63:1 (rgb(117, 99, 77) sobre color(srgb 1 1 1 / 0.94))",
+    "#versao. v2026.10.03.2 -> 3.63:1 (rgb(117, 99, 77) sobre color(srgb 1 1 1 / 0.94))",
+    "#lidoCpu. Ryzen 5 5600G -> 3.66:1 (rgb(122, 98, 78) sobre color(srgb 1 1 1 / 0.94))",
+    "#seloPendentes.selo 45 -> 2.86:1 (rgb(28, 21, 8) sobre rgb(55, 66, 250))",
+    "#.trilho-nome Nintendo (NES) -> 3.66:1 (rgb(122, 98, 78) sobre color(srgb 1 1 1 / 0.82))",
+    "#meuCodigoAmigo. 1a1a22b5e8a4 -> 2.04:1 (rgb(255, 157, 104) sobre rgb(255, 255, 255))"
+   ],
+   "menorLetra": 10.56,
+   "menorLetraOnde": "#.desempenho Roda bem",
+   "textosVistos": 161
+  },
+  "gavetaComoColocar": {
+   "semNome": [],
+   "soIcone": [],
+   "camposSemRotulo": [],
+   "imagensSemAlt": [],
+   "tabindexPositivo": [],
+   "contrasteBaixo": [
+    "#.marca-sub console da turma v2026.10.03.2 -> 3.63:1 (rgb(117, 99, 77) sobre color(srgb 1 1 1 / 0.94))",
+    "#versao. v2026.10.03.2 -> 3.63:1 (rgb(117, 99, 77) sobre color(srgb 1 1 1 / 0.94))",
+    "#lidoCpu. Ryzen 5 5600G -> 3.66:1 (rgb(122, 98, 78) sobre color(srgb 1 1 1 / 0.94))",
+    "#seloPendentes.selo 45 -> 2.86:1 (rgb(28, 21, 8) sobre rgb(55, 66, 250))",
+    "#.trilho-nome Nintendo (NES) -> 3.66:1 (rgb(122, 98, 78) sobre color(srgb 1 1 1 / 0.82))"
+   ],
+   "menorLetra": 10.56,
+   "menorLetraOnde": "#.desempenho Roda bem",
+   "textosVistos": 112
+  },
+  "gavetaAcervo": {
+   "semNome": [],
+   "soIcone": [],
+   "camposSemRotulo": [],
+   "imagensSemAlt": [],
+   "tabindexPositivo": [],
+   "contrasteBaixo": [
+    "#.marca-sub console da turma v2026.10.03.2 -> 3.63:1 (rgb(117, 99, 77) sobre color(srgb 1 1 1 / 0.94))",
+    "#versao. v2026.10.03.2 -> 3.63:1 (rgb(117, 99, 77) sobre color(srgb 1 1 1 / 0.94))",
+    "#lidoCpu. Ryzen 5 5600G -> 3.66:1 (rgb(122, 98, 78) sobre color(srgb 1 1 1 / 0.94))",
+    "#seloPendentes.selo 45 -> 2.86:1 (rgb(28, 21, 8) sobre rgb(55, 66, 250))",
+    "#.trilho-nome Nintendo (NES) -> 3.66:1 (rgb(122, 98, 78) sobre color(srgb 1 1 1 / 0.82))"
+   ],
+   "menorLetra": 10.56,
+   "menorLetraOnde": "#.desempenho Roda bem",
+   "textosVistos": 109
+  },
+  "gavetaAjustes": {
+   "semNome": [],
+   "soIcone": [],
+   "camposSemRotulo": [
+    "#listaPresetGrafico.opcao-controle Automático (recomendado)\n          Mais "
+   ],
+   "imagensSemAlt": [],
+   "tabindexPositivo": [],
+   "contrasteBaixo": [
+    "#.marca-sub console da turma v2026.10.03.2 -> 3.63:1 (rgb(117, 99, 77) sobre color(srgb 1 1 1 / 0.94))",
+    "#versao. v2026.10.03.2 -> 3.63:1 (rgb(117, 99, 77) sobre color(srgb 1 1 1 / 0.94))",
+    "#lidoCpu. Ryzen 5 5600G -> 3.66:1 (rgb(122, 98, 78) sobre color(srgb 1 1 1 / 0.94))",
+    "#seloPendentes.selo 45 -> 2.86:1 (rgb(28, 21, 8) sobre rgb(55, 66, 250))",
+    "#.trilho-nome Nintendo (NES) -> 3.66:1 (rgb(122, 98, 78) sobre color(srgb 1 1 1 / 0.82))",
+    "#.perfil-resumo Para PC fraco. Feio, mas não trava. -> 2.89:1 (rgb(122, 98, 78) sobre rgb(255, 165, 2))",
+    "#.custo pesa -> 2.13:1 (rgb(55, 66, 250) sobre rgb(59, 44, 22))",
+    "#.opcao-exemplo-botao por exemplo… -> 2.04:1 (rgb(255, 157, 104) sobre rgb(255, 255, 255))",
+    "#.custo pesa pouco -> 1.04:1 (rgb(255, 157, 104) sobre rgb(255, 165, 2))",
+    "#.custo pesa pouco -> 1.04:1 (rgb(255, 157, 104) sobre rgb(255, 165, 2))",
+    "#.controle-tipo xinput -> 1.04:1 (rgb(255, 157, 104) sobre rgb(255, 165, 2))"
+   ],
+   "menorLetra": 9.6,
+   "menorLetraOnde": "#.custo pesa",
+   "textosVistos": 485
+  },
+  "gavetaConquistas": {
+   "semNome": [],
+   "soIcone": [],
+   "camposSemRotulo": [],
+   "imagensSemAlt": [],
+   "tabindexPositivo": [],
+   "contrasteBaixo": [
+    "#.marca-sub console da turma v2026.10.03.2 -> 3.63:1 (rgb(117, 99, 77) sobre color(srgb 1 1 1 / 0.94))",
+    "#versao. v2026.10.03.2 -> 3.63:1 (rgb(117, 99, 77) sobre color(srgb 1 1 1 / 0.94))",
+    "#lidoCpu. Ryzen 5 5600G -> 3.66:1 (rgb(122, 98, 78) sobre color(srgb 1 1 1 / 0.94))",
+    "#seloPendentes.selo 45 -> 2.86:1 (rgb(28, 21, 8) sobre rgb(55, 66, 250))",
+    "#.trilho-nome Nintendo (NES) -> 3.66:1 (rgb(122, 98, 78) sobre color(srgb 1 1 1 / 0.82))"
+   ],
+   "menorLetra": 10.56,
+   "menorLetraOnde": "#.desempenho Roda bem",
+   "textosVistos": 103
+  },
+  "gavetaRecordes": {
+   "semNome": [],
+   "soIcone": [],
+   "camposSemRotulo": [],
+   "imagensSemAlt": [],
+   "tabindexPositivo": [],
+   "contrasteBaixo": [
+    "#.marca-sub console da turma v2026.10.03.2 -> 3.63:1 (rgb(117, 99, 77) sobre color(srgb 1 1 1 / 0.94))",
+    "#versao. v2026.10.03.2 -> 3.63:1 (rgb(117, 99, 77) sobre color(srgb 1 1 1 / 0.94))",
+    "#lidoCpu. Ryzen 5 5600G -> 3.66:1 (rgb(122, 98, 78) sobre color(srgb 1 1 1 / 0.94))",
+    "#seloPendentes.selo 45 -> 2.86:1 (rgb(28, 21, 8) sobre rgb(55, 66, 250))",
+    "#.trilho-nome Nintendo (NES) -> 3.66:1 (rgb(122, 98, 78) sobre color(srgb 1 1 1 / 0.82))"
+   ],
+   "menorLetra": 10.56,
+   "menorLetraOnde": "#.desempenho Roda bem",
+   "textosVistos": 104
+  },
+  "gavetaJogo": {
+   "semNome": [],
+   "soIcone": [],
+   "camposSemRotulo": [],
+   "imagensSemAlt": [],
+   "tabindexPositivo": [],
+   "contrasteBaixo": [
+    "#.marca-sub console da turma v2026.10.03.2 -> 3.63:1 (rgb(117, 99, 77) sobre color(srgb 1 1 1 / 0.94))",
+    "#versao. v2026.10.03.2 -> 3.63:1 (rgb(117, 99, 77) sobre color(srgb 1 1 1 / 0.94))",
+    "#lidoCpu. Ryzen 5 5600G -> 3.66:1 (rgb(122, 98, 78) sobre color(srgb 1 1 1 / 0.94))",
+    "#seloPendentes.selo 45 -> 2.86:1 (rgb(28, 21, 8) sobre rgb(55, 66, 250))",
+    "#.trilho-nome Nintendo (NES) -> 3.66:1 (rgb(122, 98, 78) sobre color(srgb 1 1 1 / 0.82))"
+   ],
+   "menorLetra": 10.56,
+   "menorLetraOnde": "#.desempenho Roda bem",
+   "textosVistos": 111
+  }
+ }
+}

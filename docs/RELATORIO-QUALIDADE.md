@@ -644,3 +644,76 @@ foram consertados:
 |---|---|
 | Bateria | **267**, todos passando (novos: as chaves do RetroArch, a porta, as chaves repetidas, as três frases da partida, a resposta velha da rede, o FAT32 da Fase 6) |
 | Testes do Jogar Junto (`rodada_final.py`) | 23 de 23 antes dos consertos J1–J2. Depois: **21 de 22**; a falha foi a `teste_multitap_regra_de_ouro`, que compara cada jogo com a versão de antes do multitap e pegou exatamente as chaves renomeadas de propósito (J2). Depois da revisão: regra de ouro, sexto jogador e rede ruim, **3 de 3**. O de sala passou a conferir as duas partidas de verdade (3 de 3) e o de rede ruim, o simulador no caminho |
+
+---
+
+## Fase 5 — Matriz de jogos (09–10/10/2026)
+
+Duas sessões trabalharam nesta fase (a conta do Rafael bateu no limite da
+semana, e ele seguiu por outra conta em 09/10 à noite; o trabalho das duas
+foi juntado, revisado e testado junto antes do commit).
+
+**Novo** `testes\teste_matriz_consoles.py`: um jogo de cada console que roda
+pelo RetroArch (17 consoles com jogo na pasta), aberto com o arquivo de
+opções e as opções de núcleo que o ARENA grava de verdade, no modo normal e
+no modo modesto ("Igual ao original"). Em cada um: os quadros andam (o
+título da janela traz FPS e quadros), quadros por segundo e processador do
+RetroArch por 8 s, salvar e carregar estado, foto da tela, fechar certo (como
+o F10) e o save do próprio jogo. Os comandos chegam pela rede local, só no
+teste (no ARENA ficam desligados). Números em `docs\auditoria3\matriz_consoles.json`.
+
+### A matriz (rodada de 10/10/2026, depois dos consertos)
+
+| Console | Jogo | Normal: quadros/s · processador | Modesto: quadros/s · processador | Estado, foto, fechar | Save do jogo |
+|---|---|---|---|---|---|
+| Arcade (MAME) | Killer Instinct | 59,8 · 14% | 56,1 · 15% | ok | ok (cfg do MAME) |
+| Atari 2600 | Combat | 59,8 · 7% | 59,8 · 5% | ok | — (não tem) |
+| ColecoVision | Slither | 59,8 · 3% | 59,8 · 3% | ok; tela preta **sem a BIOS** (P5: o ARENA agora avisa) | — |
+| Commodore 64 | International Karate | ~50 (PAL) · 5% | ~50 · 5% | ok | — |
+| Amiga | Alien Breed | ~50 (PAL) · 14% | ~50 · 12% | ok | — |
+| Mega Drive | Sonic 3 | 59,5 · 8% | 59,8 · 6% | ok | ok (.srm) |
+| Neo Geo (FBNeo) | Metal Slug X | 56,1 · 8% | 59,8 · 6% | ok | ok (.fs) |
+| NES | Contra | 59,8 · 6% | 59,8 · 5% | ok | — (não tem) |
+| Nintendo 64 | Bomberman 64 | **59,8** · 49% (antes do conserto P1: **29,9**) | 59,8 · 49% | ok | ok (.srm) |
+| PlayStation | CTR | 59,8 · **8%** (antes do P1: **51%**) | 59,8 · 9% | ok | ok (cartão) |
+| PSP | Burnout Legends | 59,8 · 7% | 59,8 · 11% (P8) | ok (P9) | — (só o cache de sombreamento nesses segundos) |
+| 32X | Knuckles' Chaotix | ~50 (PAL) · 3% | ~50 · 5% | ok | — |
+| Sega CD | Sonic CD (Europa) | ~50 (PAL) · 6% | ~50 · 5% | ok | ok (.brm) |
+| Dreamcast | Armada | ~50 · 36% | ~50 · 38% | ok; no normal, só na 2ª tentativa (P7) | — |
+| Saturn | Saturn Bomberman | 59,8 · 34% | 59,8 · 40% | ok | ok (.srm) |
+| Super Nintendo | Super Bomberman 4 | 59,8 · 10% | 59,8 · 7% | ok | — |
+| ZX Spectrum | Match Day II | ~50 (PAL) · 6% | ~50 · 6% | ok | ok |
+
+Processador em % de **um** núcleo do Ryzen; no Celeron N5100, cerca de 2,3
+vezes (`docs\MAQUINA-ALVO.md`). "~50": jogo europeu (PAL, 50 quadros por
+segundo de verdade; o contador da janela anda de 30 em 30 quadros, por isso
+48,6). Os consoles dos emuladores de fora estão mais abaixo.
+
+### Achados e consertos
+
+| # | Defeito | Prova | Conserto |
+|---|---|---|---|
+| P1 | **O perfil "Qualidade" ligava sozinho o "Voltar no tempo" e a "Resposta instantânea"** — e o automático escolhe o Qualidade para todo console de custo até 3 numa máquina de nota 4, **inclusive o Celeron N5100** (a nota conta núcleos) | Matriz, com o jogo aberto: o N64 caía de 60 para **30 quadros/s** (voltar no tempo); o ZX Spectrum gastava **12 vezes** o processador (55% contra 4,7% de um núcleo, resposta instantânea); o PS1, **5 vezes** (as duas juntas: 46,7% contra 8,7%) — no Celeron, o PS1 passaria de um núcleo inteiro | Nenhum perfil liga as duas sozinho; o aluno ainda liga em Ajustes → Avançado (e a trava de nota continua). Guias 3 e 6 corrigidos ("custa quase o dobro" → "de 4 a 12 vezes"). Depois: N64 59,8; PS1 10% |
+| P2 | **Os cheats nunca funcionaram**, por dois defeitos juntos: o ARENA gravava o `.cht` em `retroarch\cheats\<console>\`, mas o RetroArch só procura em `retroarch\cheats\<núcleo>\` (com o nome do jogo cortado no último ponto); e com o tipo "1" (a busca de memória do RetroArch, que ignora o código) em vez do "0" (o do emulador) | **Novo** `testes\teste_cheats_no_jogo.py`: cadastra um código pelas funções do ARENA, abre o SNES, salva o estado e **lê a memória do jogo dentro do estado** — o valor do cheat está lá; "como era" (lugar e tipo antigos), não está | Lugar e tipo certos; os códigos já cadastrados vão sozinhos para o lugar certo ao abrir o jogo; mudar os códigos com o jogo aberto é recusado (ao fechar, o RetroArch regrava o `.cht` por cima) |
+| P3 | **A gaveta "Saves e cheats" mostrava todo espaço "vazio"** e "você ainda não salvou": os estados e saves ficam em `retroarch\states\<núcleo>\` e `saves\<núcleo>\` (o `retroarch.cfg` separa por núcleo), e o ARENA olhava só a raiz | O mesmo teste: a gaveta vê o estado que acabou de ser salvo | Lê (e apaga) na subpasta do núcleo |
+| P4 | **O Game Genie do NES e do Mega Drive era recusado** (o validador só aceitava hexadecimal), e uma quebra de linha na descrição criava linhas novas no `.cht` | `servidor\tests\test_cheats_retroarch.py` | Validador por formato, sem aspas nem quebra de linha |
+| P5 | **ColecoVision sem a BIOS: tela preta, sem aviso** — o aviso de BIOS do cartão só cobria os consoles por região, o Dreamcast e o Satellaview | Registro do Gearcoleco: "BIOS not found: colecovision.rom or coleco.rom"; foto de 1,9 KB | Os consoles que só abrem com a BIOS do catálogo (ColecoVision, MSX, 3DO, Intellivision, PC-FX, CD-i, Odyssey 2) avisam no cartão e ficam amarelos na lista, com o nome do arquivo e onde pôr; `coleco.rom` também vale. O Amiga fica de fora: o núcleo dele tem um substituto embutido e o Alien Breed abriu sem a BIOS |
+| P6 | **Com a "Resposta instantânea" e a leitura do controle adiantada ou atrasada, o RetroArch não atende comando de rede nenhum** (nem fechar) — só o teste usa comandos de rede, mas é o que fazia 11 consoles "falharem" na primeira matriz | Variantes no SNES: com a leitura normal (1) ou com a segunda instância, atende; com 0 ou 2 (a do ARENA), não | Sem efeito para o aluno desde o P1 (a resposta instantânea não liga sozinha). Se alguém ligar, as teclas F2/F4/F10 continuam sendo do roteiro de sala (dá para conferir só com o teclado de verdade) |
+| P7 | **Dreamcast: a foto da tela seguida de salvar estado derruba o núcleo às vezes** ("[GPF] ... unhandled access"; o jogo trava) | Armada, foto e 2 s depois salvar: 3 de 3 falharam sem dispositivo de som no Windows; 1 de 3 com o som desligado no RetroArch; só salvar: 2 de 2 certos. Em 09/10, com o som ligado, a matriz passou | É do núcleo (Flycast), e é raro (F8 e logo F2). Não mexido: desligar o desenho em paralelo do Flycast custaria desempenho no Celeron. A matriz confere o estado antes da foto e repete uma vez a sessão que falha, anotando. **Roteiro de sala** |
+| P8 | **PSP no "Igual ao original": o pulo de quadros automático custa processador** — com folga ele não pula (59,9 quadros/s com e sem), mas gasta 12,6% de um núcleo do Ryzen contra 7,3% sem ele. Uma medida anterior desta fase deu 18,7 e 21 quadros/s com ele; repetida em 10/10 com a janela do jogo à frente (3 vezes, na matriz e em variantes), não se confirmou — vale a nova (a regra do projeto: número com a janela coberta não decide nada) | Variantes no Burnout Legends (`psp_pulo_medir`, rascunho) | **Mantido**: ele existe para o Celeron (o God of War ficava abaixo de 60, e o jogo e o som ficavam lentos) e a régua é o Celeron, onde o gargalo é a placa de vídeo. O guia 3 continua dizendo "com folga, nada muda", agora com o número. **Roteiro de sala:** God of War no Celeron, com e sem |
+| P9 | **A matriz dizia que a foto da tela do PSP não saía** (0 KB) depois de salvar estado | Depois de salvar, a foto nasce com 0 bytes e fica completa uns 3 s depois (830 KB); a matriz olhava aos 2 s. Antes de salvar, sai em menos de 2 s | Não é defeito do ARENA (para o aluno, F8 depois de F2 funciona; a foto só demora). A matriz espera a foto parar de crescer, até 10 s |
+
+### Emuladores de fora
+
+| Console | Como | Resultado |
+|---|---|---|
+| PS2 (PCSX2) | **Novo** `testes\teste_ps2_todos_os_jogos.py`: cada jogo de PS2 da pasta no Automático, e os três níveis de qualidade em 3 jogos, numa cópia isolada do PCSX2 | (completar com a rodada) |
+| GameCube, Wii, PS3, Xbox 360 | **Novo** `testes\teste_emuladores_de_fora.py`: um jogo de cada, com a linha de comando do ARENA, até 90 s; a configuração de cada emulador é guardada antes e devolvida depois | **4 de 4 abriram o jogo**. Wii (NSMB Wii): 4,0 s, 595 MB; PS3 (Rayman Legends): 2,1 s até a janela do jogo, **4,7 GB de memória** (no Celeron, com 3,8 GB livres, o PS3 não cabe — já registrado em `docs\MAQUINA-ALVO.md`); Xbox 360 (Gears of War Judgment): 2,0 s, 899 MB |
+
+### O que vai para a sala
+
+O controle com botão apertado, o save feito pelo menu do próprio jogo, o
+memory card do PS1 depois de uma partida a dois (o convidado ganha um cartão
+em branco: limite já registrado), o God of War do PSP no Celeron com e sem o
+pulo de quadros, o F8 e logo F2 no Dreamcast, e o FPS de verdade no
+notebook da escola.

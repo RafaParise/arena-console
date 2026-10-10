@@ -116,9 +116,11 @@ automática em `backup`, então dá para recuperar — mas é chato e evitável.
 
 ### Passo 6 — O cartão SD
 
-Cartão SD tem escrita aleatória lenta e desgaste rápido. O banco de recordes
-grava o tempo todo; num cartão, ele degrada e mais cedo ou mais tarde
-corrompe no meio da aula.
+O cartão SD grava devagar quando são muitos pedacinhos espalhados. E ele se
+gasta rápido. O ARENA grava no arquivo de recordes o tempo todo. Num cartão,
+isso gasta o cartão aos poucos. Cedo ou tarde, o arquivo estraga no meio da
+aula. É como apagar e escrever sempre no mesmo canto da folha: uma hora o
+papel rasga.
 
 **Não rode o ARENA do cartão SD.** Use o cartão para o que ele faz bem:
 
@@ -246,10 +248,16 @@ o RetroArch nem abre, e o Windows mostra um erro que não explica nada.
 **A maioria dos computadores já tem**, porque quase todo programa instala
 junto. O ARENA confere na abertura e avisa no topo da tela se faltar.
 
-Se faltar: baixe o **Microsoft Visual C++ Redistributable (x64)** no site da
-Microsoft e instale. É rápido e só precisa ser feito uma vez por computador.
-Um pacote que reúne todas as versões, como o *Visual C++ Runtimes All-in-One*,
-também resolve.
+Se faltar, tente primeiro o botão do ARENA. Vá em **Ajustes → Máquina** e
+clique em **Copiar para a pasta do ARENA**. Não precisa de senha de
+administrador.
+
+A tela disse que este computador também não tem as bibliotecas? Então baixe
+o **Microsoft Visual C++ Redistributable (x64)** no site da Microsoft e
+instale. Instalar pede a senha de administrador (a senha de quem cuida do
+computador): é tarefa do professor ou do técnico. É rápido e só precisa ser
+feito uma vez por computador. Um pacote que reúne todas as versões, como o
+*Visual C++ Runtimes All-in-One*, também resolve.
 
 Isso é do computador, não do ARENA — a pasta continua portátil.
 
@@ -376,7 +384,7 @@ ARENA\
 | Janela preta abre e fecha na hora | Antivírus bloqueou | Libere a pasta do ARENA no antivírus (veja abaixo) |
 | ARENA abre mas nenhum jogo inicia | Falta o Visual C++ | Passo 4b |
 | Tudo lento na primeira abertura no pen drive | Varredura inicial | Normal. Depois o catálogo é reaproveitado |
-| `[QUEDA] O servidor do ARENA caiu` | O Windows fechou o Python por uma falha grave | Nada: a janela preta reabre o servidor sozinha (até 3 vezes) e a tela volta sozinha. Leve o arquivo `dados\logs\queda-do-servidor.txt` para o professor: ele diz onde foi |
+| `[QUEDA] O servidor do ARENA caiu` | O Windows fechou o Python (o programa que roda o ARENA) por causa de uma falha grave | Não precisa fazer nada na hora. A janela preta reabre o servidor sozinha (até 3 vezes), e a tela volta sozinha. Depois, leve o arquivo `dados\logs\queda-do-servidor.txt` para o professor. Esse arquivo mostra em que parte do programa foi a queda |
 
 #### Quando o servidor cai ou trava
 
@@ -410,9 +418,10 @@ segurança.
 
 #### Antivírus bloqueando (janela preta abre e fecha na hora)
 
-Cada antivírus tem seu próprio caminho, mas o princípio é sempre "liberar
-a pasta inteira do ARENA como confiável" (nunca precisa desativar o
-antivírus inteiro):
+Cada antivírus tem os seus próprios menus. Mas a ideia é sempre a mesma:
+dizer ao antivírus que a pasta inteira do ARENA é confiável. É como pôr um
+nome na lista de convidados da portaria: a pessoa entra sem ser barrada.
+Você nunca precisa desligar o antivírus inteiro. Faça assim:
 
 1. Abra o programa antivírus instalado no computador.
 2. Procure por **"Exclusões"**, **"Exceções"** ou **"Itens confiáveis"**
@@ -432,9 +441,10 @@ instalar nada a mais):
 Atenção: o Windows pede a senha de administrador nos passos 2 e 3. Aluno
 não tem essa senha — é um passo para o professor ou para o técnico.
 
-Se mesmo assim o ARENA continuar fechando sozinho, peça pro professor
-(com acesso de administrador) fazer esse passo — em computador de escola,
-o antivírus às vezes é gerenciado central e um aluno comum não consegue
-mexer nele.
+Tentou e o ARENA continua fechando sozinho? Peça para o professor fazer esse
+passo. Ele precisa ter acesso de administrador (a conta de quem cuida do
+computador). Em computador de escola, às vezes o antivírus é controlado à
+distância, pela equipe de informática. Aí um aluno comum não consegue mexer
+nele.
 
 ---

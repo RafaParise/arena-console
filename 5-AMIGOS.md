@@ -38,8 +38,12 @@ Ver a pontuação dos colegas, comparar tempo de jogo e jogar a dois.
 
 ### Como funciona
 
-Todo ARENA é servidor. Não existe computador central obrigatório: o seu
-ARENA fala direto com o do colega.
+Todo ARENA é um **servidor**: um programa que guarda informações, como os
+recordes, e responde quando outro computador pede. É como um balcão de
+informações: alguém pergunta, ele responde.
+
+Não precisa de um computador central. O seu ARENA fala direto com o do
+colega.
 
 O servidor da escola, quando existe, é só mais um amigo da lista. Se ele
 estiver desligado, vocês continuam trocando entre si normalmente.
@@ -306,7 +310,12 @@ Depois que vocês são amigos:
 partida** → **Começar**. Você é o jogador 1.
 
 **Quem vai entrar:** clique em **Jogar junto** no **mesmo jogo** → **Entrar
-na partida do amigo** → cole o endereço → **Começar**. Você é o jogador 2.
+na partida do amigo**. Na lista **Amigo ou partida encontrada**, escolha a
+partida dele → **Começar**. Você é o jogador 2.
+
+Abrir a partida também se chama **hospedar**. É como emprestar a sua casa
+para a festa: os amigos vêm até você. Por isso quem abre começa primeiro,
+e os outros entram depois.
 
 **Jogos com mais de 2 jogadores:** quando o console permitir, cada amigo
 que entra escolhe um número diferente — jogador 2, jogador 3, jogador 4
@@ -315,9 +324,11 @@ máquina, sem dividir tela; o console é que trata todos como se
 estivessem plugados ali. Quem abriu a partida continua sendo sempre o
 jogador 1.
 
-*(O Nintendo 64 tem 4 entradas de controle de fábrica, mas isso só vale
-jogando todo mundo no mesmo computador — o núcleo dele não faz Jogar
-Junto em máquinas separadas. Veja a tabela na próxima seção.)*
+O Nintendo 64 já vinha de fábrica com 4 entradas de controle. Mas os 4 só
+jogam juntos no mesmo computador: o núcleo dele não faz Jogar Junto entre
+computadores. O RetroArch é como um celular, e cada **núcleo** é como um
+aplicativo: um abre jogos de Super Nintendo, outro de Nintendo 64... Veja
+a tabela "Nem todo console tem Jogar Junto", na Parte B.
 
 **Super Bomberman (Super Nintendo) liga o Multitap sozinho.** Jogos dessa
 série aceitam até 5 jogadores — o ARENA reconhece e libera as opções
@@ -435,16 +446,16 @@ sincronizar de novo.
 
 ### O botão que diz onde está o problema
 
-Na janela de **Jogar junto** tem o botão **Testar antes de começar**. Cole o
-endereço do colega e clique. Ele responde uma de três coisas:
+Na janela de **Jogar junto** tem o botão **Testar antes de começar**. Escolha a
+partida dele na lista e clique. Ele responde uma destas coisas:
 
 | Resposta | O que fazer |
 |---|---|
 | ARENA responde, partida aberta | Está tudo certo. Pode começar |
-| ARENA responde, partida fechada | Ele não clicou em *Eu abro a partida*, **ou o firewall dele bloqueia o retroarch.exe** |
-| **Arquivo: DIFERENTE** | Vocês têm o mesmo jogo, mas arquivos diferentes. **A partida não começa assim** |
+| ARENA responde, partida fechada | Ele ainda não abriu a partida, ou o firewall dele bloqueia o `retroarch.exe`. Peça para ele clicar em **Eu abro a partida** e esperar o jogo aparecer. Se continuar, veja "O firewall pede permissão DUAS vezes", mais abaixo |
+| **Arquivo: DIFERENTE** | Vocês têm o mesmo jogo, mas em arquivos diferentes. Assim a partida não começa. Um dos dois copia o arquivo do outro (veja a próxima seção) |
 | Ele não tem esse jogo | Passe o arquivo antes de começar |
-| ARENA não responde | Endereço errado, ou ele não ligou *Aceitar conexões da rede* |
+| ARENA não responde | O endereço está errado, ou ele não ligou **Aceitar conexões da rede**. Confira o endereço e peça para ele ligar essa chave |
 
 ---
 
@@ -480,9 +491,16 @@ Fechem os dois e comecem de novo, na ordem.
 
 ### O firewall pede permissão DUAS vezes
 
-Esse é o motivo mais comum de "o ARENA conecta mas a partida não começa".
+Esse é um dos motivos mais comuns de "o ARENA conecta mas a partida não
+começa".
 
-São dois programas diferentes pedindo passagem:
+O **firewall** é o porteiro do Windows: ele decide quais programas podem
+conversar pela rede. Na primeira vez, cada programa pede passagem. O
+Windows mostra uma caixa, e você responde.
+
+Aqui são dois programas, e cada um usa a sua **porta**. A porta é como o
+número do apartamento: o endereço leva até o prédio (o computador), e a
+porta leva até o programa certo lá dentro. Os dois pedidos são estes:
 
 | Programa | Porta | Quando o Windows pergunta |
 |---|---|---|
@@ -736,10 +754,14 @@ de novo invertendo quem hospeda.
 
 Funciona no laboratório da escola, ou na mesma casa, ou no mesmo Wi-Fi.
 
-**De uma casa para outra pela internet não funciona.** A internet
-residencial brasileira usa CGNAT — o aluno não tem endereço próprio na
-internet, então não existe porta para o amigo alcançar. Não é limitação do
-ARENA; é como a internet de casa funciona aqui.
+**De uma casa para outra, direto pela internet, não funciona.** No Brasil,
+a internet de casa usa **CGNAT**: muitas casas dividem um mesmo endereço
+na internet. Então a sua casa não tem endereço próprio. Sem ele, o amigo
+não acha uma porta para chegar até você.
+
+É como um prédio em que todo mundo tem o mesmo número e não existe número
+de apartamento: a carta chega na portaria e não sabe para quem ir. Não é
+limitação do ARENA. É assim que a internet de casa funciona aqui.
 
 A chave **"Estamos em casas diferentes"** saiu da tela (09/10/2026). Ela
 ligava o repasse da internet do RetroArch, mas, testado de verdade, o
@@ -754,9 +776,9 @@ roteador. As saídas estão na Parte A deste mesmo documento.
 | O que aconteceu | O que fazer |
 |---|---|
 | Não conecta | Confira se os dois têm o mesmo arquivo de jogo |
-| "Aguardando" e não sai disso | O endereço está errado, ou o firewall bloqueou a porta 55435 |
+| "Aguardando" e não sai disso | O endereço está errado, ou o firewall bloqueou a porta 55435. Fechem os dois e confiram o endereço. Se continuar, veja "O firewall pede permissão DUAS vezes", na Parte A |
 | Conectou mas está travando | No jogo: `Esc → Rede → Atraso de Entrada`, e suba um ou dois |
-| Está lento em máquina fraca | Normal: partida a dois custa o dobro. O ARENA já desliga filtros e efeitos durante a partida |
+| Está lento em máquina fraca | É normal: a partida a dois pesa o dobro. O ARENA já desliga filtros e efeitos durante a partida. Se ainda pesar, escolha um jogo com a etiqueta **Roda bem** (documento 3, "Partida a dois pesa o dobro") |
 | Os dois controlam o jogador 1 | Quem entrou não pediu o jogador 2. Fechem e abram de novo |
 | Dessincronizou no meio | `Esc → Rede → Desconectar` e entrem de novo |
 
