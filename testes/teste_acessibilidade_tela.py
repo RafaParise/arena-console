@@ -14,7 +14,12 @@ Jogo) e confere, em cada uma:
   5. nenhum tabindex positivo (ele baguncaria a ordem do Tab);
   6. contraste do texto com o fundo (WCAG AA: 4,5:1; texto grande, 3:1),
      nos dois temas;
-  7. a menor letra visivel (para quem tem dislexia, quanto maior melhor).
+  7. a menor letra visivel (para quem tem dislexia, quanto maior melhor);
+  8. nenhum elemento escondido (atributo hidden) aparece: uma classe com
+     display: flex ou grid passava por cima do hidden -- a mensagem "Nenhum
+     jogo na lista ainda" embaixo dos jogos, o "Mover para a pasta certa" em
+     todo jogo e a chave "Estamos em casas diferentes" que a Fase 4 tinha
+     tirado (achado da Fase 7). Tambem na janela do Jogar Junto.
 "Menos animacao quando o Windows pedir" e' do testes\teste_fundos_animados.py.
 
 Uso: servidor\python\python.exe testes\teste_acessibilidade_tela.py
@@ -39,7 +44,15 @@ LETRA_MINIMA_PX = 11.0
 CONFERIR = r"""
 (() => {
   const r = {semNome: [], soIcone: [], camposSemRotulo: [], imagensSemAlt: [], tabindexPositivo: [],
-             contrasteBaixo: [], menorLetra: 999, menorLetraOnde: "", textosVistos: 0};
+             contrasteBaixo: [], menorLetra: 999, menorLetraOnde: "", textosVistos: 0,
+             escondidoAparece: []};
+  for (const el of document.querySelectorAll("[hidden]")) {
+    if (getComputedStyle(el).display === "none") continue;
+    let dentroDeEscondido = false;
+    for (let p = el.parentElement; p; p = p.parentElement)
+      if (getComputedStyle(p).display === "none") { dentroDeEscondido = true; break; }
+    if (!dentroDeEscondido) r.escondidoAparece.push("#" + el.id + " (" + getComputedStyle(el).display + ")");
+  }
   const visivel = el => { const s = getComputedStyle(el);
     return s.display !== "none" && s.visibility !== "hidden" && el.getClientRects().length > 0; };
   const quem = el => "#" + (el.id || "") + "." + (el.className && el.className.baseVal === undefined
@@ -69,7 +82,11 @@ CONFERIR = r"""
   for (const el of document.querySelectorAll("[tabindex]")) {
     if (parseInt(el.getAttribute("tabindex"), 10) > 0) r.tabindexPositivo.push(quem(el));
   }
-  const rgb = c => (c.match(/[\d.]+/g) || []).map(Number);
+  // "rgb(255, 255, 255)" ou "color(srgb 1 1 1 / 0.94)": no segundo, as tres
+  // cores vem de 0 a 1 (sem isso, o branco translucido virava preto e o
+  // texto do tema claro "reprovava" com 3,6:1 -- o contraste contra o preto).
+  const rgb = c => { const v = (c.match(/[\d.]+/g) || []).map(Number);
+    return c.startsWith("color(srgb") ? v.map((x, i) => (i < 3 ? x * 255 : x)) : v; };
   const lum = c => { const [a, b, d] = rgb(c).slice(0, 3).map(x => { x /= 255;
       return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); });
     return 0.2126 * a + 0.7152 * b + 0.0722 * d; };
@@ -86,6 +103,9 @@ CONFERIR = r"""
     if (!proprio) continue;
     const s = getComputedStyle(el);
     if (parseFloat(s.opacity) < 0.6) continue;           // apagado de proposito (ex.: desativado)
+    // O logotipo (o nome ARENA no alto, amarelo com sombra roxa) e' isento:
+    // a WCAG 1.4.3 nao pede contraste para texto que e' parte de um logotipo.
+    if (el.closest(".marca-nome")) continue;
     r.textosVistos++;
     const tamanho = parseFloat(s.fontSize);
     if (tamanho < r.menorLetra) { r.menorLetra = tamanho; r.menorLetraOnde = quem(el); }
@@ -141,7 +161,10 @@ def main():
                                 "p.hidden = false; 1" % (gaveta, gaveta))
                     time.sleep(0.4)
                     telas[gaveta] = nav.avaliar(CONFERIR)
-                nav.avaliar("abrirGaveta(''); 1")
+                nav.avaliar("abrirGaveta(''); document.querySelector('#modalPartida').hidden = false; 1")
+                time.sleep(0.4)
+                telas["janelaJogarJunto"] = nav.avaliar(CONFERIR)
+                nav.avaliar("document.querySelector('#modalPartida').hidden = true; 1")
                 resultados[tema] = telas
         destino = os.path.join(os.path.dirname(AQUI), "docs", "auditoria3", "acessibilidade.json")
         with open(destino, "w", encoding="utf-8") as f:
@@ -170,6 +193,8 @@ def main():
         baixos = juntar("contrasteBaixo")
         confere("contraste do texto (AA) nos dois temas (%d casos abaixo)" % len(baixos), not baixos, baixos[:12])
         confere("menor letra visivel de pelo menos %.0f px" % LETRA_MINIMA_PX, menor[0] >= LETRA_MINIMA_PX, menor)
+        confere("nenhum elemento escondido (hidden) aparece na tela", not juntar("escondidoAparece"),
+                juntar("escondidoAparece")[:10])
     finally:
         if processo:
             servidor_de_teste.derrubar(processo)

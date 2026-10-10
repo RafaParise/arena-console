@@ -5,6 +5,15 @@
    vem no Windows.
    ========================================================================== */
 
+/* O atributo hidden SEMPRE esconde. Sem esta linha, a classe com display:
+   flex ou grid passava por cima do hidden e o elemento aparecia mesmo
+   escondido -- a mensagem "Nenhum jogo na lista ainda" embaixo dos jogos, o
+   aviso "Mover para a pasta certa" em todo jogo, a chave "Estamos em casas
+   diferentes" que a Fase 4 tinha tirado da tela e os campos do Jogar Junto
+   (auditoria 3, Fase 7). As regras ".x[hidden]" mais abaixo ficam: eram o
+   remendo caso a caso. */
+[hidden] { display: none !important; }
+
 :root {
   /* ---- Tema claro pele mil pastel: acolhedor, legivel e portatil ---- */
   --fundo:          linear-gradient(135deg, #f5e6e8 0%, #e8f5f2 50%, #fef9e7 100%);
@@ -24,6 +33,12 @@
   --azul-escuro:    #ffa502;   /* amarelo SNES Donkey Kong */
   --pronto:         #2ed573;   /* verde SNES Super Mario */
   --espera:         #3742fa;   /* azul SNES Metroid */
+  /* Cores de TEXTO (contraste AA, 4,5:1, conferido em
+     testes\teste_acessibilidade_tela.py): o laranja e o azul acima sao bons
+     de fundo, mas como letra no branco ou na etiqueta amarela ficavam
+     ilegiveis. Auditoria 3, Fase 7. */
+  --destaque-texto: #6b3000;   /* marrom-laranja: 10:1 no branco, 5:1 no amarelo */
+  --espera-texto:   #3742fa;   /* o azul ja passa no fundo claro (6,3:1) */
   --bloqueado:      #9c8871;
   --erro:           #ff4757;   /* vermelho SNES Street Fighter */
 
@@ -59,6 +74,8 @@ body[data-tema="escuro"] {
   --azul: #66d9ff;
   --azul-claro: #8be1ff;
   --azul-escuro: #3a5080;
+  --destaque-texto: #8be1ff;   /* o mesmo --azul-claro do tema escuro */
+  --espera-texto: #9fa6ff;     /* o azul fundo-escuro dava 3,1:1; este, 8,6:1 */
   background: #0b0d17;
 }
 
@@ -791,7 +808,7 @@ input::placeholder { color: var(--texto-apagado); }
   color: var(--texto-apagado);
 }
 
-.jogo-motivo { font-size: var(--t-micro); color: var(--espera); }
+.jogo-motivo { font-size: var(--t-micro); color: var(--espera-texto); }
 
 .jogo-origem {
   font-size: var(--t-micro);
@@ -804,12 +821,12 @@ input::placeholder { color: var(--texto-apagado); }
   margin-top: 4px;
   padding: 2px 8px;
   border-radius: 10px;
-  font-size: 0.66rem;
+  font-size: 0.72rem;          /* era 0,66rem (10,6 px): letra minima da tela, 11 px */
   font-weight: 600;
   letter-spacing: 0.02em;
 }
 .desempenho--verde    { background: #17402f; color: #6ee7a8; }
-.desempenho--azul     { background: var(--azul-escuro); color: var(--azul-claro); }
+.desempenho--azul     { background: var(--azul-escuro); color: var(--destaque-texto); }
 .desempenho--vermelho { background: #40201e; color: #f0908b; }
 .desempenho--cinza    { background: #2e2e36; color: #c9c9d4; }   /* nao abre neste PC */
 
@@ -840,7 +857,7 @@ input::placeholder { color: var(--texto-apagado); }
 }
 .detalhes-capa .capa-imagem { z-index: 1; }
 .detalhes-corpo { padding: 1rem; }
-.detalhes-kicker { color: var(--azul-claro); font-size: var(--t-micro); text-transform: uppercase; letter-spacing: .08em; }
+.detalhes-kicker { color: var(--destaque-texto); font-size: var(--t-micro); text-transform: uppercase; letter-spacing: .08em; }
 .detalhes-corpo h2 { margin: .3rem 0 .5rem; font: 600 var(--t-med) var(--fonte-titulo); }
 .detalhes-descricao { color: var(--texto-fraco); font-size: var(--t-peq); }
 
@@ -996,6 +1013,8 @@ input::placeholder { color: var(--texto-apagado); }
 
 .perfil-nome { font-family: var(--fonte-titulo); font-size: var(--t-base); }
 .perfil-resumo { font-size: var(--t-micro); color: var(--texto-fraco); }
+/* No perfil escolhido o fundo e' o amarelo: o texto fraco dava 2,9:1. */
+.perfil.ativo .perfil-resumo { color: var(--texto); }
 
 /* ---- onde ficam as coisas ---- */
 
@@ -1205,9 +1224,9 @@ input::placeholder { color: var(--texto-apagado); }
   margin-left: 4px;
   border-radius: 9px;
   background: var(--espera);
-  color: #1c1508;
+  color: #ffffff;              /* no azul: 6,3:1 (o marrom de antes dava 2,9:1) */
   font-family: var(--fonte-numero);
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   font-weight: 700;
   text-align: center;
   line-height: 18px;
@@ -1291,7 +1310,7 @@ input::placeholder { color: var(--texto-apagado); }
   font-size: var(--t-med);
   color: var(--texto-apagado);
 }
-.espaco--cheio .espaco-numero { color: var(--azul-claro); }
+.espaco--cheio .espaco-numero { color: var(--destaque-texto); }
 
 .espaco-info {
   font-size: 0.62rem;
@@ -1379,13 +1398,13 @@ input::placeholder { color: var(--texto-apagado); }
   margin-top: 3px;
   padding: 1px 7px;
   border-radius: 10px;
-  font-size: 0.66rem;
+  font-size: 0.72rem;          /* era 0,66rem (10,6 px): letra minima da tela, 11 px */
   font-weight: 600;
   letter-spacing: 0.02em;
 }
 
 .desempenho--verde    { background: #17402f; color: #6ee7a8; }
-.desempenho--azul     { background: var(--azul-escuro); color: var(--azul-claro); }
+.desempenho--azul     { background: var(--azul-escuro); color: var(--destaque-texto); }
 .desempenho--vermelho { background: #40201e; color: #f0908b; }
 .desempenho--cinza    { background: #2e2e36; color: #c9c9d4; }   /* nao abre neste PC */
 
@@ -1403,7 +1422,7 @@ input::placeholder { color: var(--texto-apagado); }
 }
 
 .codigo-amigo-box code {
-  color: var(--azul-claro);
+  color: var(--destaque-texto);
   font-family: var(--fonte-numero);
   font-size: 1.15rem;
   font-weight: 700;
@@ -1435,7 +1454,7 @@ input::placeholder { color: var(--texto-apagado); }
   align-items: center;
   justify-content: center;
   background: var(--fundo-suave, var(--fundo));
-  color: var(--azul-claro);
+  color: var(--destaque-texto);
   font-size: 1.6rem;
   font-weight: 700;
 }
@@ -1546,9 +1565,9 @@ input::placeholder { color: var(--texto-apagado); }
   padding: 0 6px;
   border-radius: 9px;
   background: var(--azul-escuro);
-  color: var(--azul-claro);
+  color: var(--destaque-texto);
   font-family: var(--fonte-numero);
-  font-size: 0.62rem;
+  font-size: 0.72rem;          /* era 0,62rem (9,9 px) */
 }
 
 /* ============ ABA AVANCADA: recursos com explicacao e exemplo ============ */
@@ -1564,19 +1583,19 @@ input::placeholder { color: var(--texto-apagado); }
 .custo {
   padding: 0 5px;
   border-radius: 8px;
-  font-size: 0.6rem;
+  font-size: 0.72rem;          /* era 0,6rem (9,6 px): letra minima da tela, 11 px */
   font-weight: 600;
   vertical-align: 1px;
 }
-.custo--baixo, .custo--medio { background: var(--azul-escuro); color: var(--azul-claro); }
-.custo--alto { background: #3b2c16; color: var(--espera); }
+.custo--baixo, .custo--medio { background: var(--azul-escuro); color: var(--destaque-texto); }
+.custo--alto { background: #3b2c16; color: #ffb36b; }   /* 7,6:1 (o azul dava 2,1:1) */
 
 .opcao-exemplo-botao {
   grid-column: 1;
   justify-self: start;
   background: none;
   border: 0;
-  color: var(--azul-claro);
+  color: var(--destaque-texto);
   cursor: pointer;
   font-family: var(--fonte-texto);
   font-size: var(--t-micro);
@@ -1615,7 +1634,7 @@ input::placeholder { color: var(--texto-apagado); }
    em .jogo--sem_pasta .jogo-faixa, la em cima) */
 .jogo--sem_pasta .jogo-titulo::after {
   content: " — escolha o console";
-  color: var(--azul-claro);
+  color: var(--destaque-texto);
   font-size: var(--t-micro);
 }
 .sinal--sem_pasta { background: var(--azul-claro); }
@@ -1659,7 +1678,7 @@ input::placeholder { color: var(--texto-apagado); }
   outline: 1px dashed var(--azul-claro);
   outline-offset: -2px;
 }
-.mapa-linha--ouvindo .mapa-valor { color: var(--azul-claro); }
+.mapa-linha--ouvindo .mapa-valor { color: var(--destaque-texto); }
 
 /* Botao de acao destrutiva: precisa parecer diferente antes do clique */
 .botao--perigo {
