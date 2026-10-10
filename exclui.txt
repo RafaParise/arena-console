@@ -1,0 +1,17 @@
+jogos\
+retroarch\
+emuladores\
+dados\
+perfil\
+backup\
+*.log
+*.tmp
+*.bin
+*.chd
+*.iso
+*.zip
+*.7z
+*.rar
+__pycache__
+*.pyc
+.git\

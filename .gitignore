@@ -1,0 +1,128 @@
+# ISAM - Repositório ARENA/Sync
+# 2026 - Rafael Parise Passos
+
+# ===========================================
+# ESTILO DO PROJETO
+# ===========================================
+# Português do Brasil - conforme o projeto
+
+# ===========================================
+# PASTAS PESADAS, EMULADORES E ARQUIVOS DINÂMICOS DO ARENA
+# ===========================================
+/retroarch/
+/emuladores/
+/jogos/
+/dados/
+/perfil/
+/backup/
+
+# ===========================================
+# ARQUIVOS DE BIOS (Segurança legal)
+# ===========================================
+# BIOS retirados temporariamente para evitar problemas de licenciamento
+BIOS/
+bios/
+
+# ===========================================
+# ROMS, ISOS, CHD - PROPRIEDADE DE TERCEIROS
+# ===========================================
+# Proibido enviar ROMs protegidas por copyright
+*.iso
+*.bin
+*.chd
+*.zip
+*.7z
+*.rar
+*.rvz
+*.wia
+*.gcm
+*.wbfs
+
+# ===========================================
+# ARQUIVOS GERAIS E BINÁRIOS
+# ===========================================
+# Executáveis e bibliotecas
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Imagens grandes
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.tga
+*.dds
+*.ico
+
+# Vídeos e áudio
+*.mp4
+*.mkv
+*.avi
+*.mov
+*.mp3
+*.wav
+*.flac
+
+# ===========================================
+# LOGS E ARQUIVOS TEMPORÁRIOS DE EXECUÇÃO
+# ===========================================
+*.log
+*.tmp
+*.temp
+*.corrompido-*
+ARENA-troca.json
+
+# ===========================================
+# CACHE E PYTHON
+# ===========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.Python
+*.swp
+*.swo
+
+# ===========================================
+# IDE E EDITOR
+# ===========================================
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+*.code-workspace
+
+# ===========================================
+# SISTEMA OPERACIONAL
+# ===========================================
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.lnk
+
+# ===========================================
+# OUTROS ARQUIVOS DE DESENVOLVIMENTO
+# ===========================================
+*.orig
+*.rej
+*.orig.*
+*.rej.*
+
+# ===========================================
+# DADOS DO USUÁRIO (nunca versionar)
+# ===========================================
+# Saves, recordes, configurações pessoais
+recordes.db
+save_states/
+config/
+user_data/
+user_profiles/
+
+# ===========================================
+# VERIFICAÇÃO FINAL
+# ===========================================
+# Sempre verificar: não enviar dados pessoais nem ROMs
