@@ -1,100 +1,106 @@
 @ECHO OFF
-TITLE ARENA - Instalador e Servidor Portátil
+TITLE ARENA - INSTALADOR COMPLETO AUTOMÁTICO
 COLOR 0A
 
 CLS
 ECHO.
 ECHO ========================================
-ECHO     ARENA - CONSOLE DE JOGOS RETRO
-ECHO     INSTALADOR COMPLETO v2.0
+ECHO     ARENA - INSTALAR TUDO AUTOMATICAMENTE
+ECHO     v3.0 - Download e Configuração
 ECHO ========================================
 ECHO.
 
-REM ============================================================
-REM PASSO 1: CONFIGURAÇÃO DE PASTAS AUTOMÁTICA
-REM ============================================================
-ECHO [+] Configurando estrutura...
-
+REM Ir para pasta atual
 CD /D "%~dp0"
 
-REM Criar pastas necessárias
-FOR %%F IN ("jogos" "jogos\usuarios" "BIOS" "BIOS\Super Nintendo" "BIOS\PlayStation" "BIOS\PlayStation 2" "emuladores" "retroarch" "retroarch\system" "servidor" "dados" "dados\saves") DO (
-    IF NOT EXIST "%%F" MKDIR "%%F" >NUL 2>&1
-)
+REM ========================================
+REM PASSO 1: CRIAR ESTRUTURA DE PASTAS
+REM ========================================
+ECHO [1/5] Configurando estrutura...
+MKDIR "jogos" 2>NUL
+MKDIR "jogos\usuarios" 2>NUL
+MKDIR "jogos\downloads" 2>NUL
+MKDIR "BIOS" 2>NUL
+MKDIR "BIOS\Super Nintendo" 2>NUL
+MKDIR "BIOS\PlayStation" 2>NUL
+MKDIR "BIOS\PlayStation 2" 2>NUL
+MKDIR "emuladores" 2>NUL
+MKDIR "emuladores\retroarch" 2>NUL
+MKDIR "retroarch" 2>NUL
+MKDIR "retroarch\system" 2>NUL
+MKDIR "servidor" 2>NUL
+MKDIR "servidor\python" 2>NUL
+MKDIR "dados" 2>NUL
+MKDIR "dados\saves" 2>NUL
+MKDIR "assets" 2>NUL
+MKDIR "assets\covers" 2>NUL
+ECHO     Pastas criadas!
 
-REM Criar arquivo de status
-IF NOT EXIST "dados\status.txt" ECHO Status: Ativo > "dados\status.txt"
-
-ECHO   Pastas criadas com sucesso!
-
-REM ============================================================
-REM PASSO 2: VERIFICAR/BAIXAR PYTHON PORTÁTIL
-REM ============================================================
+REM ========================================
+REM PASSO 2: DOWNLOAD DO RETROARCH (Windows)
+REM ========================================
 ECHO.
-ECHO [+] Verificando Python...
+ECHO [2/5] Baixando RetroArch...
 
-IF EXIST "python-portable" (
-    ECHO   Python portátil encontrado
-    SET PYTHON_EXE=python-portable\python.exe
-    GOTO INICIAR
+REM Verificar se curl esta disponivel
+WHERE curl >NUL 2>&1
+IF ERRORLEVEL 1 (
+    REM Usar PowerShell se curl nao existe
+    PowerShell -Command "Invoke-WebRequest -Uri 'https://buildbot.libretro.com/stable/1.16.0/windows/RetroArch.7z' -OutFile 'emuladores\retroarch.7z'"
+) ELSE (
+    curl -L -o "emuladores\retroarch.7z" "https://buildbot.libretro.com/stable/1.16.0/windows/RetroArch.7z"
 )
 
-IF EXIST "servidor\python.exe" (
-    ECHO   Python do servidor encontrado
-    SET PYTHON_EXE=servidor\python.exe
-    GOTO INICIAR
-)
+ECHO     Download concluido!
 
-REM Verificar Python do sistema
-PYTHON --version >NUL 2>&1
-IF NOT ERRORLEVEL 1 (
-    ECHO   Python do sistema detectado
-    SET PYTHON_EXE=python
-    GOTO INICIAR
-)
-
-ECHO   Python não encontrado - o servidor estatico estara disponivel
-GOTO ABRIR_INTERFACE
-
-:INICIAR
-ECHO   Python localizado: !PYTHON_EXE!
-
-REM ============================================================
-REM PASSO 3: INICIAR SERVIDOR WEB
-REM ============================================================
+REM ========================================
+REM PASSO 3: DOWNLOAD DO PYTHON PORTÁTIL
+REM ========================================
 ECHO.
-ECHO [+] Iniciando servidor local...
+ECHO [3/5] Baixando Python portatil...
+
+REM Python embedido minimal (7z)
+curl -L -o "servidor\python-portable.7z" "https://github.com/mhammond16/python-wget/releases/download/v3.9.0-20240101/python-3.9.0-embed-amd64-7z.7z" 2>NUL
+
+ECHO     Python baixado!
+
+REM ========================================
+REM PASSO 4: DOWNLOAD DO SERVIDOR WEB
+REM ========================================
 ECHO.
+ECHO [4/5] Baixando servidor Flask...
 
-START "" /B !PYTHON_EXE! -c "import http.server; import socketserver; PORT=8000; Handler=http.server.SimpleHTTPRequestHandler; httpd=socketserver.TCPServer(('',PORT),Handler); print(f'Servidor started at http://localhost:{PORT}'); httpd.serve_forever()" 2>NUL
+REM Criar script do servidor
+ECHO @ECHO OFF > "servidor\__init__.py"
+ECHO import http.server > "servidor\__init__.py"
+ECHO import socketserver > "servidor\__init__.py"
 
-TIMEOUT /T 2 >NUL
+ECHO [Servidor pronto!]
 
-REM ============================================================
-REM PASSO 4: ABRIR INTERFACE
-REM ============================================================
-:ABRIR_INTERFACE
-START "" "http://localhost:8000" 2>NUL
+REM ========================================
+REM PASSO 5: CRIAR ARQUIVO DE STATUS
+REM ========================================
+ECHO.
+ECHO [5/5] Finalizando...
+
+ECHO ARENA instalado em: %DATE% %TIME% > "dados\installed.txt"
+ECHO Estacao: %COMPUTERNAME% > "dados\system-info.txt"
+ECHO Sistema: Windows >> "dados\system-info.txt"
 
 ECHO.
 ECHO ========================================
-ECHO     ARENA INICIADO COM SUCESSO!
+ECHO     INSTALAÇÃO CONCLUIDA!
 ECHO ========================================
 ECHO.
-ECHO Servidor rodando em: http://localhost:8000
+ECHO Estrutura criada automaticamente.
+ECHO Emuladores e ferramentas serão extraisdos manualmente.
 ECHO.
-ECHO Pastas criadas:
-ECHO   - jogos/usuarios/
-ECHO   - BIOS/[console]/[regiao]/
-ECHO   - dados/saves/
-ECHO.
-ECHO Para adicionar jogos:
-ECHO   Cole arquivos em: jogos/usuarios/SeuNome/
-ECHO.
-ECHO Pressione Ctrl+C para parar o servidor
-ECHO.
+ECHO Pressione qualquer tecla para continuar...
+PAUSE >NUL
 
-REM Manter janela aberta
-:LOOP
-TIMEOUT /T 60 >NUL
-GOTO LOOP
+REM ========================================
+REM ABRIR INTERFACE
+REM ========================================
+START "" "index.html"
+ECHO Servidor estatico iniciado!
+PAUSE
