@@ -57,7 +57,9 @@ def git(*argumentos, tempo=120):
                            encoding="utf-8", errors="replace", timeout=tempo)
     except subprocess.TimeoutExpired:
         return 1, "o git demorou demais (mais de %d s)" % tempo
-    return r.returncode, (r.stdout + r.stderr).strip()
+    # rstrip, nao strip: no "status --porcelain" o espaco do comeco faz parte
+    # da linha (" M arquivo" = mudou e ainda nao foi para o commit).
+    return r.returncode, (r.stdout + r.stderr).rstrip()
 
 
 def mudancas_sem_commit():
@@ -157,9 +159,10 @@ def conferido_para_publicar(ramo):
     saida = io.StringIO()
     with redirect_stdout(saida):
         codigo = conferir_antes_de_publicar.principal([ramo])
+    # Sempre mostra: os avisos (e-mail, arquivo grande...) tambem sao para ler.
+    print(saida.getvalue().rstrip())
     if codigo == 0:
         return True
-    print(saida.getvalue())
     print("NADA FOI ENVIADO: algum commit leva um arquivo que nao pode ir para o GitHub")
     print("(o repositorio e' publico). Peca ao assistente para tirar esse arquivo do commit.")
     return False
@@ -188,7 +191,8 @@ def enviar(ramo, mensagem_para_tudo=None):
     if not conferido_para_publicar(ramo):
         return False
     print("Enviando para o GitHub (na primeira vez, o Windows abre a pagina do GitHub para entrar)...")
-    codigo, texto = git("push", "-u", REMOTO, ramo, tempo=900)
+    # So o ramo conferido: nada de etiqueta (tag) que aponte para outro lugar.
+    codigo, texto = git("push", "--no-follow-tags", "-u", REMOTO, ramo, tempo=900)
     if codigo != 0:
         if "rejected" in texto or "non-fast-forward" in texto or "fetch first" in texto:
             print("O GitHub tem coisa nova que esta copia nao tem. Puxe primeiro (SINCRONIZAR.bat).")

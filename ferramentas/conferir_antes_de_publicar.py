@@ -16,7 +16,9 @@ O que ela procura (em todo commit que ainda nao esta no GitHub):
      o conteudo de jogos\, retroarch\ e emuladores\ (fora os LEIA.txt),
      banco de dados, save, memory card, conta do RPCN;
   2. extensao de jogo ou de BIOS (.iso, .bin, .rom, .sfc, .chd, .zip...);
-  3. arquivo binario e arquivo grande (mais de 1 MB), para conferir um a um;
+  3. arquivo binario que nao seja imagem ou fonte DE VERDADE (conferida pelos
+     primeiros bytes: uma BIOS renomeada para .png nao passa) e arquivo
+     grande (mais de 1 MB, so aviso);
   4. no texto dos arquivos e nas mensagens dos commits: chave/token/senha,
      e-mail (o de aluno e o institucional sao bloqueantes), CPF, telefone,
      numero de RA, nome de computador e endereco de rede.
@@ -80,8 +82,9 @@ SEGREDOS = [
 EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}")
 # E-mails que podem aparecer: o da coautoria do Claude, os privados do
 # GitHub e os de exemplo.
-EMAIL_LIVRE = re.compile(r"(?i)^(noreply@anthropic\.com|[^@]+@users\.noreply\.github\.com|"
-                         r"[^@]+@(example\.(com|org|net)|exemplo\.com(\.br)?))$")
+EMAIL_LIVRE = re.compile(r"(?i)^(noreply@anthropic\.com|noreply@github\.com|[^@]+@users\.noreply\.github\.com|"
+                         r"[^@]+@(example\.(com|org|net)|exemplo\.com(\.br)?)|"
+                         r"[^@]+@[^@]+\.(invalid|test|example|localhost))$")   # dominios reservados (RFC 2606)
 EMAIL_ALUNO = re.compile(r"(?i)@al\.educacao\.sp\.gov\.br$")
 EMAIL_INSTITUCIONAL = re.compile(r"(?i)@([a-z0-9-]+\.)*educacao\.sp\.gov\.br$")
 PESSOAIS = [
@@ -95,16 +98,36 @@ MAC = re.compile(r"\b([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}\b")
 IPV4 = re.compile(r"\b(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\b")
 # Pastas de usuario do Windows que nao identificam ninguem.
 USUARIOS_GENERICOS = {"public", "default", "fulano", "aluno", "seunome", "voce", "usuario",
-                      "<usuario>", "%username%", "nome"}
+                      "<usuario>", "%username%", "nome", "%s", "...", "alguem"}
 
 
 def git(*argumentos, entrada=None, binario=False):
-    r = subprocess.run(["git", *argumentos], cwd=RAIZ, input=entrada, capture_output=True,
-                       text=not binario)
+    r = subprocess.run(["git", *argumentos], cwd=RAIZ, input=entrada, capture_output=True)
     if r.returncode != 0:
-        raise SystemExit("git %s falhou: %s" % (" ".join(argumentos),
-                                                (r.stderr if not binario else r.stderr.decode("utf-8", "replace"))[:400]))
-    return r.stdout
+        raise SystemExit("git %s falhou: %s" % (" ".join(argumentos), r.stderr.decode("utf-8", "replace")[:400]))
+    # O git fala UTF-8 (nome de arquivo com acento); o Windows, por padrao, nao.
+    return r.stdout if binario else r.stdout.decode("utf-8", "replace")
+
+
+# Binario que pode ir: imagem e fonte -- conferidos pelos primeiros bytes, para
+# que uma BIOS renomeada para .png nao passe.
+ASSINATURAS = {
+    ".png": (b"\x89PNG\r\n\x1a\n",),
+    ".jpg": (b"\xff\xd8\xff",), ".jpeg": (b"\xff\xd8\xff",),
+    ".gif": (b"GIF87a", b"GIF89a"),
+    ".ico": (b"\x00\x00\x01\x00",),
+    ".webp": (b"RIFF",),
+    ".woff": (b"wOFF",), ".woff2": (b"wOF2",),
+    ".ttf": (b"\x00\x01\x00\x00", b"true"), ".otf": (b"OTTO",),
+}
+
+
+def binario_permitido(caminho, dados):
+    extensao = os.path.splitext(caminho)[1].lower()
+    assinaturas = ASSINATURAS.get(extensao)
+    if not assinaturas or not any(dados.startswith(a) for a in assinaturas):
+        return False
+    return extensao != ".webp" or dados[8:12] == b"WEBP"
 
 
 # Enderecos publicos que nao identificam ninguem: os DNS que o ARENA usa para
@@ -186,7 +209,11 @@ def principal(argumentos):
     tamanho = {}
     primeiro_commit = {}
     for commit in commits:
-        for linha in git("ls-tree", "-r", "-l", "--full-tree", commit).splitlines():
+        # -z: o caminho vem cru. Sem ele, o git poe entre aspas o caminho com
+        # acento ("BIOS/PS2/Jap\303\243o/...") e a regra "^BIOS/" nao pegava.
+        for linha in git("ls-tree", "-r", "-l", "-z", "--full-tree", commit).split("\0"):
+            if not linha:
+                continue
             meta, caminho = linha.split("\t", 1)
             modo, tipo, sha, tam = meta.split()
             if tipo != "blob" or sha in publicados:
@@ -233,8 +260,12 @@ def principal(argumentos):
         dados = conteudo.get(sha, b"")
         nome = sorted(caminhos[sha])[0]
         if b"\0" in dados[:8000]:
-            if not nome.lower().endswith((".png", ".jpg", ".jpeg", ".gif", ".ico", ".webp")):
-                achado(avisos, "arquivo binario", nome, "%d bytes" % len(dados))
+            # O codigo do ARENA e' todo texto. Binario so imagem/fonte de
+            # verdade; qualquer outro pode ser BIOS, jogo ou save renomeado.
+            for caminho in sorted(caminhos[sha]):
+                if not binario_permitido(caminho, dados):
+                    achado(bloqueantes, "arquivo binario (nao e' imagem nem fonte)", caminho,
+                           "%d bytes" % len(dados))
             if len(dados) > GRANDE:
                 achado(avisos, "arquivo grande", nome, "%.1f MB" % (len(dados) / GRANDE))
             continue
@@ -262,7 +293,11 @@ def principal(argumentos):
                 achado(avisos, "endereco IP publico (ou numero de versao)", nome, m.group(0))
 
     # Mensagens e autores dos commits.
-    for bloco in git("log", "--no-walk", "--format=%H%x00%ae%x00%ce%x00%B%x01", *commits).split("\x01"):
+    # --stdin: com centenas de commits, a linha de comando passaria do limite
+    # do Windows.
+    mensagens = git("log", "--no-walk", "--stdin", "--format=%H%x00%ae%x00%ce%x00%B%x01",
+                    entrada="".join(c + "\n" for c in commits).encode())
+    for bloco in mensagens.split("\x01"):
         partes = bloco.strip("\n").split("\x00")
         if len(partes) < 4:
             continue

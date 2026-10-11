@@ -101,12 +101,43 @@ class TestConferirAntesDePublicar(unittest.TestCase):
         self.assertEqual(codigo, 1, saida)
         self.assertIn("jogo ou BIOS pela extensao", self.tipos(achados, "bloqueantes"))
 
+    def test_bios_em_pasta_com_acento(self):
+        # O git poe entre aspas o caminho com acento ("BIOS/PS2/Jap\303\243o/...");
+        # antes da correcao (11/10/2026), a regra "^BIOS/" nao pegava.
+        self.commitar("BIOS/PS2/Japão/scph10000.bin", "x")
+        codigo, saida, achados = self.rodar()
+        self.assertEqual(codigo, 1, saida)
+        caminhos = {a["onde"] for a in achados["bloqueantes"]}
+        self.assertIn("BIOS/PS2/Japão/scph10000.bin", caminhos)
+
+    def test_binario_renomeado_para_imagem_nao_passa(self):
+        caminho = os.path.join(self.repo, "launcher", "fundo.png")
+        os.makedirs(os.path.dirname(caminho), exist_ok=True)
+        with open(caminho, "wb") as arquivo:
+            arquivo.write(b"\x00\x01SONY PS2 BIOS" + bytes(range(256)))
+        git(self.repo, "add", "launcher/fundo.png")
+        git(self.repo, "commit", "-q", "-m", "imagem?")
+        codigo, saida, achados = self.rodar()
+        self.assertEqual(codigo, 1, saida)
+        self.assertIn("arquivo binario (nao e' imagem nem fonte)", self.tipos(achados, "bloqueantes"))
+
+    def test_imagem_de_verdade_passa(self):
+        caminho = os.path.join(self.repo, "docs", "fundo.png")
+        os.makedirs(os.path.dirname(caminho), exist_ok=True)
+        with open(caminho, "wb") as arquivo:   # cabecalho de PNG + bytes quaisquer
+            arquivo.write(b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR" + bytes(64))
+        git(self.repo, "add", "docs/fundo.png")
+        git(self.repo, "commit", "-q", "-m", "imagem do README")
+        codigo, saida, _ = self.rodar()
+        self.assertEqual(codigo, 0, saida)
+
     def test_email_de_aluno_e_institucional_bloqueiam(self):
-        self.commitar("docs/contas.md", "Aluno: fulano123@al.educacao.sp.gov.br\n")
+        # Montados na hora: este arquivo vai para o GitHub e nao pode "ter" o dado.
+        self.commitar("docs/contas.md", "Aluno: fulano123" + "@al.educacao.sp.gov.br\n")
         codigo, saida, achados = self.rodar()
         self.assertEqual(codigo, 1, saida)
         self.assertIn("e-mail de aluno", self.tipos(achados, "bloqueantes"))
-        self.commitar("docs/contas.md", "Professor: beltrano@prof.educacao.sp.gov.br\n")
+        self.commitar("docs/contas.md", "Professor: beltrano" + "@prof.educacao.sp.gov.br\n")
         codigo, saida, achados = self.rodar()
         self.assertIn("e-mail institucional", self.tipos(achados, "bloqueantes"))
 
@@ -122,7 +153,7 @@ class TestConferirAntesDePublicar(unittest.TestCase):
         self.commitar("servidor/x.py", "# a saida que nao pede senha: outro computador abre\n")
         codigo, saida, _ = self.rodar()
         self.assertEqual(codigo, 0, saida)
-        self.commitar("servidor/y.py", "senha = 'abc12345'\n")
+        self.commitar("servidor/y.py", "senha = " + "'abc12345'\n")
         codigo, saida, achados = self.rodar()
         self.assertIn("senha escrita", self.tipos(achados, "bloqueantes"))
 
