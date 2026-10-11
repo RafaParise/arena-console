@@ -36,6 +36,9 @@ def escrever(pasta, nome, texto):
 class TestSincronizarGithub(unittest.TestCase):
     def setUp(self):
         self.base = tempfile.mkdtemp(prefix="arena_sinc_")
+        # A conferencia de publicacao grava a lista de achados aqui, nao no Temp.
+        self.destino_original = sinc.conferir_antes_de_publicar.DESTINO
+        sinc.conferir_antes_de_publicar.DESTINO = os.path.join(self.base, "achados.json")
         self.remoto = os.path.join(self.base, "github.git")
         git(self.base, "init", "-q", "--bare", "-b", "auditoria", self.remoto)
         self.a = self.clone("computador_a")
@@ -47,6 +50,7 @@ class TestSincronizarGithub(unittest.TestCase):
 
     def tearDown(self):
         sinc.RAIZ = RAIZ
+        sinc.conferir_antes_de_publicar.DESTINO = self.destino_original
         shutil.rmtree(self.base, ignore_errors=True)
 
     def clone(self, nome):
@@ -141,6 +145,18 @@ class TestSincronizarGithub(unittest.TestCase):
         codigo, saida = self.rodar(self.b, "enviar")
         self.assertEqual(codigo, 1, saida)
         self.assertIn("Puxe primeiro", saida)
+
+    def test_banco_ou_bios_num_commit_nada_vai(self):
+        # Mesmo forcado com "git add -f" (o .gitignore barraria), dado de quem
+        # usa nao vai para o GitHub publico: a conferencia recusa o envio.
+        os.makedirs(os.path.join(self.b, "dados"))
+        escrever(self.b, "dados/arena.db", "recordes da turma\n")
+        git(self.b, "add", "-f", "dados/arena.db")
+        git(self.b, "commit", "-q", "-m", "sem querer")
+        codigo, saida = self.rodar(self.b, "enviar")
+        self.assertEqual(codigo, 1, saida)
+        self.assertIn("NADA FOI ENVIADO", saida)
+        self.assertNotIn("dados/arena.db", git(self.remoto, "ls-tree", "-r", "--name-only", "auditoria"))
 
 
 if __name__ == "__main__":

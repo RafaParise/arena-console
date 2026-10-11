@@ -18,6 +18,12 @@ Regras desta ferramenta (as mesmas do AGENTS.md):
     trabalho, com uma mensagem que diga o que mudou. Se houver mudanca sem
     commit, ela so mostra a lista. Para mandar tudo mesmo assim, o professor
     pede com --tudo "mensagem" (a mensagem e' obrigatoria).
+  - Antes de enviar, confere o que vai junto (ferramentas\
+    conferir_antes_de_publicar.py): BIOS, jogo, banco, save, dado de aluno,
+    e-mail institucional, senha ou token num commit = NADA e' enviado. O
+    repositorio e' publico. (Em 11/10/2026 outro assistente tentou enviar a
+    pasta dos alunos inteira, com BIOS e o banco dos recordes; so nao foi
+    porque o GitHub recusou os arquivos grandes.)
   - Puxar so avanca a copia daqui (--ff-only). Se os dois lados mudaram, ela
     junta (merge); se os dois mudaram o MESMO trecho, desiste sem estragar
     nada (merge --abort) e explica.
@@ -29,13 +35,19 @@ Uso (ou dois cliques no SINCRONIZAR.bat, que faz "tudo"):
     servidor\python\python.exe ferramentas\sincronizar_github.py [estado|puxar|enviar|tudo]
     servidor\python\python.exe ferramentas\sincronizar_github.py enviar --tudo "o que mudou"
 """
+import io
 import os
 import shutil
 import subprocess
 import sys
+from contextlib import redirect_stdout
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import conferir_antes_de_publicar  # noqa: E402
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REMOTO = "origin"
+ENDERECO = "https://github.com/RafaParise/arena-console.git"
 
 
 def git(*argumentos, tempo=120):
@@ -75,11 +87,11 @@ def preparar():
         return None
     if git("rev-parse", "--is-inside-work-tree")[0] != 0:
         print("Esta pasta nao e' um repositorio do git. Baixe o ARENA com:")
-        print("  git clone https://github.com/RafaParise/ARENA.git")
+        print("  git clone %s" % ENDERECO)
         return None
     if git("remote", "get-url", REMOTO)[0] != 0:
         print("Esta pasta nao sabe onde fica o GitHub (falta o '%s')." % REMOTO)
-        print("  git remote add origin https://github.com/RafaParise/ARENA.git")
+        print("  git remote add origin %s" % ENDERECO)
         return None
     ramo = ramo_atual()
     if not ramo or ramo == "HEAD":
@@ -137,6 +149,22 @@ def puxar(ramo):
     return True
 
 
+def conferido_para_publicar(ramo):
+    """A ultima porta antes do GitHub publico: confere cada arquivo novo dos
+    commits que o GitHub ainda nao tem. Se houver bloqueante, explica e
+    devolve False -- e nada e' enviado."""
+    conferir_antes_de_publicar.RAIZ = RAIZ
+    saida = io.StringIO()
+    with redirect_stdout(saida):
+        codigo = conferir_antes_de_publicar.principal([ramo])
+    if codigo == 0:
+        return True
+    print(saida.getvalue())
+    print("NADA FOI ENVIADO: algum commit leva um arquivo que nao pode ir para o GitHub")
+    print("(o repositorio e' publico). Peca ao assistente para tirar esse arquivo do commit.")
+    return False
+
+
 def enviar(ramo, mensagem_para_tudo=None):
     mudancas = mudancas_sem_commit()
     if mudancas and mensagem_para_tudo:
@@ -157,6 +185,8 @@ def enviar(ramo, mensagem_para_tudo=None):
     if contas is not None and contas[0] == 0:
         print("Nada daqui para enviar.")
         return True
+    if not conferido_para_publicar(ramo):
+        return False
     print("Enviando para o GitHub (na primeira vez, o Windows abre a pagina do GitHub para entrar)...")
     codigo, texto = git("push", "-u", REMOTO, ramo, tempo=900)
     if codigo != 0:
