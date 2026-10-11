@@ -1,103 +1,100 @@
 @ECHO OFF
-TITLE ARENA - Console de Jogos Portátil
+TITLE ARENA - Instalador e Servidor Portátil
 COLOR 0A
-SETLOCAL EnableDelayedExpansion
 
 CLS
 ECHO.
 ECHO ========================================
-ECHO     ARENA - Console de Jogos
-ECHO     Configuração Automática Total
+ECHO     ARENA - CONSOLE DE JOGOS RETRO
+ECHO     INSTALADOR COMPLETO v2.0
 ECHO ========================================
 ECHO.
 
-REM ========================================
+REM ============================================================
 REM PASSO 1: CONFIGURAÇÃO DE PASTAS AUTOMÁTICA
-REM ========================================
-ECHO Configurando estrutura do projeto...
+REM ============================================================
+ECHO [+] Configurando estrutura...
 
-REM Detectar pasta atual
 CD /D "%~dp0"
 
-REM Criar pastas necessárias (sempre)
-IF NOT EXIST "jogos" (
-    MKDIR "jogos" >NUL 2>&1
-    ECHO   Criado: jogos)
-
-IF NOT EXIST "jogos\usuarios" (
-    MKDIR "jogos\usuarios" >NUL 2>&1
-    ECHO   Criado: jogos\usuarios)
-
-IF NOT EXIST "BIOS" (
-    MKDIR "BIOS" >NUL 2>&1
-    ECHO   Criado: BIOS)
-
-IF NOT EXIST "BIOS\Super Nintendo" MKDIR "BIOS\Super Nintendo" >NUL 2>&1
-IF NOT EXIST "BIOS\PlayStation" MKDIR "BIOS\PlayStation" >NUL 2>&1
-IF NOT EXIST "BIOS\PlayStation 2" MKDIR "BIOS\PlayStation 2" >NUL 2>&1
-
-IF NOT EXIST "emuladores" (
-    MKDIR "emuladores" >NUL 2>&1
-    ECHO   Criado: emuladores)
-
-IF NOT EXIST "retroarch" (
-    MKDIR "retroarch" >NUL 2>&1
-    ECHO   Criado: retroarch)
-
-IF NOT EXIST "retroarch\system" MKDIR "retroarch\system" >NUL 2>&1
-
-IF NOT EXIST "servidor" (
-    MKDIR "servidor" >NUL 2>&1
-    ECHO   Criado: servidor)
-
-IF NOT EXIST "dados" (
-    MKDIR "dados" >NUL 2>&1
-    ECHO   Criado: dados)
-
-IF NOT EXIST "dados\saves" MKDIR "dados\saves" >NUL 2>&1
+REM Criar pastas necessárias
+FOR %%F IN ("jogos" "jogos\usuarios" "BIOS" "BIOS\Super Nintendo" "BIOS\PlayStation" "BIOS\PlayStation 2" "emuladores" "retroarch" "retroarch\system" "servidor" "dados" "dados\saves") DO (
+    IF NOT EXIST "%%F" MKDIR "%%F" >NUL 2>&1
+)
 
 REM Criar arquivo de status
-IF NOT EXIST "dados\status.txt" (
-    ECHO Status: Ativo > "dados\status.txt"
+IF NOT EXIST "dados\status.txt" ECHO Status: Ativo > "dados\status.txt"
+
+ECHO   Pastas criadas com sucesso!
+
+REM ============================================================
+REM PASSO 2: VERIFICAR/BAIXAR PYTHON PORTÁTIL
+REM ============================================================
+ECHO.
+ECHO [+] Verificando Python...
+
+IF EXIST "python-portable" (
+    ECHO   Python portátil encontrado
+    SET PYTHON_EXE=python-portable\python.exe
+    GOTO INICIAR
 )
 
-ECHO.
-ECHO Estrutura configurada com sucesso!
-ECHO.
-
-REM ========================================
-REM PASSO 2: INICIAR O SERVIDOR/APLICAÇÃO
-REM ========================================
-ECHO ========================================
-ECHO     INICIANDO ARENA
-ECHO ========================================
-ECHO.
-
-REM Verificar se há um index ou sistema web
-IF EXIST "index.html" (
-    START "" "index.html" 2>NUL
-    ECHO Servidor web iniciado!
-) ELSE (
-    ECHO.
-    ECHO ARENA esta pronto para uso!
-    ECHO.
-    ECHO Pastas criadas:
-    ECHO   - jogos/usuarios/ (adicione seus jogos aqui)
-    ECHO   - BIOS/[console]/[regiao]/ (adicione BIOS aqui)
-    ECHO   - dados/saves/ (saves automáticos)
-    ECHO.
+IF EXIST "servidor\python.exe" (
+    ECHO   Python do servidor encontrado
+    SET PYTHON_EXE=servidor\python.exe
+    GOTO INICIAR
 )
 
-REM ========================================
-REM PASSO 3: MENSAGEM FINAL
-REM ========================================
+REM Verificar Python do sistema
+PYTHON --version >NUL 2>&1
+IF NOT ERRORLEVEL 1 (
+    ECHO   Python do sistema detectado
+    SET PYTHON_EXE=python
+    GOTO INICIAR
+)
+
+ECHO   Python não encontrado - o servidor estatico estara disponivel
+GOTO ABRIR_INTERFACE
+
+:INICIAR
+ECHO   Python localizado: !PYTHON_EXE!
+
+REM ============================================================
+REM PASSO 3: INICIAR SERVIDOR WEB
+REM ============================================================
+ECHO.
+ECHO [+] Iniciando servidor local...
+ECHO.
+
+START "" /B !PYTHON_EXE! -c "import http.server; import socketserver; PORT=8000; Handler=http.server.SimpleHTTPRequestHandler; httpd=socketserver.TCPServer(('',PORT),Handler); print(f'Servidor started at http://localhost:{PORT}'); httpd.serve_forever()" 2>NUL
+
+TIMEOUT /T 2 >NUL
+
+REM ============================================================
+REM PASSO 4: ABRIR INTERFACE
+REM ============================================================
+:ABRIR_INTERFACE
+START "" "http://localhost:8000" 2>NUL
+
+ECHO.
 ECHO ========================================
-ECHO    CONFIGURAÇÃO CONCLUIDA!
+ECHO     ARENA INICIADO COM SUCESSO!
 ECHO ========================================
 ECHO.
-ECHO Pronto para usar!
+ECHO Servidor rodando em: http://localhost:8000
 ECHO.
-ECHO Para sair: Feche esta janela
+ECHO Pastas criadas:
+ECHO   - jogos/usuarios/
+ECHO   - BIOS/[console]/[regiao]/
+ECHO   - dados/saves/
 ECHO.
-PAUSE >NUL
-EXIT
+ECHO Para adicionar jogos:
+ECHO   Cole arquivos em: jogos/usuarios/SeuNome/
+ECHO.
+ECHO Pressione Ctrl+C para parar o servidor
+ECHO.
+
+REM Manter janela aberta
+:LOOP
+TIMEOUT /T 60 >NUL
+GOTO LOOP
