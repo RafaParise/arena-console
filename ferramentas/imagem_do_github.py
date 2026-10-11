@@ -66,12 +66,43 @@ PAGINA = """<!doctype html>
 """
 
 
+# Na capa, os Metroides e o planeta caiam bem atras das letras (o "Parado"
+# desenha a cena em t = 300, sempre no mesmo lugar). So na copia da capa,
+# eles vao para as laterais e para baixo, parados; os sorteios continuam na
+# mesma ordem, entao o resto do ceu (estrelas, nebulosas, lua) fica igual.
+# Se o galaxy-background.js mudar e um trecho nao casar, para e avisa.
+AJUSTES_DA_CAPA = [
+    ("cx: 40 + i * 72, cy: 31 + sorteio() * 8,",
+     "cx: [16, 144][i], cy: 47 + 0 * sorteio(),"),
+    ("raioX: 18 + sorteio() * 12, raioY: 7 + sorteio() * 5,",
+     "raioX: 0 * (18 + sorteio() * 12), raioY: 0 * (7 + sorteio() * 5),"),
+    ("const planeta = { x: W * 0.72, y: 58 };",
+     "const planeta = { x: W * 0.875, y: 76 };"),
+]
+
+
+def preparar_fundo_da_capa(pasta):
+    """Grava galaxy-background-capa.js (a copia com os ajustes da capa)."""
+    with open(os.path.join(pasta, "galaxy-background.js"), encoding="utf-8") as f:
+        texto = f.read()
+    for velho, novo in AJUSTES_DA_CAPA:
+        if texto.count(velho) != 1:
+            raise SystemExit("O launcher\\galaxy-background.js mudou: o trecho '%s' nao foi achado "
+                             "(uma vez). Atualize AJUSTES_DA_CAPA nesta ferramenta." % velho)
+        texto = texto.replace(velho, novo)
+    with open(os.path.join(pasta, "galaxy-background-capa.js"), "w", encoding="utf-8") as f:
+        f.write(texto)
+
+
 def desenhar(navegador, pasta, nome, largura, altura, com_texto):
     altura_cena = largura * 9 // 16              # a cena e' 16:9
     pagina = os.path.join(pasta, nome + ".html")
+    html = PAGINA % {"largura": largura, "altura": altura, "altura_cena": altura_cena,
+                     "topo": (altura - altura_cena) // 2, "com_texto": "flex" if com_texto else "none"}
+    if com_texto:
+        html = html.replace('src="galaxy-background.js"', 'src="galaxy-background-capa.js"')
     with open(pagina, "w", encoding="utf-8") as f:
-        f.write(PAGINA % {"largura": largura, "altura": altura, "altura_cena": altura_cena,
-                          "topo": (altura - altura_cena) // 2, "com_texto": "flex" if com_texto else "none"})
+        f.write(html)
     url = "file:///" + pagina.replace("\\", "/")
     navegador.abrir(url, largura=largura, altura=altura, espera=2.0)
     destino = os.path.join(DESTINO, nome + ".png")
@@ -85,6 +116,7 @@ def principal():
     try:
         for js in ("pixel-sprites.js", "galaxy-background.js"):
             shutil.copy2(os.path.join(RAIZ, "launcher", js), os.path.join(pasta, js))
+        preparar_fundo_da_capa(pasta)
         with tela_sem_janela.Navegador() as navegador:
             for nome, largura, altura, com_texto in (("arena-capa", 1280, 640, True),
                                                      ("arena-fundo-escuro", 1920, 1080, False)):

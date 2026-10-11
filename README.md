@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/{USUARIO}/ARENA/releases/latest"><b>⬇️ Baixar o ARENA pronto</b></a>
+  <a href="https://github.com/RafaParise/arena-console/releases/latest"><b>⬇️ Baixar o ARENA pronto</b></a>
   &nbsp;·&nbsp; <a href="LEIA-ME.md">Leia-me do aluno</a>
   &nbsp;·&nbsp; <a href="1-COMECAR.md">Primeiros passos</a>
   &nbsp;·&nbsp; <a href="#perguntas-frequentes">Perguntas frequentes</a>
@@ -54,15 +54,21 @@ Ele nasceu nas aulas do curso técnico de **Desenvolvimento de Sistemas**
 ## Baixar e usar
 
 1. Baixe o arquivo **`ARENA-{VERSAO}.zip`** na página
-   [**Releases**](https://github.com/{USUARIO}/ARENA/releases/latest).
-2. Descompacte numa pasta de caminho curto — no computador (`C:\ARENA`) ou
-   num pen drive formatado em **exFAT** (`D:\ARENA`).
-3. Dois cliques em **`ARENA.bat`**. Uma janela preta abre (não feche ela) e,
+   [**Releases**](https://github.com/RafaParise/arena-console/releases/latest).
+2. **Antes de descompactar, desbloqueie o arquivo:** botão direito no `.zip`
+   → **Propriedades** → marque **Desbloquear** (embaixo, em "Segurança") →
+   **OK**. O Windows marca tudo o que vem da internet; sem esse passo, cada
+   programa de dentro do pacote pergunta se pode abrir. Não precisa de senha
+   de administrador.
+3. Descompacte numa pasta de caminho curto — no computador (`C:\ARENA`) ou
+   num pen drive formatado em **exFAT** (`D:\ARENA`). Em pen drive FAT32,
+   jogo maior que 4 GB (PS2, Wii, PS3, Xbox 360) não cabe.
+4. Dois cliques em **`ARENA.bat`**. Uma janela preta abre (não feche ela) e,
    em seguida, a tela do ARENA.
-   - Se o Windows mostrar *"O Windows protegeu o seu computador"*: clique em
-     **Mais informações → Executar assim mesmo**. Isso acontece com todo
-     programa baixado da internet que não é vendido em loja.
-4. Coloque os seus jogos em `jogos\pessoais\<console>` e clique em
+   - Se ainda assim o Windows mostrar *"O Windows protegeu o seu computador"*:
+     clique em **Mais informações → Executar assim mesmo**. Isso acontece com
+     todo programa baixado da internet que não é vendido em loja.
+5. Coloque os seus jogos em `jogos\pessoais\<console>` e clique em
    **Atualizar lista**. A barra da esquerda tem o botão **Como colocar
    jogos**, que diz a pasta, os formatos e o que falta para cada console.
 
@@ -70,7 +76,7 @@ Passo a passo completo, com a tabela dos problemas mais comuns: [`1-COMECAR.md`]
 
 ### O que vem no pacote
 
-O ARENA, o Python embutido, o **RetroArch** com os 49 núcleos que o ARENA usa,
+O ARENA, o Python embutido, o **RetroArch** com os 48 núcleos que o ARENA usa,
 o **PCSX2** (PlayStation 2), o **Dolphin** (GameCube e Wii), o **RPCS3**
 (PlayStation 3) e o **Xenia** (Xbox 360) — já configurados para rodar de
 dentro da pasta, sem gravar nada fora dela.
@@ -163,12 +169,19 @@ ARENA\
 2. `servidor\consoles.json` — acrescente uma extensão de arquivo e veja a lista mudar.
 3. `servidor\indexador.py`, função `limpar_titulo` — mude como o nome do jogo aparece.
 
-**Testes:** `RODAR_TESTES.bat` roda a bateria (mais de 230 testes, uns 8
+**Testes:** `RODAR_TESTES.bat` roda a bateria (mais de 300 testes, uns 25
 segundos). Os scripts de `testes\` abrem os emuladores de verdade (o
 RetroArch, o PCSX2, o Edge sem janela) e a rodada completa
 (`ferramentas\rodada_final.py`) leva cerca de 1h30. As decisões do projeto, com
 o porquê de cada uma, estão no [`CLAUDE.md`](CLAUDE.md); os relatórios das
 auditorias, em [`docs\`](docs/).
+
+**Trabalhar em mais de um computador (e na nuvem):** este repositório é a
+cópia central. No começo, puxe; no fim, envie — o `SINCRONIZAR.bat` faz os
+dois e confere, antes de enviar, que nada de BIOS, jogo, save ou dado de
+aluno vai junto (o repositório é público). Passo a passo e regras para os
+assistentes de programação: [`docs/SINCRONIZAR-COM-O-GITHUB.md`](docs/SINCRONIZAR-COM-O-GITHUB.md)
+e [`AGENTS.md`](AGENTS.md).
 
 **Restrições que valem para toda mudança:** sem `pip install`, sem
 administrador, caminhos relativos (roda de pen drive), funciona sem
@@ -186,6 +199,12 @@ servidor\python\python.exe ferramentas\imagem_do_github.py
 Ela grava `docs\imagens\arena-capa.png` (1280 × 640, o topo desta página e a
 imagem de compartilhamento do repositório) e `docs\imagens\arena-fundo-escuro.png`
 (1920 × 1080, o céu sem texto, para papel de parede ou apresentação).
+
+Para a capa aparecer também quando alguém compartilha o link do repositório
+(WhatsApp, Classroom, redes sociais), o dono do repositório envia a imagem
+uma vez pelo site — o GitHub não deixa fazer isso por programa: **Settings →
+General → Social preview → Edit → Upload an image** →
+`docs\imagens\arena-capa.png`.
 
 ## Perguntas frequentes
 
