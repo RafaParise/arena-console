@@ -129,6 +129,27 @@ VALORES_OBRIGATORIOS = {
 }
 
 
+def _ja_dentro_do_arena(caminho, raiz_baixo):
+    """O caminho aponta para dentro desta pasta do ARENA, para algo que existe?
+
+    "Comeca com a pasta do ARENA" nao basta. Achado de 11/10/2026: a versao
+    dos alunos subiu de ...\\ARENA\\ARENA-alunos para ...\\ARENA, e o caminho
+    velho "...\\ARENA\\ARENA-alunos\\dados\\..." comeca com o novo -- mas a
+    pasta ARENA-alunos nao existe mais (o historico e os favoritos do
+    RetroArch ficaram apontando para o nada). E "...\\ARENA-velho\\dados"
+    tambem "comeca com" "...\\ARENA". Vale se o primeiro pedaco depois da
+    raiz e' uma pasta do ARENA ou existe de verdade.
+    """
+    if not caminho.lower().startswith(raiz_baixo):
+        return False
+    resto = caminho[len(raiz_baixo):]
+    if resto and resto[0] not in "\\/":
+        return False   # "...\ARENA-velho" nao e' "...\ARENA"
+    primeiro = resto.lstrip("\\/").replace("/", "\\").split("\\", 1)[0]
+    return (not primeiro or primeiro.lower() in PASTAS_CONHECIDAS_ARENA
+            or os.path.exists(os.path.join(RAIZ, primeiro)))
+
+
 def corrigir_caminhos_retroarch_cfg():
     """Reescreve, dentro do retroarch.cfg, todo caminho que nao aponta mais
     para a pasta atual do ARENA, e desliga o que nunca pode ficar ligado
@@ -178,21 +199,27 @@ def corrigir_caminhos_retroarch_cfg():
         prefixo, caminho_velho = m.group(1), m.group(2)
         chave = prefixo.split("=", 1)[0].strip()
 
-        if caminho_velho.lower().startswith(raiz_baixo):
+        if _ja_dentro_do_arena(caminho_velho, raiz_baixo):
             continue  # ja aponta pra pasta certa
 
+        # A ULTIMA pasta do ARENA no caminho velho e' a ancora. Antes, a ordem
+        # da lista decidia, e um ARENA guardado dentro de uma pasta chamada
+        # "dados" (D:\dados\ARENA\retroarch\saves) virava
+        # "<ARENA>\dados\ARENA\retroarch\saves". Nos retroarch.cfg de verdade
+        # nenhum caminho tem duas pastas do ARENA dentro (conferido em
+        # 11/10/2026); a pasta de cima com esse nome, sim, acontece.
         velho_baixo = caminho_velho.lower()
+        ancoras = []
         for pasta in PASTAS_CONHECIDAS_ARENA:
-            meio = "\\" + pasta + "\\"
-            indice = velho_baixo.find(meio)
-            if indice == -1 and velho_baixo.endswith("\\" + pasta):
+            indice = velho_baixo.rfind("\\" + pasta + "\\")
+            if velho_baixo.endswith("\\" + pasta):
                 indice = len(velho_baixo) - len(pasta) - 1
-            if indice == -1:
-                continue
-            resto = caminho_velho[indice + 1:]  # sem a barra inicial
+            if indice != -1:
+                ancoras.append(indice)
+        if ancoras:
+            resto = caminho_velho[max(ancoras) + 1:]  # sem a barra inicial
             linhas[i] = '%s"%s"\n' % (prefixo, os.path.join(RAIZ, resto))
             trocados += 1
-            break
         else:
             # Nenhuma pasta do ARENA dentro do caminho velho: se a chave
             # tem lugar certo conhecido, volta para ele.

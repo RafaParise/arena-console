@@ -707,7 +707,7 @@ segundo de verdade; o contador da janela anda de 30 em 30 quadros, por isso
 
 | Console | Como | Resultado |
 |---|---|---|
-| PS2 (PCSX2) | **Novo** `testes\teste_ps2_todos_os_jogos.py`: cada jogo de PS2 da pasta no Automático, e os três níveis de qualidade em 3 jogos, numa cópia isolada do PCSX2 | (completar com a rodada) |
+| PS2 (PCSX2) | **Novo** `testes\teste_ps2_todos_os_jogos.py`: cada jogo de PS2 da pasta no Automático, e os três níveis de qualidade em 3 jogos, numa cópia isolada do PCSX2 | **37 de 37 jogos começaram** no Automático (o registro do PCSX2 diz que o jogo está rodando e qual é), de 19 a 23 s do clique até o jogo, sem nenhum aviso de erro; "Mais leve" e "Mais bonito" em Half-Life, Darkwatch e Champions of Norrath: **6 de 6** (`docs\auditoria3\ps2_todos_os_jogos.json`, rodada de 10/10/2026). Quadros por segundo do PS2 não entram aqui: no Ryzen não dizem nada sobre o Celeron (roteiro de sala) |
 | GameCube, Wii, PS3, Xbox 360 | **Novo** `testes\teste_emuladores_de_fora.py`: um jogo de cada, com a linha de comando do ARENA, até 90 s; a configuração de cada emulador é guardada antes e devolvida depois | **4 de 4 abriram o jogo**. Wii (NSMB Wii): 4,0 s, 595 MB; PS3 (Rayman Legends): 2,1 s até a janela do jogo, **4,7 GB de memória** (no Celeron, com 3,8 GB livres, o PS3 não cabe — já registrado em `docs\MAQUINA-ALVO.md`); Xbox 360 (Gears of War Judgment): 2,0 s, 899 MB |
 
 ### O que vai para a sala
@@ -717,3 +717,56 @@ memory card do PS1 depois de uma partida a dois (o convidado ganha um cartão
 em branco: limite já registrado), o God of War do PSP no Celeron com e sem o
 pulo de quadros, o F8 e logo F2 no Dreamcast, e o FPS de verdade no
 notebook da escola.
+
+---
+
+## Fase 6 — Portabilidade e robustez (10–11/10/2026)
+
+A melhor prova de portabilidade desta auditoria não foi um teste: na noite de
+10/10/2026 as duas pastas **mudaram de lugar no disco** (o repositório saiu de
+`...\ARENA\ARENA-unificado` para `...\ARENA-unificado`, e a versão dos alunos
+subiu de `...\ARENA\ARENA-alunos` para `...\ARENA`). A versão dos alunos foi
+aberta do lugar novo às 23h46 e funcionou; a bateria e a rodada abaixo
+rodaram, também do lugar novo, sem mudar nada. **Mas a mudança mostrou um
+defeito** (F1, abaixo): 7 linhas do `retroarch.cfg` dos alunos continuaram
+apontando para a pasta `ARENA-alunos`, que não existe mais.
+
+### Achados e consertos
+
+| # | Defeito | Prova | Conserto |
+|---|---|---|---|
+| F1 | **Pasta que sobe um nível: o caminho velho passava por certo.** A correção automática do `retroarch.cfg` (a cada abertura) pulava todo caminho que "começa com a pasta do ARENA". O caminho velho `...\ARENA\ARENA-alunos\dados\...` começa com o novo `...\ARENA` — e a pasta `ARENA-alunos` não existe mais. O mesmo valia para uma pasta irmã (`...\ARENA-velho\dados` "começa com" `...\ARENA`) | No `retroarch.cfg` da versão dos alunos, depois da mudança: o histórico, os favoritos, as playlists e o registro (7 linhas) em `...\ARENA\ARENA-alunos\dados` | `graficos._ja_dentro_do_arena`: vale só se o primeiro pedaço depois da raiz é uma pasta do ARENA ou existe de verdade (e com a barra logo depois da raiz). A pasta dos alunos se conserta sozinha na primeira abertura depois do `--atualizar` |
+| F2 | **Âncora pela ordem da lista**: com o ARENA dentro de uma pasta chamada `dados` (`D:\dados\ARENA\retroarch\saves`), a correção levava para `<ARENA>\dados\ARENA\retroarch\saves` | Teste novo (a pasta de cima com nome de pasta do ARENA acontece; caminho com duas pastas do ARENA dentro não existe em nenhum `retroarch.cfg` daqui, conferido) | A **última** pasta do ARENA no caminho é a âncora |
+
+Testes novos: `TestCaminhosDoRetroarchCfgDepoisDeMudarDeLugar` (4: a pasta
+que subiu, a irmã, a pasta de cima chamada `dados`/`jogos`, e o que já está
+certo — inclusive a forma `:\system` do RetroArch e uma pasta que existe —
+não muda). Os antigos da correção continuam passando
+(`teste_caminho_fora_no_cfg`, `teste_cfg_sem_linha_repetida` 9 de 9). O
+`retroarch.cfg` da pasta de desenvolvimento (8 linhas no lugar antigo) foi
+corrigido pela própria função antes da rodada final, para nenhum RetroArch
+de teste gravar em `...\ARENA\ARENA-unificado` — que agora cairia dentro da
+pasta dos alunos.
+
+### O que foi conferido, e o resultado
+
+| O plano pede | Como | Resultado |
+|---|---|---|
+| Pen drive com outra letra, caminho com espaço, acento e muito longo | `teste_aceite_pasta_movida` (copia o ARENA para outra pasta e abre de lá), `teste_caminho_comprido`, `teste_caminho_fora_no_cfg`, `teste_varios_discos` | 4 de 4. O próprio projeto tem espaço e acento no caminho ("Criador De Apps Pedagógicos") |
+| Pasta só de leitura e disco cheio | `teste_pasta_somente_leitura`, `teste_disco_cheio`, `teste_disco_amostras` | 3 de 3: abre e explica, sem quebrar |
+| FAT32, exFAT e NTFS; avisar antes de copiar uma ISO grande | `teste_fat32_arquivo_grande`, `test_fase6_auditoria3` (FAT32) e a tela "Como colocar jogos" | No FAT32, os consoles de jogo grande (PS2, PS3, Wii, Xbox 360) ganham uma linha "Atenção" **antes** de copiar (conserto da revisão da Fase 4, `80ef090`); o jogo cortado exatamente no limite (4 GB − 1 byte) tem aviso próprio no cartão |
+| Queda no meio da gravação de save, configuração e banco | `teste_queda_no_meio_da_gravacao` | Nada corrompido (gravação atômica: temporário + troca) |
+| Configuração, JSON e banco corrompidos de propósito | `teste_arquivos_corrompidos`, `teste_dados_tortos`, `teste_comecar_do_zero` | O ARENA abre e explica; o banco quebrado é guardado do lado, nunca apagado |
+| Notebook sem driver de vídeo ("Adaptador de Vídeo Básico da Microsoft") | Leitura do código + **4 testes novos** (`TestNotebookSemDriverDeVideo`) + `teste_vulkan_de_verdade` | O motor automático escolhe **Direct3D 11**, que o Windows desenha pelo processador quando falta o driver (WARP). Vulkan só quando o Vulkan enxerga uma placa (pergunta feita num processo à parte); o `glcore` (precisa de OpenGL 3.2; sem driver o Windows só tem o 1.1) só quando nem o Direct3D 11 existe. O diagnóstico de barreiras (Ajustes → Máquina, VERIFICAR, COLETAR) avisa "Sem driver de vídeo de verdade", com o que o TI deve fazer |
+| Windows 10 e 11; Windows de 32 bits | `teste_windows_32_bits`; o `ARENA.bat` confere antes de abrir o Python (auditoria 1) | Detecta e explica |
+| Antivírus e SmartScreen bloqueando os `.bat` de um zip baixado | Guia 1 (SmartScreen e exclusão no antivírus, desde a auditoria 1) | Faltava o passo que evita o aviso: **desbloquear o `.zip` antes de extrair** (Propriedades → Desbloquear; sem administrador). Entra no guia 1 e no LEIA-ME junto com o download pelo GitHub (Fase 8) |
+| Código que exige administrador | Varredura em 204 arquivos (`servidor`, `ferramentas`, `testes`, `.bat`): gravar no registro, `netsh`, regras de firewall, `runas`, `reg add`, `schtasks`, serviços, `bcdedit`, `powercfg /set`, exclusões do Defender | **Nenhum achado.** O registro do Windows só é lido (`OpenKey`, `QueryValueEx`) |
+| Servidor que cai | `teste_servidor_que_cai` | Reabre sozinho (até 3 vezes) e a tela volta |
+
+### Resultado da Fase 6
+
+| | |
+|---|---|
+| Rodada da área (14 scripts, `rodada_final.py`) | **14 de 14** em 10/10/2026 (da pasta antiga) e **14 de 14** em 11/10/2026 (da pasta nova) |
+| Bateria | **310** (novos nesta fase: os 4 do driver de vídeo e os 4 da pasta que muda de lugar) |
+| O que vai para a sala | Um notebook sem driver de vídeo de verdade (se houver na escola): abrir um jogo de SNES e um de PS1 e anotar se abre e a velocidade. O Direct3D 11 por processador é lento: serve para jogo 2D, não para 3D |

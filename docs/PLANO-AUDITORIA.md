@@ -475,6 +475,6 @@ Comece só pela Fase 0.
 - [x] Fase 3 — Servidor e API (08/10/2026) — a tela não congela mais na releitura (3,3 s → 0,02 s); internet ruim com frase certa (teste novo, 13/13); 66+ mensagens com "o que fazer"; bateria 252
 - [x] Fase 4 — Jogar Junto (08–09/10/2026) — a porta da partida ia com o nome errado (os testes de rede ruim e de duas partidas nunca mediram o que diziam: refeitos); 8 chaves mortas do RetroArch; sexto jogador e rede Pública com explicação; bateria 261
 - [ ] Fase 5 — Matriz de jogos
-- [ ] Fase 6 — Portabilidade e robustez
+- [x] Fase 6 — Portabilidade e robustez (10–11/10/2026) — rodada da área 14 de 14 (da pasta antiga e da nova, depois que as pastas mudaram de lugar no disco); a mudança mostrou que a correção de caminhos deixava passar a pasta que sobe um nível (F1) e escolhia a âncora pela ordem da lista (F2); notebook sem driver de vídeo cai no Direct3D 11 (4 testes novos); nenhum comando que peça administrador; bateria 310
 - [ ] Fase 7 — Clareza para todos
 - [ ] Fase 8 — Relatório final e entrega
