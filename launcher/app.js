@@ -3717,6 +3717,46 @@ function abrirGaveta(id) {
   }
 }
 
+// Teclado: a janela (.modal) ou gaveta (.gaveta) que aparece leva o foco
+// para dentro dela; a que some devolve o foco para quem a abriu. Antes
+// (auditoria 3, Fase 7), o foco ficava atras da janela: as janelas estao no
+// fim da pagina, e quem usa so o teclado passava com Tab pela tela inteira
+// ate chegar nos botoes dela. Um observador so, para todas as janelas -- as
+// que abrem por clique, por Esc, pelo assistente ou pelo proprio codigo.
+const FOCAVEIS = 'button:not([disabled]), [href], input:not([disabled]):not([type="hidden"]), ' +
+  'select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+function ligarFocoDasJanelas() {
+  const voltarPara = new Map();
+  const visivel = (el) => el.offsetParent !== null || el.getClientRects().length > 0;
+  new MutationObserver((mudancas) => {
+    for (const { target: painel } of mudancas) {
+      if (!painel.matches(".modal, .gaveta")) continue;   // botoes e avisos nao
+      if (!painel.hidden && !voltarPara.has(painel)) {
+        const quemAbriu = document.activeElement;
+        voltarPara.set(painel, quemAbriu && quemAbriu !== document.body ? quemAbriu : null);
+        // Depois de a janela se desenhar (setTimeout, e nao
+        // requestAnimationFrame, que nao roda com a pagina escondida); se o
+        // codigo dela ja pos o foco num campo (o apelido, os pontos...), fica
+        // onde ele pos.
+        setTimeout(() => {
+          if (painel.hidden || painel.contains(document.activeElement)) return;
+          const primeiro = [...painel.querySelectorAll(FOCAVEIS)].find(visivel);
+          if (primeiro) primeiro.focus();
+        }, 30);
+      } else if (painel.hidden && voltarPara.has(painel)) {
+        const quemAbriu = voltarPara.get(painel);
+        voltarPara.delete(painel);
+        const focoFicouDentro = painel.contains(document.activeElement) ||
+          document.activeElement === document.body;
+        if (quemAbriu && focoFicouDentro && document.contains(quemAbriu) && visivel(quemAbriu)) {
+          quemAbriu.focus();
+        }
+      }
+    }
+  }).observe(document.body, { subtree: true, attributes: true, attributeFilter: ["hidden"] });
+}
+
 function ligarEventos() {
   // Um ouvinte para o trilho inteiro, em vez de um por botao.
   $(".trilho").addEventListener("click", (evento) => {
@@ -4404,6 +4444,7 @@ function ligarEventos() {
 
 async function iniciar() {
   ligarEventos();
+  ligarFocoDasJanelas();
   try {
     await carregarEstado();
     await carregarCatalogo();

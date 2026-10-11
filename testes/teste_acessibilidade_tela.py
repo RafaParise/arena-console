@@ -166,6 +166,21 @@ def main():
                 telas["janelaJogarJunto"] = nav.avaliar(CONFERIR)
                 nav.avaliar("document.querySelector('#modalPartida').hidden = true; 1")
                 resultados[tema] = telas
+            # 9. O foco entra na janela que abre e volta para quem abriu.
+            foco = {}
+            for nome, abrir in (("gaveta de Ajustes", "document.querySelector('#btnAjustes').click()"),
+                                ("janela do Jogar Junto", "document.querySelector('#modalPartida').hidden = false")):
+                nav.avaliar("abrirGaveta(''); document.querySelector('#modalPartida').hidden = true; "
+                            "document.querySelector('#btnAjustes').focus(); 1")
+                time.sleep(0.3)
+                nav.avaliar(abrir + "; 1")
+                time.sleep(0.5)
+                foco[nome + ": entra"] = nav.avaliar(
+                    "(() => { const a = document.activeElement; return !!(a && a.closest('.modal:not([hidden]), "
+                    ".gaveta:not([hidden])')); })()")
+                nav.avaliar("document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape'})); 1")
+                time.sleep(0.5)
+                foco[nome + ": volta"] = nav.avaliar("document.activeElement && document.activeElement.id === 'btnAjustes'")
         destino = os.path.join(os.path.dirname(AQUI), "docs", "auditoria3", "acessibilidade.json")
         with open(destino, "w", encoding="utf-8") as f:
             json.dump(resultados, f, ensure_ascii=False, indent=1)
@@ -195,6 +210,8 @@ def main():
         confere("menor letra visivel de pelo menos %.0f px" % LETRA_MINIMA_PX, menor[0] >= LETRA_MINIMA_PX, menor)
         confere("nenhum elemento escondido (hidden) aparece na tela", not juntar("escondidoAparece"),
                 juntar("escondidoAparece")[:10])
+        sem_foco = [k for k, v in foco.items() if v is not True]
+        confere("o foco entra na janela que abre e volta para quem abriu (Esc)", not sem_foco, sem_foco)
     finally:
         if processo:
             servidor_de_teste.derrubar(processo)

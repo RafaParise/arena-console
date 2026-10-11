@@ -710,6 +710,24 @@ segundo de verdade; o contador da janela anda de 30 em 30 quadros, por isso
 | PS2 (PCSX2) | **Novo** `testes\teste_ps2_todos_os_jogos.py`: cada jogo de PS2 da pasta no Automático, e os três níveis de qualidade em 3 jogos, numa cópia isolada do PCSX2 | **37 de 37 jogos começaram** no Automático (o registro do PCSX2 diz que o jogo está rodando e qual é), de 19 a 23 s do clique até o jogo, sem nenhum aviso de erro; "Mais leve" e "Mais bonito" em Half-Life, Darkwatch e Champions of Norrath: **6 de 6** (`docs\auditoria3\ps2_todos_os_jogos.json`, rodada de 10/10/2026). Quadros por segundo do PS2 não entram aqui: no Ryzen não dizem nada sobre o Celeron (roteiro de sala) |
 | GameCube, Wii, PS3, Xbox 360 | **Novo** `testes\teste_emuladores_de_fora.py`: um jogo de cada, com a linha de comando do ARENA, até 90 s; a configuração de cada emulador é guardada antes e devolvida depois | **4 de 4 abriram o jogo**. Wii (NSMB Wii): 4,0 s, 595 MB; PS3 (Rayman Legends): 2,1 s até a janela do jogo, **4,7 GB de memória** (no Celeron, com 3,8 GB livres, o PS3 não cabe — já registrado em `docs\MAQUINA-ALVO.md`); Xbox 360 (Gears of War Judgment): 2,0 s, 899 MB |
 
+### Revisão independente da Fase 5 (11/10/2026)
+
+A revisão automática (5 revisores, cada achado com 2 céticos) morreu **4
+vezes** no limite de uso da conta — 4 milhões de tokens sem devolver nada.
+Foi refeita à mão, mais enxuta, nos quatro pontos em que um erro custaria
+mais caro:
+
+| Ponto | O que foi conferido | Resultado |
+|---|---|---|
+| Cheats (`servidor\cheats.py`, reescrito) | A migração do lugar antigo só leva quando o arquivo novo **não existe** e deixa o antigo como estava (não apaga, não passa por cima); o caminho é o que o RetroArch procura (`cheats\<corename do .info>\<nome cortado no último ponto>.cht`, como o `fill_pathname` dele); o código passa por lista de caracteres e formato por bloco (quebra de linha vira `+`, aspas não passam); a descrição é limpa; o que o RetroArch escreveu no arquivo volta igual; gravação atômica | Certo |
+| Perfis sem "voltar no tempo" e "resposta instantânea" | Os 3 níveis desligam os dois (`arena.py`, PERFIS_GRAFICOS); a trava de nota continua; os guias 3 e 6 dizem o mesmo, com os números medidos | Certo |
+| Testes dos emuladores de fora | A configuração dos 4 emuladores é guardada antes e devolvida no `finally` (mesmo se o teste cair); só a árvore de processos que o teste abriu é fechada; o teste do PS2 roda numa cópia do PCSX2 | Certo |
+| Tela depois da regra global do `hidden` | Nenhum elemento que nasce escondido é mostrado por `style.display` (o conflito que a regra criaria); os campos de arquivo escondidos são abertos pelo `<label>` | Certo. Observação: o botão "Gerenciar catálogo" (acervo) nasce escondido e nenhum código o mostra **desde a base** (20/09) — não é regressão; fica anotado |
+
+Nenhum defeito confirmado. Limite anotado (do RetroArch, não do ARENA): no
+Jogar Junto de PS1 o núcleo é outro (PCSX ReARMed), e os cheats de um núcleo
+ficam na pasta dele.
+
 ### O que vai para a sala
 
 O controle com botão apertado, o save feito pelo menu do próprio jogo, o
@@ -770,3 +788,85 @@ pasta dos alunos.
 | Rodada da área (14 scripts, `rodada_final.py`) | **14 de 14** em 10/10/2026 (da pasta antiga) e **14 de 14** em 11/10/2026 (da pasta nova) |
 | Bateria | **310** (novos nesta fase: os 4 do driver de vídeo e os 4 da pasta que muda de lugar) |
 | O que vai para a sala | Um notebook sem driver de vídeo de verdade (se houver na escola): abrir um jogo de SNES e um de PS1 e anotar se abre e a velocidade. O Direct3D 11 por processador é lento: serve para jogo 2D, não para 3D |
+
+---
+
+## Fase 7 — Clareza para todos (09–11/10/2026)
+
+**Registro (a parada "proponha e espere minha aprovação" virou registro,
+como manda a leitura adotada):** as mudanças abaixo foram aplicadas, com a
+escolha recomendada e o porquê.
+
+### Linguagem simples
+
+Uma leitura só de texto (09/10) achou nos guias e na tela os **48 trechos**
+mais difíceis — 7 no LEIA-ME, 7 no guia 2, 7 no guia 5, 12 na tela, o resto
+nos guias 1, 3, 4 e 6 — e sugeriu a reescrita de cada um (frases curtas, uma
+ideia por frase, palavra técnica explicada, exemplo do dia a dia). Aplicados
+em 10/10 (entraram no commit `b2fdf44`): **46**, mais 4 trocos pedidos junto.
+Ajustes na aplicação:
+
+- nº 31 (o Firewall na primeira vez): ficou a explicação do "porteiro do
+  Windows" e "Permitir acesso", sem o "marque Redes privadas" (aluno não tem
+  como marcar);
+- nº 40 (por que de casa para casa não funciona): o CGNAT ganhou a analogia
+  do prédio em que todo mundo tem o mesmo número e não existe número de
+  apartamento;
+- nº 27 (o ranking vazio mandava "clicar em Registrar pontos"): o defeito era
+  de **código** — o botão não existia, e a janela de pontos nunca abria.
+  Voltou o botão **Registrar pontos** no painel do jogo (só nos consoles que
+  pedem placar); o texto ficou;
+- nº 43 (a tabela de problemas do guia 5): entraram as linhas "Aguardando" e
+  "lento" com o que fazer; a linha da chave "casas diferentes" já tinha sido
+  resolvida na revisão da Fase 4.
+
+Mensagem de erro com duas partes (o que aconteceu e o que fazer): feito na
+Fase 3 (mais de 66 mensagens).
+
+### Acessibilidade da tela
+
+Teste novo `testes\teste_acessibilidade_tela.py` (a tela de verdade, nos
+dois temas, com cada gaveta e a janela do Jogar Junto abertas): **9 de 9**
+(era 4 de 7 quando foi criado).
+
+| # | Achado | Conserto |
+|---|---|---|
+| A1 | **O atributo `hidden` não escondia**: classe com `display: flex/grid` passava por cima. Apareciam, mesmo escondidos, "Nenhum jogo na lista ainda" embaixo dos jogos, "Mover para a pasta certa" em todo jogo, "Jogador 2 usa controle", os campos do Jogar Junto e a chave "Estamos em casas diferentes" (o conserto J8 da Fase 4 nunca tinha valido na tela) | Regra global `[hidden] { display: none !important }` (`b2e45f8`) |
+| A2 | Contraste abaixo do AA no tema claro: o laranja e o azul eram bons de fundo e ruins de letra (2,0:1 no branco; 1,0:1 na etiqueta amarela "pesa pouco") | Cores de texto próprias (`--destaque-texto`, `--espera-texto`); 0 casos abaixo nos dois temas |
+| A3 | Letra de 9,6 a 10,9 px nas etiquetas de custo, desempenho, tipo de controle e selo | Mínimo de 11 px |
+| A4 | Seletor "Como ajustar" (emuladores de fora) sem nome | `aria-label` |
+| A5 | **O foco não entrava na janela que abre**: as janelas ficam no fim da página, e quem usa só o teclado passava com Tab pela tela inteira até chegar nos botões dela; ao fechar, o foco não voltava | `app.js`, `ligarFocoDasJanelas`: um observador para todas as janelas e gavetas leva o foco ao primeiro botão ou campo da que aparece e o devolve a quem a abriu quando ela some (Esc, clique ou código). Prova negativa: sem o conserto, a 9ª conferência reprova |
+
+Conferido, sem mudança: o Esc fecha toda janela e gaveta; o cartão do jogo
+abre com Enter ou Espaço (auditoria 1); botão só com ícone tem nome escrito;
+nenhum `tabindex` positivo. **Menos animação quando o Windows pede:** no
+"Fundo animado: Automático", o fundo fica parado se o Windows pede menos
+movimento (e no modo modesto); o CSS desliga as animações e as transições;
+a tela explica e oferece "Sempre animado" a quem quiser.
+
+### O passo a passo das cinco pessoas (a tela de hoje)
+
+Contagem feita lendo a tela de verdade (`launcher\index.html` e `app.js`,
+cada rótulo conferido em 11/10), não observando pessoas. Ação = clique,
+tecla ou texto digitado. Decisão = momento em que a pessoa precisa escolher.
+
+| Tarefa | Ações | Decisões | Onde cada pessoa pode travar | O que ajuda |
+|---|---|---|---|---|
+| **Abrir o ARENA e jogar** (1ª vez) | 5: dois cliques no `ARENA.bat` (a tela abre sozinha em ~1,6 s), digitar o apelido ("Como podemos chamar você?"), **Começar**, clicar no jogo, **Jogar agora**. Baixado do GitHub: antes, desbloquear o `.zip` (Propriedades → Desbloquear) | 2 (apelido, jogo) | **Dona Maria:** a janela preta que "não pode fechar" parece erro. **Ana:** digitar o apelido. **Todos:** o aviso do Windows, se o `.zip` não foi desbloqueado | O campo sugere "ex.: PixelMaster"; o LEIA-ME diz "não feche a janela preta"; o README e o guia 1 explicam o Desbloquear |
+| **Salvar e continuar depois** | 5: F2 (salva), F10 (fecha); depois: o jogo, **Jogar agora**, F4 (volta) | 0–1 | **Pedro, Lucas, Dona Maria:** lembrar F2 e F4 | A faixa com as teclas aparece na janela do ARENA enquanto o jogo está aberto; muitos jogos salvam sozinhos no cartão de memória do próprio jogo |
+| **Jogar com um amigo em outro notebook** (1ª vez, mesma sala) | Quem abre: **Amigos** (no alto) → ligar **Aceitar conexões da rede** (vale na hora) → fechar; o jogo → **Jogar multiplayer** → **Eu abro a partida** → **Começar** (≈6) + a caixa do Firewall na 1ª vez. Quem entra: o jogo → **Jogar multiplayer** → **Entrar na partida do amigo** → a partida (aparece sozinha) → [o número do jogador, se 3+] → **Começar** (≈5) | 2–3 | **Todos:** a caixa do Firewall (em rede "Pública" pede senha de administrador — a janela explica e diz para outro computador abrir a partida). **Professor com 5 minutos:** 30 alunos ligando a chave | A partida aparece sozinha na lista; quem não consegue entrar vê o porquê ao voltar (Fase 4) |
+| **"Meu amigo não aparece na lista"** | 0–1: a própria janela diz o que conferir ("Não apareceu? Quem abre a partida precisa ligar 'Aceitar conexões da rede' [...] rode o PARTIDA.bat nos dois computadores") | 1–2 | **Lucas, Dona Maria:** o `PARTIDA.bat` é texto numa janela preta — é ferramenta do professor | A dica na própria janela (Fase 4) |
+| **Levar o progresso no pen drive** | 4: **Ajustes** → aba **Máquina** → **Montar meu pacote** → copiar o `backup\meu-progresso-<data>.zip` para o pen drive; no outro ARENA: pôr o `.zip` na pasta `backup` dele e clicar em **Trazer de volta**, na lista | 1 (onde copiar) | **Dona Maria:** achar o arquivo no Explorador de Arquivos — a tela diz o caminho num recado que some | Os recordes viajam sozinhos pela "mala": **Trocar pelo pen drive** (aba Amigos), 1 clique em cada computador |
+
+**Recomendação (não feita nesta rodada):** um botão "Abrir a pasta dos
+pacotes" ao lado de **Montar meu pacote** (a rota que abre a pasta de jogos
+já existe e serve de modelo) — tira o passo mais difícil da Dona Maria.
+
+### Resultado da Fase 7
+
+| | |
+|---|---|
+| Acessibilidade (`teste_acessibilidade_tela.py`) | **9 de 9** nos dois temas, com as gavetas e a janela do Jogar Junto |
+| Trechos reescritos | 46 de 48 sugeridos, mais 4 trocos; 1 virou conserto de código (Registrar pontos) |
+| Bateria | 310 |
+| O que vai para a sala | Uma pessoa de cada perfil fazendo as 5 tarefas, contando os passos de verdade e onde travou; um aluno navegando só pelo teclado |
