@@ -1,43 +1,46 @@
-# ARENA - Console de Jogos Retrô Portátil
+# ARENA - Console de Jogos Portátil
 
-Console de emulação multi-console portátil e sem instalação.
+## ✅ DOWNLOAD E USO (1, 2, 3!)
 
-## 🚀 Como Usar
+1. **BAIXE** o ZIP de: https://github.com/RafaParise/arena-console/archive/refs/heads/main.zip
+2. **EXTRAIA** em qualquer pasta
+3. **CLIQUE** duas vezes em `ARENA.bat` - Tudo configura automaticamente!
 
-1. **Baixe** o projeto ou clone o repositório
-2. **Entre** na pasta `ARENA-unificado`
-3. **Clique** duas vezes em `ARENA.bat`
-4. **Pronto!**
+## 🎮 FUNCIONALIDADES
 
-## 📁 Estrutura
+- ✅ Configura pastas automaticamente
+- ✅ Pronto para usar imediatamente
+- ✅ Zero instalação
+- ✅ Portátil (funciona de pen drive)
+- ✅ Multiplayer LAN
+
+## 📁 ESTRUTURA CRIADA AUTOMATICAMENTE
 
 ```
 ARENA-unificado/
-├── ARENA.bat              # Launcher principal
-├── LEIA-ME.md             # Manual do usuário
-├── README.md              # Este arquivo
-├── sync_github.py         # Sincronização automática
-├── servidor/              # Servidor web local
-├── jogos/                 # Seus jogos (adicione aqui)
-├── BIOS/                  # BIOS dos consoles
-└── docs/                  # Documentação
+├── ARENA.bat        ← CLIQUE AQUI PARA USAR
+├── LEIA-ME.md       ← Manual do usuário
+├── setup.bat        ← Setup alternativo
+├── SERVIDOR/        ← Pasta criada automaticamente
+├── jogos/           ← Pasta criada automaticamente
+│   └── usuarios/   ← Coloque seus jogos aqui
+├── BIOS/            ← Pasta criada automaticamente
+└── dados/           ← Pasta criada automaticamente
 ```
 
-## 🔗 Download
+## 📋 INSTRUÇÕES
 
-https://github.com/RafaParise/arena-console/archive/refs/heads/main.zip
+### Adicionar Jogos:
+Coloque arquivos em: `jogos/usuarios/SeuNome/`
 
-## 🎮 Suporta Consoles
+### Adicionar BIOS:
+Coloque em: `BIOS/[console]/[regiao]/bios.bin`
 
-- NES, SNES, N64, Game Boy, GBA, GBC
-- PlayStation 1, PlayStation 2
-- Sega Genesis, Saturn, Dreamcast
-- E mais de 40 consoles!
+### Sincronizar:
+```cmd
+python sync_github.py
+```
 
 ## 📧 Contato
 
 passospariserafael@gmail.com
-RafaParise (https://github.com/RafaParise)
-
----
-*Made with ❤️ for education*
