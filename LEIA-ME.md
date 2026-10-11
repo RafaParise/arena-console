@@ -5,6 +5,11 @@ Você copia a pasta, dá dois cliques e joga. Não instala nada.
 Tudo fica dentro da pasta: seus jogos, seus saves, seus recordes. Copiou a
 pasta para outro computador, levou tudo junto.
 
+Ainda não tem a pasta do ARENA? Baixe pronta no GitHub:
+<https://github.com/RafaParise/arena-console/releases/latest>. Antes de
+descompactar, botão direito no `.zip` → **Propriedades** → **Desbloquear**
+(documento 1, "O jeito fácil").
+
 ---
 
 ## Começando
@@ -185,7 +190,7 @@ sem áudio e sem sair do computador.
 | O que aconteceu | O que fazer |
 |---|---|
 | A janela preta some na hora | Falta o Python, ou o antivírus bloqueou. Documento 1 |
-| Tela azul "O Windows protegeu o seu computador" | Clique em *Mais informações* → *Executar assim mesmo*. Documento 1 |
+| Tela azul "O Windows protegeu o seu computador" | Clique em *Mais informações* → *Executar assim mesmo*. Para não aparecer mais: desbloqueie o `.zip` antes de descompactar (Propriedades → Desbloquear). Documento 1 |
 | Diz que o Windows é de 32 bits | Esse computador não roda o ARENA. Use outro |
 | Diz que a porta 8777 está em uso | O ARENA já está aberto. Procure a outra janela preta |
 | Diz que faltou o RetroArch | A pasta tem que se chamar `retroarch`. Documento 1 |

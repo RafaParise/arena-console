@@ -5,7 +5,8 @@ Preparar a mídia e montar o ARENA. Faça uma vez; depois é copiar e colar.
 **Neste documento:**
 
 - Parte A — Preparar o pen drive ou o SSD
-- Parte B — Instalação
+- Parte B — Instalação (o jeito fácil: baixar o ARENA pronto do GitHub; ou
+  montar peça por peça)
 
 ---
 
@@ -164,6 +165,30 @@ o disco na abertura e reescreve as configurações.
 ## Parte B — Instalação
 
 Faça uma vez. Depois é só copiar e colar a pasta.
+
+### O jeito fácil: baixar o ARENA pronto (GitHub)
+
+**Tempo:** 10 minutos, mais o download (uns 1,5 GB).
+
+1. Abra <https://github.com/RafaParise/arena-console/releases/latest>.
+2. Baixe o arquivo **`ARENA-` + a versão + `.zip`**, na parte *Assets*.
+3. **Antes de descompactar, desbloqueie:** botão direito no `.zip` →
+   **Propriedades** → embaixo, em *Segurança*, marque **Desbloquear** →
+   **OK**. Não precisa de senha de administrador. Sem esse passo, o Windows
+   marca cada programa de dentro do pacote como "vindo da internet" e
+   pergunta, um por um, se pode abrir.
+4. Descompacte em `C:\ARENA` (ou direto no pen drive em exFAT, Parte A).
+5. Dois cliques em **`ARENA.bat`**. Pronto: pule para o **Passo 5 — Testar**.
+
+O pacote já traz o Python, o RetroArch com os núcleos e os emuladores de
+fora (PCSX2, Dolphin, RPCS3, Xenia). **Não traz jogos nem BIOS:** são de
+quem tem o console. Ponha cada BIOS em `BIOS\<console>` e o ARENA instala
+sozinho (documento 2).
+
+Prefere montar peça por peça (sem internet rápida, ou para estudar como o
+ARENA é feito)? Siga os passos abaixo.
+
+### Montar peça por peça
 
 **Tempo:** 20 minutos.
 
@@ -415,6 +440,11 @@ segurança.
 2. Vai aparecer o botão **"Executar assim mesmo"** — clique nele.
 3. Isso só acontece uma vez por arquivo. Nas próximas aberturas, não
    aparece mais.
+
+**Para não aparecer em nenhum:** desbloqueie o `.zip` **antes** de
+descompactar (botão direito no `.zip` → **Propriedades** → **Desbloquear**
+→ **OK**). Já descompactou? Apague a pasta, desbloqueie o `.zip` e
+descompacte de novo. Não precisa de senha de administrador.
 
 #### Antivírus bloqueando (janela preta abre e fecha na hora)
 

@@ -115,7 +115,7 @@ ARQUIVO_OVERRIDE = os.path.join(PASTA_DADOS, "arena_override.cfg")
 # Serve para uma coisa so: acabar com a duvida de "sera que estou testando
 # a versao corrigida?". Quando algo nao bate com o esperado, o primeiro
 # passo e comparar este numero.
-VERSAO = "2026.10.03.2"   # pasta BIOS (uma por console, ativa em Emuladores) e o botao Arrumar
+VERSAO = "2026.10.11"   # auditoria 3: matriz de jogos, cheats que funcionam, portabilidade, acessibilidade
 
 PORTA = 8777
 
