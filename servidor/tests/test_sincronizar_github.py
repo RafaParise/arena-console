@@ -16,6 +16,8 @@ from contextlib import redirect_stdout
 AQUI = os.path.dirname(os.path.abspath(__file__))
 RAIZ = os.path.dirname(os.path.dirname(AQUI))
 sys.path.insert(0, os.path.join(RAIZ, "ferramentas"))
+sys.path.insert(0, os.path.join(RAIZ, "testes"))
+import limpeza  # noqa: E402  (apaga a pasta mesmo com arquivo somente leitura)
 import sincronizar_github as sinc  # noqa: E402
 
 
@@ -51,7 +53,10 @@ class TestSincronizarGithub(unittest.TestCase):
     def tearDown(self):
         sinc.RAIZ = RAIZ
         sinc.conferir_antes_de_publicar.DESTINO = self.destino_original
-        shutil.rmtree(self.base, ignore_errors=True)
+        # Os objetos do git sao somente leitura no Windows: o rmtree com
+        # ignore_errors desistia calado e deixava 11 pastas no Temp a cada
+        # bateria (172 em 12/10/2026).
+        limpeza.apagar_pasta(self.base)
 
     def clone(self, nome):
         pasta = os.path.join(self.base, nome)

@@ -16,6 +16,8 @@ from contextlib import redirect_stdout
 AQUI = os.path.dirname(os.path.abspath(__file__))
 RAIZ = os.path.dirname(os.path.dirname(AQUI))
 sys.path.insert(0, os.path.join(RAIZ, "ferramentas"))
+sys.path.insert(0, os.path.join(RAIZ, "testes"))
+import limpeza  # noqa: E402  (apaga a pasta mesmo com arquivo somente leitura)
 import conferir_antes_de_publicar as conferir  # noqa: E402
 
 
@@ -51,7 +53,10 @@ class TestConferirAntesDePublicar(unittest.TestCase):
     def tearDown(self):
         conferir.RAIZ = RAIZ
         conferir.DESTINO = os.path.join(tempfile.gettempdir(), "arena_conferir_antes_de_publicar.json")
-        shutil.rmtree(self.base, ignore_errors=True)
+        # Os objetos do git sao somente leitura no Windows: o rmtree com
+        # ignore_errors desistia calado e deixava 11 pastas no Temp a cada
+        # bateria (172 em 12/10/2026).
+        limpeza.apagar_pasta(self.base)
 
     def commitar(self, nome, texto, mensagem="mais um"):
         escrever(self.repo, nome, texto)
