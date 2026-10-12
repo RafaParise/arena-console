@@ -59,5 +59,19 @@ class TestQualPastaOAtualizarAceita(unittest.TestCase):
         self.assertFalse(montador.parece_versao_dos_alunos(os.path.join(self.base, "nao-existe")))
 
 
+class TestConferenciaDoPacote(unittest.TestCase):
+    """O link de download nos guias leva o nome da conta do GitHub, que pode
+    ser o apelido de quem monta: so o endereco do repositorio sai antes de
+    procurar o apelido; em qualquer outro lugar ele continua barrado."""
+
+    def test_o_endereco_do_repositorio_nao_conta_como_dado_de_quem_montou(self):
+        texto = "baixe em https://github.com/fulanodetal/arena-console/releases/latest".lower()
+        self.assertNotIn("fulanodetal", montador.texto_sem_enderecos_publicos(texto))
+
+    def test_o_apelido_em_outro_lugar_continua_aparecendo(self):
+        texto = 'apelido = "fulanodetal"; veja github.com/fulanodetal/outro-projeto'.lower()
+        self.assertIn("fulanodetal", montador.texto_sem_enderecos_publicos(texto))
+
+
 if __name__ == "__main__":
     unittest.main()

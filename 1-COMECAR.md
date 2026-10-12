@@ -168,7 +168,7 @@ Faça uma vez. Depois é só copiar e colar a pasta.
 
 ### O jeito fácil: baixar o ARENA pronto (GitHub)
 
-**Tempo:** 10 minutos, mais o download (uns 1,5 GB).
+**Tempo:** 10 minutos, mais o download (uns 480 MB; descompactado, 1,3 GB).
 
 1. Abra <https://github.com/RafaParise/arena-console/releases/latest>.
 2. Baixe o arquivo **`ARENA-` + a versão + `.zip`**, na parte *Assets*.

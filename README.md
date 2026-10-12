@@ -53,7 +53,7 @@ Ele nasceu nas aulas do curso técnico de **Desenvolvimento de Sistemas**
 
 ## Baixar e usar
 
-1. Baixe o arquivo **`ARENA-{VERSAO}.zip`** na página
+1. Baixe o arquivo **`ARENA-2026.10.11.zip`** (uns 480 MB; descompactado, 1,3 GB) na página
    [**Releases**](https://github.com/RafaParise/arena-console/releases/latest).
 2. **Antes de descompactar, desbloqueie o arquivo:** botão direito no `.zip`
    → **Propriedades** → marque **Desbloquear** (embaixo, em "Segurança") →

@@ -591,6 +591,17 @@ def marcas_de_quem_montou():
     return sorted(m for m in marcas if len(m) >= 6)
 
 
+# O endereco publico do repositorio do ARENA leva o nome da conta do GitHub,
+# que pode ser igual ao apelido de quem monta (em 12/10/2026, era): nos guias
+# ele TEM que estar (e' de onde se baixa o ARENA). So ele sai do texto antes
+# de procurar as marcas; o apelido em qualquer outro lugar continua barrado.
+ENDERECO_DO_REPOSITORIO = re.compile(r"github\.com/[a-z0-9-]+/arena-console", re.I)
+
+
+def texto_sem_enderecos_publicos(texto):
+    return ENDERECO_DO_REPOSITORIO.sub("github.com/<repositorio>/arena-console", texto)
+
+
 def conferir(destino, com_bios=False):
     problemas = []
     # Nada de caminho da maquina de quem montou, em arquivo de texto nenhum.
@@ -605,6 +616,7 @@ def conferir(destino, com_bios=False):
         for n in arquivos:
             if n.lower().endswith((".cfg", ".ini", ".yml", ".toml", ".json", ".txt", ".md", ".bat", ".py")):
                 texto = open(os.path.join(atual, n), encoding="utf-8", errors="replace").read().lower()
+                texto = texto_sem_enderecos_publicos(texto)
                 achado = next((m for m in marcas if m in texto), None)
                 if achado:
                     problemas.append("dado de quem montou (%s) em %s" % (
