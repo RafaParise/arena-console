@@ -1035,7 +1035,7 @@ tinha a versão de 03/10, sem nenhum dos consertos acima. Feita pelo PR #1
   (CLAUDE.md), site e 16 tópicos; regra "Proteger os ramos" (sem envio
   forçado, sem apagar ramo).
 - **Release v2026.10.11:** `ARENA-2026.10.11.zip` (478 MB; SHA-256
-  `d922237c8f3b5ed8e2eb1cbabb8ed791920946e0708401884333e563c3a877e5`), montado sem BIOS e conferido duas vezes.
+  `e1a2991b0a13bb43efbfdb1450aa061644f19df166a832f8d851cadbf28d8114`), montado sem BIOS e conferido duas vezes.
 - A pasta dos alunos (`..\ARENA`) atualizada pelo `--atualizar`: o programa
   trocado, os 344 arquivos de quem usa intocados, a correção de caminhos
   rodada (as 7 linhas velhas do `retroarch.cfg` dela consertadas).
