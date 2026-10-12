@@ -1733,11 +1733,17 @@ disco cheio, banco corrompido, pasta movida, caminho comprido.
 **Padrões que valem para todo teste novo** (cada um nasceu de um estrago):
 - ARENA isolado numa **subpasta** do temporário (`mkdtemp()/ARENA`): a mala
   do pen drive vai para a pasta de cima.
-- Quem abre o RetroArch usa `testes\protege_cfg.rodar(main)`; a rodada ainda
-  confere o `retroarch.cfg` e os arquivos de `dados\` de verdade antes e
-  depois de cada teste.
+- Quem abre o RetroArch usa `testes\protege_cfg.rodar(main)` (devolve o
+  `retroarch.cfg` e o histórico em `dados\builtin`); **quem liga jogo num
+  emulador de fora (PCSX2, Dolphin, RPCS3, Xenia) usa
+  `protege_cfg.rodar(main, emuladores=True)`** — ligar um jogo grava em
+  cartão de memória, save e perfil (12/10/2026). A rodada confere o
+  `retroarch.cfg`, os arquivos de `dados\` e, arquivo por arquivo, essas
+  pastas, antes e depois de cada teste.
 - Apagar pasta temporária com `testes\limpeza.apagar_pasta` (somente
-  leitura e arquivo preso); a rodada aponta o teste que esquecer pasta no Temp.
+  leitura e arquivo preso) — nunca `rmtree(ignore_errors=True)`: com um
+  repositório git dentro, ele desiste calado (os objetos do git são somente
+  leitura). A rodada aponta o teste que esquecer pasta no Temp.
 - Jogo de verdade por `testes\jogos_de_teste.achar` (o professor reorganiza
   as pastas; o teste não pode pular calado).
 - Medida de desempenho só vale com a janela do jogo à frente, na tomada e com
@@ -1808,6 +1814,10 @@ disco cheio, banco corrompido, pasta movida, caminho comprido.
 | .chd solto na pasta Arcade: "falta o arcade.zip" | Instrução errada | O nome da pasta do console virava o romset |
 | Jogo de PS1 descompactado sumia da lista | Pasta ao lado do .zip de mesmo nome | A regra da pasta de disco do fliperama valia em todo console |
 | Prateleiras da pasta BIOS vazias numa cópia do ARENA | "Já copiei" herdado do dados\ | Pasta BIOS recém-criada ignora a anotação antiga |
+| Cartões de memória do PS2 mudando a cada rodada | Nada visível (o histórico que a BIOS do PS2 grava no cartão) | Testes ligavam jogo no PCSX2, Dolphin, Xenia e RPCS3 com os saves e perfis de verdade, e a rodada não vigiava essas pastas — `protege_cfg.rodar(main, emuladores=True)` |
+| 5,5 GB soltos no `.git` | Disco sumindo; o repack automático travava | Um `git add` com o `.gitignore` errado (10–11/10) guardou cópias da pasta inteira — provadas contra o disco e limpas com `git prune` |
+| 304 pastas `arena_publicar_*`/`arena_sinc_*` no Temp | Nada visível | `rmtree(ignore_errors=True)` desiste dos objetos do git (somente leitura) |
+| `--atualizar` recusava a versão dos alunos | "Nao achei a versao dos alunos" | A pasta passou a se chamar `ARENA`; agora vale a folha de rosto `LEIA-PRIMEIRO.txt` |
 
 ---
 
