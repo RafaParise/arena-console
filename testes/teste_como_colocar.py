@@ -159,6 +159,13 @@ def main():
             status, resposta = servidor_de_teste.pedir(porta, "GET", "/api/como-colocar")
             confere("a rota devolve o guia dos %d consoles" % len(plataformas),
                     status == 200 and len(resposta.get("consoles", [])) == len(plataformas), status)
+            # FAT32 (auditoria 3, Fase 6): a rota diz o formato do disco, e os
+            # consoles de jogo maior que 4 GB vem marcados.
+            formato = (resposta.get("formato_do_disco") or "").upper()
+            grandes = {c["id"] for c in resposta.get("consoles", []) if c.get("jogo_grande")}
+            confere("a rota diz o formato do disco (%s) e marca PS2, PS3, Wii e Xbox 360 como jogo grande"
+                    % (formato or "?"), bool(formato) and {"ps2", "ps3", "wii", "xbox360"} <= grandes
+                    and "snes" not in grandes, sorted(grandes))
             status, resposta = servidor_de_teste.pedir(porta, "POST", "/api/pasta/abrir", {"plataforma": "../../x"})
             confere("'Abrir a pasta' recusa console inventado (nada abre)", status == 400, status)
             with tela_sem_janela.Navegador() as nav:
@@ -183,6 +190,22 @@ def main():
                         and "Satellaview" in textos["snes"] and "BS-X.bin" in textos["snes"], textos["snes"][:300])
                 confere("PS2: diz o emulador e a BIOS de 4 MB", "PCSX2" in textos["ps2"] and "4 MB" in textos["ps2"],
                         textos["ps2"][:300])
+                if formato != "FAT32":
+                    confere("PS2 num disco %s: sem o aviso do FAT32" % formato, "FAT32" not in textos["ps2"],
+                            textos["ps2"][:300])
+                # O disco daqui nao e' FAT32: a tela finge que e', e o aviso tem que
+                # aparecer ANTES de copiar -- no PS2 (DVD), nao no SNES (cartucho).
+                avisos = {}
+                for console in ("ps2", "snes"):
+                    nav.avaliar("(() => { estado.formatoDoDisco = 'FAT32';"
+                                " const l = document.querySelector('#listaComoColocar'); l.value = '%s';"
+                                " l.dispatchEvent(new Event('change')); return 1; })()" % console)
+                    time.sleep(0.4)
+                    avisos[console] = nav.avaliar("document.querySelector('#cartaoComoColocar').innerText") or ""
+                confere("pen drive em FAT32: o PS2 avisa do limite de 4 GB e diz o exFAT",
+                        "FAT32" in avisos["ps2"] and "exFAT" in avisos["ps2"], avisos["ps2"][:400])
+                confere("pen drive em FAT32: o SNES (jogo pequeno) nao avisa", "FAT32" not in avisos["snes"],
+                        avisos["snes"][:300])
                 nav.foto(os.path.join(pasta, "como_colocar_jogos.png"))
                 nav.esperar(0.3)
                 erros = [e["params"].get("exceptionDetails", {}).get("text") for e in nav.eventos

@@ -13,8 +13,11 @@ import tempfile
 import time
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-JOGO = os.path.join(RAIZ, "jogos", "pessoais", "Super Nintendo",
-                    "Super Bomberman 4 (Japan) [T-En by Svambo v1.0].sfc")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import jogos_de_teste  # noqa: E402
+import limpeza  # noqa: E402
+
+JOGO = jogos_de_teste.achar("Super Nintendo", "Super Bomberman 4 (Japan) [T-En by Svambo v1.0].sfc") or ""
 RETROARCH = os.path.join(RAIZ, "retroarch", "retroarch.exe")
 CORE = os.path.join(RAIZ, "retroarch", "cores", "snes9x_libretro.dll")
 PORTA_PARTIDA = 55435
@@ -71,6 +74,9 @@ def ler_log(pasta):
 
 
 def main():
+    if not os.path.isfile(JOGO):
+        print("FALHOU: sem o Super Bomberman 4 em jogos\\pessoais\\Super Nintendo.")
+        return 1
     raiz_teste = tempfile.mkdtemp(prefix="arena_netplay_iso_")
     print("Pasta:", raiz_teste)
     processos = []
@@ -97,7 +103,14 @@ def main():
             if "netplay" in linha.lower():
                 print(" ", linha.strip())
 
-        return 0
+        # Auditoria 3 (08/10/2026): devolvia 0 SEMPRE -- a rodada contava
+        # como "passou" sem conferir nada. Agora confere o que o teste quer
+        # saber: o jogador 5 entra sozinho, na 5a vaga (o hospedeiro diz
+        # "Jogador5 se juntou", a mesma frase do teste_netplay_5_jogadores).
+        entrou = "jogador5 se juntou" in texto_host.lower()
+        print("\nRESULTADO:", "PASSOU (o jogador 5 entrou sozinho)" if entrou
+              else "FALHOU (o hospedeiro nao viu o jogador 5 entrar)")
+        return 0 if entrou else 1
     finally:
         for p, log in processos:
             try:
@@ -115,6 +128,9 @@ def main():
                 log.close()
             except Exception:
                 pass
+        # A pasta do teste sai no fim (regra 6 da auditoria 3: a rodada
+        # achava esta pasta esquecida no Temp).
+        limpeza.apagar_pasta(raiz_teste)
 
 
 if __name__ == "__main__":

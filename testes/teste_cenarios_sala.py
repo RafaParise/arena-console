@@ -8,7 +8,17 @@
    conectado).
 3. Duas partidas diferentes na mesma rede ao mesmo tempo: dois pares
    host+convidado, em portas de partida DIFERENTES, rodando juntos --
-   confere que nao se misturam.
+   confere que nao se misturam. (Num computador so, as duas partidas
+   precisam de portas diferentes; em computadores diferentes, cada
+   hospedeiro tem o seu endereco e a mesma porta 55435 serve.)
+
+Auditoria 3 (08/10/2026): o cenario 3 NUNCA tinha passado ("misturou")
+e o teste saia com 0 assim mesmo. Causa: o RetroArch ignora o "--port" da
+linha de comando, e a chave do arquivo ia com o nome errado
+("netplay_port"): os dois hospedeiros escutavam na 55435 (o Windows deixa
+dois programas na mesma porta) e os dois convidados caiam no mesmo. Agora
+a porta vai na chave certa (netplay_ip_port), e o teste reprova quando um
+cenario falha.
 """
 import importlib.util
 import os
@@ -57,6 +67,8 @@ def montar_override(destino_cfg, pasta_instancia, opcoes_partida):
 def abrir(pasta_instancia, hospedar, jogador, apelido, porta):
     os.makedirs(pasta_instancia, exist_ok=True)
     opcoes_partida = graficos.opcoes_de_partida(apelido=apelido, hospedar=hospedar, jogador=jogador)
+    # A porta vale pelo arquivo (o "--port" da linha de comando e' ignorado).
+    opcoes_partida["netplay_ip_port"] = str(porta)
     argumentos_partida = graficos.argumentos_de_partida(hospedar, endereco="127.0.0.1", porta=porta)
     cfg = os.path.join(pasta_instancia, "override.cfg")
     montar_override(cfg, pasta_instancia, opcoes_partida)
@@ -147,10 +159,7 @@ def cenario_3_duas_partidas():
     print("\n=== Cenario 3: duas partidas diferentes na mesma rede (portas diferentes) ===")
     raiz = tempfile.mkdtemp(prefix="arena_cen3_")
     try:
-        # Partida A na porta padrao, Partida B numa porta diferente --
-        # e assim que duas salas simultaneas convivem: cada Jogar Junto
-        # usa a porta configurada em Ajustes, entao duas turmas/grupos
-        # promovem uma partida em porta diferente por combinado previo.
+        # Duas portas so porque e' um computador so (ver o topo do arquivo).
         pA_host, lA_host = abrir(os.path.join(raiz, "A_host"), True, 1, "TurmaA_Anfitriao", 55437)
         pB_host, lB_host = abrir(os.path.join(raiz, "B_host"), True, 1, "TurmaB_Anfitriao", 55438)
         time.sleep(6)
@@ -188,7 +197,13 @@ def main():
     import json
     with open(os.path.join(RAIZ, "docs", "cenarios_sala_bruto.json"), "w", encoding="utf-8") as f:
         json.dump(resultados, f, ensure_ascii=False, indent=2)
-    return 0
+    reconexao, saida, duas = resultados
+    certos = [reconexao["conectou_primeira_vez"] and reconexao["reconectou"],
+              saida["conectou_antes"] and saida["convidado_registrou_queda"] and saida["convidado_nao_travou"],
+              duas["partida_A_ok"] and duas["partida_B_ok"] and not duas["misturou"]]
+    print("\nCenarios certos: %d de 3" % sum(certos))
+    print("RESULTADO:", "PASSOU" if all(certos) else "FALHOU")
+    return 0 if all(certos) else 1
 
 
 if __name__ == "__main__":

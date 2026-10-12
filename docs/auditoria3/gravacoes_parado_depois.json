@@ -1,0 +1,11 @@
+{
+  "janela_s": 3600,
+  "com_tela": true,
+  "operacoes_de_gravacao": 0,
+  "kb_gravados": 0.0,
+  "operacoes_por_hora": 0,
+  "kb_por_hora": 0.0,
+  "arquivos_que_mudaram": [],
+  "arquivos_que_nasceram": [],
+  "arquivos_que_sumiram": []
+}

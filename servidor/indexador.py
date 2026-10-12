@@ -194,6 +194,24 @@ def parece_neo_geo(nomes):
     return tem("p1") and tem("m1") and tem("c1")
 
 
+# FAT32 nao guarda arquivo maior que 4 GB menos 1 byte. Um jogo com EXATAMENTE
+# esse tamanho foi cortado na copia para um pen drive em FAT32 (algumas
+# ferramentas de copia e de descompactar param no limite em vez de recusar):
+# nao abre inteiro. O mesmo limite do VERIFICAR.bat (diagnostico.py).
+LIMITE_FAT32 = 4 * 1024 * 1024 * 1024 - 1
+
+
+def aviso_de_arquivo_cortado(tamanho):
+    """O aviso do cartao para um jogo cortado no limite do FAT32, ou None
+    (auditoria 3, Fase 6: antes so o VERIFICAR.bat dizia). Recebe o tamanho
+    que o indexador ja leu: nenhuma leitura de disco a mais."""
+    if tamanho != LIMITE_FAT32:
+        return None
+    return {"texto": "Este arquivo parou em 4 GB, o limite de um pen drive em FAT32: foi cortado na "
+                     "cópia e não abre inteiro. Copie de novo o jogo original para um pen drive em "
+                     "exFAT ou NTFS (guia 1-COMECAR.md)."}
+
+
 def aviso_da_bios_neo_geo(pasta, nucleo):
     """Jogo de Neo Geo precisa da BIOS neogeo.zip. O MAME so procura na pasta
     do jogo e so por esse nome (provado em 02/10/2026: com neogeo.mame.zip ao
@@ -957,6 +975,9 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None,
                              % (por_id[discorda]["nome"] if discorda in por_id else discorda,
                                 plataforma.get("nome", "outro console")),
                     "mover_para": discorda})
+            cortado = aviso_de_arquivo_cortado(tamanho)
+            if cortado:
+                avisos.append(cortado)
 
             # Quantos jogadores ESTE jogo aceita: quem diz e' o professor,
             # no dados\jogadores.txt (servidor\jogadores.py). Jogo que nao

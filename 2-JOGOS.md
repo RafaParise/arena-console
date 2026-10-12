@@ -140,6 +140,17 @@ No ARENA, clique em **Atualizar lista**, no canto inferior esquerdo.
 Pronto. O ARENA olha o final do nome do arquivo e descobre sozinho de qual
 console ele é.
 
+**Para o professor — conferir muitos jogos de uma vez.** Antes de levar jogo
+novo para a sala, dá para ver a lista inteira, console por console, com o
+nome que o ARENA vai mostrar, o arquivo e quantos jogadores ele aceita:
+
+```
+servidor\python\python.exe ferramentas\inventario_jogos.py
+```
+
+Serve para pegar cedo um jogo na pasta do console errado ou uma trilha de CD
+aparecendo como se fosse um jogo sozinho.
+
 ---
 
 ### Colocar um jogo seu: console por console
@@ -165,10 +176,18 @@ pasta e tem o botão **Abrir a pasta**.
 | PS2, GameCube, Wii, PS3, Xbox 360 | **Não** | Esses emuladores não abrem zip: descompacte antes |
 | MS-DOS | **Pode** | O DOSBox abre o zip direto (ou a pasta do jogo com o `.exe`) |
 
-**BIOS** é o "programa de fábrica" de alguns consoles. Vai em
-`retroarch\system` (a do Dreamcast numa pasta `dc` lá dentro; a do
-fliperama no MAME, na pasta dos próprios jogos). O nome do arquivo tem que
-ser **exatamente** o da tabela.
+**BIOS** é o "programa de fábrica" de alguns consoles. Há dois jeitos de
+colocar a BIOS:
+
+- **O mais fácil:** ponha o arquivo na pasta do console dentro de `BIOS`
+  (ex.: `BIOS\PS1`). Depois clique em **Conferir**, em **Ajustes →
+  Emuladores → BIOS dos consoles**. Nessa pasta, o nome do arquivo não
+  importa: o ARENA reconhece e instala com o nome certo (veja "A pasta
+  BIOS", mais abaixo).
+- **Direto em `retroarch\system`:** aí o nome do arquivo tem que ser
+  **exatamente** o da tabela. A do Dreamcast vai numa pasta `dc` lá dentro.
+
+No fliperama do MAME, a BIOS vai na pasta dos próprios jogos.
 
 | Console | Pasta (em `jogos\pessoais`) | Arquivos que servem | `.zip`? | BIOS |
 |---|---|---|---|---|
@@ -388,9 +407,9 @@ nunca apaga nem passa por cima de nada):
 | O disco (`.chd`) está dentro de um `.zip` (ex.: `kinst-chd.zip`) | **Arrumar** tira o `.chd` para a subpasta com o nome do jogo (`Arcade\kinst\kinst.chd`); o `.zip` fica. O emulador não lê disco de dentro de `.zip` |
 | O disco (`.chd`) está solto, ao lado do `.zip` (`Arcade\kinst.chd`) | **Arrumar** cria a pasta `kinst` e põe o disco dentro |
 | O disco (`.chd`) está numa pasta com outro nome (`Arcade\Killer Instinct\kinst.chd`) | **Arrumar** leva o disco para a pasta com o nome do `.zip` (`Arcade\kinst`) |
-| O disco (`.chd`) está sozinho, sem o `.zip` do jogo | Ponha o `.zip` do romset (ex.: `kinst.zip`) na pasta: o jogo abre pelo `.zip`; o `.chd` é só o disco dele |
+| O disco (`.chd`) está sozinho, sem o `.zip` do jogo | Ponha na pasta o **romset** do jogo (ex.: `kinst.zip`). Romset é o `.zip` com as partes do jogo de fliperama, com o nome curto que o emulador conhece. O jogo abre pelo `.zip`. O `.chd` é só o disco dele |
 | O jogo não abriu porque falta o disco (o MAME diz qual) | O ARENA cria a pasta onde ele vai (`Arcade\kinst`), com um `LEIA.txt` dizendo o nome do arquivo: é só pôr lá |
-| O emulador não conhece o nome do arquivo (ex.: `The King Of Fighters 2002.zip`) | Renomeie para o nome curto do romset. O aviso já diz qual, procurando o título no banco do RetroArch (ex.: **kof2002.zip**); quando é só um palpite pelo começo do título, ele diz "confira" |
+| O emulador não conhece o nome do arquivo (ex.: `The King Of Fighters 2002.zip`) | Renomeie para o nome curto do romset. É como a matrícula na escola: o professor chama pelo nome, mas o sistema só acha o aluno pela matrícula. O aviso já diz o nome certo: ele procura o título no banco do RetroArch (ex.: **kof2002.zip**). Quando é só um palpite pelo começo do título, o aviso diz "confira" |
 | Os arquivos estão dentro de uma pasta no `.zip` | **Arrumar** refaz o `.zip` sem a pasta; o original fica guardado em `backup\originais` |
 | O `.zip` está corrompido | Baixe ou copie o jogo de novo |
 | **O arquivo está danificado: a parte X não confere** | Copie o jogo de novo, de uma cópia boa. Foi o caso do Metal Slug X com personagens de cor estranha: uma parte do gráfico dos personagens estava estragada dentro do `.zip`, e o FBNeo abria assim mesmo |
@@ -461,7 +480,7 @@ desta versão.
 No ARENA, clique em **Criar pastas dos consoles**, embaixo da lista à
 esquerda.
 
-Ele cria as 47 pastas dentro de `jogos\pessoais`:
+Ele cria as 52 pastas dentro de `jogos\pessoais` (uma por console):
 
 ```
 ARENA\jogos\pessoais\PS1\
@@ -657,7 +676,10 @@ aparecem na lista de cima).
 
 ### Parte C — Consoles cinzas
 
-Falta o emulador daquele console. Resolve em um minuto:
+Falta o emulador daquele console. No RetroArch, o emulador de cada console
+se chama **núcleo**. Pense num celular: o RetroArch é o celular, e cada
+núcleo é o aplicativo de um console. Console cinza é aplicativo que ainda
+não foi baixado. Resolve em um minuto:
 
 1. Abra o `retroarch.exe` direto, fora do ARENA.
 2. **Carregar Núcleo → Baixar um Núcleo**.
@@ -682,9 +704,17 @@ Cada jogo tem uma etiqueta dizendo como vai rodar **no seu computador**:
 **"Pode travar" não impede de jogar.** O ARENA só avisa antes, para você não
 achar que quebrou. Se quiser tentar, tente — o botão funciona igual.
 
-O ARENA **mede** o computador ao abrir (a velocidade de um núcleo do
-processador e se ele tem AVX) em vez de adivinhar pela quantidade de
-núcleos. A conta usa o notebook mais fraco da escola como régua: em
+O ARENA **mede** o computador ao abrir, em vez de adivinhar. Pense no
+processador como uma cozinha. O ARENA olha duas coisas:
+
+- **A velocidade de um núcleo.** Cada núcleo do processador é um cozinheiro
+  (não confunda com o núcleo do RetroArch). Não basta contar os cozinheiros:
+  importa o quanto cada um é rápido.
+- **Se o processador tem AVX**, um tipo de instrução extra. O AVX é como
+  uma batedeira: algumas receitas só saem com ela. O Xbox 360 é uma delas.
+  Nem todo processador tem AVX.
+
+A conta usa o notebook mais fraco da escola como régua: em
 **Ajustes → Máquina → Capacidade** aparece, por exemplo, "2,3× o notebook
 mais fraco da escola". Quanto o Windows está pesando hoje (programas
 abertos, bateria) é outra coisa: aparece na mesma aba e na hora de jogar.
@@ -700,10 +730,10 @@ Mais detalhes: **documento 3**, parte "O selo de cada jogo".
 | Coloquei o jogo e ele não aparece | Clique em **Atualizar lista**. Confira o final do arquivo na tabela acima |
 | Apareceu no console errado | Ponha numa subpasta com o nome do console, ou crie o `_console.txt` (acima) |
 | **Muitos jogos** no console errado | Quase sempre são `.iso` ou `.chd` soltos. Ponha cada grupo na sua pasta |
-| Bolinha continua amarela | O arquivo tem que estar direto em `retroarch\system`, sem subpasta. Feche e abra o ARENA |
+| Bolinha continua amarela | Ainda falta a BIOS (a linha do console diz qual). Ponha o arquivo na pasta do console dentro de `BIOS` e clique em **Conferir** (Ajustes → Emuladores → BIOS dos consoles). Se puser direto em `retroarch\system`, deixe o arquivo solto, sem subpasta. Depois feche e abra o ARENA |
 | Bolinha cinza | Baixe o núcleo pelo RetroArch (Parte C) |
-| O jogo abre e fecha na hora | Falta arquivo de sistema, ou o motor gráfico não existe nessa máquina (documento 3) |
-| O nome ficou estranho na lista | Renomeie o arquivo. O ARENA usa o nome do arquivo como título |
+| O jogo abre e fecha na hora | Pode ser uma de duas coisas. 1) Falta a BIOS, o "programa de fábrica" do console: veja se a bolinha do console está amarela (parte "Consoles amarelos: a BIOS"). 2) O motor gráfico (por onde o jogo conversa com a placa de vídeo) não funciona neste computador: em **Ajustes → Avançado → Imagem → Motor gráfico**, volte para **Automático** (documento 3) |
+| O nome ficou estranho na lista | O ARENA usa o nome do arquivo como título: renomeie o arquivo. Faça isso **antes** de começar a jogar, porque o save segue o nome do arquivo. No fliperama, não renomeie: o `.zip` com outro nome não abre |
 | A lista está lenta com muitos jogos | Só na primeira abertura. Depois o ARENA reaproveita e fica rápido |
 
 ---

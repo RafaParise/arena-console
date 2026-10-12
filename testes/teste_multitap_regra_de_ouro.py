@@ -59,7 +59,15 @@ def arquivos_do_git(revisao, pastas):
 # o ultimo commit deixaria uma mudanca se esconder de fase em fase.
 REVISAO_ANTES = "97ffe03"
 
-TITULOS_NOVOS_DE_PROPOSITO = {"Capcom Vs SNK 2 Millionaire Fighting 2001"}
+# Titulos que mudaram DE PROPOSITO depois da versao de antes (sem par, nao
+# da para comparar):
+#  - 25/09/2026: "disc.gdi" passou a ter o nome da pasta ("Disc" -> "Capcom
+#    Vs SNK 2...");
+#  - 03/10/2026: o KOF 2002 do professor virou o kof2k2fd.zip do FBNeo, e o
+#    nome vem de nomes_arcade.NOMES_FORA_DO_BANCO (a versao de antes nao tem
+#    nomes de fliperama e o chamaria pelo nome do arquivo).
+TITULOS_NOVOS_DE_PROPOSITO = {"Capcom Vs SNK 2 Millionaire Fighting 2001",
+                              "The King of Fighters 2002"}
 
 # C64 (VICE) e Amiga (PUAE) passaram a recusar o Jogar Junto DE PROPOSITO
 # (25/09/2026): o nucleo nao tem netplay, confirmado tentando hospedar.
@@ -68,18 +76,60 @@ JOGAR_JUNTO_RECUSADO_DE_PROPOSITO = {"Alien Breed Disk1", "Top Gear 2 Disk2",
                                      "INTKARAT", "Mule", "PRINCEOP"}
 
 
+# Auditoria 3 (Fase 4, J2, e a revisao dela): chaves que o RetroArch desta
+# pasta nao conhece. As de nome errado sao COMPARADAS pelo nome certo (a
+# versao de antes passa pelo mapa) -- assim uma mudanca futura nelas nao se
+# esconde; as que nao existem mais saem dos dois lados.
+NOME_CERTO_DESDE_A_AUDITORIA_3 = {
+    "savestate_slot": "state_slot",
+    "menu_rgui_color_theme": "rgui_menu_color_theme",
+    "rgui_full_width_layout": "menu_rgui_full_width_layout",
+    "content_show_add": "content_show_add_entry",
+    "input_bsv_record_toggle": "input_record_replay",
+    "netplay_port": "netplay_ip_port",
+}
+TIRADAS_NA_AUDITORIA_3 = {"quick_menu_show_cheevos", "notification_show_recording",
+                          "notification_show_streaming", "netplay_stateless_mode",
+                          "menu_show_legacy_thumbnail_updater"}
+# Novas de proposito (o atalho de repetir/parar a gravacao da partida, sem tecla).
+NOVAS_NA_AUDITORIA_3 = {"input_play_replay", "input_halt_replay"}
+# Valor que mudou de proposito junto com o nome: o tema pedia o 27 e nunca
+# valeu (fica o 4, o que os alunos sempre viram); "Importar conteudo" escondido
+# era "false" no nome velho e e' "0" no novo.
+VALOR_NOVO_DE_PROPOSITO = {("rgui_menu_color_theme", "27"): "4", ("content_show_add_entry", "false"): "0",
+                           # Fase 5 da auditoria 3: o perfil Qualidade nao liga mais
+                           # sozinho o voltar no tempo e a resposta instantanea (o N64
+                           # caia para 30 quadros/s; o PS1 gastava 5x o processador).
+                           ("rewind_enable", "true"): "false", ("run_ahead_enabled", "true"): "false"}
+
+
+def com_nomes_certos(chaves_override):
+    """A versao de antes, falando a lingua de hoje (nomes certos e valores que
+    mudaram de proposito, nada mais)."""
+    traduzido = {}
+    for chave, valor in chaves_override.items():
+        if chave in TIRADAS_NA_AUDITORIA_3:
+            continue
+        chave = NOME_CERTO_DESDE_A_AUDITORIA_3.get(chave, chave)
+        traduzido[chave] = VALOR_NOVO_DE_PROPOSITO.get((chave, valor), valor)
+    return traduzido
+
+
 def sem_mudanca_de_proposito(chaves_override):
-    """Tira as duas mudancas que valem para TODO jogo, de proposito (teste
+    """Tira as mudancas que valem para TODO jogo, de proposito (teste
     com os controles na mao, 25/09/2026):
       - botao/eixo de controle nao definido pelo aluno vai "nul" (numero
         velho no retroarch.cfg punha o Start no R3);
       - input_remapping_directory aponta para o .rmp da partida (o RetroArch
         ignora o tipo de porta vindo do --appendconfig);
       - o teclado de todos os jogadores vai escrito (o teclado e' o primeiro
-        jogador sem controle; pedido do Rafael, 25/09/2026)."""
+        jogador sem controle; pedido do Rafael, 25/09/2026);
+      - as chaves novas da auditoria 3 (NOVAS_NA_AUDITORIA_3); as renomeadas
+        sao comparadas pelo nome certo (com_nomes_certos)."""
     teclado = r"^input_player\d+_(up|down|left|right|a|b|x|y|l|r|l2|r2|l3|r3|start|select)$"
-    return {c: v for c, v in chaves_override.items()
+    return {c: v for c, v in com_nomes_certos(chaves_override).items()
             if c != "input_remapping_directory"
+            and c not in NOVAS_NA_AUDITORIA_3
             and not re.match(teclado, c)
             and not (v == "nul" and re.match(r"^input_player\d+_\w+_(btn|axis)$", c))}
 

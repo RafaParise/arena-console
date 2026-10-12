@@ -140,23 +140,33 @@ class _WebSocket:
 class Navegador:
     """Edge/Chrome sem janela, controlado pelo protocolo de depuracao."""
 
-    def __init__(self, executavel=None):
+    def __init__(self, executavel=None, janela=False, tamanho=(1180, 760)):
+        """janela=True (auditoria 3, 07/10/2026): COM janela, como o ARENA
+        abre a tela (arena.abrir_janela: --app, 1180x760) -- para medir a
+        abertura, a memoria e o processador da tela de verdade. O perfil
+        continua temporario: o Edge do usuario nao e' tocado."""
         self.exe = executavel or achar_navegador()
         if not self.exe:
             raise OSError("nenhum Edge ou Chrome encontrado")
         self.perfil = tempfile.mkdtemp(prefix="arena_navegador_")
         self.porta = porta_livre()
+        self.janela = janela
+        self.tamanho = tamanho
         self.proc = None
         self.ws = None
         self.n = 0
         self.eventos = []     # avisos do navegador (Network.*, Page.*...)
 
     def __enter__(self):
-        self.proc = subprocess.Popen(
-            [self.exe, "--headless=new", "--remote-debugging-port=%d" % self.porta,
-             "--user-data-dir=" + self.perfil, "--no-first-run", "--no-default-browser-check",
-             "--disable-extensions", "--hide-scrollbars", "--mute-audio", "about:blank"],
-            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        comuns = ["--remote-debugging-port=%d" % self.porta, "--user-data-dir=" + self.perfil,
+                  "--no-first-run", "--no-default-browser-check", "--disable-extensions"]
+        if self.janela:
+            argumentos = comuns + ["--app=about:blank", "--window-size=%d,%d" % self.tamanho,
+                                   "--disable-features=Translate,AutofillServerCommunication"]
+        else:
+            argumentos = ["--headless=new"] + comuns + ["--hide-scrollbars", "--mute-audio", "about:blank"]
+        self.proc = subprocess.Popen([self.exe] + argumentos,
+                                     stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         alvo = None
         for _ in range(100):
             try:
@@ -213,6 +223,19 @@ class Navegador:
         while time.monotonic() < fim and self._processos_do_perfil(encerrar=False):
             time.sleep(0.3)
         return True
+
+    def pids(self):
+        """Os processos deste navegador (os que usam o perfil deste teste):
+        para medir a memoria e o processador da tela."""
+        comando = ("Get-CimInstance Win32_Process -Filter \"Name = '%s'\" | Where-Object "
+                   "{ $_.CommandLine -like '*%s*' } | ForEach-Object { $_.ProcessId }"
+                   % (os.path.basename(self.exe), self.perfil))
+        try:
+            saida = subprocess.run(["powershell", "-NoProfile", "-NonInteractive", "-Command", comando],
+                                   capture_output=True, text=True, timeout=30).stdout
+        except (OSError, subprocess.TimeoutExpired):
+            return []
+        return [int(linha) for linha in saida.split() if linha.strip().isdigit()]
 
     def _processos_do_perfil(self, encerrar):
         """Quantos processos do navegador usam o perfil DESTE teste (e, com

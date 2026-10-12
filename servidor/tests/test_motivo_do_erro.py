@@ -292,5 +292,48 @@ class TestAvisoDaBiosNoCartao(unittest.TestCase):
         self.assertIn("o MAME precisa da BIOS neogeo.zip na mesma pasta", self.avisos()["kof2002.zip"])
 
 
+# Trecho do registro DE VERDADE do sexto jogador tentando entrar numa partida
+# de 5 (testes\teste_netplay_sexto_jogador.py, 08/10/2026).
+SEXTO_JOGADOR = """\
+[INFO] [Playlist] Written to file: "C:\\Temp\\sexto\\builtin\\content_history.lpl".
+[ERROR] [Netplay] Falha ao conectar ao host.
+[INFO] [Netplay] Desconectado da Netplay
+"""
+
+
+class TestMotivoDaPartida(unittest.TestCase):
+    """Jogar Junto: quem nao conseguiu entrar ve o porque (auditoria 3)."""
+
+    def test_partida_cheia_ou_rede(self):
+        frase = motivo_do_erro.motivo_da_partida(SEXTO_JOGADOR, 5)
+        self.assertIn("Não deu para entrar na partida", frase)
+        self.assertIn("até 5 jogadores", frase)
+        self.assertIn("PARTIDA.bat", frase)
+
+    def test_em_ingles_tambem(self):
+        self.assertTrue(motivo_do_erro.motivo_da_partida("[ERROR] [Netplay] Failed to connect to host.", 2))
+
+    def test_ninguem_atendeu_nao_e_partida_cheia(self):
+        # Revisao da Fase 4: a conexao nem abriu (o jogo do anfitriao ainda nao
+        # estava na tela, ou a rede barrou) -- "pode estar cheia" e' impossivel.
+        texto = ("[ERROR] [Netplay] Failed to connect to host 192.168.0.12 on port 55435.\n"
+                 "[ERROR] [Netplay] Failed to set up netplay sockets.\n"
+                 "[ERROR] [Netplay] Falha em inicializar a Netplay.")
+        frase = motivo_do_erro.motivo_da_partida(texto, 2)
+        self.assertIn("não respondeu", frase)
+        self.assertIn("PARTIDA.bat", frase)
+        self.assertNotIn("cheia", frase)
+
+    def test_o_anfitriao_disse_que_esta_cheia(self):
+        frase = motivo_do_erro.motivo_da_partida("[ERROR] [Netplay] Host de netplay cheio.", 5)
+        self.assertIn("está cheia", frase)
+        self.assertIn("até 5 jogadores", frase)
+        self.assertIn("Netplay host full", " ".join(motivo_do_erro.CHEIA))
+
+    def test_sem_falha_nao_diz_nada(self):
+        self.assertIsNone(motivo_do_erro.motivo_da_partida(
+            "[INFO] [Netplay] Jogador2 se juntou como o jogador 2 (ping: 16 ms)", 2))
+
+
 if __name__ == "__main__":
     unittest.main()

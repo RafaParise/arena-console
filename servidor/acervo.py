@@ -44,18 +44,18 @@ def _salvar_itens(itens):
 def _texto(valor, limite, nome, obrigatorio=False):
     texto = str(valor or "").strip()
     if obrigatorio and not texto:
-        raise ValueError("%s é obrigatório." % nome)
+        raise ValueError("Preencha o campo %s." % nome)
     if len(texto) > limite:
-        raise ValueError("%s é muito longo." % nome)
+        raise ValueError("%s ficou longo demais: encurte e tente de novo." % nome)
     return texto
 
 
 def _validar_item(item):
     if not isinstance(item, dict):
-        raise ValueError("O item do acervo precisa ser um objeto.")
+        raise ValueError("O cadastro do jogo veio torto. Preencha o formulário de novo.")
     id_item = _texto(item.get("id"), 64, "Identificador", True)
     if not re.fullmatch(r"[a-zA-Z0-9][a-zA-Z0-9_-]*", id_item):
-        raise ValueError("O identificador só pode conter letras, números, hífen e sublinhado.")
+        raise ValueError("O identificador só pode ter letras, números, hífen e sublinhado: troque os outros sinais e tente de novo.")
     # O tamanho e declarado por quem cadastra, e o download confere na
     # hora. Mas vale barrar o absurdo aqui: um item de 99 GB entupiria o
     # pen drive antes de alguem perceber.
@@ -64,9 +64,9 @@ def _validar_item(item):
         try:
             tamanho = int(tamanho)
         except (TypeError, ValueError):
-            raise ValueError("O tamanho precisa ser um número de bytes.")
+            raise ValueError("Escreva o tamanho em bytes, só com números.")
         if tamanho < 0 or tamanho > TAMANHO_MAXIMO:
-            raise ValueError("O tamanho precisa ficar entre 0 e %d GB."
+            raise ValueError("Escreva um tamanho entre 0 e %d GB (em bytes)."
                              % (TAMANHO_MAXIMO // (1024 ** 3)))
 
     titulo = _texto(item.get("titulo"), 120, "Título", True)
@@ -78,15 +78,15 @@ def _validar_item(item):
     url = _texto(item.get("url"), 500, "URL", True)
     partes = urllib.parse.urlparse(url)
     if partes.scheme != "https" or partes.hostname not in HOSTS_PERMITIDOS:
-        raise ValueError("A URL precisa ser HTTPS e estar em archive.org ou raw.githubusercontent.com.")
+        raise ValueError("Use um endereço https:// do archive.org ou do raw.githubusercontent.com (são as fontes que o ARENA aceita).")
     sha256 = _texto(item.get("sha256"), 64, "SHA-256", True).lower()
     if not re.fullmatch(r"[0-9a-f]{64}", sha256):
-        raise ValueError("O SHA-256 precisa ter 64 caracteres hexadecimais.")
+        raise ValueError("Confira o SHA-256: são 64 letras e números (de 0 a 9 e de a a f).")
     destino = _texto(item.get("destino"), 240, "Arquivo de destino", True).replace("/", os.sep)
     caminho = os.path.abspath(os.path.join(RAIZ, destino))
     livres = os.path.abspath(PASTA_LIVRES)
     if os.path.commonpath([caminho, livres]) != livres or os.path.basename(caminho) in ("", ".", ".."):
-        raise ValueError("O destino precisa ficar dentro de jogos\\livres.")
+        raise ValueError("Escolha um destino dentro de jogos\\livres.")
     return {
         "id": id_item,
         "titulo": titulo,
@@ -124,7 +124,7 @@ def remover(item_id):
     restantes = [item for item in itens
                  if not (isinstance(item, dict) and str(item.get("id", "")) == item_id)]
     if len(restantes) == len(itens):
-        raise ValueError("Jogo autorizado não encontrado no manifesto.")
+        raise ValueError("Esse jogo não está mais na lista do acervo. Clique em Atualizar lista e escolha de novo.")
     _salvar_itens(restantes)
     return {"id": item_id}
 
@@ -181,29 +181,30 @@ def _item(item_id):
 def instalar(item_id):
     item = _item(item_id)
     if not item:
-        raise ValueError("Jogo autorizado não encontrado no manifesto.")
+        raise ValueError("Esse jogo não está mais na lista do acervo. Clique em Atualizar lista e escolha de novo.")
     if not item.get("autorizado") or not item.get("licenca"):
-        raise ValueError("O item não declara autorização/licença.")
+        raise ValueError("Esse jogo não diz qual é a licença dele. Peça ao professor para completar o cadastro.")
 
     url = str(item.get("url", ""))
     partes = urllib.parse.urlparse(url)
     if partes.scheme != "https" or partes.hostname not in HOSTS_PERMITIDOS:
-        raise ValueError("A fonte precisa ser HTTPS e estar numa origem permitida.")
+        raise ValueError("O endereço desse jogo não é de uma fonte que o ARENA aceita. Peça ao professor para conferir o cadastro.")
 
     sha256 = str(item.get("sha256", "")).lower()
     if not re.fullmatch(r"[0-9a-f]{64}", sha256):
-        raise ValueError("O item precisa ter SHA-256 valido antes do download.")
+        raise ValueError("Esse jogo está sem o código de conferência (SHA-256). Peça ao professor para completar o cadastro.")
 
     destino_relativo = str(item.get("destino", ""))
     destino = os.path.abspath(os.path.join(RAIZ, destino_relativo))
     livres = os.path.abspath(PASTA_LIVRES)
     if os.path.commonpath([destino, livres]) != livres:
-        raise ValueError("O destino precisa ficar dentro de jogos\\livres.")
+        raise ValueError("Escolha um destino dentro de jogos\\livres.")
     os.makedirs(os.path.dirname(destino), exist_ok=True)
 
     temporario = destino + ".download"
     tamanho = 0
     digest = hashlib.sha256()
+    comeco = b""
     try:
         requisicao = urllib.request.Request(url, headers={"User-Agent": "ARENA/1.0"})
         with urllib.request.urlopen(requisicao, timeout=30) as resposta:
@@ -212,13 +213,22 @@ def instalar(item_id):
                     bloco = resposta.read(1024 * 1024)
                     if not bloco:
                         break
+                    if not comeco:
+                        comeco = bloco[:512]
                     tamanho += len(bloco)
                     if tamanho > TAMANHO_MAXIMO:
-                        raise ValueError("O arquivo excede o limite de 4 GB.")
+                        raise ValueError("O arquivo passa de 4 GB, o limite do ARENA. Escolha outro jogo.")
                     digest.update(bloco)
                     arquivo.write(bloco)
+        # A pagina de login do Wi-Fi da escola chega com "200 OK" no lugar do
+        # jogo (auditoria 3, Fase 3): o SHA-256 ja recusaria, mas a frase
+        # certa diz o que fazer.
+        if digest.hexdigest() != sha256 and comeco.lstrip().lower().startswith(
+                (b"<!doctype", b"<html", b"<head", b"<meta", b"<script")):
+            raise ValueError("A rede pediu login: chegou a página do Wi-Fi no lugar do jogo. Abra o "
+                             "navegador, entre na rede e tente de novo.")
         if digest.hexdigest() != sha256:
-            raise ValueError("SHA-256 diferente: download recusado por segurança.")
+            raise ValueError("O arquivo baixado não confere com o cadastro (SHA-256 diferente) e foi recusado. Ele pode ter chegado cortado: tente de novo. Se repetir, peça ao professor para conferir o cadastro.")
         os.replace(temporario, destino)
     finally:
         if os.path.exists(temporario):

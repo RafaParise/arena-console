@@ -115,7 +115,7 @@ ARQUIVO_OVERRIDE = os.path.join(PASTA_DADOS, "arena_override.cfg")
 # Serve para uma coisa so: acabar com a duvida de "sera que estou testando
 # a versao corrigida?". Quando algo nao bate com o esperado, o primeiro
 # passo e comparar este numero.
-VERSAO = "2026.10.03.2"   # pasta BIOS (uma por console, ativa em Emuladores) e o botao Arrumar
+VERSAO = "2026.10.11"   # auditoria 3: matriz de jogos, cheats que funcionam, portabilidade, acessibilidade
 
 PORTA = 8777
 
@@ -175,7 +175,14 @@ def gravar_texto_atomico(caminho, texto):
 
 # Guarda contra abrir dois jogos ao mesmo tempo. Sem isso, um duplo clique
 # apressado sobe duas janelas do RetroArch disputando o mesmo controle.
-JOGO_EM_ANDAMENTO = {"ativo": False, "titulo": ""}
+JOGO_EM_ANDAMENTO = {"ativo": False, "titulo": "", "id": ""}
+# Os codigos do jogo aberto nao mudam pela tela: ao fechar o jogo, o
+# RetroArch grava por cima do .cht a lista que ele carregou (registro dele:
+# "Save game-specific cheatfile"), e a mudanca feita no meio se perderia.
+MENSAGEM_CHEAT_COM_JOGO_ABERTO = (
+    "Este jogo está aberto agora. Feche o jogo (F10) antes de mudar os códigos dele: quando o jogo "
+    "fecha, o RetroArch grava por cima a lista de códigos que ele tem aberta, e a sua mudança se "
+    "perderia.")
 
 # A partida que ESTE computador esta hospedando agora (ou None). E' o que
 # faz o amigo ver "Fulano - partida aberta: Super Bomberman 4" na lista de
@@ -533,7 +540,14 @@ BASE_COMUM = {
     "input_toggle_fullscreen": "f",
 
     # --- Save states -------------------------------------------------------
-    "savestate_slot": "0",
+    # Todo jogo abre no espaco 0, "o de sempre" (guia 4). O RetroArch desta
+    # pasta ja volta ao 0 sozinho a cada jogo aberto -- conferido em
+    # 08/10/2026 com a configuracao pedindo o espaco 3. A chave fica, agora
+    # com o nome certo (era "savestate_slot", que nao existe: auditoria 3,
+    # servidor\tests\test_chaves_do_retroarch.py), para o caso de uma versao
+    # nova do RetroArch passar a lembrar o espaco -- e o proximo F2 regravar
+    # o 9, o "seguro" do guia.
+    "state_slot": "0",
     "savestate_max_keep": "0",     # 0 = nao apaga estado antigo sozinho
     "quick_menu_show_save_load_state": "true",
     "quick_menu_show_undo_save_load_state": "true",
@@ -556,11 +570,15 @@ BASE_COMUM = {
     # que e grego - e o menu abria em grego, com as letras que o aluno nao
     # le. Erro simples, efeito devastador.
     "user_language": "7",
-    "menu_rgui_color_theme": "27",              # tema escuro sobrio
+    # Verde classico (o 4 do RetroArch): letra branca no fundo verde-escuro,
+    # o que os alunos sempre viram. O ARENA pedia o 27 (Solarized escuro),
+    # mas com o nome errado ("menu_rgui_color_theme") -- nunca valeu, e
+    # trocar agora seria surpresa para quem ja conhece o menu.
+    "rgui_menu_color_theme": "4",
     "rgui_background_filler_thickness_enable": "false",
     "rgui_border_filler_enable": "true",
     "rgui_border_filler_thickness_enable": "false",
-    "rgui_full_width_layout": "true",
+    "menu_rgui_full_width_layout": "true",
     "rgui_inline_thumbnails": "false",
     "rgui_particle_effect": "0",                # sem animacao de fundo
     "rgui_show_start_screen": "false",
@@ -568,8 +586,7 @@ BASE_COMUM = {
     "menu_show_help": "false",
     "menu_show_reboot": "false",
     "menu_show_shutdown": "false",
-    "menu_show_legacy_thumbnail_updater": "false",
-    "content_show_add": "false",
+    "content_show_add_entry": "0",              # "Importar conteudo": escondido
     "content_show_images": "false",
     "content_show_music": "false",
     "content_show_video": "false",
@@ -578,11 +595,9 @@ BASE_COMUM = {
     "content_show_explore": "false",
     "quick_menu_show_take_screenshot": "true",
     "quick_menu_show_options": "true",
-    # Itens que so confundem quem quer salvar e voltar ao jogo.
-    "quick_menu_show_save_load_state": "true",
-    "quick_menu_show_undo_save_load_state": "true",
+    # Itens que so confundem quem quer salvar e voltar ao jogo. (As
+    # conquistas nem aparecem: cheevos_enable fica no padrao, desligado.)
     "quick_menu_show_replay": "false",
-    "quick_menu_show_cheevos": "false",
     "menu_show_core_updater": "false",
     "menu_show_online_updater": "false",
     "menu_show_load_content_animation": "false",
@@ -629,10 +644,13 @@ BASE_COMUM = {
     "quick_menu_show_start_streaming": "false",
     "input_recording_toggle": "nul",
     "input_streaming_toggle": "nul",
-    "input_bsv_record_toggle": "nul",
+    # Gravar e repetir a partida (replay, so os botoes): o atalho tinha o
+    # nome antigo ("input_bsv_record_toggle") e nao valia; o padrao do
+    # RetroArch ja e' sem tecla, e aqui fica garantido.
+    "input_record_replay": "nul",
+    "input_play_replay": "nul",
+    "input_halt_replay": "nul",
     "input_grab_mouse_toggle": "nul",
-    "notification_show_recording": "false",
-    "notification_show_streaming": "false",
     "settings_show_user_interface": "false",
     "settings_show_file_browser": "false",
 
@@ -680,32 +698,13 @@ BASE_COMUM = {
     # Consulta o controle o mais tarde possivel dentro do quadro: e o
     # ajuste que mais reduz atraso de comando sem custar desempenho.
     "input_poll_type_behavior": "2",
-    "input_autodetect_enable": "true",
 
-    # --- Analogico E direcional funcionando juntos ------------------------
-    # Valor 1 faz o analogico esquerdo tambem valer como direcional, SEM
-    # desligar o direcional de verdade. Os dois funcionam ao mesmo tempo,
-    # em qualquer controle - e o aluno usa o que preferir sem configurar
-    # nada. Num jogo de PlayStation 1 sem suporte a analogico, e a
-    # diferenca entre o controle funcionar ou nao.
-    "input_player1_analog_dpad_mode": "1",
-    "input_player2_analog_dpad_mode": "1",
-    "input_player3_analog_dpad_mode": "1",
-    "input_player4_analog_dpad_mode": "1",
-
-    # --- Vibracao --------------------------------------------------------
-    # Funciona em Xbox, PS4, PS5 e Switch Pro por cabo. Em controle
-    # generico depende do modelo.
-    "input_rumble_gain": "100",
-    "input_auto_game_focus": "0",
     "video_black_frame_insertion": "0",
     "savestate_auto_save": "false",
     "savestate_auto_load": "false",
     "savestate_thumbnail_enable": "false",
     "content_show_favorites": "false",
     "content_show_history": "false",
-    "menu_show_online_updater": "false",
-    "menu_show_core_updater": "false",
     "check_firmware_before_loading": "false",
     "video_font_enable": "false",
     "fps_show": "false",
@@ -772,12 +771,20 @@ PERFIS_GRAFICOS = {
             "menu_show_load_content_animation": "true",
             "audio_latency": "32",
             "audio_resampler_quality": "5",
-            "rewind_enable": "true",
-            # Resposta instantanea: o emulador roda um quadro escondido e
-            # devolve o resultado na hora, tirando o atraso que o console
-            # de verdade tinha. So no perfil mais pesado, e so em maquina
-            # que aguenta - por isso a checagem de nota logo abaixo.
-            "run_ahead_enabled": "true",
+            # "Voltar no tempo" e "Resposta instantanea" NAO entram sozinhas
+            # (auditoria 3, Fase 5, 09/10/2026). O Qualidade e' o que o
+            # automatico escolhe para todo console de custo ate 3 numa
+            # maquina de nota 4 -- e o Celeron N5100 da escola tira nota 4,
+            # igual ao Ryzen (a nota conta nucleos). Medido no Ryzen, com o
+            # jogo aberto (testes da Fase 5): o voltar no tempo derrubava o
+            # N64 de 60 para 30 quadros/s; a resposta instantanea fazia o
+            # ZX Spectrum gastar 12x o processador (55% contra 4,7% de um
+            # nucleo), e as duas juntas, o PS1 5x (46,7% contra 8,7%, e 57
+            # quadros/s). No Celeron (43% da velocidade de um nucleo do
+            # Ryzen) o PS1 passaria de um nucleo inteiro. As duas continuam
+            # em Ajustes -> Avancado para quem quiser ligar.
+            "rewind_enable": "false",
+            "run_ahead_enabled": "false",
         },
     },
 }
@@ -997,6 +1004,32 @@ def recursos_visiveis():
     nota = CAPACIDADE["nota"]
     return [r for r in carregar_recursos()["recursos"]
             if nota >= r.get("nota_minima", 0)]
+
+
+def avancado_desta_maquina(config):
+    """As opcoes avancadas que valem NESTA maquina.
+
+    A configuracao viaja no pen drive. Uma opcao pesada (nota_minima no
+    recursos.json) ligada num PC forte nao pode voltar a valer no
+    notebook fraco: aqui a tela nem a mostra (recursos_visiveis). Achado
+    da auditoria 3 (07/10/2026): a "Resposta instantanea" ligada num i5
+    religava no Celeron por cima da trava de opcoes_efetivas.
+
+    Fora da nota, a opcao volta ao padrao do ARENA (AVANCADO_PADRAO, sempre
+    o desligado); sem padrao, vale o que o perfil de imagem manda (os perfis
+    sempre escrevem filtro, voltar no tempo, resposta instantanea e quadro
+    preto). Tirar a opcao nao bastava: o RetroArch guarda no retroarch.cfg,
+    ao fechar, o que recebeu -- e o valor do PC forte voltaria por la."""
+    nota = CAPACIDADE["nota"]
+    pesadas = {r["chave"] for r in carregar_recursos()["recursos"]
+               if nota < r.get("nota_minima", 0)}
+    desta = {}
+    for chave, valor in (config.get("avancado") or {}).items():
+        if chave not in pesadas:
+            desta[chave] = valor
+        elif chave in AVANCADO_PADRAO:
+            desta[chave] = AVANCADO_PADRAO[chave]
+    return desta
 
 
 def recursos_por_chave():
@@ -1267,13 +1300,13 @@ LIMITE_FOTO_PERFIL = 2 * 1024 * 1024
 
 def foto_perfil_caminho():
     """Acha o arquivo da foto atual, seja qual for a extensao - ou None
-    se ninguem colocou foto ainda."""
-    try:
-        for nome in os.listdir(PASTA_PERFIL):
-            if nome.startswith("foto."):
-                return os.path.join(PASTA_PERFIL, nome)
-    except OSError:
-        pass
+    se ninguem colocou foto ainda. So os nomes certos (foto.png, foto.jpg,
+    foto.webp): o temporario de uma gravacao interrompida tambem comeca com
+    "foto." (foto.png.1234.tmp) e nao pode passar por foto (auditoria 3)."""
+    for extensao in TIPOS_FOTO_PERFIL.values():
+        caminho = os.path.join(PASTA_PERFIL, "foto" + extensao)
+        if os.path.isfile(caminho):
+            return caminho
     return None
 
 
@@ -1297,31 +1330,40 @@ def gravar_foto_perfil(imagem_base64):
     try:
         brutos = base64.b64decode(imagem_base64, validate=True)
     except (binascii.Error, ValueError):
-        raise ValueError("Imagem inválida.")
+        raise ValueError("Não consegui ler essa imagem. Escolha outra foto (PNG, JPG ou WEBP).")
 
     if not brutos or len(brutos) > LIMITE_FOTO_PERFIL:
-        raise ValueError("Foto grande demais (limite de 2 MB).")
+        raise ValueError("Foto grande demais: o limite é 2 MB. Escolha uma foto menor.")
 
     tipo = _tipo_da_imagem(brutos)
     if tipo not in TIPOS_FOTO_PERFIL:
-        raise ValueError("Formato de imagem não aceito (use PNG, JPG ou WEBP).")
+        raise ValueError("Esse formato de imagem não serve. Escolha uma foto PNG, JPG ou WEBP.")
 
     os.makedirs(PASTA_PERFIL, exist_ok=True)
     antiga = foto_perfil_caminho()
-    if antiga:
+    destino = os.path.join(PASTA_PERFIL, "foto" + TIPOS_FOTO_PERFIL[tipo])
+    temporario = "%s.%d.tmp" % (destino, threading.get_ident())
+    try:
+        with TRAVA_ARQUIVO:
+            with open(temporario, "wb") as arquivo:
+                arquivo.write(brutos)
+                arquivo.flush()
+                os.fsync(arquivo.fileno())
+            os.replace(temporario, destino)
+    finally:
+        if os.path.exists(temporario):
+            try:
+                os.remove(temporario)
+            except OSError:
+                pass
+    # A antiga (de outra extensao) so sai depois que a nova esta inteira no
+    # lugar. Achado da auditoria 3: saia ANTES, e uma gravacao que falhasse
+    # (pen drive cheio) deixava o aluno sem foto nenhuma.
+    if antiga and os.path.normcase(antiga) != os.path.normcase(destino):
         try:
             os.remove(antiga)
         except OSError:
             pass
-
-    destino = os.path.join(PASTA_PERFIL, "foto" + TIPOS_FOTO_PERFIL[tipo])
-    temporario = "%s.%d.tmp" % (destino, threading.get_ident())
-    with TRAVA_ARQUIVO:
-        with open(temporario, "wb") as arquivo:
-            arquivo.write(brutos)
-            arquivo.flush()
-            os.fsync(arquivo.fileno())
-        os.replace(temporario, destino)
     return destino
 
 
@@ -1477,13 +1519,15 @@ def opcoes_efetivas(config, custo=None, controles_ligados=None):
         driver = MAQUINA["driver_video"]
     ajustar_para_driver(opcoes, driver, nome_perfil)
 
-    # Trava de seguranca: resposta instantanea custa quase o dobro de
-    # processador. Em maquina abaixo de nota 4, ela transforma um jogo que
-    # rodava liso num jogo que engasga. Melhor nem oferecer.
+    # Trava de seguranca: resposta instantanea custa de 4 a 12 vezes o
+    # processador do emulador (medido na Fase 5 da auditoria 3: PS1 e ZX
+    # Spectrum). Em maquina abaixo de nota 4, ela transforma um jogo que
+    # rodava liso num jogo que engasga. Melhor nem oferecer. (Nenhum perfil
+    # liga sozinho; so o aluno, em Ajustes -> Avancado.)
     if CAPACIDADE["nota"] < 4:
         opcoes["run_ahead_enabled"] = "false"
 
-    opcoes.update(config.get("avancado", {}))
+    opcoes.update(avancado_desta_maquina(config))
     opcoes["video_driver"] = driver
     opcoes["log_dir"] = PASTA_DADOS
 
@@ -1796,14 +1840,30 @@ def carregar_catalogo():
     return _cache["catalogo"]
 
 
+# Uma releitura dos jogos por vez. Separada da TRAVA_CACHE de proposito:
+# achado da auditoria 3 (08/10/2026, testes\teste_tela_responde_indexando.py)
+# -- a releitura segurava a TRAVA_CACHE do comeco ao fim, e essa trava e' a
+# mesma da configuracao, que quase toda rota le. Enquanto o ARENA relia
+# 5.000 jogos (7 s no Ryzen, ~16 s no Celeron), a tela inteira esperava.
+TRAVA_RELEITURA = threading.Lock()
+
+
 def manifesto(forcar=False):
     """Catalogo de jogos, com cache curto em memoria."""
     with TRAVA_CACHE:
         idade, salvo = _cache["manifesto"]
         if not forcar and salvo and (time.time() - idade) < VALIDADE_CACHE:
             return salvo
+    with TRAVA_RELEITURA:
+        if not forcar:
+            # Quem esperou a releitura de outro pedido usa o resultado dela.
+            with TRAVA_CACHE:
+                idade, salvo = _cache["manifesto"]
+                if salvo and (time.time() - idade) < VALIDADE_CACHE:
+                    return salvo
         resultado = indexador.indexar(forcar=forcar)
-        _cache["manifesto"] = (time.time(), resultado)
+        with TRAVA_CACHE:
+            _cache["manifesto"] = (time.time(), resultado)
         return resultado
 
 
@@ -1875,6 +1935,9 @@ def avaliar_plataformas(forcar=False):
             # Sega CD e Saturn nao abrem jogo nenhum sem a BIOS deles. Antes
             # (ate 03/10/2026) so ficavam "falta" com a pasta system VAZIA:
             # com a BIOS do PS1 la, apareciam prontos e o jogo nao abria.
+            # Desde a auditoria 3 (Fase 5), tambem os que so abrem com a BIOS
+            # do catalogo (ColecoVision, MSX, 3DO, Intellivision, PC-FX, CD-i,
+            # Odyssey 2): o ColecoVision abria com a tela preta, calado.
             estado = "falta_sistema"
             motivo = bios.falta_para_o_console(plataforma["id"], PASTA_SISTEMA)
         else:
@@ -2037,6 +2100,20 @@ def buscar_capas_que_faltam():
 
 def achar_jogo(jogo_id):
     return next((j for j in manifesto()["jogos"] if j["id"] == jogo_id), None)
+
+
+def nucleo_das_pastas(jogo):
+    """'Snes9x': a subpasta do nucleo deste jogo dentro de retroarch\\saves,
+    states e cheats -- onde o RetroArch guarda tudo dele (servidor\\cheats.py).
+    None para console sem nucleo do RetroArch (emulador de fora)."""
+    plataforma = next((p for p in carregar_catalogo() if p["id"] == jogo.get("plataforma")), None)
+    return cheats.nome_do_nucleo((plataforma or {}).get("core"), os.path.join(PASTA_RETROARCH, "info"))
+
+
+def jogo_aberto_agora(jogo):
+    """Este jogo esta aberto no emulador agora?"""
+    with TRAVA_JOGO:
+        return JOGO_EM_ANDAMENTO["ativo"] and JOGO_EM_ANDAMENTO.get("id") == jogo["id"]
 
 
 # ---------------------------------------------------------------------------
@@ -2222,21 +2299,34 @@ def ler_problemas():
             if isinstance(v, dict) and isinstance(v.get("texto"), str)}
 
 
-def anotar_motivo_do_erro(jogo, desde):
+def anotar_motivo_do_erro(jogo, desde, partida=None):
     """Depois do jogo: le o registro DESTA partida e guarda por que ele nao
     abriu -- ou apaga o motivo antigo, se agora abriu.
 
     Achado de 02/10/2026: o Rafael abriu o KOF 2002 quatro vezes; nas quatro
     o MAME escreveu no registro o que faltava, e o ARENA nao dizia nada (o
     RetroArch so mostra "Falha ao carregar o conteudo"). Nunca atrapalha o
-    resto: qualquer falha aqui e' ignorada."""
+    resto: qualquer falha aqui e' ignorada.
+
+    Jogar Junto (auditoria 3): quem tentou ENTRAR na partida de um colega e
+    nao conseguiu ve, ao voltar, o porque (partida cheia ou rede barrando).
+    Isso nao marca o jogo como "com problema": o jogo abre."""
     try:
         registro = motivo_do_erro.registro_da_partida(PASTA_DADOS, desde)
         if not registro:
             return None
+        texto_do_registro = motivo_do_erro.ler(registro)
+        if partida and not partida.get("hospedar") and not partida.get("assistir"):
+            recado = motivo_do_erro.motivo_da_partida(
+                texto_do_registro, (jogo.get("ligacao") or {}).get("jogadores"))
+            if recado:
+                ULTIMO_PROBLEMA.clear()
+                ULTIMO_PROBLEMA.update({"jogo_id": jogo["id"], "titulo": jogo.get("titulo", ""),
+                                        "texto": recado})
+                print("[ARENA] Jogar junto: %s" % recado)
+                return None
         caminho = os.path.join(RAIZ, jogo["arquivo"])
-        resultado = motivo_do_erro.analisar(motivo_do_erro.ler(registro), caminho,
-                                           jogo.get("core", ""))
+        resultado = motivo_do_erro.analisar(texto_do_registro, caminho, jogo.get("core", ""))
         problemas = ler_problemas()
         if resultado and resultado.get("discos"):
             # Faltou o disco (.chd) de um fliperama: a pasta onde ele vai
@@ -2473,6 +2563,15 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         # jogo de varios discos e' quase sempre de um jogador so (RPG).
         if not partida:
             caminho_jogo = lista_de_discos(jogo, caminho_jogo)
+            # Codigo de cheat cadastrado antes da auditoria 3 ficava num
+            # lugar em que o RetroArch nao procura (servidor\cheats.py): vai
+            # para o lugar certo antes de abrir. Na partida a dois o
+            # RetroArch nao usa cheat nenhum.
+            try:
+                if cheats.levar_do_lugar_antigo(jogo, cheats.nome_do_nucleo(jogo.get("core"))):
+                    print("[ARENA] Codigos de cheat deste jogo levados para a pasta que o RetroArch le.")
+            except OSError as falha:
+                print("[ARENA] Nao consegui levar os codigos de cheat para a pasta certa: %s" % falha)
         extra = dict(partida["opcoes"]) if partida else None
         # Mais de 2 jogadores (graficos.jogadores_do_jogo, calculado no
         # /api/jogar). Entra POR ULTIMO, depois das opcoes de controle:
@@ -2611,7 +2710,7 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             # Nao abriu? O registro do RetroArch diz por que (MAME e FBNeo
             # dizem ate o nome de cada arquivo que falta).
             if not jogo.get("externo"):
-                anotar_motivo_do_erro(jogo, aberto_em)
+                anotar_motivo_do_erro(jogo, aberto_em, partida)
         except OSError as falha:
             print("[ARENA] Nao foi possivel abrir o RetroArch: %s" % falha)
         finally:
@@ -2777,34 +2876,91 @@ def e_pasta_de_copia(nome):
         return False
 
 
+# Pastas de saves que a copia nao leva: o saves\.netplay e' a pasta
+# descartavel que o RetroArch usa so enquanto o aluno e' convidado numa
+# partida (para o save do colega nao cobrir o dele) -- e vem somente
+# leitura; CACHE e' o que o emulador refaz sozinho (os sombreadores do PSP,
+# saves\PPSSPP\PSP\SYSTEM\CACHE -- achado da auditoria 3, Fase 0).
+FORA_DA_COPIA = {".netplay", "cache"}
+
+
+def arquivos_da_copia():
+    """(origem, caminho dentro da copia) de tudo o que a copia leva: a
+    configuracao do RetroArch (e' ela que guarda o mapeamento dos
+    controles), o banco, a configuracao e os controles do ARENA, e os saves
+    comuns (pequenos -- alguns KB -- e o que doi perder)."""
+    itens = []
+    origem_cfg = os.path.join(PASTA_RETROARCH, "retroarch.cfg")
+    if os.path.isfile(origem_cfg):
+        itens.append((origem_cfg, "retroarch.cfg"))
+    for nome in ARQUIVOS_DE_BACKUP:
+        origem = os.path.join(PASTA_DADOS, nome)
+        if os.path.isfile(origem):
+            itens.append((origem, nome))
+    if os.path.isdir(PASTA_SAVES):
+        for atual, pastas, arquivos in os.walk(PASTA_SAVES):
+            pastas[:] = sorted(p for p in pastas if p.lower() not in FORA_DA_COPIA)
+            for nome in sorted(arquivos):
+                origem = os.path.join(atual, nome)
+                itens.append((origem, os.path.join("saves", os.path.relpath(origem, PASTA_SAVES))))
+    return itens
+
+
+def ultima_copia():
+    """A pasta da copia de seguranca mais recente, ou None."""
+    try:
+        copias = sorted(d for d in os.listdir(PASTA_BACKUP)
+                        if os.path.isdir(os.path.join(PASTA_BACKUP, d)) and e_pasta_de_copia(d))
+    except OSError:
+        return None
+    return os.path.join(PASTA_BACKUP, copias[-1]) if copias else None
+
+
+def copia_igual(pasta_da_copia, itens):
+    """A copia guardada ja tem tudo o que uma nova levaria, igual?
+
+    Tamanho diferente: mudou. Mesmo tamanho e a mesma data (a copia guarda a
+    data do original): igual. Mesmo tamanho e data diferente: compara o
+    conteudo -- o save de cartucho tem SEMPRE o mesmo tamanho, e o FAT32
+    guarda a hora de 2 em 2 segundos (a copia pode ficar com outra hora sem
+    nada ter mudado). Os arquivos sao pequenos (KB)."""
+    import filecmp
+    if not pasta_da_copia or not itens:
+        return False
+    for origem, relativo in itens:
+        guardado = os.path.join(pasta_da_copia, relativo)
+        try:
+            atual, antes = os.stat(origem), os.stat(guardado)
+            if atual.st_size != antes.st_size:
+                return False
+            if atual.st_mtime_ns != antes.st_mtime_ns and not filecmp.cmp(origem, guardado, shallow=False):
+                return False
+        except OSError:
+            return False
+    return True
+
+
 def fazer_backup():
-    """Guarda banco, configuracao e saves comuns na pasta backup."""
+    """Guarda banco, configuracao e saves comuns na pasta backup.
+
+    So quando algo mudou desde a ultima copia. Achado da auditoria 3 (Fase
+    0): copias iguais umas as outras (uma a cada abertura, uma a cada volta
+    da internet) faziam o rodizio de 3 jogar fora as copias de momentos
+    diferentes. Nada mudou: devolve a ultima copia, que ja guarda tudo."""
     import shutil
     try:
         os.makedirs(PASTA_BACKUP, exist_ok=True)
+        itens = arquivos_da_copia()
+        anterior = ultima_copia()
+        if copia_igual(anterior, itens):
+            return anterior
         carimbo = time.strftime("%Y-%m-%d_%H%M%S")
         destino = os.path.join(PASTA_BACKUP, carimbo)
         os.makedirs(destino, exist_ok=True)
-
-        # A configuracao do RetroArch entra na copia: e ela que guarda o
-        # mapeamento dos controles.
-        origem_cfg = os.path.join(PASTA_RETROARCH, "retroarch.cfg")
-        if os.path.isfile(origem_cfg):
-            shutil.copy2(origem_cfg, os.path.join(destino, "retroarch.cfg"))
-
-        for nome in ARQUIVOS_DE_BACKUP:
-            origem = os.path.join(PASTA_DADOS, nome)
-            if os.path.isfile(origem):
-                shutil.copy2(origem, os.path.join(destino, nome))
-
-        # Saves comuns sao pequenos (alguns KB) e sao o que doi perder.
-        # Fica de fora o saves\.netplay: e' a pasta descartavel que o
-        # RetroArch usa so enquanto o aluno e' convidado numa partida (para
-        # o save do colega nao cobrir o dele) -- e vem somente leitura.
-        if os.path.isdir(PASTA_SAVES):
-            shutil.copytree(PASTA_SAVES, os.path.join(destino, "saves"),
-                            dirs_exist_ok=True,
-                            ignore=shutil.ignore_patterns(".netplay"))
+        for origem, relativo in itens:
+            alvo = os.path.join(destino, relativo)
+            os.makedirs(os.path.dirname(alvo), exist_ok=True)
+            shutil.copy2(origem, alvo)
 
         # Mantem so as copias mais recentes. Giram SO as pastas com nome de
         # data (o carimbo acima): o .zip do "Exportar" e as pastas avulsas
@@ -2879,11 +3035,12 @@ def importar_saves(nome_arquivo):
     maquina, seu save continua valendo. O que vem de fora so preenche o
     que estava faltando. Assim ninguem perde progresso por engano.
     """
+    import shutil
     import zipfile
 
     caminho = os.path.join(PASTA_BACKUP, os.path.basename(str(nome_arquivo)))
     if not dentro_da_pasta(caminho, PASTA_BACKUP) or not os.path.isfile(caminho):
-        return None, "Pacote não encontrado na pasta backup."
+        return None, ("Não achei o pacote na pasta backup. Copie o arquivo meu-progresso (o .zip) para a pasta backup e tente de novo.")
 
     destinos = {"saves": PASTA_SAVES, "states": PASTA_STATES,
                 "cheats": PASTA_CHEATS, "remaps": PASTA_REMAPS,
@@ -2905,11 +3062,23 @@ def importar_saves(nome_arquivo):
                     pulados += 1
                     continue
                 os.makedirs(os.path.dirname(alvo), exist_ok=True)
-                with pacote.open(item) as origem, open(alvo, "wb") as saida:
-                    saida.write(origem.read())
+                # Pelo temporario: se o pen drive sair no meio, nao fica um
+                # save cortado com o nome certo -- a proxima importacao o
+                # pularia por "ja existir". Achado da auditoria 3.
+                temporario = alvo + ".importando"
+                try:
+                    with pacote.open(item) as origem, open(temporario, "wb") as saida:
+                        shutil.copyfileobj(origem, saida)
+                    os.replace(temporario, alvo)
+                finally:
+                    if os.path.exists(temporario):
+                        try:
+                            os.remove(temporario)
+                        except OSError:
+                            pass
                 trazidos += 1
     except (zipfile.BadZipFile, OSError) as falha:
-        return None, "Pacote danificado ou ilegivel (%s)." % falha
+        return None, ("O pacote está danificado ou não dá para ler (%s). No outro computador, clique em Montar meu pacote de novo e tente outra vez." % falha)
 
     return {"trazidos": trazidos, "ja_existiam": pulados}, None
 
@@ -3129,6 +3298,98 @@ def gritar(pacote):
                     pass
 
 
+# Teto da lista de colegas vistos: numa sala cabem uns 40. Cada computador
+# da rede pode mandar o que quiser na porta da descoberta; sem teto, quem
+# inventasse codigos enchia a lista (e a poda, a cada pacote, ficava
+# cada vez mais lenta). Por endereco, ate 4 (dois ARENAs no mesmo
+# computador ja acontece nos testes).
+LIMITE_VIZINHOS = 200
+LIMITE_POR_ENDERECO = 4
+# (Sem limite de gritos por segundo por endereco, de proposito: a revisao
+# de seguranca de 08/10/2026 mostrou que, com o endereco de origem
+# falsificado, alguem gastaria a cota de um colega de verdade e o faria
+# sumir da lista -- e contar o pacote custa quase o mesmo que le-lo.)
+_PODA_DOS_VIZINHOS = {"ultima": 0.0, "aviso": 0.0}
+
+
+def receber_grito(pacote, remetente, meus=None, agora=None):
+    """Trata um grito recebido na porta da descoberta. Devolve True se o
+    colega entrou (ou foi renovado) na lista.
+
+    Vem da rede: qualquer computador pode mandar qualquer coisa. Achado da
+    auditoria 3 (07/10/2026): um pacote torto -- um JSON que nao e'
+    objeto, ou "porta": "abc" -- levantava erro fora do try e MATAVA a
+    linha que escuta: a descoberta de colegas acabava ate fechar o ARENA.
+    E a lista nao tinha teto. Agora tudo o que chega e' conferido, e uma
+    enxurrada (de um computador, ou com enderecos inventados) nao tira da
+    lista os colegas que ja estao nela.
+    """
+    agora = time.monotonic() if agora is None else agora
+    if not pacote.startswith(MARCA_DESCOBERTA):
+        return False
+    ip = str(remetente[0])
+    try:
+        dados = json.loads(pacote[len(MARCA_DESCOBERTA):].decode("utf-8"))
+    except (ValueError, UnicodeDecodeError):
+        return False
+    if not isinstance(dados, dict):
+        return False
+    identificacao = str(dados.get("id") or "")[:32]
+    if not identificacao:
+        return False
+    # Sem porta no grito: a padrao. Porta que nao e' numero de 1 a 65535
+    # (0, "abc", true, [1]...): o grito nao vale.
+    porta_bruta = dados.get("porta")
+    if isinstance(porta_bruta, bool):
+        return False
+    try:
+        porta_dele = PORTA if porta_bruta in (None, "") else int(porta_bruta)
+    except (TypeError, ValueError, OverflowError):
+        return False
+    if not 1 <= porta_dele <= 65535:
+        return False
+    # "Sou eu?" nao da para responder pelo codigo: em laboratorio com
+    # maquinas clonadas o codigo pode se repetir, e ai o ARENA ignoraria o
+    # colega achando que e o proprio eco. Quem responde e o par
+    # endereco+porta, que e unico de verdade.
+    if meus is None:
+        meus = {e["ip"] for e in enderecos_locais()} | {"127.0.0.1"}
+    if porta_dele == PORTA and ip in meus:
+        return False
+    with TRAVA_VIZINHOS:
+        # Some quem sumiu ha mais de um minuto -- no maximo uma vez por
+        # segundo (com pacote chegando sem parar, era a cada pacote).
+        if agora - _PODA_DOS_VIZINHOS["ultima"] >= 1.0:
+            _PODA_DOS_VIZINHOS["ultima"] = agora
+            for chave in [k for k, v in VIZINHOS.items() if agora - v["visto_em"] > 60]:
+                VIZINHOS.pop(chave, None)
+        atual = VIZINHOS.get(identificacao)
+        if atual is None:
+            # Lista cheia (no total, ou deste endereco): quem ja esta fica, e
+            # o novo espera vagar (quem some sai em 1 minuto). A primeira
+            # versao tirava o mais antigo -- e uma enxurrada de codigos
+            # inventados empurrava para fora os colegas de verdade.
+            do_mesmo = sum(1 for v in VIZINHOS.values() if v["ip"] == ip)
+            if do_mesmo >= LIMITE_POR_ENDERECO or len(VIZINHOS) >= LIMITE_VIZINHOS:
+                return False
+        elif atual["ip"] != ip and agora - atual["visto_em"] <= 60:
+            # O codigo ja esta no ar em outro endereco: quem chega com o
+            # codigo de outro nao toma o lugar dele. O computador que mudou
+            # de endereco de verdade volta em ate 1 minuto, quando o
+            # endereco antigo some (e o de dois adaptadores de rede para de
+            # trocar de endereco a cada grito).
+            return False
+        VIZINHOS[identificacao] = {
+            "id": identificacao,
+            "apelido": limpar_apelido(dados.get("apelido", "")),
+            "ip": ip,
+            "porta": porta_dele,
+            "visto_em": agora,
+            "partida": limpar_partida_recebida(dados.get("partida")),
+        }
+    return True
+
+
 def anunciar_e_escutar():
     """Fica gritando e ouvindo na rede local, em segundo plano."""
     try:
@@ -3180,39 +3441,13 @@ def anunciar_e_escutar():
         except (socket.timeout, OSError):
             continue
 
-        if not pacote.startswith(MARCA_DESCOBERTA):
-            continue
+        # Vem da rede: nada do que chega pode derrubar quem escuta.
         try:
-            dados = json.loads(pacote[len(MARCA_DESCOBERTA):].decode("utf-8"))
-        except (ValueError, UnicodeDecodeError):
-            continue
-
-        identificacao = str(dados.get("id", ""))[:32]
-        if not identificacao:
-            continue
-
-        # "Sou eu?" nao da para responder pelo codigo: em laboratorio com
-        # maquinas clonadas o codigo pode se repetir, e ai o ARENA
-        # ignoraria o colega achando que e o proprio eco. Quem responde e
-        # o par endereco+porta, que e unico de verdade.
-        porta_dele = int(dados.get("porta") or PORTA)
-        meus = {e["ip"] for e in enderecos_locais()} | {"127.0.0.1"}
-        if porta_dele == PORTA and remetente[0] in meus:
-            continue
-
-        with TRAVA_VIZINHOS:
-            VIZINHOS[identificacao] = {
-                "id": identificacao,
-                "apelido": str(dados.get("apelido", ""))[:24],
-                "ip": remetente[0],
-                "porta": int(dados.get("porta") or PORTA),
-                "visto_em": time.monotonic(),
-                "partida": limpar_partida_recebida(dados.get("partida")),
-            }
-            # Some quem sumiu ha mais de um minuto.
-            for chave in [k for k, v in VIZINHOS.items()
-                          if time.monotonic() - v["visto_em"] > 60]:
-                VIZINHOS.pop(chave, None)
+            receber_grito(pacote, remetente)
+        except Exception as falha:   # noqa: BLE001 -- defeito nosso, nao do pacote
+            if time.monotonic() - _PODA_DOS_VIZINHOS["aviso"] > 60:
+                _PODA_DOS_VIZINHOS["aviso"] = time.monotonic()
+                print("[ARENA] Descoberta de colegas: pacote ignorado (%s)." % falha)
 
 
 def limpar_partida_recebida(partida):
@@ -3250,6 +3485,68 @@ def colegas_na_rede():
             "jogo_id_partida": (vizinho.get("partida") or {}).get("jogo_id", ""),
         })
     return saida
+
+
+# A rede que o Windows marcou como Publica (auditoria 3, Fase 4). O Firewall
+# fecha bem mais nela, e a caixa "Permitir que este app se comunique" pede
+# senha de administrador -- o aluno nao consegue aprovar, e ninguem entra na
+# partida dele. O PARTIDA.bat ja dizia isso; agora a tela avisa quem ABRE a
+# partida, na hora, com a saida que nao pede senha: outro computador abre e
+# este entra (quem entra so faz conexao de saida, que o Firewall deixa).
+# O "Estamos em casas diferentes" NAO e' saida: testado em 09/10/2026, com
+# ele o anfitriao vai pelo repasse da internet e nao atende na rede local, e
+# o convidado (que o ARENA manda para o endereco local) nao entra.
+_CATEGORIA_DA_REDE = {"valor": None, "quando": 0.0, "perguntando": False}
+VALIDADE_DA_CATEGORIA = 300.0
+AVISO_REDE_PUBLICA = (
+    "Atenção: o Windows marcou esta rede como Pública, e o Firewall pode barrar quem tentar "
+    "entrar (a caixa de permissão pede senha de administrador). Se ninguém conseguir entrar, "
+    "troquem: outro computador abre a partida e este entra — quem entra não precisa dessa permissão.")
+
+
+def _perguntar_categoria_da_rede():
+    """"Public", "Private", "DomainAuthenticated" ou None (so LER a categoria
+    nao pede administrador). Leva ~1 s (PowerShell): nunca no caminho de
+    abrir o jogo. Com duas redes ligadas (o cabo direto e o Wi-Fi), basta
+    uma ser Publica: a partida pode estar passando justo por ela (revisao da
+    Fase 4 -- antes valia so a primeira da lista)."""
+    try:
+        resultado = subprocess.run(
+            ["powershell.exe", "-NoProfile", "-NonInteractive", "-Command",
+             "(Get-NetConnectionProfile).NetworkCategory"],
+            capture_output=True, text=True, timeout=10,
+            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+        categorias = [c.strip() for c in resultado.stdout.splitlines() if c.strip()]
+        if "Public" in categorias:
+            return "Public"
+        return categorias[0] if categorias else None
+    except (OSError, subprocess.SubprocessError):
+        return None
+    finally:
+        _CATEGORIA_DA_REDE["perguntando"] = False
+
+
+def preparar_categoria_da_rede():
+    """Pergunta em segundo plano, se a resposta guardada ja passou de 5 min."""
+    if not sys.platform.startswith("win") or _CATEGORIA_DA_REDE["perguntando"]:
+        return
+    if time.monotonic() - _CATEGORIA_DA_REDE["quando"] < VALIDADE_DA_CATEGORIA and _CATEGORIA_DA_REDE["quando"]:
+        return
+    _CATEGORIA_DA_REDE["perguntando"] = True
+
+    def perguntar():
+        _CATEGORIA_DA_REDE["valor"] = _perguntar_categoria_da_rede()
+        _CATEGORIA_DA_REDE["quando"] = time.monotonic()
+    threading.Thread(target=perguntar, daemon=True).start()
+
+
+def aviso_da_rede_para_quem_hospeda(agora=None):
+    """O aviso da rede Publica, ou "" (sem resposta recente: nao espera, e
+    nem usa resposta velha -- a rede pode ter mudado de categoria ou de
+    lugar desde entao). Quem chama ja pede outra pergunta para a proxima."""
+    agora = time.monotonic() if agora is None else agora
+    recente = _CATEGORIA_DA_REDE["quando"] and agora - _CATEGORIA_DA_REDE["quando"] < 2 * VALIDADE_DA_CATEGORIA
+    return AVISO_REDE_PUBLICA if recente and _CATEGORIA_DA_REDE["valor"] == "Public" else ""
 
 
 def procurar_partidas(config):
@@ -3744,7 +4041,11 @@ VIGIA = {
     "ultimo_backup": 0.0,
     "ultimo_backup_local": 0.0,
     "estava_offline": True,
-    "internet_estava_fora": True,
+    # None = "ainda nao sei". Comecava True, e a primeira checagem (20 s
+    # depois de abrir) contava como "a internet voltou": uma copia de
+    # seguranca a CADA abertura -- e, com o rodizio de 3, tres aberturas
+    # apagavam as copias de antes. Achado da auditoria 3 (07/10/2026).
+    "internet_estava_fora": None,
     "encerrar": threading.Event(),
     # Ligado durante o jogo no modo ultra: as tarefas de fundo param de
     # vez, para nao roubar processador nem tocar no disco enquanto o
@@ -4263,10 +4564,10 @@ class Manipulador(BaseHTTPRequestHandler):
             achado = next((j for j in manifesto()["jogos"]
                            if j["titulo"].lower() == titulo), None)
             if not achado:
-                return self.erro("Não tenho esse jogo.", 404)
+                return self.erro("Este computador não tem esse jogo. Para jogar junto, os dois precisam do mesmo arquivo de jogo: copie o jogo para a pasta jogos\\pessoais do outro computador.", 404)
             marca = impressao_do_jogo(achado)
             if not marca:
-                return self.erro("Não consegui ler o arquivo.", 404)
+                return self.erro("Não consegui ler o arquivo do jogo para comparar. Feche o jogo, se estiver aberto, e tente de novo.", 404)
             return self.responder_json(marca)
 
         # ---- acervo de jogos livres ---------------------------------------
@@ -4280,8 +4581,12 @@ class Manipulador(BaseHTTPRequestHandler):
                     falta[plataforma["id"]] = (
                         graficos.falta_para_o_externo(dados_externo["nome"], caminho_externo)
                         if caminho_externo else "o emulador não está na pasta")
+            # O formato do disco do ARENA: no FAT32 nao cabe arquivo maior que
+            # 4 GB, e a tela avisa nos consoles de jogo grande ANTES de alguem
+            # copiar (auditoria 3, Fase 6; antes so o VERIFICAR.bat dizia).
             return self.responder_json({
                 "ok": True, "pasta_bios": bios.NOME_DA_PASTA,
+                "formato_do_disco": hardware.sistema_de_arquivos(RAIZ) or "",
                 "consoles": como_colocar.guia(carregar_catalogo(), PASTA_SISTEMA, PASTA_JOGOS, falta)})
 
         # As BIOS de cada console, como estao agora (Ajustes -> Emuladores ->
@@ -4317,12 +4622,16 @@ class Manipulador(BaseHTTPRequestHandler):
                 return self.responder_json({"itens": [],
                                             "consoles": internet_archive.consoles_da_biblioteca()})
             if not VIGIA["internet"]:
-                return self.erro("Sem internet agora. A busca online precisa "
-                                 "de conexão; o acervo local continua "
+                return self.erro("Sem internet agora. Ligue o computador na internet para buscar; "
+                                 "os jogos da pasta e o acervo local continuam "
                                  "funcionando.", 503)
             try:
                 return self.responder_json({"itens": internet_archive.buscar(consulta),
                                             "consoles": internet_archive.consoles_da_biblioteca()})
+            except internet_archive.FalhaDeRede as falha:
+                # A rede falhou ou pediu login: a frase ja diz o que fazer
+                # (antes a tela dizia "nenhum resultado").
+                return self.erro(str(falha), 502)
             except Exception as falha:
                 return self.erro(traduzir_erro_do_sistema(falha, "pesquisar"), 502)
 
@@ -4399,6 +4708,13 @@ class Manipulador(BaseHTTPRequestHandler):
         if caminho == "/api/partida/procurar":
             # So deste computador (nao esta em ROTAS_REDE_EXTERNA): e' a tela
             # do convidado perguntando "quem tem partida aberta agora?".
+            # Com ?rede=1 (a janela de Jogar junto abriu), ja pergunta ao
+            # Windows, em segundo plano, se a rede e' Publica -- para o aviso
+            # de quem abre a partida nao atrasar o "Comecar". Sem ele (a busca
+            # de quando a tela abre), nao: seria um PowerShell a mais em toda
+            # abertura do ARENA, no Celeron (revisao da Fase 4).
+            if "rede=1" in urllib.parse.urlparse(self.path).query:
+                preparar_categoria_da_rede()
             config = carregar_config()
             lista, corrigidos = procurar_partidas(config)
             if corrigidos:
@@ -4448,9 +4764,9 @@ class Manipulador(BaseHTTPRequestHandler):
                     key=lambda p: p["nome"]),
                 "sugestao": jogo.get("sugestao"),
                 "pasta_atual": os.path.dirname(jogo["arquivo"]),
-                "estados": cheats.listar_estados(jogo),
-                "tem_save": cheats.tem_save(jogo),
-                "cheats": cheats.ler_cheats(jogo),
+                "estados": cheats.listar_estados(jogo, nucleo_das_pastas(jogo)),
+                "tem_save": cheats.tem_save(jogo, nucleo_das_pastas(jogo)),
+                "cheats": cheats.ler_cheats(jogo, nucleo_das_pastas(jogo)),
             })
 
         return self.erro("Rota não encontrada.", 404)
@@ -4689,7 +5005,7 @@ class Manipulador(BaseHTTPRequestHandler):
         # ---- comecar do zero: novo perfil ---------------------------------
         if caminho == "/api/perfil/novo":
             if str(dados.get("confirmar")) != "sim":
-                return self.erro("Falta confirmar.")
+                return self.erro("Falta confirmar. Clique em Começar do zero de novo e confirme.")
 
             with TRAVA_JOGO:
                 if JOGO_EM_ANDAMENTO["ativo"]:
@@ -4869,6 +5185,7 @@ class Manipulador(BaseHTTPRequestHandler):
                     return self.erro("Feche o jogo aberto antes.", 409)
                 JOGO_EM_ANDAMENTO["ativo"] = True
                 JOGO_EM_ANDAMENTO["titulo"] = "BIOS do %s" % plataforma["nome"]
+                JOGO_EM_ANDAMENTO["id"] = ""
 
             config = carregar_config()
             caminho_externo, dados_externo = graficos.achar_externo(plataforma)
@@ -4882,7 +5199,7 @@ class Manipulador(BaseHTTPRequestHandler):
                     with TRAVA_JOGO:
                         JOGO_EM_ANDAMENTO["ativo"] = False
                         JOGO_EM_ANDAMENTO["titulo"] = ""
-                    return self.erro("Este console não tem emulador instalado.")
+                    return self.erro("Este console não tem emulador instalado. Veja em Como colocar jogos (barra da esquerda) o que falta para ele.")
                 # Sem jogo no comando: o console abre na tela inicial, que
                 # e onde ficam o relogio, os ajustes e o memory card.
                 extras = {}
@@ -4930,7 +5247,7 @@ class Manipulador(BaseHTTPRequestHandler):
             try:
                 os.makedirs(alvo, exist_ok=True)
                 if not hasattr(os, "startfile"):
-                    return self.erro("Abrir a pasta só funciona no Windows. Ela fica em %s." % alvo)
+                    return self.erro("Abrir a pasta só funciona no Windows. Ela fica em %s: abra pelo gerenciador de arquivos." % alvo)
                 os.startfile(alvo)
             except OSError as falha:
                 return self.erro(traduzir_erro_do_sistema(falha, "abrir a pasta"))
@@ -4976,7 +5293,7 @@ class Manipulador(BaseHTTPRequestHandler):
                 bios.criar_prateleiras(RAIZ)
                 os.makedirs(alvo, exist_ok=True)
                 if not hasattr(os, "startfile"):
-                    return self.erro("Abrir a pasta só funciona no Windows. Ela fica em %s." % alvo)
+                    return self.erro("Abrir a pasta só funciona no Windows. Ela fica em %s: abra pelo gerenciador de arquivos." % alvo)
                 os.startfile(alvo)
             except OSError as falha:
                 return self.erro(traduzir_erro_do_sistema(falha, "abrir a pasta"))
@@ -5012,7 +5329,7 @@ class Manipulador(BaseHTTPRequestHandler):
 
             origem = os.path.join(RAIZ, jogo["arquivo"])
             if not dentro_da_pasta(origem, PASTA_JOGOS) or not os.path.isfile(origem):
-                return self.erro("O arquivo do jogo não está mais no lugar.", 404)
+                return self.erro("O arquivo do jogo não está mais no lugar (foi movido ou apagado). Clique em Atualizar lista.", 404)
 
             with TRAVA_JOGO:
                 if JOGO_EM_ANDAMENTO["ativo"]:
@@ -5031,7 +5348,7 @@ class Manipulador(BaseHTTPRequestHandler):
                      "plataforma_nome": plataforma["nome"]})
             if os.path.exists(destino):
                 return self.erro(
-                    "Já existe um arquivo com esse nome em %s." % plataforma["pasta"])
+                    "Já existe um arquivo com esse nome em %s. Apague ou renomeie o repetido e tente de novo." % plataforma["pasta"])
 
             try:
                 os.makedirs(pasta_destino, exist_ok=True)
@@ -5136,13 +5453,13 @@ class Manipulador(BaseHTTPRequestHandler):
                 return self.erro("Jogo não encontrado. Ele pode ter sido movido ou apagado. "
                                  "Clique em Atualizar lista e tente de novo.", 404)
             try:
-                apagou = cheats.apagar_estado(jogo, dados.get("espaco"))
+                apagou = cheats.apagar_estado(jogo, dados.get("espaco"), nucleo_das_pastas(jogo))
             except (TypeError, ValueError):
                 return self.erro("Esse número de espaço não existe. Escolha um dos que "
                                  "aparecem na lista de saves do jogo.")
             return self.responder_json({
                 "ok": True, "apagou": apagou,
-                "estados": cheats.listar_estados(jogo)})
+                "estados": cheats.listar_estados(jogo, nucleo_das_pastas(jogo))})
 
         # ---- cheats ------------------------------------------------------
         if caminho == "/api/cheat/adicionar":
@@ -5150,9 +5467,11 @@ class Manipulador(BaseHTTPRequestHandler):
             if not jogo:
                 return self.erro("Jogo não encontrado. Ele pode ter sido movido ou apagado. "
                                  "Clique em Atualizar lista e tente de novo.", 404)
+            if jogo_aberto_agora(jogo):
+                return self.erro(MENSAGEM_CHEAT_COM_JOGO_ABERTO, 409)
             lista, erro = cheats.adicionar_cheat(
                 jogo, str(dados.get("descricao", ""))[:120],
-                str(dados.get("codigo", "")), bool(dados.get("ligado")))
+                str(dados.get("codigo", "")), bool(dados.get("ligado")), nucleo_das_pastas(jogo))
             if erro:
                 return self.erro(erro)
             return self.responder_json({"ok": True, "cheats": lista})
@@ -5167,8 +5486,10 @@ class Manipulador(BaseHTTPRequestHandler):
             except (TypeError, ValueError):
                 return self.erro("Esse código não está mais na lista de cheats. "
                                  "Reabra o painel do jogo e tente de novo.")
+            if jogo_aberto_agora(jogo):
+                return self.erro(MENSAGEM_CHEAT_COM_JOGO_ABERTO, 409)
             lista, erro = cheats.alterar_cheat(
-                jogo, indice, dados.get("ligado"), bool(dados.get("apagar")))
+                jogo, indice, dados.get("ligado"), bool(dados.get("apagar")), nucleo_das_pastas(jogo))
             if erro:
                 return self.erro(erro, 404)
             return self.responder_json({"ok": True, "cheats": lista})
@@ -5187,11 +5508,14 @@ class Manipulador(BaseHTTPRequestHandler):
             return self.responder_json(dict(ok=True, **resultado))
 
         if caminho == "/api/backup":
+            anterior = ultima_copia()
             destino = fazer_backup()
             if not destino:
-                return self.erro("Não foi possível gravar a cópia.")
+                return self.erro("Não consegui gravar a cópia de segurança: o pen drive pode estar cheio ou só de leitura. Libere espaço e tente de novo.")
             return self.responder_json(
-                {"ok": True, "pasta": os.path.basename(destino)})
+                {"ok": True, "pasta": os.path.basename(destino),
+                 # Nada mudou desde a ultima: ela continua valendo (L3).
+                 "nada_mudou": bool(anterior) and os.path.normcase(destino) == os.path.normcase(anterior)})
 
         # ---- capa do jogo, buscada sob pedido -------------------------------
         if caminho == "/api/capa/atualizar":
@@ -5200,7 +5524,7 @@ class Manipulador(BaseHTTPRequestHandler):
                 return self.erro("Jogo não está no catálogo. Clique em Atualizar lista.", 404)
             if not VIGIA["internet"]:
                 if jogo.get("plataforma") not in ("ps3", "psp"):
-                    return self.erro("Sem internet agora. Essa busca precisa de conexão.", 503)
+                    return self.erro("Sem internet agora. Ligue o computador na internet e clique em Buscar capa de novo.", 503)
 
             # Fliperama: o nome completo do banco ("Metal Slug X - Super
             # Vehicle-001 (NGM-2500)(NGH-2500)") e' o que o banco de capas usa.
@@ -5239,7 +5563,7 @@ class Manipulador(BaseHTTPRequestHandler):
 
             imagem = str(dados.get("imagem", ""))
             if not imagem:
-                return self.erro("Nenhuma imagem enviada.")
+                return self.erro("Nenhuma imagem chegou. Escolha a imagem e tente de novo.")
             if "," in imagem:
                 imagem = imagem.split(",", 1)[1]
             try:
@@ -5247,14 +5571,14 @@ class Manipulador(BaseHTTPRequestHandler):
             except (binascii.Error, ValueError):
                 return self.erro("Essa imagem não abriu. Use um arquivo .png, .jpg ou .webp.")
             if not brutos or len(brutos) > 6 * 1024 * 1024:
-                return self.erro("Imagem grande demais (limite de 6 MB).")
+                return self.erro("Imagem grande demais: o limite é 6 MB. Escolha uma imagem menor.")
             tipo = _tipo_da_imagem(brutos)
             if not tipo:
                 return self.erro("Formato de imagem não aceito (use PNG, JPG ou WEBP).")
 
             caminho_rom = os.path.join(RAIZ, jogo["arquivo"])
             if not dentro_da_pasta(caminho_rom, PASTA_JOGOS) or not os.path.isfile(caminho_rom):
-                return self.erro("O arquivo do jogo não está mais no lugar.", 404)
+                return self.erro("O arquivo do jogo não está mais no lugar (foi movido ou apagado). Clique em Atualizar lista.", 404)
 
             extensoes = {"image/png": ".png", "image/jpeg": ".jpg", "image/webp": ".webp"}
             pasta_jogo = os.path.dirname(caminho_rom)
@@ -5302,7 +5626,7 @@ class Manipulador(BaseHTTPRequestHandler):
 
             imagem = str(dados.get("imagem", ""))
             if not imagem:
-                return self.erro("Nenhuma imagem enviada.")
+                return self.erro("Nenhuma imagem chegou. Escolha a imagem e tente de novo.")
             try:
                 gravar_foto_perfil(imagem)
             except ValueError as falha:
@@ -5323,10 +5647,10 @@ class Manipulador(BaseHTTPRequestHandler):
                 # ar" para sempre, sem dizer por que.
                 return self.erro(ENDERECO_ESTRANHO)
             if len(config["servidores"]) >= 20:
-                return self.erro("Limite de 20 amigos.")
+                return self.erro("Você já tem 20 amigos, o máximo. Remova um (Perfil → Amigos) para adicionar outro.")
             if any(a["apelido"].lower() == apelido.lower()
                    for a in config["servidores"]):
-                return self.erro("Já existe um amigo com esse apelido.")
+                return self.erro("Já existe um amigo com esse apelido. Escolha outro apelido para ele.")
 
             config["servidores"].append({
                 "apelido": apelido, "url": url,
@@ -5521,7 +5845,7 @@ class Manipulador(BaseHTTPRequestHandler):
             plataforma = next((p for p in carregar_catalogo()
                                if p["id"] == jogo["plataforma"]), None)
             if not plataforma:
-                return self.erro("Plataforma desconhecida.")
+                return self.erro("Não sei de que console é este jogo. Clique em Atualizar lista; se continuar, ponha o jogo na pasta do console certo.")
             # Jogo de CD dentro de .zip: o emulador nao abre assim (o RetroArch
             # tira um arquivo so do zip, e o .cue precisa dos .bin ao lado).
             # O problema e' o arquivo: diz isso antes de olhar o emulador.
@@ -5536,18 +5860,18 @@ class Manipulador(BaseHTTPRequestHandler):
             if not caminho_externo:
                 if not os.path.isfile(EXECUTAVEL_RETROARCH):
                     return self.erro(
-                        "retroarch.exe não foi encontrado na pasta retroarch.")
+                        "Não achei o retroarch.exe na pasta retroarch. A pasta tem que se chamar retroarch (guia 1); rode o VERIFICAR.bat para conferir.")
                 if not os.path.isfile(os.path.join(PASTA_CORES, plataforma["core"])):
                     sugestao = ""
                     if dados_externo:
                         sugestao = (" Ou instale o %s na pasta emuladores."
                                     % dados_externo["nome"])
                     return self.erro(
-                        "O núcleo desta plataforma não está instalado." + sugestao)
+                        "Falta o núcleo deste console na pasta retroarch\\cores. Rode o VERIFICAR.bat (guia 6)." + sugestao)
 
             caminho_rom = os.path.join(RAIZ, jogo["arquivo"])
             if not dentro_da_pasta(caminho_rom, PASTA_JOGOS) or not os.path.isfile(caminho_rom):
-                return self.erro("O arquivo do jogo não está mais no lugar.", 404)
+                return self.erro("O arquivo do jogo não está mais no lugar (foi movido ou apagado). Clique em Atualizar lista.", 404)
 
             if caminho_externo:
                 falta = graficos.falta_para_o_externo(dados_externo["nome"], caminho_externo)
@@ -5583,6 +5907,10 @@ class Manipulador(BaseHTTPRequestHandler):
                         "de abrir outro." % JOGO_EM_ANDAMENTO["titulo"], 409)
                 JOGO_EM_ANDAMENTO["ativo"] = True
                 JOGO_EM_ANDAMENTO["titulo"] = jogo["titulo"]
+                # O id: a gaveta "Saves e cheats" nao deixa mudar os codigos
+                # do jogo que esta aberto (o RetroArch grava a lista dele
+                # por cima ao fechar).
+                JOGO_EM_ANDAMENTO["id"] = jogo["id"]
 
             # Partida a dois, se pedida.
             partida = None
@@ -5593,7 +5921,7 @@ class Manipulador(BaseHTTPRequestHandler):
                     JOGO_EM_ANDAMENTO["titulo"] = ""
                 return self.erro(
                     "Jogar junto só funciona pelo RetroArch. Esta plataforma "
-                    "está usando o %s, que tem rede própria."
+                    "está usando o %s, que tem rede própria: use o menu de rede do próprio jogo (guia 5)."
                     % dados_externo["nome"], 409)
             if modo and not plataforma.get("netplay", True):
                 with TRAVA_JOGO:
@@ -5614,7 +5942,7 @@ class Manipulador(BaseHTTPRequestHandler):
                         JOGO_EM_ANDAMENTO["ativo"] = False
                         JOGO_EM_ANDAMENTO["titulo"] = ""
                     return self.erro(
-                        "Falta o núcleo %s para jogar em rede neste console."
+                        "Falta o núcleo %s para jogar em rede neste console. Sozinho dá para jogar; rode o VERIFICAR.bat para conferir os núcleos."
                         % plataforma["core_netplay"], 409)
                 jogo["core"] = plataforma["core_netplay"]
                 aviso_netplay = plataforma.get("netplay_aviso", "")
@@ -5664,6 +5992,8 @@ class Manipulador(BaseHTTPRequestHandler):
                         repasse=str(dados.get("repasse", "saopaulo")),
                         jogador=posicao),
                     "argumentos": graficos.argumentos_de_partida(hospedar, endereco),
+                    "hospedar": hospedar,
+                    "assistir": assistir,
                     "papel": ("jogador 1" if hospedar else
                               "espectador" if assistir else
                               "jogador %d" % posicao),
@@ -5715,6 +6045,14 @@ class Manipulador(BaseHTTPRequestHandler):
                 resposta["porta"] = graficos.PORTA_PARTIDA
             if aviso_netplay:
                 resposta["aviso"] = aviso_netplay
+            if partida and partida.get("hospedar"):
+                # Vai separado do "aviso": a tela o deixa fixo no alto ate o
+                # jogo fechar -- um recado sumiria atras da janela do jogo antes
+                # de alguem tentar entrar (revisao da Fase 4).
+                aviso_rede = aviso_da_rede_para_quem_hospeda()
+                if aviso_rede:
+                    resposta["aviso_rede"] = aviso_rede
+                preparar_categoria_da_rede()
             # Na hora de jogar, o que pode travar o jogo AGORA: memoria quase
             # cheia, notebook na bateria, economia de bateria (~10 ms, sem
             # PowerShell). A tela avisa junto com "Abrindo...".
@@ -5755,9 +6093,9 @@ class Manipulador(BaseHTTPRequestHandler):
             try:
                 pontos = int(dados.get("pontos"))
             except (TypeError, ValueError):
-                return self.erro("Informe a pontuacao usando apenas números.")
+                return self.erro("Escreva a pontuação só com números, sem pontos nem letras.")
             if not 0 <= pontos <= 99999999:
-                return self.erro("Pontuacao fora da faixa aceita.")
+                return self.erro("Essa pontuação não vale: escreva um número de 0 a 99.999.999.")
 
             jogo = achar_jogo(dados.get("jogo_id"))
             if not jogo:
@@ -6231,10 +6569,21 @@ def principal():
     print("  ARENA %s - servidor local" % VERSAO)
     print("=" * 62)
 
+    # Pasta que nao da para criar nao derruba a abertura. Achado da auditoria
+    # 3 (08/10/2026): um ARQUIVO chamado "backup" na pasta do ARENA (ou
+    # "saves", "dados"...) fazia o ARENA cair aqui, com o erro cru do Windows,
+    # antes de abrir a tela. Agora avisa na janela preta e segue; quem
+    # precisar da pasta (a copia de seguranca, por exemplo) explica depois.
     for pasta in (PASTA_DADOS, PASTA_SISTEMA, PASTA_SAVES, PASTA_STATES,
                   PASTA_CAPTURAS, PASTA_CORES, PASTA_CHEATS, PASTA_BACKUP,
                   PASTA_REMAPS, PASTA_CONTROLES):
-        os.makedirs(pasta, exist_ok=True)
+        try:
+            os.makedirs(pasta, exist_ok=True)
+        except OSError as falha:
+            print("[ARENA] AVISO: nao consegui criar a pasta %s (%s). Se ha um "
+                  "arquivo com esse nome na pasta do ARENA, renomeie o arquivo "
+                  "e abra o ARENA de novo." % (os.path.relpath(pasta, RAIZ),
+                                               getattr(falha, "strerror", None) or falha))
 
     # Um desligamento abrupto (pen drive retirado, queda de energia) pode
     # deixar arquivos temporarios para tras. Limpa na abertura.
@@ -6369,7 +6718,11 @@ def principal():
         print("  Reaberto sozinho depois de uma queda. A tela que ja estava")
         print("  aberta volta sozinha em poucos segundos.")
     elif os.environ.get("ARENA_SEM_JANELA") != "1":
-        threading.Timer(1.0, lambda: abrir_janela(local)).start()
+        # Sem espera: a porta ja escuta desde o Servidor(...) acima, e o
+        # pedido da janela fica na fila do Windows ate o serve_forever logo
+        # abaixo. Havia 1,0 s de espera fixa aqui, sem motivo registrado
+        # (auditoria 3, Fase 2: a abertura ficou 1 s mais curta).
+        threading.Thread(target=abrir_janela, args=(local,), daemon=True).start()
 
     try:
         with TRAVA_REDE:

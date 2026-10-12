@@ -1,42 +1,95 @@
 [
   {
+    "cenario": "sem simulador (referencia)",
+    "atraso_ms": 0,
+    "perda_pct": 0,
+    "com_simulador": false,
+    "conectou": true,
+    "entrou_em_s": 0.8,
+    "ping_ms": 29,
+    "caiu_depois_de_entrar": false,
+    "os_dois_abertos_no_fim": true
+  },
+  {
     "cenario": "so atraso 50ms",
     "atraso_ms": 50,
     "perda_pct": 0,
+    "com_simulador": true,
     "conectou": true,
-    "ping_reportado_ms": "11",
-    "avisos_travada": 0
+    "entrou_em_s": 1.0,
+    "ping_ms": 128,
+    "caiu_depois_de_entrar": false,
+    "os_dois_abertos_no_fim": true,
+    "pedacos_no_simulador": {
+      "cliente->host": 861,
+      "host->cliente": 871
+    },
+    "passou_pelo_simulador": true
   },
   {
     "cenario": "so atraso 100ms",
     "atraso_ms": 100,
     "perda_pct": 0,
+    "com_simulador": true,
     "conectou": true,
-    "ping_reportado_ms": "28",
-    "avisos_travada": 0
+    "entrou_em_s": 1.3,
+    "ping_ms": 227,
+    "caiu_depois_de_entrar": false,
+    "os_dois_abertos_no_fim": true,
+    "pedacos_no_simulador": {
+      "cliente->host": 842,
+      "host->cliente": 861
+    },
+    "passou_pelo_simulador": true
   },
   {
     "cenario": "so atraso 200ms",
     "atraso_ms": 200,
     "perda_pct": 0,
+    "com_simulador": true,
     "conectou": true,
-    "ping_reportado_ms": "11",
-    "avisos_travada": 0
+    "entrou_em_s": 1.8,
+    "ping_ms": 411,
+    "caiu_depois_de_entrar": false,
+    "os_dois_abertos_no_fim": true,
+    "pedacos_no_simulador": {
+      "cliente->host": 807,
+      "host->cliente": 844
+    },
+    "passou_pelo_simulador": true
   },
   {
     "cenario": "perda 1% (com 50ms de base)",
     "atraso_ms": 50,
     "perda_pct": 1,
+    "com_simulador": true,
     "conectou": true,
-    "ping_reportado_ms": "11",
-    "avisos_travada": 0
+    "entrou_em_s": 1.0,
+    "ping_ms": 128,
+    "caiu_depois_de_entrar": false,
+    "os_dois_abertos_no_fim": true,
+    "pedacos_no_simulador": {
+      "cliente->host": 861,
+      "host->cliente": 872,
+      "perdidos": 22
+    },
+    "passou_pelo_simulador": true
   },
   {
     "cenario": "perda 5% (com 50ms de base)",
     "atraso_ms": 50,
     "perda_pct": 5,
+    "com_simulador": true,
     "conectou": true,
-    "ping_reportado_ms": "28",
-    "avisos_travada": 0
+    "entrou_em_s": 1.0,
+    "ping_ms": 112,
+    "caiu_depois_de_entrar": false,
+    "os_dois_abertos_no_fim": true,
+    "pedacos_no_simulador": {
+      "cliente->host": 861,
+      "host->cliente": 871,
+      "perdidos": 87
+    },
+    "passou_pelo_simulador": true
   }
 ]

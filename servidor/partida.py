@@ -82,12 +82,16 @@ def categoria_de_rede():
     se nao deu pra descobrir (comando indisponivel, por exemplo)."""
     import subprocess
     try:
+        # Todas as redes ligadas, nao so a primeira: com o cabo direto E o
+        # Wi-Fi, basta uma ser Publica (revisao da Fase 4 da auditoria 3).
         resultado = subprocess.run(
             ["powershell.exe", "-NoProfile", "-NonInteractive", "-Command",
-             "(Get-NetConnectionProfile | Select-Object -First 1 -ExpandProperty NetworkCategory)"],
+             "(Get-NetConnectionProfile).NetworkCategory"],
             capture_output=True, text=True, timeout=5)
-        saida = resultado.stdout.strip()
-        return saida or None
+        categorias = [c.strip() for c in resultado.stdout.splitlines() if c.strip()]
+        if "Public" in categorias:
+            return "Public"
+        return categorias[0] if categorias else None
     except Exception:
         return None
 
@@ -169,10 +173,12 @@ if categoria == "Public":
         "O Windows marcou esta rede como PUBLICA.",
         "O Firewall do Windows fecha bem mais numa rede publica, e a caixa "
         "'Permitir que este app se comunique' pede senha de administrador -- "
-        "um aluno comum nao consegue aprovar sozinho. Peca para o professor "
-        "(com a senha de admin) trocar a rede para 'Privada' em "
-        "Configuracoes > Rede e Internet > Wi-Fi > Propriedades, ou aprove "
-        "a caixa do Firewall quando ela aparecer.")
+        "um aluno comum nao consegue aprovar sozinho. Saida SEM senha: "
+        "outro computador abre a partida e este ENTRA (quem entra so faz "
+        "conexao de saida, que o Firewall deixa). Com a senha de admin, o "
+        "professor pode trocar a rede para 'Privada' em Configuracoes > Rede e "
+        "Internet > Wi-Fi > Propriedades, ou aprovar a caixa do Firewall quando "
+        "ela aparecer.")
 elif categoria:
     certo("rede categorizada como %s (nao e publica)" % categoria)
 else:
@@ -199,8 +205,11 @@ if colega:
 
     if not porta_aberta(colega, PORTA):
         torto("Nao alcanco o ARENA dele.",
-              "Confira o endereco, se ele ligou 'Aceitar conexoes' e "
-              "se voces estao na mesma rede.")
+              "Confira o endereco, se ele ligou 'Aceitar conexoes' e se voces "
+              "estao na mesma rede. Se estao no mesmo Wi-Fi e mesmo assim nao "
+              "alcanca, o Wi-Fi pode estar isolando os aparelhos (comum na "
+              "escola): liguem o ponto de acesso de um celular e conectem os "
+              "dois nele, ou liguem um cabo direto entre os dois computadores.")
     else:
         certo("o ARENA dele responde")
 

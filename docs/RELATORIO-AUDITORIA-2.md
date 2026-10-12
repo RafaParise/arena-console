@@ -5,7 +5,7 @@
 > (seguir sozinho de fase em fase; remoções com prova aplicadas em bloco;
 > mudanças da Fase 7 aplicadas; juntar ao `main` no fim). O pedido completo
 > está no fim do `PLANO-AUDITORIA.md`. O relatório da primeira auditoria,
-> `RELATORIO-QUALIDADE.md`, fica como histórico.
+> `RELATORIO-AUDITORIA-1.md`, fica como histórico.
 >
 > **Extra desta rodada:** o testador de máquinas e o próprio ARENA passam
 > a identificar o que deixa o computador lento e a recomendar ação.
@@ -401,7 +401,7 @@ comentado (bateria `run.py`: validação de cheat; `teste_partida_testar_timing`
 
 ---
 
-## Roteiros de sala novos (continuam a numeração do `RELATORIO-QUALIDADE.md`)
+## Roteiros de sala novos (continuam a numeração do `RELATORIO-AUDITORIA-1.md`)
 
 ### Roteiro 9 — Cache do PS1 no pen drive (Fase 2)
 

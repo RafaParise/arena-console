@@ -665,14 +665,67 @@ def aviso_do_jogo(plataforma_id, nome_arquivo, pasta_sistema, nome_console="", c
                 "BS-X.bin, que é o cartucho \"BS-X - Sore wa Namae o Nusumareta Machi no Monogatari "
                 "(Japan)\"; ela não vem na coleção de jogos do Satellaview. %s"
                 % como_colocar_a_bios(NOME_DA_PASTA + "\\Super Nintendo (Satellaview)"))
+    if plataforma_id not in COM_AVISO_PROPRIO:
+        return frase_da_bios_que_falta(bios_obrigatorias_que_faltam(plataforma_id, pasta_sistema)) or None
     return None
 
 
-def falta_para_o_console(plataforma_id, pasta_sistema):
-    """Frase do que falta para o console abrir QUALQUER jogo (so os de
-    SEM_ELA_NAO_ABRE), ou ""."""
-    if plataforma_id not in SEM_ELA_NAO_ABRE:
+# Os consoles que ja tem aviso proprio de BIOS (acima e no indexador) e o
+# Amiga, cujo nucleo (PUAE) tem um substituto embutido da BIOS: muitos jogos
+# abrem sem ela (o Alien Breed abriu na matriz da auditoria 3).
+COM_AVISO_PROPRIO = {"ps1", "ps2", "ps3", "dreamcast", "snes", "neogeo", "arcade", "amiga"} | set(POR_REGIAO)
+
+
+def bios_obrigatorias_que_faltam(plataforma_id, pasta_sistema):
+    """As BIOS de nivel "precisa" deste console que nao estao instaladas.
+    Achado da auditoria 3 (Fase 5): o ColecoVision sem a BIOS abria com a
+    tela preta, e o cartao nao dizia nada -- o aviso de BIOS so cobria os
+    consoles por regiao, o Dreamcast e o Satellaview. Grupo "uma": basta
+    uma do grupo."""
+    def instalada(entrada):
+        if entrada.get("e_pasta"):          # o Machines e o Databases do MSX
+            return _pasta_com_algo(os.path.join(pasta_sistema, *entrada["destino"].split("/")))
+        return bool(_instalada(pasta_sistema, entrada))
+    precisas = [e for e in catalogo.do_console(plataforma_id) if e.get("nivel") == "precisa"]
+    faltam = [e for e in precisas if not instalada(e)]
+    if any(e.get("grupo") == "uma" for e in precisas) and len(faltam) < len(precisas):
+        return []
+    return faltam
+
+
+def _descricao_da_bios(entrada):
+    """"a BIOS do ColecoVision (colecovision.rom)": o 'o_que' do catalogo,
+    com o nome do arquivo quando ele ainda nao aparece."""
+    nome = catalogo.nome_de_instalacao(entrada)
+    o_que = entrada.get("o_que") or ("a BIOS " + nome)
+    return o_que if nome.lower() in o_que.lower() else "%s (%s)" % (o_que, nome)
+
+
+def frase_da_bios_que_falta(faltam):
+    """A frase do cartao e do console quando falta BIOS obrigatoria (a lista
+    de bios_obrigatorias_que_faltam), ou "". Duas partes: o que acontece e o
+    que fazer."""
+    if not faltam:
         return ""
+    prateleira = prateleira_relativa(faltam[0])
+    if any(e.get("e_pasta") for e in faltam):
+        fazer = ("Ponha as pastas na pasta %s do ARENA (soltas, ou o .zip em que vieram) e clique em "
+                 "Conferir, em Ajustes → Emuladores (ou abra o ARENA de novo)." % prateleira)
+    else:
+        fazer = como_colocar_a_bios(prateleira)
+    return ("Falta a BIOS deste console (o programa de fábrica dele): %s. Sem ela, os jogos não abrem "
+            "ou ficam com a tela preta. %s" % (" e ".join(_descricao_da_bios(e) for e in faltam), fazer))
+
+
+def falta_para_o_console(plataforma_id, pasta_sistema):
+    """Frase do que falta para o console abrir QUALQUER jogo, ou "": os de
+    SEM_ELA_NAO_ABRE (pela regiao) e os que so abrem com a BIOS de nivel
+    "precisa" do catalogo (ColecoVision, MSX, 3DO, Intellivision...: ate a
+    auditoria 3 eles apareciam "prontos" e o jogo abria com a tela preta)."""
+    if plataforma_id not in SEM_ELA_NAO_ABRE:
+        if plataforma_id in COM_AVISO_PROPRIO:
+            return ""
+        return frase_da_bios_que_falta(bios_obrigatorias_que_faltam(plataforma_id, pasta_sistema))
     arquivos = set(POR_REGIAO[plataforma_id].values())
     if any(tem(pasta_sistema, a) for a in arquivos):
         return ""

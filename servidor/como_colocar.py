@@ -112,19 +112,21 @@ CONSOLES = {
                "bios": ("todas", ["neogeo.zip"],
                         "neogeo.zip (o .zip inteiro, sem descompactar). O ARENA põe uma cópia também "
                         "na pasta Arcade, onde o MAME procura.")},
-    "ps2": {"tipo": "externo", "exemplo": "Crash Nitro Kart (USA).iso",
+    # "grande": jogo que passa de 4 GB (DVD, Blu-ray) -- num pen drive em
+    # FAT32 nao cabe, e a tela avisa ANTES de copiar (auditoria 3, Fase 6).
+    "ps2": {"tipo": "externo", "exemplo": "Crash Nitro Kart (USA).iso", "grande": True,
             "bios": ("ps2", [], "Uma BIOS de PS2 (um arquivo .bin de 4 MB), de qualquer região: o "
                                "ARENA passa para o PCSX2 sozinho."),
             "dica": "Também abre .chd."},
     "gamecube": {"tipo": "externo", "exemplo": "Super Smash Bros. Melee (USA).rvz",
                  "dica": "O .rvz é o melhor (comprimido, sem perder nada). GameCube não precisa de BIOS."},
-    "wii": {"tipo": "externo", "exemplo": "Mario Kart Wii (USA).rvz",
+    "wii": {"tipo": "externo", "exemplo": "Mario Kart Wii (USA).rvz", "grande": True,
             "dica": "Também .wbfs e .iso. Wii não precisa de BIOS."},
-    "ps3": {"tipo": "externo", "exemplo": "Borderlands 2 (USA).iso",
+    "ps3": {"tipo": "externo", "exemplo": "Borderlands 2 (USA).iso", "grande": True,
             "bios": ("ps3", [], "O firmware oficial do PS3 (PS3UPDAT.PUP), instalado UMA vez pelo próprio "
                                "RPCS3: menu File, Install Firmware."),
             "dica": "Jogo digital: o .pkg. Precisa de computador forte (o PS3 pesa muito)."},
-    "xbox360": {"tipo": "externo", "exemplo": "Halo 3 (USA).iso",
+    "xbox360": {"tipo": "externo", "exemplo": "Halo 3 (USA).iso", "grande": True,
                 "dica": ("Também .xex. Precisa de processador com AVX (o Celeron N5100 da escola não "
                          "tem: lá o Xbox 360 não abre).")},
     "dos": {"tipo": "dos", "exemplo": "Commander Keen 1.zip"},
@@ -172,19 +174,6 @@ CONSOLES = {
 }
 
 LEGENDA_ZIP = {"pode": "Pode ser .zip", "nao": "Não pode ser .zip", "obrigatorio": "Tem que ser .zip"}
-
-
-def _tem(pasta_sistema, relativo):
-    """O arquivo (ou pasta) de BIOS existe em retroarch\\system? Sem
-    diferenca de maiuscula e minuscula, como o Windows."""
-    caminho = os.path.join(pasta_sistema, *relativo.split("/"))
-    if os.path.exists(caminho):
-        return True
-    pasta, nome = os.path.split(caminho)
-    try:
-        return nome.lower() in {n.lower() for n in os.listdir(pasta)}
-    except OSError:
-        return False
 
 
 def guia(plataformas, pasta_sistema, pasta_jogos, falta_externo=None):
@@ -238,5 +227,6 @@ def guia(plataformas, pasta_sistema, pasta_jogos, falta_externo=None):
             "bios": bios,
             "dica": info.get("dica", ""),
             "emulador": (plataforma.get("externo") or {}).get("nome", ""),
+            "jogo_grande": bool(info.get("grande")),
         })
     return saida

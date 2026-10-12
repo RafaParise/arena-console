@@ -9,6 +9,8 @@ O QUE ENTRA (lista fechada -- o que nao esta aqui, nao vai):
   - os .bat de usar (ARENA, VERIFICAR, PARTIDA), os guias (LEIA-ME, 1 a 6)
     e o COLETAR.bat (o professor mede o notebook da escola com a propria
     versao dos alunos: ferramentas\coletar_maquina.py e medir_arena.py);
+  - a licenca (LICENSE, GPL-3.0) e o TERCEIROS.md (a licenca e o
+    codigo-fonte de cada programa de outros projetos que vai no pacote);
   - servidor\ (o ARENA e o Python embutido), sem testes;
   - launcher\ (a tela);
   - RetroArch: o programa, so os 48 nucleos que o ARENA usa (de 195), os
@@ -64,7 +66,12 @@ NOME_DESTINO = "ARENA-alunos"
 
 ARQUIVOS_DA_RAIZ = ["ARENA.bat", "VERIFICAR.bat", "PARTIDA.bat", "COLETAR.bat", "LEIA-ME.md", "1-COMECAR.md",
                     "2-JOGOS.md", "3-IMAGEM-SOM-CONTROLE.md", "4-SAVES.md", "5-AMIGOS.md",
-                    "6-RECURSOS-E-REPARO.md"]
+                    "6-RECURSOS-E-REPARO.md",
+                    # A licenca do ARENA (GPL-3.0) e a de cada programa de
+                    # outros projetos que vai junto, com o codigo-fonte: a GPL
+                    # pede o texto da licenca junto do programa distribuido
+                    # (Fase 8 da auditoria 3, o pacote do GitHub).
+                    "LICENSE", "TERCEIROS.md"]
 # Do ferramentas\, so o que o COLETAR.bat usa.
 FERRAMENTAS = ["coletar_maquina.py", "medir_arena.py"]
 # Jogo pequeno do proprio projeto para conferir que o RetroArch da versao
@@ -569,6 +576,39 @@ def porta_livre(porta=8777):
         s.close()
 
 
+def marcas_de_quem_montou():
+    """O que identifica quem monta, descoberto NA HORA (o nome de ninguem
+    fica escrito neste arquivo, que e' publico no GitHub): o e-mail do git
+    (a parte antes do @; no e-mail privado do GitHub, o nome depois do +) e
+    o apelido do ARENA de quem monta (dados\\config.json)."""
+    marcas = set()
+    try:
+        email = subprocess.run(["git", "-C", RAIZ, "config", "user.email"], capture_output=True,
+                               text=True, timeout=10).stdout.strip().lower()
+    except (OSError, subprocess.SubprocessError):
+        email = ""
+    nome = email.split("@", 1)[0]
+    marcas.add(nome.split("+", 1)[-1])
+    try:
+        with open(os.path.join(RAIZ, "dados", "config.json"), encoding="utf-8") as arquivo:
+            marcas.add(str(json.load(arquivo).get("apelido") or "").strip().lower())
+    except (OSError, ValueError, AttributeError):
+        pass
+    # Curto demais pegaria palavra comum ("ana", "rafa"): so nome com 6 letras ou mais.
+    return sorted(m for m in marcas if len(m) >= 6)
+
+
+# O endereco publico do repositorio do ARENA leva o nome da conta do GitHub,
+# que pode ser igual ao apelido de quem monta (em 12/10/2026, era): nos guias
+# ele TEM que estar (e' de onde se baixa o ARENA). So ele sai do texto antes
+# de procurar as marcas; o apelido em qualquer outro lugar continua barrado.
+ENDERECO_DO_REPOSITORIO = re.compile(r"github\.com/[a-z0-9-]+/arena-console", re.I)
+
+
+def texto_sem_enderecos_publicos(texto):
+    return ENDERECO_DO_REPOSITORIO.sub("github.com/<repositorio>/arena-console", texto)
+
+
 def conferir(destino, com_bios=False):
     problemas = []
     # Nada de caminho da maquina de quem montou, em arquivo de texto nenhum.
@@ -576,13 +616,14 @@ def conferir(destino, com_bios=False):
     # A pasta do usuario do Windows de quem montou (C:\Users\<nome>) tambem
     # nao pode aparecer: seria um caminho fora da pasta do ARENA.
     usuario = os.path.expanduser("~").lower().replace("/", "\\")
-    marcas = [alvo, usuario + "\\", "passospariserafael", "rafaparise"]
+    marcas = [alvo, usuario + "\\"] + marcas_de_quem_montou()
     for atual, _sub, arquivos in os.walk(destino):
         if os.sep + "python" + os.sep in atual + os.sep:
             continue
         for n in arquivos:
             if n.lower().endswith((".cfg", ".ini", ".yml", ".toml", ".json", ".txt", ".md", ".bat", ".py")):
                 texto = open(os.path.join(atual, n), encoding="utf-8", errors="replace").read().lower()
+                texto = texto_sem_enderecos_publicos(texto)
                 achado = next((m for m in marcas if m in texto), None)
                 if achado:
                     problemas.append("dado de quem montou (%s) em %s" % (
@@ -720,6 +761,22 @@ def prova_do_retroarch(copia, relativo, nucleo, quadros=300, nome="jogo de prova
     return problemas
 
 
+def parece_versao_dos_alunos(destino):
+    """O --atualizar so mexe numa versao dos alunos: a pasta com o nome de
+    sempre (ARENA-alunos) ou uma com a folha de rosto que o montador escreve
+    (LEIA-PRIMEIRO.txt) -- em 10/10/2026 o Rafael passou a usar a versao dos
+    alunos com o nome ARENA. Nunca esta pasta (a de desenvolvimento) nem
+    pasta com .git (o repositorio)."""
+    if not os.path.isdir(destino):
+        return False
+    if os.path.normcase(os.path.abspath(destino)) == os.path.normcase(os.path.abspath(RAIZ)):
+        return False
+    if os.path.exists(os.path.join(destino, ".git")):
+        return False
+    return (os.path.basename(os.path.normpath(destino)) == NOME_DESTINO
+            or os.path.isfile(os.path.join(destino, "LEIA-PRIMEIRO.txt")))
+
+
 def principal():
     com_bios = "--com-bios" in sys.argv
     destino = os.path.join(PROJETO, NOME_DESTINO)
@@ -727,8 +784,9 @@ def principal():
         destino = os.path.abspath(sys.argv[sys.argv.index("--destino") + 1])
     inicio = time.time()
     if "--atualizar" in sys.argv:
-        if os.path.basename(os.path.normpath(destino)) != NOME_DESTINO or not os.path.isdir(destino):
-            print("Nao achei a versao dos alunos em %s." % destino)
+        if not parece_versao_dos_alunos(destino):
+            print("Nao achei a versao dos alunos em %s (a pasta ARENA-alunos, ou uma com o "
+                  "LEIA-PRIMEIRO.txt que o montador escreve)." % destino)
             return 1
         print("Atualizando so o programa da versao em %s (jogos, dados e saves ficam)..." % destino,
               flush=True)

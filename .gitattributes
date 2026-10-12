@@ -1,0 +1,23 @@
+# Finais de linha: o repositório guarda tudo com LF, e cada computador
+# converte ao baixar (o Windows, com core.autocrlf, volta para CRLF).
+* text=auto
+
+# Os .bat e .ps1 do Windows precisam de CRLF mesmo baixados como .zip do
+# GitHub ou por um computador que não é Windows: com LF, o cmd erra rótulo e
+# GOTO no meio do ARENA.bat.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Arquivos que nunca são texto.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
+*.gif binary
+*.zip binary
+*.7z binary
+*.dll binary
+*.exe binary
+*.db binary

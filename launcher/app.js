@@ -104,7 +104,7 @@ async function pedir(rota, metodo = "GET", corpo = null) {
   } catch (falha) {
     perderContato();
     const erro = new Error(
-      "O servidor do Arena não está acessível. Abra o ARENA pela janela preta e tente novamente."
+      "O ARENA parou de responder. Espere uns segundos: ele costuma voltar sozinho. Se não voltar, feche a janela preta e abra o ARENA.bat de novo."
     );
     erro.causa = falha;
     throw erro;
@@ -700,6 +700,12 @@ function desenharDetalhes() {
   const multiplayerBotao = $("#btnMultiplayerSelecionado");
   const gerirBotao = $("#btnGerirSelecionado");
   const consoleBotao = $("#btnEscolherConsole");
+  // Registrar pontos: so nos consoles que pedem placar (os de fantasia, onde a
+  // turma faz os proprios jogos). A janela e a rota sempre existiram; o botao
+  // nao existia nesta versao (auditoria 3, Fase 7) -- o ranking de pontos so
+  // recebia o que vinha dos amigos.
+  const placarBotao = $("#btnPlacarSelecionado");
+  placarBotao.hidden = !(jogo && jogo.pede_placar);
   if (!jogo) {
     painel.classList.add("detalhes--vazio");
     jogarBotao.disabled = true;
@@ -1420,10 +1426,12 @@ const EXPLICA_NIVEL_GRAFICO = {
     "vira 1x com desenho pelo processador; no PSP, 480×272; no Nintendo 64, resolução " +
     "nativa. Use se o jogo trava mesmo com o modo Desempenho.",
   leve: "Imagem PIOR que a do console, para o jogo rodar: o Dreamcast desenha pela metade " +
-    "(320×240), PSP e Nintendo 64 pulam quadros e efeitos quando o computador atrasa, " +
-    "Mega Drive, GBA, fliperama e outros pulam quadros se precisar. PS2, GameCube e Wii " +
-    "rodam com o processador do console mais devagar (em cena pesada, o jogo pode ficar " +
-    "lento); o PS3 desenha a 50%. SNES, NES e Game Boy ficam iguais: já são leves.",
+    "do tamanho (320×240). PSP e Nintendo 64 pulam quadros e efeitos quando o computador " +
+    "atrasa. Pular quadros é como aquele desenho animado no canto do caderno, com algumas " +
+    "folhas a menos: o movimento fica menos liso, mas não para. Mega Drive, GBA, fliperama " +
+    "e outros pulam quadros só se precisar. PS2, GameCube e Wii: o processador (o cérebro) " +
+    "do console imitado trabalha mais devagar. Em cena pesada, o jogo pode ficar lento. " +
+    "PS3: a imagem cai para a metade (50%). SNES, NES e Game Boy ficam iguais: já são leves.",
   minimo: "Bonecos de papelão: tudo do leve e mais. Dreamcast sem neblina e sem sombra, " +
     "PSP e Nintendo 64 pulam mais, PS2 com a mistura de cores mínima, GameCube sem " +
     "neblina, PS3 a 25%. Alguns jogos desenham errado (sombra, transparência, mira) — " +
@@ -1973,7 +1981,7 @@ function wizardAguardar() {
       encerrar();
       gravaWizard("teclado", tecla);
     } else {
-      recado("Essa tecla o RetroArch não reconhece.", true);
+      recado("Essa tecla o RetroArch não reconhece. Escolha outra tecla.", true);
     }
   }
 
@@ -2101,7 +2109,7 @@ function capturar(linha, valor, botaoDefinir, jogador, botao) {
     evento.stopPropagation();
     if (evento.key === "Escape") { encerrar(); desenharMapa(); return; }
     const tecla = traduzirTecla(evento);
-    if (!tecla) { recado("Essa tecla o RetroArch não reconhece.", true); return; }
+    if (!tecla) { recado("Essa tecla o RetroArch não reconhece. Escolha outra tecla.", true); return; }
     gravar("teclado", tecla);
   }
 
@@ -2636,8 +2644,9 @@ function abrirJuntoLocal(jogo) {
     ? `Este console abre por outro programa (${plataforma.emulador}), que não ` +
       "tem o Jogar Junto do ARENA. Por isso vocês jogam juntos no mesmo " +
       "computador, cada um com seu controle."
-    : "Neste console, o emulador não consegue deixar dois computadores " +
-      "iguais ao mesmo tempo. Por isso vocês jogam juntos no mesmo " +
+    : "Para jogar em dois computadores, o jogo precisa ficar igualzinho nos dois, " +
+      "como dois relógios acertados. O emulador deste console (o programa que imita " +
+      "o console) não consegue isso. Por isso vocês jogam juntos no mesmo " +
       "computador, cada um com seu controle.";
   const passos = [
     "Ligue os controles antes de abrir o jogo. O 1º controle é o jogador 1, " +
@@ -2652,10 +2661,10 @@ function abrirJuntoLocal(jogo) {
       "Ajustes → Controles.",
     // De onde vem o numero (02/10/2026: o Rafael ligou o multitap pelo
     // menu do PCSX2 e o ARENA desligava de novo a cada jogo).
-    "O jogo aceita mais jogadores do que aparece aqui? O professor escreve " +
-      `o número no arquivo dados\\jogadores.txt (uma linha: ${jogo.titulo} = 4). ` +
-      "O ARENA liga o adaptador de controles (multitap) sozinho a partir " +
-      "desse número. Ligar pelo menu do emulador pode não valer: o ARENA " +
+    "Para o professor: o jogo aceita mais jogadores do que aparece aqui? " +
+      `Escreva o número no arquivo dados\\jogadores.txt, numa linha assim: ${jogo.titulo} = 4. ` +
+      "Com esse número, o ARENA liga sozinho o multitap (o adaptador que deixa ligar mais " +
+      "controles no console). Ligar pelo menu do emulador pode não funcionar, porque o ARENA " +
       "arruma a configuração dos controles a cada jogo.",
   ];
   if (jogo.plataforma === "wii") {
@@ -2686,7 +2695,15 @@ function abrirPartida(jogo) {
   $("#campoJogadorPartida").hidden = true;
   preencherAmigosPartida();
   carregarColegas();
-  $("#campoInternet").hidden = false;
+  // Ja pergunta ao Windows se a rede e' Publica (em segundo plano), para o
+  // aviso de quem abre a partida sair certo no "Comecar".
+  procurarPartidas(true);
+  // "Estamos em casas diferentes" ESCONDIDA (auditoria 3, revisao da Fase 4,
+  // 09/10/2026): testado com o RetroArch de verdade, com ela o anfitriao vai
+  // pelo repasse da internet e nao atende na rede local, e o convidado -- que
+  // o ARENA manda para o endereco do anfitriao, sem o codigo da sala do
+  // repasse -- nunca entra. Volta quando o convidado entrar pelo repasse.
+  $("#campoInternet").hidden = true;
   $("#chaveInternet").setAttribute("aria-pressed", "false");
   $("#resultadoTeste").textContent = "";
 
@@ -2733,9 +2750,15 @@ async function comecarPartida() {
       : estado.papelDaPartida === "assistir"
       ? "Entrando para assistir. Você vê a tela dele, sem controlar nada."
       : `Entrando como ${dados.papel}. Aguarde a tela abrir.`;
-    const aviso = dados.aviso ? " " + dados.aviso : "";
-    recado(texto + aviso, false, aviso ? 9000 : 4500);
+    const complemento = dados.aviso ? " " + dados.aviso : "";
+    recado(texto + complemento, false, complemento ? 9000 : 4500);
     mostrarFaixaTeclas();
+    if (dados.aviso_rede) {
+      // Rede Pública: fica na barra do alto até o jogo fechar. O recado
+      // sumiria atrás da janela do jogo antes de alguém tentar entrar.
+      estado.avisoDaMaquina = true;
+      aviso(dados.aviso_rede);
+    }
   } catch (falha) {
     recado(falha.message, true);
   }
@@ -2851,6 +2874,11 @@ function preencherAmigosPartida() {
   lista.dataset.assinatura = assinatura;
 
   lista.replaceChildren();
+  // "Meu amigo não aparece na lista" (auditoria 3, Fase 4, J5; uma das
+  // tarefas da Fase 7): sem partida, a dica diz o que conferir antes de
+  // chamar o professor.
+  const dica = $("#dicaSemPartida");
+  if (dica) dica.hidden = Boolean(unicos.size) || Boolean(estado.procurandoPartidas);
   if (!unicos.size) {
     const opcao = document.createElement("option");
     opcao.value = "";
@@ -2890,14 +2918,16 @@ function preencherAmigosPartida() {
   if (escolhida && unicos.has(escolhida)) lista.value = escolhida;
 }
 
-async function procurarPartidas() {
+async function procurarPartidas(janelaAberta = false) {
   // Uma busca por vez: amigo fora do ar faz a busca levar até 3 s, e a
   // próxima (a cada 4 s) não pode empilhar em cima.
   if (estado.buscandoPartidas) return;
   estado.buscandoPartidas = true;
   estado.procurandoPartidas = !(estado.partidasEncontradas || []).length;
   try {
-    const dados = await pedir("/api/partida/procurar");
+    // Com a janela do Jogar Junto aberta, o servidor também pergunta ao
+    // Windows se a rede é Pública; na busca de quando a tela abre, não.
+    const dados = await pedir("/api/partida/procurar" + (janelaAberta ? "?rede=1" : ""));
     estado.partidasEncontradas = dados.colegas || [];
     estado.partidasEm = Date.now();
     desenharAmigos(estado.partidasEncontradas);
@@ -2916,13 +2946,13 @@ function vigiarPartidas(ligar) {
   clearInterval(estado.vigiaPartidas);
   estado.vigiaPartidas = null;
   if (!ligar) return;
-  procurarPartidas();
+  procurarPartidas(true);
   estado.vigiaPartidas = setInterval(() => {
     if ($("#modalPartida").hidden || estado.papelDaPartida === "hospedar") {
       vigiarPartidas(false);
       return;
     }
-    procurarPartidas();
+    procurarPartidas(true);
   }, 4000);
 }
 
@@ -3310,7 +3340,8 @@ async function carregarRanking() {
     const dados = await pedir("/api/ranking");
     desenharRanking("#rankingPontos", dados.placar,
       (e) => e.pontos.toLocaleString("pt-BR"),
-      "Ninguém registrou pontuação ainda. Jogue e clique em Registrar pontos.");
+      "Ninguém registrou pontuação ainda. Jogue um jogo de TIC-80, WASM-4 ou LowRes NX e, no " +
+      "painel do jogo, clique em Registrar pontos. O botão Enviar recordes, no alto, traz os dos amigos.");
     desenharRanking("#rankingTempo", dados.tempo,
       (e) => `${formatarTempo(e.segundos)} · ${e.partidas} partidas`,
       "Nenhuma partida registrada ainda. Partidas de menos de 30 segundos não contam.");
@@ -3415,6 +3446,7 @@ async function abrirComoColocar() {
     const dados = await pedir("/api/como-colocar");
     estado.comoColocar = dados.consoles || [];
     estado.pastaBios = dados.pasta_bios || "BIOS";
+    estado.formatoDoDisco = (dados.formato_do_disco || "").toUpperCase();
     const escolhido = lista.value || (estado.filtroPlataforma || "");
     const ordem = [...estado.comoColocar].sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
     lista.replaceChildren(...ordem.map((console) => {
@@ -3460,6 +3492,19 @@ function desenharComoColocar() {
   linha("Arquivos que servem", console.formatos.join("  ") || "—");
   linha("Como guardar", console.como);
   linha(console.zip_titulo, console.zip_texto);
+  // FAT32 não guarda arquivo maior que 4 GB: o aviso vem ANTES de copiar,
+  // só nos consoles de jogo grande (auditoria 3, Fase 6).
+  if (console.jogo_grande && estado.formatoDoDisco === "FAT32") {
+    const aviso = document.createElement("strong");
+    aviso.className = "bios-falta";
+    aviso.textContent = "Este pen drive está em FAT32 (o jeito como ele organiza os arquivos). " +
+      "No FAT32, nenhum arquivo passa de 4 GB: é como uma gaveta onde caixa grande não entra. " +
+      "Muitos jogos deste console são maiores: a cópia para no meio ou o Windows recusa. " +
+      "Para eles, o pen drive precisa estar em exFAT, um jeito sem esse limite. Para mudar, " +
+      "é preciso formatar. Formatar apaga tudo: copie seus arquivos antes. Passo a passo: " +
+      "guia 1-COMECAR.md, Parte A, passo 2.";
+    linha("Atenção", aviso);
+  }
   if (console.bios) {
     // O servidor confere a marca de cada BIOS (servidor/bios.py): certa,
     // de outra versao (pode funcionar), presente (marca desconhecida) ou falta.
@@ -3672,6 +3717,46 @@ function abrirGaveta(id) {
   }
 }
 
+// Teclado: a janela (.modal) ou gaveta (.gaveta) que aparece leva o foco
+// para dentro dela; a que some devolve o foco para quem a abriu. Antes
+// (auditoria 3, Fase 7), o foco ficava atras da janela: as janelas estao no
+// fim da pagina, e quem usa so o teclado passava com Tab pela tela inteira
+// ate chegar nos botoes dela. Um observador so, para todas as janelas -- as
+// que abrem por clique, por Esc, pelo assistente ou pelo proprio codigo.
+const FOCAVEIS = 'button:not([disabled]), [href], input:not([disabled]):not([type="hidden"]), ' +
+  'select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+function ligarFocoDasJanelas() {
+  const voltarPara = new Map();
+  const visivel = (el) => el.offsetParent !== null || el.getClientRects().length > 0;
+  new MutationObserver((mudancas) => {
+    for (const { target: painel } of mudancas) {
+      if (!painel.matches(".modal, .gaveta")) continue;   // botoes e avisos nao
+      if (!painel.hidden && !voltarPara.has(painel)) {
+        const quemAbriu = document.activeElement;
+        voltarPara.set(painel, quemAbriu && quemAbriu !== document.body ? quemAbriu : null);
+        // Depois de a janela se desenhar (setTimeout, e nao
+        // requestAnimationFrame, que nao roda com a pagina escondida); se o
+        // codigo dela ja pos o foco num campo (o apelido, os pontos...), fica
+        // onde ele pos.
+        setTimeout(() => {
+          if (painel.hidden || painel.contains(document.activeElement)) return;
+          const primeiro = [...painel.querySelectorAll(FOCAVEIS)].find(visivel);
+          if (primeiro) primeiro.focus();
+        }, 30);
+      } else if (painel.hidden && voltarPara.has(painel)) {
+        const quemAbriu = voltarPara.get(painel);
+        voltarPara.delete(painel);
+        const focoFicouDentro = painel.contains(document.activeElement) ||
+          document.activeElement === document.body;
+        if (quemAbriu && focoFicouDentro && document.contains(quemAbriu) && visivel(quemAbriu)) {
+          quemAbriu.focus();
+        }
+      }
+    }
+  }).observe(document.body, { subtree: true, attributes: true, attributeFilter: ["hidden"] });
+}
+
 function ligarEventos() {
   // Um ouvinte para o trilho inteiro, em vez de um por botao.
   $(".trilho").addEventListener("click", (evento) => {
@@ -3782,6 +3867,9 @@ function ligarEventos() {
   $("#btnGerirSelecionado").addEventListener("click", () => {
     if (estado.jogoSelecionado) abrirGaveta_jogo(estado.jogoSelecionado);
   });
+  $("#btnPlacarSelecionado").addEventListener("click", () => {
+    if (estado.jogoSelecionado) abrirPlacar(estado.jogoSelecionado);
+  });
   $("#btnEscolherConsole").addEventListener("click", () => {
     if (estado.jogoSelecionado) abrirEscolhaConsole(estado.jogoSelecionado);
   });
@@ -3803,7 +3891,7 @@ function ligarEventos() {
     evento.target.value = "";
     if (!jogo || !arquivo) return;
     if (arquivo.size > 6 * 1024 * 1024) {
-      recado("Imagem grande demais (limite de 6 MB).", true);
+      recado("Imagem grande demais: o limite é 6 MB. Escolha uma imagem menor.", true);
       return;
     }
     recado("Enviando capa…");
@@ -4018,7 +4106,7 @@ function ligarEventos() {
     evento.target.value = "";
     if (!arquivo) return;
     if (arquivo.size > 2 * 1024 * 1024) {
-      recado("Foto grande demais (limite de 2 MB).", true);
+      recado("Foto grande demais: o limite é 2 MB. Escolha uma foto menor.", true);
       return;
     }
     try {
@@ -4152,7 +4240,8 @@ function ligarEventos() {
       }
       const entrando = estado.papelDaPartida !== "hospedar";
       $("#campoAmigoPartida").hidden = !entrando;
-      $("#campoInternet").hidden = false;
+      // "Estamos em casas diferentes" fica escondida (ver abrirPartida).
+      $("#campoInternet").hidden = true;
       preencherAmigosPartida();
       vigiarPartidas(entrando);
 
@@ -4226,7 +4315,11 @@ function ligarEventos() {
   $("#btnBackup").addEventListener("click", async () => {
     try {
       const dados = await pedir("/api/backup", "POST");
-      recado(`Cópia guardada na pasta backup, em ${dados.pasta}`);
+      // Nada mudou desde a última cópia: ela continua valendo, e o rodízio
+      // não joga fora uma cópia de outro momento (auditoria 3, Fase 2).
+      recado(dados.nada_mudou
+        ? `Nada mudou desde a última cópia (pasta backup, em ${dados.pasta}): ela continua valendo.`
+        : `Cópia guardada na pasta backup, em ${dados.pasta}`);
     } catch (falha) {
       recado(falha.message, true);
     }
@@ -4351,6 +4444,7 @@ function ligarEventos() {
 
 async function iniciar() {
   ligarEventos();
+  ligarFocoDasJanelas();
   try {
     await carregarEstado();
     await carregarCatalogo();

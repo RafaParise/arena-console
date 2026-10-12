@@ -62,8 +62,12 @@ def main():
     try:
         graficos.tem_bios_pcsx2 = lambda *_a, **_k: False
         frase = graficos.falta_para_o_externo("PCSX2", os.path.join(RAIZ, "x", "pcsx2-qt.exe"))
-        confere("sem BIOS: a frase diz o que fazer (BIOS, retroarch\\system, professor)",
-                "BIOS" in frase and "retroarch\\system" in frase and "professor" in frase, frase)
+        # Desde 03/10/2026 (pasta BIOS, commit ce05805) a BIOS vai na pasta
+        # BIOS\PS2 do ARENA, e o ARENA leva para o PCSX2; antes a frase
+        # mandava para retroarch\system (a rodada da auditoria 3 pegou o
+        # teste ainda esperando a frase antiga).
+        confere("sem BIOS: a frase diz o que fazer (BIOS, BIOS\\PS2, professor)",
+                "BIOS" in frase and "BIOS\\PS2" in frase and "professor" in frase, frase)
         caminho_pcsx2, _dados = graficos.achar_externo(
             next(p for p in arena.carregar_catalogo() if p["id"] == "ps2"))
         if caminho_pcsx2:

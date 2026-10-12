@@ -47,7 +47,7 @@ sozinhos.
 |---|---|
 | **Xbox 360, One, Series** | Plugou, funcionou |
 | **PlayStation 4 e 5** | Por cabo USB funciona direto. Por Bluetooth, pareie antes |
-| **PlayStation 3** | Precisa do driver SCP ou DsHidMini no Windows |
+| **PlayStation 3** | Precisa de um **driver**: um programa que ensina o Windows a conversar com o controle (o SCP ou o DsHidMini). Instalar pede senha de administrador: peça ao professor ou ao TI |
 | **Switch Pro** | Por cabo funciona. Por Bluetooth, pareie antes |
 | **Joy-Con avulso** | Funciona, mas mapeie os botões na mão |
 | **Steam Controller** | Deixe o Steam aberto — ele converte sozinho |
@@ -158,9 +158,13 @@ pronto já acerta. Dá para configurar os **jogadores 1 a 5**.
 
 Para o teclado, o botão ao lado é **Padrão do teclado**.
 
-E dá para misturar controle e teclado ao mesmo tempo: com um controle
-plugado, o teclado já vira o jogador 2 sozinho. As teclas que você mudar
-no **jogador 1** acompanham o teclado para o jogador em que ele estiver.
+Dá para jogar com controle e teclado ao mesmo tempo. Com um controle
+plugado, o teclado vira o jogador 2 sozinho.
+
+**Para mudar as teclas do teclado, mude no jogador 1.** Elas vão junto com
+o teclado, em qualquer jogador que ele virar. Exemplo: no jogador 1, você
+põe o Start na barra de espaço. Com um controle plugado, o teclado vira o
+jogador 2, e o Start continua na barra de espaço.
 
 #### O direcional é diferente dos outros botões
 
@@ -763,7 +767,10 @@ O resto deste documento é para quem quer ajustar fino.
 
 ### O motor gráfico
 
-Está em **Ajustes → Avançado → Imagem → Motor gráfico**.
+O **motor gráfico** é por onde o jogo conversa com a placa de vídeo. A placa
+de vídeo é a peça do computador que desenha a imagem. O motor é como uma
+língua: se a placa não entende a língua escolhida, o jogo abre e fecha na
+hora. Está em **Ajustes → Avançado → Imagem → Motor gráfico**.
 
 | Opção | Quando usar |
 |---|---|
@@ -820,6 +827,13 @@ O ARENA muda os dois de uma vez.
 | Atraso do som | 96 ms | 64 ms | 32 ms |
 | Som exclusivo | não | não | sim |
 | Menu | leve | completo | completo |
+| Voltar no tempo e Resposta instantânea | desligados | desligados | desligados |
+
+Os dois últimos ficam desligados em todo nível: só liga quem quiser, em
+**Ajustes → Avançado** (guia 6). Até a auditoria 3, o Qualidade ligava os
+dois sozinho — e o automático escolhe o Qualidade para todo console até o
+N64 no notebook da escola. Medido: o N64 caía de 60 para 30 quadros por
+segundo, e o PS1 gastava 5 vezes o processador.
 
 ---
 
@@ -893,9 +907,10 @@ diferente.
 Conecte os dois controles antes de abrir o jogo e confira que **Quantos
 jogadores** está em 2 ou mais.
 
-O teclado sempre funciona como jogador 1, mesmo com controle conectado:
-setas movem, `Z` e `X` são os botões, `Enter` é Start, `Shift` direito é
-Select.
+O teclado também funciona junto com os controles. Ele entra como o
+primeiro jogador **sem** controle: com 1 controle conectado, o teclado é o
+jogador 2 (veja a Parte A). Setas movem, `Z` e `X` são os botões, `Enter`
+é Start, `Shift` direito é Select.
 
 ---
 
@@ -924,7 +939,7 @@ saber qual resolveu.
 |---|---|
 | **Jogo travando** | 1. Desça para Desempenho · 2. Ligue Vídeo em segundo plano · 3. Desligue Filtros de tela · 4. Fila de imagens para 3 |
 | **Som picotando** | 1. Atraso do som para 96 · 2. Desligue Som exclusivo · 3. Se persistir, 128 |
-| **Controle demorando** | 1. Suba para Qualidade · 2. Desligue Vídeo em segundo plano · 3. Atraso do som para 32 · 4. Fila de imagens para 2 |
+| **Controle demorando** | 1. Desligue Vídeo em segundo plano · 2. Atraso do som para 32 · 3. Fila de imagens para 2 · 4. Em jogo 2D e PC forte: ligue a **Resposta instantânea** (Ajustes → Avançado; custa de 4 a 12 vezes o processador, guia 6) |
 | **Imagem borrada** | Desligue Suavizar imagem, ligue Escala inteira |
 | **Imagem cortando ao meio** | Ligue Sincronizar com o monitor |
 | **Imagem esticada** | Ligue Escala inteira |
@@ -943,9 +958,11 @@ O que o nível Desempenho já desliga sozinho: menu pesado, fontes na tela,
 salvamento automático de estado, verificação de arquivos na abertura. Tudo
 isso são gravações e leituras que o pen drive faria à toa.
 
-**Feche o ARENA pela janela preta antes de retirar o pen drive.** Ela mostra
-"Pode retirar o pen drive com segurança" quando terminou de gravar. Retirar
-antes disso pode corromper o banco de recordes.
+**Feche o ARENA pela janela preta antes de retirar o pen drive.** Espere
+aparecer "Pode retirar o pen drive com segurança": é o sinal de que ele
+terminou de gravar. Se tirar antes, o arquivo dos recordes pode estragar
+(o nome técnico é "corromper o banco de dados"). É como puxar o caderno de
+um colega no meio de uma frase: a frase fica pela metade.
 
 ---
 
@@ -1153,8 +1170,9 @@ chave `ppsspp_texture_scaling_level`.
 Com o **Gráfico original** ligado, o PSP também ganha o **pulo de quadros
 automático**: quando o computador atrasa, o emulador deixa de desenhar um
 quadro para o jogo e o som não ficarem lentos. A imagem fica um pouco
-menos lisa nesses momentos; com folga, nada muda. Fora do Gráfico
-original, ele fica desligado (imagem sempre completa).
+menos lisa nesses momentos; com folga, nada muda (medido num computador
+forte: 60 quadros por segundo com e sem ele). Fora do Gráfico original, ele
+fica desligado (imagem sempre completa).
 
 ---
 

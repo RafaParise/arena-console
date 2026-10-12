@@ -19,6 +19,8 @@ import urllib.error
 import urllib.request
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(RAIZ, "testes"))
+import limpeza  # noqa: E402
 
 
 def main():
@@ -80,7 +82,8 @@ def main():
         return 0 if ok else 1
     finally:
         subprocess.run(["attrib", "-R", os.path.join(destino, "dados", "config.json")], shell=True, capture_output=True)
-        shutil.rmtree(destino, ignore_errors=True)
+        # shutil.rmtree calado desistia de arquivo somente leitura ou preso (a rodada da auditoria 3 achava esta pasta no Temp).
+        limpeza.apagar_pasta(destino)
 
 
 if __name__ == "__main__":

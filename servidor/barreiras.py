@@ -631,12 +631,12 @@ def fechar_programa(nome):
     (ok, mensagem)."""
     nome = str(nome or "").strip().lower()
     if nome not in FECHAVEIS:
-        return False, "Esse programa não está na lista dos que o ARENA pode fechar."
+        return False, "Esse programa não está na lista dos que o ARENA pode fechar. Feche-o pelo próprio programa."
     r = subprocess.run(["taskkill", "/IM", nome + ".exe", "/F"], capture_output=True,
                        creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
     if r.returncode == 0:
         return True, "%s fechado." % FECHAVEIS[nome]
-    return False, "Não consegui fechar %s (talvez já estivesse fechado)." % FECHAVEIS[nome]
+    return False, ("Não consegui fechar %s (talvez já estivesse fechado). Clique em Verificar agora para ver de novo." % FECHAVEIS[nome])
 
 
 if __name__ == "__main__":

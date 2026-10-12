@@ -3,7 +3,8 @@
 //
 // Mesmo esquema do field-background.js (leia o comentario de la):
 // 160 x 90 pontos esticados pelo CSS, camada fixa desenhada uma vez,
-// 30 quadros por segundo, e tres jeitos de mostrar (automatico, sempre,
+// 20 quadros por segundo por relogio (o porque, com os numeros, esta la, no
+// item 3), e tres jeitos de mostrar (automatico, sempre,
 // parado) -- a cena aparece SEMPRE; o que muda e' so se ela se mexe.
 //
 // Achado de 01/10/2026: antes, o ceu desenhava ~5.000 quadradinhos de
@@ -782,7 +783,7 @@
     return 'animado';
   }
 
-  const INTERVALO = 1000 / 30;
+  const INTERVALO = 1000 / 20;   // 20 por segundo, por relogio (field-background.js, item 3)
   let velocidade = 1;   // so os testes aceleram (__fundoEscuro.velocidade)
   let geracao = 0;
   let ultimo = 0;
@@ -791,10 +792,12 @@
   function iniciarLaco() {
     const minha = ++geracao;
     ultimo = 0;
-    function quadro(agora) {
+    function quadro() {
       if (minha !== geracao) return;
-      requestAnimationFrame(quadro);
-      if (ultimo && agora - ultimo < INTERVALO - 2) return;
+      setTimeout(quadro, INTERVALO);
+      // Janela escondida (minimizada, ou o jogo por cima): nao desenha.
+      if (document.visibilityState !== 'visible') return;
+      const agora = performance.now();
       const passo = (ultimo ? Math.min(4, (agora - ultimo) / (1000 / 60)) : 1) * velocidade;
       ultimo = agora;
       t += passo;
@@ -804,7 +807,7 @@
         console.error('Fundo galactico: erro num quadro, seguindo pro proximo.', e);
       }
     }
-    requestAnimationFrame(quadro);
+    setTimeout(quadro, 0);
   }
 
   function sincronizar() {

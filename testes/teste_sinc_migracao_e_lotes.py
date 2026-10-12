@@ -9,6 +9,7 @@ de chegada) nao pode perder nada.
    lote atras de lote, sempre com a marca devolvida, traz TODOS -- nenhum
    pulado, nenhum repetido.
 """
+import contextlib
 import importlib.util
 import os
 import shutil
@@ -18,6 +19,8 @@ import tempfile
 import uuid
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(RAIZ, "testes"))
+import limpeza  # noqa: E402
 
 
 def carregar_arena(destino):
@@ -39,14 +42,16 @@ def main():
         banco = os.path.join(destino, "dados", "arena.db")
 
         # --- 1. migracao de um banco real antigo ---
+        # (contextlib.closing: o 'with' do sqlite3 so confirma a transacao, nao
+        # fecha -- o arena.db ficava preso e a pasta nao saia do Temp.)
         if os.path.isfile(banco):
-            with sqlite3.connect(banco) as c:
+            with contextlib.closing(sqlite3.connect(banco)) as c:
                 antes_p = c.execute("SELECT COUNT(*) FROM placar").fetchone()[0]
                 antes_s = c.execute("SELECT COUNT(*) FROM sessao").fetchone()[0]
                 tinha_seq = "seq" in {r[1] for r in c.execute("PRAGMA table_info(placar)")}
             arena = carregar_arena(destino)
             arena.preparar_banco()
-            with sqlite3.connect(banco) as c:
+            with contextlib.closing(sqlite3.connect(banco)) as c:
                 depois_p = c.execute("SELECT COUNT(*) FROM placar").fetchone()[0]
                 depois_s = c.execute("SELECT COUNT(*) FROM sessao").fetchone()[0]
                 sem_numero = c.execute("SELECT COUNT(*) FROM placar WHERE seq IS NULL").fetchone()[0] + \
@@ -86,7 +91,8 @@ def main():
         return 0 if ok else 1
     finally:
         sys.path = [p for p in sys.path if not p.startswith(destino)]
-        shutil.rmtree(destino, ignore_errors=True)
+        # shutil.rmtree calado desistia de arquivo somente leitura ou preso (a rodada da auditoria 3 achava esta pasta no Temp).
+        limpeza.apagar_pasta(destino)
 
 
 if __name__ == "__main__":

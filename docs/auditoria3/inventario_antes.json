@@ -1,0 +1,7103 @@
+{
+  "pastas": {
+    "emuladores": {
+      "arquivos": 11756,
+      "mb": 10250.4
+    },
+    "retroarch": {
+      "arquivos": 15235,
+      "mb": 2456.9
+    },
+    "BIOS": {
+      "arquivos": 59,
+      "mb": 30.8
+    },
+    "servidor": {
+      "arquivos": 112,
+      "mb": 22.5
+    },
+    "dados": {
+      "arquivos": 191,
+      "mb": 3.0
+    },
+    "testes": {
+      "arquivos": 130,
+      "mb": 0.9
+    },
+    "docs": {
+      "arquivos": 36,
+      "mb": 0.7
+    },
+    "ferramentas": {
+      "arquivos": 54,
+      "mb": 0.6
+    },
+    "launcher": {
+      "arquivos": 6,
+      "mb": 0.3
+    },
+    "(raiz)": {
+      "arquivos": 13,
+      "mb": 0.2
+    },
+    "perfil": {
+      "arquivos": 33,
+      "mb": 0.1
+    }
+  },
+  "pastas_de_fora": {
+    "retroarch": {
+      "arquivos": 15235,
+      "mb": 2456.9,
+      "subpastas": {
+        "cores": {
+          "arquivos": 196,
+          "mb": 1560.0
+        },
+        "system": {
+          "arquivos": 33,
+          "mb": 324.8
+        },
+        "database": {
+          "arquivos": 146,
+          "mb": 168.1
+        },
+        "(solto)": {
+          "arquivos": 73,
+          "mb": 153.1
+        },
+        "shaders": {
+          "arquivos": 5411,
+          "mb": 89.0
+        },
+        "assets": {
+          "arquivos": 6563,
+          "mb": 76.9
+        },
+        "thumbnails": {
+          "arquivos": 153,
+          "mb": 51.9
+        },
+        "overlays": {
+          "arquivos": 1829,
+          "mb": 27.9
+        },
+        "saves": {
+          "arquivos": 21,
+          "mb": 1.6
+        },
+        "platforms": {
+          "arquivos": 1,
+          "mb": 1.0
+        },
+        "screenshots": {
+          "arquivos": 2,
+          "mb": 1.0
+        },
+        "filters": {
+          "arquivos": 118,
+          "mb": 0.6
+        },
+        "autoconfig": {
+          "arquivos": 380,
+          "mb": 0.5
+        },
+        "info": {
+          "arquivos": 292,
+          "mb": 0.5
+        },
+        "config": {
+          "arquivos": 8,
+          "mb": 0.0
+        },
+        "playlists": {
+          "arquivos": 4,
+          "mb": 0.0
+        },
+        "cache": {
+          "arquivos": 1,
+          "mb": 0.0
+        },
+        "remaps": {
+          "arquivos": 1,
+          "mb": 0.0
+        },
+        "cheats": {
+          "arquivos": 1,
+          "mb": 0.0
+        },
+        "controles": {
+          "arquivos": 1,
+          "mb": 0.0
+        },
+        "states": {
+          "arquivos": 1,
+          "mb": 0.0
+        },
+        "downloads": {
+          "arquivos": 0,
+          "mb": 0.0
+        },
+        "logs": {
+          "arquivos": 0,
+          "mb": 0.0
+        },
+        "recordings": {
+          "arquivos": 0,
+          "mb": 0.0
+        }
+      }
+    },
+    "emuladores": {
+      "arquivos": 11756,
+      "mb": 10250.4,
+      "subpastas": {
+        "RPCS3": {
+          "arquivos": 8642,
+          "mb": 8307.1
+        },
+        "Xenia": {
+          "arquivos": 91,
+          "mb": 1502.7
+        },
+        "Dolphin": {
+          "arquivos": 2752,
+          "mb": 220.4
+        },
+        "PCSX2": {
+          "arquivos": 270,
+          "mb": 220.1
+        },
+        "(solto)": {
+          "arquivos": 1,
+          "mb": 0.0
+        }
+      }
+    },
+    "dados": {
+      "arquivos": 191,
+      "mb": 3.0,
+      "subpastas": {
+        "miniaturas": {
+          "arquivos": 106,
+          "mb": 2.6
+        },
+        "(solto)": {
+          "arquivos": 26,
+          "mb": 0.3
+        },
+        "builtin": {
+          "arquivos": 4,
+          "mb": 0.0
+        },
+        "logs": {
+          "arquivos": 54,
+          "mb": 0.0
+        },
+        "remap_partida": {
+          "arquivos": 1,
+          "mb": 0.0
+        },
+        "perfil": {
+          "arquivos": 0,
+          "mb": 0.0
+        }
+      }
+    },
+    "jogos": {
+      "arquivos": 207,
+      "mb": 210741.4,
+      "subpastas": {
+        "pessoais": {
+          "arquivos": 205,
+          "mb": 210741.4
+        },
+        "livres": {
+          "arquivos": 1,
+          "mb": 0.0
+        },
+        "turma": {
+          "arquivos": 1,
+          "mb": 0.0
+        },
+        "(solto)": {
+          "arquivos": 0,
+          "mb": 0.0
+        }
+      }
+    },
+    "backup": {
+      "arquivos": 80,
+      "mb": 83.0,
+      "subpastas": {
+        "(solto)": {
+          "arquivos": 9,
+          "mb": 39.3
+        },
+        "originais": {
+          "arquivos": 2,
+          "mb": 39.2
+        },
+        "2026-10-07_204120": {
+          "arquivos": 23,
+          "mb": 1.5
+        },
+        "2026-10-07_205024": {
+          "arquivos": 23,
+          "mb": 1.5
+        },
+        "2026-10-07_205356": {
+          "arquivos": 23,
+          "mb": 1.5
+        }
+      }
+    },
+    "BIOS": {
+      "arquivos": 59,
+      "mb": 30.8,
+      "subpastas": {
+        "PS2": {
+          "arquivos": 8,
+          "mb": 16.0
+        },
+        "Sega Saturn": {
+          "arquivos": 7,
+          "mb": 5.9
+        },
+        "Sega CD": {
+          "arquivos": 8,
+          "mb": 3.5
+        },
+        "Dreamcast": {
+          "arquivos": 2,
+          "mb": 2.1
+        },
+        "Neo Geo": {
+          "arquivos": 2,
+          "mb": 1.7
+        },
+        "Super Nintendo (Satellaview)": {
+          "arquivos": 2,
+          "mb": 1.0
+        },
+        "PS1": {
+          "arquivos": 5,
+          "mb": 0.5
+        },
+        "(solto)": {
+          "arquivos": 1,
+          "mb": 0.0
+        },
+        "Amiga": {
+          "arquivos": 4,
+          "mb": 0.0
+        },
+        "Odyssey 2": {
+          "arquivos": 2,
+          "mb": 0.0
+        },
+        "Nintendo DS": {
+          "arquivos": 1,
+          "mb": 0.0
+        },
+        "Game Boy": {
+          "arquivos": 1,
+          "mb": 0.0
+        },
+        "Intellivision": {
+          "arquivos": 1,
+          "mb": 0.0
+        },
+        "Game Boy Advance": {
+          "arquivos": 1,
+          "mb": 0.0
+        },
+        "Nintendo 64 (64DD)": {
+          "arquivos": 1,
+          "mb": 0.0
+        },
+        "Atari Lynx": {
+          "arquivos": 1,
+          "mb": 0.0
+        },
+        "Atari 5200": {
+          "arquivos": 1,
+          "mb": 0.0
+        },
+        "PC Engine (CD)": {
+          "arquivos": 1,
+          "mb": 0.0
+        },
+        "NES (Famicom Disk System)": {
+          "arquivos": 1,
+          "mb": 0.0
+        },
+        "3DO": {
+          "arquivos": 1,
+          "mb": 0.0
+        },
+        "Super Nintendo (Sufami Turbo)": {
+          "arquivos": 1,
+          "mb": 0.0
+        },
+        "ColecoVision": {
+          "arquivos": 1,
+          "mb": 0.0
+        },
+        "PC-FX": {
+          "arquivos": 1,
+          "mb": 0.0
+        },
+        "MSX": {
+          "arquivos": 1,
+          "mb": 0.0
+        },
+        "Atari 7800": {
+          "arquivos": 1,
+          "mb": 0.0
+        },
+        "Pokemon mini": {
+          "arquivos": 1,
+          "mb": 0.0
+        },
+        "CD-i": {
+          "arquivos": 1,
+          "mb": 0.0
+        },
+        "PS3": {
+          "arquivos": 1,
+          "mb": 0.0
+        }
+      }
+    },
+    "perfil": {
+      "arquivos": 33,
+      "mb": 0.1,
+      "subpastas": {
+        "012944B9B2_2026-10-01_1804": {
+          "arquivos": 5,
+          "mb": 0.0
+        },
+        "59A30E147B_2026-09-28_1046": {
+          "arquivos": 5,
+          "mb": 0.0
+        },
+        "D682F0CCEB_2026-09-27_2215": {
+          "arquivos": 5,
+          "mb": 0.0
+        },
+        "59A30E147B_2026-09-28_0848": {
+          "arquivos": 2,
+          "mb": 0.0
+        },
+        "012944B9B2_2026-09-25_0636": {
+          "arquivos": 5,
+          "mb": 0.0
+        },
+        "012944B9B2_2026-09-25_0625": {
+          "arquivos": 5,
+          "mb": 0.0
+        },
+        "012944B9B2_2026-09-25_0624": {
+          "arquivos": 2,
+          "mb": 0.0
+        },
+        "012944B9B2_2026-09-25_1045": {
+          "arquivos": 3,
+          "mb": 0.0
+        },
+        "(solto)": {
+          "arquivos": 1,
+          "mb": 0.0
+        }
+      }
+    },
+    "servidor\\python": {
+      "arquivos": 35,
+      "mb": 20.3,
+      "subpastas": {
+        "(solto)": {
+          "arquivos": 35,
+          "mb": 20.3
+        }
+      }
+    }
+  },
+  "arquivos_do_arena": [
+    {
+      "arquivo": ".gitignore",
+      "kb": 2.5,
+      "linhas": null
+    },
+    {
+      "arquivo": "1-COMECAR.md",
+      "kb": 15.6,
+      "linhas": 435
+    },
+    {
+      "arquivo": "2-JOGOS.md",
+      "kb": 49.3,
+      "linhas": 1031
+    },
+    {
+      "arquivo": "3-IMAGEM-SOM-CONTROLE.md",
+      "kb": 51.5,
+      "linhas": 1305
+    },
+    {
+      "arquivo": "4-SAVES.md",
+      "kb": 17.1,
+      "linhas": 513
+    },
+    {
+      "arquivo": "5-AMIGOS.md",
+      "kb": 30.0,
+      "linhas": 763
+    },
+    {
+      "arquivo": "6-RECURSOS-E-REPARO.md",
+      "kb": 16.5,
+      "linhas": 525
+    },
+    {
+      "arquivo": "ARENA.bat",
+      "kb": 3.9,
+      "linhas": 110
+    },
+    {
+      "arquivo": "COLETAR.bat",
+      "kb": 2.9,
+      "linhas": 81
+    },
+    {
+      "arquivo": "docs\\abrir_todos_bruto.json",
+      "kb": 45.4,
+      "linhas": 1693
+    },
+    {
+      "arquivo": "docs\\auditoria2\\linha_base_fase0.json",
+      "kb": 1.8,
+      "linhas": 110
+    },
+    {
+      "arquivo": "docs\\auditoria2\\linha_base_fase8.json",
+      "kb": 1.8,
+      "linhas": 110
+    },
+    {
+      "arquivo": "docs\\auditoria2\\medir_fase0\\arena.json",
+      "kb": 1.7,
+      "linhas": 67
+    },
+    {
+      "arquivo": "docs\\auditoria2\\medir_fase0\\arena.txt",
+      "kb": 1.1,
+      "linhas": 31
+    },
+    {
+      "arquivo": "docs\\auditoria2\\medir_fase0\\arena_janela_preta.txt",
+      "kb": 0.0,
+      "linhas": 0
+    },
+    {
+      "arquivo": "docs\\auditoria2\\medir_fase8\\arena.json",
+      "kb": 1.9,
+      "linhas": 73
+    },
+    {
+      "arquivo": "docs\\auditoria2\\medir_fase8\\arena.txt",
+      "kb": 1.4,
+      "linhas": 35
+    },
+    {
+      "arquivo": "docs\\auditoria2\\medir_fase8\\arena_janela_preta.txt",
+      "kb": 0.0,
+      "linhas": 0
+    },
+    {
+      "arquivo": "docs\\auditoria2\\medir_tela_fase2.json",
+      "kb": 0.3,
+      "linhas": 16
+    },
+    {
+      "arquivo": "docs\\auditoria3\\inventario_antes.json",
+      "kb": 160.5,
+      "linhas": 6868
+    },
+    {
+      "arquivo": "docs\\auditoria3\\inventario_antes.md",
+      "kb": 38.7,
+      "linhas": 686
+    },
+    {
+      "arquivo": "docs\\auditoria3\\linha_base_antes.json",
+      "kb": 39.1,
+      "linhas": 1767
+    },
+    {
+      "arquivo": "docs\\auditoria3\\varredura_fase1.json",
+      "kb": 64.1,
+      "linhas": 2174
+    },
+    {
+      "arquivo": "docs\\cenarios_sala_bruto.json",
+      "kb": 0.4,
+      "linhas": 18
+    },
+    {
+      "arquivo": "docs\\fuzz_rotas_bruto.json",
+      "kb": 51.2,
+      "linhas": 2512
+    },
+    {
+      "arquivo": "docs\\gravacoes_parado_bruto.json",
+      "kb": 0.2,
+      "linhas": 7
+    },
+    {
+      "arquivo": "docs\\inventario_bruto.json",
+      "kb": 13.3,
+      "linhas": 666
+    },
+    {
+      "arquivo": "docs\\linha_base_bruta.json",
+      "kb": 1.8,
+      "linhas": 110
+    },
+    {
+      "arquivo": "docs\\linha_base_depois_bruta.json",
+      "kb": 1.8,
+      "linhas": 109
+    },
+    {
+      "arquivo": "docs\\longa_duracao_bruto.json",
+      "kb": 2.6,
+      "linhas": 139
+    },
+    {
+      "arquivo": "docs\\MAPA-MULTITAP.md",
+      "kb": 9.5,
+      "linhas": 114
+    },
+    {
+      "arquivo": "docs\\MAQUINA-ALVO.md",
+      "kb": 23.8,
+      "linhas": 362
+    },
+    {
+      "arquivo": "docs\\matriz_jogos_bruto.json",
+      "kb": 1.5,
+      "linhas": 57
+    },
+    {
+      "arquivo": "docs\\matriz_multitap_bruto.json",
+      "kb": 6.4,
+      "linhas": 228
+    },
+    {
+      "arquivo": "docs\\medir_tela_bruto.json",
+      "kb": 0.3,
+      "linhas": 16
+    },
+    {
+      "arquivo": "docs\\netplay_5_jogadores_bruto.json",
+      "kb": 2.3,
+      "linhas": 70
+    },
+    {
+      "arquivo": "docs\\PLANO-AUDITORIA.md",
+      "kb": 33.1,
+      "linhas": 480
+    },
+    {
+      "arquivo": "docs\\rede_ruim_bruto.json",
+      "kb": 0.9,
+      "linhas": 41
+    },
+    {
+      "arquivo": "docs\\RELATORIO-AUDITORIA-1.md",
+      "kb": 108.1,
+      "linhas": 1691
+    },
+    {
+      "arquivo": "docs\\RELATORIO-AUDITORIA-2.md",
+      "kb": 29.5,
+      "linhas": 527
+    },
+    {
+      "arquivo": "docs\\RELATORIO-QUALIDADE.md",
+      "kb": 20.0,
+      "linhas": 245
+    },
+    {
+      "arquivo": "docs\\rodada_final_bruta.json",
+      "kb": 48.6,
+      "linhas": 1212
+    },
+    {
+      "arquivo": "docs\\ROTEIRO-MULTITAP.md",
+      "kb": 3.8,
+      "linhas": 72
+    },
+    {
+      "arquivo": "docs\\varredura_fase1_bruta.json",
+      "kb": 10.3,
+      "linhas": 429
+    },
+    {
+      "arquivo": "docs\\varredura_fase2_css_bruta.json",
+      "kb": 0.7,
+      "linhas": 31
+    },
+    {
+      "arquivo": "ferramentas\\acentuar_textos.py",
+      "kb": 9.8,
+      "linhas": 196
+    },
+    {
+      "arquivo": "ferramentas\\aplicar_protege_cfg.py",
+      "kb": 1.4,
+      "linhas": 33
+    },
+    {
+      "arquivo": "ferramentas\\baixar_capas.py",
+      "kb": 1.8,
+      "linhas": 44
+    },
+    {
+      "arquivo": "ferramentas\\chaves_bios_nucleos.py",
+      "kb": 1.1,
+      "linhas": 27
+    },
+    {
+      "arquivo": "ferramentas\\coletar_maquina.py",
+      "kb": 44.1,
+      "linhas": 958
+    },
+    {
+      "arquivo": "ferramentas\\conferir_bios_neogeo.py",
+      "kb": 1.8,
+      "linhas": 47
+    },
+    {
+      "arquivo": "ferramentas\\conferir_mapa_multitap.py",
+      "kb": 3.3,
+      "linhas": 78
+    },
+    {
+      "arquivo": "ferramentas\\converter_fliperama_decriptado.py",
+      "kb": 10.2,
+      "linhas": 238
+    },
+    {
+      "arquivo": "ferramentas\\corrigir_chaves_graficos.py",
+      "kb": 2.7,
+      "linhas": 62
+    },
+    {
+      "arquivo": "ferramentas\\inventario_jogos.py",
+      "kb": 1.5,
+      "linhas": 36
+    },
+    {
+      "arquivo": "ferramentas\\limpar_botoes_retroarch_cfg.py",
+      "kb": 1.5,
+      "linhas": 41
+    },
+    {
+      "arquivo": "ferramentas\\limpar_registros_de_teste.py",
+      "kb": 3.3,
+      "linhas": 76
+    },
+    {
+      "arquivo": "ferramentas\\limpar_retroarch_cfg.py",
+      "kb": 1.4,
+      "linhas": 38
+    },
+    {
+      "arquivo": "ferramentas\\medir_arena.py",
+      "kb": 51.3,
+      "linhas": 1090
+    },
+    {
+      "arquivo": "ferramentas\\medir_parado.py",
+      "kb": 5.7,
+      "linhas": 130
+    },
+    {
+      "arquivo": "ferramentas\\modo_alvo.py",
+      "kb": 7.2,
+      "linhas": 155
+    },
+    {
+      "arquivo": "ferramentas\\montar_relatorio_aud2.py",
+      "kb": 6.9,
+      "linhas": 155
+    },
+    {
+      "arquivo": "ferramentas\\montar_versao_alunos.py",
+      "kb": 40.0,
+      "linhas": 770
+    },
+    {
+      "arquivo": "ferramentas\\opcoes_do_nucleo.py",
+      "kb": 0.8,
+      "linhas": 20
+    },
+    {
+      "arquivo": "ferramentas\\rodada_final.py",
+      "kb": 9.7,
+      "linhas": 206
+    },
+    {
+      "arquivo": "ferramentas\\testar_controles.py",
+      "kb": 4.5,
+      "linhas": 126
+    },
+    {
+      "arquivo": "ferramentas\\teste_aceite_pasta_movida.py",
+      "kb": 3.9,
+      "linhas": 116
+    },
+    {
+      "arquivo": "ferramentas\\teste_amigo_ip_muda.py",
+      "kb": 3.6,
+      "linhas": 103
+    },
+    {
+      "arquivo": "ferramentas\\teste_backup_falha_cancela_apagamento.py",
+      "kb": 5.2,
+      "linhas": 134
+    },
+    {
+      "arquivo": "ferramentas\\teste_biblioteca_online.py",
+      "kb": 2.9,
+      "linhas": 80
+    },
+    {
+      "arquivo": "ferramentas\\teste_capa_online.py",
+      "kb": 4.6,
+      "linhas": 109
+    },
+    {
+      "arquivo": "ferramentas\\teste_controle_neogeo.py",
+      "kb": 2.1,
+      "linhas": 62
+    },
+    {
+      "arquivo": "ferramentas\\teste_correcao_caminhos.py",
+      "kb": 2.9,
+      "linhas": 81
+    },
+    {
+      "arquivo": "ferramentas\\teste_memory_card_ps1.py",
+      "kb": 10.0,
+      "linhas": 226
+    },
+    {
+      "arquivo": "ferramentas\\teste_netplay_check_frames.py",
+      "kb": 9.6,
+      "linhas": 244
+    },
+    {
+      "arquivo": "ferramentas\\teste_netplay_megadrive.py",
+      "kb": 5.4,
+      "linhas": 138
+    },
+    {
+      "arquivo": "ferramentas\\teste_netplay_neogeo.py",
+      "kb": 5.7,
+      "linhas": 143
+    },
+    {
+      "arquivo": "ferramentas\\teste_netplay_ps1.py",
+      "kb": 5.5,
+      "linhas": 142
+    },
+    {
+      "arquivo": "ferramentas\\teste_netplay_suporte_nucleos.py",
+      "kb": 3.1,
+      "linhas": 95
+    },
+    {
+      "arquivo": "ferramentas\\teste_netplay_xbox360.py",
+      "kb": 3.3,
+      "linhas": 95
+    },
+    {
+      "arquivo": "ferramentas\\teste_pcsx2_completo.py",
+      "kb": 4.6,
+      "linhas": 129
+    },
+    {
+      "arquivo": "ferramentas\\teste_pcsx_rearmed_basico.py",
+      "kb": 2.0,
+      "linhas": 63
+    },
+    {
+      "arquivo": "ferramentas\\teste_perfil_foto.py",
+      "kb": 3.7,
+      "linhas": 104
+    },
+    {
+      "arquivo": "ferramentas\\teste_qualidade_pcsx2.py",
+      "kb": 3.4,
+      "linhas": 96
+    },
+    {
+      "arquivo": "ferramentas\\teste_rede_ps2_gt4.py",
+      "kb": 3.8,
+      "linhas": 107
+    },
+    {
+      "arquivo": "ferramentas\\teste_rodizio_logs.py",
+      "kb": 2.2,
+      "linhas": 58
+    },
+    {
+      "arquivo": "ferramentas\\teste_rpcn.py",
+      "kb": 3.5,
+      "linhas": 102
+    },
+    {
+      "arquivo": "ferramentas\\textos_do_nucleo.py",
+      "kb": 1.6,
+      "linhas": 44
+    },
+    {
+      "arquivo": "ferramentas\\trocar_testdb.py",
+      "kb": 4.1,
+      "linhas": 101
+    },
+    {
+      "arquivo": "launcher\\app.js",
+      "kb": 164.7,
+      "linhas": 4362
+    },
+    {
+      "arquivo": "launcher\\estilo.css",
+      "kb": 48.8,
+      "linhas": 1778
+    },
+    {
+      "arquivo": "launcher\\field-background.js",
+      "kb": 33.8,
+      "linhas": 848
+    },
+    {
+      "arquivo": "launcher\\galaxy-background.js",
+      "kb": 32.8,
+      "linhas": 837
+    },
+    {
+      "arquivo": "launcher\\index.html",
+      "kb": 48.9,
+      "linhas": 1044
+    },
+    {
+      "arquivo": "launcher\\pixel-sprites.js",
+      "kb": 2.4,
+      "linhas": 58
+    },
+    {
+      "arquivo": "LEIA-ME.md",
+      "kb": 8.3,
+      "linhas": 223
+    },
+    {
+      "arquivo": "PARTIDA.bat",
+      "kb": 0.8,
+      "linhas": 29
+    },
+    {
+      "arquivo": "RODAR_TESTES.bat",
+      "kb": 1.4,
+      "linhas": 40
+    },
+    {
+      "arquivo": "servidor\\acervo.py",
+      "kb": 8.9,
+      "linhas": 230
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "kb": 290.7,
+      "linhas": 6416
+    },
+    {
+      "arquivo": "servidor\\arrumar.py",
+      "kb": 24.4,
+      "linhas": 513
+    },
+    {
+      "arquivo": "servidor\\barreiras.py",
+      "kb": 39.5,
+      "linhas": 647
+    },
+    {
+      "arquivo": "servidor\\bios.py",
+      "kb": 67.4,
+      "linhas": 1445
+    },
+    {
+      "arquivo": "servidor\\bios_catalogo.py",
+      "kb": 17.6,
+      "linhas": 274
+    },
+    {
+      "arquivo": "servidor\\capas_do_disco.py",
+      "kb": 8.0,
+      "linhas": 179
+    },
+    {
+      "arquivo": "servidor\\capas_online.py",
+      "kb": 25.5,
+      "linhas": 566
+    },
+    {
+      "arquivo": "servidor\\cheats.py",
+      "kb": 9.2,
+      "linhas": 266
+    },
+    {
+      "arquivo": "servidor\\como_colocar.py",
+      "kb": 14.8,
+      "linhas": 242
+    },
+    {
+      "arquivo": "servidor\\consoles.json",
+      "kb": 31.6,
+      "linhas": 1277
+    },
+    {
+      "arquivo": "servidor\\controles.py",
+      "kb": 22.7,
+      "linhas": 579
+    },
+    {
+      "arquivo": "servidor\\diagnostico.py",
+      "kb": 21.9,
+      "linhas": 539
+    },
+    {
+      "arquivo": "servidor\\graficos.json",
+      "kb": 17.5,
+      "linhas": 551
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "kb": 115.0,
+      "linhas": 2565
+    },
+    {
+      "arquivo": "servidor\\hardware.py",
+      "kb": 28.6,
+      "linhas": 743
+    },
+    {
+      "arquivo": "servidor\\identificador.py",
+      "kb": 12.4,
+      "linhas": 345
+    },
+    {
+      "arquivo": "servidor\\indexador.py",
+      "kb": 54.9,
+      "linhas": 1151
+    },
+    {
+      "arquivo": "servidor\\integridade.py",
+      "kb": 4.6,
+      "linhas": 124
+    },
+    {
+      "arquivo": "servidor\\internet_archive.py",
+      "kb": 11.1,
+      "linhas": 265
+    },
+    {
+      "arquivo": "servidor\\janela_preta.py",
+      "kb": 9.7,
+      "linhas": 233
+    },
+    {
+      "arquivo": "servidor\\jogadores.py",
+      "kb": 8.4,
+      "linhas": 200
+    },
+    {
+      "arquivo": "servidor\\motivo_do_erro.py",
+      "kb": 15.2,
+      "linhas": 291
+    },
+    {
+      "arquivo": "servidor\\multitap.json",
+      "kb": 10.6,
+      "linhas": 189
+    },
+    {
+      "arquivo": "servidor\\nomes_arcade.py",
+      "kb": 13.8,
+      "linhas": 340
+    },
+    {
+      "arquivo": "servidor\\partida.py",
+      "kb": 10.8,
+      "linhas": 291
+    },
+    {
+      "arquivo": "servidor\\perfis_controle.json",
+      "kb": 13.5,
+      "linhas": 271
+    },
+    {
+      "arquivo": "servidor\\processos.py",
+      "kb": 6.8,
+      "linhas": 182
+    },
+    {
+      "arquivo": "servidor\\recursos.json",
+      "kb": 21.9,
+      "linhas": 644
+    },
+    {
+      "arquivo": "servidor\\tests\\__init__.py",
+      "kb": 0.0,
+      "linhas": 0
+    },
+    {
+      "arquivo": "servidor\\tests\\run.py",
+      "kb": 26.7,
+      "linhas": 624
+    },
+    {
+      "arquivo": "servidor\\tests\\test_arrumar.py",
+      "kb": 13.7,
+      "linhas": 296
+    },
+    {
+      "arquivo": "servidor\\tests\\test_barreiras.py",
+      "kb": 9.4,
+      "linhas": 177
+    },
+    {
+      "arquivo": "servidor\\tests\\test_bios.py",
+      "kb": 18.0,
+      "linhas": 353
+    },
+    {
+      "arquivo": "servidor\\tests\\test_cache_ps1.py",
+      "kb": 2.4,
+      "linhas": 68
+    },
+    {
+      "arquivo": "servidor\\tests\\test_capas_que_faltavam.py",
+      "kb": 12.7,
+      "linhas": 237
+    },
+    {
+      "arquivo": "servidor\\tests\\test_converter_fliperama.py",
+      "kb": 6.8,
+      "linhas": 145
+    },
+    {
+      "arquivo": "servidor\\tests\\test_graficos_acervo.py",
+      "kb": 18.8,
+      "linhas": 392
+    },
+    {
+      "arquivo": "servidor\\tests\\test_janela_preta.py",
+      "kb": 3.6,
+      "linhas": 96
+    },
+    {
+      "arquivo": "servidor\\tests\\test_jogadores.py",
+      "kb": 12.0,
+      "linhas": 224
+    },
+    {
+      "arquivo": "servidor\\tests\\test_motivo_do_erro.py",
+      "kb": 15.2,
+      "linhas": 296
+    },
+    {
+      "arquivo": "servidor\\tests\\test_multitap.py",
+      "kb": 8.4,
+      "linhas": 186
+    },
+    {
+      "arquivo": "testes\\abrir_dois_arenas.py",
+      "kb": 3.8,
+      "linhas": 97
+    },
+    {
+      "arquivo": "testes\\abrir_para_teste_manual.py",
+      "kb": 7.0,
+      "linhas": 144
+    },
+    {
+      "arquivo": "testes\\apertar_teclas.ps1",
+      "kb": 0.7,
+      "linhas": 14
+    },
+    {
+      "arquivo": "testes\\comparar_linhas_produto.py",
+      "kb": 2.6,
+      "linhas": 69
+    },
+    {
+      "arquivo": "testes\\controles_detectados.py",
+      "kb": 2.2,
+      "linhas": 52
+    },
+    {
+      "arquivo": "testes\\foto_pcsx2_janela.ps1",
+      "kb": 0.9,
+      "linhas": 18
+    },
+    {
+      "arquivo": "testes\\foto_rpcs3.ps1",
+      "kb": 1.2,
+      "linhas": 21
+    },
+    {
+      "arquivo": "testes\\foto_tela.ps1",
+      "kb": 0.5,
+      "linhas": 9
+    },
+    {
+      "arquivo": "testes\\funcoes_js_mortas.py",
+      "kb": 1.1,
+      "linhas": 26
+    },
+    {
+      "arquivo": "testes\\fuzz_rotas.py",
+      "kb": 15.5,
+      "linhas": 360
+    },
+    {
+      "arquivo": "testes\\ids_da_tela.py",
+      "kb": 1.8,
+      "linhas": 37
+    },
+    {
+      "arquivo": "testes\\inventario.py",
+      "kb": 36.8,
+      "linhas": 791
+    },
+    {
+      "arquivo": "testes\\jogos_de_teste.py",
+      "kb": 1.0,
+      "linhas": 25
+    },
+    {
+      "arquivo": "testes\\limpeza.py",
+      "kb": 3.0,
+      "linhas": 86
+    },
+    {
+      "arquivo": "testes\\linha_base.py",
+      "kb": 20.2,
+      "linhas": 429
+    },
+    {
+      "arquivo": "testes\\medir_cache_ps1.py",
+      "kb": 4.0,
+      "linhas": 88
+    },
+    {
+      "arquivo": "testes\\medir_gravacoes_parado.py",
+      "kb": 5.6,
+      "linhas": 143
+    },
+    {
+      "arquivo": "testes\\medir_tela.ps1",
+      "kb": 2.9,
+      "linhas": 57
+    },
+    {
+      "arquivo": "testes\\neogeo_bios_registro.py",
+      "kb": 2.1,
+      "linhas": 48
+    },
+    {
+      "arquivo": "testes\\protege_cfg.py",
+      "kb": 1.2,
+      "linhas": 35
+    },
+    {
+      "arquivo": "testes\\proxy_rede_ruim.py",
+      "kb": 3.5,
+      "linhas": 100
+    },
+    {
+      "arquivo": "testes\\tela_sem_janela.py",
+      "kb": 13.3,
+      "linhas": 308
+    },
+    {
+      "arquivo": "testes\\teste_abaixo_do_original.py",
+      "kb": 24.4,
+      "linhas": 398
+    },
+    {
+      "arquivo": "testes\\teste_abrir_todos.py",
+      "kb": 5.1,
+      "linhas": 106
+    },
+    {
+      "arquivo": "testes\\teste_acervo_download_real.py",
+      "kb": 3.8,
+      "linhas": 86
+    },
+    {
+      "arquivo": "testes\\teste_acervo_sha256.py",
+      "kb": 4.0,
+      "linhas": 106
+    },
+    {
+      "arquivo": "testes\\teste_acesso_de_rede.py",
+      "kb": 6.4,
+      "linhas": 137
+    },
+    {
+      "arquivo": "testes\\teste_adaptadores_sem_laco.py",
+      "kb": 5.4,
+      "linhas": 133
+    },
+    {
+      "arquivo": "testes\\teste_adaptadores_vpn.py",
+      "kb": 2.6,
+      "linhas": 61
+    },
+    {
+      "arquivo": "testes\\teste_alcas_sem_vazamento.py",
+      "kb": 4.4,
+      "linhas": 119
+    },
+    {
+      "arquivo": "testes\\teste_arquivos_corrompidos.py",
+      "kb": 3.8,
+      "linhas": 96
+    },
+    {
+      "arquivo": "testes\\teste_arrumar_jogos.py",
+      "kb": 11.9,
+      "linhas": 220
+    },
+    {
+      "arquivo": "testes\\teste_atualizar_versao_alunos.py",
+      "kb": 9.2,
+      "linhas": 181
+    },
+    {
+      "arquivo": "testes\\teste_backup_rodizio.py",
+      "kb": 5.7,
+      "linhas": 118
+    },
+    {
+      "arquivo": "testes\\teste_barreiras_api.py",
+      "kb": 4.5,
+      "linhas": 104
+    },
+    {
+      "arquivo": "testes\\teste_barreiras_modo_restrito.py",
+      "kb": 3.3,
+      "linhas": 74
+    },
+    {
+      "arquivo": "testes\\teste_biblioteca_busca.py",
+      "kb": 7.5,
+      "linhas": 163
+    },
+    {
+      "arquivo": "testes\\teste_bios_consoles.py",
+      "kb": 8.6,
+      "linhas": 168
+    },
+    {
+      "arquivo": "testes\\teste_bios_organizador.py",
+      "kb": 10.8,
+      "linhas": 190
+    },
+    {
+      "arquivo": "testes\\teste_caminho_comprido.py",
+      "kb": 2.6,
+      "linhas": 60
+    },
+    {
+      "arquivo": "testes\\teste_caminho_fora_no_cfg.py",
+      "kb": 3.3,
+      "linhas": 78
+    },
+    {
+      "arquivo": "testes\\teste_capas_miniaturas.py",
+      "kb": 7.5,
+      "linhas": 158
+    },
+    {
+      "arquivo": "testes\\teste_capas_todos_os_consoles.py",
+      "kb": 12.8,
+      "linhas": 242
+    },
+    {
+      "arquivo": "testes\\teste_cenarios_sala.py",
+      "kb": 8.7,
+      "linhas": 200
+    },
+    {
+      "arquivo": "testes\\teste_cfg_sem_linha_repetida.py",
+      "kb": 4.4,
+      "linhas": 97
+    },
+    {
+      "arquivo": "testes\\teste_chaves_graficos.py",
+      "kb": 3.3,
+      "linhas": 78
+    },
+    {
+      "arquivo": "testes\\teste_coletar_regua.py",
+      "kb": 11.5,
+      "linhas": 197
+    },
+    {
+      "arquivo": "testes\\teste_como_colocar.py",
+      "kb": 12.0,
+      "linhas": 205
+    },
+    {
+      "arquivo": "testes\\teste_concorrencia.py",
+      "kb": 6.3,
+      "linhas": 155
+    },
+    {
+      "arquivo": "testes\\teste_dados_tortos.py",
+      "kb": 6.5,
+      "linhas": 137
+    },
+    {
+      "arquivo": "testes\\teste_descoberta_30_maquinas.py",
+      "kb": 6.1,
+      "linhas": 148
+    },
+    {
+      "arquivo": "testes\\teste_disco_amostras.py",
+      "kb": 4.3,
+      "linhas": 115
+    },
+    {
+      "arquivo": "testes\\teste_disco_cheio.py",
+      "kb": 4.2,
+      "linhas": 101
+    },
+    {
+      "arquivo": "testes\\teste_dns_rebinding.py",
+      "kb": 4.9,
+      "linhas": 110
+    },
+    {
+      "arquivo": "testes\\teste_dolphin_config.py",
+      "kb": 7.2,
+      "linhas": 146
+    },
+    {
+      "arquivo": "testes\\teste_estresse_catalogo.py",
+      "kb": 4.1,
+      "linhas": 107
+    },
+    {
+      "arquivo": "testes\\teste_fase7.py",
+      "kb": 3.4,
+      "linhas": 91
+    },
+    {
+      "arquivo": "testes\\teste_fat32_arquivo_grande.py",
+      "kb": 3.7,
+      "linhas": 85
+    },
+    {
+      "arquivo": "testes\\teste_filtro_de_tela.py",
+      "kb": 6.0,
+      "linhas": 124
+    },
+    {
+      "arquivo": "testes\\teste_fliperama_nomes.py",
+      "kb": 11.9,
+      "linhas": 216
+    },
+    {
+      "arquivo": "testes\\teste_fundos_animados.py",
+      "kb": 8.5,
+      "linhas": 173
+    },
+    {
+      "arquivo": "testes\\teste_imagem_ps1.py",
+      "kb": 4.4,
+      "linhas": 100
+    },
+    {
+      "arquivo": "testes\\teste_internet_archive_download.py",
+      "kb": 4.4,
+      "linhas": 118
+    },
+    {
+      "arquivo": "testes\\teste_kof2002_convertido.py",
+      "kb": 4.9,
+      "linhas": 104
+    },
+    {
+      "arquivo": "testes\\teste_lista_partidas.js",
+      "kb": 5.6,
+      "linhas": 108
+    },
+    {
+      "arquivo": "testes\\teste_local_4_jogadores.py",
+      "kb": 5.2,
+      "linhas": 116
+    },
+    {
+      "arquivo": "testes\\teste_longa_duracao.py",
+      "kb": 6.9,
+      "linhas": 169
+    },
+    {
+      "arquivo": "testes\\teste_mala_validacao.py",
+      "kb": 3.7,
+      "linhas": 87
+    },
+    {
+      "arquivo": "testes\\teste_matriz_jogos.py",
+      "kb": 9.8,
+      "linhas": 217
+    },
+    {
+      "arquivo": "testes\\teste_matriz_multitap.py",
+      "kb": 9.9,
+      "linhas": 202
+    },
+    {
+      "arquivo": "testes\\teste_motivo_fliperama.py",
+      "kb": 6.3,
+      "linhas": 134
+    },
+    {
+      "arquivo": "testes\\teste_multitap_5_jogadores_arena.py",
+      "kb": 10.2,
+      "linhas": 219
+    },
+    {
+      "arquivo": "testes\\teste_multitap_opcao_nucleo_real.py",
+      "kb": 4.0,
+      "linhas": 87
+    },
+    {
+      "arquivo": "testes\\teste_multitap_por_console.py",
+      "kb": 12.3,
+      "linhas": 250
+    },
+    {
+      "arquivo": "testes\\teste_multitap_regra_de_ouro.py",
+      "kb": 14.8,
+      "linhas": 299
+    },
+    {
+      "arquivo": "testes\\teste_netplay_5_jogadores.py",
+      "kb": 11.4,
+      "linhas": 259
+    },
+    {
+      "arquivo": "testes\\teste_netplay_isolamento.py",
+      "kb": 5.0,
+      "linhas": 126
+    },
+    {
+      "arquivo": "testes\\teste_opcoes_nucleo_ponta_a_ponta.py",
+      "kb": 5.6,
+      "linhas": 117
+    },
+    {
+      "arquivo": "testes\\teste_orcamentos_modo_alvo.py",
+      "kb": 5.4,
+      "linhas": 114
+    },
+    {
+      "arquivo": "testes\\teste_partida_aparece.py",
+      "kb": 12.8,
+      "linhas": 276
+    },
+    {
+      "arquivo": "testes\\teste_partida_colega.py",
+      "kb": 2.8,
+      "linhas": 69
+    },
+    {
+      "arquivo": "testes\\teste_partida_testar_timing.py",
+      "kb": 3.3,
+      "linhas": 82
+    },
+    {
+      "arquivo": "testes\\teste_pasta_somente_leitura.py",
+      "kb": 3.5,
+      "linhas": 87
+    },
+    {
+      "arquivo": "testes\\teste_pcsx2_bissecao.py",
+      "kb": 3.5,
+      "linhas": 86
+    },
+    {
+      "arquivo": "testes\\teste_pcsx2_inicia.py",
+      "kb": 4.1,
+      "linhas": 97
+    },
+    {
+      "arquivo": "testes\\teste_pcsx2_motor.py",
+      "kb": 5.3,
+      "linhas": 126
+    },
+    {
+      "arquivo": "testes\\teste_pcsx2_placa.py",
+      "kb": 4.6,
+      "linhas": 114
+    },
+    {
+      "arquivo": "testes\\teste_pcsx2_portatil.py",
+      "kb": 2.8,
+      "linhas": 66
+    },
+    {
+      "arquivo": "testes\\teste_pcsx2_seguro.py",
+      "kb": 8.8,
+      "linhas": 182
+    },
+    {
+      "arquivo": "testes\\teste_perfil_apelido.py",
+      "kb": 6.7,
+      "linhas": 135
+    },
+    {
+      "arquivo": "testes\\teste_ps2_sem_bios.py",
+      "kb": 4.2,
+      "linhas": 94
+    },
+    {
+      "arquivo": "testes\\teste_ps3_sem_firmware.py",
+      "kb": 2.9,
+      "linhas": 73
+    },
+    {
+      "arquivo": "testes\\teste_psp_pulo_de_quadros.py",
+      "kb": 5.7,
+      "linhas": 123
+    },
+    {
+      "arquivo": "testes\\teste_qual_opcao_de_nucleo_vale.py",
+      "kb": 4.1,
+      "linhas": 93
+    },
+    {
+      "arquivo": "testes\\teste_quebrar_api.py",
+      "kb": 12.6,
+      "linhas": 261
+    },
+    {
+      "arquivo": "testes\\teste_queda_no_meio_da_gravacao.py",
+      "kb": 4.0,
+      "linhas": 100
+    },
+    {
+      "arquivo": "testes\\teste_rede_ruim.py",
+      "kb": 6.6,
+      "linhas": 164
+    },
+    {
+      "arquivo": "testes\\teste_rede_sem_reabrir.py",
+      "kb": 5.5,
+      "linhas": 131
+    },
+    {
+      "arquivo": "testes\\teste_rpcs3_controles.py",
+      "kb": 2.4,
+      "linhas": 61
+    },
+    {
+      "arquivo": "testes\\teste_satellaview_aviso.py",
+      "kb": 4.3,
+      "linhas": 96
+    },
+    {
+      "arquivo": "testes\\teste_servidor_que_cai.py",
+      "kb": 14.0,
+      "linhas": 303
+    },
+    {
+      "arquivo": "testes\\teste_sinc_migracao_e_lotes.py",
+      "kb": 4.2,
+      "linhas": 93
+    },
+    {
+      "arquivo": "testes\\teste_sinc_sem_relogio.py",
+      "kb": 3.2,
+      "linhas": 69
+    },
+    {
+      "arquivo": "testes\\teste_tela_4k.py",
+      "kb": 7.8,
+      "linhas": 150
+    },
+    {
+      "arquivo": "testes\\teste_tela_motivo.py",
+      "kb": 6.6,
+      "linhas": 121
+    },
+    {
+      "arquivo": "testes\\teste_temp_esparso.py",
+      "kb": 3.1,
+      "linhas": 84
+    },
+    {
+      "arquivo": "testes\\teste_travessia_capa.py",
+      "kb": 3.5,
+      "linhas": 87
+    },
+    {
+      "arquivo": "testes\\teste_ultra_promessas.py",
+      "kb": 6.3,
+      "linhas": 144
+    },
+    {
+      "arquivo": "testes\\teste_varios_discos.py",
+      "kb": 9.8,
+      "linhas": 182
+    },
+    {
+      "arquivo": "testes\\teste_verificador_arquivos.py",
+      "kb": 3.2,
+      "linhas": 70
+    },
+    {
+      "arquivo": "testes\\teste_vulkan_de_verdade.py",
+      "kb": 3.5,
+      "linhas": 82
+    },
+    {
+      "arquivo": "testes\\teste_xenia_abre.py",
+      "kb": 2.5,
+      "linhas": 55
+    },
+    {
+      "arquivo": "testes\\teste_zip_danificado.py",
+      "kb": 6.2,
+      "linhas": 130
+    },
+    {
+      "arquivo": "testes\\textos_sem_acento.py",
+      "kb": 2.5,
+      "linhas": 56
+    },
+    {
+      "arquivo": "testes\\varredura_auditoria3.py",
+      "kb": 16.6,
+      "linhas": 384
+    },
+    {
+      "arquivo": "testes\\varredura_fase1.py",
+      "kb": 7.4,
+      "linhas": 189
+    },
+    {
+      "arquivo": "testes\\varredura_fase2_css.py",
+      "kb": 1.6,
+      "linhas": 49
+    },
+    {
+      "arquivo": "VERIFICAR.bat",
+      "kb": 0.9,
+      "linhas": 37
+    }
+  ],
+  "linhas_do_produto": {
+    "servidor\\arena.py": 6416,
+    "launcher\\app.js": 4362,
+    "servidor\\graficos.py": 2565,
+    "launcher\\estilo.css": 1778,
+    "servidor\\bios.py": 1445,
+    "3-IMAGEM-SOM-CONTROLE.md": 1305,
+    "servidor\\consoles.json": 1277,
+    "servidor\\indexador.py": 1151,
+    "launcher\\index.html": 1044,
+    "2-JOGOS.md": 1031,
+    "launcher\\field-background.js": 848,
+    "launcher\\galaxy-background.js": 837,
+    "5-AMIGOS.md": 763,
+    "servidor\\hardware.py": 743,
+    "servidor\\barreiras.py": 647,
+    "servidor\\recursos.json": 644,
+    "servidor\\controles.py": 579,
+    "servidor\\capas_online.py": 566,
+    "servidor\\graficos.json": 551,
+    "servidor\\diagnostico.py": 539,
+    "6-RECURSOS-E-REPARO.md": 525,
+    "4-SAVES.md": 513,
+    "servidor\\arrumar.py": 513,
+    "1-COMECAR.md": 435,
+    "servidor\\identificador.py": 345,
+    "servidor\\nomes_arcade.py": 340,
+    "servidor\\motivo_do_erro.py": 291,
+    "servidor\\partida.py": 291,
+    "servidor\\bios_catalogo.py": 274,
+    "servidor\\perfis_controle.json": 271,
+    "servidor\\cheats.py": 266,
+    "servidor\\internet_archive.py": 265,
+    "servidor\\como_colocar.py": 242,
+    "servidor\\janela_preta.py": 233,
+    "servidor\\acervo.py": 230,
+    "LEIA-ME.md": 223,
+    "servidor\\jogadores.py": 200,
+    "servidor\\multitap.json": 189,
+    "servidor\\processos.py": 182,
+    "servidor\\capas_do_disco.py": 179,
+    "servidor\\integridade.py": 124,
+    "ARENA.bat": 110,
+    "COLETAR.bat": 81,
+    "launcher\\pixel-sprites.js": 58,
+    "RODAR_TESTES.bat": 40,
+    "VERIFICAR.bat": 37,
+    "PARTIDA.bat": 29
+  },
+  "rotas": [
+    {
+      "rota": "/api/acervo",
+      "metodo": "GET",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "carregarAcervo"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/acervo/instalar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "carregarAcervo"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/acervo/remover",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "carregarAcervo"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/acervo/salvar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "ligarEventos"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/amigo/adicionar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "adicionarAmigo"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/amigo/codigo",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "adicionarAmigoCodigo",
+        "carregarColegas"
+      ],
+      "aberta_a_rede": true
+    },
+    {
+      "rota": "/api/amigo/remover",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "removerAmigo"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/amigo/testar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "testarAmigo"
+      ],
+      "aberta_a_rede": true
+    },
+    {
+      "rota": "/api/arrumar/progresso",
+      "metodo": "GET",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "arrumarJogo"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/backup",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "ligarEventos"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/barreiras",
+      "metodo": "GET",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "verificarBarreiras"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/barreiras/fechar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "desenharBarreiras"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/biblioteca-online",
+      "metodo": "GET",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "carregarBibliotecaOnline"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/biblioteca-online/instalar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "carregarBibliotecaOnline"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/bios",
+      "metodo": "GET",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "carregarBios"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/bios/abrir",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "ligarEventos"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/bios/conferir",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "carregarBios"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/bios/pasta",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "abrirPastaDaBios"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/botoes",
+      "metodo": "GET",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "desenharBotoes",
+        "desenharMapa"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/capa",
+      "metodo": "GET",
+      "chamada_por": [
+        "tela (endereco que vem do servidor)"
+      ],
+      "funcoes_da_tela": [],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/capa/atualizar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "ligarEventos"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/capa/enviar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "ligarEventos"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/capa/miniatura",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "proximaMiniatura"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/capas/buscar-faltando",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "buscarCapasQueFaltam"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/capas/parar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "buscarCapasQueFaltam"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/capas/progresso",
+      "metodo": "GET",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "buscarCapasQueFaltam"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/catalogo",
+      "metodo": "GET",
+      "chamada_por": [
+        "tela",
+        "PARTIDA.bat"
+      ],
+      "funcoes_da_tela": [
+        "carregarCatalogo"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/cheat/adicionar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "adicionarCheat"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/cheat/alterar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "alterarCheat"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/colegas",
+      "metodo": "GET",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "carregarColegas"
+      ],
+      "aberta_a_rede": true
+    },
+    {
+      "rota": "/api/como-colocar",
+      "metodo": "GET",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "abrirComoColocar"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/config",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "salvarConfig"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/conquistas",
+      "metodo": "GET",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "carregarConquistas"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/estado",
+      "metodo": "GET",
+      "chamada_por": [
+        "tela",
+        "PARTIDA.bat"
+      ],
+      "funcoes_da_tela": [
+        "carregarEstado",
+        "conferirFaixaTeclas",
+        "esperarServidorVoltar",
+        "exportarPacote",
+        "ligarEventos"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/estado/apagar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "apagarEspaco"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/exportar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "exportarPacote"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/importar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "importarPacote"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/indexar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "ligarEventos"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/jogar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "comecarPartida",
+        "jogar"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/jogo",
+      "metodo": "GET",
+      "chamada_por": [
+        "tela",
+        "PARTIDA.bat"
+      ],
+      "funcoes_da_tela": [
+        "abrirEscolhaConsole",
+        "abrirGaveta_jogo"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/jogo/arrumar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "arrumarJogo"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/jogo/console",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "ligarEventos"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/jogo/impressao",
+      "metodo": "GET",
+      "chamada_por": [
+        "PARTIDA.bat"
+      ],
+      "funcoes_da_tela": [],
+      "aberta_a_rede": true
+    },
+    {
+      "rota": "/api/jogo/mover",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "moverJogo"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/mala",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "ligarEventos"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/mapeamento",
+      "metodo": "GET",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "desenharMapa"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/mapeamento/definir",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "capturar",
+        "gravaWizard"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/mapeamento/limpar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "ligarEventos"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/mapeamento/padrao",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "ligarEventos"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/partida/procurar",
+      "metodo": "GET",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "procurarPartidas"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/partida/testar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "ligarEventos"
+      ],
+      "aberta_a_rede": true
+    },
+    {
+      "rota": "/api/pasta/abrir",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "desenharComoColocar"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/pastas/criar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "ligarEventos"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/perfil-controle",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "prepararMapa"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/perfil/foto",
+      "metodo": "GET",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "atualizarFotoPerfil",
+        "ligarEventos"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/perfil/foto",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "atualizarFotoPerfil",
+        "ligarEventos"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/perfil/novo",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "ligarEventos"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/perfis-controle",
+      "metodo": "GET",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "desenharMapa",
+        "prepararMapa"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/placar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "salvarPlacar"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/ranking",
+      "metodo": "GET",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "carregarRanking"
+      ],
+      "aberta_a_rede": true
+    },
+    {
+      "rota": "/api/reparar-runtime",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "ligarEventos"
+      ],
+      "aberta_a_rede": false
+    },
+    {
+      "rota": "/api/sinc/ola",
+      "metodo": "POST",
+      "chamada_por": [
+        "PARTIDA.bat",
+        "outro ARENA"
+      ],
+      "funcoes_da_tela": [],
+      "aberta_a_rede": true
+    },
+    {
+      "rota": "/api/sinc/receber",
+      "metodo": "POST",
+      "chamada_por": [
+        "outro ARENA"
+      ],
+      "funcoes_da_tela": [],
+      "aberta_a_rede": true
+    },
+    {
+      "rota": "/api/sincronizar",
+      "metodo": "POST",
+      "chamada_por": [
+        "tela"
+      ],
+      "funcoes_da_tela": [
+        "enviarRecordes"
+      ],
+      "aberta_a_rede": false
+    }
+  ],
+  "tela": {
+    "janelas": {
+      "gavetaPerfil": {
+        "tipo": "gaveta",
+        "titulo": "Perfil"
+      },
+      "gavetaComoColocar": {
+        "tipo": "gaveta",
+        "titulo": "Como colocar jogos"
+      },
+      "gavetaAcervo": {
+        "tipo": "gaveta",
+        "titulo": "Biblioteca online"
+      },
+      "gavetaAjustes": {
+        "tipo": "gaveta",
+        "titulo": "Ajustes"
+      },
+      "gavetaConquistas": {
+        "tipo": "gaveta",
+        "titulo": "Conquistas da turma"
+      },
+      "gavetaRecordes": {
+        "tipo": "gaveta",
+        "titulo": "Recordes"
+      },
+      "gavetaJogo": {
+        "tipo": "gaveta",
+        "titulo": "Jogo"
+      },
+      "modalJuntoLocal": {
+        "tipo": "modal",
+        "titulo": "Jogar junto neste computador"
+      },
+      "modalPartida": {
+        "tipo": "modal",
+        "titulo": "Jogar junto"
+      },
+      "modalPlacar": {
+        "tipo": "modal",
+        "titulo": "Registrar pontuação"
+      },
+      "modalAcervo": {
+        "tipo": "modal",
+        "titulo": "Adicionar jogo autorizado"
+      },
+      "modalConsole": {
+        "tipo": "modal",
+        "titulo": "Qual é o console deste jogo?"
+      },
+      "modalApelido": {
+        "tipo": "modal",
+        "titulo": "Como podemos chamar você?"
+      }
+    },
+    "controles": [
+      {
+        "tag": "button",
+        "id": "btnPerfil",
+        "tipo": "button",
+        "classe": "botao botao--perfil",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "Abrir o seu perfil",
+        "janela": "(tela principal)",
+        "aba": "",
+        "texto": "Perfil",
+        "atributos_data": [],
+        "linha": 29,
+        "acao": "click",
+        "rotas": [],
+        "funcoes": [
+          "abrirGaveta",
+          "abrirPerfil"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "btnAmigos",
+        "tipo": "button",
+        "classe": "botao",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "(tela principal)",
+        "aba": "",
+        "texto": "Amigos",
+        "atributos_data": [],
+        "linha": 33,
+        "acao": "click",
+        "rotas": [],
+        "funcoes": [
+          "abrirGaveta",
+          "abrirPerfil"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "btnRecordes",
+        "tipo": "button",
+        "classe": "botao",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "(tela principal)",
+        "aba": "",
+        "texto": "Recordes",
+        "atributos_data": [],
+        "linha": 34,
+        "acao": "click",
+        "rotas": [
+          "/api/estado",
+          "/api/ranking"
+        ],
+        "funcoes": [
+          "abrirGaveta",
+          "carregarRanking",
+          "desenharRanking",
+          "esperarServidorVoltar",
+          "formatarTempo",
+          "pedir",
+          "perderContato",
+          "recado"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "btnConquistas",
+        "tipo": "button",
+        "classe": "botao",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "(tela principal)",
+        "aba": "",
+        "texto": "Conquistas",
+        "atributos_data": [],
+        "linha": 35,
+        "acao": "click",
+        "rotas": [
+          "/api/conquistas",
+          "/api/estado"
+        ],
+        "funcoes": [
+          "abrirGaveta",
+          "carregarConquistas",
+          "esperarServidorVoltar",
+          "pedir",
+          "perderContato",
+          "recado"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "btnAcervo",
+        "tipo": "button",
+        "classe": "botao",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "(tela principal)",
+        "aba": "",
+        "texto": "Biblioteca",
+        "atributos_data": [],
+        "linha": 36,
+        "acao": "click",
+        "rotas": [
+          "/api/acervo",
+          "/api/estado"
+        ],
+        "funcoes": [
+          "abrirGaveta",
+          "carregarAcervo",
+          "esperarServidorVoltar",
+          "pedir",
+          "perderContato",
+          "recado"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "btnTema",
+        "tipo": "button",
+        "classe": "botao botao-tema",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "Alternar modo de cor",
+        "janela": "(tela principal)",
+        "aba": "",
+        "texto": "☾ Escuro",
+        "atributos_data": [],
+        "linha": 37,
+        "acao": "click",
+        "rotas": [
+          "/api/config",
+          "/api/estado"
+        ],
+        "funcoes": [
+          "atualizarBotaoTema",
+          "esperarServidorVoltar",
+          "pedir",
+          "perderContato",
+          "recado",
+          "salvarConfig"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "btnSincronizar",
+        "tipo": "button",
+        "classe": "botao",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "(tela principal)",
+        "aba": "",
+        "texto": "Enviar recordes 0",
+        "atributos_data": [],
+        "linha": 38,
+        "acao": "click",
+        "rotas": [
+          "/api/ranking",
+          "/api/sincronizar"
+        ],
+        "funcoes": [
+          "amigoEstaOnline",
+          "carregarRanking",
+          "desenharAmigos",
+          "desenharRanking",
+          "enviarRecordes",
+          "formatarTempo",
+          "mostrarPendentes",
+          "pedir",
+          "perderContato",
+          "recado"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "btnAjustes",
+        "tipo": "button",
+        "classe": "botao",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "(tela principal)",
+        "aba": "",
+        "texto": "Ajustes",
+        "atributos_data": [],
+        "linha": 41,
+        "acao": "click",
+        "rotas": [],
+        "funcoes": [
+          "abrirGaveta"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "",
+        "tipo": "button",
+        "classe": "trilho-item trilho-item--todos ativo",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "(tela principal)",
+        "aba": "",
+        "texto": "Todos os jogos 0",
+        "atributos_data": [
+          "data-plataforma"
+        ],
+        "linha": 74,
+        "acao": "achado pelo atributo data-plataforma (linha 394)",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "button",
+        "id": "btnComoColocar",
+        "tipo": "button",
+        "classe": "botao botao--largo",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "(tela principal)",
+        "aba": "",
+        "texto": "Como colocar jogos",
+        "atributos_data": [],
+        "linha": 79,
+        "acao": "click",
+        "rotas": [
+          "/api/como-colocar",
+          "/api/estado"
+        ],
+        "funcoes": [
+          "abrirComoColocar",
+          "abrirGaveta",
+          "desenharComoColocar",
+          "esperarServidorVoltar",
+          "pedir",
+          "perderContato",
+          "recado"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "btnCriarPastas",
+        "tipo": "button",
+        "classe": "botao botao--largo",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "(tela principal)",
+        "aba": "",
+        "texto": "Criar pastas dos consoles",
+        "atributos_data": [],
+        "linha": 80,
+        "acao": "click",
+        "rotas": [
+          "/api/catalogo",
+          "/api/estado",
+          "/api/pastas/criar"
+        ],
+        "funcoes": [
+          "carregarCatalogo",
+          "classeDaCapa",
+          "desenharAvisosDoJogo",
+          "desenharDetalhes",
+          "desenharJogos",
+          "desenharPlataformas",
+          "esperarServidorVoltar",
+          "formatarBytes",
+          "formatarMb",
+          "iniciaisDaCapa",
+          "jogosVisiveis",
+          "linhaDoJogo",
+          "normalizar",
+          "pedir",
+          "perderContato",
+          "prepararCapa",
+          "recado",
+          "soNoMesmoComputador",
+          "textoJogadores",
+          "tipoDeMidia"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "btnAtualizar",
+        "tipo": "button",
+        "classe": "botao botao--largo",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "(tela principal)",
+        "aba": "",
+        "texto": "Atualizar lista",
+        "atributos_data": [],
+        "linha": 81,
+        "acao": "click",
+        "rotas": [
+          "/api/catalogo",
+          "/api/estado",
+          "/api/indexar"
+        ],
+        "funcoes": [
+          "carregarCatalogo",
+          "classeDaCapa",
+          "desenharAvisosDoJogo",
+          "desenharDetalhes",
+          "desenharJogos",
+          "desenharPlataformas",
+          "esperarServidorVoltar",
+          "formatarBytes",
+          "formatarMb",
+          "iniciaisDaCapa",
+          "jogosVisiveis",
+          "linhaDoJogo",
+          "normalizar",
+          "pedir",
+          "perderContato",
+          "prepararCapa",
+          "recado",
+          "soNoMesmoComputador",
+          "textoJogadores",
+          "tipoDeMidia"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "btnBuscarCapas",
+        "tipo": "button",
+        "classe": "botao botao--largo",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "Procura na internet a capa de cada jogo que está sem (PS3 e PSP pegam o ícone do próprio disco, sem internet)",
+        "janela": "(tela principal)",
+        "aba": "",
+        "texto": "Buscar capas que faltam",
+        "atributos_data": [],
+        "linha": 82,
+        "acao": "click",
+        "rotas": [
+          "/api/capas/buscar-faltando",
+          "/api/capas/parar",
+          "/api/capas/progresso",
+          "/api/catalogo",
+          "/api/estado"
+        ],
+        "funcoes": [
+          "buscarCapasQueFaltam",
+          "carregarCatalogo",
+          "classeDaCapa",
+          "desenharAvisosDoJogo",
+          "desenharDetalhes",
+          "desenharJogos",
+          "desenharPlataformas",
+          "esperarServidorVoltar",
+          "formatarMb",
+          "jogosVisiveis",
+          "linhaDoJogo",
+          "pedir",
+          "perderContato",
+          "prepararCapa",
+          "recado",
+          "soNoMesmoComputador"
+        ]
+      },
+      {
+        "tag": "input",
+        "id": "campoBusca",
+        "tipo": "search",
+        "classe": "",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "Procurar jogo",
+        "janela": "(tela principal)",
+        "aba": "",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 89,
+        "acao": "input",
+        "rotas": [],
+        "funcoes": [
+          "classeDaCapa",
+          "desenharJogos",
+          "formatarBytes",
+          "formatarMb",
+          "iniciaisDaCapa",
+          "jogosVisiveis",
+          "linhaDoJogo",
+          "normalizar",
+          "prepararCapa",
+          "textoJogadores",
+          "tipoDeMidia"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "btnTodosJogos",
+        "tipo": "button",
+        "classe": "filtro-rapido ativo",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "(tela principal)",
+        "aba": "",
+        "texto": "Todos",
+        "atributos_data": [],
+        "linha": 92,
+        "acao": "ligado num laco do app.js (linha 3722, em ligarEventos)",
+        "rotas": [],
+        "funcoes": [
+          "classeDaCapa",
+          "desenharJogos",
+          "formatarBytes",
+          "formatarMb",
+          "iniciaisDaCapa",
+          "jogosVisiveis",
+          "linhaDoJogo",
+          "normalizar",
+          "prepararCapa",
+          "textoJogadores",
+          "tipoDeMidia"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "btnFavoritos",
+        "tipo": "button",
+        "classe": "filtro-rapido",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "(tela principal)",
+        "aba": "",
+        "texto": "★ Favoritos",
+        "atributos_data": [],
+        "linha": 93,
+        "acao": "ligado num laco do app.js (linha 3723, em ligarEventos)",
+        "rotas": [],
+        "funcoes": [
+          "classeDaCapa",
+          "desenharJogos",
+          "formatarBytes",
+          "formatarMb",
+          "iniciaisDaCapa",
+          "jogosVisiveis",
+          "linhaDoJogo",
+          "normalizar",
+          "prepararCapa",
+          "textoJogadores",
+          "tipoDeMidia"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "btnRecentes",
+        "tipo": "button",
+        "classe": "filtro-rapido",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "(tela principal)",
+        "aba": "",
+        "texto": "Recentes",
+        "atributos_data": [],
+        "linha": 94,
+        "acao": "ligado num laco do app.js (linha 3724, em ligarEventos)",
+        "rotas": [],
+        "funcoes": [
+          "classeDaCapa",
+          "desenharJogos",
+          "formatarBytes",
+          "formatarMb",
+          "iniciaisDaCapa",
+          "jogosVisiveis",
+          "linhaDoJogo",
+          "normalizar",
+          "prepararCapa",
+          "textoJogadores",
+          "tipoDeMidia"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "btnMais",
+        "tipo": "button",
+        "classe": "botao botao--largo",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "(tela principal)",
+        "aba": "",
+        "texto": "Mostrar mais",
+        "atributos_data": [],
+        "linha": 101,
+        "acao": "click",
+        "rotas": [],
+        "funcoes": [
+          "classeDaCapa",
+          "desenharJogos",
+          "formatarBytes",
+          "formatarMb",
+          "iniciaisDaCapa",
+          "jogosVisiveis",
+          "linhaDoJogo",
+          "normalizar",
+          "prepararCapa",
+          "textoJogadores",
+          "tipoDeMidia"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "btnMoverSugerido",
+        "tipo": "button",
+        "classe": "botao",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "(tela principal)",
+        "aba": "",
+        "texto": "Mover para a pasta certa",
+        "atributos_data": [],
+        "linha": 122,
+        "acao": "click",
+        "rotas": [
+          "/api/catalogo",
+          "/api/estado",
+          "/api/jogo/mover"
+        ],
+        "funcoes": [
+          "carregarCatalogo",
+          "classeDaCapa",
+          "desenharAvisosDoJogo",
+          "desenharDetalhes",
+          "desenharJogos",
+          "desenharPlataformas",
+          "esperarServidorVoltar",
+          "formatarMb",
+          "jogosVisiveis",
+          "linhaDoJogo",
+          "moverJogo",
+          "pedir",
+          "perderContato",
+          "prepararCapa",
+          "recado",
+          "soNoMesmoComputador"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "btnJogarSelecionado",
+        "tipo": "button",
+        "classe": "botao botao--principal",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "(tela principal)",
+        "aba": "",
+        "texto": "Jogar agora",
+        "atributos_data": [],
+        "linha": 131,
+        "acao": "click",
+        "rotas": [
+          "/api/config",
+          "/api/jogar"
+        ],
+        "funcoes": [
+          "atualizarBotaoTema",
+          "aviso",
+          "classeDaCapa",
+          "desenharJogos",
+          "formatarMb",
+          "jogar",
+          "jogosVisiveis",
+          "linhaDoJogo",
+          "marcarJogoAberto",
+          "mostrarAlertaMaquina",
+          "mostrarFaixaTeclas",
+          "normalizar",
+          "pedir",
+          "perderContato",
+          "prepararCapa",
+          "recado",
+          "salvarConfig",
+          "textoJogadores",
+          "tipoDeMidia"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "btnMultiplayerSelecionado",
+        "tipo": "button",
+        "classe": "botao",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "(tela principal)",
+        "aba": "",
+        "texto": "Jogar multiplayer",
+        "atributos_data": [],
+        "linha": 132,
+        "acao": "click",
+        "rotas": [
+          "/api/colegas",
+          "/api/config",
+          "/api/jogar"
+        ],
+        "funcoes": [
+          "abrirJuntoLocal",
+          "abrirPartida",
+          "amigoEstaOnline",
+          "atualizarBotaoTema",
+          "aviso",
+          "carregarColegas",
+          "desenharAmigos",
+          "desenharJogos",
+          "jogar",
+          "jogosVisiveis",
+          "linhaDoJogo",
+          "marcarJogoAberto",
+          "mostrarAlertaMaquina",
+          "mostrarFaixaTeclas",
+          "pedir",
+          "perderContato",
+          "preencherAmigosPartida",
+          "recado",
+          "salvarConfig",
+          "soNoMesmoComputador"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "btnGerirSelecionado",
+        "tipo": "button",
+        "classe": "botao",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "(tela principal)",
+        "aba": "",
+        "texto": "Saves e cheats",
+        "atributos_data": [],
+        "linha": 133,
+        "acao": "click",
+        "rotas": [
+          "/api/estado",
+          "/api/jogo"
+        ],
+        "funcoes": [
+          "abrirGaveta",
+          "abrirGaveta_jogo",
+          "desenharCheats",
+          "desenharConsoleDoJogo",
+          "desenharEspacos",
+          "esperarServidorVoltar",
+          "pedir",
+          "perderContato",
+          "recado"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "btnEscolherConsole",
+        "tipo": "button",
+        "classe": "botao",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "(tela principal)",
+        "aba": "",
+        "texto": "Escolher console",
+        "atributos_data": [],
+        "linha": 134,
+        "acao": "click",
+        "rotas": [
+          "/api/estado",
+          "/api/jogo"
+        ],
+        "funcoes": [
+          "abrirEscolhaConsole",
+          "esperarServidorVoltar",
+          "pedir",
+          "perderContato",
+          "recado"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "btnAtualizarCapa",
+        "tipo": "button",
+        "classe": "botao",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "(tela principal)",
+        "aba": "",
+        "texto": "Buscar capa",
+        "atributos_data": [],
+        "linha": 137,
+        "acao": "click",
+        "rotas": [
+          "/api/capa/atualizar",
+          "/api/catalogo",
+          "/api/estado"
+        ],
+        "funcoes": [
+          "carregarCatalogo",
+          "classeDaCapa",
+          "desenharAvisosDoJogo",
+          "desenharDetalhes",
+          "desenharJogos",
+          "desenharPlataformas",
+          "esperarServidorVoltar",
+          "formatarBytes",
+          "formatarMb",
+          "iniciaisDaCapa",
+          "jogosVisiveis",
+          "linhaDoJogo",
+          "normalizar",
+          "pedir",
+          "perderContato",
+          "prepararCapa",
+          "recado",
+          "soNoMesmoComputador",
+          "textoJogadores",
+          "tipoDeMidia"
+        ]
+      },
+      {
+        "tag": "input",
+        "id": "campoEnviarCapa",
+        "tipo": "file",
+        "classe": "",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "(tela principal)",
+        "aba": "",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 139,
+        "acao": "change",
+        "rotas": [
+          "/api/capa/enviar",
+          "/api/catalogo",
+          "/api/estado"
+        ],
+        "funcoes": [
+          "carregarCatalogo",
+          "classeDaCapa",
+          "desenharAvisosDoJogo",
+          "desenharDetalhes",
+          "desenharJogos",
+          "desenharPlataformas",
+          "esperarServidorVoltar",
+          "formatarBytes",
+          "formatarMb",
+          "iniciaisDaCapa",
+          "jogosVisiveis",
+          "linhaDoJogo",
+          "normalizar",
+          "pedir",
+          "perderContato",
+          "prepararCapa",
+          "recado",
+          "soNoMesmoComputador",
+          "textoJogadores",
+          "tipoDeMidia"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "",
+        "tipo": "button",
+        "classe": "botao botao--fechar",
+        "aba_alvo": "",
+        "fecha": "gavetaPerfil",
+        "rotulo": "",
+        "janela": "gavetaPerfil",
+        "aba": "",
+        "texto": "Fechar",
+        "atributos_data": [],
+        "linha": 152,
+        "acao": "fecha a janela gavetaPerfil",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "button",
+        "id": "",
+        "tipo": "button",
+        "classe": "aba ativo",
+        "aba_alvo": "perfil",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaPerfil",
+        "aba": "",
+        "texto": "Meu perfil",
+        "atributos_data": [],
+        "linha": 156,
+        "acao": "abre a aba perfil",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "button",
+        "id": "",
+        "tipo": "button",
+        "classe": "aba",
+        "aba_alvo": "rede",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaPerfil",
+        "aba": "",
+        "texto": "Amigos",
+        "atributos_data": [],
+        "linha": 157,
+        "acao": "abre a aba rede",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "input",
+        "id": "perfilFotoArquivo",
+        "tipo": "file",
+        "classe": "",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaPerfil",
+        "aba": "perfil",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 173,
+        "acao": "change",
+        "rotas": [
+          "/api/estado",
+          "/api/perfil/foto"
+        ],
+        "funcoes": [
+          "atualizarFotoPerfil",
+          "esperarServidorVoltar",
+          "pedir",
+          "perderContato",
+          "recado",
+          "redimensionarFotoPerfil"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "btnRemoverFotoPerfil",
+        "tipo": "button",
+        "classe": "botao",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaPerfil",
+        "aba": "perfil",
+        "texto": "Remover foto",
+        "atributos_data": [],
+        "linha": 174,
+        "acao": "click",
+        "rotas": [
+          "/api/estado",
+          "/api/perfil/foto"
+        ],
+        "funcoes": [
+          "atualizarFotoPerfil",
+          "esperarServidorVoltar",
+          "pedir",
+          "perderContato",
+          "recado"
+        ]
+      },
+      {
+        "tag": "input",
+        "id": "campoApelido",
+        "tipo": "text",
+        "classe": "",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaPerfil",
+        "aba": "perfil",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 182,
+        "acao": "keydown",
+        "rotas": [
+          "/api/config"
+        ],
+        "funcoes": [
+          "atualizarBotaoTema",
+          "mostrarApelido",
+          "pedir",
+          "perderContato",
+          "recado",
+          "salvarConfig",
+          "trocarApelido"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "btnTrocarApelido",
+        "tipo": "button",
+        "classe": "botao botao--principal",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaPerfil",
+        "aba": "perfil",
+        "texto": "Salvar apelido",
+        "atributos_data": [],
+        "linha": 185,
+        "acao": "click",
+        "rotas": [
+          "/api/config"
+        ],
+        "funcoes": [
+          "atualizarBotaoTema",
+          "mostrarApelido",
+          "pedir",
+          "perderContato",
+          "recado",
+          "salvarConfig",
+          "trocarApelido"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "chaveApagarSaves",
+        "tipo": "",
+        "classe": "chave opcao-controle",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "Apagar saves e cheats",
+        "janela": "gavetaPerfil",
+        "aba": "perfil",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 201,
+        "acao": "click",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "button",
+        "id": "btnNovoPerfil",
+        "tipo": "button",
+        "classe": "botao botao--perigo",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaPerfil",
+        "aba": "perfil",
+        "texto": "Começar do zero",
+        "atributos_data": [],
+        "linha": 208,
+        "acao": "click",
+        "rotas": [
+          "/api/botoes",
+          "/api/catalogo",
+          "/api/colegas",
+          "/api/estado",
+          "/api/mapeamento",
+          "/api/partida/procurar",
+          "/api/perfil/foto",
+          "/api/perfil/novo",
+          "/api/perfis-controle",
+          "/api/ranking"
+        ],
+        "funcoes": [
+          "amigoEstaOnline",
+          "atualizarBotaoTema",
+          "atualizarExplicaPreset",
+          "atualizarFotoPerfil",
+          "aviso",
+          "carregarCatalogo",
+          "carregarColegas",
+          "carregarEstado",
+          "carregarRanking",
+          "classeDaCapa",
+          "controleDaOpcao",
+          "desenharAmigos",
+          "desenharAvancado",
+          "desenharAvisosDoJogo",
+          "desenharBios",
+          "desenharBotoes",
+          "desenharCartoes",
+          "desenharControles",
+          "desenharDetalhes",
+          "desenharEnderecos",
+          "desenharExternos",
+          "desenharFechamentos",
+          "desenharJogos",
+          "desenharMapa",
+          "desenharPacotes",
+          "desenharPerfis",
+          "desenharPlataformas",
+          "desenharRanking",
+          "desenharRedePs2",
+          "esperarServidorVoltar",
+          "explicarFundoAnimado",
+          "explicarNivelGrafico",
+          "formatarBytes",
+          "formatarMb",
+          "formatarTempo",
+          "iniciaisDaCapa",
+          "jogosVisiveis",
+          "linhaDoJogo",
+          "linhaDoRecurso",
+          "montarAbaControles",
+          "mostrarApelido",
+          "mostrarPendentes",
+          "nivelDoGrafico",
+          "nomeCurtoDoProcessador",
+          "normalizar",
+          "numeroBr",
+          "pedir",
+          "perderContato",
+          "preencherAmigosPartida",
+          "prepararAbrirBios",
+          "prepararBotoes",
+          "prepararCapa",
+          "prepararMapa",
+          "procurarPartidas",
+          "recado",
+          "soNoMesmoComputador",
+          "textoJogadores",
+          "tipoDeMidia"
+        ]
+      },
+      {
+        "tag": "input",
+        "id": "amigoCodigo",
+        "tipo": "text",
+        "classe": "",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "ARENA-AB12-CD34",
+        "janela": "gavetaPerfil",
+        "aba": "rede",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 226,
+        "acao": "",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "button",
+        "id": "btnAddAmigoCodigo",
+        "tipo": "button",
+        "classe": "botao botao--principal",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaPerfil",
+        "aba": "rede",
+        "texto": "Adicionar pelo código",
+        "atributos_data": [],
+        "linha": 229,
+        "acao": "click",
+        "rotas": [
+          "/api/amigo/codigo",
+          "/api/estado"
+        ],
+        "funcoes": [
+          "adicionarAmigoCodigo",
+          "amigoEstaOnline",
+          "desenharAmigos",
+          "esperarServidorVoltar",
+          "pedir",
+          "perderContato",
+          "preencherAmigosPartida",
+          "recado"
+        ]
+      },
+      {
+        "tag": "details",
+        "id": "",
+        "tipo": "",
+        "classe": "detalhe-avancado",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaPerfil",
+        "aba": "rede",
+        "texto": "Ou digite o endereço na mão\n        \n          Use quando o código não funcionar — por exemplo, se vocês estão em\n          redes que não se enxergam.\n        \n        \n          \n            Apelido do amigo\n            \n          \n          \n            Endereço que ele te passou\n            \n          \n          \n            ",
+        "atributos_data": [],
+        "linha": 235,
+        "acao": "abre e fecha (sem rota)",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "input",
+        "id": "amigoApelido",
+        "tipo": "text",
+        "classe": "",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "lucas",
+        "janela": "gavetaPerfil",
+        "aba": "rede",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 244,
+        "acao": "",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "input",
+        "id": "amigoUrl",
+        "tipo": "text",
+        "classe": "",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "192.168.0.22",
+        "janela": "gavetaPerfil",
+        "aba": "rede",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 249,
+        "acao": "",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "button",
+        "id": "btnTestarAmigo",
+        "tipo": "button",
+        "classe": "botao",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaPerfil",
+        "aba": "rede",
+        "texto": "Testar",
+        "atributos_data": [],
+        "linha": 253,
+        "acao": "click",
+        "rotas": [
+          "/api/amigo/testar",
+          "/api/estado"
+        ],
+        "funcoes": [
+          "esperarServidorVoltar",
+          "pedir",
+          "perderContato",
+          "recado",
+          "testarAmigo"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "btnAddAmigo",
+        "tipo": "button",
+        "classe": "botao botao--principal",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaPerfil",
+        "aba": "rede",
+        "texto": "Adicionar",
+        "atributos_data": [],
+        "linha": 254,
+        "acao": "click",
+        "rotas": [
+          "/api/amigo/adicionar",
+          "/api/estado"
+        ],
+        "funcoes": [
+          "adicionarAmigo",
+          "amigoEstaOnline",
+          "desenharAmigos",
+          "esperarServidorVoltar",
+          "pedir",
+          "perderContato",
+          "recado"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "chaveRede",
+        "tipo": "",
+        "classe": "chave opcao-controle",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "Aceitar conexões da rede",
+        "janela": "gavetaPerfil",
+        "aba": "rede",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 262,
+        "acao": "click",
+        "rotas": [
+          "/api/config",
+          "/api/estado"
+        ],
+        "funcoes": [
+          "atualizarBotaoTema",
+          "esperarServidorVoltar",
+          "pedir",
+          "perderContato",
+          "recado",
+          "salvarConfig"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "btnEnviarAgora",
+        "tipo": "button",
+        "classe": "botao botao--principal",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaPerfil",
+        "aba": "rede",
+        "texto": "Sincronizar agora",
+        "atributos_data": [],
+        "linha": 285,
+        "acao": "click",
+        "rotas": [
+          "/api/ranking",
+          "/api/sincronizar"
+        ],
+        "funcoes": [
+          "amigoEstaOnline",
+          "carregarRanking",
+          "desenharAmigos",
+          "desenharRanking",
+          "enviarRecordes",
+          "formatarTempo",
+          "mostrarPendentes",
+          "pedir",
+          "perderContato",
+          "recado"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "btnMala",
+        "tipo": "button",
+        "classe": "botao botao--principal",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaPerfil",
+        "aba": "rede",
+        "texto": "Trocar pelo pen drive",
+        "atributos_data": [],
+        "linha": 297,
+        "acao": "click",
+        "rotas": [
+          "/api/estado",
+          "/api/mala",
+          "/api/ranking"
+        ],
+        "funcoes": [
+          "carregarRanking",
+          "desenharRanking",
+          "esperarServidorVoltar",
+          "formatarTempo",
+          "mostrarPendentes",
+          "pedir",
+          "perderContato",
+          "recado"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "",
+        "tipo": "button",
+        "classe": "botao botao--fechar",
+        "aba_alvo": "",
+        "fecha": "gavetaComoColocar",
+        "rotulo": "",
+        "janela": "gavetaComoColocar",
+        "aba": "",
+        "texto": "Fechar",
+        "atributos_data": [],
+        "linha": 314,
+        "acao": "fecha a janela gavetaComoColocar",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "select",
+        "id": "listaComoColocar",
+        "tipo": "",
+        "classe": "",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaComoColocar",
+        "aba": "",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 330,
+        "acao": "change",
+        "rotas": [],
+        "funcoes": [
+          "desenharComoColocar"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "",
+        "tipo": "button",
+        "classe": "botao botao--fechar",
+        "aba_alvo": "",
+        "fecha": "gavetaAcervo",
+        "rotulo": "",
+        "janela": "gavetaAcervo",
+        "aba": "",
+        "texto": "Fechar",
+        "atributos_data": [],
+        "linha": 340,
+        "acao": "fecha a janela gavetaAcervo",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "input",
+        "id": "campoBuscaOnline",
+        "tipo": "search",
+        "classe": "",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "ex.: Commander Keen, Jazz Jackrabbit",
+        "janela": "gavetaAcervo",
+        "aba": "",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 351,
+        "acao": "input",
+        "rotas": [
+          "/api/biblioteca-online",
+          "/api/estado"
+        ],
+        "funcoes": [
+          "carregarBibliotecaOnline",
+          "esperarServidorVoltar",
+          "formatarBytes",
+          "pedir",
+          "perderContato",
+          "recado"
+        ]
+      },
+      {
+        "tag": "input",
+        "id": "campoBuscaAcervo",
+        "tipo": "search",
+        "classe": "",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "nome, console ou licença",
+        "janela": "gavetaAcervo",
+        "aba": "",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 358,
+        "acao": "input",
+        "rotas": [
+          "/api/acervo",
+          "/api/estado"
+        ],
+        "funcoes": [
+          "carregarAcervo",
+          "esperarServidorVoltar",
+          "pedir",
+          "perderContato",
+          "recado"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "btnNovoAcervo",
+        "tipo": "button",
+        "classe": "botao",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaAcervo",
+        "aba": "",
+        "texto": "Gerenciar catálogo",
+        "atributos_data": [],
+        "linha": 363,
+        "acao": "click",
+        "rotas": [],
+        "funcoes": [
+          "abrirEditorAcervo",
+          "preencherCampo"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "",
+        "tipo": "button",
+        "classe": "botao botao--fechar",
+        "aba_alvo": "",
+        "fecha": "gavetaAjustes",
+        "rotulo": "",
+        "janela": "gavetaAjustes",
+        "aba": "",
+        "texto": "Fechar",
+        "atributos_data": [],
+        "linha": 374,
+        "acao": "fecha a janela gavetaAjustes",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "button",
+        "id": "",
+        "tipo": "button",
+        "classe": "aba ativo",
+        "aba_alvo": "simples",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaAjustes",
+        "aba": "",
+        "texto": "Simples",
+        "atributos_data": [],
+        "linha": 378,
+        "acao": "abre a aba simples",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "button",
+        "id": "",
+        "tipo": "button",
+        "classe": "aba",
+        "aba_alvo": "avancado",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaAjustes",
+        "aba": "",
+        "texto": "Avançado",
+        "atributos_data": [],
+        "linha": 379,
+        "acao": "abre a aba avancado",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "button",
+        "id": "",
+        "tipo": "button",
+        "classe": "aba",
+        "aba_alvo": "maquina",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaAjustes",
+        "aba": "",
+        "texto": "Máquina",
+        "atributos_data": [],
+        "linha": 380,
+        "acao": "abre a aba maquina",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "button",
+        "id": "",
+        "tipo": "button",
+        "classe": "aba",
+        "aba_alvo": "controles",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaAjustes",
+        "aba": "",
+        "texto": "Controles",
+        "atributos_data": [],
+        "linha": 381,
+        "acao": "abre a aba controles",
+        "rotas": [
+          "/api/botoes",
+          "/api/mapeamento",
+          "/api/perfis-controle"
+        ],
+        "funcoes": []
+      },
+      {
+        "tag": "button",
+        "id": "",
+        "tipo": "button",
+        "classe": "aba",
+        "aba_alvo": "emuladores",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaAjustes",
+        "aba": "",
+        "texto": "Emuladores",
+        "atributos_data": [],
+        "linha": 382,
+        "acao": "abre a aba emuladores",
+        "rotas": [
+          "/api/bios",
+          "/api/bios/conferir",
+          "/api/estado"
+        ],
+        "funcoes": []
+      },
+      {
+        "tag": "select",
+        "id": "listaFundoAnimado",
+        "tipo": "",
+        "classe": "opcao-controle",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "Fundo animado",
+        "janela": "gavetaAjustes",
+        "aba": "simples",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 392,
+        "acao": "change",
+        "rotas": [
+          "/api/config",
+          "/api/estado"
+        ],
+        "funcoes": [
+          "atualizarBotaoTema",
+          "esperarServidorVoltar",
+          "explicarFundoAnimado",
+          "pedir",
+          "perderContato",
+          "recado",
+          "salvarConfig"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "btnRestaurar",
+        "tipo": "button",
+        "classe": "botao",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaAjustes",
+        "aba": "avancado",
+        "texto": "Voltar tudo ao padrão",
+        "atributos_data": [],
+        "linha": 417,
+        "acao": "click",
+        "rotas": [
+          "/api/config",
+          "/api/estado"
+        ],
+        "funcoes": [
+          "atualizarBotaoTema",
+          "controleDaOpcao",
+          "desenharAvancado",
+          "desenharPerfis",
+          "esperarServidorVoltar",
+          "linhaDoRecurso",
+          "pedir",
+          "perderContato",
+          "recado",
+          "salvarConfig"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "btnRepararRuntime",
+        "tipo": "button",
+        "classe": "botao botao--principal",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaAjustes",
+        "aba": "maquina",
+        "texto": "Copiar para a pasta do ARENA",
+        "atributos_data": [],
+        "linha": 441,
+        "acao": "click",
+        "rotas": [
+          "/api/config",
+          "/api/jogar",
+          "/api/reparar-runtime"
+        ],
+        "funcoes": [
+          "atualizarBotaoTema",
+          "aviso",
+          "classeDaCapa",
+          "desenharJogos",
+          "formatarMb",
+          "jogar",
+          "jogosVisiveis",
+          "linhaDoJogo",
+          "marcarJogoAberto",
+          "mostrarAlertaMaquina",
+          "mostrarFaixaTeclas",
+          "normalizar",
+          "pedir",
+          "perderContato",
+          "prepararCapa",
+          "recado",
+          "salvarConfig",
+          "textoJogadores",
+          "tipoDeMidia"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "btnBarreiras",
+        "tipo": "button",
+        "classe": "botao botao--principal",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaAjustes",
+        "aba": "maquina",
+        "texto": "Verificar agora",
+        "atributos_data": [],
+        "linha": 454,
+        "acao": "click",
+        "rotas": [
+          "/api/barreiras",
+          "/api/estado"
+        ],
+        "funcoes": [
+          "desenharBarreiras",
+          "esperarServidorVoltar",
+          "pedir",
+          "perderContato",
+          "verificarBarreiras"
+        ]
+      },
+      {
+        "tag": "select",
+        "id": "listaNivelGrafico",
+        "tipo": "",
+        "classe": "opcao-controle",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "Nível do gráfico",
+        "janela": "gavetaAjustes",
+        "aba": "maquina",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 469,
+        "acao": "change",
+        "rotas": [
+          "/api/config",
+          "/api/estado"
+        ],
+        "funcoes": [
+          "atualizarBotaoTema",
+          "esperarServidorVoltar",
+          "explicarNivelGrafico",
+          "nivelDoGrafico",
+          "pedir",
+          "perderContato",
+          "recado",
+          "salvarConfig"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "chaveDesempenho",
+        "tipo": "",
+        "classe": "chave opcao-controle",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "Modo desempenho",
+        "janela": "gavetaAjustes",
+        "aba": "maquina",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 484,
+        "acao": "click",
+        "rotas": [
+          "/api/config",
+          "/api/estado"
+        ],
+        "funcoes": [
+          "atualizarBotaoTema",
+          "esperarServidorVoltar",
+          "pedir",
+          "perderContato",
+          "recado",
+          "salvarConfig"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "chaveUltra",
+        "tipo": "",
+        "classe": "chave opcao-controle",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "Ultra desempenho",
+        "janela": "gavetaAjustes",
+        "aba": "maquina",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 490,
+        "acao": "click",
+        "rotas": [
+          "/api/config",
+          "/api/estado"
+        ],
+        "funcoes": [
+          "atualizarBotaoTema",
+          "esperarServidorVoltar",
+          "pedir",
+          "perderContato",
+          "recado",
+          "salvarConfig"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "chaveTravar",
+        "tipo": "",
+        "classe": "chave opcao-controle",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "Travar teclas do sistema",
+        "janela": "gavetaAjustes",
+        "aba": "maquina",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 496,
+        "acao": "click",
+        "rotas": [
+          "/api/config",
+          "/api/estado"
+        ],
+        "funcoes": [
+          "atualizarBotaoTema",
+          "esperarServidorVoltar",
+          "pedir",
+          "perderContato",
+          "recado",
+          "salvarConfig"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "btnBackup",
+        "tipo": "button",
+        "classe": "botao",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaAjustes",
+        "aba": "maquina",
+        "texto": "Fazer cópia agora",
+        "atributos_data": [],
+        "linha": 511,
+        "acao": "click",
+        "rotas": [
+          "/api/backup",
+          "/api/estado"
+        ],
+        "funcoes": [
+          "esperarServidorVoltar",
+          "pedir",
+          "perderContato",
+          "recado"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "btnExportar",
+        "tipo": "button",
+        "classe": "botao botao--principal",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaAjustes",
+        "aba": "maquina",
+        "texto": "Montar meu pacote",
+        "atributos_data": [],
+        "linha": 517,
+        "acao": "click",
+        "rotas": [
+          "/api/estado",
+          "/api/exportar"
+        ],
+        "funcoes": [
+          "desenharPacotes",
+          "esperarServidorVoltar",
+          "exportarPacote",
+          "formatarBytes",
+          "formatarMb",
+          "pedir",
+          "perderContato",
+          "recado"
+        ]
+      },
+      {
+        "tag": "select",
+        "id": "listaDriverControleTopo",
+        "tipo": "",
+        "classe": "opcao-controle",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "Tipo de conexão do controle",
+        "janela": "gavetaAjustes",
+        "aba": "controles",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 533,
+        "acao": "change",
+        "rotas": [
+          "/api/config",
+          "/api/estado"
+        ],
+        "funcoes": [
+          "atualizarBotaoTema",
+          "esperarServidorVoltar",
+          "pedir",
+          "perderContato",
+          "recado",
+          "salvarConfig"
+        ]
+      },
+      {
+        "tag": "select",
+        "id": "mapaTipo",
+        "tipo": "",
+        "classe": "opcao-controle",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "Tipo de controle",
+        "janela": "gavetaAjustes",
+        "aba": "controles",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 556,
+        "acao": "change",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "select",
+        "id": "mapaConsole",
+        "tipo": "",
+        "classe": "opcao-controle",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "Console do mapeamento",
+        "janela": "gavetaAjustes",
+        "aba": "controles",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 565,
+        "acao": "change",
+        "rotas": [
+          "/api/botoes",
+          "/api/estado",
+          "/api/mapeamento",
+          "/api/perfis-controle"
+        ],
+        "funcoes": [
+          "aplicarPerfil",
+          "desenharMapa",
+          "esperarServidorVoltar",
+          "pedir",
+          "perderContato",
+          "recado"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "chaveDirecional",
+        "tipo": "",
+        "classe": "chave opcao-controle",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "Usar o direcional",
+        "janela": "gavetaAjustes",
+        "aba": "controles",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 575,
+        "acao": "ligado num laco do app.js (linha 1762, em prepararMapa)",
+        "rotas": [
+          "/api/botoes",
+          "/api/estado",
+          "/api/mapeamento",
+          "/api/perfil-controle",
+          "/api/perfis-controle"
+        ],
+        "funcoes": [
+          "aplicarPerfil",
+          "desenharMapa",
+          "esperarServidorVoltar",
+          "pedir",
+          "perderContato",
+          "recado"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "chaveAnalogicoEsq",
+        "tipo": "",
+        "classe": "chave opcao-controle",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "Usar o analógico esquerdo",
+        "janela": "gavetaAjustes",
+        "aba": "controles",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 581,
+        "acao": "ligado num laco do app.js (linha 1763, em prepararMapa)",
+        "rotas": [
+          "/api/botoes",
+          "/api/estado",
+          "/api/mapeamento",
+          "/api/perfil-controle",
+          "/api/perfis-controle"
+        ],
+        "funcoes": [
+          "aplicarPerfil",
+          "desenharMapa",
+          "esperarServidorVoltar",
+          "pedir",
+          "perderContato",
+          "recado"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "chaveAnalogicoDir",
+        "tipo": "",
+        "classe": "chave opcao-controle",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "Usar o analógico direito",
+        "janela": "gavetaAjustes",
+        "aba": "controles",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 587,
+        "acao": "ligado num laco do app.js (linha 1764, em prepararMapa)",
+        "rotas": [
+          "/api/botoes",
+          "/api/estado",
+          "/api/mapeamento",
+          "/api/perfil-controle",
+          "/api/perfis-controle"
+        ],
+        "funcoes": [
+          "aplicarPerfil",
+          "desenharMapa",
+          "esperarServidorVoltar",
+          "pedir",
+          "perderContato",
+          "recado"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "chaveVibracao",
+        "tipo": "",
+        "classe": "chave opcao-controle",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "Vibração",
+        "janela": "gavetaAjustes",
+        "aba": "controles",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 593,
+        "acao": "ligado num laco do app.js (linha 1765, em prepararMapa)",
+        "rotas": [
+          "/api/botoes",
+          "/api/estado",
+          "/api/mapeamento",
+          "/api/perfil-controle",
+          "/api/perfis-controle"
+        ],
+        "funcoes": [
+          "aplicarPerfil",
+          "desenharMapa",
+          "esperarServidorVoltar",
+          "pedir",
+          "perderContato",
+          "recado"
+        ]
+      },
+      {
+        "tag": "select",
+        "id": "listaExtra",
+        "tipo": "",
+        "classe": "opcao-controle",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "Dispositivo do jogador 2",
+        "janela": "gavetaAjustes",
+        "aba": "controles",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 599,
+        "acao": "change",
+        "rotas": [
+          "/api/estado",
+          "/api/perfil-controle"
+        ],
+        "funcoes": [
+          "esperarServidorVoltar",
+          "pedir",
+          "perderContato",
+          "recado"
+        ]
+      },
+      {
+        "tag": "select",
+        "id": "mapaJogador",
+        "tipo": "",
+        "classe": "opcao-controle",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "Jogador",
+        "janela": "gavetaAjustes",
+        "aba": "controles",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 613,
+        "acao": "change",
+        "rotas": [
+          "/api/botoes",
+          "/api/estado",
+          "/api/mapeamento",
+          "/api/perfis-controle"
+        ],
+        "funcoes": [
+          "aplicarPerfil",
+          "desenharMapa",
+          "esperarServidorVoltar",
+          "pedir",
+          "perderContato",
+          "recado"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "btnMapaLimpar",
+        "tipo": "button",
+        "classe": "botao",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaAjustes",
+        "aba": "controles",
+        "texto": "Limpar tudo",
+        "atributos_data": [],
+        "linha": 626,
+        "acao": "click",
+        "rotas": [
+          "/api/botoes",
+          "/api/estado",
+          "/api/mapeamento",
+          "/api/mapeamento/limpar",
+          "/api/perfis-controle"
+        ],
+        "funcoes": [
+          "aplicarPerfil",
+          "desenharMapa",
+          "esperarServidorVoltar",
+          "pedir",
+          "perderContato",
+          "recado"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "btnMapaPadrao",
+        "tipo": "button",
+        "classe": "botao",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaAjustes",
+        "aba": "controles",
+        "texto": "Padrão do teclado",
+        "atributos_data": [],
+        "linha": 627,
+        "acao": "click",
+        "rotas": [
+          "/api/botoes",
+          "/api/estado",
+          "/api/mapeamento",
+          "/api/mapeamento/padrao",
+          "/api/perfis-controle"
+        ],
+        "funcoes": [
+          "aplicarPerfil",
+          "desenharMapa",
+          "esperarServidorVoltar",
+          "pedir",
+          "perderContato",
+          "recado"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "btnMapaAuto",
+        "tipo": "button",
+        "classe": "botao botao--principal",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaAjustes",
+        "aba": "controles",
+        "texto": "Voltar ao reconhecimento automático",
+        "atributos_data": [],
+        "linha": 628,
+        "acao": "click",
+        "rotas": [
+          "/api/botoes",
+          "/api/estado",
+          "/api/mapeamento",
+          "/api/mapeamento/padrao",
+          "/api/perfis-controle"
+        ],
+        "funcoes": [
+          "aplicarPerfil",
+          "desenharMapa",
+          "esperarServidorVoltar",
+          "pedir",
+          "perderContato",
+          "recado"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "btnMapaWizard",
+        "tipo": "button",
+        "classe": "botao botao--principal",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaAjustes",
+        "aba": "controles",
+        "texto": "Configurar com assistente",
+        "atributos_data": [],
+        "linha": 631,
+        "acao": "click",
+        "rotas": [
+          "/api/botoes",
+          "/api/mapeamento",
+          "/api/perfis-controle"
+        ],
+        "funcoes": [
+          "desenharMapa",
+          "iniciarWizard",
+          "recado",
+          "wizardFinalizar",
+          "wizardPasso"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "wizardAguardar",
+        "tipo": "button",
+        "classe": "botao botao--principal",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaAjustes",
+        "aba": "controles",
+        "texto": "Estou pronto — pressione o botão agora",
+        "atributos_data": [],
+        "linha": 652,
+        "acao": "click",
+        "rotas": [
+          "/api/botoes",
+          "/api/mapeamento",
+          "/api/mapeamento/definir",
+          "/api/perfis-controle"
+        ],
+        "funcoes": [
+          "desenharMapa",
+          "gravaWizard",
+          "pedir",
+          "perderContato",
+          "recado",
+          "traduzirTecla",
+          "wizardAguardar",
+          "wizardCancelar",
+          "wizardFinalizar",
+          "wizardPasso"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "wizardPular",
+        "tipo": "button",
+        "classe": "botao",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaAjustes",
+        "aba": "controles",
+        "texto": "Não tenho esse botão",
+        "atributos_data": [],
+        "linha": 655,
+        "acao": "click",
+        "rotas": [
+          "/api/botoes",
+          "/api/mapeamento",
+          "/api/perfis-controle"
+        ],
+        "funcoes": [
+          "desenharMapa",
+          "recado",
+          "wizardFinalizar",
+          "wizardPasso",
+          "wizardPular"
+        ]
+      },
+      {
+        "tag": "select",
+        "id": "listaConsoleBotoes",
+        "tipo": "",
+        "classe": "opcao-controle",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "Console para ver os botões",
+        "janela": "gavetaAjustes",
+        "aba": "controles",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 669,
+        "acao": "change",
+        "rotas": [
+          "/api/botoes",
+          "/api/estado"
+        ],
+        "funcoes": [
+          "desenharBotoes",
+          "esperarServidorVoltar",
+          "pedir",
+          "perderContato",
+          "recado"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "btnBiosPasta",
+        "tipo": "button",
+        "classe": "botao",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaAjustes",
+        "aba": "emuladores",
+        "texto": "Abrir a pasta BIOS",
+        "atributos_data": [],
+        "linha": 690,
+        "acao": "click",
+        "rotas": [
+          "/api/bios/pasta",
+          "/api/estado"
+        ],
+        "funcoes": [
+          "abrirPastaDaBios",
+          "esperarServidorVoltar",
+          "pedir",
+          "perderContato",
+          "recado"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "btnBiosConferir",
+        "tipo": "button",
+        "classe": "botao botao--principal",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaAjustes",
+        "aba": "emuladores",
+        "texto": "Conferir",
+        "atributos_data": [],
+        "linha": 691,
+        "acao": "click",
+        "rotas": [
+          "/api/bios",
+          "/api/bios/conferir",
+          "/api/catalogo"
+        ],
+        "funcoes": [
+          "carregarBios",
+          "carregarCatalogo",
+          "classeDaCapa",
+          "conferirBios",
+          "desenharAvisosDoJogo",
+          "desenharBiosConsoles",
+          "desenharDetalhes",
+          "desenharJogos",
+          "desenharPlataformas",
+          "formatarMb",
+          "jogosVisiveis",
+          "linhaDoJogo",
+          "linhasDoConsole",
+          "pedir",
+          "perderContato",
+          "prepararCapa",
+          "recado",
+          "situacaoDoConsole",
+          "soNoMesmoComputador"
+        ]
+      },
+      {
+        "tag": "select",
+        "id": "listaPresetGrafico",
+        "tipo": "",
+        "classe": "opcao-controle",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaAjustes",
+        "aba": "emuladores",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 705,
+        "acao": "change",
+        "rotas": [
+          "/api/config",
+          "/api/estado"
+        ],
+        "funcoes": [
+          "atualizarBotaoTema",
+          "atualizarExplicaPreset",
+          "esperarServidorVoltar",
+          "pedir",
+          "perderContato",
+          "recado",
+          "salvarConfig"
+        ]
+      },
+      {
+        "tag": "select",
+        "id": "listaMotorPs2",
+        "tipo": "",
+        "classe": "opcao-controle",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "Motor de vídeo do PS2",
+        "janela": "gavetaAjustes",
+        "aba": "emuladores",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 718,
+        "acao": "change",
+        "rotas": [
+          "/api/config",
+          "/api/estado"
+        ],
+        "funcoes": [
+          "atualizarBotaoTema",
+          "esperarServidorVoltar",
+          "pedir",
+          "perderContato",
+          "recado",
+          "salvarConfig"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "chaveRpcn",
+        "tipo": "",
+        "classe": "chave opcao-controle",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "Ligar RPCN",
+        "janela": "gavetaAjustes",
+        "aba": "emuladores",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 766,
+        "acao": "click",
+        "rotas": [
+          "/api/config",
+          "/api/estado"
+        ],
+        "funcoes": [
+          "atualizarBotaoTema",
+          "esperarServidorVoltar",
+          "pedir",
+          "perderContato",
+          "recado",
+          "salvarConfig"
+        ]
+      },
+      {
+        "tag": "select",
+        "id": "listaBiosAbrir",
+        "tipo": "",
+        "classe": "opcao-controle",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "Console para abrir a BIOS",
+        "janela": "gavetaAjustes",
+        "aba": "emuladores",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 779,
+        "acao": "",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "button",
+        "id": "btnAbrirBios",
+        "tipo": "button",
+        "classe": "botao botao--principal",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaAjustes",
+        "aba": "emuladores",
+        "texto": "Abrir só a BIOS",
+        "atributos_data": [],
+        "linha": 783,
+        "acao": "click",
+        "rotas": [
+          "/api/bios/abrir",
+          "/api/estado"
+        ],
+        "funcoes": [
+          "esperarServidorVoltar",
+          "pedir",
+          "perderContato",
+          "recado"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "",
+        "tipo": "button",
+        "classe": "botao botao--fechar",
+        "aba_alvo": "",
+        "fecha": "gavetaConquistas",
+        "rotulo": "",
+        "janela": "gavetaConquistas",
+        "aba": "",
+        "texto": "Fechar",
+        "atributos_data": [],
+        "linha": 810,
+        "acao": "fecha a janela gavetaConquistas",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "button",
+        "id": "",
+        "tipo": "button",
+        "classe": "botao botao--fechar",
+        "aba_alvo": "",
+        "fecha": "gavetaRecordes",
+        "rotulo": "",
+        "janela": "gavetaRecordes",
+        "aba": "",
+        "texto": "Fechar",
+        "atributos_data": [],
+        "linha": 822,
+        "acao": "fecha a janela gavetaRecordes",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "button",
+        "id": "",
+        "tipo": "button",
+        "classe": "aba ativo",
+        "aba_alvo": "pontos",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaRecordes",
+        "aba": "",
+        "texto": "Pontuação",
+        "atributos_data": [],
+        "linha": 826,
+        "acao": "abre a aba pontos",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "button",
+        "id": "",
+        "tipo": "button",
+        "classe": "aba",
+        "aba_alvo": "tempo",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaRecordes",
+        "aba": "",
+        "texto": "Tempo de jogo",
+        "atributos_data": [],
+        "linha": 827,
+        "acao": "abre a aba tempo",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "button",
+        "id": "",
+        "tipo": "button",
+        "classe": "botao botao--fechar",
+        "aba_alvo": "",
+        "fecha": "gavetaJogo",
+        "rotulo": "",
+        "janela": "gavetaJogo",
+        "aba": "",
+        "texto": "Fechar",
+        "atributos_data": [],
+        "linha": 838,
+        "acao": "fecha a janela gavetaJogo",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "button",
+        "id": "",
+        "tipo": "button",
+        "classe": "aba ativo",
+        "aba_alvo": "estados",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaJogo",
+        "aba": "",
+        "texto": "Save states",
+        "atributos_data": [],
+        "linha": 842,
+        "acao": "abre a aba estados",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "button",
+        "id": "",
+        "tipo": "button",
+        "classe": "aba",
+        "aba_alvo": "cheats",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaJogo",
+        "aba": "",
+        "texto": "Cheats",
+        "atributos_data": [],
+        "linha": 843,
+        "acao": "abre a aba cheats",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "select",
+        "id": "listaConsoleJogo",
+        "tipo": "",
+        "classe": "opcao-controle",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "Console deste jogo",
+        "janela": "gavetaJogo",
+        "aba": "estados",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 852,
+        "acao": "change",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "input",
+        "id": "cheatDescricao",
+        "tipo": "text",
+        "classe": "",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "Vidas infinitas",
+        "janela": "gavetaJogo",
+        "aba": "cheats",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 873,
+        "acao": "",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "textarea",
+        "id": "cheatCodigo",
+        "tipo": "",
+        "classe": "",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "7E0DBE09\n7E0DBF09",
+        "janela": "gavetaJogo",
+        "aba": "cheats",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 878,
+        "acao": "",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "button",
+        "id": "btnAddCheat",
+        "tipo": "button",
+        "classe": "botao botao--principal",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "gavetaJogo",
+        "aba": "cheats",
+        "texto": "Adicionar código",
+        "atributos_data": [],
+        "linha": 881,
+        "acao": "click",
+        "rotas": [
+          "/api/cheat/adicionar",
+          "/api/estado"
+        ],
+        "funcoes": [
+          "adicionarCheat",
+          "desenharCheats",
+          "esperarServidorVoltar",
+          "pedir",
+          "perderContato",
+          "recado"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "",
+        "tipo": "button",
+        "classe": "botao",
+        "aba_alvo": "",
+        "fecha": "modalJuntoLocal",
+        "rotulo": "",
+        "janela": "modalJuntoLocal",
+        "aba": "",
+        "texto": "Fechar",
+        "atributos_data": [],
+        "linha": 898,
+        "acao": "fecha a janela modalJuntoLocal",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "button",
+        "id": "btnAbrirJuntoLocal",
+        "tipo": "button",
+        "classe": "botao botao--principal",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "modalJuntoLocal",
+        "aba": "",
+        "texto": "Abrir o jogo",
+        "atributos_data": [],
+        "linha": 899,
+        "acao": "click",
+        "rotas": [
+          "/api/config",
+          "/api/jogar"
+        ],
+        "funcoes": [
+          "atualizarBotaoTema",
+          "aviso",
+          "classeDaCapa",
+          "desenharJogos",
+          "formatarMb",
+          "jogar",
+          "jogosVisiveis",
+          "linhaDoJogo",
+          "marcarJogoAberto",
+          "mostrarAlertaMaquina",
+          "mostrarFaixaTeclas",
+          "normalizar",
+          "pedir",
+          "perderContato",
+          "prepararCapa",
+          "recado",
+          "salvarConfig",
+          "textoJogadores",
+          "tipoDeMidia"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "",
+        "tipo": "button",
+        "classe": "perfil",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "modalPartida",
+        "aba": "",
+        "texto": "Eu abro a partida Cria uma partida.",
+        "atributos_data": [
+          "data-papel"
+        ],
+        "linha": 910,
+        "acao": "achado pelo atributo data-papel (linha 2694)",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "button",
+        "id": "",
+        "tipo": "button",
+        "classe": "perfil",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "modalPartida",
+        "aba": "",
+        "texto": "Entrar na partida do amigo Entra em uma partida aberta.",
+        "atributos_data": [
+          "data-papel"
+        ],
+        "linha": 914,
+        "acao": "achado pelo atributo data-papel (linha 2694)",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "button",
+        "id": "",
+        "tipo": "button",
+        "classe": "perfil",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "modalPartida",
+        "aba": "",
+        "texto": "Só assistir Assiste sem controlar.",
+        "atributos_data": [
+          "data-papel"
+        ],
+        "linha": 918,
+        "acao": "achado pelo atributo data-papel (linha 2694)",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "button",
+        "id": "chaveInternet",
+        "tipo": "",
+        "classe": "chave opcao-controle",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "Jogar pela internet",
+        "janela": "modalPartida",
+        "aba": "",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 926,
+        "acao": "click",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "select",
+        "id": "listaAmigosPartida",
+        "tipo": "",
+        "classe": "",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "modalPartida",
+        "aba": "",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 933,
+        "acao": "change",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "select",
+        "id": "listaJogadorPartida",
+        "tipo": "",
+        "classe": "",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "modalPartida",
+        "aba": "",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 940,
+        "acao": "",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "button",
+        "id": "btnTestarPartida",
+        "tipo": "button",
+        "classe": "botao",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "modalPartida",
+        "aba": "",
+        "texto": "Testar antes de começar",
+        "atributos_data": [],
+        "linha": 948,
+        "acao": "click",
+        "rotas": [
+          "/api/estado",
+          "/api/partida/testar"
+        ],
+        "funcoes": [
+          "esperarServidorVoltar",
+          "pedir",
+          "perderContato",
+          "recado"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "",
+        "tipo": "button",
+        "classe": "botao",
+        "aba_alvo": "",
+        "fecha": "modalPartida",
+        "rotulo": "",
+        "janela": "modalPartida",
+        "aba": "",
+        "texto": "Cancelar",
+        "atributos_data": [],
+        "linha": 954,
+        "acao": "fecha a janela modalPartida",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "button",
+        "id": "btnAbrirPartida",
+        "tipo": "button",
+        "classe": "botao botao--principal",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "modalPartida",
+        "aba": "",
+        "texto": "Começar",
+        "atributos_data": [],
+        "linha": 955,
+        "acao": "click",
+        "rotas": [
+          "/api/estado",
+          "/api/jogar"
+        ],
+        "funcoes": [
+          "aviso",
+          "comecarPartida",
+          "esperarServidorVoltar",
+          "marcarJogoAberto",
+          "mostrarFaixaTeclas",
+          "pedir",
+          "perderContato",
+          "recado"
+        ]
+      },
+      {
+        "tag": "input",
+        "id": "campoPontos",
+        "tipo": "number",
+        "classe": "",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "modalPlacar",
+        "aba": "",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 967,
+        "acao": "keydown",
+        "rotas": [
+          "/api/estado",
+          "/api/placar",
+          "/api/ranking"
+        ],
+        "funcoes": [
+          "carregarRanking",
+          "desenharRanking",
+          "esperarServidorVoltar",
+          "formatarTempo",
+          "mostrarPendentes",
+          "pedir",
+          "perderContato",
+          "recado",
+          "salvarPlacar"
+        ]
+      },
+      {
+        "tag": "button",
+        "id": "",
+        "tipo": "button",
+        "classe": "botao",
+        "aba_alvo": "",
+        "fecha": "modalPlacar",
+        "rotulo": "",
+        "janela": "modalPlacar",
+        "aba": "",
+        "texto": "Cancelar",
+        "atributos_data": [],
+        "linha": 971,
+        "acao": "fecha a janela modalPlacar",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "button",
+        "id": "btnSalvarPontos",
+        "tipo": "button",
+        "classe": "botao botao--principal",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "modalPlacar",
+        "aba": "",
+        "texto": "Salvar",
+        "atributos_data": [],
+        "linha": 972,
+        "acao": "click",
+        "rotas": [
+          "/api/estado",
+          "/api/placar",
+          "/api/ranking"
+        ],
+        "funcoes": [
+          "carregarRanking",
+          "desenharRanking",
+          "esperarServidorVoltar",
+          "formatarTempo",
+          "mostrarPendentes",
+          "pedir",
+          "perderContato",
+          "recado",
+          "salvarPlacar"
+        ]
+      },
+      {
+        "tag": "input",
+        "id": "acervoId",
+        "tipo": "",
+        "classe": "",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "meu-homebrew",
+        "janela": "modalAcervo",
+        "aba": "",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 983,
+        "acao": "",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "input",
+        "id": "acervoTitulo",
+        "tipo": "",
+        "classe": "",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "Meu jogo homebrew",
+        "janela": "modalAcervo",
+        "aba": "",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 984,
+        "acao": "",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "input",
+        "id": "acervoPlataforma",
+        "tipo": "",
+        "classe": "",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "Nintendo NES",
+        "janela": "modalAcervo",
+        "aba": "",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 985,
+        "acao": "",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "textarea",
+        "id": "acervoDescricao",
+        "tipo": "",
+        "classe": "",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "Jogo criado e liberado pelo autor.",
+        "janela": "modalAcervo",
+        "aba": "",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 986,
+        "acao": "",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "input",
+        "id": "acervoLicenca",
+        "tipo": "",
+        "classe": "",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "CC0, domínio público ou autorização do autor",
+        "janela": "modalAcervo",
+        "aba": "",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 987,
+        "acao": "",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "input",
+        "id": "acervoFonte",
+        "tipo": "",
+        "classe": "",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "https://github.com/...",
+        "janela": "modalAcervo",
+        "aba": "",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 988,
+        "acao": "",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "input",
+        "id": "acervoUrl",
+        "tipo": "",
+        "classe": "",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "https://raw.githubusercontent.com/...",
+        "janela": "modalAcervo",
+        "aba": "",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 989,
+        "acao": "",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "input",
+        "id": "acervoDestino",
+        "tipo": "",
+        "classe": "",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "NES/Meu jogo.nes",
+        "janela": "modalAcervo",
+        "aba": "",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 990,
+        "acao": "",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "input",
+        "id": "acervoSha256",
+        "tipo": "",
+        "classe": "",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "64 caracteres hexadecimais",
+        "janela": "modalAcervo",
+        "aba": "",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 991,
+        "acao": "",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "input",
+        "id": "acervoAutorizado",
+        "tipo": "checkbox",
+        "classe": "",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "modalAcervo",
+        "aba": "",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 994,
+        "acao": "",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "button",
+        "id": "",
+        "tipo": "button",
+        "classe": "botao",
+        "aba_alvo": "",
+        "fecha": "modalAcervo",
+        "rotulo": "",
+        "janela": "modalAcervo",
+        "aba": "",
+        "texto": "Cancelar",
+        "atributos_data": [],
+        "linha": 999,
+        "acao": "fecha a janela modalAcervo",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "button",
+        "id": "btnSalvarAcervo",
+        "tipo": "button",
+        "classe": "botao botao--principal",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "modalAcervo",
+        "aba": "",
+        "texto": "Salvar item",
+        "atributos_data": [],
+        "linha": 1000,
+        "acao": "click",
+        "rotas": [
+          "/api/acervo",
+          "/api/acervo/salvar",
+          "/api/estado"
+        ],
+        "funcoes": [
+          "carregarAcervo",
+          "esperarServidorVoltar",
+          "lerEditorAcervo",
+          "pedir",
+          "perderContato",
+          "recado"
+        ]
+      },
+      {
+        "tag": "select",
+        "id": "listaConsoleJogoModal",
+        "tipo": "",
+        "classe": "",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "modalConsole",
+        "aba": "",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 1012,
+        "acao": "",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "button",
+        "id": "",
+        "tipo": "button",
+        "classe": "botao",
+        "aba_alvo": "",
+        "fecha": "modalConsole",
+        "rotulo": "",
+        "janela": "modalConsole",
+        "aba": "",
+        "texto": "Cancelar",
+        "atributos_data": [],
+        "linha": 1016,
+        "acao": "fecha a janela modalConsole",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "button",
+        "id": "btnSalvarConsole",
+        "tipo": "button",
+        "classe": "botao botao--principal",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "modalConsole",
+        "aba": "",
+        "texto": "Salvar escolha",
+        "atributos_data": [],
+        "linha": 1017,
+        "acao": "click",
+        "rotas": [
+          "/api/catalogo",
+          "/api/estado",
+          "/api/jogo/console"
+        ],
+        "funcoes": [
+          "carregarCatalogo",
+          "classeDaCapa",
+          "desenharAvisosDoJogo",
+          "desenharDetalhes",
+          "desenharJogos",
+          "desenharPlataformas",
+          "esperarServidorVoltar",
+          "formatarBytes",
+          "formatarMb",
+          "iniciaisDaCapa",
+          "jogosVisiveis",
+          "linhaDoJogo",
+          "normalizar",
+          "pedir",
+          "perderContato",
+          "prepararCapa",
+          "recado",
+          "soNoMesmoComputador",
+          "textoJogadores",
+          "tipoDeMidia"
+        ]
+      },
+      {
+        "tag": "input",
+        "id": "campoApelidoInicial",
+        "tipo": "text",
+        "classe": "",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "ex.: PixelMaster",
+        "janela": "modalApelido",
+        "aba": "",
+        "texto": "",
+        "atributos_data": [],
+        "linha": 1029,
+        "acao": "keydown",
+        "rotas": [],
+        "funcoes": []
+      },
+      {
+        "tag": "button",
+        "id": "btnSalvarApelido",
+        "tipo": "button",
+        "classe": "botao botao--principal",
+        "aba_alvo": "",
+        "fecha": "",
+        "rotulo": "",
+        "janela": "modalApelido",
+        "aba": "",
+        "texto": "Começar",
+        "atributos_data": [],
+        "linha": 1032,
+        "acao": "click",
+        "rotas": [],
+        "funcoes": [
+          "recado"
+        ]
+      }
+    ],
+    "botoes_criados_pelo_js": [
+      {
+        "funcao": "desenharPlataformas",
+        "variavel": "botao",
+        "texto": [],
+        "linha": 391,
+        "acoes": [
+          {
+            "evento": "dragover",
+            "rotas": [],
+            "funcoes": []
+          },
+          {
+            "evento": "dragleave",
+            "rotas": [],
+            "funcoes": []
+          },
+          {
+            "evento": "drop",
+            "rotas": [
+              "/api/catalogo",
+              "/api/estado",
+              "/api/jogo/mover"
+            ],
+            "funcoes": [
+              "carregarCatalogo",
+              "classeDaCapa",
+              "desenharAvisosDoJogo",
+              "desenharDetalhes",
+              "desenharJogos",
+              "desenharPlataformas",
+              "esperarServidorVoltar",
+              "formatarMb",
+              "jogosVisiveis",
+              "linhaDoJogo",
+              "moverJogo",
+              "pedir",
+              "perderContato",
+              "prepararCapa",
+              "recado",
+              "soNoMesmoComputador"
+            ]
+          }
+        ]
+      },
+      {
+        "funcao": "linhaDoJogo",
+        "variavel": "abrir",
+        "texto": [],
+        "linha": 638,
+        "acoes": []
+      },
+      {
+        "funcao": "linhaDoJogo",
+        "variavel": "favorito",
+        "texto": [
+          "estaFavorito ? \"★\" : \"☆\""
+        ],
+        "linha": 644,
+        "acoes": []
+      },
+      {
+        "funcao": "desenharAvisosDoJogo",
+        "variavel": "b",
+        "texto": [
+          "a.arrumar.rotulo"
+        ],
+        "linha": 840,
+        "acoes": [
+          {
+            "evento": "click",
+            "rotas": [
+              "/api/arrumar/progresso",
+              "/api/catalogo",
+              "/api/estado",
+              "/api/jogo/arrumar"
+            ],
+            "funcoes": [
+              "arrumarJogo",
+              "carregarCatalogo",
+              "classeDaCapa",
+              "desenharAvisosDoJogo",
+              "desenharDetalhes",
+              "desenharJogos",
+              "desenharPlataformas",
+              "esperarServidorVoltar",
+              "formatarMb",
+              "jogosVisiveis",
+              "linhaDoJogo",
+              "pedir",
+              "perderContato",
+              "prepararCapa",
+              "recado",
+              "soNoMesmoComputador"
+            ]
+          }
+        ]
+      },
+      {
+        "funcao": "desenharBarreiras",
+        "variavel": "botao",
+        "texto": [
+          "`Fechar ${alvo.nome}`",
+          "\"Fechado\""
+        ],
+        "linha": 1021,
+        "acoes": [
+          {
+            "evento": "click",
+            "rotas": [
+              "/api/barreiras/fechar",
+              "/api/estado"
+            ],
+            "funcoes": [
+              "esperarServidorVoltar",
+              "pedir",
+              "perderContato",
+              "recado"
+            ]
+          }
+        ]
+      },
+      {
+        "funcao": "desenharPerfis",
+        "variavel": "botao",
+        "texto": [],
+        "linha": 1181,
+        "acoes": []
+      },
+      {
+        "funcao": "controleDaOpcao",
+        "variavel": "chave",
+        "texto": [],
+        "linha": 1210,
+        "acoes": [
+          {
+            "evento": "click",
+            "rotas": [
+              "/api/config",
+              "/api/estado"
+            ],
+            "funcoes": [
+              "atualizarBotaoTema",
+              "esperarServidorVoltar",
+              "pedir",
+              "perderContato",
+              "recado",
+              "salvarConfig"
+            ]
+          }
+        ]
+      },
+      {
+        "funcao": "linhaDoRecurso",
+        "variavel": "puxar",
+        "texto": [
+          "\"por exemplo…\""
+        ],
+        "linha": 1298,
+        "acoes": [
+          {
+            "evento": "click",
+            "rotas": [],
+            "funcoes": []
+          }
+        ]
+      },
+      {
+        "funcao": "carregarColegas",
+        "variavel": "adicionar",
+        "texto": [
+          "\"Adicionar\""
+        ],
+        "linha": 1372,
+        "acoes": [
+          {
+            "evento": "click",
+            "rotas": [
+              "/api/amigo/codigo",
+              "/api/botoes",
+              "/api/colegas",
+              "/api/estado",
+              "/api/mapeamento",
+              "/api/partida/procurar",
+              "/api/perfil/foto",
+              "/api/perfis-controle"
+            ],
+            "funcoes": [
+              "amigoEstaOnline",
+              "atualizarBotaoTema",
+              "atualizarExplicaPreset",
+              "atualizarFotoPerfil",
+              "aviso",
+              "carregarColegas",
+              "carregarEstado",
+              "controleDaOpcao",
+              "desenharAmigos",
+              "desenharAvancado",
+              "desenharBios",
+              "desenharBotoes",
+              "desenharCartoes",
+              "desenharControles",
+              "desenharEnderecos",
+              "desenharExternos",
+              "desenharFechamentos",
+              "desenharMapa",
+              "desenharPacotes",
+              "desenharPerfis",
+              "desenharRedePs2",
+              "explicarFundoAnimado",
+              "explicarNivelGrafico",
+              "formatarBytes",
+              "formatarMb",
+              "linhaDoRecurso",
+              "montarAbaControles",
+              "mostrarApelido",
+              "mostrarPendentes",
+              "nivelDoGrafico",
+              "nomeCurtoDoProcessador",
+              "numeroBr",
+              "pedir",
+              "preencherAmigosPartida",
+              "prepararAbrirBios",
+              "prepararBotoes",
+              "prepararMapa",
+              "procurarPartidas",
+              "recado"
+            ]
+          }
+        ]
+      },
+      {
+        "funcao": "desenharPacotes",
+        "variavel": "trazer",
+        "texto": [
+          "\"Trazer de volta\""
+        ],
+        "linha": 1570,
+        "acoes": [
+          {
+            "evento": "click",
+            "rotas": [
+              "/api/estado",
+              "/api/importar"
+            ],
+            "funcoes": [
+              "esperarServidorVoltar",
+              "importarPacote",
+              "pedir",
+              "perderContato",
+              "recado"
+            ]
+          }
+        ]
+      },
+      {
+        "funcao": "desenharMapa",
+        "variavel": "definir",
+        "texto": [
+          "atual ? \"Trocar\" : \"Definir\""
+        ],
+        "linha": 1849,
+        "acoes": [
+          {
+            "evento": "click",
+            "rotas": [
+              "/api/botoes",
+              "/api/mapeamento",
+              "/api/mapeamento/definir",
+              "/api/perfis-controle"
+            ],
+            "funcoes": [
+              "aplicarPerfil",
+              "capturar",
+              "desenharMapa",
+              "pedir",
+              "perderContato",
+              "recado",
+              "traduzirTecla"
+            ]
+          }
+        ]
+      },
+      {
+        "funcao": "desenharBiosConsoles",
+        "variavel": "abrir",
+        "texto": [
+          "`Abrir a pasta BIOS\\\\${pasta}`"
+        ],
+        "linha": 2475,
+        "acoes": [
+          {
+            "evento": "click",
+            "rotas": [
+              "/api/bios/pasta",
+              "/api/estado"
+            ],
+            "funcoes": [
+              "abrirPastaDaBios",
+              "esperarServidorVoltar",
+              "pedir",
+              "perderContato",
+              "recado"
+            ]
+          }
+        ]
+      },
+      {
+        "funcao": "desenharAmigos",
+        "variavel": "remover",
+        "texto": [
+          "\"remover\""
+        ],
+        "linha": 2815,
+        "acoes": [
+          {
+            "evento": "click",
+            "rotas": [
+              "/api/amigo/remover",
+              "/api/estado"
+            ],
+            "funcoes": [
+              "amigoEstaOnline",
+              "desenharAmigos",
+              "esperarServidorVoltar",
+              "pedir",
+              "perderContato",
+              "recado",
+              "removerAmigo"
+            ]
+          }
+        ]
+      },
+      {
+        "funcao": "desenharEspacos",
+        "variavel": "apagar",
+        "texto": [
+          "\"apagar\""
+        ],
+        "linha": 3067,
+        "acoes": [
+          {
+            "evento": "click",
+            "rotas": [
+              "/api/estado",
+              "/api/estado/apagar"
+            ],
+            "funcoes": [
+              "apagarEspaco",
+              "desenharEspacos",
+              "esperarServidorVoltar",
+              "pedir",
+              "perderContato",
+              "recado"
+            ]
+          }
+        ]
+      },
+      {
+        "funcao": "desenharCheats",
+        "variavel": "chave",
+        "texto": [],
+        "linha": 3109,
+        "acoes": [
+          {
+            "evento": "click",
+            "rotas": [
+              "/api/cheat/alterar",
+              "/api/estado"
+            ],
+            "funcoes": [
+              "alterarCheat",
+              "desenharCheats",
+              "esperarServidorVoltar",
+              "pedir",
+              "perderContato",
+              "recado"
+            ]
+          }
+        ]
+      },
+      {
+        "funcao": "desenharCheats",
+        "variavel": "apagar",
+        "texto": [
+          "\"apagar\""
+        ],
+        "linha": 3124,
+        "acoes": [
+          {
+            "evento": "click",
+            "rotas": [
+              "/api/cheat/alterar",
+              "/api/estado"
+            ],
+            "funcoes": [
+              "alterarCheat",
+              "desenharCheats",
+              "esperarServidorVoltar",
+              "pedir",
+              "perderContato",
+              "recado"
+            ]
+          }
+        ]
+      },
+      {
+        "funcao": "carregarAcervo",
+        "variavel": "botao",
+        "texto": [
+          "item.instalado ? \"Instalado\" : \"Instalar\"",
+          "\"Baixando…\"",
+          "\"Instalar\""
+        ],
+        "linha": 3358,
+        "acoes": [
+          {
+            "evento": "click",
+            "rotas": [
+              "/api/acervo",
+              "/api/acervo/instalar",
+              "/api/catalogo",
+              "/api/estado"
+            ],
+            "funcoes": [
+              "carregarAcervo",
+              "carregarCatalogo",
+              "classeDaCapa",
+              "desenharAvisosDoJogo",
+              "desenharDetalhes",
+              "desenharJogos",
+              "desenharPlataformas",
+              "esperarServidorVoltar",
+              "formatarBytes",
+              "formatarMb",
+              "iniciaisDaCapa",
+              "jogosVisiveis",
+              "linhaDoJogo",
+              "normalizar",
+              "pedir",
+              "perderContato",
+              "prepararCapa",
+              "recado",
+              "soNoMesmoComputador",
+              "textoJogadores",
+              "tipoDeMidia"
+            ]
+          }
+        ]
+      },
+      {
+        "funcao": "carregarAcervo",
+        "variavel": "editar",
+        "texto": [
+          "\"Editar\""
+        ],
+        "linha": 3377,
+        "acoes": [
+          {
+            "evento": "click",
+            "rotas": [],
+            "funcoes": [
+              "abrirEditorAcervo",
+              "preencherCampo"
+            ]
+          }
+        ]
+      },
+      {
+        "funcao": "carregarAcervo",
+        "variavel": "remover",
+        "texto": [
+          "\"Remover\""
+        ],
+        "linha": 3382,
+        "acoes": [
+          {
+            "evento": "click",
+            "rotas": [
+              "/api/acervo",
+              "/api/acervo/remover",
+              "/api/estado"
+            ],
+            "funcoes": [
+              "carregarAcervo",
+              "esperarServidorVoltar",
+              "pedir",
+              "perderContato",
+              "recado"
+            ]
+          }
+        ]
+      },
+      {
+        "funcao": "desenharComoColocar",
+        "variavel": "abrir",
+        "texto": [
+          "\"Abrir a pasta\""
+        ],
+        "linha": 3447,
+        "acoes": [
+          {
+            "evento": "click",
+            "rotas": [
+              "/api/estado",
+              "/api/pasta/abrir"
+            ],
+            "funcoes": [
+              "esperarServidorVoltar",
+              "pedir",
+              "perderContato",
+              "recado"
+            ]
+          }
+        ]
+      },
+      {
+        "funcao": "desenharComoColocar",
+        "variavel": "botaoPasta",
+        "texto": [
+          "\"Abrir a pasta da BIOS\""
+        ],
+        "linha": 3493,
+        "acoes": [
+          {
+            "evento": "click",
+            "rotas": [
+              "/api/bios/pasta",
+              "/api/estado"
+            ],
+            "funcoes": [
+              "abrirPastaDaBios",
+              "esperarServidorVoltar",
+              "pedir",
+              "perderContato",
+              "recado"
+            ]
+          }
+        ]
+      },
+      {
+        "funcao": "desenharComoColocar",
+        "variavel": "botaoConferir",
+        "texto": [
+          "\"Conferir\""
+        ],
+        "linha": 3498,
+        "acoes": [
+          {
+            "evento": "click",
+            "rotas": [
+              "/api/bios",
+              "/api/bios/conferir",
+              "/api/catalogo",
+              "/api/como-colocar",
+              "/api/estado"
+            ],
+            "funcoes": [
+              "abrirComoColocar",
+              "abrirGaveta",
+              "carregarBios",
+              "carregarCatalogo",
+              "classeDaCapa",
+              "conferirBios",
+              "desenharAvisosDoJogo",
+              "desenharBiosConsoles",
+              "desenharComoColocar",
+              "desenharDetalhes",
+              "desenharJogos",
+              "desenharPlataformas",
+              "esperarServidorVoltar",
+              "formatarMb",
+              "jogosVisiveis",
+              "linhaDoJogo",
+              "linhasDoConsole",
+              "pedir",
+              "perderContato",
+              "prepararCapa",
+              "recado",
+              "situacaoDoConsole",
+              "soNoMesmoComputador"
+            ]
+          }
+        ]
+      },
+      {
+        "funcao": "carregarBibliotecaOnline",
+        "variavel": "botao",
+        "texto": [
+          "\"Instalar\"",
+          "\"Instalando…\"",
+          "\"Instalado\""
+        ],
+        "linha": 3582,
+        "acoes": [
+          {
+            "evento": "click",
+            "rotas": [
+              "/api/acervo",
+              "/api/biblioteca-online/instalar",
+              "/api/catalogo",
+              "/api/estado"
+            ],
+            "funcoes": [
+              "carregarAcervo",
+              "carregarCatalogo",
+              "classeDaCapa",
+              "desenharAvisosDoJogo",
+              "desenharDetalhes",
+              "desenharJogos",
+              "desenharPlataformas",
+              "esperarServidorVoltar",
+              "formatarBytes",
+              "formatarMb",
+              "iniciaisDaCapa",
+              "jogosVisiveis",
+              "linhaDoJogo",
+              "normalizar",
+              "pedir",
+              "perderContato",
+              "prepararCapa",
+              "recado",
+              "soNoMesmoComputador",
+              "textoJogadores",
+              "tipoDeMidia"
+            ]
+          }
+        ]
+      }
+    ],
+    "sem_acao": [],
+    "acao_sem_elemento": [],
+    "rotas_que_a_tela_pede": [
+      "/api/acervo",
+      "/api/acervo/instalar",
+      "/api/acervo/remover",
+      "/api/acervo/salvar",
+      "/api/amigo/adicionar",
+      "/api/amigo/codigo",
+      "/api/amigo/remover",
+      "/api/amigo/testar",
+      "/api/arrumar/progresso",
+      "/api/backup",
+      "/api/barreiras",
+      "/api/barreiras/fechar",
+      "/api/biblioteca-online",
+      "/api/biblioteca-online/instalar",
+      "/api/bios",
+      "/api/bios/abrir",
+      "/api/bios/conferir",
+      "/api/bios/pasta",
+      "/api/botoes",
+      "/api/capa/atualizar",
+      "/api/capa/enviar",
+      "/api/capa/miniatura",
+      "/api/capas/buscar-faltando",
+      "/api/capas/parar",
+      "/api/capas/progresso",
+      "/api/catalogo",
+      "/api/cheat/adicionar",
+      "/api/cheat/alterar",
+      "/api/colegas",
+      "/api/como-colocar",
+      "/api/config",
+      "/api/conquistas",
+      "/api/estado",
+      "/api/estado/apagar",
+      "/api/exportar",
+      "/api/importar",
+      "/api/indexar",
+      "/api/jogar",
+      "/api/jogo",
+      "/api/jogo/arrumar",
+      "/api/jogo/console",
+      "/api/jogo/mover",
+      "/api/mala",
+      "/api/mapeamento",
+      "/api/mapeamento/definir",
+      "/api/mapeamento/limpar",
+      "/api/mapeamento/padrao",
+      "/api/partida/procurar",
+      "/api/partida/testar",
+      "/api/pasta/abrir",
+      "/api/pastas/criar",
+      "/api/perfil-controle",
+      "/api/perfil/foto",
+      "/api/perfil/novo",
+      "/api/perfis-controle",
+      "/api/placar",
+      "/api/ranking",
+      "/api/reparar-runtime",
+      "/api/sincronizar"
+    ],
+    "rotas_pedidas_que_nao_existem": [],
+    "controles_com_id": 103
+  },
+  "temporizadores_da_tela": [
+    {
+      "arquivo": "app.js",
+      "linha": 137,
+      "tipo": "setTimeout",
+      "espera": "2000",
+      "funcao": "esperarServidorVoltar"
+    },
+    {
+      "arquivo": "app.js",
+      "linha": 139,
+      "tipo": "setTimeout",
+      "espera": "3000",
+      "funcao": "esperarServidorVoltar"
+    },
+    {
+      "arquivo": "app.js",
+      "linha": 170,
+      "tipo": "setTimeout",
+      "espera": "duracaoMs",
+      "funcao": "recado"
+    },
+    {
+      "arquivo": "app.js",
+      "linha": 527,
+      "tipo": "setTimeout",
+      "espera": "400",
+      "funcao": "pedirMiniatura"
+    },
+    {
+      "arquivo": "app.js",
+      "linha": 547,
+      "tipo": "setTimeout",
+      "espera": "30",
+      "funcao": "proximaMiniatura"
+    },
+    {
+      "arquivo": "app.js",
+      "linha": 861,
+      "tipo": "setTimeout",
+      "espera": "1000",
+      "funcao": "arrumarJogo"
+    },
+    {
+      "arquivo": "app.js",
+      "linha": 1997,
+      "tipo": "requestAnimationFrame",
+      "espera": "",
+      "funcao": "wizardAguardar"
+    },
+    {
+      "arquivo": "app.js",
+      "linha": 2001,
+      "tipo": "requestAnimationFrame",
+      "espera": "",
+      "funcao": "wizardAguardar"
+    },
+    {
+      "arquivo": "app.js",
+      "linha": 2165,
+      "tipo": "requestAnimationFrame",
+      "espera": "",
+      "funcao": "capturar"
+    },
+    {
+      "arquivo": "app.js",
+      "linha": 2169,
+      "tipo": "requestAnimationFrame",
+      "espera": "",
+      "funcao": "capturar"
+    },
+    {
+      "arquivo": "app.js",
+      "linha": 2920,
+      "tipo": "setInterval",
+      "espera": "4000",
+      "funcao": "vigiarPartidas"
+    },
+    {
+      "arquivo": "app.js",
+      "linha": 3536,
+      "tipo": "setTimeout",
+      "espera": "1000",
+      "funcao": "buscarCapasQueFaltam"
+    },
+    {
+      "arquivo": "app.js",
+      "linha": 3710,
+      "tipo": "setTimeout",
+      "espera": "130",
+      "funcao": "ligarEventos"
+    },
+    {
+      "arquivo": "app.js",
+      "linha": 3860,
+      "tipo": "setTimeout",
+      "espera": "300",
+      "funcao": "ligarEventos"
+    },
+    {
+      "arquivo": "app.js",
+      "linha": 3864,
+      "tipo": "setTimeout",
+      "espera": "300",
+      "funcao": "ligarEventos"
+    },
+    {
+      "arquivo": "field-background.js",
+      "linha": 791,
+      "tipo": "requestAnimationFrame",
+      "espera": "",
+      "funcao": "(fora de funcao)"
+    },
+    {
+      "arquivo": "field-background.js",
+      "linha": 806,
+      "tipo": "requestAnimationFrame",
+      "espera": "",
+      "funcao": "(fora de funcao)"
+    },
+    {
+      "arquivo": "field-background.js",
+      "linha": 847,
+      "tipo": "setInterval",
+      "espera": "3000",
+      "funcao": "(fora de funcao)"
+    },
+    {
+      "arquivo": "galaxy-background.js",
+      "linha": 796,
+      "tipo": "requestAnimationFrame",
+      "espera": "",
+      "funcao": "(fora de funcao)"
+    },
+    {
+      "arquivo": "galaxy-background.js",
+      "linha": 807,
+      "tipo": "requestAnimationFrame",
+      "espera": "",
+      "funcao": "(fora de funcao)"
+    },
+    {
+      "arquivo": "galaxy-background.js",
+      "linha": 836,
+      "tipo": "setInterval",
+      "espera": "3000",
+      "funcao": "(fora de funcao)"
+    }
+  ],
+  "chaves_de_config": {
+    "abaixo_do_original": [
+      "servidor\\arena.py",
+      "servidor\\graficos.py",
+      "launcher\\app.js"
+    ],
+    "apelido": [
+      "servidor\\arena.py",
+      "servidor\\diagnostico.py",
+      "servidor\\partida.py",
+      "launcher\\app.js"
+    ],
+    "avancado": [
+      "servidor\\arena.py",
+      "launcher\\app.js"
+    ],
+    "bios": [
+      "servidor\\arena.py",
+      "servidor\\bios.py",
+      "servidor\\bios_catalogo.py",
+      "servidor\\como_colocar.py",
+      "servidor\\graficos.py",
+      "launcher\\app.js"
+    ],
+    "codigo_proprio": [
+      "servidor\\arena.py"
+    ],
+    "dispositivo_id": [
+      "servidor\\arena.py",
+      "servidor\\partida.py",
+      "launcher\\app.js"
+    ],
+    "favoritos": [
+      "servidor\\arena.py",
+      "launcher\\app.js"
+    ],
+    "fundo_animado": [
+      "servidor\\arena.py",
+      "launcher\\app.js"
+    ],
+    "modo_desempenho": [
+      "servidor\\arena.py",
+      "launcher\\app.js"
+    ],
+    "modo_modesto": [
+      "servidor\\arena.py",
+      "launcher\\app.js"
+    ],
+    "motor_ps2": [
+      "servidor\\arena.py",
+      "launcher\\app.js"
+    ],
+    "nome_dispositivo": [
+      "servidor\\arena.py"
+    ],
+    "perfil_controle": [
+      "servidor\\arena.py"
+    ],
+    "perfil_grafico": [
+      "servidor\\arena.py",
+      "launcher\\app.js"
+    ],
+    "permitir_rede": [
+      "servidor\\arena.py",
+      "servidor\\partida.py",
+      "launcher\\app.js"
+    ],
+    "preset_grafico_externo": [
+      "servidor\\arena.py",
+      "launcher\\app.js"
+    ],
+    "recentes": [
+      "servidor\\arena.py",
+      "launcher\\app.js"
+    ],
+    "rpcn_ativo": [
+      "servidor\\arena.py",
+      "servidor\\graficos.py",
+      "launcher\\app.js"
+    ],
+    "servidores": [
+      "servidor\\arena.py",
+      "servidor\\diagnostico.py",
+      "launcher\\app.js"
+    ],
+    "tema": [
+      "servidor\\arena.py",
+      "launcher\\app.js"
+    ],
+    "tipo_controle": [
+      "servidor\\arena.py"
+    ],
+    "travar_teclas": [
+      "servidor\\arena.py",
+      "launcher\\app.js"
+    ],
+    "ultra_desempenho": [
+      "servidor\\arena.py",
+      "launcher\\app.js"
+    ],
+    "avancado.audio_enable": [
+      "servidor\\arena.py:1486 (todas de uma vez: viram opcoes do RetroArch)"
+    ],
+    "avancado.audio_sync": [
+      "servidor\\arena.py:1486 (todas de uma vez: viram opcoes do RetroArch)"
+    ],
+    "avancado.audio_volume": [
+      "servidor\\arena.py:1486 (todas de uma vez: viram opcoes do RetroArch)"
+    ],
+    "avancado.fastforward_ratio": [
+      "servidor\\arena.py:1486 (todas de uma vez: viram opcoes do RetroArch)"
+    ],
+    "avancado.fps_show": [
+      "servidor\\arena.py",
+      "servidor\\arena.py:1486 (todas de uma vez: viram opcoes do RetroArch)"
+    ],
+    "avancado.input_analog_deadzone": [
+      "servidor\\arena.py:1486 (todas de uma vez: viram opcoes do RetroArch)"
+    ],
+    "avancado.input_analog_sensitivity": [
+      "servidor\\arena.py:1486 (todas de uma vez: viram opcoes do RetroArch)"
+    ],
+    "avancado.input_joypad_driver": [
+      "launcher\\app.js",
+      "servidor\\arena.py:1486 (todas de uma vez: viram opcoes do RetroArch)"
+    ],
+    "avancado.input_max_users": [
+      "servidor\\arena.py",
+      "servidor\\graficos.py",
+      "servidor\\arena.py:1486 (todas de uma vez: viram opcoes do RetroArch)"
+    ],
+    "avancado.input_menu_toggle_gamepad_combo": [
+      "servidor\\arena.py:1486 (todas de uma vez: viram opcoes do RetroArch)"
+    ],
+    "avancado.input_turbo_period": [
+      "servidor\\arena.py:1486 (todas de uma vez: viram opcoes do RetroArch)"
+    ],
+    "avancado.pause_nonactive": [
+      "servidor\\arena.py:1486 (todas de uma vez: viram opcoes do RetroArch)"
+    ],
+    "avancado.rewind_buffer_size": [
+      "servidor\\arena.py:1486 (todas de uma vez: viram opcoes do RetroArch)"
+    ],
+    "avancado.run_ahead_frames": [
+      "servidor\\arena.py:1486 (todas de uma vez: viram opcoes do RetroArch)"
+    ],
+    "avancado.run_ahead_secondary_instance": [
+      "servidor\\arena.py:1486 (todas de uma vez: viram opcoes do RetroArch)"
+    ],
+    "avancado.savestate_thumbnail_enable": [
+      "servidor\\arena.py",
+      "servidor\\arena.py:1486 (todas de uma vez: viram opcoes do RetroArch)"
+    ],
+    "avancado.slowmotion_ratio": [
+      "servidor\\arena.py:1486 (todas de uma vez: viram opcoes do RetroArch)"
+    ],
+    "avancado.video_driver": [
+      "servidor\\arena.py",
+      "launcher\\app.js",
+      "servidor\\arena.py:1486 (todas de uma vez: viram opcoes do RetroArch)"
+    ],
+    "avancado.video_fullscreen": [
+      "servidor\\arena.py",
+      "servidor\\arena.py:1486 (todas de uma vez: viram opcoes do RetroArch)"
+    ],
+    "avancado.video_scale_integer": [
+      "servidor\\arena.py",
+      "servidor\\arena.py:1486 (todas de uma vez: viram opcoes do RetroArch)"
+    ],
+    "avancado.video_swap_interval": [
+      "servidor\\arena.py",
+      "servidor\\arena.py:1486 (todas de uma vez: viram opcoes do RetroArch)"
+    ]
+  },
+  "arquivos_de_dados": {
+    "acervo_autorizado.json": [
+      "servidor\\acervo.py"
+    ],
+    "arena.db": [
+      "servidor\\arena.py",
+      "servidor\\diagnostico.py"
+    ],
+    "config.json": [
+      "servidor\\arena.py",
+      "servidor\\diagnostico.py"
+    ],
+    "consoles_manuais.json": [
+      "servidor\\indexador.py"
+    ],
+    "controles.json": [
+      "servidor\\controles.py"
+    ],
+    "fechamentos.json": [
+      "servidor\\arena.py"
+    ],
+    "manifesto.json": [
+      "servidor\\diagnostico.py",
+      "servidor\\indexador.py"
+    ],
+    "problemas_dos_jogos.json": [
+      "servidor\\arena.py"
+    ],
+    "zips_conferidos.json": [
+      "servidor\\integridade.py"
+    ]
+  },
+  "linhas_de_execucao": [
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 3310,
+      "tipo": "Thread",
+      "alvo": "perguntar",
+      "nasce_em": "procurar_partidas",
+      "em_laco": false,
+      "esperas": [],
+      "daemon": true,
+      "motivo_no_codigo": ""
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 3782,
+      "tipo": "Thread",
+      "alvo": "testar",
+      "nasce_em": "quem_esta_online",
+      "em_laco": false,
+      "esperas": [],
+      "daemon": true,
+      "motivo_no_codigo": ""
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 4915,
+      "tipo": "Thread",
+      "alvo": "rodar",
+      "nasce_em": "api_post",
+      "em_laco": false,
+      "esperas": [
+        ""
+      ],
+      "daemon": true,
+      "motivo_no_codigo": ""
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 5226,
+      "tipo": "Thread",
+      "alvo": "buscar_capas_que_faltam",
+      "nasce_em": "api_post",
+      "em_laco": false,
+      "esperas": [],
+      "daemon": true,
+      "motivo_no_codigo": ""
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 5698,
+      "tipo": "Thread",
+      "alvo": "executar_jogo",
+      "nasce_em": "api_post",
+      "em_laco": false,
+      "esperas": [
+        ""
+      ],
+      "daemon": true,
+      "motivo_no_codigo": ""
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 5926,
+      "tipo": "Thread",
+      "alvo": "atualizar_adaptadores",
+      "nasce_em": "nome_do_adaptador",
+      "em_laco": false,
+      "esperas": [],
+      "daemon": true,
+      "motivo_no_codigo": ""
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 6124,
+      "tipo": "Thread",
+      "alvo": "encerrar_depois_da_resposta",
+      "nasce_em": "trocar_escuta_de_rede",
+      "em_laco": false,
+      "esperas": [
+        "0.3"
+      ],
+      "daemon": true,
+      "motivo_no_codigo": ""
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 6352,
+      "tipo": "Thread",
+      "alvo": "rodar_vigia",
+      "nasce_em": "principal",
+      "em_laco": true,
+      "esperas": [
+        "INTERVALO_VIGIA"
+      ],
+      "daemon": true,
+      "motivo_no_codigo": ""
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 6353,
+      "tipo": "Thread",
+      "alvo": "anunciar_e_escutar",
+      "nasce_em": "principal",
+      "em_laco": true,
+      "esperas": [
+        "1.0"
+      ],
+      "daemon": true,
+      "motivo_no_codigo": ""
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 6356,
+      "tipo": "Thread",
+      "alvo": "conferir_vulkan",
+      "nasce_em": "principal",
+      "em_laco": false,
+      "esperas": [],
+      "daemon": true,
+      "motivo_no_codigo": "Vulkan de verdade? (hardware.vulkan_tem_placa): pergunta em segundo plano, num processo a parte, depois que a tela ja abriu."
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 6358,
+      "tipo": "Thread",
+      "alvo": "conferir_fliperamas",
+      "nasce_em": "principal",
+      "em_laco": true,
+      "esperas": [
+        "1.0 if ECONOMICO else 0.2",
+        "5.0",
+        "8.0"
+      ],
+      "daemon": true,
+      "motivo_no_codigo": "Zip de fliperama danificado: confere cada um uma vez, devagar."
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 6361,
+      "tipo": "Thread",
+      "alvo": "organizar_bios",
+      "nasce_em": "principal",
+      "em_laco": false,
+      "esperas": [
+        "esperar"
+      ],
+      "daemon": true,
+      "motivo_no_codigo": "A pasta BIOS: prateleiras, LEIA e a BIOS posta la vai para onde o emulador procura, com o nome certo (servidor\\bios.py)."
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linha": 6372,
+      "tipo": "Timer",
+      "alvo": "abrir_janela",
+      "nasce_em": "principal",
+      "em_laco": false,
+      "esperas": [],
+      "daemon": false,
+      "motivo_no_codigo": ""
+    },
+    {
+      "arquivo": "servidor\\arrumar.py",
+      "linha": 512,
+      "tipo": "Thread",
+      "alvo": "trabalhar",
+      "nasce_em": "_iniciar",
+      "em_laco": true,
+      "esperas": [],
+      "daemon": true,
+      "motivo_no_codigo": ""
+    },
+    {
+      "arquivo": "servidor\\janela_preta.py",
+      "linha": 121,
+      "tipo": "Thread",
+      "alvo": "self._passar_para_a_janela",
+      "nasce_em": "__init__",
+      "em_laco": true,
+      "esperas": [],
+      "daemon": true,
+      "motivo_no_codigo": ""
+    }
+  ],
+  "internet": [
+    {
+      "arquivo": "servidor\\capas_do_disco.py",
+      "enderecos": [
+        "art.gametdb.com",
+        "download.xbox.com"
+      ]
+    },
+    {
+      "arquivo": "servidor\\capas_online.py",
+      "enderecos": [
+        "raw.githubusercontent.com",
+        "thumbnails.libretro.com"
+      ]
+    },
+    {
+      "arquivo": "servidor\\internet_archive.py",
+      "enderecos": [
+        "archive.org"
+      ]
+    },
+    {
+      "arquivo": "launcher\\index.html",
+      "enderecos": [
+        "github.com",
+        "npcap.com",
+        "raw.githubusercontent.com"
+      ]
+    }
+  ],
+  "resumo": {
+    "arquivos_do_arena": 258,
+    "linhas_do_produto": 35577,
+    "arquivos_do_produto": 47,
+    "rotas": 64,
+    "rotas_abertas_a_rede": 8,
+    "rotas_sem_chamador": [],
+    "janelas_da_tela": 13,
+    "controles_da_tela": 131,
+    "botoes_criados_pelo_js": 23,
+    "botoes_sem_acao": [],
+    "acao_para_elemento_que_nao_existe": [],
+    "rotas_pedidas_que_nao_existem": [],
+    "temporizadores_da_tela": 21,
+    "chaves_de_config": 44,
+    "chaves_nao_lidas": [],
+    "linhas_de_execucao": 15
+  }
+}

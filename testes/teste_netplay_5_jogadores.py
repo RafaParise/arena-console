@@ -29,8 +29,11 @@ import tempfile
 import time
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-JOGO = os.path.join(RAIZ, "jogos", "pessoais", "Super Nintendo",
-                    "Super Bomberman 4 (Japan) [T-En by Svambo v1.0].sfc")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import jogos_de_teste  # noqa: E402
+import limpeza  # noqa: E402
+
+JOGO = jogos_de_teste.achar("Super Nintendo", "Super Bomberman 4 (Japan) [T-En by Svambo v1.0].sfc") or ""
 RETROARCH = os.path.join(RAIZ, "retroarch", "retroarch.exe")
 CORE = os.path.join(RAIZ, "retroarch", "cores", "snes9x_libretro.dll")
 PORTA_PARTIDA = 55435
@@ -133,6 +136,7 @@ def main():
     pasta_host = None
     tempos_de_entrada = {}
     amostras_host = []
+    manter_pasta = True        # erro no meio: os registros ficam para olhar
     try:
         for papel in papeis:
             pasta_instancia = os.path.join(raiz_teste, papel["nome"])
@@ -219,14 +223,19 @@ def main():
             json.dump({"processos_vivos": vivos, "de_5": len(papeis), "logs": achados,
                       "tempos_de_entrada_s": tempos_de_entrada, "amostras_host": amostras_host},
                       f, ensure_ascii=False, indent=2)
-        print("\nLogs completos salvos em cada pasta de instancia (nao apagados: ver",
-              raiz_teste, ") -- rode de novo o script pra limpar.")
         print("Resumo salvo em", destino_relatorio)
 
         # Corrigido na revisao pos-auditoria: antes devolvia 0 SEMPRE, e a
         # rodada final contava como "passou" mesmo com um convidado de fora.
         faltaram = [n for n, t in tempos_de_entrada.items() if t is None]
         ok = not faltaram and vivos == len(papeis)
+        # Os registros de cada instancia so ficam quando falha (para ver o
+        # porque); passou, a pasta sai -- regra 6 da auditoria 3 (a rodada
+        # achava esta pasta esquecida no Temp a cada vez).
+        manter_pasta = not ok
+        if manter_pasta:
+            print("\nRegistros completos de cada instancia guardados em", raiz_teste,
+                  "(apague a pasta depois de olhar).")
         print("\nRESULTADO:", "PASSOU (os %d convidados entraram)" % len(tempos_de_entrada)
               if ok else "FALHOU (nao entraram: %s)" % (", ".join(faltaram) or "-"))
         return 0 if ok else 1
@@ -248,6 +257,8 @@ def main():
                 p["log"].close()
             except Exception:
                 pass
+        if not manter_pasta:
+            limpeza.apagar_pasta(raiz_teste)
 
 
 if __name__ == "__main__":

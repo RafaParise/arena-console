@@ -132,7 +132,7 @@ def montar_perfil(tipo_id, console_id, usar_direcional=True,
     tipo = dados.get("tipos", {}).get(tipo_id)
     console = perfil_do_console(console_id)
     if not tipo:
-        return None, "Tipo de controle desconhecido."
+        return None, "Escolha o tipo de controle na lista."
 
     rotulos = tipo.get("rotulos", {})
     botoes_do_console = console.get("botoes", [])
@@ -275,7 +275,7 @@ def validar(tipo, valor):
 
     if tipo == "teclado":
         if valor not in TECLAS:
-            return None, ("O RetroArch não conhece a tecla '%s'." % valor)
+            return None, ("O RetroArch não conhece a tecla '%s'. Escolha outra tecla." % valor)
         return valor, None
 
     if tipo == "botao":
@@ -288,7 +288,7 @@ def validar(tipo, valor):
             return valor, None          # ja veio pronto: h0up
         if valor in DIRECOES_HAT:
             return "h0" + valor, None
-        return None, "Direção de direcional inválida."
+        return None, "Direção do direcional que o ARENA não conhece: aperte a direção de novo."
 
     if tipo == "eixo":
         # Formato do RetroArch: sinal e o numero do eixo, tipo '-0' ou '+1'.
@@ -298,15 +298,15 @@ def validar(tipo, valor):
             return None, "Número de eixo inválido. Use de 0 a 15."
         return valor, None
 
-    return None, "Tipo de comando desconhecido."
+    return None, "Comando que o ARENA não conhece: clique em Definir e aperte de novo."
 
 
 def definir(jogador, botao, tipo, valor):
     """Guarda uma atribuicao. Com tipo vazio, apaga."""
     if jogador not in JOGADORES:
-        return None, "Jogador inválido."
+        return None, "Escolha o jogador na lista (de 1 a 5)."
     if botao not in BOTOES:
-        return None, "Botao desconhecido."
+        return None, "Botão que o ARENA não conhece: escolha o botão na lista."
 
     dados = ler()
 
@@ -557,7 +557,7 @@ def aplicar_padrao_controle(jogador):
     no retroarch.cfg.
     """
     if jogador not in JOGADORES:
-        return None, "Jogador inválido."
+        return None, "Escolha o jogador na lista (de 1 a 5)."
     dados = ler()
     dados[jogador] = {botao: atribuicao for botao, atribuicao in dados[jogador].items()
                       if atribuicao.get("tipo") == "teclado"}
@@ -568,7 +568,7 @@ def aplicar_padrao_controle(jogador):
 def aplicar_padrao(jogador):
     """Coloca o mapeamento de fabrica do teclado para aquele jogador."""
     if jogador not in JOGADORES:
-        return None, "Jogador inválido."
+        return None, "Escolha o jogador na lista (de 1 a 5)."
     if jogador not in PADRAO_TECLADO:
         return None, ("O teclado padrão existe para os jogadores 1 e 2. "
                       "Para este jogador, defina as teclas uma a uma.")

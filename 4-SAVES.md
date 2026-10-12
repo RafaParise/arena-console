@@ -71,8 +71,11 @@ Você não precisa entrar no menu dele para nada disso:
 | Zona morta | 0.10, para analógico gasto não andar sozinho |
 | Tela cheia | Abre direto, no modo ultra desempenho |
 
-**A BIOS continua sendo pela tela dele**, na primeira vez. O ARENA preserva
-essa configuração ao escrever o resto — testado.
+**O ARENA também passa a BIOS do PS2 para o PCSX2, sozinho**, na primeira
+vez que você abre um jogo de PS2. Basta ela estar na pasta `BIOS\PS2`. A
+BIOS é o programinha que vem dentro do console e liga o aparelho, como a
+chave que dá a partida no carro. Se alguém já escolheu uma BIOS na tela do
+PCSX2, o ARENA mantém essa escolha (testado).
 
 Os 10 espaços de save do ARENA e os cheats cadastrados por ele **também não
 valem no PCSX2** — ele tem os próprios. Isso está na tabela de comparação do
@@ -136,6 +139,9 @@ Dos 46 itens que o RetroArch mostra por padrão, o ARENA deixa **12**.
 Cada jogo tem 10 espaços, numerados de **0 a 9**. Cada espaço guarda o jogo
 exatamente como estava: posição, vida, itens, tudo.
 
+Todo jogo abre no espaço **0**. Para usar outro, escolha com `F6`/`F7`
+antes do `F2`. Assim um `F2` distraído nunca grava por cima do espaço 9.
+
 Diferente do save do próprio jogo, que só grava nos pontos que o jogo
 permite. O save state grava em qualquer lugar, até no meio de um chefe.
 
@@ -173,7 +179,10 @@ Uma forma que funciona:
 | 9 | Ponto seguro. Só grave aqui quando tiver certeza |
 
 **Deixe o espaço 9 como seu seguro.** Só grave nele quando tiver certeza.
-Se você gravar por engano por cima de um espaço bom, não tem como recuperar.
+
+Gravou por engano por cima de um espaço bom? Ainda com o jogo aberto,
+aperte `Esc` → **Desfazer Salvar Estado**: o save state de antes volta.
+Depois que o jogo fecha, não tem mais como recuperar.
 
 #### Ver e apagar pelo ARENA
 
@@ -198,8 +207,13 @@ daqueles cartuchos antigos.
 #### Como funciona
 
 O ARENA guarda os códigos num arquivo por jogo. O RetroArch lê esse arquivo
-e mostra os códigos dentro do jogo, com um interruptor para cada um. Você
-liga e desliga na hora, sem fechar nada.
+quando o jogo abre e mostra os códigos dentro do jogo, com um interruptor
+para cada um. Dentro do jogo, você liga e desliga na hora, sem fechar nada.
+
+**Cadastre e mude os códigos com o jogo fechado.** Quando o jogo fecha, o
+RetroArch grava por cima a lista que ele tem aberta — uma mudança feita no
+meio se perderia. Por isso o ARENA não deixa mudar os códigos do jogo que
+está aberto (ele avisa).
 
 #### Passo 1 — Cadastrar o código
 
@@ -215,7 +229,8 @@ liga e desliga na hora, sem fechar nada.
 
 Duas formas:
 
-**Pelo ARENA:** o interruptor azul ao lado do código.
+**Pelo ARENA:** o interruptor azul ao lado do código, com o jogo fechado.
+Vale na próxima vez que o jogo abrir.
 
 **Dentro do jogo:** `Esc` → **Cheats** → ligue o que quiser.
 
@@ -227,16 +242,22 @@ desliga depois, sem sair.
 O ARENA aceita:
 
 ```
-7E0DBE09
-7E0DBE:09
-7E0DBE09 7E0DBF09
+7E0DBE09            ← Pro Action Replay (Super Nintendo)
+7E0DBE:09           ← endereço:valor (GameShark, Action Replay)
+DD32-6DAD           ← Game Genie do Super Nintendo e do Game Boy
+SXIOPO              ← Game Genie do NES (6 ou 8 letras)
+ATBT-AA32           ← Game Genie do Mega Drive
+7E0DBE09 7E0DBF09   ← código de duas linhas
 ```
 
 Código de várias linhas: cole uma por linha, ou separe por espaço. O ARENA
 junta sozinho.
 
-**Só entram números e as letras de A a F.** Qualquer outra coisa é recusada
-na hora, com aviso. Isso protege o arquivo de virar lixo.
+**Entram números, letras e os sinais `-`, `:` e `=`, no formato de um dos
+cartuchos acima.** Aspas, barras e texto solto são recusados na hora, com
+aviso. Isso protege o arquivo de virar lixo. (Até a auditoria 3, só
+números e letras de A a F entravam: o Game Genie do NES e do Mega Drive era
+recusado.)
 
 #### Descobrir códigos sem procurar na internet
 
@@ -265,10 +286,18 @@ Tudo dentro da pasta do ARENA. Copiou a pasta, levou tudo.
 
 | O quê | Onde |
 |---|---|
-| Os 10 save states | `retroarch\states\` |
-| Save do próprio jogo | `retroarch\saves\` |
-| Cheats | `retroarch\cheats\<Console>\` |
+| Os 10 save states | `retroarch\states\<núcleo>\` |
+| Save do próprio jogo | `retroarch\saves\<núcleo>\` |
+| Cheats | `retroarch\cheats\<núcleo>\` |
 | Fotos da tela | `retroarch\screenshots\` |
+
+O **núcleo** é o emulador que o RetroArch usa para o console: `Snes9x` no
+Super Nintendo, `SwanStation` no PlayStation, `Genesis Plus GX` no Mega
+Drive... O RetroArch separa tudo numa pasta com o nome dele. (Até a
+auditoria 3, a aba **Save states** do ARENA procurava fora dessas pastas e
+mostrava os 10 espaços sempre vazios, e os cheats iam para uma pasta que o
+RetroArch não lia: nunca funcionaram. Os códigos cadastrados antes vão
+sozinhos para o lugar certo na próxima vez que o jogo abrir.)
 
 Os save states seguem o nome do arquivo do jogo:
 
@@ -312,11 +341,13 @@ Para restaurar: copie os arquivos de dentro de `backup\<data>` de volta para
 |---|---|---|
 | `Esc` fecha o jogo em vez de abrir o menu | O ARENA não gerou a configuração | Feche e abra o ARENA. Ele reescreve na abertura |
 | Save state some ao trocar de computador | O jogo foi renomeado | Use o mesmo nome de arquivo |
-| Gravei por cima de um espaço bom | Não tem como recuperar | `Esc` → Desfazer Salvar Estado, mas só funciona antes de fechar o jogo |
+| Gravei por cima de um espaço bom | Salvar grava por cima, sem perguntar | `Esc` → Desfazer Salvar Estado, mas só funciona antes de fechar o jogo |
 | Cheat cadastrado mas não aparece no jogo | O código não foi ligado | `Esc` → Cheats → ligue o interruptor |
+| Mudei o código pelo ARENA e ele voltou como era | O jogo estava aberto: ao fechar, o RetroArch gravou a lista dele por cima | Feche o jogo (F10) e mude de novo. O ARENA agora avisa e não deixa mudar com o jogo aberto |
+| Dois jogos mostram os mesmos cheats | O RetroArch corta o nome do arquivo no último ponto: `Mr. Driller` e `Mr. Do!` viram os dois `Mr.cht` | Limite do RetroArch. Renomeie um dos jogos sem o ponto (antes de começar a jogar: o save segue o nome) |
 | Cheat ligado mas nada muda | O código não é desse jogo ou dessa versão | Códigos são específicos por versão. Tente o buscador de cheat |
 | Cheat travou o jogo | Normal. Cheat mexe direto na memória | Desligue, `Esc` → Carregar Estado |
-| "Código inválido" ao cadastrar | Tem letra fora de A a F | Confira se não copiou texto junto |
+| "Código inválido" ao cadastrar | Veio texto junto, ou o código está incompleto | Copie só o código, exatamente como aparece |
 | Pen drive enchendo | Save states ocupam muito | Aba Save states, apague os espaços que não usa |
 
 ---
@@ -328,11 +359,15 @@ Este arquivo de cheat é texto puro:
 ```
 cheats = 2
 
-cheat0_desc = "Vidas infinitas"
 cheat0_code = "7E0DBE09"
-cheat0_enable = true
-cheat0_handler = "1"
+cheat0_desc = "Vidas infinitas"
+cheat0_enable = "true"
+cheat0_handler = "0"
 ```
+
+`handler = "0"` quer dizer: quem aplica o código é o emulador do console.
+(O `1` é a busca de memória do próprio RetroArch, que ignora o código — o
+ARENA gravava `1` até a auditoria 3, e por isso nenhum cheat funcionava.)
 
 `7E0DBE` é um endereço de memória. `09` é o valor gravado nele. O cheat não
 tem mágica nenhuma: ele escreve um número num lugar da memória, toda vez que

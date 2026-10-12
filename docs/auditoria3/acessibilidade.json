@@ -1,0 +1,222 @@
+{
+ "escuro": {
+  "principal": {
+   "semNome": [],
+   "soIcone": [],
+   "camposSemRotulo": [],
+   "imagensSemAlt": [],
+   "tabindexPositivo": [],
+   "contrasteBaixo": [],
+   "menorLetra": 11.52,
+   "menorLetraOnde": "#.marca-sub console da turma v2026.10.11",
+   "textosVistos": 95,
+   "escondidoAparece": []
+  },
+  "gavetaPerfil": {
+   "semNome": [],
+   "soIcone": [],
+   "camposSemRotulo": [],
+   "imagensSemAlt": [],
+   "tabindexPositivo": [],
+   "contrasteBaixo": [],
+   "menorLetra": 11.52,
+   "menorLetraOnde": "#.marca-sub console da turma v2026.10.11",
+   "textosVistos": 156,
+   "escondidoAparece": []
+  },
+  "gavetaComoColocar": {
+   "semNome": [],
+   "soIcone": [],
+   "camposSemRotulo": [],
+   "imagensSemAlt": [],
+   "tabindexPositivo": [],
+   "contrasteBaixo": [],
+   "menorLetra": 11.52,
+   "menorLetraOnde": "#.marca-sub console da turma v2026.10.11",
+   "textosVistos": 107,
+   "escondidoAparece": []
+  },
+  "gavetaAcervo": {
+   "semNome": [],
+   "soIcone": [],
+   "camposSemRotulo": [],
+   "imagensSemAlt": [],
+   "tabindexPositivo": [],
+   "contrasteBaixo": [],
+   "menorLetra": 11.52,
+   "menorLetraOnde": "#.marca-sub console da turma v2026.10.11",
+   "textosVistos": 104,
+   "escondidoAparece": []
+  },
+  "gavetaAjustes": {
+   "semNome": [],
+   "soIcone": [],
+   "camposSemRotulo": [],
+   "imagensSemAlt": [],
+   "tabindexPositivo": [],
+   "contrasteBaixo": [],
+   "menorLetra": 11.52,
+   "menorLetraOnde": "#.marca-sub console da turma v2026.10.11",
+   "textosVistos": 478,
+   "escondidoAparece": []
+  },
+  "gavetaConquistas": {
+   "semNome": [],
+   "soIcone": [],
+   "camposSemRotulo": [],
+   "imagensSemAlt": [],
+   "tabindexPositivo": [],
+   "contrasteBaixo": [],
+   "menorLetra": 11.52,
+   "menorLetraOnde": "#.marca-sub console da turma v2026.10.11",
+   "textosVistos": 98,
+   "escondidoAparece": []
+  },
+  "gavetaRecordes": {
+   "semNome": [],
+   "soIcone": [],
+   "camposSemRotulo": [],
+   "imagensSemAlt": [],
+   "tabindexPositivo": [],
+   "contrasteBaixo": [],
+   "menorLetra": 11.52,
+   "menorLetraOnde": "#.marca-sub console da turma v2026.10.11",
+   "textosVistos": 99,
+   "escondidoAparece": []
+  },
+  "gavetaJogo": {
+   "semNome": [],
+   "soIcone": [],
+   "camposSemRotulo": [],
+   "imagensSemAlt": [],
+   "tabindexPositivo": [],
+   "contrasteBaixo": [],
+   "menorLetra": 11.52,
+   "menorLetraOnde": "#.marca-sub console da turma v2026.10.11",
+   "textosVistos": 106,
+   "escondidoAparece": []
+  },
+  "janelaJogarJunto": {
+   "semNome": [],
+   "soIcone": [],
+   "camposSemRotulo": [],
+   "imagensSemAlt": [],
+   "tabindexPositivo": [],
+   "contrasteBaixo": [],
+   "menorLetra": 11.52,
+   "menorLetraOnde": "#.marca-sub console da turma v2026.10.11",
+   "textosVistos": 106,
+   "escondidoAparece": []
+  }
+ },
+ "claro": {
+  "principal": {
+   "semNome": [],
+   "soIcone": [],
+   "camposSemRotulo": [],
+   "imagensSemAlt": [],
+   "tabindexPositivo": [],
+   "contrasteBaixo": [],
+   "menorLetra": 11.52,
+   "menorLetraOnde": "#.marca-sub console da turma v2026.10.11",
+   "textosVistos": 95,
+   "escondidoAparece": []
+  },
+  "gavetaPerfil": {
+   "semNome": [],
+   "soIcone": [],
+   "camposSemRotulo": [],
+   "imagensSemAlt": [],
+   "tabindexPositivo": [],
+   "contrasteBaixo": [],
+   "menorLetra": 11.52,
+   "menorLetraOnde": "#.marca-sub console da turma v2026.10.11",
+   "textosVistos": 156,
+   "escondidoAparece": []
+  },
+  "gavetaComoColocar": {
+   "semNome": [],
+   "soIcone": [],
+   "camposSemRotulo": [],
+   "imagensSemAlt": [],
+   "tabindexPositivo": [],
+   "contrasteBaixo": [],
+   "menorLetra": 11.52,
+   "menorLetraOnde": "#.marca-sub console da turma v2026.10.11",
+   "textosVistos": 107,
+   "escondidoAparece": []
+  },
+  "gavetaAcervo": {
+   "semNome": [],
+   "soIcone": [],
+   "camposSemRotulo": [],
+   "imagensSemAlt": [],
+   "tabindexPositivo": [],
+   "contrasteBaixo": [],
+   "menorLetra": 11.52,
+   "menorLetraOnde": "#.marca-sub console da turma v2026.10.11",
+   "textosVistos": 104,
+   "escondidoAparece": []
+  },
+  "gavetaAjustes": {
+   "semNome": [],
+   "soIcone": [],
+   "camposSemRotulo": [],
+   "imagensSemAlt": [],
+   "tabindexPositivo": [],
+   "contrasteBaixo": [],
+   "menorLetra": 11.52,
+   "menorLetraOnde": "#.marca-sub console da turma v2026.10.11",
+   "textosVistos": 478,
+   "escondidoAparece": []
+  },
+  "gavetaConquistas": {
+   "semNome": [],
+   "soIcone": [],
+   "camposSemRotulo": [],
+   "imagensSemAlt": [],
+   "tabindexPositivo": [],
+   "contrasteBaixo": [],
+   "menorLetra": 11.52,
+   "menorLetraOnde": "#.marca-sub console da turma v2026.10.11",
+   "textosVistos": 98,
+   "escondidoAparece": []
+  },
+  "gavetaRecordes": {
+   "semNome": [],
+   "soIcone": [],
+   "camposSemRotulo": [],
+   "imagensSemAlt": [],
+   "tabindexPositivo": [],
+   "contrasteBaixo": [],
+   "menorLetra": 11.52,
+   "menorLetraOnde": "#.marca-sub console da turma v2026.10.11",
+   "textosVistos": 99,
+   "escondidoAparece": []
+  },
+  "gavetaJogo": {
+   "semNome": [],
+   "soIcone": [],
+   "camposSemRotulo": [],
+   "imagensSemAlt": [],
+   "tabindexPositivo": [],
+   "contrasteBaixo": [],
+   "menorLetra": 11.52,
+   "menorLetraOnde": "#.marca-sub console da turma v2026.10.11",
+   "textosVistos": 106,
+   "escondidoAparece": []
+  },
+  "janelaJogarJunto": {
+   "semNome": [],
+   "soIcone": [],
+   "camposSemRotulo": [],
+   "imagensSemAlt": [],
+   "tabindexPositivo": [],
+   "contrasteBaixo": [],
+   "menorLetra": 11.52,
+   "menorLetraOnde": "#.marca-sub console da turma v2026.10.11",
+   "textosVistos": 106,
+   "escondidoAparece": []
+  }
+ }
+}

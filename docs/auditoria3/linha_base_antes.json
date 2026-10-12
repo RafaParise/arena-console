@@ -1,0 +1,1768 @@
+{
+  "quando": "2026-10-07 20:50",
+  "nucleos_logicos": 12,
+  "config_do_usuario": {
+    "permitir_rede": false,
+    "modo_modesto": true,
+    "tema": "escuro",
+    "fundo_animado": "sempre",
+    "ultra_desempenho": true
+  },
+  "tamanho_total_mb": 12766.2,
+  "tamanho_por_pasta_mb": {
+    "emuladores": 10250.4,
+    "retroarch": 2456.9,
+    "BIOS": 30.8,
+    "servidor": 22.5,
+    "dados": 3.0,
+    "testes": 0.9,
+    "docs": 0.6,
+    "ferramentas": 0.5,
+    "launcher": 0.3,
+    "(raiz)": 0.2,
+    "perfil": 0.1
+  },
+  "linhas_por_grupo": {
+    "documentos": {
+      "arquivos": 10,
+      "linhas": 3312,
+      "por_extensao": {
+        ".md": 3246,
+        ".txt": 66
+      }
+    },
+    "ferramentas": {
+      "arquivos": 44,
+      "linhas": 7072,
+      "por_extensao": {
+        ".py": 7072
+      }
+    },
+    "guias": {
+      "arquivos": 7,
+      "linhas": 4796,
+      "por_extensao": {
+        ".md": 4796
+      }
+    },
+    "medidas": {
+      "arquivos": 23,
+      "linhas": 16725,
+      "por_extensao": {
+        ".json": 16725
+      }
+    },
+    "programa": {
+      "arquivos": 39,
+      "linhas": 30744,
+      "por_extensao": {
+        ".py": 18626,
+        ".js": 6105,
+        ".css": 1778,
+        ".json": 2934,
+        ".html": 1044,
+        ".bat": 257
+      }
+    },
+    "testes": {
+      "arquivos": 130,
+      "linhas": 18647,
+      "por_extensao": {
+        ".py": 18380,
+        ".js": 108,
+        ".ps1": 119,
+        ".bat": 40
+      }
+    }
+  },
+  "linhas_por_arquivo": [
+    {
+      "arquivo": "docs\\RELATORIO-AUDITORIA-1.md",
+      "linhas": 1691,
+      "grupo": "documentos",
+      "ext": ".md"
+    },
+    {
+      "arquivo": "docs\\RELATORIO-AUDITORIA-2.md",
+      "linhas": 527,
+      "grupo": "documentos",
+      "ext": ".md"
+    },
+    {
+      "arquivo": "docs\\PLANO-AUDITORIA.md",
+      "linhas": 480,
+      "grupo": "documentos",
+      "ext": ".md"
+    },
+    {
+      "arquivo": "docs\\MAQUINA-ALVO.md",
+      "linhas": 362,
+      "grupo": "documentos",
+      "ext": ".md"
+    },
+    {
+      "arquivo": "docs\\MAPA-MULTITAP.md",
+      "linhas": 114,
+      "grupo": "documentos",
+      "ext": ".md"
+    },
+    {
+      "arquivo": "docs\\ROTEIRO-MULTITAP.md",
+      "linhas": 72,
+      "grupo": "documentos",
+      "ext": ".md"
+    },
+    {
+      "arquivo": "docs\\auditoria2\\medir_fase8\\arena.txt",
+      "linhas": 35,
+      "grupo": "documentos",
+      "ext": ".txt"
+    },
+    {
+      "arquivo": "docs\\auditoria2\\medir_fase0\\arena.txt",
+      "linhas": 31,
+      "grupo": "documentos",
+      "ext": ".txt"
+    },
+    {
+      "arquivo": "docs\\auditoria2\\medir_fase0\\arena_janela_preta.txt",
+      "linhas": 0,
+      "grupo": "documentos",
+      "ext": ".txt"
+    },
+    {
+      "arquivo": "docs\\auditoria2\\medir_fase8\\arena_janela_preta.txt",
+      "linhas": 0,
+      "grupo": "documentos",
+      "ext": ".txt"
+    },
+    {
+      "arquivo": "ferramentas\\medir_arena.py",
+      "linhas": 1090,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\coletar_maquina.py",
+      "linhas": 958,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\montar_versao_alunos.py",
+      "linhas": 770,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\teste_netplay_check_frames.py",
+      "linhas": 244,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\converter_fliperama_decriptado.py",
+      "linhas": 238,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\teste_memory_card_ps1.py",
+      "linhas": 226,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\acentuar_textos.py",
+      "linhas": 196,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\rodada_final.py",
+      "linhas": 180,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\modo_alvo.py",
+      "linhas": 155,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\montar_relatorio_aud2.py",
+      "linhas": 155,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\teste_netplay_neogeo.py",
+      "linhas": 143,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\teste_netplay_ps1.py",
+      "linhas": 142,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\teste_netplay_megadrive.py",
+      "linhas": 138,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\teste_backup_falha_cancela_apagamento.py",
+      "linhas": 134,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\medir_parado.py",
+      "linhas": 130,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\teste_pcsx2_completo.py",
+      "linhas": 129,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\testar_controles.py",
+      "linhas": 126,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\teste_aceite_pasta_movida.py",
+      "linhas": 116,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\teste_capa_online.py",
+      "linhas": 109,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\teste_rede_ps2_gt4.py",
+      "linhas": 107,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\teste_perfil_foto.py",
+      "linhas": 104,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\teste_amigo_ip_muda.py",
+      "linhas": 103,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\teste_rpcn.py",
+      "linhas": 102,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\trocar_testdb.py",
+      "linhas": 101,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\teste_qualidade_pcsx2.py",
+      "linhas": 96,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\teste_netplay_suporte_nucleos.py",
+      "linhas": 95,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\teste_netplay_xbox360.py",
+      "linhas": 95,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\teste_correcao_caminhos.py",
+      "linhas": 81,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\teste_biblioteca_online.py",
+      "linhas": 80,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\conferir_mapa_multitap.py",
+      "linhas": 78,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\limpar_registros_de_teste.py",
+      "linhas": 76,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\teste_pcsx_rearmed_basico.py",
+      "linhas": 63,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\corrigir_chaves_graficos.py",
+      "linhas": 62,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\teste_controle_neogeo.py",
+      "linhas": 62,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\teste_rodizio_logs.py",
+      "linhas": 58,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\conferir_bios_neogeo.py",
+      "linhas": 47,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\baixar_capas.py",
+      "linhas": 44,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\textos_do_nucleo.py",
+      "linhas": 44,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\limpar_botoes_retroarch_cfg.py",
+      "linhas": 41,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\limpar_retroarch_cfg.py",
+      "linhas": 38,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\inventario_jogos.py",
+      "linhas": 36,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\aplicar_protege_cfg.py",
+      "linhas": 33,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\chaves_bios_nucleos.py",
+      "linhas": 27,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ferramentas\\opcoes_do_nucleo.py",
+      "linhas": 20,
+      "grupo": "ferramentas",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "3-IMAGEM-SOM-CONTROLE.md",
+      "linhas": 1305,
+      "grupo": "guias",
+      "ext": ".md"
+    },
+    {
+      "arquivo": "2-JOGOS.md",
+      "linhas": 1031,
+      "grupo": "guias",
+      "ext": ".md"
+    },
+    {
+      "arquivo": "5-AMIGOS.md",
+      "linhas": 763,
+      "grupo": "guias",
+      "ext": ".md"
+    },
+    {
+      "arquivo": "6-RECURSOS-E-REPARO.md",
+      "linhas": 525,
+      "grupo": "guias",
+      "ext": ".md"
+    },
+    {
+      "arquivo": "4-SAVES.md",
+      "linhas": 513,
+      "grupo": "guias",
+      "ext": ".md"
+    },
+    {
+      "arquivo": "1-COMECAR.md",
+      "linhas": 435,
+      "grupo": "guias",
+      "ext": ".md"
+    },
+    {
+      "arquivo": "LEIA-ME.md",
+      "linhas": 224,
+      "grupo": "guias",
+      "ext": ".md"
+    },
+    {
+      "arquivo": "docs\\auditoria3\\inventario_antes.json",
+      "linhas": 7238,
+      "grupo": "medidas",
+      "ext": ".json"
+    },
+    {
+      "arquivo": "docs\\fuzz_rotas_bruto.json",
+      "linhas": 2513,
+      "grupo": "medidas",
+      "ext": ".json"
+    },
+    {
+      "arquivo": "docs\\auditoria3\\linha_base_antes.json",
+      "linhas": 1754,
+      "grupo": "medidas",
+      "ext": ".json"
+    },
+    {
+      "arquivo": "docs\\abrir_todos_bruto.json",
+      "linhas": 1694,
+      "grupo": "medidas",
+      "ext": ".json"
+    },
+    {
+      "arquivo": "docs\\rodada_final_bruta.json",
+      "linhas": 1213,
+      "grupo": "medidas",
+      "ext": ".json"
+    },
+    {
+      "arquivo": "docs\\inventario_bruto.json",
+      "linhas": 667,
+      "grupo": "medidas",
+      "ext": ".json"
+    },
+    {
+      "arquivo": "docs\\varredura_fase1_bruta.json",
+      "linhas": 430,
+      "grupo": "medidas",
+      "ext": ".json"
+    },
+    {
+      "arquivo": "docs\\matriz_multitap_bruto.json",
+      "linhas": 229,
+      "grupo": "medidas",
+      "ext": ".json"
+    },
+    {
+      "arquivo": "docs\\longa_duracao_bruto.json",
+      "linhas": 140,
+      "grupo": "medidas",
+      "ext": ".json"
+    },
+    {
+      "arquivo": "docs\\linha_base_bruta.json",
+      "linhas": 111,
+      "grupo": "medidas",
+      "ext": ".json"
+    },
+    {
+      "arquivo": "docs\\auditoria2\\linha_base_fase0.json",
+      "linhas": 111,
+      "grupo": "medidas",
+      "ext": ".json"
+    },
+    {
+      "arquivo": "docs\\auditoria2\\linha_base_fase8.json",
+      "linhas": 111,
+      "grupo": "medidas",
+      "ext": ".json"
+    },
+    {
+      "arquivo": "docs\\linha_base_depois_bruta.json",
+      "linhas": 110,
+      "grupo": "medidas",
+      "ext": ".json"
+    },
+    {
+      "arquivo": "docs\\auditoria2\\medir_fase8\\arena.json",
+      "linhas": 74,
+      "grupo": "medidas",
+      "ext": ".json"
+    },
+    {
+      "arquivo": "docs\\netplay_5_jogadores_bruto.json",
+      "linhas": 71,
+      "grupo": "medidas",
+      "ext": ".json"
+    },
+    {
+      "arquivo": "docs\\auditoria2\\medir_fase0\\arena.json",
+      "linhas": 68,
+      "grupo": "medidas",
+      "ext": ".json"
+    },
+    {
+      "arquivo": "docs\\matriz_jogos_bruto.json",
+      "linhas": 58,
+      "grupo": "medidas",
+      "ext": ".json"
+    },
+    {
+      "arquivo": "docs\\rede_ruim_bruto.json",
+      "linhas": 42,
+      "grupo": "medidas",
+      "ext": ".json"
+    },
+    {
+      "arquivo": "docs\\varredura_fase2_css_bruta.json",
+      "linhas": 32,
+      "grupo": "medidas",
+      "ext": ".json"
+    },
+    {
+      "arquivo": "docs\\cenarios_sala_bruto.json",
+      "linhas": 19,
+      "grupo": "medidas",
+      "ext": ".json"
+    },
+    {
+      "arquivo": "docs\\medir_tela_bruto.json",
+      "linhas": 16,
+      "grupo": "medidas",
+      "ext": ".json"
+    },
+    {
+      "arquivo": "docs\\auditoria2\\medir_tela_fase2.json",
+      "linhas": 16,
+      "grupo": "medidas",
+      "ext": ".json"
+    },
+    {
+      "arquivo": "docs\\gravacoes_parado_bruto.json",
+      "linhas": 8,
+      "grupo": "medidas",
+      "ext": ".json"
+    },
+    {
+      "arquivo": "servidor\\arena.py",
+      "linhas": 6416,
+      "grupo": "programa",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "launcher\\app.js",
+      "linhas": 4362,
+      "grupo": "programa",
+      "ext": ".js"
+    },
+    {
+      "arquivo": "servidor\\graficos.py",
+      "linhas": 2565,
+      "grupo": "programa",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "launcher\\estilo.css",
+      "linhas": 1778,
+      "grupo": "programa",
+      "ext": ".css"
+    },
+    {
+      "arquivo": "servidor\\bios.py",
+      "linhas": 1445,
+      "grupo": "programa",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "servidor\\consoles.json",
+      "linhas": 1278,
+      "grupo": "programa",
+      "ext": ".json"
+    },
+    {
+      "arquivo": "servidor\\indexador.py",
+      "linhas": 1151,
+      "grupo": "programa",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "launcher\\index.html",
+      "linhas": 1044,
+      "grupo": "programa",
+      "ext": ".html"
+    },
+    {
+      "arquivo": "launcher\\field-background.js",
+      "linhas": 848,
+      "grupo": "programa",
+      "ext": ".js"
+    },
+    {
+      "arquivo": "launcher\\galaxy-background.js",
+      "linhas": 837,
+      "grupo": "programa",
+      "ext": ".js"
+    },
+    {
+      "arquivo": "servidor\\hardware.py",
+      "linhas": 743,
+      "grupo": "programa",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "servidor\\barreiras.py",
+      "linhas": 647,
+      "grupo": "programa",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "servidor\\recursos.json",
+      "linhas": 645,
+      "grupo": "programa",
+      "ext": ".json"
+    },
+    {
+      "arquivo": "servidor\\controles.py",
+      "linhas": 579,
+      "grupo": "programa",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "servidor\\capas_online.py",
+      "linhas": 566,
+      "grupo": "programa",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "servidor\\graficos.json",
+      "linhas": 551,
+      "grupo": "programa",
+      "ext": ".json"
+    },
+    {
+      "arquivo": "servidor\\diagnostico.py",
+      "linhas": 539,
+      "grupo": "programa",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "servidor\\arrumar.py",
+      "linhas": 513,
+      "grupo": "programa",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "servidor\\identificador.py",
+      "linhas": 345,
+      "grupo": "programa",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "servidor\\nomes_arcade.py",
+      "linhas": 340,
+      "grupo": "programa",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "servidor\\motivo_do_erro.py",
+      "linhas": 291,
+      "grupo": "programa",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "servidor\\partida.py",
+      "linhas": 291,
+      "grupo": "programa",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "servidor\\bios_catalogo.py",
+      "linhas": 274,
+      "grupo": "programa",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "servidor\\perfis_controle.json",
+      "linhas": 271,
+      "grupo": "programa",
+      "ext": ".json"
+    },
+    {
+      "arquivo": "servidor\\cheats.py",
+      "linhas": 266,
+      "grupo": "programa",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "servidor\\internet_archive.py",
+      "linhas": 265,
+      "grupo": "programa",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "servidor\\como_colocar.py",
+      "linhas": 242,
+      "grupo": "programa",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "servidor\\janela_preta.py",
+      "linhas": 233,
+      "grupo": "programa",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "servidor\\acervo.py",
+      "linhas": 230,
+      "grupo": "programa",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "servidor\\jogadores.py",
+      "linhas": 200,
+      "grupo": "programa",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "servidor\\multitap.json",
+      "linhas": 189,
+      "grupo": "programa",
+      "ext": ".json"
+    },
+    {
+      "arquivo": "servidor\\processos.py",
+      "linhas": 182,
+      "grupo": "programa",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "servidor\\capas_do_disco.py",
+      "linhas": 179,
+      "grupo": "programa",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "servidor\\integridade.py",
+      "linhas": 124,
+      "grupo": "programa",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "ARENA.bat",
+      "linhas": 110,
+      "grupo": "programa",
+      "ext": ".bat"
+    },
+    {
+      "arquivo": "COLETAR.bat",
+      "linhas": 81,
+      "grupo": "programa",
+      "ext": ".bat"
+    },
+    {
+      "arquivo": "launcher\\pixel-sprites.js",
+      "linhas": 58,
+      "grupo": "programa",
+      "ext": ".js"
+    },
+    {
+      "arquivo": "VERIFICAR.bat",
+      "linhas": 37,
+      "grupo": "programa",
+      "ext": ".bat"
+    },
+    {
+      "arquivo": "PARTIDA.bat",
+      "linhas": 29,
+      "grupo": "programa",
+      "ext": ".bat"
+    },
+    {
+      "arquivo": "testes\\inventario.py",
+      "linhas": 658,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "servidor\\tests\\run.py",
+      "linhas": 624,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\linha_base.py",
+      "linhas": 429,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_abaixo_do_original.py",
+      "linhas": 398,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "servidor\\tests\\test_graficos_acervo.py",
+      "linhas": 392,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\fuzz_rotas.py",
+      "linhas": 360,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "servidor\\tests\\test_bios.py",
+      "linhas": 353,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\tela_sem_janela.py",
+      "linhas": 308,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_servidor_que_cai.py",
+      "linhas": 303,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_multitap_regra_de_ouro.py",
+      "linhas": 299,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "servidor\\tests\\test_arrumar.py",
+      "linhas": 296,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "servidor\\tests\\test_motivo_do_erro.py",
+      "linhas": 296,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_partida_aparece.py",
+      "linhas": 276,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_quebrar_api.py",
+      "linhas": 261,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_netplay_5_jogadores.py",
+      "linhas": 259,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_multitap_por_console.py",
+      "linhas": 250,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_capas_todos_os_consoles.py",
+      "linhas": 242,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "servidor\\tests\\test_capas_que_faltavam.py",
+      "linhas": 237,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "servidor\\tests\\test_jogadores.py",
+      "linhas": 224,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_arrumar_jogos.py",
+      "linhas": 220,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_multitap_5_jogadores_arena.py",
+      "linhas": 219,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_matriz_jogos.py",
+      "linhas": 217,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_fliperama_nomes.py",
+      "linhas": 216,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_como_colocar.py",
+      "linhas": 205,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_matriz_multitap.py",
+      "linhas": 202,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_cenarios_sala.py",
+      "linhas": 200,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_coletar_regua.py",
+      "linhas": 197,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_bios_organizador.py",
+      "linhas": 190,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\varredura_fase1.py",
+      "linhas": 189,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "servidor\\tests\\test_multitap.py",
+      "linhas": 186,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_pcsx2_seguro.py",
+      "linhas": 182,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_varios_discos.py",
+      "linhas": 182,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_atualizar_versao_alunos.py",
+      "linhas": 181,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "servidor\\tests\\test_barreiras.py",
+      "linhas": 177,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_fundos_animados.py",
+      "linhas": 173,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_longa_duracao.py",
+      "linhas": 169,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_bios_consoles.py",
+      "linhas": 168,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_rede_ruim.py",
+      "linhas": 164,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_biblioteca_busca.py",
+      "linhas": 163,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_capas_miniaturas.py",
+      "linhas": 158,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_concorrencia.py",
+      "linhas": 155,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_tela_4k.py",
+      "linhas": 150,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_descoberta_30_maquinas.py",
+      "linhas": 148,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_dolphin_config.py",
+      "linhas": 146,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "servidor\\tests\\test_converter_fliperama.py",
+      "linhas": 145,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\abrir_para_teste_manual.py",
+      "linhas": 144,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_ultra_promessas.py",
+      "linhas": 144,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\medir_gravacoes_parado.py",
+      "linhas": 143,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_acesso_de_rede.py",
+      "linhas": 137,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_dados_tortos.py",
+      "linhas": 137,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_perfil_apelido.py",
+      "linhas": 135,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_motivo_fliperama.py",
+      "linhas": 134,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_adaptadores_sem_laco.py",
+      "linhas": 133,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_rede_sem_reabrir.py",
+      "linhas": 131,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_zip_danificado.py",
+      "linhas": 130,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_netplay_isolamento.py",
+      "linhas": 126,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_pcsx2_motor.py",
+      "linhas": 126,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_filtro_de_tela.py",
+      "linhas": 124,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_psp_pulo_de_quadros.py",
+      "linhas": 123,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_tela_motivo.py",
+      "linhas": 121,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_alcas_sem_vazamento.py",
+      "linhas": 119,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_backup_rodizio.py",
+      "linhas": 118,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_internet_archive_download.py",
+      "linhas": 118,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_opcoes_nucleo_ponta_a_ponta.py",
+      "linhas": 117,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_local_4_jogadores.py",
+      "linhas": 116,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_disco_amostras.py",
+      "linhas": 115,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_orcamentos_modo_alvo.py",
+      "linhas": 114,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_pcsx2_placa.py",
+      "linhas": 114,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_dns_rebinding.py",
+      "linhas": 110,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_lista_partidas.js",
+      "linhas": 108,
+      "grupo": "testes",
+      "ext": ".js"
+    },
+    {
+      "arquivo": "testes\\teste_estresse_catalogo.py",
+      "linhas": 107,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_abrir_todos.py",
+      "linhas": 106,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_acervo_sha256.py",
+      "linhas": 106,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_barreiras_api.py",
+      "linhas": 104,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_kof2002_convertido.py",
+      "linhas": 104,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_disco_cheio.py",
+      "linhas": 101,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\proxy_rede_ruim.py",
+      "linhas": 100,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_imagem_ps1.py",
+      "linhas": 100,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_queda_no_meio_da_gravacao.py",
+      "linhas": 100,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\abrir_dois_arenas.py",
+      "linhas": 97,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_cfg_sem_linha_repetida.py",
+      "linhas": 97,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_pcsx2_inicia.py",
+      "linhas": 97,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "servidor\\tests\\test_janela_preta.py",
+      "linhas": 96,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_arquivos_corrompidos.py",
+      "linhas": 96,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_satellaview_aviso.py",
+      "linhas": 96,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_ps2_sem_bios.py",
+      "linhas": 94,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_qual_opcao_de_nucleo_vale.py",
+      "linhas": 93,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_sinc_migracao_e_lotes.py",
+      "linhas": 93,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_fase7.py",
+      "linhas": 91,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\medir_cache_ps1.py",
+      "linhas": 88,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_mala_validacao.py",
+      "linhas": 87,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_multitap_opcao_nucleo_real.py",
+      "linhas": 87,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_pasta_somente_leitura.py",
+      "linhas": 87,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_travessia_capa.py",
+      "linhas": 87,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\limpeza.py",
+      "linhas": 86,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_acervo_download_real.py",
+      "linhas": 86,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_pcsx2_bissecao.py",
+      "linhas": 86,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_fat32_arquivo_grande.py",
+      "linhas": 85,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_temp_esparso.py",
+      "linhas": 84,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_partida_testar_timing.py",
+      "linhas": 82,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_vulkan_de_verdade.py",
+      "linhas": 82,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_caminho_fora_no_cfg.py",
+      "linhas": 78,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_chaves_graficos.py",
+      "linhas": 78,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_barreiras_modo_restrito.py",
+      "linhas": 74,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_ps3_sem_firmware.py",
+      "linhas": 73,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_verificador_arquivos.py",
+      "linhas": 70,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\comparar_linhas_produto.py",
+      "linhas": 69,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_partida_colega.py",
+      "linhas": 69,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_sinc_sem_relogio.py",
+      "linhas": 69,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "servidor\\tests\\test_cache_ps1.py",
+      "linhas": 68,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_pcsx2_portatil.py",
+      "linhas": 66,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_adaptadores_vpn.py",
+      "linhas": 61,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_rpcs3_controles.py",
+      "linhas": 61,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_caminho_comprido.py",
+      "linhas": 60,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\medir_tela.ps1",
+      "linhas": 57,
+      "grupo": "testes",
+      "ext": ".ps1"
+    },
+    {
+      "arquivo": "testes\\textos_sem_acento.py",
+      "linhas": 56,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\teste_xenia_abre.py",
+      "linhas": 55,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\controles_detectados.py",
+      "linhas": 52,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\varredura_fase2_css.py",
+      "linhas": 49,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\neogeo_bios_registro.py",
+      "linhas": 48,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "RODAR_TESTES.bat",
+      "linhas": 40,
+      "grupo": "testes",
+      "ext": ".bat"
+    },
+    {
+      "arquivo": "testes\\ids_da_tela.py",
+      "linhas": 37,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\protege_cfg.py",
+      "linhas": 35,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\funcoes_js_mortas.py",
+      "linhas": 26,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\jogos_de_teste.py",
+      "linhas": 25,
+      "grupo": "testes",
+      "ext": ".py"
+    },
+    {
+      "arquivo": "testes\\foto_rpcs3.ps1",
+      "linhas": 21,
+      "grupo": "testes",
+      "ext": ".ps1"
+    },
+    {
+      "arquivo": "testes\\foto_pcsx2_janela.ps1",
+      "linhas": 18,
+      "grupo": "testes",
+      "ext": ".ps1"
+    },
+    {
+      "arquivo": "testes\\apertar_teclas.ps1",
+      "linhas": 14,
+      "grupo": "testes",
+      "ext": ".ps1"
+    },
+    {
+      "arquivo": "testes\\foto_tela.ps1",
+      "linhas": 9,
+      "grupo": "testes",
+      "ext": ".ps1"
+    },
+    {
+      "arquivo": "servidor\\tests\\__init__.py",
+      "linhas": 0,
+      "grupo": "testes",
+      "ext": ".py"
+    }
+  ],
+  "servidor_abre_s": 0.58,
+  "espera_antes_da_janela_s": 1.0,
+  "tela": {
+    "navegador_s": 0.52,
+    "pagina_s": 0.51,
+    "servidor_com_tela": {
+      "ram_mb": 42.1,
+      "privada_mb": 29.9,
+      "threads": 7,
+      "alcas": 185,
+      "processos": 1,
+      "cpu_um_nucleo_pct": 0.03,
+      "cpu_total_pct": 0.002,
+      "janela_s": 61.9,
+      "detalhe": [
+        {
+          "pid": 12328,
+          "nome": "python",
+          "ram_mb": 42.1,
+          "threads": 7,
+          "alcas": 185
+        }
+      ]
+    },
+    "tela": {
+      "ram_mb": 539.9,
+      "privada_mb": 271.9,
+      "threads": 198,
+      "alcas": 4210,
+      "processos": 8,
+      "cpu_um_nucleo_pct": 9.67,
+      "cpu_total_pct": 0.805,
+      "janela_s": 61.9,
+      "detalhe": [
+        {
+          "pid": 1404,
+          "nome": "msedge",
+          "ram_mb": 17.9,
+          "threads": 12,
+          "alcas": 201
+        },
+        {
+          "pid": 2468,
+          "nome": "msedge",
+          "ram_mb": 101.6,
+          "threads": 23,
+          "alcas": 317
+        },
+        {
+          "pid": 3540,
+          "nome": "msedge",
+          "ram_mb": 60.5,
+          "threads": 18,
+          "alcas": 272
+        },
+        {
+          "pid": 3948,
+          "nome": "msedge",
+          "ram_mb": 34.6,
+          "threads": 13,
+          "alcas": 214
+        },
+        {
+          "pid": 10440,
+          "nome": "msedge",
+          "ram_mb": 184.0,
+          "threads": 67,
+          "alcas": 1907
+        },
+        {
+          "pid": 10560,
+          "nome": "msedge",
+          "ram_mb": 12.5,
+          "threads": 11,
+          "alcas": 205
+        },
+        {
+          "pid": 12008,
+          "nome": "msedge",
+          "ram_mb": 43.7,
+          "threads": 30,
+          "alcas": 454
+        },
+        {
+          "pid": 12844,
+          "nome": "msedge",
+          "ram_mb": 85.1,
+          "threads": 24,
+          "alcas": 640
+        }
+      ]
+    },
+    "pagina": {
+      "segundos": 65.15010000000149,
+      "intervalos": [
+        {
+          "ms": 3000,
+          "origem": "http://127.0.0.1:8777/galaxy-background.js:836:3"
+        },
+        {
+          "ms": 3000,
+          "origem": "http://127.0.0.1:8777/field-background.js:847:3"
+        }
+      ],
+      "timeouts": 0,
+      "quadros": 3901,
+      "pedidos": {},
+      "visivel": "visible",
+      "foco": true,
+      "menos_movimento": true,
+      "telas_de_desenho": 2,
+      "tema": "escuro",
+      "timeouts_por_minuto": 0.0,
+      "quadros_por_segundo": 59.9,
+      "pedidos_por_minuto": {}
+    }
+  },
+  "abertura_sem_a_espera_s": 1.61,
+  "abertura_total_s": 2.61,
+  "portas_com_tela": [
+    {
+      "protocolo": "TCP",
+      "endereco": "127.0.0.1",
+      "porta": 8777,
+      "alcance": "so este computador",
+      "pid": 12328
+    },
+    {
+      "protocolo": "UDP",
+      "endereco": "0.0.0.0",
+      "porta": 55436,
+      "alcance": "rede toda",
+      "pid": 12328
+    }
+  ],
+  "servidor_parado": {
+    "ram_mb": 42.1,
+    "privada_mb": 29.9,
+    "threads": 5,
+    "alcas": 181,
+    "processos": 1,
+    "cpu_um_nucleo_pct": 0.05,
+    "cpu_total_pct": 0.004,
+    "janela_s": 60.9,
+    "detalhe": [
+      {
+        "pid": 12328,
+        "nome": "python",
+        "ram_mb": 42.1,
+        "threads": 5,
+        "alcas": 181
+      }
+    ]
+  },
+  "portas": [
+    {
+      "protocolo": "TCP",
+      "endereco": "127.0.0.1",
+      "porta": 8777,
+      "alcance": "so este computador",
+      "pid": 12328
+    },
+    {
+      "protocolo": "UDP",
+      "endereco": "0.0.0.0",
+      "porta": 55436,
+      "alcance": "rede toda",
+      "pid": 12328
+    }
+  ]
+}

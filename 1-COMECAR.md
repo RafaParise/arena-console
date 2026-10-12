@@ -5,7 +5,8 @@ Preparar a mídia e montar o ARENA. Faça uma vez; depois é copiar e colar.
 **Neste documento:**
 
 - Parte A — Preparar o pen drive ou o SSD
-- Parte B — Instalação
+- Parte B — Instalação (o jeito fácil: baixar o ARENA pronto do GitHub; ou
+  montar peça por peça)
 
 ---
 
@@ -13,8 +14,8 @@ Preparar a mídia e montar o ARENA. Faça uma vez; depois é copiar e colar.
 
 Faça isto antes de instalar o ARENA. Cinco minutos.
 
-Se você vai usar o ARENA só no disco `C:` do computador, **pule para o
-deste documento**. Nada aqui é obrigatório.
+Se você vai usar o ARENA só no disco `C:` do computador, **pule para a
+Parte B** deste documento. Nada aqui é obrigatório.
 
 ---
 
@@ -70,6 +71,11 @@ Leva menos de um minuto.
 
 FAT32 não serve porque um jogo de PlayStation 2 passa de 4 GB.
 
+Se o ARENA estiver num pen drive em FAT32, ele avisa: o botão **Como colocar
+jogos** mostra "Atenção" nos consoles de jogo grande (PlayStation 2 e 3, Wii
+e Xbox 360), antes de você copiar. E um jogo que chegou cortado no limite de
+4 GB ganha, no cartão, a explicação do que houve.
+
 NTFS funciona, mas grava dono e permissão em cada arquivo. Quando o pen
 drive passa de mão em mão, o Windows do colega às vezes recusa acesso. É um
 problema que só aparece na hora errada — evite.
@@ -93,7 +99,7 @@ problema com nome de arquivo comprido, que ainda existe no Windows.
 
 ### Passo 4 — Instalar
 
-Continue no **deste documento — Instalação**.
+Continue na **Parte B — Instalação**, logo abaixo.
 
 ---
 
@@ -111,9 +117,11 @@ automática em `backup`, então dá para recuperar — mas é chato e evitável.
 
 ### Passo 6 — O cartão SD
 
-Cartão SD tem escrita aleatória lenta e desgaste rápido. O banco de recordes
-grava o tempo todo; num cartão, ele degrada e mais cedo ou mais tarde
-corrompe no meio da aula.
+O cartão SD grava devagar quando são muitos pedacinhos espalhados. E ele se
+gasta rápido. O ARENA grava no arquivo de recordes o tempo todo. Num cartão,
+isso gasta o cartão aos poucos. Cedo ou tarde, o arquivo estraga no meio da
+aula. É como apagar e escrever sempre no mesmo canto da folha: uma hora o
+papel rasga.
 
 **Não rode o ARENA do cartão SD.** Use o cartão para o que ele faz bem:
 
@@ -158,6 +166,30 @@ o disco na abertura e reescreve as configurações.
 
 Faça uma vez. Depois é só copiar e colar a pasta.
 
+### O jeito fácil: baixar o ARENA pronto (GitHub)
+
+**Tempo:** 10 minutos, mais o download (uns 480 MB; descompactado, 1,3 GB).
+
+1. Abra <https://github.com/RafaParise/arena-console/releases/latest>.
+2. Baixe o arquivo **`ARENA-` + a versão + `.zip`**, na parte *Assets*.
+3. **Antes de descompactar, desbloqueie:** botão direito no `.zip` →
+   **Propriedades** → embaixo, em *Segurança*, marque **Desbloquear** →
+   **OK**. Não precisa de senha de administrador. Sem esse passo, o Windows
+   marca cada programa de dentro do pacote como "vindo da internet" e
+   pergunta, um por um, se pode abrir.
+4. Descompacte em `C:\ARENA` (ou direto no pen drive em exFAT, Parte A).
+5. Dois cliques em **`ARENA.bat`**. Pronto: pule para o **Passo 5 — Testar**.
+
+O pacote já traz o Python, o RetroArch com os núcleos e os emuladores de
+fora (PCSX2, Dolphin, RPCS3, Xenia). **Não traz jogos nem BIOS:** são de
+quem tem o console. Ponha cada BIOS em `BIOS\<console>` e o ARENA instala
+sozinho (documento 2).
+
+Prefere montar peça por peça (sem internet rápida, ou para estudar como o
+ARENA é feito)? Siga os passos abaixo.
+
+### Montar peça por peça
+
 **Tempo:** 20 minutos.
 
 ---
@@ -169,7 +201,7 @@ Crie `C:\ARENA` e copie tudo deste pacote para dentro.
 Monte primeiro no disco `C:`. É mais rápido para montar e testar. Só depois
 copie para o pen drive ou o SSD.
 
-Se você já preparou a mídia pelo **neste mesmo documento**, pode montar direto nela.
+Se você já preparou a mídia pela **Parte A** deste documento, pode montar direto nela.
 
 ---
 
@@ -241,10 +273,16 @@ o RetroArch nem abre, e o Windows mostra um erro que não explica nada.
 **A maioria dos computadores já tem**, porque quase todo programa instala
 junto. O ARENA confere na abertura e avisa no topo da tela se faltar.
 
-Se faltar: baixe o **Microsoft Visual C++ Redistributable (x64)** no site da
-Microsoft e instale. É rápido e só precisa ser feito uma vez por computador.
-Um pacote que reúne todas as versões, como o *Visual C++ Runtimes All-in-One*,
-também resolve.
+Se faltar, tente primeiro o botão do ARENA. Vá em **Ajustes → Máquina** e
+clique em **Copiar para a pasta do ARENA**. Não precisa de senha de
+administrador.
+
+A tela disse que este computador também não tem as bibliotecas? Então baixe
+o **Microsoft Visual C++ Redistributable (x64)** no site da Microsoft e
+instale. Instalar pede a senha de administrador (a senha de quem cuida do
+computador): é tarefa do professor ou do técnico. É rápido e só precisa ser
+feito uma vez por computador. Um pacote que reúne todas as versões, como o
+*Visual C++ Runtimes All-in-One*, também resolve.
 
 Isso é do computador, não do ARENA — a pasta continua portátil.
 
@@ -276,7 +314,7 @@ Dois cliques em **`ARENA.bat`**. A janela preta deve mostrar:
 ```
 
 O navegador abre no ARENA. A lista fica vazia — está certo, ainda não há
-jogos. Para adicionar, veja o **neste mesmo documento**.
+jogos. Para adicionar, veja o **documento 2** (`2-JOGOS.md`).
 
 **Se aparecer `[ERRO] O Python nao foi encontrado`:** volte ao passo 2.
 
@@ -284,7 +322,7 @@ jogos. Para adicionar, veja o **neste mesmo documento**.
 
 ### Passo 6 — Copiar para o pen drive ou SSD
 
-A mídia precisa estar em exFAT — veja o **neste mesmo documento**.
+A mídia precisa estar em exFAT — veja a **Parte A**, passo 2, deste documento.
 
 1. Formate a mídia em **exFAT**. Aceita arquivo maior que 4 GB e é lida em
    qualquer computador. NTFS funciona, mas cria permissões que atrapalham
@@ -371,7 +409,7 @@ ARENA\
 | Janela preta abre e fecha na hora | Antivírus bloqueou | Libere a pasta do ARENA no antivírus (veja abaixo) |
 | ARENA abre mas nenhum jogo inicia | Falta o Visual C++ | Passo 4b |
 | Tudo lento na primeira abertura no pen drive | Varredura inicial | Normal. Depois o catálogo é reaproveitado |
-| `[QUEDA] O servidor do ARENA caiu` | O Windows fechou o Python por uma falha grave | Nada: a janela preta reabre o servidor sozinha (até 3 vezes) e a tela volta sozinha. Leve o arquivo `dados\logs\queda-do-servidor.txt` para o professor: ele diz onde foi |
+| `[QUEDA] O servidor do ARENA caiu` | O Windows fechou o Python (o programa que roda o ARENA) por causa de uma falha grave | Não precisa fazer nada na hora. A janela preta reabre o servidor sozinha (até 3 vezes), e a tela volta sozinha. Depois, leve o arquivo `dados\logs\queda-do-servidor.txt` para o professor. Esse arquivo mostra em que parte do programa foi a queda |
 
 #### Quando o servidor cai ou trava
 
@@ -403,11 +441,17 @@ segurança.
 3. Isso só acontece uma vez por arquivo. Nas próximas aberturas, não
    aparece mais.
 
+**Para não aparecer em nenhum:** desbloqueie o `.zip` **antes** de
+descompactar (botão direito no `.zip` → **Propriedades** → **Desbloquear**
+→ **OK**). Já descompactou? Apague a pasta, desbloqueie o `.zip` e
+descompacte de novo. Não precisa de senha de administrador.
+
 #### Antivírus bloqueando (janela preta abre e fecha na hora)
 
-Cada antivírus tem seu próprio caminho, mas o princípio é sempre "liberar
-a pasta inteira do ARENA como confiável" (nunca precisa desativar o
-antivírus inteiro):
+Cada antivírus tem os seus próprios menus. Mas a ideia é sempre a mesma:
+dizer ao antivírus que a pasta inteira do ARENA é confiável. É como pôr um
+nome na lista de convidados da portaria: a pessoa entra sem ser barrada.
+Você nunca precisa desligar o antivírus inteiro. Faça assim:
 
 1. Abra o programa antivírus instalado no computador.
 2. Procure por **"Exclusões"**, **"Exceções"** ou **"Itens confiáveis"**
@@ -427,9 +471,10 @@ instalar nada a mais):
 Atenção: o Windows pede a senha de administrador nos passos 2 e 3. Aluno
 não tem essa senha — é um passo para o professor ou para o técnico.
 
-Se mesmo assim o ARENA continuar fechando sozinho, peça pro professor
-(com acesso de administrador) fazer esse passo — em computador de escola,
-o antivírus às vezes é gerenciado central e um aluno comum não consegue
-mexer nele.
+Tentou e o ARENA continua fechando sozinho? Peça para o professor fazer esse
+passo. Ele precisa ter acesso de administrador (a conta de quem cuida do
+computador). Em computador de escola, às vezes o antivírus é controlado à
+distância, pela equipe de informática. Aí um aluno comum não consegue mexer
+nele.
 
 ---

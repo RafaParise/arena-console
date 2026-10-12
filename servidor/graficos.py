@@ -129,6 +129,27 @@ VALORES_OBRIGATORIOS = {
 }
 
 
+def _ja_dentro_do_arena(caminho, raiz_baixo):
+    """O caminho aponta para dentro desta pasta do ARENA, para algo que existe?
+
+    "Comeca com a pasta do ARENA" nao basta. Achado de 11/10/2026: a versao
+    dos alunos subiu de ...\\ARENA\\ARENA-alunos para ...\\ARENA, e o caminho
+    velho "...\\ARENA\\ARENA-alunos\\dados\\..." comeca com o novo -- mas a
+    pasta ARENA-alunos nao existe mais (o historico e os favoritos do
+    RetroArch ficaram apontando para o nada). E "...\\ARENA-velho\\dados"
+    tambem "comeca com" "...\\ARENA". Vale se o primeiro pedaco depois da
+    raiz e' uma pasta do ARENA ou existe de verdade.
+    """
+    if not caminho.lower().startswith(raiz_baixo):
+        return False
+    resto = caminho[len(raiz_baixo):]
+    if resto and resto[0] not in "\\/":
+        return False   # "...\ARENA-velho" nao e' "...\ARENA"
+    primeiro = resto.lstrip("\\/").replace("/", "\\").split("\\", 1)[0]
+    return (not primeiro or primeiro.lower() in PASTAS_CONHECIDAS_ARENA
+            or os.path.exists(os.path.join(RAIZ, primeiro)))
+
+
 def corrigir_caminhos_retroarch_cfg():
     """Reescreve, dentro do retroarch.cfg, todo caminho que nao aponta mais
     para a pasta atual do ARENA, e desliga o que nunca pode ficar ligado
@@ -178,21 +199,27 @@ def corrigir_caminhos_retroarch_cfg():
         prefixo, caminho_velho = m.group(1), m.group(2)
         chave = prefixo.split("=", 1)[0].strip()
 
-        if caminho_velho.lower().startswith(raiz_baixo):
+        if _ja_dentro_do_arena(caminho_velho, raiz_baixo):
             continue  # ja aponta pra pasta certa
 
+        # A ULTIMA pasta do ARENA no caminho velho e' a ancora. Antes, a ordem
+        # da lista decidia, e um ARENA guardado dentro de uma pasta chamada
+        # "dados" (D:\dados\ARENA\retroarch\saves) virava
+        # "<ARENA>\dados\ARENA\retroarch\saves". Nos retroarch.cfg de verdade
+        # nenhum caminho tem duas pastas do ARENA dentro (conferido em
+        # 11/10/2026); a pasta de cima com esse nome, sim, acontece.
         velho_baixo = caminho_velho.lower()
+        ancoras = []
         for pasta in PASTAS_CONHECIDAS_ARENA:
-            meio = "\\" + pasta + "\\"
-            indice = velho_baixo.find(meio)
-            if indice == -1 and velho_baixo.endswith("\\" + pasta):
+            indice = velho_baixo.rfind("\\" + pasta + "\\")
+            if velho_baixo.endswith("\\" + pasta):
                 indice = len(velho_baixo) - len(pasta) - 1
-            if indice == -1:
-                continue
-            resto = caminho_velho[indice + 1:]  # sem a barra inicial
+            if indice != -1:
+                ancoras.append(indice)
+        if ancoras:
+            resto = caminho_velho[max(ancoras) + 1:]  # sem a barra inicial
             linhas[i] = '%s"%s"\n' % (prefixo, os.path.join(RAIZ, resto))
             trocados += 1
-            break
         else:
             # Nenhuma pasta do ARENA dentro do caminho velho: se a chave
             # tem lugar certo conhecido, volta para ele.
@@ -1233,6 +1260,15 @@ MOTORES_PCSX2 = {"automatico": "-1", "d3d11": "3", "d3d12": "15", "vulkan": "14"
 PCSX2_SEGUROS = {"hw_mipmap": "true", "TriFilter": "-1", "filter": "2", "HWDownloadMode": "0"}
 
 
+def aviso_sem_gravar(emulador, falha):
+    """A configuracao do emulador nao gravou (pasta somente leitura, disco
+    cheio...): ele abre com a que ja tinha, e a janela preta diz por que.
+    Antes o ARENA ficava calado -- e o controle ou a imagem do jogo
+    "nao obedeciam" sem ninguem saber o motivo (auditoria 3, 07/10/2026)."""
+    print("[ARENA] AVISO: nao consegui gravar a configuracao do %s (%s). "
+          "Ele abre com a que ja tinha." % (emulador, falha))
+
+
 def escrever_config_pcsx2(caminho_executavel, ultra=False, nota=None,
                           nota_gpu=None, modesto=False, preset=None,
                           jogadores=2, controles_xinput=(0, 1),
@@ -1403,7 +1439,8 @@ def escrever_config_pcsx2(caminho_executavel, ultra=False, nota=None,
         os.makedirs(os.path.dirname(destino), exist_ok=True)
         gravar_atomico(destino, texto)
         return destino
-    except OSError:
+    except OSError as falha:
+        aviso_sem_gravar("PCSX2", falha)
         return None
 
 
@@ -1716,7 +1753,8 @@ def escrever_config_dolphin(caminho_executavel, controles_xinput, teclado=True,
                 texto = _trocar_chaves_ini(texto, secao, chaves)
             gravar_atomico(caminho, texto)
         return pasta_config
-    except OSError:
+    except OSError as falha:
+        aviso_sem_gravar("Dolphin", falha)
         return None
 
 
@@ -1943,7 +1981,8 @@ def escrever_config_xenia(caminho_executavel, nota, nota_gpu=None, modesto=False
     try:
         gravar_atomico(destino, texto)
         return destino
-    except OSError:
+    except OSError as falha:
+        aviso_sem_gravar("Xenia", falha)
         return None
 
 
@@ -2111,7 +2150,8 @@ def escrever_config_rpcs3(caminho_executavel, nota, nota_gpu=None, modesto=False
     try:
         gravar_atomico(destino, texto)
         return destino
-    except OSError:
+    except OSError as falha:
+        aviso_sem_gravar("RPCS3", falha)
         return None
 
 
@@ -2277,18 +2317,6 @@ JOGADORES_MULTITAP = 5          # jogador 1 na porta 1 + 4 no adaptador da porta
 NETPLAY_CONEXOES_PADRAO = 3     # o mesmo padrao do RetroArch (netplay_max_connections)
 
 
-def jogo_suporta_multitap(plataforma, titulo):
-    """Confere se ESTE jogo (pelo titulo) esta na lista curada de jogos que
-    aceitam o adaptador Multitap (consoles.json -> jogos_multitap). Lista
-    curta de proposito, do mesmo jeito que o PS2 com 'system link': so
-    cresce testando com jogo real, nunca por suposicao -- a maioria dos
-    jogos de um console nao usa multitap, e mostrar "Jogador 3/4/5" pra
-    eles confundiria o aluno a toa."""
-    lista = plataforma.get("jogos_multitap", [])
-    titulo_normalizado = (titulo or "").lower()
-    return any(nome.lower() in titulo_normalizado for nome in lista)
-
-
 def opcoes_de_partida(apelido, hospedar, atraso=0, assistir=False,
                       pela_internet=False, repasse=REPASSE_PADRAO, jogador=None,
                       multitap=False):
@@ -2315,7 +2343,11 @@ def opcoes_de_partida(apelido, hospedar, atraso=0, assistir=False,
     # caminho que funciona de casa para casa.
     opcoes = {
         "netplay_nickname": (apelido or "jogador")[:24],
-        "netplay_port": str(PORTA_PARTIDA),
+        # A porta vale por AQUI: o "--port" da linha de comando e' ignorado
+        # pelo RetroArch desta pasta. Ate 08/10/2026 a chave ia com o nome
+        # errado ("netplay_port") e so funcionava porque a porta padrao do
+        # RetroArch e' a mesma (auditoria 3, Fase 4).
+        "netplay_ip_port": str(PORTA_PARTIDA),
         # Nunca anunciar a partida na lista publica: quem entra e quem foi
         # convidado, e ninguem mais.
         "netplay_public_announce": "false",
@@ -2331,7 +2363,6 @@ def opcoes_de_partida(apelido, hospedar, atraso=0, assistir=False,
         "netplay_input_latency_frames_range": "6" if pela_internet else "0",
         "netplay_check_frames": "900" if pela_internet else "600",
         "netplay_nat_traversal": "true" if pela_internet else "false",
-        "netplay_stateless_mode": "false",
     }
 
     posicao = 1 if hospedar else int(jogador or JOGADORES_PADRAO_NETPLAY)
@@ -2551,9 +2582,10 @@ def devolver_valores_no_retroarch_cfg(antes):
 def argumentos_de_partida(hospedar, endereco=None, porta=None):
     """Parametros de linha de comando para abrir o jogo em rede.
 
-    A porta vai explicita aqui, alem de estar no arquivo de configuracao.
-    Cinto e suspensorio: se por algum motivo o arquivo de configuracao nao
-    for lido a tempo, a porta da linha de comando ainda vale.
+    A porta vai aqui tambem, mas quem manda e' a chave netplay_ip_port do
+    arquivo (opcoes_de_partida): o RetroArch desta pasta ignora o "--port"
+    -- provado em 08/10/2026, com dois hospedeiros pedindo 55437 e 55438 e
+    os dois escutando na 55435 (testes\\teste_cenarios_sala.py, cenario 3).
     """
     porta = int(porta or PORTA_PARTIDA)
     if hospedar:

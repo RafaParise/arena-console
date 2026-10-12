@@ -6,7 +6,9 @@ Achado de 01/10/2026 (so leitura): o banco desta maquina tem
     "maquina-relogio-errado") -- do teste do relogio errado de 24/09;
   - sessoes com apelido "hospedeiro" e "teste" (21 a 26/09) -- das
     ferramentas antigas que abrem jogo pelo ARENA de verdade
-    (ferramentas\teste_netplay_*.py, teste_memory_card_ps1.py);
+    (ferramentas\teste_netplay_*.py, teste_memory_card_ps1.py; tirados
+    na auditoria 3 -- o que eles conferiam esta em testes\ e na bateria,
+    numa copia isolada);
   - sessoes com apelido "aluno" (22/09) -- podem ser de teste OU do roteiro
     com conta de aluno: so saem com --com-aluno.
 A bateria atual nao grava no banco de verdade (os testes usam copia).

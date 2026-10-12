@@ -32,7 +32,13 @@ def requisicao_post(caminho, corpo):
 
 
 def main():
-    destino = tempfile.mkdtemp(prefix="arena_mala_")
+    # O ARENA de teste numa SUBPASTA: sem caminho (caso 3), a mala vai para
+    # a pasta de cima -- a raiz do pen drive. Com o ARENA direto no
+    # temporario, a mala ficava solta no Temp do Windows a cada rodada
+    # (achado da auditoria 3, 08/10/2026).
+    raiz_temporaria = tempfile.mkdtemp(prefix="arena_mala_")
+    destino = os.path.join(raiz_temporaria, "ARENA")
+    os.makedirs(destino)
     try:
         for pasta in ("servidor", "dados", "launcher"):
             shutil.copytree(os.path.join(RAIZ, pasta), os.path.join(destino, pasta),
@@ -69,8 +75,10 @@ def main():
 
         # Caso 3: sem 'caminho' nenhum -- continua usando o padrao.
         status3, resp3 = requisicao_post("/api/mala", {})
-        caso3_ok = resp3.get("ok")
-        print("Caso 3 (sem caminho, usa o padrao) -- status=%s resp=%s" % (status3, resp3))
+        mala_padrao = os.path.join(raiz_temporaria, "ARENA-troca.json")
+        caso3_ok = resp3.get("ok") and os.path.isfile(mala_padrao)
+        print("Caso 3 (sem caminho, usa o padrao, ao lado da pasta do ARENA) -- status=%s resp=%s "
+              "arquivo_criado=%s" % (status3, resp3, os.path.isfile(mala_padrao)))
 
         servidor.shutdown()
         servidor.server_close()
@@ -80,7 +88,7 @@ def main():
         return 0 if ok else 1
     finally:
         sys.path = [p for p in sys.path if not p.startswith(destino)]
-        shutil.rmtree(destino, ignore_errors=True)
+        shutil.rmtree(raiz_temporaria, ignore_errors=True)
 
 
 if __name__ == "__main__":

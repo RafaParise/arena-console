@@ -1,0 +1,33 @@
+[
+ {
+  "console": "Sega Dreamcast",
+  "jogo": "Armada",
+  "nucleo": "flycast",
+  "normal": {
+   "abre": true,
+   "ate_o_1o_quadro_s": 5.0,
+   "quadros_por_segundo": 48.6,
+   "menor_fps": 38.5,
+   "processador_pct_de_um_nucleo": 32.1,
+   "salva_estado": true,
+   "carrega_estado": true,
+   "foto_kb": 172.6,
+   "mostra_imagem": true,
+   "fecha_certo": true,
+   "save_do_jogo": []
+  },
+  "modesto": {
+   "abre": true,
+   "ate_o_1o_quadro_s": 1.8,
+   "quadros_por_segundo": 48.6,
+   "menor_fps": 37.6,
+   "processador_pct_de_um_nucleo": 31.9,
+   "salva_estado": true,
+   "carrega_estado": true,
+   "foto_kb": 188.2,
+   "mostra_imagem": true,
+   "fecha_certo": true,
+   "save_do_jogo": []
+  }
+ }
+]

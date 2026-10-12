@@ -18,14 +18,20 @@ import time
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(RAIZ, "servidor"))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import controles  # noqa: E402
 import graficos  # noqa: E402
+import jogos_de_teste  # noqa: E402
 
 EXE = os.path.join(RAIZ, "emuladores", "PCSX2", "PCSX2", "pcsx2-qt.exe")
-JOGO = os.path.join(RAIZ, "jogos", "pessoais", "PS2", "Crash Nitro Kart (USA).chd")
+# Pelo ajudante (o professor reorganiza as pastas; o teste nao pode pular calado).
+JOGO = jogos_de_teste.achar("PS2", "Crash Nitro Kart (USA).chd")
 
 
 def main():
+    if not JOGO or not os.path.isfile(EXE):
+        print("FALHOU: sem o PCSX2 ou sem o Crash Nitro Kart (USA).chd em jogos\\pessoais\\PS2.")
+        return 1
     documentos = os.path.join(os.path.expanduser("~"), "OneDrive", "Documents", "PCSX2", "inis", "PCSX2.ini")
     antes_doc = os.path.getmtime(documentos) if os.path.exists(documentos) else None
     log = os.path.join(os.path.dirname(EXE), "logs", "emulog.txt")
@@ -62,5 +68,28 @@ def main():
     return 0 if ok else 1
 
 
+def main_devolvendo_o_ini():
+    """Grava no PCSX2.ini de verdade (precisa: e' o PCSX2 da pasta que abre),
+    mas devolve o original no fim. Achado da rodada da auditoria 3
+    (07/10/2026): este teste deixava o PCSX2 do professor com 4 jogadores e a
+    qualidade de nota 3 -- quem devolvia era a rodada, nao o teste."""
+    ini = os.path.join(os.path.dirname(EXE), "inis", "PCSX2.ini")
+    original = None
+    if os.path.isfile(ini):
+        with open(ini, "rb") as arquivo:
+            original = arquivo.read()
+    try:
+        return main()
+    finally:
+        if original is not None:
+            with open(ini + ".teste.tmp", "wb") as arquivo:
+                arquivo.write(original)
+            os.replace(ini + ".teste.tmp", ini)
+            print("PCSX2.ini de verdade devolvido como estava antes do teste.")
+
+
 if __name__ == "__main__":
-    sys.exit(main())
+    # Os cartoes de memoria, saves e perfis de verdade tambem (Fase 8 da
+    # auditoria 3): ligar um jogo grava neles (o historico no cartao do PS2).
+    import protege_cfg
+    sys.exit(protege_cfg.rodar(main_devolvendo_o_ini, emuladores=True))

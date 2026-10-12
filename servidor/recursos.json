@@ -2,21 +2,21 @@
   "_leia": [
     "Recursos do RetroArch expostos na tela do ARENA.",
     "",
-    "Cada item tem: 'nome' (como aparece), 'explica' (o que faz, sem jargao)",
-    "e 'exemplo' (quando o assunto e tecnico demais).",
+    "Cada item tem: 'nome' (como aparece), 'explica' (o que faz, sem jargão)",
+    "e 'exemplo' (quando o assunto é técnico demais).",
     "",
-    "'nota_minima' esconde o recurso em maquina que nao aguenta: menos e",
-    "mais, e ninguem precisa ver botao que so vai atrapalhar.",
-    "'custo' e so informativo: nada, baixo, medio, alto.",
+    "'nota_minima' esconde o recurso em máquina que não aguenta: menos é",
+    "mais, e ninguém precisa ver botão que só vai atrapalhar.",
+    "'custo' é só informativo: nada, baixo, médio, alto.",
     "",
-    "Voce pode editar este arquivo. Chave que o RetroArch nao reconhece e",
+    "Você pode editar este arquivo. Chave que o RetroArch não reconhece é",
     "ignorada sem quebrar nada."
   ],
   "grupos": [
     {
       "id": "resposta",
       "nome": "Resposta do controle",
-      "resumo": "O tempo entre apertar o botao e a coisa acontecer na tela."
+      "resumo": "O tempo entre apertar o botão e a coisa acontecer na tela."
     },
     {
       "id": "imagem",
@@ -26,7 +26,7 @@
     {
       "id": "som",
       "nome": "Som",
-      "resumo": "Volume, atraso e qualidade do audio."
+      "resumo": "Volume, atraso e qualidade do áudio."
     },
     {
       "id": "controle",
@@ -36,7 +36,7 @@
     {
       "id": "jogatina",
       "nome": "Enquanto joga",
-      "resumo": "Recursos que voce usa no meio da partida."
+      "resumo": "Recursos que você usa no meio da partida."
     },
     {
       "id": "sistema",
@@ -48,12 +48,12 @@
     {
       "chave": "run_ahead_enabled",
       "grupo": "resposta",
-      "nome": "Resposta instantanea",
+      "nome": "Resposta instantânea",
       "tipo": "bool",
       "custo": "alto",
       "nota_minima": 4,
-      "explica": "Tira o atraso natural que todo console tem entre o botao e a tela.",
-      "exemplo": "O console de verdade demora 2 ou 3 quadros para reagir. Com isso ligado, o emulador roda esses quadros escondido e mostra o resultado na hora. O soco sai mais rapido do que saia no aparelho original."
+      "explica": "Tira o atraso natural que todo console tem entre o botão e a tela.",
+      "exemplo": "O console de verdade demora 2 ou 3 quadros para reagir. Com isso ligado, o emulador roda esses quadros escondido e mostra o resultado na hora. O soco sai mais rápido do que saía no aparelho original."
     },
     {
       "chave": "run_ahead_frames",
@@ -67,8 +67,8 @@
       ],
       "custo": "alto",
       "nota_minima": 4,
-      "explica": "Quanto maior, mais rapida a resposta e mais pesado fica.",
-      "exemplo": "Comece em 1. Se o jogo aguentar e voce quiser mais resposta, suba para 2. Acima disso, quase todo jogo comeca a engasgar."
+      "explica": "Quanto maior, mais rápida a resposta e mais pesado fica.",
+      "exemplo": "Comece em 1. Se o jogo aguentar e você quiser mais resposta, suba para 2. Acima disso, quase todo jogo começa a engasgar."
     },
     {
       "chave": "run_ahead_secondary_instance",
@@ -77,8 +77,8 @@
       "tipo": "bool",
       "custo": "alto",
       "nota_minima": 5,
-      "explica": "Roda uma segunda copia do emulador so para adiantar, em vez de voltar no tempo.",
-      "exemplo": "Deixa o som melhor e o jogo mais estavel, mas usa quase o dobro de processador. So em PC forte."
+      "explica": "Roda uma segunda cópia do emulador só para adiantar, em vez de voltar no tempo.",
+      "exemplo": "Deixa o som melhor e o jogo mais estável, mas usa quase o dobro de processador. Só em PC forte."
     },
     {
       "chave": "input_poll_type_behavior",
@@ -91,7 +91,7 @@
         "2"
       ],
       "custo": "nada",
-      "explica": "Deixe no 2. E o que faz o ARENA perguntar ao controle no ultimo instante possivel.",
+      "explica": "Deixe no 2. É o que faz o ARENA perguntar ao controle no último instante possível.",
       "exemplo": "0 pergunta cedo demais e perde a metade do seu aperto. 2 pergunta na hora exata."
     },
     {
@@ -100,8 +100,8 @@
       "nome": "Esperar antes de desenhar",
       "tipo": "bool",
       "custo": "baixo",
-      "explica": "O emulador espera o maximo que pode antes de desenhar, para pegar seu comando mais tarde.",
-      "exemplo": "Ligado, ele mede sozinho quanto da para esperar sem atrasar a imagem. Deixe ligado."
+      "explica": "O emulador espera o máximo que pode antes de desenhar, para pegar seu comando mais tarde.",
+      "exemplo": "Ligado, ele mede sozinho quanto dá para esperar sem atrasar a imagem. Deixe ligado."
     },
     {
       "chave": "video_frame_delay",
@@ -116,8 +116,8 @@
         "8"
       ],
       "custo": "medio",
-      "explica": "So funciona com a espera automatica desligada.",
-      "exemplo": "Cada numero e 1 milissegundo a menos de atraso. Se o jogo comecar a engasgar, voltou longe demais."
+      "explica": "Só funciona com a espera automática desligada.",
+      "exemplo": "Cada número é 1 milissegundo a menos de atraso. Se o jogo começar a engasgar, voltou longe demais."
     },
     {
       "chave": "video_max_swapchain_images",
@@ -130,21 +130,21 @@
       ],
       "custo": "nada",
       "explica": "Quantas imagens ficam prontas esperando a vez de aparecer.",
-      "exemplo": "2 = a imagem chega mais rapido na tela. 3 = trava menos em PC fraco. Vale em Vulkan e D3D11."
+      "exemplo": "2 = a imagem chega mais rápido na tela. 3 = trava menos em PC fraco. Vale em Vulkan e D3D11."
     },
     {
       "chave": "video_hard_sync",
       "grupo": "resposta",
-      "nome": "Sincronia rigida",
+      "nome": "Sincronia rígida",
       "tipo": "bool",
       "custo": "medio",
-      "explica": "Obriga a placa de video a terminar cada quadro antes de comecar o proximo.",
-      "exemplo": "Corta o atraso, mas so funciona em OpenGL. Em Vulkan use a Fila de imagens."
+      "explica": "Obriga a placa de vídeo a terminar cada quadro antes de começar o próximo.",
+      "exemplo": "Corta o atraso, mas só funciona em OpenGL. Em Vulkan use a Fila de imagens."
     },
     {
       "chave": "video_driver",
       "grupo": "imagem",
-      "nome": "Motor grafico",
+      "nome": "Motor gráfico",
       "tipo": "lista",
       "opcoes": [
         "automatico",
@@ -153,8 +153,8 @@
         "glcore"
       ],
       "custo": "nada",
-      "explica": "Por onde o jogo fala com a placa de video.",
-      "exemplo": "Deixe no automatico. Vulkan e o caminho mais curto, mas placa antiga nao tem. O ARENA testa e escolhe o que existe."
+      "explica": "Por onde o jogo fala com a placa de vídeo.",
+      "exemplo": "Deixe no automático. Vulkan é o caminho mais curto, mas placa antiga não tem. O ARENA testa e escolhe o que existe."
     },
     {
       "chave": "video_fullscreen",
@@ -162,8 +162,8 @@
       "nome": "Tela cheia",
       "tipo": "bool",
       "custo": "nada",
-      "explica": "Comeca o jogo ocupando a tela toda.",
-      "exemplo": "Igual apertar o botao de tela cheia no YouTube. Desligado, o jogo fica numa janelinha que voce pode arrastar."
+      "explica": "Começa o jogo ocupando a tela toda.",
+      "exemplo": "Igual apertar o botão de tela cheia no YouTube. Desligado, o jogo fica numa janelinha que você pode arrastar."
     },
     {
       "chave": "video_scale_integer",
@@ -180,8 +180,8 @@
       "nome": "Suavizar",
       "tipo": "bool",
       "custo": "nada",
-      "explica": "Ligado borra um pouco. Desligado fica quadradinho e nitido.",
-      "exemplo": "Pense numa foto pequena ampliada: ligado, ela fica lisinha e meio borrada; desligado, da para contar os quadradinhos."
+      "explica": "Ligado borra um pouco. Desligado fica quadradinho e nítido.",
+      "exemplo": "Pense numa foto pequena ampliada: ligado, ela fica lisinha e meio borrada; desligado, dá para contar os quadradinhos."
     },
     {
       "chave": "video_shader_enable",
@@ -190,8 +190,8 @@
       "tipo": "bool",
       "custo": "baixo",
       "nota_minima": 3,
-      "explica": "Nos consoles 2D, deixa todo pixel do mesmo tamanho e nitido em qualquer tela, ate 4K. Console 3D fica sem filtro.",
-      "exemplo": "E o que o ReShade faz em jogos de PC, so que feito para emulador e bem mais leve. Sem ele, esticar um jogo de Super Nintendo deixa uns quadradinhos mais largos que outros."
+      "explica": "Nos consoles 2D, deixa todo pixel do mesmo tamanho e nítido em qualquer tela, até 4K. Console 3D fica sem filtro.",
+      "exemplo": "É o que o ReShade faz em jogos de PC, só que feito para emulador e bem mais leve. Sem ele, esticar um jogo de Super Nintendo deixa uns quadradinhos mais largos que outros."
     },
     {
       "chave": "video_vsync",
@@ -199,8 +199,8 @@
       "nome": "Sincronizar com o monitor",
       "tipo": "bool",
       "custo": "nada",
-      "explica": "Tira o rasgo horizontal que aparece quando voce anda rapido.",
-      "exemplo": "Sabe quando voce gira a camera e a tela parece rasgada ao meio, com a parte de cima atrasada? Isso some com essa opcao ligada."
+      "explica": "Tira o rasgo horizontal que aparece quando você anda rápido.",
+      "exemplo": "Sabe quando você gira a câmera e a tela parece rasgada ao meio, com a parte de cima atrasada? Isso some com essa opção ligada."
     },
     {
       "chave": "video_swap_interval",
@@ -213,8 +213,8 @@
         "3"
       ],
       "custo": "nada",
-      "explica": "1 e o normal.",
-      "exemplo": "Se seu monitor e de 120 Hz e o jogo e de 60, use 2 para casar direitinho."
+      "explica": "1 é o normal.",
+      "exemplo": "Se o seu monitor é de 120 Hz e o jogo é de 60, use 2 para casar direitinho."
     },
     {
       "chave": "video_threaded",
@@ -223,12 +223,12 @@
       "tipo": "bool",
       "custo": "nada",
       "explica": "Ligue se o jogo estiver travando. O controle fica um tiquinho mais lento.",
-      "exemplo": "E como ter alguem so para desenhar enquanto outro cuida do jogo. Trava menos, mas o desenhista as vezes esta um passo atras do que voce apertou."
+      "exemplo": "É como ter alguém só para desenhar enquanto outro cuida do jogo. Trava menos, mas o desenhista às vezes está um passo atrás do que você apertou."
     },
     {
       "chave": "video_black_frame_insertion",
       "grupo": "imagem",
-      "nome": "Reduzir borrao de movimento",
+      "nome": "Reduzir borrão de movimento",
       "tipo": "lista",
       "opcoes": [
         "0",
@@ -238,7 +238,7 @@
       "custo": "medio",
       "nota_minima": 4,
       "explica": "Pisca um quadro preto entre os quadros do jogo.",
-      "exemplo": "Deixa o movimento mais nitido, do jeito que era na TV de tubo. Escurece a tela e so vale em monitor de 120 Hz para cima."
+      "exemplo": "Deixa o movimento mais nítido, do jeito que era na TV de tubo. Escurece a tela e só vale em monitor de 120 Hz para cima."
     },
     {
       "chave": "video_font_enable",
@@ -246,8 +246,8 @@
       "nome": "Avisos na tela",
       "tipo": "bool",
       "custo": "nada",
-      "explica": "Aquelas mensagens que aparecem no canto quando voce salva.",
-      "exemplo": "Aquele 'Estado salvo no espaco 3' que aparece no canto. Desligue se te atrapalha na hora de gravar video."
+      "explica": "Aquelas mensagens que aparecem no canto quando você salva.",
+      "exemplo": "Aquele 'Estado salvo no espaço 3' que aparece no canto. Desligue se ele atrapalha a foto da tela (F8)."
     },
     {
       "chave": "fps_show",
@@ -255,8 +255,8 @@
       "nome": "Mostrar quadros por segundo",
       "tipo": "bool",
       "custo": "nada",
-      "explica": "Numero no canto da tela.",
-      "exemplo": "Serve para conferir se esta rodando liso. Se ficar abaixo do que o console pede, e porque esta travando."
+      "explica": "Número no canto da tela.",
+      "exemplo": "Serve para conferir se está rodando liso. Se ficar abaixo do que o console pede, é porque está travando."
     },
     {
       "chave": "audio_enable",
@@ -265,12 +265,12 @@
       "tipo": "bool",
       "custo": "nada",
       "explica": "Desligue se o som estiver falhando muito.",
-      "exemplo": "Mudo total. Serve quando o som esta chiando tanto que atrapalha mais do que ajuda, ou quando voce quer ouvir outra coisa."
+      "exemplo": "Mudo total. Serve quando o som está chiando tanto que atrapalha mais do que ajuda, ou quando você quer ouvir outra coisa."
     },
     {
       "chave": "audio_driver",
       "grupo": "som",
-      "nome": "Motor de audio",
+      "nome": "Motor de áudio",
       "tipo": "lista",
       "opcoes": [
         "wasapi",
@@ -278,18 +278,18 @@
         "dsound"
       ],
       "custo": "nada",
-      "explica": "Deixe no wasapi. E o caminho mais curto ate a placa de som no Windows.",
-      "exemplo": "Sao caminhos diferentes ate a caixa de som. wasapi e a estrada nova; dsound e a estrada velha, mais lenta mas que existe em qualquer PC."
+      "explica": "Deixe no wasapi. É o caminho mais curto até a placa de som no Windows.",
+      "exemplo": "São caminhos diferentes até a caixa de som. wasapi é a estrada nova; dsound é a estrada velha, mais lenta mas que existe em qualquer PC."
     },
     {
       "chave": "audio_wasapi_exclusive_mode",
       "grupo": "som",
-      "nome": "Som so para o jogo",
+      "nome": "Som só para o jogo",
       "tipo": "bool",
       "custo": "nada",
       "nota_minima": 3,
       "explica": "O jogo toma a placa de som para ele.",
-      "exemplo": "O som fica mais rapido e mais limpo, mas nada mais toca enquanto voce joga: nem musica, nem video, nem chamada."
+      "exemplo": "O som fica mais rápido e mais limpo, mas nada mais toca enquanto você joga: nem música, nem vídeo, nem chamada."
     },
     {
       "chave": "audio_latency",
@@ -305,8 +305,8 @@
         "192"
       ],
       "custo": "nada",
-      "explica": "Som falhando? Aumente. Som atrasado em relacao a imagem? Diminua.",
-      "exemplo": "O numero e em milissegundos. 64 e o meio-termo. Abaixo de 32 so em PC bom, senao comeca a estalar."
+      "explica": "Som falhando? Aumente. Som atrasado em relação à imagem? Diminua.",
+      "exemplo": "O número é em milissegundos. 64 é o meio-termo. Abaixo de 32 só em PC bom, senão começa a estalar."
     },
     {
       "chave": "audio_sync",
@@ -314,8 +314,8 @@
       "nome": "Casar som com imagem",
       "tipo": "bool",
       "custo": "nada",
-      "explica": "Segura a velocidade do jogo para o som nao ficar acelerado.",
-      "exemplo": "Deixe ligado. Desligado, o jogo pode rodar mais rapido que a musica."
+      "explica": "Segura a velocidade do jogo para o som não ficar acelerado.",
+      "exemplo": "Deixe ligado. Desligado, o jogo pode rodar mais rápido que a música."
     },
     {
       "chave": "audio_resampler_quality",
@@ -328,8 +328,8 @@
         "5"
       ],
       "custo": "baixo",
-      "explica": "Quao caprichado e o ajuste do som do console para a sua placa.",
-      "exemplo": "1 e o mais leve, 5 o mais fiel. A diferenca so aparece em fone bom."
+      "explica": "Quão caprichado é o ajuste do som do console para a sua placa.",
+      "exemplo": "1 é o mais leve, 5 o mais fiel. A diferença só aparece em fone bom."
     },
     {
       "chave": "audio_volume",
@@ -345,8 +345,8 @@
         "6"
       ],
       "custo": "nada",
-      "explica": "0 e o volume normal. Negativo abaixa, positivo aumenta.",
-      "exemplo": "So mexa se o jogo estiver muito mais alto ou mais baixo que o resto do computador. Cada -6 corta o volume pela metade."
+      "explica": "0 é o volume normal. Negativo abaixa, positivo aumenta.",
+      "exemplo": "Só mexa se o jogo estiver muito mais alto ou mais baixo que o resto do computador. Cada -6 corta o volume pela metade."
     },
     {
       "chave": "input_joypad_driver",
@@ -358,8 +358,8 @@
         "dinput"
       ],
       "custo": "nada",
-      "explica": "xinput cobre Xbox, PS4, PS5 e Switch Pro. Troque para dinput se o seu for antigo e nao aparecer.",
-      "exemplo": "Sao dois idiomas que o Windows usa para falar com controle. Controle novo fala xinput; controle velho fala dinput. Se o seu nao aparece, ele fala o outro idioma."
+      "explica": "xinput cobre Xbox, PS4, PS5 e Switch Pro. Troque para dinput se o seu for antigo e não aparecer.",
+      "exemplo": "São dois idiomas que o Windows usa para falar com controle. Controle novo fala xinput; controle velho fala dinput. Se o seu não aparece, ele fala o outro idioma."
     },
     {
       "chave": "input_autodetect_enable",
@@ -367,8 +367,8 @@
       "nome": "Reconhecer sozinho",
       "tipo": "bool",
       "custo": "nada",
-      "explica": "Configura o controle na hora que voce plugar.",
-      "exemplo": "Igual plugar um pendrive e o Windows ja reconhecer. Deixe ligado: sem isso voce teria que configurar cada botao na mao toda vez."
+      "explica": "Configura o controle na hora que você plugar.",
+      "exemplo": "Igual plugar um pen drive e o Windows já reconhecer. Deixe ligado: sem isso você teria que configurar cada botão na mão toda vez."
     },
     {
       "chave": "input_max_users",
@@ -382,8 +382,8 @@
         "8"
       ],
       "custo": "nada",
-      "explica": "Quantas pessoas vao jogar juntas nesta maquina.",
-      "exemplo": "Quantos controles o jogo vai escutar. Deixe em 2 se voce joga com um amigo no mesmo PC. Em 1, o segundo controle simplesmente nao faz nada."
+      "explica": "Quantas pessoas vão jogar juntas nesta máquina.",
+      "exemplo": "Quantos controles o jogo vai escutar. Deixe em 2 se você joga com um amigo no mesmo PC. Em 1, o segundo controle simplesmente não faz nada."
     },
     {
       "chave": "input_menu_toggle_gamepad_combo",
@@ -401,7 +401,7 @@
       ],
       "custo": "nada",
       "explica": "Sem teclado por perto? Deixe no 2 e aperte Start + Select juntos.",
-      "exemplo": "Serve para quando o teclado esta longe ou voce esta jogando na TV. Com 2, Start e Select juntos abrem o menu, sem levantar do sofa."
+      "exemplo": "Serve para quando o teclado está longe ou você está jogando na TV. Com 2, Start e Select juntos abrem o menu, sem levantar do sofá."
     },
     {
       "chave": "input_turbo_period",
@@ -415,13 +415,13 @@
         "12"
       ],
       "custo": "nada",
-      "explica": "Menor = o botao turbo atira mais rapido.",
-      "exemplo": "O botao turbo aperta sozinho, sem parar. Em 3 ele dispara rapido demais e alguns jogos nem registram; 6 e o que costuma funcionar."
+      "explica": "Menor = o botão turbo atira mais rápido.",
+      "exemplo": "O botão turbo aperta sozinho, sem parar. Em 3 ele dispara rápido demais e alguns jogos nem registram; 6 é o que costuma funcionar."
     },
     {
       "chave": "input_analog_deadzone",
       "grupo": "controle",
-      "nome": "Folga do analogico",
+      "nome": "Folga do analógico",
       "tipo": "lista",
       "opcoes": [
         "0.0",
@@ -430,13 +430,13 @@
         "0.3"
       ],
       "custo": "nada",
-      "explica": "Quanto o analogico precisa sair do centro para o jogo perceber.",
-      "exemplo": "Se o personagem anda sozinho com o controle parado, o analogico esta gasto. Suba para 0.2."
+      "explica": "Quanto o analógico precisa sair do centro para o jogo perceber.",
+      "exemplo": "Se o personagem anda sozinho com o controle parado, o analógico está gasto. Suba para 0.2."
     },
     {
       "chave": "input_analog_sensitivity",
       "grupo": "controle",
-      "nome": "Sensibilidade do analogico",
+      "nome": "Sensibilidade do analógico",
       "tipo": "lista",
       "opcoes": [
         "1.0",
@@ -445,8 +445,8 @@
         "2.0"
       ],
       "custo": "nada",
-      "explica": "Multiplica o quanto voce inclinou.",
-      "exemplo": "Suba se o analogico nao chega no maximo. Passar de 1.5 costuma deixar o movimento nervoso."
+      "explica": "Multiplica o quanto você inclinou.",
+      "exemplo": "Suba se o analógico não chega no máximo. Passar de 1.5 costuma deixar o movimento nervoso."
     },
     {
       "chave": "rewind_enable",
@@ -455,13 +455,13 @@
       "tipo": "bool",
       "custo": "alto",
       "nota_minima": 3,
-      "explica": "Segure a tecla e o jogo volta como um video de tras para frente.",
-      "exemplo": "Caiu no buraco? Segura e volta dois segundos antes do pulo. Come memoria enquanto esta ligado."
+      "explica": "Segure a tecla e o jogo volta como um vídeo de trás para frente.",
+      "exemplo": "Caiu no buraco? Segura e volta dois segundos antes do pulo. Come memória enquanto está ligado."
     },
     {
       "chave": "rewind_buffer_size",
       "grupo": "jogatina",
-      "nome": "Quanto da para voltar",
+      "nome": "Quanto dá para voltar",
       "tipo": "lista",
       "opcoes": [
         "10",
@@ -470,13 +470,13 @@
       ],
       "custo": "alto",
       "nota_minima": 3,
-      "explica": "Em megabytes de memoria.",
-      "exemplo": "20 MB dao uns 10 segundos em jogo 16 bits, bem menos em jogo 3D."
+      "explica": "Em megabytes de memória.",
+      "exemplo": "20 MB dão uns 10 segundos em jogo 16 bits, bem menos em jogo 3D."
     },
     {
       "chave": "fastforward_ratio",
       "grupo": "jogatina",
-      "nome": "Limite do avanco rapido",
+      "nome": "Limite do avanço rápido",
       "tipo": "lista",
       "opcoes": [
         "0.0",
@@ -485,13 +485,13 @@
         "8.0"
       ],
       "custo": "nada",
-      "explica": "Quantas vezes mais rapido quando voce segura o avanco.",
-      "exemplo": "0.0 = sem limite, vai o quanto o PC aguentar. Use 4.0 para pular dialogo sem perder o audio inteiro."
+      "explica": "Quantas vezes mais rápido quando você segura o avanço.",
+      "exemplo": "0.0 = sem limite, vai o quanto o PC aguentar. Use 4.0 para pular diálogo sem perder o áudio inteiro."
     },
     {
       "chave": "slowmotion_ratio",
       "grupo": "jogatina",
-      "nome": "Camera lenta",
+      "nome": "Câmera lenta",
       "tipo": "lista",
       "opcoes": [
         "2.0",
@@ -500,7 +500,7 @@
       ],
       "custo": "nada",
       "explica": "Quantas vezes mais devagar.",
-      "exemplo": "Serve para passar aquele trecho impossivel, ou para ver de onde veio o golpe."
+      "exemplo": "Serve para passar aquele trecho impossível, ou para ver de onde veio o golpe."
     },
     {
       "chave": "savestate_auto_save",
@@ -508,8 +508,8 @@
       "nome": "Salvar ao sair",
       "tipo": "bool",
       "custo": "baixo",
-      "explica": "Grava sozinho quando voce fecha o jogo.",
-      "exemplo": "Bom no PC. No pen drive, cada saida vira uma gravacao grande - deixe desligado."
+      "explica": "Grava sozinho quando você fecha o jogo.",
+      "exemplo": "Bom no PC. No pen drive, cada saída vira uma gravação grande - deixe desligado."
     },
     {
       "chave": "savestate_auto_load",
@@ -517,8 +517,8 @@
       "nome": "Continuar de onde parou",
       "tipo": "bool",
       "custo": "nada",
-      "explica": "Abre o jogo exatamente onde voce fechou. So funciona com o de cima ligado.",
-      "exemplo": "O jogo abre exatamente onde voce parou, sem voce apertar nada. Como fechar um livro com o dedo na pagina."
+      "explica": "Abre o jogo exatamente onde você fechou. Só funciona com o de cima ligado.",
+      "exemplo": "O jogo abre exatamente onde você parou, sem você apertar nada. Como fechar um livro com o dedo na página."
     },
     {
       "chave": "savestate_thumbnail_enable",
@@ -526,8 +526,8 @@
       "nome": "Foto no save",
       "tipo": "bool",
       "custo": "baixo",
-      "explica": "Guarda uma imagem junto de cada save, para voce reconhecer qual e qual.",
-      "exemplo": "Util com 10 saves. Cada foto sao alguns KB a mais."
+      "explica": "Guarda uma imagem junto de cada save, para você reconhecer qual é qual.",
+      "exemplo": "Útil com 10 saves. Cada foto são alguns KB a mais."
     },
     {
       "chave": "quick_menu_show_cheats",
@@ -535,8 +535,8 @@
       "nome": "Mostrar cheats no menu",
       "tipo": "bool",
       "custo": "nada",
-      "explica": "Deixa a lista de codigos aparecer quando voce aperta Esc.",
-      "exemplo": "Se voce nao usa codigo nenhum, desligue e o menu do Esc fica com um item a menos para procurar."
+      "explica": "Deixa a lista de códigos aparecer quando você aperta Esc.",
+      "exemplo": "Se você não usa código nenhum, desligue e o menu do Esc fica com um item a menos para procurar."
     },
     {
       "chave": "apply_cheats_after_load",
@@ -544,13 +544,13 @@
       "nome": "Ligar cheats ao carregar",
       "tipo": "bool",
       "custo": "nada",
-      "explica": "Reaplica os codigos ligados depois que voce volta um save.",
-      "exemplo": "Sem isso, toda vez que voce volta um save os codigos desligam sozinhos e voce tem que ligar de novo. Com isso, continuam valendo."
+      "explica": "Reaplica os códigos ligados depois que você volta um save.",
+      "exemplo": "Sem isso, toda vez que você volta um save os códigos desligam sozinhos e você tem que ligar de novo. Com isso, continuam valendo."
     },
     {
       "chave": "menu_driver",
       "grupo": "sistema",
-      "nome": "Aparencia do menu",
+      "nome": "Aparência do menu",
       "tipo": "lista",
       "opcoes": [
         "rgui",
@@ -558,8 +558,8 @@
         "xmb"
       ],
       "custo": "baixo",
-      "explica": "rgui e o mais leve e feio. ozone e bonito e leve. xmb e o mais bonito e mais pesado.",
-      "exemplo": "So muda a aparencia do menu do Esc, nada do jogo. rgui e texto puro e abre na hora; xmb tem icone grande e demora um pouquinho."
+      "explica": "rgui é o mais leve e feio. ozone é bonito e leve. xmb é o mais bonito e mais pesado.",
+      "exemplo": "Só muda a aparência do menu do Esc, nada do jogo. rgui é texto puro e abre na hora; xmb tem ícone grande e demora um pouquinho."
     },
     {
       "chave": "pause_nonactive",
@@ -567,8 +567,8 @@
       "nome": "Pausar quando sair da janela",
       "tipo": "bool",
       "custo": "nada",
-      "explica": "Deixe DESLIGADO. Ligado, o jogo pode ficar parado avancando so um quadro por vez.",
-      "exemplo": "O emulador pausa quando acha que a janela dele nao esta na frente. Em varios computadores de escola ele nunca acha que esta, e o jogo fica travado - avanca um quadro a cada alt+tab. Ligue so se voce quiser mesmo que o jogo pare quando voce troca de janela."
+      "explica": "Deixe DESLIGADO. Ligado, o jogo pode ficar parado, avançando só um quadro por vez.",
+      "exemplo": "O emulador pausa quando acha que a janela dele não está na frente. Em vários computadores de escola ele nunca acha que está, e o jogo fica travado - avança um quadro a cada alt+tab. Ligue só se você quiser mesmo que o jogo pare quando você troca de janela."
     },
     {
       "chave": "check_firmware_before_loading",
@@ -577,7 +577,7 @@
       "tipo": "bool",
       "custo": "baixo",
       "explica": "Verifica os arquivos de sistema toda vez que abre um jogo.",
-      "exemplo": "Deixe desligado. O ARENA ja avisa com a bolinha amarela, e a conferencia le o disco a toa."
+      "exemplo": "Deixe desligado. O ARENA já avisa com a bolinha amarela, e a conferência lê o disco à toa."
     },
     {
       "chave": "config_save_on_exit",
@@ -585,22 +585,22 @@
       "nome": "Guardar o que eu mexer",
       "tipo": "bool",
       "custo": "nada",
-      "explica": "Salva suas mudancas de dentro do jogo ao fechar.",
-      "exemplo": "Deixe ligado. E o que faz o mapeamento do seu controle continuar valendo amanha."
+      "explica": "Salva suas mudanças de dentro do jogo ao fechar.",
+      "exemplo": "Deixe ligado. É o que faz o mapeamento do seu controle continuar valendo amanhã."
     },
     {
       "chave": "auto_remaps_enable",
       "grupo": "sistema",
-      "nome": "Botoes por jogo",
+      "nome": "Botões por jogo",
       "tipo": "bool",
       "custo": "nada",
-      "explica": "Deixa voce trocar os botoes so num jogo, sem bagunçar os outros.",
-      "exemplo": "Trocou pulo e tiro num jogo de plataforma? Fica so nele."
+      "explica": "Deixa você trocar os botões só num jogo, sem bagunçar os outros.",
+      "exemplo": "Trocou pulo e tiro num jogo de plataforma? Fica só nele."
     },
     {
       "chave": "input_player1_analog_dpad_mode",
       "grupo": "controle",
-      "nome": "Analogico tambem anda (jogador 1)",
+      "nome": "Analógico também anda (jogador 1)",
       "tipo": "lista",
       "opcoes": [
         "0",
@@ -608,13 +608,13 @@
         "2"
       ],
       "custo": "nada",
-      "explica": "Deixe no 1. O analogico passa a valer como direcional, e o direcional continua funcionando.",
-      "exemplo": "Jogo de PlayStation 1 antigo nao entende analogico: se voce so tiver analogico, o personagem nao anda. Com 1, os dois funcionam ao mesmo tempo e voce usa o que preferir."
+      "explica": "Deixe no 1. O analógico passa a valer como direcional, e o direcional continua funcionando.",
+      "exemplo": "Jogo de PlayStation 1 antigo não entende analógico: se você só tiver analógico, o personagem não anda. Com 1, os dois funcionam ao mesmo tempo e você usa o que preferir."
     },
     {
       "chave": "input_player2_analog_dpad_mode",
       "grupo": "controle",
-      "nome": "Analogico tambem anda (jogador 2)",
+      "nome": "Analógico também anda (jogador 2)",
       "tipo": "lista",
       "opcoes": [
         "0",
@@ -623,12 +623,12 @@
       ],
       "custo": "nada",
       "explica": "O mesmo do de cima, para o segundo controle.",
-      "exemplo": "Vale a pena deixar igual ao do jogador 1, senao um joga de um jeito e o outro de outro."
+      "exemplo": "Vale a pena deixar igual ao do jogador 1, senão um joga de um jeito e o outro de outro."
     },
     {
       "chave": "input_rumble_gain",
       "grupo": "controle",
-      "nome": "Forca da vibracao",
+      "nome": "Força da vibração",
       "tipo": "lista",
       "opcoes": [
         "0",
@@ -638,8 +638,8 @@
         "100"
       ],
       "custo": "nada",
-      "explica": "0 desliga. 100 e a vibracao cheia.",
-      "exemplo": "Funciona em Xbox, PS4, PS5 e Switch Pro por cabo. Em controle generico depende do modelo - se o seu nao vibra, nao e o ARENA."
+      "explica": "0 desliga. 100 é a vibração cheia.",
+      "exemplo": "Funciona em Xbox, PS4, PS5 e Switch Pro por cabo. Em controle genérico depende do modelo - se o seu não vibra, não é o ARENA."
     }
   ]
 }

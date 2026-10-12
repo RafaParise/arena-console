@@ -13,6 +13,8 @@ import urllib.error
 import urllib.request
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(RAIZ, "testes"))
+import limpeza  # noqa: E402
 URL = "http://127.0.0.1:8777"
 
 
@@ -84,7 +86,8 @@ def main():
         if processo:
             processo.kill()
         time.sleep(0.5)
-        shutil.rmtree(destino, ignore_errors=True)
+        # shutil.rmtree calado desistia de arquivo somente leitura ou preso (a rodada da auditoria 3 achava esta pasta no Temp).
+        limpeza.apagar_pasta(destino)
 
 
 if __name__ == "__main__":

@@ -7,10 +7,15 @@ entao nao podem rodar juntos). Anota codigo de saida e tempo de cada um em
 docs\rodada_final_bruta.json.
 
 Uso:
-    servidor\python\python.exe ferramentas\rodada_final.py [pedaco do nome ...]
+    servidor\python\python.exe ferramentas\rodada_final.py [pedaco do nome ...] [--saida=<arquivo.json>] [--continuar]
 
 Com pedacos de nome, roda so os scripts que tem algum deles no nome (para
 repetir os que falharam sem esperar a rodada inteira).
+
+--saida (auditoria 3, 07/10/2026): grava o resultado nesse arquivo DEPOIS DE
+CADA script, e nao so no fim -- em 02/10 e 03/10 a rodada foi morta no meio
+por falta de memoria e tudo o que ja tinha passado se perdeu. Com
+--continuar, pula os scripts que ja estao no arquivo (retoma de onde parou).
 """
 import glob
 import json
@@ -23,11 +28,15 @@ RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PYTHON = os.path.join(RAIZ, "servidor", "python", "python.exe")
 sys.path.insert(0, os.path.join(RAIZ, "testes"))
 import limpeza  # noqa: E402  (pastas que um teste esquece no Temp)
+import protege_cfg  # noqa: E402  (o que um jogo grava: cartoes, perfis, historico)
 LIMITE_S = 900  # 15 min por script; o mais lento (5 RetroArch) leva bem menos
 LIMITES_ESPECIAIS = {
     # Abre CADA jogo do catalogo, e o catalogo cresceu (62 jogos em 25/09,
     # 129 em 01/10): ~45 s por jogo nos consoles com Jogar Junto.
     os.path.join("testes", "teste_abrir_todos.py"): 3600,
+    # Abre CADA jogo de PS2 da pasta (37 em 10/10/2026), ~20 s cada, mais os
+    # niveis de qualidade em 3 jogos; o jogo que nao comeca espera 60 s.
+    os.path.join("testes", "teste_ps2_todos_os_jogos.py"): 2700,
 }
 
 # Arquivos DE VERDADE que nenhum teste deveria mudar. O retroarch.cfg volta
@@ -42,6 +51,13 @@ DEVOLVIDOS = [os.path.join("retroarch", "retroarch.cfg"),
 VIGIADOS = DEVOLVIDOS + [
     os.path.join("dados", nome) for nome in ("arena.db", "config.json", "controles.json", "jogadores.txt",
                                              "consoles_manuais.json")]
+# Achado da Fase 8 da auditoria 3 (12/10/2026): os testes que ligam jogo
+# mudavam dado de quem joga -- os cartoes de memoria do PS2, o perfil do
+# Xbox 360, os dados do Wii, o historico do RetroArch -- e a rodada nao via.
+# Agora cada arquivo dessas pastas e' apontado (tamanho e data). Quem
+# devolve e' o proprio teste (protege_cfg.rodar); se ele for morto no meio,
+# a copia fica numa pasta protege_arena_* do Temp para devolver a mao.
+PASTAS_VIGIADAS = protege_cfg.DO_RETROARCH + protege_cfg.DOS_EMULADORES
 
 # Ferramentas de investigacao que moram em testes\ mas pedem arquivos de uma
 # partida especifica (nao ha o que testar sem eles). Ficam fora, com o motivo.
@@ -78,13 +94,23 @@ def retrato_dos_vigiados():
                 retrato[relativo] = (info.st_size, info.st_mtime_ns)
         except OSError:
             retrato[relativo] = None
+    for pasta in PASTAS_VIGIADAS:
+        for arquivo in protege_cfg.arquivos(pasta) if os.path.exists(pasta) else []:
+            relativo = os.path.relpath(arquivo, RAIZ)
+            if relativo in retrato or arquivo.endswith(".protege.tmp"):
+                continue   # o retroarch.cfg e o PCSX2.ini ja estao, inteiros
+            try:
+                info = os.stat(arquivo)
+                retrato[relativo] = (info.st_size, info.st_mtime_ns)
+            except OSError:
+                retrato[relativo] = None
     return retrato
 
 
 def conferir_vigiados(antes):
     """Aponta o que o teste mudou de verdade; devolve os DEVOLVIDOS."""
     depois = retrato_dos_vigiados()
-    mexidos = [r for r in VIGIADOS if depois.get(r) != antes.get(r)]
+    mexidos = sorted(r for r in set(antes) | set(depois) if depois.get(r) != antes.get(r))
     devolvidos = []
     for relativo in DEVOLVIDOS:
         if relativo in mexidos and antes.get(relativo) is not None:
@@ -155,23 +181,44 @@ def principal():
                os.path.join("ferramentas", "teste_aceite_pasta_movida.py")]
     scripts += sorted(os.path.relpath(c, RAIZ)
                       for c in glob.glob(os.path.join(RAIZ, "testes", "teste_*.py")))
-    pedacos = [p.lower() for p in sys.argv[1:]]
+    pedacos = [p.lower() for p in sys.argv[1:] if not p.startswith("--")]
     if pedacos:
         scripts = [s for s in scripts if any(p in s.lower() for p in pedacos)]
+    saida = next((a.split("=", 1)[1] for a in sys.argv[1:] if a.startswith("--saida=")), "")
+    if saida and not os.path.isabs(saida):
+        saida = os.path.join(RAIZ, saida)
     resultados = []
+    if saida and "--continuar" in sys.argv and os.path.isfile(saida):
+        with open(saida, encoding="utf-8") as f:
+            resultados = json.load(f)
+        feitos = {r["script"] for r in resultados}
+        print("Continuando: %d script(s) ja estao em %s" % (len(feitos), saida), flush=True)
+        scripts = [s for s in scripts if s not in feitos]
+
+    def gravar(destino):
+        os.makedirs(os.path.dirname(destino), exist_ok=True)
+        temporario = destino + ".tmp"
+        with open(temporario, "w", encoding="utf-8") as f:
+            json.dump(resultados, f, ensure_ascii=False, indent=2)
+        os.replace(temporario, destino)
+
     for script in scripts:
         if script in FORA_DA_RODADA:
             print("[fora] %s (%s)" % (script, FORA_DA_RODADA[script]), flush=True)
             continue
         resultados.append(rodar(script))
+        if saida:
+            gravar(saida)
     falhas = [r for r in resultados if r["codigo_saida"] != 0]
     print(f"\n{len(resultados) - len(falhas)} de {len(resultados)} passaram.")
+    if saida:
+        print("Resultado salvo em", saida)
+        return 1 if falhas else 0
     if pedacos:
         print("(rodada parcial: o docs\\rodada_final_bruta.json nao foi trocado)")
         return 1 if falhas else 0
     destino = os.path.join(RAIZ, "docs", "rodada_final_bruta.json")
-    with open(destino, "w", encoding="utf-8") as f:
-        json.dump(resultados, f, ensure_ascii=False, indent=2)
+    gravar(destino)
     print("Resultado salvo em", destino)
     return 1 if falhas else 0
 

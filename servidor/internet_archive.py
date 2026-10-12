@@ -21,11 +21,39 @@ import subprocess
 import urllib.parse
 import urllib.error
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor
 
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PASTA_LIVRES = os.path.join(RAIZ, "jogos", "livres")
 HOST = "archive.org"
+# O endereco de onde tudo vem (os testes de internet ruim apontam para um
+# servidor falso aqui: testes\teste_internet_ruim.py).
+BASE = "https://archive.org"
+
+# Internet ruim (auditoria 3, Fase 3). Antes, a busca devolvia "nenhum
+# resultado" quando, na verdade, a rede tinha falhado -- ou quando a rede da
+# escola devolvia a PAGINA DE LOGIN do Wi-Fi no lugar dos dados -- e pedia
+# as fichas dos jogos uma de cada vez, ate 30 pedidos de ate 20 s (numa
+# rede lenta, minutos com a tela esperando).
+MENSAGEM_REDE = ("Não consegui falar com o Internet Archive agora (a internet caiu ou está muito "
+                 "lenta). Confira a internet e tente de novo daqui a pouco.")
+MENSAGEM_PORTAL = ("A rede pediu login: chegou a página do Wi-Fi no lugar da resposta do Internet "
+                   "Archive. Abra o navegador, entre na rede e tente de novo.")
+SEGUNDOS_BUSCA = 20          # o pedido da busca
+SEGUNDOS_FICHA = 10          # cada ficha de jogo (pedidas ao mesmo tempo)
+FICHAS_AO_MESMO_TEMPO = 10
+
+
+class FalhaDeRede(ValueError):
+    """A rede falhou (nao e' "nao achei"). A mensagem diz o que fazer."""
+
+
+def parece_pagina_de_login(bruto):
+    """O comeco da resposta e' uma pagina HTML (o login do Wi-Fi da escola)
+    no lugar dos dados esperados?"""
+    comeco = bytes(bruto[:512]).lstrip().lower()
+    return comeco.startswith((b"<!doctype", b"<html", b"<head", b"<meta", b"<script"))
 
 # Colecoes do Internet Archive com curadoria editorial de verdade e
 # licenca de distribuicao livre conhecida - nao e' so o nome da colecao
@@ -49,12 +77,24 @@ LIMITE = 4 * 1024 * 1024 * 1024
 EXTENSOES = (".zip", ".7z", ".lha", ".gz", ".exe", ".com", ".dsk", ".img", ".iso")
 
 
-def _ler(url):
-    resultado = subprocess.run(
-        ["curl.exe", "--fail", "--silent", "--show-error", "--location",
-         "--max-time", "20", "-A", "ARENA/1.0", url],
-        capture_output=True, check=True)
-    return json.loads(resultado.stdout.decode("utf-8"))
+def _ler(url, segundos=None):
+    """O JSON de 'url', ou FalhaDeRede com a frase certa (rede ou login)."""
+    segundos = segundos or SEGUNDOS_BUSCA
+    try:
+        resultado = subprocess.run(
+            ["curl.exe", "--fail", "--silent", "--show-error", "--location",
+             "--max-time", str(segundos), "-A", "ARENA/1.0", url],
+            capture_output=True)
+    except (OSError, subprocess.SubprocessError):
+        raise FalhaDeRede(MENSAGEM_REDE)
+    if resultado.returncode != 0:
+        raise FalhaDeRede(MENSAGEM_REDE)
+    if parece_pagina_de_login(resultado.stdout):
+        raise FalhaDeRede(MENSAGEM_PORTAL)
+    try:
+        return json.loads(resultado.stdout.decode("utf-8"))
+    except (ValueError, UnicodeDecodeError):
+        raise FalhaDeRede(MENSAGEM_REDE)
 
 
 def _texto(valor):
@@ -129,28 +169,43 @@ def buscar(consulta):
         ("fl[]", "creator"), ("fl[]", "collection"), ("rows", "30"), ("output", "json"),
     ])
 
-    try:
-        dados = _ler("https://archive.org/advancedsearch.php?" + parametros)
-    except (OSError, ValueError, urllib.error.URLError, subprocess.SubprocessError):
-        return []
+    # Rede que falha ou pagina de login do Wi-Fi: FalhaDeRede, com a frase
+    # para a tela (antes virava "nenhum resultado").
+    dados = _ler(BASE + "/advancedsearch.php?" + parametros)
+    documentos = [d for d in ((dados.get("response") or {}).get("docs") or []) if isinstance(d, dict)]
+    documentos = [d for d in documentos if re.fullmatch(r"[A-Za-z0-9_-]{3,100}", str(d.get("identifier", "")))]
+
+    def ficha(documento):
+        try:
+            return _ler(BASE + "/metadata/" + urllib.parse.quote(str(documento["identifier"])),
+                        SEGUNDOS_FICHA)
+        except FalhaDeRede as falha:
+            return falha
+
+    # As fichas ao mesmo tempo (antes, uma de cada vez): numa rede lenta, a
+    # busca inteira leva o tempo de umas poucas fichas, nao de 30.
+    with ThreadPoolExecutor(max_workers=FICHAS_AO_MESMO_TEMPO) as grupo:
+        fichas = list(grupo.map(ficha, documentos))
+    if documentos and all(isinstance(f, FalhaDeRede) for f in fichas):
+        raise fichas[0]          # a rede caiu no meio: diz isso, nao "nenhum resultado"
 
     resultado = []
-    for documento in dados.get("response", {}).get("docs", []):
+    for documento, meta in zip(documentos, fichas):
         identificador = str(documento.get("identifier", ""))
-        if not re.fullmatch(r"[A-Za-z0-9_-]{3,100}", identificador):
+        if isinstance(meta, FalhaDeRede) or not isinstance(meta, dict):
             continue
+        # Ficha torta (vinda da rede) nao derruba a busca: o item fica de fora.
         try:
-            meta = _ler("https://archive.org/metadata/" + urllib.parse.quote(identificador))
             colecao = _colecao_permitida(meta)
-            if not colecao:
-                continue
-            arquivo = _arquivo(meta)
+            arquivo = _arquivo(meta) if colecao else None
             if not arquivo:
                 continue
-        except (OSError, ValueError, urllib.error.URLError, subprocess.SubprocessError):
+            metadados = meta.get("metadata") or {}
+            titulo = _texto(metadados.get("title") or documento.get("title"))[:160]
+            criador = _texto(metadados.get("creator") or documento.get("creator"))[:120]
+            descricao = _texto(metadados.get("description"))[:300]
+        except (AttributeError, TypeError, ValueError):
             continue
-
-        titulo = _texto(meta.get("metadata", {}).get("title") or documento.get("title"))[:160]
         # Confere aqui tambem: toda palavra pedida precisa estar no titulo.
         if not all(palavra.casefold() in titulo.casefold() for palavra in palavras):
             continue
@@ -160,8 +215,8 @@ def buscar(consulta):
             "titulo": titulo,
             "plataforma": info["plataforma"],
             "plataforma_nome": info["nome"],
-            "criador": _texto(meta.get("metadata", {}).get("creator") or documento.get("creator"))[:120],
-            "descricao": _texto(meta.get("metadata", {}).get("description"))[:300],
+            "criador": criador,
+            "descricao": descricao,
             "arquivo": arquivo[0],
             "tamanho": arquivo[2],
             "fonte": "Internet Archive",
@@ -171,28 +226,26 @@ def buscar(consulta):
 
 def instalar(identificador, nome_arquivo, plataforma=""):
     if not re.fullmatch(r"[A-Za-z0-9_-]{3,100}", str(identificador or "")):
-        raise ValueError("Item do Internet Archive inválido.")
+        raise ValueError("Esse item do Internet Archive não serve. Faça a busca de novo e escolha da lista.")
 
-    # Achado real na auditoria: sem este try/except, uma falha de rede (sem
-    # internet, DNS fora) ou uma pagina de login de Wi-Fi de escola no
-    # lugar do JSON esperado vazava como OSError/erro de JSON cru --
-    # buscar() ja tinha essa protecao, instalar() nao tinha.
+    # Achado real na auditoria: uma falha de rede (sem internet, DNS fora) ou
+    # uma pagina de login de Wi-Fi de escola no lugar do JSON esperado vazava
+    # como OSError/erro de JSON cru. Agora _ler devolve FalhaDeRede com a
+    # frase certa (rede ou login), e ela chega a tela como esta.
+    meta = _ler(BASE + "/metadata/" + urllib.parse.quote(identificador))
+
     try:
-        meta = _ler("https://archive.org/metadata/" + urllib.parse.quote(identificador))
-    except (OSError, ValueError, urllib.error.URLError, subprocess.SubprocessError):
-        raise ValueError(
-            "Não consegui falar com o Internet Archive agora. Confira a "
-            "internet e tente de novo.")
-
-    colecao = _colecao_permitida(meta)
+        colecao = _colecao_permitida(meta)
+    except (AttributeError, TypeError):
+        colecao = None
     if not colecao:
-        raise ValueError("Este item não está numa coleção de distribuição livre.")
+        raise ValueError("Esse item não está numa coleção de jogos liberados pelos autores, e o ARENA só baixa esses. Escolha outro da lista.")
     info = COLECOES_LIVRES[colecao]
 
-    arquivo = next((item for item in meta.get("files", [])
-                    if str(item.get("name", "")) == str(nome_arquivo)), None)
+    arquivo = next((item for item in (meta.get("files") or [])
+                    if isinstance(item, dict) and str(item.get("name", "")) == str(nome_arquivo)), None)
     if not arquivo or not str(nome_arquivo).lower().endswith(EXTENSOES):
-        raise ValueError("Arquivo não encontrado no item.")
+        raise ValueError("O arquivo do jogo não está mais nesse item do Internet Archive. Escolha outro da lista.")
 
     try:
         tamanho_meta = int(arquivo.get("size", 0) or 0)
@@ -200,7 +253,7 @@ def instalar(identificador, nome_arquivo, plataforma=""):
         tamanho_meta = 0
 
     if not tamanho_meta or tamanho_meta > LIMITE:
-        raise ValueError("Arquivo grande demais para o Arena.")
+        raise ValueError("O arquivo passa de 4 GB, o limite do ARENA. Escolha outro jogo.")
 
     nome_seguro = re.sub(r"[^A-Za-z0-9._()\- ]", "_", os.path.basename(str(nome_arquivo)))
     # Na pasta do console da colecao (jogos\livres\MS-DOS): e' a pasta que
@@ -209,13 +262,13 @@ def instalar(identificador, nome_arquivo, plataforma=""):
     livres = os.path.abspath(PASTA_LIVRES)
 
     if os.path.commonpath([destino, livres]) != livres:
-        raise ValueError("Destino inválido.")
+        raise ValueError("Nome de arquivo estranho: o ARENA não baixou. Escolha outro jogo.")
 
     os.makedirs(os.path.dirname(destino), exist_ok=True)
     temporario = destino + ".download"
     digest = hashlib.sha1()
     tamanho = 0
-    url = "https://archive.org/download/%s/%s" % (
+    url = BASE + "/download/%s/%s" % (
         urllib.parse.quote(str(identificador)), urllib.parse.quote(str(nome_arquivo), safe="/"))
     # O Internet Archive nao declara SHA-256 por arquivo, so md5/sha1/crc32
     # -- confirmado na propria API (/metadata devolve isto pra cada item de
@@ -234,24 +287,31 @@ def instalar(identificador, nome_arquivo, plataforma=""):
                  "--max-time", "120", "-A", "ARENA/1.0", "-o", temporario, url],
                 check=True)
         except (OSError, subprocess.SubprocessError):
-            raise ValueError(
+            raise FalhaDeRede(
                 "O download caiu no meio do caminho. Confira a internet e "
                 "tente de novo.")
 
+        comeco = b""
         with open(temporario, "rb") as entrada:
             while True:
                 bloco = entrada.read(1024 * 1024)
                 if not bloco:
                     break
+                if not comeco:
+                    comeco = bloco[:512]
                 tamanho += len(bloco)
                 if tamanho > LIMITE:
-                    raise ValueError("Arquivo grande demais para o Arena.")
+                    raise ValueError("O arquivo passa de 4 GB, o limite do ARENA. Escolha outro jogo.")
                 digest.update(bloco)
 
+        # A pagina de login do Wi-Fi chega com "200 OK" e o curl acha que deu
+        # certo: no lugar do jogo, um HTML.
+        if parece_pagina_de_login(comeco):
+            raise FalhaDeRede(MENSAGEM_PORTAL)
         if sha1_esperado and digest.hexdigest() != sha1_esperado:
             raise ValueError(
-                "O arquivo baixado não bate com o esperado (SHA-1 "
-                "diferente). Download recusado por segurança.")
+                "O arquivo baixado não confere com o esperado (SHA-1 diferente) e foi recusado, "
+                "por segurança. Ele pode ter chegado cortado: tente de novo.")
 
         os.replace(temporario, destino)
     finally:

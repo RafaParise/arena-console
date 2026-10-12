@@ -1,140 +1,140 @@
 {
   "duracao_s": 180.0,
-  "pedidos_total": 47782,
+  "pedidos_total": 46158,
   "falhas": 0,
   "amostras": [
     {
-      "t": 0.1,
-      "ram_mb": 40.9,
-      "handles": 177,
-      "threads": 10,
+      "t": 0.0,
+      "ram_mb": 43.7,
+      "handles": 182,
+      "threads": 12,
       "pedidos_ate_aqui": 7
     },
     {
       "t": 10.0,
-      "ram_mb": 41.4,
-      "handles": 168,
-      "threads": 6,
-      "pedidos_ate_aqui": 2583
+      "ram_mb": 44.3,
+      "handles": 171,
+      "threads": 7,
+      "pedidos_ate_aqui": 2772
     },
     {
       "t": 20.0,
-      "ram_mb": 41.9,
-      "handles": 181,
-      "threads": 7,
-      "pedidos_ate_aqui": 5642
+      "ram_mb": 44.4,
+      "handles": 177,
+      "threads": 8,
+      "pedidos_ate_aqui": 5803
     },
     {
       "t": 30.0,
-      "ram_mb": 42.0,
-      "handles": 182,
-      "threads": 9,
-      "pedidos_ate_aqui": 8736
+      "ram_mb": 44.6,
+      "handles": 178,
+      "threads": 10,
+      "pedidos_ate_aqui": 8953
     },
     {
       "t": 40.0,
-      "ram_mb": 42.0,
-      "handles": 182,
-      "threads": 9,
-      "pedidos_ate_aqui": 11823
+      "ram_mb": 44.6,
+      "handles": 178,
+      "threads": 10,
+      "pedidos_ate_aqui": 12096
     },
     {
       "t": 50.0,
-      "ram_mb": 42.1,
-      "handles": 182,
-      "threads": 9,
-      "pedidos_ate_aqui": 14924
+      "ram_mb": 44.6,
+      "handles": 178,
+      "threads": 10,
+      "pedidos_ate_aqui": 15260
     },
     {
       "t": 60.0,
-      "ram_mb": 42.1,
-      "handles": 182,
-      "threads": 6,
-      "pedidos_ate_aqui": 18004
+      "ram_mb": 44.6,
+      "handles": 178,
+      "threads": 7,
+      "pedidos_ate_aqui": 18032
     },
     {
       "t": 70.0,
-      "ram_mb": 42.2,
-      "handles": 182,
-      "threads": 6,
-      "pedidos_ate_aqui": 21077
+      "ram_mb": 44.6,
+      "handles": 178,
+      "threads": 7,
+      "pedidos_ate_aqui": 20356
     },
     {
       "t": 80.0,
-      "ram_mb": 42.2,
-      "handles": 182,
-      "threads": 6,
-      "pedidos_ate_aqui": 24136
+      "ram_mb": 44.6,
+      "handles": 178,
+      "threads": 7,
+      "pedidos_ate_aqui": 22701
     },
     {
       "t": 90.0,
-      "ram_mb": 42.3,
-      "handles": 182,
-      "threads": 6,
-      "pedidos_ate_aqui": 26635
+      "ram_mb": 44.8,
+      "handles": 178,
+      "threads": 7,
+      "pedidos_ate_aqui": 25046
     },
     {
       "t": 100.0,
-      "ram_mb": 42.3,
-      "handles": 182,
-      "threads": 6,
-      "pedidos_ate_aqui": 28966
+      "ram_mb": 44.8,
+      "handles": 178,
+      "threads": 7,
+      "pedidos_ate_aqui": 27356
     },
     {
       "t": 110.0,
-      "ram_mb": 42.3,
-      "handles": 182,
-      "threads": 6,
-      "pedidos_ate_aqui": 31269
+      "ram_mb": 44.8,
+      "handles": 178,
+      "threads": 7,
+      "pedidos_ate_aqui": 29715
     },
     {
       "t": 120.0,
-      "ram_mb": 42.3,
-      "handles": 182,
-      "threads": 6,
-      "pedidos_ate_aqui": 33586
+      "ram_mb": 44.8,
+      "handles": 178,
+      "threads": 7,
+      "pedidos_ate_aqui": 32074
     },
     {
       "t": 130.0,
-      "ram_mb": 42.3,
-      "handles": 182,
-      "threads": 6,
-      "pedidos_ate_aqui": 35924
+      "ram_mb": 44.8,
+      "handles": 178,
+      "threads": 7,
+      "pedidos_ate_aqui": 34433
     },
     {
       "t": 140.0,
-      "ram_mb": 42.2,
-      "handles": 178,
-      "threads": 4,
-      "pedidos_ate_aqui": 38304
+      "ram_mb": 44.8,
+      "handles": 174,
+      "threads": 5,
+      "pedidos_ate_aqui": 36750
     },
     {
       "t": 150.0,
-      "ram_mb": 42.2,
-      "handles": 178,
-      "threads": 4,
-      "pedidos_ate_aqui": 40705
+      "ram_mb": 44.8,
+      "handles": 174,
+      "threads": 5,
+      "pedidos_ate_aqui": 39081
     },
     {
       "t": 160.0,
-      "ram_mb": 42.2,
-      "handles": 178,
-      "threads": 4,
-      "pedidos_ate_aqui": 43064
+      "ram_mb": 44.8,
+      "handles": 174,
+      "threads": 5,
+      "pedidos_ate_aqui": 41433
     },
     {
       "t": 170.0,
-      "ram_mb": 42.2,
-      "handles": 178,
-      "threads": 4,
-      "pedidos_ate_aqui": 45409
+      "ram_mb": 44.8,
+      "handles": 174,
+      "threads": 5,
+      "pedidos_ate_aqui": 43806
     },
     {
       "t": 180.0,
-      "ram_mb": 42.3,
-      "handles": 178,
-      "threads": 4,
-      "pedidos_ate_aqui": 47782
+      "ram_mb": 44.8,
+      "handles": 174,
+      "threads": 5,
+      "pedidos_ate_aqui": 46158
     }
   ]
 }
