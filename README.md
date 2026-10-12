@@ -60,9 +60,10 @@ Ele nasceu nas aulas do curso técnico de **Desenvolvimento de Sistemas**
    **OK**. O Windows marca tudo o que vem da internet; sem esse passo, cada
    programa de dentro do pacote pergunta se pode abrir. Não precisa de senha
    de administrador.
-3. Descompacte numa pasta de caminho curto — no computador (`C:\ARENA`) ou
-   num pen drive formatado em **exFAT** (`D:\ARENA`). Em pen drive FAT32,
-   jogo maior que 4 GB (PS2, Wii, PS3, Xbox 360) não cabe.
+3. Descompacte na raiz do disco: em **Extrair tudo**, troque o destino por
+   `C:\` (o `.zip` já traz a pasta `ARENA`, e fica `C:\ARENA`) ou pela raiz
+   de um pen drive formatado em **exFAT** (`D:\`, e fica `D:\ARENA`). Em pen
+   drive FAT32, jogo maior que 4 GB (PS2, Wii, PS3, Xbox 360) não cabe.
 4. Dois cliques em **`ARENA.bat`**. Uma janela preta abre (não feche ela) e,
    em seguida, a tela do ARENA.
    - Se ainda assim o Windows mostrar *"O Windows protegeu o seu computador"*:

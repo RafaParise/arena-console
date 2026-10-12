@@ -177,7 +177,9 @@ Faça uma vez. Depois é só copiar e colar a pasta.
    **OK**. Não precisa de senha de administrador. Sem esse passo, o Windows
    marca cada programa de dentro do pacote como "vindo da internet" e
    pergunta, um por um, se pode abrir.
-4. Descompacte em `C:\ARENA` (ou direto no pen drive em exFAT, Parte A).
+4. Descompacte na raiz do disco: em **Extrair tudo**, troque o destino por
+   `C:\` — o `.zip` já traz a pasta `ARENA`, e fica `C:\ARENA`. No pen drive
+   em exFAT (Parte A), o destino é a raiz dele (`D:\`, por exemplo).
 5. Dois cliques em **`ARENA.bat`**. Pronto: pule para o **Passo 5 — Testar**.
 
 O pacote já traz o Python, o RetroArch com os núcleos e os emuladores de
