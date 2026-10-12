@@ -7,6 +7,9 @@ versão 2026.10.03.2). O pedido inteiro, sem resumir, e as regras estão em
 `docs\RELATORIO-AUDITORIA-2.md` (25/09). Os números brutos desta rodada ficam
 em `docs\auditoria3\`.
 
+**Concluída em 12/10/2026** (Fase 8, no fim): versão 2026.10.11, juntada ao
+`main` e publicada no GitHub com o pacote para baixar.
+
 **Onde foi medido:** o computador do Rafael (Ryzen 5 5600G, 12 núcleos
 lógicos, Radeon integrada, ~11,8 GB). **A régua não é ele:** toda decisão de
 desempenho é julgada pelo notebook da escola (Celeron N5100, sem AVX —
@@ -870,3 +873,169 @@ já existe e serve de modelo) — tira o passo mais difícil da Dona Maria.
 | Trechos reescritos | 46 de 48 sugeridos, mais 4 trocos; 1 virou conserto de código (Registrar pontos) |
 | Bateria | 310 |
 | O que vai para a sala | Uma pessoa de cada perfil fazendo as 5 tarefas, contando os passos de verdade e onde travou; um aluno navegando só pelo teclado |
+
+---
+
+## Fase 8 — Relatório final e entrega (11–12/10/2026)
+
+### Depois × Antes (os números da Fase 0)
+
+Mesmas ferramentas da Fase 0 (`testes\linha_base.py`,
+`testes\medir_gravacoes_parado.py`), no mesmo computador; números brutos em
+`docs\auditoria3\linha_base_depois.json` (e `linha_base_depois_2.json`),
+`gravacoes_abertura_depois.json` e `gravacoes_parado_depois.json` (os da
+Fase 2 têm `fase2` no nome).
+
+| Medida | Antes (07/10) | Depois (12/10) | Observação |
+|---|---|---|---|
+| Bateria (`servidor\tests\run.py`) | 203 de 203, 11,2 s | **323 de 323**, ~24 s | +120 testes; cada achado da auditoria virou pelo menos um |
+| Rodada completa (`ferramentas\rodada_final.py`) | 87 de 92 (as 5 falhas analisadas) | **101 de 102** | A única falha foi o Dreamcast na matriz (P7: o núcleo Flycast cai às vezes com foto da tela e salvar estado, pior sem saída de som); repetido sozinho, passou de primeira nos dois modos (`docs\auditoria3\matriz_dreamcast_repetida.json`) |
+| Pasta de desenvolvimento, sem jogos, `.git` e `backup` | 12.766 MB | 12.768 MB | Quase tudo é dado de jogo dentro de `emuladores\` (RPCS3, Xenia); fica fora do pacote |
+| **Pacote para baixar** | 1,54 GB (02/10, com BIOS) | **1,32 GB descompactado (7.812 arquivos), 478 MB em zip, sem BIOS** | Conferido pelo montador e por uma busca independente: nenhum nome de BIOS, firmware (`dev_flash`), conta ou dado. Leva `LICENSE` e `TERCEIROS.md` (E3) |
+| Linhas do programa (servidor + tela + `.bat`) | 30.744 em 39 arquivos | 31.770 em 40 | +3%: os consertos (cheats, caminhos, foco das janelas, avisos) |
+| Linhas dos guias (raiz `.md`) | 4.796 em 7 | 7.260 em 11 | Entraram o README do GitHub, o TERCEIROS, o AGENTS e o CLAUDE.md (a memória do projeto) |
+| Testes · ferramentas · documentos | 18.647 em 130 · 7.072 em 44 · 3.312 em 10 | 23.782 em 154 · 5.307 em 23 · 5.017 em 13 | As 20 ferramentas de teste antigas viraram testes de verdade (R5) |
+| **Abertura até a tela pronta** | **2,61 s** | **1,90 s e 1,69 s** (duas amostras) | Sem a espera fixa de 1 s (L1). A página: 0,51 → 0,28 e 0,39 s; o Edge, abrindo do zero com perfil novo, varia (0,52 → 1,02 e 0,72 s) |
+| Processador parado — servidor | 0,05% de um núcleo | 0,05% | |
+| **Processador parado — a tela** (fundo "Sempre", a configuração do Rafael) | **9,67%** | **7,51%** (a 1ª amostra deu 9,92%) | Mesma configuração e o mesmo trabalho da página nas duas (~1.185 `setTimeout`/min, nenhum quadro por `requestAnimationFrame`). A 2ª (17h40) bate com a da Fase 2 depois do conserto (7,64%); a 1ª (16h16) pegou a máquina ocupada (o Edge levou 1,02 s para abrir, contra 0,72 s). O Edge se atualizou em 09/10 (155.0.4283.45), depois da Fase 2 |
+| Memória — servidor | 42,1 MB | 43,6 e 43,4 MB | Teto do modo alvo: 64 MB |
+| Memória — a tela | 539,9 MB em 8 processos | 538,5 MB em 8 processos | |
+| Linhas de execução · alças do servidor | 5 · 181 | 5 · 173 | |
+| Temporizadores da tela parada | 2 `setInterval`, 59,9 quadros por `requestAnimationFrame` | 2 `setInterval`, ~1.180 `setTimeout`/min (o fundo a 20 quadros/s por relógio), 0 por `requestAnimationFrame` | L4 |
+| Gravações por abertura | 43 + 2, ~9,8 MB | **35, 72 KB**; nos 10 minutos seguintes, nenhuma (a Fase 0 olhou 60 s) | L2 (o teste de disco não grava mais a cada abertura) e L3 (cópia só quando algo mudou) |
+| Gravações por hora, parado com a tela | 0, 0 KB | **0, 0 KB** — nenhum arquivo mudou (desta vez sem nenhuma edição no meio da hora) | |
+| Portas | TCP 127.0.0.1:8777; UDP 0.0.0.0:55436 | Iguais | A UDP é a descoberta de colegas (de propósito); endurecida no C5 |
+
+### Os achados da Fase 0, um por um
+
+| # | Achado | Destino |
+|---|---|---|
+| 1 | Cópia de segurança a cada abertura (3 aberturas apagavam as cópias boas) | Consertado (C1) |
+| 2 | A tela parada gastava 9,7% de um núcleo | Fundo a 20 quadros/s por relógio (L4); na configuração do Rafael (fundo "Sempre"), 9,67% → 7,51% de um núcleo |
+| 3 | 1,0 s de espera fixa antes de abrir a janela | Tirada (L1): 0,0 s |
+| 4 | O vigia testa a internet a cada 20 s | Fica: as funções online usam o resultado para dizer "sem internet" na hora; a cópia indevida que ele disparava saiu (C1) |
+| 5 | UDP 55436 escuta a rede toda | Fica (é como os colegas se acham); endurecida contra pacote torto e enxurrada (C5 e a revisão de segurança dele) |
+| 6 | A trava do "run ahead" era desfeita pelas opções avançadas | Consertado (C4) |
+| 7 | Sobra `xenia-canary.config.toml.11580.tmp` | Removida (R4) |
+| 8 | 8 GB de dado de jogo em `emuladores\` | Conferido no pacote: nada disso vai |
+| 9 | `setInterval` repetido nos fundos | Fica de propósito: religa a animação quando o laço trava |
+| 10 | A versão dos alunos mudou de lugar | Voltou em 07/10; mudou de novo em 10/10 (agora `..\ARENA`): o `--atualizar` passou a reconhecê-la pela folha de rosto (Fase 8) |
+| 11 | O teste de disco gravava 8 MB a cada abertura | Consertado (L2) |
+| 12 | A cópia levava caches e era feita sem mudança | Consertado (L3) |
+
+### Achados da Fase 8 (corrigidos, com teste)
+
+| # | Achado | Prova | Conserto |
+|---|---|---|---|
+| E1 | O `--atualizar` não achava a versão dos alunos com o nome novo (`..\ARENA`, desde 10/10) | "Nao achei a versao dos alunos": só aceitava o nome `ARENA-alunos` | Reconhece pela folha de rosto que só o montador escreve (`LEIA-PRIMEIRO.txt`); recusa a pasta de desenvolvimento e pasta com `.git` (6 testes) |
+| E2 | A conferência do pacote acusava o link do repositório como "dado de quem montou" | O endereço `github.com/<conta>/arena-console` leva o nome da conta, igual ao apelido de quem monta | Só o endereço do repositório sai antes de procurar o apelido; em qualquer outro lugar ele continua barrado (2 testes) |
+| E3 | O pacote ia sem o texto da licença e sem a lista das licenças de terceiros | A GPL-3.0 pede o texto da licença junto do programa distribuído (seções 4 a 6) | `LICENSE` e `TERCEIROS.md` no pacote e no `--atualizar` |
+| E4 | **Testes que ligam jogo mudavam dado de quem joga, e a rodada não via** | Na rodada de 11/10: os cartões de memória do PS2 às 18h41 e 18h43 (`teste_pcsx2_inicia`; 5 de 16.384 e 8 de 131.072 páginas diferentes — o histórico que a BIOS do PS2 grava no cartão do slot 1; nenhum save de jogo sobrescrito); o perfil do Xbox 360 e os dados do sistema do Wii às 18h04 (`teste_emuladores_de_fora`, que só devolvia `.ini/.yml/.toml/.json/.cfg`); o histórico do RetroArch às 19h02 (`teste_qual_opcao_de_nucleo_vale`); a configuração do RPCS3 às 19h05 (`teste_rpcs3_controles`). A rodada só vigiava o `retroarch.cfg`, o `PCSX2.ini` e 5 arquivos de `dados\` | `testes\protege_cfg.py` passa a guardar e devolver também `dados\builtin` (todo teste que abre o RetroArch) e, com `emuladores=True`, os cartões, saves, perfis e configurações dos 4 emuladores de fora — o que mudou volta com a data de antes, o que o teste criou sai; a cópia fica numa pasta `protege_arena_*` (a limpeza da rodada só apaga as `arena_*`). A rodada aponta qualquer arquivo dessas pastas que um teste mudar. Prova: mini-rodada com a vigilância nova (os 8 testes de PCSX2, emuladores de fora, RPCS3 e opção de núcleo): **8 de 8, nenhum dado de quem joga mexido** — as datas dos cartões continuam as de antes; prova negativa: a vigilância acusa o arquivo mudado, o criado e o apagado; 5 testes na bateria |
+| E5 | **5,5 GB de cópias soltas no `.git`** (o que os ramos alcançam ocupa 7 MB) | 9.489 blobs gravados em 10/10 entre 19h23 e 19h26 (a hora do `git pull` do outro assistente, que trocou o `.gitignore` e deixou a junção pela metade) e em 11/10 entre 0h e 1h (a janela em que ele transformou a pasta dos alunos em repositório); nenhum ramo, etiqueta, registro ou índice os alcança. Os 288 commits "WIP on…/index on…" sem dono são retratos de `git stash` — desde 01/10, do plugin de segurança do Claude Code (`git stash create` numa cópia do índice): não mexem em arquivo nem em ramo | Prova antes de limpar: 9.050 têm um arquivo idêntico no disco, 341 são iguais a menos do fim de linha, 78 são versões intermediárias de arquivos do repositório. Os 20 que mudaram de verdade desde 10/10 (os 2 cartões de PS2 daquele dia, uma versão do `config.json`, o tempo de jogo, a lista de jogos do RPCS3) foram guardados em `backup\versoes-antigas-do-git-2026-10-10\` antes do `git prune`. Depois: o `.git` foi de 5,40 GB soltos para **1,83 MB** empacotados (2.242 objetos), `git fsck` sem erro, e a manutenção automática do git, desligada em 11/10 porque travava com aqueles 5 GB, voltou ao padrão. O disco ganhou 4 GB livres. |
+
+### O que foi removido (cada um com a prova)
+
+- **Fase 1:** R1 a R5 (duas funções sem nenhuma chamada, cinco ferramentas
+  de uso único que já tinham rodado, um temporário esquecido e as 20
+  ferramentas de teste antigas — o que só elas conferiam foi para a bateria
+  ou para `testes\`). Tabela com a prova na seção da Fase 1.
+- **Fase 4:** 8 chaves que o ARENA gravava e o RetroArch não conhece (J2:
+  ignoradas em silêncio, sem efeito na tela), conferidas contra o próprio
+  `retroarch.cfg`.
+- **Fase 8 (publicação):** `README_GITHUB.md`, `DOWNLOAD.md` e `releases.md`
+  (de outro assistente, 10/10): apontavam para um repositório que não existe
+  e mandavam baixar o código sem o RetroArch; nenhum arquivo os citava. Os
+  três scripts de sincronização dele (`sync_github.py`, `sincronizador.py`,
+  `SINCRONIZAR_ARENA.bat`), que faziam `git add -A` de tudo, foram trocados
+  pelo `SINCRONIZAR.bat`; um quarto (`sync_to_github.bat`) foi desativado sem
+  apagar (`backup\desativados\`).
+
+### O que foi corrigido (resumo; o detalhe está em cada fase)
+
+| Fase | Itens |
+|---|---|
+| 1 — Limpeza | C1 cópia a cada abertura · C2 importar pacote sem gravação atômica · C3 configuração de emulador que não grava, calada · C4 trava do "run ahead" desfeita · C5 descoberta derrubada por pacote torto · C6 arquivo com nome de pasta derrubava o ARENA · C7 foto do perfil apagada antes da nova |
+| 2 — Leveza | L1 abertura 2,57 → 1,63 s · L2 8.264 → 72 KB por abertura · L3 cópia só quando muda · L4 fundo animado 7,7 → 5,0% de um núcleo |
+| 3 — Servidor e API | A1 a tela congelava na releitura (3,3 s → 0,02 s) · A2–A5 internet ruim e página de login do Wi-Fi com a frase certa · A6 mais de 66 mensagens com "o que fazer" |
+| 4 — Jogar Junto | J1 a porta da partida com o nome errado · J2 chaves mortas · J3 sexto jogador explicado · J4 rede Pública percebida pelo ARENA · J5 Wi-Fi que isola · J6 simulador de rede ruim · J7 teste que deixava recordes no Temp · J8 "casas diferentes" nunca funcionou |
+| 5 — Matriz de jogos | P1 o perfil Qualidade ligava sozinho "voltar no tempo" e "resposta instantânea" (N64 a 30 quadros/s) · P2 os cheats nunca funcionaram · P3 gaveta de saves vazia · P4 Game Genie recusado · P5 ColecoVision sem BIOS calado · P6–P9 limites dos núcleos, medidos e anotados |
+| 6 — Portabilidade | F1 a pasta que sobe um nível passava na correção de caminhos · F2 a âncora pela ordem da lista · o notebook sem driver de vídeo cai no Direct3D 11 (provado) |
+| 7 — Clareza | 46 trechos em linguagem simples · o botão Registrar pontos, que não existia · A1 `hidden` que não escondia · A2 contraste AA · A3 letra mínima 11 px · A4 seletor sem nome · A5 o foco nas janelas |
+| 8 — Entrega e publicação | Conferência antes de publicar (e as 2 correções da revisão de segurança automática) · SINCRONIZAR com a conferência · regra "Proteger os ramos" no GitHub · E1–E5 (acima): a versão dos alunos com outro nome, o link do repositório, a licença no pacote, os testes que mexiam em dado de quem joga e as cópias soltas no `.git` |
+
+**E o que aconteceu no caminho (10 e 11/10), registrado:** outro assistente
+(Hermes) trocou o `.gitignore` do ARENA pelo de Python do GitHub, publicou um
+"ARENA" de exemplo e transformou a pasta dos alunos num repositório para
+enviá-la ao GitHub público, com BIOS e o banco dos recordes, apagando 8
+arquivos no caminho. Esse envio foi recusado pelo GitHub (arquivos grandes
+demais): BIOS e recordes não chegaram lá. Os 8 arquivos (BIOS de PS1 e PS2,
+o cartão de memória do PS2, `rpcs3.exe`...) foram devolvidos do próprio
+commit dele, conferidos pelo hash; 5.981 textos que o checkout dele
+converteu voltaram ao fim de linha original; o e-mail institucional do
+professor saiu de 9 commits que nunca tinham sido enviados.
+
+### O que ainda falta (com honestidade)
+
+- **Na sala, com aparelhos de verdade** (roteiros abaixo): tudo o que
+  depende de 5 notebooks, do Wi-Fi da escola, do Celeron e de controle na
+  mão.
+- **A tela parada no Celeron:** o fundo animado em "Sempre" custa de 7,5% a 9,9%
+  de um núcleo do Ryzen; no Celeron (43% por núcleo), passaria de 20%. O
+  Automático já para quando o Windows pede menos movimento e no modo modesto.
+- **Limites conhecidos, não do ARENA:** o cartão de memória do PS1 não vai
+  para o convidado na partida a dois; a tela dividida não separa; o
+  Dreamcast (Flycast) cai às vezes com foto e salvar estado em seguida;
+  cheats de PS1 no Jogar Junto ficam na pasta de outro núcleo; o HUD do
+  Mario Kart 64 com `parallel-rdp` e a partida entre operadoras diferentes
+  continuam sem conferir.
+- **Observações para decidir:** o botão "Gerenciar catálogo" (acervo) nunca
+  aparece, desde a base; um "Abrir a pasta dos pacotes" ajudaria quem nunca
+  usou computador (Fase 7).
+- **Git e GitHub:** o e-mail institucional do professor já está público nos
+  commits que o outro assistente enviou em 10/10 — tirar de lá exige envio
+  forçado (decisão do Rafael); o Gmail no histórico ficou (já estava
+  público; reescrever mudaria ~450 hashes citados); a imagem de
+  compartilhamento ("Social preview") só se põe pelo site.
+- **As duas versões originais** (a antiga e o remake) e o `Instruções.txt`
+  não estão mais no disco desde 10/10 à noite.
+
+### Roteiros de sala
+
+Cada fase tem o seu, na própria seção; juntos, na ordem em que valem mais:
+
+1. **Jogar Junto em 5 notebooks** (Fase 4): Multitap de 5 jogadores,
+   convidado que cai e volta, sexto jogador, duas partidas na mesma rede,
+   rede "Pública" e Wi-Fi que isola.
+2. **Celeron N5100** (Fases 2, 5 e 6): a tela parada nos três modos do fundo,
+   o FPS de verdade no SNES, no PS1 e no N64, o God of War (PSP) com e sem o
+   pulo de quadros, um notebook sem driver de vídeo.
+3. **Controle na mão** (Fase 5): botão apertado, o save pelo menu do próprio
+   jogo, o cartão de memória do PS1 depois de uma partida a dois, F8 e logo F2
+   no Dreamcast.
+4. **As cinco pessoas** (Fase 7): cada perfil fazendo as cinco tarefas,
+   contando passos e onde travou; um aluno só com o teclado.
+5. **Pen drive** (Fase 6): exFAT e FAT32 (o aviso antes de copiar a ISO
+   grande), letra diferente, arrancar no meio da gravação.
+
+### A junção ao `main` (registro)
+
+A parada "espere minha aprovação para juntar o ramo auditoria ao principal"
+virou registro, como as outras. **Escolha:** juntar, depois da rodada completa
+(101 de 102, a falha explicada e repetida com sucesso), das medidas e da
+conferência de publicação. **Por quê:** o pedido de 07/10 manda finalizar a
+auditoria e publicar o ARENA no GitHub como cópia central; o `main` do GitHub
+tinha a versão de 03/10, sem nenhum dos consertos acima. Feita pelo PR #1
+(aberto pela conta do Rafael em 11/10), com a descrição de verdade.
+
+### Publicação
+
+- Repositório `RafaParise/arena-console` (público): o `main` passa a ser a
+  versão 2026.10.11; README com a capa tirada do fundo do modo escuro,
+  LICENSE (GPL-3.0), TERCEIROS.md, AGENTS.md, a memória do projeto
+  (CLAUDE.md), site e 16 tópicos; regra "Proteger os ramos" (sem envio
+  forçado, sem apagar ramo).
+- **Release v2026.10.11:** `ARENA-2026.10.11.zip` (478 MB; SHA-256
+  `d922237c8f3b5ed8e2eb1cbabb8ed791920946e0708401884333e563c3a877e5`), montado sem BIOS e conferido duas vezes.
+- A pasta dos alunos (`..\ARENA`) atualizada pelo `--atualizar`: o programa
+  trocado, os 344 arquivos de quem usa intocados, a correção de caminhos
+  rodada (as 7 linhas velhas do `retroarch.cfg` dela consertadas).

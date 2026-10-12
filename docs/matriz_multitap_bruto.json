@@ -5,7 +5,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 97479,
-      "segundos": 10.8,
+      "segundos": 10.6,
       "travou": false,
       "erros": []
     },
@@ -23,7 +23,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 235564,
-      "segundos": 10.9,
+      "segundos": 10.7,
       "travou": false,
       "erros": []
     },
@@ -41,7 +41,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 336143,
-      "segundos": 10.8,
+      "segundos": 10.6,
       "travou": false,
       "erros": [
         "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented."
@@ -63,7 +63,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 40997,
-      "segundos": 10.8,
+      "segundos": 10.6,
       "travou": false,
       "erros": []
     },
@@ -81,7 +81,7 @@
     "abre": {
       "abre_e_mostra_imagem": false,
       "foto_bytes": 1796,
-      "segundos": 10.8,
+      "segundos": 10.6,
       "travou": false,
       "erros": []
     },
@@ -120,7 +120,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 29288,
-      "segundos": 12.9,
+      "segundos": 11.9,
       "travou": false,
       "erros": []
     },
@@ -138,7 +138,7 @@
     "abre": {
       "abre_e_mostra_imagem": false,
       "foto_bytes": 1848,
-      "segundos": 10.9,
+      "segundos": 10.6,
       "travou": false,
       "erros": []
     },
@@ -155,8 +155,8 @@
     "jogo": "Marvel vs. Capcom 2 - New Age of Heroes (Europe).cue",
     "abre": {
       "abre_e_mostra_imagem": true,
-      "foto_bytes": 243674,
-      "segundos": 13.6,
+      "foto_bytes": 241998,
+      "segundos": 12.1,
       "travou": false,
       "erros": [
         "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
@@ -187,7 +187,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 7933,
-      "segundos": 11.3,
+      "segundos": 10.9,
       "travou": false,
       "erros": [
         "[libretro WARN] [sceDisplay] Video out requested, not supported: mode=0 size=512,272"
@@ -210,7 +210,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 28984,
-      "segundos": 11.4,
+      "segundos": 11.2,
       "travou": false,
       "erros": []
     },

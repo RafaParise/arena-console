@@ -1,17 +1,17 @@
 {
-  "janela_s": 60,
+  "janela_s": 600,
   "ate_o_servidor_responder": {
     "operacoes": 35,
-    "kb": 72.3
+    "kb": 72.1
   },
   "ate_o_fim": {
     "operacoes": 35,
-    "kb": 72.3
+    "kb": 72.1
   },
   "arquivos_que_mudaram_ou_nasceram": [
     "dados\\arena_override.cfg",
     "dados\\logs\\queda-do-servidor.txt",
     "retroarch\\retroarch-core-options.cfg"
   ],
-  "kb_dos_arquivos": 72.5
+  "kb_dos_arquivos": 72.6
 }
