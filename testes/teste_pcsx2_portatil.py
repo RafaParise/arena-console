@@ -89,4 +89,7 @@ def main_devolvendo_o_ini():
 
 
 if __name__ == "__main__":
-    sys.exit(main_devolvendo_o_ini())
+    # Os cartoes de memoria, saves e perfis de verdade tambem (Fase 8 da
+    # auditoria 3): ligar um jogo grava neles (o historico no cartao do PS2).
+    import protege_cfg
+    sys.exit(protege_cfg.rodar(main_devolvendo_o_ini, emuladores=True))

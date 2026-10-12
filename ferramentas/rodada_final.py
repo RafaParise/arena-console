@@ -28,6 +28,7 @@ RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PYTHON = os.path.join(RAIZ, "servidor", "python", "python.exe")
 sys.path.insert(0, os.path.join(RAIZ, "testes"))
 import limpeza  # noqa: E402  (pastas que um teste esquece no Temp)
+import protege_cfg  # noqa: E402  (o que um jogo grava: cartoes, perfis, historico)
 LIMITE_S = 900  # 15 min por script; o mais lento (5 RetroArch) leva bem menos
 LIMITES_ESPECIAIS = {
     # Abre CADA jogo do catalogo, e o catalogo cresceu (62 jogos em 25/09,
@@ -50,6 +51,13 @@ DEVOLVIDOS = [os.path.join("retroarch", "retroarch.cfg"),
 VIGIADOS = DEVOLVIDOS + [
     os.path.join("dados", nome) for nome in ("arena.db", "config.json", "controles.json", "jogadores.txt",
                                              "consoles_manuais.json")]
+# Achado da Fase 8 da auditoria 3 (12/10/2026): os testes que ligam jogo
+# mudavam dado de quem joga -- os cartoes de memoria do PS2, o perfil do
+# Xbox 360, os dados do Wii, o historico do RetroArch -- e a rodada nao via.
+# Agora cada arquivo dessas pastas e' apontado (tamanho e data). Quem
+# devolve e' o proprio teste (protege_cfg.rodar); se ele for morto no meio,
+# a copia fica numa pasta protege_arena_* do Temp para devolver a mao.
+PASTAS_VIGIADAS = protege_cfg.DO_RETROARCH + protege_cfg.DOS_EMULADORES
 
 # Ferramentas de investigacao que moram em testes\ mas pedem arquivos de uma
 # partida especifica (nao ha o que testar sem eles). Ficam fora, com o motivo.
@@ -86,13 +94,23 @@ def retrato_dos_vigiados():
                 retrato[relativo] = (info.st_size, info.st_mtime_ns)
         except OSError:
             retrato[relativo] = None
+    for pasta in PASTAS_VIGIADAS:
+        for arquivo in protege_cfg.arquivos(pasta) if os.path.exists(pasta) else []:
+            relativo = os.path.relpath(arquivo, RAIZ)
+            if relativo in retrato or arquivo.endswith(".protege.tmp"):
+                continue   # o retroarch.cfg e o PCSX2.ini ja estao, inteiros
+            try:
+                info = os.stat(arquivo)
+                retrato[relativo] = (info.st_size, info.st_mtime_ns)
+            except OSError:
+                retrato[relativo] = None
     return retrato
 
 
 def conferir_vigiados(antes):
     """Aponta o que o teste mudou de verdade; devolve os DEVOLVIDOS."""
     depois = retrato_dos_vigiados()
-    mexidos = [r for r in VIGIADOS if depois.get(r) != antes.get(r)]
+    mexidos = sorted(r for r in set(antes) | set(depois) if depois.get(r) != antes.get(r))
     devolvidos = []
     for relativo in DEVOLVIDOS:
         if relativo in mexidos and antes.get(relativo) is not None:

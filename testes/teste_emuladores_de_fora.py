@@ -244,4 +244,8 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    # Os cartoes de memoria, saves e perfis de verdade tambem (Fase 8 da
+    # auditoria 3): ligar um jogo grava neles (o historico no cartao do PS2).
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import protege_cfg
+    sys.exit(protege_cfg.rodar(main, emuladores=True))
