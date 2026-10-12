@@ -742,6 +742,22 @@ def prova_do_retroarch(copia, relativo, nucleo, quadros=300, nome="jogo de prova
     return problemas
 
 
+def parece_versao_dos_alunos(destino):
+    """O --atualizar so mexe numa versao dos alunos: a pasta com o nome de
+    sempre (ARENA-alunos) ou uma com a folha de rosto que o montador escreve
+    (LEIA-PRIMEIRO.txt) -- em 10/10/2026 o Rafael passou a usar a versao dos
+    alunos com o nome ARENA. Nunca esta pasta (a de desenvolvimento) nem
+    pasta com .git (o repositorio)."""
+    if not os.path.isdir(destino):
+        return False
+    if os.path.normcase(os.path.abspath(destino)) == os.path.normcase(os.path.abspath(RAIZ)):
+        return False
+    if os.path.exists(os.path.join(destino, ".git")):
+        return False
+    return (os.path.basename(os.path.normpath(destino)) == NOME_DESTINO
+            or os.path.isfile(os.path.join(destino, "LEIA-PRIMEIRO.txt")))
+
+
 def principal():
     com_bios = "--com-bios" in sys.argv
     destino = os.path.join(PROJETO, NOME_DESTINO)
@@ -749,8 +765,9 @@ def principal():
         destino = os.path.abspath(sys.argv[sys.argv.index("--destino") + 1])
     inicio = time.time()
     if "--atualizar" in sys.argv:
-        if os.path.basename(os.path.normpath(destino)) != NOME_DESTINO or not os.path.isdir(destino):
-            print("Nao achei a versao dos alunos em %s." % destino)
+        if not parece_versao_dos_alunos(destino):
+            print("Nao achei a versao dos alunos em %s (a pasta ARENA-alunos, ou uma com o "
+                  "LEIA-PRIMEIRO.txt que o montador escreve)." % destino)
             return 1
         print("Atualizando so o programa da versao em %s (jogos, dados e saves ficam)..." % destino,
               flush=True)
