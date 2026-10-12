@@ -46,97 +46,78 @@ Ambiente de desenvolvimento: Windows 11.
 
 ## Estado atual (atualizar ao fim de cada sessão)
 
-**RETOMAR DAQUI (11/10/2026, ~01h00) — sessão aberta em `C:\Projetos\Criador
-De Apps Pedagógicos` (pedido: "continue de onde parou
-quando acabou o limite da sessão do dia de hoje").** O que aconteceu e já foi
-resolvido nesta sessão (detalhe no `docs\RELATORIO-QUALIDADE.md`, quando a
-Fase 8 for escrita):
+**ESTADO EM 12/10/2026 (~18h30) — AUDITORIA 3 CONCLUÍDA E ARENA PUBLICADO.
+Versão: 2026.10.11. Bateria `servidor\tests\run.py`: 323.** Sessão aberta
+em `C:\Projetos\Criador De Apps Pedagógicos` (pedidos: o de 07/10, "finalize
+a auditoria sozinho [...] depois o github com o ARENA completo para
+download", e o de 11/10, "continue de onde parou").
 
-- **Pastas mudaram de lugar (10/10, ~23h49, não fui eu):** o repositório agora
-  é `C:\Projetos\Criador De Apps Pedagógicos\ARENA-unificado` (era
-  `...\ARENA\ARENA-unificado`) e a **versão dos alunos é
-  `C:\Projetos\Criador De Apps Pedagógicos\ARENA`** (era `ARENA-alunos`). As
-  duas versões originais e o `Instruções.txt` não estão mais em `C:\Projetos`
-  (perguntar ao Rafael). O montador procura `..\ARENA-alunos`: usar o destino
-  novo no `--atualizar` (conferir o parâmetro antes).
-- **O GitHub é `RafaParise/arena-console`** (público; NÃO `RafaParise/ARENA`,
-  que não existe — os docs `SINCRONIZAR-COM-O-GITHUB.md` e a ferramenta
-  `sincronizar_github.py` ainda citam o nome errado: corrigir). `gh` instalado
-  (`C:\Program Files\GitHub CLI\gh.exe`, logado como RafaParise) e credencial
-  do Git guardada: dá para enviar sem pedir login.
-- **10/10 19h23 — `git pull` (do Hermes) trocou o `.gitignore` do ARENA pelo de
-  Python do GitHub**, deixou a junção pela metade e uma trava `index.lock`;
-  um `sync_to_github.bat` (20h22) faria `git add -A` + push (BIOS, jogos e
-  `arena.db` iriam a público). Consertado: junção desfeita, `.gitignore` de
-  volta, trava velha removida, script em `ARENA-unificado\backup\desativados\`.
-- **11/10 00h21–00h50 — o Hermes (`hermes --yolo`) fez `git init` NA PASTA DOS
-  ALUNOS**, commit de 4.942 arquivos (BIOS da Sony/Sega/Nintendo, `backup\...
-  \arena.db`, saves) e tentou `git push --force-with-lease` ao GitHub
-  público (recusado: arquivos > 100 MB). **Parei o Hermes.** Ele tinha
-  APAGADO do disco 8 arquivos (BIOS PS1/PS2, `dc_boot.zip`, `neogeo.zip`, o
-  memory card `Memory Card Slot 1.ps2` do PCSX2, `rpcs3.exe`,
-  `ni-n-sat.zip`): **devolvidos do commit dele e conferidos pelo hash.** O
-  checkout dele converteu 6.453 textos para CRLF: 5.981 voltaram ao original
-  (referência: a pasta de desenvolvimento). Conferência final: 8.637 de 9.113
-  arquivos idênticos byte a byte ao das 00h29 (o resto: CRLF original ou
-  configuração). Jogos intocados (103 arquivos, 3.957.916.092 bytes). O
-  `.git` dele virou `ARENA\.git-do-hermes-desativado` (568 MB, nada apagado);
-  o `.gitignore` dele em `.gitignore-do-hermes.txt`; `.gitignore` do ARENA no
-  lugar; `ARENA\LEIA - GIT DESATIVADO.txt` explica. Há uma tarefa agendada
-  `Hermes_Gateway` no Windows (não mexi).
-- **E-mail institucional do professor** estava em 9 commits do `auditoria`
-  (arquivos do Hermes, nunca enviados): tirado com `filter-branch` só nesse
-  trecho; original em `ARENA-unificado\backup\git\auditoria-antes-de-tirar-o-email-2026-10-11.bundle`.
-  Hashes novos: e752b0b→08aaac7, 69cc361→1053f15, a5e4e7b→b2fdf44,
-  6ae7fc2→5dc2363, ae58a21→cfdc66d, 1e6967a→0133c38, 8740aa2→f3a641a,
-  60d8932→b2e45f8, b27fffd→7bd973b. (Ele JÁ está público nos arquivos que o
-  Hermes enviou ao GitHub — avisar o Rafael; tirar de lá exige envio forçado.)
-- **Gmail no histórico:** decidido NÃO reescrever (já está público em 10
-  commits do GitHub; reescrever mudaria ~450 hashes citados). Registrar.
-- **Novo:** `ferramentas\conferir_antes_de_publicar.py` + teste (commit
-  `68e5e2f`; bateria **298**): rodar antes de todo envio ao GitHub.
-- **GitHub agora:** `main` = `c4f62dc` (o `main` aprovado, versão 2026.10.03.2,
-  + junção "ours" que guarda os 10 commits do GitHub sem os arquivos);
-  `auditoria` enviado (`68e5e2f`). Regra 24866071: sem envio forçado e sem
-  apagar ramo (todos os ramos). `git config maintenance.auto` — o repack
-  geométrico automático trava aqui (matei um preso às 00h45): desligar.
+- **GitHub `RafaParise/arena-console` (público; `RafaParise/ARENA` não
+  existe):** `main` = 2026.10.11 (o `auditoria` juntado pelo PR #1, commit
+  `8624480`). **O trabalho continua no `main`**; o `auditoria` fica (a regra
+  "Proteger os ramos", 24866071, não deixa apagar ramo nem enviar à força).
+  **Release `v2026.10.11`**: `ARENA-2026.10.11.zip`, 478 MB, SHA-256
+  `e1a2991b0a13bb43efbfdb1450aa061644f19df166a832f8d851cadbf28d8114`, montado SEM BIOS (`montar_versao_alunos.py --destino
+  %TEMP%\ap\ARENA-alunos`; o modo montar exige esse nome) e conferido duas
+  vezes (o montador e uma busca independente de nomes de BIOS, `dev_flash`,
+  contas e dados: 0 achados em 7.810 arquivos). Leva `LICENSE` e
+  `TERCEIROS.md` (a GPL pede o texto da licença junto do programa). Tópicos,
+  site e descrição preenchidos; **a "Social preview" só se põe pelo site**
+  (Settings → General → Social preview → `docs\imagens\arena-capa.png`).
+  `gh` em `C:\Program Files\GitHub CLI\gh.exe`, logado; credencial do Git
+  guardada.
+- **Pastas (mudança do Rafael, 10/10 23h49):** o repositório é
+  `C:\Projetos\Criador De Apps Pedagógicos\ARENA-unificado`; **a versão dos
+  alunos é `..\ARENA`** (era `ARENA-alunos`). O `--atualizar` agora a
+  reconhece pela folha de rosto (`LEIA-PRIMEIRO.txt`) e recusa a pasta de
+  desenvolvimento e pasta com `.git`. Atualizada em 12/10 (2026.10.11; 344
+  arquivos dele intocados; as 7 linhas velhas do `retroarch.cfg` dela
+  consertadas pela correção de caminhos). As duas versões originais e o
+  `Instruções.txt` não estão mais no disco (perguntar ao Rafael); a seção
+  "Duas versões nesta pasta", mais abaixo, ficou velha.
+- **Medidas da Fase 8 (Depois × Antes no relatório):** abertura 2,61 →
+  1,90 s; 35 gravações e 72 KB por abertura (antes ~9,8 MB); parado 1 h com
+  a tela: 0 gravações, nenhum arquivo mudado; servidor 0,05% e 43,6 MB; a tela parada com o fundo
+  "Sempre" 7,51% de um núcleo (a 1ª amostra, com a máquina ocupada, 9,92%) (o Edge se atualizou em 09/10; a Fase 2 deu 7,64%).
+  Rodada completa 101 de 102 (o Dreamcast da matriz, P7; repetido sozinho,
+  passou).
+- **Hermes (outro assistente), incidentes resolvidos (detalhe na memória
+  `hermes-agente-concorrente` e no relatório, Fase 8):** 10/10 19h23 o `git
+  pull` dele trocou o `.gitignore` pelo de Python e deixou a junção pela
+  metade (consertado; o `sync_to_github.bat` dele, que faria `git add -A` +
+  envio, está em `backup\desativados\`); 11/10 00h21–00h50 fez `git init` NA
+  PASTA DOS ALUNOS e tentou enviar BIOS e o `arena.db` ao GitHub (recusado
+  pelo tamanho); os 8 arquivos que ele apagou voltaram, conferidos pelo hash;
+  o `.git` dele é `..\ARENA\.git-do-hermes-desativado` (568 MB, nada
+  apagado; `LEIA - GIT DESATIVADO.txt`). Hoje o Hermes roda como aplicativo
+  de mesa (`Hermes.exe`), sem mexer nas pastas; há a tarefa agendada
+  `Hermes_Gateway` (não mexi). O e-mail institucional saiu de 9 commits que
+  nunca tinham ido ao GitHub (cópia em
+  `backup\git\auditoria-antes-de-tirar-o-email-2026-10-11.bundle`; hashes:
+  e752b0b→08aaac7, 69cc361→1053f15, a5e4e7b→b2fdf44, 6ae7fc2→5dc2363,
+  ae58a21→cfdc66d, 1e6967a→0133c38, 8740aa2→f3a641a, 60d8932→b2e45f8,
+  b27fffd→7bd973b), mas já
+  está público nos commits que o Hermes enviou em 10/10 (tirar exige envio
+  forçado: decisão do Rafael). O Gmail no histórico ficou (já público).
+- **`.git` daqui:** os 5,5 GB de cópias soltas (9.489 blobs gravados nos dois incidentes do Hermes, com o `.gitignore` errado) foram provados contra o disco — os 20 que tinham mudado desde 10/10 (2 cartões de PS2, um `config.json`, tempo de jogo) estão em `backup\versoes-antigas-do-git-2026-10-10\` — e limpos com `git prune`: o `.git` tem 1,8 MB e a manutenção automática voltou ao padrão (`maintenance.auto` desfeito). Os commits "WIP on …"/"index on …" que
+  aparecem sem dono são retratos do plugin **security-guidance** do Claude
+  Code (`git stash create` numa cópia do índice): não mexem em arquivo nem
+  em ramo.
+- **Publicar:** sempre pelo `SINCRONIZAR.bat` (ou
+  `ferramentas\sincronizar_github.py enviar`), que roda
+  `ferramentas\conferir_antes_de_publicar.py` (recusa BIOS, jogo, banco,
+  save, e-mail institucional, senha e token).
 
-**Feito depois (11/10, até ~10h30; tudo enviado ao `auditoria` do GitHub):**
-`dc30207` SINCRONIZAR confere antes de enviar; `9cb3f64` conferência: caminho
-com acento, binário renomeado, avisos à mostra (revisão de segurança
-automática); `bd3a590` **Fase 6 FECHADA** (F1: pasta que sobe um nível
-passava na correção de caminhos — o `retroarch.cfg` dos alunos tem 7 linhas
-em `...\ARENA\ARENA-alunos` que se consertam no 1º abrir depois do
-`--atualizar`; F2 âncora; driver de vídeo; linha do PS2 da Fase 5: 37 de 37);
-`a2314f1` README completo (desbloquear o .zip), capa sem desenho atrás do
-texto, `TERCEIROS.md`, docs do Hermes removidos. Bateria **310**. O
-`retroarch.cfg` de desenvolvimento foi corrigido (8 linhas no lugar antigo).
+**Para o Rafael (substitui as listas de baixo):** (1) pôr a "Social preview"
+pelo site; (2) decidir se tira o e-mail institucional dos commits já
+públicos (envio forçado); (3) dizer onde ficaram as duas versões originais;
+(4) os roteiros de sala do relatório (Jogar Junto em 5 notebooks, o Celeron,
+controle na mão, as cinco pessoas, pen drive); (5) BIOS que faltam:
+`BIOS\LEIA - O QUE FALTA.txt` e a lista de 03/10, abaixo; (6) observações da
+Fase 7: o botão "Gerenciar catálogo" (acervo) nunca aparece, e um "Abrir a
+pasta dos pacotes" ajudaria quem nunca usou computador.
 
-**Feito à tarde (11/10, 17h–17h30):** as revisões automáticas morreram 4×
-no limite de uso → feitas à mão; `b68ea4b` **Fases 5 e 7 FECHADAS** (revisão
-da Fase 5 sem defeito; Fase 7: o foco agora entra na janela que abre —
-`ligarFocoDasJanelas`, acessibilidade 9 de 9 com prova negativa; passo a
-passo das 5 pessoas conferido); `ad28dbd` **versão 2026.10.11** e guias
-(1-COMECAR "O jeito fácil" pelo GitHub + Desbloquear; LEIA-ME). Esta
-memória (o CLAUDE.md) passou a morar no repositório; a pasta de cima tem só
-o apontador `@ARENA-unificado/CLAUDE.md` (a antiga em `backup\claude-md\`).
-No GitHub há um **PR #1** (`auditoria` → `main`), aberto pela conta RafaParise
-às 10h45 com um texto-modelo: usar para a junção, com a descrição de
-verdade. Rodada completa da Fase 8 começada às 17h20
-(`docs\auditoria3\rodada_depois.json`, gravada a cada script; se morrer:
-`rodada_final.py --saida=docs/auditoria3/rodada_depois.json --continuar`).
-
-**Falta (nesta ordem):** terminar a rodada completa; `testes\linha_base.py` e
-`testes\medir_gravacoes_parado.py` (1 h) para a tabela Depois; seção da
-Fase 8 no relatório (Depois × Antes, removidos, corrigidos, o que falta,
-roteiros); `auditoria`→`main` pelo PR #1 (descrição de verdade) e push;
-`--atualizar --destino ..\ARENA`; Release (montador `--destino <temp>` sem
-`--com-bios`, conferir, zip < 2 GB, `gh release create v2026.10.11`);
-tópicos e página do repositório; avisar o Rafael da "Social preview" (só
-pelo site). A seção "Duas versões nesta pasta", mais abaixo, ficou velha:
-as duas versões originais não estão mais no disco (perguntar ao Rafael).
-
-**AUDITORIA 3 — EM ANDAMENTO (começada em 07/10/2026), ramo `auditoria`.**
+**AUDITORIA 3 — CONCLUÍDA (07 a 12/10/2026; juntada ao `main` pelo PR #1).**
 O pedido do Rafael ("AUDITORIA COMPLETA DO ARENA: TESTES, LIMPEZA E
 OTIMIZAÇÃO", fases 0 a 8, 10 regras) está salvo SEM RESUMIR em
 `ARENA-unificado\docs\PLANO-AUDITORIA.md`, seção "Auditoria 3", com as
@@ -1426,7 +1407,7 @@ foi feito.
 > quem, o que já foi decidido e **por quê**, e os erros que custaram caro
 > para descobrir. Leia antes de propor qualquer mudança.
 
-**Versão atual:** 2026.10.03.2
+**Versão atual:** 2026.10.11
 **Autor:** Rafael Parise Passos — professor, SEDUC-SP
 **Local do projeto no Windows:** `C:\Projetos\Criador De Apps Pedagógicos\ARENA`
 
