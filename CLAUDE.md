@@ -1501,17 +1501,19 @@ viole está errada**, por melhor que seja tecnicamente.
 
 ## 3. Contexto pedagógico
 
-**Escolas:** EE Alexandrina Santiago Netto e EE Vilma Catharina Mosca Leone
-(Praia Grande/SP). Sede administrativa em EE Silvia Jorge Pollastrini
-(Itanhaém/SP).
+**Escolas:** duas escolas estaduais da Baixada Santista (SP), chamadas aqui
+de Escola A e Escola B, e a sede administrativa da diretoria de ensino. Os
+nomes e as letras das turmas ficam fora deste arquivo, que é público
+desde 11/10/2026: o público do ARENA inclui alunos menores de idade
+(o Rafael sabe quais são).
 
 **Turmas e componentes:**
 
 | Turma | Componentes |
 |---|---|
-| 2ºC (Alexandrina) | Lógica e Linguagem de Programação (C1); Redes e Segurança da Informação na Nuvem (C2) |
-| 2ºA (Vilma) | Redes e Segurança (C2); Processos de Desenvolvimento de Software e Metodologias Ágeis (C3) |
-| 3ºB (Alexandrina) | Programação Back-End (C2); Front-End (C3); Modelagem e Desenvolvimento de Banco de Dados (C4) |
+| 2ª série (Escola A) | Lógica e Linguagem de Programação (C1); Redes e Segurança da Informação na Nuvem (C2) |
+| 2ª série (Escola B) | Redes e Segurança (C2); Processos de Desenvolvimento de Software e Metodologias Ágeis (C3) |
+| 3ª série (Escola A) | Programação Back-End (C2); Front-End (C3); Modelagem e Desenvolvimento de Banco de Dados (C4) |
 
 **Como o ARENA vira aula:**
 
@@ -1525,8 +1527,8 @@ viole está errada**, por melhor que seja tecnicamente.
 
 **Hardware alvo:**
 
-- Alexandrina: notebooks i5/i7, 8 GB, NVMe
-- Vilma: Positivo dual-core, 4 GB, sem SSD
+- Escola A: notebooks i5/i7, 8 GB, NVMe
+- Escola B: Positivo dual-core, 4 GB, sem SSD
 - Máquina do Rafael: Ryzen 5 5600G, Radeon Vega **integrada**, ~11,8 GB
 - Portáteis: SanDisk USB 3.1 64 GB, cartão SD 512 GB, SSD SATA com adaptador USB 3.2
 
