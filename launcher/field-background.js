@@ -393,52 +393,8 @@
     }
   }
 
-  // Joaninha (02/10/2026: era "so uma barrinha preta e vermelha que passa
-  // de um lado para o outro"). Agora com casco de pintas, cabeca e
-  // perninhas que andam; de vez em quando abre as asas e voa para outro
-  // lugar do campo.
-  const QUADROS_JOANINHA = S.quadros([
-    ['..RRR..',
-     '.RKRKRK',
-     'RRRRRRK',
-     'RKRRKRK',
-     '.l.l.l.'],
-    ['..RRR..',
-     '.RKRKRK',
-     'RRRRRRK',
-     'RKRRKRK',
-     'l.l.l..'],
-    ['w.RRR.w',
-     'wRKRKRK',
-     '.RRRRRK',
-     '..RRKR.']
-  ], { R: '#e53935', K: '#1a1a1a', l: '#1a1a1a', w: 'rgba(255,255,255,0.85)' });
-  const joaninha = { x: 10 + sorteio() * (W - 30), y: HORIZONTE + 2, dir: 1, voo: null,
-                     espera: 600 + sorteio() * 900 };
-
-  function desenharJoaninha(passo) {
-    const j = joaninha;
-    if (j.voo) {
-      j.voo.p = Math.min(1, j.voo.p + passo / j.voo.duracao);
-      j.x = j.voo.x0 + (j.voo.x1 - j.voo.x0) * j.voo.p;
-      j.y = j.voo.y0 + (j.voo.y1 - j.voo.y0) * j.voo.p - Math.sin(j.voo.p * Math.PI) * 14;
-      S.colar(ctx, QUADROS_JOANINHA[2], j.x, j.y - 4, j.dir);
-      if (j.voo.p >= 1) j.voo = null;
-      return;
-    }
-    j.x += j.dir * 0.07 * passo;
-    if (j.x > W - 10) j.dir = -1;
-    if (j.x < 3) j.dir = 1;
-    j.espera -= passo;
-    if (j.espera <= 0) {                  // abre as asas e vai para outro canto
-      const x1 = 6 + aleatorio() * (W - 20);
-      j.dir = x1 > j.x ? 1 : -1;
-      j.voo = { p: 0, x0: j.x, y0: j.y, x1: x1, y1: HORIZONTE + 2 + Math.floor(aleatorio() * 3),
-                duracao: 90 + Math.abs(x1 - j.x) * 1.2 };
-      j.espera = 900 + aleatorio() * 1200;
-    }
-    S.colar(ctx, QUADROS_JOANINHA[Math.floor(t / 8) % 2], j.x, j.y - 4, j.dir);
-  }
+  // (A joaninha saiu em 12/10/2026, a pedido do Rafael: o chao do campo
+  // ficou para os personagens de 16 bits que visitam.)
 
   // Sementes de dente-de-leao: vao com o vento
   const sementes = [];
@@ -723,9 +679,12 @@
     }
     if (!visita.desenhar(passo)) {
       visita = null;
-      esperaVisita = 1200 + aleatorio() * 900;      // 20 a 35 s
+      // 20 a 35 s; no "Visualizar animação", 1,5 a 4 s (quem abriu quer ver).
+      esperaVisita = soFundo() ? 90 + aleatorio() * 150 : 1200 + aleatorio() * 900;
     }
   }
+
+  function soFundo() { return document.body.dataset.soFundo === 'true'; }
 
   // Para os testes chamarem uma visita na hora (testes\\teste_fundos_animados.py).
   window.__fundoClaro = {
@@ -733,7 +692,21 @@
     chamar: function (nome) { if (VISITAS[nome]) visita = VISITAS[nome](); return !!visita; },
     rodando: function () { return !!visita; },
     velocidade: function (v) { velocidade = Math.max(1, Math.min(16, Number(v) || 1)); return velocidade; },
-    soltarCoelho: function () { esperaCoelho = 0; return true; }
+    soltarCoelho: function () { esperaCoelho = 0; return true; },
+    // Avanca n quadros na hora (passo em 1/60 s; 3 = um quadro dos 20 por
+    // segundo): para revisar as visitas quadro a quadro e gravar o GIF.
+    avancar: function (n, passo) {
+      passo = passo || 3;
+      for (let i = 0; i < (n || 1); i++) { t += passo; desenharQuadro(passo); }
+      return t;
+    },
+    // Os pontos da tela (160 x 90, RGBA) em base64.
+    pixels: function () {
+      const d = ctx.getImageData(0, 0, W, H).data;
+      let s = '';
+      for (let i = 0; i < d.length; i += 8192) s += String.fromCharCode.apply(null, d.subarray(i, i + 8192));
+      return btoa(s);
+    }
   };
 
   // Um quadro completo
@@ -745,7 +718,6 @@
     desenharNuvens(passo);
     desenharBando(passo);
     desenharGirassois();
-    desenharJoaninha(passo);
     desenharCoelho(passo);
     desenharVisitas(passo);
     desenharAbelhas(passo);
@@ -775,6 +747,7 @@
 
   function modo() {
     if (document.body.dataset.tema === 'escuro') return 'oculto';
+    if (soFundo()) return 'animado';       // "Visualizar animação": anima sempre
     const escolha = document.body.dataset.fundoAnimado || 'automatico';
     if (escolha === 'parado') return 'parado';
     if (escolha === 'sempre') return 'animado';
@@ -818,7 +791,11 @@
     geracao++;
   }
 
+  let assistindo = false;
   function sincronizar() {
+    // Quem acabou de abrir o "Visualizar animação" ve uma visita logo.
+    if (soFundo() && !assistindo) esperaVisita = Math.min(esperaVisita, 45);
+    assistindo = soFundo();
     const novo = modo();
     canvas.style.display = novo === 'oculto' ? 'none' : 'block';
     const travado = novo === 'animado' && modoAtual === 'animado'
@@ -846,7 +823,7 @@
   sincronizar();
   // Reage na hora a troca de tema, modo modesto e escolha do aluno...
   new MutationObserver(sincronizar).observe(document.body, {
-    attributes: true, attributeFilter: ['data-tema', 'data-modo-modesto', 'data-fundo-animado']
+    attributes: true, attributeFilter: ['data-tema', 'data-modo-modesto', 'data-fundo-animado', 'data-so-fundo']
   });
   // ...e a mudanca da preferencia do Windows (animacoes ligadas/desligadas).
   if (menosMovimento && menosMovimento.addEventListener) {

@@ -692,16 +692,33 @@
     }
     if (!visita.desenhar(passo)) {
       visita = null;
-      esperaVisita = 1200 + aleatorio() * 900;      // 20 a 35 s
+      // 20 a 35 s; no "Visualizar animação", 1,5 a 4 s (quem abriu quer ver).
+      esperaVisita = soFundo() ? 90 + aleatorio() * 150 : 1200 + aleatorio() * 900;
     }
   }
+
+  function soFundo() { return document.body.dataset.soFundo === 'true'; }
 
   // Para os testes chamarem uma visita na hora (testes\\teste_fundos_animados.py).
   window.__fundoEscuro = {
     visitas: Object.keys(VISITAS),
     chamar: function (nome) { if (VISITAS[nome]) visita = VISITAS[nome](); return !!visita; },
     rodando: function () { return !!visita; },
-    velocidade: function (v) { velocidade = Math.max(1, Math.min(16, Number(v) || 1)); return velocidade; }
+    velocidade: function (v) { velocidade = Math.max(1, Math.min(16, Number(v) || 1)); return velocidade; },
+    // Avanca n quadros na hora (passo em 1/60 s; 3 = um quadro dos 20 por
+    // segundo): para revisar as visitas quadro a quadro e gravar o GIF.
+    avancar: function (n, passo) {
+      passo = passo || 3;
+      for (let i = 0; i < (n || 1); i++) { t += passo; desenharQuadro(passo); }
+      return t;
+    },
+    // Os pontos da tela (160 x 90, RGBA) em base64.
+    pixels: function () {
+      const d = ctx.getImageData(0, 0, W, H).data;
+      let s = '';
+      for (let i = 0; i < d.length; i += 8192) s += String.fromCharCode.apply(null, d.subarray(i, i + 8192));
+      return btoa(s);
+    }
   };
 
   function desenharCeu(passo) {
@@ -775,6 +792,7 @@
 
   function modo() {
     if (document.body.dataset.tema !== 'escuro') return 'oculto';
+    if (soFundo()) return 'animado';       // "Visualizar animação": anima sempre
     const escolha = document.body.dataset.fundoAnimado || 'automatico';
     if (escolha === 'parado') return 'parado';
     if (escolha === 'sempre') return 'animado';
@@ -810,7 +828,11 @@
     setTimeout(quadro, 0);
   }
 
+  let assistindo = false;
   function sincronizar() {
+    // Quem acabou de abrir o "Visualizar animação" ve uma visita logo.
+    if (soFundo() && !assistindo) esperaVisita = Math.min(esperaVisita, 45);
+    assistindo = soFundo();
     const novo = modo();
     canvas.style.display = novo === 'oculto' ? 'none' : 'block';
     const travado = novo === 'animado' && modoAtual === 'animado'
@@ -831,7 +853,7 @@
 
   sincronizar();
   new MutationObserver(sincronizar).observe(document.body, {
-    attributes: true, attributeFilter: ['data-tema', 'data-modo-modesto', 'data-fundo-animado']
+    attributes: true, attributeFilter: ['data-tema', 'data-modo-modesto', 'data-fundo-animado', 'data-so-fundo']
   });
   if (menosMovimento && menosMovimento.addEventListener) {
     menosMovimento.addEventListener('change', sincronizar);

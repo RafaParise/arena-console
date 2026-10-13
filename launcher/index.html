@@ -11,11 +11,18 @@
 <canvas id="galaxyCanvas"></canvas>
 <canvas id="fieldCanvas"></canvas>
 
+<!-- Só aparece no "Visualizar animação": a tela some e fica só o fundo. -->
+<button class="botao" id="btnVoltarAnimacao" type="button" hidden
+        aria-label="Voltar para a tela do ARENA">◀ Voltar</button>
+
 <!-- ===================== BARRA DE ESTADO DA MAQUINA ===================== -->
 <header class="painel-topo">
   <div class="marca">
     <span class="marca-nome">ARENA</span>
-    <span class="marca-sub">console da turma <b id="versao"></b></span>
+    <span class="marca-sub">central retrô da turma <b id="versao"></b></span>
+    <button class="botao botao--mini" id="btnVerAnimacao" type="button" aria-label="Visualizar animação"
+            title="Visualizar animação: esconde a tela inteira e deixa só o fundo animado (Esc volta)"><span
+            aria-hidden="true">▶</span><span class="rotulo-largo"> Visualizar animação</span></button>
   </div>
 
   <dl class="leitura">

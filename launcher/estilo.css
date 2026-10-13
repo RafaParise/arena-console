@@ -210,6 +210,33 @@ code {
   white-space: nowrap;
 }
 
+/* "Visualizar animação" (pedido do Rafael, 12/10/2026): a tela inteira some
+   e fica só o fundo animado; o "Voltar" fica num canto, discreto. */
+.botao--mini {
+  align-self: center;
+  padding: .2rem .6rem;
+  font-size: var(--t-micro);
+  white-space: nowrap;
+}
+/* No notebook da escola (1366 de largura) o topo nao tem folga: o botao
+   vira so o icone (o nome fica na dica e no leitor de tela). */
+@media (max-width: 1600px) {
+  .botao--mini .rotulo-largo { display: none; }
+}
+body[data-so-fundo="true"] > *:not(canvas):not(script):not(#btnVoltarAnimacao) {
+  display: none !important;
+}
+#btnVoltarAnimacao {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 50;
+  opacity: .5;
+}
+#btnVoltarAnimacao:hover,
+#btnVoltarAnimacao:focus-visible { opacity: 1; }
+#btnVoltarAnimacao[hidden] { display: none; }
+
 .leitura {
   display: flex;
   gap: var(--gap-g);

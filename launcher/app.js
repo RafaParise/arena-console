@@ -3842,6 +3842,22 @@ function ligarEventos() {
   $("#btnComoColocar").addEventListener("click", abrirComoColocar);
   $("#listaComoColocar").addEventListener("change", desenharComoColocar);
   $("#btnAjustes").addEventListener("click", () => abrirGaveta("gavetaAjustes"));
+  // "Visualizar animação": esconde a tela inteira (o CSS de
+  // body[data-so-fundo]) e os fundos animam mesmo no "Parado", com as
+  // visitas dos personagens mais seguidas. Esc ou o "Voltar" trazem a tela.
+  const verAnimacao = (ligar) => {
+    document.body.dataset.soFundo = ligar ? "true" : "false";
+    $("#btnVoltarAnimacao").hidden = !ligar;
+    (ligar ? $("#btnVoltarAnimacao") : $("#btnVerAnimacao")).focus();
+  };
+  $("#btnVerAnimacao").addEventListener("click", () => verAnimacao(true));
+  $("#btnVoltarAnimacao").addEventListener("click", () => verAnimacao(false));
+  document.addEventListener("keydown", (evento) => {
+    if (evento.key === "Escape" && document.body.dataset.soFundo === "true") {
+      evento.preventDefault();
+      verAnimacao(false);
+    }
+  });
   $("#btnTema").addEventListener("click", async () => {
     const tema = estado.config.tema === "escuro" ? "claro" : "escuro";
     try {
