@@ -48,18 +48,34 @@ Ambiente de desenvolvimento: Windows 11.
 
 **PEDIDOS DE 12/10/2026 À NOITE — EM ANDAMENTO, NESTA ORDEM (o Rafael pediu
 assim; marcar [x] ao terminar cada um):**
-1. [ ] **GitHub.** (a) Tirar o e-mail institucional do histórico público —
-   AUTORIZADO ("pode fazer por favor eu autorizo"): reescrita feita na pasta
-   (filter-branch só nos 9 commits do Hermes de 10/10, `main ^auditoria
-   ^10d053b`; cópia em `backup\git\main-antes-de-tirar-o-email-institucional-2026-10-12.bundle`),
-   falta o envio forçado (desligar e religar a regra 24866071) e mover a
-   etiqueta `v2026.10.11`. (b) Release da versão auditada (existe; revisar
-   as notas). (c) Perfil do GitHub "de forma profissional" (nome, bio,
-   empresa, local, site + README de perfil `RafaParise/RafaParise`) — o
-   `gh` não tem o escopo `user`: o Rafael precisa rodar `gh auth refresh -h
-   github.com -s user`. (d) Revisar descrição, tópicos, recursos e arquivos
-   da comunidade (CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, modelos de issue
-   e de PR). (e) "Social preview" só pelo site (usar o GIF do item 3).
+1. [ ] **GitHub** (quase todo feito em 13/10, madrugada):
+   - [x] (a) E-mail institucional fora do histórico público: filter-branch só
+     nos 9 commits do Hermes (`main ^auditoria ^10d053b`, o commit inicial
+     assinado ficou), 3 verificadores independentes, envio forçado ATÔMICO do
+     `main` e da etiqueta com lease, regra 24866071 religada e conferida;
+     nenhuma ref do GitHub alcança os commits velhos; cópias locais
+     apagadas (o bundle e o mapa dos hashes ficam em `backup\git\`). FALTA
+     o Rafael mandar ao Suporte do GitHub o pedido de limpeza do PR #1 e do
+     cache: texto pronto em `backup\git\pedido-ao-suporte-do-github.txt`.
+     O e-mail esteve público de 10/10 a 13/10 (107 clones de 50 origens em
+     10–11/10): tratar como divulgado.
+   - [ ] (b) Release v2026.10.11: título novo feito; FALTA refazer o pacote
+     completo (o guia 6 mudou), subir também o pacote de atualização
+     (`montar_versao_alunos.py --zip-atualizacao`), mover a etiqueta e trocar
+     as notas (rascunho revisado no scratchpad da sessão; refazer se perder).
+   - [ ] (c) Perfil: README de perfil publicado (`RafaParise/RafaParise`).
+     Campos prontos, esperando o escopo `user` do gh (`gh auth refresh -h
+     github.com -s user`): bio "Professor do curso técnico de Desenvolvimento
+     de Sistemas na rede estadual de São Paulo. Crio aplicativos pedagógicos
+     para a sala de aula.", empresa "SEDUC-SP", local "São Paulo, Brasil",
+     site https://github.com/RafaParise/arena-console.
+   - [x] (d) Descrição nova (338 caracteres), 20 tópicos, Wiki e Projetos
+     desligados, relato privado de vulnerabilidade ligado; comunidade 100%
+     (CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, formulários de issue e de PR);
+     README corrigido (mais de 50 consoles; Celeron só com o que foi medido;
+     pacote de atualização). Revisão dos outros documentos públicos rodando.
+   - [ ] (e) "Social preview" e repositórios fixados: só pelo site (o GIF do
+     item 3).
 2. [ ] **Fundos animados** (`launcher\field-background.js` e
    `galaxy-background.js`): o máximo de personagens de jogos de 16 bits,
    os mais famosos, no mesmo estilo (espaço no escuro, campo florido no
