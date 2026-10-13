@@ -22,7 +22,7 @@
 
 ## O que é
 
-O ARENA junta numa tela só, em português, os emuladores de **52 consoles** —
+O ARENA junta numa tela só, em português, os emuladores de **mais de 50 consoles** —
 do Atari 2600 ao PlayStation 3 e ao Xbox 360 — e cuida do que costuma dar
 trabalho: achar o jogo, escolher o emulador, ajustar a imagem para o
 computador que está ali, configurar o controle, guardar o save e juntar os
@@ -73,6 +73,11 @@ Ele nasceu nas aulas do curso técnico de **Desenvolvimento de Sistemas**
    **Atualizar lista**. A barra da esquerda tem o botão **Como colocar
    jogos**, que diz a pasta, os formatos e o que falta para cada console.
 
+**Já usa o ARENA?** Para atualizar sem perder nada, baixe o
+`ARENA-2026.10.11-atualizacao.zip` (só o programa, uns 11 MB) e descompacte
+no mesmo lugar, substituindo os arquivos: o passo a passo está no
+[guia 6](6-RECURSOS-E-REPARO.md). O pacote completo é para instalar do zero.
+
 Passo a passo completo, com a tabela dos problemas mais comuns: [`1-COMECAR.md`](1-COMECAR.md).
 
 ### O que vem no pacote
@@ -107,12 +112,13 @@ dentro da pasta, sem gravar nada fora dela.
 | Internet | não precisa | capas e biblioteca online |
 
 A régua de desempenho do projeto é um notebook de escola com **Celeron N5100**
-(4 núcleos de 1,1 a 2,8 GHz, sem AVX, 8 GB em canal simples). Nele rodam bem
-os consoles até a geração do PlayStation 1 e do Nintendo 64, e o PSP. O
-PlayStation 2 e o GameCube ficam abaixo do mínimo que os próprios emuladores
-pedem: alguns jogos rodam, dependendo do jogo e de como o Windows está. O
-Xbox 360 exige processador com AVX, e o PlayStation 3 pede uma máquina bem
-mais forte. Os números medidos estão em
+(4 núcleos de 1,1 a 2,8 GHz, sem AVX, 8 GB em canal simples). Nos testes do
+professor, num N5100 com o Windows enxuto, o PlayStation 2 e o PSP rodaram,
+com quedas em alguns jogos. O PlayStation 2 e o GameCube ficam abaixo do
+mínimo que os próprios emuladores pedem: depende do jogo e de como o Windows
+está. O Xbox 360 exige processador com AVX (não abre nele), e o PlayStation 3
+pede uma máquina bem mais forte. O desempenho de cada console nesse notebook
+ainda vai ser medido em sala; o que já foi medido está em
 [`docs/MAQUINA-ALVO.md`](docs/MAQUINA-ALVO.md).
 
 ## Os consoles
@@ -125,7 +131,7 @@ mais forte. Os números medidos estão em
 | Microsoft | Xbox 360, MS-DOS |
 | Atari | 2600, 5200, 7800, Lynx, Jaguar |
 | Fliperama | Neo Geo e fliperamas (FBNeo), Arcade (MAME), Neo Geo Pocket |
-| Outros | PC Engine, PC-FX, WonderSwan, 3DO, CD-i, Odyssey 2, ColecoVision, Intellivision, Vectrex, MSX, Commodore 64, Amiga, ZX Spectrum, Amstrad CPC, ScummVM, Tamagotchi, Java ME |
+| Outros | PC Engine, PC-FX, WonderSwan, 3DO, CD-i, Odyssey 2, ColecoVision, Intellivision, Vectrex, MSX, Commodore 64, Amiga, ZX Spectrum, Amstrad CPC, ScummVM, Tamagotchi, Java ME (ainda sem núcleo) |
 | Consoles de fantasia | TIC-80, WASM-4, LowRes NX, Uzebox |
 
 ## Os guias

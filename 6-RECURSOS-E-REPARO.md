@@ -294,29 +294,43 @@ quebra.
 
 ### Atualizar o ARENA sem perder nada
 
-Chegou uma versão nova? **Copie por cima. Não apague nada.**
+Chegou uma versão nova? Use o **pacote de atualização**, e não o completo.
+Não apague nada.
 
-O que vem na versão nova e substitui:
+1. Na página do Release, baixe o `ARENA-<versão>-atualizacao.zip` (só o
+   programa, uns 11 MB) e desbloqueie o arquivo como na instalação: botão
+   direito → **Propriedades** → **Desbloquear** → **OK**.
+2. Feche o ARENA (a janela preta também).
+3. Descompacte no mesmo lugar onde está a pasta `ARENA` (por exemplo, `C:\`
+   ou a raiz do pen drive) e, quando o Windows perguntar, escolha
+   **Substituir os arquivos no destino**.
+
+O que o pacote de atualização traz e substitui:
 
 ```
-ARENA.bat  ·  VERIFICAR.bat  ·  PARTIDA.bat  ·  COLETAR.bat  ·  os 6 leia-me
-launcher\   ·  servidor\ (menos a pasta python)  ·  ferramentas\
+ARENA.bat · VERIFICAR.bat · PARTIDA.bat · COLETAR.bat · LEIA-ME e guias 1 a 6
+LICENSE · TERCEIROS.md · servidor\ (com o Python embutido) · launcher\ · ferramentas\
 ```
 
-O que é **seu** e nunca vem no pacote:
+O que é **seu** e não vem no pacote de atualização:
 
 ```
 jogos\        seus jogos
 dados\        recordes, apelido, amigos, mapeamento de controle
-retroarch\    o emulador, os núcleos, saves, states, cheats, BIOS
-emuladores\   PCSX2, Dolphin, RPCS3 e Xenia
+BIOS\         as BIOS que você colocou
+retroarch\    o emulador, os núcleos, saves, states, cheats e a configuração dele
+emuladores\   PCSX2, Dolphin, RPCS3 e Xenia, com a configuração e os saves deles
 perfil\       as coletas do COLETAR.bat
-servidor\python\   o Python embutido
 backup\       suas cópias
 ```
 
 Ao mandar substituir, o Windows só troca o que tem o mesmo nome. Tudo o que
 é seu fica.
+
+O **pacote completo** (`ARENA-<versão>.zip`) é para instalar do zero: ele traz
+também o RetroArch e os emuladores com a configuração do pacote. Descompactado
+por cima de um ARENA em uso, ele troca a configuração que você fez neles (os
+jogos, os saves, as BIOS e os recordes ficam).
 
 **Depois de copiar:**
 

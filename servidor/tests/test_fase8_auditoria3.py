@@ -83,6 +83,32 @@ class TestOPacoteLevaALicenca(unittest.TestCase):
             self.assertTrue(os.path.isfile(os.path.join(montador.RAIZ, nome)), nome)
 
 
+class TestPacoteDeAtualizacao(unittest.TestCase):
+    """O guia 6 manda atualizar copiando por cima: o pacote de atualizacao
+    leva so o programa (o completo traz o RetroArch e os emuladores ja
+    configurados, e por cima trocaria a configuracao de quem usa)."""
+
+    def test_so_o_programa(self):
+        import zipfile
+        pasta = tempfile.mkdtemp(prefix="arena_zip_atualizacao_")
+        try:
+            caminho = os.path.join(pasta, "atualizacao.zip")
+            montador.zip_de_atualizacao(caminho)
+            with zipfile.ZipFile(caminho) as z:
+                nomes = z.namelist()
+        finally:
+            shutil.rmtree(pasta, ignore_errors=True)
+        for esperado in ("ARENA/ARENA.bat", "ARENA/LICENSE", "ARENA/servidor/arena.py",
+                         "ARENA/launcher/app.js", "ARENA/ferramentas/coletar_maquina.py"):
+            self.assertIn(esperado, nomes)
+        for nome in nomes:
+            self.assertTrue(nome.startswith("ARENA/"), nome)
+            partes = nome.split("/")
+            self.assertNotIn(partes[1], ("retroarch", "emuladores", "dados", "jogos", "BIOS", "backup"), nome)
+            self.assertNotIn("__pycache__", partes, nome)
+            self.assertFalse(nome.startswith("ARENA/servidor/tests/"), nome)
+
+
 sys.path.insert(0, os.path.join(RAIZ, "testes"))
 import protege_cfg  # noqa: E402
 

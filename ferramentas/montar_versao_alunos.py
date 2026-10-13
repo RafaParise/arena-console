@@ -38,6 +38,9 @@ versao, e nenhum caminho da maquina do professor sobra nela.
 Uso:
     servidor\python\python.exe ferramentas\montar_versao_alunos.py [--com-bios] [--destino PASTA]
     servidor\python\python.exe ferramentas\montar_versao_alunos.py --atualizar [--destino PASTA]
+    servidor\python\python.exe ferramentas\montar_versao_alunos.py --zip-atualizacao ARQUIVO.zip
+(o ultimo monta o pacote de atualizacao do Release: so o programa, o mesmo
+conjunto que o --atualizar troca.)
 
 TRAVA (02/10/2026): montar APAGA a pasta de destino e faz de novo. Se ela ja
 foi usada (jogos, dados, saves, recordes...), a montagem recusa -- o Rafael
@@ -777,12 +780,55 @@ def parece_versao_dos_alunos(destino):
             or os.path.isfile(os.path.join(destino, "LEIA-PRIMEIRO.txt")))
 
 
+def arquivos_do_programa():
+    """(origem, caminho no pacote) de tudo o que o --atualizar troca: os
+    arquivos da raiz, servidor\\ (com o Python embutido, sem os testes),
+    launcher\\ e as ferramentas do COLETAR. Nada de jogos, dados, saves, BIOS,
+    RetroArch nem emuladores."""
+    lista = [(os.path.join(RAIZ, nome), nome) for nome in ARQUIVOS_DA_RAIZ]
+    for pasta, extra in (("servidor", ["tests"]), ("launcher", [])):
+        padroes = LIXO_SEMPRE + extra
+        lixo = lambda nome: any(fnmatch.fnmatch(nome, p) for p in padroes)  # noqa: E731
+        for atual, subpastas, nomes in os.walk(os.path.join(RAIZ, pasta)):
+            subpastas[:] = sorted(s for s in subpastas if not lixo(s))
+            for nome in sorted(nomes):
+                if not lixo(nome):
+                    origem = os.path.join(atual, nome)
+                    lista.append((origem, os.path.relpath(origem, RAIZ)))
+    lista += [(os.path.join(RAIZ, "ferramentas", nome), os.path.join("ferramentas", nome)) for nome in FERRAMENTAS]
+    return lista
+
+
+def zip_de_atualizacao(caminho_zip):
+    """O pacote de ATUALIZACAO (Fase 8 da auditoria 3): so o programa, para
+    copiar por cima de um ARENA em uso sem trocar a configuracao dos
+    emuladores nem tocar em nada de quem usa (o guia 6 manda usar este, e
+    nao o pacote completo, que traz o RetroArch e os emuladores ja
+    configurados). Dentro do .zip tudo fica em ARENA\\, como no completo."""
+    import zipfile
+    temporario = caminho_zip + ".fazendo"
+    with zipfile.ZipFile(temporario, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=6) as z:
+        for origem, rel in arquivos_do_programa():
+            z.write(origem, "ARENA/" + rel.replace("\\", "/"))
+    os.replace(temporario, caminho_zip)
+    with zipfile.ZipFile(caminho_zip) as z:
+        if z.testzip() is not None:
+            raise SystemExit("arquivo estragado no zip de atualizacao")
+        return len(z.namelist())
+
+
 def principal():
     com_bios = "--com-bios" in sys.argv
     destino = os.path.join(PROJETO, NOME_DESTINO)
     if "--destino" in sys.argv:
         destino = os.path.abspath(sys.argv[sys.argv.index("--destino") + 1])
     inicio = time.time()
+    if "--zip-atualizacao" in sys.argv:
+        caminho = os.path.abspath(sys.argv[sys.argv.index("--zip-atualizacao") + 1])
+        quantos = zip_de_atualizacao(caminho)
+        print("Pacote de atualizacao: %s (%d arquivos, %.1f MB)." % (caminho, quantos,
+                                                                    os.path.getsize(caminho) / 1024 ** 2))
+        return 0
     if "--atualizar" in sys.argv:
         if not parece_versao_dos_alunos(destino):
             print("Nao achei a versao dos alunos em %s (a pasta ARENA-alunos, ou uma com o "
