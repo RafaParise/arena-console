@@ -46,6 +46,47 @@ Ambiente de desenvolvimento: Windows 11.
 
 ## Estado atual (atualizar ao fim de cada sessão)
 
+**PEDIDOS DE 12/10/2026 À NOITE — EM ANDAMENTO, NESTA ORDEM (o Rafael pediu
+assim; marcar [x] ao terminar cada um):**
+1. [ ] **GitHub.** (a) Tirar o e-mail institucional do histórico público —
+   AUTORIZADO ("pode fazer por favor eu autorizo"): reescrita feita na pasta
+   (filter-branch só nos 9 commits do Hermes de 10/10, `main ^auditoria
+   ^10d053b`; cópia em `backup\git\main-antes-de-tirar-o-email-institucional-2026-10-12.bundle`),
+   falta o envio forçado (desligar e religar a regra 24866071) e mover a
+   etiqueta `v2026.10.11`. (b) Release da versão auditada (existe; revisar
+   as notas). (c) Perfil do GitHub "de forma profissional" (nome, bio,
+   empresa, local, site + README de perfil `RafaParise/RafaParise`) — o
+   `gh` não tem o escopo `user`: o Rafael precisa rodar `gh auth refresh -h
+   github.com -s user`. (d) Revisar descrição, tópicos, recursos e arquivos
+   da comunidade (CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, modelos de issue
+   e de PR). (e) "Social preview" só pelo site (usar o GIF do item 3).
+2. [ ] **Fundos animados** (`launcher\field-background.js` e
+   `galaxy-background.js`): o máximo de personagens de jogos de 16 bits,
+   os mais famosos, no mesmo estilo (espaço no escuro, campo florido no
+   claro); tirar SÓ a joaninha; revisar todas as animações com cuidado.
+   Botão "Visualizar animação" que esconde todo o HUD (e outro para voltar),
+   ao lado do título. Revisar o subtítulo "o console da turma" (tão curto
+   quanto, dizendo o que o ARENA é/faz).
+3. [ ] **GIFs** dos dois fundos (depois do item 2) para a "Social preview"
+   (1280×640, margem de 40 pt, PNG/GIF/JPG; a página do GitHub pede menos de
+   1 MB) e para onde mais der (README, perfil).
+4. [ ] **Controles.** Primeiro: sistema de 8 controles nos consoles que
+   permitem e têm jogos com isso. Depois: sem controle, o direcional do
+   teclado tem que mover também o analógico (Diddy Kong Racing no N64 não
+   aceitou o teclado) — revisar todos os consoles; manter a ordem (o 1º
+   controle conectado é o jogador 1 e o teclado o próximo livre).
+5. [ ] **Jogar Junto:** revisar o servidor inteiro e o amigo entrando como
+   jogador 2; o anfitrião espera o jogador 2 para começarem juntos; nesse
+   caso pular a BIOS; intermediar a conexão também no PS2 e nos outros
+   emuladores onde der; botão na lateral direita (nome bacana), esmaecido
+   quando o jogo não tem partida em dois computadores, e embaixo dele a
+   instrução simples de como jogar a dois no mesmo computador.
+6. [ ] **Todos os consoles possíveis** (de preferência pelo RetroArch) e
+   BIOS: usar as livres e as emulações de BIOS (HLE) onde existem; dizer
+   com clareza onde não dá (o PS2 não tem BIOS livre; distribuir BIOS da
+   Sony/Sega/SNK é proibido — a analogia do chip não vale: o chip não leva
+   o programa da Sony dentro).
+
 **ESTADO EM 12/10/2026 (~18h30) — AUDITORIA 3 CONCLUÍDA E ARENA PUBLICADO.
 Versão: 2026.10.11. Bateria `servidor\tests\run.py`: 323.** Sessão aberta
 em `C:\Projetos\Criador De Apps Pedagógicos` (pedidos: o de 07/10, "finalize
@@ -1340,9 +1381,12 @@ foi feito.
 - **Medir de verdade o efeito do `netplay_check_frames = 0`** num Positivo dual-core/4GB da escola (não deu pra confirmar no computador de desenvolvimento, forte demais).
 
 ## Duas versões nesta pasta
-- `ARENA - Versão antiga para.implemen…` (nome completo no disco): versão feita pelo professor no chat do Claude. É a que a seção "Funcionalidades existentes" descreve (arena.py, graficos.py, dados\controles.json).
-- `ARENA-remake--master`: remake feito por um aluno.
-- `Instruções.txt`: **não se aplica ao ARENA.** É um modelo genérico de prompts para outro aplicativo (ZeroHit, com Next.js, Supabase e cobrança). Contradiz todas as restrições do ARENA — Python puro, offline, sem administrador, sem monetização. Não seguir.
+Desde 11/10/2026 o Rafael tirou a pasta `ARENA` que ficava em volta delas:
+todas moram direto em `C:\Projetos\Criador De Apps Pedagógicos\`.
+- `ARENA - Versão antiga para implementar`: versão feita pelo professor no chat do Claude. É a que a seção "Funcionalidades existentes" descreve (arena.py, graficos.py, dados\controles.json).
+- `ARENA-remake--master`: remake feito por um aluno (versão 2026.09.15).
+- `Instruções.txt`: não está mais no disco (12/10/2026). **Não se aplicava ao ARENA** (modelo de prompts de outro aplicativo, ZeroHit, com Next.js, Supabase e cobrança).
+- Versões dos alunos: `ARENA` (a que o `--atualizar` mantém; 2026.10.11; tem o `.git-do-hermes-desativado`) e `ARENA-alunos` (reapareceu em 11/10 às 10h30, ainda na 2026.10.03.2). As duas com os mesmos 104 arquivos de jogo — perguntar ao Rafael qual ele usa antes de atualizar a segunda.
 
 ## Objetivo atual: unificar as duas versões
 - Trabalhar somente em `ARENA-unificado`. Os dois originais nunca são editados: são backup e referência.
