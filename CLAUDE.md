@@ -59,10 +59,11 @@ assim; marcar [x] ao terminar cada um):**
      cache: texto pronto em `backup\git\pedido-ao-suporte-do-github.txt`.
      O e-mail esteve público de 10/10 a 13/10 (107 clones de 50 origens em
      10–11/10): tratar como divulgado.
-   - [ ] (b) Release v2026.10.11: título novo feito; FALTA refazer o pacote
-     completo (o guia 6 mudou), subir também o pacote de atualização
-     (`montar_versao_alunos.py --zip-atualizacao`), mover a etiqueta e trocar
-     as notas (rascunho revisado no scratchpad da sessão; refazer se perder).
+   - [x] (b) Release v2026.10.11 refeito em 13/10: pacote completo com o
+     guia 6 novo + `ARENA-2026.10.11-atualizacao.zip` (só o programa, 85
+     arquivos), etiqueta movida para o `main` (`0d6c9e0`), notas revisadas
+     (os dois SHA-256 conferidos pelo `digest` do GitHub). Rascunhos dos
+     textos em `backup\git\textos-github-rascunhos-2026-10-13.json`.
    - [ ] (c) Perfil: README de perfil publicado (`RafaParise/RafaParise`).
      Campos prontos, esperando o escopo `user` do gh (`gh auth refresh -h
      github.com -s user`): bio "Professor do curso técnico de Desenvolvimento
@@ -114,7 +115,7 @@ download", e o de 11/10, "continue de onde parou").
   `1226ec3` depois da reescrita de 13/10). **O trabalho continua no `main`**; o `auditoria` fica (a regra
   "Proteger os ramos", 24866071, não deixa apagar ramo nem enviar à força).
   **Release `v2026.10.11`**: `ARENA-2026.10.11.zip`, 478 MB, SHA-256
-  `e1a2991b0a13bb43efbfdb1450aa061644f19df166a832f8d851cadbf28d8114`, montado SEM BIOS (`montar_versao_alunos.py --destino
+  `002d22083c4d7206e308eae549304233ee47bf8296882571c202a14dd3064bf6` (refeito em 13/10; mais o `ARENA-2026.10.11-atualizacao.zip`, só o programa, 11 MB), montado SEM BIOS (`montar_versao_alunos.py --destino
   %TEMP%\ap\ARENA-alunos`; o modo montar exige esse nome) e conferido duas
   vezes (o montador e uma busca independente de nomes de BIOS, `dev_flash`,
   contas e dados: 0 achados em 7.810 arquivos). Leva `LICENSE` e
