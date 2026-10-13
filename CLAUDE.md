@@ -95,7 +95,7 @@ download", e o de 11/10, "continue de onde parou").
 
 - **GitHub `RafaParise/arena-console` (público; `RafaParise/ARENA` não
   existe):** `main` = 2026.10.11 (o `auditoria` juntado pelo PR #1, commit
-  `8624480`). **O trabalho continua no `main`**; o `auditoria` fica (a regra
+  `1226ec3` depois da reescrita de 13/10). **O trabalho continua no `main`**; o `auditoria` fica (a regra
   "Proteger os ramos", 24866071, não deixa apagar ramo nem enviar à força).
   **Release `v2026.10.11`**: `ARENA-2026.10.11.zip`, 478 MB, SHA-256
   `e1a2991b0a13bb43efbfdb1450aa061644f19df166a832f8d851cadbf28d8114`, montado SEM BIOS (`montar_versao_alunos.py --destino
@@ -137,9 +137,19 @@ download", e o de 11/10, "continue de onde parou").
   `backup\git\auditoria-antes-de-tirar-o-email-2026-10-11.bundle`; hashes:
   e752b0b→08aaac7, 69cc361→1053f15, a5e4e7b→b2fdf44, 6ae7fc2→5dc2363,
   ae58a21→cfdc66d, 1e6967a→0133c38, 8740aa2→f3a641a, 60d8932→b2e45f8,
-  b27fffd→7bd973b), mas já
-  está público nos commits que o Hermes enviou em 10/10 (tirar exige envio
-  forçado: decisão do Rafael). O Gmail no histórico ficou (já público).
+  b27fffd→7bd973b). **Nos 9 commits que o Hermes ENVIOU em 10/10** (4
+  arquivos dele com o e-mail institucional) a troca foi feita em 13/10/2026,
+  com autorização do Rafael: filter-branch só em `main ^auditoria ^10d053b`
+  (o endereço virou "[e-mail removido]"), conferida por 3 verificadores
+  independentes, e envio forçado atômico do `main` e da etiqueta; cópia do
+  antes e o mapa dos hashes velhos para os novos em `backup\git\` (fora do
+  GitHub de propósito: hash velho citado aqui viraria um caminho para o
+  histórico velho, que o GitHub guarda em cache). Ele esteve público de
+  10/10 23h39 UTC a 13/10 (o GitHub contou 107 clones de 50 origens em
+  10–11/10, contra 18 visitas de 2 pessoas: robôs) — tratar como divulgado.
+  O PR #1 e as visões em cache ainda alcançam os commits velhos: só o
+  Suporte do GitHub limpa (pedido pendente, texto pronto para o Rafael). O
+  Gmail no histórico ficou (já público).
 - **`.git` daqui:** os 5,5 GB de cópias soltas (9.489 blobs gravados nos dois incidentes do Hermes, com o `.gitignore` errado) foram provados contra o disco — os 20 que tinham mudado desde 10/10 (2 cartões de PS2, um `config.json`, tempo de jogo) estão em `backup\versoes-antigas-do-git-2026-10-10\` — e limpos com `git prune`: o `.git` tem 1,8 MB e a manutenção automática voltou ao padrão (`maintenance.auto` desfeito). Os commits "WIP on …"/"index on …" que
   aparecem sem dono são retratos do plugin **security-guidance** do Claude
   Code (`git stash create` numa cópia do índice): não mexem em arquivo nem
@@ -150,8 +160,8 @@ download", e o de 11/10, "continue de onde parou").
   save, e-mail institucional, senha e token).
 
 **Para o Rafael (substitui as listas de baixo):** (1) pôr a "Social preview"
-pelo site; (2) decidir se tira o e-mail institucional dos commits já
-públicos (envio forçado); (3) dizer onde ficaram as duas versões originais;
+pelo site; (2) mandar ao Suporte do GitHub o pedido de limpeza do PR #1 e
+das visões em cache (o histórico já foi reescrito em 13/10); (3) dizer onde ficaram as duas versões originais;
 (4) os roteiros de sala do relatório (Jogar Junto em 5 notebooks, o Celeron,
 controle na mão, as cinco pessoas, pen drive); (5) BIOS que faltam:
 `BIOS\LEIA - O QUE FALTA.txt` e a lista de 03/10, abaixo; (6) observações da
