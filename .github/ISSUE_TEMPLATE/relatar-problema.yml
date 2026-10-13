@@ -1,0 +1,61 @@
+name: Relatar um problema
+description: Algo não funciona como devia no ARENA.
+title: "[Problema] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por avisar! Antes de continuar, rode o **VERIFICAR.bat** (ele confere e conserta a maior parte dos problemas). Para a partida a dois, rode o **PARTIDA.bat**.
+
+        **As issues são públicas.** Não escreva nome completo, escola, turma, telefone ou e-mail, e **não anexe** jogo, BIOS, firmware, save nem o banco de recordes (`arena.db`).
+  - type: input
+    id: versao
+    attributes:
+      label: Versão do ARENA
+      description: "Aparece no topo da tela, ao lado do nome (por exemplo, 2026.10.11)."
+      placeholder: "2026.10.11"
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows
+      description: "Por exemplo, Windows 11 de 64 bits; computador da escola ou de casa; rodando do disco ou do pen drive."
+    validations:
+      required: true
+  - type: input
+    id: console
+    attributes:
+      label: Console e jogo
+      description: "Por exemplo, PlayStation 2 — Crash Nitro Kart. Só o nome; não anexe o jogo."
+  - type: textarea
+    id: passos
+    attributes:
+      label: Passo a passo
+      description: O que você fez, na ordem, até o problema aparecer.
+      placeholder: |
+        1. Abri o ARENA
+        2. Cliquei em ...
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: esperado
+    attributes:
+      label: O que você esperava e o que aconteceu
+    validations:
+      required: true
+  - type: textarea
+    id: verificar
+    attributes:
+      label: Resultado do VERIFICAR.bat
+      description: Copie o que ele mostrou (ou diga "não rodei").
+      render: text
+  - type: checkboxes
+    id: privacidade
+    attributes:
+      label: Conferência
+      options:
+        - label: Não coloquei dado de aluno nem anexei jogo, BIOS, firmware, save ou o arena.db.
+          required: true

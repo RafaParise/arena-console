@@ -1,0 +1,27 @@
+name: Sugerir uma melhoria
+description: Uma ideia para o ARENA ficar melhor na sala de aula.
+title: "[Sugestão] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Toda ideia é bem-vinda! Lembre que o ARENA precisa continuar rodando **do pen drive, sem instalar nada, sem senha de administrador e sem internet**, num notebook fraco de escola. **As issues são públicas:** não escreva dados de aluno.
+  - type: textarea
+    id: ideia
+    attributes:
+      label: O que você gostaria que o ARENA fizesse
+    validations:
+      required: true
+  - type: textarea
+    id: motivo
+    attributes:
+      label: Por que isso ajuda
+      description: De preferência um caso real de sala de aula.
+    validations:
+      required: true
+  - type: textarea
+    id: como
+    attributes:
+      label: Como você imagina que funcione
+      description: Onde fica o botão, o que aparece na tela, etc. (opcional)

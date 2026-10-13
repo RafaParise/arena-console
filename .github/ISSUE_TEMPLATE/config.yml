@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Primeiros passos e problemas comuns
+    url: https://github.com/RafaParise/arena-console/blob/main/1-COMECAR.md
+    about: Instalação, desbloquear o .zip e a tabela dos problemas mais comuns.
+  - name: Verificador e reparo (guia 6)
+    url: https://github.com/RafaParise/arena-console/blob/main/6-RECURSOS-E-REPARO.md
+    about: O que o VERIFICAR.bat faz e como atualizar o ARENA sem perder nada.
+  - name: Falha de segurança (relato particular)
+    url: https://github.com/RafaParise/arena-console/security/advisories/new
+    about: Falha de segurança não vai em issue pública. Relate em particular.
