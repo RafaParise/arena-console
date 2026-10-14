@@ -353,7 +353,8 @@ ligar até 4 jogadores no mesmo computador:
 **Quantos jogadores cada jogo aceita** vem da lista `dados\jogadores.txt`,
 uma linha por jogo (`Crash Nitro Kart = 4`; basta um pedaço do nome). É
 dela que sai o número do cartão, e é com ela que o ARENA liga sozinho o
-adaptador de controles (multitap) do PS2 e do Super Nintendo. Jogo que não
+adaptador de controles (multitap) do Super Nintendo, do PlayStation, do PS2
+e do Saturn. Jogo que não
 está na lista usa o que o ARENA já sabe: os jogos testados com os controles
 na mão (Crash Nitro Kart, Champions of Norrath, Marvel Ultimate Alliance,
 CTR, Mario Kart Double Dash e Wii, Smash Bros...) já vêm com o número certo
@@ -362,6 +363,23 @@ em qualquer cópia do ARENA; o resto fica com o número do console ou 2.
 **Ligar o multitap pelo menu do PCSX2 não adianta:** o ARENA refaz a
 configuração dos controles a cada jogo, pelo número da lista. Para mudar,
 escreva o número na lista e salve; a lista de jogos se atualiza sozinha.
+
+**Até 8 jogadores no mesmo computador.** Com o número certo na lista, o
+ARENA liga o adaptador sozinho, até onde cada console vai:
+
+| Console | Até | Como |
+|---|---|---|
+| PlayStation | 8 | De 3 a 5 jogadores, o adaptador na porta 1; de 6 a 8, nas duas portas |
+| Sega Saturn | 10 | Os dois adaptadores de 6 (o Saturn Bomberman aceita 10) |
+| Super Nintendo | 5 | O Multitap (Super Bomberman) |
+| PlayStation 2 | 5 | O adaptador na porta 1 e o 5º jogador na porta 2. O PCSX2 lê os controles pelo XInput, que o Windows limita a 4; o 5º é o teclado |
+| Mega Drive | 4 | Team Player ou J-Cart, conforme o cartucho |
+| Nintendo 64, Dreamcast, GameCube, Wii, Xbox 360 | 4 | As 4 entradas de fábrica |
+
+O Windows só enxerga 4 controles do tipo Xbox de cada vez. Para passar de
+4, ligue controles USB comuns, que não sejam do tipo Xbox, ou use o
+teclado. Para um jogo de 8, escreva, por exemplo, `Micro Machines V3 = 8`
+na lista.
 
 Alguns desses jogos têm **rede própria** (System Link), como Gears of War e
 Left 4 Dead 2 (Xbox 360) e Gran Turismo 4 (PS2). Neles, a janela avisa: com

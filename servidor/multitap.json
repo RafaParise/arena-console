@@ -83,6 +83,7 @@
         "desligado": "disabled",
         "jogadores": 5,
         "valores_possiveis": {"port 1": 5, "port 2": 5, "ports 1 and 2": 8},
+        "segundo_adaptador": {"chaves": {"pcsx_rearmed_multitap": "ports 1 and 2"}, "jogadores": 8},
         "fonte": "pcsx_rearmed frontend/libretro_core_options.h (chave, valores e padrao 'disabled') e frontend/libretro.c funcao update_multitap(); valores 'port 1', 'port 2', 'ports 1 and 2' presentes no .dll",
         "observacao": "Opcao do nucleo: vai no arquivo de opcoes de nucleo da partida, nao no retroarch.cfg. As chaves antigas pcsx_rearmed_multitap1/2 ainda aparecem no .dll, mas so nas traducoes; o codigo atual le so pcsx_rearmed_multitap."
       }
@@ -100,6 +101,7 @@
         "desligado": "Disabled",
         "jogadores": 5,
         "valores_possiveis": {"Port1Only": 5, "Port2Only": 5, "BothPorts": 8},
+        "segundo_adaptador": {"chaves": {"swanstation_ControllerPorts_MultitapMode": "BothPorts"}, "jogadores": 8},
         "fonte": "swanstation src/libretro/libretro_core_options.h linha 856 (chave e valores), src/core/settings.h linha 220 (padrao Disabled), src/libretro/libretro_host_interface.cpp linhas 1201-1206 (5 portas com um adaptador, 8 com dois); valores presentes no .dll"
       }
     },

@@ -28,12 +28,15 @@ fica no commit). O detalhe de cada pedido está em
    - Depende do Rafael: enviar o `arena-escuro.gif` em Settings → General →
      Social preview (só pelo site).
 4. **Controles:**
-   - 8 controles nos consoles que permitem e têm jogos com isso.
-   - Sem controle, o direcional do teclado também move o analógico (o
-     Diddy Kong Racing, no N64, não aceitou o teclado). Revisar todos os
-     consoles.
-   - A ordem continua a mesma: o 1º controle conectado é o jogador 1, e o
-     teclado fica com o próximo livre.
+   - Feito, sem os controles na mão: até 8 jogadores (PS1 com o adaptador
+     nas duas portas, Saturn até 10, PS2 até 5, tela de controles com 8),
+     e as setas movendo também o analógico (RetroArch, PCSX2 e RPCS3; o
+     Dolphin já fazia). A ordem continua a mesma.
+   - Depende do Rafael: testar o Diddy Kong Racing só no teclado e, se der,
+     um jogo de PS1 com 6 ou mais controles.
+   - Limite do Windows: só 4 controles do tipo Xbox de cada vez. O driver
+     SDL2 do RetroArch passaria disso, mas a tela traduz os botões para a
+     numeração do XInput; fica para depois de um teste com os controles.
 5. **Jogar Junto:**
    - Revisar o servidor e a entrada do amigo como jogador 2.
    - O anfitrião espera o jogador 2 para começarem juntos, e nesse caso a

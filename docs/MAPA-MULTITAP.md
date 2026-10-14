@@ -38,15 +38,15 @@
 | Super Nintendo | snes9x | 2 | **tipo de controle** numa porta ("Multitap") | `input_libretro_device_p2 = "257"` | **5** (8 com as duas portas) | sim |
 | NES | fceumm | 2 | **tipo de controle** "Gamepad" nas portas 3 e 4, que liga o Four Score (o "4-Player Adapter" do núcleo é outro: o do Famicom japonês, na porta 5). O núcleo **já liga sozinho** para os jogos de uma lista interna dele | `input_libretro_device_p3 = "513"` e `input_libretro_device_p4 = "513"` | **4** | sim |
 | Mega Drive | genesis_plus_gx | 2 | **depende do cartucho** — o núcleo não escolhe sozinho. **Team Player** (Sega): tipo de controle na porta 1, só quando o cartucho declara "4" no cabeçalho (0x190). **J-Cart** (entradas no próprio cartucho): o núcleo liga sozinho pela série | Team Player: `input_libretro_device_p1 = "1537"`. J-Cart: nenhuma chave (só `input_max_users` = 4) | **4** | sim |
-| PS1 jogando junto | pcsx_rearmed | 2 | **opção do núcleo** "Multitap Mode" | `pcsx_rearmed_multitap = "port 1"` (desligado: `"disabled"`) | **5** (`"ports 1 and 2"` = 8) | sim |
-| PS1 no mesmo computador | swanstation | 2 | **opção do núcleo** "Multitap Mode" | `swanstation_ControllerPorts_MultitapMode = "Port1Only"` (desligado: `"Disabled"`) | **5** (`"BothPorts"` = 8) | não (núcleo recusa) |
+| PS1 jogando junto | pcsx_rearmed | 2 | **opção do núcleo** "Multitap Mode" | `pcsx_rearmed_multitap = "port 1"`; de 6 a 8 jogadores, `"ports 1 and 2"` (desligado: `"disabled"`) | **5** com um, **8** com os dois | sim |
+| PS1 no mesmo computador | swanstation | 2 | **opção do núcleo** "Multitap Mode" | `swanstation_ControllerPorts_MultitapMode = "Port1Only"`; de 6 a 8, `"BothPorts"` (desligado: `"Disabled"`) | **5** com um, **8** com os dois | não (núcleo recusa) |
 | Sega Saturn | mednafen_saturn | 2 | **opção do núcleo**, uma por porta ("6Player Adaptor") | `beetle_saturn_multitap_port1 = "enabled"` (+ `..._port2 = "enabled"`) | **7** com um, **12** com os dois | **não confirmado** (nunca testado) |
 | Nintendo 64 | mupen64plus_next | **4** | não existe: o console já tem 4 entradas | — (só `input_max_users` ≥ 4) | 4 | não (núcleo recusa) |
 | Dreamcast | flycast | **4** | não existe: 4 entradas de fábrica | — (só `input_max_users` ≥ 4) | 4 | não (núcleo recusa) |
 | PSP | ppsspp | 1 | não existe: aparelho de uma pessoa; multijogador é por rede própria (ad hoc) | — | 1 | não (núcleo recusa) |
 | Neo Geo | fbneo | 2 | não existe: no arcade o número vem de cada jogo; os de Neo Geo são de 2 | — | 2 | sim |
 | GameCube | Dolphin (externo) | — | fora do RetroArch | — | — | não pelo RetroArch |
-| PS2 | PCSX2 (externo) | — | fora do RetroArch; como o PCSX2 liga o multitap dele: **não confirmado** | — | — | não pelo RetroArch |
+| PS2 | PCSX2 (externo) | 2 | `[Pad] MultitapPort1` (`Pad.cpp`); jogadores em Pad1, Pad3, Pad4 e Pad5 (`Sio.cpp`) e o 5º no Pad2 | `MultitapPort1 = true` | **5**: 4 controles XInput (o limite do Windows) + o teclado | não pelo RetroArch |
 | PS3 | RPCS3 (externo) | — | fora do RetroArch | — | — | não pelo RetroArch |
 | Xbox 360 | Xenia (externo) | — | fora do RetroArch | — | — | não pelo RetroArch |
 
@@ -66,6 +66,14 @@
   ao valor de antes. Com 1 ou 2 jogadores nada disso acontece — provado por
   `testes\teste_multitap_regra_de_ouro.py` contra a versão de antes do
   multitap (114 casos iguais).
+
+**Até 8 controles (14/10/2026, pedido do Rafael):** o PS1 passou a ligar o
+adaptador nas duas portas de 6 a 8 jogadores (`segundo_adaptador` no
+`multitap.json`, o mesmo caminho do Saturn), e a tela de controles foi a 8
+jogadores. O Windows só enxerga 4 controles XInput (tipo Xbox); o driver
+`xinput` do RetroArch lê os outros pelo DirectInput, mas pula os do tipo
+Xbox além do 4º. Do 5º ao 8º: controles USB comuns ou o teclado. Testado só
+sem os controles na mão (`servidor\tests\test_multitap.py`).
 
 ## Não confirmado — o que falta
 

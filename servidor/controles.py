@@ -34,7 +34,9 @@ ARQUIVO_PERFIS = os.path.join(PASTA_SERVIDOR, "perfis_controle.json")
 
 _TRAVA = threading.Lock()
 
-JOGADORES = ("1", "2", "3", "4", "5")
+# Ate 8 jogadores com botoes proprios na tela (pedido do Rafael, 14/10/2026:
+# o PS1 com o adaptador nas duas portas chega a 8).
+JOGADORES = ("1", "2", "3", "4", "5", "6", "7", "8")
 
 # Quantos jogadores tem os botoes de controle zerados em toda partida (o
 # Saturn com dois adaptadores chega a 10; o RetroArch aceita ate 16).
@@ -347,6 +349,13 @@ TECLADO_PADRAO = {
     "start": "enter", "select": "rshift",
 }
 
+# As direcoes do teclado movem tambem o analogico esquerdo (pedido do
+# Rafael, 14/10/2026: sem controle, o Diddy Kong Racing, do N64, nao andava
+# pelas setas -- o jogo so le o analogico). Em console sem analogico o
+# nucleo nem pergunta pelo eixo, entao nada muda. Cima e' o eixo Y negativo.
+ANALOGICO_DO_TECLADO = (("l_y_minus", "up"), ("l_y_plus", "down"),
+                        ("l_x_minus", "left"), ("l_x_plus", "right"))
+
 
 # Uma contagem por vez. Raw Input e XInput aguentam chamadas juntas, mas a
 # contagem antiga (joyGetPosEx) era a principal suspeita das quedas do
@@ -455,7 +464,8 @@ def opcoes_do_teclado(dados, controles_ligados):
     Regra (aprovada pelo Rafael): o teclado e' o PRIMEIRO jogador sem
     controle. 3 controles -> teclado no jogador 4; nenhum -> jogador 1
     (quem nao tem controle continua jogando). Escreve o teclado de todos os
-    jogadores explicitamente, para nada velho do retroarch.cfg valer."""
+    jogadores explicitamente, para nada velho do retroarch.cfg valer. As
+    direcoes movem tambem o analogico esquerdo (ANALOGICO_DO_TECLADO)."""
     teclas = dict(TECLADO_PADRAO)
     for botao, atribuicao in (dados.get("1") or {}).items():
         if atribuicao.get("tipo") == "teclado":
@@ -466,15 +476,23 @@ def opcoes_do_teclado(dados, controles_ligados):
     for jogador in range(1, JOGADORES_NO_CONTROLE + 1):
         for botao in BOTOES:
             opcoes["input_player%d_%s" % (jogador, botao)] = "nul"
+        for eixo, _direcao in ANALOGICO_DO_TECLADO:
+            opcoes["input_player%d_%s" % (jogador, eixo)] = "nul"
     for botao, tecla in teclas.items():
         if tecla:
             opcoes["input_player%d_%s" % (dono, botao)] = tecla
+    for eixo, direcao in ANALOGICO_DO_TECLADO:
+        if teclas.get(direcao):
+            opcoes["input_player%d_%s" % (dono, eixo)] = teclas[direcao]
     # Teclas que o aluno pos em outro jogador na tela (hoje, o jogador 2)
-    # continuam la.
+    # continuam la, e as direcoes dele tambem movem o analogico.
     for jogador in JOGADORES[1:]:
         for botao, atribuicao in (dados.get(jogador) or {}).items():
             if atribuicao.get("tipo") == "teclado" and atribuicao.get("valor"):
                 opcoes["input_player%s_%s" % (jogador, botao)] = atribuicao["valor"]
+                for eixo, direcao in ANALOGICO_DO_TECLADO:
+                    if direcao == botao:
+                        opcoes["input_player%s_%s" % (jogador, eixo)] = atribuicao["valor"]
     return opcoes
 
 

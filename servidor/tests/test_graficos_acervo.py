@@ -100,6 +100,23 @@ class TestGraficos(unittest.TestCase):
         self.assertIn("Start = Keyboard/Return", texto)  # teclado: 4o jogador
         self.assertIn("[Pad2]\nType = None", texto)
 
+    def test_pcsx2_quinto_jogador_na_porta_2_e_setas_no_analogico(self):
+        # 4 controles XInput (o teto do Windows) + teclado = 5: o 5o entra
+        # pela porta 2 (Pad2), com o adaptador na porta 1.
+        texto = "\n".join(self.mod.controles_pcsx2(5, [0, 1, 2, 3]))
+        self.assertIn("MultitapPort1 = true", texto)
+        self.assertIn("MultitapPort2 = false", texto)
+        self.assertIn("[Pad2]\nType = DualShock2", texto)
+        self.assertIn("Left = Keyboard/Left", texto)
+        self.assertIn("LLeft = Keyboard/Left", texto)    # setas tambem no analogico
+        self.assertIn("LUp = Keyboard/Up", texto)
+
+    def test_rpcs3_setas_do_teclado_no_analogico(self):
+        texto = self.mod.controles_rpcs3([])
+        self.assertIn("    Left Stick Left: Left", texto)
+        self.assertIn("    Left Stick Up: Up", texto)
+        self.assertIn("    Up: Up", texto)
+
     def test_pcsx2_2_jogadores_sem_multitap(self):
         texto = "\n".join(self.mod.controles_pcsx2(2, [0]))
         self.assertIn("MultitapPort1 = false", texto)

@@ -54,6 +54,22 @@ class TestJogadoresDoJogo(unittest.TestCase):
         s = self.ligar("swanstation_libretro.dll", 5)
         self.assertEqual(s["nucleo"], {"swanstation_ControllerPorts_MultitapMode": "Port1Only"})
 
+    def test_ps1_oito_jogadores_liga_as_duas_portas(self):
+        # 14/10/2026: de 6 a 8 jogadores, o adaptador vai nas duas portas.
+        r = self.ligar("pcsx_rearmed_libretro.dll", 8)
+        self.assertEqual(r["nucleo"], {"pcsx_rearmed_multitap": "ports 1 and 2"})
+        self.assertEqual(r["jogadores"], 8)
+        self.assertEqual(r["cfg"]["input_max_users"], "8")
+        self.assertEqual(r["max_conexoes"], 7)
+        s = self.ligar("swanstation_libretro.dll", 6)
+        self.assertEqual(s["nucleo"], {"swanstation_ControllerPorts_MultitapMode": "BothPorts"})
+        self.assertEqual(s["jogadores"], 6)
+        cinco = self.ligar("pcsx_rearmed_libretro.dll", 5)     # 5 ainda cabe numa porta
+        self.assertEqual(cinco["nucleo"], {"pcsx_rearmed_multitap": "port 1"})
+        mais = self.ligar("pcsx_rearmed_libretro.dll", 10)     # o teto do PS1 e' 8
+        self.assertEqual(mais["jogadores"], 8)
+        self.assertIn("até 8", mais["motivo"])
+
     def test_saturn_dez_jogadores_liga_os_dois_adaptadores(self):
         r = self.ligar("mednafen_saturn_libretro.dll", 10)
         self.assertEqual(r["nucleo"], {"beetle_saturn_multitap_port1": "enabled",

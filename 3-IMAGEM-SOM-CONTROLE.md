@@ -29,10 +29,22 @@ Assim ninguém briga pelo mesmo boneco, e quem não tem controle continua
 jogando sozinho no teclado. Plugou ou tirou um controle? Feche e abra o
 jogo de novo.
 
+**As setas também movem o analógico.** Jogo que só anda pelo analógico
+(o Diddy Kong Racing, do Nintendo 64, por exemplo) responde ao teclado: as
+setas apertam o direcional e, ao mesmo tempo, empurram o analógico
+esquerdo até o fim. Em console sem analógico, nada muda.
+
 Vale também nos emuladores de fora do RetroArch: PS2 (PCSX2), PS3
-(RPCS3), GameCube e Wii (Dolphin) e Xbox 360 (Xenia). No Xbox 360 o
+(RPCS3), GameCube e Wii (Dolphin) e Xbox 360 (Xenia). No PS2, no PS3, no
+GameCube e no Wii, as setas também movem o analógico. No Xbox 360 o
 teclado usa as teclas do próprio Xenia (WASD anda, setas miram); com 4
 controles plugados ele fica desligado, porque o Xbox 360 só tem 4 jogadores.
+
+**Até 8 controles ao mesmo tempo**, nos consoles que têm jogo para tantos
+(veja "Até 8 jogadores no mesmo computador", no guia 5). O Windows só
+enxerga **4 controles do tipo Xbox** de cada vez (é limite do próprio
+Windows). Do 5º em diante, use controles USB comuns, que não sejam do tipo
+Xbox, ou o teclado.
 
 ---
 

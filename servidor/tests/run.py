@@ -385,13 +385,32 @@ class TestControles(unittest.TestCase):
         self.assertNotIn("start", dados["3"])
         self.assertEqual(dados["3"]["b"], {"tipo": "teclado", "valor": "c"})
 
-    def test_jogadores_1_a_5(self):
-        self.assertEqual(self.mod.JOGADORES, ("1", "2", "3", "4", "5"))
-        _, erro = self.mod.definir("5", "a", "botao", "1")
+    def test_jogadores_1_a_8(self):
+        # Ate 8 (14/10/2026): o PS1 com o adaptador nas duas portas.
+        self.assertEqual(self.mod.JOGADORES, tuple(str(n) for n in range(1, 9)))
+        _, erro = self.mod.definir("8", "a", "botao", "1")
         self.assertIsNone(erro)
-        self.assertEqual(self.mod.opcoes_do_retroarch()["input_player5_a_btn"], "1")
+        self.assertEqual(self.mod.opcoes_do_retroarch()["input_player8_a_btn"], "1")
         _, erro = self.mod.aplicar_padrao("4")
         self.assertIsNotNone(erro)   # teclado padrao so existe para 1 e 2
+
+    def test_setas_do_teclado_movem_o_analogico(self):
+        # Diddy Kong Racing (N64) so le o analogico: sem controle, as setas
+        # nao faziam nada. Agora movem o analogico esquerdo de quem tem o
+        # teclado -- e o de mais ninguem.
+        opcoes = self.mod.opcoes_do_teclado({}, 0)
+        self.assertEqual(opcoes["input_player1_l_x_minus"], "left")
+        self.assertEqual(opcoes["input_player1_l_x_plus"], "right")
+        self.assertEqual(opcoes["input_player1_l_y_minus"], "up")
+        self.assertEqual(opcoes["input_player1_l_y_plus"], "down")
+        self.assertEqual(opcoes["input_player1_up"], "up")     # o direcional continua
+        self.assertEqual(opcoes["input_player2_l_x_minus"], "nul")
+        opcoes = self.mod.opcoes_do_teclado({}, 2)              # 2 controles: teclado no 3
+        self.assertEqual(opcoes["input_player3_l_y_minus"], "up")
+        self.assertEqual(opcoes["input_player1_l_y_minus"], "nul")
+        # Tecla posta no jogador 2 pela tela: a direcao dele tambem move o analogico.
+        dados = {"2": {"left": {"tipo": "teclado", "valor": "j"}}}
+        self.assertEqual(self.mod.opcoes_do_teclado(dados, 0)["input_player2_l_x_minus"], "j")
 
 
 # ============================================================================

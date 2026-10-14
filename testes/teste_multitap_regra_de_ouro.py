@@ -123,10 +123,11 @@ def sem_mudanca_de_proposito(chaves_override):
       - input_remapping_directory aponta para o .rmp da partida (o RetroArch
         ignora o tipo de porta vindo do --appendconfig);
       - o teclado de todos os jogadores vai escrito (o teclado e' o primeiro
-        jogador sem controle; pedido do Rafael, 25/09/2026);
+        jogador sem controle; pedido do Rafael, 25/09/2026), e as direcoes
+        dele movem tambem o analogico esquerdo (pedido de 14/10/2026);
       - as chaves novas da auditoria 3 (NOVAS_NA_AUDITORIA_3); as renomeadas
         sao comparadas pelo nome certo (com_nomes_certos)."""
-    teclado = r"^input_player\d+_(up|down|left|right|a|b|x|y|l|r|l2|r2|l3|r3|start|select)$"
+    teclado = r"^input_player\d+_(up|down|left|right|a|b|x|y|l|r|l2|r2|l3|r3|start|select|l_x_plus|l_x_minus|l_y_plus|l_y_minus)$"
     return {c: v for c, v in com_nomes_certos(chaves_override).items()
             if c != "input_remapping_directory"
             and c not in NOVAS_NA_AUDITORIA_3

@@ -1194,8 +1194,11 @@ PCSX2_BOTOES_SDL = [
     ("LargeMotor", "LargeMotor"), ("SmallMotor", "SmallMotor"),
 ]
 # Mesmas teclas do resto do ARENA (setas, X, Z, S, A, Q, W, Enter, Shift).
+# As setas movem tambem o analogico esquerdo (14/10/2026): sem controle, o
+# jogo que so anda pelo analogico nao respondia ao teclado.
 PCSX2_BOTOES_TECLADO = [
     ("Up", "Up"), ("Down", "Down"), ("Left", "Left"), ("Right", "Right"),
+    ("LUp", "Up"), ("LDown", "Down"), ("LLeft", "Left"), ("LRight", "Right"),
     ("Cross", "Z"), ("Circle", "X"), ("Square", "A"), ("Triangle", "S"),
     ("L1", "Q"), ("R1", "W"), ("L2", "E"), ("R2", "R"),
     ("Select", "Shift"), ("Start", "Return"),
@@ -1205,9 +1208,12 @@ PCSX2_BOTOES_TECLADO = [
 def controles_pcsx2(jogadores, controles_xinput):
     """Blocos [Pad]/[PadN] do PCSX2 para esta partida.
 
-    Ate 2 jogadores: Pad1 e Pad2, sem adaptador. 3 ou mais: multitap na
-    porta 1, jogadores em Pad1, Pad3, Pad4, Pad5. Os controles entram na
-    ordem; o teclado e' o primeiro jogador sem controle (regra do ARENA).
+    Ate 2 jogadores: Pad1 e Pad2, sem adaptador. 3 ou 4: multitap na
+    porta 1, jogadores em Pad1, Pad3, Pad4, Pad5. 5 ou mais: o 5o entra pela
+    porta 2 (Pad2). O teto e' 5: os controles vem do XInput, que o Windows
+    limita a 4, e o 5o e' o teclado -- o segundo adaptador (MultitapPort2)
+    nao teria quem ligar. Os controles entram na ordem; o teclado e' o
+    primeiro jogador sem controle (regra do ARENA).
 
     'controles_xinput': numeros (0 a 3) dos controles XInput ligados. Usa a
     fonte XInput do PCSX2 ("XInput-N", N = numero do Windows) e nao a SDL:
@@ -1217,7 +1223,12 @@ def controles_pcsx2(jogadores, controles_xinput):
     controles_xinput = list(controles_xinput or [])
     controles_ligados = len(controles_xinput)
     multitap = int(jogadores or 2) > 2
-    secoes = [1, 3, 4, 5] if multitap else [1, 2]
+    if not multitap:
+        secoes = [1, 2]
+    elif int(jogadores) >= 5:
+        secoes = [1, 3, 4, 5, 2]
+    else:
+        secoes = [1, 3, 4, 5]
     linhas = ["[Pad]", "MultitapPort1 = %s" % ("true" if multitap else "false"),
               "MultitapPort2 = false", ""]
     teclado_usado = False
@@ -2182,8 +2193,11 @@ RPCS3_AJUSTES_XINPUT = [
     ("Vibration Threshold", "63"),
 ]
 # Mesmas teclas do resto do ARENA (setas, Z, X, A, S, Q, W, E, R, Enter, Shift).
+# As setas movem tambem o analogico esquerdo (14/10/2026).
 RPCS3_BOTOES_TECLADO = [
     ("Up", "Up"), ("Down", "Down"), ("Left", "Left"), ("Right", "Right"),
+    ("Left Stick Left", "Left"), ("Left Stick Down", "Down"),
+    ("Left Stick Right", "Right"), ("Left Stick Up", "Up"),
     ("Cross", "Z"), ("Circle", "X"), ("Square", "A"), ("Triangle", "S"),
     ("L1", "Q"), ("R1", "W"), ("L2", "E"), ("R2", "R"),
     ("Select", "Shift"), ("Start", "Return"),
