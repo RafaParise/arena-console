@@ -9,6 +9,13 @@
 *.cmd text eol=crlf
 *.ps1 text eol=crlf
 
+# BIOS livres e jogos livres dos testes: o ARENA e o conferidor conferem cada
+# arquivo pela marca (SHA-256), byte a byte. Sem conversão de final de linha,
+# senão o config.ini do C-BIOS baixado no Windows ganharia CRLF, a marca não
+# bateria e o ARENA não instalaria a BIOS livre.
+servidor/bios_livres/** -text
+testes/jogos_livres/** -text
+
 # Arquivos que nunca são texto.
 *.png binary
 *.jpg binary
