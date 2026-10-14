@@ -13,17 +13,17 @@ fica no commit). O detalhe de cada pedido está em
      com o GIF do item 3.
 2. **Fundos animados** (`launcher\field-background.js` e
    `galaxy-background.js`):
-   - Falta: o máximo de personagens famosos de 16 bits no mesmo estilo
-     (espaço no escuro, campo florido no claro) e a revisão de todas as
-     animações.
-   - Já feito (`bfc84a0`): o botão "Visualizar animação", o subtítulo novo
-     e a joaninha fora.
-   - Os dois arquivos têm alterações sem commit.
+   - Feito: o botão "Visualizar animação", o subtítulo novo ("central
+     retrô da turma", também no README, no LEIA-ME e na capa) e a joaninha
+     fora (`bfc84a0`); 22 personagens novos de 16 bits, 15 visitas em cada
+     fundo, todas revisadas quadro a quadro (`ferramentas\revisar_visitas.py`)
+     e listadas no guia 3.
 3. **GIFs** dos dois fundos:
    - Para a "Social preview" (1280×640, margem de 40 pt, menos de 1 MB),
      para o README e para o perfil.
-   - Em andamento, sem commit: `ferramentas\gif_animado.py` e
-     `ferramentas\gravar_fundo_gif.py`.
+   - As ferramentas estão prontas (`ferramentas\gif_animado.py` e
+     `ferramentas\gravar_fundo_gif.py`). Falta gravar os GIFs finais com os
+     personagens novos e trocar a "Social preview" pelo site.
 4. **Controles:**
    - 8 controles nos consoles que permitem e têm jogos com isso.
    - Sem controle, o direcional do teclado também move o analógico (o

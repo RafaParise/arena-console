@@ -493,7 +493,7 @@
             { F: '#b02a6e', b: '#ff4fa0', B: '#b02a6e', k: '#ffffff', c: '#ffe066', E: '#ff7a29',
               N: '#ffd23f', r: 'rgba(255,90,60,0.7)' })
   ];
-  const PISTA = 69;            // altura da pista de luz (abaixo dos Metroides e do planeta)
+  const PISTA = 71;            // altura da pista de luz (abaixo dos Metroides e do planeta, que vai ate a linha 61)
 
   function iniciarFzero() {
     const dir = aleatorio() < 0.5 ? 1 : -1;
@@ -580,8 +580,10 @@
     return voltando || this.rastro.length > 0;
   }
 
-  // Space Invaders (1978): tres invasores marcham la em cima, passo a
-  // passo, trocando de pose a cada passo -- e vao embora.
+  // Space Invaders (1978): tres invasores entram pela direita marchando la
+  // em cima, passo a passo, trocando de pose a cada passo. Perto da lua, a
+  // formacao desce uma linha e volta mais depressa, como no jogo (antes ela
+  // passava por cima da lua).
   const INVASOR = S.quadros([
     ['..I.....I..',
      '...I...I...',
@@ -601,22 +603,29 @@
      '.I.......I.']
   ], { I: '#7dff8a' });
 
+  const BORDA_DA_LUA = 34;      // a lua vai ate a coluna 28 (centro em 22, raio 6)
+
   function iniciarInvasores() {
-    const dir = aleatorio() < 0.5 ? 1 : -1;
-    return { dir: dir, x: dir === 1 ? -50 : W + 4, y: 4, passoMarcha: 0, pose: 0, desenhar: desenharInvasores };
+    return { dir: -1, x: W + 4, y: 4, ritmo: 14, passoMarcha: 0, pose: 0, desenhar: desenharInvasores };
   }
 
   function desenharInvasores(passo) {
     this.passoMarcha += passo;
-    if (this.passoMarcha >= 14) {        // a marcha: um passo de 3 pontos
+    if (this.passoMarcha >= this.ritmo) {      // a marcha: um passo de 3 pontos
       this.passoMarcha = 0;
-      this.x += this.dir * 3;
       this.pose = 1 - this.pose;
+      if (this.dir === -1 && this.x <= BORDA_DA_LUA) {
+        this.y += 8;                           // desce uma linha...
+        this.dir = 1;                          // ...volta...
+        this.ritmo = 10;                       // ...e acelera
+      } else {
+        this.x += this.dir * 3;
+      }
     }
     for (let i = 0; i < 3; i++) {
       S.colar(ctx, INVASOR[this.pose], this.x + i * 15, this.y, 1);
     }
-    return this.dir === 1 ? this.x < W + 4 : this.x > -50;
+    return this.dir === -1 || this.x < W + 4;
   }
 
   // Arwing (Star Fox, SNES 1993): duas naves em formacao; a da frente da'
@@ -666,7 +675,834 @@
     return this.dir === 1 ? this.x < W + 30 : this.x > -30;
   }
 
-  const VISITAS = { fzero: iniciarFzero, kirby: iniciarKirby, invasores: iniciarInvasores, arwing: iniciarArwing };
+  // ------------------------------------------------------------------
+  // Mais visitas de 16 bits (lote ceu-a, 13/10/2026).
+  // ------------------------------------------------------------------
+
+  // Super Sonic e o Dr. Robotnik (Sonic 3 & Knuckles, Mega Drive 1994): a
+  // luta final no espaco. O Egg Mobile foge na frente, tremendo, e o Super
+  // Sonic dourado vem atras, cada vez mais perto, soltando faiscas.
+  // Y/y = dourado e sombra, h = brilho (o dourado pisca), s = pele,
+  // w = olho e luva, R = olho vermelho e tenis, k = nariz.
+  const SUPER_SONIC = S.quadros([
+    ['...........Y..........',
+     '........YY..YY.Y......',
+     '.....YYYYyYYYYYYY.....',
+     '..YYYYYYyYYYYYYYYwY...',
+     'YYYyyyyYYYYYYYYwwRY...',
+     '...yyyyyyYYYYYYYwsss..',
+     '.....yyyyYYYYYYYsssk..',
+     '.RRwyyyyyYYYYYYss.....',
+     'RRw.....yyyYYYYYYYww..',
+     '............yyyyYwww..'],
+    ['...........h..........',    // o dourado pisca
+     '........Yh..Yh.h......',
+     '.....hYYYyYYYYYYY.....',
+     '..hYYYYYyYYYYYYYYwY...',
+     'hYYyyyyYYYYYYYYwwRY...',
+     '...yyyyyyYYYYYYYwsss..',
+     '.....yyyyYYYYYYYsssk..',
+     'RRw.yyyyyYYYYYYss.....',
+     '.RRw....yyyYYYYYYYww..',
+     '............yyyyYwww..']
+  ], { Y: '#ffe24a', y: '#d09000', h: '#fff6c0', s: '#ffc890', w: '#ffffff', k: '#1a1a1a', R: '#e8202a' });
+  // p = careca, N = narigao, K = oculos, w = reflexo e borda do casulo,
+  // M = bigode, R = jaqueta e luzes, g/G = casco.
+  const EGG_MOBILE = S.quadros([
+    ['......pppp..........',
+     '....pppppppp........',
+     '...ppppppKKKKK......',
+     '...pppppppKwKKp.....',
+     '...pppppppppNNN.....',
+     '...ppppppppNNNNN....',
+     '....pMMMMMMMNNNMM...',
+     '..RRRMMMMMMMMMMMMM..',
+     '.RRRRRRRMMMMMR......',
+     'wwwwwwwwwwwwwwwwwwww',
+     'GgggggggggggggggggG.',
+     '.GgwwggggggggggggG..',
+     '..GKKKRKKKKRKKKKG...',
+     '....GGGGGGGGGGG.....'],
+    ['....................',    // afundando de medo
+     '......pppp..........',
+     '....pppppppp........',
+     '...ppppppKKKKK......',
+     '...pppppppKwKKp.....',
+     '...pppppppppNNN.....',
+     '...ppppppppNNNNN....',
+     '....pMMMMMMMNNNMM...',
+     '..RRRMMMMMMMMMMMMM..',
+     'wwwwwwwwwwwwwwwwwwww',
+     'GgggggggggggggggggG.',
+     '.GgwwggggggggggggG..',
+     '..GKKKwKKKKwKKKKG...',
+     '....GGGGGGGGGGG.....']
+  ], { p: '#f8b498', N: '#e07c64', K: '#14141e', w: '#ffffff', M: '#d0601c', R: '#e02020', g: '#c4ccd8', G: '#5e6678' });
+
+  function iniciarSuperSonic() {
+    const dir = aleatorio() < 0.5 ? 1 : -1;
+    return { dir: dir, x: dir === 1 ? -12 : W + 12, base: 20 + aleatorio() * 22, distancia: 54,
+             faiscas: [], desenhar: desenharSuperSonic };
+  }
+
+  function desenharSuperSonic(passo) {
+    const ev = this;
+    ev.x += ev.dir * 0.5 * passo;                                // centro do Egg Mobile
+    ev.distancia = Math.max(27, ev.distancia - 0.05 * passo);    // o Sonic vai chegando
+    const sx = ev.x - ev.dir * ev.distancia;                     // centro do Super Sonic
+    const onda = function (x) { return ev.base + Math.sin(x * 0.035) * 6; };
+    const egg = EGG_MOBILE[Math.floor(t / 10) % 2];
+    const ex = Math.round(ev.x - egg.w / 2);
+    const ey = Math.round(onda(ev.x) - egg.h / 2) + Math.floor(t / 6) % 2;   // treme
+    const sonic = SUPER_SONIC[Math.floor(t / 4) % 2];
+    const qx = Math.round(sx - sonic.w / 2);
+    const qy = Math.round(onda(sx) - sonic.h / 2) + 3;          // o Sonic segue o mesmo caminho
+    const costas = ev.dir === 1 ? qx : qx + sonic.w;             // de onde saem as faiscas
+    const naTela = qx > -sonic.w && qx < W;
+    // Faiscas douradas que ficam para tras.
+    if (passo && naTela && aleatorio() < 0.5 * passo) {
+      ev.faiscas.push({ x: costas + ev.dir * aleatorio() * 6, y: qy + aleatorio() * sonic.h, vida: 1 });
+    }
+    for (const f of ev.faiscas) { f.vida -= 0.04 * passo; f.x -= ev.dir * 0.15 * passo; }
+    ev.faiscas = ev.faiscas.filter(function (f) { return f.vida > 0; });
+    for (const f of ev.faiscas) {
+      const fx = Math.round(f.x), fy = Math.round(f.y);
+      ctx.fillStyle = rgba('255,236,140', f.vida);
+      ctx.fillRect(fx, fy, 1, 1);
+      if (f.vida > 0.65) {                                       // estrelinha de quatro pontas
+        ctx.fillStyle = rgba('255,250,220', (f.vida - 0.65) * 2.5);
+        ctx.fillRect(fx - 1, fy, 1, 1);
+        ctx.fillRect(fx + 1, fy, 1, 1);
+        ctx.fillRect(fx, fy - 1, 1, 1);
+        ctx.fillRect(fx, fy + 1, 1, 1);
+      }
+    }
+    // Riscos de velocidade atras do Sonic.
+    for (let k = 0; k < 3; k++) {
+      const comp = 3 + (Math.floor(t / 2) + k * 2) % 4;
+      ctx.fillStyle = rgba('255,226,74', 0.4 - k * 0.1);
+      ctx.fillRect(ev.dir === 1 ? costas - 2 - comp - k * 2 : costas + 2 + k * 2, qy + 2 + k * 3, comp, 1);
+    }
+    // Chama do motor do Egg Mobile, na traseira do casco.
+    ctx.fillStyle = Math.floor(t / 2) % 2 === 0 ? '#ffe066' : '#ff7a29';
+    ctx.fillRect(ev.dir === 1 ? ex - 2 : ex + egg.w, ey + 10, 2, 2);
+    S.colar(ctx, egg, ex, ey, ev.dir);
+    S.colar(ctx, sonic, qx, qy, ev.dir);
+    const indo = ev.dir === 1 ? qx < W : qx > -sonic.w;
+    return indo || ev.faiscas.length > 0;
+  }
+
+  // A nave da Samus (Super Metroid, SNES 1994): cruza o ceu devagar,
+  // balancando, com as luzes piscando e os jatos azuis dos dois motores.
+  // De frente ela lembra o capacete da Samus: casco laranja e visor verde.
+  // O = casco, o = contorno, Y = brilho, g = visor, h = reflexo,
+  // L = luz acesa, l = luz apagada, G = bocal do motor.
+  const NAVE_SAMUS = S.quadros([
+    ['........ooooo........',    // luzes das asas
+     '......ooOOOOOoo......',
+     '.....oOYYOOOOOOo.....',
+     '....oOOOOOOOOOOOo....',
+     '....ohggggggggggo....',
+     '..ooOgggggggggggOoo..',
+     '.oOOOOogggggggoOOOOo.',
+     'oOOLOOOOogggoOOOOLOOo',
+     'oOOOoOOOOOOOOOOOoOOOo',
+     '.oGo.ooolooolooo.oGo.',
+     '.GGG.............GGG.'],
+    ['........ooooo........',    // luzes da barriga
+     '......ooOOOOOoo......',
+     '.....oOYYOOOOOOo.....',
+     '....oOOOOOOOOOOOo....',
+     '....ohggggggggggo....',
+     '..ooOgggggggggggOoo..',
+     '.oOOOOogggggggoOOOOo.',
+     'oOOlOOOOogggoOOOOlOOo',
+     'oOOOoOOOOOOOOOOOoOOOo',
+     '.oGo.oooLoooLooo.oGo.',
+     '.GGG.............GGG.']
+  ], { O: '#f08a24', o: '#9a4a16', Y: '#ffd25a', g: '#3cd85a', h: '#d4ffd8', L: '#ff4050', l: '#6a2a1a', G: '#7a8496' });
+
+  function iniciarNaveSamus() {
+    const dir = aleatorio() < 0.5 ? 1 : -1;
+    return { dir: dir, x: dir === 1 ? -13 : W + 13, base: 14 + aleatorio() * 24, jato: [],
+             desenhar: desenharNaveSamus };
+  }
+
+  function desenharNaveSamus(passo) {
+    this.x += this.dir * 0.32 * passo;                           // centro da nave
+    const nave = NAVE_SAMUS[Math.floor(t / 15) % 2];             // luzes: asas, barriga, asas...
+    const x0 = Math.round(this.x - nave.w / 2);
+    const y0 = Math.round(this.base + Math.sin(t * 0.04) * 2.5 - nave.h / 2);
+    const indo = this.dir === 1 ? x0 < W : x0 > -nave.w;
+    // Jatos: pontinhos azuis que saem dos bocais e ficam para tras.
+    if (passo && indo && aleatorio() < 0.6 * passo) {
+      this.jato.push({ x: x0 + (aleatorio() < 0.5 ? 2 : 18), y: y0 + nave.h, vida: 1 });
+    }
+    for (const j of this.jato) { j.vida -= 0.05 * passo; j.y += 0.25 * passo; j.x -= this.dir * 0.2 * passo; }
+    this.jato = this.jato.filter(function (j) { return j.vida > 0; });
+    for (const j of this.jato) {
+      ctx.fillStyle = rgba('140,210,255', j.vida * 0.6);
+      ctx.fillRect(Math.round(j.x), Math.round(j.y), 1, 1);
+    }
+    ctx.fillStyle = Math.floor(t / 2) % 2 === 0 ? '#e8f8ff' : '#7fd0ff';
+    ctx.fillRect(x0 + 1, y0 + nave.h, 3, 1);
+    ctx.fillRect(x0 + 17, y0 + nave.h, 3, 1);
+    S.colar(ctx, nave, x0, y0, this.dir);
+    return indo || this.jato.length > 0;
+  }
+
+  // Mario de capa (Super Mario World, SNES 1990): sobe la de baixo no pulo,
+  // de punho para cima, e la no alto plana -- mergulha devagar e puxa para
+  // cima de novo, com a capa batendo, como no jogo.
+  // R = bone e camisa, B = macacao, S = pele, H = cabelo e sapato,
+  // K = olho e bigode, W = luva, Y/y = capa.
+  const MARIO_CAPA = S.quadros([
+    ['..............WW..',    // subindo
+     '..........RRRRRR..',
+     '.........RRRRRRRR.',
+     '.........HHSSKS...',
+     'y.......HSHSSSSS..',
+     'yYy.....HSHHSSSK..',
+     '.yYy.....SSKKKK...',
+     '.yYYy...RRBBRR....',
+     '..yYYy.RRBBBBB....',
+     '..yYYYyyBBBBBB....',
+     '...yYYYHH...BBH...',
+     '....yyyHH....HH...'],
+    ['..................',    // planando, capa para cima
+     '..................',
+     'y.................',
+     'yYy...............',
+     '.yYYy.......RRRR..',
+     '..yYYYy....RRRRRRR',
+     '...yYYYYy.HHSSKSS.',
+     '....yYYYYyHSSSSSSS',
+     'HBBBBBBBRRRSKKKK..',
+     'HHBBBBBBRRRRRRRRWW',
+     '..................',
+     '..................'],
+    ['..................',    // planando, capa batendo
+     '..................',
+     '..................',
+     '..................',
+     '............RRRR..',
+     'y..........RRRRRRR',
+     'yYYyy.....HHSSKSS.',
+     '.yYYYYyyy.HSSSSSSS',
+     'HByyYYYYYyRSKKKK..',
+     'HHBBBBBBRRRRRRRRWW',
+     '..................',
+     '..................']
+  ], { R: '#e02810', B: '#2050e8', S: '#ffc898', H: '#6a3a10', K: '#000000', W: '#ffffff', Y: '#ffd800', y: '#c07c00' });
+
+  function iniciarMarioCapa() {
+    const dir = aleatorio() < 0.5 ? 1 : -1;
+    return { dir: dir, x: dir === 1 ? -18 : W, y: H + 2, alto: 10 + aleatorio() * 18, yPlano: 0,
+             subindo: true, fase: 0, vento: [], desenhar: desenharMarioCapa };
+  }
+
+  function desenharMarioCapa(passo) {
+    const indo = this.dir === 1 ? this.x < W + 2 : this.x > -20;
+    let quadro;
+    if (this.subindo) {                                          // o pulo
+      this.x += this.dir * 0.5 * passo;
+      this.y -= 0.65 * passo;
+      quadro = MARIO_CAPA[0];
+      if (this.y <= this.alto) {
+        this.subindo = false;
+        this.yPlano = this.y - 3;           // no quadro planando o bone fica 3 pontos mais baixo
+      }
+    } else {                                                     // o voo planado
+      this.x += this.dir * 0.75 * passo;
+      this.fase += 0.035 * passo;
+      this.y = this.yPlano + 6 - 6 * Math.cos(this.fase);
+      quadro = MARIO_CAPA[1 + Math.floor(t / 6) % 2];
+      // Risquinhos de vento atras da capa.
+      if (passo && indo && aleatorio() < 0.25 * passo) {
+        this.vento.push({ x: this.x + (this.dir === 1 ? -4 : 19), y: this.y + 3 + Math.floor(aleatorio() * 7), vida: 1 });
+      }
+    }
+    for (const v of this.vento) { v.vida -= 0.06 * passo; v.x -= this.dir * 0.3 * passo; }
+    this.vento = this.vento.filter(function (v) { return v.vida > 0; });
+    for (const v of this.vento) {
+      ctx.fillStyle = rgba('255,255,255', v.vida * 0.4);
+      ctx.fillRect(Math.round(v.x), Math.round(v.y), 3, 1);
+    }
+    S.colar(ctx, quadro, this.x, this.y, this.dir);
+    return indo || this.vento.length > 0;
+  }
+
+  // Meta Knight (Kirby Super Star, SNES 1996): chega batendo as asas de
+  // morcego, para no meio do ceu, a espada Galaxia brilha... e ele sai num
+  // risco, deixando a sombra para tras.
+  // B = corpo, M/m = mascara e lamina, K = visor, Y = olhos e cabo da espada,
+  // V/v = asas, P = sapatos.
+  const META_KNIGHT = S.quadros([
+    ['V...................V',    // asas em cima
+     'VV.................VV',
+     'vVV.......BBBB....VVv',
+     '.vVV....BBBBMMM..VVv.',
+     '.vVVV..BBBMMMMMMVVVv.',
+     '..vVVVvBBKKKKKKKvVv..',
+     '..V.VVvBBKYKKYKKvVV..',
+     '...V.V.BBMMMMMMm.V.V.',
+     '.......BBBMMMMm.Y....',
+     '........BBBBBBYYMMMM.',
+     '........PP...PPY.....',
+     '.....................'],
+    ['.....................',    // asas no meio
+     '.....................',
+     '..........BBBB.......',
+     '........BBBBMMM......',
+     'VVVV...BBBMMMMMM..VVV',
+     'vVVVVVvBBKKKKKKKvVVVv',
+     '.vVVVVvBBKYKKYKKvVVv.',
+     '..V.V.VBBMMMMMMmV.V..',
+     '.......BBBMMMMm.Y....',
+     '........BBBBBBYYMMMM.',
+     '........PP...PPY.....',
+     '.....................'],
+    ['.....................',    // asas embaixo
+     '.....................',
+     '..........BBBB.......',
+     '........BBBBMMM......',
+     '.......BBBMMMMMM.....',
+     '......vBBKKKKKKKv....',
+     '.....vVBBKYKKYKKVv...',
+     '...vvVVBBMMMMMMmVVvv.',
+     '..vVVV.BBBMMMMm.YVVVv',
+     '.vVV.V..BBBBBBYYMMMM.',
+     'vV..V...PP...PPY..VVv',
+     'V...................V']
+  ], { B: '#3448c0', M: '#dde3f0', m: '#8a92a8', K: '#101018', Y: '#ffe040', V: '#6c3fb0', v: '#a37ae6', P: '#d050b0' });
+  const BATIDA_MK = [0, 1, 2, 1];          // cima, meio, baixo, meio
+  const SOBE_MK = [1, 0, -1, 0];           // a asa desce e ele sobe um pouquinho
+
+  function iniciarMetaKnight() {
+    const dir = aleatorio() < 0.5 ? 1 : -1;
+    return { dir: dir, x: dir === 1 ? -22 : W + 1, y: 14 + aleatorio() * 24, alvo: W / 2 + (aleatorio() - 0.5) * 50,
+             fase: 'chega', espera: 0, vel: 0.5, rastro: [], desenhar: desenharMetaKnight };
+  }
+
+  function desenharMetaKnight(passo) {
+    const centro = this.x + 10.5;
+    if (this.fase === 'chega' && (this.dir === 1 ? centro >= this.alvo : centro <= this.alvo)) this.fase = 'para';
+    if (this.fase === 'para') {
+      this.espera += passo;
+      if (this.espera > 90) this.fase = 'sai';
+    } else {
+      if (this.fase === 'sai') this.vel = Math.min(3, this.vel + 0.08 * passo);
+      this.x += this.dir * this.vel * passo;
+    }
+    const batida = Math.floor(t / (this.fase === 'sai' ? 3 : 5)) % 4;
+    const quadro = META_KNIGHT[BATIDA_MK[batida]];
+    const y = Math.round(this.y + SOBE_MK[batida] + (this.fase === 'para' ? Math.sin(this.espera * 0.07) * 1.5 : 0));
+    // No risco, duas sombras ficam para tras.
+    if (this.fase === 'sai' && passo) {
+      this.rastro.unshift({ x: this.x, y: y, quadro: quadro });
+      if (this.rastro.length > 5) this.rastro.pop();
+    }
+    for (const [k, alfa] of [[4, 0.18], [2, 0.35]]) {
+      const r = this.rastro[k];
+      if (!r) continue;
+      ctx.globalAlpha = alfa;
+      S.colar(ctx, r.quadro, r.x, r.y, this.dir);
+      ctx.globalAlpha = 1;
+    }
+    S.colar(ctx, quadro, this.x, y, this.dir);
+    // Parado, a ponta da espada brilha.
+    if (this.fase === 'para' && this.espera > 20 && this.espera < 60) {
+      const k = Math.sin((this.espera - 20) / 40 * Math.PI);
+      const bx = Math.round(this.dir === 1 ? this.x + 19 : this.x + 1), by = y + 9;
+      const raio = Math.round(k * 2.4);
+      ctx.fillStyle = rgba('255,250,200', k);
+      ctx.fillRect(bx - raio, by, raio * 2 + 1, 1);
+      ctx.fillRect(bx, by - raio, 1, raio * 2 + 1);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(bx, by, 1, 1);
+    }
+    return this.dir === 1 ? this.x < W + 40 : this.x > -60;
+  }
+
+  // Vic Viper (Gradius III, SNES 1990): a nave do Gradius faz ondas pelo ceu
+  // com as duas "options" (as bolinhas laranja) seguindo o mesmo caminho,
+  // uma atras da outra, e atirando junto com ela.
+  // W/w = casco, B = asa, c = cabine, R = detalhe, E = motor.
+  const VIC_VIPER = S.quadros([
+    ['.....wWWWWWWWWw..',    // reta
+     '....wBB..........',
+     '...RWWB..........',
+     '..RWWWWWWWWW.....',
+     'EEWWWWWWWccWWWWWw',
+     '..RWWWWWWWWW.....',
+     '...RWWB..........',
+     '....wBB..........',
+     '.....wWWWWWWWWw..'],
+    ['.................',    // subindo
+     '.....wWWWWWWWw...',
+     '...RWBB..........',
+     '..RWWWWWWWWW.....',
+     'EEWWWWWWWccWWWWWw',
+     '..RWWWWWWWWW.....',
+     '...RWWBB.........',
+     '....wWWBB........',
+     '....wWWWWWWWWWWw.'],
+    ['....wWWWWWWWWWWw.',    // descendo
+     '....wWWBB........',
+     '...RWWBB.........',
+     '..RWWWWWWWWW.....',
+     'EEWWWWWWWccWWWWWw',
+     '..RWWWWWWWWW.....',
+     '...RWBB..........',
+     '.....wWWWWWWWw...',
+     '.................']
+  ], { W: '#e8ecf4', w: '#a8b0c8', B: '#3060e0', c: '#60d0ff', R: '#e03030', E: '#ff9a3c' });
+  // A option: bolinha laranja que pulsa.
+  const OPTION_GRADIUS = S.quadros([
+    ['.ooo.',
+     'oOOOo',
+     'oOhOo',
+     'oOOOo',
+     '.ooo.'],
+    ['..o..',
+     '.oOo.',
+     'oOhOo',
+     '.oOo.',
+     '..o..']
+  ], { o: '#c84010', O: '#ff8a20', h: '#ffe9a0' });
+
+  function iniciarVicViper() {
+    const dir = aleatorio() < 0.5 ? 1 : -1;
+    return { dir: dir, x: dir === 1 ? -10 : W + 10, base: 20 + aleatorio() * 26, amp: 7 + aleatorio() * 5,
+             recarga: 30, tiros: [], desenhar: desenharVicViper };
+  }
+
+  function desenharVicViper(passo) {
+    const ev = this;
+    ev.x += ev.dir * 0.6 * passo;                                // centro da nave
+    const caminho = function (x) { return ev.base + Math.sin(x * 0.045) * ev.amp; };
+    const y = Math.round(caminho(ev.x));
+    // Inclina conforme o caminho logo a frente: subindo, reta ou descendo.
+    const frente = caminho(ev.x + ev.dir * 3) - caminho(ev.x);
+    const nave = VIC_VIPER[frente < -0.6 ? 1 : frente > 0.6 ? 2 : 0];
+    // As options passam pelos mesmos pontos, logo atras.
+    const options = [ev.x - ev.dir * 15, ev.x - ev.dir * 28].map(function (ox) {
+      return { x: Math.round(ox), y: Math.round(caminho(ox)) };
+    });
+    // A nave e as options atiram juntas.
+    ev.recarga -= passo;
+    if (ev.recarga <= 0) {
+      ev.recarga = 22;
+      ev.tiros.push({ x: ev.x + ev.dir * 9, y: y });
+      for (const o of options) ev.tiros.push({ x: o.x + ev.dir * 3, y: o.y });
+    }
+    for (const tiro of ev.tiros) tiro.x += ev.dir * 2.6 * passo;
+    ev.tiros = ev.tiros.filter(function (tiro) { return tiro.x > -6 && tiro.x < W + 6; });
+    ctx.fillStyle = '#fff2a8';
+    for (const tiro of ev.tiros) ctx.fillRect(Math.round(tiro.x) - (ev.dir === 1 ? 0 : 3), tiro.y, 4, 1);
+    const opt = OPTION_GRADIUS[Math.floor(t / 4) % 2];
+    for (const o of options) {
+      ctx.fillStyle = rgba('255,140,40', 0.22);                  // brilho em volta
+      ctx.fillRect(o.x - 3, o.y - 1, 7, 3);
+      ctx.fillRect(o.x - 1, o.y - 3, 3, 7);
+      S.colar(ctx, opt, o.x - 2, o.y - 2, 1);
+    }
+    const x0 = Math.round(ev.x) - 8;
+    ctx.fillStyle = Math.floor(t / 2) % 2 === 0 ? '#ffe066' : '#ff9a3c';
+    ctx.fillRect(ev.dir === 1 ? x0 - 2 : x0 + nave.w, y, 2, 1);  // chama do motor
+    S.colar(ctx, nave, x0, y - 4, ev.dir);
+    const indo = ev.dir === 1 ? options[1].x < W + 6 : options[1].x > -6;
+    return indo || ev.tiros.length > 0;
+  }
+
+  // ------------------------------------------------------------------
+  // Mais visitas de 16 bits (lote ceu-b, 14/10/2026): Ristar, ToeJam &
+  // Earl, o Starman do EarthBound, Earthworm Jim, Mario e Luigi na
+  // Rainbow Road e a Lunar Whale do Final Fantasy IV.
+  // ------------------------------------------------------------------
+  const RISTAR = S.quadros([
+    ['......L......',
+     '.....LYL.....',
+     '.....LYY.....',
+     '....LYYYD....',
+     'WWLYYYYYYYDWW',
+     'WgDYKYYYKYDgW',
+     '...YKYYYKY...',
+     '...YYYYYYYD..',
+     '..YYYrrrYYD..',
+     '..YYYDYDYYD..',
+     '.DYYD...DYYD.',
+     'WWr.......rWW',
+     'ggg.......ggg'],
+    ['gW.....WW....',
+     'gWD....gW....',
+     'grYYY..DL....',
+     '..YYYYYYY....',
+     '..DYYYKKYL...',
+     '...DrYYYYYLL.',
+     '...YrYYYYYYYL',
+     '...DrYYYYYYL.',
+     '..DYYYKKYD...',
+     '..YYYYYYY....',
+     'grYDDD.DD....',
+     'gWD....gW....',
+     'gW.....WW....'],
+    ['ggg.......ggg',
+     'WWr.......rWW',
+     '.DYYD...DYYD.',
+     '..DYYDYDYYY..',
+     '..DYYrrrYYY..',
+     '..DYYYYYYY...',
+     '...YKYYYKY...',
+     'WgDYKYYYKYDgW',
+     'WWDYYYYYYYLWW',
+     '....DYYYL....',
+     '.....YYL.....',
+     '.....LYL.....',
+     '......L......'],
+    ['......L......',
+     '.....LYL.....',
+     '.....LYY.....',
+     '....LYYYD....',
+     '.LLYYYYYYYDD.',
+     '..DYKYYYKYD..',
+     '...YKYYYKY...',
+     '...YYYYYYYD..',
+     '..YYYrrrYYD..',
+     '..YYYDYDYYD..',
+     '.DYYD...DYYD.',
+     'WWr.......rWW',
+     'ggg.......ggg']
+  ], { Y: '#ffd23a', L: '#fff4a8', D: '#e8941e', K: '#1c1a3a', W: '#ffffff', g: '#b9c3dd', r: '#e8202a' });
+
+  const TOEJAM_EARL = S.quadros([
+    ['...o..o...............',
+     '..oooooo........W..W..',
+     '.oKKKKKKo.......r..r..',
+     '.oKWKoKWo.....BBrrrr..',
+     'oooooooooo......rrrr..',
+     'oooooooooo......rYrr..',
+     '.BBBBBBBB.......rrrr..',
+     '.BBB..BBB.......r.r.r.',
+     '.rrr..rrr......WW.W.WW',
+     'rr..sSSSSSSSSSSSSSSs..',
+     'rrsSSSSSSSSSSSSSSSSSSs',
+     'rrSSSrrrrrrrrBBSSSSSSS',
+     'rrsSSSSSSSSSSSSSSSSSs.',
+     'rr...sssssssssssssss..'],
+    ['..o....o..............',
+     '...oooooo.......W...W.',
+     '..oKKKKKKo.......r.r..',
+     '..oKWKoKWo....BBBrrrr.',
+     '.oooooooooo......rrrr.',
+     '.oooooooooo......rYrr.',
+     '..BBBBBBBB.......rrrr.',
+     '..BBB..BBB......r.r.r.',
+     '..rrr..rrr.....WW.W.WW',
+     'rr..sSSSSSSSSSSSSSSs..',
+     'rrsSSSSSSSSSSSSSSSSSSs',
+     'rrSSSrrrrrrrrBBSSSSSSS',
+     'rrsSSSSSSSSSSSSSSSSSs.',
+     'rr...sssssssssssssss..']
+  ], { r: '#ec2d45', o: '#ff9a3c', K: '#15151f', W: '#ffffff', B: '#3a6cff', Y: '#ffd23f', S: '#d4dae8', s: '#8a93aa' });
+
+  const STARMAN = S.quadros([
+    ['....sWs....',
+     '...sWWWs...',
+     '...sKKKs...',
+     '..dsWWWsd..',
+     '.dsWWWWWsd.',
+     'ds.sKKKs.sd',
+     'ds.sWKWs.sd',
+     '.ds.sKs.sd.',
+     '..dsWWWsd..',
+     '...ss.ss...',
+     '...sd.ds...',
+     '...sd.ds...',
+     '..dsd.dsd..'],
+    ['....sWs....',
+     '...sWWWs...',
+     '...sKKcs...',
+     '..dsWWWsd..',
+     '.dsWWWWWsd.',
+     'ds.sKKKs.sd',
+     'ds.sWKWs.sd',
+     '.ds.sKs.sd.',
+     '..dsWWWsd..',
+     '...ss.ss...',
+     '...sd.ds...',
+     '...sd.ds...',
+     '..dsd.dsd..'],
+    ['....sWs....',
+     '...........',
+     '...sKKKs...',
+     '...........',
+     '.dsWWWWWsd.',
+     '...........',
+     'ds.sWKWs.sd',
+     '...........',
+     '..dsWWWsd..',
+     '...........',
+     '...sd.ds...',
+     '...........',
+     '..dsd.dsd..'],
+    ['.....c.....',
+     '.....W.....',
+     '.....W.....',
+     '....sWs....',
+     '....sWs....',
+     '....sWs....',
+     '....sWs....',
+     '....sWs....',
+     '....sWs....',
+     '.....W.....',
+     '.....W.....',
+     '.....W.....',
+     '.....c.....']
+  ], { W: '#f2f5fb', s: '#b3bccf', d: '#737d99', K: '#14161f', c: '#8ff3ff' });
+
+  const JIM = S.quadros([
+    ['.....qpp............',
+     '.....pWW............',
+     '.....pWK............',
+     '......pp............',
+     '......qp............',
+     '.....gWWg.yy........',
+     '.....WWWWWRR........',
+     '.....gWWg...........',
+     '..r.RRRWRRRRRRRWW...',
+     '.rrRRRRWWRRRRRRRWWy.',
+     '..rrRRRRRRRRRRRRWW..',
+     '.rr.................'],
+    ['....qpp.............',
+     '....pWW.............',
+     '....pWK.............',
+     '.....pp.............',
+     '......qp............',
+     '.....gWWg.yy........',
+     '.....WWWWWRR........',
+     '.....gWWg...........',
+     '..r.RRRWRRRRRRRWW...',
+     '.rrRRRRWWRRRRRRRWWy.',
+     '..rrRRRRRRRRRRRRWW..',
+     '.rr.................']
+  ], { p: '#ff9a8a', q: '#d8606a', W: '#ffffff', K: '#16161f', g: '#9fb2d6', R: '#e8302a', r: '#9a1c22', y: '#ffd23f' });
+
+  const KART_MARIO = S.quadros([
+    ['....CCCC....',
+     '...CCCCCC...',
+     '....SSES....',
+     '....SKKS....',
+     '...OOOOGG...',
+     '.BBBBBBBBBB.',
+     'BBBBBBBBBBBB',
+     '.KKK....KKK.',
+     '.KGK....KGK.',
+     '..K......K..'],
+    ['............',
+     '....CCCC....',
+     '...CCCCCC...',
+     '....SSES....',
+     '....SKKS....',
+     '...OOOOGG...',
+     '.BBBBBBBBBB.',
+     'BKKKBBBBKKKB',
+     '.KKG....KKG.',
+     '..K......K..']
+  ], { C: '#e8202a', S: '#ffb070', E: '#14141f', K: '#1a1a22', O: '#2f5bff', G: '#c9ced8', B: '#e8202a' });
+
+  const KART_LUIGI = S.quadros([
+    ['....CCCC....',
+     '...CCCCCC...',
+     '....SSES....',
+     '....SKKS....',
+     '...OOOOGG...',
+     '.BBBBBBBBBB.',
+     'BBBBBBBBBBBB',
+     '.KKK....KKK.',
+     '.KGK....KGK.',
+     '..K......K..'],
+    ['............',
+     '....CCCC....',
+     '...CCCCCC...',
+     '....SSES....',
+     '....SKKS....',
+     '...OOOOGG...',
+     '.BBBBBBBBBB.',
+     'BKKKBBBBKKKB',
+     '.KKG....KKG.',
+     '..K......K..']
+  ], { C: '#2fbf4a', S: '#ffb070', E: '#14141f', K: '#1a1a22', O: '#2f5bff', G: '#c9ced8', B: '#2fbf4a' });
+
+  const BALEIA = S.quadros([
+    ['F...................',
+     'FF........DDDD......',
+     '.Fdd...dDDDDDDDD....',
+     '..ddddDDDDDDDDDDDD..',
+     '...dddrrrrrrrrrrDDD.',
+     '....ddPPPPPPPPPPPdDD',
+     '.....dpPpPpPpPpPPPd.',
+     '.......pppppppppp...',
+     '..........y..y......'],
+    ['....................',
+     'F.........DDDD......',
+     'FFdd...dDDDDDDDD....',
+     '.FddddDDDDDDDDDDDD..',
+     '...dddrrrrrrrrrrDDD.',
+     '....ddPPPPPPPPPPPdDD',
+     '.....dpPpPpPpPpPPPd.',
+     '.......pppppppppp...',
+     '..........y..y......']
+  ], { d: '#4b4670', D: '#7a74a6', P: '#ece6f6', p: '#b2a8cf', r: '#e8483a', F: '#f6cfe0', y: '#ffd84a', K: '#15131f' });
+
+  // Ristar (Ristar, Mega Drive 1995): a estrelinha heroi cruza o ceu em arco,
+  // girando, e deixa um rastro de faiscas douradas.
+  function iniciarRistar() {
+    const dir = aleatorio() < 0.5 ? 1 : -1;
+    return { dir: dir, x: dir === 1 ? -14 : W + 2, base: 14 + aleatorio() * 18, rastro: [], desenhar: desenharRistar };
+  }
+
+  function desenharRistar(passo) {
+    this.x += this.dir * 0.65 * passo;
+    const y = this.base + Math.sin(this.x * 0.05) * 7;
+    const naTela = this.x > -14 && this.x < W + 2;
+    if (passo && naTela && aleatorio() < 0.7) {
+      this.rastro.push({ x: this.x + 6 - this.dir * 5, y: y + 6 + (aleatorio() - 0.5) * 4, vida: 1 });
+    }
+    for (const r of this.rastro) { r.vida -= 0.04 * passo; r.y += 0.04 * passo; }
+    this.rastro = this.rastro.filter(function (r) { return r.vida > 0; });
+    for (const r of this.rastro) {
+      ctx.fillStyle = rgba('255,230,110', r.vida * 0.8);
+      ctx.fillRect(Math.round(r.x), Math.round(r.y), 1, 1);
+    }
+    S.colar(ctx, RISTAR[Math.floor(t / 5) % RISTAR.length], this.x, y, this.dir);
+    const voltando = this.dir === 1 ? this.x < W + 2 : this.x > -14;
+    return voltando || this.rastro.length > 0;
+  }
+
+  // ToeJam & Earl (Mega Drive 1991): os dois alienigenas passam devagar no
+  // pedaco de foguete deles, balancando, com a chama piscando atras.
+  function iniciarToeJam() {
+    const dir = aleatorio() < 0.5 ? 1 : -1;
+    return { dir: dir, x: dir === 1 ? -24 : W + 2, base: 20 + aleatorio() * 16, chama: [], desenhar: desenharToeJam };
+  }
+
+  function desenharToeJam(passo) {
+    this.x += this.dir * 0.32 * passo;
+    const y = this.base + Math.sin(t * 0.06) * 2;
+    const traseira = this.dir === 1 ? this.x - 1 : this.x + 22;
+    const naTela = this.x > -24 && this.x < W + 2;          // fora da tela, a chama para
+    if (passo && naTela && aleatorio() < 0.5) this.chama.push({ x: traseira, y: y + 10 + aleatorio() * 2, vida: 1 });
+    for (const c of this.chama) { c.vida -= 0.035 * passo; c.x -= this.dir * 0.15 * passo; }
+    this.chama = this.chama.filter(function (c) { return c.vida > 0; });
+    for (const c of this.chama) {
+      ctx.fillStyle = rgba('255,170,80', c.vida * 0.6);
+      ctx.fillRect(Math.round(c.x), Math.round(c.y), 1, 1);
+    }
+    S.colar(ctx, TOEJAM_EARL[Math.floor(t / 8) % 2], this.x, y, this.dir);
+    const voltando = this.dir === 1 ? this.x < W + 2 : this.x > -24;
+    return voltando || this.chama.length > 0;
+  }
+
+  // Starman (EarthBound, SNES 1994): aparece num risco de luz, flutua um pouco
+  // no lugar e vai embora do mesmo jeito (o teleporte deles).
+  function iniciarStarman() {
+    return { x: 24 + aleatorio() * (W - 48), y: 12 + aleatorio() * 26, fase: 0, desenhar: desenharStarman };
+  }
+
+  function desenharStarman(passo) {
+    this.fase += passo;
+    const f = this.fase;
+    let quadro;
+    if (f < 12 || (f >= 216 && f < 228)) quadro = STARMAN[3];        // o risco de luz
+    else if (f < 24 || (f >= 204 && f < 216)) quadro = STARMAN[2];   // se formando / sumindo
+    else if (f < 204) quadro = STARMAN[Math.floor(t / 10) % 2];      // flutuando (~3 s)
+    else return false;
+    const y = this.y + (f >= 24 && f < 204 ? Math.sin(t * 0.05) * 1.5 : 0);
+    S.colar(ctx, quadro, this.x, y, 1);
+    return true;
+  }
+
+  // Earthworm Jim (SNES/Mega Drive 1994): a toda velocidade no foguete de
+  // bolso, tremendo de leve e soltando fumaca.
+  function iniciarJim() {
+    const dir = aleatorio() < 0.5 ? 1 : -1;
+    return { dir: dir, x: dir === 1 ? -22 : W + 2, y: 22 + aleatorio() * 24, fumaca: [], desenhar: desenharJim };
+  }
+
+  function desenharJim(passo) {
+    this.x += this.dir * 1.0 * passo;
+    const y = this.y + Math.sin(t * 0.3) * 0.7;
+    const traseira = this.dir === 1 ? this.x : this.x + 19;
+    if (passo && this.x > -22 && this.x < W + 2) {
+      this.fumaca.push({ x: traseira, y: y + 9 + (aleatorio() - 0.5) * 2, vida: 1 });
+    }
+    for (const f of this.fumaca) { f.vida -= 0.03 * passo; f.y -= 0.03 * passo; }
+    this.fumaca = this.fumaca.filter(function (f) { return f.vida > 0; });
+    for (const f of this.fumaca) {
+      ctx.fillStyle = rgba('200,190,220', f.vida * 0.5);
+      ctx.fillRect(Math.round(f.x), Math.round(f.y), 1, 1);
+    }
+    S.colar(ctx, JIM[Math.floor(t / 3) % 2], this.x, y, this.dir);
+    const voltando = this.dir === 1 ? this.x < W + 2 : this.x > -22;
+    return voltando || this.fumaca.length > 0;
+  }
+
+  // Super Mario Kart (SNES 1992): Mario e Luigi disputam uma volta numa faixa
+  // da Rainbow Road, a pista de arco-iris, que aparece e some como a do F-Zero.
+  const ARCO_IRIS = ['255,90,90', '255,180,60', '255,240,90', '110,240,130', '110,190,255', '200,140,255'];
+  const PISTA_KART = 68;       // na altura da pista do F-Zero, abaixo do planeta
+
+  function iniciarKart() {
+    const dir = aleatorio() < 0.5 ? 1 : -1;
+    const karts = [KART_MARIO, KART_LUIGI].map(function (sprite, i) {
+      return { sprite: sprite, x: dir === 1 ? -14 - i * 16 : W + 2 + i * 16, faixa: i,
+               vel: 0.5 + aleatorio() * 0.04, fase: aleatorio() * 6 };
+    });
+    return { dir: dir, karts: karts, pista: 0, desenhar: desenharKart };
+  }
+
+  function desenharKart(passo) {
+    const ev = this;
+    const chegaram = ev.karts.every(function (k) { return ev.dir === 1 ? k.x > W + 2 : k.x < -14; });
+    ev.pista = Math.max(0, Math.min(1, ev.pista + (chegaram ? -0.03 : 0.03) * passo));
+    if (ev.pista > 0) {
+      for (let i = 0; i < ARCO_IRIS.length; i++) {
+        ctx.fillStyle = rgba(ARCO_IRIS[i], ev.pista * 0.45);
+        ctx.fillRect(0, PISTA_KART + i, W, 1);
+      }
+      for (let x = 0; x < W; x += 2) {          // o brilho que corre na pista
+        if (Math.floor((x - t * 1.2 * ev.dir) / 8) % 3 === 0) {
+          ctx.fillStyle = rgba('255,255,255', ev.pista * 0.35);
+          ctx.fillRect(x, PISTA_KART + 2, 1, 2);
+        }
+      }
+    }
+    for (const k of ev.karts) {          // trocam de posicao: um acelera, o outro alivia
+      k.x += ev.dir * (k.vel + 0.08 * Math.sin(t * 0.03 + k.fase)) * passo;
+      const y = PISTA_KART - k.sprite[0].h + 4 + k.faixa * 2;
+      S.colar(ctx, k.sprite[Math.floor(t / 4) % 2], k.x, y, ev.dir);
+    }
+    return !(chegaram && ev.pista <= 0);
+  }
+
+  // Lunar Whale (Final Fantasy IV, SNES 1991): a nave-baleia sobe devagar ate
+  // a lua do ceu (em 22, 13), passa por ela e vai embora.
+  function iniciarBaleia() {
+    const y0 = 40 + aleatorio() * 8;
+    const ticks = (W + 4 - 12) / 0.28;             // ate o meio dela chegar a lua
+    return { x: W + 4, y: y0, vy: (y0 - 9) / ticks, desenhar: desenharBaleia };
+  }
+
+  function desenharBaleia(passo) {
+    this.x -= 0.28 * passo;
+    this.y -= this.vy * passo;
+    S.colar(ctx, BALEIA[Math.floor(t / 12) % 2], this.x, this.y + Math.sin(t * 0.04) * 1.2, -1);
+    return this.x > -24;
+  }
+
+  const VISITAS = { fzero: iniciarFzero, kirby: iniciarKirby, invasores: iniciarInvasores, arwing: iniciarArwing,
+                    supersonic: iniciarSuperSonic, navesamus: iniciarNaveSamus, mariocapa: iniciarMarioCapa, metaknight: iniciarMetaKnight, vicviper: iniciarVicViper, ristar: iniciarRistar, toejam: iniciarToeJam, starman: iniciarStarman, jim: iniciarJim, kart: iniciarKart, baleia: iniciarBaleia };
   let filaDeVisitas = ['fzero'];
   let visita = null;
   let esperaVisita = 420;       // ~7 s depois de abrir

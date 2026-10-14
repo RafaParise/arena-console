@@ -57,8 +57,8 @@ PAGINA = """<!doctype html>
 <canvas id="galaxyCanvas"></canvas>
 <div class="marca">
   <div class="nome">ARENA</div>
-  <div class="sub">o console da turma</div>
-  <div class="linha">jogos retr&ocirc; na sala de aula &middot; roda de pen drive &middot; sem instalar nada</div>
+  <div class="sub">central retr&ocirc; da turma</div>
+  <div class="linha">mais de 50 consoles na sala de aula &middot; roda de pen drive &middot; sem instalar nada</div>
 </div>
 <script src="pixel-sprites.js"></script>
 <script src="galaxy-background.js"></script>

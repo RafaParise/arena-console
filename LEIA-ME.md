@@ -1,4 +1,4 @@
-# ARENA — o console da turma
+# ARENA — central retrô da turma
 
 Você copia a pasta, dá dois cliques e joga. Não instala nada.
 

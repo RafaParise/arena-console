@@ -637,17 +637,38 @@ Atrás da lista de jogos há uma cena em pixel art: o **céu** no tema escuro
 Metroides flutuando, cometa, chuva de meteoros, satélite, OVNI e, de vez em
 quando, um foguete) e o **campo** no tema claro (sol, nuvens, girassóis,
 borboletas de várias cores, abelhas, passarinhos, sementes ao vento,
-joaninha que anda e voa, coelho pulando e balão).
+coelho pulando e balão).
 
-De 20 em 20 a 35 s passa uma **visita de um jogo famoso de 8 ou 16 bits**,
-uma de cada vez:
+A cada 20 a 35 s passa uma **visita de um jogo famoso de 8 ou 16 bits**,
+uma de cada vez, sem repetir até passarem todas (são 15 em cada fundo):
 
 | Céu (tema escuro) | Campo (tema claro) |
 |---|---|
 | **F-Zero** (SNES): as quatro máquinas — Blue Falcon, Golden Fox, Wild Goose e Fire Stingray — correndo numa pista de luz, uns 8 s para cruzar a tela. É a primeira visita, uns 7 s depois de abrir | **Super Mario Bros.** (NES): o Mario corre e pula por cima do Goomba. É a primeira visita do campo |
 | **Kirby na Warp Star** (NES): cruza o céu deixando estrelinhas coloridas | **Sonic** (Mega Drive): passa correndo, pula em bola e pega o anel |
-| **Space Invaders**: três invasores marchando lá em cima | **Duck Hunt** (NES): dois patos sobem e o cachorro aparece rindo na grama |
+| **Space Invaders**: três invasores entram marchando lá em cima; perto da lua, descem uma linha e voltam mais depressa, como no jogo | **Duck Hunt** (NES): dois patos sobem e o cachorro aparece rindo na grama |
 | **Arwing** (Star Fox, SNES): duas naves em formação; a da frente gira no meio do caminho | **Kirby** (Game Boy): flutua estufado pelo céu, levado pela brisa |
+| **Super Sonic e o Dr. Robotnik** (Sonic 3 & Knuckles, Mega Drive): o Egg Mobile foge tremendo, e o Super Sonic dourado vem atrás soltando faíscas | **Yoshi** (Super Mario World, SNES): para diante de uma frutinha, estica a língua, come e segue feliz |
+| **Nave da Samus** (Super Metroid, SNES): cruza o céu devagar, com as luzes piscando e os jatos dos motores | **Link** (Zelda: A Link to the Past, SNES): corta um tufo de grama, acha uma rupia e a ergue sobre a cabeça |
+| **Mario de capa** (Super Mario World, SNES): sobe no pulo e plana lá no alto, mergulhando e subindo de novo | **Wiggler** (Super Mario World, SNES): a lagarta da florzinha passeia devagar, cada gomo no seu passo |
+| **Meta Knight** (Kirby Super Star, SNES): chega batendo as asas, a espada brilha e ele sai num risco | **Monty Mole** (Super Mario World, SNES): a terra treme, a toupeira espia do buraco, pula para fora e sai correndo |
+| **Vic Viper** (Gradius III, SNES): faz ondas pelo céu com as duas *options* atrás, atirando junto | **Lakitu** (Super Mario World, SNES): cruza o céu na nuvem, pescando com um cogumelo 1-UP na linha |
+| **Ristar** (Mega Drive): a estrelinha cruza o céu em arco, girando, com um rastro dourado | **Donkey Kong e Diddy** (Donkey Kong Country, SNES): o DK passa rolando, e o Diddy pula para pegar a banana |
+| **ToeJam & Earl** (Mega Drive): os dois passam devagar no pedaço de foguete, com a chama piscando | **Tails** (Sonic 2, Mega Drive): cruza o céu voando, com as caudas girando como hélice |
+| **Starman** (EarthBound, SNES): aparece num risco de luz, flutua um pouco e some do mesmo jeito | **Knuckles** (Sonic & Knuckles, Mega Drive): chega planando, pousa deslizando na grama, pula e sai planando |
+| **Earthworm Jim** (SNES e Mega Drive): passa a toda velocidade no foguete de bolso, soltando fumaça | **Chocobo** (Final Fantasy VI, SNES): passa correndo, levantando poeira, e solta uma pena |
+| **Super Mario Kart** (SNES): Mario e Luigi disputam uma volta na Rainbow Road, a pista de arco-íris | **Rabites** (Secret of Mana, SNES): dois ou três coelhinhos-monstro atravessam o campo aos pulos |
+| **Lunar Whale** (Final Fantasy IV, SNES): a nave-baleia sobe devagar até a lua e passa por ela | **Mr. Saturn** (EarthBound, SNES): atravessa bem devagar, dá um pulinho ("boing!") e solta um coração |
+
+O botão **Visualizar animação**, ao lado do nome ARENA no topo, esconde a
+tela inteira e deixa só o fundo; enquanto você assiste, as visitas vêm a
+cada 1,5 a 4 s. Para voltar, use o botão **◀ Voltar**, no canto, ou a tecla
+**Esc**.
+
+Para revisar as visitas quadro a quadro (depois de mexer num personagem):
+`servidor\python\python.exe ferramentas\revisar_visitas.py`. Ela chama cada
+visita, avisa de erro e de visita que não vai embora e monta folhas com
+alguns quadros de cada uma.
 
 Os personagens são desenhos próprios, pequenos, em homenagem aos jogos (não
 são os sprites tirados dos jogos). Cada desenho está escrito como texto em

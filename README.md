@@ -1,9 +1,9 @@
 <p align="center">
   <img src="docs/imagens/arena-capa.png" width="100%"
-       alt="ARENA, o console da turma: o nome ARENA em letras douradas sobre o céu de galáxia em pixel art do modo escuro">
+       alt="ARENA, central retrô da turma: o nome ARENA em letras douradas sobre o céu de galáxia em pixel art do modo escuro">
 </p>
 
-<h1 align="center">ARENA — o console da turma</h1>
+<h1 align="center">ARENA — central retrô da turma</h1>
 
 <p align="center">
   Uma central de jogos retrô <b>portátil</b> para a sala de aula.<br>
