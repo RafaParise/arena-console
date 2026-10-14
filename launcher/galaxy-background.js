@@ -698,6 +698,7 @@
   }
 
   function soFundo() { return document.body.dataset.soFundo === 'true'; }
+  let gravando = false;
 
   // Para os testes chamarem uma visita na hora (testes\\teste_fundos_animados.py).
   window.__fundoEscuro = {
@@ -707,6 +708,8 @@
     velocidade: function (v) { velocidade = Math.max(1, Math.min(16, Number(v) || 1)); return velocidade; },
     // Avanca n quadros na hora (passo em 1/60 s; 3 = um quadro dos 20 por
     // segundo): para revisar as visitas quadro a quadro e gravar o GIF.
+    // Para o laco normal: quem grava o GIF avanca quadro a quadro (avancar).
+    gravar: function () { gravando = true; sincronizar(); return true; },
     avancar: function (n, passo) {
       passo = passo || 3;
       for (let i = 0; i < (n || 1); i++) { t += passo; desenharQuadro(passo); }
@@ -792,6 +795,7 @@
 
   function modo() {
     if (document.body.dataset.tema !== 'escuro') return 'oculto';
+    if (gravando) return 'gravando';       // ferramentas\gravar_fundo_gif.py avanca na mao
     if (soFundo()) return 'animado';       // "Visualizar animação": anima sempre
     const escolha = document.body.dataset.fundoAnimado || 'automatico';
     if (escolha === 'parado') return 'parado';
