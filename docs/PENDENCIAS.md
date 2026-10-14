@@ -21,9 +21,12 @@ fica no commit). O detalhe de cada pedido está em
 3. **GIFs** dos dois fundos:
    - Para a "Social preview" (1280×640, margem de 40 pt, menos de 1 MB),
      para o README e para o perfil.
-   - As ferramentas estão prontas (`ferramentas\gif_animado.py` e
-     `ferramentas\gravar_fundo_gif.py`). Falta gravar os GIFs finais com os
-     personagens novos e trocar a "Social preview" pelo site.
+   - Feito: `docs\imagens\arena-escuro.gif` (Mario e Luigi na Rainbow Road,
+     997 mil bytes) e `arena-claro.gif` (o Yoshi, 804 mil bytes), 1280×640,
+     no topo do README (um para cada tema do GitHub). Os comandos estão no
+     README, em "Imagens desta página".
+   - Depende do Rafael: enviar o `arena-escuro.gif` em Settings → General →
+     Social preview (só pelo site).
 4. **Controles:**
    - 8 controles nos consoles que permitem e têm jogos com isso.
    - Sem controle, o direcional do teclado também move o analógico (o

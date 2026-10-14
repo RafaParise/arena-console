@@ -1,6 +1,9 @@
 <p align="center">
-  <img src="docs/imagens/arena-capa.png" width="100%"
-       alt="ARENA, central retrô da turma: o nome ARENA em letras douradas sobre o céu de galáxia em pixel art do modo escuro">
+  <picture>
+    <source media="(prefers-color-scheme: light)" srcset="docs/imagens/arena-claro.gif">
+    <img src="docs/imagens/arena-escuro.gif" width="100%"
+         alt="ARENA, central retrô da turma: o nome ARENA em letras douradas sobre o fundo animado em pixel art do ARENA. No tema escuro, Mario e Luigi correm na Rainbow Road pelo céu de galáxia; no tema claro, o Yoshi come uma frutinha no campo florido">
+  </picture>
 </p>
 
 <h1 align="center">ARENA — central retrô da turma</h1>
@@ -196,22 +199,33 @@ internet, e cabe num Celeron de escola.
 
 ### Imagens desta página
 
-A imagem do topo sai do próprio fundo do modo escuro do ARENA
-(`launcher\galaxy-background.js`). Mudou o fundo? Gere de novo:
+As imagens do topo saem dos próprios fundos animados do ARENA
+(`launcher\galaxy-background.js` e `launcher\field-background.js`): quem usa
+o GitHub no tema escuro vê o céu, e quem usa o tema claro vê o campo. Mudou
+um fundo? Grave de novo (cada GIF fica abaixo de 1 MB, o limite do GitHub):
+
+```
+servidor\python\python.exe ferramentas\gravar_fundo_gif.py --tema escuro --visitas kart --quadros 63 --passo 6.4 --girar 24
+servidor\python\python.exe ferramentas\gravar_fundo_gif.py --tema claro --visitas yoshi --quadros 68 --girar 26
+```
+
+Eles gravam `docs\imagens\arena-escuro.gif` e `docs\imagens\arena-claro.gif`
+(1280 × 640). A versão parada, em PNG, sai de:
 
 ```
 servidor\python\python.exe ferramentas\imagem_do_github.py
 ```
 
-Ela grava `docs\imagens\arena-capa.png` (1280 × 640, o topo desta página e a
-imagem de compartilhamento do repositório) e `docs\imagens\arena-fundo-escuro.png`
-(1920 × 1080, o céu sem texto, para papel de parede ou apresentação).
+Ela grava `docs\imagens\arena-capa.png` (1280 × 640) e
+`docs\imagens\arena-fundo-escuro.png` (1920 × 1080, o céu sem texto, para
+papel de parede ou apresentação).
 
-Para a capa aparecer também quando alguém compartilha o link do repositório
+Para a imagem aparecer quando alguém compartilha o link do repositório
 (WhatsApp, Classroom, redes sociais), o dono do repositório envia a imagem
 uma vez pelo site — o GitHub não deixa fazer isso por programa: **Settings →
 General → Social preview → Edit → Upload an image** →
-`docs\imagens\arena-capa.png`.
+`docs\imagens\arena-escuro.gif`. A maioria dos sites mostra só o primeiro
+quadro (Mario e Luigi na Rainbow Road); a `arena-capa.png` também serve.
 
 ## Perguntas frequentes
 

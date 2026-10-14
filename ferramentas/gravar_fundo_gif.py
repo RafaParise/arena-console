@@ -25,9 +25,14 @@ Como funciona, sem instalar nada (so a biblioteca padrao do Python):
 Uso:
     servidor\python\python.exe ferramentas\gravar_fundo_gif.py [--tema escuro|claro]
         [--visitas fzero,kirby] [--quadros 60] [--passo 6] [--atraso 10]
-        [--escala 8] [--sem-texto] [--saida docs\imagens\arena-escuro.gif]
+        [--escala 8] [--adiantar 0] [--girar 0] [--semente 7] [--sem-texto]
+        [--saida docs\imagens\arena-escuro.gif]
   --passo e' quanto o fundo anda por quadro, em 1/60 s (6 = 10 quadros por
   segundo em tempo real, com --atraso 10 centesimos).
+  --girar K: o GIF comeca no quadro K da gravacao, e os quadros antes dele
+  vao para o fim. Gravando uma visita inteira (do ceu vazio ao ceu vazio),
+  o primeiro quadro ja mostra o personagem e a emenda do laco cai na parte
+  vazia, onde quase nao se nota.
 """
 import base64
 import os
@@ -45,18 +50,34 @@ import limpeza  # noqa: E402
 import tela_sem_janela  # noqa: E402
 
 W, H = 160, 90
-CORTE_TOPO = 5           # 160 x 90 -> 160 x 80 (2:1): tira 5 linhas em cima e 5 embaixo
+# 160 x 90 -> 160 x 80 (2:1): quantas linhas saem em cima (o resto sai embaixo).
+# No campo, quem anda na grama pisa na linha 85: ali o corte e' maior em cima
+# (so a ponta dos raios do sol) para os pes nao sumirem.
+CORTE_TOPO = {"escuro": 5, "claro": 7}
 ALTURA_GIF = 80
 
 PAGINA = """<!doctype html>
 <html lang="pt-BR"><head><meta charset="utf-8">
+<script>
+  // Sorteio com semente (mulberry32): a mesma gravacao sai sempre igual.
+  (function () {
+    let s = %(semente)d >>> 0;
+    Math.random = function () {
+      s = (s + 0x6D2B79F5) >>> 0;
+      let t = s;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  })();
+</script>
 <style>
   html, body { margin: 0; width: %(largura)dpx; height: %(altura)dpx; overflow: hidden; background: transparent; }
   canvas { display: none; }
   .marca { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center;
            justify-content: center; gap: %(gap)dpx; text-align: center; }
   .nome { font-family: "Courier New", monospace; font-weight: 700; font-size: %(nome)dpx; letter-spacing: 0.08em;
-          color: #ffe08a; line-height: 1; text-shadow: %(sombra)dpx %(sombra)dpx 0 #7c4d9e; }
+          color: #ffe08a; line-height: 1; text-shadow: %(sombra)dpx %(sombra)dpx 0 #7c4d9e;%(contorno_nome)s }
   .sub { font-family: "Segoe UI", system-ui, sans-serif; font-size: %(sub)dpx; font-weight: 600; color: %(cor_sub)s;
          text-shadow: 0 0 %(contorno)dpx %(cor_contorno)s, 0 0 %(contorno)dpx %(cor_contorno)s; }
 </style></head>
@@ -133,6 +154,12 @@ def principal():
     passo = float(argumento("--passo", "6"))
     atraso = int(argumento("--atraso", "10"))
     visitas = [v for v in argumento("--visitas", "").split(",") if v]
+    # Quadros que a primeira visita anda antes de comecar a gravar: o primeiro
+    # quadro do GIF ja mostra o personagem (e o que aparece quando alguem
+    # compartilha o link: a maioria dos sites nao anima a imagem).
+    adiantar = int(argumento("--adiantar", "0"))
+    girar = int(argumento("--girar", "0"))
+    semente = int(argumento("--semente", "7"))
     com_texto = "--sem-texto" not in sys.argv
     saida = os.path.abspath(argumento("--saida", os.path.join(RAIZ, "docs", "imagens", "arena-%s.gif" % tema)))
     largura, altura = W * escala, ALTURA_GIF * escala
@@ -149,13 +176,27 @@ def principal():
             import imagem_do_github
             imagem_do_github.preparar_fundo_da_capa(pasta)
             fundo = "galaxy-background-capa.js"
+            # A capa leva o planeta para baixo, onde no GIF passam as pistas do
+            # F-Zero e da Rainbow Road: aqui ele vai para o alto, a direita do
+            # titulo, embaixo da constelacao.
+            capa = os.path.join(pasta, fundo)
+            with open(capa, encoding="utf-8") as f:
+                texto = f.read()
+            velho = "const planeta = { x: W * 0.875, y: 76 };"
+            if texto.count(velho) != 1:
+                raise SystemExit("O ajuste do planeta da capa mudou: atualize esta ferramenta.")
+            with open(capa, "w", encoding="utf-8") as f:
+                f.write(texto.replace(velho, "const planeta = { x: 132, y: 26 };"))
         k = escala / 8.0          # o titulo foi medido para 1280 x 640
         escuro = tema == "escuro"
-        html = PAGINA % {"largura": largura, "altura": altura, "tema": tema, "fundo": fundo,
+        html = PAGINA % {"largura": largura, "altura": altura, "tema": tema, "fundo": fundo, "semente": semente,
                          "gap": int(14 * k), "nome": int(170 * k), "sombra": max(2, int(8 * k)),
                          "sub": int(40 * k), "contorno": max(2, int(6 * k)),
                          "cor_sub": "#f1ecff" if escuro else "#ffffff",
-                         "cor_contorno": "rgba(0,0,0,.9)" if escuro else "rgba(40,70,20,.95)"}
+                         "cor_contorno": "rgba(0,0,0,.9)" if escuro else "rgba(40,70,20,.95)",
+                         # No ceu claro o amarelo do titulo fica fraco: ganha contorno.
+                         "contorno_nome": "" if escuro else (
+                             " -webkit-text-stroke: %dpx #4b2c6f; paint-order: stroke fill;" % max(3, int(9 * k)))}
         caminho = os.path.join(pasta, "pagina.html")
         with open(caminho, "w", encoding="utf-8") as f:
             f.write(html)
@@ -176,6 +217,9 @@ def principal():
             nav.avaliar("document.getElementById('marca').style.display = 'none'; window.%s.gravar()" % gancho)
             nav.avaliar("window.%s.avancar(40, 3)" % gancho)     # a cena assenta
             fila = list(visitas)
+            if fila and adiantar:
+                nav.avaliar("window.%s.chamar('%s')" % (gancho, fila.pop(0)))
+                nav.avaliar("window.%s.avancar(%d, %s)" % (gancho, adiantar, passo))
             imagens = []
             for n in range(quadros):
                 if fila and not nav.avaliar("window.%s.rodando()" % gancho):
@@ -183,7 +227,7 @@ def principal():
                 nav.avaliar("window.%s.avancar(1, %s)" % (gancho, passo))
                 px = base64.b64decode(nav.avaliar("window.%s.pixels()" % gancho))
                 linhas = []
-                for y in range(CORTE_TOPO, CORTE_TOPO + ALTURA_GIF):
+                for y in range(CORTE_TOPO[tema], CORTE_TOPO[tema] + ALTURA_GIF):
                     linha = []
                     for x in range(W):
                         i = (y * W + x) * 4
@@ -201,6 +245,9 @@ def principal():
                 if (n + 1) % 10 == 0:
                     print("  %d de %d quadros" % (n + 1, quadros), flush=True)
         os.makedirs(os.path.dirname(saida), exist_ok=True)
+        if girar:
+            girar %= len(imagens)
+            imagens = imagens[girar:] + imagens[:girar]
         tamanho = gif_animado.salvar(saida, largura, altura, imagens, atraso_cs=atraso)
         print("GIF: %s (%dx%d, %d quadros, %.0f KB)" % (saida, largura, altura, len(imagens), tamanho / 1024))
         return 0

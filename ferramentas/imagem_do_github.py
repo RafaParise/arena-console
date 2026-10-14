@@ -9,9 +9,11 @@ verdade da tela -- o mesmo ceu, os mesmos desenhos --, desenhado como no
 estilo do topo da tela. Mudou o fundo? Rode de novo e a pagina acompanha.
 
 Gera, em docs\imagens\:
-  - arena-capa.png        1280 x 640: topo do LEIA-ME do GitHub e a "Social
-                          preview" (a imagem que aparece quando alguem
-                          compartilha o link do repositorio);
+  - arena-capa.png        1280 x 640: a capa parada. O topo do LEIA-ME do
+                          GitHub agora e' o GIF animado
+                          (ferramentas\gravar_fundo_gif.py); a capa fica
+                          como alternativa para a "Social preview" (a
+                          imagem de quando alguem compartilha o link);
   - arena-fundo-escuro.png 1920 x 1080: o fundo sozinho, sem texto (papel de
                           parede, apresentacao de aula).
 
