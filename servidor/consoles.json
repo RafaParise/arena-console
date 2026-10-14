@@ -601,6 +601,8 @@
       "pede_placar": false,
       "netplay": true,
       "core_netplay": "pcsx_rearmed_libretro.dll",
+      "core_sem_bios": "pcsx_rearmed_libretro.dll",
+      "sem_bios_aviso": "Sem a BIOS do PlayStation, o jogo abre pelo PCSX ReARMed, que imita a BIOS: a maioria dos jogos abre, mas alguns travam.",
       "netplay_aviso": "Jogar Junto no PlayStation usa o PCSX ReARMed em vez do núcleo normal - o SwanStation (mais fiel) não tem jogo em rede. Sozinho, continua sendo o SwanStation.",
       "apelidos": [
         "playstation",

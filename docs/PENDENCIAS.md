@@ -50,8 +50,14 @@ fica no commit). O detalhe de cada pedido está em
      System Link o ARENA já configura, e eles se acham na rede local); o
      NetPlay do Dolphin não abre pela linha de comando; o PS3 tem o RPCN.
 6. **Consoles e BIOS:**
-   - Todos os consoles possíveis, de preferência pelo RetroArch, com BIOS
-     livre ou emulação de BIOS (HLE) onde houver.
+   - Feito: o PS1 abre sem BIOS pelo PCSX ReARMed, que imita a BIOS (o CTR
+     abriu assim; `consoles.json → core_sem_bios`). Dreamcast e Amiga já
+     abriam sem. O Saturn pelo Yabause, sem BIOS, ficou com a tela preta:
+     continua precisando dela (guia 2).
+   - Falta: BIOS livres que precisam ser baixadas (C-BIOS do MSX, EmuTOS
+     do Atari ST) e os consoles novos com núcleo já na pasta (ZX81, VIC-20,
+     Plus/4, Watara Supervision, Thomson, CHIP-8...), cada um testado com
+     um jogo livre.
    - Dizer com clareza onde não dá: o PS2 não tem BIOS livre, e distribuir
      BIOS da Sony, da Sega ou da SNK é proibido.
 

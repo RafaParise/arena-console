@@ -255,6 +255,31 @@ def playstation(caminho):
     return resultado
 
 
+def tem_bios_de_ps1(pasta_sistema):
+    """Ha alguma BIOS de PS1 em retroarch\\system (reconhecida pelo conteudo)?
+    Sem ela, o ARENA abre os jogos de PS1 pelo PCSX ReARMed, que imita a BIOS
+    (consoles.json -> core_sem_bios)."""
+    try:
+        nomes = os.listdir(pasta_sistema)
+    except OSError:
+        return False
+    for nome in nomes:
+        caminho = os.path.join(pasta_sistema, nome)
+        if os.path.isfile(caminho):
+            achado = playstation(caminho)
+            if achado and achado[0] == "ps1":
+                return True
+    return False
+
+
+def tem_a_bios(plataforma_id, pasta_sistema):
+    """O console tem a BIOS que o nucleo de sempre precisa? Sem ela, um console
+    com consoles.json -> core_sem_bios abre pelo nucleo que imita a BIOS."""
+    if plataforma_id == "ps1":
+        return tem_bios_de_ps1(pasta_sistema)
+    return not falta_para_o_console(plataforma_id, pasta_sistema)
+
+
 # ---------------------------------------------------------------------------
 # Onde as coisas ficam
 # ---------------------------------------------------------------------------
@@ -654,6 +679,10 @@ def aviso_do_jogo(plataforma_id, nome_arquivo, pasta_sistema, nome_console="", c
         return ("Este console só abre jogo com a BIOS da região do jogo: %s. Nenhuma está no ARENA. %s"
                 % (LISTA_POR_REGIAO[plataforma_id],
                    como_colocar_a_bios(NOME_DA_PASTA + "\\" + catalogo.do_console(plataforma_id)[0]["pasta"])))
+    if plataforma_id == "ps1" and not tem_bios_de_ps1(pasta_sistema):
+        return ("Sem a BIOS do PlayStation, o ARENA abre este jogo pelo PCSX ReARMed, que imita a "
+                "BIOS: a maioria dos jogos abre, mas alguns travam, e os saves ficam no PCSX ReARMed. %s"
+                % como_colocar_a_bios(NOME_DA_PASTA + "\\PS1"))
     if plataforma_id == "dreamcast" and not tem(pasta_sistema, "dc/dc_boot.bin"):
         return ("Sem a BIOS do Dreamcast (dc_boot.bin), o emulador usa uma imitação dela: a maioria dos "
                 "jogos abre, mas alguns travam (ex.: Marvel vs. Capcom 1). %s"

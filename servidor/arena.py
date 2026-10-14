@@ -2024,7 +2024,10 @@ def avaliar_plataformas(forcar=False):
             else:
                 estado = "sem_core"
                 motivo = "Núcleo não instalado. Baixe pelo RetroArch."
-        elif precisa_sistema and not tem_sistema:
+        elif precisa_sistema and not tem_sistema and not (
+                plataforma.get("core_sem_bios", "").lower() in cores):
+            # (Com um nucleo que imita a BIOS -- o PS1 pelo PCSX ReARMed --,
+            # o console abre mesmo sem BIOS nenhuma.)
             estado = "falta_sistema"
             motivo = ("Precisa da BIOS do console. Veja o que falta em Ajustes → Emuladores → BIOS "
                       "dos consoles (a pasta é a BIOS, na pasta do ARENA).")
@@ -6082,6 +6085,18 @@ class Manipulador(BaseHTTPRequestHandler):
             # jogar sozinho, mas sem suporte a jogo em rede - nesse caso o
             # cadastro aponta um segundo nucleo so para quando for Jogar
             # Junto. Jogando sozinho, o normal continua valendo.
+            # Sem a BIOS que o nucleo de sempre precisa, o console que tem um
+            # nucleo que imita a BIOS abre por ele (consoles.json ->
+            # core_sem_bios): o PS1 pelo PCSX ReARMed -- o CTR abriu assim, sem
+            # BIOS nenhuma (14/10/2026). O pacote do ARENA nunca leva BIOS da
+            # Sony, e o SwanStation nao abre jogo nenhum sem ela.
+            aviso_sem_bios = ""
+            if (plataforma.get("core_sem_bios") and not caminho_externo
+                    and os.path.isfile(os.path.join(PASTA_CORES, plataforma["core_sem_bios"]))
+                    and not bios.tem_a_bios(plataforma["id"], PASTA_SISTEMA)):
+                jogo["core"] = plataforma["core_sem_bios"]
+                aviso_sem_bios = plataforma.get("sem_bios_aviso", "")
+
             aviso_netplay = ""
             if modo in ("hospedar", "entrar", "assistir") and plataforma.get("core_netplay"):
                 core_netplay = os.path.join(PASTA_CORES, plataforma["core_netplay"])
@@ -6203,8 +6218,8 @@ class Manipulador(BaseHTTPRequestHandler):
                 resposta["porta"] = graficos.PORTA_PARTIDA
             if esperar:
                 resposta["esperando"] = True
-            if aviso_netplay:
-                resposta["aviso"] = aviso_netplay
+            if aviso_netplay or aviso_sem_bios:
+                resposta["aviso"] = " ".join(a for a in (aviso_sem_bios, aviso_netplay) if a)
             if partida and partida.get("hospedar"):
                 # Vai separado do "aviso": a tela o deixa fixo no alto ate o
                 # jogo fechar -- um recado sumiria atras da janela do jogo antes

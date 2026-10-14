@@ -36,17 +36,21 @@ import zipfile
 # A pasta de cada console tem o MESMO nome da pasta de jogos dele
 # (jogos\pessoais\PS1 <-> BIOS\PS1); entre parenteses, a parte do console
 # que precisa dela (o Satellaview e' um acessorio do Super Nintendo).
+# Sem a BIOS do PS1, o ARENA abre os jogos pelo PCSX ReARMed, que imita a
+# BIOS (consoles.json -> core_sem_bios; o CTR abriu assim em 14/10/2026).
+SEM_ELA_PS1 = ("a maioria dos jogos abre com a imitação da BIOS (o ARENA usa o PCSX ReARMed), "
+               "mas alguns travam; com ela, o ARENA usa o SwanStation, mais fiel")
 CATALOGO = [
     # ---- PlayStation 1: basta uma, de qualquer regiao ----------------------
     {"id": "ps1-eua", "console": "ps1", "pasta": "PS1", "sub": "EUA", "regiao": "A",
-     "nome": "scph5501.bin", "pelo_conteudo": "ps1", "grupo": "uma", "nivel": "precisa", "tamanho": 524288,
-     "o_que": "a BIOS do PlayStation americano (ex.: scph5501.bin, SCPH1001.BIN)"},
+     "nome": "scph5501.bin", "pelo_conteudo": "ps1", "grupo": "uma", "nivel": "alguns", "tamanho": 524288,
+     "o_que": "a BIOS do PlayStation americano (ex.: scph5501.bin, SCPH1001.BIN)", "sem_ela": SEM_ELA_PS1},
     {"id": "ps1-europa", "console": "ps1", "pasta": "PS1", "sub": "Europa", "regiao": "E",
-     "nome": "scph5502.bin", "pelo_conteudo": "ps1", "grupo": "uma", "nivel": "precisa", "tamanho": 524288,
-     "o_que": "a BIOS do PlayStation europeu (ex.: scph5502.bin)"},
+     "nome": "scph5502.bin", "pelo_conteudo": "ps1", "grupo": "uma", "nivel": "alguns", "tamanho": 524288,
+     "o_que": "a BIOS do PlayStation europeu (ex.: scph5502.bin)", "sem_ela": SEM_ELA_PS1},
     {"id": "ps1-japao", "console": "ps1", "pasta": "PS1", "sub": "Japão", "regiao": "J",
-     "nome": "scph5500.bin", "pelo_conteudo": "ps1", "grupo": "uma", "nivel": "precisa", "tamanho": 524288,
-     "o_que": "a BIOS do PlayStation japonês (ex.: scph5500.bin)"},
+     "nome": "scph5500.bin", "pelo_conteudo": "ps1", "grupo": "uma", "nivel": "alguns", "tamanho": 524288,
+     "o_que": "a BIOS do PlayStation japonês (ex.: scph5500.bin)", "sem_ela": SEM_ELA_PS1},
     # ---- PlayStation 2: basta uma; o ARENA passa ao PCSX2 ------------------
     {"id": "ps2-eua", "console": "ps2", "pasta": "PS2", "sub": "EUA", "regiao": "A",
      "nome": "scph39001.bin", "pelo_conteudo": "ps2", "grupo": "uma", "nivel": "precisa", "tamanho": 4194304,

@@ -125,6 +125,13 @@ def trabalhador(raiz, porta):
     arena.limpar_logs_antigos = lambda *a, **k: None
     arena.VIGIA["online"] = False
     arena.controles.contar_controles = lambda: 0   # nao depende do que esta plugado
+    # A copia nao leva BIOS nenhuma; aqui vale o console com a BIOS, como na
+    # pasta de verdade. O PS1 sem BIOS (pelo PCSX ReARMed) tem teste proprio:
+    # servidor	ests	est_ps1_sem_bios.py (14/10/2026).
+    if hasattr(arena.bios, "tem_a_bios"):
+        arena.bios.tem_a_bios = lambda *a, **k: True
+    if hasattr(arena, "chegar_na_partida"):
+        arena.chegar_na_partida = lambda *a, **k: False   # sem anfitriao de verdade
     servidor = arena.Servidor(("127.0.0.1", porta), arena.Manipulador)
     threading.Thread(target=servidor.serve_forever, daemon=True).start()
 

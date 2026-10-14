@@ -391,7 +391,9 @@ class TestAvisos(unittest.TestCase):
             # embutido do PUAE), nao ganham esta frase.
             self.assertIsNone(bios.aviso_do_jogo("amiga", "Alien Breed Disk1.adf", vazia))
             self.assertEqual(bios.falta_para_o_console("amiga", vazia), "")
-            self.assertIsNone(bios.aviso_do_jogo("ps1", "CTR.chd", vazia))
+            # PS1 sem BIOS abre pelo PCSX ReARMed, que imita a BIOS (14/10/2026):
+            # o cartao avisa, e o console nunca fica bloqueado.
+            self.assertIn("PCSX ReARMed", bios.aviso_do_jogo("ps1", "CTR.chd", vazia))
             self.assertEqual(bios.falta_para_o_console("ps1", vazia), "")
             self.assertEqual(bios.falta_para_o_console("nes", vazia), "")
         finally:

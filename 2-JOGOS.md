@@ -619,7 +619,6 @@ reconhece e leva para o lugar certo.
 
 | Os jogos precisam (sem ela, não abrem) | O que vai |
 |---|---|
-| PlayStation | uma BIOS de qualquer região |
 | PlayStation 2 | uma BIOS de qualquer região (um `.bin` de 4 MB) |
 | PlayStation 3 | o firmware `PS3UPDAT.PUP`, instalado uma vez pelo RPCS3 |
 | Sega CD | uma por região: `bios_CD_U.bin` (EUA), `bios_CD_E.bin` (Europa), `bios_CD_J.bin` (Japão) |
@@ -634,7 +633,10 @@ reconhece e leva para o lugar certo.
 | MSX | as pastas `Machines` e `Databases` do blueMSX |
 | Commodore Amiga | `kick34005.A500` (Kickstart 1.3) |
 
-**Só para alguns jogos:** Dreamcast (`dc_boot.bin` — a maioria abre sem ela,
+**Só para alguns jogos:** PlayStation (uma BIOS de qualquer região — sem
+ela, o ARENA abre o jogo pelo PCSX ReARMed, que imita a BIOS: a maioria
+abre, como o CTR, mas alguns travam; com ela, ele usa o SwanStation, mais
+fiel) · Dreamcast (`dc_boot.bin` — a maioria abre sem ela,
 mas alguns travam, como o Marvel vs. Capcom 1) · Satellaview, os jogos "BS"
 do Super Nintendo (`BS-X.bin`) · Sufami Turbo (`STBIOS.bin`) · Famicom Disk
 System, os jogos `.fds` (`disksys.rom`) · PC Engine em CD (`syscard3.pce`) ·
@@ -644,6 +646,12 @@ cartuchos do Saturn (o do The King of Fighters '95 e o do Ultraman).
 **Opcionais (o console abre sem; com ela, fica mais fiel):** Atari 5200 ·
 Atari 7800 · Atari Lynx · Game Boy e Game Boy Color · Game Boy Advance ·
 Nintendo DS · Pokémon mini.
+
+**Sem BIOS nenhuma (o pacote do ARENA não leva BIOS da Sony, da Sega nem da
+SNK):** o PlayStation, o Dreamcast e o Amiga abrem com uma imitação da BIOS
+que vem dentro do emulador. O Saturn foi testado assim, com o Yabause, em
+14/10/2026, e ficou com a tela preta: continua precisando da BIOS. PS2, Sega
+CD, PC Engine CD, Neo Geo e os outros da tabela não têm BIOS livre.
 
 **Fliperama (MAME e FBNeo):** cada placa tem a sua BIOS em `.zip`
 (`neogeo.zip`, `pgm.zip`, `naomi.zip`...), que vai na mesma pasta dos jogos
