@@ -484,7 +484,7 @@ const MIDIA_POR_PLATAFORMA = {
   ],
   jewel_case: [
     "ps1", "ps3", "saturn", "dreamcast", "segacd", "threedo", "cdi", "pcfx",
-    "scummvm", "dos", "amiga", "spectrum",
+    "scummvm", "dos", "amiga", "spectrum", "atarist",
   ],
   caixa_dvd: ["ps2", "gamecube", "wii"],
   caixa_xbox: ["xbox360"],

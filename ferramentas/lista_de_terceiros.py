@@ -3,7 +3,8 @@ r"""Escreve o TERCEIROS.md: os programas de outros projetos que o pacote do
 ARENA leva, cada um com a licenca e o endereco do codigo-fonte.
 
 Por que existe: o pacote para baixar (GitHub, Releases) leva o RetroArch, os
-nucleos, o PCSX2, o Dolphin, o RPCS3, o Xenia e o Python embutido. Cada um
+nucleos, o PCSX2, o Dolphin, o RPCS3, o Xenia, o Python embutido e as BIOS
+livres (servidor\bios_livres\lista.json). Cada um
 tem a sua licenca, e as do tipo GPL pedem que quem distribui diga onde esta
 o codigo-fonte. A licenca de cada nucleo vem do proprio arquivo .info dele
 (retroarch\info), entao a lista acompanha os nucleos que a versao leva.
@@ -62,6 +63,18 @@ def nucleos(pasta_retroarch):
     return saida
 
 
+def bios_livres():
+    """Os projetos da servidor\\bios_livres\\lista.json (as BIOS livres que o
+    pacote leva), na ordem do nome."""
+    import json
+    try:
+        with open(os.path.join(RAIZ, "servidor", "bios_livres", "lista.json"), encoding="utf-8") as f:
+            projetos = json.load(f).get("projetos", {})
+    except (OSError, ValueError):
+        return []
+    return [projetos[nome] for nome in sorted(projetos)]
+
+
 def montar(pasta):
     if os.path.isdir(os.path.join(pasta, "retroarch", "cores")) and pasta != RAIZ:
         lista = nucleos(os.path.join(pasta, "retroarch"))
@@ -82,7 +95,9 @@ def montar(pasta):
         "da tabela; se precisar da versão exata que foi no pacote, peça pelas",
         "*Issues* do repositório do ARENA.",
         "",
-        "Nenhum jogo, BIOS ou firmware vai no pacote: são de quem tem o console.",
+        "Nenhum jogo vai no pacote, nem BIOS ou firmware das empresas: são de quem",
+        "tem o console. Vão só as **BIOS livres** da tabela abaixo, escritas do zero",
+        "por voluntários para qualquer um copiar.",
         "",
         "## Programas",
         "",
@@ -91,6 +106,22 @@ def montar(pasta):
     ]
     for nome, licenca, fonte, onde in PROGRAMAS:
         linhas.append("| %s | %s | <%s> | `%s` |" % (nome, licenca, fonte, onde))
+    livres = bios_livres()
+    linhas += [
+        "",
+        "## BIOS livres (%d)" % len(livres),
+        "",
+        "Ficam em `servidor\\bios_livres`, sem mudança nenhuma, com o texto da",
+        "licença ao lado; a `lista.json` dessa pasta guarda a marca (SHA-256) de",
+        "cada arquivo. O ARENA as copia para `retroarch\\system` só onde falta.",
+        "",
+        "| BIOS | Console | Licença | Código-fonte | Pasta |",
+        "|---|---|---|---|---|",
+    ]
+    for projeto in livres:
+        linhas.append("| %s %s | %s | %s | <%s> | `servidor\\bios_livres\\%s` |" % (
+            projeto["nome"], projeto.get("versao", ""), projeto.get("console", ""), projeto.get("licenca", ""),
+            projeto.get("codigo_fonte") or projeto.get("site", ""), projeto["nome"]))
     linhas += [
         "",
         "## Núcleos do RetroArch (%d)" % len(lista),

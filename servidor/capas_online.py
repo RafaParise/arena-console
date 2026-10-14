@@ -88,6 +88,7 @@ REPO_POR_PLATAFORMA = {
     "msx": ("Microsoft_-_MSX", "Microsoft_-_MSX2"),
     "c64": "Commodore_-_64",
     "amiga": ("Commodore_-_Amiga", "Commodore_-_CD32", "Commodore_-_CDTV"),
+    "atarist": "Atari_-_ST",
     "spectrum": "Sinclair_-_ZX_Spectrum",
     "amstrad": ("Amstrad_-_CPC", "Amstrad_-_GX4000"),
     "dos": "DOS",

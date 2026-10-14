@@ -61,11 +61,17 @@ fica no commit). O detalhe de cada pedido está em
      no ARENA (`servidor\bios_livres`; testado com o NOBORUNOCA, MIT, em
      `testes\jogos_livres`). Disquete e fita ainda pedem o `Machines`. O MSX
      não tem Jogar Junto (o blueMSX recusa).
+   - Feito: o Atari ST, console novo, liga pelo EmuTOS 1.4 (testado com o
+     Rayoid, domínio público). O Hatari não abre pasta com acento: a ponte
+     `servidor\ponte_sem_acento.py` abre por uma pasta sem acento e devolve o
+     disquete gravado. Sem Jogar Junto (o Hatari recusa).
    - Falta (pedido de 14/10: "todos os consoles de código aberto", mantendo
-     os emuladores de sempre): o EmuTOS do Atari ST e os consoles novos com
-     núcleo já na pasta (ZX81, VIC-20, Plus/4, Watara Supervision, Thomson,
-     CHIP-8 e os outros que abrirem sem BIOS das empresas), cada um testado
-     com um jogo livre (`testes\teste_consoles_livres.py`).
+     os emuladores de sempre): os consoles novos com núcleo já na pasta
+     (ZX81, VIC-20, Plus/4, Watara Supervision, Thomson, CHIP-8 e os outros
+     que abrirem sem BIOS das empresas), cada um testado com um jogo livre
+     (`testes\teste_consoles_livres.py`).
+   - Depois: versão nova do pacote (um download só, com tudo), pedido de
+     14/10 ("tudo pronto para só colocar o jogo e jogar").
    - Dizer com clareza onde não dá: o PS2 não tem BIOS livre, e distribuir
      BIOS da Sony, da Sega ou da SNK é proibido.
 

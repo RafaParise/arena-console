@@ -171,6 +171,13 @@ CATALOGO = [
      "nivel": "alguns", "tamanho": 524288, "o_que": "a ROM estendida do Amiga CD32",
      "sem_ela": "os jogos de CD32 não abrem"},
     # ---- Abrem sem; com a BIOS, ficam mais fieis ----------------------------
+    # Atari ST: sem o TOS original, liga pelo EmuTOS, a BIOS livre que vem no
+    # ARENA (servidor\bios_livres; o Rayoid abriu assim em 14/10/2026). O TOS
+    # de verdade, posto na prateleira, entra no lugar dele.
+    {"id": "atarist-tos", "console": "atarist", "pasta": "Atari ST", "sub": "", "destino": "tos.img",
+     "nivel": "melhor", "tamanho": 196608, "o_que": "o TOS original do Atari ST",
+     "sem_ela": ("o Atari ST liga do mesmo jeito, pelo EmuTOS, a BIOS livre que já vem no ARENA: a maioria dos "
+                 "jogos abre; com o TOS original, os poucos que não abrem passam a abrir")},
     {"id": "atari5200", "console": "atari5200", "pasta": "Atari 5200", "sub": "", "destino": "5200.rom",
      "nivel": "melhor", "tamanho": 2048, "o_que": "a BIOS do Atari 5200"},
     {"id": "atari7800", "console": "atari7800", "pasta": "Atari 7800", "sub": "", "destino": "7800 BIOS (U).rom",

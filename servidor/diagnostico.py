@@ -50,7 +50,7 @@ PROGRAMA = [
     "servidor/integridade.py", "servidor/janela_preta.py", "servidor/jogadores.py",
     "servidor/motivo_do_erro.py", "servidor/bios.py", "servidor/bios_catalogo.py", "servidor/arrumar.py",
     "servidor/nomes_arcade.py", "servidor/processos.py", "servidor/capas_do_disco.py",
-    "servidor/como_colocar.py",
+    "servidor/como_colocar.py", "servidor/ponte_sem_acento.py",
     "servidor/consoles.json", "servidor/graficos.json", "servidor/recursos.json",
     "servidor/perfis_controle.json",
 ]

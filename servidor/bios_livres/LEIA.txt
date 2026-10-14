@@ -11,9 +11,16 @@ ARENA:
     disquete: jogo de disquete (.dsk) e de fita (.cas) continua pedindo a
     BIOS de verdade (a pasta Machines do blueMSX, na pasta BIOS\MSX).
 
+  EmuTOS 1.4 (Atari ST) - licença GPL 2 - https://emutos.sourceforge.io/
+    Liga o computador e abre os jogos. É a imagem de 192 KB em inglês
+    (etos192uk.img), a feita para o ST comum; o ARENA a instala como
+    tos.img. O código-fonte desta versão: emutos-src-1.4.tar.gz, na página
+    de downloads do EmuTOS (endereço em TERCEIROS.md).
+
 Ninguém precisa mexer aqui. Ao abrir, o ARENA copia para retroarch\system só
 o que estiver faltando, e nunca troca uma BIOS que já está lá. A BIOS de
 verdade, se você puser na pasta BIOS do ARENA, passa na frente da livre.
 
 Cada arquivo, de onde ele veio e a marca dele (SHA-256) estão na lista.json.
-A licença de cada projeto vai junto, na pasta dele (C-BIOS\doc\cbios.txt).
+A licença de cada projeto vai junto, na pasta dele (C-BIOS\doc\cbios.txt,
+EmuTOS\doc\license.txt).

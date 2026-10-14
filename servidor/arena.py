@@ -81,6 +81,7 @@ import como_colocar  # noqa: E402  (como colocar os jogos de cada console -- 02/
 import motivo_do_erro  # noqa: E402  (por que o jogo nao abriu, pelo registro -- 02/10/2026)
 import bios        # noqa: E402  (nome, pasta e versao certa de cada BIOS -- 03/10/2026)
 import arrumar     # noqa: E402  (o botao Arrumar: o arquivo do jogo no lugar certo -- 03/10/2026)
+import ponte_sem_acento  # noqa: E402  (nucleo que nao abre pasta com acento: o Hatari -- 14/10/2026)
 
 PASTA_LAUNCHER = os.path.join(RAIZ, "launcher")
 PASTA_DADOS = os.path.join(RAIZ, "dados")
@@ -1857,7 +1858,10 @@ def gravar_override(config, custo=None, extras=None, em_partida=False,
     opcoes["savefile_directory"] = PASTA_SAVES
     opcoes["savestate_directory"] = PASTA_STATES
     opcoes["screenshot_directory"] = PASTA_CAPTURAS
-    opcoes["system_directory"] = PASTA_SISTEMA
+    # A pasta das BIOS e' a do ARENA, a nao ser que a partida mande outra:
+    # a ponte sem acento do Hatari (servidor\ponte_sem_acento.py) manda a
+    # copia dela, numa pasta sem acento.
+    opcoes["system_directory"] = (extras or {}).get("system_directory") or PASTA_SISTEMA
     opcoes["cheat_database_path"] = PASTA_CHEATS
     opcoes["input_remapping_directory"] = PASTA_REMAPS
     if remapear:
@@ -2534,6 +2538,9 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
 
     caminho_jogo = os.path.join(RAIZ, jogo["arquivo"])
     pasta_trabalho = PASTA_RETROARCH
+    # Leva de volta o disquete que o jogo gravou na pasta sem acento (so o
+    # Hatari usa: servidor\ponte_sem_acento.py).
+    devolver_ponte = None
 
     if jogo.get("externo"):
         # Emulador de fora: o RetroArch fica de lado nesta plataforma.
@@ -2682,6 +2689,20 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         ligacao = jogo.get("ligacao") or {}
         opcoes_jogo = dict(extra or {}, **extras_controle)
         opcoes_jogo.update(ligacao.get("cfg", {}))
+        # Nucleo que nao abre caminho com acento (o Hatari, do Atari ST): a
+        # BIOS e o jogo vao por uma pasta sem acento. O caminho de verdade
+        # continua valendo para o resto (nome do remapeamento, sessao).
+        caminho_do_nucleo = caminho_jogo
+        chaves_da_ponte = []
+        if ponte_sem_acento.precisa(jogo.get("core"), PASTA_SISTEMA, caminho_jogo):
+            try:
+                caminho_do_nucleo, opcoes_ponte, devolver_ponte = ponte_sem_acento.preparar(
+                    jogo["core"], PASTA_SISTEMA, caminho_jogo)
+                opcoes_jogo.update(opcoes_ponte)
+                chaves_da_ponte = list(opcoes_ponte)
+                print("[ARENA] Pasta com acento: o jogo abre por %s." % os.path.dirname(caminho_do_nucleo))
+            except OSError as falha:
+                print("[ARENA] Nao consegui preparar a pasta sem acento: %s" % falha)
         copia_nucleo = None
         if ligacao.get("nucleo"):
             try:
@@ -2694,6 +2715,9 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         # portas 3 em diante (tipo de controle e analogico, acima) e a copia
         # das opcoes de nucleo. Com 1 ou 2 jogadores a lista fica vazia.
         so_desta_partida = list(ligacao.get("cfg", {}))
+        # A pasta system da ponte sem acento (pasta temporaria) tambem: senao
+        # o proximo jogo, de outro console, procuraria a BIOS la.
+        so_desta_partida += chaves_da_ponte
         if jogadores_ligacao > 2:
             for n in range(3, jogadores_controle + 1):
                 so_desta_partida += ["input_libretro_device_p%d" % n,
@@ -2726,7 +2750,7 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             comando += ["--set-shader", filtro]
         if partida:
             comando += partida["argumentos"]
-        comando.append(caminho_jogo)
+        comando.append(caminho_do_nucleo)
         if partida and partida.get("anfitriao"):
             # Quem entra avisa o anfitriao e, se ele esperava, aguarda o
             # jogo dele abrir: os dois comecam juntos (14/10/2026). Fica
@@ -2794,6 +2818,14 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             if acelerar and processos.tirar_da_economia_de_energia(processo.pid):
                 print("[ARENA] Emulador fora da economia de energia do Windows.")
             codigo = processo.wait()
+
+            # O jogo gravou no disquete da pasta sem acento: leva de volta.
+            if devolver_ponte:
+                try:
+                    if devolver_ponte():
+                        print("[ARENA] O jogo gravou no disquete: copia levada de volta para a pasta dele.")
+                except OSError as falha:
+                    print("[ARENA] Nao consegui levar o disquete de volta: %s" % falha)
 
             # Partida de 3+ jogadores: o que foi so dela nao pode ficar no
             # retroarch.cfg para o proximo jogo (ver graficos).

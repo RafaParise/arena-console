@@ -2,6 +2,19 @@
   "_leia": "Os jogos livres que os testes abrem no núcleo de verdade (testes\\teste_consoles_livres.py). Só os testes usam: não vão no pacote dos alunos. Cada um com autor, licença, a versão exata e a marca (sha256). O conferidor de publicação só deixa ir ao GitHub o arquivo desta pasta que tem a marca registrada aqui.",
   "arquivos": [
     {
+      "origem": "Atari ST/RAYOID.PRG",
+      "licenca_arquivo": "licencas/rayoid.txt",
+      "console": "atarist",
+      "jogo": "Rayoïd",
+      "versao": "commit f3d0727",
+      "autor": "Raymond Hill (gorhill), 1992",
+      "licenca": "Unlicense (domínio público)",
+      "fonte": "https://github.com/gorhill/rayoid",
+      "baixado_de": "https://raw.githubusercontent.com/gorhill/rayoid/f3d0727eb93b66bd8526f5975a3b509ed70b2ec8/dist/RAYOID.PRG",
+      "o_que_prova": "o Atari ST liga pelo EmuTOS (a BIOS livre) e roda o programa da pasta AUTO de um disquete que o teste monta",
+      "sha256": "b44403c3fea6b75808799976cbc5598d8e6036476b00ef14a1cf45d7193ffc1f"
+    },
+    {
       "origem": "MSX/noborunoca.rom",
       "licenca_arquivo": "licencas/noborunoca.txt",
       "console": "msx",

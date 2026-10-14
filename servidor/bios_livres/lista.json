@@ -10,6 +10,17 @@
       "baixado_de": "https://downloads.sourceforge.net/project/cbios/cbios/0.29/cbios-0.29a.zip",
       "sha256_do_pacote": "c585a2f4a10b397e460a95043d59ac79cf4442fbb45a6e14a1e27ef9febaed73",
       "o_que_faz": "Abre os jogos de cartucho (.rom). Não tem o MSX-BASIC nem o leitor de disquete: jogo de disquete (.dsk) e de fita (.cas) continua pedindo a BIOS de verdade (a pasta Machines do blueMSX)."
+    },
+    "EmuTOS": {
+      "nome": "EmuTOS",
+      "versao": "1.4",
+      "console": "Atari ST",
+      "licenca": "GPL-2.0 ou posterior (o texto vai junto, em EmuTOS\\doc\\license.txt)",
+      "site": "https://emutos.sourceforge.io/",
+      "baixado_de": "https://downloads.sourceforge.net/project/emutos/emutos/1.4/emutos-192k-1.4.zip",
+      "sha256_do_pacote": "59abac06a2d29b0864c5a7cfb2af65f022c337aed34188e174a9a08cc737e4bc",
+      "codigo_fonte": "https://downloads.sourceforge.net/project/emutos/emutos/1.4/emutos-src-1.4.tar.gz",
+      "o_que_faz": "A imagem de 192 KB em inglês (etos192uk.img), a feita para o ST comum, que é a máquina que o Hatari liga por padrão. Liga o computador e abre a área de trabalho e os jogos."
     }
   },
   "arquivos": [
@@ -117,6 +128,13 @@
       "origem": "C-BIOS/doc/cbios.txt",
       "destino": "Machines/MSX2+ - C-BIOS/cbios.txt",
       "sha256": "b7c5b9fde2fd3b7bab292b8995581bc4f0f0315efe65ee49d934a1afd53099d8"
+    },
+    {
+      "projeto": "EmuTOS",
+      "console": "atarist",
+      "origem": "EmuTOS/etos192uk.img",
+      "destino": "tos.img",
+      "sha256": "2d6f3f6f304c9ba340aff8d47ba72b274ae29b8fbe6214138846dada97edf0f3"
     }
   ]
 }

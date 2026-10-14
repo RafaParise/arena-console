@@ -122,6 +122,21 @@ class TestBiosLivres(unittest.TestCase):
         guia = como_colocar.guia(plataformas, self.sistema, os.path.join(self.base, "jogos"))[0]
         self.assertTrue(guia["bios"]["tem"])
 
+    def test_emutos_do_atari_st_nao_e_o_tos_original(self):
+        bios.instalar_livres(self.sistema)
+        tos = os.path.join(self.sistema, "tos.img")
+        self.assertTrue(bios.e_livre(tos))                  # o EmuTOS, instalado como tos.img
+        self.assertEqual(bios.estado(self.sistema, "tos.img"), "falta")
+        entrada = next(e for e in bios_catalogo.CATALOGO if e["id"] == "atarist-tos")
+        self.assertEqual(entrada["nivel"], "melhor")
+        self.assertIn("EmuTOS", entrada["sem_ela"])
+        self.assertIsNone(bios._instalada(self.sistema, entrada))
+        self.assertEqual(bios.falta_para_o_console("atarist", self.sistema), "")
+        with open(os.path.join(RAIZ, "consoles.json"), encoding="utf-8") as arquivo:
+            plataforma = next(p for p in json.load(arquivo)["plataformas"] if p["id"] == "atarist")
+        self.assertEqual(plataforma["core"], "hatari_libretro.dll")
+        self.assertIs(plataforma["netplay"], False)       # o Hatari recusa (testado em 14/10/2026)
+
     def test_catalogo_e_consoles_do_msx(self):
         msx = {e["id"]: e for e in bios_catalogo.CATALOGO if e["console"] == "msx"}
         self.assertEqual(msx["msx-machines"]["nivel"], "alguns")
@@ -158,6 +173,20 @@ class TestOrganizarComLivres(unittest.TestCase):
         self.assertFalse(item["ativa"])
         segunda = bios.organizar(self.raiz, self.info)
         self.assertFalse([i for i in segunda["instaladas"] if i["id"].startswith("livre-")])
+
+    def test_o_tos_de_verdade_entra_no_lugar_do_emutos(self):
+        bios.organizar(self.raiz, self.info)
+        tos = os.path.join(self.sistema, "tos.img")
+        self.assertTrue(bios.e_livre(tos))
+        prateleira = os.path.join(self.raiz, bios.NOME_DA_PASTA, "Atari ST")
+        self.assertFalse(os.path.exists(os.path.join(prateleira, "tos.img")))    # o EmuTOS nao vai para la
+        with open(os.path.join(prateleira, "TOS 1.04 (Europe).img"), "wb") as arquivo:
+            arquivo.write((b"\x60\x2e" + b"TOS de verdade" * 14100)[:196608])     # o tamanho do TOS 1.x
+        feito = bios.organizar(self.raiz, self.info)
+        self.assertIn("atarist-tos", [i["id"] for i in feito["instaladas"]])
+        self.assertFalse(bios.e_livre(tos))
+        item = next(i for i in feito["itens"] if i["id"] == "atarist-tos")
+        self.assertTrue(item["ativa"])
 
 
 if __name__ == "__main__":

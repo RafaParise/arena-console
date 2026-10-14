@@ -164,6 +164,31 @@
       "pasta": "Atari Jaguar"
     },
     {
+      "id": "atarist",
+      "nome": "Atari ST",
+      "descricao": "Computador de 16 bits de 1985. Liga pelo EmuTOS, a BIOS livre que vem no ARENA.",
+      "core": "hatari_libretro.dll",
+      "extensoes": [
+        ".st",
+        ".msa",
+        ".stx",
+        ".dim"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 2,
+      "pede_placar": false,
+      "apelidos": [
+        "atari st",
+        "atarist",
+        "atari ste",
+        "atari-st"
+      ],
+      "netplay": false,
+      "netplay_motivo": "O núcleo do Atari ST (Hatari) não suporta jogo em rede - confirmado tentando hospedar em 14/10/2026, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Os 2 jogadores só valem no mesmo computador.",
+      "pasta": "Atari ST"
+    },
+    {
       "id": "nes",
       "nome": "Nintendo (NES)",
       "descricao": "8 bits. Roda em qualquer maquina.",

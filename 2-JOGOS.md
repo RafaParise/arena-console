@@ -199,6 +199,7 @@ No fliperama do MAME, a BIOS vai na pasta dos próprios jogos.
 | Atari 7800 | `Atari 7800` | `.a78` | pode | não precisa |
 | Atari Jaguar | `Atari Jaguar` | `.j64` `.jag` | pode | não precisa |
 | Atari Lynx | `Atari Lynx` | `.lnx` | pode | `lynxboot.img` |
+| Atari ST | `Atari ST` | `.st` `.msa` `.stx` `.dim` | pode | `tos.img` (sem ele, liga pelo EmuTOS, livre) |
 | ColecoVision | `ColecoVision` | `.col` | pode | `colecovision.rom` |
 | Commodore 64 | `Commodore 64` | `.d64` `.t64` `.prg` `.crt` | pode | não precisa |
 | Commodore Amiga | `Amiga` | `.adf` `.hdf` `.ipf` | pode | uma de: `kick34005.A500`, `kick40068.A1200` |
@@ -279,6 +280,7 @@ AVX.
 | `.a78` | Atari 7800 |
 | `.lnx` | Atari Lynx |
 | `.j64` `.jag` | Atari Jaguar |
+| `.st` `.msa` `.stx` `.dim` | Atari ST |
 | `.col` | ColecoVision |
 | `.int` | Intellivision |
 | `.vec` | Vectrex |
@@ -649,11 +651,13 @@ blueMSX (os de cartucho abrem pelo C-BIOS, a BIOS livre que vem no ARENA).
 **Opcionais (o console abre sem; com ela, fica mais fiel):** Atari 5200 ·
 Atari 7800 · Atari Lynx · Game Boy e Game Boy Color · Game Boy Advance ·
 Nintendo DS · Pokémon mini · a pasta `Databases` do blueMSX (sem ela, o
-emulador do MSX adivinha o tipo de cada cartucho).
+emulador do MSX adivinha o tipo de cada cartucho) · o TOS original do Atari
+ST (`tos.img`; sem ele, o Atari ST liga pelo EmuTOS, a BIOS livre).
 
 **Sem BIOS nenhuma (o pacote do ARENA não leva BIOS da Sony, da Sega nem da
 SNK):** o PlayStation, o Dreamcast e o Amiga abrem com uma imitação da BIOS
-que vem dentro do emulador, e o MSX abre os cartuchos pelo C-BIOS. O Saturn
+que vem dentro do emulador, o MSX abre os cartuchos pelo C-BIOS e o Atari ST
+liga pelo EmuTOS. O Saturn
 foi testado assim, com o Yabause, em 14/10/2026, e ficou com a tela preta:
 continua precisando da BIOS. PS2, Sega CD, PC Engine CD, Neo Geo e os outros
 da tabela não têm BIOS livre.
@@ -667,12 +671,19 @@ cada uma com a licença dela:
 | Console | BIOS livre | O que abre |
 |---|---|---|
 | MSX | C-BIOS 0.29a (licença BSD) | os jogos de cartucho (`.rom`); disquete e fita continuam pedindo a pasta `Machines` |
+| Atari ST | EmuTOS 1.4 (licença GPL) | liga o computador e abre os jogos; o TOS original é opcional |
 
 Ninguém precisa mexer nela. Ao abrir, o ARENA copia para `retroarch\system`
 só o que falta. **As duas funções continuam valendo:** a BIOS de verdade, se
 você puser na pasta `BIOS`, passa na frente da livre (no MSX, o próprio
 emulador escolhe: tenta a máquina original e, sem a BIOS dela, liga a do
-C-BIOS).
+C-BIOS; no Atari ST, o TOS original entra no lugar do EmuTOS).
+
+**Atari ST numa pasta com acento:** o emulador do Atari ST (o Hatari) não
+abre arquivo de pasta com acento (como `Área de Trabalho`). O ARENA resolve
+sozinho: copia o jogo e a BIOS para uma pasta sem acento, abre de lá e, se o
+jogo gravou no disquete (recorde, jogo salvo), leva a cópia de volta ao
+fechar.
 
 **Fliperama (MAME e FBNeo):** cada placa tem a sua BIOS em `.zip`
 (`neogeo.zip`, `pgm.zip`, `naomi.zip`...), que vai na mesma pasta dos jogos

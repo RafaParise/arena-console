@@ -140,6 +140,11 @@ CONSOLES = {
               "bios": ("uma", ["kick34005.A500", "kick40068.A1200"],
                        "Um Kickstart (kick34005.A500 serve para a maioria dos jogos).")},
     "c64": {"tipo": "computador", "exemplo": "Nome do Jogo.d64"},
+    "atarist": {"tipo": "computador", "exemplo": "Nome do Jogo.st",
+                "bios": ("opcional", ["tos.img"],
+                         "Opcional: o TOS original (tos.img). Sem ele, o Atari ST liga pelo EmuTOS, a BIOS "
+                         "livre que já vem no ARENA."),
+                "dica": "Também .msa, .stx e .dim. Jogo que veio em .zip: ponha o .st (ou o .msa) de dentro."},
     "spectrum": {"tipo": "computador", "exemplo": "Nome do Jogo.tzx"},
     "amstrad": {"tipo": "computador", "exemplo": "Nome do Jogo.dsk"},
     "megadrive": {"tipo": "cartucho", "exemplo": "Sonic The Hedgehog 3 (USA).md",

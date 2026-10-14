@@ -103,7 +103,8 @@ dentro da pasta, sem gravar nada fora dela.
   instala com o nome certo e mostra o que ainda falta
   (**Ajustes → Emuladores → BIOS dos consoles**). A exceção é a **BIOS
   livre**, escrita do zero por voluntários: essa já vem com o ARENA (o
-  C-BIOS, que abre os cartuchos do MSX), e a de verdade passa na frente dela.
+  C-BIOS, que abre os cartuchos do MSX, e o EmuTOS, que liga o Atari ST), e a
+  de verdade passa na frente dela.
 
 ## Requisitos
 
@@ -134,7 +135,7 @@ ainda vai ser medido em sala; o que já foi medido está em
 | Sega | SG-1000, Master System, Mega Drive, Game Gear, 32X, Sega CD, Saturn, Dreamcast |
 | Sony | PlayStation, PlayStation 2, PSP, PlayStation 3 |
 | Microsoft | Xbox 360, MS-DOS |
-| Atari | 2600, 5200, 7800, Lynx, Jaguar |
+| Atari | 2600, 5200, 7800, Lynx, Jaguar, ST |
 | Fliperama | Neo Geo e fliperamas (FBNeo), Arcade (MAME), Neo Geo Pocket |
 | Outros | PC Engine, PC-FX, WonderSwan, 3DO, CD-i, Odyssey 2, ColecoVision, Intellivision, Vectrex, MSX, Commodore 64, Amiga, ZX Spectrum, Amstrad CPC, ScummVM, Tamagotchi, Java ME (ainda sem núcleo) |
 | Consoles de fantasia | TIC-80, WASM-4, LowRes NX, Uzebox |

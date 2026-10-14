@@ -13,16 +13,6 @@ Nenhum jogo vai no pacote, nem BIOS ou firmware das empresas: são de quem
 tem o console. Vão só as **BIOS livres** da tabela abaixo, escritas do zero
 por voluntários para qualquer um copiar.
 
-## BIOS livres (1)
-
-Ficam em `servidor\bios_livres`, sem mudança nenhuma, com o texto da
-licença ao lado; a `lista.json` dessa pasta guarda a marca (SHA-256) de
-cada arquivo. O ARENA as copia para `retroarch\system` só onde falta.
-
-| BIOS | Console | Licença | Código-fonte | Pasta |
-|---|---|---|---|---|
-| C-BIOS 0.29a | MSX | BSD de 2 cláusulas (`C-BIOS\doc\cbios.txt`) | <https://cbios.sourceforge.net/> | `servidor\bios_livres\C-BIOS` |
-
 ## Programas
 
 | Programa | Licença | Código-fonte | Pasta |
@@ -37,7 +27,18 @@ cada arquivo. O ARENA as copia para `retroarch\system` só onde falta.
 | RPCS3 (PlayStation 3) | GPL-2.0 | <https://github.com/RPCS3/rpcs3> | `emuladores\RPCS3` |
 | Xenia Canary (Xbox 360) | BSD-3-Clause | <https://github.com/xenia-canary/xenia-canary> | `emuladores\Xenia` |
 
-## Núcleos do RetroArch (48)
+## BIOS livres (2)
+
+Ficam em `servidor\bios_livres`, sem mudança nenhuma, com o texto da
+licença ao lado; a `lista.json` dessa pasta guarda a marca (SHA-256) de
+cada arquivo. O ARENA as copia para `retroarch\system` só onde falta.
+
+| BIOS | Console | Licença | Código-fonte | Pasta |
+|---|---|---|---|---|
+| C-BIOS 0.29a | MSX | BSD de 2 cláusulas (o aviso de direitos vai junto, em C-BIOS\doc\cbios.txt) | <https://cbios.sourceforge.net/> | `servidor\bios_livres\C-BIOS` |
+| EmuTOS 1.4 | Atari ST | GPL-2.0 ou posterior (o texto vai junto, em EmuTOS\doc\license.txt) | <https://downloads.sourceforge.net/project/emutos/emutos/1.4/emutos-src-1.4.tar.gz> | `servidor\bios_livres\EmuTOS` |
+
+## Núcleos do RetroArch (49)
 
 Cada núcleo é o emulador de um console. A licença vem do arquivo `.info`
 do próprio núcleo (`retroarch\info`). Os de licença **não comercial**
@@ -63,6 +64,7 @@ mas não vendidos. O código-fonte de todos está em
 | Sega - MS/GG/MD/CD (Genesis Plus GX) | `genesis_plus_gx_libretro.dll` | v1.7.4 | Non-commercial |
 | Handheld Electronic (GW) | `gw_libretro.dll` | Git | zlib |
 | Atari - Lynx (Handy) | `handy_libretro.dll` | 0.95 | Zlib |
+| Atari - ST/STE/TT/Falcon (Hatari) | `hatari_libretro.dll` | 1.8 | GPLv2 |
 | LowRes NX | `lowresnx_libretro.dll` | v1.2 | zlib |
 | Arcade (MAME) | `mame_libretro.dll` | Git | GPLv2+ |
 | SNK - Neo Geo Pocket / Color (Beetle NeoPop) | `mednafen_ngp_libretro.dll` | v0.9.36.1 | GPLv2 |
