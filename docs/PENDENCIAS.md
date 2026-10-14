@@ -38,13 +38,17 @@ fica no commit). O detalhe de cada pedido está em
      SDL2 do RetroArch passaria disso, mas a tela traduz os botões para a
      numeração do XInput; fica para depois de um teste com os controles.
 5. **Jogar Junto:**
-   - Revisar o servidor e a entrada do amigo como jogador 2.
-   - O anfitrião espera o jogador 2 para começarem juntos, e nesse caso a
-     BIOS se pula.
-   - Intermediar a conexão também no PS2 e nos outros emuladores onde der.
-   - Um botão na lateral direita, com um nome bacana. Fica esmaecido
-     quando o jogo não tem partida em dois computadores, e embaixo dele vai
-     a instrução de como jogar a dois no mesmo computador.
+   - Feito: o botão **Desafio em rede** no painel (esmaecido sem partida em
+     dois computadores, com a instrução de jogar a dois no mesmo computador
+     embaixo); o anfitrião espera o jogador 2 e o jogo abre nos dois ao mesmo
+     tempo (`/api/partida/cheguei`); a lista mostra "esperando você"; o
+     pré-teste reconhece a espera; a abertura da BIOS fica de fora, igual
+     nos dois (`graficos.json`). A entrada como jogador 2 já estava certa
+     (`netplay_request_device_pN`).
+   - Depende do Rafael: testar com dois computadores de verdade.
+   - Emuladores de fora: o PCSX2 não tem partida em rede (os jogos com
+     System Link o ARENA já configura, e eles se acham na rede local); o
+     NetPlay do Dolphin não abre pela linha de comando; o PS3 tem o RPCN.
 6. **Consoles e BIOS:**
    - Todos os consoles possíveis, de preferência pelo RetroArch, com BIOS
      livre ou emulação de BIOS (HLE) onde houver.

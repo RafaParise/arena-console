@@ -274,11 +274,20 @@
         }
       ]
     },
+    "pcsx_rearmed": {
+      "_nome": "PlayStation no Jogar Junto",
+      "_bios": "Sem a abertura da BIOS (o logo do PlayStation), igual nos dois computadores: a partida em rede comeca do mesmo jeito nos dois (14/10/2026).",
+      "sempre": {
+        "pcsx_rearmed_show_bios_bootlogo": "disabled"
+      }
+    },
     "genesis_plus_gx": {
       "_nome": "Mega Drive, Master System e Game Gear",
+      "_bios": "genesis_plus_gx_bios = disabled: pula a abertura da BIOS (14/10/2026). Igual em todo computador, a partida em rede comeca do mesmo jeito nos dois.",
       "sempre": {
         "genesis_plus_gx_lcd_filter": "disabled",
-        "genesis_plus_gx_overscan": "disabled"
+        "genesis_plus_gx_overscan": "disabled",
+        "genesis_plus_gx_bios": "disabled"
       },
       "por_nota": [
         {
@@ -351,8 +360,10 @@
     },
     "melonds": {
       "_nome": "Nintendo DS",
+      "_bios": "melonds_boot_directly = enabled: o jogo comeca direto, sem o menu do DS (14/10/2026).",
       "sempre": {
-        "melonds_threaded_renderer": "enabled"
+        "melonds_threaded_renderer": "enabled",
+        "melonds_boot_directly": "enabled"
       },
       "por_nota": [
         {

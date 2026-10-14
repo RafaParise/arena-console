@@ -914,6 +914,12 @@ input::placeholder { color: var(--texto-apagado); }
 .detalhes-meta dd { margin: .1rem 0 0; font-size: var(--t-peq); }
 .detalhes-acoes { display: grid; gap: .45rem; }
 .detalhes-acoes .botao { width: 100%; }
+/* "Desafio em rede" num jogo sem partida em dois computadores: continua
+   clicavel (explica como jogar junto no mesmo computador), so mais apagado. */
+.botao--esmaecido { opacity: .55; }
+.botao--esmaecido:hover, .botao--esmaecido:focus-visible { opacity: .8; }
+.detalhes-dica { margin: 0 0 .2rem; font-size: var(--t-micro); line-height: 1.4;
+                 color: var(--texto-apagado); }
 
 /* Estado vazio */
 .vazio {

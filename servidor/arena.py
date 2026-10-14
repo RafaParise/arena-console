@@ -201,6 +201,101 @@ def partida_aberta_agora():
         return dict(atual) if atual else None
 
 
+# Partida esperando o jogador 2 (pedido do Rafael, 14/10/2026): quem abre a
+# partida nao abre o jogo na hora. O ARENA guarda tudo pronto aqui e abre
+# quando o amigo chega (POST /api/partida/cheguei, vindo do ARENA dele) ou
+# quando o anfitriao clica em "Comecar sem esperar". Assim os dois comecam
+# juntos, em vez de o amigo cair no meio do jogo. Sem ninguem em 15 minutos,
+# a espera se desfaz sozinha (a janela pode ter sido fechada).
+PARTIDA_PENDENTE = {"args": None, "convidado": "", "vez": 0}
+ESPERA_MAXIMA = 15 * 60
+
+
+def esperar_o_amigo(argumentos):
+    """Guarda a partida pronta (os argumentos de executar_jogo) e arma o
+    relogio da espera maxima."""
+    with TRAVA_JOGO:
+        PARTIDA_PENDENTE["args"] = argumentos
+        PARTIDA_PENDENTE["convidado"] = ""
+        PARTIDA_PENDENTE["vez"] += 1
+        vez = PARTIDA_PENDENTE["vez"]
+    relogio = threading.Timer(ESPERA_MAXIMA, cancelar_partida_pendente, args=(vez,))
+    relogio.daemon = True
+    relogio.start()
+
+
+def comecar_partida_pendente(convidado=""):
+    """Abre o jogo que esperava o amigo. False se nao havia espera."""
+    with TRAVA_JOGO:
+        argumentos = PARTIDA_PENDENTE["args"]
+        if not argumentos:
+            return False
+        PARTIDA_PENDENTE["args"] = None
+        PARTIDA_PENDENTE["convidado"] = convidado
+        if PARTIDA_ABERTA["partida"]:
+            PARTIDA_ABERTA["partida"]["esperando"] = False
+            PARTIDA_ABERTA["partida"]["convidado"] = convidado
+    threading.Thread(target=executar_jogo, args=argumentos, daemon=True).start()
+    return True
+
+
+def cancelar_partida_pendente(vez=None):
+    """Desfaz a espera (botao Cancelar, ou o tempo acabou). 'vez': so
+    cancela se ainda for a MESMA espera -- o relogio de uma espera antiga
+    nao derruba uma nova. True se cancelou."""
+    with TRAVA_JOGO:
+        if not PARTIDA_PENDENTE["args"] or (vez is not None and vez != PARTIDA_PENDENTE["vez"]):
+            return False
+        PARTIDA_PENDENTE["args"] = None
+        PARTIDA_ABERTA["partida"] = None
+        JOGO_EM_ANDAMENTO["ativo"] = False
+        JOGO_EM_ANDAMENTO["titulo"] = ""
+    return True
+
+
+def estado_da_partida():
+    """Para a janela "Esperando o jogador 2" de quem abriu a partida."""
+    with TRAVA_JOGO:
+        aberta = PARTIDA_ABERTA["partida"] or {}
+        esperando = bool(PARTIDA_PENDENTE["args"])
+        return {"esperando": esperando,
+                "convidado": PARTIDA_PENDENTE["convidado"],
+                "jogo": aberta.get("jogo", ""),
+                "aberto": bool(JOGO_EM_ANDAMENTO["ativo"]) and not esperando}
+
+
+def chegar_na_partida(anfitriao, apelido, porta=None, limite=25.0):
+    """Quem ENTRA avisa o ARENA de quem abriu a partida ("cheguei"). Se ele
+    estava esperando, espera a porta da partida dele abrir antes de abrir o
+    proprio RetroArch -- senao o --connect bateria numa porta fechada.
+    Anfitriao de versao antiga ou fora do ar: segue como antes, sem esperar.
+    Devolve True se o anfitriao estava esperando."""
+    porta = porta or graficos.PORTA_PARTIDA
+    corpo = json.dumps({"apelido": (apelido or "")[:24]}).encode("utf-8")
+    pedido = urllib.request.Request(anfitriao.rstrip("/") + "/api/partida/cheguei", data=corpo,
+                                    headers={"Content-Type": "application/json"})
+    try:
+        with urllib.request.urlopen(pedido, timeout=3) as resposta:
+            dados = json.loads(resposta.read() or b"{}")
+    except (OSError, ValueError):
+        return False
+    if not dados.get("abrindo"):
+        return False
+    ip = urllib.parse.urlsplit(anfitriao).hostname
+    fim = time.monotonic() + limite
+    while time.monotonic() < fim:
+        try:
+            with socket.create_connection((ip, porta), timeout=1.0):
+                pass
+        except OSError:
+            time.sleep(0.5)
+            continue
+        # A porta abriu: o RetroArch dele ja carregou o jogo. Um respiro e vai.
+        time.sleep(1.0)
+        break
+    return True
+
+
 def agora_utc():
     """Data e hora em UTC, no formato ISO, COM microssegundos.
 
@@ -2627,6 +2722,10 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         if partida:
             comando += partida["argumentos"]
         comando.append(caminho_jogo)
+        if partida and partida.get("anfitriao"):
+            # Quem entra avisa o anfitriao e, se ele esperava, aguarda o
+            # jogo dele abrir: os dois comecam juntos (14/10/2026).
+            chegar_na_partida(partida["anfitriao"], apelido)
 
     try:
         with TRAVA_BANCO, banco() as conexao:
@@ -3458,7 +3557,10 @@ def limpar_partida_recebida(partida):
     jogo = str(partida.get("jogo") or "")[:80].strip()
     if not jogo:
         return None
-    return {"jogo": jogo, "jogo_id": str(partida.get("jogo_id") or "")[:120]}
+    # "esperando": quem abriu espera o jogador 2 (14/10/2026); so verdadeiro
+    # ou falso, nada que venha da rede passa como texto.
+    return {"jogo": jogo, "jogo_id": str(partida.get("jogo_id") or "")[:120],
+            "esperando": partida.get("esperando") is True}
 
 
 def colegas_na_rede():
@@ -3483,6 +3585,7 @@ def colegas_na_rede():
             "partida_aberta": bool(vizinho.get("partida")),
             "jogo_partida": (vizinho.get("partida") or {}).get("jogo", ""),
             "jogo_id_partida": (vizinho.get("partida") or {}).get("jogo_id", ""),
+            "esperando_partida": bool((vizinho.get("partida") or {}).get("esperando")),
         })
     return saida
 
@@ -3592,6 +3695,7 @@ def procurar_partidas(config):
             "partida_aberta": bool(partida),
             "jogo_partida": (partida or {}).get("jogo", ""),
             "jogo_id_partida": (partida or {}).get("jogo_id", ""),
+            "esperando_partida": bool((partida or {}).get("esperando")),
         }
         with trava:
             # O que veio por TCP e' mais novo que o grito (ate 5 s de atraso)
@@ -4247,6 +4351,7 @@ ROTAS_REDE_EXTERNA = frozenset((
     "/api/amigo/testar",    # POST - "esse endereco responde?"
     "/api/amigo/codigo",    # POST - adicionar amigo pelo codigo
     "/api/partida/testar",  # POST - pre-voo do Jogar Junto
+    "/api/partida/cheguei", # POST - o convidado chegou (o anfitriao esperava)
     "/api/sinc/ola",        # POST - handshake da sincronizacao
     "/api/sinc/receber",    # POST - recebe placar/sessoes de outro ARENA
 ))
@@ -4705,6 +4810,9 @@ class Manipulador(BaseHTTPRequestHandler):
         if caminho == "/api/colegas":
             return self.responder_json({"colegas": colegas_na_rede()})
 
+        if caminho == "/api/partida/estado":
+            # So deste computador: a janela "Esperando o jogador 2".
+            return self.responder_json(estado_da_partida())
         if caminho == "/api/partida/procurar":
             # So deste computador (nao esta em ROTAS_REDE_EXTERNA): e' a tela
             # do convidado perguntando "quem tem partida aberta agora?".
@@ -5068,6 +5176,21 @@ class Manipulador(BaseHTTPRequestHandler):
             })
 
         # ---- conferir se a partida a dois tem caminho ---------------------
+        if caminho == "/api/partida/cheguei":
+            # Vem do ARENA do amigo (ROTAS_REDE_EXTERNA): "entrei na sua
+            # partida". Se este computador esperava, abre o jogo agora.
+            apelido_amigo = str(dados.get("apelido") or "")[:24].strip()
+            if comecar_partida_pendente(apelido_amigo or "Seu amigo"):
+                return self.responder_json({"ok": True, "abrindo": True})
+            if partida_aberta_agora():
+                return self.responder_json({"ok": True, "abrindo": False})
+            return self.erro("Não há partida aberta neste computador. Peça para o amigo "
+                             "abrir de novo: Desafio em rede → Eu abro a partida.", 404)
+        if caminho == "/api/partida/comecar":
+            # "Comecar sem esperar" (so deste computador).
+            return self.responder_json({"ok": True, "abrindo": comecar_partida_pendente("")})
+        if caminho == "/api/partida/cancelar":
+            return self.responder_json({"ok": True, "cancelada": cancelar_partida_pendente()})
         if caminho == "/api/partida/testar":
             bruto = str(dados.get("endereco", "")).strip()
             alvo = normalizar_url(bruto)
@@ -5115,6 +5238,17 @@ class Manipulador(BaseHTTPRequestHandler):
             except OSError:
                 pass
 
+            # Porta da partida fechada, mas o ARENA dele responde: ele pode estar
+            # esperando o jogador 2 (o jogo so abre quando alguem entra). Pergunta
+            # a ele, do mesmo jeito que a lista de partidas pergunta.
+            if resultado["arena"] and not resultado["partida"]:
+                try:
+                    retorno = falar_com(alvo, "/api/sinc/ola", {}, "POST", 2)
+                    dele = limpar_partida_recebida(retorno.get("partida"))
+                    resultado["esperando"] = bool(dele and dele.get("esperando"))
+                except Exception:
+                    pass
+
             # O arquivo e o mesmo? E a causa mais comum de "conecta e nao
             # comeca": titulo parecido, arquivo diferente.
             titulo = str(dados.get("titulo", "")).strip()
@@ -5153,6 +5287,10 @@ class Manipulador(BaseHTTPRequestHandler):
                 resultado["diagnostico"] = (
                     "Ele não tem esse jogo na lista. Passe o arquivo para ele "
                     "antes de comecar.")
+            elif resultado["arena"] and resultado.get("esperando"):
+                resultado["diagnostico"] = (
+                    "Tudo certo. Ele abriu a partida e está esperando você: clique "
+                    "em Começar e o jogo abre nos dois computadores.")
             elif resultado["arena"] and resultado["partida"]:
                 resultado["diagnostico"] = (
                     "Tudo certo. A partida dele está aberta e você alcança.")
@@ -6002,6 +6140,10 @@ class Manipulador(BaseHTTPRequestHandler):
                 # recusaria o ultimo colega. Com 1 ou 2, continua 3.
                 partida["opcoes"]["netplay_max_connections"] = str(
                     jogo["ligacao"]["max_conexoes"])
+                if not hospedar and not assistir:
+                    # Para avisar o ARENA de quem abriu ("cheguei") antes de
+                    # conectar: se ele esperava, os dois comecam juntos.
+                    partida["anfitriao"] = normalizar_url(str(dados.get("endereco", "") or ""))
                 if plataforma.get("core_netplay"):
                     # O nucleo alternativo so de netplay (ex.: PCSX ReARMed
                     # no PS1) tem estado maior pra serializar que o nucleo
@@ -6015,6 +6157,10 @@ class Manipulador(BaseHTTPRequestHandler):
                     # Positivo fraco da escola.
                     partida["opcoes"]["netplay_check_frames"] = "0"
 
+            # Quem abre a partida pode esperar o amigo para comecarem juntos
+            # (a tela pede "esperar"; ver PARTIDA_PENDENTE). Sem o pedido, o
+            # jogo abre na hora, como sempre.
+            esperar = bool(modo == "hospedar" and partida and dados.get("esperar"))
             if modo == "hospedar" and partida:
                 with TRAVA_JOGO:
                     PARTIDA_ABERTA["partida"] = {
@@ -6023,12 +6169,14 @@ class Manipulador(BaseHTTPRequestHandler):
                         "console": plataforma.get("nome", ""),
                         "jogadores": jogo["ligacao"]["jogadores"],
                         "pela_internet": bool(dados.get("pela_internet")),
+                        "esperando": esperar,
                     }
 
-            threading.Thread(
-                target=executar_jogo,
-                args=(jogo, apelido, config, plataforma.get("custo"), partida),
-                daemon=True).start()
+            argumentos = (jogo, apelido, config, plataforma.get("custo"), partida)
+            if esperar:
+                esperar_o_amigo(argumentos)
+            else:
+                threading.Thread(target=executar_jogo, args=argumentos, daemon=True).start()
 
             # Lista dos ultimos abertos, sem repetir.
             recentes = [x for x in config.get("recentes", []) if x != jogo["id"]]
@@ -6043,6 +6191,8 @@ class Manipulador(BaseHTTPRequestHandler):
             if partida:
                 resposta["papel"] = partida["papel"]
                 resposta["porta"] = graficos.PORTA_PARTIDA
+            if esperar:
+                resposta["esperando"] = True
             if aviso_netplay:
                 resposta["aviso"] = aviso_netplay
             if partida and partida.get("hospedar"):

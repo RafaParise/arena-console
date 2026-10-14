@@ -136,7 +136,9 @@
       </dl>
       <div class="detalhes-acoes">
         <button class="botao botao--principal" id="btnJogarSelecionado" type="button" disabled>Jogar agora</button>
-        <button class="botao" id="btnMultiplayerSelecionado" type="button" disabled>Jogar multiplayer</button>
+        <button class="botao" id="btnMultiplayerSelecionado" type="button" disabled
+                aria-describedby="dicaMesmoComputador">Desafio em rede</button>
+        <p class="detalhes-dica" id="dicaMesmoComputador" hidden></p>
         <button class="botao" id="btnGerirSelecionado" type="button" disabled>Saves e cheats</button>
         <button class="botao" id="btnPlacarSelecionado" type="button" hidden>Registrar pontos</button>
         <button class="botao" id="btnEscolherConsole" type="button" hidden>Escolher console</button>
@@ -982,6 +984,22 @@
     <div class="modal-acoes">
       <button class="botao" data-fechar="modalPartida" type="button">Cancelar</button>
       <button class="botao botao--principal" id="btnAbrirPartida" type="button">Começar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Quem abre a partida espera o jogador 2 (pedido do Rafael, 14/10/2026). -->
+<div class="modal" id="modalEsperaPartida" hidden>
+  <div class="modal-caixa" role="dialog" aria-modal="true" aria-labelledby="tituloEsperaPartida">
+    <h2 id="tituloEsperaPartida">Esperando o jogador 2</h2>
+    <p class="explica" id="esperaPartidaJogo"></p>
+    <p class="explica">No computador do amigo: abrir o ARENA, escolher este mesmo jogo e
+      clicar em <b>Desafio em rede</b> → <b>Entrar na partida do amigo</b>. Quando ele
+      entrar, o jogo abre nos dois computadores ao mesmo tempo.</p>
+    <p class="explica" id="esperaPartidaEstado" role="status">Esperando…</p>
+    <div class="modal-acoes">
+      <button class="botao" id="btnCancelarEspera" type="button">Cancelar</button>
+      <button class="botao botao--principal" id="btnComecarSemEsperar" type="button">Começar sem esperar</button>
     </div>
   </div>
 </div>

@@ -710,6 +710,7 @@ function desenharDetalhes() {
     painel.classList.add("detalhes--vazio");
     jogarBotao.disabled = true;
     multiplayerBotao.disabled = true;
+    $("#dicaMesmoComputador").hidden = true;
     gerirBotao.disabled = true;
     consoleBotao.hidden = true;
     $("#btnAtualizarCapa").disabled = true;
@@ -739,9 +740,18 @@ function desenharDetalhes() {
   // Console sem jogo entre computadores: o botao continua ativo e abre a
   // explicacao de como jogar junto NO MESMO computador (pedido do Rafael).
   multiplayerBotao.disabled = plataforma.estado !== "pronta";
+  // Sem partida em dois computadores: o botao fica apagado, mas continua
+  // abrindo a explicacao de como jogar junto no mesmo computador.
+  multiplayerBotao.classList.toggle("botao--esmaecido", soNoMesmoComputador(jogo));
   multiplayerBotao.title = soNoMesmoComputador(jogo)
-    ? "Neste console, jogar junto é no mesmo computador. Clique para ver como."
+    ? "Este jogo não tem partida em dois computadores. Clique para ver como jogar junto no mesmo computador."
     : (jogo.motivo_jogadores || "");
+  // Como jogar a dois no mesmo computador, sempre a vista, embaixo do botao.
+  const nJogadores = Number(jogo.jogadores_max) || 2;
+  const dica = $("#dicaMesmoComputador");
+  dica.hidden = nJogadores < 2;
+  dica.textContent = `No mesmo computador (até ${nJogadores}): ligue os controles antes de ` +
+    "abrir o jogo. O 1º controle é o jogador 1; o teclado é o próximo livre.";
   gerirBotao.disabled = plataforma.estado !== "pronta";
   consoleBotao.hidden = jogo.plataforma !== "indefinido";
 }
@@ -2726,6 +2736,8 @@ async function comecarPartida() {
     partida: estado.papelDaPartida,
     pela_internet: pelaInternet,
   };
+  // Quem abre a partida espera o jogador 2: os dois comecam juntos.
+  if (estado.papelDaPartida === "hospedar") corpo.esperar = true;
   if (estado.papelDaPartida !== "hospedar") {
     const escolha = $("#listaAmigosPartida").selectedOptions[0];
     corpo.endereco = escolha ? escolha.value : "";
@@ -2744,14 +2756,19 @@ async function comecarPartida() {
     const dados = await pedir("/api/jogar", "POST", corpo);
     marcarJogoAberto(corpo.jogo_id);
     $("#modalPartida").hidden = true;
-    const porRepasse = dados.pela_internet ? " (pela internet, com repasse)" : "";
-    const texto = estado.papelDaPartida === "hospedar"
-      ? `Sala criada${porRepasse}. O jogo abrirá quando seu amigo entrar.`
-      : estado.papelDaPartida === "assistir"
-      ? "Entrando para assistir. Você vê a tela dele, sem controlar nada."
-      : `Entrando como ${dados.papel}. Aguarde a tela abrir.`;
-    const complemento = dados.aviso ? " " + dados.aviso : "";
-    recado(texto + complemento, false, complemento ? 9000 : 4500);
+    if (dados.esperando) {
+      abrirEsperaPartida(estado.jogoDaPartida, dados.aviso || "");
+    } else {
+      const porRepasse = dados.pela_internet ? " (pela internet, com repasse)" : "";
+      const texto = estado.papelDaPartida === "hospedar"
+        ? `Sala criada${porRepasse}. Seu amigo pode entrar a qualquer hora.`
+        : estado.papelDaPartida === "assistir"
+        ? "Entrando para assistir. Você vê a tela dele, sem controlar nada."
+        : `Entrando como ${dados.papel}. Se o amigo estiver esperando, o jogo ` +
+          "abre nos dois computadores ao mesmo tempo.";
+      const complemento = dados.aviso ? " " + dados.aviso : "";
+      recado(texto + complemento, false, complemento ? 9000 : 4500);
+    }
     mostrarFaixaTeclas();
     if (dados.aviso_rede) {
       // Rede Pública: fica na barra do alto até o jogo fechar. O recado
@@ -2761,6 +2778,39 @@ async function comecarPartida() {
     }
   } catch (falha) {
     recado(falha.message, true);
+  }
+}
+
+// Quem abre a partida espera o jogador 2 (pedido do Rafael, 14/10/2026): a
+// janela fica aberta, pergunta ao servidor a cada 1,5 s e some quando o
+// amigo chega e o jogo abre.
+function abrirEsperaPartida(jogo, aviso) {
+  $("#esperaPartidaJogo").textContent = (jogo ? jogo.titulo : "") + (aviso ? " " + aviso : "");
+  $("#esperaPartidaEstado").textContent = "Esperando o amigo entrar…";
+  $("#modalEsperaPartida").hidden = false;
+  clearInterval(estado.relogioEspera);
+  estado.relogioEspera = setInterval(acompanharEspera, 1500);
+}
+
+function fecharEspera() {
+  clearInterval(estado.relogioEspera);
+  estado.relogioEspera = null;
+  $("#modalEsperaPartida").hidden = true;
+}
+
+async function acompanharEspera() {
+  let dados;
+  try {
+    dados = await pedir("/api/partida/estado");
+  } catch (falha) {
+    return;   // o servidor pode estar ocupado; tenta de novo em 1,5 s
+  }
+  if (dados.esperando) return;
+  fecharEspera();
+  if (dados.aberto) {
+    recado(dados.convidado
+      ? `${dados.convidado} chegou! O jogo está abrindo nos dois computadores.`
+      : "Abrindo o jogo. Seu amigo pode entrar a qualquer hora.", false, 6000);
   }
 }
 
@@ -2868,7 +2918,8 @@ function preencherAmigosPartida() {
   // A lista se atualiza a cada 4 s: só redesenha se algo mudou. Redesenhar
   // sem mudança fecha a lista aberta no meio da escolha do aluno.
   const assinatura = JSON.stringify([estado.procurandoPartidas,
-    [...unicos.values()].map((c) => [c.url, c.apelido, c.jogo_partida, c.jogo_id_partida]),
+    [...unicos.values()].map((c) => [c.url, c.apelido, c.jogo_partida, c.jogo_id_partida,
+      c.esperando_partida]),
     estado.jogoDaPartida ? estado.jogoDaPartida.id : ""]);
   if (assinatura === lista.dataset.assinatura && lista.options.length) return;
   lista.dataset.assinatura = assinatura;
@@ -2911,7 +2962,7 @@ function preencherAmigosPartida() {
       nomeDoArquivo(colega.jogo_id_partida) !== meuJogo;
     const jogo = colega.jogo_partida
       ? ` · ${outroJogo ? "OUTRO JOGO: " : ""}${colega.jogo_partida}` : "";
-    opcao.textContent = `${nome}${jogo}`;
+    opcao.textContent = `${nome}${jogo}${colega.esperando_partida ? " · esperando você" : ""}`;
     lista.append(opcao);
   }
   // Mantém a escolha do aluno quando a lista se atualiza sozinha.
@@ -3876,6 +3927,23 @@ function ligarEventos() {
     if (soNoMesmoComputador(jogo)) abrirJuntoLocal(jogo);
     else abrirPartida(jogo);
   });
+  $("#btnComecarSemEsperar").addEventListener("click", async () => {
+    try {
+      await pedir("/api/partida/comecar", "POST", {});
+      acompanharEspera();
+    } catch (falha) {
+      recado(falha.message, true);
+    }
+  });
+  $("#btnCancelarEspera").addEventListener("click", async () => {
+    fecharEspera();
+    try {
+      await pedir("/api/partida/cancelar", "POST", {});
+      recado("Partida cancelada.");
+    } catch (falha) {
+      recado(falha.message, true);
+    }
+  });
   $("#btnAbrirJuntoLocal").addEventListener("click", () => {
     $("#modalJuntoLocal").hidden = true;
     if (estado.jogoSelecionado) jogar(estado.jogoSelecionado);
@@ -4443,6 +4511,9 @@ function ligarEventos() {
 
   document.addEventListener("keydown", (evento) => {
     if (evento.key !== "Escape") return;
+    // Esc na espera do jogador 2 vale como Cancelar: senao a partida ficava
+    // esperando escondida, sem botao para desfazer.
+    if (!$("#modalEsperaPartida").hidden) $("#btnCancelarEspera").click();
     for (const painel of document.querySelectorAll(".gaveta, .modal")) {
       painel.hidden = true;
     }

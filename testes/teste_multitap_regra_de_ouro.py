@@ -204,6 +204,10 @@ def trabalhador(raiz, porta):
     arena.servidor_alcancavel = lambda *a, **k: False
     arena.limpar_logs_antigos = lambda *a, **k: None
     arena.VIGIA["online"] = False
+    # Quem entra avisa o ARENA do anfitriao (14/10/2026); no teste nao ha
+    # anfitriao de verdade, e nada pode bater num ARENA real da porta 8777.
+    if hasattr(arena, "chegar_na_partida"):
+        arena.chegar_na_partida = lambda *a, **k: False
     # O resultado nao pode depender de quantos controles estao plugados
     # nesta maquina na hora do teste (o teclado muda de jogador com isso).
     if hasattr(arena.controles, "contar_controles"):

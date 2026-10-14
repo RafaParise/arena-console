@@ -306,16 +306,31 @@ escola** no navegador e clique em Recordes lá.
 
 Depois que vocês são amigos:
 
-**Quem vai abrir:** clique em **Jogar junto** na linha do jogo → **Eu abro a
-partida** → **Começar**. Você é o jogador 1.
+**Quem vai abrir:** no painel do jogo, à direita, clique em **Desafio em
+rede** → **Eu abro a partida** → **Começar**. Você é o jogador 1. Aparece a
+janela **Esperando o jogador 2**: o jogo só abre quando o amigo entrar, e aí
+abre nos dois computadores ao mesmo tempo. Não quer esperar? **Começar sem
+esperar** (os amigos entram depois, com o jogo andando). **Cancelar** (ou
+Esc) desfaz a partida.
 
-**Quem vai entrar:** clique em **Jogar junto** no **mesmo jogo** → **Entrar
-na partida do amigo**. Na lista **Amigo ou partida encontrada**, escolha a
-partida dele → **Começar**. Você é o jogador 2.
+**Quem vai entrar:** clique em **Desafio em rede** no **mesmo jogo** →
+**Entrar na partida do amigo**. Na lista **Amigo ou partida encontrada**,
+escolha a partida dele (aparece *esperando você*) → **Começar**. Você é o
+jogador 2.
 
 Abrir a partida também se chama **hospedar**. É como emprestar a sua casa
-para a festa: os amigos vêm até você. Por isso quem abre começa primeiro,
-e os outros entram depois.
+para a festa: os amigos vêm até você. Por isso quem abre a partida vem
+primeiro, e os outros entram depois.
+
+**Na partida em rede, o jogo começa direto**, sem a abertura da BIOS (o logo
+do PlayStation, o menu do Nintendo DS), igual nos dois computadores. Se um
+começasse pela abertura e o outro não, os dois jogos sairiam diferentes.
+
+**Botão apagado:** em jogo que não tem partida em dois computadores
+(Nintendo 64, Dreamcast, PS2...), o **Desafio em rede** fica mais apagado.
+Clicando nele, o ARENA explica como jogar junto no mesmo computador. Embaixo
+do botão fica sempre a instrução curta de como jogar a dois no mesmo
+computador.
 
 **Jogos com mais de 2 jogadores:** quando o console permitir, cada amigo
 que entra escolhe um número diferente — jogador 2, jogador 3, jogador 4
@@ -341,7 +356,7 @@ com 5 notebooks de verdade, veja se funciona e avise.
 conseguem deixar dois computadores iguais ao mesmo tempo: Nintendo 64,
 Dreamcast, PSP, Commodore 64 e Amiga (limite do emulador), e os que abrem
 por outro programa: PlayStation 2, PlayStation 3, Xbox 360, GameCube e Wii.
-Neles, **Jogar junto** abre uma janela curta que explica isso e mostra como
+Neles, o **Desafio em rede** abre uma janela curta que explica isso e mostra como
 ligar até 4 jogadores no mesmo computador:
 
 1. Ligue os controles **antes** de abrir o jogo: o 1º controle é o jogador
@@ -464,7 +479,7 @@ sincronizar de novo.
 
 ### O botão que diz onde está o problema
 
-Na janela de **Jogar junto** tem o botão **Testar antes de começar**. Escolha a
+Na janela do **Desafio em rede** tem o botão **Testar antes de começar**. Escolha a
 partida dele na lista e clique. Ele responde uma destas coisas:
 
 | Resposta | O que fazer |
@@ -499,11 +514,14 @@ pasta compartilhada.
 
 ### Ordem importa: abra primeiro, entre depois
 
-Quem hospeda clica **Eu abro a partida** e **espera o jogo aparecer na
-tela**. Só então o outro clica em Entrar.
+Quem hospeda clica **Eu abro a partida** primeiro; a partida só aparece na
+lista do outro depois disso. Com a espera (o normal), o ARENA de quem entra
+avisa o ARENA de quem abriu e espera o jogo dele abrir antes de conectar:
+os dois começam juntos, sem pressa de ninguém.
 
-Se o convidado clicar antes, a conexão falha uma vez e não tenta de novo.
-Fechem os dois e comecem de novo, na ordem.
+Se quem abriu clicou em **Começar sem esperar**, quem entra cai no jogo que
+já está andando. Se a conexão falhar, fechem os dois e comecem de novo, na
+ordem.
 
 ---
 
@@ -621,18 +639,20 @@ que funciona bem até em Wi-Fi fraco — são poucos bytes por quadro.
 **No computador de quem vai abrir:**
 
 1. Ache o jogo na lista.
-2. Clique em **Jogar junto**.
+2. No painel do jogo, à direita, clique em **Desafio em rede**.
 3. Escolha **Eu abro a partida**.
-4. **Começar**. A partida fica anunciada para os colegas enquanto o jogo
-   estiver aberto; fechou o jogo, o anúncio some.
+4. **Começar**. Aparece **Esperando o jogador 2**, e o jogo abre quando o
+   amigo entrar (ou em **Começar sem esperar**). A partida fica anunciada
+   para os colegas enquanto espera e enquanto o jogo estiver aberto; fechou
+   o jogo, o anúncio some.
 
 **No computador de quem vai entrar:**
 
 1. Ache **o mesmo jogo** na lista.
-2. Clique em **Jogar junto**.
+2. Clique em **Desafio em rede**.
 3. Escolha **Entrar na partida do amigo** (ou **Só assistir**).
 4. Na lista **Amigo ou partida encontrada**, escolha a partida dele — por
-   exemplo *"Rafael · Super Bomberman 4"*. A lista se atualiza sozinha a
+   exemplo *"Rafael · Super Bomberman 4 · esperando você"*. A lista se atualiza sozinha a
    cada 4 segundos: se o amigo abrir a partida agora, ela aparece em
    seguida, sem fechar a janela. Se aparecer **OUTRO JOGO**, vocês abriram
    jogos diferentes.
