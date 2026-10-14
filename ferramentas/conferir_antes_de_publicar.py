@@ -23,6 +23,11 @@ O que ela procura (em todo commit que ainda nao esta no GitHub):
      e-mail (o de aluno e o institucional sao bloqueantes), CPF, telefone,
      numero de RA, nome de computador e endereco de rede.
 
+A unica excecao das regras 2 e 3: os arquivos LIVRES conferidos (as BIOS
+livres do ARENA, em servidor\bios_livres, e os jogos livres dos testes, em
+testes\jogos_livres). Passam so com o caminho E o conteudo (SHA-256) que a
+lista.json da pasta deles registra; com um byte trocado, voltam a barrar.
+
 Resultado: BLOQUEANTE (nao envie), AVISO (confira) ou nada. Sai com codigo 1
 se houver bloqueante. Os achados vao so para a tela e para um arquivo na
 pasta temporaria do Windows: nunca para dentro do repositorio (seriam
@@ -34,6 +39,7 @@ Uso:
     --tudo     confere tambem o que ja esta no GitHub (para comparar)
 """
 import collections
+import hashlib
 import json
 import os
 import re
@@ -128,6 +134,27 @@ def binario_permitido(caminho, dados):
     if not assinaturas or not any(dados.startswith(a) for a in assinaturas):
         return False
     return extensao != ".webp" or dados[8:12] == b"WEBP"
+
+
+# Os arquivos livres conferidos: a pasta e a lista que registra cada um.
+LISTAS_DE_LIVRES = {
+    "servidor/bios_livres/": "servidor/bios_livres/lista.json",
+    "testes/jogos_livres/": "testes/jogos_livres/lista.json",
+}
+
+
+def livres_conferidos():
+    """{caminho no git: sha256} de cada arquivo que as listas de livres registram."""
+    saida = {}
+    for pasta, lista in LISTAS_DE_LIVRES.items():
+        try:
+            with open(os.path.join(RAIZ, *lista.split("/")), encoding="utf-8") as arquivo:
+                dados = json.load(arquivo)
+        except (OSError, ValueError):
+            continue
+        for item in dados.get("arquivos", []):
+            saida[pasta + item["origem"]] = item["sha256"]
+    return saida
 
 
 # Enderecos publicos que nao identificam ninguem: os DNS que o ARENA usa para
@@ -227,6 +254,8 @@ def principal(argumentos):
     def achado(lista, tipo, onde, detalhe):
         lista.append({"tipo": tipo, "onde": onde, "detalhe": detalhe})
 
+    # Livre conferido: a extensao nao barra; o conteudo e' conferido abaixo.
+    livres = livres_conferidos()
     todos_os_caminhos = sorted({c for cs in caminhos.values() for c in cs})
     for caminho in todos_os_caminhos:
         if PERMITIDOS.search(caminho):
@@ -237,7 +266,7 @@ def principal(argumentos):
                        "%s (commit %s)" % (motivo, primeiro_commit[caminho][:7]))
                 break
         else:
-            if EXT_JOGO_OU_BIOS.search(caminho):
+            if EXT_JOGO_OU_BIOS.search(caminho) and caminho not in livres:
                 achado(bloqueantes, "jogo ou BIOS pela extensao", caminho,
                        "commit %s" % primeiro_commit[caminho][:7])
 
@@ -259,10 +288,21 @@ def principal(argumentos):
     for sha in shas:
         dados = conteudo.get(sha, b"")
         nome = sorted(caminhos[sha])[0]
+        conferidos = set()
+        if any(c in livres for c in caminhos[sha]):
+            marca = hashlib.sha256(dados).hexdigest()
+            for caminho in sorted(c for c in caminhos[sha] if c in livres):
+                if livres[caminho] == marca:
+                    conferidos.add(caminho)
+                else:
+                    achado(bloqueantes, "arquivo livre diferente do conferido", caminho,
+                           "o conteudo nao bate com a marca da lista.json")
         if b"\0" in dados[:8000]:
             # O codigo do ARENA e' todo texto. Binario so imagem/fonte de
             # verdade; qualquer outro pode ser BIOS, jogo ou save renomeado.
             for caminho in sorted(caminhos[sha]):
+                if caminho in conferidos:
+                    continue
                 if not binario_permitido(caminho, dados):
                     achado(bloqueantes, "arquivo binario (nao e' imagem nem fonte)", caminho,
                            "%d bytes" % len(dados))

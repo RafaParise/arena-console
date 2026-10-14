@@ -27,6 +27,9 @@ fica no commit). O detalhe de cada pedido está em
      README, em "Imagens desta página".
    - Depende do Rafael: enviar o `arena-escuro.gif` em Settings → General →
      Social preview (só pelo site).
+   - Pedido de 14/10: o GIF escuro mostrar TODOS os personagens e animações
+     do modo escuro, sem deixar nenhum de fora, e uma cópia dele na pasta do
+     `arena-console` para usar em outros lugares.
 4. **Controles:**
    - Feito, sem os controles na mão: até 8 jogadores (PS1 com o adaptador
      nas duas portas, Saturn até 10, PS2 até 5, tela de controles com 8),
@@ -54,10 +57,15 @@ fica no commit). O detalhe de cada pedido está em
      abriu assim; `consoles.json → core_sem_bios`). Dreamcast e Amiga já
      abriam sem. O Saturn pelo Yabause, sem BIOS, ficou com a tela preta:
      continua precisando dela (guia 2).
-   - Falta: BIOS livres que precisam ser baixadas (C-BIOS do MSX, EmuTOS
-     do Atari ST) e os consoles novos com núcleo já na pasta (ZX81, VIC-20,
-     Plus/4, Watara Supervision, Thomson, CHIP-8...), cada um testado com
-     um jogo livre.
+   - Feito: o MSX abre os cartuchos pelo C-BIOS 0.29a, a BIOS livre que vem
+     no ARENA (`servidor\bios_livres`; testado com o NOBORUNOCA, MIT, em
+     `testes\jogos_livres`). Disquete e fita ainda pedem o `Machines`. O MSX
+     não tem Jogar Junto (o blueMSX recusa).
+   - Falta (pedido de 14/10: "todos os consoles de código aberto", mantendo
+     os emuladores de sempre): o EmuTOS do Atari ST e os consoles novos com
+     núcleo já na pasta (ZX81, VIC-20, Plus/4, Watara Supervision, Thomson,
+     CHIP-8 e os outros que abrirem sem BIOS das empresas), cada um testado
+     com um jogo livre (`testes\teste_consoles_livres.py`).
    - Dizer com clareza onde não dá: o PS2 não tem BIOS livre, e distribuir
      BIOS da Sony, da Sega ou da SNK é proibido.
 

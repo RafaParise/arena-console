@@ -32,10 +32,12 @@ Conferir (Ajustes -> Emuladores):
      neogeo.zip tambem na pasta do Arcade, onde o MAME procura). Nunca troca
      uma BIOS que ja esta la, a nao ser a de outra versao pela recomendada
      -- e a antiga vai para backup\bios-trocadas;
-  4. copia para a prateleira a BIOS que ja estava instalada (uma vez so:
+  4. poe as BIOS LIVRES que faltam (servidor\bios_livres: o C-BIOS do MSX),
+     so no lugar vazio -- a de verdade, quando chega, passa na frente;
+  5. copia para a prateleira a BIOS que ja estava instalada (uma vez so:
      quem apaga da prateleira nao ve ela voltar), para a pasta BIOS mostrar
      tudo o que existe;
-  5. reescreve os LEIA (so quando muda alguma coisa).
+  6. reescreve os LEIA (so quando muda alguma coisa).
 Nunca apaga nada. Cada arquivo e' lido uma vez; a marca fica guardada em
 dados\bios_conferidas.json ate o arquivo mudar.
 """
@@ -54,6 +56,7 @@ import bios_catalogo as catalogo
 PASTA_SERVIDOR = os.path.dirname(os.path.abspath(__file__))
 RAIZ = os.path.dirname(PASTA_SERVIDOR)
 PASTA_INFO = os.path.join(RAIZ, "retroarch", "info")
+PASTA_LIVRES = os.path.join(PASTA_SERVIDOR, "bios_livres")
 NOME_DA_PASTA = "BIOS"
 ARQUIVO_LEIA = "LEIA.txt"
 ARQUIVO_RESUMO = "LEIA - O QUE FALTA.txt"
@@ -121,6 +124,7 @@ _cache_reverso = {}      # pasta dos .info -> {md5: {nome em minusculas}}
 _cache_md5 = {}          # (caminho, tamanho, data) -> md5
 _cache_ps = {}           # (caminho, tamanho, data) -> ("ps1"|"ps2", regiao, versao) ou None
 _cache_consoles = {}
+_cache_livres = {}
 
 ID_DO_PLAYSTATION = {(e["pelo_conteudo"], e["regiao"]): e["id"]
                      for e in catalogo.CATALOGO if e.get("pelo_conteudo") in ("ps1", "ps2")}
@@ -345,12 +349,15 @@ def tem(pasta_sistema, relativo):
 
 
 def _instalada(pasta_sistema, entrada):
-    """O caminho da BIOS instalada (com o nome certo ou um aceito), ou None."""
+    """O caminho da BIOS instalada (com o nome certo ou um aceito), ou None.
+    A BIOS livre que o ARENA poe no lugar (servidor\\bios_livres) nao conta:
+    a de verdade, quando aparece na prateleira, entra no lugar dela, e ela
+    nunca vai para a prateleira como se fosse do professor."""
     destino = entrada.get("destino") or ""
     pasta = os.path.dirname(destino)
     for nome in [catalogo.nome_de_instalacao(entrada)] + list(entrada.get("alternativas", [])):
         caminho = _achar(pasta_sistema, (pasta + "/" + nome) if pasta else nome)
-        if caminho:
+        if caminho and not e_livre(caminho):
             return caminho
     return None
 
@@ -425,10 +432,13 @@ def bios_em_uso_no_pcsx2(raiz=None):
 
 
 def _pasta_com_algo(caminho):
-    """A pasta existe e tem alguma coisa dentro (o Machines do MSX)?"""
+    """A pasta existe e tem alguma coisa dentro (o Machines do MSX)? As
+    maquinas do C-BIOS, que o proprio ARENA poe la, nao contam: senao o
+    Machines de verdade, posto depois na prateleira, nunca seria instalado."""
+    nossos = nomes_livres(os.path.basename(caminho))
     try:
         with os.scandir(caminho) as itens:
-            return any(True for _item in itens)
+            return any(item.name.lower() not in nossos for item in itens)
     except OSError:
         return False
 
@@ -454,6 +464,106 @@ def _firmware_do_ps3(raiz):
 
 
 # ---------------------------------------------------------------------------
+# BIOS livres (servidor\bios_livres)
+# ---------------------------------------------------------------------------
+# Pedido do Rafael (12/10/2026): "integrar emuladores sem precisar baixar
+# BIOS". A BIOS das empresas (Sony, Sega, SNK...) nao pode ir junto com o
+# ARENA. Mas alguns consoles tem uma BIOS LIVRE, escrita do zero por
+# voluntarios, que qualquer um pode copiar e distribuir: o C-BIOS do MSX
+# (licenca BSD). Ela mora em servidor\bios_livres, com a licenca e a
+# lista.json (de onde sai cada arquivo, para onde vai em retroarch\system e
+# a marca SHA-256 de cada um).
+#
+# A livre so ocupa o lugar VAZIO: nao conta como a BIOS do console, nao vai
+# para a prateleira e nunca impede a de verdade de entrar. No MSX, quem
+# escolhe e' o proprio nucleo: o blueMSX tenta a maquina de verdade (MSX2+)
+# e, sem a BIOS dela, liga a "MSX2+ - C-BIOS" (o registro diz "'MSX2+' is
+# incomplete, falling back to 'MSX2+ - C-BIOS'", visto em 14/10/2026).
+
+def livres():
+    """A lista.json das BIOS livres ({"projetos": {...}, "arquivos": [...]}),
+    lida uma vez."""
+    with _trava:
+        if "lista" not in _cache_livres:
+            try:
+                with open(os.path.join(PASTA_LIVRES, "lista.json"), encoding="utf-8") as arquivo:
+                    _cache_livres["lista"] = json.load(arquivo)
+            except (OSError, ValueError):
+                _cache_livres["lista"] = {"projetos": {}, "arquivos": []}
+        return _cache_livres["lista"]
+
+
+def sha256_do_arquivo(caminho):
+    resumo = hashlib.sha256()
+    with open(caminho, "rb") as arquivo:
+        for bloco in iter(lambda: arquivo.read(1 << 16), b""):
+            resumo.update(bloco)
+    return resumo.hexdigest()
+
+
+def _tamanhos_livres():
+    """O tamanho de cada BIOS livre: so o arquivo de um desses tamanhos e'
+    lido para tirar a marca (a abertura do ARENA nao fica mais lenta)."""
+    with _trava:
+        if "tamanhos" in _cache_livres:
+            return _cache_livres["tamanhos"]
+    tamanhos = set()
+    for item in livres()["arquivos"]:
+        try:
+            tamanhos.add(os.path.getsize(os.path.join(PASTA_LIVRES, *item["origem"].split("/"))))
+        except OSError:
+            continue
+    with _trava:
+        _cache_livres["tamanhos"] = tamanhos
+    return tamanhos
+
+
+def e_livre(caminho):
+    """O arquivo e' uma BIOS livre do ARENA (e nao a BIOS do console)? Pela
+    marca SHA-256 da lista.json."""
+    try:
+        if os.path.getsize(caminho) not in _tamanhos_livres():
+            return False
+        return sha256_do_arquivo(caminho) in {item["sha256"] for item in livres()["arquivos"]}
+    except OSError:
+        return False
+
+
+def nomes_livres(relativo):
+    """O que o proprio ARENA poe dentro desta pasta de retroarch\\system, em
+    minusculas. Para "Machines": as tres maquinas do C-BIOS."""
+    alvo = [p.lower() for p in relativo.replace("\\", "/").strip("/").split("/") if p]
+    nomes = set()
+    for item in livres()["arquivos"]:
+        partes = item["destino"].split("/")
+        if len(partes) > len(alvo) and [p.lower() for p in partes[:len(alvo)]] == alvo:
+            nomes.add(partes[len(alvo)].lower())
+    return nomes
+
+
+def instalar_livres(pasta_sistema):
+    """Passo 4: copia para retroarch\\system as BIOS livres que faltam. Nunca
+    troca arquivo que ja esta la, nem instala o que nao bate com a marca da
+    lista (arquivo mexido na pasta do ARENA). Devolve {projeto: arquivos
+    copiados}."""
+    copiados = {}
+    for item in livres()["arquivos"]:
+        destino = os.path.join(pasta_sistema, *item["destino"].split("/"))
+        if os.path.exists(destino):
+            continue
+        try:
+            with open(os.path.join(PASTA_LIVRES, *item["origem"].split("/")), "rb") as arquivo:
+                dados = arquivo.read()
+            if hashlib.sha256(dados).hexdigest() != item["sha256"]:
+                continue
+            _gravar(destino, dados)
+        except OSError:
+            continue
+        copiados[item["projeto"]] = copiados.get(item["projeto"], 0) + 1
+    return copiados
+
+
+# ---------------------------------------------------------------------------
 # Estado de cada BIOS
 # ---------------------------------------------------------------------------
 
@@ -461,9 +571,15 @@ def estado(pasta_sistema, relativo, pasta_info=None):
     """'certa' (esta la, com a marca da versao certa), 'testada' (outra
     versao, testada aqui), 'outra' (esta la, com outra marca: pode funcionar,
     mas nao e' a recomendada), 'presente' (esta la; o ARENA nao conhece a
-    marca) ou 'falta'."""
+    marca) ou 'falta'. A BIOS livre (o C-BIOS) nao conta: e' 'falta'. Uma
+    pasta (o Machines do MSX) esta 'presente' quando tem algo alem das
+    livres -- antes, a pasta nunca contava (so arquivo), e o "Como colocar
+    jogos" dizia que o Machines faltava mesmo com ele la."""
+    pasta = os.path.join(pasta_sistema, *relativo.split("/"))
+    if os.path.isdir(pasta):
+        return "presente" if _pasta_com_algo(pasta) else "falta"
     caminho = _achar(pasta_sistema, relativo)
-    if not caminho:
+    if not caminho or e_livre(caminho):
         return "falta"
     return _estado_do_arquivo(caminho, marcas_aceitas(relativo, pasta_info))
 
@@ -694,6 +810,13 @@ def aviso_do_jogo(plataforma_id, nome_arquivo, pasta_sistema, nome_console="", c
                 "BS-X.bin, que é o cartucho \"BS-X - Sore wa Namae o Nusumareta Machi no Monogatari "
                 "(Japan)\"; ela não vem na coleção de jogos do Satellaview. %s"
                 % como_colocar_a_bios(NOME_DA_PASTA + "\\Super Nintendo (Satellaview)"))
+    # Jogo que so abre com a BIOS de verdade, mesmo com a livre no lugar
+    # (catalogo -> extensoes): no MSX, o C-BIOS abre cartucho, mas nao
+    # disquete nem fita.
+    extensao = os.path.splitext(nome_arquivo)[1].lower()
+    for entrada in catalogo.do_console(plataforma_id):
+        if extensao in entrada.get("extensoes", ()) and not _esta_instalada(pasta_sistema, entrada):
+            return "%s %s" % (entrada["aviso"], _o_que_fazer([entrada]))
     if plataforma_id not in COM_AVISO_PROPRIO:
         return frase_da_bios_que_falta(bios_obrigatorias_que_faltam(plataforma_id, pasta_sistema)) or None
     return None
@@ -705,18 +828,22 @@ def aviso_do_jogo(plataforma_id, nome_arquivo, pasta_sistema, nome_console="", c
 COM_AVISO_PROPRIO = {"ps1", "ps2", "ps3", "dreamcast", "snes", "neogeo", "arcade", "amiga"} | set(POR_REGIAO)
 
 
+def _esta_instalada(pasta_sistema, entrada):
+    """A BIOS desta linha do catalogo esta em retroarch\\system? A pasta (o
+    Machines do MSX) conta pelo que tem dentro, sem as maquinas livres."""
+    if entrada.get("e_pasta"):
+        return _pasta_com_algo(os.path.join(pasta_sistema, *entrada["destino"].split("/")))
+    return bool(_instalada(pasta_sistema, entrada))
+
+
 def bios_obrigatorias_que_faltam(plataforma_id, pasta_sistema):
     """As BIOS de nivel "precisa" deste console que nao estao instaladas.
     Achado da auditoria 3 (Fase 5): o ColecoVision sem a BIOS abria com a
     tela preta, e o cartao nao dizia nada -- o aviso de BIOS so cobria os
     consoles por regiao, o Dreamcast e o Satellaview. Grupo "uma": basta
     uma do grupo."""
-    def instalada(entrada):
-        if entrada.get("e_pasta"):          # o Machines e o Databases do MSX
-            return _pasta_com_algo(os.path.join(pasta_sistema, *entrada["destino"].split("/")))
-        return bool(_instalada(pasta_sistema, entrada))
     precisas = [e for e in catalogo.do_console(plataforma_id) if e.get("nivel") == "precisa"]
-    faltam = [e for e in precisas if not instalada(e)]
+    faltam = [e for e in precisas if not _esta_instalada(pasta_sistema, e)]
     if any(e.get("grupo") == "uma" for e in precisas) and len(faltam) < len(precisas):
         return []
     return faltam
@@ -736,14 +863,22 @@ def frase_da_bios_que_falta(faltam):
     que fazer."""
     if not faltam:
         return ""
-    prateleira = prateleira_relativa(faltam[0])
-    if any(e.get("e_pasta") for e in faltam):
-        fazer = ("Ponha as pastas na pasta %s do ARENA (soltas, ou o .zip em que vieram) e clique em "
-                 "Conferir, em Ajustes → Emuladores (ou abra o ARENA de novo)." % prateleira)
-    else:
-        fazer = como_colocar_a_bios(prateleira)
     return ("Falta a BIOS deste console (o programa de fábrica dele): %s. Sem ela, os jogos não abrem "
-            "ou ficam com a tela preta. %s" % (" e ".join(_descricao_da_bios(e) for e in faltam), fazer))
+            "ou ficam com a tela preta. %s" % (" e ".join(_descricao_da_bios(e) for e in faltam),
+                                                 _o_que_fazer(faltam)))
+
+
+def _o_que_fazer(faltam):
+    """Onde pôr o que falta (a prateleira do console) e o que clicar depois."""
+    prateleira = prateleira_relativa(faltam[0])
+    pastas = [e for e in faltam if e.get("e_pasta")]
+    if len(pastas) > 1:
+        return ("Ponha as pastas na pasta %s do ARENA (soltas, ou o .zip em que vieram) e clique em "
+                "Conferir, em Ajustes → Emuladores (ou abra o ARENA de novo)." % prateleira)
+    if pastas:
+        return ("Ponha a pasta na pasta %s do ARENA (solta, ou o .zip em que veio) e clique em "
+                "Conferir, em Ajustes → Emuladores (ou abra o ARENA de novo)." % prateleira)
+    return como_colocar_a_bios(prateleira)
 
 
 def falta_para_o_console(plataforma_id, pasta_sistema):
@@ -976,10 +1111,12 @@ def _candidatos(raiz, conferidos, pasta_info, avisos):
         if contados > LIMITE_DE_ARQUIVOS:
             break
     # Pacotes .zip (e arquivos soltos com outro nome) deixados em retroarch\system.
+    # A BIOS livre que o ARENA pos la nao e' candidata: nao vai para a
+    # prateleira nem disputa o lugar com a de verdade.
     try:
         for nome in sorted(os.listdir(lugar["sistema"])):
             caminho = os.path.join(lugar["sistema"], nome)
-            if os.path.isfile(caminho) and not nome.lower().endswith(_NAO_E_BIOS):
+            if os.path.isfile(caminho) and not nome.lower().endswith(_NAO_E_BIOS) and not e_livre(caminho):
                 fontes.append((caminho, "sistema", None))
     except OSError:
         pass
@@ -1488,7 +1625,7 @@ def escrever_leias(raiz, itens, candidatos):
 
 
 def organizar(raiz=None, pasta_info=None):
-    """Arruma as BIOS (os 5 passos do topo deste arquivo). Devolve
+    """Arruma as BIOS (os 6 passos do topo deste arquivo). Devolve
     {"instaladas": [...], "copiadas": [...], "avisos": [...], "leias": n,
      "itens": situacao(), "resumo": {...}}."""
     raiz = raiz or RAIZ
@@ -1510,6 +1647,13 @@ def organizar(raiz=None, pasta_info=None):
         candidatos = _candidatos(raiz, arquivos, pasta_info, feito["avisos"])
         _instalar(raiz, candidatos, pasta_info, feito)
         _instalar_pastas(raiz, feito)
+        # Depois da de verdade: a livre so ocupa o lugar que ficou vazio.
+        for projeto, quantos in sorted(instalar_livres(lugar["sistema"]).items()):
+            dados = livres()["projetos"].get(projeto, {})
+            feito["instaladas"].append({
+                "id": "livre-" + projeto.lower(),
+                "arquivo": "%s %s, a BIOS livre do %s" % (projeto, dados.get("versao", ""), dados.get("console", "")),
+                "de": "servidor\\bios_livres (%d arquivos)" % quantos})
         _copias_extras(raiz, feito)
         _copiar_para_as_prateleiras(raiz, candidatos, copiadas, feito)
         if feito["instaladas"] or feito["copiadas"]:

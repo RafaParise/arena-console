@@ -9,7 +9,19 @@ deles antes de abrir um jogo. O código-fonte de cada um está no endereço
 da tabela; se precisar da versão exata que foi no pacote, peça pelas
 *Issues* do repositório do ARENA.
 
-Nenhum jogo, BIOS ou firmware vai no pacote: são de quem tem o console.
+Nenhum jogo vai no pacote, nem BIOS ou firmware das empresas: são de quem
+tem o console. Vão só as **BIOS livres** da tabela abaixo, escritas do zero
+por voluntários para qualquer um copiar.
+
+## BIOS livres (1)
+
+Ficam em `servidor\bios_livres`, sem mudança nenhuma, com o texto da
+licença ao lado; a `lista.json` dessa pasta guarda a marca (SHA-256) de
+cada arquivo. O ARENA as copia para `retroarch\system` só onde falta.
+
+| BIOS | Console | Licença | Código-fonte | Pasta |
+|---|---|---|---|---|
+| C-BIOS 0.29a | MSX | BSD de 2 cláusulas (`C-BIOS\doc\cbios.txt`) | <https://cbios.sourceforge.net/> | `servidor\bios_livres\C-BIOS` |
 
 ## Programas
 

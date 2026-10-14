@@ -132,8 +132,10 @@ CONSOLES = {
     "dos": {"tipo": "dos", "exemplo": "Commander Keen 1.zip"},
     "scummvm": {"tipo": "scummvm", "exemplo": "Monkey Island\\monkey.scummvm"},
     "msx": {"tipo": "computador", "exemplo": "Nome do Jogo.rom",
-            "bios": ("todas", ["Machines", "Databases"],
-                     "As pastas Machines e Databases do blueMSX (as pastas inteiras).")},
+            "bios": ("alguns", ["Machines"],
+                     "Só para os jogos de disquete (.dsk) e de fita (.cas): a pasta Machines do blueMSX (a "
+                     "pasta inteira). Os de cartucho (.rom) abrem sem ela, pelo C-BIOS, a BIOS livre que já "
+                     "vem no ARENA.")},
     "amiga": {"tipo": "computador", "exemplo": "Alien Breed.adf",
               "bios": ("uma", ["kick34005.A500", "kick40068.A1200"],
                        "Um Kickstart (kick34005.A500 serve para a maioria dos jogos).")},

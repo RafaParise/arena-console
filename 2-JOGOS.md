@@ -212,7 +212,7 @@ No fliperama do MAME, a BIOS vai na pasta dos próprios jogos.
 | Magnavox Odyssey 2 | `Odyssey 2` | `.bin` | pode | `o2rom.bin` |
 | Mega Drive, Master System e Game Gear | `Mega Drive` | `.md` `.gen` `.smd` `.sms` `.gg` | pode | não precisa |
 | MS-DOS | `MS-DOS` | `.exe` `.com` `.bat` `.conf` | pode | não precisa |
-| MSX | `MSX` | `.rom` `.dsk` `.cas` | pode | `Machines`, `Databases` |
+| MSX | `MSX` | `.rom` `.dsk` `.cas` | pode | não precisa no cartucho (C-BIOS livre); disquete e fita: `Machines` |
 | Neo Geo e fliperamas (FBNeo) | `Neo Geo` | `.zip` `.7z` | **tem que ser** | `neogeo.zip` |
 | Neo Geo Pocket | `Neo Geo Pocket` | `.ngp` `.ngc` | pode | não precisa |
 | Nintendo (NES) | `NES` | `.nes` `.fds` `.unf` `.unif` | pode | não precisa |
@@ -561,6 +561,8 @@ Alguns consoles não funcionam só com o emulador: precisam da **BIOS**, o
 programinha que vinha gravado de fábrica dentro do aparelho e que liga ele
 por dentro. Ela pertence à empresa que fabricou o console — **o ARENA não
 baixa BIOS**. Quem tem o aparelho original pode extrair da própria máquina.
+A exceção é a **BIOS livre**, escrita do zero por voluntários: essa vem com o
+ARENA (veja "BIOS livres", mais abaixo).
 
 #### A pasta BIOS: uma pasta por console
 
@@ -630,7 +632,6 @@ reconhece e leva para o lugar certo.
 | Magnavox Odyssey 2 | `o2rom.bin` |
 | ColecoVision | `colecovision.rom` |
 | Intellivision | `exec.bin` e `grom.bin` |
-| MSX | as pastas `Machines` e `Databases` do blueMSX |
 | Commodore Amiga | `kick34005.A500` (Kickstart 1.3) |
 
 **Só para alguns jogos:** PlayStation (uma BIOS de qualquer região — sem
@@ -641,17 +642,37 @@ mas alguns travam, como o Marvel vs. Capcom 1) · Satellaview, os jogos "BS"
 do Super Nintendo (`BS-X.bin`) · Sufami Turbo (`STBIOS.bin`) · Famicom Disk
 System, os jogos `.fds` (`disksys.rom`) · PC Engine em CD (`syscard3.pce`) ·
 64DD (`IPL.n64`) · Videopac+ (`g7400.bin`) · Amiga 1200 e CD32 · os dois
-cartuchos do Saturn (o do The King of Fighters '95 e o do Ultraman).
+cartuchos do Saturn (o do The King of Fighters '95 e o do Ultraman) · MSX,
+os jogos de disquete (`.dsk`) e de fita (`.cas`): a pasta `Machines` do
+blueMSX (os de cartucho abrem pelo C-BIOS, a BIOS livre que vem no ARENA).
 
 **Opcionais (o console abre sem; com ela, fica mais fiel):** Atari 5200 ·
 Atari 7800 · Atari Lynx · Game Boy e Game Boy Color · Game Boy Advance ·
-Nintendo DS · Pokémon mini.
+Nintendo DS · Pokémon mini · a pasta `Databases` do blueMSX (sem ela, o
+emulador do MSX adivinha o tipo de cada cartucho).
 
 **Sem BIOS nenhuma (o pacote do ARENA não leva BIOS da Sony, da Sega nem da
 SNK):** o PlayStation, o Dreamcast e o Amiga abrem com uma imitação da BIOS
-que vem dentro do emulador. O Saturn foi testado assim, com o Yabause, em
-14/10/2026, e ficou com a tela preta: continua precisando da BIOS. PS2, Sega
-CD, PC Engine CD, Neo Geo e os outros da tabela não têm BIOS livre.
+que vem dentro do emulador, e o MSX abre os cartuchos pelo C-BIOS. O Saturn
+foi testado assim, com o Yabause, em 14/10/2026, e ficou com a tela preta:
+continua precisando da BIOS. PS2, Sega CD, PC Engine CD, Neo Geo e os outros
+da tabela não têm BIOS livre.
+
+#### BIOS livres: as que vêm com o ARENA
+
+Alguns consoles têm uma BIOS livre, escrita do zero por voluntários, que
+qualquer um pode copiar. Essas vêm com o ARENA, em `servidor\bios_livres`,
+cada uma com a licença dela:
+
+| Console | BIOS livre | O que abre |
+|---|---|---|
+| MSX | C-BIOS 0.29a (licença BSD) | os jogos de cartucho (`.rom`); disquete e fita continuam pedindo a pasta `Machines` |
+
+Ninguém precisa mexer nela. Ao abrir, o ARENA copia para `retroarch\system`
+só o que falta. **As duas funções continuam valendo:** a BIOS de verdade, se
+você puser na pasta `BIOS`, passa na frente da livre (no MSX, o próprio
+emulador escolhe: tenta a máquina original e, sem a BIOS dela, liga a do
+C-BIOS).
 
 **Fliperama (MAME e FBNeo):** cada placa tem a sua BIOS em `.zip`
 (`neogeo.zip`, `pgm.zip`, `naomi.zip`...), que vai na mesma pasta dos jogos

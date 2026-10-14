@@ -515,7 +515,8 @@ def montar(destino, com_bios=False):
     return usados
 
 
-BIOS_FORA = "Esta versão NÃO vem com BIOS nem firmware (são da Sony, da Sega, da SNK...)."
+BIOS_FORA = ("Esta versão NÃO vem com BIOS nem firmware das empresas (são da Sony, da Sega, da SNK...). "
+             "Vêm só as BIOS livres, escritas por voluntários (servidor\\bios_livres: o C-BIOS do MSX).")
 
 
 def frase_das_bios(levadas):

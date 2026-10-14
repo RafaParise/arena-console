@@ -1,0 +1,13 @@
+JOGOS LIVRES DOS TESTES
+
+Jogos com licença livre que o teste testes\teste_consoles_livres.py abre no
+núcleo de verdade, para provar que cada console funciona (com a BIOS livre,
+quando o console precisa de uma). Só os testes usam esta pasta: ela não vai
+no pacote dos alunos.
+
+Cada jogo veio do endereço do próprio autor, na versão exata que está na
+lista.json, sem mudança nenhuma. A lista.json traz também o autor, a licença
+e a marca (SHA-256) de cada arquivo. O texto de cada licença está na pasta
+licencas (o da GPL-3.0 é o mesmo do ARENA: o arquivo LICENSE da raiz).
+
+  MSX\noborunoca.rom   NOBORUNOCA, de Hiromasa Tanaka (h1romas4) - MIT

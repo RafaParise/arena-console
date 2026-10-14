@@ -368,18 +368,18 @@ class TestAvisos(unittest.TestCase):
             self.assertIn("grom.bin", aviso)
             self.assertNotIn("exec.bin", aviso)
 
-            # MSX: a BIOS sao duas PASTAS (Machines e Databases), com algo dentro.
-            aviso = bios.aviso_do_jogo("msx", "Penguin Adventure.rom", vazia)
-            self.assertIn("Machines", aviso)
-            self.assertIn("Databases", aviso)
-            self.assertIn("Ponha as pastas", aviso)
-            for pasta in ("Machines", "Databases"):
-                os.makedirs(os.path.join(vazia, pasta))
-            self.assertIn("Machines", bios.aviso_do_jogo("msx", "Penguin Adventure.rom", vazia))  # vazias
-            for pasta, arquivo in (("Machines", "Shared Roms"), ("Databases", "msxromdb.xml")):
-                with open(os.path.join(vazia, pasta, arquivo), "w") as feito:
-                    feito.write("x")
+            # MSX (14/10/2026): o cartucho abre pelo C-BIOS, a BIOS livre que
+            # vem no ARENA; disquete e fita pedem a PASTA Machines, com algo
+            # dentro alem das maquinas livres.
             self.assertIsNone(bios.aviso_do_jogo("msx", "Penguin Adventure.rom", vazia))
+            aviso = bios.aviso_do_jogo("msx", "Penguin Adventure.dsk", vazia)
+            self.assertIn("Machines", aviso)
+            self.assertIn("Ponha a pasta", aviso)
+            os.makedirs(os.path.join(vazia, "Machines", "MSX2+ - C-BIOS"))
+            self.assertIn("Machines", bios.aviso_do_jogo("msx", "Penguin Adventure.dsk", vazia))  # so a livre
+            with open(os.path.join(vazia, "Machines", "Shared Roms"), "w") as feito:
+                feito.write("x")
+            self.assertIsNone(bios.aviso_do_jogo("msx", "Penguin Adventure.dsk", vazia))
 
             # 3DO: qualquer uma das versoes aceitas basta.
             self.assertIn("panafz10.bin", bios.aviso_do_jogo("threedo", "Gex.chd", vazia))

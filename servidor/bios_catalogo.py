@@ -143,10 +143,22 @@ CATALOGO = [
      "nivel": "precisa", "tamanho": 8192, "o_que": "a Executive ROM do Intellivision (exec.bin)"},
     {"id": "intv-grom", "console": "intellivision", "pasta": "Intellivision", "sub": "", "destino": "grom.bin",
      "nivel": "precisa", "tamanho": 2048, "o_que": "a Graphics ROM do Intellivision (grom.bin)"},
+    # MSX: os cartuchos abrem pelo C-BIOS, a BIOS livre que vem no ARENA
+    # (servidor\bios_livres; o NOBORUNOCA abriu assim em 14/10/2026, sem o
+    # Machines e sem o Databases). O C-BIOS nao tem o MSX-BASIC nem o leitor
+    # de disquete: disquete e fita ainda pedem o Machines de verdade.
+    # 'extensoes': o jogo com esse final ganha o 'aviso' no cartao.
     {"id": "msx-machines", "console": "msx", "pasta": "MSX", "sub": "", "destino": "Machines", "e_pasta": True,
-     "nivel": "precisa", "o_que": "a pasta Machines do blueMSX (a pasta inteira)"},
+     "nivel": "alguns", "o_que": "a pasta Machines do blueMSX (a pasta inteira)", "extensoes": [".dsk", ".cas"],
+     "sem_ela": ("os jogos de disquete (.dsk) e de fita (.cas) não abrem; os de cartucho (.rom) abrem pelo "
+                 "C-BIOS, a BIOS livre que já vem no ARENA"),
+     "aviso": ("Jogo de disquete ou de fita: ele só abre com a BIOS de verdade do MSX, a pasta Machines do "
+               "blueMSX. Os jogos de cartucho (.rom) abrem sem ela, pelo C-BIOS, a BIOS livre que já vem no "
+               "ARENA.")},
     {"id": "msx-databases", "console": "msx", "pasta": "MSX", "sub": "", "destino": "Databases", "e_pasta": True,
-     "nivel": "precisa", "o_que": "a pasta Databases do blueMSX (a pasta inteira)"},
+     "nivel": "melhor", "o_que": "a pasta Databases do blueMSX (a pasta inteira)",
+     "sem_ela": ("o console abre do mesmo jeito: o emulador adivinha o tipo de cada cartucho; com ela, o tipo vem "
+                 "da lista do blueMSX e acerta também os cartuchos grandes mais difíceis")},
     {"id": "amiga-a500", "console": "amiga", "pasta": "Amiga", "sub": "A500", "destino": "kick34005.A500",
      "nivel": "precisa", "tamanho": 262144, "o_que": "o Kickstart 1.3 do Amiga 500 (serve para a maioria dos jogos)"},
     {"id": "amiga-a1200", "console": "amiga", "pasta": "Amiga", "sub": "A1200", "destino": "kick40068.A1200",

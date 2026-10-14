@@ -3,6 +3,7 @@
 (pasta temporaria, sem internet). Confere que a ultima porta antes do GitHub
 publico pega o que importa -- inclusive o que entrou num commit antigo e ja
 saiu da pasta -- e nao reclama do texto normal do ARENA."""
+import hashlib
 import io
 import json
 import os
@@ -125,6 +126,44 @@ class TestConferirAntesDePublicar(unittest.TestCase):
         codigo, saida, achados = self.rodar()
         self.assertEqual(codigo, 1, saida)
         self.assertIn("arquivo binario (nao e' imagem nem fonte)", self.tipos(achados, "bloqueantes"))
+
+    def commitar_livre(self, dados, marca):
+        """Uma BIOS livre (servidor/bios_livres) com a lista.json dizendo a marca."""
+        caminho = os.path.join(self.repo, "servidor", "bios_livres", "C-BIOS", "roms", "cbios_sub.rom")
+        os.makedirs(os.path.dirname(caminho), exist_ok=True)
+        with open(caminho, "wb") as arquivo:
+            arquivo.write(dados)
+        lista = {"arquivos": [{"origem": "C-BIOS/roms/cbios_sub.rom", "sha256": marca}]}
+        escrever(self.repo, "servidor/bios_livres/lista.json", json.dumps(lista))
+        git(self.repo, "add", "servidor/bios_livres")
+        git(self.repo, "commit", "-q", "-m", "BIOS livre")
+
+    def test_bios_livre_conferida_passa(self):
+        dados = b"\x00C-BIOS" + bytes(range(256)) * 8
+        self.commitar_livre(dados, hashlib.sha256(dados).hexdigest())
+        codigo, saida, _ = self.rodar()
+        self.assertEqual(codigo, 0, saida)
+
+    def test_bios_livre_com_um_byte_trocado_barra(self):
+        dados = b"\x00C-BIOS" + bytes(range(256)) * 8
+        self.commitar_livre(dados[:-1] + b"\x01", hashlib.sha256(dados).hexdigest())
+        codigo, saida, achados = self.rodar()
+        self.assertEqual(codigo, 1, saida)
+        self.assertIn("arquivo livre diferente do conferido", self.tipos(achados, "bloqueantes"))
+
+    def test_rom_fora_da_lista_continua_barrada(self):
+        dados = b"\x00C-BIOS" + bytes(range(256)) * 8
+        self.commitar_livre(dados, hashlib.sha256(dados).hexdigest())
+        caminho = os.path.join(self.repo, "servidor", "bios_livres", "scph1001.bin")
+        with open(caminho, "wb") as arquivo:
+            arquivo.write(b"\x00SONY" + bytes(range(256)))
+        git(self.repo, "add", "servidor/bios_livres/scph1001.bin")
+        git(self.repo, "commit", "-q", "-m", "BIOS da Sony escondida")
+        codigo, saida, achados = self.rodar()
+        self.assertEqual(codigo, 1, saida)
+        caminhos = {a["onde"] for a in achados["bloqueantes"]}
+        self.assertIn("servidor/bios_livres/scph1001.bin", caminhos)
+        self.assertNotIn("servidor/bios_livres/C-BIOS/roms/cbios_sub.rom", caminhos)
 
     def test_imagem_de_verdade_passa(self):
         caminho = os.path.join(self.repo, "docs", "fundo.png")

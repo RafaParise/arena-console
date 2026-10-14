@@ -101,7 +101,9 @@ dentro da pasta, sem gravar nada fora dela.
   programas da Sony, da Sega, da SNK e de outras empresas: só podem vir do seu
   próprio console. Ponha cada uma em `BIOS\<console>` e o ARENA reconhece,
   instala com o nome certo e mostra o que ainda falta
-  (**Ajustes → Emuladores → BIOS dos consoles**).
+  (**Ajustes → Emuladores → BIOS dos consoles**). A exceção é a **BIOS
+  livre**, escrita do zero por voluntários: essa já vem com o ARENA (o
+  C-BIOS, que abre os cartuchos do MSX), e a de verdade passa na frente dela.
 
 ## Requisitos
 

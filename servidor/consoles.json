@@ -943,13 +943,15 @@
         ".cas"
       ],
       "peso": "leve",
-      "arquivos_sistema": 1,
+      "arquivos_sistema": 0,
       "custo": 1,
       "pede_placar": false,
       "apelidos": [
         "msx",
         "msx2"
       ],
+      "netplay": false,
+      "netplay_motivo": "O núcleo do MSX (blueMSX) não suporta jogo em rede - confirmado tentando hospedar em 14/10/2026, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Os 2 jogadores só valem no mesmo computador.",
       "pasta": "MSX"
     },
     {

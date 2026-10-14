@@ -25,6 +25,10 @@ professor da rede estadual de SP.
   `ferramentas\montar_versao_alunos.py --atualizar`.
 - O ARENA distribui a ferramenta, nunca o acervo: **ROM e BIOS
   proprietária (Sony, Sega, SNK) não entram no repositório nem no pacote.**
+  A exceção é o que tem licença livre: as BIOS livres
+  (`servidor\bios_livres`, como o C-BIOS) e os jogos livres dos testes
+  (`testes\jogos_livres`). O conferidor só os aceita pela marca da
+  `lista.json` de cada pasta.
 - **Gravação de vídeo e transmissão ficam desligadas de propósito, para
   proteger os dados dos alunos. Não reativar nem propor.**
 

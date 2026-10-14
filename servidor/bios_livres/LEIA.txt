@@ -1,0 +1,19 @@
+BIOS LIVRES DO ARENA
+
+BIOS é o programinha que vem de fábrica dentro do console. A dos consoles das
+empresas (Sony, Sega, SNK...) não pode ir junto com o ARENA: é de quem tem o
+aparelho. Mas alguns consoles têm uma BIOS LIVRE, escrita do zero por
+voluntários, que qualquer pessoa pode copiar e distribuir. Estas vêm com o
+ARENA:
+
+  C-BIOS 0.29a (MSX) - licença BSD - https://cbios.sourceforge.net/
+    Abre os jogos de cartucho (.rom). Não tem o MSX-BASIC nem o leitor de
+    disquete: jogo de disquete (.dsk) e de fita (.cas) continua pedindo a
+    BIOS de verdade (a pasta Machines do blueMSX, na pasta BIOS\MSX).
+
+Ninguém precisa mexer aqui. Ao abrir, o ARENA copia para retroarch\system só
+o que estiver faltando, e nunca troca uma BIOS que já está lá. A BIOS de
+verdade, se você puser na pasta BIOS do ARENA, passa na frente da livre.
+
+Cada arquivo, de onde ele veio e a marca dele (SHA-256) estão na lista.json.
+A licença de cada projeto vai junto, na pasta dele (C-BIOS\doc\cbios.txt).

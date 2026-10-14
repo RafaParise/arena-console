@@ -1,0 +1,122 @@
+{
+  "_leia": "As BIOS livres que vêm com o ARENA (servidor\\bios_livres.py). Cada arquivo diz de onde sai (origem, dentro desta pasta), para onde o ARENA o copia (destino, dentro de retroarch\\system) e a marca dele (sha256). O ARENA só copia o que falta e nunca troca uma BIOS que já está lá. O conferidor de publicação só deixa ir ao GitHub o arquivo desta pasta que tem a marca registrada aqui.",
+  "projetos": {
+    "C-BIOS": {
+      "nome": "C-BIOS",
+      "versao": "0.29a",
+      "console": "MSX",
+      "licenca": "BSD de 2 cláusulas (o aviso de direitos vai junto, em C-BIOS\\doc\\cbios.txt)",
+      "site": "https://cbios.sourceforge.net/",
+      "baixado_de": "https://downloads.sourceforge.net/project/cbios/cbios/0.29/cbios-0.29a.zip",
+      "sha256_do_pacote": "c585a2f4a10b397e460a95043d59ac79cf4442fbb45a6e14a1e27ef9febaed73",
+      "o_que_faz": "Abre os jogos de cartucho (.rom). Não tem o MSX-BASIC nem o leitor de disquete: jogo de disquete (.dsk) e de fita (.cas) continua pedindo a BIOS de verdade (a pasta Machines do blueMSX)."
+    }
+  },
+  "arquivos": [
+    {
+      "projeto": "C-BIOS",
+      "console": "msx",
+      "origem": "C-BIOS/configs/blueMSX/MSX - C-BIOS/config.ini",
+      "destino": "Machines/MSX - C-BIOS/config.ini",
+      "sha256": "6c3e65f0ac9741d46c83b75931f5bb47242e350cc8bf4d8ee300d17474654eb0"
+    },
+    {
+      "projeto": "C-BIOS",
+      "console": "msx",
+      "origem": "C-BIOS/roms/cbios_main_msx1.rom",
+      "destino": "Machines/MSX - C-BIOS/cbios_main_msx1.rom",
+      "sha256": "921d35edf143f1fde8e53570f92f85e05854610d6a5ea76cce881f2f9040cd9c"
+    },
+    {
+      "projeto": "C-BIOS",
+      "console": "msx",
+      "origem": "C-BIOS/roms/cbios_logo_msx1.rom",
+      "destino": "Machines/MSX - C-BIOS/cbios_logo_msx1.rom",
+      "sha256": "8ad88a4653e26bdbd4c38329fe0a115846e9aa0866b0ac1fe1dd2c260c9932b3"
+    },
+    {
+      "projeto": "C-BIOS",
+      "console": "msx",
+      "origem": "C-BIOS/doc/cbios.txt",
+      "destino": "Machines/MSX - C-BIOS/cbios.txt",
+      "sha256": "b7c5b9fde2fd3b7bab292b8995581bc4f0f0315efe65ee49d934a1afd53099d8"
+    },
+    {
+      "projeto": "C-BIOS",
+      "console": "msx",
+      "origem": "C-BIOS/configs/blueMSX/MSX2 - C-BIOS/config.ini",
+      "destino": "Machines/MSX2 - C-BIOS/config.ini",
+      "sha256": "db6e08fc1a79ad9598e3d1009e138d75cf8aee4445ab29d427377f4f53798a97"
+    },
+    {
+      "projeto": "C-BIOS",
+      "console": "msx",
+      "origem": "C-BIOS/roms/cbios_main_msx2.rom",
+      "destino": "Machines/MSX2 - C-BIOS/cbios_main_msx2.rom",
+      "sha256": "8767fca1a1ca5928496bb6185a0e951c66d68f65361305134a25f7912085766b"
+    },
+    {
+      "projeto": "C-BIOS",
+      "console": "msx",
+      "origem": "C-BIOS/roms/cbios_logo_msx2.rom",
+      "destino": "Machines/MSX2 - C-BIOS/cbios_logo_msx2.rom",
+      "sha256": "a6ecf0bee1d1aeae4a2df4ace1d711b8c5883cbed50f7d6c8c524f6b19f03ef4"
+    },
+    {
+      "projeto": "C-BIOS",
+      "console": "msx",
+      "origem": "C-BIOS/roms/cbios_sub.rom",
+      "destino": "Machines/MSX2 - C-BIOS/cbios_sub.rom",
+      "sha256": "95db258195d1dea673b3826a8ef3d4b747f87f93587ae66e137acd2e39c3c0f1"
+    },
+    {
+      "projeto": "C-BIOS",
+      "console": "msx",
+      "origem": "C-BIOS/doc/cbios.txt",
+      "destino": "Machines/MSX2 - C-BIOS/cbios.txt",
+      "sha256": "b7c5b9fde2fd3b7bab292b8995581bc4f0f0315efe65ee49d934a1afd53099d8"
+    },
+    {
+      "projeto": "C-BIOS",
+      "console": "msx",
+      "origem": "C-BIOS/configs/blueMSX/MSX2+ - C-BIOS/config.ini",
+      "destino": "Machines/MSX2+ - C-BIOS/config.ini",
+      "sha256": "627c4f437040e1b9d46d03cfe2cc8673a8f342bb43dc78adc2651ad7d8c194b0"
+    },
+    {
+      "projeto": "C-BIOS",
+      "console": "msx",
+      "origem": "C-BIOS/roms/cbios_main_msx2+.rom",
+      "destino": "Machines/MSX2+ - C-BIOS/cbios_main_msx2+.rom",
+      "sha256": "f65adce74b52836f1e2a54d2f7e269859baa688b61c18bafbcf7496adfb440e3"
+    },
+    {
+      "projeto": "C-BIOS",
+      "console": "msx",
+      "origem": "C-BIOS/roms/cbios_logo_msx2+.rom",
+      "destino": "Machines/MSX2+ - C-BIOS/cbios_logo_msx2+.rom",
+      "sha256": "cc89b76cbf87ee87ab6c84dbd26e3bad014d8bd30a1f1bbe0629d2f39a1ab87b"
+    },
+    {
+      "projeto": "C-BIOS",
+      "console": "msx",
+      "origem": "C-BIOS/roms/cbios_sub.rom",
+      "destino": "Machines/MSX2+ - C-BIOS/cbios_sub.rom",
+      "sha256": "95db258195d1dea673b3826a8ef3d4b747f87f93587ae66e137acd2e39c3c0f1"
+    },
+    {
+      "projeto": "C-BIOS",
+      "console": "msx",
+      "origem": "C-BIOS/roms/cbios_music.rom",
+      "destino": "Machines/MSX2+ - C-BIOS/cbios_music.rom",
+      "sha256": "8b4adaea1893d8176f32f64fbb87603663b070ee7c0c3f028d141a37d7ed4bc4"
+    },
+    {
+      "projeto": "C-BIOS",
+      "console": "msx",
+      "origem": "C-BIOS/doc/cbios.txt",
+      "destino": "Machines/MSX2+ - C-BIOS/cbios.txt",
+      "sha256": "b7c5b9fde2fd3b7bab292b8995581bc4f0f0315efe65ee49d934a1afd53099d8"
+    }
+  ]
+}

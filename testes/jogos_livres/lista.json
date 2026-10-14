@@ -1,0 +1,18 @@
+{
+  "_leia": "Os jogos livres que os testes abrem no núcleo de verdade (testes\\teste_consoles_livres.py). Só os testes usam: não vão no pacote dos alunos. Cada um com autor, licença, a versão exata e a marca (sha256). O conferidor de publicação só deixa ir ao GitHub o arquivo desta pasta que tem a marca registrada aqui.",
+  "arquivos": [
+    {
+      "origem": "MSX/noborunoca.rom",
+      "licenca_arquivo": "licencas/noborunoca.txt",
+      "console": "msx",
+      "jogo": "NOBORUNOCA",
+      "versao": "v1.0.2 (commit a1c4860)",
+      "autor": "Hiromasa Tanaka (h1romas4)",
+      "licenca": "MIT (código e recursos: gráficos e música)",
+      "fonte": "https://github.com/h1romas4/noborunoca",
+      "baixado_de": "https://github.com/h1romas4/noborunoca/releases/download/v1.0.2/noborunoca.rom",
+      "o_que_prova": "o MSX abre cartucho só com o C-BIOS (a BIOS livre), sem a BIOS de verdade",
+      "sha256": "57a3be2fe5c3190daa3e69cf23cd262cdc8af98c60993ea941d43c815cbb25f6"
+    }
+  ]
+}
