@@ -11,23 +11,32 @@ com o ARENA numa "Área de Trabalho" do OneDrive. O nome curto do Windows
 (8.3) nao resolve: ele vem desligado em muitos computadores (neste tambem).
 
 A saida: antes de abrir o jogo, o ARENA copia a BIOS e o disquete para uma
-pasta SEM acento (a pasta temporaria do Windows, ou C:\Users\Public quando
-ate ela tem acento) e manda o nucleo abrir de la. Quando o jogo fecha, o
+pasta SEM acento e manda o nucleo abrir de la. Quando o jogo fecha, o
 disquete volta para o lugar dele, se o jogo gravou nele (recorde, jogo
-salvo). Com o ARENA numa pasta sem acento (um pen drive E:\ARENA, por
-exemplo), nada disso acontece: o jogo abre direto, como sempre.
+salvo), e a pasta e' apagada. Com o ARENA numa pasta sem acento (um pen
+drive E:\ARENA, por exemplo), nada disso acontece: o jogo abre direto.
+
+Seguranca (revisao de 14/10/2026): a pasta e' NOVA a cada jogo, com nome
+sorteado, e so em lugar que e' de quem esta usando o computador: a pasta
+temporaria dele ou, quando ate ela tem acento (um usuario "João"), a
+C:\ProgramData, onde o Windows deixa so quem criou a pasta mexer no que esta
+dentro. Nunca a pasta Public do Windows, que e' de todos: la outro usuario
+poderia trocar o disquete no meio do jogo, e o ARENA levaria a troca de volta
+para a pasta do aluno.
 """
 import hashlib
 import os
 import shutil
+import stat
 import tempfile
+import time
 
 # Os nucleos que nao abrem caminho com acento e o que cada um precisa da
 # pasta system (conferido abrindo o jogo de verdade: testes\teste_consoles_livres.py).
 NUCLEOS = {
     "hatari_libretro.dll": ["tos.img"],
 }
-NOME_DA_PONTE = "ARENA-sem-acento"
+PREFIXO = "ARENA-sem-acento-"
 
 
 def sem_acento(caminho):
@@ -43,10 +52,11 @@ def precisa(nucleo, pasta_sistema, caminho_jogo):
 
 
 def pasta_da_ponte():
-    """A pasta sem acento onde a ponte trabalha, ou None se nao houver."""
-    for base in (tempfile.gettempdir(), os.environ.get("PUBLIC", "")):
+    """Onde a ponte cria a pasta dela: a temporaria de quem esta usando o
+    computador ou a ProgramData, a primeira sem acento. None se nenhuma."""
+    for base in (tempfile.gettempdir(), os.environ.get("ProgramData", "")):
         if base and sem_acento(base) and os.path.isdir(base):
-            return os.path.join(base, NOME_DA_PONTE)
+            return base
     return None
 
 
@@ -65,33 +75,76 @@ def _copiar(origem, destino):
     os.replace(temporario, destino)
 
 
+def _apagar(pasta):
+    """Apaga a pasta da ponte, ate arquivo somente leitura (o disquete
+    protegido contra gravacao). O que nao sair fica para a proxima limpeza."""
+    def tirar_protecao(funcao, alvo, _erro):
+        try:
+            os.chmod(alvo, stat.S_IWRITE)
+            funcao(alvo)
+        except OSError:
+            pass
+    try:
+        shutil.rmtree(pasta, onexc=tirar_protecao)
+    except OSError:
+        pass
+
+
+def limpar_sobras(base, idade=12 * 3600):
+    """Apaga as pastas de pontes velhas (de um jogo que nao fechou direito).
+    So as de mais de 12 horas: nunca a de um jogo que ainda esta aberto."""
+    try:
+        nomes = os.listdir(base)
+    except OSError:
+        return
+    agora = time.time()
+    for nome in nomes:
+        caminho = os.path.join(base, nome)
+        try:
+            velha = agora - os.path.getmtime(caminho) > idade
+        except OSError:
+            continue
+        if nome.startswith(PREFIXO) and velha and os.path.isdir(caminho):
+            _apagar(caminho)
+
+
 def preparar(nucleo, pasta_sistema, caminho_jogo):
-    """Poe a BIOS e o jogo na pasta sem acento. Devolve (caminho do jogo para
-    o nucleo, opcoes do RetroArch para esta partida, devolver), em que
-    devolver() leva de volta o disquete, se o jogo gravou nele. OSError se
-    nao houver pasta sem acento ou a copia falhar."""
-    ponte = pasta_da_ponte()
-    if not ponte:
-        raise OSError("nenhuma pasta sem acento para abrir o jogo (nem a temporaria, nem C:\\Users\\Public)")
-    sistema = os.path.join(ponte, "system")
-    os.makedirs(sistema, exist_ok=True)
-    for nome in NUCLEOS[os.path.basename(nucleo).lower()]:
-        origem = os.path.join(pasta_sistema, nome)
-        destino = os.path.join(sistema, nome)
-        if os.path.isfile(origem) and not (os.path.isfile(destino) and _marca(destino) == _marca(origem)):
-            _copiar(origem, destino)
-    if sem_acento(caminho_jogo):
-        return caminho_jogo, {"system_directory": sistema}, lambda: False
-    extensao = os.path.splitext(caminho_jogo)[1].lower()
-    copia = os.path.join(ponte, "jogo" + (extensao if sem_acento(extensao) else ""))
-    _copiar(caminho_jogo, copia)
-    marca = _marca(copia)
+    """Poe a BIOS e o jogo numa pasta nova, sem acento. Devolve (caminho do
+    jogo para o nucleo, opcoes do RetroArch para esta partida, devolver), em
+    que devolver() -- chamado UMA vez, quando o jogo fecha -- leva de volta o
+    disquete, se o jogo gravou nele, e apaga a pasta. OSError se nao houver
+    lugar sem acento ou a copia falhar."""
+    base = pasta_da_ponte()
+    if not base:
+        raise OSError("nenhuma pasta sem acento para abrir o jogo (nem a temporária do Windows, nem a ProgramData)")
+    limpar_sobras(base)
+    ponte = tempfile.mkdtemp(prefix=PREFIXO, dir=base)
+    try:
+        sistema = os.path.join(ponte, "system")
+        os.makedirs(sistema)
+        for nome in NUCLEOS[os.path.basename(nucleo).lower()]:
+            origem = os.path.join(pasta_sistema, nome)
+            if os.path.isfile(origem):
+                _copiar(origem, os.path.join(sistema, nome))
+        copia = caminho_jogo
+        if not sem_acento(caminho_jogo):
+            extensao = os.path.splitext(caminho_jogo)[1].lower()
+            copia = os.path.join(ponte, "jogo" + (extensao if sem_acento(extensao) else ""))
+            _copiar(caminho_jogo, copia)
+        marca = _marca(copia)
+    except OSError:
+        _apagar(ponte)
+        raise
 
     def devolver():
-        """Leva o disquete de volta se o jogo gravou nele. True se levou."""
-        if not os.path.isfile(copia) or _marca(copia) == marca:
-            return False
-        _copiar(copia, caminho_jogo)
-        return True
+        """Leva o disquete de volta se o jogo gravou nele (True se levou) e
+        apaga a pasta da ponte."""
+        try:
+            if copia == caminho_jogo or not os.path.isfile(copia) or _marca(copia) == marca:
+                return False
+            _copiar(copia, caminho_jogo)
+            return True
+        finally:
+            _apagar(ponte)
 
     return copia, {"system_directory": sistema}, devolver

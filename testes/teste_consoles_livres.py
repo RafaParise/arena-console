@@ -140,10 +140,10 @@ def abrir(jogo, nucleo, pasta, sistema, quadros):
     os.makedirs(pasta)
     cfg = base.config_base(pasta, {})
     opcoes = {"system_directory": sistema}
-    jogo_do_nucleo = jogo
+    jogo_do_nucleo, devolver = jogo, None
     ponte = ponte_sem_acento.precisa(nucleo, sistema, jogo)
     if ponte:
-        jogo_do_nucleo, opcoes_da_ponte, _devolver = ponte_sem_acento.preparar(nucleo, sistema, jogo)
+        jogo_do_nucleo, opcoes_da_ponte, devolver = ponte_sem_acento.preparar(nucleo, sistema, jogo)
         opcoes.update(opcoes_da_ponte)
     # A pasta system so com as BIOS livres (o --appendconfig aceita varios
     # arquivos separados por "|"; o ultimo vale).
@@ -162,6 +162,8 @@ def abrir(jogo, nucleo, pasta, sistema, quadros):
         travou = False
     except subprocess.TimeoutExpired:
         travou = True
+    if devolver:
+        devolver()          # como o ARENA faz quando o jogo fecha: a pasta da ponte some
     texto = open(registro, encoding="utf-8", errors="ignore").read() if os.path.exists(registro) else ""
     return foto, texto, travou, ponte
 

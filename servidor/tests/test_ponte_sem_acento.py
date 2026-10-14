@@ -53,12 +53,28 @@ class TestPonteSemAcento(unittest.TestCase):
         self.assertTrue(caminho.endswith(".st"))
         with open(os.path.join(opcoes["system_directory"], "tos.img"), "rb") as arquivo:
             self.assertEqual(arquivo.read(), b"TOS" * 1000)
-        self.assertFalse(devolver())                       # nao gravou: nada volta
         with open(caminho, "ab") as arquivo:               # o jogo gravou o recorde
             arquivo.write(b"recorde")
         self.assertTrue(devolver())
         with open(self.jogo, "rb") as arquivo:
             self.assertEqual(arquivo.read(), b"disquete" * 100 + b"recorde")
+        self.assertFalse(os.path.exists(os.path.dirname(caminho)))      # a pasta da ponte some
+
+    def test_sem_gravar_nada_volta_e_a_pasta_some(self):
+        caminho, _opcoes, devolver = ponte.preparar(HATARI, self.sistema, self.jogo)
+        self.assertFalse(devolver())
+        with open(self.jogo, "rb") as arquivo:
+            self.assertEqual(arquivo.read(), b"disquete" * 100)
+        self.assertFalse(os.path.exists(os.path.dirname(caminho)))
+
+    def test_cada_jogo_tem_pasta_nova_e_nunca_a_public(self):
+        primeiro, _o1, devolver1 = ponte.preparar(HATARI, self.sistema, self.jogo)
+        segundo, _o2, devolver2 = ponte.preparar(HATARI, self.sistema, self.jogo)
+        self.assertNotEqual(os.path.dirname(primeiro), os.path.dirname(segundo))
+        publica = os.environ.get("PUBLIC", "C:\\Users\\Public").lower()
+        self.assertFalse(primeiro.lower().startswith(publica))
+        devolver1()
+        devolver2()
 
     def test_jogo_sem_acento_abre_direto(self):
         jogo = os.path.join(self.base, "jogo.st")
@@ -67,20 +83,32 @@ class TestPonteSemAcento(unittest.TestCase):
         self.assertEqual(caminho, jogo)
         self.assertTrue(opcoes["system_directory"].isascii())
         self.assertFalse(devolver())
+        self.assertFalse(os.path.exists(os.path.dirname(opcoes["system_directory"])))
+
+    def test_sobras_velhas_somem_e_a_de_agora_fica(self):
+        velha = os.path.join(self.temporaria, ponte.PREFIXO + "velha")
+        nova = os.path.join(self.temporaria, ponte.PREFIXO + "nova")
+        for pasta in (velha, nova):
+            os.makedirs(os.path.join(pasta, "system"))
+        dois_dias = 2 * 24 * 3600
+        os.utime(velha, (os.path.getatime(velha) - dois_dias, os.path.getmtime(velha) - dois_dias))
+        ponte.limpar_sobras(self.temporaria)
+        self.assertFalse(os.path.exists(velha))
+        self.assertTrue(os.path.exists(nova))
 
     def test_sem_pasta_sem_acento_avisa(self):
         tempfile.tempdir = self.com_acento
-        publica = os.environ.get("PUBLIC")
-        os.environ["PUBLIC"] = self.com_acento
+        guardada = os.environ.get("ProgramData")
+        os.environ["ProgramData"] = self.com_acento
         try:
             self.assertIsNone(ponte.pasta_da_ponte())
             with self.assertRaises(OSError):
                 ponte.preparar(HATARI, self.sistema, self.jogo)
         finally:
-            if publica is None:
-                os.environ.pop("PUBLIC", None)
+            if guardada is None:
+                os.environ.pop("ProgramData", None)
             else:
-                os.environ["PUBLIC"] = publica
+                os.environ["ProgramData"] = guardada
 
 
 CFG = os.path.join(os.path.dirname(RAIZ), "retroarch", "retroarch.cfg")

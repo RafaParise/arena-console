@@ -681,9 +681,9 @@ C-BIOS; no Atari ST, o TOS original entra no lugar do EmuTOS).
 
 **Atari ST numa pasta com acento:** o emulador do Atari ST (o Hatari) não
 abre arquivo de pasta com acento (como `Área de Trabalho`). O ARENA resolve
-sozinho: copia o jogo e a BIOS para uma pasta sem acento, abre de lá e, se o
-jogo gravou no disquete (recorde, jogo salvo), leva a cópia de volta ao
-fechar.
+sozinho: copia o jogo e a BIOS para uma pasta nova, sem acento e só sua (a
+temporária do Windows), abre de lá e, ao fechar, leva de volta o disquete se
+o jogo gravou nele (recorde, jogo salvo) e apaga a pasta.
 
 **Fliperama (MAME e FBNeo):** cada placa tem a sua BIOS em `.zip`
 (`neogeo.zip`, `pgm.zip`, `naomi.zip`...), que vai na mesma pasta dos jogos
