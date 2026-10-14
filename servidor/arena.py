@@ -269,25 +269,27 @@ def chegar_na_partida(anfitriao, apelido, porta=None, limite=25.0):
     estava esperando, espera a porta da partida dele abrir antes de abrir o
     proprio RetroArch -- senao o --connect bateria numa porta fechada.
     Anfitriao de versao antiga ou fora do ar: segue como antes, sem esperar.
+    Nunca levanta erro: o outro computador pode responder qualquer coisa
+    (revisao de seguranca, 14/10/2026), e quem entra so perde a espera.
     Devolve True se o anfitriao estava esperando."""
     porta = porta or graficos.PORTA_PARTIDA
-    corpo = json.dumps({"apelido": (apelido or "")[:24]}).encode("utf-8")
-    pedido = urllib.request.Request(anfitriao.rstrip("/") + "/api/partida/cheguei", data=corpo,
-                                    headers={"Content-Type": "application/json"})
     try:
+        ip = urllib.parse.urlsplit(anfitriao).hostname
+        corpo = json.dumps({"apelido": (apelido or "")[:24]}).encode("utf-8")
+        pedido = urllib.request.Request(anfitriao.rstrip("/") + "/api/partida/cheguei", data=corpo,
+                                        headers={"Content-Type": "application/json"})
         with urllib.request.urlopen(pedido, timeout=3) as resposta:
-            dados = json.loads(resposta.read() or b"{}")
-    except (OSError, ValueError):
+            dados = json.loads(resposta.read(4096) or b"{}")   # a resposta certa e' curta
+    except Exception:
         return False
-    if not dados.get("abrindo"):
+    if not ip or not isinstance(dados, dict) or dados.get("abrindo") is not True:
         return False
-    ip = urllib.parse.urlsplit(anfitriao).hostname
     fim = time.monotonic() + limite
     while time.monotonic() < fim:
         try:
             with socket.create_connection((ip, porta), timeout=1.0):
                 pass
-        except OSError:
+        except (OSError, ValueError):
             time.sleep(0.5)
             continue
         # A porta abriu: o RetroArch dele ja carregou o jogo. Um respiro e vai.
@@ -2724,8 +2726,13 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         comando.append(caminho_jogo)
         if partida and partida.get("anfitriao"):
             # Quem entra avisa o anfitriao e, se ele esperava, aguarda o
-            # jogo dele abrir: os dois comecam juntos (14/10/2026).
-            chegar_na_partida(partida["anfitriao"], apelido)
+            # jogo dele abrir: os dois comecam juntos (14/10/2026). Fica
+            # protegido: aqui ainda nao entrou o trecho que solta a trava
+            # do jogo no fim, e um erro deixaria o ARENA preso.
+            try:
+                chegar_na_partida(partida["anfitriao"], apelido)
+            except Exception as falha:
+                print("[ARENA] Nao consegui avisar quem abriu a partida: %s" % falha)
 
     try:
         with TRAVA_BANCO, banco() as conexao:
@@ -3684,6 +3691,8 @@ def procurar_partidas(config):
             retorno = falar_com(url, "/api/sinc/ola", {}, "POST", 2)
         except Exception:
             return
+        if not isinstance(retorno, dict):
+            return      # resposta torta de outro computador: fica de fora
         partida = limpar_partida_recebida(retorno.get("partida"))
         item = {
             "apelido": amigo.get("apelido", ""),
@@ -5179,7 +5188,8 @@ class Manipulador(BaseHTTPRequestHandler):
         if caminho == "/api/partida/cheguei":
             # Vem do ARENA do amigo (ROTAS_REDE_EXTERNA): "entrei na sua
             # partida". Se este computador esperava, abre o jogo agora.
-            apelido_amigo = str(dados.get("apelido") or "")[:24].strip()
+            bruto = dados.get("apelido") if isinstance(dados, dict) else ""
+            apelido_amigo = "".join(c for c in str(bruto or "")[:24] if c.isprintable()).strip()
             if comecar_partida_pendente(apelido_amigo or "Seu amigo"):
                 return self.responder_json({"ok": True, "abrindo": True})
             if partida_aberta_agora():

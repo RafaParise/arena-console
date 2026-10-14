@@ -164,14 +164,14 @@ class TestPartidaRecebida(unittest.TestCase):
 
 
 class TestQuemEntraAvisa(unittest.TestCase):
-    def anfitriao_falso(self, resposta):
+    def anfitriao_falso(self, resposta, bruto=None):
         class Atende(BaseHTTPRequestHandler):
             recebido = None
 
             def do_POST(self):
                 tamanho = int(self.headers.get("Content-Length") or 0)
                 Atende.recebido = json.loads(self.rfile.read(tamanho) or b"{}")
-                corpo = json.dumps(resposta).encode("utf-8")
+                corpo = bruto if bruto is not None else json.dumps(resposta).encode("utf-8")
                 self.send_response(200)
                 self.send_header("Content-Type", "application/json")
                 self.send_header("Content-Length", str(len(corpo)))
@@ -209,6 +209,14 @@ class TestQuemEntraAvisa(unittest.TestCase):
         inicio = time.monotonic()
         self.assertFalse(arena.chegar_na_partida(url, "Ana", porta=porta_livre(), limite=8))
         self.assertLess(time.monotonic() - inicio, 2)
+
+    def test_resposta_torta_do_outro_computador_nao_trava_quem_entra(self):
+        # Revisao de seguranca (14/10/2026): uma lista ou um texto qualquer no
+        # lugar do JSON derrubava o aviso antes de soltar a trava do jogo.
+        for resposta, bruto in (([1, 2, 3], None), (None, b"isso nao e json"),
+                                ({"abrindo": "sim"}, None)):
+            url, _ = self.anfitriao_falso(resposta, bruto)
+            self.assertFalse(arena.chegar_na_partida(url, "Ana", porta=porta_livre(), limite=8))
 
     def test_anfitriao_fora_do_ar_segue_na_hora(self):
         inicio = time.monotonic()
