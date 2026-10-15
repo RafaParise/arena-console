@@ -25,11 +25,13 @@ fica no commit). O detalhe de cada pedido está em
      997 mil bytes) e `arena-claro.gif` (o Yoshi, 804 mil bytes), 1280×640,
      no topo do README (um para cada tema do GitHub). Os comandos estão no
      README, em "Imagens desta página".
-   - Depende do Rafael: enviar o `arena-escuro.gif` em Settings → General →
-     Social preview (só pelo site).
-   - Pedido de 14/10: o GIF escuro mostrar TODOS os personagens e animações
-     do modo escuro, sem deixar nenhum de fora, e uma cópia dele na pasta do
-     `arena-console` para usar em outros lugares.
+   - Depende do Rafael: enviar o `arena-escuro-curto.gif` em Settings →
+     General → Social preview (só pelo site).
+   - Feito (pedido de 14/10): o `arena-escuro.gif` mostra todos os
+     personagens e animações do modo escuro (as 15 visitas, em velocidade
+     dobrada, e os de passagem), com os personagens na frente do nome, e há
+     uma cópia na raiz do `arena-console`. O de 1 MB, para a Social preview,
+     virou o `arena-escuro-curto.gif`.
 4. **Controles:**
    - Feito, sem os controles na mão: até 8 jogadores (PS1 com o adaptador
      nas duas portas, Saturn até 10, PS2 até 5, tela de controles com 8),

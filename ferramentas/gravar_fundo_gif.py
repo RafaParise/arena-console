@@ -26,9 +26,22 @@ Uso:
     servidor\python\python.exe ferramentas\gravar_fundo_gif.py [--tema escuro|claro]
         [--visitas fzero,kirby] [--quadros 60] [--passo 6] [--atraso 10]
         [--escala 8] [--adiantar 0] [--girar 0] [--semente 7] [--sem-texto]
+        [--disparar ovni,cometa] [--ate-o-fim] [--tolerancia 0] [--amostras folha.png]
         [--saida docs\imagens\arena-escuro.gif]
   --passo e' quanto o fundo anda por quadro, em 1/60 s (6 = 10 quadros por
   segundo em tempo real, com --atraso 10 centesimos).
+  --visitas kart,todas: a Rainbow Road e depois todas as outras visitas, uma
+  atras da outra; com --ate-o-fim, a gravacao para quando a ultima acaba
+  (--quadros vira o maximo).
+  --disparar: os de passagem do ceu (cometa, meteoros, ovni, satelite,
+  foguete), um no comeco de cada visita, da segunda em diante; sozinhos, eles
+  demoram (o foguete aparece a cada 1 ou 2 minutos).
+  No ceu com o titulo, os personagens passam NA FRENTE dele (o fundo e' lido
+  em duas camadas: o ceu, ate o planeta, e o resto).
+  --tolerancia N: o ponto que mudou menos que N (distancia de cor) fica como
+  esta (ferramentas\gif_animado.py): a aurora e as nebulosas pulsam devagar
+  e, sem isso, seriam regravadas a cada quadro.
+  --amostras: uma folha PNG com o quadro do meio de cada visita, para revisar.
   --girar K: o GIF comeca no quadro K da gravacao, e os quadros antes dele
   vao para o fim. Gravando uma visita inteira (do ceu vazio ao ceu vazio),
   o primeiro quadro ja mostra o personagem e a emenda do laco cai na parte
@@ -147,6 +160,64 @@ def argumento(nome, padrao):
     return padrao
 
 
+def ler_pixels(nav, expressao, corte):
+    """Os 160 x 90 pontos RGBA que a expressao devolve em base64, so as linhas
+    que entram no GIF (o corte de 2:1, a partir da linha 'corte')."""
+    px = base64.b64decode(nav.avaliar(expressao))
+    return px[corte * W * 4:(corte + ALTURA_GIF) * W * 4]
+
+
+def montar_quadro(tudo, ceu, titulo, escala, largura):
+    """O quadro grande (lista de cores) de um quadro pequeno: amplia o ceu,
+    cola o titulo por cima e, com as camadas, os personagens por cima de tudo
+    (cada ponto de 'tudo' diferente do 'ceu' e' de um personagem)."""
+    base = ceu if ceu is not None else tudo
+    linhas = []
+    for y in range(ALTURA_GIF):
+        linha = []
+        for x in range(W):
+            i = (y * W + x) * 4
+            linha += [(base[i], base[i + 1], base[i + 2])] * escala
+        linhas += [linha] * escala
+    quadro = [c for linha in linhas for c in linha]
+    for i, (r, g, b, a) in titulo:
+        if a >= 255:
+            quadro[i] = (r, g, b)
+        else:
+            fr, fg, fb = quadro[i]
+            quadro[i] = ((r * a + fr * (255 - a)) // 255, (g * a + fg * (255 - a)) // 255,
+                         (b * a + fb * (255 - a)) // 255)
+    if ceu is not None and titulo:
+        for p in range(0, len(tudo), 4):
+            if tudo[p:p + 3] != ceu[p:p + 3]:
+                y, x = divmod(p // 4, W)
+                cor = (tudo[p], tudo[p + 1], tudo[p + 2])
+                for dy in range(escala):
+                    inicio = (y * escala + dy) * largura + x * escala
+                    quadro[inicio:inicio + escala] = [cor] * escala
+    return quadro
+
+
+def salvar_amostras(caminho, pequenos, comecos, titulo, escala, largura, altura):
+    """Uma folha PNG para revisar o GIF sem abri-lo: o quadro do meio de cada
+    visita, pela metade do tamanho, 4 por linha (antes do --girar)."""
+    from revisar_visitas import salvar_png
+    inicios = [n for n, nome in comecos if not nome.startswith("+")] + [len(pequenos)]
+    meios = [(a + b) // 2 for a, b in zip(inicios, inicios[1:])]
+    colunas, lw, lh = 4, largura // 2, altura // 2
+    linhas = (len(meios) + colunas - 1) // colunas
+    folha = [(0, 0, 0)] * (colunas * lw * linhas * lh)
+    for k, n in enumerate(meios):
+        tudo, ceu = pequenos[n]
+        quadro = montar_quadro(tudo, ceu, titulo, escala, largura)
+        ox, oy = (k % colunas) * lw, (k // colunas) * lh
+        for y in range(lh):
+            inicio = (oy + y) * colunas * lw + ox
+            folha[inicio:inicio + lw] = quadro[2 * y * largura:2 * y * largura + largura:2]
+    salvar_png(caminho, colunas * lw, linhas * lh, folha)
+    print("amostras: %s (%d visitas)" % (caminho, len(meios)))
+
+
 def principal():
     tema = argumento("--tema", "escuro")
     escala = int(argumento("--escala", "8"))
@@ -154,6 +225,9 @@ def principal():
     passo = float(argumento("--passo", "6"))
     atraso = int(argumento("--atraso", "10"))
     visitas = [v for v in argumento("--visitas", "").split(",") if v]
+    # Os de passagem que o GIF chama (um no comeco de cada visita, da segunda
+    # em diante): no ceu, cometa, meteoros, ovni, satelite e foguete.
+    disparos = [d for d in argumento("--disparar", "").split(",") if d]
     # Quadros que a primeira visita anda antes de comecar a gravar: o primeiro
     # quadro do GIF ja mostra o personagem (e o que aparece quando alguem
     # compartilha o link: a maioria dos sites nao anima a imagem).
@@ -161,10 +235,17 @@ def principal():
     girar = int(argumento("--girar", "0"))
     semente = int(argumento("--semente", "7"))
     com_texto = "--sem-texto" not in sys.argv
+    ate_o_fim = "--ate-o-fim" in sys.argv
+    tolerancia = int(argumento("--tolerancia", "0"))
+    amostras = argumento("--amostras", "")
     saida = os.path.abspath(argumento("--saida", os.path.join(RAIZ, "docs", "imagens", "arena-%s.gif" % tema)))
     largura, altura = W * escala, ALTURA_GIF * escala
     gancho = "__fundoEscuro" if tema == "escuro" else "__fundoClaro"
     fundo = "galaxy-background.js" if tema == "escuro" else "field-background.js"
+    # Personagens na frente do titulo (pedido do Rafael, 14/10/2026: o GIF
+    # mostrar todos, sem deixar nenhum para tras). No ceu, quase todas as
+    # visitas cruzam a faixa do meio, a do titulo.
+    camadas = tema == "escuro" and com_texto
     pasta = tempfile.mkdtemp(prefix="arena_gif_")
     try:
         for js in ("pixel-sprites.js", fundo):
@@ -182,11 +263,19 @@ def principal():
             capa = os.path.join(pasta, fundo)
             with open(capa, encoding="utf-8") as f:
                 texto = f.read()
-            velho = "const planeta = { x: W * 0.875, y: 76 };"
-            if texto.count(velho) != 1:
-                raise SystemExit("O ajuste do planeta da capa mudou: atualize esta ferramenta.")
+            trocas = [("const planeta = { x: W * 0.875, y: 76 };", "const planeta = { x: 132, y: 26 };"),
+                      # As camadas: o ceu (ate o planeta) fica guardado a cada
+                      # quadro; o que vem depois (os de passagem, as visitas,
+                      # os Metroides e o foguete) vai na frente do titulo.
+                      ("    desenharPlaneta(passo);\n",
+                       "    desenharPlaneta(passo);\n"
+                       "    if (window.__camadas) window.__camadas.ceu = ctx.getImageData(0, 0, W, H).data.slice();\n")]
+            for velho, novo in trocas:
+                if texto.count(velho) != 1:
+                    raise SystemExit("O fundo mudou (%r): atualize esta ferramenta." % velho[:40])
+                texto = texto.replace(velho, novo)
             with open(capa, "w", encoding="utf-8") as f:
-                f.write(texto.replace(velho, "const planeta = { x: 132, y: 26 };"))
+                f.write(texto)
         k = escala / 8.0          # o titulo foi medido para 1280 x 640
         escuro = tema == "escuro"
         html = PAGINA % {"largura": largura, "altura": altura, "tema": tema, "fundo": fundo, "semente": semente,
@@ -215,41 +304,64 @@ def principal():
                 titulo = [(i, p) for i, p in enumerate(pontos) if p[3] > 0]
                 print("titulo: %d pontos (%dx%d)" % (len(titulo), lw, lh))
             nav.avaliar("document.getElementById('marca').style.display = 'none'; window.%s.gravar()" % gancho)
+            if camadas:
+                nav.avaliar("window.__camadas = {}")
+            if "todas" in visitas:
+                # "kart,todas": a Rainbow Road primeiro, depois as outras, na
+                # ordem do fundo.
+                todas = nav.avaliar("window.%s.visitas" % gancho)
+                i = visitas.index("todas")
+                visitas = visitas[:i] + [v for v in todas if v not in visitas] + visitas[i + 1:]
             nav.avaliar("window.%s.avancar(40, 3)" % gancho)     # a cena assenta
             fila = list(visitas)
+            comecos = []                 # (quadro, nome): o que entrou em cada quadro
             if fila and adiantar:
+                comecos.append((0, fila[0]))
                 nav.avaliar("window.%s.chamar('%s')" % (gancho, fila.pop(0)))
                 nav.avaliar("window.%s.avancar(%d, %s)" % (gancho, adiantar, passo))
-            imagens = []
+            ceu_js = ("(function () { const d = window.__camadas.ceu; let s = ''; for (let i = 0; i < d.length; "
+                      "i += 8192) s += String.fromCharCode.apply(null, d.subarray(i, i + 8192)); return btoa(s); })()")
+            # Os quadros pequenos (160 x 80, RGBA): os grandes saem deles na
+            # hora de gravar, um de cada vez (centenas de quadros de 1280 x 640
+            # nao cabem na memoria).
+            pequenos = []
             for n in range(quadros):
-                if fila and not nav.avaliar("window.%s.rodando()" % gancho):
-                    nav.avaliar("window.%s.chamar('%s')" % (gancho, fila.pop(0)))
+                rodando = nav.avaliar("window.%s.rodando()" % gancho)
+                if fila and not rodando:
+                    nome = fila.pop(0)
+                    nav.avaliar("window.%s.chamar('%s')" % (gancho, nome))
+                    comecos.append((n, nome))
+                    if disparos and len([c for c in comecos if not c[1].startswith("+")]) >= 2:
+                        extra = disparos.pop(0)
+                        nav.avaliar("window.%s.disparar && window.%s.disparar('%s')" % (gancho, gancho, extra))
+                        comecos.append((n, "+" + extra))
+                elif ate_o_fim and not fila and not rodando and n:
+                    break
                 nav.avaliar("window.%s.avancar(1, %s)" % (gancho, passo))
-                px = base64.b64decode(nav.avaliar("window.%s.pixels()" % gancho))
-                linhas = []
-                for y in range(CORTE_TOPO[tema], CORTE_TOPO[tema] + ALTURA_GIF):
-                    linha = []
-                    for x in range(W):
-                        i = (y * W + x) * 4
-                        linha += [(px[i], px[i + 1], px[i + 2])] * escala
-                    linhas += [linha] * escala
-                quadro = [c for linha in linhas for c in linha]
-                for i, (r, g, b, a) in titulo:
-                    if a >= 255:
-                        quadro[i] = (r, g, b)
-                    else:
-                        fr, fg, fb = quadro[i]
-                        quadro[i] = ((r * a + fr * (255 - a)) // 255, (g * a + fg * (255 - a)) // 255,
-                                     (b * a + fb * (255 - a)) // 255)
-                imagens.append(quadro)
-                if (n + 1) % 10 == 0:
-                    print("  %d de %d quadros" % (n + 1, quadros), flush=True)
+                tudo = ler_pixels(nav, "window.%s.pixels()" % gancho, CORTE_TOPO[tema])
+                pequenos.append((tudo, ler_pixels(nav, ceu_js, CORTE_TOPO[tema]) if camadas else None))
+                if (n + 1) % 50 == 0:
+                    print("  %d quadros" % (n + 1), flush=True)
+        print("entraram: " + ", ".join("%s (%d)" % (nome, n) for n, nome in comecos))
+        if fila or disparos:
+            print("AVISO: nao couberam em %d quadros: %s" % (quadros, ", ".join(fila + disparos)))
         os.makedirs(os.path.dirname(saida), exist_ok=True)
+        if amostras:
+            salvar_amostras(amostras, pequenos, comecos, titulo, escala, largura, altura)
         if girar:
-            girar %= len(imagens)
-            imagens = imagens[girar:] + imagens[:girar]
-        tamanho = gif_animado.salvar(saida, largura, altura, imagens, atraso_cs=atraso)
-        print("GIF: %s (%dx%d, %d quadros, %.0f KB)" % (saida, largura, altura, len(imagens), tamanho / 1024))
+            girar %= len(pequenos)
+            pequenos = pequenos[girar:] + pequenos[:girar]
+
+        def grandes():
+            for tudo, ceu in pequenos:
+                yield montar_quadro(tudo, ceu, titulo, escala, largura)
+
+        # Duas passadas: a primeira conta as cores (a paleta e' uma so para o
+        # GIF inteiro), a segunda grava.
+        paleta = gif_animado.paleta_da_contagem(gif_animado.contar_cores(grandes()))
+        tamanho = gif_animado.salvar(saida, largura, altura, grandes(), atraso_cs=atraso, paleta=paleta,
+                                     tolerancia=tolerancia)
+        print("GIF: %s (%dx%d, %d quadros, %.0f KB)" % (saida, largura, altura, len(pequenos), tamanho / 1024))
         return 0
     finally:
         limpeza.apagar_pasta(pasta)

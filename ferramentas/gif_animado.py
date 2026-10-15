@@ -13,7 +13,9 @@ ate 1 MB).
 Uso (como biblioteca):
     import gif_animado
     gif_animado.salvar("saida.gif", largura, altura, quadros, atraso_cs=10)
-onde cada quadro e' uma lista de largura*altura cores (r, g, b).
+onde cada quadro e' uma lista de largura*altura cores (r, g, b). GIF comprido
+(centenas de quadros grandes): conte as cores antes (contar_cores e
+paleta_da_contagem) e passe os quadros por um gerador, com paleta=.
 """
 import struct
 
@@ -48,11 +50,23 @@ def _corte_pela_mediana(contagem, maximo):
     return paleta
 
 
-def paleta_de(quadros, maximo=255):
-    contagem = {}
+def contar_cores(quadros, contagem=None):
+    """Soma as cores dos quadros em 'contagem' ({cor: quantas}) e a devolve. Vale
+    para um gerador: o GIF comprido conta as cores sem guardar os quadros."""
+    contagem = {} if contagem is None else contagem
     for quadro in quadros:
         for cor in quadro:
             contagem[cor] = contagem.get(cor, 0) + 1
+    return contagem
+
+
+def paleta_de(quadros, maximo=255):
+    return paleta_da_contagem(contar_cores(quadros), maximo)
+
+
+def paleta_da_contagem(contagem, maximo=255):
+    """(paleta, mapa): ate 'maximo' cores e, para cada cor dos quadros, a da
+    paleta mais parecida."""
     if len(contagem) <= maximo:
         paleta = sorted(contagem)
         return paleta, {cor: i for i, cor in enumerate(paleta)}
@@ -80,33 +94,40 @@ def _lzw(indices, tamanho_minimo):
             acumulador >>= 8
             bits -= 8
 
+    # O dicionario guarda cada sequencia como (codigo da sequencia sem o
+    # ultimo ponto, ultimo ponto) -> codigo novo, num numero so: o codigo
+    # vezes 256, mais o ponto (a paleta tem ate 256 entradas). A sequencia de
+    # um ponto so tem o proprio ponto como codigo. Igual ao LZW de sempre, mas
+    # sem montar tuplas cada vez maiores (o GIF de 1280 x 640 com centenas de
+    # quadros levava horas).
     largura = tamanho_minimo + 1
-    dicionario = {(i,): i for i in range(limpar)}
+    dicionario = {}
     proximo = fim + 1
     emitir(limpar, largura)
-    atual = None
+    atual = -1
     for indice in indices:
-        if atual is None:
-            atual = (indice,)
+        if atual < 0:
+            atual = indice
             continue
-        candidato = atual + (indice,)
-        if candidato in dicionario:
-            atual = candidato
+        chave = (atual << 8) | indice
+        codigo = dicionario.get(chave)
+        if codigo is not None:
+            atual = codigo
             continue
-        emitir(dicionario[atual], largura)
+        emitir(atual, largura)
         if proximo < 4096:
-            dicionario[candidato] = proximo
+            dicionario[chave] = proximo
             proximo += 1
             if proximo > (1 << largura) and largura < 12:
                 largura += 1
         else:
             emitir(limpar, largura)
-            dicionario = {(i,): i for i in range(limpar)}
+            dicionario = {}
             proximo = fim + 1
             largura = tamanho_minimo + 1
-        atual = (indice,)
-    if atual is not None:
-        emitir(dicionario[atual], largura)
+        atual = indice
+    if atual >= 0:
+        emitir(atual, largura)
     emitir(fim, largura)
     if bits:
         saida.append(acumulador & 0xff)
@@ -119,48 +140,90 @@ def _lzw(indices, tamanho_minimo):
     return bytes(blocos)
 
 
-def salvar(caminho, largura, altura, quadros, atraso_cs=10, repetir=True):
-    """Grava o GIF. Devolve o tamanho em bytes."""
-    paleta, mapa = paleta_de(quadros)
+def salvar(caminho, largura, altura, quadros, atraso_cs=10, repetir=True, paleta=None, tolerancia=0):
+    """Grava o GIF. Devolve o tamanho em bytes.
+
+    Para um GIF comprido, 'quadros' pode ser um gerador e 'paleta' o par
+    (paleta, mapa) feito antes (paleta_da_contagem): o GIF e' gravado quadro a
+    quadro, e so o quadro atual e o anterior ficam na memoria.
+
+    'tolerancia' (distancia entre duas cores, de 0 a 441): o ponto que mudou
+    menos que isso fica como esta na tela. O ceu que pulsa devagar (a aurora,
+    as nebulosas) deixa de ser regravado inteiro a cada quadro, e o GIF
+    encolhe. A comparacao e' sempre com o que ja aparece na tela, entao a
+    diferenca nunca se acumula. Com 0, so o ponto igual fica."""
+    if paleta is None:
+        quadros = list(quadros)
+        paleta = paleta_de(quadros)
+    paleta, mapa = paleta
     transparente = len(paleta)                    # a cor reservada
     cores = list(paleta) + [(0, 0, 0)]
     bits_paleta = max(1, (len(cores) - 1).bit_length())
     cores += [(0, 0, 0)] * ((1 << bits_paleta) - len(cores))
     tamanho_minimo = max(2, bits_paleta)
-    dados = bytearray(b"GIF89a")
-    dados += struct.pack("<HHBBB", largura, altura, 0x80 | 0x70 | (bits_paleta - 1), 0, 0)
-    for cor in cores:
-        dados += bytes(cor)
-    if repetir:
-        dados += b"\x21\xff\x0bNETSCAPE2.0\x03\x01\x00\x00\x00"
-    anterior = None
-    for quadro in quadros:
-        indices = [mapa[c] for c in quadro]
-        if anterior is None:
-            x0, y0, x1, y1 = 0, 0, largura - 1, altura - 1
-        else:
-            mudou = [i for i in range(len(indices)) if indices[i] != anterior[i]]
-            if mudou:
-                ys = [i // largura for i in mudou]
-                xs = [i % largura for i in mudou]
-                x0, y0, x1, y1 = min(xs), min(ys), max(xs), max(ys)
-            else:
-                x0 = y0 = x1 = y1 = 0                 # quadro igual: 1 ponto transparente
-        w, h = x1 - x0 + 1, y1 - y0 + 1
-        recorte = []
-        for y in range(y0, y1 + 1):
-            linha = indices[y * largura + x0:y * largura + x1 + 1]
-            if anterior is not None:
-                velha = anterior[y * largura + x0:y * largura + x1 + 1]
-                linha = [transparente if a == b else a for a, b in zip(linha, velha)]
-            recorte += linha
-        # Controle grafico: "deixar como esta" (1), com transparencia.
-        dados += b"\x21\xf9\x04" + bytes([0x04 | 0x01]) + struct.pack("<H", atraso_cs) + bytes([transparente]) + b"\x00"
-        dados += b"\x2c" + struct.pack("<HHHHB", x0, y0, w, h, 0)
-        dados.append(tamanho_minimo)
-        dados += _lzw(recorte, tamanho_minimo)
-        anterior = indices
-    dados += b"\x3b"
+    # perto[a][b]: as cores a e b da paleta estao dentro da tolerancia.
+    perto = [bytes(1 if a != b and (ra - rb) ** 2 + (ga - gb) ** 2 + (ba - bb) ** 2 <= tolerancia ** 2 else 0
+                   for b, (rb, gb, bb) in enumerate(paleta))
+             for a, (ra, ga, ba) in enumerate(paleta)] if tolerancia else None
     with open(caminho, "wb") as f:
+        dados = bytearray(b"GIF89a")
+        dados += struct.pack("<HHBBB", largura, altura, 0x80 | 0x70 | (bits_paleta - 1), 0, 0)
+        for cor in cores:
+            dados += bytes(cor)
+        if repetir:
+            dados += b"\x21\xff\x0bNETSCAPE2.0\x03\x01\x00\x00\x00"
         f.write(dados)
-    return len(dados)
+        tela = None                       # o que aparece na tela depois do quadro anterior
+        for quadro in quadros:
+            indices = [mapa[c] for c in quadro]
+            if tela is None:
+                x0, y0, x1, y1 = 0, 0, largura - 1, altura - 1
+                recorte = indices
+                tela = indices
+            else:
+                # Linha por linha (comparar a linha inteira e' muito mais rapido
+                # que ponto a ponto): o que muda vira o ponto novo, o resto -1.
+                mudancas = {}
+                x0, y0, x1, y1 = largura, None, -1, None
+                for y in range(altura):
+                    inicio = y * largura
+                    nova, velha = indices[inicio:inicio + largura], tela[inicio:inicio + largura]
+                    if nova == velha:
+                        continue
+                    if perto:
+                        linha = [a if a != b and not perto[a][b] else -1 for a, b in zip(nova, velha)]
+                    else:
+                        linha = [a if a != b else -1 for a, b in zip(nova, velha)]
+                    esquerda = next((x for x, v in enumerate(linha) if v >= 0), None)
+                    if esquerda is None:
+                        continue                  # so mudancas pequenas: a linha fica
+                    direita = largura - 1 - next(x for x, v in enumerate(reversed(linha)) if v >= 0)
+                    mudancas[y] = linha
+                    x0, x1 = min(x0, esquerda), max(x1, direita)
+                    y0 = y if y0 is None else y0
+                    y1 = y
+                if y0 is None:
+                    x0 = y0 = x1 = y1 = 0                 # quadro igual: 1 ponto transparente
+                recorte = []
+                for y in range(y0, y1 + 1):
+                    linha = mudancas.get(y)
+                    if linha is None:
+                        recorte += [transparente] * (x1 - x0 + 1)
+                    else:
+                        recorte += [transparente if v < 0 else v for v in linha[x0:x1 + 1]]
+                if mudancas:
+                    tela = list(tela)
+                    for y, linha in mudancas.items():
+                        inicio = y * largura
+                        tela[inicio:inicio + largura] = [v if v >= 0 else b
+                                                         for v, b in zip(linha, tela[inicio:inicio + largura])]
+            w, h = x1 - x0 + 1, y1 - y0 + 1
+            # Controle grafico: "deixar como esta" (1), com transparencia.
+            dados = bytearray(b"\x21\xf9\x04" + bytes([0x04 | 0x01]) + struct.pack("<H", atraso_cs)
+                              + bytes([transparente]) + b"\x00")
+            dados += b"\x2c" + struct.pack("<HHHHB", x0, y0, w, h, 0)
+            dados.append(tamanho_minimo)
+            dados += _lzw(recorte, tamanho_minimo)
+            f.write(dados)
+        f.write(b"\x3b")
+        return f.tell()

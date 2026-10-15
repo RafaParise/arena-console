@@ -85,6 +85,30 @@ class TestGifAnimado(unittest.TestCase):
         for original, lido in zip(quadros, lidos):
             self.assertEqual(original, lido)
 
+    def test_tolerancia_nao_acumula_e_nao_perde_o_que_anda(self):
+        # 15/10/2026: o GIF com todas as visitas do ceu. O fundo que muda pouco
+        # (aqui, 2 niveis por quadro) fica como esta na tela, mas a diferenca
+        # para o original nunca passa da tolerancia; o bloco que anda aparece.
+        largura, altura, quadros = 40, 24, []
+        for k in range(6):
+            fundo = (20 + 2 * k, 20, 40)
+            quadros.append([(255, 255, 0) if k * 5 <= x < k * 5 + 4 and 10 <= y < 14 else fundo
+                            for y in range(altura) for x in range(largura)])
+        pasta = tempfile.mkdtemp(prefix="arena_gif_teste_")
+        try:
+            exato, tolerante = os.path.join(pasta, "exato.gif"), os.path.join(pasta, "tolerante.gif")
+            gif_animado.salvar(exato, largura, altura, quadros)
+            gif_animado.salvar(tolerante, largura, altura, quadros, tolerancia=8)
+            _, _, lidos = decodificar(tolerante)
+            self.assertLess(os.path.getsize(tolerante), os.path.getsize(exato))
+        finally:
+            for nome in os.listdir(pasta):
+                os.remove(os.path.join(pasta, nome))
+            os.rmdir(pasta)
+        for k, (original, lido) in enumerate(zip(quadros, lidos)):
+            self.assertLessEqual(max(abs(p[i] - q[i]) for p, q in zip(original, lido) for i in range(3)), 8)
+            self.assertEqual(lido[12 * largura + k * 5 + 1], (255, 255, 0))
+
     def test_muitas_cores_viram_ate_255(self):
         cores = [(i % 256, (i * 7) % 256, (i * 13) % 256) for i in range(1000)]
         paleta, mapa = gif_animado.paleta_de([cores])

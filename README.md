@@ -2,7 +2,7 @@
   <picture>
     <source media="(prefers-color-scheme: light)" srcset="docs/imagens/arena-claro.gif">
     <img src="docs/imagens/arena-escuro.gif" width="100%"
-         alt="ARENA, central retrô da turma: o nome ARENA em letras douradas sobre o fundo animado em pixel art do ARENA. No tema escuro, Mario e Luigi correm na Rainbow Road pelo céu de galáxia; no tema claro, o Yoshi come uma frutinha no campo florido">
+         alt="ARENA, central retrô da turma: o nome ARENA em letras douradas sobre o fundo animado em pixel art do ARENA. No tema escuro, todos os personagens do céu de galáxia passam na frente do nome, um de cada vez: Mario e Luigi na Rainbow Road, as máquinas do F-Zero, o Kirby na Warp Star, os Space Invaders, as Arwings, o Super Sonic e o Dr. Robotnik, a nave da Samus, o Mario de capa, o Meta Knight, a Vic Viper, o Ristar, ToeJam &amp; Earl, o Starman, o Earthworm Jim e a Lunar Whale, com o cometa, a chuva de meteoros, o OVNI, o satélite e o foguete; no tema claro, o Yoshi come uma frutinha no campo florido">
   </picture>
 </p>
 
@@ -205,16 +205,26 @@ internet, e cabe num Celeron de escola.
 
 As imagens do topo saem dos próprios fundos animados do ARENA
 (`launcher\galaxy-background.js` e `launcher\field-background.js`): quem usa
-o GitHub no tema escuro vê o céu, e quem usa o tema claro vê o campo. Mudou
-um fundo? Grave de novo (cada GIF fica abaixo de 1 MB, o limite do GitHub):
+o GitHub no tema escuro vê o céu, e quem usa o tema claro vê o campo. O do
+céu mostra **todos os personagens e animações do modo escuro**: as 15
+visitas, uma atrás da outra e em velocidade dobrada, e os de passagem
+(cometa, chuva de meteoros, OVNI, satélite e foguete), com os personagens
+passando na frente do nome. Uma cópia dele fica na raiz do repositório
+(`arena-escuro.gif`), para usar em outros lugares. Mudou um fundo? Grave de
+novo:
 
 ```
-servidor\python\python.exe ferramentas\gravar_fundo_gif.py --tema escuro --visitas kart --quadros 63 --passo 6.4 --girar 24
+servidor\python\python.exe ferramentas\gravar_fundo_gif.py --tema escuro --visitas kart,todas --disparar foguete,satelite,meteoros,ovni,cometa --ate-o-fim --quadros 2000 --passo 12 --escala 6 --girar 13 --tolerancia 12
 servidor\python\python.exe ferramentas\gravar_fundo_gif.py --tema claro --visitas yoshi --quadros 68 --girar 26
+servidor\python\python.exe ferramentas\gravar_fundo_gif.py --tema escuro --visitas kart --quadros 63 --passo 6.4 --girar 24 --tolerancia 12 --saida docs\imagens\arena-escuro-curto.gif
 ```
 
-Eles gravam `docs\imagens\arena-escuro.gif` e `docs\imagens\arena-claro.gif`
-(1280 × 640). A versão parada, em PNG, sai de:
+Eles gravam `docs\imagens\arena-escuro.gif` (960 × 480, 5,2 MB, com
+todos), `docs\imagens\arena-claro.gif` (1280 × 640, o Yoshi) e
+`docs\imagens\arena-escuro-curto.gif` (1280 × 640, só a Rainbow Road, 784 KB:
+a "Social preview" do GitHub aceita até 1 MB). Para conferir o GIF sem abri-lo quadro a quadro, ponha
+`--amostras folha.png` no comando: sai uma folha com cada visita.
+A versão parada, em PNG, sai de:
 
 ```
 servidor\python\python.exe ferramentas\imagem_do_github.py
@@ -228,8 +238,9 @@ Para a imagem aparecer quando alguém compartilha o link do repositório
 (WhatsApp, Classroom, redes sociais), o dono do repositório envia a imagem
 uma vez pelo site — o GitHub não deixa fazer isso por programa: **Settings →
 General → Social preview → Edit → Upload an image** →
-`docs\imagens\arena-escuro.gif`. A maioria dos sites mostra só o primeiro
-quadro (Mario e Luigi na Rainbow Road); a `arena-capa.png` também serve.
+`docs\imagens\arena-escuro-curto.gif` (o completo passa de 1 MB, o limite
+dessa página). A maioria dos sites mostra só o primeiro quadro (Mario e
+Luigi na Rainbow Road); a `arena-capa.png` também serve.
 
 ## Perguntas frequentes
 

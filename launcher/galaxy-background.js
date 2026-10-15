@@ -1541,6 +1541,17 @@
     visitas: Object.keys(VISITAS),
     chamar: function (nome) { if (VISITAS[nome]) visita = VISITAS[nome](); return !!visita; },
     rodando: function () { return !!visita; },
+    // Os de passagem aparecem sozinhos, de tempos em tempos (o foguete, so a
+    // cada 1 ou 2 minutos); o GIF chama cada um na hora, para nenhum faltar.
+    disparar: function (nome) {
+      if (nome === 'cometa') esperaCometa = 0;
+      else if (nome === 'meteoros') esperaChuva = 0;
+      else if (nome === 'ovni') esperaOvni = 0;
+      else if (nome === 'satelite') esperaSatelite = 0;
+      else if (nome === 'foguete') esperaFoguete = 0;
+      else return false;
+      return true;
+    },
     velocidade: function (v) { velocidade = Math.max(1, Math.min(16, Number(v) || 1)); return velocidade; },
     // Avanca n quadros na hora (passo em 1/60 s; 3 = um quadro dos 20 por
     // segundo): para revisar as visitas quadro a quadro e gravar o GIF.
