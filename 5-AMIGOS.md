@@ -354,8 +354,8 @@ com 5 notebooks de verdade, veja se funciona e avise.
 
 **Console que só joga junto no mesmo computador.** Alguns consoles não
 conseguem deixar dois computadores iguais ao mesmo tempo: Nintendo 64,
-Dreamcast, PSP, Commodore 64, VIC-20, Plus/4, ZX81, MSX, Atari ST e Amiga (limite do
-emulador), e os que abrem
+Dreamcast, PSP, Commodore 64, VIC-20, Plus/4, ZX81, MSX, Atari ST, Apple II e Amiga
+(limite do emulador), e os que abrem
 por outro programa: PlayStation 2, PlayStation 3, Xbox 360, GameCube e Wii.
 Neles, o **Desafio em rede** abre uma janela curta que explica isso e mostra como
 ligar até 4 jogadores no mesmo computador:

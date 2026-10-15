@@ -69,11 +69,16 @@ fica no commit). O detalhe de cada pedido está em
      CHIP-8 (Slippery Slope), consoles novos testados com jogo livre nas
      duas pastas (com e sem acento). Só o CHIP-8 tem Jogar Junto (os
      outros três núcleos recusam).
+   - Feito: Apple II (DIAFLW, MIT; a ROM vem no AppleWin, que também não
+     abre pasta com acento e passou pela ponte), Arduboy (Evade, MIT) e
+     MicroW8 (Skip Ahead, domínio público). Arduboy e MicroW8 têm Jogar
+     Junto; o Apple II, não.
    - Falta (pedido de 14/10: "todos os consoles de código aberto", mantendo
-     os emuladores de sempre): Watara Supervision e Thomson (sem jogo livre
-     publicado: um programa de teste escrito para o ARENA) e os outros
-     núcleos da pasta que abrirem sem BIOS das empresas, cada um testado
-     (`testes\teste_consoles_livres.py`).
+     os emuladores de sempre): Atari 8-bit (o núcleo traz o AltirraOS, BIOS
+     livre), Commodore PET e C128, Watara Supervision e Thomson: sem jogo
+     livre publicado, vão com um programa de teste escrito para o ARENA.
+     Vircon32: o núcleo já traz a BIOS livre, mas o menor jogo oficial
+     (BSD-3) tem 18 MB, grande demais para o repositório.
    - Depois: versão nova do pacote (um download só, com tudo), pedido de
      14/10 ("tudo pronto para só colocar o jogo e jogar").
    - Dizer com clareza onde não dá: o PS2 não tem BIOS livre, e distribuir

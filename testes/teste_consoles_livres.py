@@ -7,7 +7,7 @@ Pedido do Rafael (12/10/2026): todos os consoles possiveis, "integrar
 emuladores sem precisar baixar BIOS". Para cada jogo da lista.json:
   1. ABRE: o RetroArch roda alguns segundos com as opcoes do ARENA e tira a
      foto da tela (--max-frames-ss). A foto tem que ter imagem de verdade:
-     mais de uma cor, e a cor mais comum cobrindo menos de 98% da tela (o
+     mais de uma cor, e a cor mais comum cobrindo menos de 99,5% da tela (o
      tamanho do arquivo nao serve: a tela do CHIP-8 tem 128x64 pontos).
   2. O REGISTRO prova o caminho livre, quando o console tem um (no MSX:
      "falling back to 'MSX2+ - C-BIOS'").
@@ -117,6 +117,9 @@ POR_CONSOLE = {
     "vic20": {"quadros": 1500},
     "plus4": {"quadros": 1200},
     "chip8": {"quadros": 600},
+    "apple2": {"quadros": 1800},
+    "arduboy": {"quadros": 900},
+    "microw8": {"quadros": 600},
 }
 
 
@@ -126,14 +129,15 @@ def plataformas():
 
 
 def imagem_de_verdade(foto):
-    """(sim/nao, detalhe): a foto tem mais de uma cor e nenhuma cobre 98%?"""
+    """(sim/nao, detalhe): a foto tem mais de uma cor e nenhuma cobre 99,5%? (A tela de
+    texto do Apple II e o Arduboy ficam pretos em 97%: imagem de verdade.)"""
     if not os.path.isfile(foto):
         return False, "sem foto"
     with open(foto, "rb") as arquivo:
         largura, altura, pontos = ler_png(arquivo.read())
     cores = collections.Counter(p[:3] for p in pontos)
     maior = cores.most_common(1)[0][1] / float(len(pontos))
-    return len(cores) > 1 and maior < 0.98, "%dx%d, %d cores, a mais comum em %.0f%%" % (
+    return len(cores) > 1 and maior < 0.995, "%dx%d, %d cores, a mais comum em %.0f%%" % (
         largura, altura, len(cores), maior * 100)
 
 

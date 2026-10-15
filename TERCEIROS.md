@@ -38,7 +38,7 @@ cada arquivo. O ARENA as copia para `retroarch\system` só onde falta.
 | C-BIOS 0.29a | MSX | BSD de 2 cláusulas (o aviso de direitos vai junto, em C-BIOS\doc\cbios.txt) | <https://cbios.sourceforge.net/> | `servidor\bios_livres\C-BIOS` |
 | EmuTOS 1.4 | Atari ST | GPL-2.0 ou posterior (o texto vai junto, em EmuTOS\doc\license.txt) | <https://downloads.sourceforge.net/project/emutos/emutos/1.4/emutos-src-1.4.tar.gz> | `servidor\bios_livres\EmuTOS` |
 
-## Núcleos do RetroArch (53)
+## Núcleos do RetroArch (56)
 
 Cada núcleo é o emulador de um console. A licença vem do arquivo `.info`
 do próprio núcleo (`retroarch\info`). Os de licença **não comercial**
@@ -50,6 +50,8 @@ mas não vendidos. O código-fonte de todos está em
 |---|---|---|---|
 | Sinclair - ZX 81 (EightyOne) | `81_libretro.dll` | 1.0a | GPLv3 |
 | Atari - 5200 (a5200) | `a5200_libretro.dll` | 2.0.2 | GPLv2 |
+| Apple II (AppleWin) | `applewin_libretro.dll` | 1.30.21.0 | GPLv2 |
+| Arduboy (Ardens) | `ardens_libretro.dll` | Git | MIT |
 | MSX/SVI/ColecoVision/SG-1000 (blueMSX) | `bluemsx_libretro.dll` | SVN | GPLv2 |
 | Amstrad - CPC/GX4000 (Caprice32) | `cap32_libretro.dll` | v4.2.0 | GPLv2 |
 | Nintendo - GameCube / Wii (Dolphin) | `dolphin_libretro.dll` | Git | GPLv2+ |
@@ -94,6 +96,7 @@ mas não vendidos. O código-fonte de todos está em
 | Sony - PlayStation (SwanStation) | `swanstation_libretro.dll` | v0.1 | GPLv3 |
 | Bandai - Tamagotchi P1 (TamaLIBretro) | `tamalibretro_libretro.dll` | 1.0 | GPL-2.0 |
 | TIC-80 | `tic80_libretro.dll` | 0.80.0 | MIT |
+| MicroW8 | `uw8_libretro.dll` | 0.2.2 | The Unlicense |
 | Uzebox (Uzem) | `uzem_libretro.dll` | — | MIT |
 | GCE - Vectrex (vecx) | `vecx_libretro.dll` | SVN | GPLv3 |
 | Commodore - C64 (VICE x64, fast) | `vice_x64_libretro.dll` | 3.9 | GPLv2 |

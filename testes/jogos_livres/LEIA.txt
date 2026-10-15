@@ -19,3 +19,7 @@ licencas.
   Plus-4\intervallo-plus4.prg   Intervallo, de Zalka Ernő (ern0) - MIT
   CHIP-8\slipperyslope.ch8      Slippery Slope, de John Earnest - CC0
                                 (domínio público, como todo o Chip8 Archive)
+  Apple II\DIAFLW_Release.2mg   DIAFLW, de Randall Frank - MIT
+  Arduboy\evade.hex             Evade, da Modus Create - MIT
+  MicroW8\skipahead.uw8         Skip Ahead, de Dennis Ranke (exoticorn) -
+                                Unlicense (domínio público)

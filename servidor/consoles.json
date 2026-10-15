@@ -97,6 +97,44 @@
       "pasta": "CHIP-8"
     },
     {
+      "id": "arduboy",
+      "nome": "Arduboy",
+      "descricao": "Console de bolso de codigo aberto, de 2015, do tamanho de um cartao de credito.",
+      "core": "ardens_libretro.dll",
+      "extensoes": [
+        ".hex",
+        ".arduboy"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "arduboy",
+        "ardu boy"
+      ],
+      "pasta": "Arduboy"
+    },
+    {
+      "id": "microw8",
+      "nome": "MicroW8",
+      "descricao": "Console de fantasia para jogos minusculos: cada cartucho cabe em 256 bytes.",
+      "core": "uw8_libretro.dll",
+      "extensoes": [
+        ".uw8"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "microw8",
+        "micro w8",
+        "uw8"
+      ],
+      "pasta": "MicroW8"
+    },
+    {
       "id": "atari2600",
       "nome": "Atari 2600",
       "descricao": "O comeco de tudo. Extremamente leve.",
@@ -1179,6 +1217,35 @@
       "pasta": "Amstrad CPC"
     },
     {
+      "id": "apple2",
+      "nome": "Apple II",
+      "descricao": "O computador pessoal da Apple, de 1977: um dos primeiros das escolas.",
+      "core": "applewin_libretro.dll",
+      "extensoes": [
+        ".dsk",
+        ".do",
+        ".po",
+        ".nib",
+        ".woz",
+        ".2mg"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "apple ii",
+        "apple 2",
+        "apple2",
+        "apple iie",
+        "apple ][",
+        "appleii"
+      ],
+      "netplay": false,
+      "netplay_motivo": "O núcleo do Apple II (AppleWin) não suporta jogo em rede - confirmado tentando hospedar em 14/10/2026, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Os 2 jogadores só valem no mesmo computador.",
+      "pasta": "Apple II"
+    },
+    {
       "id": "dos",
       "nome": "MS-DOS",
       "descricao": "Jogos de PC dos anos 80 e 90.",
@@ -1410,7 +1477,8 @@
     ],
     ".dsk": [
       "amstrad",
-      "msx"
+      "msx",
+      "apple2"
     ],
     ".rom": [
       "msx"

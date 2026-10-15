@@ -485,7 +485,7 @@ const MIDIA_POR_PLATAFORMA = {
   ],
   jewel_case: [
     "ps1", "ps3", "saturn", "dreamcast", "segacd", "threedo", "cdi", "pcfx",
-    "scummvm", "dos", "amiga", "spectrum", "atarist", "zx81",
+    "scummvm", "dos", "amiga", "spectrum", "atarist", "zx81", "apple2",
   ],
   caixa_dvd: ["ps2", "gamecube", "wii"],
   caixa_xbox: ["xbox360"],
@@ -493,7 +493,7 @@ const MIDIA_POR_PLATAFORMA = {
   umd: ["psp"],
   // Sem mídia física de verdade (portátil digital, homebrew) - cartão
   // genérico.
-  cartao: ["tic80", "wasm4", "lowresnx", "uzebox", "tamagotchi", "j2me", "chip8"],
+  cartao: ["tic80", "wasm4", "lowresnx", "uzebox", "tamagotchi", "j2me", "chip8", "arduboy", "microw8"],
 };
 
 const TIPO_MIDIA_POR_ID = {};

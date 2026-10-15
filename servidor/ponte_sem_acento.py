@@ -3,10 +3,11 @@ r"""
 ARENA - a ponte sem acento: para o nucleo que nao abre arquivo de pasta com
 acento.
 
-Achado de 14/10/2026: o Hatari (o nucleo do Atari ST) so abre caminho SEM
-acento. O ARENA do Rafael mora em "...\Criador De Apps Pedagógicos\...": com
-o "ó" no caminho, o Hatari nao achava a BIOS ("System BIOS (tos.img) is
-missing") nem o disquete do jogo, e a tela ficava preta. O mesmo aconteceria
+Achado de 14/10/2026: o Hatari (o nucleo do Atari ST) e o AppleWin (o do
+Apple II) so abrem caminho SEM acento. O ARENA do Rafael mora em
+"...\Criador De Apps Pedagógicos\...": com o "ó" no caminho, o Hatari nao
+achava a BIOS ("System BIOS (tos.img) is missing") nem o disquete do jogo, e
+o AppleWin nao abria o disco ("Falha ao carregar o conteudo"). O mesmo aconteceria
 com o ARENA numa "Área de Trabalho" do OneDrive. O nome curto do Windows
 (8.3) nao resolve: ele vem desligado em muitos computadores (neste tambem).
 
@@ -33,8 +34,10 @@ import time
 
 # Os nucleos que nao abrem caminho com acento e o que cada um precisa da
 # pasta system (conferido abrindo o jogo de verdade: testes\teste_consoles_livres.py).
+# Lista vazia: o nucleo nao usa a pasta system (so o jogo vai pela ponte).
 NUCLEOS = {
-    "hatari_libretro.dll": ["tos.img"],
+    "hatari_libretro.dll": ["tos.img"],          # Atari ST
+    "applewin_libretro.dll": [],                 # Apple II ("Falha ao carregar o conteudo", 14/10/2026)
 }
 PREFIXO = "ARENA-sem-acento-"
 
@@ -46,9 +49,11 @@ def sem_acento(caminho):
 
 def precisa(nucleo, pasta_sistema, caminho_jogo):
     """Este jogo precisa da ponte: o nucleo e' um dos que nao aceitam acento
-    e a pasta da BIOS ou o jogo tem acento?"""
+    e o jogo tem acento -- ou a pasta da BIOS, quando ele usa uma?"""
     nucleo = os.path.basename(str(nucleo or "")).lower()
-    return nucleo in NUCLEOS and not (sem_acento(pasta_sistema) and sem_acento(caminho_jogo))
+    if nucleo not in NUCLEOS:
+        return False
+    return not sem_acento(caminho_jogo) or (bool(NUCLEOS[nucleo]) and not sem_acento(pasta_sistema))
 
 
 def pasta_da_ponte():
@@ -119,10 +124,11 @@ def preparar(nucleo, pasta_sistema, caminho_jogo):
         raise OSError("nenhuma pasta sem acento para abrir o jogo (nem a temporária do Windows, nem a ProgramData)")
     limpar_sobras(base)
     ponte = tempfile.mkdtemp(prefix=PREFIXO, dir=base)
+    necessarios = NUCLEOS[os.path.basename(nucleo).lower()]
     try:
         sistema = os.path.join(ponte, "system")
         os.makedirs(sistema)
-        for nome in NUCLEOS[os.path.basename(nucleo).lower()]:
+        for nome in necessarios:
             origem = os.path.join(pasta_sistema, nome)
             if os.path.isfile(origem):
                 _copiar(origem, os.path.join(sistema, nome))
@@ -147,4 +153,5 @@ def preparar(nucleo, pasta_sistema, caminho_jogo):
         finally:
             _apagar(ponte)
 
-    return copia, {"system_directory": sistema}, devolver
+    # O nucleo que nao usa a pasta system continua com a do ARENA.
+    return copia, ({"system_directory": sistema} if necessarios else {}), devolver

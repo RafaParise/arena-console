@@ -50,11 +50,12 @@ class TestConsolesLivres(unittest.TestCase):
 
     def test_jogar_junto_como_o_teste_viu(self):
         # 14/10/2026, hospedando de verdade: o RetroArch recusa nestes...
-        for console in ("msx", "atarist", "zx81", "vic20", "plus4"):
+        for console in ("msx", "atarist", "zx81", "vic20", "plus4", "apple2"):
             self.assertIs(self.plataformas[console].get("netplay"), False, console)
             self.assertIn("Netplay", self.plataformas[console]["netplay_motivo"])
-        # ...e o CHIP-8 (JAXE) conectou.
-        self.assertTrue(self.plataformas["chip8"].get("netplay", True))
+        # ...e o CHIP-8 (JAXE), o Arduboy (Ardens) e o MicroW8 conectaram.
+        for console in ("chip8", "arduboy", "microw8"):
+            self.assertTrue(self.plataformas[console].get("netplay", True), console)
 
 
 if __name__ == "__main__":

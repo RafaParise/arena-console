@@ -76,6 +76,17 @@ class TestPonteSemAcento(unittest.TestCase):
         devolver1()
         devolver2()
 
+    def test_nucleo_sem_bios_so_leva_o_jogo(self):
+        # O AppleWin (Apple II) nao usa a pasta system: a ponte so entra com
+        # acento no JOGO e nao troca a pasta system do ARENA.
+        applewin = "applewin_libretro.dll"
+        self.assertTrue(ponte.precisa(applewin, "C:\\ARENA\\retroarch\\system", self.jogo))
+        self.assertFalse(ponte.precisa(applewin, self.sistema, "C:\\ARENA\\jogo.dsk"))
+        caminho, opcoes, devolver = ponte.preparar(applewin, self.sistema, self.jogo)
+        self.assertTrue(caminho.isascii())
+        self.assertEqual(opcoes, {})
+        self.assertFalse(devolver())
+
     def test_jogo_sem_acento_abre_direto(self):
         jogo = os.path.join(self.base, "jogo.st")
         shutil.copyfile(self.jogo, jogo)

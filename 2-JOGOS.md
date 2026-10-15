@@ -193,7 +193,9 @@ No fliperama do MAME, a BIOS vai na pasta dos próprios jogos.
 |---|---|---|---|---|
 | 3DO | `3DO` | `.iso` `.cue` `.chd` | **não** | uma de: `panafz10.bin`, `panafz1.bin`, `goldstar.bin` |
 | Amstrad CPC | `Amstrad CPC` | `.cdt` `.sna` `.dsk` | pode | não precisa |
+| Apple II | `Apple II` | `.dsk` `.do` `.po` `.nib` `.woz` `.2mg` | pode | não precisa |
 | Arcade (MAME) | `Arcade` | `.zip` `.7z` | **tem que ser** | só jogo de Neo Geo: `neogeo.zip` **na própria pasta `Arcade`** |
+| Arduboy | `Arduboy` | `.hex` `.arduboy` | pode | não precisa |
 | Atari 2600 | `Atari 2600` | `.a26` | pode | não precisa |
 | Atari 5200 | `Atari 5200` | `.a52` | pode | `5200.rom` |
 | Atari 7800 | `Atari 7800` | `.a78` | pode | não precisa |
@@ -215,6 +217,7 @@ No fliperama do MAME, a BIOS vai na pasta dos próprios jogos.
 | LowRes NX | `LowRes NX` | `.nx` | pode | não precisa |
 | Magnavox Odyssey 2 | `Odyssey 2` | `.bin` | pode | `o2rom.bin` |
 | Mega Drive, Master System e Game Gear | `Mega Drive` | `.md` `.gen` `.smd` `.sms` `.gg` | pode | não precisa |
+| MicroW8 | `MicroW8` | `.uw8` | pode | não precisa |
 | MS-DOS | `MS-DOS` | `.exe` `.com` `.bat` `.conf` | pode | não precisa |
 | MSX | `MSX` | `.rom` `.dsk` `.cas` | pode | não precisa no cartucho (C-BIOS livre); disquete e fita: `Machines` |
 | Neo Geo e fliperamas (FBNeo) | `Neo Geo` | `.zip` `.7z` | **tem que ser** | `neogeo.zip` |
@@ -297,6 +300,7 @@ AVX.
 | `.tzx` `.tap` `.z80` `.szx` | ZX Spectrum (na pasta dele, o ZX81, o VIC-20 ou o Plus/4) |
 | `.p` `.t81` | ZX81 |
 | `.cdt` `.sna` | Amstrad CPC |
+| `.do` `.po` `.nib` `.woz` `.2mg` | Apple II |
 | `.rom` `.cas` | MSX |
 | `.exe` `.com` `.bat` `.conf` | MS-DOS |
 | `.scummvm` `.svm` | ScummVM |
@@ -305,6 +309,8 @@ AVX.
 | `.nx` | LowRes NX |
 | `.uze` | Uzebox |
 | `.ch8` `.sc8` `.xo8` | CHIP-8 |
+| `.hex` `.arduboy` | Arduboy |
+| `.uw8` | MicroW8 |
 
 #### Quando o final serve a mais de um console
 
@@ -689,8 +695,9 @@ você puser na pasta `BIOS`, passa na frente da livre (no MSX, o próprio
 emulador escolhe: tenta a máquina original e, sem a BIOS dela, liga a do
 C-BIOS; no Atari ST, o TOS original entra no lugar do EmuTOS).
 
-**Atari ST numa pasta com acento:** o emulador do Atari ST (o Hatari) não
-abre arquivo de pasta com acento (como `Área de Trabalho`). O ARENA resolve
+**Atari ST e Apple II numa pasta com acento:** os emuladores deles (o Hatari
+e o AppleWin) não abrem arquivo de pasta com acento (como `Área de
+Trabalho`). O ARENA resolve
 sozinho: copia o jogo e a BIOS para uma pasta nova, sem acento e só sua (a
 temporária do Windows), abre de lá e, ao fechar, leva de volta o disquete se
 o jogo gravou nele (recorde, jogo salvo) e apaga a pasta.
@@ -706,10 +713,11 @@ a BIOS. Com o BS-X, os jogos BS ligam pela tela do BS-X.
 
 #### Os que não pedem nada
 
-Amstrad CPC · Atari 2600 · Atari Jaguar · CHIP-8 · Commodore 64 · Commodore
+Amstrad CPC · Apple II · Arduboy · Atari 2600 · Atari Jaguar · CHIP-8 ·
+Commodore 64 · Commodore
 Plus/4 · Commodore VIC-20 · Game & Watch ·
 GameCube · Java ME (celular antigo) · LowRes NX · Mega Drive, Master System
-e Game Gear · MS-DOS · Neo Geo Pocket · Nintendo Wii · PlayStation Portable ·
+e Game Gear · MicroW8 · MS-DOS · Neo Geo Pocket · Nintendo Wii · PlayStation Portable ·
 ScummVM · Sega 32X · Sega SG-1000 · Tamagotchi · TIC-80 · Uzebox · Vectrex ·
 Virtual Boy · WASM-4 · WonderSwan · Xbox 360 · ZX Spectrum · ZX81. Também não pedem
 o NES, o Super Nintendo, o Nintendo 64 e o PC Engine (só as partes que

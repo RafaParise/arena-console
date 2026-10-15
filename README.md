@@ -137,8 +137,8 @@ ainda vai ser medido em sala; o que já foi medido está em
 | Microsoft | Xbox 360, MS-DOS |
 | Atari | 2600, 5200, 7800, Lynx, Jaguar, ST |
 | Fliperama | Neo Geo e fliperamas (FBNeo), Arcade (MAME), Neo Geo Pocket |
-| Outros | PC Engine, PC-FX, WonderSwan, 3DO, CD-i, Odyssey 2, ColecoVision, Intellivision, Vectrex, MSX, Commodore 64, VIC-20, Plus/4, Amiga, ZX Spectrum, ZX81, Amstrad CPC, ScummVM, Tamagotchi, Java ME (ainda sem núcleo) |
-| Consoles de fantasia | TIC-80, WASM-4, LowRes NX, Uzebox, CHIP-8 |
+| Outros | PC Engine, PC-FX, WonderSwan, 3DO, CD-i, Odyssey 2, ColecoVision, Intellivision, Vectrex, MSX, Commodore 64, VIC-20, Plus/4, Amiga, ZX Spectrum, ZX81, Amstrad CPC, Apple II, Arduboy, ScummVM, Tamagotchi, Java ME (ainda sem núcleo) |
+| Consoles de fantasia | TIC-80, WASM-4, LowRes NX, Uzebox, CHIP-8, MicroW8 |
 
 ## Os guias
 
@@ -168,7 +168,7 @@ ARENA\
 │   ├── indexador.py     acha os jogos nas pastas
 │   ├── hardware.py      mede o computador
 │   ├── graficos.py      a configuração de cada emulador
-│   ├── consoles.json    os 57 consoles
+│   ├── consoles.json    os 60 consoles
 │   └── tests\           a bateria de testes (RODAR_TESTES.bat)
 ├── launcher\     a tela (index.html, app.js, estilo.css e os fundos em pixel art)
 ├── testes\       testes de ponta a ponta com os emuladores de verdade

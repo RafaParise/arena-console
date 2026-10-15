@@ -148,6 +148,15 @@ CONSOLES = {
                       "serve ao C64: quem decide é a pasta."},
     "zx81": {"tipo": "computador", "exemplo": "Nome do Jogo.p",
              "dica": "Também .t81 e .tzx. O .tzx do ZX Spectrum vai na pasta dele: quem decide é a pasta."},
+    "apple2": {"tipo": "computador", "exemplo": "Nome do Jogo.dsk",
+               "dica": "Também .do, .po, .nib, .woz e .2mg. O mesmo .dsk serve ao Amstrad e ao MSX: quem "
+                       "decide é a pasta."},
+    "arduboy": {"tipo": "cartucho", "exemplo": "Nome do Jogo.hex",
+                "dica": "Também .arduboy (o pacote com a capa). O Arduboy é de código aberto: muitos jogos "
+                        "livres no GitHub."},
+    "microw8": {"tipo": "cartucho", "exemplo": "Nome do Jogo.uw8",
+                "dica": "Cada jogo cabe em 256 bytes (são de competições de programação). Jogos em "
+                        "github.com/exoticorn/microw8."},
     "chip8": {"tipo": "cartucho", "exemplo": "Nome do Jogo.ch8",
               "dica": "Também .sc8 (Super-CHIP) e .xo8 (XO-CHIP). Muitos jogos livres em "
                       "github.com/JohnEarnest/chip8Archive."},

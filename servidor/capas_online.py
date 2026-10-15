@@ -90,6 +90,7 @@ REPO_POR_PLATAFORMA = {
     "vic20": "Commodore_-_VIC-20",
     "plus4": "Commodore_-_Plus-4",
     "zx81": "Sinclair_-_ZX_81",
+    "arduboy": "Arduboy_Inc_-_Arduboy",
     "amiga": ("Commodore_-_Amiga", "Commodore_-_CD32", "Commodore_-_CDTV"),
     "atarist": "Atari_-_ST",
     "spectrum": "Sinclair_-_ZX_Spectrum",

@@ -2,6 +2,32 @@
   "_leia": "Os jogos livres que os testes abrem no núcleo de verdade (testes\\teste_consoles_livres.py). Só os testes usam: não vão no pacote dos alunos. Cada um com autor, licença, a versão exata e a marca (sha256). O conferidor de publicação só deixa ir ao GitHub o arquivo desta pasta que tem a marca registrada aqui.",
   "arquivos": [
     {
+      "origem": "Apple II/DIAFLW_Release.2mg",
+      "licenca_arquivo": "licencas/diaflw.txt",
+      "console": "apple2",
+      "jogo": "DIAFLW",
+      "versao": "v1.5.0 (commit 29706bb)",
+      "autor": "Randall Frank",
+      "licenca": "MIT",
+      "fonte": "https://github.com/randall-frank/DIAFLW",
+      "baixado_de": "https://github.com/randall-frank/DIAFLW/releases/download/v1.5.0/DIAFLW_Release.2mg",
+      "o_que_prova": "o Apple II liga com a ROM que vem dentro do AppleWin e abre o disco .2mg",
+      "sha256": "692067bbfe2c3d8466becb0d489b1035c1266c2685658d4e46890a30cacb8f9c"
+    },
+    {
+      "origem": "Arduboy/evade.hex",
+      "licenca_arquivo": "licencas/evade.txt",
+      "console": "arduboy",
+      "jogo": "Evade",
+      "versao": "commit 0933a8f",
+      "autor": "Modus Create",
+      "licenca": "MIT",
+      "fonte": "https://github.com/ModusCreateOrg/evade-arduboy-game",
+      "baixado_de": "https://raw.githubusercontent.com/ModusCreateOrg/evade-arduboy-game/0933a8fb3cb78c083e38c7e37124ad3f08f3d90a/dist/evade.hex",
+      "o_que_prova": "o Arduboy roda o programa .hex do jogo",
+      "sha256": "eef385f6a7fbea7a82d747d5e9cbbada71b634dadd079384d2715f2fdc683b17"
+    },
+    {
       "origem": "Atari ST/RAYOID.PRG",
       "licenca_arquivo": "licencas/rayoid.txt",
       "console": "atarist",
@@ -26,6 +52,19 @@
       "baixado_de": "https://raw.githubusercontent.com/JohnEarnest/chip8Archive/761e3ffc63f43e6a849e80714122feff2afca208/roms/slipperyslope.ch8",
       "o_que_prova": "o CHIP-8 abre um jogo .ch8",
       "sha256": "9b41321353363bea616d51e1d63435e583c6ca8772ec78d6ceea33f21c89169d"
+    },
+    {
+      "origem": "MicroW8/skipahead.uw8",
+      "licenca_arquivo": "licencas/microw8.txt",
+      "console": "microw8",
+      "jogo": "Skip Ahead",
+      "versao": "commit b3dbc02",
+      "autor": "Dennis Ranke (exoticorn)",
+      "licenca": "Unlicense (domínio público)",
+      "fonte": "https://github.com/exoticorn/microw8",
+      "baixado_de": "https://raw.githubusercontent.com/exoticorn/microw8/b3dbc026f30349f89e088e2fafcc012f792d887c/site/static/uw8/skipahead.uw8",
+      "o_que_prova": "o MicroW8 roda um cartucho .uw8 de 229 bytes",
+      "sha256": "a0cc78991e9c564801c9cac3835aaae4d2450fee9137c0a6e0f2e3e18073b6bb"
     },
     {
       "origem": "MSX/noborunoca.rom",
