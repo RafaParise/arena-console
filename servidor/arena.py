@@ -120,6 +120,13 @@ ARQUIVO_OVERRIDE = os.path.join(PASTA_DADOS, "arena_override.cfg")
 VERSAO = "2026.10.15"   # 66 consoles, os livres sem BIOS (C-BIOS, EmuTOS, AltirraOS), ate 8 jogadores
 
 PORTA = 8777
+# Os testes que sobem uma copia do ARENA (testes\copia_do_arena.py) usam
+# outra porta, ARENA_PORTA: assim nenhum pedido do teste chega ao ARENA de
+# verdade, que pode estar aberto ao lado.
+try:
+    PORTA = int(os.environ.get("ARENA_PORTA") or PORTA)
+except ValueError:
+    pass
 
 # Porta usada quando o aluno digita so o IP do servidor, sem ":porta".
 PORTA_PADRAO = 8777
