@@ -56,7 +56,7 @@ Ele nasceu nas aulas do curso técnico de **Desenvolvimento de Sistemas**
 
 ## Baixar e usar
 
-1. Baixe o arquivo **`ARENA-2026.10.11.zip`** (uns 480 MB; descompactado, 1,3 GB) na página
+1. Baixe o arquivo **`ARENA-2026.10.15.zip`** (uns 490 MB; descompactado, 1,4 GB) na página
    [**Releases**](https://github.com/RafaParise/arena-console/releases/latest).
 2. **Antes de descompactar, desbloqueie o arquivo:** botão direito no `.zip`
    → **Propriedades** → marque **Desbloquear** (embaixo, em "Segurança") →
@@ -77,9 +77,11 @@ Ele nasceu nas aulas do curso técnico de **Desenvolvimento de Sistemas**
    jogos**, que diz a pasta, os formatos e o que falta para cada console.
 
 **Já usa o ARENA?** Para atualizar sem perder nada, baixe o
-`ARENA-2026.10.11-atualizacao.zip` (só o programa, uns 11 MB) e descompacte
+`ARENA-2026.10.15-atualizacao.zip` (só o programa, uns 11 MB) e descompacte
 no mesmo lugar, substituindo os arquivos: o passo a passo está no
 [guia 6](6-RECURSOS-E-REPARO.md). O pacote completo é para instalar do zero.
+Os 14 consoles novos desta versão precisam dos núcleos novos do RetroArch,
+que vêm só no pacote completo (o guia 6 explica como trazer só eles).
 
 Passo a passo completo, com a tabela dos problemas mais comuns: [`1-COMECAR.md`](1-COMECAR.md).
 

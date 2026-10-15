@@ -1039,3 +1039,13 @@ tinha a versão de 03/10, sem nenhum dos consertos acima. Feita pelo PR #1
 - A pasta dos alunos (`..\ARENA`) atualizada pelo `--atualizar`: o programa
   trocado, os 344 arquivos de quem usa intocados, a correção de caminhos
   rodada (as 7 linhas velhas do `retroarch.cfg` dela consertadas).
+- **Release v2026.10.15** (15/10): `ARENA-2026.10.15.zip` (493 MB, 7.858
+  arquivos; SHA-256
+  `a841c3ede74643b0679c3763876e6c90936c6b33f5e527a852f5c8b1ca263d39`) e
+  `ARENA-2026.10.15-atualizacao.zip` (11 MB; SHA-256
+  `789d0d63c085671fe82bc32a25f834698f699b7cc105bcf7918587a6a19116a3`).
+  66 consoles (eram 52) e 62 núcleos (eram 48), com as BIOS livres C-BIOS e
+  EmuTOS. Montado sem BIOS das empresas e conferido duas vezes: pelo
+  montador (abre numa cópia, lista vazia, nada de quem montou) e por uma
+  conferência das BIOS, das pastas de quem usa, dos núcleos, de caminhos e
+  de e-mails. Rodada final: 104 de 104 (os 3 consertados no dia, repetidos).
