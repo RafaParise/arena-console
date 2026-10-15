@@ -23,10 +23,19 @@ ARENA:
     (freej2me-lr.jar). O núcleo do RetroArch procura este arquivo na pasta
     system e o abre com o Java que vem no ARENA (emuladores\Java).
 
+  OpenBIOS do Libreboot 26.10 (PlayStation) - licença MIT -
+  https://github.com/grumpycoders/pcsx-redux (pasta src/mips/openbios)
+    A BIOS do PlayStation escrita do zero pelo projeto PCSX-Redux. Quase
+    todos os jogos abrem; não tem a tela do memory card nem o tocador de
+    CD de música (salvar dentro do jogo funciona). Fica numa pasta só dela,
+    retroarch\system\OpenBIOS, para não passar na frente da BIOS de verdade:
+    com as duas, o ARENA pergunta qual usar.
+
 Ninguém precisa mexer aqui. Ao abrir, o ARENA copia para retroarch\system só
 o que estiver faltando, e nunca troca uma BIOS que já está lá. A BIOS de
-verdade, se você puser na pasta BIOS do ARENA, passa na frente da livre.
+verdade, se você puser na pasta BIOS do ARENA, passa na frente da livre (no
+PlayStation, o ARENA pergunta qual das duas usar e lembra a resposta).
 
 Cada arquivo, de onde ele veio e a marca dele (SHA-256) estão na lista.json.
 A licença de cada projeto vai junto, na pasta dele (C-BIOS\doc\cbios.txt,
-EmuTOS\doc\license.txt, FreeJ2ME-Plus\LICENSE.txt).
+EmuTOS\doc\license.txt, FreeJ2ME-Plus\LICENSE.txt, OpenBIOS\COPYING.txt).

@@ -83,6 +83,7 @@ import bios        # noqa: E402  (nome, pasta e versao certa de cada BIOS -- 03/
 import arrumar     # noqa: E402  (o botao Arrumar: o arquivo do jogo no lugar certo -- 03/10/2026)
 import ponte_sem_acento  # noqa: E402  (nucleo que nao abre pasta com acento: o Hatari -- 14/10/2026)
 import java_do_arena  # noqa: E402  (o Java que vem junto, para o Java ME -- 15/10/2026)
+import jeitos_de_abrir  # noqa: E402  (o original ou o livre: a tela pergunta -- 15/10/2026)
 
 PASTA_LAUNCHER = os.path.join(RAIZ, "launcher")
 PASTA_DADOS = os.path.join(RAIZ, "dados")
@@ -1185,6 +1186,10 @@ def config_padrao():
         "servidores": [],
         # BIOS escolhida por console: {"ps1": "scph5501.bin"}
         "bios": {},
+        # O jeito de abrir que a pessoa pediu para lembrar, por console
+        # (servidor\jeitos_de_abrir.py): {"ps1": "livre"}. Sem a chave, o
+        # ARENA pergunta quando o console tem mais de um jeito.
+        "jeito_de_abrir": {},
         "dispositivo_id": "",
         "codigo_proprio": False,
         "modo_desempenho": False,
@@ -1357,6 +1362,9 @@ def ler_config_do_disco():
     if isinstance(salvo.get("bios"), dict):
         config["bios"] = {str(k)[:24]: str(v)[:120]
                           for k, v in salvo["bios"].items()}
+    if isinstance(salvo.get("jeito_de_abrir"), dict):
+        config["jeito_de_abrir"] = {str(k)[:24]: v for k, v in salvo["jeito_de_abrir"].items()
+                                    if v in jeitos_de_abrir.JEITOS}
 
     # Identificador desta instalacao. Criado uma vez e nunca mais muda:
     # e o que permite juntar recordes de varios ARENAs sem duplicar.
@@ -1994,6 +2002,11 @@ def avaliar_plataformas(forcar=False):
         if not forcar and salvo and (time.time() - idade) < VALIDADE_CACHE:
             return salvo
 
+    # As BIOS livres no lugar antes da conta (so copia o que falta: e'
+    # rapido). Na primeira abertura, a tela pedia a lista antes de a
+    # arrumacao das BIOS (em segundo plano) por a OpenBIOS, e Ajustes ->
+    # Emuladores dizia que o PlayStation so ligava de um jeito.
+    bios.instalar_livres(PASTA_SISTEMA)
     tem_sistema = contar_arquivos_sistema() > 0
 
     try:
@@ -2089,6 +2102,11 @@ def avaliar_plataformas(forcar=False):
             "externo_sugerido": (dados_externo["nome"] if dados_externo
                                  and not caminho_externo else None),
             "perfil_sugerido": PERFIS_GRAFICOS[classe["perfil"]]["rotulo"],
+            # Os jeitos de abrir que existem agora (a aba Emuladores deixa
+            # escolher qual usar quando ha mais de um).
+            "jeitos": [{"id": j["id"], "titulo": j["titulo"]} for j in jeitos_de_abrir.jeitos(
+                plataforma, PASTA_CORES, PASTA_SISTEMA,
+                dados_externo["nome"] if caminho_externo else None)],
         })
 
     with TRAVA_CACHE:
@@ -2510,9 +2528,15 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         extras_core = {}
         nome_core = nome_curto_do_core(jogo.get("core", ""))
         # A MESMA BIOS toda vez: e o que faz a data, a hora e os icones do
-        # memory card continuarem de uma sessao para a outra.
-        extras_core.update(graficos.opcoes_de_bios(
-            nome_core, config.get("bios", {}).get(jogo["plataforma"])))
+        # memory card continuarem de uma sessao para a outra. No jeito livre
+        # (servidor\jeitos_de_abrir.py), a BIOS livre do console; no
+        # original, a livre que estiver escolhida na lista nao vale.
+        escolhida = jogo.get("bios_livre") or config.get("bios", {}).get(jogo["plataforma"])
+        if (jogo.get("jeito") == "original" and escolhida
+                and bios.e_livre(os.path.join(PASTA_SISTEMA, escolhida))):
+            escolhida = None
+        extras_core.update(graficos.opcoes_de_bios(nome_core, escolhida))
+        extras_core.update(jogo.get("opcoes_livre") or {})
         extras_core.update(graficos.opcoes_de_memory_card(
             PASTA_SAVES, jogo["plataforma"]))
         # Avisa o console de que o controle tem analogico. Sem isto, no
@@ -2683,6 +2707,12 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             # lugar em que o RetroArch nao procura (servidor\cheats.py): vai
             # para o lugar certo antes de abrir. Na partida a dois o
             # RetroArch nao usa cheat nenhum.
+            # O cartao de memoria que o PCSX ReARMed fez (o PS1 sem a BIOS da
+            # Sony abria por ele ate 15/10/2026) vale tambem no SwanStation:
+            # uma copia, so se o SwanStation ainda nao tem cartao do jogo.
+            if (jogo.get("plataforma") == "ps1" and "swanstation" in str(jogo.get("core", "")).lower()
+                    and graficos.levar_cartao_do_ps1(PASTA_SAVES, caminho_jogo)):
+                print("[ARENA] Cartao de memoria do PCSX ReARMed copiado para o SwanStation (o original ficou).")
             try:
                 if cheats.levar_do_lugar_antigo(jogo, cheats.nome_do_nucleo(jogo.get("core"))):
                     print("[ARENA] Codigos de cheat deste jogo levados para a pasta que o RetroArch le.")
@@ -2711,6 +2741,15 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         instaladas = bios.instalar_livres(PASTA_SISTEMA)
         if instaladas:
             print("[ARENA] BIOS livres postas antes do jogo: %s." % ", ".join(sorted(instaladas)))
+        # O jeito livre com a BIOS livre numa pasta so dela (a OpenBIOS do
+        # PS1, em retroarch\system\OpenBIOS): o nucleo recebe essa pasta como
+        # a pasta das BIOS. Solta na system, ela passaria na frente da BIOS
+        # de verdade tambem no jeito original (servidor\jeitos_de_abrir.py).
+        chaves_do_livre = []
+        if jogo.get("sistema_livre"):
+            opcoes_jogo["system_directory"] = jogo["sistema_livre"]
+            chaves_do_livre = ["system_directory"]
+            print("[ARENA] Jeito livre: as BIOS desta partida vem de %s." % jogo["sistema_livre"])
         # Nucleo que nao abre caminho com acento (o Hatari, do Atari ST): a
         # BIOS e o jogo vao por uma pasta sem acento. O caminho de verdade
         # continua valendo para o resto (nome do remapeamento, sessao).
@@ -2737,10 +2776,11 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         # portas 3 em diante (tipo de controle e analogico, acima) e a copia
         # das opcoes de nucleo. Com 1 ou 2 jogadores a lista fica vazia.
         so_desta_partida = list(ligacao.get("cfg", {}))
-        # A pasta system da ponte sem acento (pasta temporaria) tambem: senao
-        # o proximo jogo, de outro console, procuraria a BIOS la. E o que o
-        # console pediu (o video sem thread do Java ME) fica so nele.
-        so_desta_partida += chaves_da_ponte + list(opcoes_do_console)
+        # A pasta system da ponte sem acento (pasta temporaria) e a do jeito
+        # livre tambem: senao o proximo jogo, de outro console, procuraria a
+        # BIOS la. E o que o console pediu (o video sem thread do Java ME)
+        # fica so nele.
+        so_desta_partida += chaves_da_ponte + chaves_do_livre + list(opcoes_do_console)
         if jogadores_ligacao > 2:
             for n in range(3, jogadores_controle + 1):
                 so_desta_partida += ["input_libretro_device_p%d" % n,
@@ -2841,7 +2881,10 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
                                 and not jogo.get("externo")
                                 and "swanstation" in str(jogo.get("core", "")))
             placa = str(MAQUINA["gpu"].get("nome", ""))
-            cache_antes = graficos.preparar_cache_ps1(placa) if cuidar_cache_ps1 else -1
+            # No jeito livre, o cache fica na pasta da OpenBIOS (a pasta das
+            # BIOS que o nucleo recebeu).
+            cache_do_ps1 = graficos.cache_ps1(jogo.get("sistema_livre"))
+            cache_antes = graficos.preparar_cache_ps1(placa, cache_do_ps1) if cuidar_cache_ps1 else -1
 
             ULTIMO_PROBLEMA.clear()
             aberto_em = time.time()
@@ -2873,7 +2916,7 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
                 except OSError as falha:
                     print("[ARENA] Nao consegui arrumar o retroarch.cfg: %s" % falha)
 
-            if cuidar_cache_ps1 and graficos.fixar_cache_ps1(cache_antes, placa):
+            if cuidar_cache_ps1 and graficos.fixar_cache_ps1(cache_antes, placa, cache_do_ps1):
                 print("[ARENA] Cache de video do PS1 estavel: nao sera mais regravado.")
 
             # Cada partida deixa um registro do RetroArch em dados\. O rodizio
@@ -5987,6 +6030,18 @@ class Manipulador(BaseHTTPRequestHandler):
                     else:
                         config["bios"].pop(plataforma, None)
 
+            # O jeito de abrir de cada console (Ajustes -> Emuladores):
+            # "externo", "original" ou "livre"; vazio volta a perguntar.
+            if isinstance(dados.get("jeito_de_abrir"), dict):
+                validas = {p["id"] for p in carregar_catalogo()}
+                for plataforma, jeito in dados["jeito_de_abrir"].items():
+                    if plataforma not in validas:
+                        continue
+                    if jeito in jeitos_de_abrir.JEITOS:
+                        config["jeito_de_abrir"][plataforma] = jeito
+                    elif not jeito:
+                        config["jeito_de_abrir"].pop(plataforma, None)
+
             if "modo_desempenho" in dados:
                 config["modo_desempenho"] = bool(dados["modo_desempenho"])
             if dados.get("preset_grafico_externo") in ("automatico", "leve", "bonito"):
@@ -6079,11 +6134,39 @@ class Manipulador(BaseHTTPRequestHandler):
             # nem precisa estar instalado para esta plataforma.
             caminho_externo, dados_externo = graficos.achar_externo(plataforma)
 
+            # Os jeitos de abrir este console (servidor\jeitos_de_abrir.py):
+            # o emulador de fora, o original (a BIOS de verdade) e o livre
+            # (o que vem no ARENA). Com mais de um e nenhum escolhido, a tela
+            # pergunta qual usar -- pedido do Rafael, 15/10/2026. Jogar Junto
+            # nao pergunta: segue o lembrado ou o de sempre. As BIOS livres
+            # entram antes da conta: com o ARENA recem-aberto, a arrumacao
+            # das BIOS (em segundo plano) pode nao ter posto a livre ainda.
+            bios.instalar_livres(PASTA_SISTEMA)
+            lista_jeitos = jeitos_de_abrir.jeitos(
+                plataforma, PASTA_CORES, PASTA_SISTEMA,
+                dados_externo["nome"] if caminho_externo else None)
+            jeito = jeitos_de_abrir.escolher(
+                lista_jeitos, dados.get("jeito"),
+                carregar_config().get("jeito_de_abrir", {}).get(plataforma["id"]))
+            if jeito is None and len(lista_jeitos) > 1 and not dados.get("partida"):
+                return self.responder_json({"ok": True, "escolher_jeito": True,
+                                            "console": plataforma["nome"],
+                                            "plataforma": plataforma["id"],
+                                            "jeitos": lista_jeitos})
+            if jeito and dados.get("jeito") == jeito and dados.get("lembrar"):
+                lembrar = carregar_config()
+                lembrar["jeito_de_abrir"][plataforma["id"]] = jeito
+                salvar_config(lembrar)
+            if jeito in ("original", "livre"):
+                caminho_externo = None       # a pessoa escolheu o RetroArch
+            livre = (plataforma.get("livre") or {}) if jeito == "livre" else {}
+            core_do_jeito = livre.get("core") or plataforma["core"]
+
             if not caminho_externo:
                 if not os.path.isfile(EXECUTAVEL_RETROARCH):
                     return self.erro(
                         "Não achei o retroarch.exe na pasta retroarch. A pasta tem que se chamar retroarch (guia 1); rode o VERIFICAR.bat para conferir.")
-                if not os.path.isfile(os.path.join(PASTA_CORES, plataforma["core"])):
+                if not os.path.isfile(os.path.join(PASTA_CORES, core_do_jeito)):
                     sugestao = ""
                     if dados_externo:
                         sugestao = (" Ou instale o %s na pasta emuladores."
@@ -6110,7 +6193,15 @@ class Manipulador(BaseHTTPRequestHandler):
                     aviso_arquivo = "Atenção: " + frase[:1].lower() + frase[1:]
 
             jogo = dict(jogo)
-            jogo["core"] = plataforma["core"]
+            jogo["core"] = core_do_jeito
+            # O jeito livre: a BIOS livre que o nucleo usa (a OpenBIOS do PS1),
+            # a pasta dela (o nucleo a recebe como a pasta das BIOS) e as
+            # opcoes de nucleo dele (consoles.json -> livre).
+            jogo["jeito"] = jeito or ""
+            jogo["bios_livre"] = livre.get("bios") or ""
+            jogo["sistema_livre"] = (jeitos_de_abrir.pasta_do_livre(plataforma, PASTA_SISTEMA) or ""
+                                     if livre else "")
+            jogo["opcoes_livre"] = dict(livre.get("opcoes_nucleo") or {})
             if caminho_externo:
                 jogo["externo"] = {"caminho": caminho_externo,
                                    "dados": dados_externo}
@@ -6161,8 +6252,10 @@ class Manipulador(BaseHTTPRequestHandler):
             # core_sem_bios): o PS1 pelo PCSX ReARMed -- o CTR abriu assim, sem
             # BIOS nenhuma (14/10/2026). O pacote do ARENA nunca leva BIOS da
             # Sony, e o SwanStation nao abre jogo nenhum sem ela.
-            aviso_sem_bios = ""
-            if (plataforma.get("core_sem_bios") and not caminho_externo
+            # O jeito livre so avisa quando abriu por ele por ser o unico (falta
+            # a BIOS de verdade). Quem escolheu na pergunta ja sabe.
+            aviso_sem_bios = livre.get("aviso", "") if len(lista_jeitos) == 1 else ""
+            if (plataforma.get("core_sem_bios") and not caminho_externo and jeito != "livre"
                     and os.path.isfile(os.path.join(PASTA_CORES, plataforma["core_sem_bios"]))
                     and not bios.tem_a_bios(plataforma["id"], PASTA_SISTEMA)):
                 jogo["core"] = plataforma["core_sem_bios"]
@@ -6180,6 +6273,15 @@ class Manipulador(BaseHTTPRequestHandler):
                         % plataforma["core_netplay"], 409)
                 jogo["core"] = plataforma["core_netplay"]
                 aviso_netplay = plataforma.get("netplay_aviso", "")
+                if jeito == "livre":
+                    # O nucleo da partida (o PCSX ReARMed) procura a BIOS de
+                    # sempre, na system: o jeito livre vale so para jogar
+                    # sozinho. Os dois lados da partida abrem do mesmo jeito
+                    # de antes (com a BIOS de verdade, ou com a imitada).
+                    jogo["bios_livre"] = jogo["sistema_livre"] = ""
+                    jogo["opcoes_livre"] = {}
+                    aviso_sem_bios = ("" if bios.tem_a_bios(plataforma["id"], PASTA_SISTEMA)
+                                      else plataforma.get("sem_bios_aviso", ""))
 
             # Quantos jogadores ESTE jogo aceita, e o que o nucleo que vai
             # abrir (ja trocado acima, se for Jogar Junto) precisa para isso:

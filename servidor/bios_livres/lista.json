@@ -32,6 +32,18 @@
       "sha256_do_pacote": "27eb4f51d4201b6f7682ed0259d08d86e0410d41f572412812fe1ae928df9688",
       "codigo_fonte": "https://github.com/TASEmulators/freej2me-plus/tree/8f87bf1497e7a9738a32d1909379376a1faca7dd",
       "o_que_faz": "Não é BIOS de console: é a metade Java do emulador do Java ME (o freej2me-lr.jar do pacote). A outra metade é o núcleo freej2me_libretro.dll, que procura este arquivo na pasta system e o abre com o Java do ARENA (emuladores\\Java)."
+    },
+    "OpenBIOS": {
+      "nome": "OpenBIOS",
+      "versao": "do Libreboot 26.10",
+      "console": "PlayStation",
+      "licenca": "MIT (o texto vai junto, em OpenBIOS\\COPYING.txt)",
+      "site": "https://libreboot.org/",
+      "baixado_de": "https://www.mirrorservice.org/sites/libreboot.org/release/stable/26.10/roms/playstation/openbios.bin",
+      "sha512_publicado": "4037a9569f57d0a88818f311efeb088fedd556f38593fc4e3c551112b47f99ca8b06fc8c5ca4c600e4457681bff3b9988411507c8c84f9befd05cc885f846e1e",
+      "sha512_publicado_em": "https://www.mirrorservice.org/sites/libreboot.org/release/stable/26.10/roms/playstation/openbios.bin.sha256 (o arquivo tem esse nome, mas a marca dentro dele é SHA-512; conferida)",
+      "codigo_fonte": "https://github.com/grumpycoders/pcsx-redux/tree/main/src/mips/openbios",
+      "o_que_faz": "A BIOS do PlayStation escrita do zero pelo projeto PCSX-Redux, compilada e publicada pelo Libreboot. O ARENA a guarda numa pasta só dela (retroarch\\system\\OpenBIOS): solta na system, o SwanStation a escolheria até no jeito original, porque procura a BIOS em ordem alfabética e openbios.bin vem antes de SCPH1001.BIN (testado em 15/10/2026). Só o jeito livre do PlayStation aponta o núcleo para essa pasta. Não tem a tela do memory card nem o tocador de CD de música do console; salvar dentro do jogo funciona."
     }
   },
   "arquivos": [
@@ -153,6 +165,20 @@
       "origem": "FreeJ2ME-Plus/freej2me-lr.jar",
       "destino": "freej2me-lr.jar",
       "sha256": "358992e0b71b5b6a370c5f07b6fbd050fda3cb1fde7256bf818f1bbe20245dd4"
+    },
+    {
+      "projeto": "OpenBIOS",
+      "console": "ps1",
+      "origem": "OpenBIOS/openbios.bin",
+      "destino": "OpenBIOS/openbios.bin",
+      "sha256": "da0bf3d3e0bf75d4bea49c037f9d0639d75c3ff4a569659965e04b9809b707c5"
+    },
+    {
+      "projeto": "OpenBIOS",
+      "console": "ps1",
+      "origem": "OpenBIOS/COPYING.txt",
+      "destino": "OpenBIOS/COPYING.txt",
+      "sha256": "ac541852ba3bb0de15333872f16bb9e4a2c3e9cc70dc4171c4416b5b1a5c7996"
     }
   ]
 }

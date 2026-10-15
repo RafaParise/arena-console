@@ -1098,6 +1098,7 @@ input::placeholder { color: var(--texto-apagado); }
 .opcao-rotulo { font-size: var(--t-peq); }
 .opcao-ajuda { grid-column: 1; font-size: var(--t-micro); color: var(--texto-apagado); }
 .opcao-controle { grid-row: 1 / span 2; }
+#listaJeitos { margin-top: 0.6rem; }
 
 /* interruptor */
 .chave {

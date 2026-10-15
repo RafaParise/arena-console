@@ -701,6 +701,13 @@
     <p class="explica">Coloque cada emulador na pasta <code>emuladores</code>.</p>
 
     <div>
+      <h3 class="grupo-titulo">Jeito de ligar cada console</h3>
+      <p class="explica">Alguns consoles ligam de mais de um jeito: com a <strong>BIOS original</strong> (a do aparelho de verdade, que você pôs na pasta BIOS), com uma <strong>BIOS livre</strong>, feita por voluntários, que já vem no ARENA, ou num <strong>emulador de fora</strong>. É como a peça de um carro: a original é a de fábrica; a livre foi feita pela comunidade, e qualquer um pode usar.</p>
+      <p class="explica">Quando um console tem mais de um jeito, o ARENA pergunta na hora de jogar. Aqui dá para trocar a resposta ou voltar a perguntar.</p>
+      <div class="avancado" id="listaJeitos"></div>
+    </div>
+
+    <div>
       <h3 class="grupo-titulo">BIOS dos consoles</h3>
       <p class="explica"><strong>BIOS</strong> é o programinha que vem de fábrica dentro do console de verdade e liga ele por dentro. Alguns consoles não abrem jogo nenhum sem ela; outros só precisam dela para alguns jogos.</p>
       <p class="explica">Cada console tem a sua pasta dentro da pasta <code>BIOS</code> do ARENA, com o mesmo nome da pasta de jogos dele. Quando o console tem uma BIOS para cada região (EUA, Europa, Japão), há uma pasta para cada região.</p>
@@ -1000,6 +1007,23 @@
     <div class="modal-acoes">
       <button class="botao" id="btnCancelarEspera" type="button">Cancelar</button>
       <button class="botao botao--principal" id="btnComecarSemEsperar" type="button">Começar sem esperar</button>
+    </div>
+  </div>
+</div>
+
+<!-- O jeito de ligar o console: o original, o livre ou o emulador de fora
+     (pedido do Rafael, 15/10/2026). -->
+<div class="modal" id="modalJeito" hidden>
+  <div class="modal-caixa" role="dialog" aria-modal="true" aria-labelledby="tituloJeito">
+    <h2 id="tituloJeito">Como ligar o console?</h2>
+    <p class="explica" id="jeitoExplica"></p>
+    <div class="perfis" id="listaJeitosModal"></div>
+    <label class="opcao">
+      <input id="lembrarJeito" type="checkbox" checked>
+      <span>Lembrar para todos os jogos deste console. Dá para trocar depois em Ajustes → Emuladores.</span>
+    </label>
+    <div class="modal-acoes">
+      <button class="botao" data-fechar="modalJeito" type="button">Cancelar</button>
     </div>
   </div>
 </div>

@@ -524,8 +524,8 @@ def montar(destino, com_bios=False):
 
 
 BIOS_FORA = ("Esta versão NÃO vem com BIOS nem firmware das empresas (são da Sony, da Sega, da SNK...). "
-             "Vêm só as BIOS livres, escritas por voluntários (servidor\\bios_livres: o C-BIOS do MSX e o "
-             "EmuTOS do Atari ST).")
+             "Vêm só as BIOS livres, escritas por voluntários (servidor\\bios_livres: o C-BIOS do MSX, o "
+             "EmuTOS do Atari ST e a OpenBIOS do PlayStation).")
 
 
 def frase_das_bios(levadas):

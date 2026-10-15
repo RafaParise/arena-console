@@ -28,7 +28,7 @@ por voluntários para qualquer um copiar.
 | Xenia Canary (Xbox 360) | BSD-3-Clause | <https://github.com/xenia-canary/xenia-canary> | `emuladores\Xenia` |
 | Java do Java ME: OpenJDK 21 (Eclipse Temurin), reduzido com o jlink | GPL-2.0 com a exceção Classpath (os textos vão em emuladores\Java\legal) | <https://github.com/adoptium/temurin21-binaries> | `emuladores\Java` |
 
-## BIOS livres (3)
+## BIOS livres (4)
 
 Ficam em `servidor\bios_livres`, sem mudança nenhuma, com o texto da
 licença ao lado; a `lista.json` dessa pasta guarda a marca (SHA-256) de
@@ -39,6 +39,7 @@ cada arquivo. O ARENA as copia para `retroarch\system` só onde falta.
 | C-BIOS 0.29a | MSX | BSD de 2 cláusulas (o aviso de direitos vai junto, em C-BIOS\doc\cbios.txt) | <https://cbios.sourceforge.net/> | `servidor\bios_livres\C-BIOS` |
 | EmuTOS 1.4 | Atari ST | GPL-2.0 ou posterior (o texto vai junto, em EmuTOS\doc\license.txt) | <https://downloads.sourceforge.net/project/emutos/emutos/1.4/emutos-src-1.4.tar.gz> | `servidor\bios_livres\EmuTOS` |
 | FreeJ2ME-Plus 1.52 | Java ME | GPL-3.0 (o texto vai junto, em FreeJ2ME-Plus\LICENSE.txt, com as licenças das bibliotecas que vêm dentro: ObjectWeb ASM, JLayer e libsdl4j) | <https://github.com/TASEmulators/freej2me-plus/tree/8f87bf1497e7a9738a32d1909379376a1faca7dd> | `servidor\bios_livres\FreeJ2ME-Plus` |
+| OpenBIOS do Libreboot 26.10 | PlayStation | MIT (o texto vai junto, em OpenBIOS\COPYING.txt) | <https://github.com/grumpycoders/pcsx-redux/tree/main/src/mips/openbios> | `servidor\bios_livres\OpenBIOS` |
 
 ## Núcleos do RetroArch (63)
 

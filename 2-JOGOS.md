@@ -666,9 +666,9 @@ reconhece e leva para o lugar certo.
 | Commodore Amiga | `kick34005.A500` (Kickstart 1.3) |
 
 **Só para alguns jogos:** PlayStation (uma BIOS de qualquer região — sem
-ela, o ARENA abre o jogo pelo PCSX ReARMed, que imita a BIOS: a maioria
-abre, como o CTR, mas alguns travam; com ela, ele usa o SwanStation, mais
-fiel) · Dreamcast (`dc_boot.bin` — a maioria abre sem ela,
+ela, o PlayStation liga pela OpenBIOS, a BIOS livre que vem no ARENA, e
+quase todos os jogos abrem; com as duas, o ARENA pergunta qual usar) ·
+Dreamcast (`dc_boot.bin` — a maioria abre sem ela,
 mas alguns travam, como o Marvel vs. Capcom 1) · Satellaview, os jogos "BS"
 do Super Nintendo (`BS-X.bin`) · Sufami Turbo (`STBIOS.bin`) · Famicom Disk
 System, os jogos `.fds` (`disksys.rom`) · PC Engine em CD (`syscard3.pce`) ·
@@ -686,12 +686,15 @@ sistema original do Atari 8-bit (`ATARIXL.ROM` e `ATARIBAS.ROM`; sem eles,
 ele liga pelo AltirraOS e pelo Altirra BASIC, livres, que vêm no emulador).
 
 **Sem BIOS nenhuma (o pacote do ARENA não leva BIOS da Sony, da Sega nem da
-SNK):** o PlayStation, o Dreamcast e o Amiga abrem com uma imitação da BIOS
-que vem dentro do emulador, o MSX abre os cartuchos pelo C-BIOS, o Atari ST
-liga pelo EmuTOS e o Atari 8-bit, pelo AltirraOS. O Saturn
-foi testado assim, com o Yabause, em 14/10/2026, e ficou com a tela preta:
-continua precisando da BIOS. PS2, Sega CD, PC Engine CD, Neo Geo e os outros
-da tabela não têm BIOS livre.
+SNK):** o PlayStation liga pela OpenBIOS, o Dreamcast e o Amiga abrem com
+uma imitação da BIOS que vem dentro do emulador, o MSX abre os cartuchos
+pelo C-BIOS, o Atari ST liga pelo EmuTOS e o Atari 8-bit, pelo AltirraOS.
+O Saturn continua precisando da BIOS: testado em 15/10/2026 com os três
+emuladores de Saturn de código aberto. O Kronos e o YabaSanshiro nem ligam
+sem ela, e com a imitação da BIOS forçada os três (com o Yabause) abrem com
+a tela preta no Saturn Bomberman, mesmo esperando 60 segundos. Com a
+`mpr-17933.bin`, o jogo aparece em cerca de 32 segundos. PS2, Sega CD, PC
+Engine CD, Neo Geo e os outros da tabela não têm BIOS livre.
 
 #### BIOS livres: as que vêm com o ARENA
 
@@ -703,6 +706,7 @@ cada uma com a licença dela:
 |---|---|---|
 | MSX | C-BIOS 0.29a (licença BSD) | os jogos de cartucho (`.rom`); disquete e fita continuam pedindo a pasta `Machines` |
 | Atari ST | EmuTOS 1.4 (licença GPL) | liga o computador e abre os jogos; o TOS original é opcional |
+| PlayStation | OpenBIOS do Libreboot 26.10 (licença MIT) | quase todos os jogos; não tem a tela do memory card nem o tocador de CD de música (salvar dentro do jogo funciona) |
 
 O Atari 8-bit também liga sem BIOS da Atari: o AltirraOS e o Altirra BASIC,
 de Avery Lee (licença livre), já vêm dentro do emulador dele (o atari800).
@@ -715,6 +719,33 @@ só o que falta. **As duas funções continuam valendo:** a BIOS de verdade, se
 você puser na pasta `BIOS`, passa na frente da livre (no MSX, o próprio
 emulador escolhe: tenta a máquina original e, sem a BIOS dela, liga a do
 C-BIOS; no Atari ST, o TOS original entra no lugar do EmuTOS).
+
+**PlayStation: com as duas, você escolhe.** Pense na peça de um carro: a
+original é a de fábrica, e a livre foi feita pela comunidade, para qualquer
+um usar. Com a BIOS do PlayStation na pasta `BIOS` e a OpenBIOS que vem no
+ARENA, o primeiro jogo de PlayStation pergunta qual usar:
+
+| Escolha | Como liga | Bom para |
+|---|---|---|
+| BIOS original | com a BIOS do console de verdade | é a mais fiel: todos os jogos abrem |
+| BIOS livre (OpenBIOS) | com a BIOS escrita do zero por voluntários | funciona sem nada das empresas |
+
+A caixinha **Lembrar** já vem marcada: o ARENA guarda a resposta e não
+pergunta de novo. Para trocar ou voltar a perguntar: **Ajustes → Emuladores
+→ Jeito de ligar cada console**. Os dois jeitos usam o mesmo emulador (o
+SwanStation), então os saves são os mesmos nos dois. Sem a BIOS da Sony, o
+ARENA liga pela OpenBIOS sem perguntar. O **Jogar Junto** continua do jeito
+de sempre: o PCSX ReARMed, com a BIOS original se ela estiver na pasta.
+
+A OpenBIOS fica numa pasta só dela, `retroarch\system\OpenBIOS`. Solta na
+`system`, o emulador a escolheria até no jeito original: ele procura a BIOS
+em ordem alfabética, e `openbios.bin` vem antes de `SCPH1001.BIN` (testado
+em 15/10/2026). Nos testes desse dia, os 7 jogos de PlayStation do professor
+abriram com a OpenBIOS (Crash Bandicoot, Crash 3, CTR, Soul Reaver, Twisted
+Metal 2, Metal Slug X e Vigilante 8). Quem jogou sem BIOS na versão de
+15/10, pelo PCSX ReARMed, não perde o save: na primeira vez que o jogo abre
+pelo SwanStation, o ARENA leva uma cópia do cartão de memória (o original
+fica onde estava).
 
 **Atari ST, Apple II e Atari 8-bit numa pasta com acento:** os emuladores
 deles (o Hatari, o AppleWin e o atari800) não abrem arquivo de pasta com

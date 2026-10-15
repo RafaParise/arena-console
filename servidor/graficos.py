@@ -839,6 +839,43 @@ def opcoes_de_memory_card(pasta_saves, plataforma_id):
     return {"swanstation_MemoryCards_Card1Type": "Libretro"}
 
 
+TAMANHO_CARTAO_PS1 = 131072     # 128 KB: 16 blocos de 8 KB
+
+
+def levar_cartao_do_ps1(pasta_saves, caminho_jogo):
+    """O cartao de memoria que o PCSX ReARMed fez para este jogo de PS1
+    passa a valer tambem no SwanStation: uma COPIA, e o original fica onde
+    esta. Devolve True se copiou.
+
+    O RetroArch guarda o cartao na pasta do nucleo (sort_savefiles_enable):
+    saves\\PCSX-ReARMed\\<jogo>.srm ou saves\\SwanStation\\<jogo>.srm. Ate
+    15/10/2026, o PS1 sem a BIOS da Sony abria pelo PCSX ReARMed; agora abre
+    pelo SwanStation com a OpenBIOS (o jeito livre), e o save de antes
+    sumiria da tela do jogo. Os dois nucleos usam o mesmo cartao de 128 KB,
+    byte a byte. So copia quando o SwanStation ainda nao tem cartao deste
+    jogo: nunca troca um que ja existe (o os.rename do Windows recusa)."""
+    nome = os.path.splitext(os.path.basename(caminho_jogo))[0] + ".srm"
+    origem = os.path.join(pasta_saves, "PCSX-ReARMed", nome)
+    destino = os.path.join(pasta_saves, "SwanStation", nome)
+    temporario = "%s.%d.copiando" % (destino, threading.get_ident())
+    try:
+        if os.path.exists(destino) or os.path.getsize(origem) != TAMANHO_CARTAO_PS1:
+            return False
+        with open(origem, "rb") as arquivo:
+            dados = arquivo.read()
+        os.makedirs(os.path.dirname(destino), exist_ok=True)
+        with open(temporario, "wb") as arquivo:
+            arquivo.write(dados)
+        os.rename(temporario, destino)
+        return True
+    except OSError:
+        try:
+            os.remove(temporario)
+        except OSError:
+            pass
+        return False
+
+
 # ---------------------------------------------------------------------------
 # Cache de video do PS1 (so no modo economico)
 # ---------------------------------------------------------------------------
@@ -859,43 +896,56 @@ def opcoes_de_memory_card(pasta_saves, plataforma_id):
 CACHE_PS1 = os.path.join(PASTA_RETROARCH, "system", "swanstation", "vulkan_pipelines.bin")
 
 
-def _marca_do_cache_ps1():
-    return CACHE_PS1 + ".placa"
+def cache_ps1(pasta_sistema=None):
+    """O cache de video do SwanStation, que fica na pasta das BIOS que o
+    nucleo recebe. No jeito livre do PlayStation (servidor\\jeitos_de_abrir.py)
+    essa pasta e' a da OpenBIOS, retroarch\\system\\OpenBIOS, e o cache fica
+    la dentro."""
+    if not pasta_sistema:
+        return CACHE_PS1
+    return os.path.join(pasta_sistema, "swanstation", "vulkan_pipelines.bin")
 
 
-def preparar_cache_ps1(placa):
+def _marca_do_cache_ps1(cache=None):
+    return (cache or CACHE_PS1) + ".placa"
+
+
+def preparar_cache_ps1(placa, cache=None):
     """Antes de abrir um jogo de PS1. Devolve o tamanho atual do cache
-    (ou -1 se nao existe), para comparar depois."""
+    (ou -1 se nao existe), para comparar depois. 'cache': o arquivo
+    (cache_ps1), quando nao e' o de sempre."""
+    cache = cache or CACHE_PS1
     try:
-        if not os.path.isfile(CACHE_PS1):
+        if not os.path.isfile(cache):
             return -1
         try:
-            with open(_marca_do_cache_ps1(), encoding="utf-8") as f:
+            with open(_marca_do_cache_ps1(cache), encoding="utf-8") as f:
                 placa_do_cache = f.read().strip()
         except OSError:
             placa_do_cache = ""
         if placa_do_cache and placa_do_cache != placa:
             # Veio de outro computador: nao serve aqui.
-            os.chmod(CACHE_PS1, 0o666)
-            os.remove(CACHE_PS1)
+            os.chmod(cache, 0o666)
+            os.remove(cache)
             return -1
-        return os.path.getsize(CACHE_PS1)
+        return os.path.getsize(cache)
     except OSError:
         return -1
 
 
-def fixar_cache_ps1(tamanho_antes, placa):
+def fixar_cache_ps1(tamanho_antes, placa, cache=None):
     """Depois do jogo de PS1: se o cache nao cresceu, trava contra regravacao.
     Devolve True se travou agora."""
+    cache = cache or CACHE_PS1
     try:
-        if not os.path.isfile(CACHE_PS1) or tamanho_antes < 0:
+        if not os.path.isfile(cache) or tamanho_antes < 0:
             return False
-        if os.path.getsize(CACHE_PS1) != tamanho_antes:
+        if os.path.getsize(cache) != tamanho_antes:
             return False                      # aprendeu coisa nova: deixa livre
-        if not os.access(CACHE_PS1, os.W_OK):
+        if not os.access(cache, os.W_OK):
             return False                      # ja estava travado
-        os.chmod(CACHE_PS1, 0o444)
-        with open(_marca_do_cache_ps1(), "w", encoding="utf-8") as f:
+        os.chmod(cache, 0o444)
+        with open(_marca_do_cache_ps1(cache), "w", encoding="utf-8") as f:
             f.write(placa)
         return True
     except OSError:

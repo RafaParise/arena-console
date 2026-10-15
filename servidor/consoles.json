@@ -743,6 +743,13 @@
       "core_netplay": "pcsx_rearmed_libretro.dll",
       "core_sem_bios": "pcsx_rearmed_libretro.dll",
       "sem_bios_aviso": "Sem a BIOS do PlayStation, o jogo abre pelo PCSX ReARMed, que imita a BIOS: a maioria dos jogos abre, mas alguns travam.",
+      "livre": {
+        "nome": "BIOS livre (OpenBIOS)",
+        "pasta": "OpenBIOS",
+        "bios": "openbios.bin",
+        "explica": "Liga com a OpenBIOS, uma BIOS escrita do zero por voluntários, de licença livre, que já vem no ARENA. Quase todos os jogos abrem; ela não tem a tela do memory card nem o tocador de CD de música do console (salvar dentro do jogo funciona).",
+        "aviso": "Este PlayStation liga com a OpenBIOS, a BIOS livre que vem no ARENA: quase todos os jogos abrem. Se algum não abrir, ponha a BIOS do console na pasta BIOS (guia 2)."
+      },
       "netplay_aviso": "Jogar Junto no PlayStation usa o PCSX ReARMed em vez do núcleo normal - o SwanStation (mais fiel) não tem jogo em rede. Sozinho, continua sendo o SwanStation.",
       "apelidos": [
         "playstation",

@@ -105,9 +105,11 @@ dentro da pasta, sem gravar nada fora dela.
   instala com o nome certo e mostra o que ainda falta
   (**Ajustes → Emuladores → BIOS dos consoles**). A exceção é a **BIOS
   livre**, escrita do zero por voluntários: essa já vem com o ARENA (o
-  C-BIOS, que abre os cartuchos do MSX, e o EmuTOS, que liga o Atari ST; o
-  AltirraOS, que liga o Atari 8-bit, vem dentro do emulador dele), e a de
-  verdade passa na frente dela.
+  C-BIOS, que abre os cartuchos do MSX, o EmuTOS, que liga o Atari ST, e a
+  OpenBIOS, que liga o PlayStation; o AltirraOS, que liga o Atari 8-bit, vem
+  dentro do emulador dele), e a de verdade passa na frente dela. No
+  PlayStation, com as duas na pasta, o ARENA pergunta qual usar e lembra a
+  resposta.
 
 ## Requisitos
 

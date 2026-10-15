@@ -285,6 +285,7 @@ async function carregarEstado() {
   estado.consolesBotoes = dados.consoles_botoes || [];
   if (estado.controlesMontados) montarAbaControles();
   desenharExternos(dados.externos || []);
+  desenharJeitos();
   desenharBios(dados.bios_consoles || [], dados.bios_disponiveis || []);
   desenharCartoes(dados.memory_cards || []);
   prepararAbrirBios(dados.bios_consoles || []);
@@ -354,6 +355,7 @@ async function carregarCatalogo() {
   // o estado da plataforma dentro de cada um dos jogos.
   estado.porPlataforma = {};
   for (const p of dados.plataformas) estado.porPlataforma[p.id] = p;
+  desenharJeitos();
   estado.jogos = dados.jogos;
   if (!estado.jogoSelecionado || !estado.jogos.some((jogo) => jogo.id === estado.jogoSelecionado.id))
     estado.jogoSelecionado = estado.jogos[0] || null;
@@ -968,7 +970,7 @@ async function moverJogo(jogoId, plataformaId) {
 
 const acharJogo = (id) => estado.jogos.find((jogo) => jogo.id === id);
 
-async function jogar(jogo) {
+async function jogar(jogo, jeito = "", lembrar = false) {
   const apelido = apelidoAtual();
   if (!apelido) {
     recado("Escolha seu apelido antes de jogar.", true);
@@ -976,7 +978,20 @@ async function jogar(jogo) {
     return;
   }
   try {
-    const dados = await pedir("/api/jogar", "POST", { jogo_id: jogo.id, apelido });
+    const corpo = { jogo_id: jogo.id, apelido };
+    if (jeito) Object.assign(corpo, { jeito, lembrar });
+    const dados = await pedir("/api/jogar", "POST", corpo);
+    // O console liga de mais de um jeito (o original, o livre, o emulador
+    // de fora) e ninguem escolheu ainda: o servidor pergunta antes de abrir.
+    if (dados.escolher_jeito) {
+      perguntarJeito(jogo, dados);
+      return;
+    }
+    // A escolha lembrada ja aparece em Ajustes > Emuladores, sem recarregar.
+    if (jeito && lembrar && estado.config) {
+      estado.config.jeito_de_abrir = { ...(estado.config.jeito_de_abrir || {}), [jogo.plataforma]: jeito };
+      desenharJeitos();
+    }
     marcarJogoAberto(jogo.id);
     const recentes = [jogo.id, ...(estado.config.recentes || []).filter((id) => id !== jogo.id)].slice(0, 20);
     salvarConfig({ recentes }).then(() => desenharJogos()).catch(() => {});
@@ -990,6 +1005,97 @@ async function jogar(jogo) {
   } catch (falha) {
     recado(falha.message, true);
   }
+}
+
+// --------------------------------------------------------------------------
+// O jeito de ligar o console (pedido do Rafael, 15/10/2026)
+// --------------------------------------------------------------------------
+// Quando o console liga de mais de um jeito -- com a BIOS original, com a
+// BIOS livre que vem no ARENA ou num emulador de fora --, a janela mostra
+// os jeitos que existem neste computador (o recomendado primeiro) e abre o
+// jogo pelo que a pessoa clicar.
+
+function perguntarJeito(jogo, dados) {
+  const jeitos = dados.jeitos || [];
+  $("#tituloJeito").textContent = `Como ligar o ${dados.console}?`;
+  $("#jeitoExplica").textContent =
+    `${jogo.titulo} pode abrir de ${jeitos.length} jeitos neste computador. ` +
+    (jeitos.length === 2 ? "Os dois funcionam" : "Todos funcionam") +
+    ": escolha um, e o jogo abre na hora.";
+  const lote = document.createDocumentFragment();
+  for (const j of jeitos) {
+    const botao = document.createElement("button");
+    botao.className = "perfil";
+    botao.type = "button";
+    botao.dataset.jeito = j.id;
+    const nome = document.createElement("span");
+    nome.className = "perfil-nome";
+    nome.textContent = j.selo ? `${j.titulo} · ${j.selo}` : j.titulo;
+    const resumo = document.createElement("span");
+    resumo.className = "perfil-resumo";
+    resumo.textContent = j.explica;
+    botao.append(nome, resumo);
+    botao.addEventListener("click", () => {
+      $("#modalJeito").hidden = true;
+      jogar(jogo, j.id, $("#lembrarJeito").checked);
+    });
+    lote.append(botao);
+  }
+  $("#listaJeitosModal").replaceChildren(lote);
+  $("#modalJeito").hidden = false;
+  const primeiro = $("#listaJeitosModal .perfil");
+  if (primeiro) primeiro.focus();
+}
+
+// Ajustes > Emuladores: o jeito de cada console que tem mais de um.
+function desenharJeitos() {
+  const caixa = $("#listaJeitos");
+  if (!caixa || !estado.plataformas) return;
+  const consoles = estado.plataformas.filter((p) => (p.jeitos || []).length > 1);
+  if (consoles.length === 0) {
+    const vazio = document.createElement("p");
+    vazio.className = "explica";
+    vazio.textContent = "Neste computador, cada console liga de um jeito só: não há o que escolher.";
+    caixa.replaceChildren(vazio);
+    return;
+  }
+  const lembrados = (estado.config && estado.config.jeito_de_abrir) || {};
+  const lote = document.createDocumentFragment();
+  for (const c of consoles) {
+    const linha = document.createElement("div");
+    linha.className = "opcao";
+    const rotulo = document.createElement("span");
+    rotulo.className = "opcao-rotulo";
+    rotulo.textContent = c.nome;
+    const lista = document.createElement("select");
+    lista.className = "opcao-controle";
+    lista.setAttribute("aria-label", "Jeito de ligar o " + c.nome);
+    const perguntar = document.createElement("option");
+    perguntar.value = "";
+    perguntar.textContent = "perguntar na hora de jogar";
+    lista.append(perguntar);
+    for (const j of c.jeitos) {
+      const item = document.createElement("option");
+      item.value = j.id;
+      item.textContent = j.titulo;
+      if (lembrados[c.id] === j.id) item.selected = true;
+      lista.append(item);
+    }
+    lista.addEventListener("change", async () => {
+      try {
+        await salvarConfig({ jeito_de_abrir: { [c.id]: lista.value } });
+        const escolhido = c.jeitos.find((j) => j.id === lista.value);
+        recado(escolhido
+          ? `${c.nome} vai ligar sempre assim: ${escolhido.titulo}.`
+          : `${c.nome}: o ARENA volta a perguntar na hora de jogar.`);
+      } catch (falha) {
+        recado(falha.message, true);
+      }
+    });
+    linha.append(rotulo, lista);
+    lote.append(linha);
+  }
+  caixa.replaceChildren(lote);
 }
 
 // --------------------------------------------------------------------------
