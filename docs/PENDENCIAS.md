@@ -4,6 +4,74 @@ Lista curta do que falta. Ao terminar um item, apague a linha (o registro
 fica no commit). O detalhe de cada pedido está em
 `git show bfc84a0:CLAUDE.md`, seção "Estado atual".
 
+## Pedidos de 15/10/2026, nesta ordem
+
+Visão do Rafael: o pacote vem o mais completo possível, com BIOS e
+emuladores livres, e só fica para baixar o que não tem versão livre. Quando
+um console tiver o original (do professor) e o livre, o ARENA pergunta qual
+usar, para BIOS e para emulador.
+
+Primeiro, o que já estava pedido:
+
+1. Feito: o Java ME (FreeJ2ME-Plus com o Java do ARENA, `fc788dd`), as
+   versões antigas no histórico e nos Releases (`v0.9` do professor e `v1.0`
+   do aluno DOOK3DS, `1cdb034`) e o `CREDITOS.md` (`009722f`).
+2. Saturn e PS1 sem a BIOS da empresa (Kronos ou YabaSanshiro com BIOS
+   imitada; a OpenBIOS do PCSX-Redux), com a escolha entre o original e o
+   livre. Avaliar o Play! para o PS2.
+3. Biblioteca de jogos livres para mais consoles, como a do MS-DOS
+   (homebrew de licença aberta e os 28 jogos do MAME liberados em
+   mamedev.org).
+4. Sala limpa das BIOS pequenas (Odyssey 2, ColecoVision e Intellivision):
+   primeiro, levantar a documentação pública e dizer se dá.
+5. Testes com as BIOS e os jogos do professor em todos os consoles.
+6. Fundos animados e GIF:
+   - a nave rosa do F-Zero está vermelha;
+   - mais naves do F-Zero: a que pisca e explode ao encostar, a roxa e a
+     verde;
+   - no Mario Kart, o Donkey Kong, o Wario, a Peach e outros;
+   - mais personagens de 16 bits em todos os cantos dos dois fundos (no
+     claro, também no pé do morro, menores, como se estivessem longe);
+   - revisar animações, formatos e cores;
+   - o GIF claro ou escuro conforme o tema do GitHub, que não está
+     funcionando;
+   - por fim, o GIF novo, com todos os personagens, no README e na raiz.
+7. As pendências desta lista e o que fica com o professor.
+8. O `INICIAR-ARENA.bat`/`.ps1` do professor (fora do git), por último.
+9. Um Release com tudo.
+
+Depois do Release, nesta ordem:
+
+10. Tela cheia com escala otimizada em todo jogo (como o Lossless
+    Scaling): integrar o Lossless Scaling do professor, se a licença
+    deixar; se não, as mesmas técnicas no ARENA. Inclui o 4K nas placas
+    boas e números de desempenho antes e depois.
+11. O ARENA em qualquer navegador (não só o Edge), com testes.
+12. Chromebook.
+13. Linux, idêntico.
+14. Android: antes, um emulador de Android de código aberto para os
+    testes; depois, o APK nos Releases.
+15. Testes nos sistemas virtuais (Docker e WSL), com números e
+    descontando a perda de rodar dentro de outro sistema.
+
+Achados de 15/10 que esperam conserto:
+
+- Na rodada final, o N64 (mupen64plus-next) gravou o cache de shaders, o de
+  texturas e o `mupen64plus.ini` numa pasta de nome estragado,
+  `C:\Projetos\Criador De Apps PedagÃ³gicos\arena-console\retroarch\system`.
+  Ali também ficou uma pasta `vice` vazia, do VICE. Os dois núcleos gravam
+  pelo caminho em ANSI quando o ARENA está numa pasta com acento. É só
+  cache: a pasta pode ser apagada.
+- O servidor escuta a descoberta de colegas (UDP 55436) em todas as redes,
+  mesmo com a rede fechada. Por isso o Firewall do Windows pergunta na
+  primeira vez que um Python novo roda. Avaliar escutar só com a rede
+  aberta.
+- A ponte sem acento chama a cópia do jogo de `jogo.<extensão>`. Os estados
+  (F2) dos jogos que passam por ela ficam com o mesmo nome. Manter o nome
+  do arquivo quando ele não tiver acento.
+- Ideia do aluno ainda não usada: o código de amigo curto
+  (`ARENA-XXXX-XXXX`), no lugar do identificador inteiro do aparelho.
+
 ## Pedidos de 12/10/2026, nesta ordem
 
 1. **GitHub:**
