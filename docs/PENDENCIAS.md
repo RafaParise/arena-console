@@ -86,10 +86,15 @@ fica no commit). O detalhe de cada pedido está em
      18 MB, então o teste escreve um cartucho de 168 bytes que desenha a
      textura da BIOS). Tem Jogar Junto. Ele desenha em OpenGL: o RetroArch
      troca de motor sozinho (driver_switch_enable).
-   - Depois: versão nova do pacote (um download só, com tudo), pedido de
-     14/10 ("tudo pronto para só colocar o jogo e jogar").
-   - Dizer com clareza onde não dá: o PS2 não tem BIOS livre, e distribuir
-     BIOS da Sony, da Sega ou da SNK é proibido.
+   - Feito (15/10): a versão nova do pacote, num download só (pedido de
+     14/10, "tudo pronto para só colocar o jogo e jogar"): o Release
+     v2026.10.15, com o `ARENA-2026.10.15.zip` (493 MB, 66 consoles, 62
+     núcleos, as BIOS livres) e o de atualização. O README e as notas do
+     Release dizem com clareza onde não dá: o PS2 não tem BIOS livre, e as
+     BIOS da Sony, da Sega e da SNK não vão no pacote.
+   - Depende do Rafael: atualizar a pasta dos alunos (`..\ARENA`) com o
+     `--atualizar` e, para os consoles novos, copiar para ela as pastas
+     `retroarch\cores` e `retroarch\info` do pacote novo (guia 6).
 
 Também: o botão "Gerenciar catálogo" (acervo) nunca aparece, e um "Abrir a
 pasta dos pacotes" ajudaria quem nunca usou computador.
