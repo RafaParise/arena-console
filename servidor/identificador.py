@@ -314,6 +314,24 @@ def identificar(caminho, candidatos, palpite=False):
     except OSError:
         return None
 
+    # O .xex serve a dois consoles, e o comeco do arquivo diz qual: o do
+    # Xbox 360 (o default.xex) comeca com "XEX" e a versao ("XEX2"); o do
+    # Atari 8-bit, com FF FF. Vale em qualquer tamanho (o do Atari tem
+    # poucos KB).
+    if caminho.lower().endswith(".xex"):
+        try:
+            with open(caminho, "rb") as arquivo:
+                inicio = arquivo.read(4)
+        except OSError:
+            return None
+        if inicio[:3] == b"XEX":
+            achado = "xbox360"
+        elif inicio[:2] == b"\xff\xff":
+            achado = "atari800"
+        else:
+            achado = None
+        return achado if achado in candidatos else None
+
     # Arquivo pequeno demais para ser um disco: nem tenta.
     if tamanho < 64 * 1024:
         return None

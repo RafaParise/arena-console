@@ -189,6 +189,40 @@
       "pasta": "Atari 7800"
     },
     {
+      "id": "atari800",
+      "nome": "Atari 8-bit",
+      "descricao": "Os computadores Atari 400, 800, XL e XE, de 1979: o sistema livre AltirraOS ja vem no emulador.",
+      "core": "atari800_libretro.dll",
+      "extensoes": [
+        ".atr",
+        ".xex",
+        ".car",
+        ".cas",
+        ".xfd",
+        ".atx",
+        ".dcm"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "atari 8-bit",
+        "atari 8bit",
+        "atari 8 bit",
+        "atari 400",
+        "atari 800",
+        "atari 800xl",
+        "atari 1200xl",
+        "atari 65xe",
+        "atari 130xe",
+        "atari xl",
+        "atari xe",
+        "atari800"
+      ],
+      "pasta": "Atari 8-bit"
+    },
+    {
       "id": "lynx",
       "nome": "Atari Lynx",
       "descricao": "Portatil colorido de 1989.",
@@ -908,6 +942,26 @@
       "pasta": "WonderSwan"
     },
     {
+      "id": "supervision",
+      "nome": "Watara Supervision",
+      "descricao": "Portatil de 1992, rival barato do Game Boy, com tela de 4 tons de cinza.",
+      "core": "potator_libretro.dll",
+      "extensoes": [
+        ".sv"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "supervision",
+        "super vision",
+        "watara",
+        "quickshot supervision"
+      ],
+      "pasta": "Watara Supervision"
+    },
+    {
       "id": "threedo",
       "nome": "3DO",
       "descricao": "Console multimidia de 1993.",
@@ -1065,6 +1119,34 @@
       "pasta": "Commodore 64"
     },
     {
+      "id": "c128",
+      "nome": "Commodore 128",
+      "descricao": "O sucessor do Commodore 64, de 1985, com o BASIC 7.0 e 128 KB de memoria.",
+      "core": "vice_x128_libretro.dll",
+      "extensoes": [
+        ".d64",
+        ".d71",
+        ".d81",
+        ".prg",
+        ".t64",
+        ".tap",
+        ".crt"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "c128",
+        "c-128",
+        "c 128",
+        "commodore 128"
+      ],
+      "netplay": false,
+      "netplay_motivo": "O núcleo do Commodore 128 (VICE) não suporta jogo em rede - confirmado tentando hospedar em 15/10/2026, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Os 2 jogadores só valem no mesmo computador.",
+      "pasta": "Commodore 128"
+    },
+    {
       "id": "vic20",
       "nome": "Commodore VIC-20",
       "descricao": "O primeiro computador a vender um milhao de unidades, de 1980.",
@@ -1126,6 +1208,36 @@
       "netplay": false,
       "netplay_motivo": "O núcleo do Plus/4 (VICE) não suporta jogo em rede - confirmado tentando hospedar em 14/10/2026, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Os 2 jogadores só valem no mesmo computador.",
       "pasta": "Commodore Plus-4"
+    },
+    {
+      "id": "pet",
+      "nome": "Commodore PET",
+      "descricao": "O primeiro computador da Commodore, de 1977, com o monitor de letras verdes embutido.",
+      "core": "vice_xpet_libretro.dll",
+      "extensoes": [
+        ".prg",
+        ".d64",
+        ".d80",
+        ".d82",
+        ".t64",
+        ".tap"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "commodore pet",
+        "cbm pet",
+        "pet 2001",
+        "pet 4032",
+        "pet 8032",
+        "cbm 4032",
+        "cbm 8032"
+      ],
+      "netplay": false,
+      "netplay_motivo": "O núcleo do Commodore PET (VICE) não suporta jogo em rede - confirmado tentando hospedar em 15/10/2026, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Os 2 jogadores só valem no mesmo computador.",
+      "pasta": "Commodore PET"
     },
     {
       "id": "amiga",
@@ -1244,6 +1356,34 @@
       "netplay": false,
       "netplay_motivo": "O núcleo do Apple II (AppleWin) não suporta jogo em rede - confirmado tentando hospedar em 14/10/2026, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Os 2 jogadores só valem no mesmo computador.",
       "pasta": "Apple II"
+    },
+    {
+      "id": "thomson",
+      "nome": "Thomson MO/TO",
+      "descricao": "Os computadores franceses MO5, TO7 e TO8, dos anos 1980, os das escolas da Franca.",
+      "core": "theodore_libretro.dll",
+      "extensoes": [
+        ".fd",
+        ".sap",
+        ".k7",
+        ".m5",
+        ".m7"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "thomson",
+        "mo5",
+        "mo6",
+        "to7",
+        "to8",
+        "to9"
+      ],
+      "netplay": false,
+      "netplay_motivo": "O núcleo do Thomson (Theodore) não suporta jogo em rede - confirmado tentando hospedar em 15/10/2026, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Os 2 jogadores só valem no mesmo computador.",
+      "pasta": "Thomson"
     },
     {
       "id": "dos",
@@ -1486,31 +1626,48 @@
     ".prg": [
       "c64",
       "vic20",
-      "plus4"
+      "plus4",
+      "c128",
+      "pet"
     ],
     ".d64": [
       "c64",
       "vic20",
-      "plus4"
+      "plus4",
+      "c128",
+      "pet"
     ],
     ".t64": [
       "c64",
       "vic20",
-      "plus4"
+      "plus4",
+      "c128",
+      "pet"
     ],
     ".crt": [
       "c64",
       "vic20",
-      "plus4"
+      "plus4",
+      "c128"
     ],
     ".tap": [
       "spectrum",
       "vic20",
-      "plus4"
+      "plus4",
+      "c128",
+      "pet"
     ],
     ".tzx": [
       "spectrum",
       "zx81"
+    ],
+    ".xex": [
+      "xbox360",
+      "atari800"
+    ],
+    ".cas": [
+      "msx",
+      "atari800"
     ]
   }
 }

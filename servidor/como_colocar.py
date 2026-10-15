@@ -146,6 +146,11 @@ CONSOLES = {
     "plus4": {"tipo": "computador", "exemplo": "Nome do Jogo.prg",
               "dica": "Também .d64, .t64, .tap e .crt. Os jogos do Commodore 16 vão nesta pasta. O mesmo .d64 "
                       "serve ao C64: quem decide é a pasta."},
+    "c128": {"tipo": "computador", "exemplo": "Nome do Jogo.d64",
+             "dica": "Também .d71 e .d81 (os disquetes do 128), .prg, .t64, .tap e .crt. O mesmo .d64 serve ao "
+                     "C64: quem decide é a pasta."},
+    "pet": {"tipo": "computador", "exemplo": "Nome do Jogo.prg",
+            "dica": "Também .d64, .d80, .d82, .t64 e .tap. O mesmo .prg serve ao C64: quem decide é a pasta."},
     "zx81": {"tipo": "computador", "exemplo": "Nome do Jogo.p",
              "dica": "Também .t81 e .tzx. O .tzx do ZX Spectrum vai na pasta dele: quem decide é a pasta."},
     "apple2": {"tipo": "computador", "exemplo": "Nome do Jogo.dsk",
@@ -165,6 +170,17 @@ CONSOLES = {
                          "Opcional: o TOS original (tos.img). Sem ele, o Atari ST liga pelo EmuTOS, a BIOS "
                          "livre que já vem no ARENA."),
                 "dica": "Também .msa, .stx e .dim. Jogo que veio em .zip: ponha o .st (ou o .msa) de dentro."},
+    "atari800": {"tipo": "computador", "exemplo": "Nome do Jogo.atr",
+                 "bios": ("opcional", ["ATARIXL.ROM", "ATARIBAS.ROM"],
+                          "Opcional: o sistema original da Atari (ATARIXL.ROM) e o Atari BASIC (ATARIBAS.ROM). "
+                          "Sem eles, o Atari 8-bit liga pelo AltirraOS e pelo Altirra BASIC, livres, que já vêm "
+                          "no emulador."),
+                 "dica": "Também .xex, .car, .cas, .xfd, .atx e .dcm. O .xex também é do Xbox 360, e o .cas, do "
+                         "MSX: quem decide é a pasta."},
+    "thomson": {"tipo": "computador", "exemplo": "Nome do Jogo.k7",
+                "dica": "Também .fd e .sap (disquete) e .m5 e .m7 (cartucho). O emulador escolhe o modelo pelo "
+                        "caminho do arquivo: jogo de MO5 vai numa pasta MO5 dentro desta. Na fita e no disquete, "
+                        "aperte Start no controle para o jogo começar."},
     "spectrum": {"tipo": "computador", "exemplo": "Nome do Jogo.tzx"},
     "amstrad": {"tipo": "computador", "exemplo": "Nome do Jogo.dsk"},
     "megadrive": {"tipo": "cartucho", "exemplo": "Sonic The Hedgehog 3 (USA).md",
@@ -172,6 +188,7 @@ CONSOLES = {
     "atari5200": {"tipo": "cartucho", "bios": ("opcional", ["5200.rom"], "Opcional: 5200.rom.")},
     "atari7800": {"tipo": "cartucho", "bios": ("opcional", ["7800 BIOS (U).rom"], "Opcional: 7800 BIOS (U).rom.")},
     "lynx": {"tipo": "cartucho", "bios": ("opcional", ["lynxboot.img"], "Opcional: lynxboot.img.")},
+    "supervision": {"tipo": "cartucho", "exemplo": "Nome do Jogo.sv"},
     "pokemini": {"tipo": "cartucho", "bios": ("opcional", ["bios.min"], "Opcional: bios.min.")},
     "odyssey2": {"tipo": "cartucho", "bios": ("todas", ["o2rom.bin"], "o2rom.bin.")},
     "colecovision": {"tipo": "cartucho", "bios": ("todas", ["colecovision.rom"], "colecovision.rom.")},

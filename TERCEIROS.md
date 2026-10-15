@@ -38,7 +38,7 @@ cada arquivo. O ARENA as copia para `retroarch\system` só onde falta.
 | C-BIOS 0.29a | MSX | BSD de 2 cláusulas (o aviso de direitos vai junto, em C-BIOS\doc\cbios.txt) | <https://cbios.sourceforge.net/> | `servidor\bios_livres\C-BIOS` |
 | EmuTOS 1.4 | Atari ST | GPL-2.0 ou posterior (o texto vai junto, em EmuTOS\doc\license.txt) | <https://downloads.sourceforge.net/project/emutos/emutos/1.4/emutos-src-1.4.tar.gz> | `servidor\bios_livres\EmuTOS` |
 
-## Núcleos do RetroArch (56)
+## Núcleos do RetroArch (61)
 
 Cada núcleo é o emulador de um console. A licença vem do arquivo `.info`
 do próprio núcleo (`retroarch\info`). Os de licença **não comercial**
@@ -52,6 +52,7 @@ mas não vendidos. O código-fonte de todos está em
 | Atari - 5200 (a5200) | `a5200_libretro.dll` | 2.0.2 | GPLv2 |
 | Apple II (AppleWin) | `applewin_libretro.dll` | 1.30.21.0 | GPLv2 |
 | Arduboy (Ardens) | `ardens_libretro.dll` | Git | MIT |
+| Atari - 400/800/600XL/800XL/130XE/5200 (Atari800) | `atari800_libretro.dll` | 3.1.0 | GPLv2 |
 | MSX/SVI/ColecoVision/SG-1000 (blueMSX) | `bluemsx_libretro.dll` | SVN | GPLv2 |
 | Amstrad - CPC/GX4000 (Caprice32) | `cap32_libretro.dll` | v4.2.0 | GPLv2 |
 | Nintendo - GameCube / Wii (Dolphin) | `dolphin_libretro.dll` | Git | GPLv2+ |
@@ -86,6 +87,7 @@ mas não vendidos. O código-fonte de todos está em
 | Sony - PlayStation (PCSX ReARMed) | `pcsx_rearmed_libretro.dll` | r24 | GPLv2 |
 | Sega - MS/GG/MD/CD/32X (PicoDrive) | `picodrive_libretro.dll` | 1.99 | MAME |
 | Nintendo - Pokemon Mini (PokeMini) | `pokemini_libretro.dll` | v0.60 | GPLv3 |
+| Watara - Supervision (Potator) | `potator_libretro.dll` | 1.0.5 | Public Domain |
 | Sony - PlayStation Portable (PPSSPP) | `ppsspp_libretro.dll` | Git | GPLv2 |
 | Atari - 7800 (ProSystem) | `prosystem_libretro.dll` | 1.3e | GPLv2 |
 | Commodore - Amiga (PUAE) | `puae_libretro.dll` | 5.3.0 | GPLv2 |
@@ -95,11 +97,14 @@ mas não vendidos. O código-fonte de todos está em
 | Atari - 2600 (Stella) | `stella_libretro.dll` | 6.6 | GPLv2 |
 | Sony - PlayStation (SwanStation) | `swanstation_libretro.dll` | v0.1 | GPLv3 |
 | Bandai - Tamagotchi P1 (TamaLIBretro) | `tamalibretro_libretro.dll` | 1.0 | GPL-2.0 |
+| Thomson - MO/TO (Theodore) | `theodore_libretro.dll` | Git | GPLv3 |
 | TIC-80 | `tic80_libretro.dll` | 0.80.0 | MIT |
 | MicroW8 | `uw8_libretro.dll` | 0.2.2 | The Unlicense |
 | Uzebox (Uzem) | `uzem_libretro.dll` | — | MIT |
 | GCE - Vectrex (vecx) | `vecx_libretro.dll` | SVN | GPLv3 |
+| Commodore - C128 (VICE x128) | `vice_x128_libretro.dll` | 3.9 | GPLv2 |
 | Commodore - C64 (VICE x64, fast) | `vice_x64_libretro.dll` | 3.9 | GPLv2 |
+| Commodore - PET (VICE xpet) | `vice_xpet_libretro.dll` | 3.9 | GPLv2 |
 | Commodore - PLUS/4 (VICE xplus4) | `vice_xplus4_libretro.dll` | 3.9 | GPLv2 |
 | Commodore - VIC-20 (VICE xvic) | `vice_xvic_libretro.dll` | 3.9 | GPLv2 |
 | Atari - Jaguar (Virtual Jaguar) | `virtualjaguar_libretro.dll` | v2.1.0 | GPLv3 |

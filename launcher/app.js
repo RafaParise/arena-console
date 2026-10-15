@@ -477,15 +477,15 @@ const MIDIA_POR_PLATAFORMA = {
     "nes", "snes", "megadrive", "sega32x", "n64", "sg1000", "atari2600",
     "atari5200", "atari7800", "jaguar", "intellivision", "colecovision",
     "odyssey2", "arcade", "c64", "msx", "vectrex", "neogeo", "amstrad",
-    "vic20", "plus4",
+    "vic20", "plus4", "c128", "atari800", "thomson",
   ],
   cartucho_v: [
     "gameboy", "gba", "virtualboy", "pokemini", "gamewatch", "ngp",
-    "wonderswan", "nds", "lynx", "pcengine",
+    "wonderswan", "nds", "lynx", "pcengine", "supervision",
   ],
   jewel_case: [
     "ps1", "ps3", "saturn", "dreamcast", "segacd", "threedo", "cdi", "pcfx",
-    "scummvm", "dos", "amiga", "spectrum", "atarist", "zx81", "apple2",
+    "scummvm", "dos", "amiga", "spectrum", "atarist", "zx81", "apple2", "pet",
   ],
   caixa_dvd: ["ps2", "gamecube", "wii"],
   caixa_xbox: ["xbox360"],

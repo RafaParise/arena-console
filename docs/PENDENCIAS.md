@@ -73,11 +73,15 @@ fica no commit). O detalhe de cada pedido está em
      abre pasta com acento e passou pela ponte), Arduboy (Evade, MIT) e
      MicroW8 (Skip Ahead, domínio público). Arduboy e MicroW8 têm Jogar
      Junto; o Apple II, não.
-   - Falta (pedido de 14/10: "todos os consoles de código aberto", mantendo
-     os emuladores de sempre): Atari 8-bit (o núcleo traz o AltirraOS, BIOS
-     livre), Commodore PET e C128, Watara Supervision e Thomson: sem jogo
-     livre publicado, vão com um programa de teste escrito para o ARENA.
-     Vircon32: o núcleo já traz a BIOS livre, mas o menor jogo oficial
+   - Feito: Atari 8-bit (liga pelo AltirraOS, livre, que vem no emulador; com
+     acento, pela ponte), Commodore PET e 128, Watara Supervision e Thomson
+     MO/TO. Sem jogo livre publicado que servisse, cada um foi testado com um
+     programa que o próprio teste escreve (a cor que ele pinta prova que
+     rodou). Atari 8-bit e Supervision têm Jogar Junto; PET, C128 e Thomson,
+     não. No Thomson, a fita e o disquete começam pelo Start do controle (a
+     partida automática do núcleo ficou desligada, sem jogo para testá-la).
+   - Falta (pedido de 14/10: "todos os consoles de código aberto"):
+     Vircon32. O núcleo já traz a BIOS livre, mas o menor jogo oficial
      (BSD-3) tem 18 MB, grande demais para o repositório.
    - Depois: versão nova do pacote (um download só, com tudo), pedido de
      14/10 ("tudo pronto para só colocar o jogo e jogar").

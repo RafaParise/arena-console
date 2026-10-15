@@ -146,6 +146,34 @@ class TestIndexador(unittest.TestCase):
         finally:
             shutil.rmtree(pasta, ignore_errors=True)
 
+    def test_xex_do_atari_e_do_xbox360(self):
+        # 14/10/2026: o .xex serve ao Xbox 360 e ao Atari 8-bit. Fora das
+        # pastas, o jogo fica indefinido, e a sugestao sai do comeco do arquivo.
+        import identificador
+        pasta = tempfile.mkdtemp()
+        try:
+            atari = os.path.join(pasta, "jogo.xex")
+            with open(atari, "wb") as f:
+                f.write(b"\xff\xff\x00\x30\x02\x30\x4c\x00\x30")
+            x360 = os.path.join(pasta, "default.xex")
+            with open(x360, "wb") as f:
+                f.write(b"XEX2" + b"\0" * 0x20000)
+            todos = ["xbox360", "atari800"]
+            self.assertEqual(identificador.identificar(atari, todos), "atari800")
+            self.assertEqual(identificador.identificar(x360, todos), "xbox360")
+            self.assertIsNone(identificador.identificar(atari, ["xbox360"]))
+            por_id, por_ext = self.mod.carregar_plataformas()
+            self.assertEqual(por_ext[".xex"], ["xbox360", "atari800"])
+            # O nome da pasta e' o caminho dentro de jogos\pessoais ("." na raiz).
+            self.assertEqual(self.mod.escolher_plataforma(por_ext[".xex"], por_id, "Atari 8-bit",
+                                                         None, 0.01, atari), ("atari800", None))
+            self.assertEqual(self.mod.escolher_plataforma(por_ext[".xex"], por_id, ".",
+                                                         None, 0.01, atari), (self.mod.SEM_PASTA, "atari800"))
+            self.assertEqual(self.mod.escolher_plataforma(por_ext[".xex"], por_id, r"Xbox 360\Halo 3",
+                                                         None, 0.2, x360), ("xbox360", None))
+        finally:
+            shutil.rmtree(pasta, ignore_errors=True)
+
 
 # ============================================================================
 # 2. cheats.py

@@ -103,8 +103,9 @@ dentro da pasta, sem gravar nada fora dela.
   instala com o nome certo e mostra o que ainda falta
   (**Ajustes → Emuladores → BIOS dos consoles**). A exceção é a **BIOS
   livre**, escrita do zero por voluntários: essa já vem com o ARENA (o
-  C-BIOS, que abre os cartuchos do MSX, e o EmuTOS, que liga o Atari ST), e a
-  de verdade passa na frente dela.
+  C-BIOS, que abre os cartuchos do MSX, e o EmuTOS, que liga o Atari ST; o
+  AltirraOS, que liga o Atari 8-bit, vem dentro do emulador dele), e a de
+  verdade passa na frente dela.
 
 ## Requisitos
 
@@ -135,9 +136,9 @@ ainda vai ser medido em sala; o que já foi medido está em
 | Sega | SG-1000, Master System, Mega Drive, Game Gear, 32X, Sega CD, Saturn, Dreamcast |
 | Sony | PlayStation, PlayStation 2, PSP, PlayStation 3 |
 | Microsoft | Xbox 360, MS-DOS |
-| Atari | 2600, 5200, 7800, Lynx, Jaguar, ST |
+| Atari | 2600, 5200, 7800, Lynx, Jaguar, ST, 8-bit (400, 800, XL e XE) |
 | Fliperama | Neo Geo e fliperamas (FBNeo), Arcade (MAME), Neo Geo Pocket |
-| Outros | PC Engine, PC-FX, WonderSwan, 3DO, CD-i, Odyssey 2, ColecoVision, Intellivision, Vectrex, MSX, Commodore 64, VIC-20, Plus/4, Amiga, ZX Spectrum, ZX81, Amstrad CPC, Apple II, Arduboy, ScummVM, Tamagotchi, Java ME (ainda sem núcleo) |
+| Outros | PC Engine, PC-FX, WonderSwan, 3DO, CD-i, Odyssey 2, ColecoVision, Intellivision, Vectrex, MSX, Commodore 64, Commodore 128, VIC-20, Plus/4, PET, Amiga, ZX Spectrum, ZX81, Amstrad CPC, Apple II, Thomson MO/TO, Watara Supervision, Arduboy, ScummVM, Tamagotchi, Java ME (ainda sem núcleo) |
 | Consoles de fantasia | TIC-80, WASM-4, LowRes NX, Uzebox, CHIP-8, MicroW8 |
 
 ## Os guias
@@ -168,7 +169,7 @@ ARENA\
 │   ├── indexador.py     acha os jogos nas pastas
 │   ├── hardware.py      mede o computador
 │   ├── graficos.py      a configuração de cada emulador
-│   ├── consoles.json    os 60 consoles
+│   ├── consoles.json    os 65 consoles
 │   └── tests\           a bateria de testes (RODAR_TESTES.bat)
 ├── launcher\     a tela (index.html, app.js, estilo.css e os fundos em pixel art)
 ├── testes\       testes de ponta a ponta com os emuladores de verdade

@@ -87,6 +87,18 @@ class TestPonteSemAcento(unittest.TestCase):
         self.assertEqual(opcoes, {})
         self.assertFalse(devolver())
 
+    def test_atari_8bit_leva_so_as_roms_originais_que_existem(self):
+        # O atari800 liga pelo AltirraOS embutido; a ROM original, quando a
+        # pessoa poe, tem que chegar a ele mesmo com acento na pasta system.
+        atari800 = "atari800_libretro.dll"
+        with open(os.path.join(self.sistema, "ATARIXL.ROM"), "wb") as arquivo:
+            arquivo.write(b"XL" * 8192)
+        self.assertTrue(ponte.precisa(atari800, self.sistema, "C:\\ARENA\\jogo.xex"))
+        self.assertFalse(ponte.precisa(atari800, "C:\\ARENA\\retroarch\\system", "C:\\ARENA\\jogo.xex"))
+        caminho, opcoes, devolver = ponte.preparar(atari800, self.sistema, self.jogo)
+        self.assertEqual(sorted(os.listdir(opcoes["system_directory"])), ["ATARIXL.ROM"])
+        self.assertFalse(devolver())
+
     def test_jogo_sem_acento_abre_direto(self):
         jogo = os.path.join(self.base, "jogo.st")
         shutil.copyfile(self.jogo, jogo)

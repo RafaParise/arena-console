@@ -199,13 +199,16 @@ No fliperama do MAME, a BIOS vai na pasta dos próprios jogos.
 | Atari 2600 | `Atari 2600` | `.a26` | pode | não precisa |
 | Atari 5200 | `Atari 5200` | `.a52` | pode | `5200.rom` |
 | Atari 7800 | `Atari 7800` | `.a78` | pode | não precisa |
+| Atari 8-bit | `Atari 8-bit` | `.atr` `.xex` `.car` `.cas` `.xfd` `.atx` `.dcm` | pode | não precisa (liga pelo AltirraOS, livre); opcional: `ATARIXL.ROM` e `ATARIBAS.ROM` |
 | Atari Jaguar | `Atari Jaguar` | `.j64` `.jag` | pode | não precisa |
 | Atari Lynx | `Atari Lynx` | `.lnx` | pode | `lynxboot.img` |
 | Atari ST | `Atari ST` | `.st` `.msa` `.stx` `.dim` | pode | `tos.img` (sem ele, liga pelo EmuTOS, livre) |
 | CHIP-8 | `CHIP-8` | `.ch8` `.sc8` `.xo8` | pode | não precisa |
 | ColecoVision | `ColecoVision` | `.col` | pode | `colecovision.rom` |
+| Commodore 128 | `Commodore 128` | `.d64` `.d71` `.d81` `.prg` `.t64` `.tap` `.crt` | pode | não precisa |
 | Commodore 64 | `Commodore 64` | `.d64` `.t64` `.prg` `.crt` | pode | não precisa |
 | Commodore Amiga | `Amiga` | `.adf` `.hdf` `.ipf` | pode | uma de: `kick34005.A500`, `kick40068.A1200` |
+| Commodore PET | `Commodore PET` | `.prg` `.d64` `.d80` `.d82` `.t64` `.tap` | pode | não precisa |
 | Commodore Plus/4 | `Commodore Plus-4` | `.prg` `.d64` `.t64` `.tap` `.crt` | pode | não precisa |
 | Commodore VIC-20 | `Commodore VIC-20` | `.prg` `.d64` `.t64` `.tap` `.crt` `.20` `.40` `.60` `.a0` `.b0` | pode | não precisa |
 | Game & Watch | `Game and Watch` | `.mgw` | pode | não precisa |
@@ -242,11 +245,13 @@ No fliperama do MAME, a BIOS vai na pasta dos próprios jogos.
 | Sega SG-1000 | `SG-1000` | `.sg` | pode | não precisa |
 | Super Nintendo | `Super Nintendo` | `.sfc` `.smc` `.swc` `.fig` `.bs` | pode | não precisa |
 | Tamagotchi | `Tamagotchi` | `.b` `.bin` | pode | não precisa |
+| Thomson MO/TO | `Thomson` | `.k7` `.fd` `.sap` `.m5` `.m7` | pode | não precisa |
 | TIC-80 | `TIC-80` | `.tic` | pode | não precisa |
 | Uzebox | `Uzebox` | `.uze` | pode | não precisa |
 | Vectrex | `Vectrex` | `.vec` | pode | não precisa |
 | Virtual Boy | `Virtual Boy` | `.vb` `.vboy` | pode | não precisa |
 | WASM-4 | `WASM-4` | `.wasm` | pode | não precisa |
+| Watara Supervision | `Watara Supervision` | `.sv` | pode | não precisa |
 | WonderSwan | `WonderSwan` | `.ws` `.wsc` | pode | não precisa |
 | Xbox 360 | `XBOX360` | `.iso` `.xex` | **não** | não precisa |
 | ZX Spectrum | `ZX Spectrum` | `.tzx` `.tap` `.z80` `.szx` | pode | não precisa |
@@ -288,20 +293,25 @@ AVX.
 | `.lnx` | Atari Lynx |
 | `.j64` `.jag` | Atari Jaguar |
 | `.st` `.msa` `.stx` `.dim` | Atari ST |
+| `.atr` `.car` `.xfd` `.atx` `.dcm` | Atari 8-bit |
 | `.col` | ColecoVision |
 | `.int` | Intellivision |
 | `.vec` | Vectrex |
 | `.pce` `.sgx` | PC Engine |
 | `.ngp` `.ngc` | Neo Geo Pocket |
 | `.ws` `.wsc` | WonderSwan |
-| `.d64` `.t64` `.prg` `.crt` | Commodore 64 (na pasta dele, o VIC-20 ou o Plus/4) |
+| `.sv` | Watara Supervision |
+| `.d64` `.t64` `.prg` `.crt` | Commodore 64 (na pasta dele, o VIC-20, o Plus/4, o 128 ou o PET) |
+| `.d71` `.d81` | Commodore 128 |
+| `.d80` `.d82` | Commodore PET |
 | `.20` `.40` `.60` `.a0` `.b0` | Commodore VIC-20 |
 | `.adf` `.hdf` `.ipf` | Commodore Amiga |
-| `.tzx` `.tap` `.z80` `.szx` | ZX Spectrum (na pasta dele, o ZX81, o VIC-20 ou o Plus/4) |
+| `.tzx` `.tap` `.z80` `.szx` | ZX Spectrum (na pasta dele, o ZX81, o VIC-20, o Plus/4, o Commodore 128 ou o PET) |
 | `.p` `.t81` | ZX81 |
 | `.cdt` `.sna` | Amstrad CPC |
 | `.do` `.po` `.nib` `.woz` `.2mg` | Apple II |
-| `.rom` `.cas` | MSX |
+| `.rom` `.cas` | MSX (o `.cas`, na pasta dele, o Atari 8-bit) |
+| `.k7` `.fd` `.sap` `.m5` `.m7` | Thomson MO/TO |
 | `.exe` `.com` `.bat` `.conf` | MS-DOS |
 | `.scummvm` `.svm` | ScummVM |
 | `.tic` | TIC-80 |
@@ -316,7 +326,8 @@ AVX.
 
 `.iso`, `.cue`, `.chd`, `.bin`, `.zip` e `.dsk` servem a vários consoles,
 assim como os finais dos computadores da Commodore (`.prg`, `.d64`, `.t64`,
-`.crt` e `.tap`: C64, VIC-20 e Plus/4) e o `.tzx` (ZX Spectrum e ZX81).
+`.crt` e `.tap`: C64, C128, VIC-20, Plus/4 e PET), o `.tzx` (ZX Spectrum e
+ZX81), o `.cas` (MSX e Atari 8-bit) e o `.xex` (Xbox 360 e Atari 8-bit).
 Nesses casos **quem decide é a pasta**, igual ao RetroArch. Fora da pasta
 de um console, vale o C64 e o ZX Spectrum.
 
@@ -668,12 +679,14 @@ blueMSX (os de cartucho abrem pelo C-BIOS, a BIOS livre que vem no ARENA).
 Atari 7800 · Atari Lynx · Game Boy e Game Boy Color · Game Boy Advance ·
 Nintendo DS · Pokémon mini · a pasta `Databases` do blueMSX (sem ela, o
 emulador do MSX adivinha o tipo de cada cartucho) · o TOS original do Atari
-ST (`tos.img`; sem ele, o Atari ST liga pelo EmuTOS, a BIOS livre).
+ST (`tos.img`; sem ele, o Atari ST liga pelo EmuTOS, a BIOS livre) · o
+sistema original do Atari 8-bit (`ATARIXL.ROM` e `ATARIBAS.ROM`; sem eles,
+ele liga pelo AltirraOS e pelo Altirra BASIC, livres, que vêm no emulador).
 
 **Sem BIOS nenhuma (o pacote do ARENA não leva BIOS da Sony, da Sega nem da
 SNK):** o PlayStation, o Dreamcast e o Amiga abrem com uma imitação da BIOS
-que vem dentro do emulador, o MSX abre os cartuchos pelo C-BIOS e o Atari ST
-liga pelo EmuTOS. O Saturn
+que vem dentro do emulador, o MSX abre os cartuchos pelo C-BIOS, o Atari ST
+liga pelo EmuTOS e o Atari 8-bit, pelo AltirraOS. O Saturn
 foi testado assim, com o Yabause, em 14/10/2026, e ficou com a tela preta:
 continua precisando da BIOS. PS2, Sega CD, PC Engine CD, Neo Geo e os outros
 da tabela não têm BIOS livre.
@@ -689,15 +702,18 @@ cada uma com a licença dela:
 | MSX | C-BIOS 0.29a (licença BSD) | os jogos de cartucho (`.rom`); disquete e fita continuam pedindo a pasta `Machines` |
 | Atari ST | EmuTOS 1.4 (licença GPL) | liga o computador e abre os jogos; o TOS original é opcional |
 
+O Atari 8-bit também liga sem BIOS da Atari: o AltirraOS e o Altirra BASIC,
+de Avery Lee (licença livre), já vêm dentro do emulador dele (o atari800).
+
 Ninguém precisa mexer nela. Ao abrir, o ARENA copia para `retroarch\system`
 só o que falta. **As duas funções continuam valendo:** a BIOS de verdade, se
 você puser na pasta `BIOS`, passa na frente da livre (no MSX, o próprio
 emulador escolhe: tenta a máquina original e, sem a BIOS dela, liga a do
 C-BIOS; no Atari ST, o TOS original entra no lugar do EmuTOS).
 
-**Atari ST e Apple II numa pasta com acento:** os emuladores deles (o Hatari
-e o AppleWin) não abrem arquivo de pasta com acento (como `Área de
-Trabalho`). O ARENA resolve
+**Atari ST, Apple II e Atari 8-bit numa pasta com acento:** os emuladores
+deles (o Hatari, o AppleWin e o atari800) não abrem arquivo de pasta com
+acento (como `Área de Trabalho`). O ARENA resolve
 sozinho: copia o jogo e a BIOS para uma pasta nova, sem acento e só sua (a
 temporária do Windows), abre de lá e, ao fechar, leva de volta o disquete se
 o jogo gravou nele (recorde, jogo salvo) e apaga a pasta.
@@ -714,12 +730,13 @@ a BIOS. Com o BS-X, os jogos BS ligam pela tela do BS-X.
 #### Os que não pedem nada
 
 Amstrad CPC · Apple II · Arduboy · Atari 2600 · Atari Jaguar · CHIP-8 ·
-Commodore 64 · Commodore
+Commodore 64 · Commodore 128 · Commodore PET · Commodore
 Plus/4 · Commodore VIC-20 · Game & Watch ·
 GameCube · Java ME (celular antigo) · LowRes NX · Mega Drive, Master System
 e Game Gear · MicroW8 · MS-DOS · Neo Geo Pocket · Nintendo Wii · PlayStation Portable ·
-ScummVM · Sega 32X · Sega SG-1000 · Tamagotchi · TIC-80 · Uzebox · Vectrex ·
-Virtual Boy · WASM-4 · WonderSwan · Xbox 360 · ZX Spectrum · ZX81. Também não pedem
+ScummVM · Sega 32X · Sega SG-1000 · Tamagotchi · Thomson MO/TO · TIC-80 ·
+Uzebox · Vectrex · Virtual Boy · WASM-4 · Watara Supervision · WonderSwan ·
+Xbox 360 · ZX Spectrum · ZX81. Também não pedem
 o NES, o Super Nintendo, o Nintendo 64 e o PC Engine (só as partes que
 aparecem na lista de cima).
 

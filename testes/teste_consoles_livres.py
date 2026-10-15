@@ -16,6 +16,12 @@ emuladores sem precisar baixar BIOS". Para cada jogo da lista.json:
   4. Com --junto: hospedeiro e convidado de verdade em 127.0.0.1 (o Jogar
      Junto), para conferir o que o consoles.json diz do console.
 
+Cinco consoles nao tem jogo livre publicado que sirva (Atari 8-bit,
+Commodore PET e 128, Watara Supervision e Thomson): para eles o teste
+escreve na hora um programinha (GERADOS, sem binario novo no git), e a foto
+tem que mostrar a cor que o programa pinta -- a tela de partida do console
+nao tem essa cor, entao a cor prova que o programa rodou.
+
 Uso:
     servidor\python\python.exe testes\teste_consoles_livres.py [pedaco do console] [--junto]
 """
@@ -107,6 +113,138 @@ def disquete_st(destino, programas):
         arquivo.write(imagem)
 
 
+# ---------------------------------------------------------------------------
+# Programas escritos pelo proprio teste (15/10/2026), em codigo de maquina ou
+# em BASIC ja convertido em fichas (tokens), byte a byte.
+# ---------------------------------------------------------------------------
+
+def basic_commodore(endereco, linhas):
+    """Um programa BASIC da Commodore como o LOAD o le: o endereco de carga e,
+    em cada linha, o endereco da linha seguinte, o numero da linha, o texto
+    (com as palavras do BASIC ja trocadas por fichas) e um zero. Dois zeros
+    no fim."""
+    corpo = bytearray()
+    for numero, texto in linhas:
+        linha = struct.pack("<H", numero) + texto + b"\x00"
+        proxima = endereco + len(corpo) + 2 + len(linha)
+        corpo += struct.pack("<H", proxima) + linha
+    return struct.pack("<H", endereco) + bytes(corpo) + b"\x00\x00"
+
+
+def prg_pet():
+    """PET (BASIC 4.0, que comeca em $0401): enche a tela de espacos
+    invertidos (o 160), e a tela inteira acende em verde. O 34767 cobre a
+    tela de 80 colunas; na de 40, a memoria de video se repete."""
+    return basic_commodore(0x0401, [
+        (10, b"\x81I\xb232768\xa434767:\x97I,160:\x82"),   # FOR I=32768 TO 34767:POKE I,160:NEXT
+        (20, b"\x8920"),                                   # GOTO 20
+    ])
+
+
+def prg_c128():
+    """C128 (BASIC 7.0, que comeca em $1C01): o COLOR so existe no BASIC do
+    128, entao o fundo vermelho prova que ele ligou no modo 128."""
+    return basic_commodore(0x1C01, [
+        (10, b"\xe70,3:\xe74,1:\xe75,2"),     # COLOR 0,3:COLOR 4,1:COLOR 5,2 (fundo vermelho, borda preta)
+        (20, b"\x99\"ARENA\""),               # PRINT "ARENA"
+        (30, b"\x8930"),                      # GOTO 30
+    ])
+
+
+def xex_atari():
+    """Atari 8-bit: um executavel .xex (FF FF, depois os trechos com o
+    endereco de inicio e de fim). Pinta o fundo de laranja escuro e escreve
+    ARENA direto na memoria da tela. Quem roda e' o AltirraOS, o sistema
+    livre que vem dentro do emulador."""
+    inicio = 0x3000
+    codigo = bytearray([
+        0xA9, 0x34, 0x8D, 0xC6, 0x02,   # LDA #$34 / STA COLOR2 (fundo)
+        0xA9, 0x00, 0x8D, 0xC8, 0x02,   # LDA #$00 / STA COLOR4 (borda preta)
+        0xA9, 0x0E, 0x8D, 0xC5, 0x02,   # LDA #$0E / STA COLOR1 (letra clara)
+        0xA0, 0x00,                     # LDY #0
+        0xB9, 0x00, 0x00,               # LDA texto,Y (o endereco entra abaixo)
+        0x91, 0x58,                     # STA (SAVMSC),Y: a memoria da tela
+        0xC8, 0xC0, 0x05, 0xD0, 0xF6,   # INY / CPY #5 / BNE (volta ao LDA)
+        0x4C, 0x00, 0x00,               # JMP para si mesmo (o endereco entra abaixo)
+    ])
+    codigo[18:20] = struct.pack("<H", inicio + len(codigo))
+    codigo[28:30] = struct.pack("<H", inicio + len(codigo) - 3)
+    codigo += bytes([0x21, 0x32, 0x25, 0x2E, 0x21])   # ARENA no codigo de tela do Atari
+    trecho = struct.pack("<HH", inicio, inicio + len(codigo) - 1) + bytes(codigo)
+    partida = struct.pack("<HHH", 0x02E0, 0x02E1, inicio)   # RUNAD: onde comecar
+    return b"\xFF\xFF" + trecho + partida
+
+
+def rom_supervision():
+    """Watara Supervision: ROM de 32 KB (o potator pede multiplo de 16 KB).
+    Os ultimos 16 KB ficam em $C000-$FFFF, com os enderecos de partida no
+    fim. A tela (160x160, 4 pontos por byte, 48 bytes por linha) fica em
+    $4000, e so aparece depois de gravar a largura dela em $2000. O programa
+    enche 20 paginas de pontos pretos: os 2/3 de cima da tela."""
+    codigo = bytes([
+        0x78, 0xD8, 0xA2, 0xFF, 0x9A,           # SEI / CLD / LDX #$FF / TXS
+        0xA9, 0xA0, 0x8D, 0x00, 0x20,           # LDA #160 / STA $2000 (largura da tela)
+        0x8D, 0x01, 0x20,                       # STA $2001 (altura)
+        0xA9, 0x00, 0x8D, 0x02, 0x20,           # LDA #0 / STA $2002 (rolagem X)
+        0x8D, 0x03, 0x20,                       # STA $2003 (rolagem Y)
+        0x85, 0x00, 0xA9, 0x40, 0x85, 0x01,     # ponteiro em $00/$01 = $4000
+        0xA2, 0x14, 0xA9, 0xFF, 0xA0, 0x00,     # LDX #20 paginas / LDA #$FF (preto) / LDY #0
+        0x91, 0x00, 0xC8, 0xD0, 0xFB,           # STA ($00),Y / INY / BNE
+        0xE6, 0x01, 0xCA, 0xD0, 0xF6,           # INC $01 / DEX / BNE
+        0x4C, 0x2B, 0xC0,                       # JMP para si mesmo ($C02B)
+        0x40,                                   # RTI ($C02E), para as interrupcoes
+    ])
+    rom = bytearray(b"\xFF" * 0x8000)
+    rom[0x4000:0x4000 + len(codigo)] = codigo
+    rom[0x7FFA:0x8000] = struct.pack("<HHH", 0xC02E, 0xC000, 0xC02E)   # NMI, partida, IRQ
+    return bytes(rom)
+
+
+def cartucho_mo5():
+    """Thomson MO5: cartucho de 16 KB, que o MO5 liga sozinho, em $B000-$EFFF.
+    O endereco de partida vai nos 2 ultimos bytes ($EFFE; sem ele, visto em
+    15/10/2026, o cartucho nao roda). O programa (6809) enche a memoria de
+    cor ($0000, com a cor da frente e a do fundo em cada byte) de vermelho.
+    O final .m5 faz o emulador escolher o MO5."""
+    codigo = bytes([
+        0x1A, 0x50,                 # ORCC #$50 (sem interrupcao)
+        0x10, 0xCE, 0x9F, 0x00,     # LDS #$9F00 (a pilha)
+        0x86, 0x00,                 # LDA #0
+        0xB7, 0xA7, 0xC0,           # STA $A7C0: memoria de cor, borda preta
+        0x8E, 0x00, 0x00,           # LDX #$0000
+        0x86, 0x11,                 # LDA #$11 (frente e fundo vermelhos)
+        0xA7, 0x80,                 # STA ,X+
+        0x8C, 0x1F, 0x40,           # CMPX #$1F40 (fim da tela)
+        0x25, 0xF9,                 # BLO (volta ao STA)
+        0x20, 0xFE,                 # BRA para si mesmo
+    ])
+    cartucho = bytearray(0x4000)
+    cartucho[:len(codigo)] = codigo
+    cartucho[0x3FFE:0x4000] = b"\xB0\x00"
+    return bytes(cartucho)
+
+
+# A cor que cada programa pinta, conferida na cor mais comum da foto.
+COR = {
+    "avermelhada": lambda r, g, b: r > 60 and r > 1.6 * g and r > 1.6 * b,
+    "verde": lambda r, g, b: g > 120 and g > r and g > b,
+    "preta": lambda r, g, b: r + g + b < 60,
+}
+
+GERADOS = [
+    {"console": "atari800", "jogo": "programa de teste (AltirraOS)", "arquivo": "teste.xex",
+     "gerar": xex_atari, "cor": "avermelhada"},
+    {"console": "pet", "jogo": "programa de teste (BASIC 4.0)", "arquivo": "teste.prg",
+     "gerar": prg_pet, "cor": "verde"},
+    {"console": "c128", "jogo": "programa de teste (BASIC 7.0)", "arquivo": "teste.prg",
+     "gerar": prg_c128, "cor": "avermelhada"},
+    {"console": "supervision", "jogo": "programa de teste", "arquivo": "teste.sv",
+     "gerar": rom_supervision, "cor": "preta"},
+    {"console": "thomson", "jogo": "programa de teste (cartucho do MO5)", "arquivo": "teste.m5",
+     "gerar": cartucho_mo5, "cor": "avermelhada"},
+]
+
+
 # O que cada console precisa a mais: quantos quadros rodar antes da foto, o
 # que o registro tem que dizer e, quando o jogo livre nao e' o arquivo que o
 # nucleo abre, como montar esse arquivo.
@@ -120,6 +258,11 @@ POR_CONSOLE = {
     "apple2": {"quadros": 1800},
     "arduboy": {"quadros": 900},
     "microw8": {"quadros": 600},
+    "atari800": {"quadros": 600},
+    "pet": {"quadros": 1500},       # o FOR do BASIC leva uns segundos para encher a tela
+    "c128": {"quadros": 1500},
+    "supervision": {"quadros": 300},
+    "thomson": {"quadros": 600},
 }
 
 
@@ -128,17 +271,23 @@ def plataformas():
         return {p["id"]: p for p in json.load(arquivo)["plataformas"]}
 
 
-def imagem_de_verdade(foto):
+def imagem_de_verdade(foto, cor=None):
     """(sim/nao, detalhe): a foto tem mais de uma cor e nenhuma cobre 99,5%? (A tela de
-    texto do Apple II e o Arduboy ficam pretos em 97%: imagem de verdade.)"""
+    texto do Apple II e o Arduboy ficam pretos em 97%: imagem de verdade.) Com 'cor'
+    (do COR), a mais comum tambem tem que ser dessa cor."""
     if not os.path.isfile(foto):
         return False, "sem foto"
     with open(foto, "rb") as arquivo:
         largura, altura, pontos = ler_png(arquivo.read())
     cores = collections.Counter(p[:3] for p in pontos)
-    maior = cores.most_common(1)[0][1] / float(len(pontos))
-    return len(cores) > 1 and maior < 0.995, "%dx%d, %d cores, a mais comum em %.0f%%" % (
-        largura, altura, len(cores), maior * 100)
+    (rgb, quantos), = cores.most_common(1)
+    maior = quantos / float(len(pontos))
+    ok = len(cores) > 1 and maior < 0.995
+    detalhe = "%dx%d, %d cores, a mais comum em %.0f%%" % (largura, altura, len(cores), maior * 100)
+    if cor:
+        ok = ok and COR[cor](*rgb)
+        detalhe += ", %s%s" % (rgb, "" if COR[cor](*rgb) else " (o programa pinta de " + cor + ")")
+    return ok, detalhe
 
 
 def abrir(jogo, nucleo, pasta, sistema, quadros):
@@ -206,7 +355,7 @@ def main():
     todas = plataformas()
     falhas = []
     fotos = tempfile.mkdtemp(prefix="arena_livres_fotos_")
-    for item in jogos:
+    for item in jogos + GERADOS:
         if filtro and filtro not in item["console"] and filtro not in item["jogo"].lower():
             continue
         plataforma = todas.get(item["console"])
@@ -221,17 +370,22 @@ def main():
                 sistema = os.path.join(trabalho, "system")
                 os.makedirs(sistema)
                 bios.instalar_livres(sistema)
-                origem = os.path.join(PASTA_JOGOS, *item["origem"].split("/"))
-                if regras.get("montar"):
-                    extensao, montar = regras["montar"]
-                    jogo = os.path.join(trabalho, os.path.splitext(os.path.basename(origem))[0].lower() + extensao)
-                    montar(jogo, origem)
+                if item.get("gerar"):
+                    jogo = os.path.join(trabalho, item["arquivo"])
+                    with open(jogo, "wb") as arquivo:
+                        arquivo.write(item["gerar"]())
                 else:
-                    jogo = os.path.join(trabalho, os.path.basename(origem))
-                    shutil.copyfile(origem, jogo)
+                    origem = os.path.join(PASTA_JOGOS, *item["origem"].split("/"))
+                    if regras.get("montar"):
+                        extensao, montar = regras["montar"]
+                        jogo = os.path.join(trabalho, os.path.splitext(os.path.basename(origem))[0].lower() + extensao)
+                        montar(jogo, origem)
+                    else:
+                        jogo = os.path.join(trabalho, os.path.basename(origem))
+                        shutil.copyfile(origem, jogo)
                 foto, texto, travou, ponte = abrir(jogo, plataforma["core"], os.path.join(trabalho, "rodada"),
                                                    sistema, regras.get("quadros", 600))
-                ok, detalhe = imagem_de_verdade(foto)
+                ok, detalhe = imagem_de_verdade(foto, item.get("cor"))
                 if os.path.isfile(foto):
                     shutil.copyfile(foto, os.path.join(fotos, "%s - %s.png" % (item["console"], rotulo)))
                 print("   %-17s imagem: %-3s (%s)%s%s" % (rotulo, "sim" if ok else "NAO", detalhe,

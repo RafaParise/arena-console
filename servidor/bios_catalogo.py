@@ -178,6 +178,15 @@ CATALOGO = [
      "nivel": "melhor", "tamanho": 196608, "o_que": "o TOS original do Atari ST",
      "sem_ela": ("o Atari ST liga do mesmo jeito, pelo EmuTOS, a BIOS livre que já vem no ARENA: a maioria dos "
                  "jogos abre; com o TOS original, os poucos que não abrem passam a abrir")},
+    # Atari 8-bit: o emulador (atari800, no modelo 800XL) ja traz o AltirraOS e o
+    # Altirra BASIC, livres (licenca "all-permissive" da FSF, de Avery Lee).
+    {"id": "atari800-xl", "console": "atari800", "pasta": "Atari 8-bit", "sub": "", "destino": "ATARIXL.ROM",
+     "nivel": "melhor", "tamanho": 16384, "o_que": "o sistema original do Atari XL/XE (ATARIXL.ROM)",
+     "sem_ela": ("o Atari 8-bit liga do mesmo jeito, pelo AltirraOS, o sistema livre que vem dentro do "
+                 "emulador: a maioria dos jogos abre; com o original, os poucos que não abrem passam a abrir")},
+    {"id": "atari800-basic", "console": "atari800", "pasta": "Atari 8-bit", "sub": "", "destino": "ATARIBAS.ROM",
+     "nivel": "melhor", "tamanho": 8192, "o_que": "o Atari BASIC original (ATARIBAS.ROM)",
+     "sem_ela": "os programas em BASIC rodam do mesmo jeito, no Altirra BASIC, livre, que vem dentro do emulador"},
     {"id": "atari5200", "console": "atari5200", "pasta": "Atari 5200", "sub": "", "destino": "5200.rom",
      "nivel": "melhor", "tamanho": 2048, "o_que": "a BIOS do Atari 5200"},
     {"id": "atari7800", "console": "atari7800", "pasta": "Atari 7800", "sub": "", "destino": "7800 BIOS (U).rom",

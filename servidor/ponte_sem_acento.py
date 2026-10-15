@@ -3,8 +3,8 @@ r"""
 ARENA - a ponte sem acento: para o nucleo que nao abre arquivo de pasta com
 acento.
 
-Achado de 14/10/2026: o Hatari (o nucleo do Atari ST) e o AppleWin (o do
-Apple II) so abrem caminho SEM acento. O ARENA do Rafael mora em
+Achados de 14 e 15/10/2026: o Hatari (o nucleo do Atari ST), o AppleWin (o do
+Apple II) e o atari800 (o do Atari 8-bit) so abrem caminho SEM acento. O ARENA do Rafael mora em
 "...\Criador De Apps Pedagógicos\...": com o "ó" no caminho, o Hatari nao
 achava a BIOS ("System BIOS (tos.img) is missing") nem o disquete do jogo, e
 o AppleWin nao abria o disco ("Falha ao carregar o conteudo"). O mesmo aconteceria
@@ -38,6 +38,11 @@ import time
 NUCLEOS = {
     "hatari_libretro.dll": ["tos.img"],          # Atari ST
     "applewin_libretro.dll": [],                 # Apple II ("Falha ao carregar o conteudo", 14/10/2026)
+    # Atari 8-bit: com acento, o atari800 ficava na tela do AltirraOS, sem o
+    # jogo (15/10/2026). Leva as ROMs originais da lista do .info, quando a
+    # pessoa tiver posto alguma; sem elas, ele liga pelo AltirraOS embutido.
+    "atari800_libretro.dll": ["ATARIXL.ROM", "ATARIBAS.ROM", "ATARIOSA.ROM", "ATARIOSB.ROM",
+                              "5200.rom", "BB01R4_OS.ROM", "XEGAME.ROM"],
 }
 PREFIXO = "ARENA-sem-acento-"
 
