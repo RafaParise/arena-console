@@ -159,6 +159,9 @@ CONSOLES = {
     "arduboy": {"tipo": "cartucho", "exemplo": "Nome do Jogo.hex",
                 "dica": "Também .arduboy (o pacote com a capa). O Arduboy é de código aberto: muitos jogos "
                         "livres no GitHub."},
+    "vircon32": {"tipo": "cartucho", "exemplo": "Nome do Jogo.v32",
+                 "dica": "A BIOS livre já vem no emulador. Os jogos oficiais, livres, ficam em vircon32.com "
+                         "(cada um tem dezenas de MB)."},
     "microw8": {"tipo": "cartucho", "exemplo": "Nome do Jogo.uw8",
                 "dica": "Cada jogo cabe em 256 bytes (são de competições de programação). Jogos em "
                         "github.com/exoticorn/microw8."},

@@ -92,6 +92,7 @@ REPO_POR_PLATAFORMA = {
     "pet": "Commodore_-_PET",
     "zx81": "Sinclair_-_ZX_81",
     "arduboy": "Arduboy_Inc_-_Arduboy",
+    "vircon32": "Vircon32",
     "atari800": "Atari_-_8-bit_Family",
     "supervision": "Watara_-_Supervision",
     "thomson": "Thomson_-_MOTO",

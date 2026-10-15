@@ -135,6 +135,25 @@
       "pasta": "MicroW8"
     },
     {
+      "id": "vircon32",
+      "nome": "Vircon32",
+      "descricao": "Console de fantasia de 32 bits, de 2021, todo de codigo aberto: a BIOS livre ja vem no emulador.",
+      "core": "vircon32_libretro.dll",
+      "extensoes": [
+        ".v32"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 2,
+      "pede_placar": false,
+      "apelidos": [
+        "vircon32",
+        "vircon 32",
+        "vircon"
+      ],
+      "pasta": "Vircon32"
+    },
+    {
       "id": "atari2600",
       "nome": "Atari 2600",
       "descricao": "O comeco de tudo. Extremamente leve.",

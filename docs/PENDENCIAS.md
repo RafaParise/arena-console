@@ -82,9 +82,10 @@ fica no commit). O detalhe de cada pedido está em
      rodou). Atari 8-bit e Supervision têm Jogar Junto; PET, C128 e Thomson,
      não. No Thomson, a fita e o disquete começam pelo Start do controle (a
      partida automática do núcleo ficou desligada, sem jogo para testá-la).
-   - Falta (pedido de 14/10: "todos os consoles de código aberto"):
-     Vircon32. O núcleo já traz a BIOS livre, mas o menor jogo oficial
-     (BSD-3) tem 18 MB, grande demais para o repositório.
+   - Feito: Vircon32 (a BIOS livre vem no núcleo; o menor jogo oficial tem
+     18 MB, então o teste escreve um cartucho de 168 bytes que desenha a
+     textura da BIOS). Tem Jogar Junto. Ele desenha em OpenGL: o RetroArch
+     troca de motor sozinho (driver_switch_enable).
    - Depois: versão nova do pacote (um download só, com tudo), pedido de
      14/10 ("tudo pronto para só colocar o jogo e jogar").
    - Dizer com clareza onde não dá: o PS2 não tem BIOS livre, e distribuir

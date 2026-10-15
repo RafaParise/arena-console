@@ -16,8 +16,9 @@ emuladores sem precisar baixar BIOS". Para cada jogo da lista.json:
   4. Com --junto: hospedeiro e convidado de verdade em 127.0.0.1 (o Jogar
      Junto), para conferir o que o consoles.json diz do console.
 
-Cinco consoles nao tem jogo livre publicado que sirva (Atari 8-bit,
-Commodore PET e 128, Watara Supervision e Thomson): para eles o teste
+Seis consoles nao tem jogo livre publicado que sirva (Atari 8-bit,
+Commodore PET e 128, Watara Supervision, Thomson e Vircon32, cujo menor jogo
+oficial tem 18 MB): para eles o teste
 escreve na hora um programinha (GERADOS, sem binario novo no git), e a foto
 tem que mostrar a cor que o programa pinta -- a tela de partida do console
 nao tem essa cor, entao a cor prova que o programa rodou.
@@ -224,6 +225,39 @@ def cartucho_mo5():
     return bytes(cartucho)
 
 
+def cartucho_vircon32():
+    """Vircon32: cartucho .v32 (o cabecalho "V32-CART" de 128 bytes e o programa,
+    "V32-VBIN", em palavras de 32 bits), sem textura nem som. Cada instrucao e'
+    uma palavra: o codigo nos 6 bits de cima, o "usa valor imediato" no bit 25
+    e a porta nos 14 de baixo; o valor imediato vem na palavra seguinte. O
+    programa escolhe a textura da BIOS (-1, que vem no emulador), limpa a tela
+    de vermelho e desenha a textura inteira por cima, a cada quadro."""
+    def instrucao(codigo, porta=0, imediato=None):
+        palavra = (codigo << 26) | ((1 << 25) if imediato is not None else 0) | porta
+        return [palavra] + ([imediato] if imediato is not None else [])
+    OUT, WAIT, JMP = 24, 1, 2
+    preparo = (instrucao(OUT, 0x205, 0xFFFFFFFF)      # textura escolhida: -1, a da BIOS
+               + instrucao(OUT, 0x206, 0)             # regiao 0 dela
+               + instrucao(OUT, 0x20C, 0) + instrucao(OUT, 0x20D, 0)        # canto de cima
+               + instrucao(OUT, 0x20E, 479) + instrucao(OUT, 0x20F, 327)    # canto de baixo (480 x 328)
+               + instrucao(OUT, 0x210, 0) + instrucao(OUT, 0x211, 0))       # ponto de apoio
+    laco = 0x20000000 + len(preparo)           # o cartucho comeca em $20000000
+    programa = (preparo
+                + instrucao(OUT, 0x202, 0xFF0000FF)   # cor de limpar: vermelho (R, G, B, A)
+                + instrucao(OUT, 0x200, 0x10)         # comando da GPU: limpar a tela
+                + instrucao(OUT, 0x207, 80) + instrucao(OUT, 0x208, 16)     # onde desenhar
+                + instrucao(OUT, 0x200, 0x11)         # comando da GPU: desenhar a regiao
+                + instrucao(WAIT)                     # espera o proximo quadro
+                + instrucao(JMP, 0, laco))            # e de novo
+    binario = b"V32-VBIN" + struct.pack("<I", len(programa)) + struct.pack("<%dI" % len(programa), *programa)
+    fim = 128 + len(binario)
+    cabecalho = (b"V32-CART" + struct.pack("<II", 1, 0) + b"ARENA - programa de teste".ljust(64, b"\0")
+                 + struct.pack("<IIII", 1, 0, 0, 0)                       # versao 1.0, 0 texturas, 0 sons
+                 + struct.pack("<IIIIII", 128, len(binario), fim, 0, fim, 0)   # onde fica cada parte
+                 + b"\0" * 8)
+    return cabecalho + binario
+
+
 # A cor que cada programa pinta, conferida na cor mais comum da foto.
 COR = {
     "avermelhada": lambda r, g, b: r > 60 and r > 1.6 * g and r > 1.6 * b,
@@ -242,6 +276,8 @@ GERADOS = [
      "gerar": rom_supervision, "cor": "preta"},
     {"console": "thomson", "jogo": "programa de teste (cartucho do MO5)", "arquivo": "teste.m5",
      "gerar": cartucho_mo5, "cor": "avermelhada"},
+    {"console": "vircon32", "jogo": "programa de teste (BIOS livre)", "arquivo": "teste.v32",
+     "gerar": cartucho_vircon32, "cor": "avermelhada"},
 ]
 
 
@@ -263,6 +299,7 @@ POR_CONSOLE = {
     "c128": {"quadros": 1500},
     "supervision": {"quadros": 300},
     "thomson": {"quadros": 600},
+    "vircon32": {"quadros": 600},   # a abertura da BIOS leva uns 3 s; o RetroArch troca para OpenGL sozinho
 }
 
 

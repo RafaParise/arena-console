@@ -7,7 +7,7 @@ testes\\teste_consoles_livres.py, com o nucleo de verdade):
   - o final repetido (.d64, .prg, .tap, .tzx...) continua sendo do C64 e do
     ZX Spectrum fora das pastas: quem decide e' a pasta;
   - o Jogar Junto dito no consoles.json e' o que o teste viu;
-  - os cinco consoles sem jogo livre publicado (15/10/2026), que o teste
+  - os seis consoles sem jogo livre publicado (15/10/2026), que o teste
     abre com um programa escrito por ele mesmo, aceitam o final desse
     programa."""
 import json
@@ -23,7 +23,8 @@ import indexador  # noqa: E402
 PASTA_JOGOS_LIVRES = os.path.join(os.path.dirname(RAIZ), "testes", "jogos_livres")
 MONTADOS = {"atarist": ".st"}       # o teste monta o disquete com o programa dentro
 # Os programas que testes\teste_consoles_livres.py escreve (GERADOS).
-GERADOS = {"atari800": ".xex", "pet": ".prg", "c128": ".prg", "supervision": ".sv", "thomson": ".m5"}
+GERADOS = {"atari800": ".xex", "pet": ".prg", "c128": ".prg", "supervision": ".sv", "thomson": ".m5",
+           "vircon32": ".v32"}
 
 
 class TestConsolesLivres(unittest.TestCase):
@@ -72,8 +73,8 @@ class TestConsolesLivres(unittest.TestCase):
             self.assertIs(self.plataformas[console].get("netplay"), False, console)
             self.assertIn("Netplay", self.plataformas[console]["netplay_motivo"])
         # ...e o CHIP-8 (JAXE), o Arduboy (Ardens), o MicroW8, o Atari 8-bit
-        # (atari800) e o Supervision (potator) conectaram.
-        for console in ("chip8", "arduboy", "microw8", "atari800", "supervision"):
+        # (atari800), o Supervision (potator) e o Vircon32 conectaram.
+        for console in ("chip8", "arduboy", "microw8", "atari800", "supervision", "vircon32"):
             self.assertTrue(self.plataformas[console].get("netplay", True), console)
 
 

@@ -38,7 +38,7 @@ cada arquivo. O ARENA as copia para `retroarch\system` só onde falta.
 | C-BIOS 0.29a | MSX | BSD de 2 cláusulas (o aviso de direitos vai junto, em C-BIOS\doc\cbios.txt) | <https://cbios.sourceforge.net/> | `servidor\bios_livres\C-BIOS` |
 | EmuTOS 1.4 | Atari ST | GPL-2.0 ou posterior (o texto vai junto, em EmuTOS\doc\license.txt) | <https://downloads.sourceforge.net/project/emutos/emutos/1.4/emutos-src-1.4.tar.gz> | `servidor\bios_livres\EmuTOS` |
 
-## Núcleos do RetroArch (61)
+## Núcleos do RetroArch (62)
 
 Cada núcleo é o emulador de um console. A licença vem do arquivo `.info`
 do próprio núcleo (`retroarch\info`). Os de licença **não comercial**
@@ -107,5 +107,6 @@ mas não vendidos. O código-fonte de todos está em
 | Commodore - PET (VICE xpet) | `vice_xpet_libretro.dll` | 3.9 | GPLv2 |
 | Commodore - PLUS/4 (VICE xplus4) | `vice_xplus4_libretro.dll` | 3.9 | GPLv2 |
 | Commodore - VIC-20 (VICE xvic) | `vice_xvic_libretro.dll` | 3.9 | GPLv2 |
+| Vircon32 | `vircon32_libretro.dll` | 2024.08.28 | 3-clause BSD |
 | Atari - Jaguar (Virtual Jaguar) | `virtualjaguar_libretro.dll` | v2.1.0 | GPLv3 |
 | WASM-4 | `wasm4_libretro.dll` | 2.1.0 | ISC |

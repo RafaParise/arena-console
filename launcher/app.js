@@ -493,7 +493,8 @@ const MIDIA_POR_PLATAFORMA = {
   umd: ["psp"],
   // Sem mídia física de verdade (portátil digital, homebrew) - cartão
   // genérico.
-  cartao: ["tic80", "wasm4", "lowresnx", "uzebox", "tamagotchi", "j2me", "chip8", "arduboy", "microw8"],
+  cartao: ["tic80", "wasm4", "lowresnx", "uzebox", "tamagotchi", "j2me", "chip8", "arduboy", "microw8",
+           "vircon32"],
 };
 
 const TIPO_MIDIA_POR_ID = {};

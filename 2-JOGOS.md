@@ -249,6 +249,7 @@ No fliperama do MAME, a BIOS vai na pasta dos próprios jogos.
 | TIC-80 | `TIC-80` | `.tic` | pode | não precisa |
 | Uzebox | `Uzebox` | `.uze` | pode | não precisa |
 | Vectrex | `Vectrex` | `.vec` | pode | não precisa |
+| Vircon32 | `Vircon32` | `.v32` | pode | não precisa (a BIOS livre vem no emulador) |
 | Virtual Boy | `Virtual Boy` | `.vb` `.vboy` | pode | não precisa |
 | WASM-4 | `WASM-4` | `.wasm` | pode | não precisa |
 | Watara Supervision | `Watara Supervision` | `.sv` | pode | não precisa |
@@ -321,6 +322,7 @@ AVX.
 | `.ch8` `.sc8` `.xo8` | CHIP-8 |
 | `.hex` `.arduboy` | Arduboy |
 | `.uw8` | MicroW8 |
+| `.v32` | Vircon32 |
 
 #### Quando o final serve a mais de um console
 
@@ -704,6 +706,9 @@ cada uma com a licença dela:
 
 O Atari 8-bit também liga sem BIOS da Atari: o AltirraOS e o Altirra BASIC,
 de Avery Lee (licença livre), já vêm dentro do emulador dele (o atari800).
+O Vircon32, console de fantasia de código aberto, também traz a BIOS dele
+(licença BSD) dentro do emulador. Ele desenha pela placa de vídeo em
+OpenGL: o RetroArch troca de motor sozinho para esse console.
 
 Ninguém precisa mexer nela. Ao abrir, o ARENA copia para `retroarch\system`
 só o que falta. **As duas funções continuam valendo:** a BIOS de verdade, se
@@ -735,7 +740,8 @@ Plus/4 · Commodore VIC-20 · Game & Watch ·
 GameCube · Java ME (celular antigo) · LowRes NX · Mega Drive, Master System
 e Game Gear · MicroW8 · MS-DOS · Neo Geo Pocket · Nintendo Wii · PlayStation Portable ·
 ScummVM · Sega 32X · Sega SG-1000 · Tamagotchi · Thomson MO/TO · TIC-80 ·
-Uzebox · Vectrex · Virtual Boy · WASM-4 · Watara Supervision · WonderSwan ·
+Uzebox · Vectrex · Vircon32 · Virtual Boy · WASM-4 · Watara Supervision ·
+WonderSwan ·
 Xbox 360 · ZX Spectrum · ZX81. Também não pedem
 o NES, o Super Nintendo, o Nintendo 64 e o PC Engine (só as partes que
 aparecem na lista de cima).
