@@ -191,11 +191,11 @@
     },
     "flycast": {
       "_nome": "Dreamcast",
-      "_leia": "DCNet (internet do Dreamcast, servidor dcnet.flyca.st) desligado em toda partida: vinha ligado de fabrica, e e' jogo online com desconhecidos -- aluno menor de idade. Mesmo criterio do RPCN do PS3: so o professor liga.",
+      "_leia": "DCNet (internet do Dreamcast, servidor dcnet.flyca.st) desligado em toda partida: vinha ligado de fabrica, e e' jogo online com desconhecidos -- aluno menor de idade. Mesmo criterio do RPCN do PS3: so o professor liga. Renderizacao em thread DESLIGADA (15/10/2026): ligada, o flycast caia logo na partida (GPF dentro do ntdll, o RetroArch travado) em 4 de 4 tentativas, com Vulkan e com D3D11, com BIOS e sem; desligada, 4 de 4 abriram. Na rodada de 12/10 a mesma queda era rara.",
       "sempre": {
         "reicast_mipmapping": "enabled",
         "reicast_enable_rttb": "disabled",
-        "reicast_threaded_rendering": "enabled",
+        "reicast_threaded_rendering": "disabled",
         "reicast_dcnet": "disabled"
       },
       "por_nota": [

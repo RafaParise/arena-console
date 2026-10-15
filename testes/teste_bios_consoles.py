@@ -42,9 +42,11 @@ JOGOS = [
      "genesis_plus_gx", 900),
     ("Saturn (EUA) com mpr-17933.bin", os.path.join(P, "Sega Saturn", "Saturn Bomberman",
                                                    "Saturn Bomberman (USA) (1S).cue"), "mednafen_saturn", 600),
+    # 15/10/2026: sem a renderizacao em thread (graficos.json), o quadro 1500
+    # caia na tela preta entre a BIOS e a abertura; no 2500 a abertura aparece.
     ("Dreamcast com dc_boot.bin", os.path.join(P, "Dreamcast", "Marvel vs. Capcom - Clash of Super Heroes (Europe)",
                                                "Marvel vs. Capcom - Clash of Super Heroes (Europe).cue"),
-     "flycast", 1500),
+     "flycast", 2500),
     ("Satellaview: BS F-ZERO com o BS-X", os.path.join(P, "Super Nintendo", "BS F-ZERO (J).smc"), "snes9x", 900),
     ("Satellaview: BS F-ZERO Grand Prix 2 com o BS-X",
      os.path.join(P, "Super Nintendo", "BS F-ZERO Grand Prix 2 (J) [h1].smc"), "snes9x", 900),
