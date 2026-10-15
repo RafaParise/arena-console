@@ -1097,7 +1097,13 @@ input::placeholder { color: var(--texto-apagado); }
 .opcao:last-child { border-bottom: 0; padding-bottom: 0; }
 .opcao-rotulo { font-size: var(--t-peq); }
 .opcao-ajuda { grid-column: 1; font-size: var(--t-micro); color: var(--texto-apagado); }
-.opcao-controle { grid-row: 1 / span 2; }
+/* O controle na coluna da direita, ao lado do nome e da ajuda. Sem a
+   coluna, a grade punha o controle na primeira (ele tem a linha marcada e
+   e' posto antes dos outros), e o nome ia para a direita (15/10/2026). */
+.opcao-controle { grid-column: 2; grid-row: 1 / span 2; }
+/* Sem a linha de ajuda, o controle fica so na linha do nome: ocupando duas,
+   a grade dividia a altura dele entre elas e o nome subia. */
+.opcao:not(:has(.opcao-ajuda)) > .opcao-controle { grid-row: 1; }
 #listaJeitos { margin-top: 0.6rem; }
 
 /* interruptor */
