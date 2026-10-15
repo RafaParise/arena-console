@@ -9,8 +9,9 @@ O QUE ENTRA (lista fechada -- o que nao esta aqui, nao vai):
   - os .bat de usar (ARENA, VERIFICAR, PARTIDA), os guias (LEIA-ME, 1 a 6)
     e o COLETAR.bat (o professor mede o notebook da escola com a propria
     versao dos alunos: ferramentas\coletar_maquina.py e medir_arena.py);
-  - a licenca (LICENSE, GPL-3.0) e o TERCEIROS.md (a licenca e o
-    codigo-fonte de cada programa de outros projetos que vai no pacote);
+  - a licenca (LICENSE, GPL-3.0), o TERCEIROS.md (a licenca e o
+    codigo-fonte de cada programa de outros projetos que vai no pacote) e
+    o CREDITOS.md (quem fez o que);
   - servidor\ (o ARENA e o Python embutido), sem testes;
   - launcher\ (a tela);
   - RetroArch: o programa, so os 48 nucleos que o ARENA usa (de 195), os
@@ -75,7 +76,9 @@ ARQUIVOS_DA_RAIZ = ["ARENA.bat", "VERIFICAR.bat", "PARTIDA.bat", "COLETAR.bat", 
                     # outros projetos que vai junto, com o codigo-fonte: a GPL
                     # pede o texto da licenca junto do programa distribuido
                     # (Fase 8 da auditoria 3, o pacote do GitHub).
-                    "LICENSE", "TERCEIROS.md"]
+                    "LICENSE", "TERCEIROS.md",
+                    # Quem fez o que, a comecar pelo aluno DOOK3DS (15/10/2026).
+                    "CREDITOS.md"]
 # Do ferramentas\, so o que o COLETAR.bat usa.
 FERRAMENTAS = ["coletar_maquina.py", "medir_arena.py"]
 # Jogo pequeno do proprio projeto para conferir que o RetroArch da versao

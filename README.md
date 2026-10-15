@@ -281,10 +281,17 @@ licença — a lista, com o link do código-fonte de cada um, está em
 ## Créditos
 
 Criado por **Rafael Parise Passos**, professor da rede estadual de São Paulo
-(SEDUC-SP), com as turmas de Desenvolvimento de Sistemas. A base da tela e a
-primeira bateria de testes vieram de um remake do ARENA feito por um aluno. O
-desenvolvimento usa o Claude Code como parceiro de programação, com as
-decisões e os testes de sala do professor.
+(SEDUC-SP), com as turmas de Desenvolvimento de Sistemas. O desenvolvimento
+usa o Claude Code como parceiro de programação, com as decisões e os testes
+de sala do professor.
+
+A primeira publicação do ARENA no GitHub foi de um aluno, a conta
+**[DOOK3DS](https://github.com/DOOK3DS)** (19/09/2026, a versão `v1.0`). Dele
+vieram a base da tela, a primeira ideia dos fundos animados claro e escuro,
+baixar as capas dos jogos, a biblioteca do archive.org, o assistente de
+controle, a primeira bateria de testes e correções de bugs. O que é de cada
+um, e as versões antigas para baixar (`v0.9`, do professor, e `v1.0`, do
+aluno), estão em [`CREDITOS.md`](CREDITOS.md).
 
 Os emuladores são obra das equipes do RetroArch/libretro, PCSX2, Dolphin,
 RPCS3 e Xenia — o ARENA só os organiza para a sala de aula.
