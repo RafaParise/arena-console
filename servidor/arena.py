@@ -82,6 +82,7 @@ import motivo_do_erro  # noqa: E402  (por que o jogo nao abriu, pelo registro --
 import bios        # noqa: E402  (nome, pasta e versao certa de cada BIOS -- 03/10/2026)
 import arrumar     # noqa: E402  (o botao Arrumar: o arquivo do jogo no lugar certo -- 03/10/2026)
 import ponte_sem_acento  # noqa: E402  (nucleo que nao abre pasta com acento: o Hatari -- 14/10/2026)
+import java_do_arena  # noqa: E402  (o Java que vem junto, para o Java ME -- 15/10/2026)
 
 PASTA_LAUNCHER = os.path.join(RAIZ, "launcher")
 PASTA_DADOS = os.path.join(RAIZ, "dados")
@@ -2538,6 +2539,7 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
 
     caminho_jogo = os.path.join(RAIZ, jogo["arquivo"])
     pasta_trabalho = PASTA_RETROARCH
+    plataforma_jogo = next((p for p in carregar_catalogo() if p["id"] == jogo.get("plataforma")), {})
     # Leva de volta o disquete que o jogo gravou na pasta sem acento (so o
     # Hatari usa: servidor\ponte_sem_acento.py).
     devolver_ponte = None
@@ -2689,6 +2691,12 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         ligacao = jogo.get("ligacao") or {}
         opcoes_jogo = dict(extra or {}, **extras_controle)
         opcoes_jogo.update(ligacao.get("cfg", {}))
+        # O que o proprio console pede ao RetroArch (consoles.json ->
+        # opcoes_retroarch). No Java ME, o video sem thread: com ele, o
+        # RetroArch travava ao fechar o jogo (15/10/2026). Entra depois de
+        # tudo, ate da partida a dois, porque e' defeito do nucleo.
+        opcoes_do_console = plataforma_jogo.get("opcoes_retroarch", {})
+        opcoes_jogo.update(opcoes_do_console)
         # As BIOS livres (e a metade Java do Java ME) no lugar ANTES de abrir.
         # A arrumacao das BIOS roda em segundo plano ao abrir o ARENA e pode
         # nao ter terminado: achado de 15/10/2026, o primeiro jogo de Java ME
@@ -2723,8 +2731,9 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         # das opcoes de nucleo. Com 1 ou 2 jogadores a lista fica vazia.
         so_desta_partida = list(ligacao.get("cfg", {}))
         # A pasta system da ponte sem acento (pasta temporaria) tambem: senao
-        # o proximo jogo, de outro console, procuraria a BIOS la.
-        so_desta_partida += chaves_da_ponte
+        # o proximo jogo, de outro console, procuraria a BIOS la. E o que o
+        # console pediu (o video sem thread do Java ME) fica so nele.
+        so_desta_partida += chaves_da_ponte + list(opcoes_do_console)
         if jogadores_ligacao > 2:
             for n in range(3, jogadores_controle + 1):
                 so_desta_partida += ["input_libretro_device_p%d" % n,
@@ -2782,6 +2791,7 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         # Achado de 30/09/2026 (ver servidor\processos.py): antes, nenhuma das
         # mudancas de prioridade acontecia de verdade.
         acelerar = bool(config.get("modo_desempenho") or config.get("ultra_desempenho"))
+        caixa = None
         try:
             # Todo jogo abre "acima do normal": ganha a CPU na frente do
             # navegador e do resto. Faz diferenca real em maquina de 2 nucleos.
@@ -2792,6 +2802,13 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             extras = {}
             if sys.platform.startswith("win"):
                 extras["creationflags"] = processos.ACIMA_DO_NORMAL
+            # Java ME: o nucleo abre o "javaw" que achar no PATH. O do ARENA
+            # (emuladores\Java) vai na frente, so para este RetroArch.
+            if plataforma_jogo.get("usa_java") and not jogo.get("externo"):
+                extras["env"] = java_do_arena.ambiente()
+                if not java_do_arena.javaw():
+                    print("[ARENA] Falta o Java do ARENA (emuladores\\Java): o jogo de Java ME "
+                          "so abre se o computador tiver Java instalado.")
             if acelerar:
                 processos.prioridade_do_arena(processos.ABAIXO_DO_NORMAL)
                 processos.memoria_do_arena(processos.MEMORIA_BAIXA)
@@ -2822,9 +2839,16 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             ULTIMO_PROBLEMA.clear()
             aberto_em = time.time()
             processo = subprocess.Popen(comando, cwd=pasta_trabalho, **extras)
+            # Java ME: o RetroArch entra numa caixa do Windows; fechada no
+            # fim, ela encerra o Java que tiver ficado para tras (o RetroArch
+            # que cai deixava o Java aberto, escondido: processos.py).
+            if "env" in extras:
+                caixa = processos.caixa_que_fecha_os_filhos(processo.pid)
             if acelerar and processos.tirar_da_economia_de_energia(processo.pid):
                 print("[ARENA] Emulador fora da economia de energia do Windows.")
             codigo = processo.wait()
+            processos.fechar_caixa(caixa)
+            caixa = None
 
             # O jogo gravou no disquete da pasta sem acento: leva de volta.
             if devolver_ponte:
@@ -2864,6 +2888,7 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         finally:
             # Volta tudo ao normal, abrindo o jogo ou nao.
             VIGIA["suspenso"] = False
+            processos.fechar_caixa(caixa)
             if acelerar:
                 processos.prioridade_do_arena(processos.NORMAL)
                 processos.memoria_do_arena(processos.MEMORIA_NORMAL)

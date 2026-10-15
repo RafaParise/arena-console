@@ -1,5 +1,5 @@
 {
-  "_leia": "Catalogo de plataformas do ARENA, ate a geracao do PlayStation 2. 'custo' vai de 1 (trivial) a 5 (pesadissimo) e e comparado com a capacidade medida da maquina para classificar o desempenho. 'peso' decide se a plataforma aparece em maquina fraca. 'arquivos_sistema' e apenas a QUANTIDADE esperada na pasta system: o ARENA nunca lista, nomeia nem baixa esses arquivos. 'apelidos' sao os nomes de pasta que apontam para esta plataforma. 'tamanho_max_mb' e o tamanho maximo da midia original, usado para desempatar extensao ambigua. 'externo' e o emulador de fora que o ARENA prefere quando encontra a pasta em emuladores/. Se nao encontrar, usa o nucleo do RetroArch normalmente. 'pasta' e o nome da pasta oficial daquele console dentro de jogos/. A pasta e quem decide o console de arquivos com extensao ambigua. 'jogadores_por_jogo' e' quantos jogadores aceitam os jogos ja conferidos (pedaco do nome -> numero; palavra inteira, sem pontuacao): vale quando o jogo nao esta no dados\\jogadores.txt do professor, e e' com ele que esse arquivo nasce. Mora aqui, no programa, para valer em qualquer copia (antes so existia nos dados de quem montou).",
+  "_leia": "Catalogo de plataformas do ARENA, ate a geracao do PlayStation 2. 'custo' vai de 1 (trivial) a 5 (pesadissimo) e e comparado com a capacidade medida da maquina para classificar o desempenho. 'peso' decide se a plataforma aparece em maquina fraca. 'arquivos_sistema' e apenas a QUANTIDADE esperada na pasta system: o ARENA nunca lista, nomeia nem baixa esses arquivos. 'apelidos' sao os nomes de pasta que apontam para esta plataforma. 'tamanho_max_mb' e o tamanho maximo da midia original, usado para desempatar extensao ambigua. 'externo' e o emulador de fora que o ARENA prefere quando encontra a pasta em emuladores/. Se nao encontrar, usa o nucleo do RetroArch normalmente. 'pasta' e o nome da pasta oficial daquele console dentro de jogos/. A pasta e quem decide o console de arquivos com extensao ambigua. 'jogadores_por_jogo' e' quantos jogadores aceitam os jogos ja conferidos (pedaco do nome -> numero; palavra inteira, sem pontuacao): vale quando o jogo nao esta no dados\\jogadores.txt do professor, e e' com ele que esse arquivo nasce. Mora aqui, no programa, para valer em qualquer copia (antes so existia nos dados de quem montou). 'usa_java' diz que o nucleo abre o Java (o Java ME): o ARENA poe o Java que vem com ele (emuladores\\Java) na frente do PATH do RetroArch. 'opcoes_retroarch' sao opcoes do RetroArch que valem so neste console, por cima de todas as outras (o motivo fica em 'opcoes_retroarch_motivo').",
   "plataformas": [
     {
       "id": "tic80",
@@ -1466,12 +1466,19 @@
     {
       "id": "j2me",
       "nome": "Java ME (celular antigo)",
-      "descricao": "Jogos de celular Java de antes do smartphone (Nokia e outros). Precisa do Java instalado no computador - o ARENA nao o instala.",
-      "core": "freej2me_plus_libretro.dll",
+      "descricao": "Jogos de celular Java de antes do smartphone (Nokia e outros). O Java que o emulador usa ja vem no ARENA.",
+      "core": "freej2me_libretro.dll",
       "extensoes": [
         ".jar",
-        ".jad"
+        ".kjx"
       ],
+      "usa_java": true,
+      "opcoes_retroarch": {
+        "video_threaded": "false"
+      },
+      "opcoes_retroarch_motivo": "Com o video em thread, o RetroArch travava ao fechar o jogo em 1 de cada 3 ou 4 vezes (o Java ja tinha fechado); sem ele, 0 de 8 (15/10/2026).",
+      "netplay": false,
+      "netplay_motivo": "O núcleo do Java ME (FreeJ2ME-Plus) não suporta jogo em rede - confirmado tentando hospedar em 15/10/2026, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"): o jogo roda no Java, fora do RetroArch.",
       "peso": "leve",
       "arquivos_sistema": 0,
       "custo": 1,

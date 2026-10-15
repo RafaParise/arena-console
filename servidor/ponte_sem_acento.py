@@ -4,7 +4,8 @@ ARENA - a ponte sem acento: para o nucleo que nao abre arquivo de pasta com
 acento.
 
 Achados de 14 e 15/10/2026: o Hatari (o nucleo do Atari ST), o AppleWin (o do
-Apple II) e o atari800 (o do Atari 8-bit) so abrem caminho SEM acento. O ARENA do Rafael mora em
+Apple II), o atari800 (o do Atari 8-bit) e o FreeJ2ME-Plus (o do Java ME) so
+abrem caminho SEM acento. O ARENA do Rafael mora em
 "...\Criador De Apps Pedagógicos\...": com o "ó" no caminho, o Hatari nao
 achava a BIOS ("System BIOS (tos.img) is missing") nem o disquete do jogo, e
 o AppleWin nao abria o disco ("Falha ao carregar o conteudo"). O mesmo aconteceria
@@ -43,6 +44,10 @@ NUCLEOS = {
     # pessoa tiver posto alguma; sem elas, ele liga pelo AltirraOS embutido.
     "atari800_libretro.dll": ["ATARIXL.ROM", "ATARIBAS.ROM", "ATARIOSA.ROM", "ATARIOSB.ROM",
                               "5200.rom", "BB01R4_OS.ROM", "XEGAME.ROM"],
+    # Java ME (15/10/2026): com acento, o FreeJ2ME-Plus dizia "freej2me-lr.jar
+    # does not exist in the system dir" e nem abria o Java. A metade Java
+    # dele mora na system e abre com a system como pasta de trabalho.
+    "freej2me_libretro.dll": ["freej2me-lr.jar"],
 }
 PREFIXO = "ARENA-sem-acento-"
 

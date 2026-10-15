@@ -180,3 +180,92 @@ def memoria_de(pid=None):
     finally:
         if not proprio:
             k.CloseHandle(h)
+
+
+# ---------------------------------------------------------------------------
+# A caixa que fecha os filhos (Job Object)
+# ---------------------------------------------------------------------------
+# Achado de 15/10/2026: o emulador do Java ME abre o Java ("javaw") como um
+# processo separado. Fechando o jogo do jeito normal, o proprio nucleo encerra
+# o Java. Mas se o RetroArch cai, ou e' fechado a forca, o Java do jogo fica
+# aberto, escondido, gastando processador -- conferido: 40 s depois ainda
+# estava la (num Celeron, o computador inteiro ficaria lento).
+#
+# A saida e' uma "caixa" do Windows (Job Object): o RetroArch entra nela, e
+# tudo o que ele abrir entra junto. Quando o jogo acaba, o ARENA fecha a
+# caixa, e o Windows encerra o que tiver sobrado dentro. Sem administrador.
+
+_JOB_INFORMACAO_ESTENDIDA = 9         # JobObjectExtendedLimitInformation
+_JOB_FECHA_TUDO_AO_FECHAR = 0x2000    # JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE
+_ACESSO_CAIXA = 0x0100 | 0x0001       # PROCESS_SET_QUOTA | PROCESS_TERMINATE
+
+
+class _JobBasica(ctypes.Structure):
+    _fields_ = [("PerProcessUserTimeLimit", ctypes.c_int64), ("PerJobUserTimeLimit", ctypes.c_int64),
+                ("LimitFlags", w.DWORD), ("MinimumWorkingSetSize", ctypes.c_size_t),
+                ("MaximumWorkingSetSize", ctypes.c_size_t), ("ActiveProcessLimit", w.DWORD),
+                ("Affinity", ctypes.c_size_t), ("PriorityClass", w.DWORD),
+                ("SchedulingClass", w.DWORD)]
+
+
+class _JobIO(ctypes.Structure):
+    _fields_ = [(nome, ctypes.c_ulonglong) for nome in
+                ("ReadOperationCount", "WriteOperationCount", "OtherOperationCount",
+                 "ReadTransferCount", "WriteTransferCount", "OtherTransferCount")]
+
+
+class _JobEstendida(ctypes.Structure):
+    _fields_ = [("BasicLimitInformation", _JobBasica), ("IoInfo", _JobIO),
+                ("ProcessMemoryLimit", ctypes.c_size_t), ("JobMemoryLimit", ctypes.c_size_t),
+                ("PeakProcessMemoryUsed", ctypes.c_size_t), ("PeakJobMemoryUsed", ctypes.c_size_t)]
+
+
+def _kernel32_caixa():
+    k = _kernel32()
+    k.CreateJobObjectW.restype = w.HANDLE
+    k.CreateJobObjectW.argtypes = [ctypes.c_void_p, w.LPCWSTR]
+    k.SetInformationJobObject.restype = w.BOOL
+    k.SetInformationJobObject.argtypes = [w.HANDLE, ctypes.c_int, ctypes.c_void_p, w.DWORD]
+    k.AssignProcessToJobObject.restype = w.BOOL
+    k.AssignProcessToJobObject.argtypes = [w.HANDLE, w.HANDLE]
+    return k
+
+
+def caixa_que_fecha_os_filhos(pid):
+    """Poe o processo numa caixa que, quando fechada (fechar_caixa), encerra
+    tudo o que ainda estiver dentro dela: os filhos que ele abriu e que
+    ficaram para tras. Devolve a alca da caixa, ou None (fora do Windows, ou
+    se o Windows recusar: o jogo abre do mesmo jeito)."""
+    if not _no_windows():
+        return None
+    try:
+        k = _kernel32_caixa()
+        caixa = k.CreateJobObjectW(None, None)
+        if not caixa:
+            return None
+        estendida = _JobEstendida()
+        estendida.BasicLimitInformation.LimitFlags = _JOB_FECHA_TUDO_AO_FECHAR
+        h = k.OpenProcess(_ACESSO_CAIXA, False, pid)
+        dentro = False
+        if h:
+            try:
+                dentro = (k.SetInformationJobObject(caixa, _JOB_INFORMACAO_ESTENDIDA, ctypes.byref(estendida),
+                                                    ctypes.sizeof(estendida))
+                          and k.AssignProcessToJobObject(caixa, h))
+            finally:
+                k.CloseHandle(h)
+        if not dentro:
+            k.CloseHandle(caixa)
+            return None
+        return caixa
+    except (OSError, AttributeError):
+        return None
+
+
+def fechar_caixa(caixa):
+    """Fecha a caixa: o Windows encerra o que tiver sobrado dentro dela."""
+    if caixa:
+        try:
+            _kernel32().CloseHandle(caixa)
+        except (OSError, AttributeError):
+            pass

@@ -21,6 +21,17 @@
       "sha256_do_pacote": "59abac06a2d29b0864c5a7cfb2af65f022c337aed34188e174a9a08cc737e4bc",
       "codigo_fonte": "https://downloads.sourceforge.net/project/emutos/emutos/1.4/emutos-src-1.4.tar.gz",
       "o_que_faz": "A imagem de 192 KB em inglês (etos192uk.img), a feita para o ST comum, que é a máquina que o Hatari liga por padrão. Liga o computador e abre a área de trabalho e os jogos."
+    },
+    "FreeJ2ME-Plus": {
+      "nome": "FreeJ2ME-Plus",
+      "versao": "1.52",
+      "console": "Java ME",
+      "licenca": "GPL-3.0 (o texto vai junto, em FreeJ2ME-Plus\\LICENSE.txt, com as licenças das bibliotecas que vêm dentro: ObjectWeb ASM, JLayer e libsdl4j)",
+      "site": "https://github.com/TASEmulators/freej2me-plus",
+      "baixado_de": "https://github.com/TASEmulators/freej2me-plus/releases/download/1.52/freej2me-v1.52.zip",
+      "sha256_do_pacote": "27eb4f51d4201b6f7682ed0259d08d86e0410d41f572412812fe1ae928df9688",
+      "codigo_fonte": "https://github.com/TASEmulators/freej2me-plus/tree/8f87bf1497e7a9738a32d1909379376a1faca7dd",
+      "o_que_faz": "Não é BIOS de console: é a metade Java do emulador do Java ME (o freej2me-lr.jar do pacote). A outra metade é o núcleo freej2me_libretro.dll, que procura este arquivo na pasta system e o abre com o Java do ARENA (emuladores\\Java)."
     }
   },
   "arquivos": [
@@ -135,6 +146,13 @@
       "origem": "EmuTOS/etos192uk.img",
       "destino": "tos.img",
       "sha256": "2d6f3f6f304c9ba340aff8d47ba72b274ae29b8fbe6214138846dada97edf0f3"
+    },
+    {
+      "projeto": "FreeJ2ME-Plus",
+      "console": "j2me",
+      "origem": "FreeJ2ME-Plus/freej2me-lr.jar",
+      "destino": "freej2me-lr.jar",
+      "sha256": "358992e0b71b5b6a370c5f07b6fbd050fda3cb1fde7256bf818f1bbe20245dd4"
     }
   ]
 }

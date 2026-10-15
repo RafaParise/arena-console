@@ -117,6 +117,19 @@
       "baixado_de": "https://github.com/andrivet/Factory-2023/releases/download/v2024.01/factory2023.P",
       "o_que_prova": "o ZX81 abre um jogo .P com a ROM que vem dentro do núcleo",
       "sha256": "2ed0c89d96fe8f636c7cb3ea140a47282a1758f7df501f1c364c2828fc09615a"
+    },
+    {
+      "origem": "J2ME/shooter.jar",
+      "licenca_arquivo": "licencas/shooter.txt",
+      "console": "j2me",
+      "jogo": "Shooter",
+      "versao": "commit cab8869 (o jogo é de 2006)",
+      "autor": "Muhammad Rehan Saeed",
+      "licenca": "MIT",
+      "fonte": "https://github.com/RehanSaeed/Shooter",
+      "baixado_de": "https://raw.githubusercontent.com/RehanSaeed/Shooter/cab88697a4b4921f72c043067d2b7bd02fe65839/MobileGame/dist/MobileGame.jar",
+      "o_que_prova": "o Java ME abre um jogo .jar (MIDP 2.0) com o Java que vem no ARENA (emuladores\\Java), sem Java instalado no computador",
+      "sha256": "e0de73e1d330ba48905a58d09f45e5e9d66982806d7da6ca4e54a22c9d3e9949"
     }
   ]
 }

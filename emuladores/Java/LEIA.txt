@@ -1,0 +1,19 @@
+﻿Java - para o Java ME (jogos de celular antigo)
+================================================
+
+O emulador do Java ME (o núcleo FreeJ2ME-Plus, no RetroArch) tem uma metade
+escrita em Java, e ela precisa do Java para rodar. Esta pasta traz um Java
+pequeno, só com o que o emulador usa (uns 47 MB): ninguém precisa instalar
+Java no computador.
+
+O ARENA usa este Java só para o RetroArch do jogo de Java ME, sem mexer no
+Windows nem no Java que o computador já tenha.
+
+De onde vem: OpenJDK 21 (Eclipse Temurin, da Adoptium), reduzido com o
+jlink do próprio Java. A licença é a GPL-2.0 com a exceção Classpath; os
+textos vão na pasta legal. Para montar de novo esta pasta:
+    servidor\python\python.exe ferramentas\preparar_java.py
+
+Se esta pasta sumir, os jogos de Java ME só abrem num computador com Java
+instalado. Copie de novo a pasta emuladores\Java do pacote completo do
+ARENA.

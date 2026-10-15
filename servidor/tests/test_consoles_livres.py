@@ -69,7 +69,7 @@ class TestConsolesLivres(unittest.TestCase):
 
     def test_jogar_junto_como_o_teste_viu(self):
         # 14 e 15/10/2026, hospedando de verdade: o RetroArch recusa nestes...
-        for console in ("msx", "atarist", "zx81", "vic20", "plus4", "apple2", "pet", "c128", "thomson"):
+        for console in ("msx", "atarist", "zx81", "vic20", "plus4", "apple2", "pet", "c128", "thomson", "j2me"):
             self.assertIs(self.plataformas[console].get("netplay"), False, console)
             self.assertIn("Netplay", self.plataformas[console]["netplay_motivo"])
         # ...e o CHIP-8 (JAXE), o Arduboy (Ardens), o MicroW8, o Atari 8-bit

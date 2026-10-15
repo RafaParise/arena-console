@@ -69,6 +69,15 @@ TIPOS = {
         "regra_zip": "Pode: um .zip com o jogo dentro funciona direto (o DOSBox abre o zip).",
         "como": "A pasta do jogo inteira (o ARENA abre o .exe) ou um .zip com o jogo dentro.",
     },
+    # Java ME (15/10/2026): o .jar ja e' um zip. Zipado de novo, o RetroArch
+    # o tiraria para a pasta cache do ARENA, e com acento no caminho o Java
+    # nao acharia o jogo (servidor\ponte_sem_acento.py so leva o arquivo que
+    # o ARENA abre).
+    "java": {
+        "zip": "nao",
+        "regra_zip": "NÃO use .zip: o .jar já é compactado. Ponha o .jar direto na pasta.",
+        "como": "Um arquivo .jar por jogo, solto na pasta (ou numa subpasta, para organizar).",
+    },
     "scummvm": {
         "zip": "nao",
         "regra_zip": "Não use .zip: a pasta do jogo precisa estar aberta.",
@@ -217,7 +226,10 @@ CONSOLES = {
     "nds": {"tipo": "cartucho", "exemplo": "Nome do Jogo (USA).nds",
             "bios": ("opcional", ["bios7.bin", "bios9.bin", "firmware.bin"],
                      "Opcional: bios7.bin, bios9.bin e firmware.bin (mais fiel ao aparelho).")},
-    "j2me": {"tipo": "cartucho", "exemplo": "Nome do Jogo.jar"},
+    "j2me": {"tipo": "java", "exemplo": "Nome do Jogo.jar",
+             "dica": "O Java que o emulador usa já vem no ARENA (pasta emuladores\\Java): não precisa instalar "
+                     "nada. Também .kjx (jogos da KDDI, do Japão). Jogo que veio com .jad e .jar: ponha só o "
+                     ".jar."},
 }
 
 LEGENDA_ZIP = {"pode": "Pode ser .zip", "nao": "Não pode ser .zip", "obrigatorio": "Tem que ser .zip"}

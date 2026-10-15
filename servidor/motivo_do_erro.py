@@ -98,6 +98,20 @@ def motivo_da_bios(texto, caminho_jogo, quem):
                 "(o cartucho \"BS-X - Sore wa Namae o Nusumareta Machi no Monogatari\"). %s"
                 % (quem, _dica_da_bios("BS-X.bin")))
     return None
+def motivo_do_java(texto):
+    """Java ME (15/10/2026): sem o Java, o nucleo FreeJ2ME-Plus "abre" o jogo
+    e a tela fica preta -- o RetroArch nem diz "Falha ao carregar". So o
+    registro conta o motivo. Devolve a explicacao, ou None."""
+    if "does not exist in the system dir" in texto:
+        return ("O emulador do Java ME não achou a metade Java dele (freej2me-lr.jar) na pasta "
+                "retroarch\\system. Ela vem com o ARENA, em servidor\\bios_livres: feche o ARENA e abra "
+                "de novo, que ele a copia sozinho.")
+    if "Couldn't create process" in texto or "FreeJ2ME could not start" in texto:
+        return ("O jogo de Java ME não abriu porque o Java não foi achado. O ARENA traz o Java dele na "
+                "pasta emuladores\\Java: se ela sumiu, copie de novo essa pasta do pacote completo do ARENA.")
+    return None
+
+
 MOSTRAR = 3   # quantos nomes de arquivo cabem numa frase sem virar lista
 
 
@@ -223,6 +237,10 @@ def analisar(texto, caminho_jogo, nucleo=""):
     # "WRONG CHECKSUMS" com o MAME rodando assim mesmo ("might not run
     # correctly"), nao e' "nao abriu" -- o zip danificado ja tem o aviso do
     # integridade.py.
+    if "freej2me" in nucleo:
+        recado = motivo_do_java(texto)
+        if recado:
+            return {"texto": recado, "faltando": [], "renomear": None, "discos": []}
     falhou = (any(f in texto for f in FALHOU_AO_CARREGAR) or "Required files are missing" in texto
               or bool(crcs))
     desconhecido = "Romset is unknown" in texto

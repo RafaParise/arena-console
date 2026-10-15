@@ -198,6 +198,12 @@ professor da rede estadual de SP.
   - O Multitap pede `netplay_max_connections = 4`.
 - Dos registros do RetroArch, ficam os 10 mais recentes
   (`limpar_logs_antigos`).
+- Java ME (FreeJ2ME-Plus): o núcleo abre o `javaw` do PATH.
+  - O Java de `emuladores\Java` vai na frente do PATH (`java_do_arena.py`).
+  - Vídeo sem thread (`consoles.json → opcoes_retroarch`): com thread, o
+    RetroArch travava ao fechar.
+  - Uma caixa do Windows (`processos.caixa_que_fecha_os_filhos`) fecha o
+    Java que sobrar quando o RetroArch cai.
 
 ## Como trabalhar
 

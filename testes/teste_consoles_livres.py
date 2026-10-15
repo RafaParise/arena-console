@@ -43,6 +43,7 @@ sys.path.insert(0, AQUI)
 sys.path.insert(0, os.path.join(RAIZ, "servidor"))
 sys.path.insert(0, os.path.join(RAIZ, "ferramentas"))
 import bios  # noqa: E402
+import java_do_arena  # noqa: E402
 import limpeza  # noqa: E402
 import ponte_sem_acento  # noqa: E402
 import protege_cfg  # noqa: E402
@@ -300,7 +301,28 @@ POR_CONSOLE = {
     "supervision": {"quadros": 300},
     "thomson": {"quadros": 600},
     "vircon32": {"quadros": 600},   # a abertura da BIOS leva uns 3 s; o RetroArch troca para OpenGL sozinho
+    "j2me": {"quadros": 900},       # o Java leva uns 3 s para abrir o jogo
 }
+
+
+def ambiente_sem_outro_java():
+    """O ambiente de um computador SEM Java instalado, com o Java do ARENA
+    (emuladores\\Java) na frente do PATH, como o ARENA abre o Java ME: prova
+    que o Java que vem no ARENA basta (este computador tem outro Java)."""
+    caminhos = [c for c in os.environ.get("PATH", "").split(os.pathsep)
+                if c and not re.search(r"(?i)java|oracle", c)]
+    base = dict(os.environ, PATH=os.pathsep.join(caminhos))
+    base.pop("JAVA_HOME", None)
+    return java_do_arena.ambiente(base)
+
+
+def javaw_do_arena_abertos():
+    """Os numeros (PID) dos javaw do Java do ARENA que estao abertos."""
+    comando = ("Get-Process javaw -ErrorAction SilentlyContinue | Where-Object { $_.Path -like '%s*' } "
+               "| ForEach-Object { $_.Id }" % java_do_arena.PASTA_JAVA.replace("'", "''"))
+    saida = subprocess.run(["powershell", "-NoProfile", "-Command", comando],
+                           capture_output=True, text=True).stdout
+    return saida.split()
 
 
 def plataformas():
@@ -327,12 +349,16 @@ def imagem_de_verdade(foto, cor=None):
     return ok, detalhe
 
 
-def abrir(jogo, nucleo, pasta, sistema, quadros):
+def abrir(jogo, nucleo, pasta, sistema, quadros, plataforma=None):
     """Roda o jogo e devolve (foto, texto do registro, travou, usou a ponte).
     O nucleo que nao abre caminho com acento (o Hatari) vai pela MESMA ponte
-    que o ARENA usa (servidor\\ponte_sem_acento.py)."""
+    que o ARENA usa (servidor\\ponte_sem_acento.py). As opcoes do RetroArch
+    do proprio console (consoles.json -> opcoes_retroarch) e o Java do ARENA
+    (usa_java) entram como no ARENA."""
+    plataforma = plataforma or {}
     os.makedirs(pasta)
-    cfg = base.config_base(pasta, {})
+    cfg = base.config_base(pasta, plataforma.get("opcoes_retroarch", {}))
+    ambiente = ambiente_sem_outro_java() if plataforma.get("usa_java") else None
     opcoes = {"system_directory": sistema}
     jogo_do_nucleo, devolver = jogo, None
     ponte = ponte_sem_acento.precisa(nucleo, sistema, jogo)
@@ -351,7 +377,7 @@ def abrir(jogo, nucleo, pasta, sistema, quadros):
                         "--appendconfig", cfg + "|" + extra, "--verbose", "--log-file", registro,
                         "--max-frames=%d" % quadros, "--max-frames-ss", "--max-frames-ss-path=" + foto,
                         jogo_do_nucleo],
-                       cwd=os.path.dirname(RETROARCH), timeout=150,
+                       cwd=os.path.dirname(RETROARCH), timeout=150, env=ambiente,
                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         travou = False
     except subprocess.TimeoutExpired:
@@ -421,8 +447,18 @@ def main():
                         jogo = os.path.join(trabalho, os.path.basename(origem))
                         shutil.copyfile(origem, jogo)
                 foto, texto, travou, ponte = abrir(jogo, plataforma["core"], os.path.join(trabalho, "rodada"),
-                                                   sistema, regras.get("quadros", 600))
+                                                   sistema, regras.get("quadros", 600), plataforma)
                 ok, detalhe = imagem_de_verdade(foto, item.get("cor"))
+                if plataforma.get("usa_java"):
+                    # O Java do jogo fecha junto com o RetroArch (nada fica
+                    # aberto escondido depois da aula).
+                    time.sleep(2)
+                    sobras = javaw_do_arena_abertos()
+                    for pid in sobras:
+                        subprocess.run(["taskkill", "/F", "/PID", pid],
+                                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    if sobras:
+                        falhas.append("%s, %s: o Java ficou aberto depois do jogo" % (plataforma["nome"], rotulo))
                 if os.path.isfile(foto):
                     shutil.copyfile(foto, os.path.join(fotos, "%s - %s.png" % (item["console"], rotulo)))
                 print("   %-17s imagem: %-3s (%s)%s%s" % (rotulo, "sim" if ok else "NAO", detalhe,
@@ -437,7 +473,21 @@ def main():
                         falhas.append("%s, %s: o registro nao diz %r" % (plataforma["nome"], rotulo,
                                                                         regras["registro"]))
                 if junto and rotulo == "pasta comum":
-                    resultado = jogar_junto(jogo, plataforma["core"], os.path.join(trabalho, "junto"), sistema)
+                    # Os dois RetroArch do Jogar Junto herdam o PATH deste teste.
+                    path_antes = os.environ.get("PATH", "")
+                    if plataforma.get("usa_java"):
+                        os.environ["PATH"] = ambiente_sem_outro_java()["PATH"]
+                    try:
+                        resultado = jogar_junto(jogo, plataforma["core"], os.path.join(trabalho, "junto"), sistema)
+                    finally:
+                        os.environ["PATH"] = path_antes
+                        # Aqui quem derruba os dois RetroArch e' o teste, sem a
+                        # caixa do ARENA (processos.py): o Java que sobrar e' dele.
+                        if plataforma.get("usa_java"):
+                            time.sleep(2)
+                            for pid in javaw_do_arena_abertos():
+                                subprocess.run(["taskkill", "/F", "/PID", pid],
+                                               stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                     print("   %-17s Jogar Junto: %s %s" % ("", "conectou" if resultado.get("conectou") else
                                                           "NAO conectou", resultado.get("recusa_do_nucleo", "")))
                     if bool(resultado.get("conectou")) != plataforma.get("netplay", True):

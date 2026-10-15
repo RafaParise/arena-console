@@ -36,7 +36,15 @@ PROGRAMAS = [
     ("RPCS3 (PlayStation 3)", "GPL-2.0", "https://github.com/RPCS3/rpcs3", "emuladores\\RPCS3"),
     ("Xenia Canary (Xbox 360)", "BSD-3-Clause", "https://github.com/xenia-canary/xenia-canary",
      "emuladores\\Xenia"),
+    ("Java do Java ME: OpenJDK 21 (Eclipse Temurin), reduzido com o jlink",
+     "GPL-2.0 com a exceção Classpath (os textos vão em emuladores\\Java\\legal)",
+     "https://github.com/adoptium/temurin21-binaries", "emuladores\\Java"),
 ]
+
+# Nucleos cujo codigo-fonte NAO fica no GitHub do libretro.
+FONTE_FORA_DO_LIBRETRO = {
+    "freej2me_libretro.dll": "https://github.com/TASEmulators/freej2me-plus/tree/8f87bf1497e7a9738a32d1909379376a1faca7dd",
+}
 
 
 def ler_info(caminho):
@@ -130,7 +138,8 @@ def montar(pasta):
         "do próprio núcleo (`retroarch\\info`). Os de licença **não comercial**",
         "(Non-commercial) podem ser usados e distribuídos de graça, como aqui,",
         "mas não vendidos. O código-fonte de todos está em",
-        "<https://github.com/libretro> (um repositório por núcleo).",
+        "<https://github.com/libretro> (um repositório por núcleo), menos os",
+        "que a lista depois da tabela aponta.",
         "",
         "| Núcleo | Arquivo | Versão | Licença |",
         "|---|---|---|---|",
@@ -138,6 +147,11 @@ def montar(pasta):
     for arquivo, exibicao, licenca, versao in lista:
         linhas.append("| %s | `%s` | %s | %s |" % (exibicao.replace("|", "/"), arquivo, versao or "—",
                                                   licenca.replace("|", " / ")))
+    fora = [(arquivo, FONTE_FORA_DO_LIBRETRO[arquivo.lower()]) for arquivo, _e, _l, _v in lista
+            if arquivo.lower() in FONTE_FORA_DO_LIBRETRO]
+    if fora:
+        linhas += ["", "Código-fonte fora do libretro:", ""]
+        linhas += ["- `%s`: <%s>" % par for par in fora]
     linhas.append("")
     return "\n".join(linhas)
 

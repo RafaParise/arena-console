@@ -64,6 +64,7 @@ emuladores/*
 !emuladores/Dolphin/
 !emuladores/RPCS3/
 !emuladores/Xenia/
+!emuladores/Java/
 emuladores/PCSX2/*
 !emuladores/PCSX2/LEIA.txt
 emuladores/Dolphin/*
@@ -72,6 +73,8 @@ emuladores/RPCS3/*
 !emuladores/RPCS3/LEIA.txt
 emuladores/Xenia/*
 !emuladores/Xenia/LEIA.txt
+emuladores/Java/*
+!emuladores/Java/LEIA.txt
 
 retroarch/*
 !retroarch/system/

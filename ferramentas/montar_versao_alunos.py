@@ -18,6 +18,7 @@ O QUE ENTRA (lista fechada -- o que nao esta aqui, nao vai):
     nomes de fliperama (FBNeo e MAME);
   - PCSX2, Dolphin, RPCS3 e Xenia: so o programa e a configuracao que o
     ARENA completa a cada jogo (sem os dados de quem usou);
+  - o Java do Java ME (emuladores\Java, uns 47 MB, so programa);
   - pastas vazias com o LEIA.txt de cada uma (jogos, saves, estados...).
 
 O QUE NAO ENTRA, e por que:
@@ -453,8 +454,12 @@ def montar(destino, com_bios=False):
     # 4. Emuladores de fora: so o programa e a configuracao que o ARENA completa.
     E, E_D = os.path.join(RAIZ, "emuladores"), os.path.join(destino, "emuladores")
     copiar_leia("emuladores", destino)
-    for emu in ("PCSX2", "Dolphin", "RPCS3", "Xenia"):
+    for emu in ("PCSX2", "Dolphin", "RPCS3", "Xenia", "Java"):
         copiar_leia(os.path.join("emuladores", emu), destino)
+    # O Java do Java ME (servidor\java_do_arena.py): a pasta inteira, que e'
+    # so programa, sem nada de quem usa (o jlink de ferramentas\preparar_java.py).
+    if os.path.isfile(os.path.join(E, "Java", "bin", "javaw.exe")):
+        copiar_arvore(os.path.join(E, "Java"), os.path.join(E_D, "Java"))
 
     def programa(pasta_rel, arquivos, pastas, fora=()):
         origem, alvo = os.path.join(E, pasta_rel), os.path.join(E_D, pasta_rel)

@@ -17,10 +17,16 @@ ARENA:
     tos.img. O código-fonte desta versão: emutos-src-1.4.tar.gz, na página
     de downloads do EmuTOS (endereço em TERCEIROS.md).
 
+  FreeJ2ME-Plus 1.52 (Java ME) - licença GPL 3 -
+  https://github.com/TASEmulators/freej2me-plus
+    Não é BIOS de console: é a metade Java do emulador do Java ME
+    (freej2me-lr.jar). O núcleo do RetroArch procura este arquivo na pasta
+    system e o abre com o Java que vem no ARENA (emuladores\Java).
+
 Ninguém precisa mexer aqui. Ao abrir, o ARENA copia para retroarch\system só
 o que estiver faltando, e nunca troca uma BIOS que já está lá. A BIOS de
 verdade, se você puser na pasta BIOS do ARENA, passa na frente da livre.
 
 Cada arquivo, de onde ele veio e a marca dele (SHA-256) estão na lista.json.
 A licença de cada projeto vai junto, na pasta dele (C-BIOS\doc\cbios.txt,
-EmuTOS\doc\license.txt).
+EmuTOS\doc\license.txt, FreeJ2ME-Plus\LICENSE.txt).

@@ -26,8 +26,9 @@ por voluntários para qualquer um copiar.
 | Dolphin (GameCube e Wii) | GPL-2.0 ou posterior | <https://github.com/dolphin-emu/dolphin> | `emuladores\Dolphin` |
 | RPCS3 (PlayStation 3) | GPL-2.0 | <https://github.com/RPCS3/rpcs3> | `emuladores\RPCS3` |
 | Xenia Canary (Xbox 360) | BSD-3-Clause | <https://github.com/xenia-canary/xenia-canary> | `emuladores\Xenia` |
+| Java do Java ME: OpenJDK 21 (Eclipse Temurin), reduzido com o jlink | GPL-2.0 com a exceção Classpath (os textos vão em emuladores\Java\legal) | <https://github.com/adoptium/temurin21-binaries> | `emuladores\Java` |
 
-## BIOS livres (2)
+## BIOS livres (3)
 
 Ficam em `servidor\bios_livres`, sem mudança nenhuma, com o texto da
 licença ao lado; a `lista.json` dessa pasta guarda a marca (SHA-256) de
@@ -37,14 +38,16 @@ cada arquivo. O ARENA as copia para `retroarch\system` só onde falta.
 |---|---|---|---|---|
 | C-BIOS 0.29a | MSX | BSD de 2 cláusulas (o aviso de direitos vai junto, em C-BIOS\doc\cbios.txt) | <https://cbios.sourceforge.net/> | `servidor\bios_livres\C-BIOS` |
 | EmuTOS 1.4 | Atari ST | GPL-2.0 ou posterior (o texto vai junto, em EmuTOS\doc\license.txt) | <https://downloads.sourceforge.net/project/emutos/emutos/1.4/emutos-src-1.4.tar.gz> | `servidor\bios_livres\EmuTOS` |
+| FreeJ2ME-Plus 1.52 | Java ME | GPL-3.0 (o texto vai junto, em FreeJ2ME-Plus\LICENSE.txt, com as licenças das bibliotecas que vêm dentro: ObjectWeb ASM, JLayer e libsdl4j) | <https://github.com/TASEmulators/freej2me-plus/tree/8f87bf1497e7a9738a32d1909379376a1faca7dd> | `servidor\bios_livres\FreeJ2ME-Plus` |
 
-## Núcleos do RetroArch (62)
+## Núcleos do RetroArch (63)
 
 Cada núcleo é o emulador de um console. A licença vem do arquivo `.info`
 do próprio núcleo (`retroarch\info`). Os de licença **não comercial**
 (Non-commercial) podem ser usados e distribuídos de graça, como aqui,
 mas não vendidos. O código-fonte de todos está em
-<https://github.com/libretro> (um repositório por núcleo).
+<https://github.com/libretro> (um repositório por núcleo), menos os
+que a lista depois da tabela aponta.
 
 | Núcleo | Arquivo | Versão | Licença |
 |---|---|---|---|
@@ -61,6 +64,7 @@ mas não vendidos. O código-fonte de todos está em
 | Nintendo - NES / Famicom (FCEUmm) | `fceumm_libretro.dll` | SVN | GPLv2 |
 | Sega - Dreamcast/Naomi (Flycast) | `flycast_libretro.dll` | Git | GPLv2 |
 | Mattel - Intellivision (FreeIntv) | `freeintv_libretro.dll` | 2018.1.5 | GPLv3 |
+| Mobile - J2ME (FreeJ2ME-Plus) | `freej2me_libretro.dll` | 1.52-GIT | GPLv3 |
 | Sinclair - ZX Spectrum (Fuse) | `fuse_libretro.dll` | 1.6.0 | GPLv3 |
 | Nintendo - Game Boy / Color (Gambatte) | `gambatte_libretro.dll` | v0.5.0 | GPLv2 |
 | Coleco - ColecoVision (Gearcoleco) | `gearcoleco_libretro.dll` | 1.0.0 | GPLv3 |
@@ -110,3 +114,7 @@ mas não vendidos. O código-fonte de todos está em
 | Vircon32 | `vircon32_libretro.dll` | 2024.08.28 | 3-clause BSD |
 | Atari - Jaguar (Virtual Jaguar) | `virtualjaguar_libretro.dll` | v2.1.0 | GPLv3 |
 | WASM-4 | `wasm4_libretro.dll` | 2.1.0 | ISC |
+
+Código-fonte fora do libretro:
+
+- `freej2me_libretro.dll`: <https://github.com/TASEmulators/freej2me-plus/tree/8f87bf1497e7a9738a32d1909379376a1faca7dd>

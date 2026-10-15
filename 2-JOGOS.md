@@ -216,7 +216,7 @@ No fliperama do MAME, a BIOS vai na pasta dos próprios jogos.
 | Game Boy e Game Boy Color | `Game Boy` | `.gb` `.gbc` | pode | não precisa |
 | GameCube | `GameCube` | `.rvz` `.gcm` `.gcz` `.chd` `.iso` | **não** | não precisa |
 | Intellivision | `Intellivision` | `.int` | pode | `exec.bin`, `grom.bin` |
-| Java ME (celular antigo) | `J2ME` | `.jar` `.jad` | pode | não precisa |
+| Java ME (celular antigo) | `J2ME` | `.jar` `.kjx` | **não** (o `.jar` já é compactado) | não precisa (o Java vem no ARENA) |
 | LowRes NX | `LowRes NX` | `.nx` | pode | não precisa |
 | Magnavox Odyssey 2 | `Odyssey 2` | `.bin` | pode | `o2rom.bin` |
 | Mega Drive, Master System e Game Gear | `Mega Drive` | `.md` `.gen` `.smd` `.sms` `.gg` | pode | não precisa |

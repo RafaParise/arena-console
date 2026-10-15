@@ -23,3 +23,6 @@ licencas.
   Arduboy\evade.hex             Evade, da Modus Create - MIT
   MicroW8\skipahead.uw8         Skip Ahead, de Dennis Ranke (exoticorn) -
                                 Unlicense (domínio público)
+  J2ME\shooter.jar              Shooter, de Muhammad Rehan Saeed (2006) - MIT.
+                                Abre com o Java que vem no ARENA
+                                (emuladores\Java).

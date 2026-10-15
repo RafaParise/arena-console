@@ -50,7 +50,7 @@ PROGRAMA = [
     "servidor/integridade.py", "servidor/janela_preta.py", "servidor/jogadores.py",
     "servidor/motivo_do_erro.py", "servidor/bios.py", "servidor/bios_catalogo.py", "servidor/arrumar.py",
     "servidor/nomes_arcade.py", "servidor/processos.py", "servidor/capas_do_disco.py",
-    "servidor/como_colocar.py", "servidor/ponte_sem_acento.py",
+    "servidor/como_colocar.py", "servidor/ponte_sem_acento.py", "servidor/java_do_arena.py",
     "servidor/consoles.json", "servidor/graficos.json", "servidor/recursos.json",
     "servidor/perfis_controle.json",
 ]
@@ -336,6 +336,18 @@ if os.path.isdir(sistema):
         1 for n in os.listdir(sistema)
         if os.path.isfile(os.path.join(sistema, n)) and not n.lower().endswith(".txt"))
 print("  %d arquivo(s) de sistema na pasta system" % quantos_sistema)
+
+# O Java ME abre o Java que vem no ARENA (servidor\java_do_arena.py). Sem a
+# pasta emuladores\Java, os jogos de celular so abrem se o computador tiver
+# Java instalado (15/10/2026).
+if "freej2me_libretro.dll" in [n.lower() for n in cores]:
+    if os.path.isfile(caminho("emuladores", "Java", "bin", "javaw.exe")):
+        print("  ok     Java do ARENA (para o Java ME) em emuladores\\Java")
+    else:
+        atencao.append("falta o Java do ARENA (emuladores\\Java)")
+        print("  FALTA  o Java do ARENA, em emuladores\\Java")
+        print("         Sem ele, os jogos de Java ME (celular antigo) nao abrem. Copie")
+        print("         a pasta emuladores\\Java do pacote completo do ARENA.")
 
 
 # ---------------------------------------------------------------------------

@@ -319,7 +319,8 @@ jogos\        seus jogos
 dados\        recordes, apelido, amigos, mapeamento de controle
 BIOS\         as BIOS que você colocou
 retroarch\    o emulador, os núcleos, saves, states, cheats e a configuração dele
-emuladores\   PCSX2, Dolphin, RPCS3 e Xenia, com a configuração e os saves deles
+emuladores\   PCSX2, Dolphin, RPCS3 e Xenia, com a configuração e os saves deles,
+              e o Java do Java ME
 perfil\       as coletas do COLETAR.bat
 backup\       suas cópias
 ```
@@ -339,6 +340,12 @@ pasta qualquer e copie de lá só as pastas `retroarch\cores` e
 `retroarch\info` para dentro do seu `retroarch\`, substituindo os arquivos.
 Elas só têm os núcleos e a ficha de cada um: a sua configuração, os saves e
 os cheats ficam como estão.
+
+**Java ME (jogos de celular antigo):** o emulador dele usa o Java que vem no
+pacote completo, na pasta `emuladores\Java` (uns 47 MB, só o programa). Se a
+sua versão ainda não tem essa pasta, copie-a do pacote completo para dentro
+do seu `emuladores\`. Sem ela, os jogos de Java ME só abrem num computador
+com Java instalado, e o `VERIFICAR.bat` avisa que ela falta.
 
 **Depois de copiar:**
 
