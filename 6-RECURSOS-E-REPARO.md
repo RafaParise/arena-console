@@ -332,6 +332,14 @@ também o RetroArch e os emuladores com a configuração do pacote. Descompactad
 por cima de um ARENA em uso, ele troca a configuração que você fez neles (os
 jogos, os saves, as BIOS e os recordes ficam).
 
+**Versão com console novo** (como a 2026.10.15, com 14): cada console novo
+precisa de um núcleo novo do RetroArch, e o pacote de atualização não mexe
+no `retroarch\`. Depois de atualizar, descompacte o pacote completo numa
+pasta qualquer e copie de lá só as pastas `retroarch\cores` e
+`retroarch\info` para dentro do seu `retroarch\`, substituindo os arquivos.
+Elas só têm os núcleos e a ficha de cada um: a sua configuração, os saves e
+os cheats ficam como estão.
+
 **Depois de copiar:**
 
 1. Dois cliques em **`VERIFICAR.bat`**.
