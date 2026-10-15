@@ -2689,6 +2689,13 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         ligacao = jogo.get("ligacao") or {}
         opcoes_jogo = dict(extra or {}, **extras_controle)
         opcoes_jogo.update(ligacao.get("cfg", {}))
+        # As BIOS livres (e a metade Java do Java ME) no lugar ANTES de abrir.
+        # A arrumacao das BIOS roda em segundo plano ao abrir o ARENA e pode
+        # nao ter terminado: achado de 15/10/2026, o primeiro jogo de Java ME
+        # abriu sem o freej2me-lr.jar. So copia o que falta (e' rapido).
+        instaladas = bios.instalar_livres(PASTA_SISTEMA)
+        if instaladas:
+            print("[ARENA] BIOS livres postas antes do jogo: %s." % ", ".join(sorted(instaladas)))
         # Nucleo que nao abre caminho com acento (o Hatari, do Atari ST): a
         # BIOS e o jogo vao por uma pasta sem acento. O caminho de verdade
         # continua valendo para o resto (nome do remapeamento, sessao).

@@ -1026,7 +1026,9 @@ def _ler_de_dentro(caminho, dentro):
 
 def _gravar(destino, dados):
     os.makedirs(os.path.dirname(destino), exist_ok=True)
-    temporario = destino + ".instalando"
+    # Nome unico por thread: a arrumacao da abertura e o jogo que vai abrir
+    # podem instalar a mesma BIOS livre ao mesmo tempo (15/10/2026).
+    temporario = "%s.%d.instalando" % (destino, threading.get_ident())
     with open(temporario, "wb") as arquivo:
         arquivo.write(dados)
     os.replace(temporario, destino)
