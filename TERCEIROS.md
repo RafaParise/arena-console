@@ -38,7 +38,7 @@ cada arquivo. O ARENA as copia para `retroarch\system` só onde falta.
 | C-BIOS 0.29a | MSX | BSD de 2 cláusulas (o aviso de direitos vai junto, em C-BIOS\doc\cbios.txt) | <https://cbios.sourceforge.net/> | `servidor\bios_livres\C-BIOS` |
 | EmuTOS 1.4 | Atari ST | GPL-2.0 ou posterior (o texto vai junto, em EmuTOS\doc\license.txt) | <https://downloads.sourceforge.net/project/emutos/emutos/1.4/emutos-src-1.4.tar.gz> | `servidor\bios_livres\EmuTOS` |
 
-## Núcleos do RetroArch (49)
+## Núcleos do RetroArch (53)
 
 Cada núcleo é o emulador de um console. A licença vem do arquivo `.info`
 do próprio núcleo (`retroarch\info`). Os de licença **não comercial**
@@ -48,6 +48,7 @@ mas não vendidos. O código-fonte de todos está em
 
 | Núcleo | Arquivo | Versão | Licença |
 |---|---|---|---|
+| Sinclair - ZX 81 (EightyOne) | `81_libretro.dll` | 1.0a | GPLv3 |
 | Atari - 5200 (a5200) | `a5200_libretro.dll` | 2.0.2 | GPLv2 |
 | MSX/SVI/ColecoVision/SG-1000 (blueMSX) | `bluemsx_libretro.dll` | SVN | GPLv2 |
 | Amstrad - CPC/GX4000 (Caprice32) | `cap32_libretro.dll` | v4.2.0 | GPLv2 |
@@ -65,6 +66,7 @@ mas não vendidos. O código-fonte de todos está em
 | Handheld Electronic (GW) | `gw_libretro.dll` | Git | zlib |
 | Atari - Lynx (Handy) | `handy_libretro.dll` | 0.95 | Zlib |
 | Atari - ST/STE/TT/Falcon (Hatari) | `hatari_libretro.dll` | 1.8 | GPLv2 |
+| CHIP-8/S-CHIP/XO-CHIP (JAXE) | `jaxe_libretro.dll` | GIT | MIT |
 | LowRes NX | `lowresnx_libretro.dll` | v1.2 | zlib |
 | Arcade (MAME) | `mame_libretro.dll` | Git | GPLv2+ |
 | SNK - Neo Geo Pocket / Color (Beetle NeoPop) | `mednafen_ngp_libretro.dll` | v0.9.36.1 | GPLv2 |
@@ -95,5 +97,7 @@ mas não vendidos. O código-fonte de todos está em
 | Uzebox (Uzem) | `uzem_libretro.dll` | — | MIT |
 | GCE - Vectrex (vecx) | `vecx_libretro.dll` | SVN | GPLv3 |
 | Commodore - C64 (VICE x64, fast) | `vice_x64_libretro.dll` | 3.9 | GPLv2 |
+| Commodore - PLUS/4 (VICE xplus4) | `vice_xplus4_libretro.dll` | 3.9 | GPLv2 |
+| Commodore - VIC-20 (VICE xvic) | `vice_xvic_libretro.dll` | 3.9 | GPLv2 |
 | Atari - Jaguar (Virtual Jaguar) | `virtualjaguar_libretro.dll` | v2.1.0 | GPLv3 |
 | WASM-4 | `wasm4_libretro.dll` | 2.1.0 | ISC |

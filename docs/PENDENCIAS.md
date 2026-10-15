@@ -65,10 +65,14 @@ fica no commit). O detalhe de cada pedido está em
      Rayoid, domínio público). O Hatari não abre pasta com acento: a ponte
      `servidor\ponte_sem_acento.py` abre por uma pasta sem acento e devolve o
      disquete gravado. Sem Jogar Junto (o Hatari recusa).
+   - Feito: ZX81 (Factory 2023), VIC-20 (Baguel), Plus/4 (Intervallo) e
+     CHIP-8 (Slippery Slope), consoles novos testados com jogo livre nas
+     duas pastas (com e sem acento). Só o CHIP-8 tem Jogar Junto (os
+     outros três núcleos recusam).
    - Falta (pedido de 14/10: "todos os consoles de código aberto", mantendo
-     os emuladores de sempre): os consoles novos com núcleo já na pasta
-     (ZX81, VIC-20, Plus/4, Watara Supervision, Thomson, CHIP-8 e os outros
-     que abrirem sem BIOS das empresas), cada um testado com um jogo livre
+     os emuladores de sempre): Watara Supervision e Thomson (sem jogo livre
+     publicado: um programa de teste escrito para o ARENA) e os outros
+     núcleos da pasta que abrirem sem BIOS das empresas, cada um testado
      (`testes\teste_consoles_livres.py`).
    - Depois: versão nova do pacote (um download só, com tudo), pedido de
      14/10 ("tudo pronto para só colocar o jogo e jogar").

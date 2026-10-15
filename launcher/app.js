@@ -477,6 +477,7 @@ const MIDIA_POR_PLATAFORMA = {
     "nes", "snes", "megadrive", "sega32x", "n64", "sg1000", "atari2600",
     "atari5200", "atari7800", "jaguar", "intellivision", "colecovision",
     "odyssey2", "arcade", "c64", "msx", "vectrex", "neogeo", "amstrad",
+    "vic20", "plus4",
   ],
   cartucho_v: [
     "gameboy", "gba", "virtualboy", "pokemini", "gamewatch", "ngp",
@@ -484,7 +485,7 @@ const MIDIA_POR_PLATAFORMA = {
   ],
   jewel_case: [
     "ps1", "ps3", "saturn", "dreamcast", "segacd", "threedo", "cdi", "pcfx",
-    "scummvm", "dos", "amiga", "spectrum", "atarist",
+    "scummvm", "dos", "amiga", "spectrum", "atarist", "zx81",
   ],
   caixa_dvd: ["ps2", "gamecube", "wii"],
   caixa_xbox: ["xbox360"],
@@ -492,7 +493,7 @@ const MIDIA_POR_PLATAFORMA = {
   umd: ["psp"],
   // Sem mídia física de verdade (portátil digital, homebrew) - cartão
   // genérico.
-  cartao: ["tic80", "wasm4", "lowresnx", "uzebox", "tamagotchi", "j2me"],
+  cartao: ["tic80", "wasm4", "lowresnx", "uzebox", "tamagotchi", "j2me", "chip8"],
 };
 
 const TIPO_MIDIA_POR_ID = {};

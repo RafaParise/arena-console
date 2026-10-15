@@ -113,6 +113,10 @@ def disquete_st(destino, programas):
 POR_CONSOLE = {
     "msx": {"quadros": 900, "registro": r"falling back to 'MSX2\+ - C-BIOS'"},
     "atarist": {"quadros": 1500, "montar": (".st", lambda destino, origem: disquete_st(destino, [origem]))},
+    "zx81": {"quadros": 1500},
+    "vic20": {"quadros": 1500},
+    "plus4": {"quadros": 1200},
+    "chip8": {"quadros": 600},
 }
 
 

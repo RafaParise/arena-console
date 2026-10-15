@@ -8,9 +8,14 @@ no pacote dos alunos.
 Cada jogo veio do endereço do próprio autor, na versão exata que está na
 lista.json, sem mudança nenhuma. A lista.json traz também o autor, a licença
 e a marca (SHA-256) de cada arquivo. O texto de cada licença está na pasta
-licencas (o da GPL-3.0 é o mesmo do ARENA: o arquivo LICENSE da raiz).
+licencas.
 
-  MSX\noborunoca.rom        NOBORUNOCA, de Hiromasa Tanaka (h1romas4) - MIT
-  Atari ST\RAYOID.PRG       Rayoïd, de Raymond Hill (1992) - Unlicense
-                            (domínio público). O teste monta um disquete
-                            com ele na pasta AUTO, e o EmuTOS o abre sozinho.
+  MSX\noborunoca.rom            NOBORUNOCA, de Hiromasa Tanaka (h1romas4) - MIT
+  Atari ST\RAYOID.PRG           Rayoïd, de Raymond Hill (1992) - Unlicense
+                                (domínio público). O teste monta um disquete
+                                com ele na pasta AUTO, e o EmuTOS o abre sozinho.
+  ZX81\factory2023.P            Factory 2023, de Sebastien Andrivet - GPL-3.0
+  VIC-20\baguel.d64             Baguel, de Marco Giorgini - MIT
+  Plus-4\intervallo-plus4.prg   Intervallo, de Zalka Ernő (ern0) - MIT
+  CHIP-8\slipperyslope.ch8      Slippery Slope, de John Earnest - CC0
+                                (domínio público, como todo o Chip8 Archive)

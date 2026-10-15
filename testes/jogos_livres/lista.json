@@ -15,6 +15,19 @@
       "sha256": "b44403c3fea6b75808799976cbc5598d8e6036476b00ef14a1cf45d7193ffc1f"
     },
     {
+      "origem": "CHIP-8/slipperyslope.ch8",
+      "licenca_arquivo": "licencas/chip8archive.txt",
+      "console": "chip8",
+      "jogo": "Slippery Slope",
+      "versao": "commit 761e3ff",
+      "autor": "John Earnest",
+      "licenca": "CC0 (domínio público), como todo o Chip8 Community Archive",
+      "fonte": "https://github.com/JohnEarnest/chip8Archive",
+      "baixado_de": "https://raw.githubusercontent.com/JohnEarnest/chip8Archive/761e3ffc63f43e6a849e80714122feff2afca208/roms/slipperyslope.ch8",
+      "o_que_prova": "o CHIP-8 abre um jogo .ch8",
+      "sha256": "9b41321353363bea616d51e1d63435e583c6ca8772ec78d6ceea33f21c89169d"
+    },
+    {
       "origem": "MSX/noborunoca.rom",
       "licenca_arquivo": "licencas/noborunoca.txt",
       "console": "msx",
@@ -26,6 +39,45 @@
       "baixado_de": "https://github.com/h1romas4/noborunoca/releases/download/v1.0.2/noborunoca.rom",
       "o_que_prova": "o MSX abre cartucho só com o C-BIOS (a BIOS livre), sem a BIOS de verdade",
       "sha256": "57a3be2fe5c3190daa3e69cf23cd262cdc8af98c60993ea941d43c815cbb25f6"
+    },
+    {
+      "origem": "Plus-4/intervallo-plus4.prg",
+      "licenca_arquivo": "licencas/intervallo.txt",
+      "console": "plus4",
+      "jogo": "Intervallo",
+      "versao": "commit 5925dee",
+      "autor": "Zalka Ernő (ern0)",
+      "licenca": "MIT",
+      "fonte": "https://github.com/ern0/intervallo",
+      "baixado_de": "https://raw.githubusercontent.com/ern0/intervallo/5925deee683a06eb2e56593e9e33c8ccd4097b0d/release/intervallo-plus4.prg",
+      "o_que_prova": "o Plus/4 carrega e roda um programa .prg sozinho (autostart do VICE)",
+      "sha256": "3614465c004b9088fafb534fe456dffcaa779668ff00e17693cbf4dfa657831f"
+    },
+    {
+      "origem": "VIC-20/baguel.d64",
+      "licenca_arquivo": "licencas/baguel.txt",
+      "console": "vic20",
+      "jogo": "Baguel",
+      "versao": "commit 5223967",
+      "autor": "Marco Giorgini (MGProduction)",
+      "licenca": "MIT",
+      "fonte": "https://github.com/mgproduction/baguel",
+      "baixado_de": "https://raw.githubusercontent.com/mgproduction/baguel/522396799cdd28996b41ec43384da182b924282c/bin/baguel.d64",
+      "o_que_prova": "o VIC-20 abre um disquete .d64 sozinho (autostart do VICE)",
+      "sha256": "f3771bf640b3fdf4388ac9119f8549a5824aaac7fd18e7fb65834f1429e97c4d"
+    },
+    {
+      "origem": "ZX81/factory2023.P",
+      "licenca_arquivo": "licencas/factory2023.txt",
+      "console": "zx81",
+      "jogo": "Factory 2023",
+      "versao": "v2024.01 (commit 355be76)",
+      "autor": "Sebastien Andrivet",
+      "licenca": "GPL-3.0",
+      "fonte": "https://github.com/andrivet/Factory-2023",
+      "baixado_de": "https://github.com/andrivet/Factory-2023/releases/download/v2024.01/factory2023.P",
+      "o_que_prova": "o ZX81 abre um jogo .P com a ROM que vem dentro do núcleo",
+      "sha256": "2ed0c89d96fe8f636c7cb3ea140a47282a1758f7df501f1c364c2828fc09615a"
     }
   ]
 }

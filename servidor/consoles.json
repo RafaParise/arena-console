@@ -73,6 +73,30 @@
       "pasta": "Uzebox"
     },
     {
+      "id": "chip8",
+      "nome": "CHIP-8",
+      "descricao": "Maquina virtual de 1977 para jogos simples. Boa para aprender a programar.",
+      "core": "jaxe_libretro.dll",
+      "extensoes": [
+        ".ch8",
+        ".sc8",
+        ".xo8"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "chip-8",
+        "chip8",
+        "schip",
+        "super-chip",
+        "xo-chip",
+        "octo"
+      ],
+      "pasta": "CHIP-8"
+    },
+    {
       "id": "atari2600",
       "nome": "Atari 2600",
       "descricao": "O comeco de tudo. Extremamente leve.",
@@ -1003,6 +1027,69 @@
       "pasta": "Commodore 64"
     },
     {
+      "id": "vic20",
+      "nome": "Commodore VIC-20",
+      "descricao": "O primeiro computador a vender um milhao de unidades, de 1980.",
+      "core": "vice_xvic_libretro.dll",
+      "extensoes": [
+        ".prg",
+        ".d64",
+        ".t64",
+        ".tap",
+        ".crt",
+        ".20",
+        ".40",
+        ".60",
+        ".a0",
+        ".b0"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "vic-20",
+        "vic20",
+        "vic 20",
+        "commodore vic-20",
+        "commodore vic20",
+        "vc-20"
+      ],
+      "netplay": false,
+      "netplay_motivo": "O núcleo do VIC-20 (VICE) não suporta jogo em rede - confirmado tentando hospedar em 14/10/2026, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Os 2 jogadores só valem no mesmo computador.",
+      "pasta": "Commodore VIC-20"
+    },
+    {
+      "id": "plus4",
+      "nome": "Commodore Plus/4",
+      "descricao": "Computador da Commodore de 1984, da familia do C16.",
+      "core": "vice_xplus4_libretro.dll",
+      "extensoes": [
+        ".prg",
+        ".d64",
+        ".t64",
+        ".tap",
+        ".crt"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "plus4",
+        "plus-4",
+        "plus 4",
+        "commodore plus-4",
+        "commodore plus4",
+        "commodore 16",
+        "c16",
+        "c-16"
+      ],
+      "netplay": false,
+      "netplay_motivo": "O núcleo do Plus/4 (VICE) não suporta jogo em rede - confirmado tentando hospedar em 14/10/2026, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Os 2 jogadores só valem no mesmo computador.",
+      "pasta": "Commodore Plus-4"
+    },
+    {
       "id": "amiga",
       "nome": "Commodore Amiga",
       "descricao": "Microcomputador de 16 bits.",
@@ -1044,6 +1131,31 @@
         "zx spectrum"
       ],
       "pasta": "ZX Spectrum"
+    },
+    {
+      "id": "zx81",
+      "nome": "ZX81",
+      "descricao": "Computador de 1981 da Sinclair, com 1 KB de memoria e tela em preto e branco.",
+      "core": "81_libretro.dll",
+      "extensoes": [
+        ".p",
+        ".t81",
+        ".tzx"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "zx81",
+        "zx 81",
+        "sinclair zx81",
+        "timex sinclair 1000",
+        "ts1000"
+      ],
+      "netplay": false,
+      "netplay_motivo": "O núcleo do ZX81 (EightyOne) não suporta jogo em rede - confirmado tentando hospedar em 14/10/2026, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Os 2 jogadores só valem no mesmo computador.",
+      "pasta": "ZX81"
     },
     {
       "id": "amstrad",
@@ -1302,6 +1414,35 @@
     ],
     ".rom": [
       "msx"
+    ],
+    ".prg": [
+      "c64",
+      "vic20",
+      "plus4"
+    ],
+    ".d64": [
+      "c64",
+      "vic20",
+      "plus4"
+    ],
+    ".t64": [
+      "c64",
+      "vic20",
+      "plus4"
+    ],
+    ".crt": [
+      "c64",
+      "vic20",
+      "plus4"
+    ],
+    ".tap": [
+      "spectrum",
+      "vic20",
+      "plus4"
+    ],
+    ".tzx": [
+      "spectrum",
+      "zx81"
     ]
   }
 }

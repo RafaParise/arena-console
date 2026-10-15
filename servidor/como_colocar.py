@@ -140,6 +140,17 @@ CONSOLES = {
               "bios": ("uma", ["kick34005.A500", "kick40068.A1200"],
                        "Um Kickstart (kick34005.A500 serve para a maioria dos jogos).")},
     "c64": {"tipo": "computador", "exemplo": "Nome do Jogo.d64"},
+    "vic20": {"tipo": "computador", "exemplo": "Nome do Jogo.prg",
+              "dica": "Também .d64, .t64, .tap e cartucho (.crt, .20, .40, .60, .a0, .b0). O mesmo .d64 serve ao "
+                      "C64: quem decide é a pasta."},
+    "plus4": {"tipo": "computador", "exemplo": "Nome do Jogo.prg",
+              "dica": "Também .d64, .t64, .tap e .crt. Os jogos do Commodore 16 vão nesta pasta. O mesmo .d64 "
+                      "serve ao C64: quem decide é a pasta."},
+    "zx81": {"tipo": "computador", "exemplo": "Nome do Jogo.p",
+             "dica": "Também .t81 e .tzx. O .tzx do ZX Spectrum vai na pasta dele: quem decide é a pasta."},
+    "chip8": {"tipo": "cartucho", "exemplo": "Nome do Jogo.ch8",
+              "dica": "Também .sc8 (Super-CHIP) e .xo8 (XO-CHIP). Muitos jogos livres em "
+                      "github.com/JohnEarnest/chip8Archive."},
     "atarist": {"tipo": "computador", "exemplo": "Nome do Jogo.st",
                 "bios": ("opcional", ["tos.img"],
                          "Opcional: o TOS original (tos.img). Sem ele, o Atari ST liga pelo EmuTOS, a BIOS "

@@ -200,9 +200,12 @@ No fliperama do MAME, a BIOS vai na pasta dos próprios jogos.
 | Atari Jaguar | `Atari Jaguar` | `.j64` `.jag` | pode | não precisa |
 | Atari Lynx | `Atari Lynx` | `.lnx` | pode | `lynxboot.img` |
 | Atari ST | `Atari ST` | `.st` `.msa` `.stx` `.dim` | pode | `tos.img` (sem ele, liga pelo EmuTOS, livre) |
+| CHIP-8 | `CHIP-8` | `.ch8` `.sc8` `.xo8` | pode | não precisa |
 | ColecoVision | `ColecoVision` | `.col` | pode | `colecovision.rom` |
 | Commodore 64 | `Commodore 64` | `.d64` `.t64` `.prg` `.crt` | pode | não precisa |
 | Commodore Amiga | `Amiga` | `.adf` `.hdf` `.ipf` | pode | uma de: `kick34005.A500`, `kick40068.A1200` |
+| Commodore Plus/4 | `Commodore Plus-4` | `.prg` `.d64` `.t64` `.tap` `.crt` | pode | não precisa |
+| Commodore VIC-20 | `Commodore VIC-20` | `.prg` `.d64` `.t64` `.tap` `.crt` `.20` `.40` `.60` `.a0` `.b0` | pode | não precisa |
 | Game & Watch | `Game and Watch` | `.mgw` | pode | não precisa |
 | Game Boy Advance | `Game Boy Advance` | `.gba` | pode | não precisa |
 | Game Boy e Game Boy Color | `Game Boy` | `.gb` `.gbc` | pode | não precisa |
@@ -244,6 +247,7 @@ No fliperama do MAME, a BIOS vai na pasta dos próprios jogos.
 | WonderSwan | `WonderSwan` | `.ws` `.wsc` | pode | não precisa |
 | Xbox 360 | `XBOX360` | `.iso` `.xex` | **não** | não precisa |
 | ZX Spectrum | `ZX Spectrum` | `.tzx` `.tap` `.z80` `.szx` | pode | não precisa |
+| ZX81 | `ZX81` | `.p` `.t81` `.tzx` | pode | não precisa |
 
 Jogo de **vários discos** (PS1, Saturn...): deixe todos na mesma pasta, com
 `(Disc 1)`, `(Disc 2)` no nome — o ARENA junta num jogo só e troca o disco
@@ -287,9 +291,11 @@ AVX.
 | `.pce` `.sgx` | PC Engine |
 | `.ngp` `.ngc` | Neo Geo Pocket |
 | `.ws` `.wsc` | WonderSwan |
-| `.d64` `.t64` `.prg` `.crt` | Commodore 64 |
+| `.d64` `.t64` `.prg` `.crt` | Commodore 64 (na pasta dele, o VIC-20 ou o Plus/4) |
+| `.20` `.40` `.60` `.a0` `.b0` | Commodore VIC-20 |
 | `.adf` `.hdf` `.ipf` | Commodore Amiga |
-| `.tzx` `.tap` `.z80` `.szx` | ZX Spectrum |
+| `.tzx` `.tap` `.z80` `.szx` | ZX Spectrum (na pasta dele, o ZX81, o VIC-20 ou o Plus/4) |
+| `.p` `.t81` | ZX81 |
 | `.cdt` `.sna` | Amstrad CPC |
 | `.rom` `.cas` | MSX |
 | `.exe` `.com` `.bat` `.conf` | MS-DOS |
@@ -298,11 +304,15 @@ AVX.
 | `.wasm` | WASM-4 |
 | `.nx` | LowRes NX |
 | `.uze` | Uzebox |
+| `.ch8` `.sc8` `.xo8` | CHIP-8 |
 
 #### Quando o final serve a mais de um console
 
-`.iso`, `.cue`, `.chd`, `.bin`, `.zip` e `.dsk` servem a vários consoles.
-Nesses casos **quem decide é a pasta**, igual ao RetroArch.
+`.iso`, `.cue`, `.chd`, `.bin`, `.zip` e `.dsk` servem a vários consoles,
+assim como os finais dos computadores da Commodore (`.prg`, `.d64`, `.t64`,
+`.crt` e `.tap`: C64, VIC-20 e Plus/4) e o `.tzx` (ZX Spectrum e ZX81).
+Nesses casos **quem decide é a pasta**, igual ao RetroArch. Fora da pasta
+de um console, vale o C64 e o ZX Spectrum.
 
 O ARENA não tenta adivinhar. Já tentou, e errava: o **Half-Life de
 PlayStation 2 foi lançado em CD**, com a mesma estrutura de um jogo de
@@ -696,11 +706,12 @@ a BIOS. Com o BS-X, os jogos BS ligam pela tela do BS-X.
 
 #### Os que não pedem nada
 
-Amstrad CPC · Atari 2600 · Atari Jaguar · Commodore 64 · Game & Watch ·
+Amstrad CPC · Atari 2600 · Atari Jaguar · CHIP-8 · Commodore 64 · Commodore
+Plus/4 · Commodore VIC-20 · Game & Watch ·
 GameCube · Java ME (celular antigo) · LowRes NX · Mega Drive, Master System
 e Game Gear · MS-DOS · Neo Geo Pocket · Nintendo Wii · PlayStation Portable ·
 ScummVM · Sega 32X · Sega SG-1000 · Tamagotchi · TIC-80 · Uzebox · Vectrex ·
-Virtual Boy · WASM-4 · WonderSwan · Xbox 360 · ZX Spectrum. Também não pedem
+Virtual Boy · WASM-4 · WonderSwan · Xbox 360 · ZX Spectrum · ZX81. Também não pedem
 o NES, o Super Nintendo, o Nintendo 64 e o PC Engine (só as partes que
 aparecem na lista de cima).
 
