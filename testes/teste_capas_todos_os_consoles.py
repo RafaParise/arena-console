@@ -45,7 +45,9 @@ import capas_do_disco  # noqa: E402
 import capas_online  # noqa: E402
 import limpeza  # noqa: E402
 
-SEM_BANCO = {"uzebox", "tamagotchi", "j2me"}
+# 15/10/2026: o libretro-thumbnails tambem nao tem banco do Apple II, do
+# CHIP-8, do Commodore 128 nem do MicroW8 (conferido na lista do GitHub).
+SEM_BANCO = {"uzebox", "tamagotchi", "j2me", "apple2", "chip8", "c128", "microw8"}
 P = os.path.join(RAIZ, "jogos", "pessoais")
 # PNG minimo valido (1x1), o mesmo tipo de icone que o disco traz.
 PNG = bytes.fromhex("89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c489"

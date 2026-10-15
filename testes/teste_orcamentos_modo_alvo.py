@@ -36,6 +36,7 @@ sys.path.insert(0, AQUI)
 sys.path.insert(0, os.path.join(RAIZ, "ferramentas"))
 import limpeza  # noqa: E402
 import modo_alvo  # noqa: E402
+import protege_cfg  # noqa: E402  (o jogo de SNES grava o historico do RetroArch: 15/10/2026)
 
 
 def main():
@@ -111,4 +112,4 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(protege_cfg.rodar(main))
