@@ -6,7 +6,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 203940,
-   "segundos": 12.6,
+   "segundos": 12.2,
    "travou": false,
    "erros": []
   },
@@ -25,8 +25,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 4785,
-   "segundos": 10.8,
+   "foto_bytes": 4824,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -46,7 +46,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 8699,
-   "segundos": 10.6,
+   "segundos": 11.3,
    "travou": false,
    "erros": []
   },
@@ -65,8 +65,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 3071,
-   "segundos": 10.8,
+   "foto_bytes": 7273,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -86,7 +86,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 31547,
-   "segundos": 13.0,
+   "segundos": 13.3,
    "travou": false,
    "erros": []
   },
@@ -102,7 +102,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 34475,
-   "segundos": 12.9,
+   "segundos": 13.4,
    "travou": false,
    "erros": []
   },
@@ -118,7 +118,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 96717,
-   "segundos": 12.9,
+   "segundos": 13.4,
    "travou": false,
    "erros": []
   },
@@ -134,7 +134,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 4101,
-   "segundos": 12.9,
+   "segundos": 13.1,
    "travou": false,
    "erros": []
   },
@@ -150,7 +150,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 67668,
-   "segundos": 12.7,
+   "segundos": 13.1,
    "travou": false,
    "erros": []
   },
@@ -196,7 +196,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 457257,
-   "segundos": 10.9,
+   "segundos": 11.3,
    "travou": false,
    "erros": []
   },
@@ -216,7 +216,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 40997,
-   "segundos": 10.6,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
@@ -236,7 +236,7 @@
   "abrir": {
    "abre_e_mostra_imagem": false,
    "foto_bytes": 1796,
-   "segundos": 10.6,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
@@ -249,7 +249,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 212480,
-   "segundos": 10.6,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -269,7 +269,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 464201,
-   "segundos": 10.7,
+   "segundos": 11.2,
    "travou": false,
    "erros": []
   },
@@ -289,7 +289,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 152297,
-   "segundos": 10.6,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -309,7 +309,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 100256,
-   "segundos": 11.3,
+   "segundos": 11.7,
    "travou": false,
    "erros": []
   },
@@ -329,7 +329,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 169621,
-   "segundos": 10.8,
+   "segundos": 11.2,
    "travou": false,
    "erros": []
   },
@@ -349,7 +349,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 28984,
-   "segundos": 11.0,
+   "segundos": 11.5,
    "travou": false,
    "erros": []
   },
@@ -369,7 +369,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 30273,
-   "segundos": 11.1,
+   "segundos": 11.6,
    "travou": false,
    "erros": []
   },
@@ -389,7 +389,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 336143,
-   "segundos": 10.7,
+   "segundos": 11.1,
    "travou": false,
    "erros": [
     "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented."
@@ -413,7 +413,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 78748,
-   "segundos": 11.1,
+   "segundos": 11.4,
    "travou": false,
    "erros": []
   },
@@ -429,7 +429,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 324806,
-   "segundos": 12.1,
+   "segundos": 12.2,
    "travou": false,
    "erros": []
   },
@@ -445,7 +445,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 954050,
-   "segundos": 11.8,
+   "segundos": 12.2,
    "travou": false,
    "erros": []
   },
@@ -461,7 +461,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 50874,
-   "segundos": 11.2,
+   "segundos": 11.3,
    "travou": false,
    "erros": []
   },
@@ -477,7 +477,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 225364,
-   "segundos": 11.3,
+   "segundos": 11.6,
    "travou": false,
    "erros": []
   },
@@ -493,7 +493,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 37075,
-   "segundos": 11.0,
+   "segundos": 11.3,
    "travou": false,
    "erros": []
   },
@@ -509,7 +509,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 125404,
-   "segundos": 11.6,
+   "segundos": 11.5,
    "travou": false,
    "erros": []
   },
@@ -543,7 +543,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 29288,
-   "segundos": 21.4,
+   "segundos": 21.5,
    "travou": false,
    "erros": []
   },
@@ -563,7 +563,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 29288,
-   "segundos": 21.6,
+   "segundos": 21.7,
    "travou": false,
    "erros": []
   },
@@ -583,7 +583,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 42018,
-   "segundos": 18.5,
+   "segundos": 19.1,
    "travou": false,
    "erros": []
   },
@@ -603,7 +603,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 29288,
-   "segundos": 25.3,
+   "segundos": 25.0,
    "travou": false,
    "erros": []
   },
@@ -623,7 +623,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 29288,
-   "segundos": 11.8,
+   "segundos": 12.2,
    "travou": false,
    "erros": []
   },
@@ -643,7 +643,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 29288,
-   "segundos": 22.8,
+   "segundos": 22.7,
    "travou": false,
    "erros": []
   },
@@ -663,7 +663,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 42018,
-   "segundos": 12.8,
+   "segundos": 13.6,
    "travou": false,
    "erros": []
   },
@@ -941,7 +941,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 430246,
-   "segundos": 11.7,
+   "segundos": 12.3,
    "travou": false,
    "erros": []
   },
@@ -957,7 +957,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 97334,
-   "segundos": 11.0,
+   "segundos": 11.3,
    "travou": false,
    "erros": []
   },
@@ -973,7 +973,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 120104,
-   "segundos": 10.9,
+   "segundos": 11.3,
    "travou": false,
    "erros": []
   },
@@ -989,7 +989,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 7933,
-   "segundos": 11.0,
+   "segundos": 11.3,
    "travou": false,
    "erros": [
     "[libretro WARN] [sceDisplay] Video out requested, not supported: mode=0 size=512,272"
@@ -1007,7 +1007,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 84025,
-   "segundos": 10.9,
+   "segundos": 11.4,
    "travou": false,
    "erros": [
     "[libretro WARN] [sceDisplay] Video out requested, not supported: mode=0 size=512,272"
@@ -1025,7 +1025,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 1416699,
-   "segundos": 17.3,
+   "segundos": 17.7,
    "travou": false,
    "erros": []
   },
@@ -1040,8 +1040,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 449206,
-   "segundos": 11.0,
+   "foto_bytes": 448961,
+   "segundos": 11.5,
    "travou": false,
    "erros": []
   },
@@ -1057,7 +1057,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 47656,
-   "segundos": 12.8,
+   "segundos": 13.2,
    "travou": false,
    "erros": []
   },
@@ -1077,7 +1077,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 7570,
-   "segundos": 10.6,
+   "segundos": 11.7,
    "travou": false,
    "erros": []
   },
@@ -1097,7 +1097,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 427566,
-   "segundos": 11.1,
+   "segundos": 11.6,
    "travou": false,
    "erros": []
   },
@@ -1117,7 +1117,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 405363,
-   "segundos": 12.8,
+   "segundos": 13.3,
    "travou": false,
    "erros": []
   },
@@ -1135,18 +1135,16 @@
   "titulo": "Armada",
   "jogadores": 4,
   "abrir": {
-   "abre_e_mostra_imagem": true,
-   "foto_bytes": 319354,
-   "segundos": 13.5,
+   "abre_e_mostra_imagem": false,
+   "foto_bytes": 0,
+   "segundos": 12.5,
    "travou": false,
    "erros": [
-    "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
     "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
     "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
     "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value."
    ]
   },
-  "foto": "096 Sega Dreamcast - Armada.png",
   "jogar_junto": {
    "pulado": "O núcleo do Dreamcast (Flycast) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Multiplayer só vale no mesmo computador."
   }
@@ -1158,7 +1156,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 67492,
-   "segundos": 12.1,
+   "segundos": 13.6,
    "travou": false,
    "erros": [
     "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
@@ -1179,7 +1177,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 291001,
-   "segundos": 12.6,
+   "segundos": 14.9,
    "travou": false,
    "erros": [
     "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
@@ -1200,8 +1198,8 @@
   "jogadores": 4,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 813317,
-   "segundos": 15.8,
+   "foto_bytes": 822815,
+   "segundos": 17.3,
    "travou": false,
    "erros": [
     "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
@@ -1221,8 +1219,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 241998,
-   "segundos": 12.0,
+   "foto_bytes": 243674,
+   "segundos": 14.1,
    "travou": false,
    "erros": [
     "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
@@ -1242,19 +1240,17 @@
   "titulo": "Marvel Vs Capcom Clash of Super Heroes",
   "jogadores": 2,
   "abrir": {
-   "abre_e_mostra_imagem": true,
-   "foto_bytes": 220981,
-   "segundos": 12.5,
+   "abre_e_mostra_imagem": false,
+   "foto_bytes": 0,
+   "segundos": 68.7,
    "travou": false,
    "erros": [
     "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
     "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
     "[libretro INFO] [BOOT] USA region not supported. Using Europe instead",
-    "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
     "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value."
    ]
   },
-  "foto": "101 Sega Dreamcast - Marvel Vs Capcom Clash of Super Heroes.png",
   "jogar_junto": {
    "pulado": "O núcleo do Dreamcast (Flycast) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Multiplayer só vale no mesmo computador."
   }
@@ -1266,7 +1262,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 46473,
-   "segundos": 11.3,
+   "segundos": 11.8,
    "travou": false,
    "erros": []
   },
@@ -1286,7 +1282,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 185997,
-   "segundos": 10.8,
+   "segundos": 11.2,
    "travou": false,
    "erros": []
   },
@@ -1306,7 +1302,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 185997,
-   "segundos": 10.7,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -1326,7 +1322,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 346224,
-   "segundos": 10.7,
+   "segundos": 11.2,
    "travou": false,
    "erros": []
   },
@@ -1346,7 +1342,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 404304,
-   "segundos": 10.7,
+   "segundos": 11.2,
    "travou": false,
    "erros": []
   },
@@ -1366,7 +1362,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 136698,
-   "segundos": 10.7,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -1386,7 +1382,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 267243,
-   "segundos": 12.7,
+   "segundos": 13.2,
    "travou": false,
    "erros": []
   },
@@ -1406,7 +1402,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 347705,
-   "segundos": 12.9,
+   "segundos": 13.3,
    "travou": false,
    "erros": []
   },
@@ -1426,7 +1422,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 329805,
-   "segundos": 12.7,
+   "segundos": 13.2,
    "travou": false,
    "erros": []
   },
@@ -1446,7 +1442,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 291217,
-   "segundos": 10.7,
+   "segundos": 11.2,
    "travou": false,
    "erros": []
   },
@@ -1466,7 +1462,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 158161,
-   "segundos": 10.7,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -1486,7 +1482,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 2073,
-   "segundos": 10.6,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -1506,7 +1502,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 103061,
-   "segundos": 12.6,
+   "segundos": 13.1,
    "travou": false,
    "erros": []
   },
@@ -1526,7 +1522,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 103061,
-   "segundos": 10.7,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -1546,7 +1542,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 417221,
-   "segundos": 10.8,
+   "segundos": 11.2,
    "travou": false,
    "erros": []
   },
@@ -1566,7 +1562,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 2073,
-   "segundos": 12.6,
+   "segundos": 13.3,
    "travou": false,
    "erros": []
   },
@@ -1586,7 +1582,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 2073,
-   "segundos": 10.6,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -1606,7 +1602,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 97479,
-   "segundos": 10.6,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -1626,7 +1622,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 235564,
-   "segundos": 10.7,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -1646,7 +1642,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 434351,
-   "segundos": 10.8,
+   "segundos": 11.2,
    "travou": false,
    "erros": []
   },
@@ -1666,7 +1662,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 59118,
-   "segundos": 10.6,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -1704,7 +1700,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 11185,
-   "segundos": 12.7,
+   "segundos": 13.2,
    "travou": false,
    "erros": [
     "[ERROR] [Disc] Failed to set initial disc index. Expected #1 \"\", Detected #1 \"\"."

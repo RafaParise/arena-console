@@ -5,8 +5,8 @@
     "perda_pct": 0,
     "com_simulador": false,
     "conectou": true,
-    "entrou_em_s": 0.8,
-    "ping_ms": 29,
+    "entrou_em_s": 1.0,
+    "ping_ms": 28,
     "caiu_depois_de_entrar": false,
     "os_dois_abertos_no_fim": true
   },
@@ -16,13 +16,13 @@
     "perda_pct": 0,
     "com_simulador": true,
     "conectou": true,
-    "entrou_em_s": 1.0,
-    "ping_ms": 128,
+    "entrou_em_s": 1.3,
+    "ping_ms": 111,
     "caiu_depois_de_entrar": false,
     "os_dois_abertos_no_fim": true,
     "pedacos_no_simulador": {
-      "cliente->host": 861,
-      "host->cliente": 871
+      "cliente->host": 843,
+      "host->cliente": 857
     },
     "passou_pelo_simulador": true
   },
@@ -32,13 +32,13 @@
     "perda_pct": 0,
     "com_simulador": true,
     "conectou": true,
-    "entrou_em_s": 1.3,
-    "ping_ms": 227,
+    "entrou_em_s": 1.5,
+    "ping_ms": 228,
     "caiu_depois_de_entrar": false,
     "os_dois_abertos_no_fim": true,
     "pedacos_no_simulador": {
-      "cliente->host": 842,
-      "host->cliente": 861
+      "cliente->host": 824,
+      "host->cliente": 844
     },
     "passou_pelo_simulador": true
   },
@@ -48,13 +48,13 @@
     "perda_pct": 0,
     "com_simulador": true,
     "conectou": true,
-    "entrou_em_s": 1.8,
+    "entrou_em_s": 2.0,
     "ping_ms": 411,
     "caiu_depois_de_entrar": false,
     "os_dois_abertos_no_fim": true,
     "pedacos_no_simulador": {
-      "cliente->host": 807,
-      "host->cliente": 844
+      "cliente->host": 788,
+      "host->cliente": 824
     },
     "passou_pelo_simulador": true
   },
@@ -64,14 +64,14 @@
     "perda_pct": 1,
     "com_simulador": true,
     "conectou": true,
-    "entrou_em_s": 1.0,
-    "ping_ms": 128,
+    "entrou_em_s": 1.3,
+    "ping_ms": 129,
     "caiu_depois_de_entrar": false,
     "os_dois_abertos_no_fim": true,
     "pedacos_no_simulador": {
-      "cliente->host": 861,
-      "host->cliente": 872,
-      "perdidos": 22
+      "cliente->host": 848,
+      "host->cliente": 861,
+      "perdidos": 15
     },
     "passou_pelo_simulador": true
   },
@@ -81,14 +81,14 @@
     "perda_pct": 5,
     "com_simulador": true,
     "conectou": true,
-    "entrou_em_s": 1.0,
-    "ping_ms": 112,
+    "entrou_em_s": 1.5,
+    "ping_ms": 129,
     "caiu_depois_de_entrar": false,
     "os_dois_abertos_no_fim": true,
     "pedacos_no_simulador": {
-      "cliente->host": 861,
-      "host->cliente": 871,
-      "perdidos": 87
+      "cliente->host": 806,
+      "host->cliente": 835,
+      "perdidos": 80
     },
     "passou_pelo_simulador": true
   }

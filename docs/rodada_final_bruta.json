@@ -1,1213 +1,1821 @@
 [
-  {
-    "script": "servidor\\tests\\run.py",
-    "codigo_saida": 0,
-    "segundos": 2.0,
-    "ultimas_linhas": [
-      "test_marcar_enviados (__main__.TestDB.test_marcar_enviados) ... ok",
-      "test_registros_desde (__main__.TestDB.test_registros_desde) ... ok",
-      "test_schema (__main__.TestDB.test_schema) ... ok",
-      "",
-      "----------------------------------------------------------------------",
-      "Ran 115 tests in 1.923s",
-      "",
-      "OK"
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\fuzz_rotas.py",
-    "codigo_saida": 0,
-    "segundos": 187.0,
-    "ultimas_linhas": [
-      "  [42/43] POST /api/config",
-      "  [43/43] POST /api/placar",
-      "",
-      "--- RESUMO ---",
-      "Total de checagens: 258",
-      "Falhas: 0",
-      "",
-      "Relatorio completo salvo em C:\\Projetos\\Criador De Apps Pedagógicos\\ARENA\\ARENA-unificado\\docs\\fuzz_rotas_bruto.json"
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\textos_sem_acento.py",
-    "codigo_saida": 0,
-    "segundos": 0.0,
-    "ultimas_linhas": [
-      "0 frase(s) sem acento que chegam na tela."
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "ferramentas\\teste_aceite_pasta_movida.py",
-    "codigo_saida": 0,
-    "segundos": 6.8,
-    "ultimas_linhas": [
-      "Copiando (sem jogos/cores/BIOS/assets) para:",
-      "  C:\\Projetos\\Criador De Apps Pedagógicos\\ARENA\\ARENA-teste-pasta-movida",
-      "Abrindo o ARENA da pasta nova por alguns segundos...",
-      "OK: nenhum caminho absoluto do retroarch.cfg aponta pra fora de",
-      "  C:\\Projetos\\Criador De Apps Pedagógicos\\ARENA\\ARENA-teste-pasta-movida"
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_abrir_todos.py",
-    "codigo_saida": "tempo esgotado",
-    "segundos": 900.0,
-    "ultimas_linhas": [],
-    "pastas_esquecidas_no_temp": 2,
-    "mb_esquecidos": 26.7
-  },
-  {
-    "script": "testes\\teste_acervo_download_real.py",
-    "codigo_saida": 0,
-    "segundos": 0.5,
-    "ultimas_linhas": [
-      "Arquivo de teste: https://raw.githubusercontent.com/libretro/RetroArch/master/COPYING (35147 bytes)",
-      "1. SHA certo: instalado {'titulo': 'Arquivo de teste', 'tamanho': 35147}, conteudo identico: True",
-      "2. SHA errado: recusado (SHA-256 diferente: download recusado por segurança.); sobrou: []",
-      "3. Origem fora da lista: recusado (A URL precisa ser HTTPS e estar em archive.org ou raw.githubusercontent.com.)",
-      "",
-      "RESULTADO: PASSOU"
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_acervo_sha256.py",
-    "codigo_saida": 0,
-    "segundos": 0.1,
-    "ultimas_linhas": [
-      "--- Caso 1: SHA-256 ERRADO no manifesto -- tem que recusar ---",
-      "OK, recusado: SHA-256 diferente: download recusado por segurança.",
-      "Arquivo NAO foi criado (esperado): True",
-      "",
-      "--- Caso 2: SHA-256 CERTO -- tem que aceitar ---",
-      "OK, aceito: {'titulo': 'Jogo de teste SHA-256', 'tamanho': 37} | arquivo criado: True",
-      "",
-      "RESULTADO: PASSOU"
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_acesso_de_rede.py",
-    "codigo_saida": 0,
-    "segundos": 1.5,
-    "ultimas_linhas": [
-      "  POST /api/cheat/adicionar      status=403 OK, recusado",
-      "  POST /api/mala                 status=403 OK, recusado",
-      "  GET /api/estado               status=403 OK, recusado",
-      "  GET /api/catalogo             status=403 OK, recusado",
-      "",
-      "Config realmente NAO foi alterada (tema continua 'claro'): True",
-      "",
-      "RESULTADO: PASSOU"
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_adaptadores_sem_laco.py",
-    "codigo_saida": 0,
-    "segundos": 11.0,
-    "ultimas_linhas": [
-      "  [OK] espera depois de falhas: 60, 120, 240, 480, 600, 600, 600 s ",
-      "  [OK] endereco que nao veio na resposta: 1 pergunta em 3 s ",
-      "  [OK] resposta completa: 1 pergunta so ",
-      "  [OK] o mapa ficou com os nomes ",
-      "  [OK] adaptador com nome de VPN continua marcado como VPN ",
-      "  [OK] mapa de mais de 10 minutos: renova 1 vez ",
-      "",
-      "Adaptadores sem laco: 8 de 8 certos."
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_adaptadores_vpn.py",
-    "codigo_saida": 0,
-    "segundos": 3.7,
-    "ultimas_linhas": [
-      "  169.254.20.5     cabo_direto  OK",
-      "  10.0.0.5         rede_local   OK",
-      "",
-      "Nesta maquina (nomes descobertos em segundo plano):",
-      "  192.168.18.17    rede_local   wi-fi intel(r) wi-fi 6e ax210 160mhz          ok",
-      "  172.18.16.1      virtual      vethernet (default switch) hyper-v virtual et ok",
-      "",
-      "RESULTADO: PASSOU"
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_arquivos_corrompidos.py",
-    "codigo_saida": 0,
-    "segundos": 0.8,
-    "ultimas_linhas": [
-      "Arquivos corrompidos de proposito. Subindo o ARENA...",
-      "ARENA respondeu apesar dos arquivos corrompidos: True",
-      "Apelido (deveria ser vazio/padrao, nao travar): ''",
-      "Tema (deveria ser o padrao 'claro'): claro",
-      "catalogo respondeu: True",
-      "Travou com traceback cru (nao deveria): False",
-      "",
-      "RESULTADO: PASSOU"
-    ],
-    "pastas_esquecidas_no_temp": 1,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_backup_rodizio.py",
-    "codigo_saida": 0,
-    "segundos": 4.4,
-    "ultimas_linhas": [
-      "  [OK] os 5 esqueletos velhos sumiram ",
-      "  [OK] nenhuma copia leva o .netplay ",
-      "  [OK] o save comum esta em todas as copias ",
-      "  [OK] o .zip do Exportar continua la ",
-      "  [OK] o .netplay de verdade (em saves) nao foi mexido ",
-      "  [OK] a pasta do teste sai do Temp (com o somente leitura) ",
-      "",
-      "Rodizio da copia de seguranca: 8 de 8 certos."
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_barreiras_api.py",
-    "codigo_saida": 0,
-    "segundos": 7.3,
-    "ultimas_linhas": [
-      "1. 1 barreira(s) em 5.9 s, formato certo: True",
-      "   segunda consulta (guardada): 0.001 s",
-      "2. sem lista de processos: True; dado pessoal vazado: nenhum",
-      "3. fechar programa fora da lista: recusado nos 5 casos: True",
-      "4. de outra maquina: GET 403, fechar 403 (esperado 403 e 403)",
-      "",
-      "RESULTADO: PASSOU"
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_barreiras_modo_restrito.py",
-    "codigo_saida": 0,
-    "segundos": 9.4,
-    "ultimas_linhas": [
-      "  inicializacao  normal    5 | restrito    5  ok",
-      "  servicos       normal   16 | restrito   16  ok",
-      "  antivirus      normal    1 | restrito    1  ok",
-      "  instalados     normal  264 | restrito  264  ok",
-      "  campos simples iguais nos dois modos: 13 de 13",
-      "  avaliar() com os fatos do modo restrito: 1 barreira(s), sem erro",
-      "",
-      "RESULTADO: PASSOU"
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_caminho_comprido.py",
-    "codigo_saida": 0,
-    "segundos": 1.1,
-    "ultimas_linhas": [
-      "  Ainda nao ha copia. A primeira sai quando voce fechar um jogo.",
-      "",
-      "10.",
-      "",
-      "Acusou o jogo de nome comprido: True",
-      "Acusou o jogo de nome curto por engano: False",
-      "",
-      "RESULTADO: PASSOU"
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_caminho_fora_no_cfg.py",
-    "codigo_saida": 0,
-    "segundos": 0.1,
-    "ultimas_linhas": [
-      "  log_dir                    dentro do ARENA",
-      "  playlist_directory         dentro do ARENA",
-      "  content_history_path       dentro do ARENA",
-      "  content_favorites_path     dentro do ARENA",
-      "  network_cmd_enable desligado: True",
-      "",
-      "Linhas trocadas: 8",
-      "RESULTADO: PASSOU"
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_capas_miniaturas.py",
-    "codigo_saida": 0,
-    "segundos": 2.4,
-    "ultimas_linhas": [
-      "  [OK] recusa: imagem grande demais (sem erro 500) ",
-      "  [OK] recusa: base64 quebrado (sem erro 500) ",
-      "  [OK] recusa: tipos trocados (sem erro 500) ",
-      "  [OK] recusa: pedido vazio (sem erro 500) ",
-      "  [OK] capa fora da pasta continua 404 com mini= ",
-      "  [OK] passou do teto: apaga as mais antigas (fica 90%) ",
-      "",
-      "Miniaturas das capas: 17 de 17 certos."
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_cenarios_sala.py",
-    "codigo_saida": 0,
-    "segundos": 75.0,
-    "ultimas_linhas": [
-      "  Misturou (nao deveria): True",
-      "",
-      "",
-      "--- RESUMO ---",
-      "  {'cenario': 'convidado_cai_e_volta', 'conectou_primeira_vez': True, 'reconectou': True}",
-      "  {'cenario': 'host_sai_no_meio', 'conectou_antes': True, 'convidado_registrou_queda': True, 'convidado_nao_travou': True}",
-      "  {'cenario': 'duas_partidas_simultaneas', 'partida_A_ok': True, 'partida_B_ok': False, 'misturou': True}",
-      "[protege_cfg] retroarch.cfg real devolvido como estava antes do teste."
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_chaves_graficos.py",
-    "codigo_saida": 0,
-    "segundos": 0.2,
-    "ultimas_linhas": [
-      "75 chaves conferidas.",
-      "Nucleos sem .dll na pasta (nao deu para conferir): nenhum",
-      "Todas as chaves existem nos nucleos."
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_coletar_regua.py",
-    "codigo_saida": 0,
-    "segundos": 0.1,
-    "ultimas_linhas": [
-      "  [OK] teto 5 do medidor = 1 em 2 min e 16 KB/min ",
-      "  [OK] piso 6 do medidor = 59 FPS e 5% ",
-      "  [OK] retrato lista quem 'Roda bem' ",
-      "  [OK] retrato explica o 'Nao abre' ",
-      "  [OK] retrato separa 'falta arquivo' de maquina fraca ",
-      "  [OK] retrato com avaliacao que falhou nao quebra ",
-      "",
-      "Regua do COLETAR: 49 de 49 certos."
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_concorrencia.py",
-    "codigo_saida": 0,
-    "segundos": 1.5,
-    "ultimas_linhas": [
-      "Respostas 5xx: 0",
-      "",
-      "Conferindo integridade dos arquivos gravados...",
-      "  config.json: JSON valido",
-      "  controles.json: JSON valido",
-      "  arena.db: PRAGMA integrity_check -> ok",
-      "",
-      "RESULTADO: PASSOU"
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_dados_tortos.py",
-    "codigo_saida": 0,
-    "segundos": 10.8,
-    "ultimas_linhas": [
-      "  [OK] acervo_autorizado.json com 11 formatos tortos: nenhum derruba ",
-      "  [OK] manifesto.json com 11 formatos tortos: nenhum derruba ",
-      "  [OK] consoles_manuais.json com 11 formatos tortos: nenhum derruba ",
-      "  [OK] fechamentos.json com 11 formatos tortos: nenhum derruba ",
-      "  [OK] manifesto.json torto nao e' reaproveitado (a lista e' refeita) ",
-      "  [OK] jogadores.txt com lixo e numeros absurdos: le o que da, limita 1..16 ",
-      "",
-      "Dados tortos: 9 de 9 certos."
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_descoberta_30_maquinas.py",
-    "codigo_saida": 1,
-    "segundos": 13.5,
-    "ultimas_linhas": [
-      "",
-      "Colegas vistos: 14",
-      "Tempo de resposta de /api/colegas: 0.02 s",
-      "CPU do servidor durante/depois da rajada: 0.01%",
-      "Primeiros nomes parecem corretos: True",
-      "Exemplo: {'apelido': 'Aluno16', 'url': 'http://127.0.0.1:20016', 'id': 'maquinafalsa16', 'codigo_amigo': 'maquinafalsa16', 'ja_e_amigo': False, 'ha_quantos_segundos': 11, 'partida_aberta': False, 'jogo_partida': '', 'jogo_id_partida': ''}",
-      "",
-      "RESULTADO: FALHOU (ou precisa olhar os numeros)"
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_disco_amostras.py",
-    "codigo_saida": 0,
-    "segundos": 1.3,
-    "ultimas_linhas": [
-      "  [OK] 45 MB/s, em cima da divisa: 3 amostra(s) (3 amostras, 0.57 s, 42.8 MB/s medidos, amostra de 8.0 MB)",
-      "  [OK] 45 MB/s, em cima da divisa: velocidade medida perto da real {'escrita_mbs': 42.8, 'leitura_mbs': 3488.9, 'escrita_ms': 187.0, 'amostra_mb': 8.0, 'confirmacao_ms': 3.6}",
-      "  [OK] pen drive lento de 5 MB/s: 1 amostra(s) (1 amostras, 0.40 s, 5.0 MB/s medidos, amostra de 2.0 MB)",
-      "  [OK] pen drive lento de 5 MB/s: velocidade medida perto da real {'escrita_mbs': 5.0, 'leitura_mbs': 2178.6, 'escrita_ms': 402.3, 'amostra_mb': 2.0, 'confirmacao_ms': 1.2}",
-      "  [OK] pen drive lento: para em ~2 MB (antes gravava 8 MB, 1,6 s) 0.40 s",
-      "  [OK] o arquivo do teste nao fica para tras ",
-      "",
-      "Disco na abertura: 14 de 14 certos."
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_disco_cheio.py",
-    "codigo_saida": 0,
-    "segundos": 1.4,
-    "ultimas_linhas": [
-      "Temporarios que sobraram: []",
-      "[ARENA] concluir o pedido falhou: OSError(28, 'No space left on device')",
-      "API: status 500, resposta {\"ok\": false, \"erro\": \"Não consegui concluir o pedido. Acabou o espaço no disco ou no pen drive. Apague algo que não precisa mais e tente de novo.\"}",
-      "Mensagem sem texto cru do sistema: True",
-      "Servidor continua de pe: True",
-      "Arquivo continua intacto depois da API: True",
-      "",
-      "RESULTADO: PASSOU"
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_dns_rebinding.py",
-    "codigo_saida": 0,
-    "segundos": 1.8,
-    "ultimas_linhas": [
-      "  local, Host de site estranho, le estado       status=403 OK",
-      "  local, Host 127.0.0.1                         status=200 OK",
-      "  local, Host localhost                         status=200 OK",
-      "  outra maquina, rota da rede, Host com nome    status=200 OK",
-      "",
-      "Tema continua o mesmo (a tentativa nao mudou nada): True",
-      "",
-      "RESULTADO: PASSOU"
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_dolphin_config.py",
-    "codigo_saida": 0,
-    "segundos": 0.2,
-    "ultimas_linhas": [
-      "",
-      "7. Duas vezes seguidas",
-      "  [OK] nenhuma chave repetida '[Settings]\\nShowFPS = True\\nInternalResolution = 1\\nShaderCompilationMode = 2\\nMSAA = 1\\nSSAA = False\\n\\n[Enhancements]\\nMaxAnisotropy = 0\\n'",
-      "",
-      "8. Controles",
-      "  [OK] GCPadNew.ini com os dois controles XInput ",
-      "",
-      "RESULTADO: PASSOU"
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_estresse_catalogo.py",
-    "codigo_saida": 0,
-    "segundos": 4.9,
-    "ultimas_linhas": [
-      "Antes:  129 jogos, 0.193s",
-      "Depois: 5127 jogos (+4998 falsos), 2.188s",
-      "Cache:  0.036s (reaproveitado)",
-      "RESULTADO: PASSOU",
-      "",
-      "Apagando os arquivos falsos...",
-      "Reindexando para tirar o catalogo do estado de teste...",
-      "Limpeza concluida."
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_fase7.py",
-    "codigo_saida": 0,
-    "segundos": 1.2,
-    "ultimas_linhas": [
-      "OK    conquistas com 3 jogadores 200",
-      "OK    jogo inexistente tem 2 partes Jogo não encontrado. Ele pode ter sido movido ou apagado. Clique em Atualizar lista e tente de novo.",
-      "OK    cheat em jogo inexistente Jogo não encontrado. Ele pode ter sido movido ou apagado. Clique em Atualizar lista e tente de novo.",
-      "OK    capa em jogo inexistente Jogo não está no catálogo. Clique em Atualizar lista.",
-      "",
-      "RESULTADO: PASSOU"
-    ],
-    "pastas_esquecidas_no_temp": 1,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_fat32_arquivo_grande.py",
-    "codigo_saida": 0,
-    "segundos": 1.2,
-    "ultimas_linhas": [
-      "         Copie de novo para um pen drive em exFAT ou NTFS.",
-      "",
-      "",
-      "Detectou o arquivo cortado no limite: True",
-      "Marcou como GRAVE: True",
-      "Acusou o jogo normal por engano: False",
-      "",
-      "RESULTADO: PASSOU"
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_filtro_de_tela.py",
-    "codigo_saida": 0,
-    "segundos": 3.3,
-    "ultimas_linhas": [
-      "  [OK] PS1: video_shader_enable = false ",
-      "  [OK] filtro desligado: nada, mesmo no SNES ",
-      "  [OK] chamada antiga (sem devolver_filtro) devolve so o arquivo ",
-      "  [OK] o RetroArch compila o filtro do ARENA (registro) ",
-      "  [OK] e nao fica no filtro padrao ",
-      "",
-      "Filtro de tela: 9 de 9 certos.",
-      "[protege_cfg] retroarch.cfg real devolvido como estava antes do teste."
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_fliperama_nomes.py",
-    "codigo_saida": 0,
-    "segundos": 0.2,
-    "ultimas_linhas": [
-      "  [OK] CD com um console so possivel = esse console ",
-      "  [OK] 'Tmnt2 = 4' vale com o titulo novo, pelo romset ",
-      "  [OK] sem o romset, o titulo novo cai no padrao 2 ",
-      "  [OK] o titulo continua valendo como antes ",
-      "  [OK] a tela desenha os avisos do jogo ",
-      "  [OK] o botao de mover usa o mesmo moverJogo da gaveta ",
-      "",
-      "Fliperama e avisos: 26 de 26 certos."
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_fundos_animados.py",
-    "codigo_saida": 0,
-    "segundos": 65.5,
-    "ultimas_linhas": [
-      "  [OK] escuro: Windows pedindo menos movimento = cena PARADA, mas inteira ",
-      "  [OK] escuro: 'sempre animado' anima mesmo com o pedido do Windows ",
-      "  [OK] escuro: 'parado' nunca anima (e a cena continua inteira) ",
-      "  [OK] escuro: parado nao gasta processador (0.1 ms de script em 4 s) ",
-      "  [OK] escuro: modo modesto + automatico = parada ",
-      "  [OK] nenhum erro no console ",
-      "",
-      "Fundos animados: 17 de 17 certos."
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_internet_archive_download.py",
-    "codigo_saida": 0,
-    "segundos": 0.1,
-    "ultimas_linhas": [
-      "--- Caso 2: SHA-1 nao bate com o declarado ---",
-      "OK, recusado: O arquivo baixado não bate com o esperado (SHA-1 diferente). Download recusado por segurança.",
-      "Arquivo NAO instalado (esperado): True",
-      "",
-      "--- Caso 3: conteudo certo -- tem que instalar ---",
-      "OK, instalado: {'titulo': 'Jogo de Teste', 'tamanho': 43} | arquivo existe: True",
-      "",
-      "RESULTADO: PASSOU"
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_local_4_jogadores.py",
-    "codigo_saida": 0,
-    "segundos": 9.9,
-    "ultimas_linhas": [
-      "  p4 = 1",
-      "",
-      "Abrindo GoldenEye 007 com config de 4 jogadores...",
-      "Processo vivo apos 8s: True",
-      "Linhas de erro no log: 0",
-      "",
-      "RESULTADO: PASSOU (abriu sem erro com 4 portas configuradas)",
-      "[protege_cfg] retroarch.cfg real devolvido como estava antes do teste."
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_longa_duracao.py",
-    "codigo_saida": 0,
-    "segundos": 182.8,
-    "ultimas_linhas": [
-      "",
-      "--- RESUMO ---",
-      "Pedidos totais: 47201 | falhas de conexao: 0",
-      "Crescimento de RAM (apos aquecimento): 0.5 MB",
-      "Crescimento de handles (apos aquecimento): 10",
-      "",
-      "Relatorio salvo em C:\\Projetos\\Criador De Apps Pedagógicos\\ARENA\\ARENA-unificado\\docs\\longa_duracao_bruto.json",
-      "RESULTADO: PASSOU"
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_mala_validacao.py",
-    "codigo_saida": 0,
-    "segundos": 1.4,
-    "ultimas_linhas": [
-      "Caso 1 (nome arbitrario) -- status=400 resp={'ok': False, 'erro': 'Caminho da mala inválido: o arquivo precisa se chamar ARENA-troca.json.'} arquivo_criado=False",
-      "Caso 2 (nome correto, pasta diferente) -- status=200 resp={'ok': True, 'recebidos': 0, 'na_mala': 44, 'maquinas': 1, 'arquivo': 'C:\\\\Users\\\\passo\\\\AppData\\\\Local\\\\Temp\\\\arena_mala_zq4h3bc4\\\\pendrive_simulado\\\\ARENA-troca.json'} arquivo_criado=True",
-      "Caso 3 (sem caminho, usa o padrao) -- status=200 resp={'ok': True, 'recebidos': 0, 'na_mala': 44, 'maquinas': 1, 'arquivo': 'C:\\\\Users\\\\passo\\\\AppData\\\\Local\\\\Temp\\\\ARENA-troca.json'}",
-      "",
-      "RESULTADO: PASSOU"
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_matriz_jogos.py",
-    "codigo_saida": 0,
-    "segundos": 84.3,
-    "ultimas_linhas": [
-      "  {'console': 'Nintendo 64', 'jogo': 'Bomberman 64 (USA).n64', 'abre_e_mostra_imagem': True, 'tamanho_captura_bytes': 72168, 'salva_estado': True, 'carrega_sem_travar': True}",
-      "  {'console': 'Mega Drive', 'jogo': 'Sonic The Hedgehog 3 (USA).md', 'abre_e_mostra_imagem': True, 'tamanho_captura_bytes': 53677, 'salva_estado': True, 'carrega_sem_travar': True}",
-      "  {'console': 'Super Nintendo', 'jogo': 'Super Bomberman 4 (Japan) [T-En by Svambo v1.0].sfc', 'abre_e_mostra_imagem': True, 'tamanho_captura_bytes': 50098, 'salva_estado': True, 'carrega_sem_travar': True}",
-      "  {'console': 'PlayStation', 'jogo': 'CTR - Crash Team Racing (USA).bin', 'erro': 'arquivo nao encontrado'}",
-      "  {'console': 'Dreamcast', 'jogo': 'Marvel vs. Capcom 2 (USA).cue', 'erro': 'arquivo nao encontrado'}",
-      "  {'console': 'Neo Geo', 'jogo': 'kof97.zip', 'abre_e_mostra_imagem': True, 'tamanho_captura_bytes': 143790, 'salva_estado': True, 'carrega_sem_travar': True}",
-      "  {'console': 'PSP', 'jogo': 'Killzone - Liberation (USA) (En,Fr,De,Es,It,Nl,Pl,Ru).iso', 'abre_e_mostra_imagem': True, 'tamanho_captura_bytes': 41645, 'salva_estado': True, 'carrega_sem_travar': True}",
-      "[protege_cfg] retroarch.cfg real devolvido como estava antes do teste."
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_matriz_multitap.py",
-    "codigo_saida": 0,
-    "segundos": 192.2,
-    "ultimas_linhas": [
-      "[--] PlayStation    CTR - Crash Team Racing (USA).cue: arquivo nao esta na pasta",
-      "[--] Sega Saturn    Saturn Bomberman (USA) (1S) (Track 01).b: arquivo nao esta na pasta",
-      "[--] Dreamcast      Marvel vs. Capcom 2 (USA) (Track 3).bin: arquivo nao esta na pasta",
-      "[OK] PSP            Killzone - Liberation (USA) (En,Fr,De,Es,I abre=True (7945 B)  junto=NUCLEO RECUSA | [libretro WARN] [sceDisplay] Video out requested, not supported: mode=0 size=512,272",
-      "[OK] Neo Geo        kof97.zip                                  abre=True (28984 B)  junto=conectou ",
-      "",
-      "Bruto em C:\\Projetos\\Criador De Apps Pedagógicos\\ARENA\\ARENA-unificado\\docs\\matriz_multitap_bruto.json",
-      "[protege_cfg] retroarch.cfg real devolvido como estava antes do teste."
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_multitap_5_jogadores_arena.py",
-    "codigo_saida": 0,
-    "segundos": 33.4,
-    "ultimas_linhas": [
-      "  convidado2  vivo=True entrou_como=2 multitap_no_registro=False",
-      "  convidado3  vivo=True entrou_como=3 multitap_no_registro=False",
-      "  convidado4  vivo=True entrou_como=4 multitap_no_registro=False",
-      "  convidado5  vivo=True entrou_como=5 multitap_no_registro=False",
-      "",
-      "Os 5 entraram, cada um no seu jogador.",
-      "RESULTADO: PASSOU",
-      "[protege_cfg] retroarch.cfg real devolvido como estava antes do teste."
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_multitap_opcao_nucleo_real.py",
-    "codigo_saida": 0,
-    "segundos": 0.1,
-    "ultimas_linhas": [
-      "PULADO: falta C:\\Projetos\\Criador De Apps Pedagógicos\\ARENA\\ARENA-unificado\\jogos\\pessoais\\PS1\\CTR - Crash Team Racing (USA).cue",
-      "[protege_cfg] retroarch.cfg real devolvido como estava antes do teste."
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_multitap_por_console.py",
-    "codigo_saida": 1,
-    "segundos": 2.0,
-    "ultimas_linhas": [
-      "[OK] GoldenEye 007 | sozinho                       cartao=4 input_max_users=4, input_libretro_device_p3=1, input_libretro_device_p4=1",
-      "[FALHOU] Kof97 | sozinho                               cartao=4 input_max_users=4",
-      "         input_max_users='4' (esperado '2')",
-      "         cartao 4 (esperado 2)",
-      "         motivo ''",
-      "",
-      "11 caso(s), 3 falha(s).",
-      "RESULTADO: FALHOU"
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_multitap_regra_de_ouro.py",
-    "codigo_saida": 0,
-    "segundos": 58.1,
-    "ultimas_linhas": [
-      "  Mario Party | sozinho                                   p2=1 max_users=4 conexoes=- nucleo=- vazou=nada",
-      "  Super Bomberman 4 | entrar                              p2=257 max_users=5 conexoes=4 nucleo=- vazou=nada",
-      "  Super Bomberman 4 | hospedar                            p2=257 max_users=5 conexoes=4 nucleo=- vazou=nada",
-      "  Super Bomberman 4 | sozinho                             p2=257 max_users=5 conexoes=- nucleo=- vazou=nada",
-      "  Super Smash Bros | sozinho                              p2=1 max_users=4 conexoes=- nucleo=- vazou=nada",
-      "",
-      "Nenhuma diferenca fora do esperado.",
-      "RESULTADO: PASSOU"
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_netplay_5_jogadores.py",
-    "codigo_saida": 0,
-    "segundos": 39.6,
-    "ultimas_linhas": [
-      "",
-      "Logs completos salvos em cada pasta de instancia (nao apagados: ver C:\\Users\\passo\\AppData\\Local\\Temp\\arena_netplay5_twr68gcx ) -- rode de novo o script pra limpar.",
-      "Resumo salvo em C:\\Projetos\\Criador De Apps Pedagógicos\\ARENA\\ARENA-unificado\\docs\\netplay_5_jogadores_bruto.json",
-      "",
-      "RESULTADO: PASSOU (os 4 convidados entraram)",
-      "",
-      "Encerrando os 5 processos...",
-      "[protege_cfg] retroarch.cfg real devolvido como estava antes do teste."
-    ],
-    "pastas_esquecidas_no_temp": 1,
-    "mb_esquecidos": 0.2
-  },
-  {
-    "script": "testes\\teste_netplay_isolamento.py",
-    "codigo_saida": 0,
-    "segundos": 25.5,
-    "ultimas_linhas": [
-      "  [INFO] [Playlist] Carregando arquivo de histórico: \"C:\\Users\\passo\\AppData\\Local\\Temp\\arena_netplay_iso_2yjsgef9\\hospedeiro\\builtin\\content_image_history.lpl\".",
-      "  [INFO] [Playlist] Carregando arquivo de histórico: \"C:\\Users\\passo\\AppData\\Local\\Temp\\arena_netplay_iso_2yjsgef9\\hospedeiro\\builtin\\content_music_history.lpl\".",
-      "  [INFO] [Playlist] Carregando arquivo de histórico: \"C:\\Users\\passo\\AppData\\Local\\Temp\\arena_netplay_iso_2yjsgef9\\hospedeiro\\builtin\\content_video_history.lpl\".",
-      "  [INFO] [Playlist] Written to file: \"C:\\Users\\passo\\AppData\\Local\\Temp\\arena_netplay_iso_2yjsgef9\\hospedeiro\\builtin\\content_history.lpl\".",
-      "  [INFO] [Netplay] Vaga de conexão 0",
-      "  [INFO] [Netplay] Conexão recebida de: \"Jogador5\"",
-      "  [INFO] [Netplay] Jogador5 se juntou como o jogador 5 (ping: 11 ms)",
-      "[protege_cfg] retroarch.cfg real devolvido como estava antes do teste."
-    ],
-    "pastas_esquecidas_no_temp": 1,
-    "mb_esquecidos": 0.1
-  },
-  {
-    "script": "testes\\teste_opcoes_nucleo_ponta_a_ponta.py",
-    "codigo_saida": 1,
-    "segundos": 0.0,
-    "ultimas_linhas": [
-      "Sem jogo de PS1 na pasta.",
-      "[protege_cfg] retroarch.cfg real devolvido como estava antes do teste."
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_partida_aparece.py",
-    "codigo_saida": 0,
-    "segundos": 22.5,
-    "ultimas_linhas": [
-      "  [OK] assistir NAO anuncia partida aberta ",
-      "",
-      "6. Segurança e configuração",
-      "  [OK] /api/partida/procurar recusa pedido de outra máquina (403) ",
-      "  [OK] endereço novo do amigo gravado ",
-      "  [OK] ajuste salvo no meio-tempo continua lá 'Mudei no meio'",
-      "",
-      "RESULTADO: PASSOU"
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_partida_colega.py",
-    "codigo_saida": 0,
-    "segundos": 13.1,
-    "ultimas_linhas": [
-      "",
-      "",
-      "",
-      "",
-      "Conferiu a versao do colega: True",
-      "Conferiu o codigo do aparelho do colega: True",
-      "",
-      "RESULTADO: PASSOU"
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_partida_testar_timing.py",
-    "codigo_saida": 0,
-    "segundos": 5.6,
-    "ultimas_linhas": [
-      "Resposta: {'endereco': '12345', 'arena': False, 'partida': False, 'arquivo': None, 'diagnostico': \"Não alcanço o computador dele. Confira o endereço, e se ele ligou 'Aceitar conexões da rede' e reabriu o ARENA.\"}",
-      "",
-      "--- Endereco alcancavel (o proprio localhost) ---",
-      "Status=200 tempo=2.01s",
-      "Resposta: {'endereco': '127.0.0.1', 'arena': True, 'partida': False, 'arquivo': None, 'diagnostico': \"Vocês se enxergam, mas a porta da partida está fechada. Duas causas: ele ainda não clicou em 'Eu abro a partida', ou o firewall do Windows dele está bloqueando o retroarch.exe. Veja o documento 5.\"}",
-      "",
-      "Tempo com endereco invalido: 2.69s (antes da correcao: ~5,3s medido)",
-      "RESULTADO: PASSOU"
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_pasta_somente_leitura.py",
-    "codigo_saida": 0,
-    "segundos": 1.0,
-    "ultimas_linhas": [
-      "Pasta de teste: C:\\Users\\passo\\AppData\\Local\\Temp\\arena_ro_ioibnwry",
-      "Marcando config.json como somente-leitura (attrib +R)...",
-      "ARENA subiu com dados\\ somente-leitura: True",
-      "Status ao tentar gravar config: 500 | resposta: {'ok': False, 'erro': 'Não consegui concluir o pedido. Outro programa está usando esse arquivo, ou a pasta está protegida. Feche os outros programas e tente de novo.'}",
-      "Vazou traceback no console (nao deveria): False",
-      "",
-      "RESULTADO: PASSOU"
-    ],
-    "pastas_esquecidas_no_temp": 1,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_pcsx2_bissecao.py",
-    "codigo_saida": 1,
-    "segundos": 0.1,
-    "ultimas_linhas": [
-      "Traceback (most recent call last):",
-      "  File \"C:\\Projetos\\Criador De Apps Pedagógicos\\ARENA\\ARENA-unificado\\testes\\teste_pcsx2_bissecao.py\", line 83, in <module>",
-      "    sys.exit(main())",
-      "             ~~~~^^",
-      "  File \"C:\\Projetos\\Criador De Apps Pedagógicos\\ARENA\\ARENA-unificado\\testes\\teste_pcsx2_bissecao.py\", line 50, in main",
-      "    base, foto, pedidas = sys.argv[1], sys.argv[2], sys.argv[3:]",
-      "                          ~~~~~~~~^^^",
-      "IndexError: list index out of range"
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_pcsx2_inicia.py",
-    "codigo_saida": 0,
-    "segundos": 94.8,
-    "ultimas_linhas": [
-      "2jog     COMECOU   ultima linha: [    5,7372] UpdateVSyncRate: Mode Changed to NTSC.",
-      "semctl   COMECOU   ultima linha: [    4,9791] Updating CPU configuration...",
-      "cartao   COMECOU   ultima linha: [    4,9789] EE/iR5900 Recompiler Reset",
-      "vulkan   COMECOU   ultima linha: [    4,9676] Updating CPU configuration...",
-      "dx11     COMECOU   ultima linha: [    4,9736] Updating CPU configuration...",
-      "semxinput COMECOU   ultima linha: [    4,9810] EE/iR5900 Recompiler Reset",
-      "semsdl   COMECOU   ultima linha: [    4,7313] EE/iR5900 Recompiler Reset",
-      "fastboot COMECOU   ultima linha: [   19,9570] Updating CPU configuration..."
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_pcsx2_motor.py",
-    "codigo_saida": 0,
-    "segundos": 0.2,
-    "ultimas_linhas": [
-      "  [OK] config com motor_ps2 = '<script>' vira 'automatico' ",
-      "  [OK] config com motor_ps2 = 5 vira 'automatico' ",
-      "  [OK] config com motor_ps2 = [1, 2] vira 'automatico' ",
-      "  [OK] config com motor_ps2 = {'a': 1} vira 'automatico' ",
-      "  [OK] config sem a chave = automatico ",
-      "  [OK] a tela oferece os mesmos motores que o servidor aceita ",
-      "",
-      "Motor do PS2: 21 de 21 certos."
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_pcsx2_placa.py",
-    "codigo_saida": 0,
-    "segundos": 0.1,
-    "ultimas_linhas": [
-      "5. Placa dedicada, automatico",
-      "  [OK] dedicada forte: 4x, mistura nao mexida ",
-      "  [OK] dedicada media: 2x como antes, mistura nao mexida ",
-      "",
-      "6. Quem chama sem dizer a placa (comportamento antigo)",
-      "  [OK] 2x, mistura nao mexida ",
-      "",
-      "RESULTADO: PASSOU"
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_pcsx2_portatil.py",
-    "codigo_saida": 0,
-    "segundos": 26.1,
-    "ultimas_linhas": [
-      "   [   19,5528] ELF cdrom0:\\SLUS_206.49;1 with entry point at 0x00108D28 is executing.",
-      "-- Pad ",
-      "   [    0,5007] SDLInputSource: 885 gamepad mappings are loaded.",
-      "   [    1,4176] Initializing Pad...",
-      "   [    1,6741] SDLInputSource: Gamepad 7 inserted",
-      "Memory cards: ['Memory Card Slot 1.ps2', 'Memory Card Slot 2.mcr']",
-      "",
-      "RESULTADO: PASSOU"
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_perfil_apelido.py",
-    "codigo_saida": 0,
-    "segundos": 1.5,
-    "ultimas_linhas": [
-      "  [OK] toda linha do arquivo extra e' chave = \"valor\" (ou comentario) ",
-      "  [OK] nenhum id repetido na tela ",
-      "  [OK] gaveta Perfil com as abas Meu perfil e Amigos ",
-      "  [OK] campo e botao de trocar o apelido na gaveta ",
-      "  [OK] Ajustes sem as abas Amigos e Perfil ",
-      "  [OK] botoes do topo ligados (Perfil e Amigos abrem a gaveta) ",
-      "",
-      "Perfil e apelido: 19 de 19 certos."
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_ps2_sem_bios.py",
-    "codigo_saida": 0,
-    "segundos": 0.2,
-    "ultimas_linhas": [
-      "  [OK] .bin de 4 MB em retroarch\\system vale ",
-      "  [OK] BIOS na pasta bios\\ do PCSX2 vale ",
-      "  [OK] sem BIOS: a frase diz o que fazer (BIOS, retroarch\\system, professor) ",
-      "  [OK] cartao do PS2 sem BIOS: falta_sistema com o motivo ",
-      "  [OK] com BIOS: nada a avisar ",
-      "  [OK] cartao do PS2 com BIOS: pronta ",
-      "",
-      "PS2 sem BIOS: 8 de 8 certos."
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_ps3_sem_firmware.py",
-    "codigo_saida": 0,
-    "segundos": 1.3,
-    "ultimas_linhas": [
-      "Aba Emuladores, PS3: [{'plataforma': 'PlayStation 3', 'id': 'ps3', 'nome': 'RPCS3', 'pasta': 'emuladores\\\\RPCS3', 'site': 'rpcs3.net/download', 'motivo': 'OBRIGATÓRIO. Não existe núcleo de PlayStation 3 no RetroArch - só o RPCS3 emula este console, e só em computador forte.', 'instalado': True, 'com",
-      "RPCS3 ausente ou com firmware: nada a testar aqui."
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_psp_pulo_de_quadros.py",
-    "codigo_saida": 0,
-    "segundos": 59.2,
-    "ultimas_linhas": [
-      "  [OK] normal: pulo automatico desligado disabled",
-      "  [OK] normal: frameskip 'disabled' (valor que o nucleo conhece) disabled",
-      "  [OK] modesto: pulo automatico ligado enabled",
-      "  [OK] modesto: frameskip 1 (o automatico precisa dele diferente de zero) 1",
-      "  [OK] modesto: skip_buffer_effects desligado (senao o automatico nao funciona) disabled",
-      "",
-      "PSP pulo de quadros: 7 de 7 certos.",
-      "[protege_cfg] retroarch.cfg real devolvido como estava antes do teste."
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_qual_opcao_de_nucleo_vale.py",
-    "codigo_saida": 0,
-    "segundos": 16.5,
-    "ultimas_linhas": [
-      "   [DEBUG] [Environ] SET_CORE_OPTIONS_DISPLAY: swanstation_GPU_ResolutionScale = visible",
-      "   [DEBUG] [Environ] GET_VARIABLE: swanstation_GPU_ResolutionScale = \"3\"",
-      "   [INFO] [Core] Saved core options file to \"C:\\Projetos\\Criador De Apps Pedagógicos\\ARENA\\ARENA-unificado\\retroarch\\retroarch-core-options.cfg\".",
-      "",
-      "Modo: padrao do RetroArch",
-      "Escala que o nucleo usou: 3 (3 = arquivo do ARENA, 2 = .opt do nucleo)",
-      "Arquivos de opcoes devolvidos como estavam.",
-      "[protege_cfg] retroarch.cfg real devolvido como estava antes do teste."
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_quebrar_api.py",
-    "codigo_saida": 0,
-    "segundos": 33.9,
-    "ultimas_linhas": [
-      "  [OK] o servidor continua de pe depois de A, B e C ",
-      "  [OK] D. pedido que promete 1000 bytes e manda 10: o servidor larga em ~30 s ",
-      "  [OK] E. com 200 conexoes paradas, a tela ainda responde (0.01 s) ",
-      "  [OK] F. metodo, caminho e cabecalho estranhos: tratados ",
-      "  [OK] G. 12 enderecos estranhos em 3 rotas de rede: recusados na hora, sem erro 500 ",
-      "  [OK] o servidor continua de pe no fim ",
-      "",
-      "Tentando quebrar a API: 10 de 10 certos."
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_queda_no_meio_da_gravacao.py",
-    "codigo_saida": 0,
-    "segundos": 0.4,
-    "ultimas_linhas": [
-      "Pasta de teste: C:\\Users\\passo\\AppData\\Local\\Temp\\arena_queda_8cda38se",
-      "Apelido antes: RafaParise",
-      "Codigo de saida do processo filho (137 = morto de proposito): 137",
-      "config.json continua JSON valido: True",
-      "apelido depois (tem que ser o ANTIGO, nao 'NomeQueDeviaGravar' -- a troca nunca aconteceu): RafaParise",
-      "arquivos .tmp orfaos encontrados (esperado: 1, sera limpo na proxima abertura): ['config.json.2180.tmp']",
-      "",
-      "RESULTADO: PASSOU (arquivo antigo protegido, nada corrompido)"
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_rede_ruim.py",
-    "codigo_saida": 0,
-    "segundos": 113.0,
-    "ultimas_linhas": [
-      "",
-      "--- RESUMO ---",
-      "  {'cenario': 'so atraso 50ms', 'atraso_ms': 50, 'perda_pct': 0, 'conectou': True, 'ping_reportado_ms': '11', 'avisos_travada': 0}",
-      "  {'cenario': 'so atraso 100ms', 'atraso_ms': 100, 'perda_pct': 0, 'conectou': True, 'ping_reportado_ms': '11', 'avisos_travada': 0}",
-      "  {'cenario': 'so atraso 200ms', 'atraso_ms': 200, 'perda_pct': 0, 'conectou': True, 'ping_reportado_ms': '28', 'avisos_travada': 0}",
-      "  {'cenario': 'perda 1% (com 50ms de base)', 'atraso_ms': 50, 'perda_pct': 1, 'conectou': True, 'ping_reportado_ms': '29', 'avisos_travada': 0}",
-      "  {'cenario': 'perda 5% (com 50ms de base)', 'atraso_ms': 50, 'perda_pct': 5, 'conectou': True, 'ping_reportado_ms': '12', 'avisos_travada': 0}",
-      "[protege_cfg] retroarch.cfg real devolvido como estava antes do teste."
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_rede_sem_reabrir.py",
-    "codigo_saida": 0,
-    "segundos": 16.1,
-    "ultimas_linhas": [
-      "1. Chave desligada, escuta em: ['127.0.0.1']",
-      "2. Ligou pela API (rede_aplicada=True): escuta em ['0.0.0.0'] depois de 3.8 s",
-      "3. Desligou: escuta em ['127.0.0.1']",
-      "4. Liga/desliga 5 vezes seguidas: vivo=True, escuta final ['0.0.0.0'] (esperado 0.0.0.0)",
-      "5. 12 cliques colados: vivo=True, escuta ['0.0.0.0'] (ultimo clique = ligar)",
-      "",
-      "RESULTADO: PASSOU"
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_rpcs3_controles.py",
-    "codigo_saida": 0,
-    "segundos": 42.3,
-    "ultimas_linhas": [
-      "   ·! 0:00:01.148738 {Pad Thread} Input: Pad 4: device='Null', handler=Null, VID=0x0, PID=0x0, class_type=0x0, class_profile=0x0",
-      "   ·! 0:00:01.148742 {Pad Thread} Input: Pad 5: device='Null', handler=Null, VID=0x0, PID=0x0, class_type=0x0, class_profile=0x0",
-      "   ·! 0:00:01.148746 {Pad Thread} Input: Pad 6: device='Null', handler=Null, VID=0x0, PID=0x0, class_type=0x0, class_profile=0x0",
-      "   ·! 0:00:01.148748 {Pad Thread} Input: set_mouse_and_keyboard: device=pad",
-      "   ·S 0:00:01.154299 {Pad Thread} Input: XInput device 0 connected",
-      "   ·S 0:00:01.154375 {Pad Thread} Input: XInput device 1 connected",
-      "   ·S 0:00:01.154400 {Pad Thread} Input: XInput device 2 connected",
-      "Default.yml: 7 jogadores, teclado=True, xinput=3"
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_sinc_migracao_e_lotes.py",
-    "codigo_saida": 0,
-    "segundos": 0.4,
-    "ultimas_linhas": [
-      "Banco real (copia): tinha 'seq' antes? True",
-      "  recordes 2 -> 2, sessoes 97 -> 97, encerrados sem numero: 0",
-      "  registros_desde('') devolve 2 recordes",
-      "Lotes: criados 1250, recebidos 1250, faltaram 0, repetidos 0",
-      "",
-      "RESULTADO: PASSOU"
-    ],
-    "pastas_esquecidas_no_temp": 1,
-    "mb_esquecidos": 0.3
-  },
-  {
-    "script": "testes\\teste_sinc_sem_relogio.py",
-    "codigo_saida": 0,
-    "segundos": 0.4,
-    "ultimas_linhas": [
-      "Recorde gravado com relogio em 2020 chega ao colega: True",
-      "Partida longa (sinc. no meio) chega ao colega quando fecha: True",
-      "",
-      "RESULTADO: PASSOU"
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_tela_4k.py",
-    "codigo_saida": 0,
-    "segundos": 92.5,
-    "ultimas_linhas": [
-      "3. RetroArch com os valores 4K",
-      "  [OK] PS1: o nucleo leu swanstation_GPU_ResolutionScale = 9 e o jogo mostrou imagem (29 s) ",
-      "  [OK] PSP: o nucleo leu ppsspp_internal_resolution = 2880x1632 e o jogo mostrou imagem (26 s) ",
-      "  [OK] Dreamcast: o nucleo leu reicast_internal_resolution = 2880x2160 e o jogo mostrou imagem (17 s) ",
-      "  [OK] Nintendo 64: o nucleo leu mupen64plus-parallel-rdp-upscaling = 2x e o jogo mostrou imagem (20 s) ",
-      "",
-      "Tela 4K: 11 de 11 certos.",
-      "[protege_cfg] retroarch.cfg real devolvido como estava antes do teste."
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_temp_esparso.py",
-    "codigo_saida": 0,
-    "segundos": 0.1,
-    "ultimas_linhas": [
-      "[OK] arquivo esparso de 1 GB: fachada 1 GB, ocupado < 1 MB ",
-      "  [OK] arquivo comum: ocupado = tamanho ",
-      "  [OK] arquivo que nao existe: 0 (nao derruba) ",
-      "  [OK] o verificador mede a pasta com o esparso em menos de 2 MB (era 1.024) ",
-      "",
-      "Temporarios esparsos: 4 de 4 certos."
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_travessia_capa.py",
-    "codigo_saida": 0,
-    "segundos": 1.5,
-    "ultimas_linhas": [
-      "  ../segredo_fora_da_pasta.png                            status=404  bloqueado",
-      "  ../../segredo_fora_da_pasta.png                         status=404  bloqueado",
-      "  ..\\segredo_fora_da_pasta.png                            status=404  bloqueado",
-      "  jogos/../../segredo_fora_da_pasta.png                   status=404  bloqueado",
-      "  jogos\\..\\..\\segredo_fora_da_pasta.png                   status=404  bloqueado",
-      "  C:\\Users\\passo\\AppData\\Local\\Temp\\arena_travessia_vesrn0qy\\segredo_fora_da_pasta.png status=404  bloqueado",
-      "",
-      "RESULTADO: PASSOU (nenhuma travessia vazou o segredo)"
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_ultra_promessas.py",
-    "codigo_saida": 0,
-    "segundos": 6.7,
-    "ultimas_linhas": [
-      "3. Emulador que NAO abre",
-      "[ARENA] C:\\Users\\passo\\AppData\\Local\\Temp\\arena_U_d2po7sf7\\retroarch\\retroarch.exe -L C:\\Users\\passo\\AppData\\Local\\Temp\\arena_U_d2po7sf7\\retroarch\\cores\\snes9x_libretro.dll --appendconfig C:\\Users\\passo\\AppData\\Local\\Temp\\arena_U_d2po7sf7\\dados\\arena_override.cfg \"C:\\Users\\passo\\AppData\\Local\\Temp\\a",
-      "[ARENA] Nao foi possivel abrir o RetroArch: emulador de mentira que nao abre",
-      "[ARENA] Sessao encerrada: 0s",
-      "  [OK] vigia da rede volta mesmo sem o jogo abrir (antes ficava parado) ",
-      "  [OK] ARENA volta ao normal mesmo sem o jogo abrir ",
-      "",
-      "RESULTADO: PASSOU"
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_varios_discos.py",
-    "codigo_saida": 0,
-    "segundos": 25.6,
-    "ultimas_linhas": [
-      "3. RetroArch abrindo a lista",
-      "     registro (PS1): [INFO] [Config] Appending config: \"C:\\Users\\passo\\AppData\\Local\\Temp\\arena_discos_aygs66_q\\PS1\\partida.cfg\". | [INFO] [Override] Redirecionando arquivo dados da memória do jogo em \"C:\\Users\\passo\\AppData\\Local\\Temp\\arena_discos_aygs66_q\\PS1\\SwanStation\\Crash Bandicoot (USA).srm\"",
-      "  [OK] PS1: abre pela lista e mostra imagem ",
-      "     registro (Amiga): [INFO] [Config] Appending config: \"C:\\Users\\passo\\AppData\\Local\\Temp\\arena_discos_aygs66_q\\Amiga\\partida.cfg\". | [INFO] [Override] Redirecionando arquivo dados da memória do jogo em \"C:\\Users\\passo\\AppData\\Local\\Temp\\arena_discos_aygs66_q\\Amiga\\PUAE\\Alien Breed_Disk1.srm\". | [",
-      "  [OK] Amiga: abre pela lista e mostra imagem ",
-      "",
-      "Varios discos: 22 de 22 certos.",
-      "[protege_cfg] retroarch.cfg real devolvido como estava antes do teste."
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_verificador_arquivos.py",
-    "codigo_saida": 0,
-    "segundos": 1.2,
-    "ultimas_linhas": [
-      "Sem controles.py o ARENA nao abre (importa na abertura): True",
-      "O verificador acusou a falta de controles.py: True",
-      "",
-      "RESULTADO: PASSOU"
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_vulkan_de_verdade.py",
-    "codigo_saida": 0,
-    "segundos": 1.4,
-    "ultimas_linhas": [
-      "  [OK] duas placas = serve ",
-      "[ARENA] O Vulkan desta maquina nao enxerga placa de video: motor automatico trocado para d3d11.",
-      "  [OK] motor vulkan + resposta False -> d3d11 ",
-      "  [OK] motor vulkan + resposta True -> vulkan ",
-      "  [OK] motor vulkan + resposta None -> vulkan ",
-      "  [OK] motor d3d11 + resposta False -> d3d11 ",
-      "",
-      "Vulkan de verdade: 9 de 9 certos."
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  },
-  {
-    "script": "testes\\teste_xenia_abre.py",
-    "codigo_saida": 2,
-    "segundos": 0.0,
-    "ultimas_linhas": [
-      "",
-      "Achado 26/09/2026: Left 4 Dead 2 mostrava \"atualizacao disponivel\" e",
-      "travava em tela preta; o registro dizia \"Graphics device lost\". Aqui abre o",
-      "jogo num dos Xenia da pasta, opcionalmente com '--gpu=...', espera, tira",
-      "foto da tela e resume o registro (placa perdida, rede, mensagens).",
-      "",
-      "Uso: servidor\\python\\python.exe testes\\teste_xenia_abre.py <parte do nome> <exe> <foto.png> [--gpu=vulkan ...]",
-      "     exe: xenia_canary.exe ou xenia_canary_netplay.exe"
-    ],
-    "pastas_esquecidas_no_temp": 0,
-    "mb_esquecidos": 0.0
-  }
+ {
+  "script": "servidor\\tests\\run.py",
+  "codigo_saida": 0,
+  "segundos": 38.1,
+  "ultimas_linhas": [
+   "test_marcar_enviados (__main__.TestDB.test_marcar_enviados) ... ok",
+   "test_registros_desde (__main__.TestDB.test_registros_desde) ... ok",
+   "test_schema (__main__.TestDB.test_schema) ... ok",
+   "",
+   "----------------------------------------------------------------------",
+   "Ran 376 tests in 37.789s",
+   "",
+   "OK"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\fuzz_rotas.py",
+  "codigo_saida": 0,
+  "segundos": 192.3,
+  "ultimas_linhas": [
+   "  [46/47] POST /api/config",
+   "  [47/47] POST /api/placar",
+   "",
+   "--- RESUMO ---",
+   "Total de checagens: 279",
+   "Falhas: 0",
+   "",
+   "Relatorio completo salvo em C:\\Projetos\\Criador De Apps Pedagógicos\\arena-console\\docs\\fuzz_rotas_bruto.json"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\textos_sem_acento.py",
+  "codigo_saida": 0,
+  "segundos": 0.1,
+  "ultimas_linhas": [
+   "0 frase(s) sem acento que chegam na tela."
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "ferramentas\\teste_aceite_pasta_movida.py",
+  "codigo_saida": 0,
+  "segundos": 7.3,
+  "ultimas_linhas": [
+   "Copiando (sem jogos/cores/BIOS/assets) para:",
+   "  C:\\Projetos\\Criador De Apps Pedagógicos\\ARENA-teste-pasta-movida",
+   "Abrindo o ARENA da pasta nova por alguns segundos...",
+   "OK: nenhum caminho absoluto do retroarch.cfg aponta pra fora de",
+   "  C:\\Projetos\\Criador De Apps Pedagógicos\\ARENA-teste-pasta-movida"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_abaixo_do_original.py",
+  "codigo_saida": 0,
+  "segundos": 226.6,
+  "ultimas_linhas": [
+   "  [OK] PSP: o nucleo leu os 3 valores do minimo e mostrou imagem (120 s) ",
+   "  [OK] Nintendo 64: o nucleo leu os 3 valores do minimo e mostrou imagem (17 s) ",
+   "  [OK] Mega Drive: o nucleo leu os 1 valores do minimo e mostrou imagem (16 s) ",
+   "6. PCSX2 de verdade no minimo",
+   "  [OK] PS2 no minimo: o Crash Nitro Kart comecou e seguiu rodando 8 s ",
+   "",
+   "Abaixo do original: 36 de 36 certos.",
+   "[protege_cfg] arquivos de verdade devolvidos como estavam antes do teste: nenhum mudou"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_abrir_todos.py",
+  "codigo_saida": 0,
+  "segundos": 1634.9,
+  "ultimas_linhas": [
+   "Gears of War Judgment                         emulador de fora (Xenia): testar com o professor",
+   "Halo 3                                        emulador de fora (Xenia): testar com o professor",
+   "Left 4 Dead 2                                 emulador de fora (Xenia): testar com o professor",
+   "Match Day II                                  abre      junto: conectou     [ERROR] [Disc] Failed to set initial disc index. Expected #1 \"\", Detected #1 \"\".",
+   "",
+   "Fotos: C:\\Users\\passo\\AppData\\Local\\Temp\\arena_abrir_todos_qmmfe2a6\\fotos",
+   "Resultado: C:\\Projetos\\Criador De Apps Pedagógicos\\arena-console\\docs\\abrir_todos_bruto.json",
+   "[protege_cfg] arquivos de verdade devolvidos como estavam antes do teste: nenhum mudou"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 1,
+  "mb_esquecidos": 42.9
+ },
+ {
+  "script": "testes\\teste_acervo_download_real.py",
+  "codigo_saida": 0,
+  "segundos": 0.6,
+  "ultimas_linhas": [
+   "Arquivo de teste: https://raw.githubusercontent.com/libretro/RetroArch/master/COPYING (35147 bytes)",
+   "1. SHA certo: instalado {'titulo': 'Arquivo de teste', 'tamanho': 35147}, conteudo identico: True",
+   "2. SHA errado: recusado (O arquivo baixado não confere com o cadastro (SHA-256 diferente) e foi recusado. Ele pode ter chegado cortado: tente de novo. Se repetir, peça ao professor para conferir o cadastro.); sobrou: []",
+   "3. Origem fora da lista: recusado (Use um endereço https:// do archive.org ou do raw.githubusercontent.com (são as fontes que o ARENA aceita).)",
+   "",
+   "RESULTADO: PASSOU"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_acervo_sha256.py",
+  "codigo_saida": 0,
+  "segundos": 0.1,
+  "ultimas_linhas": [
+   "--- Caso 1: SHA-256 ERRADO no manifesto -- tem que recusar ---",
+   "OK, recusado: O arquivo baixado não confere com o cadastro (SHA-256 diferente) e foi recusado. Ele pode ter chegado cortado: tente de novo. Se repetir, peça ao professor para conferir o cadastro.",
+   "Arquivo NAO foi criado (esperado): True",
+   "",
+   "--- Caso 2: SHA-256 CERTO -- tem que aceitar ---",
+   "OK, aceito: {'titulo': 'Jogo de teste SHA-256', 'tamanho': 37} | arquivo criado: True",
+   "",
+   "RESULTADO: PASSOU"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_acessibilidade_tela.py",
+  "codigo_saida": 0,
+  "segundos": 18.3,
+  "ultimas_linhas": [
+   "  [OK] toda imagem tem texto alternativo ",
+   "  [OK] nenhum tabindex positivo ",
+   "  [OK] contraste do texto (AA) nos dois temas (0 casos abaixo) ",
+   "  [OK] menor letra visivel de pelo menos 11 px ",
+   "  [OK] nenhum elemento escondido (hidden) aparece na tela ",
+   "  [OK] o foco entra na janela que abre e volta para quem abriu (Esc) ",
+   "",
+   "Acessibilidade da tela: 9 de 9 certos."
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_acesso_de_rede.py",
+  "codigo_saida": 0,
+  "segundos": 1.7,
+  "ultimas_linhas": [
+   "  POST /api/bios/conferir        status=403 OK, recusado",
+   "  POST /api/bios/pasta           status=403 OK, recusado",
+   "  POST /api/jogo/arrumar         status=403 OK, recusado",
+   "  GET /api/arrumar/progresso?tarefa=x status=403 OK, recusado",
+   "",
+   "Config realmente NAO foi alterada (tema continua 'claro'): True",
+   "",
+   "RESULTADO: PASSOU"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_adaptadores_sem_laco.py",
+  "codigo_saida": 0,
+  "segundos": 11.0,
+  "ultimas_linhas": [
+   "  [OK] espera depois de falhas: 60, 120, 240, 480, 600, 600, 600 s ",
+   "  [OK] endereco que nao veio na resposta: 1 pergunta em 3 s ",
+   "  [OK] resposta completa: 1 pergunta so ",
+   "  [OK] o mapa ficou com os nomes ",
+   "  [OK] adaptador com nome de VPN continua marcado como VPN ",
+   "  [OK] mapa de mais de 10 minutos: renova 1 vez ",
+   "",
+   "Adaptadores sem laco: 8 de 8 certos."
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_adaptadores_vpn.py",
+  "codigo_saida": 0,
+  "segundos": 2.7,
+  "ultimas_linhas": [
+   "  10.0.0.5         rede_local   OK",
+   "",
+   "Nesta maquina (nomes descobertos em segundo plano):",
+   "  192.168.18.17    rede_local   wi-fi intel(r) wi-fi 6e ax210 160mhz          ok",
+   "  172.25.192.1     virtual      vethernet (default switch) hyper-v virtual et ok",
+   "  172.30.224.1     virtual      vethernet (wsl (hyper-v firewall)) hyper-v vi ok",
+   "",
+   "RESULTADO: PASSOU"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_alcas_sem_vazamento.py",
+  "codigo_saida": 0,
+  "segundos": 8.2,
+  "ultimas_linhas": [
+   "[OK] contar os controles 100 vezes: quase nenhuma alca nova (eram 2.400) ",
+   "  [OK] GET /api/estado 200 vezes: quase nenhuma alca nova (eram ~24 por pedido) ",
+   "  [OK] POST /api/config 200 vezes: quase nenhuma alca nova (eram ~48 por pedido) ",
+   "",
+   "Alcas sem vazamento: 3 de 3 certos."
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_arquivos_corrompidos.py",
+  "codigo_saida": 0,
+  "segundos": 1.7,
+  "ultimas_linhas": [
+   "Arquivos corrompidos de proposito. Subindo o ARENA...",
+   "ARENA respondeu apesar dos arquivos corrompidos: True",
+   "Apelido (deveria ser vazio/padrao, nao travar): ''",
+   "Tema (deveria ser o padrao 'claro'): claro",
+   "catalogo respondeu: True",
+   "Travou com traceback cru (nao deveria): False",
+   "",
+   "RESULTADO: PASSOU"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 1,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_arrumar_jogos.py",
+  "codigo_saida": 0,
+  "segundos": 29.3,
+  "ultimas_linhas": [
+   "  [OK] o Jogar recusa com a explicação ",
+   "  [OK] o Arrumar começa a descompactar ",
+   "  [OK] termina, e diz onde ficou ",
+   "  [OK] o jogo agora é o da pasta (o .cue), e o zip saiu da lista ",
+   "  [OK] o .zip continua lá ",
+   "",
+   "Arrumar de ponta a ponta: 18 de 18 certos.",
+   "[protege_cfg] arquivos de verdade devolvidos como estavam antes do teste: nenhum mudou"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_atualizar_versao_alunos.py",
+  "codigo_saida": 0,
+  "segundos": 4.3,
+  "ultimas_linhas": [
+   "3. De novo: nada a trocar",
+   "  [OK] segunda vez nao troca nem tira nada ",
+   "4. O comando inteiro (abre o servidor da versao numa copia)",
+   "  [OK] o comando termina sem problema ",
+   "  [OK] e o servidor da versao atualizada abriu com a versao certa ",
+   "  [OK] e os dados continuam iguais ",
+   "",
+   "Atualizar a versao dos alunos: 15 de 15 certos."
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_backup_rodizio.py",
+  "codigo_saida": 0,
+  "segundos": 5.5,
+  "ultimas_linhas": [
+   "  [OK] o save comum esta em todas as copias ",
+   "  [OK] o .zip do Exportar continua la ",
+   "  [OK] pastas sem nome de data (originais, 0-guardar) ficam, com o que tem dentro ",
+   "  [OK] e nao tomam vaga: sao 3 copias de data alem delas ",
+   "  [OK] o .netplay de verdade (em saves) nao foi mexido ",
+   "  [OK] a pasta do teste sai do Temp (com o somente leitura) ",
+   "",
+   "Rodizio da copia de seguranca: 12 de 12 certos."
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_barreiras_api.py",
+  "codigo_saida": 0,
+  "segundos": 11.8,
+  "ultimas_linhas": [
+   "1. 1 barreira(s) em 10.0 s, formato certo: True",
+   "   segunda consulta (guardada): 0.011 s",
+   "2. sem lista de processos: True; dado pessoal vazado: nenhum",
+   "3. fechar programa fora da lista: recusado nos 5 casos: True",
+   "4. de outra maquina: GET 403, fechar 403 (esperado 403 e 403)",
+   "",
+   "RESULTADO: PASSOU"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_barreiras_modo_restrito.py",
+  "codigo_saida": 0,
+  "segundos": 8.7,
+  "ultimas_linhas": [
+   "  inicializacao  normal    9 | restrito    9  ok",
+   "  servicos       normal   16 | restrito   16  ok",
+   "  antivirus      normal    1 | restrito    1  ok",
+   "  instalados     normal  282 | restrito  282  ok",
+   "  campos simples iguais nos dois modos: 13 de 13",
+   "  avaliar() com os fatos do modo restrito: 0 barreira(s), sem erro",
+   "",
+   "RESULTADO: PASSOU"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_biblioteca_busca.py",
+  "codigo_saida": 0,
+  "segundos": 5.9,
+  "ultimas_linhas": [
+   "  [OK] a resposta diz o console ",
+   "  [OK] o indexador de verdade reconhece como MS-DOS (antes: 'Precisa escolher o console') ",
+   "3. Com internet (Internet Archive de verdade)",
+   "  [OK] 'Mario': so titulos com Mario (2) ",
+   "  [OK] 'mario super nintendo': nada (nao ha Super Nintendo livre aqui) ",
+   "  [OK] 'keen': acha o Commander Keen, de MS-DOS ",
+   "",
+   "Biblioteca: 11 de 11 certos."
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_bios_consoles.py",
+  "codigo_saida": 0,
+  "segundos": 147.5,
+  "ultimas_linhas": [
+   "  [OK] BS F-Zero Deluxe com o BS-X: a tela não está preta ",
+   "3. BS F-Zero Deluxe SEM o BS-X",
+   "     (sem o BS-X: foto 344237 bytes, registro [])",
+   "  [OK] o Deluxe abre sem o BS-X: o cartão não pede a BIOS ",
+   "  [OK] o BS F-ZERO sem o BS-X: o cartão pede a BIOS ",
+   "",
+   "BIOS abrindo jogos de verdade: 19 de 19 certos.",
+   "[protege_cfg] arquivos de verdade devolvidos como estavam antes do teste: nenhum mudou"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_bios_organizador.py",
+  "codigo_saida": 0,
+  "segundos": 18.0,
+  "ultimas_linhas": [
+   "  [OK] a lista do PS2 diz que basta uma região ",
+   "  [OK] o resumo diz quantas estão ativas ",
+   "  [OK] cada console tem o botão de abrir a pasta ",
+   "  [OK] Como colocar jogos (Sega CD): a pasta BIOS\\Sega CD e os botões ",
+   "  [OK] sem erro de JavaScript ",
+   "",
+   "Pasta BIOS de ponta a ponta: 23 de 23 certos.",
+   "[protege_cfg] arquivos de verdade devolvidos como estavam antes do teste: nenhum mudou"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_caminho_comprido.py",
+  "codigo_saida": 0,
+  "segundos": 1.2,
+  "ultimas_linhas": [
+   "  Ainda nao ha copia. A primeira sai quando voce fechar um jogo.",
+   "",
+   "10.",
+   "",
+   "Acusou o jogo de nome comprido: True",
+   "Acusou o jogo de nome curto por engano: False",
+   "",
+   "RESULTADO: PASSOU"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_caminho_fora_no_cfg.py",
+  "codigo_saida": 0,
+  "segundos": 0.1,
+  "ultimas_linhas": [
+   "  log_dir                    dentro do ARENA",
+   "  playlist_directory         dentro do ARENA",
+   "  content_history_path       dentro do ARENA",
+   "  content_favorites_path     dentro do ARENA",
+   "  network_cmd_enable desligado: True",
+   "",
+   "Linhas trocadas: 8",
+   "RESULTADO: PASSOU"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_capas_miniaturas.py",
+  "codigo_saida": 0,
+  "segundos": 2.7,
+  "ultimas_linhas": [
+   "  [OK] recusa: imagem grande demais (sem erro 500) ",
+   "  [OK] recusa: base64 quebrado (sem erro 500) ",
+   "  [OK] recusa: tipos trocados (sem erro 500) ",
+   "  [OK] recusa: pedido vazio (sem erro 500) ",
+   "  [OK] capa fora da pasta continua 404 com mini= ",
+   "  [OK] passou do teto: apaga as mais antigas (fica 90%) ",
+   "",
+   "Miniaturas das capas: 17 de 17 certos."
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_capas_todos_os_consoles.py",
+  "codigo_saida": 0,
+  "segundos": 15.1,
+  "ultimas_linhas": [
+   "  [OK] a busca terminou e achou a capa do jogo de teste (icone do disco) ",
+   "  [OK] a lista agora mostra a capa ",
+   "6. Com internet: PS2, Xbox 360 e GameCube de verdade",
+   "  [OK] ps2: capa de Crash Nitro Kart baixada (banco do RetroArch) ",
+   "  [OK] xbox360: capa de Halo 3 baixada (a capa oficial do Xbox 360 (Microsoft)) ",
+   "  [OK] gamecube: capa de MKDD 3 4 Grand Prix baixada (o GameTDB (a fonte de capas do Dolphin)) ",
+   "",
+   "Capas: 21 de 21 certos."
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_cenarios_sala.py",
+  "codigo_saida": 0,
+  "segundos": 74.9,
+  "ultimas_linhas": [
+   "--- RESUMO ---",
+   "  {'cenario': 'convidado_cai_e_volta', 'conectou_primeira_vez': True, 'reconectou': True}",
+   "  {'cenario': 'host_sai_no_meio', 'conectou_antes': True, 'convidado_registrou_queda': True, 'convidado_nao_travou': True}",
+   "  {'cenario': 'duas_partidas_simultaneas', 'partida_A_ok': True, 'partida_B_ok': True, 'misturou': False}",
+   "",
+   "Cenarios certos: 3 de 3",
+   "RESULTADO: PASSOU",
+   "[protege_cfg] arquivos de verdade devolvidos como estavam antes do teste: nenhum mudou"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_cfg_sem_linha_repetida.py",
+  "codigo_saida": 0,
+  "segundos": 0.2,
+  "ultimas_linhas": [
+   "  [OK] ... e a 2a correcao nao muda nada ",
+   "  [OK] sem a chave: ganha uma, dentro do ARENA ",
+   "  [OK] ... e a 2a correcao nao repete ",
+   "  [OK] vazia: vai para retroarch\\cache, uma linha so ",
+   "  [OK] fora do ARENA: vai para retroarch\\cache, uma linha so ",
+   "  [OK] as outras linhas continuam ",
+   "",
+   "retroarch.cfg sem linha repetida: 9 de 9 certos."
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_chaves_graficos.py",
+  "codigo_saida": 0,
+  "segundos": 1.3,
+  "ultimas_linhas": [
+   "97 chaves conferidas.",
+   "Nucleos sem .dll na pasta (nao deu para conferir): nenhum",
+   "Todas as chaves existem nos nucleos."
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_cheats_no_jogo.py",
+  "codigo_saida": 0,
+  "segundos": 17.9,
+  "ultimas_linhas": [
+   "  [OK] depois que o RetroArch regravou o .cht, a gaveta ainda le o codigo, ligado",
+   "  [OK] a gaveta ve o estado salvo (espaco 0) na pasta do nucleo",
+   "  [OK] (como era: olhando so a raiz, a gaveta nao via nada)",
+   "Como era: memoria 7FFF00 = 0xFF",
+   "  [OK] (como era: o cheat nao chegava ao jogo)",
+   "",
+   "Cheats no jogo: 6 de 6 certos.",
+   "[protege_cfg] arquivos de verdade devolvidos como estavam antes do teste: nenhum mudou"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_coletar_regua.py",
+  "codigo_saida": 0,
+  "segundos": 0.1,
+  "ultimas_linhas": [
+   "  [OK] teto 5 do medidor = 1 em 2 min e 16 KB/min ",
+   "  [OK] piso 6 do medidor = 59 FPS e 5% ",
+   "  [OK] retrato lista quem 'Roda bem' ",
+   "  [OK] retrato explica o 'Nao abre' ",
+   "  [OK] retrato separa 'falta arquivo' de maquina fraca ",
+   "  [OK] retrato com avaliacao que falhou nao quebra ",
+   "",
+   "Regua do COLETAR: 49 de 49 certos."
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_comecar_do_zero.py",
+  "codigo_saida": 0,
+  "segundos": 1.5,
+  "ultimas_linhas": [
+   "  [OK] e diz que nada foi apagado ",
+   "  [OK] os arquivos do perfil continuam iguais, byte a byte ",
+   "3. A copia de seguranca funciona",
+   "  [OK] apaga ",
+   "  [OK] o controles.json saiu ",
+   "  [OK] e a copia guardada tem o config.json de antes ",
+   "",
+   "Comecar do zero: 8 de 8 certos."
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_como_colocar.py",
+  "codigo_saida": 0,
+  "segundos": 24.7,
+  "ultimas_linhas": [
+   "  [OK] PS2: diz o emulador e a BIOS de 4 MB ",
+   "  [OK] PS2 num disco NTFS: sem o aviso do FAT32 ",
+   "  [OK] pen drive em FAT32: o PS2 avisa do limite de 4 GB e diz o exFAT ",
+   "  [OK] pen drive em FAT32: o SNES (jogo pequeno) nao avisa ",
+   "  [OK] sem erro de JavaScript ",
+   "",
+   "Como colocar jogos: 23 de 23 certos.",
+   "[protege_cfg] arquivos de verdade devolvidos como estavam antes do teste: nenhum mudou"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_concorrencia.py",
+  "codigo_saida": 0,
+  "segundos": 1.8,
+  "ultimas_linhas": [
+   "Respostas 5xx: 0",
+   "",
+   "Conferindo integridade dos arquivos gravados...",
+   "  config.json: JSON valido",
+   "  controles.json: JSON valido",
+   "  arena.db: PRAGMA integrity_check -> ok",
+   "",
+   "RESULTADO: PASSOU"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_consoles_livres.py",
+  "codigo_saida": 0,
+  "segundos": 663.2,
+  "ultimas_linhas": [
+   "== Vircon32 (programa de teste (BIOS livre), vircon32_libretro.dll)",
+   "   pasta comum       imagem: sim (1920x1080, 13758 cores, a mais comum em 72%, (255, 0, 0))",
+   "   pasta com acento  imagem: sim (1920x1080, 13758 cores, a mais comum em 72%, (255, 0, 0))",
+   "",
+   "Fotos: C:\\Users\\passo\\AppData\\Local\\Temp\\arena_livres_fotos_fnqtd7zo",
+   "",
+   "Tudo certo.",
+   "[protege_cfg] arquivos de verdade devolvidos como estavam antes do teste: nenhum mudou"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 1,
+  "mb_esquecidos": 0.9
+ },
+ {
+  "script": "testes\\teste_dados_tortos.py",
+  "codigo_saida": 0,
+  "segundos": 37.8,
+  "ultimas_linhas": [
+   "  [OK] acervo_autorizado.json com 11 formatos tortos: nenhum derruba ",
+   "  [OK] manifesto.json com 11 formatos tortos: nenhum derruba ",
+   "  [OK] consoles_manuais.json com 11 formatos tortos: nenhum derruba ",
+   "  [OK] fechamentos.json com 11 formatos tortos: nenhum derruba ",
+   "  [OK] manifesto.json torto nao e' reaproveitado (a lista e' refeita) ",
+   "  [OK] jogadores.txt com lixo e numeros absurdos: le o que da, limita 1..16 ",
+   "",
+   "Dados tortos: 9 de 9 certos."
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_descoberta_30_maquinas.py",
+  "codigo_saida": 0,
+  "segundos": 16.3,
+  "ultimas_linhas": [
+   "",
+   "Colegas vistos: 30",
+   "Tempo de resposta de /api/colegas: 0.001 s",
+   "CPU do servidor durante/depois da rajada: 0.0%",
+   "Primeiros nomes parecem corretos: True",
+   "Exemplo: {'apelido': 'Aluno00', 'url': 'http://127.0.0.2:20000', 'id': 'maquinafalsa00', 'codigo_amigo': 'maquinafalsa00', 'ja_e_amigo': False, 'ha_quantos_segundos': 11, 'partida_aberta': False, 'jogo_partida': '', 'jogo_id_partida': '', 'esperando_partida': False}",
+   "",
+   "RESULTADO: PASSOU"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_descoberta_pacote_torto.py",
+  "codigo_saida": 0,
+  "segundos": 11.5,
+  "ultimas_linhas": [
+   "  [OK] colega-depois na lista (a descoberta nao morreu) ",
+   "  [OK] nenhum torto entrou ",
+   "4. 500 codigos inventados do mesmo computador",
+   "  [OK] a lista nao encheu (no maximo 4 deste endereco) ",
+   "  [OK] e os colegas que ja estavam continuam ",
+   "  [OK] e um colega novo ainda entra ",
+   "",
+   "Descoberta com pacote torto: 7 de 7 certos."
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_disco_amostras.py",
+  "codigo_saida": 0,
+  "segundos": 1.4,
+  "ultimas_linhas": [
+   "  [OK] 45 MB/s, em cima da divisa: 3 amostra(s) (3 amostras, 0.58 s, 43.3 MB/s medidos, amostra de 8.0 MB)",
+   "  [OK] 45 MB/s, em cima da divisa: velocidade medida perto da real {'escrita_mbs': 43.3, 'leitura_mbs': 1118.9, 'escrita_ms': 184.9, 'amostra_mb': 8.0, 'confirmacao_ms': 2.0}",
+   "  [OK] pen drive lento de 5 MB/s: 1 amostra(s) (1 amostras, 0.42 s, 4.9 MB/s medidos, amostra de 2.0 MB)",
+   "  [OK] pen drive lento de 5 MB/s: velocidade medida perto da real {'escrita_mbs': 4.9, 'leitura_mbs': 308.9, 'escrita_ms': 408.6, 'amostra_mb': 2.0, 'confirmacao_ms': 7.2}",
+   "  [OK] pen drive lento: para em ~2 MB (antes gravava 8 MB, 1,6 s) 0.42 s",
+   "  [OK] o arquivo do teste nao fica para tras ",
+   "",
+   "Disco na abertura: 14 de 14 certos."
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_disco_cheio.py",
+  "codigo_saida": 0,
+  "segundos": 1.7,
+  "ultimas_linhas": [
+   "Temporarios que sobraram: []",
+   "[ARENA] concluir o pedido falhou: OSError(28, 'No space left on device')",
+   "API: status 500, resposta {\"ok\": false, \"erro\": \"Não consegui concluir o pedido. Acabou o espaço no disco ou no pen drive. Apague algo que não precisa mais e tente de novo.\"}",
+   "Mensagem sem texto cru do sistema: True",
+   "Servidor continua de pe: True",
+   "Arquivo continua intacto depois da API: True",
+   "",
+   "RESULTADO: PASSOU"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_dns_rebinding.py",
+  "codigo_saida": 0,
+  "segundos": 1.8,
+  "ultimas_linhas": [
+   "  local, Host de site estranho, le estado       status=403 OK",
+   "  local, Host 127.0.0.1                         status=200 OK",
+   "  local, Host localhost                         status=200 OK",
+   "  outra maquina, rota da rede, Host com nome    status=200 OK",
+   "",
+   "Tema continua o mesmo (a tentativa nao mudou nada): True",
+   "",
+   "RESULTADO: PASSOU"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_dolphin_config.py",
+  "codigo_saida": 0,
+  "segundos": 0.2,
+  "ultimas_linhas": [
+   "",
+   "7. Duas vezes seguidas",
+   "  [OK] nenhuma chave repetida '[Settings]\\nShowFPS = True\\nInternalResolution = 1\\nShaderCompilationMode = 2\\nDisableFog = False\\nMSAA = 1\\nSSAA = False\\n\\n[Hacks]\\nEFBAccessEnable = True\\n\\n[Enhancements]\\nMaxAnisotropy = 0\\n'",
+   "",
+   "8. Controles",
+   "  [OK] GCPadNew.ini com os dois controles XInput ",
+   "",
+   "RESULTADO: PASSOU"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_emuladores_de_fora.py",
+  "codigo_saida": 0,
+  "segundos": 67.7,
+  "ultimas_linhas": [
+   "        (1 arquivo(s) de configuracao devolvido(s) como estavam)",
+   "  [OK] PlayStation 3 Rayman Legends (USA) (En,Fr,Es,Pt).iso           2.1 s, 1096 MB, janela: FPS: 0.00 | Vulkan | 0.0.42-20058 | Rayman® Legends [BLUS31183]",
+   "        (1 arquivo(s) de configuracao devolvido(s) como estavam)",
+   "  [OK] Xbox 360     Gears of War Judgment.iso                        2.1 s, 1029 MB, janela: Xenia-canary (canary_experimental@0bd090dbe on Sep 20 2026) | [4D530A26 v0.0.0.3] Gears of",
+   "        (1 arquivo(s) de configuracao devolvido(s) como estavam)",
+   "",
+   "Emuladores de fora: 4 de 4 abriram o jogo.",
+   "[protege_cfg] arquivos de verdade devolvidos como estavam antes do teste: emuladores\\Dolphin\\Dolphin-x64\\User\\Wii\\fst.bin, emuladores\\Dolphin\\Dolphin-x64\\User\\Wii\\shared2\\sys\\SYSCONF, emuladores\\Dolphin\\Dolphin-x64\\User\\Wii\\title\\00000001\\00000002\\data\\play_rec.dat, emuladores\\Dolphin\\Dolphin-x64\\Us"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_estresse_catalogo.py",
+  "codigo_saida": 0,
+  "segundos": 9.7,
+  "ultimas_linhas": [
+   "Antes:  127 jogos, 0.212s",
+   "Depois: 5125 jogos (+4998 falsos), 7.191s",
+   "Cache:  0.039s (reaproveitado)",
+   "RESULTADO: PASSOU",
+   "",
+   "Apagando os arquivos falsos...",
+   "Reindexando para tirar o catalogo do estado de teste...",
+   "Limpeza concluida."
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_fase7.py",
+  "codigo_saida": 0,
+  "segundos": 3.9,
+  "ultimas_linhas": [
+   "OK    conquistas com 3 jogadores 200",
+   "OK    jogo inexistente tem 2 partes Jogo não encontrado. Ele pode ter sido movido ou apagado. Clique em Atualizar lista e tente de novo.",
+   "OK    cheat em jogo inexistente Jogo não encontrado. Ele pode ter sido movido ou apagado. Clique em Atualizar lista e tente de novo.",
+   "OK    capa em jogo inexistente Jogo não está no catálogo. Clique em Atualizar lista.",
+   "",
+   "RESULTADO: PASSOU"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_fat32_arquivo_grande.py",
+  "codigo_saida": 0,
+  "segundos": 1.3,
+  "ultimas_linhas": [
+   "         Copie de novo para um pen drive em exFAT ou NTFS.",
+   "",
+   "",
+   "Detectou o arquivo cortado no limite: True",
+   "Marcou como GRAVE: True",
+   "Acusou o jogo normal por engano: False",
+   "",
+   "RESULTADO: PASSOU"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_filtro_de_tela.py",
+  "codigo_saida": 0,
+  "segundos": 3.4,
+  "ultimas_linhas": [
+   "  [OK] PS1: video_shader_enable = false ",
+   "  [OK] filtro desligado: nada, mesmo no SNES ",
+   "  [OK] chamada antiga (sem devolver_filtro) devolve so o arquivo ",
+   "  [OK] o RetroArch compila o filtro do ARENA (registro) ",
+   "  [OK] e nao fica no filtro padrao ",
+   "",
+   "Filtro de tela: 9 de 9 certos.",
+   "[protege_cfg] arquivos de verdade devolvidos como estavam antes do teste: dados\\builtin\\content_history.lpl"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_fliperama_nomes.py",
+  "codigo_saida": 0,
+  "segundos": 0.3,
+  "ultimas_linhas": [
+   "  [OK] CD com um console so possivel = esse console ",
+   "  [OK] 'Tmnt2 = 4' vale com o titulo novo, pelo romset ",
+   "  [OK] sem o romset, o titulo novo cai no padrao 2 ",
+   "  [OK] o titulo continua valendo como antes ",
+   "  [OK] a tela desenha os avisos do jogo ",
+   "  [OK] o botao de mover usa o mesmo moverJogo da gaveta ",
+   "",
+   "Fliperama e avisos: 35 de 35 certos."
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_fundos_animados.py",
+  "codigo_saida": 0,
+  "segundos": 110.2,
+  "ultimas_linhas": [
+   "  [OK] escuro: Windows pedindo menos movimento = cena PARADA, mas inteira ",
+   "  [OK] escuro: 'sempre animado' anima mesmo com o pedido do Windows ",
+   "  [OK] escuro: 'parado' nunca anima (e a cena continua inteira) ",
+   "  [OK] escuro: parado nao gasta processador (0.1 ms de script em 4 s) ",
+   "  [OK] escuro: modo modesto + automatico = parada ",
+   "  [OK] nenhum erro no console ",
+   "",
+   "Fundos animados: 51 de 51 certos."
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_internet_archive_download.py",
+  "codigo_saida": 0,
+  "segundos": 0.1,
+  "ultimas_linhas": [
+   "--- Caso 2: SHA-1 nao bate com o declarado ---",
+   "OK, recusado: O arquivo baixado não confere com o esperado (SHA-1 diferente) e foi recusado, por segurança. Ele pode ter chegado cortado: tente de novo.",
+   "Arquivo NAO instalado (esperado): True",
+   "",
+   "--- Caso 3: conteudo certo -- tem que instalar ---",
+   "OK, instalado: {'titulo': 'Jogo de Teste', 'tamanho': 43, 'plataforma_nome': 'MS-DOS'} | arquivo existe: True",
+   "",
+   "RESULTADO: PASSOU"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_internet_ruim.py",
+  "codigo_saida": 0,
+  "segundos": 15.6,
+  "ultimas_linhas": [
+   "  [OK] servidor que nao responde: a frase diz isso, nao 'nao achei' (6.0 s) ",
+   "  [OK] o banco respondeu e nao tem: ai sim 'nao achei', com o botao Enviar capa ",
+   "  [OK] e nenhuma capa falsa nem pela metade ficou guardada ",
+   "4. Acervo autorizado",
+   "  [OK] a pagina de login no lugar do jogo: recusado, com a frase do login ",
+   "  [OK] e o jogo nao ficou instalado (nem o temporario) ",
+   "",
+   "Internet ruim: 13 de 13 certos."
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_kof2002_convertido.py",
+  "codigo_saida": 0,
+  "segundos": 84.3,
+  "ultimas_linhas": [
+   "  [OK] o FBNeo achou a correcao do som ",
+   "  [OK] e nao pediu parte nenhuma ",
+   "  [OK] mostrou o jogo (fotos de 56 e 29 KB) ",
+   "3. O motivo de 'nao abriu'",
+   "  [OK] o ARENA nao acha motivo nenhum no registro ",
+   "",
+   "KOF 2002 convertido: 7 de 7 certos.",
+   "[protege_cfg] arquivos de verdade devolvidos como estavam antes do teste: dados\\builtin\\content_history.lpl"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_local_4_jogadores.py",
+  "codigo_saida": 0,
+  "segundos": 9.7,
+  "ultimas_linhas": [
+   "  p4 = 1",
+   "",
+   "Abrindo GoldenEye 007 com config de 4 jogadores...",
+   "Processo vivo apos 8s: True",
+   "Linhas de erro no log: 0",
+   "",
+   "RESULTADO: PASSOU (abriu sem erro com 4 portas configuradas)",
+   "[protege_cfg] arquivos de verdade devolvidos como estavam antes do teste: nenhum mudou"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_longa_duracao.py",
+  "codigo_saida": 0,
+  "segundos": 182.8,
+  "ultimas_linhas": [
+   "",
+   "--- RESUMO ---",
+   "Pedidos totais: 12362 | falhas de conexao: 0",
+   "Crescimento de RAM (apos aquecimento): 0.3 MB",
+   "Crescimento de handles (apos aquecimento): 2",
+   "",
+   "Relatorio salvo em C:\\Projetos\\Criador De Apps Pedagógicos\\arena-console\\docs\\longa_duracao_bruto.json",
+   "RESULTADO: PASSOU"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_mala_validacao.py",
+  "codigo_saida": 0,
+  "segundos": 1.7,
+  "ultimas_linhas": [
+   "Caso 1 (nome arbitrario) -- status=400 resp={'ok': False, 'erro': 'Caminho da mala inválido: o arquivo precisa se chamar ARENA-troca.json.'} arquivo_criado=False",
+   "Caso 2 (nome correto, pasta diferente) -- status=200 resp={'ok': True, 'recebidos': 0, 'na_mala': 45, 'maquinas': 1, 'arquivo': 'C:\\\\Users\\\\passo\\\\AppData\\\\Local\\\\Temp\\\\arena_mala_26ecmf05\\\\ARENA\\\\pendrive_simulado\\\\ARENA-troca.json'} arquivo_criado=True",
+   "Caso 3 (sem caminho, usa o padrao, ao lado da pasta do ARENA) -- status=200 resp={'ok': True, 'recebidos': 0, 'na_mala': 45, 'maquinas': 1, 'arquivo': 'C:\\\\Users\\\\passo\\\\AppData\\\\Local\\\\Temp\\\\arena_mala_26ecmf05\\\\ARENA-troca.json'} arquivo_criado=True",
+   "",
+   "RESULTADO: PASSOU"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_matriz_consoles.py",
+  "codigo_saida": 0,
+  "segundos": 635.7,
+  "ultimas_linhas": [
+   "Sega Saturn                  s/s      s/s    s/s    s/s    s      59.8/59.9   33.9/33.7  ",
+   "Super Nintendo               s/s      s/s    s/s    s/s    -      59.8/59.8   7.4/4.7    ",
+   "ZX Spectrum                  s/s      s/s    s/s    s/s    s      48.6/48.6   5.6/5.6    ",
+   "",
+   "Consoles: 17 | falhas: 0",
+   "Resultado: C:\\Projetos\\Criador De Apps Pedagógicos\\arena-console\\docs\\auditoria3\\matriz_consoles.json",
+   "RESULTADO: PASSOU",
+   "[protege_cfg] arquivos de verdade devolvidos como estavam antes do teste: nenhum mudou"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_matriz_jogos.py",
+  "codigo_saida": 0,
+  "segundos": 121.2,
+  "ultimas_linhas": [
+   "  {'console': 'Nintendo 64', 'jogo': 'Bomberman 64 (USA).n64', 'abre_e_mostra_imagem': True, 'tamanho_captura_bytes': 72168, 'salva_estado': True, 'carrega_sem_travar': True}",
+   "  {'console': 'Mega Drive', 'jogo': 'Sonic The Hedgehog 3 (USA).md', 'abre_e_mostra_imagem': True, 'tamanho_captura_bytes': 53677, 'salva_estado': True, 'carrega_sem_travar': True}",
+   "  {'console': 'Super Nintendo', 'jogo': 'Super Bomberman 4 (Japan) [T-En by Svambo v1.0].sfc', 'abre_e_mostra_imagem': True, 'tamanho_captura_bytes': 50098, 'salva_estado': True, 'carrega_sem_travar': True}",
+   "  {'console': 'PlayStation', 'jogo': 'CTR - Crash Team Racing (USA).bin', 'abre_e_mostra_imagem': True, 'tamanho_captura_bytes': 7105, 'salva_estado': True, 'carrega_sem_travar': True}",
+   "  {'console': 'Dreamcast', 'jogo': 'Marvel vs. Capcom 2 - New Age of Heroes (Europe).cue', 'abre_e_mostra_imagem': True, 'tamanho_captura_bytes': 29103, 'salva_estado': True, 'carrega_sem_travar': True}",
+   "  {'console': 'Neo Geo', 'jogo': 'kof97.zip', 'abre_e_mostra_imagem': True, 'tamanho_captura_bytes': 143790, 'salva_estado': True, 'carrega_sem_travar': True}",
+   "  {'console': 'PSP', 'jogo': 'Killzone - Liberation (USA) (En,Fr,De,Es,It,Nl,Pl,Ru).iso', 'abre_e_mostra_imagem': True, 'tamanho_captura_bytes': 41645, 'salva_estado': True, 'carrega_sem_travar': True}",
+   "[protege_cfg] arquivos de verdade devolvidos como estavam antes do teste: nenhum mudou"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_matriz_multitap.py",
+  "codigo_saida": 0,
+  "segundos": 270.3,
+  "ultimas_linhas": [
+   "[OK] PlayStation    CTR - Crash Team Racing (USA).cue          abre=True (29288 B)  junto=conectou ",
+   "[!!] Sega Saturn    Saturn Bomberman (USA) (1S) (Track 01).bin abre=False (1848 B)  junto=conectou ",
+   "[OK] Dreamcast      Marvel vs. Capcom 2 - New Age of Heroes (E abre=True (243674 B)  junto=NUCLEO RECUSA | [ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.; [ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
+   "[OK] PSP            Killzone - Liberation (USA) (En,Fr,De,Es,I abre=True (7933 B)  junto=NUCLEO RECUSA | [libretro WARN] [sceDisplay] Video out requested, not supported: mode=0 size=512,272",
+   "[OK] Neo Geo        kof97.zip                                  abre=True (28984 B)  junto=conectou ",
+   "",
+   "Bruto em C:\\Projetos\\Criador De Apps Pedagógicos\\arena-console\\docs\\matriz_multitap_bruto.json",
+   "[protege_cfg] arquivos de verdade devolvidos como estavam antes do teste: nenhum mudou"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_motivo_fliperama.py",
+  "codigo_saida": 0,
+  "segundos": 16.9,
+  "ultimas_linhas": [
+   "  OK   continua sem abrir (o zip e' o problema)",
+   "  OK   a parte da BIOS sumiu",
+   "  OK   a parte do jogo ficou",
+   "3. FBNeo, o mesmo zip",
+   "  OK   o FBNeo tambem diz o que falta",
+   "",
+   "RESULTADO: tudo certo",
+   "[protege_cfg] arquivos de verdade devolvidos como estavam antes do teste: dados\\builtin\\content_history.lpl"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_multitap_5_jogadores_arena.py",
+  "codigo_saida": 0,
+  "segundos": 44.2,
+  "ultimas_linhas": [
+   "  convidado2  vivo=True entrou_como=2 multitap_no_registro=False",
+   "  convidado3  vivo=True entrou_como=3 multitap_no_registro=False",
+   "  convidado4  vivo=True entrou_como=4 multitap_no_registro=False",
+   "  convidado5  vivo=True entrou_como=5 multitap_no_registro=False",
+   "",
+   "Os 5 entraram, cada um no seu jogador.",
+   "RESULTADO: PASSOU",
+   "[protege_cfg] arquivos de verdade devolvidos como estavam antes do teste: nenhum mudou"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_multitap_opcao_nucleo_real.py",
+  "codigo_saida": 0,
+  "segundos": 18.0,
+  "ultimas_linhas": [
+   "   [sem] [INFO] [Override] Redirecionando ponto de save para \"C:\\Users\\passo\\AppData\\Local\\Temp\\arena_multitap_real_x2q2h_i_\\PCSX-ReARMed\\CTR - Crash Team Raci",
+   "   [sem] [INFO] [Environ] GET_SAVE_DIRECTORY: \"C:\\Users\\passo\\AppData\\Local\\Temp\\arena_multitap_real_x2q2h_i_\\PCSX-ReARMed\".",
+   "   [sem] [libretro INFO] Loading memory card C:\\Users\\passo\\AppData\\Local\\Temp\\arena_multitap_real_x2q2h_i_\\PCSX-ReARMed/pcsx-card2.mcd",
+   "   [sem] [INFO] [SRAM] Salvando tipo de RAM #0 em \"C:\\Users\\passo\\AppData\\Local\\Temp\\arena_multitap_real_x2q2h_i_\\PCSX-ReARMed\\CTR - Crash Team Racing (USA).sr",
+   "   [sem] [INFO] [SRAM] Salvo com sucesso em \"C:\\Users\\passo\\AppData\\Local\\Temp\\arena_multitap_real_x2q2h_i_\\PCSX-ReARMed\\CTR - Crash Team Racing (USA).srm\".",
+   "   [sem] [INFO] [Core] Saved core options file to \"C:\\Projetos\\Criador De Apps Pedagógicos\\arena-console\\retroarch\\retroarch-core-options.cfg\".",
+   "RESULTADO: PASSOU",
+   "[protege_cfg] arquivos de verdade devolvidos como estavam antes do teste: dados\\builtin\\content_history.lpl"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_multitap_por_console.py",
+  "codigo_saida": 0,
+  "segundos": 2.4,
+  "ultimas_linhas": [
+   "[OK] CTR Crash Team Racing | hospedar              cartao=4 input_max_users=4, netplay_max_connections=3, input_libretro_device_p3=517, input_libretro_device_p4=517  nucleo={'pcsx_rearmed_multitap': 'port 1'}",
+   "[OK] CTR Crash Team Racing | sozinho               cartao=4 input_max_users=4, input_libretro_device_p3=517, input_libretro_device_p4=517  nucleo={'swanstation_ControllerPorts_MultitapMode': 'Port1Only'}",
+   "[OK] Saturn Bomberman | hospedar                   cartao=10 input_max_users=10, netplay_max_connections=9, input_libretro_device_p5=517, input_libretro_device_p10=517  nucleo={'beetle_saturn_multitap_port1': 'enabled', 'beetle_saturn_multitap_port2': 'enabled'}",
+   "[OK] GoldenEye 007 | sozinho                       cartao=4 input_max_users=4, input_libretro_device_p3=1, input_libretro_device_p4=1",
+   "[OK] Kof97 | sozinho                               cartao=4 input_max_users=4",
+   "",
+   "11 caso(s), 0 falha(s).",
+   "RESULTADO: PASSOU"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_multitap_regra_de_ouro.py",
+  "codigo_saida": 0,
+  "segundos": 66.0,
+  "ultimas_linhas": [
+   "  Super Smash Bros Melee | sozinho                        p2=517 max_users=2 conexoes=- nucleo=- vazou=nada",
+   "  Super Smash Bros | sozinho                              p2=1 max_users=4 conexoes=- nucleo=- vazou=nada",
+   "  Tmnt2 | entrar                                          p2=1 max_users=4 conexoes=3 nucleo=- vazou=nada",
+   "  Tmnt2 | hospedar                                        p2=1 max_users=4 conexoes=3 nucleo=- vazou=nada",
+   "  Tmnt2 | sozinho                                         p2=1 max_users=4 conexoes=- nucleo=- vazou=nada",
+   "",
+   "Nenhuma diferenca fora do esperado.",
+   "RESULTADO: PASSOU"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_netplay_5_jogadores.py",
+  "codigo_saida": 0,
+  "segundos": 39.0,
+  "ultimas_linhas": [
+   "  apos convidado4   RAM=231.9 MB  CPU=2.265625s",
+   "  apos convidado5   RAM=232.1 MB  CPU=2.6875s",
+   "Resumo salvo em C:\\Projetos\\Criador De Apps Pedagógicos\\arena-console\\docs\\netplay_5_jogadores_bruto.json",
+   "",
+   "RESULTADO: PASSOU (os 4 convidados entraram)",
+   "",
+   "Encerrando os 5 processos...",
+   "[protege_cfg] arquivos de verdade devolvidos como estavam antes do teste: nenhum mudou"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_netplay_isolamento.py",
+  "codigo_saida": 0,
+  "segundos": 25.3,
+  "ultimas_linhas": [
+   "  [INFO] [Playlist] Carregando arquivo de histórico: \"C:\\Users\\passo\\AppData\\Local\\Temp\\arena_netplay_iso_vjtj28js\\hospedeiro\\builtin\\content_video_history.lpl\".",
+   "  [INFO] [Playlist] Written to file: \"C:\\Users\\passo\\AppData\\Local\\Temp\\arena_netplay_iso_vjtj28js\\hospedeiro\\builtin\\content_history.lpl\".",
+   "  [INFO] [Netplay] Vaga de conexão 0",
+   "  [INFO] [Netplay] Conexão recebida de: \"Jogador5\"",
+   "  [INFO] [Netplay] Jogador5 se juntou como o jogador 5 (ping: 12 ms)",
+   "",
+   "RESULTADO: PASSOU (o jogador 5 entrou sozinho)",
+   "[protege_cfg] arquivos de verdade devolvidos como estavam antes do teste: nenhum mudou"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_netplay_sexto_jogador.py",
+  "codigo_saida": 0,
+  "segundos": 43.1,
+  "ultimas_linhas": [
+   "",
+   "O que o ARENA mostra ao sexto, ao voltar:",
+   "    Não deu para entrar na partida. Ela pode estar cheia: este jogo aceita até 5 jogadores. Pergunte a quem hospeda quantos já entraram; se ainda tem vaga, rode o PARTIDA.bat nos dois computadores para ver o que a rede está barrando.",
+   "  [OK] o sexto ve o porque, em portugues, com 'cheia' e o que fazer ",
+   "  [OK] o hospedeiro e os 4 convidados continuam abertos depois da tentativa ",
+   "",
+   "Sexto jogador: 4 de 4 certos.",
+   "[protege_cfg] arquivos de verdade devolvidos como estavam antes do teste: nenhum mudou"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_opcoes_nucleo_ponta_a_ponta.py",
+  "codigo_saida": 0,
+  "segundos": 15.6,
+  "ultimas_linhas": [
+   "Escala: ARENA escreveu 4, .opt tinha 7, nucleo usou 4",
+   "Opcao do aluno (swanstation_Display_ShowOSDMessages): nucleo usou false (esperado false)",
+   "Memory card: Libretro (esperado Libretro)",
+   "",
+   "RESULTADO: PASSOU",
+   "Arquivos de opcoes devolvidos como estavam.",
+   "[protege_cfg] arquivos de verdade devolvidos como estavam antes do teste: dados\\builtin\\content_history.lpl"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_orcamentos_modo_alvo.py",
+  "codigo_saida": 0,
+  "segundos": 309.7,
+  "ultimas_linhas": [
+   "4    Indexacao (1,9 s por 100 jogos)                            0.19 s   max 2.41  PASSOU",
+   "5a   Gravacoes com o ARENA parado (por minuto)                0.0 /min    max 0.5  PASSOU",
+   "5b   Gravacoes com o ARENA parado (volume)                  0.0 KB/min   max 16.0  PASSOU",
+   "6a   FPS do Super Nintendo (piso)                             60.0 FPS   min 59.0  PASSOU",
+   "6b   Variacao dos quadros no SNES                              3.015 %    max 5.0  PASSOU",
+   "",
+   "Orcamentos no modo alvo: nenhum estourou.",
+   "[protege_cfg] arquivos de verdade devolvidos como estavam antes do teste: nenhum mudou"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_partida_aparece.py",
+  "codigo_saida": 0,
+  "segundos": 22.7,
+  "ultimas_linhas": [
+   "  [OK] assistir NAO anuncia partida aberta ",
+   "",
+   "6. Segurança e configuração",
+   "  [OK] /api/partida/procurar recusa pedido de outra máquina (403) ",
+   "  [OK] endereço novo do amigo gravado ",
+   "  [OK] ajuste salvo no meio-tempo continua lá 'Mudei no meio'",
+   "",
+   "RESULTADO: PASSOU"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_partida_colega.py",
+  "codigo_saida": 0,
+  "segundos": 12.3,
+  "ultimas_linhas": [
+   "",
+   "",
+   "",
+   "",
+   "Conferiu a versao do colega: True",
+   "Conferiu o codigo do aparelho do colega: True",
+   "",
+   "RESULTADO: PASSOU"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_partida_testar_timing.py",
+  "codigo_saida": 0,
+  "segundos": 6.5,
+  "ultimas_linhas": [
+   "Resposta: {'endereco': '12345', 'arena': False, 'partida': False, 'arquivo': None, 'diagnostico': \"Não alcanço o computador dele. Confira o endereço, e se ele ligou 'Aceitar conexões da rede' e reabriu o ARENA.\"}",
+   "",
+   "--- Endereco alcancavel (o proprio localhost) ---",
+   "Status=200 tempo=2.03s",
+   "Resposta: {'endereco': '127.0.0.1', 'arena': True, 'partida': False, 'arquivo': None, 'esperando': False, 'diagnostico': \"Vocês se enxergam, mas a porta da partida está fechada. Duas causas: ele ainda não clicou em 'Eu abro a partida', ou o firewall do Windows dele está bloqueando o retroarch.exe. V",
+   "",
+   "Tempo com endereco invalido: 2.69s (antes da correcao: ~5,3s medido)",
+   "RESULTADO: PASSOU"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_pasta_somente_leitura.py",
+  "codigo_saida": 0,
+  "segundos": 3.5,
+  "ultimas_linhas": [
+   "Pasta de teste: C:\\Users\\passo\\AppData\\Local\\Temp\\arena_ro_k9ntlrb_",
+   "Marcando config.json como somente-leitura (attrib +R)...",
+   "ARENA subiu com dados\\ somente-leitura: True",
+   "Status ao tentar gravar config: 500 | resposta: {'ok': False, 'erro': 'Não consegui concluir o pedido. Outro programa está usando esse arquivo, ou a pasta está protegida. Feche os outros programas e tente de novo.'}",
+   "Vazou traceback no console (nao deveria): False",
+   "",
+   "RESULTADO: PASSOU"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_pcsx2_inicia.py",
+  "codigo_saida": 0,
+  "segundos": 235.3,
+  "ultimas_linhas": [
+   "semctl   COMECOU   ultima linha: [   18,9702] EE/iR5900 Recompiler Reset",
+   "cartao   COMECOU   ultima linha: [   18,7604] EE/iR5900 Recompiler Reset",
+   "vulkan   COMECOU   ultima linha: [   19,0432] Updating CPU configuration...",
+   "dx11     COMECOU   ultima linha: [   18,9123] EE/iR5900 Recompiler Reset",
+   "semxinput COMECOU   ultima linha: [   18,9686] EE/iR5900 Recompiler Reset",
+   "semsdl   COMECOU   ultima linha: [   19,0414] EE/iR5900 Recompiler Reset",
+   "fastboot COMECOU   ultima linha: [   18,9615] EE/iR5900 Recompiler Reset",
+   "[protege_cfg] arquivos de verdade devolvidos como estavam antes do teste: emuladores\\PCSX2\\PCSX2\\memcards\\Mcd001.ps2, emuladores\\PCSX2\\PCSX2\\memcards\\Memory Card Slot 1.ps2, emuladores\\PCSX2\\PCSX2\\memcards\\Memory Card Slot 2.mcr, emuladores\\PCSX2\\PCSX2\\inis\\PCSX2.ini"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_pcsx2_motor.py",
+  "codigo_saida": 0,
+  "segundos": 0.3,
+  "ultimas_linhas": [
+   "  [OK] config com motor_ps2 = '<script>' vira 'automatico' ",
+   "  [OK] config com motor_ps2 = 5 vira 'automatico' ",
+   "  [OK] config com motor_ps2 = [1, 2] vira 'automatico' ",
+   "  [OK] config com motor_ps2 = {'a': 1} vira 'automatico' ",
+   "  [OK] config sem a chave = automatico ",
+   "  [OK] a tela oferece os mesmos motores que o servidor aceita ",
+   "",
+   "Motor do PS2: 21 de 21 certos."
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_pcsx2_placa.py",
+  "codigo_saida": 0,
+  "segundos": 0.1,
+  "ultimas_linhas": [
+   "5. Placa dedicada, automatico",
+   "  [OK] dedicada forte: 4x, mistura nao mexida ",
+   "  [OK] dedicada media: 2x como antes, mistura nao mexida ",
+   "",
+   "6. Quem chama sem dizer a placa (comportamento antigo)",
+   "  [OK] 2x, mistura nao mexida ",
+   "",
+   "RESULTADO: PASSOU"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_pcsx2_portatil.py",
+  "codigo_saida": 0,
+  "segundos": 26.6,
+  "ultimas_linhas": [
+   "   [    0,3835] SDLInputSource: 885 gamepad mappings are loaded.",
+   "   [    1,2032] Initializing Pad...",
+   "   [    3,2278] Pad: DS2 Config Finished - P1/S1 - AL: Off - AB: Usable - VS: Disabled - VL: Disabled - RB: D (0x00000000)",
+   "Memory cards: ['Memory Card Slot 1.ps2', 'Memory Card Slot 2.mcr']",
+   "",
+   "RESULTADO: PASSOU",
+   "PCSX2.ini de verdade devolvido como estava antes do teste.",
+   "[protege_cfg] arquivos de verdade devolvidos como estavam antes do teste: emuladores\\PCSX2\\PCSX2\\memcards\\Memory Card Slot 1.ps2, emuladores\\PCSX2\\PCSX2\\memcards\\Memory Card Slot 2.mcr, emuladores\\PCSX2\\PCSX2\\inis\\PCSX2.ini"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_pcsx2_seguro.py",
+  "codigo_saida": 0,
+  "segundos": 58.1,
+  "ultimas_linhas": [
+   "2. PCSX2 de verdade abre o Crash Nitro Kart sem reclamar",
+   "  [OK] motor vulkan: o Crash Nitro Kart comecou (correcoes do banco de jogos aplicadas) ",
+   "  [OK] motor vulkan: o PCSX2 reclama de 1 coisa(s) (no maximo 1) ",
+   "        aviso do PCSX2: A API dos Gráficos não está definida em Automático. Isto pode causar problemas de performance e problemas gráficos.",
+   "  [OK] motor automatico: o Crash Nitro Kart comecou (correcoes do banco de jogos aplicadas) ",
+   "  [OK] motor automatico: o PCSX2 reclama de 0 coisa(s) (no maximo 0) ",
+   "",
+   "PCSX2 seguro: 22 de 22 certos."
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_perfil_apelido.py",
+  "codigo_saida": 0,
+  "segundos": 1.6,
+  "ultimas_linhas": [
+   "  [OK] toda linha do arquivo extra e' chave = \"valor\" (ou comentario) ",
+   "  [OK] nenhum id repetido na tela ",
+   "  [OK] gaveta Perfil com as abas Meu perfil e Amigos ",
+   "  [OK] campo e botao de trocar o apelido na gaveta ",
+   "  [OK] Ajustes sem as abas Amigos e Perfil ",
+   "  [OK] botoes do topo ligados (Perfil e Amigos abrem a gaveta) ",
+   "",
+   "Perfil e apelido: 19 de 19 certos."
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_ps2_sem_bios.py",
+  "codigo_saida": 0,
+  "segundos": 0.2,
+  "ultimas_linhas": [
+   "  [OK] .bin de 4 MB em retroarch\\system vale ",
+   "  [OK] BIOS na pasta bios\\ do PCSX2 vale ",
+   "  [OK] sem BIOS: a frase diz o que fazer (BIOS, BIOS\\PS2, professor) ",
+   "  [OK] cartao do PS2 sem BIOS: falta_sistema com o motivo ",
+   "  [OK] com BIOS: nada a avisar ",
+   "  [OK] cartao do PS2 com BIOS: pronta ",
+   "",
+   "PS2 sem BIOS: 8 de 8 certos."
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_ps2_todos_os_jogos.py",
+  "codigo_saida": 0,
+  "segundos": 978.4,
+  "ultimas_linhas": [
+   "  [OK] Half-Life (USA).chd                                          leve     20.1 s",
+   "  [OK] Half-Life (USA).chd                                          bonito   20.1 s",
+   "  [OK] Darkwatch (USA).chd                                          leve     22.1 s",
+   "  [OK] Darkwatch (USA).chd                                          bonito   22.1 s",
+   "  [OK] Champions of Norrath (Europe) (En,Fr,De).iso                 leve     20.1 s",
+   "  [OK] Champions of Norrath (Europe) (En,Fr,De).iso                 bonito   20.1 s",
+   "",
+   "PS2, todos os jogos: 43 de 43 certos."
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_ps3_sem_firmware.py",
+  "codigo_saida": 0,
+  "segundos": 1.2,
+  "ultimas_linhas": [
+   "Aba Emuladores, PS3: [{'plataforma': 'PlayStation 3', 'id': 'ps3', 'nome': 'RPCS3', 'pasta': 'emuladores\\\\RPCS3', 'site': 'rpcs3.net/download', 'motivo': 'OBRIGATÓRIO. Não existe núcleo de PlayStation 3 no RetroArch - só o RPCS3 emula este console, e só em computador forte.', 'instalado': True, 'com",
+   "RPCS3 ausente ou com firmware: nada a testar aqui."
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_psp_pulo_de_quadros.py",
+  "codigo_saida": 0,
+  "segundos": 33.6,
+  "ultimas_linhas": [
+   "  [OK] normal: pulo automatico desligado disabled",
+   "  [OK] normal: frameskip 'disabled' (valor que o nucleo conhece) disabled",
+   "  [OK] modesto: pulo automatico ligado enabled",
+   "  [OK] modesto: frameskip 1 (o automatico precisa dele diferente de zero) 1",
+   "  [OK] modesto: skip_buffer_effects desligado (senao o automatico nao funciona) disabled",
+   "",
+   "PSP pulo de quadros: 7 de 7 certos.",
+   "[protege_cfg] arquivos de verdade devolvidos como estavam antes do teste: dados\\builtin\\content_history.lpl"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_qual_opcao_de_nucleo_vale.py",
+  "codigo_saida": 0,
+  "segundos": 15.7,
+  "ultimas_linhas": [
+   "   [DEBUG] [Environ] SET_CORE_OPTIONS_DISPLAY: swanstation_GPU_ResolutionScale = visible",
+   "   [DEBUG] [Environ] GET_VARIABLE: swanstation_GPU_ResolutionScale = \"3\"",
+   "   [INFO] [Core] Saved core options file to \"C:\\Projetos\\Criador De Apps Pedagógicos\\arena-console\\retroarch\\retroarch-core-options.cfg\".",
+   "",
+   "Modo: padrao do RetroArch",
+   "Escala que o nucleo usou: 3 (3 = arquivo do ARENA, 2 = .opt do nucleo)",
+   "Arquivos de opcoes devolvidos como estavam.",
+   "[protege_cfg] arquivos de verdade devolvidos como estavam antes do teste: dados\\builtin\\content_history.lpl"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_quebrar_api.py",
+  "codigo_saida": 0,
+  "segundos": 35.3,
+  "ultimas_linhas": [
+   "  [OK] o servidor continua de pe depois de A, B e C ",
+   "  [OK] D. pedido que promete 1000 bytes e manda 10: o servidor larga em ~30 s ",
+   "  [OK] E. com 200 conexoes paradas, a tela ainda responde (0.01 s) ",
+   "  [OK] F. metodo, caminho e cabecalho estranhos: tratados ",
+   "  [OK] G. 12 enderecos estranhos em 3 rotas de rede: recusados na hora, sem erro 500 ",
+   "  [OK] o servidor continua de pe no fim ",
+   "",
+   "Tentando quebrar a API: 10 de 10 certos."
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_queda_no_meio_da_gravacao.py",
+  "codigo_saida": 0,
+  "segundos": 0.8,
+  "ultimas_linhas": [
+   "Pasta de teste: C:\\Users\\passo\\AppData\\Local\\Temp\\arena_queda_l9izu_mm",
+   "Apelido antes: RafaParise",
+   "Codigo de saida do processo filho (137 = morto de proposito): 137",
+   "config.json continua JSON valido: True",
+   "apelido depois (tem que ser o ANTIGO, nao 'NomeQueDeviaGravar' -- a troca nunca aconteceu): RafaParise",
+   "arquivos .tmp orfaos encontrados (esperado: 1, sera limpo na proxima abertura): ['config.json.14552.tmp']",
+   "",
+   "RESULTADO: PASSOU (arquivo antigo protegido, nada corrompido)"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_rede_ruim.py",
+  "codigo_saida": 0,
+  "segundos": 146.6,
+  "ultimas_linhas": [
+   "  {'cenario': 'so atraso 50ms', 'atraso_ms': 50, 'perda_pct': 0, 'com_simulador': True, 'conectou': True, 'entrou_em_s': 1.3, 'ping_ms': 111, 'caiu_depois_de_entrar': False, 'os_dois_abertos_no_fim': True, 'pedacos_no_simulador': {'cliente->host': 843, 'host->cliente': 857}, 'passou_pelo_simulador':",
+   "  {'cenario': 'so atraso 100ms', 'atraso_ms': 100, 'perda_pct': 0, 'com_simulador': True, 'conectou': True, 'entrou_em_s': 1.5, 'ping_ms': 228, 'caiu_depois_de_entrar': False, 'os_dois_abertos_no_fim': True, 'pedacos_no_simulador': {'cliente->host': 824, 'host->cliente': 844}, 'passou_pelo_simulador",
+   "  {'cenario': 'so atraso 200ms', 'atraso_ms': 200, 'perda_pct': 0, 'com_simulador': True, 'conectou': True, 'entrou_em_s': 2.0, 'ping_ms': 411, 'caiu_depois_de_entrar': False, 'os_dois_abertos_no_fim': True, 'pedacos_no_simulador': {'cliente->host': 788, 'host->cliente': 824}, 'passou_pelo_simulador",
+   "  {'cenario': 'perda 1% (com 50ms de base)', 'atraso_ms': 50, 'perda_pct': 1, 'com_simulador': True, 'conectou': True, 'entrou_em_s': 1.3, 'ping_ms': 129, 'caiu_depois_de_entrar': False, 'os_dois_abertos_no_fim': True, 'pedacos_no_simulador': {'cliente->host': 848, 'host->cliente': 861, 'perdidos': ",
+   "  {'cenario': 'perda 5% (com 50ms de base)', 'atraso_ms': 50, 'perda_pct': 5, 'com_simulador': True, 'conectou': True, 'entrou_em_s': 1.5, 'ping_ms': 129, 'caiu_depois_de_entrar': False, 'os_dois_abertos_no_fim': True, 'pedacos_no_simulador': {'cliente->host': 806, 'host->cliente': 835, 'perdidos': ",
+   "",
+   "RESULTADO: PASSOU",
+   "[protege_cfg] arquivos de verdade devolvidos como estavam antes do teste: nenhum mudou"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_rede_sem_reabrir.py",
+  "codigo_saida": 0,
+  "segundos": 16.5,
+  "ultimas_linhas": [
+   "1. Chave desligada, escuta em: ['127.0.0.1']",
+   "2. Ligou pela API (rede_aplicada=True): escuta em ['0.0.0.0'] depois de 3.2 s",
+   "3. Desligou: escuta em ['127.0.0.1']",
+   "4. Liga/desliga 5 vezes seguidas: vivo=True, escuta final ['0.0.0.0'] (esperado 0.0.0.0)",
+   "5. 12 cliques colados: vivo=True, escuta ['0.0.0.0'] (ultimo clique = ligar)",
+   "",
+   "RESULTADO: PASSOU"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_rpcs3_controles.py",
+  "codigo_saida": 0,
+  "segundos": 42.8,
+  "ultimas_linhas": [
+   "   ·! 0:00:00.798247 {Pad Thread} Input: Pad 2: device='Null', handler=Null, VID=0x0, PID=0x0, class_type=0x0, class_profile=0x0",
+   "   ·! 0:00:00.798249 {Pad Thread} Input: Pad 3: device='Null', handler=Null, VID=0x0, PID=0x0, class_type=0x0, class_profile=0x0",
+   "   ·! 0:00:00.798251 {Pad Thread} Input: Pad 4: device='Null', handler=Null, VID=0x0, PID=0x0, class_type=0x0, class_profile=0x0",
+   "   ·! 0:00:00.798253 {Pad Thread} Input: Pad 5: device='Null', handler=Null, VID=0x0, PID=0x0, class_type=0x0, class_profile=0x0",
+   "   ·! 0:00:00.798255 {Pad Thread} Input: Pad 6: device='Null', handler=Null, VID=0x0, PID=0x0, class_type=0x0, class_profile=0x0",
+   "   ·! 0:00:00.798257 {Pad Thread} Input: set_mouse_and_keyboard: device=pad",
+   "Default.yml: 7 jogadores, teclado=True, xinput=0",
+   "[protege_cfg] arquivos de verdade devolvidos como estavam antes do teste: emuladores\\RPCS3\\RPCS3\\config\\games.yml, emuladores\\RPCS3\\RPCS3\\config\\input_configs\\global\\Default.yml, emuladores\\RPCS3\\RPCS3\\GuiConfigs\\CurrentSettings.ini, emuladores\\RPCS3\\RPCS3\\GuiConfigs\\persistent_settings.dat"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_satellaview_aviso.py",
+  "codigo_saida": 0,
+  "segundos": 0.1,
+  "ultimas_linhas": [
+   "[OK] BS sem a BIOS: aviso no cartao, com o nome do arquivo ",
+   "  [OK] jogo comum: sem aviso ",
+   "  [OK] extensao .bs entra na lista (e avisa) ",
+   "  [OK] 'BS' no nome sem cabeçalho de Satellaview: sem aviso ",
+   "  [OK] com a BIOS (BS-X.bin): sem aviso ",
+   "  [OK] com a BIOS (BS-X.bios): sem aviso ",
+   "",
+   "Satellaview: 6 de 6 certos."
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_servidor_que_cai.py",
+  "codigo_saida": 0,
+  "segundos": 29.1,
+  "ultimas_linhas": [
+   "  [OK] COM a protecao: mover jogo (escreve na janela travada) responde ",
+   "  [OK] COM a protecao: o servidor segue respondendo depois ",
+   "  [OK] janela de console nova: Edicao Rapida desligada (o clique nao trava mais) ",
+   "  [OK] a Edicao Rapida estava LIGADA antes (o padrao do Windows) ",
+   "  [OK] servidor fora: a tela mostra 'parou de responder' ",
+   "  [OK] servidor de volta: a tela recarrega sozinha e o aviso some ",
+   "",
+   "Servidor que cai: 17 de 17 certos."
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_sinc_migracao_e_lotes.py",
+  "codigo_saida": 0,
+  "segundos": 0.7,
+  "ultimas_linhas": [
+   "Banco real (copia): tinha 'seq' antes? True",
+   "  recordes 0 -> 0, sessoes 84 -> 84, encerrados sem numero: 0",
+   "  registros_desde('') devolve 0 recordes",
+   "Lotes: criados 1250, recebidos 1250, faltaram 0, repetidos 0",
+   "",
+   "RESULTADO: PASSOU"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_sinc_sem_relogio.py",
+  "codigo_saida": 0,
+  "segundos": 0.7,
+  "ultimas_linhas": [
+   "Recorde gravado com relogio em 2020 chega ao colega: True",
+   "Partida longa (sinc. no meio) chega ao colega quando fecha: True",
+   "",
+   "RESULTADO: PASSOU"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_tela_4k.py",
+  "codigo_saida": 0,
+  "segundos": 93.2,
+  "ultimas_linhas": [
+   "  [OK] PS1: o nucleo leu swanstation_GPU_ResolutionScale = 9 e o jogo mostrou imagem (28 s) ",
+   "  [OK] PSP: o nucleo leu ppsspp_internal_resolution = 2880x1632 e o jogo mostrou imagem (25 s) ",
+   "  [OK] Dreamcast: o nucleo leu reicast_internal_resolution = 2880x2160 e o jogo mostrou imagem (18 s) ",
+   "  [OK] Dreamcast: o nucleo leu reicast_dcnet = disabled ",
+   "  [OK] Nintendo 64: o nucleo leu mupen64plus-parallel-rdp-upscaling = 2x e o jogo mostrou imagem (21 s) ",
+   "",
+   "Tela 4K: 12 de 12 certos.",
+   "[protege_cfg] arquivos de verdade devolvidos como estavam antes do teste: nenhum mudou"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_tela_motivo.py",
+  "codigo_saida": 0,
+  "segundos": 9.4,
+  "ultimas_linhas": [
+   "  [OK] abrir o proximo jogo tira o motivo do alto ",
+   "2. Jogar junto neste computador",
+   "  [OK] com 2 jogadores: 'o modo de 2 jogadores' (nao mais '2, 3 ou 2') ",
+   "  [OK] diz que o numero vem do dados\\jogadores.txt, com o nome do jogo ",
+   "  [OK] com 4 jogadores: 'de 2 a 4' ",
+   "  [OK] sem erro de JavaScript ",
+   "",
+   "Tela (motivo e jogadores): 11 de 11 certos."
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_tela_responde_indexando.py",
+  "codigo_saida": 0,
+  "segundos": 9.0,
+  "ultimas_linhas": [
+   "Releitura: 5001 jogos em 2.7 s; 13 pedidos do estado no meio, o mais lento em 0.02 s",
+   "  [OK] a releitura achou os 5000 jogos falsos ",
+   "  [OK] a tela foi atendida durante a releitura (13 pedidos) ",
+   "  [OK] nenhum pedido do estado esperou mais de 1 s (o mais lento: 0.02 s) ",
+   "",
+   "A tela responde durante a releitura: 3 de 3 certos."
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_temp_esparso.py",
+  "codigo_saida": 0,
+  "segundos": 0.1,
+  "ultimas_linhas": [
+   "[OK] arquivo esparso de 1 GB: fachada 1 GB, ocupado < 1 MB ",
+   "  [OK] arquivo comum: ocupado = tamanho ",
+   "  [OK] arquivo que nao existe: 0 (nao derruba) ",
+   "  [OK] o verificador mede a pasta com o esparso em menos de 2 MB (era 1.024) ",
+   "",
+   "Temporarios esparsos: 4 de 4 certos."
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_travessia_capa.py",
+  "codigo_saida": 0,
+  "segundos": 1.8,
+  "ultimas_linhas": [
+   "  ../segredo_fora_da_pasta.png                            status=404  bloqueado",
+   "  ../../segredo_fora_da_pasta.png                         status=404  bloqueado",
+   "  ..\\segredo_fora_da_pasta.png                            status=404  bloqueado",
+   "  jogos/../../segredo_fora_da_pasta.png                   status=404  bloqueado",
+   "  jogos\\..\\..\\segredo_fora_da_pasta.png                   status=404  bloqueado",
+   "  C:\\Users\\passo\\AppData\\Local\\Temp\\arena_travessia_7b6s6i8i\\segredo_fora_da_pasta.png status=404  bloqueado",
+   "",
+   "RESULTADO: PASSOU (nenhuma travessia vazou o segredo)"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_ultra_promessas.py",
+  "codigo_saida": 0,
+  "segundos": 6.8,
+  "ultimas_linhas": [
+   "3. Emulador que NAO abre",
+   "[ARENA] C:\\Users\\passo\\AppData\\Local\\Temp\\arena_U_e3guetrx\\retroarch\\retroarch.exe -L C:\\Users\\passo\\AppData\\Local\\Temp\\arena_U_e3guetrx\\retroarch\\cores\\snes9x_libretro.dll --appendconfig C:\\Users\\passo\\AppData\\Local\\Temp\\arena_U_e3guetrx\\dados\\arena_override.cfg \"C:\\Users\\passo\\AppData\\Local\\Temp\\a",
+   "[ARENA] Nao foi possivel abrir o RetroArch: emulador de mentira que nao abre",
+   "[ARENA] Sessao encerrada: 0s",
+   "  [OK] vigia da rede volta mesmo sem o jogo abrir (antes ficava parado) ",
+   "  [OK] ARENA volta ao normal mesmo sem o jogo abrir ",
+   "",
+   "RESULTADO: PASSOU"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_varios_discos.py",
+  "codigo_saida": 0,
+  "segundos": 25.7,
+  "ultimas_linhas": [
+   "3. RetroArch abrindo a lista",
+   "     registro (PS1): [INFO] [Config] Appending config: \"C:\\Users\\passo\\AppData\\Local\\Temp\\arena_discos_bpvtxgu9\\PS1\\partida.cfg\". | [INFO] [Override] Redirecionando arquivo dados da memória do jogo em \"C:\\Users\\passo\\AppData\\Local\\Temp\\arena_discos_bpvtxgu9\\PS1\\SwanStation\\Crash Bandicoot (USA).srm\"",
+   "  [OK] PS1: abre pela lista e mostra imagem ",
+   "     registro (Amiga): [INFO] [Config] Appending config: \"C:\\Users\\passo\\AppData\\Local\\Temp\\arena_discos_bpvtxgu9\\Amiga\\partida.cfg\". | [INFO] [Override] Redirecionando arquivo dados da memória do jogo em \"C:\\Users\\passo\\AppData\\Local\\Temp\\arena_discos_bpvtxgu9\\Amiga\\PUAE\\Alien Breed_Disk1.srm\". | [",
+   "  [OK] Amiga: abre pela lista e mostra imagem ",
+   "",
+   "Varios discos: 22 de 22 certos.",
+   "[protege_cfg] arquivos de verdade devolvidos como estavam antes do teste: nenhum mudou"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_ver_animacao.py",
+  "codigo_saida": 0,
+  "segundos": 13.3,
+  "ultimas_linhas": [
+   "  [OK] claro: anima mesmo com o fundo em Parado ",
+   "  [OK] claro: uma visita chega logo (em ate 5 s) ",
+   "  [OK] claro: o Esc volta a tela ",
+   "  [OK] claro: o foco volta ao botao ",
+   "  [OK] claro: ganchos avancar() e pixels() (160 x 90 RGBA) ",
+   "  [OK] nenhum erro no console ",
+   "",
+   "Visualizar animacao: 17 de 17 certos."
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_verificador_arquivos.py",
+  "codigo_saida": 0,
+  "segundos": 1.3,
+  "ultimas_linhas": [
+   "Sem controles.py o ARENA nao abre (importa na abertura): True",
+   "O verificador acusou a falta de controles.py: True",
+   "",
+   "RESULTADO: PASSOU"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_vulkan_de_verdade.py",
+  "codigo_saida": 0,
+  "segundos": 1.4,
+  "ultimas_linhas": [
+   "  [OK] duas placas = serve ",
+   "[ARENA] O Vulkan desta maquina nao enxerga placa de video: motor automatico trocado para d3d11.",
+   "  [OK] motor vulkan + resposta False -> d3d11 ",
+   "  [OK] motor vulkan + resposta True -> vulkan ",
+   "  [OK] motor vulkan + resposta None -> vulkan ",
+   "  [OK] motor d3d11 + resposta False -> d3d11 ",
+   "",
+   "Vulkan de verdade: 9 de 9 certos."
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_windows_32_bits.py",
+  "codigo_saida": 0,
+  "segundos": 0.3,
+  "ultimas_linhas": [
+   "[OK] Windows de 32 bits: para e explica (saida 1)",
+   "[OK] cmd de 32 bits num Windows de 64: passa da checagem",
+   "[OK] Windows de 64 bits: passa da checagem",
+   "RESULTADO: PASSOU"
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ },
+ {
+  "script": "testes\\teste_zip_danificado.py",
+  "codigo_saida": 0,
+  "segundos": 0.4,
+  "ultimas_linhas": [
+   "  [OK] copiou de novo: o guardado nao vale mais (None sem conferir) ",
+   "  [OK] ... e a conferencia nova diz que esta inteiro ",
+   "  [OK] a frase para o aluno diz a parte e o que fazer ",
+   "  [OK] antes de conferir: a lista nao descompacta nem avisa ",
+   "  [OK] depois de conferido: o cartao avisa ",
+   "  (mslugx.zip da pasta: DANIFICADO em MSX_C3.rom)",
+   "",
+   "Zip danificado: 10 de 10 certos."
+  ],
+  "dados_reais_mexidos": [],
+  "pastas_esquecidas_no_temp": 0,
+  "mb_esquecidos": 0.0
+ }
 ]
