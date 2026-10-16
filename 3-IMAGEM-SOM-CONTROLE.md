@@ -652,11 +652,12 @@ borboletas de várias cores, abelhas, passarinhos, sementes ao vento,
 coelho pulando e balão).
 
 A cada 20 a 35 s passa uma **visita de um jogo famoso de 8 ou 16 bits**,
-uma de cada vez, sem repetir até passarem todas (são 15 em cada fundo):
+uma de cada vez, sem repetir até passarem todas (são 17 no céu e 21 no
+campo):
 
 | Céu (tema escuro) | Campo (tema claro) |
 |---|---|
-| **F-Zero** (SNES): as quatro máquinas — Blue Falcon, Golden Fox, Wild Goose e Fire Stingray — correndo numa pista de luz, uns 8 s para cruzar a tela. É a primeira visita, uns 7 s depois de abrir | **Super Mario Bros.** (NES): o Mario corre e pula por cima do Goomba. É a primeira visita do campo |
+| **F-Zero** (SNES): as quatro máquinas — Blue Falcon, Golden Fox, Wild Goose e Fire Stingray — alcançam três naves sem piloto numa pista de luz: a roxa, a verde e a que pisca, que explode quando uma das quatro encosta nela. É a primeira visita, uns 7 s depois de abrir | **Super Mario Bros.** (NES): o Mario corre e pula por cima do Goomba. É a primeira visita do campo |
 | **Kirby na Warp Star** (NES): cruza o céu deixando estrelinhas coloridas | **Sonic** (Mega Drive): passa correndo, pula em bola e pega o anel |
 | **Space Invaders**: três invasores entram marchando lá em cima; perto da lua, descem uma linha e voltam mais depressa, como no jogo | **Duck Hunt** (NES): dois patos sobem e o cachorro aparece rindo na grama |
 | **Arwing** (Star Fox, SNES): duas naves em formação; a da frente gira no meio do caminho | **Kirby** (Game Boy): flutua estufado pelo céu, levado pela brisa |
@@ -669,8 +670,14 @@ uma de cada vez, sem repetir até passarem todas (são 15 em cada fundo):
 | **ToeJam & Earl** (Mega Drive): os dois passam devagar no pedaço de foguete, com a chama piscando | **Tails** (Sonic 2, Mega Drive): cruza o céu voando, com as caudas girando como hélice |
 | **Starman** (EarthBound, SNES): aparece num risco de luz, flutua um pouco e some do mesmo jeito | **Knuckles** (Sonic & Knuckles, Mega Drive): chega planando, pousa deslizando na grama, pula e sai planando |
 | **Earthworm Jim** (SNES e Mega Drive): passa a toda velocidade no foguete de bolso, soltando fumaça | **Chocobo** (Final Fantasy VI, SNES): passa correndo, levantando poeira, e solta uma pena |
-| **Super Mario Kart** (SNES): Mario e Luigi disputam uma volta na Rainbow Road, a pista de arco-íris | **Rabites** (Secret of Mana, SNES): dois ou três coelhinhos-monstro atravessam o campo aos pulos |
+| **Super Mario Kart** (SNES) e **Mario Kart 64**: nove karts disputam uma volta na Rainbow Road, a pista de arco-íris — Mario, Luigi, Peach, Toad, Yoshi, Bowser, Koopa Troopa, Donkey Kong e Wario | **Rabites** (Secret of Mana, SNES): dois ou três coelhinhos-monstro atravessam o campo aos pulos |
 | **Lunar Whale** (Final Fantasy IV, SNES): a nave-baleia sobe devagar até a lua e passa por ela | **Mr. Saturn** (EarthBound, SNES): atravessa bem devagar, dá um pulinho ("boing!") e solta um coração |
+| **Koopa Clown Car** (Super Mario World, SNES): o Bowser passa pelo alto do céu na xícara de palhaço, balançando, com a hélice girando | **Ryu** (Street Fighter II, SNES): para no meio do campo e solta o Hadouken, a bola de energia azul que atravessa a tela |
+| **Sparkster** (Rocket Knight Adventures, Mega Drive): o gambá de armadura azul cruza o céu na diagonal, na mochila-foguete, de espada na mão | **Mega Man X** (SNES): corre, dá a arrancada com rastro e atira com o X Buster |
+| | **Bomberman** (Super Bomberman, SNES): deixa a bomba, sai andando, e ela explode em cruz |
+| | **Bonk** (PC Engine): o homem das cavernas de cabeça enorme passa aos pulos |
+| | **Ao longe, no pé do morro**, pequenos: a turma do Mario (Mario, Luigi, Peach e Toad) passa andando |
+| | **Ao longe, no pé do morro**: o Sonic e o Tails passam correndo |
 
 O botão **Visualizar animação**, ao lado do nome ARENA no topo, esconde a
 tela inteira e deixa só o fundo; enquanto você assiste, as visitas vêm a

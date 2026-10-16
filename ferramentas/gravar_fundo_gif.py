@@ -245,7 +245,9 @@ def principal():
     # Personagens na frente do titulo (pedido do Rafael, 14/10/2026: o GIF
     # mostrar todos, sem deixar nenhum para tras). No ceu, quase todas as
     # visitas cruzam a faixa do meio, a do titulo.
-    camadas = tema == "escuro" and com_texto
+    # No campo tambem (16/10/2026): os de longe passam no pe do morro, bem
+    # atras do titulo, e no GIF sumiam atras das letras.
+    camadas = com_texto
     pasta = tempfile.mkdtemp(prefix="arena_gif_")
     try:
         for js in ("pixel-sprites.js", fundo):
@@ -276,6 +278,21 @@ def principal():
                 texto = texto.replace(velho, novo)
             with open(capa, "w", encoding="utf-8") as f:
                 f.write(texto)
+        if tema == "claro" and com_texto:
+            # As camadas no campo: o cenario (ate os girassois e o coelho) fica
+            # guardado a cada quadro; as visitas e o que vem depois (abelhas,
+            # borboletas, sementes) vao na frente do titulo -- so na copia.
+            copia = os.path.join(pasta, "field-background-gif.js")
+            with open(os.path.join(pasta, fundo), encoding="utf-8") as f:
+                texto = f.read()
+            velho = "    desenharVisitas(passo);\n"
+            if texto.count(velho) != 1:
+                raise SystemExit("O fundo mudou (%r): atualize esta ferramenta." % velho.strip())
+            texto = texto.replace(velho, "    if (window.__camadas) window.__camadas.ceu = "
+                                         "ctx.getImageData(0, 0, W, H).data.slice();\n" + velho)
+            with open(copia, "w", encoding="utf-8") as f:
+                f.write(texto)
+            fundo = "field-background-gif.js"
         k = escala / 8.0          # o titulo foi medido para 1280 x 640
         escuro = tema == "escuro"
         html = PAGINA % {"largura": largura, "altura": altura, "tema": tema, "fundo": fundo, "semente": semente,

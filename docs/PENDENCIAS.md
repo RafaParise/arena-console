@@ -32,17 +32,9 @@ Primeiro, o que já estava pedido:
    15/10 e, de novo, os 3 "NAO ABRE" dela, que eram aberturas lentas). Das
    BIOS dele, só a do Dreamcast tem alternativa livre: o jeito livre dele
    entrou (`80a7d35`). O `protege_cfg` passou a guardar a `system\dc`.
-6. Fundos animados e GIF:
-   - a nave rosa do F-Zero está vermelha;
-   - mais naves do F-Zero: a que pisca e explode ao encostar, a roxa e a
-     verde;
-   - no Mario Kart, o Donkey Kong, o Wario, a Peach e outros;
-   - mais personagens de 16 bits em todos os cantos dos dois fundos (no
-     claro, também no pé do morro, menores, como se estivessem longe);
-   - revisar animações, formatos e cores;
-   - o GIF claro ou escuro conforme o tema do GitHub, que não está
-     funcionando;
-   - por fim, o GIF novo, com todos os personagens, no README e na raiz.
+6. Feito: os fundos e os GIFs (a Fire Stingray rosa, as naves sem piloto do
+   F-Zero, nove karts, Clown Car, Sparkster, Ryu, Mega Man X, Bomberman,
+   Bonk e os de longe no pé do morro; os GIFs com todos, pelo tema do GitHub).
 7. As pendências desta lista e o que fica com o professor.
 8. O `INICIAR-ARENA.bat`/`.ps1` do professor (fora do git), por último.
 9. Um Release com tudo.
