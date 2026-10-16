@@ -296,16 +296,26 @@ def sessao(jogo, plataforma, modesto, pasta):
             # estado, a do PSP nasce com 0 bytes e fica completa uns 3 s depois
             # (medido na Fase 5; com espera fixa de 2 s, o PSP "nao mostrava
             # imagem"). Espera o tamanho parar de mudar, ate 10 s.
-            comando("SCREENSHOT")
-            fotos, anterior, limite = {}, None, time.monotonic() + 10
-            while time.monotonic() < limite:
-                time.sleep(0.5)
-                fotos = {k: v for k, v in arquivos(pastas["PASTA_CAPTURAS"]).items()
-                         if k.lower().endswith(".png")}
-                maior = max(fotos.values()) if fotos else 0
-                if maior > 2000 and maior == anterior:
+            # Foto preta (ate 2 KB): espera 3 s e tira outra, ate 3 fotos.
+            # Achado de 16/10/2026: com a tela do computador a menos de 60 Hz
+            # (o RetroArch dizia "Game FPS > Monitor FPS"), o jogo anda mais
+            # devagar, e o Contra ainda estava na tela preta da abertura na
+            # hora da foto (1,8 KB, toda preta; 3 s depois, a tela-titulo).
+            fotos = {}
+            for _foto in range(3):
+                comando("SCREENSHOT")
+                anterior, limite = None, time.monotonic() + 10
+                while time.monotonic() < limite:
+                    time.sleep(0.5)
+                    fotos = {k: v for k, v in arquivos(pastas["PASTA_CAPTURAS"]).items()
+                             if k.lower().endswith(".png")}
+                    maior = max(fotos.values()) if fotos else 0
+                    if maior > 2000 and maior == anterior:
+                        break
+                    anterior = maior
+                if fotos and max(fotos.values()) > 2000:
                     break
-                anterior = maior
+                time.sleep(3)
             resultado["foto_kb"] = round(max(fotos.values()) / 1024, 1) if fotos else 0
             resultado["mostra_imagem"] = bool(fotos) and max(fotos.values()) > 2000
 
