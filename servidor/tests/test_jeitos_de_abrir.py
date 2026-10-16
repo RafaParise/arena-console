@@ -25,12 +25,13 @@ class TestJeitos(unittest.TestCase):
         self.sistema = os.path.join(self.base, "system")
         os.makedirs(self.cores)
         os.makedirs(self.sistema)
-        self.tem_a_bios = j.bios.tem_a_bios
+        self.tem_a_bios, self.tem_bios_original = j.bios.tem_a_bios, j.bios.tem_bios_original
         self.com_bios = set()
         j.bios.tem_a_bios = lambda plataforma, pasta: plataforma in self.com_bios
+        j.bios.tem_bios_original = lambda plataforma, pasta: plataforma in self.com_bios
 
     def tearDown(self):
-        j.bios.tem_a_bios = self.tem_a_bios
+        j.bios.tem_a_bios, j.bios.tem_bios_original = self.tem_a_bios, self.tem_bios_original
         limpeza.apagar_pasta(self.base)
 
     def nucleo(self, nome):
@@ -120,6 +121,38 @@ class TestFichasDeVerdade(unittest.TestCase):
             if livre.get("bios"):
                 caminho = "/".join(p for p in (livre.get("pasta"), livre["bios"]) if p)
                 self.assertIn(caminho, destinos, plataforma["id"])
+
+    def test_dreamcast_so_pergunta_com_a_bios_de_verdade(self):
+        """O Dreamcast liga sem BIOS (a imitacao do Flycast): sem a
+        dc_boot.bin, so o jeito livre, sem pergunta; com ela, a pergunta."""
+        with open(os.path.join(RAIZ, "consoles.json"), encoding="utf-8") as arquivo:
+            dados = json.load(arquivo)
+        dc = next(p for p in (dados["plataformas"] if isinstance(dados, dict) else dados) if p["id"] == "dreamcast")
+        base = tempfile.mkdtemp(prefix="arena_jeito_dc_")
+        try:
+            cores, sistema = os.path.join(base, "cores"), os.path.join(base, "system")
+            os.makedirs(cores)
+            os.makedirs(os.path.join(sistema, "dc"))
+            open(os.path.join(cores, dc["core"]), "wb").close()
+            self.assertEqual([x["id"] for x in j.jeitos(dc, cores, sistema)], ["livre"])
+            with open(os.path.join(sistema, "dc", "dc_boot.bin"), "wb") as arquivo:
+                arquivo.write(b"\0" * 2097152)
+            self.assertEqual([x["id"] for x in j.jeitos(dc, cores, sistema)], ["original", "livre"])
+        finally:
+            limpeza.apagar_pasta(base)
+
+    def test_as_opcoes_do_jeito_livre_sao_do_arena(self):
+        """A opcao do jeito livre (a BIOS imitada do Dreamcast) e' gerenciada
+        pelo ARENA: no jeito original ela sai do arquivo. Fora da lista, o
+        "ligado" ficaria gravado e valeria tambem no original."""
+        import graficos
+        gerenciadas = graficos.chaves_gerenciadas_pelo_arena()
+        with open(os.path.join(RAIZ, "consoles.json"), encoding="utf-8") as arquivo:
+            dados = json.load(arquivo)
+        for plataforma in (dados["plataformas"] if isinstance(dados, dict) else dados):
+            for chave in ((plataforma.get("livre") or {}).get("opcoes_nucleo") or {}):
+                self.assertIn(chave, gerenciadas, plataforma["id"])
+        self.assertIn("reicast_hle_bios", gerenciadas)
 
     def test_a_openbios_nao_passa_pela_bios_da_sony(self):
         """A OpenBIOS e' livre (marca da lista) e nao e' tomada pela BIOS da

@@ -701,6 +701,14 @@
       "nome": "Sega Dreamcast",
       "descricao": "Ultimo console da Sega, de 1998.",
       "core": "flycast_libretro.dll",
+      "livre": {
+        "nome": "BIOS imitada (Flycast)",
+        "opcoes_nucleo": {
+          "reicast_hle_bios": "enabled"
+        },
+        "explica": "Liga sem a BIOS do Dreamcast: o próprio emulador, de código aberto, imita a BIOS. Abre mais rápido (pula o logo do console) e a maioria dos jogos funciona, mas algum pode travar no meio.",
+        "motivo": "Testado em 16/10/2026 com o GigaWing 2 e o Marvel vs. Capcom 1 do professor: os dois abriram nos dois jeitos; o registro diz Did not load BIOS, using reios."
+      },
       "extensoes": [
         ".gdi",
         ".cdi",

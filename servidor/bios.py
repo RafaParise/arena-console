@@ -284,6 +284,21 @@ def tem_a_bios(plataforma_id, pasta_sistema):
     return not falta_para_o_console(plataforma_id, pasta_sistema)
 
 
+def tem_bios_original(plataforma_id, pasta_sistema):
+    """Alguma BIOS de verdade deste console esta instalada (as livres nao
+    contam)? Para os jeitos de abrir (servidor\\jeitos_de_abrir.py): so ha o
+    "original" para escolher quando a BIOS da empresa esta na pasta. No
+    Dreamcast, a BIOS e' opcional (falta_para_o_console nao reclama dela),
+    e sem esse cuidado o ARENA perguntaria entre duas coisas iguais."""
+    if plataforma_id == "ps1":
+        return tem_bios_de_ps1(pasta_sistema)
+    for entrada in catalogo.do_console(plataforma_id):
+        relativo = entrada.get("destino")
+        if relativo and estado(pasta_sistema, relativo) in ATIVA:
+            return True
+    return False
+
+
 # ---------------------------------------------------------------------------
 # Onde as coisas ficam
 # ---------------------------------------------------------------------------

@@ -71,6 +71,11 @@ def _original_pronto(plataforma, pasta_cores, pasta_sistema, externo):
     apoio = plataforma.get("apoio_do_nucleo")
     if apoio and not os.path.isdir(os.path.join(pasta_sistema, *apoio.split("/"))):
         return False
+    # Com um jeito livre, o original e' o da BIOS de verdade: so conta com ela
+    # na pasta. No Dreamcast a BIOS e' opcional, e sem isto o ARENA
+    # perguntaria entre a imitacao e... a mesma imitacao.
+    if plataforma.get("livre"):
+        return bios.tem_bios_original(plataforma["id"], pasta_sistema)
     return bios.tem_a_bios(plataforma["id"], pasta_sistema)
 
 

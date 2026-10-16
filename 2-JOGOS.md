@@ -695,8 +695,9 @@ reconhece e leva para o lugar certo.
 **Só para alguns jogos:** PlayStation (uma BIOS de qualquer região — sem
 ela, o PlayStation liga pela OpenBIOS, a BIOS livre que vem no ARENA, e
 quase todos os jogos abrem; com as duas, o ARENA pergunta qual usar) ·
-Dreamcast (`dc_boot.bin` — a maioria abre sem ela,
-mas alguns travam, como o Marvel vs. Capcom 1) · Satellaview, os jogos "BS"
+Dreamcast (`dc_boot.bin` — a maioria abre sem ela, pela BIOS imitada do
+emulador, mas algum pode travar no meio; com a BIOS na pasta, o ARENA
+pergunta qual usar) · Satellaview, os jogos "BS"
 do Super Nintendo (`BS-X.bin`) · Sufami Turbo (`STBIOS.bin`) · Famicom Disk
 System, os jogos `.fds` (`disksys.rom`) · PC Engine em CD (`syscard3.pce`) ·
 64DD (`IPL.n64`) · Videopac+ (`g7400.bin`) · Amiga 1200 e CD32 · os dois
@@ -789,6 +790,15 @@ Metal 2, Metal Slug X e Vigilante 8). Quem jogou sem BIOS na versão de
 15/10, pelo PCSX ReARMed, não perde o save: na primeira vez que o jogo abre
 pelo SwanStation, o ARENA leva uma cópia do cartão de memória (o original
 fica onde estava).
+
+**Dreamcast: a mesma escolha.** Com a `dc_boot.bin` na pasta, o primeiro
+jogo de Dreamcast pergunta: **BIOS original** (a do console, com o logo de
+abertura) ou **BIOS imitada (Flycast)**, a que o próprio emulador, de código
+aberto, faz no lugar dela: abre mais rápido (pula o logo), e a maioria dos
+jogos funciona, mas algum pode travar no meio. Sem a `dc_boot.bin`, o
+Dreamcast liga pela imitada sem perguntar, como sempre. Os saves (os VMUs)
+são os mesmos nos dois jeitos. Testado em 16/10/2026 com o GigaWing 2 e o
+Marvel vs. Capcom 1 do professor, que abriram nos dois.
 
 **Atari ST, Apple II e Atari 8-bit numa pasta com acento:** os emuladores
 deles (o Hatari, o AppleWin e o atari800) não abrem arquivo de pasta com

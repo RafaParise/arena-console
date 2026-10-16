@@ -980,7 +980,23 @@ def chaves_gerenciadas_pelo_arena():
     for lista in CHAVE_BIOS.values():
         chaves.update(lista)
     chaves.add("swanstation_MemoryCards_Card1Type")
+    # As do jeito livre (consoles.json -> livre.opcoes_nucleo; a BIOS imitada
+    # do Dreamcast, 16/10/2026): fora daqui, o "ligado" do jeito livre ficaria
+    # no arquivo e valeria tambem no jeito original.
+    chaves.update(chaves_do_jeito_livre())
     return chaves
+
+
+def chaves_do_jeito_livre():
+    """As chaves de opcao de nucleo que os jeitos livres do consoles.json usam."""
+    try:
+        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "consoles.json"),
+                  encoding="utf-8") as arquivo:
+            dados = json.load(arquivo)
+        plataformas = dados["plataformas"] if isinstance(dados, dict) else dados
+        return {chave for p in plataformas for chave in ((p.get("livre") or {}).get("opcoes_nucleo") or {})}
+    except (OSError, ValueError, KeyError, TypeError):
+        return set()
 
 
 _PADRAO_OPCAO = re.compile(r'^([A-Za-z0-9_.\-]+)\s*=\s*"(.*)"\s*$')
