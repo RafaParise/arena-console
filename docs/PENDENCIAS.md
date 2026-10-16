@@ -145,8 +145,6 @@ Depois do Release, nesta ordem:
      `--atualizar` e, para os consoles novos, copiar para ela as pastas
      `retroarch\cores` e `retroarch\info` do pacote novo (guia 6).
 
-Também: o botão "Gerenciar catálogo" (acervo) nunca aparece.
-
 ## Depende do Rafael
 
 - Mandar ao Suporte do GitHub o pedido de limpeza do PR #1 e do cache. O
@@ -154,6 +152,12 @@ Também: o botão "Gerenciar catálogo" (acervo) nunca aparece.
 - Pôr a "Social preview" pelo site (Settings → General).
 - As BIOS que faltam estão listadas em `BIOS\LEIA - O QUE FALTA.txt`.
 - O `mslugx.zip` está danificado. Só uma cópia nova resolve.
+- O botão "Gerenciar catálogo" (o editor do acervo autorizado, escondido
+  desde a versão 0.9): com ele, qualquer pessoa diante da tela marca "tenho
+  autorização" e o ARENA baixa do archive.org ou do GitHub o arquivo que ela
+  indicar. Recomendação: deixar escondido. Os jogos livres conferidos já vêm
+  pela biblioteca livre (item 3), e os da turma vão em `jogos\pessoais`. Se
+  quiser o editor só para o professor (com senha), é um pedido novo.
 - Apagar, se quiser, a pasta `C:\Projetos\Criador De Apps PedagÃ³gicos` (o
   nome estragado de "Pedagógicos"): só tem o cache do N64 da rodada final de
   15/10, gravado ali pelo caminho em ANSI. Desde 16/10 o ARENA não grava mais
