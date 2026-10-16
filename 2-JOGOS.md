@@ -736,7 +736,7 @@ emulador de PS2 de código aberto (licença BSD) que imita a BIOS. Em
 | Jogos com imagem | 33 de 37 (Dynasty Warriors 6, Guitar Hero III, Mortal Kombat Deadly Alliance e SOCOM não mostraram nada em 4 minutos) |
 | Velocidade | de 47% a 100% da do console: Gun 47%, Black 51%, God Hand 53%, Burnout 3 54%; God of War 80%; Gran Turismo 4 e Dragon Quest VIII 100% |
 | Fechar o jogo | o RetroArch fica preso ("Unloading core...") e só sai derrubado: 3 de 3 pela janela, como o aluno fecha |
-| Pasta com acento | o emulador cai na hora (como a do professor, "Pedagógicos") |
+| Pasta com acento | o emulador cai na hora (numa pasta com "ó" no nome) |
 
 Num Celeron da escola, que é bem mais lento, a velocidade cairia muito
 abaixo disso. Por isso o PS2 continua pelo PCSX2, com a BIOS do console. O
@@ -816,7 +816,7 @@ de um jogo ficava por cima do de outro.
 VICE abrem o jogo, mas gravam os arquivos deles (o cache de imagem e o banco
 de jogos `mupen64plus.ini` do N64; a pasta `vice`) pelo jeito antigo do
 Windows, em que o "ó" vira "Ã³". Até 15/10/2026, isso criava, fora do ARENA,
-uma pasta de nome estragado (como `Criador De Apps PedagÃ³gicos`): ela só tem
+uma pasta de nome estragado (com `Ã³` no lugar de cada `ó`): ela só tem
 cache e pode ser apagada. Agora o ARENA dá a eles a pasta das BIOS pelo
 caminho curto (`system`, a partir da pasta do RetroArch), e tudo fica dentro
 do ARENA. De quebra, o N64 passou a ler o banco de jogos, com o ajuste certo
