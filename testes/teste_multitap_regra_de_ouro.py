@@ -73,7 +73,10 @@ TITULOS_NOVOS_DE_PROPOSITO = {"Capcom Vs SNK 2 Millionaire Fighting 2001",
 # (25/09/2026): o nucleo nao tem netplay, confirmado tentando hospedar.
 # Antes o ARENA abria e o RetroArch falhava; agora o servidor responde 409.
 JOGAR_JUNTO_RECUSADO_DE_PROPOSITO = {"Alien Breed Disk1", "Top Gear 2 Disk2",
-                                     "INTKARAT", "Mule", "PRINCEOP"}
+                                     "INTKARAT", "Mule", "PRINCEOP",
+                                     # Java ME (15/10/2026): o FreeJ2ME-Plus nao tem
+                                     # netplay, confirmado tentando hospedar.
+                                     "God of War Betrayal J2ME EN V0195"}
 
 
 # Auditoria 3 (Fase 4, J2, e a revisao dela): chaves que o RetroArch desta
@@ -311,8 +314,21 @@ def principal():
             if (b["status"] == 409 and modo in ("hospedar", "entrar")
                     and titulo in JOGAR_JUNTO_RECUSADO_DE_PROPOSITO):
                 continue
+            if a["status"] != 200 and b["status"] in (200, 409):
+                # O jogo que antes nem abria e agora abre nao e' mudanca para
+                # pior: a regra de ouro e' nao estragar o que ja funcionava. O
+                # Java ME (16/10/2026): antes sem nucleo, o ARENA respondia 400;
+                # desde 15/10 abre pelo FreeJ2ME-Plus (fc788dd).
+                continue
             if not mais_de_dois:
                 ca, cb =sem_mudanca_de_proposito(chaves(a["override"])), sem_mudanca_de_proposito(chaves(b["override"]))
+                if (cb.get("system_directory", "").endswith("\\OpenBIOS")
+                        and ca.get("system_directory", "").endswith("\\system")):
+                    # O PS1 sem a BIOS da Sony (as copias deste teste vem do git,
+                    # sem BIOS de empresa): desde 15/10/2026 liga pela OpenBIOS, a
+                    # livre, numa pasta so dela (f50cdac).
+                    ca.pop("system_directory")
+                    cb.pop("system_directory")
                 if a["status"] != b["status"] or ca != cb:
                     dif = sorted(set(ca.items()) ^ set(cb.items()))
                     falhas.append("%s: MUDOU (status %s -> %s) %s" % (caso, a["status"], b["status"], dif[:6]))
