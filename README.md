@@ -59,7 +59,7 @@ Ele nasceu nas aulas do curso técnico de **Desenvolvimento de Sistemas**
 
 ## Baixar e usar
 
-1. Baixe o arquivo **`ARENA-2026.10.15.zip`** (uns 490 MB; descompactado, 1,4 GB) na página
+1. Baixe o arquivo **`ARENA-2026.10.16.zip`** (uns 530 MB; descompactado, 1,4 GB) na página
    [**Releases**](https://github.com/RafaParise/arena-console/releases/latest).
 2. **Antes de descompactar, desbloqueie o arquivo:** botão direito no `.zip`
    → **Propriedades** → marque **Desbloquear** (embaixo, em "Segurança") →
@@ -80,20 +80,22 @@ Ele nasceu nas aulas do curso técnico de **Desenvolvimento de Sistemas**
    jogos**, que diz a pasta, os formatos e o que falta para cada console.
 
 **Já usa o ARENA?** Para atualizar sem perder nada, baixe o
-`ARENA-2026.10.15-atualizacao.zip` (só o programa, uns 11 MB) e descompacte
+`ARENA-2026.10.16-atualizacao.zip` (só o programa, uns 12 MB) e descompacte
 no mesmo lugar, substituindo os arquivos: o passo a passo está no
 [guia 6](6-RECURSOS-E-REPARO.md). O pacote completo é para instalar do zero.
-Os 14 consoles novos desta versão precisam dos núcleos novos do RetroArch,
-que vêm só no pacote completo (o guia 6 explica como trazer só eles).
+O Java ME e o GameCube e o Wii dentro do RetroArch precisam de arquivos que
+vêm só no pacote completo (o guia 6 explica como trazer só eles).
 
 Passo a passo completo, com a tabela dos problemas mais comuns: [`1-COMECAR.md`](1-COMECAR.md).
 
 ### O que vem no pacote
 
-O ARENA, o Python embutido, o **RetroArch** com os 48 núcleos que o ARENA usa,
+O ARENA, o Python embutido, o **RetroArch** com os 63 núcleos que o ARENA usa,
 o **PCSX2** (PlayStation 2), o **Dolphin** (GameCube e Wii), o **RPCS3**
 (PlayStation 3) e o **Xenia** (Xbox 360) — já configurados para rodar de
-dentro da pasta, sem gravar nada fora dela.
+dentro da pasta, sem gravar nada fora dela. E também o **Java** do Java ME
+(só o programa) e os arquivos de apoio do Dolphin (`dolphin-emu\Sys`), para
+o GameCube e o Wii dentro do RetroArch.
 
 ### O que NÃO vem (e por quê)
 

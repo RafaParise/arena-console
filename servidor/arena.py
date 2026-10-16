@@ -119,7 +119,7 @@ ARQUIVO_OVERRIDE = os.path.join(PASTA_DADOS, "arena_override.cfg")
 # Serve para uma coisa so: acabar com a duvida de "sera que estou testando
 # a versao corrigida?". Quando algo nao bate com o esperado, o primeiro
 # passo e comparar este numero.
-VERSAO = "2026.10.15"   # 66 consoles, os livres sem BIOS (C-BIOS, EmuTOS, AltirraOS), ate 8 jogadores
+VERSAO = "2026.10.16"   # Java ME, o original ou o livre (PS1, GC/Wii, Dreamcast), jogos livres, codigo curto
 
 PORTA = 8777
 # Os testes que sobem uma copia do ARENA (testes\copia_do_arena.py) usam

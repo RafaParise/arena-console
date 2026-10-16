@@ -347,6 +347,12 @@ sua versão ainda não tem essa pasta, copie-a do pacote completo para dentro
 do seu `emuladores\`. Sem ela, os jogos de Java ME só abrem num computador
 com Java instalado, e o `VERIFICAR.bat` avisa que ela falta.
 
+**GameCube e Wii dentro do RetroArch** (desde a 2026.10.16): o núcleo do
+Dolphin precisa dos arquivos de apoio dele, a pasta
+`retroarch\system\dolphin-emu\Sys`, que vem no pacote completo. Copie-a
+para o mesmo lugar no seu ARENA. Sem ela, o GameCube e o Wii continuam pelo
+Dolphin de fora, sem perguntar, e o `VERIFICAR.bat` avisa que ela falta.
+
 **Depois de copiar:**
 
 1. Dois cliques em **`VERIFICAR.bat`**.
