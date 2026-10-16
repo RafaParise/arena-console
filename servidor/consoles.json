@@ -492,6 +492,8 @@
       "nome": "GameCube",
       "descricao": "Exige maquina forte e placa de video decente.",
       "core": "dolphin_libretro.dll",
+      "apoio_do_nucleo": "dolphin-emu/Sys",
+      "apoio_do_nucleo_motivo": "Sem a pasta Sys (os arquivos de apoio do Dolphin, que vem do libretro), o nucleo abre a maioria dos jogos, mas sem as fontes do console, sem os codigos de trapaca (codehandler.bin) e sem os filtros de imagem (registro de 15/10/2026). Sem ela, o ARENA nao oferece o jeito Dentro do RetroArch.",
       "extensoes": [
         ".rvz",
         ".gcm",
@@ -537,6 +539,8 @@
       "nome": "Nintendo Wii",
       "descricao": "Pelo Dolphin, como o GameCube. Cada controle vira Wii Remote + Nunchuk. Exige maquina forte e placa de video decente.",
       "core": "dolphin_libretro.dll",
+      "apoio_do_nucleo": "dolphin-emu/Sys",
+      "apoio_do_nucleo_motivo": "Sem a pasta Sys (os arquivos de apoio do Dolphin, que vem do libretro), o nucleo abre a maioria dos jogos, mas sem as fontes do console, sem os codigos de trapaca (codehandler.bin) e sem os filtros de imagem (registro de 15/10/2026). Sem ela, o ARENA nao oferece o jeito Dentro do RetroArch.",
       "extensoes": [
         ".rvz",
         ".wbfs",

@@ -350,6 +350,18 @@ if "freej2me_libretro.dll" in [n.lower() for n in cores]:
         print("         Sem ele, os jogos de Java ME (celular antigo) nao abrem. Copie")
         print("         a pasta emuladores\\Java do pacote completo do ARENA.")
 
+# O GameCube e o Wii pelo nucleo do RetroArch pedem os arquivos de apoio do
+# Dolphin (retroarch\system\dolphin-emu\Sys). Sem eles, o ARENA so oferece o
+# Dolphin de fora (15/10/2026).
+if "dolphin_libretro.dll" in [n.lower() for n in cores]:
+    if os.path.isdir(caminho("retroarch", "system", "dolphin-emu", "Sys")):
+        print("  ok     arquivos de apoio do Dolphin (GameCube e Wii) em retroarch\\system\\dolphin-emu")
+    else:
+        atencao.append("faltam os arquivos de apoio do Dolphin (retroarch\\system\\dolphin-emu\\Sys)")
+        print("  FALTA  os arquivos de apoio do Dolphin, em retroarch\\system\\dolphin-emu\\Sys")
+        print("         Sem eles, o GameCube e o Wii so abrem pelo Dolphin de fora. Copie a")
+        print("         pasta retroarch\\system\\dolphin-emu do pacote completo do ARENA.")
+
 
 # ---------------------------------------------------------------------------
 titulo("8. Espaco em disco")

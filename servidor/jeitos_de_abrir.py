@@ -65,6 +65,12 @@ def _original_pronto(plataforma, pasta_cores, pasta_sistema, externo):
         return False
     if externo and (plataforma.get("externo") or {}).get("obrigatorio"):
         return False
+    # Os arquivos de apoio que o nucleo pede (consoles.json -> apoio_do_nucleo):
+    # o Dolphin do RetroArch sem a pasta dolphin-emu\Sys abre quase tudo, mas
+    # sem as fontes do console e sem os codigos de trapaca (15/10/2026).
+    apoio = plataforma.get("apoio_do_nucleo")
+    if apoio and not os.path.isdir(os.path.join(pasta_sistema, *apoio.split("/"))):
+        return False
     return bios.tem_a_bios(plataforma["id"], pasta_sistema)
 
 

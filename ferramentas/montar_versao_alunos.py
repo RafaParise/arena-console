@@ -394,6 +394,17 @@ def montar(destino, com_bios=False):
             copiar_arquivo(origem, os.path.join(RA_D, "database", "rdb", rdb))
     for rel in ("system", "saves", "states", "screenshots", "cheats", "remaps", "controles", "cache"):
         copiar_leia(os.path.join("retroarch", rel), destino)
+    # GameCube e Wii pelo nucleo do RetroArch: os arquivos de apoio do Dolphin
+    # (retroarch\system\dolphin-emu\Sys, licenca GPL, o Dolphin.zip do libretro:
+    # ferramentas\preparar_dolphin_sys.py). Vao sempre, com ou sem BIOS: sao
+    # parte do emulador, nao BIOS. A pasta User (saves e configuracao de quem
+    # joga) nunca vai.
+    apoio_dolphin = os.path.join(RA, "system", "dolphin-emu")
+    if os.path.isdir(os.path.join(apoio_dolphin, "Sys")):
+        copiar_arvore(os.path.join(apoio_dolphin, "Sys"), os.path.join(RA_D, "system", "dolphin-emu", "Sys"))
+        if os.path.isfile(os.path.join(apoio_dolphin, "license.txt")):
+            copiar_arquivo(os.path.join(apoio_dolphin, "license.txt"),
+                           os.path.join(RA_D, "system", "dolphin-emu", "license.txt"))
     levadas = []          # o que foi de BIOS, para a folha de rosto
     if com_bios:
         # So os arquivos soltos de retroarch\system: as subpastas sao cache

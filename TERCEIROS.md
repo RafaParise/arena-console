@@ -24,6 +24,7 @@ por voluntários para qualquer um copiar.
 | Perfis de controle do RetroArch (autoconfig) | a do repositório | <https://github.com/libretro/retroarch-joypad-autoconfig> | `retroarch\autoconfig` |
 | PCSX2 (PlayStation 2) | GPL-3.0 ou posterior | <https://github.com/PCSX2/pcsx2> | `emuladores\PCSX2` |
 | Dolphin (GameCube e Wii) | GPL-2.0 ou posterior | <https://github.com/dolphin-emu/dolphin> | `emuladores\Dolphin` |
+| Arquivos de apoio do núcleo Dolphin do RetroArch (Sys) | GPL-2.0 ou posterior (dolphin-emu\license.txt); as fontes do GameCube, feitas da Droid Sans, Apache 2.0 (Sys\GC\font-licenses.txt) | <https://github.com/libretro/dolphin> | `retroarch\system\dolphin-emu` |
 | RPCS3 (PlayStation 3) | GPL-2.0 | <https://github.com/RPCS3/rpcs3> | `emuladores\RPCS3` |
 | Xenia Canary (Xbox 360) | BSD-3-Clause | <https://github.com/xenia-canary/xenia-canary> | `emuladores\Xenia` |
 | Java do Java ME: OpenJDK 21 (Eclipse Temurin), reduzido com o jlink | GPL-2.0 com a exceção Classpath (os textos vão em emuladores\Java\legal) | <https://github.com/adoptium/temurin21-binaries> | `emuladores\Java` |

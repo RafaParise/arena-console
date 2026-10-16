@@ -77,9 +77,13 @@ class TestJeitos(unittest.TestCase):
 
     def test_emulador_de_fora_ou_nucleo(self):
         gc = {"id": "gamecube", "core": "dolphin_libretro.dll", "arquivos_sistema": 0,
+              "apoio_do_nucleo": "dolphin-emu/Sys",
               "externo": {"nome": "Dolphin", "obrigatorio": False}}
         self.nucleo("dolphin_libretro.dll")
         self.com_bios.add("gamecube")                            # nao precisa de BIOS
+        # Sem a pasta de apoio do nucleo (dolphin-emu\Sys), so o Dolphin de fora.
+        self.assertEqual(self.ids(gc, "Dolphin"), ["externo"])
+        os.makedirs(os.path.join(self.sistema, "dolphin-emu", "Sys"))
         self.assertEqual(self.ids(gc, "Dolphin"), ["externo", "original"])
         self.assertEqual(self.ids(gc), ["original"])             # sem o Dolphin na pasta
         dentro = j.jeitos(gc, self.cores, self.sistema)[0]

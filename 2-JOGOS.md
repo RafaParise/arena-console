@@ -902,6 +902,26 @@ console (**GameCube** e **Nintendo Wii**). Os dois abrem pelo Dolphin, e o
 ARENA lê dentro do disco se ele é de Wii ou de GameCube: se um jogo estiver
 na pasta errada, aparece o aviso para mover.
 
+**Dois jeitos de abrir.** O GameCube e o Wii também abrem pelo núcleo do
+Dolphin que vem dentro do RetroArch. Com os dois no ARENA, o primeiro jogo
+pergunta qual usar, e a resposta fica lembrada (dá para trocar em **Ajustes
+→ Emuladores → Jeito de ligar cada console**):
+
+| Jeito | Bom para |
+|---|---|
+| Dolphin (programa próprio) | é o mais completo e o mais rápido; os controles de Wii (Wii Remote + Nunchuk) vêm prontos |
+| Dentro do RetroArch | as mesmas teclas, saves e telas dos outros consoles do ARENA |
+
+O núcleo usa os arquivos de apoio do Dolphin, em
+`retroarch\system\dolphin-emu\Sys` (fontes do console, códigos de trapaça e
+filtros de imagem), que já vêm no pacote. Sem essa pasta, o ARENA só
+oferece o Dolphin de fora. Teste de 15/10/2026, num Ryzen 5 5600G, pelo
+núcleo, com os 8 jogos de GameCube e Wii do professor: os 8 abriram e
+fecharam direito. F-Zero GX, Super Smash Bros. Melee e New Super Mario Bros.
+Wii rodaram na velocidade do console; Smash Bros. Brawl, a 99%; Mario Kart
+Wii, a 98%; Mario Kart Double Dash, de 78% a 94%, conforme o disco. Sem a
+pasta `Sys`, dois deles não abriam.
+
 #### Aviso de disco na pasta errada
 
 Quando dá para ler dentro do disco de qual console ele é (PS1 × PS2, PSP,
