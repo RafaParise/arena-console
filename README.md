@@ -96,7 +96,10 @@ dentro da pasta, sem gravar nada fora dela.
 
 - **Jogos.** São de quem tem o jogo. O ARENA lê o que você colocar nas
   pastas. Para começar sem nada, a **Biblioteca online** (barra da esquerda)
-  baixa jogos de MS-DOS que os próprios autores liberaram, e os consoles de
+  baixa jogos que os próprios autores liberaram: shareware de MS-DOS e uma
+  lista escolhida a dedo para mais consoles (20 fliperamas clássicos do
+  mamedev.org e jogos novos de fãs para NES, Game Boy, GBA, Mega Drive, Atari
+  2600 e outros), cada um baixado do site de quem publicou. Os consoles de
   fantasia (TIC-80, WASM-4, LowRes NX, Uzebox) existem justamente para jogos
   livres.
 - **BIOS e firmware** (PlayStation, Sega CD, Saturn, Neo Geo, PS3...). São

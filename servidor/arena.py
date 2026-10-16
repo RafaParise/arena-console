@@ -69,6 +69,7 @@ import controles   # noqa: E402
 import acervo      # noqa: E402
 import barreiras   # noqa: E402  (o que deixa o computador lento -- auditoria 2)
 import internet_archive  # noqa: E402
+import biblioteca_livre  # noqa: E402  (jogos livres de mais consoles, baixados de quem publicou -- 15/10/2026)
 import capas_online     # noqa: E402
 import graficos    # noqa: E402
 import hardware    # noqa: E402
@@ -4868,6 +4869,11 @@ class Manipulador(BaseHTTPRequestHandler):
             except Exception as falha:
                 return self.erro(traduzir_erro_do_sistema(falha, "pesquisar"), 502)
 
+        # A biblioteca de jogos livres de mais consoles (servidor\biblioteca_livre.py):
+        # a lista curada, com o que ja esta instalado. Nao precisa de internet.
+        if caminho == "/api/biblioteca-livre":
+            return self.responder_json({"jogos": biblioteca_livre.jogos()})
+
         # ---- conquistas da turma ------------------------------------------
         if caminho == "/api/conquistas":
             return self.responder_json(montar_conquistas())
@@ -5216,6 +5222,28 @@ class Manipulador(BaseHTTPRequestHandler):
                 resultado = internet_archive.instalar(
                     str(dados.get("id", "")), str(dados.get("arquivo", "")),
                     str(dados.get("plataforma", "")))
+            except ValueError as falha:
+                return self.erro(str(falha))
+            except Exception as falha:
+                return self.erro(traduzir_erro_do_sistema(falha, "baixar o jogo"), 502)
+            limpar_caches()
+            manifesto(forcar=True)
+            return self.responder_json(dict(ok=True, **resultado))
+
+        # Baixa um jogo da biblioteca livre do site de quem publicou, confere a
+        # marca e poe na pasta do console. Os do mamedev.org pedem o aceite
+        # ("so para uso nao comercial"), conferido tambem aqui.
+        if caminho == "/api/biblioteca-livre/instalar":
+            with TRAVA_JOGO:
+                if JOGO_EM_ANDAMENTO["ativo"]:
+                    return self.erro("Feche o jogo aberto antes de baixar.", 409)
+            if not ha_internet_agora():
+                return self.erro("Sem internet agora. Ligue o computador na internet para baixar; "
+                                 "os jogos que já estão na pasta continuam funcionando.", 503)
+            try:
+                resultado = biblioteca_livre.instalar(str(dados.get("id", "")), bool(dados.get("aceite")))
+            except biblioteca_livre.FalhaDeRede as falha:
+                return self.erro(str(falha), 502)
             except ValueError as falha:
                 return self.erro(str(falha))
             except Exception as falha:

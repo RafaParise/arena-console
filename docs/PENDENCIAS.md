@@ -22,9 +22,9 @@ Primeiro, o que já estava pedido:
    O Saturn não tem jeito livre (tela preta sem a BIOS, nos três
    emuladores). O Play! (PS2 sem BIOS) não entrou: o RetroArch fica preso
    ao fechar e ele cai em pasta com acento (números no guia 2).
-3. Biblioteca de jogos livres para mais consoles, como a do MS-DOS
-   (homebrew de licença aberta e os 28 jogos do MAME liberados em
-   mamedev.org).
+3. Feito: a biblioteca de jogos livres por console (`servidor\biblioteca_livre.json`,
+   37 jogos de 15 consoles, baixados de quem publicou, com a marca conferida).
+   Do mamedev.org, 20 dos 28: os 8 da Video Klein são de pôquer e aposta.
 4. Sala limpa das BIOS pequenas (Odyssey 2, ColecoVision e Intellivision):
    primeiro, levantar a documentação pública e dizer se dá.
 5. Testes com as BIOS e os jogos do professor em todos os consoles.

@@ -19,13 +19,13 @@ PROJETO = os.path.dirname(RAIZ)
 ACAO = re.compile(r"\b(clique|abra|feche|confira|tente|coloque|ponha|use|escolha|veja|pe[cç]a|aperte|escreva|"
                   r"digite|espere|ligue|desligue|mande|apague|renomeie|baixe|reabra|atualize|volte|mova|copie|"
                   r"cole|passe|deixe|libere|conecte|v[aá]|procure|rode|pergunte|remova|instale|arraste|plugue|"
-                  r"guarde|traga|leve|troque|sincronize|confirme|envie|preencha|encurte|entre|defina)\b", re.I)
+                  r"guarde|traga|leve|troque|sincronize|confirme|envie|preencha|encurte|entre|defina|marque)\b", re.I)
 
 # As mensagens dos OUTROS modulos que chegam a tela por excecao (raise
 # ValueError("...")) ou por retorno ((None, "...") / (False, "...")) --
 # auditoria 3, Fase 3 (08/10/2026). Com as internas de cada um, e o motivo.
 MODULOS = ("arena.py", "acervo.py", "barreiras.py", "capas_online.py", "cheats.py", "controles.py",
-           "internet_archive.py")
+           "internet_archive.py", "biblioteca_livre.py")
 INTERNAS_DOS_MODULOS = {
     "Miniatura inválida.": "miniatura que a propria tela faz; a fila tenta de novo",
     "Miniatura grande demais.": "miniatura que a propria tela faz",

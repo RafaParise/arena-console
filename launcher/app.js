@@ -3829,6 +3829,102 @@ async function carregarBibliotecaOnline() {
   }
 }
 
+// --------------------------------------------------------------------------
+// Jogos livres por console (servidor\biblioteca_livre.py, 15/10/2026)
+// --------------------------------------------------------------------------
+// A lista curada: cada console vira uma seção que abre e fecha. Os jogos que
+// pedem um aceite (os do mamedev.org: "só para uso não comercial") só baixam
+// com a caixinha da seção marcada -- e o servidor confere de novo.
+
+async function carregarBibliotecaLivre() {
+  const caixa = $("#listaLivresPorConsole");
+  if (!caixa) return;
+  let dados;
+  try {
+    dados = await pedir("/api/biblioteca-livre");
+  } catch (falha) {
+    caixa.textContent = `A lista de jogos livres não abriu: ${falha.message}`;
+    return;
+  }
+  const abertos = new Set([...caixa.querySelectorAll("details[open]")].map((d) => d.dataset.console));
+  const porConsole = new Map();
+  for (const jogo of dados.jogos || []) {
+    if (!porConsole.has(jogo.console)) porConsole.set(jogo.console, []);
+    porConsole.get(jogo.console).push(jogo);
+  }
+  const lote = document.createDocumentFragment();
+  for (const [idConsole, jogos] of porConsole) {
+    const grupo = document.createElement("details");
+    grupo.className = "detalhe-avancado";
+    grupo.dataset.console = idConsole;
+    grupo.open = abertos.has(idConsole);
+    const titulo = document.createElement("summary");
+    titulo.className = "grupo-titulo";
+    const instalados = jogos.filter((j) => j.instalado).length;
+    titulo.textContent = `${jogos[0].console_nome} · ${jogos.length} jogo(s)` +
+      (instalados ? ` · ${instalados} instalado(s)` : "");
+    grupo.append(titulo);
+    // Uma caixinha por aceite diferente (na prática, uma por console).
+    const caixinhas = new Map();
+    for (const texto of new Set(jogos.map((j) => j.aceite).filter(Boolean))) {
+      const rotulo = document.createElement("label");
+      rotulo.className = "opcao acervo-autorizacao";
+      const marcar = document.createElement("input");
+      marcar.type = "checkbox";
+      const frase = document.createElement("span");
+      frase.textContent = texto;
+      rotulo.append(marcar, frase);
+      grupo.append(rotulo);
+      caixinhas.set(texto, marcar);
+    }
+    const lista = document.createElement("ul");
+    lista.className = "controles";
+    for (const jogo of jogos) {
+      const linha = document.createElement("li");
+      linha.className = "controle";
+      const nome = document.createElement("span");
+      nome.className = "controle-nome";
+      nome.textContent = jogo.ano ? `${jogo.titulo} (${jogo.ano})` : jogo.titulo;
+      const nota = document.createElement("span");
+      nota.className = "controle-nota";
+      nota.textContent = `${jogo.descricao} ${jogo.autor} · licença: ${jogo.licenca} · ` +
+        formatarBytes(jogo.tamanho);
+      const botao = document.createElement("button");
+      botao.className = jogo.instalado ? "botao" : "botao botao--principal";
+      botao.type = "button";
+      botao.textContent = jogo.instalado ? "Instalado" : "Baixar";
+      botao.disabled = jogo.instalado;
+      botao.addEventListener("click", async () => {
+        const marcar = jogo.aceite ? caixinhas.get(jogo.aceite) : null;
+        if (marcar && !marcar.checked) {
+          recado("Para baixar, marque antes a caixinha deste console.", true);
+          marcar.focus();
+          return;
+        }
+        botao.disabled = true;
+        botao.textContent = "Baixando…";
+        try {
+          const resultado = await pedir("/api/biblioteca-livre/instalar", "POST",
+            { id: jogo.id, aceite: Boolean(marcar && marcar.checked) });
+          botao.textContent = "Instalado";
+          botao.className = "botao";
+          recado(`${resultado.titulo} instalado: já está na lista de ${jogo.console_nome}.`);
+          await carregarCatalogo();
+        } catch (falha) {
+          botao.disabled = false;
+          botao.textContent = "Baixar";
+          recado(falha.message, true);
+        }
+      });
+      linha.append(nome, nota, botao);
+      lista.append(linha);
+    }
+    grupo.append(lista);
+    lote.append(grupo);
+  }
+  caixa.replaceChildren(lote);
+}
+
 function preencherCampo(id, valor = "") {
   const campo = $(id);
   if (campo) campo.value = valor;
@@ -4134,6 +4230,7 @@ function ligarEventos() {
   $("#btnAcervo").addEventListener("click", () => {
     abrirGaveta("gavetaAcervo");
     carregarAcervo();
+    carregarBibliotecaLivre();
   });
   $("#campoBuscaOnline").addEventListener("input", () => {
     clearTimeout(atrasoBiblioteca);

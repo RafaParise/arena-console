@@ -133,6 +133,33 @@ problema nenhum.
 - Precisa de internet; sem ela, os jogos que já estão na pasta continuam
   funcionando normal.
 
+**Jogos livres por console.** Logo abaixo da busca, a Biblioteca tem uma
+lista escolhida a dedo, para mais consoles. Toque no console para abrir a
+lista e em **Baixar** no jogo:
+
+| Console | Jogos | De onde vêm |
+|---|---|---|
+| Arcade (MAME) | 20 fliperamas clássicos: Circus, Car Polo, Robby Roto, Super Tank, Looping, Hard Hat e outros | mamedev.org, a equipe do MAME, com licença dos donos (uso não comercial) |
+| NES | Thwaite, Concentration Room, Nova the Squirrel | os autores, no GitHub (GPL) |
+| Game Boy e Game Boy Color | Libbet and the Magic Floor, µCity | os autores (zlib e GPL) |
+| Game Boy Advance | Blind Jump | o autor (GPL; arte e música só para uso não comercial) |
+| Mega Drive | KleleAtoms (até 4 jogadores) | o autor (MIT) |
+| Atari 2600 | Space Raid | o autor (uso não comercial e educativo) |
+| Apple II, Arduboy, CHIP-8, MicroW8, MSX, Plus/4, VIC-20, ZX81 e Java ME | um jogo de cada | os autores (MIT, GPL, CC0 e outras licenças livres) |
+
+- Cada jogo vem do site de quem publicou. O ARENA confere a marca do
+  arquivo (SHA-256) e só instala se for exatamente o que foi testado. Nada
+  disso vai dentro do ARENA: é baixado quando você pede.
+- Os fliperamas do mamedev.org e o Space Raid são só para uso não comercial.
+  Antes de baixar, marque a caixinha desse console, a mesma confirmação que
+  o site deles pede.
+- O jogo vai para `jogos\livres\<console>` e já aparece no console certo.
+- Victory e Top Gunner mostram uma tela de teste da placa na primeira vez:
+  aperte um botão (ou Start) e ela não volta mais. O FAX testa a memória por
+  uns 2 minutos ao ligar.
+- O mamedev.org tem também 8 jogos da Video Klein, que ficaram de fora: são
+  de pôquer e de aposta, impróprios para uma turma de menores de idade.
+
 #### Passo 3 — Atualize a lista
 
 No ARENA, clique em **Atualizar lista**, no canto inferior esquerdo.

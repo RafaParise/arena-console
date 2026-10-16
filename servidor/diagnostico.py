@@ -51,13 +51,13 @@ PROGRAMA = [
     "servidor/motivo_do_erro.py", "servidor/bios.py", "servidor/bios_catalogo.py", "servidor/arrumar.py",
     "servidor/nomes_arcade.py", "servidor/processos.py", "servidor/capas_do_disco.py",
     "servidor/como_colocar.py", "servidor/ponte_sem_acento.py", "servidor/java_do_arena.py",
-    "servidor/jeitos_de_abrir.py",
+    "servidor/jeitos_de_abrir.py", "servidor/biblioteca_livre.py",
     "servidor/consoles.json", "servidor/graficos.json", "servidor/recursos.json",
-    "servidor/perfis_controle.json",
+    "servidor/perfis_controle.json", "servidor/biblioteca_livre.json",
 ]
 
 JSONS = ["servidor/consoles.json", "servidor/graficos.json",
-         "servidor/recursos.json", "servidor/perfis_controle.json"]
+         "servidor/recursos.json", "servidor/perfis_controle.json", "servidor/biblioteca_livre.json"]
 
 SO_VER = "--so-ver" in sys.argv
 
