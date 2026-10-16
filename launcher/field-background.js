@@ -1939,8 +1939,228 @@
     return dentro || !!this.coracao;
   }
 
+  // Street Fighter II (SNES 1992): o Ryu entra andando, para no meio do campo
+  // e solta o Hadouken, a bola de energia azul que atravessa a tela.
+  const PALETA_RYU = { H: '#3a2414', R: '#e8202a', S: '#f2b880', E: '#101010', W: '#ffffff', g: '#c8ccd8',
+                       K: '#1a1a22' };
+  const RYU = S.quadros([
+    ['...HHH....', '..HRRRR...', '.RRSSES...', 'R..SSSS...', '..WWWWW...', '.WgWWWWS..', '.SWWKWWW..',
+     '..WWKWW...', '..WW.WW...', '..WW.WW...', '..SS.SS...'],
+    ['...HHH....', '..HRRRR...', '.RRSSES...', 'R..SSSS...', '..WWWWW...', '.SWWWWgW..', '..WWKWWS..',
+     '..WWKWW...', '..WW.WW...', '.WW...WW..', '.SS...SS..'],
+    ['..HHH.....', '.HRRRR....', 'RRSSES....', '..SSSS....', '.WWWWWWWSS', '.WgWWWWWSS', '.WWKWWW...',     // Hadouken
+     '.WWWWWW...', '.WW..WW...', 'WW....WW..', 'SS....SS..']
+  ], PALETA_RYU);
+  const HADOUKEN = S.quadros([
+    ['...cCC...', '.cCCWWC..', 'cCWWWWWCc', '.cCCWWC..', '...cCC...'],
+    ['..cCC....', '.cCWWWCc.', 'cCWWWWWWC', '.cCWWWCc.', '..cCC....']
+  ], { c: '#2f6bff', C: '#7fb0ff', W: '#ffffff' });
+
+  function iniciarRyu() {
+    const dir = aleatorio() < 0.5 ? 1 : -1;
+    const para = W / 2 - 5 + (aleatorio() - 0.5) * 30;
+    return { dir: dir, x: dir === 1 ? -10 : W + 2, para: para, golpe: -1, bola: null, desenhar: desenharRyu };
+  }
+
+  function desenharRyu(passo) {
+    const chegou = this.dir === 1 ? this.x >= this.para : this.x <= this.para;
+    if (this.golpe < 0 && chegou) this.golpe = 0;
+    let quadro;
+    if (this.golpe >= 0 && this.golpe < 70) {          // "Ha-dou-ken!": prepara, solta, segura a pose
+      this.golpe += passo;
+      quadro = RYU[this.golpe > 20 ? 2 : 0];
+      if (this.golpe > 20 && !this.bola) this.bola = { x: this.x + (this.dir === 1 ? 10 : -9) };
+    } else {
+      this.x += this.dir * 0.4 * passo;
+      quadro = RYU[Math.floor(t / 7) % 2];
+    }
+    if (this.bola) {
+      this.bola.x += this.dir * 1.1 * passo;
+      S.colar(ctx, HADOUKEN[Math.floor(t / 3) % 2], this.bola.x, CHAO - 10, this.dir);
+    }
+    S.colar(ctx, quadro, this.x, CHAO - quadro.h, this.dir);
+    const fora = this.dir === 1 ? this.x > W + 2 : this.x < -10;
+    const bolaFora = !this.bola || (this.dir === 1 ? this.bola.x > W + 2 : this.bola.x < -10);
+    return !(fora && bolaFora);
+  }
+
+  // Mega Man X (SNES 1993): corre, da a arrancada com rastro e atira com o
+  // canhao do braco (o tiro amarelo do X Buster).
+  const PALETA_X = { B: '#2f5bff', b: '#7fb8ff', S: '#ffc8a0', E: '#101010', R: '#e8202a', C: '#9fd8ff',
+                     W: '#ffffff' };
+  const MEGAMAN_X = S.quadros([
+    ['...BBBB...', '..BbbbbB..', '..BbSSER..', '..BBSSSB..', '.bBBbbBBb.', 'bbBBbbBBbb', '..BBBBBBCC',
+     '..BBbbBB..', '..BB..BB..', '.bBB..BBb.', '.BBB..BBB.'],
+    ['...BBBB...', '..BbbbbB..', '..BbSSER..', '..BBSSSB..', '.bBBbbBBb.', 'bbBBbbBBbb', '..BBBBBBCC',
+     '..BBbbBB..', '.BB....BB.', 'bBB....BBb', 'BBB.....BB']
+  ], PALETA_X);
+  const TIRO_X = S.fazer(['.YY.', 'YWWY', '.YY.'], { Y: '#ffe066', W: '#ffffff' });
+
+  function iniciarMegaManX() {
+    const dir = aleatorio() < 0.5 ? 1 : -1;
+    return { dir: dir, x: dir === 1 ? -10 : W + 2, vel: 0.5, arrancada: -1, rastro: [], tiros: [],
+             proximoTiro: 40 + aleatorio() * 30, desenhar: desenharMegaManX };
+  }
+
+  function desenharMegaManX(passo) {
+    const meio = this.dir === 1 ? this.x > W * 0.3 : this.x < W * 0.7;
+    if (this.arrancada < 0 && meio) this.arrancada = 0;
+    let vel = 0.5;
+    if (this.arrancada >= 0 && this.arrancada < 40) {            // a arrancada (dash)
+      this.arrancada += passo;
+      vel = 1.6;
+      if (passo) this.rastro.push({ x: this.x, vida: 1 });
+    }
+    this.x += this.dir * vel * passo;
+    this.proximoTiro -= passo;
+    if (this.proximoTiro <= 0) {
+      this.tiros.push({ x: this.x + (this.dir === 1 ? 10 : -4) });
+      this.proximoTiro = 50;
+    }
+    for (const r of this.rastro) r.vida -= 0.07 * passo;
+    this.rastro = this.rastro.filter(function (r) { return r.vida > 0; });
+    ctx.globalAlpha = 0.35;
+    for (const r of this.rastro) S.colar(ctx, MEGAMAN_X[1], r.x, CHAO - 11, this.dir);
+    ctx.globalAlpha = 1;
+    for (const tiro of this.tiros) {
+      tiro.x += this.dir * 1.8 * passo;
+      S.colar(ctx, TIRO_X, tiro.x, CHAO - 6, this.dir);
+    }
+    this.tiros = this.tiros.filter(function (tiro) { return tiro.x > -6 && tiro.x < W + 6; });
+    S.colar(ctx, MEGAMAN_X[Math.floor(t / (vel > 1 ? 3 : 6)) % 2], this.x, CHAO - 11, this.dir);
+    const fora = this.dir === 1 ? this.x > W + 2 : this.x < -10;
+    return !(fora && this.tiros.length === 0);
+  }
+
+  // Super Bomberman (SNES 1993): o Bomberman para, deixa a bomba e sai
+  // andando; a bomba pisca, e as chamas saem em cruz.
+  const PALETA_BOMBER = { P: '#ff4fa0', K: '#3a3a4a', W: '#ffffff', w: '#d8dde8', S: '#ffc8a0', E: '#101010',
+                          B: '#2f5bff' };
+  const BOMBERMAN = S.quadros([
+    ['....P....', '....K....', '..WWWWW..', '.WWWWWWW.', '.WSSSSSW.', '.WSESESW.', '.wSSSSSw.',
+     '..WWWWW..', '.PWBBBWP.', '..WWWWW..', '..PP.PP..'],
+    ['....P....', '....K....', '..WWWWW..', '.WWWWWWW.', '.WSSSSSW.', '.WSESESW.', '.wSSSSSw.',
+     '..WWWWW..', '.PWBBBWP.', '..WWWWW..', '.PP...PP.']
+  ], PALETA_BOMBER);
+  const BOMBA = S.quadros([
+    ['....Y.', '...F..', '.KKKK.', 'KKwKKK', 'KwKKKK', 'KKKKKK', '.KKKK.'],
+    ['...Y..', '...F..', '.KKKK.', 'KKwKKK', 'KwKKKK', 'KKKKKK', '.KKKK.']
+  ], { Y: '#ffe066', F: '#8a5a2a', K: '#202030', w: '#8a8aa8' });
+
+  function iniciarBomberman() {
+    const dir = aleatorio() < 0.5 ? 1 : -1;
+    return { dir: dir, x: dir === 1 ? -10 : W + 2, larga: W / 2 + (aleatorio() - 0.5) * 50, bomba: null,
+             desenhar: desenharBomberman };
+  }
+
+  function desenharBomberman(passo) {
+    this.x += this.dir * 0.45 * passo;
+    if (!this.bomba && (this.dir === 1 ? this.x >= this.larga : this.x <= this.larga)) {
+      this.bomba = { x: Math.round(this.x + 1), vida: 0 };
+    }
+    if (this.bomba && this.bomba.vida < 150) {
+      this.bomba.vida += passo;
+      const b = this.bomba;
+      if (b.vida < 110) {
+        // A bomba pisca mais depressa perto de explodir.
+        if (b.vida < 80 || Math.floor(b.vida / 3) % 2 === 0) S.colar(ctx, BOMBA[Math.floor(t / 4) % 2], b.x, CHAO - 7, 1);
+      } else {
+        const k = (b.vida - 110) / 40;            // as chamas em cruz, que encolhem
+        const braco = Math.round(10 * (1 - k * 0.6));
+        const cx = b.x + 3, cy = CHAO - 4;
+        ctx.fillStyle = k < 0.5 ? '#ffe066' : '#ff7a29';
+        ctx.fillRect(cx - braco, cy - 1, braco * 2 + 1, 3);
+        ctx.fillRect(cx - 1, cy - braco, 3, braco + 3);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(cx - braco + 2, cy, braco * 2 - 3, 1);
+        ctx.fillRect(cx, cy - braco + 2, 1, braco);
+      }
+    }
+    S.colar(ctx, BOMBERMAN[Math.floor(t / 6) % 2], this.x, CHAO - 11, this.dir);
+    const fora = this.dir === 1 ? this.x > W + 2 : this.x < -10;
+    return !(fora && (!this.bomba || this.bomba.vida >= 150));
+  }
+
+  // Bonk's Adventure (PC Engine 1989, o PC Genjin): o homem das cavernas de
+  // cabeca enorme vem pulando e da a cabecada em giro.
+  const PALETA_BONK = { S: '#f2b880', s: '#d8905a', E: '#101010', M: '#a83a2a', Y: '#ffb02e', K: '#7a4a20' };
+  const BONK = S.quadros([
+    ['..SSSSS...', '.SSSSSSS..', 'SSSSSSSSS.', 'SSSESSESS.', 'SSSSSSSSS.', '.SSMMSSs..', '..sSSSs...',
+     '...YKY....', '..SYYYS...', '...S.S....', '..SS.SS...'],
+    ['..SSSSS...', '.SSSSSSS..', 'SSSSSSSSS.', 'SSSESSESS.', 'SSSSSSSSS.', '.SSMMSSs..', '..sSSSs...',
+     '...YKY....', '..SYYYS...', '..S...S...', '.SS...SS..']
+  ], PALETA_BONK);
+
+  function iniciarBonk() {
+    const dir = aleatorio() < 0.5 ? 1 : -1;
+    return { dir: dir, x: dir === 1 ? -10 : W + 2, altura: 0, vy: 0, desenhar: desenharBonk };
+  }
+
+  function desenharBonk(passo) {
+    this.x += this.dir * 0.5 * passo;
+    // Pula o tempo todo (pulinhos baixos e, de vez em quando, um alto).
+    if (this.altura <= 0) { this.altura = 0; this.vy = Math.floor(t / 90) % 3 === 2 ? 1.6 : 0.9; }
+    this.altura += this.vy * passo;
+    this.vy -= 0.12 * passo;
+    if (this.altura < 0) this.altura = 0;
+    const quadro = BONK[this.altura > 0.5 ? 1 : 0];
+    S.colar(ctx, quadro, this.x, CHAO - quadro.h - this.altura, this.dir);
+    return this.dir === 1 ? this.x < W + 2 : this.x > -10;
+  }
+
+  // Ao longe, no pe do morro (pedido do Rafael, 15/10/2026: "poderia aparecer
+  // mais no pe do morro, um pouco menor, como se estivesse mais distante"):
+  // os desenhos sao pequenos (5 a 6 pontos) e pisam no comeco da grama.
+  const LONGE = HORIZONTE + 1;
+  const MINI_TURMA = [
+    S.quadros([['.RR.', 'RRRR', '.SS.', 'OOOO', '.OO.', 'H..H'], ['.RR.', 'RRRR', '.SS.', 'OOOO', '.OO.', '.HH.']],
+              { R: '#d82800', S: '#ffb070', O: '#2038ec', H: '#8a4b00' }),                         // Mario
+    S.quadros([['.GG.', 'GGGG', '.SS.', 'OOOO', '.OO.', 'H..H'], ['.GG.', 'GGGG', '.SS.', 'OOOO', '.OO.', '.HH.']],
+              { G: '#2fbf4a', S: '#ffb070', O: '#2038ec', H: '#8a4b00' }),                         // Luigi
+    S.quadros([['.YY.', 'HHHH', 'HSS.', 'PPPP', 'PPPP', '.PP.'], ['.YY.', 'HHHH', 'HSS.', 'PPPP', 'PPPP', 'PPPP']],
+              { Y: '#ffc21a', H: '#ffe27a', S: '#ffd2aa', P: '#ff8ccf' }),                         // Peach
+    S.quadros([['RWWR', 'WRRW', '.SS.', 'UUUU', '.SS.', 'S..S'], ['RWWR', 'WRRW', '.SS.', 'UUUU', '.SS.', '.SS.']],
+              { R: '#e8202a', W: '#ffffff', S: '#ffd2aa', U: '#2f5bff' })                           // Toad
+  ];
+  const MINI_SONIC = S.quadros([['BBB..', '.BBBW', 'BBBSS', '.BBS.', 'RR.RR'], ['BBB..', '.BBBW', 'BBBSS', '.BBS.', '.RRR.']],
+                               { B: '#2251ff', W: '#ffffff', S: '#ffcc99', R: '#e8202a' });
+  const MINI_TAILS = S.quadros([['O.OO.', 'OOOOW', 'TOOWW', 'TTOW.', '.R.R.'], ['T.OO.', 'TOOOW', '.OOWW', 'TTOW.', '..RR.']],
+                               { O: '#f0a020', W: '#ffffff', T: '#fff2d8', R: '#e8202a' });
+
+  function iniciarTurmaLonge() {
+    const dir = aleatorio() < 0.5 ? 1 : -1;
+    return { dir: dir, x: dir === 1 ? -6 : W + 2, desenhar: desenharTurmaLonge };
+  }
+
+  function desenharTurmaLonge(passo) {
+    this.x += this.dir * 0.18 * passo;
+    for (let i = 0; i < MINI_TURMA.length; i++) {
+      const x = this.x - this.dir * i * 7;
+      const pulinho = Math.floor(t / 8 + i) % 2;
+      S.colar(ctx, MINI_TURMA[i][pulinho], x, LONGE - 6, this.dir);
+    }
+    const ultimo = this.x - this.dir * (MINI_TURMA.length - 1) * 7;
+    return this.dir === 1 ? ultimo < W + 2 : ultimo > -6;
+  }
+
+  function iniciarSonicTailsLonge() {
+    const dir = aleatorio() < 0.5 ? 1 : -1;
+    return { dir: dir, x: dir === 1 ? -6 : W + 2, desenhar: desenharSonicTailsLonge };
+  }
+
+  function desenharSonicTailsLonge(passo) {
+    this.x += this.dir * 0.7 * passo;
+    const quadro = Math.floor(t / 3) % 2;
+    S.colar(ctx, MINI_SONIC[quadro], this.x, LONGE - 5, this.dir);
+    S.colar(ctx, MINI_TAILS[quadro], this.x - this.dir * 8, LONGE - 5, this.dir);
+    const tails = this.x - this.dir * 8;
+    return this.dir === 1 ? tails < W + 2 : tails > -6;
+  }
+
   const VISITAS = { mario: iniciarMario, sonic: iniciarSonic, duckhunt: iniciarDuckHunt, kirby: iniciarKirby,
-                    yoshi: iniciarYoshi, link: iniciarLink, wiggler: iniciarWiggler, monty: iniciarMonty, lakitu: iniciarLakitu, donkey: iniciarDonkey, tails: iniciarTails, knuckles: iniciarKnuckles, chocobo: iniciarChocobo, rabites: iniciarRabites, saturno: iniciarSaturno };
+                    yoshi: iniciarYoshi, link: iniciarLink, wiggler: iniciarWiggler, monty: iniciarMonty, lakitu: iniciarLakitu, donkey: iniciarDonkey, tails: iniciarTails, knuckles: iniciarKnuckles, chocobo: iniciarChocobo, rabites: iniciarRabites, saturno: iniciarSaturno,
+                    ryu: iniciarRyu, megamanx: iniciarMegaManX, bomberman: iniciarBomberman, bonk: iniciarBonk,
+                    turmalonge: iniciarTurmaLonge, sonictailslonge: iniciarSonicTailsLonge };
   let filaDeVisitas = ['mario'];
   let visita = null;
   let esperaVisita = 420;       // ~7 s depois de abrir
