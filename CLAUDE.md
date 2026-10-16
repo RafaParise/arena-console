@@ -93,7 +93,9 @@ professor da rede estadual de SP.
 - Trabalho demorado nunca roda na thread do pedido: vai para uma thread
   `daemon`.
   - Ao abrir o ARENA: `rodar_vigia`, `anunciar_e_escutar` (UDP 55436, a
-    cada 5 s), `conferir_vulkan`, `conferir_fliperamas` e `organizar_bios`.
+    cada 5 s; só escuta com a rede liberada ou com o Jogar Junto
+    procurando partida), `conferir_vulkan`, `conferir_fliperamas` e
+    `organizar_bios`.
   - Sob pedido: capas, `arrumar` (descompactar) e o teste dos amigos, em
     paralelo.
   - A janela preta recebe os recados por fila, numa thread só dela

@@ -55,10 +55,6 @@ Depois do Release, nesta ordem:
 
 Achados de 15/10 que esperam conserto:
 
-- O servidor escuta a descoberta de colegas (UDP 55436) em todas as redes,
-  mesmo com a rede fechada. Por isso o Firewall do Windows pergunta na
-  primeira vez que um Python novo roda. Avaliar escutar só com a rede
-  aberta.
 - Ideia do aluno ainda não usada: o código de amigo curto
   (`ARENA-XXXX-XXXX`), no lugar do identificador inteiro do aparelho.
 

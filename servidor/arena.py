@@ -3472,6 +3472,33 @@ TRAVA_VIZINHOS = threading.Lock()
 
 _FALANTES = {}   # endereco local -> socket UDP preso a ele
 
+# A escuta da descoberta (a porta UDP 55436, em todas as redes) so fica
+# aberta com a rede liberada ("Aceitar conexoes da rede") ou enquanto a
+# janela do Jogar Junto procura partida (/api/partida/procurar?rede=1), e
+# fecha 2 minutos depois da ultima procura. Achado de 15/10/2026: escutando
+# desde a abertura, o ARENA fazia o Firewall do Windows perguntar pelo Python
+# logo na primeira vez, mesmo com a rede fechada ("so este computador").
+TEMPO_DA_PROCURA = 120.0
+PROCURA_DE_PARTIDA = {"ate": 0.0}     # time.monotonic() ate quando escutar
+ESCUTA_MUDOU = threading.Event()      # acorda a descoberta: a rede abriu ou fechou, ou alguem procura
+
+
+def procurando_partida():
+    """A janela do Jogar Junto procura partida: a escuta abre (se estava
+    fechada) e fica aberta por mais TEMPO_DA_PROCURA segundos."""
+    with TRAVA_VIZINHOS:
+        PROCURA_DE_PARTIDA["ate"] = time.monotonic() + TEMPO_DA_PROCURA
+    ESCUTA_MUDOU.set()
+
+
+def quer_escutar(config, agora=None):
+    """A descoberta deve escutar a rede agora? Com a rede liberada, sempre;
+    com ela fechada, so enquanto alguem procura partida."""
+    agora = time.monotonic() if agora is None else agora
+    with TRAVA_VIZINHOS:
+        procurando = agora < PROCURA_DE_PARTIDA["ate"]
+    return bool(config.get("permitir_rede")) or procurando
+
 
 def broadcast_da_rede(ip):
     """Endereco de "todos desta rede" para um IP, sem saber a mascara.
@@ -3627,10 +3654,11 @@ def receber_grito(pacote, remetente, meus=None, agora=None):
     return True
 
 
-def anunciar_e_escutar():
-    """Fica gritando e ouvindo na rede local, em segundo plano."""
+def abrir_ouvinte():
+    """O socket que escuta a descoberta (UDP, todas as redes). OSError se a
+    porta nao abrir."""
+    ouvinte = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
-        ouvinte = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         ouvinte.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         # Sem isto, dois ARENAs no mesmo computador disputam a porta e so
         # um recebe. Nao existe no Windows, e la nao faz falta.
@@ -3641,12 +3669,34 @@ def anunciar_e_escutar():
                 pass
         ouvinte.settimeout(1.0)
         ouvinte.bind(("", PORTA_DESCOBERTA))
-    except OSError as falha:
-        print("[ARENA] Nao consegui escutar a rede local (%s). Os colegas "
-              "ainda podem ser adicionados pelo endereço." % falha)
-        return
+    except OSError:
+        ouvinte.close()
+        raise
+    return ouvinte
 
+
+def fechar_a_escuta(ouvinte):
+    """A rede fechou (e ninguem procura partida): solta a porta, os sockets
+    do grito e a lista de colegas vistos, que sem escuta so envelheceria."""
+    for socket_velho in [ouvinte] + list(_FALANTES.values()):
+        try:
+            socket_velho.close()
+        except OSError:
+            pass
+    _FALANTES.clear()
+    with TRAVA_VIZINHOS:
+        VIZINHOS.clear()
+
+
+def anunciar_e_escutar():
+    """Fica gritando e ouvindo na rede local, em segundo plano, quando
+    quer_escutar diz que sim (a rede liberada, ou alguem procurando partida).
+    Com a rede fechada, a porta fica fechada: nada escuta a rede."""
+    ouvinte = None
     ultimo_grito = 0.0
+    conferido_em = -1.0       # -1: confere a configuracao ja na primeira volta
+    tentar_de_novo_em = 0.0   # a porta nao abriu: espera um pouco para tentar outra vez
+    avisou = False            # o aviso de porta fechada sai uma vez so
 
     while not VIGIA["encerrar"].is_set():
         if VIGIA["suspenso"]:
@@ -3654,11 +3704,41 @@ def anunciar_e_escutar():
             continue
 
         agora = time.monotonic()
+        # A configuracao uma vez por segundo, no maximo: numa sala cheia
+        # chegam varios gritos por segundo.
+        if agora - conferido_em >= 1.0:
+            conferido_em = agora
+            config = carregar_config()
+            escutar = quer_escutar(config, agora)
+
+        # ---- abrir ou fechar a escuta ----
+        if not escutar:
+            if ouvinte is not None:
+                fechar_a_escuta(ouvinte)
+                ouvinte = None
+            # Dorme ate a rede abrir ou alguem procurar partida (ou 5 s).
+            ESCUTA_MUDOU.wait(5.0)
+            ESCUTA_MUDOU.clear()
+            conferido_em = -1.0
+            continue
+        if ouvinte is None:
+            if agora < tentar_de_novo_em:
+                time.sleep(1.0)
+                continue
+            try:
+                ouvinte = abrir_ouvinte()
+                avisou = False
+            except OSError as falha:
+                tentar_de_novo_em = agora + 30.0
+                if not avisou:
+                    avisou = True
+                    print("[ARENA] Nao consegui escutar a rede local (%s). Os colegas "
+                          "ainda podem ser adicionados pelo endereço." % falha)
+                continue
 
         # ---- gritar ----
         if agora - ultimo_grito > 5.0:
             ultimo_grito = agora
-            config = carregar_config()
             if config.get("permitir_rede"):
                 partida = partida_aberta_agora()
                 recado = json.dumps({
@@ -3675,7 +3755,17 @@ def anunciar_e_escutar():
         # ---- escutar ----
         try:
             pacote, remetente = ouvinte.recvfrom(2048)
-        except (socket.timeout, OSError):
+        except socket.timeout:
+            continue
+        except OSError:
+            # A porta deu defeito (raro): solta e tenta abrir de novo daqui a
+            # pouco. Sem isto, o erro repetido girava o laco sem parar.
+            try:
+                ouvinte.close()
+            except OSError:
+                pass
+            ouvinte = None
+            tentar_de_novo_em = agora + 5.0
             continue
 
         # Vem da rede: nada do que chega pode derrubar quem escuta.
@@ -4968,6 +5058,9 @@ class Manipulador(BaseHTTPRequestHandler):
             # abertura do ARENA, no Celeron (revisao da Fase 4).
             if "rede=1" in urllib.parse.urlparse(self.path).query:
                 preparar_categoria_da_rede()
+                # E abre a escuta da descoberta, mesmo com a rede fechada: o
+                # convidado acha a partida do colega sem liberar a rede dele.
+                procurando_partida()
             config = carregar_config()
             lista, corrigidos = procurar_partidas(config)
             if corrigidos:
@@ -6150,6 +6243,8 @@ class Manipulador(BaseHTTPRequestHandler):
             # A chave da rede vale NA HORA (antes precisava fechar e abrir o
             # ARENA): o servidor reabre sozinho, logo depois desta resposta.
             rede_aplicada = trocar_escuta_de_rede() if rede_mudou else False
+            if rede_mudou:
+                ESCUTA_MUDOU.set()      # a descoberta abre (ou fecha) a escuta na hora
             return self.responder_json({
                 "ok": True, "config": config,
                 "efetivas": opcoes_efetivas(config),

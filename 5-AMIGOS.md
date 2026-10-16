@@ -541,7 +541,7 @@ porta leva até o programa certo lá dentro. Os dois pedidos são estes:
 
 | Programa | Porta | Quando o Windows pergunta |
 |---|---|---|
-| **Python** | 8777 | Ao ligar *Aceitar conexões* pela primeira vez |
+| **Python** | 8777 e 55436 (a descoberta de colegas) | Ao ligar *Aceitar conexões* pela primeira vez, ou ao procurar a partida de um colega no **Jogar Junto** |
 | **retroarch.exe** | 55435 | Ao **abrir uma partida** pela primeira vez |
 
 Se você clicou em "Cancelar" na segunda, a partida nunca conecta — mesmo com

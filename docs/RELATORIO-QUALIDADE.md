@@ -56,7 +56,7 @@ os temporizadores e as linhas de execução).
 | Temporizadores da tela, parada | 2 `setInterval` (3 s, um em cada fundo animado), 0 `setTimeout` por minuto, 59,9 quadros de animação por segundo | |
 | Alças do Windows — servidor | 181 | |
 | Gravações em disco por hora, parado com a tela | ver "Gravações em disco", abaixo | |
-| Portas | **TCP 127.0.0.1:8777** (só este computador; vira 0.0.0.0 com "Aceitar conexões da rede"); **UDP 0.0.0.0:55436, a rede toda, sempre** | a 55435 (partida a dois) é do RetroArch e só existe durante a partida |
+| Portas | **TCP 127.0.0.1:8777** (só este computador; vira 0.0.0.0 com "Aceitar conexões da rede"); **UDP 0.0.0.0:55436, a rede toda, só com "Aceitar conexões da rede" ou com a janela do Jogar Junto procurando partida** (até 15/10/2026, sempre) | a 55435 (partida a dois) é do RetroArch e só existe durante a partida |
 
 ### Inventário
 
@@ -118,7 +118,7 @@ registros do RetroArch e os remapeamentos da partida.
 | Serviço | Quando roda | Para quê |
 |---|---|---|
 | Vigia (`rodar_vigia`) | sempre, a cada 20 s (60 s no modo econômico); para durante o jogo no ultra | testa quais amigos salvos estão no ar (uma linha por amigo, `testar`) e corrige o endereço que mudou; testa se há internet (conexão a 1.1.1.1:53 e 8.8.8.8:53); renova a lista de endereços deste computador; manda os recordes da fila; e faz a cópia de segurança "quando a internet volta" |
-| Descoberta de colegas (`anunciar_e_escutar`) | sempre, acordando a cada 1 s | escuta a porta UDP 55436 (a rede toda); grita "estou aqui" a cada 5 s só com "Aceitar conexões da rede" ligado |
+| Descoberta de colegas (`anunciar_e_escutar`) | com a rede fechada, dorme (acorda a cada 5 s, ou na hora em que a rede abre); escutando, acorda a cada 1 s | escuta a porta UDP 55436 (a rede toda) só com "Aceitar conexões da rede" ligado ou enquanto a janela do Jogar Junto procura partida (e mais 2 minutos); grita "estou aqui" a cada 5 s só com a rede ligada |
 | Conferir Vulkan (`conferir_vulkan`) | uma vez, logo depois de abrir | pergunta, num processo à parte, se a placa tem Vulkan de verdade |
 | Conferir fliperamas (`conferir_fliperamas`) | uma vez por zip de fliperama, devagar | acha zip danificado (o caso do `mslugx.zip`) |
 | Organizar a pasta BIOS (`organizar_bios`) | uma vez, 3 s depois de abrir | prateleiras, LEIA e BIOS no lugar onde o emulador procura |

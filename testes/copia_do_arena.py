@@ -5,8 +5,9 @@ pelo caminho inteiro: o servidor de verdade, a rota /api/jogar, o RetroArch.
 A pasta da copia tem "Pedagógicos" no nome (o ARENA do Rafael mora numa
 assim). Nada do ARENA de verdade e' tocado: nem os dados, nem os saves. O
 servidor da copia roda com o Python do ARENA de verdade: um python.exe novo,
-numa pasta nova, faria o Firewall do Windows perguntar (o servidor escuta a
-descoberta de colegas, UDP 55436). E escuta noutra porta (PORTA, pela
+numa pasta nova, faria o Firewall do Windows perguntar quando a copia
+escutasse a rede (a descoberta de colegas, UDP 55436, que abre com a rede
+liberada ou com o Jogar Junto procurando partida). E escuta noutra porta (PORTA, pela
 ARENA_PORTA do servidor): o ARENA de verdade pode estar aberto ao lado, na
 8777, e nenhum pedido do teste chega a ele.
 

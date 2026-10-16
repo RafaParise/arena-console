@@ -7,8 +7,11 @@ json.loads, "dados.get(...)" e "int(dados.get('porta'))" ficavam FORA do
 try. Um unico pacote de qualquer computador da rede na porta UDP 55436 --
 um JSON que nao e' objeto, ou "porta": "abc" -- levantava erro e encerrava a
 linha de execucao que escuta: a descoberta de colegas acabava ate alguem
-fechar e abrir o ARENA. E a porta escuta a rede toda mesmo com "Aceitar
-conexoes da rede" desligado. A lista de vizinhos tambem nao tinha limite.
+fechar e abrir o ARENA. A lista de vizinhos tambem nao tinha limite.
+
+Desde 16/10/2026, a porta so escuta com "Aceitar conexoes da rede" ligado ou
+enquanto a janela do Jogar Junto procura partida: o teste pede a procura
+(/api/partida/procurar?rede=1, a rota de verdade) e espera a porta abrir.
 
 Num ARENA isolado (copia no temporario, servidor de verdade):
   1. um grito valido aparece em /api/colegas;
@@ -102,7 +105,11 @@ def main():
         processo = servidor_de_teste.subir(copia, porta, True, os.path.join(pasta, "sem-trava"))
         try:
             confere("o servidor abre", servidor_de_teste.esperar_servidor(porta))
-            time.sleep(1.5)                      # a linha que escuta liga logo depois
+            servidor_de_teste.pedir(porta, "GET", "/api/partida/procurar?rede=1")
+            fim = time.time() + 10
+            while porta_udp_livre() and time.time() < fim:
+                time.sleep(0.25)
+            confere("a procura de partida abre a porta da descoberta", not porta_udp_livre())
 
             print("1. Um grito valido aparece")
             gritar(marca, {"id": "colega-antes", "apelido": "Antes", "porta": 9001})
