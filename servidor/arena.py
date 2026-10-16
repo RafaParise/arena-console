@@ -2201,6 +2201,8 @@ def buscar_capas_que_faltam():
     """Tenta a capa de cada jogo que nao tem (roda em segundo plano)."""
     try:
         jogos = [j for j in manifesto().get("jogos", []) if not j.get("capas")]
+        # Conferida na hora: logo ao abrir o ARENA, a vigia ainda nao sabe.
+        com_internet = ha_internet_agora()
         with TRAVA_CAPAS:
             BUSCA_DE_CAPAS.update(total=len(jogos), feitos=0, achados=0)
         for jogo in jogos:
@@ -2214,7 +2216,7 @@ def buscar_capas_que_faltam():
                 achou, _motivo = capas_online.buscar_e_baixar(
                     jogo["plataforma"], jogo["titulo"], nome_base,
                     caminho_jogo=os.path.join(RAIZ, jogo["arquivo"]),
-                    com_internet=bool(VIGIA["internet"]))
+                    com_internet=com_internet)
             except Exception:     # um jogo estranho nao para a busca dos outros
                 achou = False
             with TRAVA_CAPAS:
@@ -4852,7 +4854,7 @@ class Manipulador(BaseHTTPRequestHandler):
             if len(consulta) < 2:
                 return self.responder_json({"itens": [],
                                             "consoles": internet_archive.consoles_da_biblioteca()})
-            if not VIGIA["internet"]:
+            if not ha_internet_agora():
                 return self.erro("Sem internet agora. Ligue o computador na internet para buscar; "
                                  "os jogos da pasta e o acervo local continuam "
                                  "funcionando.", 503)
@@ -5787,7 +5789,8 @@ class Manipulador(BaseHTTPRequestHandler):
             jogo = achar_jogo(str(dados.get("jogo_id", "")))
             if not jogo:
                 return self.erro("Jogo não está no catálogo. Clique em Atualizar lista.", 404)
-            if not VIGIA["internet"]:
+            com_internet = ha_internet_agora()
+            if not com_internet:
                 if jogo.get("plataforma") not in ("ps3", "psp"):
                     return self.erro("Sem internet agora. Ligue o computador na internet e clique em Buscar capa de novo.", 503)
 
@@ -5798,7 +5801,7 @@ class Manipulador(BaseHTTPRequestHandler):
             ok, motivo = capas_online.buscar_e_baixar(
                 jogo["plataforma"], jogo["titulo"], nome_base,
                 caminho_jogo=os.path.join(RAIZ, jogo["arquivo"]),
-                com_internet=bool(VIGIA["internet"]))
+                com_internet=com_internet)
             if not ok:
                 return self.erro(motivo or "Não consegui achar a capa.", 404)
 
@@ -6732,6 +6735,16 @@ def internet_disponivel():
         except OSError:
             continue
     return False
+
+
+def ha_internet_agora():
+    """Ha internet para o pedido que precisa dela agora? A vigia confere a
+    cada INTERVALO_VIGIA, mas a primeira conferencia so vem depois do
+    primeiro intervalo (20 s; 60 s no modo economico): logo ao abrir o
+    ARENA, a busca da biblioteca e o download diziam "sem internet" COM
+    internet (achado de 16/10/2026, no teste da biblioteca livre). Quando a
+    vigia ainda nao viu internet, confere na hora (sem internet, uns 3 s)."""
+    return bool(VIGIA["internet"]) or internet_disponivel()
 
 
 _LOCALAPPDATA = os.environ.get("LOCALAPPDATA", "")
