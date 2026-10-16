@@ -172,3 +172,9 @@ pasta dos pacotes" ajudaria quem nunca usou computador.
   nasce em branco e não sincroniza.
 - A partida pela internet (repasse) entre operadoras diferentes ainda não
   foi validada.
+- A descoberta de colegas não tem senha (revisão de segurança de 16/10/2026):
+  quem está na rede vê o código de todos e pode anunciar o de outro (o
+  inteiro, com o colega desligado, ou um que começa igual, e aí o código
+  curto fica com dois donos). O ARENA não escolhe no chute quando há dois, e
+  quem está no ar não perde o lugar; o endereço digitado na mão continua
+  sendo o jeito seguro de adicionar um amigo.

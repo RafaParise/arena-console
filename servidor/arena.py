@@ -5420,8 +5420,13 @@ class Manipulador(BaseHTTPRequestHandler):
             # ou o inteiro, de antes.
             achados = [v for v in colegas_na_rede() if mesmo_codigo(codigo, v["id"])]
             if len(achados) > 1:
-                # Dois aparelhos com o mesmo codigo curto: quase impossivel
-                # (1 chance em um trilhao), mas o ARENA nao escolhe no chute.
+                # Dois aparelhos com o mesmo codigo curto. Por acaso, 1 chance
+                # em um trilhao; de proposito, facil: a descoberta nao tem
+                # senha, e quem esta na rede ve o codigo de todos e pode
+                # anunciar um inventado que comeca igual (revisao de
+                # seguranca de 16/10/2026). O ARENA nao escolhe no chute:
+                # escolher errado poria o impostor na lista de amigos, e a
+                # sincronizacao mandaria a ele os recordes do aluno.
                 return self.erro("Mais de um colega na rede com esse código. Peça o endereço dele e "
                                  "use \"Ou digite o endereço na mão\", logo abaixo.", 409)
             vizinho = achados[0] if achados else None

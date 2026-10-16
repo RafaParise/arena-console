@@ -198,6 +198,11 @@ mesma rede, com **Aceitar conexões da rede** ligado.
 Quem abriu uma partida aparece sozinho em **Atividade na rede**, mais
 abaixo, com o botão **Adicionar**: aí nem precisa do código.
 
+Apareceu "Mais de um colega na rede com esse código"? Alguém na rede está
+anunciando um código igual (a descoberta não tem senha, e um colega pode
+inventar um). O ARENA não escolhe no chute: peça o endereço ao seu amigo e
+use **Ou digite o endereço na mão**, logo abaixo.
+
 **Não precisa digitar endereço nenhum** — e some de vez o erro de copiar o
 endereço do adaptador virtual.
 
