@@ -483,6 +483,9 @@
              '..r.......r...'],
             { F: '#24803a', b: '#3cbf55', B: '#24803a', k: '#ffffff', c: '#ffe066', E: '#ff7a29',
               N: '#ffd23f', r: 'rgba(255,90,60,0.7)' }),
+    // Rosa de verdade (pedido do Rafael, 15/10/2026: "a nave rosa esta
+    // vermelha"). Era #ff4fa0 com as aletas em framboesa escuro: pequena na
+    // tela, e com as 256 cores do GIF, lia-se vermelho.
     S.fazer(['.FF.FF.........',         // Fire Stingray (Samurai Goroh)
              'FFFFFFF..cc....',
              'EbbbbbbbbccbBB.',
@@ -490,24 +493,77 @@
              'EbbbbbbbbbbbB..',
              '.bbbbbbbbB.....',
              '..r.....r......'],
-            { F: '#b02a6e', b: '#ff4fa0', B: '#b02a6e', k: '#ffffff', c: '#ffe066', E: '#ff7a29',
+            { F: '#e05cb4', b: '#ff8fd2', B: '#e05cb4', k: '#ffffff', c: '#ffe066', E: '#ff7a29',
               N: '#ffd23f', r: 'rgba(255,90,60,0.7)' })
   ];
   const PISTA = 71;            // altura da pista de luz (abaixo dos Metroides e do planeta, que vai ate a linha 61)
 
+  // As naves sem piloto da corrida (pedido do Rafael, 15/10/2026): a roxa, a
+  // verde e a que fica piscando -- essa explode quando uma das quatro encosta
+  // nela, como no F-Zero. Menores e mais lentas: as quatro passam por elas.
+  const DRONE = ['..cc........',
+                 '.FbbccbbbB..',
+                 'EbbbbbbbbbbN',
+                 'EkkkkkkkkkN.',
+                 '..r.....r...'];
+  function drone(corpo, escuro, faixa) {
+    return S.fazer(DRONE, { F: escuro, b: corpo, B: escuro, k: faixa, c: '#9cf0ff', E: '#ff7a29', N: '#ffd23f',
+                            r: 'rgba(255,90,60,0.7)' });
+  }
+  const DRONES = [[drone('#a970ff', '#6438c4', '#ecdcff')],                                   // a roxa
+                  [drone('#fff07a', '#d9a400', '#ffffff'), drone('#ff5a4a', '#b02018', '#ffd8d0')],  // a que pisca
+                  [drone('#8ee052', '#3f9a2a', '#f2ffd8')]];                                   // a verde
+  const BOOM = 48;             // quanto dura a explosao (1/60 s)
+
   function iniciarFzero() {
     const dir = aleatorio() < 0.5 ? 1 : -1;
+    // As quatro saem bem de tras (96 pontos): as naves sem piloto entram
+    // primeiro, e a Blue Falcon alcanca a que pisca entre o ponto 60 e o 110
+    // da tela (de 0,34 a 0,39 contra 0,21 por quadro: o encontro e' a
+    // distancia de saida dividida pela diferenca).
     const pilotos = MAQUINAS.map(function (sprite, i) {
-      return { sprite: sprite, x: dir === 1 ? -16 - i * 20 : W + 2 + i * 20, faixa: i % 2,
-               vel: 0.33 + aleatorio() * 0.05, fase: aleatorio() * 6, rastro: [] };
+      return { sprite: sprite, x: dir === 1 ? -96 - i * 18 : W + 82 + i * 18, faixa: i % 2,
+               vel: 0.34 + aleatorio() * 0.05, fase: aleatorio() * 6, rastro: [] };
     });
-    return { dir: dir, pilotos: pilotos, pista: 0, desenhar: desenharFzero };
+    // A que pisca sai na frente, na faixa da Blue Falcon (a 0): alguem sempre
+    // encosta nela. A roxa e a verde vao na outra faixa.
+    const ordem = [1, 0, 2];
+    const drones = ordem.map(function (qual, i) {
+      return { sprites: DRONES[qual], explode: DRONES[qual].length > 1, x: dir === 1 ? -14 - i * 16 : W + 2 + i * 16,
+               faixa: qual === 1 ? 0 : 1, vel: 0.2 + aleatorio() * 0.025, fase: aleatorio() * 6, boom: -1 };
+    });
+    return { dir: dir, pilotos: pilotos, drones: drones, pista: 0, desenhar: desenharFzero };
+  }
+
+  // A explosao da nave que pisca: um clarao e faiscas que se abrem e esfriam
+  // (branco, amarelo, laranja), como as do F-Zero.
+  function desenharExplosao(cx, cy, k, semente) {
+    if (k < 0.5) {
+      ctx.fillStyle = rgba('255,244,190', 1 - k / 0.5);
+      ctx.fillRect(cx - 4, cy - 2, 9, 5);
+      ctx.fillRect(cx - 2, cy - 4, 5, 9);
+      ctx.fillStyle = rgba('255,255,255', 1 - k / 0.5);
+      ctx.fillRect(cx - 1, cy - 1, 3, 3);
+    }
+    // Duas voltas de faiscas: a de fora corre mais.
+    for (const volta of [1, 0.6]) {
+      const raio = (2 + k * 12) * volta;
+      const cor = k * volta < 0.25 ? '#ffffff' : (k * volta < 0.55 ? '#ffe066' : '#ff7a29');
+      for (let a = 0; a < 14; a++) {
+        const ang = a * Math.PI / 7 + semente + volta;
+        const r = raio * (0.7 + 0.3 * ((a * 7 + 3) % 5) / 4);
+        ctx.fillStyle = cor;
+        ctx.fillRect(Math.round(cx + Math.cos(ang) * r), Math.round(cy + Math.sin(ang) * r * 0.55), 1, 1);
+      }
+    }
   }
 
   function desenharFzero(passo) {
     const ev = this;
-    const naTela = ev.pilotos.some(function (p) { return p.x > -20 && p.x < W + 20; });
-    const chegaram = ev.pilotos.every(function (p) { return ev.dir === 1 ? p.x > W + 2 : p.x < -18; });
+    const naTela = ev.pilotos.some(function (p) { return p.x > -20 && p.x < W + 20; }) ||
+                   ev.drones.some(function (d) { return d.boom < BOOM && d.x > -14 && d.x < W + 14; });
+    const chegaram = ev.pilotos.every(function (p) { return ev.dir === 1 ? p.x > W + 2 : p.x < -18; }) &&
+                     ev.drones.every(function (d) { return d.boom >= BOOM || (ev.dir === 1 ? d.x > W + 2 : d.x < -14); });
     ev.pista = Math.max(0, Math.min(1, ev.pista + (chegaram ? -0.03 : 0.03) * passo));
     // A pista: duas grades de energia, piscando em tracinhos que correm.
     if (ev.pista > 0) {
@@ -519,6 +575,27 @@
       }
       ctx.fillStyle = rgba('120,140,255', ev.pista * 0.08);
       ctx.fillRect(0, PISTA - 8, W, 11);
+    }
+    // As naves sem piloto, por baixo das quatro (que passam por cima delas).
+    for (const d of ev.drones) {
+      if (d.boom >= BOOM) continue;
+      const y = PISTA - 5 + d.faixa * 3 + Math.round(Math.sin(t * 0.1 + d.fase) * 0.6);
+      if (d.boom >= 0) {
+        d.boom += passo;
+        desenharExplosao(Math.round(d.x + 6), y + 2, Math.min(1, d.boom / BOOM), d.fase);
+        continue;
+      }
+      d.x += ev.dir * d.vel * passo;
+      // A que pisca explode quando uma das quatro, na mesma faixa, encosta.
+      if (d.explode && ev.pilotos.some(function (p) {
+        return p.faixa === d.faixa && Math.abs(p.x + p.sprite.w / 2 - (d.x + 6)) < 9;
+      })) {
+        d.boom = 0;
+        continue;
+      }
+      ctx.fillStyle = Math.floor(t / 2 + d.fase) % 2 === 0 ? '#ffe066' : '#ff7a29';
+      ctx.fillRect(Math.round(ev.dir === 1 ? d.x - 1 : d.x + 12), y + 2, 1, 2);
+      S.colar(ctx, d.sprites[Math.floor(t / 5) % d.sprites.length], d.x, y, ev.dir);
     }
     for (const p of ev.pilotos) {
       // Cada maquina acelera e alivia um pouco: elas trocam de posicao.
@@ -1288,51 +1365,65 @@
      '.rr.................']
   ], { p: '#ff9a8a', q: '#d8606a', W: '#ffffff', K: '#16161f', g: '#9fb2d6', R: '#e8302a', r: '#9a1c22', y: '#ffd23f' });
 
-  const KART_MARIO = S.quadros([
-    ['....CCCC....',
-     '...CCCCCC...',
-     '....SSES....',
-     '....SKKS....',
-     '...OOOOGG...',
-     '.BBBBBBBBBB.',
-     'BBBBBBBBBBBB',
-     '.KKK....KKK.',
-     '.KGK....KGK.',
-     '..K......K..'],
-    ['............',
-     '....CCCC....',
-     '...CCCCCC...',
-     '....SSES....',
-     '....SKKS....',
-     '...OOOOGG...',
-     '.BBBBBBBBBB.',
-     'BKKKBBBBKKKB',
-     '.KKG....KKG.',
-     '..K......K..']
-  ], { C: '#e8202a', S: '#ffb070', E: '#14141f', K: '#1a1a22', O: '#2f5bff', G: '#c9ced8', B: '#e8202a' });
-
-  const KART_LUIGI = S.quadros([
-    ['....CCCC....',
-     '...CCCCCC...',
-     '....SSES....',
-     '....SKKS....',
-     '...OOOOGG...',
-     '.BBBBBBBBBB.',
-     'BBBBBBBBBBBB',
-     '.KKK....KKK.',
-     '.KGK....KGK.',
-     '..K......K..'],
-    ['............',
-     '....CCCC....',
-     '...CCCCCC...',
-     '....SSES....',
-     '....SKKS....',
-     '...OOOOGG...',
-     '.BBBBBBBBBB.',
-     'BKKKBBBBKKKB',
-     '.KKG....KKG.',
-     '..K......K..']
-  ], { C: '#2fbf4a', S: '#ffb070', E: '#14141f', K: '#1a1a22', O: '#2f5bff', G: '#c9ced8', B: '#2fbf4a' });
+  // Os karts da Rainbow Road: os oito do Super Mario Kart (SNES 1992) e o
+  // Wario, do Mario Kart 64 (pedido do Rafael, 15/10/2026: "o Kong, o Wario, a
+  // Peach e outros"; o Donkey Kong e' o do 64, o do SNES era o Donkey Kong
+  // Jr.). Cada um e' a cabeca do piloto (5 linhas, olhando para a direita, o
+  // volante G na mesma coluna) em cima do mesmo carrinho; o segundo quadro
+  // sacode o piloto e gira as rodas.
+  function kart(cabeca, paleta) {
+    return S.quadros([
+      cabeca.concat(['.BBBBBBBBBB.', 'BBBBBBBBBBBB', '.KKK....KKK.', '.KGK....KGK.', '..K......K..']),
+      ['............'].concat(cabeca, ['.BBBBBBBBBB.', 'BKKKBBBBKKKB', '.KKG....KKG.', '..K......K..'])
+    ], Object.assign({ E: '#14141f', K: '#1a1a22', G: '#c9ced8', S: '#ffb070' }, paleta));
+  }
+  const BONE = ['....CCCC....', '...CCCCCC...', '....SSES....', '....SKKS....', '...OOOOGG...'];
+  const KARTS = [
+    kart(BONE, { C: '#e8202a', O: '#2f5bff', B: '#e8202a' }),                       // Mario
+    kart(BONE, { C: '#2fbf4a', O: '#2f5bff', B: '#2fbf4a' }),                       // Luigi
+    kart(['.....YY.....',                                                            // Peach
+          '....HHHHH...',
+          '...HHHSES...',
+          '...HHHSSS...',
+          '...HPPPPGG..'],
+         { Y: '#ffc21a', H: '#ffe27a', S: '#ffd2aa', E: '#2850d8', P: '#ff8ccf', B: '#ff6fbe' }),
+    kart(['...RWWRW....',                                                            // Toad
+          '..WWRRWWR...',
+          '....SSES....',
+          '....SSSS....',
+          '...UUUUGG...'],
+         { R: '#e8202a', W: '#ffffff', S: '#ffd2aa', U: '#2f5bff', B: '#3a9cff' }),
+    kart(['....GGWW....',                                                            // Yoshi
+          '...GGGWEG...',
+          '...GGGGGGGG.',
+          '....WWWGG...',
+          '...GGGGGGG..'],
+         { G: '#4cd640', W: '#ffffff', E: '#101010', B: '#9be86a' }),
+    kart(['..R.RR......',                                                            // Bowser
+          '..TTTTTW....',
+          '.TTTTSEW....',
+          '.TTTSSSS....',
+          '.LWLWLLGG...'],
+         { R: '#e83a1a', T: '#f0c040', S: '#ffe9a8', W: '#ffffff', L: '#2fa83a', B: '#f28a1a' }),
+    kart(['.....YY.....',                                                            // Koopa Troopa
+          '....YYEY....',
+          '....YYYYY...',
+          '..LLLLW.....',
+          '..LLLLLGG...'],
+         { Y: '#ffd23f', L: '#2fbf4a', W: '#ffffff', B: '#30b8d0' }),
+    kart(['...NNNN.....',                                                            // Donkey Kong
+          '..NNNNNN....',
+          '..NNTTEN....',
+          '..NTTTTT....',
+          '..NNRRGG....'],
+         { N: '#7a4a20', T: '#f2c48c', R: '#e8202a', B: '#b05a20' }),
+    kart(['....YYYY....',                                                            // Wario
+          '...YYYYYY...',
+          '....SSES....',
+          '....SSPPP...',
+          '...UKKKGG...'],
+         { Y: '#ffd23f', P: '#ff9aa0', U: '#7a3ac8', B: '#8a46d6' })          // roxo: o boné amarelo some num kart amarelo
+  ];
 
   const BALEIA = S.quadros([
     ['F...................',
@@ -1455,10 +1546,12 @@
 
   function iniciarKart() {
     const dir = aleatorio() < 0.5 ? 1 : -1;
-    const karts = [KART_MARIO, KART_LUIGI].map(function (sprite, i) {
-      return { sprite: sprite, x: dir === 1 ? -14 - i * 16 : W + 2 + i * 16, faixa: i,
-               vel: 0.5 + aleatorio() * 0.04, fase: aleatorio() * 6 };
+    // Os nove em fila, em tres faixas da pista (0, 2 e 4 pontos abaixo).
+    const karts = KARTS.map(function (sprite, i) {
+      return { sprite: sprite, x: dir === 1 ? -14 - i * 14 : W + 2 + i * 14, faixa: i % 3,
+               vel: 0.5 + aleatorio() * 0.05, fase: aleatorio() * 6 };
     });
+    karts.sort(function (a, b) { return a.faixa - b.faixa; });   // o de baixo passa na frente
     return { dir: dir, karts: karts, pista: 0, desenhar: desenharKart };
   }
 
@@ -1501,8 +1594,115 @@
     return this.x > -24;
   }
 
+  // Koopa Clown Car (Super Mario World, SNES 1990): o Bowser na xicara com
+  // cara de palhaco, de helice embaixo. Passa pelo alto do ceu, balancando,
+  // e pisca de vez em quando.
+  const PALETA_CLOWN = { R: '#e83a1a', W: '#ffffff', T: '#f2c24a', S: '#ffe9a8', E: '#101010',
+                         G: '#38b048', g: '#1f7a2e', w: '#d8dde8', K: '#16161f', M: '#e8202a', P: '#9aa4b8' };
+  const CLOWN_CAR = S.quadros([
+    ['......R.R.......',
+     '.....RRRRR......',
+     '....WTTTTTW.....',
+     '....TTETTET.....',
+     '....TSSSSST.....',
+     '..GGGGGGGGGGGG..',
+     '.wWWWWWWWWWWWWw.',
+     '.WWKKWWWWWWKKWW.',
+     '.WWKWWWWWWWWKWW.',
+     '.wWWWWWWWWWWWWw.',
+     '..WWMMMMMMMMWW..',
+     '...wWMMMMMMWw...',
+     '....wWWWWWWw....',
+     '......gggg......',
+     '.......KK.......',
+     '...PPPPKKPPPP...'],
+    ['......R.R.......',
+     '.....RRRRR......',
+     '....WTTTTTW.....',
+     '....TTETTET.....',
+     '....TSSSSST.....',
+     '..GGGGGGGGGGGG..',
+     '.wWWWWWWWWWWWWw.',
+     '.WWWWWWWWWWWWWW.',
+     '.WWKKWWWWWWKKWW.',
+     '.wWWWWWWWWWWWWw.',
+     '..WWMMMMMMMMWW..',
+     '...wWMMMMMMWw...',
+     '....wWWWWWWw....',
+     '......gggg......',
+     '.......KK.......',
+     '.....PPKKPP.....']
+  ], PALETA_CLOWN);
+
+  function iniciarClownCar() {
+    const dir = aleatorio() < 0.5 ? 1 : -1;
+    return { dir: dir, x: dir === 1 ? -18 : W + 2, y: 6 + aleatorio() * 10, fase: aleatorio() * 6,
+             desenhar: desenharClownCar };
+  }
+
+  function desenharClownCar(passo) {
+    this.x += this.dir * 0.3 * passo;
+    const y = this.y + Math.sin(t * 0.05 + this.fase) * 3;
+    // A helice gira (quadro 0/1); a cada ~3 s, o palhaco pisca (a linha dos olhos desce).
+    const quadro = Math.floor(t / 3) % 2;
+    S.colar(ctx, CLOWN_CAR[quadro], this.x, y, 1);
+    return this.dir === 1 ? this.x < W + 2 : this.x > -18;
+  }
+
+  // Sparkster (Rocket Knight Adventures, Mega Drive 1993): o gamba de
+  // armadura azul cruza o ceu na mochila-foguete, de espada na mao, deixando
+  // um rastro de fogo.
+  const PALETA_SPARKSTER = { R: '#e8202a', B: '#2f6bff', b: '#1c3aa8', S: '#f2c48c', E: '#101010', N: '#5a3218',
+                             G: '#ffcc33', g: '#b08400', W: '#e8eef8', K: '#3a3a4a' };
+  const SPARKSTER = S.quadros([
+    ['.......RR.....',
+     '......BBBB....',
+     '.....bBBSSE...',
+     '.....bBBSSSN..',
+     '..GG.bBBBB....',
+     '.GGGGbBBBBBWWW',
+     '..GG.bBBBb....',
+     '.....bB.bB....',
+     '.....K...K....'],
+    ['........RR....',
+     '......BBBB....',
+     '.....bBBSSE...',
+     '.....bBBSSSN..',
+     '..GG.bBBBB....',
+     '.GGGGbBBBBBWWW',
+     '..GG.bBBBb....',
+     '......bBbB....',
+     '......K..K....']
+  ], PALETA_SPARKSTER);
+
+  function iniciarSparkster() {
+    const dir = aleatorio() < 0.5 ? 1 : -1;
+    // Entra por um canto de baixo e sai pelo canto de cima do outro lado.
+    const y0 = 44 + aleatorio() * 6;
+    return { dir: dir, x: dir === 1 ? -16 : W + 2, y: y0, vy: -(y0 - 4) / ((W + 18) / 0.7), rastro: [],
+             desenhar: desenharSparkster };
+  }
+
+  function desenharSparkster(passo) {
+    this.x += this.dir * 0.7 * passo;
+    this.y += this.vy * passo;
+    const mochila = this.dir === 1 ? this.x : this.x + 13;
+    if (passo) this.rastro.push({ x: mochila - this.dir, y: this.y + 5, vida: 1 });
+    for (const r of this.rastro) r.vida -= 0.06 * passo;
+    this.rastro = this.rastro.filter(function (r) { return r.vida > 0; });
+    for (const r of this.rastro) {
+      ctx.fillStyle = rgba(r.vida > 0.6 ? '255,230,120' : '255,120,40', r.vida * 0.8);
+      ctx.fillRect(Math.round(r.x - this.dir * (1 - r.vida) * 6), Math.round(r.y), 1, 1);
+    }
+    ctx.fillStyle = Math.floor(t / 2) % 2 === 0 ? '#ffe066' : '#ff7a29';     // a chama da mochila
+    ctx.fillRect(Math.round(this.dir === 1 ? this.x - 1 : this.x + 14), Math.round(this.y) + 5, 2, 1);
+    S.colar(ctx, SPARKSTER[Math.floor(t / 6) % 2], this.x, this.y, this.dir);
+    return this.dir === 1 ? this.x < W + 2 : this.x > -16;
+  }
+
   const VISITAS = { fzero: iniciarFzero, kirby: iniciarKirby, invasores: iniciarInvasores, arwing: iniciarArwing,
-                    supersonic: iniciarSuperSonic, navesamus: iniciarNaveSamus, mariocapa: iniciarMarioCapa, metaknight: iniciarMetaKnight, vicviper: iniciarVicViper, ristar: iniciarRistar, toejam: iniciarToeJam, starman: iniciarStarman, jim: iniciarJim, kart: iniciarKart, baleia: iniciarBaleia };
+                    supersonic: iniciarSuperSonic, navesamus: iniciarNaveSamus, mariocapa: iniciarMarioCapa, metaknight: iniciarMetaKnight, vicviper: iniciarVicViper, ristar: iniciarRistar, toejam: iniciarToeJam, starman: iniciarStarman, jim: iniciarJim, kart: iniciarKart, baleia: iniciarBaleia,
+                    clowncar: iniciarClownCar, sparkster: iniciarSparkster };
   let filaDeVisitas = ['fzero'];
   let visita = null;
   let esperaVisita = 420;       // ~7 s depois de abrir
