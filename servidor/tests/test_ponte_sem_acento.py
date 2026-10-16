@@ -60,6 +60,38 @@ class TestPonteSemAcento(unittest.TestCase):
             self.assertEqual(arquivo.read(), b"disquete" * 100 + b"recorde")
         self.assertFalse(os.path.exists(os.path.dirname(caminho)))      # a pasta da ponte some
 
+    def test_a_copia_guarda_o_nome_do_jogo(self):
+        # O estado (F2) do RetroArch leva o nome do jogo: ate 15/10/2026 todo
+        # jogo da ponte virava "jogo.st", e um estado ficava por cima do outro.
+        outro = os.path.join(self.com_acento, "Rayoid.st")
+        shutil.copyfile(self.jogo, outro)
+        primeiro, _o1, devolver1 = ponte.preparar(HATARI, self.sistema, self.jogo)
+        segundo, _o2, devolver2 = ponte.preparar(HATARI, self.sistema, outro)
+        self.assertEqual(os.path.basename(primeiro), "Jogo Acao.st")
+        self.assertEqual(os.path.basename(segundo), "Rayoid.st")    # sem acento no nome: o mesmo nome
+        devolver1()
+        devolver2()
+
+    def test_nome_sem_acento(self):
+        self.assertEqual(ponte.nome_sem_acento("Ação Ñandú.ST"), "Acao Nandu.st")
+        self.assertEqual(ponte.nome_sem_acento("Rayoid.st"), "Rayoid.st")
+        self.assertEqual(ponte.nome_sem_acento("ドラゴン.st"), "jogo.st")      # nenhuma letra do ASCII
+        self.assertEqual(ponte.nome_sem_acento("Café ..dsk"), "Cafe.dsk")
+        self.assertEqual(ponte.nome_sem_acento("disco.dsé"), "disco")
+        self.assertEqual(ponte.nome_sem_acento("system"), "system")
+
+    def test_jogo_chamado_system_nao_bate_na_pasta_das_bios(self):
+        jogo = os.path.join(self.com_acento, "system.st")
+        shutil.copyfile(self.jogo, jogo)
+        semext = os.path.join(self.com_acento, "jogos", "system")
+        os.makedirs(os.path.dirname(semext))
+        shutil.copyfile(self.jogo, semext)
+        for caminho_jogo in (jogo, semext):
+            caminho, opcoes, devolver = ponte.preparar(HATARI, self.sistema, caminho_jogo)
+            self.assertTrue(os.path.isfile(caminho))
+            self.assertTrue(os.path.isfile(os.path.join(opcoes["system_directory"], "tos.img")))
+            devolver()
+
     def test_sem_gravar_nada_volta_e_a_pasta_some(self):
         caminho, _opcoes, devolver = ponte.preparar(HATARI, self.sistema, self.jogo)
         self.assertFalse(devolver())

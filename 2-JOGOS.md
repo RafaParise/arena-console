@@ -800,12 +800,15 @@ Dreamcast liga pela imitada sem perguntar, como sempre. Os saves (os VMUs)
 são os mesmos nos dois jeitos. Testado em 16/10/2026 com o GigaWing 2 e o
 Marvel vs. Capcom 1 do professor, que abriram nos dois.
 
-**Atari ST, Apple II e Atari 8-bit numa pasta com acento:** os emuladores
-deles (o Hatari, o AppleWin e o atari800) não abrem arquivo de pasta com
-acento (como `Área de Trabalho`). O ARENA resolve
+**Atari ST, Apple II, Atari 8-bit e Java ME numa pasta com acento:** os
+emuladores deles (o Hatari, o AppleWin, o atari800 e o FreeJ2ME-Plus) não
+abrem arquivo de pasta com acento (como `Área de Trabalho`). O ARENA resolve
 sozinho: copia o jogo e a BIOS para uma pasta nova, sem acento e só sua (a
 temporária do Windows), abre de lá e, ao fechar, leva de volta o disquete se
-o jogo gravou nele (recorde, jogo salvo) e apaga a pasta.
+o jogo gravou nele (recorde, jogo salvo) e apaga a pasta. A cópia guarda o
+nome do jogo, só sem o acento ("Ação.st" vira "Acao.st"): cada jogo tem o
+seu estado (F2). Até 15/10/2026, toda cópia se chamava `jogo`, e o estado
+de um jogo ficava por cima do de outro.
 
 **Fliperama (MAME e FBNeo):** cada placa tem a sua BIOS em `.zip`
 (`neogeo.zip`, `pgm.zip`, `naomi.zip`...), que vai na mesma pasta dos jogos

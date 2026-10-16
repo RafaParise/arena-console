@@ -65,9 +65,6 @@ Achados de 15/10 que esperam conserto:
   mesmo com a rede fechada. Por isso o Firewall do Windows pergunta na
   primeira vez que um Python novo roda. Avaliar escutar só com a rede
   aberta.
-- A ponte sem acento chama a cópia do jogo de `jogo.<extensão>`. Os estados
-  (F2) dos jogos que passam por ela ficam com o mesmo nome. Manter o nome
-  do arquivo quando ele não tiver acento.
 - Ideia do aluno ainda não usada: o código de amigo curto
   (`ARENA-XXXX-XXXX`), no lugar do identificador inteiro do aparelho.
 

@@ -32,6 +32,7 @@ import shutil
 import stat
 import tempfile
 import time
+import unicodedata
 
 # Os nucleos que nao abrem caminho com acento e o que cada um precisa da
 # pasta system (conferido abrindo o jogo de verdade: testes\teste_consoles_livres.py).
@@ -55,6 +56,19 @@ PREFIXO = "ARENA-sem-acento-"
 def sem_acento(caminho):
     """So letras e simbolos do ASCII (sem acento, sem cedilha)?"""
     return str(caminho).isascii()
+
+
+def nome_sem_acento(nome):
+    """O nome do arquivo sem acento, para a copia na ponte: "Ação.st" vira
+    "Acao.st". O RetroArch da ao estado (F2) o nome do jogo: com um nome so
+    para todos ("jogo.st", ate 15/10/2026), os jogos que passavam pela ponte
+    gravavam o estado um por cima do outro. O nome sem nenhuma letra do
+    ASCII (todo em japones, por exemplo) vira "jogo"."""
+    base, extensao = os.path.splitext(nome)
+    # NFKD separa a letra do acento ("ç" vira "c" + cedilha); o ASCII fica so
+    # com a letra.
+    base = unicodedata.normalize("NFKD", base).encode("ascii", "ignore").decode("ascii").strip(" .")
+    return (base or "jogo") + (extensao.lower() if sem_acento(extensao) else "")
 
 
 def precisa(nucleo, pasta_sistema, caminho_jogo):
@@ -144,8 +158,11 @@ def preparar(nucleo, pasta_sistema, caminho_jogo):
                 _copiar(origem, os.path.join(sistema, nome))
         copia = caminho_jogo
         if not sem_acento(caminho_jogo):
-            extensao = os.path.splitext(caminho_jogo)[1].lower()
-            copia = os.path.join(ponte, "jogo" + (extensao if sem_acento(extensao) else ""))
+            # Numa pasta so do jogo: um jogo chamado "system" nao bate na
+            # pasta das BIOS.
+            pasta_jogo = os.path.join(ponte, "jogo")
+            os.makedirs(pasta_jogo)
+            copia = os.path.join(pasta_jogo, nome_sem_acento(os.path.basename(caminho_jogo)))
             _copiar(caminho_jogo, copia)
         marca = _marca(copia)
     except OSError:
