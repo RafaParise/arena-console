@@ -115,11 +115,18 @@ def memoria_mb(pids):
 
 
 def jogo_rodando(titulo, jogo):
-    """O titulo de alguma janela diz que o jogo esta rodando?"""
+    """O titulo de alguma janela diz que o jogo esta rodando? O codigo do disco
+    -- (GXXE01) no Dolphin, [BLUS31183] no RPCS3, [4D5307E6 v0.0.0.10] no
+    Xenia --, o contador de quadros ou o nome do jogo.
+    Achado de 16/10/2026: o Xenia escreve o codigo entre colchetes, com a
+    versao; so os sinais de "maior" e "menor" (<4D5307E6>) eram aceitos, e o
+    Halo 3 (o nome nao tem palavra de 5 letras alem de "Brazil") nao era
+    reconhecido rodando. O Gears of War, que passava, saiu da pasta."""
     palavras = [p for p in re.findall(r"[A-Za-z]{5,}", os.path.splitext(os.path.basename(jogo))[0])
                 if p.lower() not in ("europe", "japan", "world", "brazil", "edition")]
     baixo = titulo.lower()
-    return ("fps" in baixo or bool(re.search(r"\([A-Z0-9]{6}\)|\[[A-Z]{4}\d{5}\]|<[0-9A-F]{8}>", titulo))
+    return ("fps" in baixo
+            or bool(re.search(r"\([A-Z0-9]{6}\)|\[[A-Z]{4}\d{5}\]|<[0-9A-F]{8}>|\[[0-9A-F]{8} v[\d.]+\]", titulo))
             or any(p.lower() in baixo for p in palavras[:2]))
 
 
