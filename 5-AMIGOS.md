@@ -179,14 +179,24 @@ Na primeira vez o Windows pergunta se o Python pode se comunicar na rede.
 
 ### Passo 4 — Adicione o amigo
 
-#### O jeito fácil: deixe o ARENA achar
+#### O jeito fácil: o código de amigo
 
-Em **Perfil → Amigos**, logo abaixo da sua lista, tem **Colegas
-encontrados na rede**.
+Em **Perfil → Amigos** aparece o **seu código de amigo**, no formato
+`ARENA-7YD1-R2VX`. Dite o seu para o colega (e anote o dele): ele digita em
+**Código do amigo** e clica em **Adicionar pelo código**.
 
-O ARENA avisa "estou aqui" na rede a cada cinco segundos e escuta quem mais
-está avisando. Quem estiver na mesma rede aparece ali sozinho, com o
-endereço já preenchido. Clique em **Adicionar** e acabou.
+Pode digitar do jeito que sair: sem o `ARENA-`, sem os traços, em letra
+minúscula. O código não tem as letras I, L, O e U, que se confundem com
+números: se alguém digitar a letra O, o ARENA entende o zero; I ou L, o um.
+(O código antigo, de 12 letras, também continua valendo.)
+
+O código funciona como um apelido do computador: o ARENA avisa "estou
+aqui" na rede a cada cinco segundos, com o código junto, e acha o colega
+pelo código entre quem está avisando. Por isso os dois precisam estar na
+mesma rede, com **Aceitar conexões da rede** ligado.
+
+Quem abriu uma partida aparece sozinho em **Atividade na rede**, mais
+abaixo, com o botão **Adicionar**: aí nem precisa do código.
 
 **Não precisa digitar endereço nenhum** — e some de vez o erro de copiar o
 endereço do adaptador virtual.

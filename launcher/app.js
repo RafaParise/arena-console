@@ -1499,8 +1499,10 @@ async function carregarColegas() {
         adicionar.textContent = "Adicionar";
         adicionar.addEventListener("click", async () => {
           try {
+            // O código inteiro do aparelho (o id), não o curto: nunca há
+            // dois colegas com o mesmo.
             await pedir("/api/amigo/codigo", "POST",
-              { codigo: colega.codigo_amigo });
+              { codigo: colega.id || colega.codigo_amigo });
             recado(`${colega.apelido} entrou na sua lista de amigos.`);
             await carregarEstado();
           } catch (falha) {

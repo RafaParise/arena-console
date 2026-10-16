@@ -53,11 +53,6 @@ Depois do Release, nesta ordem:
 15. Testes nos sistemas virtuais (Docker e WSL), com números e
     descontando a perda de rodar dentro de outro sistema.
 
-Achados de 15/10 que esperam conserto:
-
-- Ideia do aluno ainda não usada: o código de amigo curto
-  (`ARENA-XXXX-XXXX`), no lugar do identificador inteiro do aparelho.
-
 ## Pedidos de 12/10/2026, nesta ordem
 
 1. **GitHub:**

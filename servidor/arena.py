@@ -3791,6 +3791,54 @@ def limpar_partida_recebida(partida):
             "esperando": partida.get("esperando") is True}
 
 
+# O codigo de amigo curto (ideia de um aluno, 16/10/2026): ARENA-XXXX-XXXX no
+# lugar das 12 letras do codigo do aparelho ("3f9a1c0b7d2e"), mais facil de
+# ditar e de digitar. As 8 letras sao os 40 primeiros bits do codigo do
+# aparelho, escritos no alfabeto de Crockford: sem I, L, O e U, que se
+# confundem com 1, 0 e V. Nao e' um codigo novo, e' o mesmo escrito de outro
+# jeito: nada muda para os amigos que ja estao na lista.
+ALFABETO_DO_CODIGO = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
+
+
+def codigo_de_amigo(identificacao):
+    """O codigo curto do aparelho: "3f9a1c0b7d2e" vira "ARENA-7YD1-R2VX".
+    Codigo de aparelho fora do padrao (de uma versao bem antiga) fica como
+    esta."""
+    texto = str(identificacao or "")
+    if len(texto) < 10 or any(c not in "0123456789abcdef" for c in texto[:10].lower()):
+        return texto
+    numero = int(texto[:10], 16)                   # 10 letras hexadecimais = 40 bits
+    letras = "".join(ALFABETO_DO_CODIGO[(numero >> (5 * i)) & 31] for i in range(7, -1, -1))
+    return "ARENA-%s-%s" % (letras[:4], letras[4:])
+
+
+def mesmo_codigo(digitado, identificacao):
+    """O que o aluno digitou e' o codigo deste aparelho? Vale o codigo curto
+    com ou sem o "ARENA-", com ou sem os tracos, em maiuscula ou minuscula,
+    com O no lugar de 0 e I ou L no lugar de 1; e vale o codigo inteiro, de
+    antes."""
+    bruto = str(digitado or "").strip()
+    if not bruto or not identificacao:
+        return False
+    if bruto.lower() == str(identificacao).lower():
+        return True
+    curto = codigo_de_amigo(identificacao)
+    if not curto.startswith("ARENA-"):
+        return False
+    limpo = "".join(c for c in bruto.upper() if c.isalnum())
+    if len(limpo) == 13 and limpo.startswith("ARENA"):
+        limpo = limpo[5:]
+    limpo = limpo.translate(str.maketrans("OIL", "011"))
+    return limpo == curto[6:].replace("-", "")
+
+
+def amigos_para_a_tela(servidores):
+    """A lista de amigos com o codigo curto de cada um (so na resposta: o
+    config.json continua guardando o codigo inteiro)."""
+    return [dict(amigo, codigo_amigo=codigo_de_amigo(amigo.get("id"))) if amigo.get("id") else dict(amigo)
+            for amigo in servidores or []]
+
+
 def colegas_na_rede():
     """Quem esta gritando na rede agora (amigos marcados com ja_e_amigo)."""
     config = carregar_config()
@@ -3807,7 +3855,7 @@ def colegas_na_rede():
             "apelido": vizinho["apelido"],
             "url": url,
             "id": vizinho["id"],
-            "codigo_amigo": vizinho["id"],
+            "codigo_amigo": codigo_de_amigo(vizinho["id"]),
             "ja_e_amigo": vizinho["id"] in conhecidos or url in conhecidos,
             "ha_quantos_segundos": int(time.monotonic() - vizinho["visto_em"]),
             "partida_aberta": bool(vizinho.get("partida")),
@@ -3919,7 +3967,7 @@ def procurar_partidas(config):
             "apelido": amigo.get("apelido", ""),
             "url": url,
             "id": str(retorno.get("servidor_id") or amigo.get("id") or ""),
-            "codigo_amigo": str(retorno.get("servidor_id") or amigo.get("id") or ""),
+            "codigo_amigo": codigo_de_amigo(retorno.get("servidor_id") or amigo.get("id") or ""),
             "ja_e_amigo": True,
             "online": True,
             "partida_aberta": bool(partida),
@@ -4785,6 +4833,9 @@ class Manipulador(BaseHTTPRequestHandler):
     def api_get(self, caminho):
         if caminho == "/api/estado":
             config = carregar_config()
+            # So na resposta (carregar_config devolve uma copia): o codigo
+            # curto de cada amigo, para a tela mostrar.
+            config["servidores"] = amigos_para_a_tela(config.get("servidores"))
             return self.responder_json({
                 "maquina": MAQUINA,
                 "retroarch_presente": os.path.isfile(EXECUTAVEL_RETROARCH),
@@ -4806,8 +4857,9 @@ class Manipulador(BaseHTTPRequestHandler):
                      for c, v in PERFIS_GRAFICOS.items()]),
                 "versao": VERSAO,
                 # Codigo curto que o aluno passa ao colega em vez do
-                # endereco. O colega digita e o ARENA acha na rede.
-                "codigo_amigo": config["dispositivo_id"],
+                # endereco (ARENA-XXXX-XXXX). O colega digita e o ARENA
+                # acha na rede.
+                "codigo_amigo": codigo_de_amigo(config["dispositivo_id"]),
                 "tem_foto_perfil": bool(foto_perfil_caminho()),
                 "capacidade": CAPACIDADE,
                 "economico": ECONOMICO,
@@ -5363,9 +5415,16 @@ class Manipulador(BaseHTTPRequestHandler):
 
         # ---- adicionar amigo pelo codigo ----------------------------------
         if caminho == "/api/amigo/codigo":
-            codigo = str(dados.get("codigo", "")).strip()
-            vizinho = next((v for v in colegas_na_rede()
-                            if v["id"] == codigo), None)
+            codigo = str(dados.get("codigo", "")).strip()[:64]
+            # O codigo curto (ARENA-XXXX-XXXX, do jeito que a pessoa digitar)
+            # ou o inteiro, de antes.
+            achados = [v for v in colegas_na_rede() if mesmo_codigo(codigo, v["id"])]
+            if len(achados) > 1:
+                # Dois aparelhos com o mesmo codigo curto: quase impossivel
+                # (1 chance em um trilhao), mas o ARENA nao escolhe no chute.
+                return self.erro("Mais de um colega na rede com esse código. Peça o endereço dele e "
+                                 "use \"Ou digite o endereço na mão\", logo abaixo.", 409)
+            vizinho = achados[0] if achados else None
             if not vizinho:
                 return self.erro("Não achei ninguém com esse código na rede. "
                                  "Os dois precisam estar na mesma rede e com "
@@ -6069,7 +6128,7 @@ class Manipulador(BaseHTTPRequestHandler):
             })
             salvar_config(config)
             return self.responder_json({"ok": True,
-                                        "servidores": config["servidores"]})
+                                        "servidores": amigos_para_a_tela(config["servidores"])})
 
         if caminho == "/api/amigo/remover":
             config = carregar_config()
@@ -6078,7 +6137,7 @@ class Manipulador(BaseHTTPRequestHandler):
                                     if a["apelido"].lower() != apelido]
             salvar_config(config)
             return self.responder_json({"ok": True,
-                                        "servidores": config["servidores"]})
+                                        "servidores": amigos_para_a_tela(config["servidores"])})
 
         if caminho == "/api/amigo/testar":
             bruto = str(dados.get("url", "")).strip()
