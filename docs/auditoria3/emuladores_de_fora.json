@@ -5,7 +5,7 @@
   "jogo": "Super Smash Bros. Melee (USA) (En,Ja) (Rev 2).rvz",
   "abre": true,
   "segundos": 4.1,
-  "memoria_mb": 558,
+  "memoria_mb": 546,
   "janela": "Dolphin 2606a | JIT64 SC | Direct3D 11 | HLE | Super Smash Bros. Melee (GALE01)"
  },
  {
@@ -14,7 +14,7 @@
   "jogo": "New Super Mario Bros. Wii (Europe) (En,Fr,De,Es,It) (Rev 2).rvz",
   "abre": true,
   "segundos": 4.0,
-  "memoria_mb": 616,
+  "memoria_mb": 604,
   "janela": "Dolphin 2606a | JIT64 SC | Direct3D 11 | HLE | New Super Mario Bros. Wii (SMNP01)"
  },
  {
@@ -22,17 +22,17 @@
   "emulador": "RPCS3",
   "jogo": "Rayman Legends (USA) (En,Fr,Es,Pt).iso",
   "abre": true,
-  "segundos": 2.1,
-  "memoria_mb": 1096,
+  "segundos": 2.0,
+  "memoria_mb": 2667,
   "janela": "FPS: 0.00 | Vulkan | 0.0.42-20058 | Rayman® Legends [BLUS31183]"
  },
  {
   "console": "Xbox 360",
   "emulador": "Xenia",
-  "jogo": "Gears of War Judgment.iso",
+  "jogo": "Halo 3 (Brazil) (En,Ja,Fr,De,Es,It,Pt,Zh,Ko).iso",
   "abre": true,
-  "segundos": 2.1,
-  "memoria_mb": 1029,
-  "janela": "Xenia-canary (canary_experimental@0bd090dbe on Sep 20 2026) | [4D530A26 v0.0.0.3] Gears of War: Judgment <Vulkan - FBO - XAudio2>"
+  "segundos": 2.0,
+  "memoria_mb": 707,
+  "janela": "Xenia-canary (canary_experimental@0bd090dbe on Sep 20 2026) | [4D5307E6 v0.0.0.10] Halo 3 <Vulkan - FBO - XAudio2>"
  }
 ]

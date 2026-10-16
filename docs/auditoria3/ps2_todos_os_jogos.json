@@ -49,24 +49,10 @@
   "avisos": []
  },
  {
-  "jogo": "Crash - Mind over Mutant (USA).chd",
-  "nivel": "automatico",
-  "comecou": true,
-  "segundos": 22.1,
-  "avisos": []
- },
- {
   "jogo": "Crash Nitro Kart (USA).chd",
   "nivel": "automatico",
   "comecou": true,
   "segundos": 22.1,
-  "avisos": []
- },
- {
-  "jogo": "Crash of the Titans (USA).chd",
-  "nivel": "automatico",
-  "comecou": true,
-  "segundos": 21.1,
   "avisos": []
  },
  {
@@ -92,13 +78,6 @@
  },
  {
   "jogo": "Dragon Ball Z - Budokai Tenkaichi 3 (USA) (En,Ja).chd",
-  "nivel": "automatico",
-  "comecou": true,
-  "segundos": 20.1,
-  "avisos": []
- },
- {
-  "jogo": "Dragon Quest VIII - Journey of the Cursed King (BR).chd",
   "nivel": "automatico",
   "comecou": true,
   "segundos": 20.1,
@@ -192,7 +171,7 @@
   "jogo": "Max Payne (BR).chd",
   "nivel": "automatico",
   "comecou": true,
-  "segundos": 19.1,
+  "segundos": 20.1,
   "avisos": []
  },
  {
@@ -227,7 +206,7 @@
   "jogo": "Mortal Kombat - Deadly Alliance (USA).chd",
   "nivel": "automatico",
   "comecou": true,
-  "segundos": 20.1,
+  "segundos": 21.1,
   "avisos": []
  },
  {
@@ -273,17 +252,17 @@
   "avisos": []
  },
  {
-  "jogo": "Darkwatch (USA).chd",
+  "jogo": "Medal of Honor - Frontline (USA).chd",
   "nivel": "leve",
   "comecou": true,
-  "segundos": 22.1,
+  "segundos": 19.1,
   "avisos": []
  },
  {
-  "jogo": "Darkwatch (USA).chd",
+  "jogo": "Medal of Honor - Frontline (USA).chd",
   "nivel": "bonito",
   "comecou": true,
-  "segundos": 22.1,
+  "segundos": 19.1,
   "avisos": []
  },
  {

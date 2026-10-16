@@ -6,7 +6,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 203940,
-   "segundos": 12.2,
+   "segundos": 12.6,
    "travou": false,
    "erros": []
   },
@@ -25,7 +25,7 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 4824,
+   "foto_bytes": 4762,
    "segundos": 11.1,
    "travou": false,
    "erros": []
@@ -46,7 +46,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 8699,
-   "segundos": 11.3,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
@@ -66,7 +66,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 7273,
-   "segundos": 11.1,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
@@ -102,7 +102,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 34475,
-   "segundos": 13.4,
+   "segundos": 13.3,
    "travou": false,
    "erros": []
   },
@@ -118,7 +118,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 96717,
-   "segundos": 13.4,
+   "segundos": 13.3,
    "travou": false,
    "erros": []
   },
@@ -190,6 +190,24 @@
   "situacao": "emulador de fora (Dolphin): testar com o professor"
  },
  {
+  "console": "Java ME (celular antigo)",
+  "titulo": "God of War Betrayal J2ME EN V0195",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 2089,
+   "segundos": 11.0,
+   "travou": false,
+   "erros": [
+    "[ERROR] [Environ] SET_MESSAGE_EXT: FreeJ2ME system files not found!"
+   ]
+  },
+  "foto": "014 Java ME (celular ant - God of War Betrayal J2ME EN V0195.png",
+  "jogar_junto": {
+   "pulado": "O núcleo do Java ME (FreeJ2ME-Plus) não suporta jogo em rede - confirmado tentando hospedar em 15/10/2026, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"): o jogo roda no Java, fora do RetroArch."
+  }
+ },
+ {
   "console": "Mega Drive, Master System e Game Gear",
   "titulo": "Golden Axe",
   "jogadores": 2,
@@ -200,7 +218,7 @@
    "travou": false,
    "erros": []
   },
-  "foto": "014 Mega Drive, Master S - Golden Axe.png",
+  "foto": "015 Mega Drive, Master S - Golden Axe.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -220,7 +238,7 @@
    "travou": false,
    "erros": []
   },
-  "foto": "015 Mega Drive, Master S - Mega Bomberman.png",
+  "foto": "016 Mega Drive, Master S - Mega Bomberman.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -234,13 +252,21 @@
   "titulo": "Micro Machines 2 Turbo Tournament",
   "jogadores": 4,
   "abrir": {
-   "abre_e_mostra_imagem": false,
-   "foto_bytes": 1796,
-   "segundos": 11.0,
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 256111,
+   "segundos": 41.1,
    "travou": false,
-   "erros": []
+   "erros": [],
+   "segunda_vez_com_40s": true
   },
-  "foto": "016 Mega Drive, Master S - Micro Machines 2 Turbo Tournament.png"
+  "foto": "017 Mega Drive, Master S - Micro Machines 2 Turbo Tournament.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": []
+  }
  },
  {
   "console": "Mega Drive, Master System e Game Gear",
@@ -249,11 +275,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 212480,
-   "segundos": 11.1,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
-  "foto": "017 Mega Drive, Master S - Sonic & Knuckles + Sonic the Hedgehog 2.png",
+  "foto": "018 Mega Drive, Master S - Sonic & Knuckles + Sonic the Hedgehog 2.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -269,11 +295,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 464201,
-   "segundos": 11.2,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
-  "foto": "018 Mega Drive, Master S - Sonic the Hedgehog 3.png",
+  "foto": "019 Mega Drive, Master S - Sonic the Hedgehog 3.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -289,11 +315,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 152297,
-   "segundos": 11.1,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
-  "foto": "019 Mega Drive, Master S - Streets of Rage 2.png",
+  "foto": "020 Mega Drive, Master S - Streets of Rage 2.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -309,11 +335,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 100256,
-   "segundos": 11.7,
+   "segundos": 11.6,
    "travou": false,
    "erros": []
   },
-  "foto": "020 Neo Geo e fliperamas - Metal Slug X - Super Vehicle-001.png",
+  "foto": "021 Neo Geo e fliperamas - Metal Slug X - Super Vehicle-001.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -333,7 +359,7 @@
    "travou": false,
    "erros": []
   },
-  "foto": "021 Neo Geo e fliperamas - Teenage Mutant Ninja Turtles - Turtles i.png",
+  "foto": "022 Neo Geo e fliperamas - Teenage Mutant Ninja Turtles - Turtles i.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -349,11 +375,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 28984,
-   "segundos": 11.5,
+   "segundos": 11.4,
    "travou": false,
    "erros": []
   },
-  "foto": "022 Neo Geo e fliperamas - The King of Fighters '97.png",
+  "foto": "023 Neo Geo e fliperamas - The King of Fighters '97.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -369,11 +395,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 30273,
-   "segundos": 11.6,
+   "segundos": 11.5,
    "travou": false,
    "erros": []
   },
-  "foto": "023 Neo Geo e fliperamas - The King of Fighters 2002.png",
+  "foto": "024 Neo Geo e fliperamas - The King of Fighters 2002.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -389,13 +415,13 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 336143,
-   "segundos": 11.1,
+   "segundos": 11.0,
    "travou": false,
    "erros": [
     "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented."
    ]
   },
-  "foto": "024 Nintendo (NES) - Contra.png",
+  "foto": "025 Nintendo (NES) - Contra.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -413,11 +439,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 78748,
-   "segundos": 11.4,
+   "segundos": 11.8,
    "travou": false,
    "erros": []
   },
-  "foto": "025 Nintendo 64 - Bomberman 64.png",
+  "foto": "026 Nintendo 64 - Bomberman 64.png",
   "jogar_junto": {
    "pulado": "O núcleo do N64 (Mupen64Plus-Next) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa. Os 4 jogadores só valem no mesmo computador, com 4 controles."
   }
@@ -429,11 +455,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 324806,
-   "segundos": 12.2,
+   "segundos": 12.1,
    "travou": false,
    "erros": []
   },
-  "foto": "026 Nintendo 64 - Diddy Kong Racing.png",
+  "foto": "027 Nintendo 64 - Diddy Kong Racing.png",
   "jogar_junto": {
    "pulado": "O núcleo do N64 (Mupen64Plus-Next) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa. Os 4 jogadores só valem no mesmo computador, com 4 controles."
   }
@@ -445,11 +471,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 954050,
-   "segundos": 12.2,
+   "segundos": 12.1,
    "travou": false,
    "erros": []
   },
-  "foto": "027 Nintendo 64 - F ZERO X.png",
+  "foto": "028 Nintendo 64 - F ZERO X.png",
   "jogar_junto": {
    "pulado": "O núcleo do N64 (Mupen64Plus-Next) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa. Os 4 jogadores só valem no mesmo computador, com 4 controles."
   }
@@ -465,7 +491,7 @@
    "travou": false,
    "erros": []
   },
-  "foto": "028 Nintendo 64 - GoldenEye 007.png",
+  "foto": "029 Nintendo 64 - GoldenEye 007.png",
   "jogar_junto": {
    "pulado": "O núcleo do N64 (Mupen64Plus-Next) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa. Os 4 jogadores só valem no mesmo computador, com 4 controles."
   }
@@ -477,11 +503,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 225364,
-   "segundos": 11.6,
+   "segundos": 11.5,
    "travou": false,
    "erros": []
   },
-  "foto": "029 Nintendo 64 - Mario Kart 64.png",
+  "foto": "030 Nintendo 64 - Mario Kart 64.png",
   "jogar_junto": {
    "pulado": "O núcleo do N64 (Mupen64Plus-Next) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa. Os 4 jogadores só valem no mesmo computador, com 4 controles."
   }
@@ -497,7 +523,7 @@
    "travou": false,
    "erros": []
   },
-  "foto": "030 Nintendo 64 - Mario Party.png",
+  "foto": "031 Nintendo 64 - Mario Party.png",
   "jogar_junto": {
    "pulado": "O núcleo do N64 (Mupen64Plus-Next) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa. Os 4 jogadores só valem no mesmo computador, com 4 controles."
   }
@@ -513,7 +539,7 @@
    "travou": false,
    "erros": []
   },
-  "foto": "031 Nintendo 64 - Super Smash Bros.png",
+  "foto": "032 Nintendo 64 - Super Smash Bros.png",
   "jogar_junto": {
    "pulado": "O núcleo do N64 (Mupen64Plus-Next) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa. Os 4 jogadores só valem no mesmo computador, com 4 controles."
   }
@@ -543,11 +569,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 29288,
-   "segundos": 21.5,
+   "segundos": 21.6,
    "travou": false,
    "erros": []
   },
-  "foto": "035 PlayStation - CTR Crash Team Racing.png",
+  "foto": "036 PlayStation - CTR Crash Team Racing.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -563,11 +589,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 29288,
-   "segundos": 21.7,
+   "segundos": 21.6,
    "travou": false,
    "erros": []
   },
-  "foto": "036 PlayStation - Crash Bandicoot.png",
+  "foto": "037 PlayStation - Crash Bandicoot.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -583,11 +609,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 42018,
-   "segundos": 19.1,
+   "segundos": 18.8,
    "travou": false,
    "erros": []
   },
-  "foto": "037 PlayStation - Crash Bandicoot 3 Warped.png",
+  "foto": "038 PlayStation - Crash Bandicoot 3 Warped.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -603,11 +629,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 29288,
-   "segundos": 25.0,
+   "segundos": 24.9,
    "travou": false,
    "erros": []
   },
-  "foto": "038 PlayStation - Legacy of Kain Soul Reaver.png",
+  "foto": "039 PlayStation - Legacy of Kain Soul Reaver.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -627,7 +653,7 @@
    "travou": false,
    "erros": []
   },
-  "foto": "039 PlayStation - Metal Slug X.png",
+  "foto": "040 PlayStation - Metal Slug X.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -643,11 +669,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 29288,
-   "segundos": 22.7,
+   "segundos": 22.6,
    "travou": false,
    "erros": []
   },
-  "foto": "040 PlayStation - Twisted Metal 2.png",
+  "foto": "041 PlayStation - Twisted Metal 2.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -663,11 +689,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 42018,
-   "segundos": 13.6,
+   "segundos": 13.3,
    "travou": false,
    "erros": []
   },
-  "foto": "041 PlayStation - Vigilante 8.png",
+  "foto": "042 PlayStation - Vigilante 8.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -720,12 +746,6 @@
  },
  {
   "console": "PlayStation 2",
-  "titulo": "Crash Mind Over Mutant",
-  "jogadores": 2,
-  "situacao": "emulador de fora (PCSX2): testar com o professor"
- },
- {
-  "console": "PlayStation 2",
   "titulo": "Crash Nitro Kart",
   "jogadores": 4,
   "situacao": "emulador de fora (PCSX2): testar com o professor"
@@ -733,12 +753,6 @@
  {
   "console": "PlayStation 2",
   "titulo": "Crash Twinsanity",
-  "jogadores": 2,
-  "situacao": "emulador de fora (PCSX2): testar com o professor"
- },
- {
-  "console": "PlayStation 2",
-  "titulo": "Crash of the Titans",
   "jogadores": 2,
   "situacao": "emulador de fora (PCSX2): testar com o professor"
  },
@@ -757,12 +771,6 @@
  {
   "console": "PlayStation 2",
   "titulo": "Dragon Ball Z Budokai Tenkaichi 3",
-  "jogadores": 2,
-  "situacao": "emulador de fora (PCSX2): testar com o professor"
- },
- {
-  "console": "PlayStation 2",
-  "titulo": "Dragon Quest VIII Journey of the Cursed King",
   "jogadores": 2,
   "situacao": "emulador de fora (PCSX2): testar com o professor"
  },
@@ -941,11 +949,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 430246,
-   "segundos": 12.3,
+   "segundos": 12.4,
    "travou": false,
    "erros": []
   },
-  "foto": "085 PlayStation Portable - Burnout Legends.png",
+  "foto": "083 PlayStation Portable - Burnout Legends.png",
   "jogar_junto": {
    "pulado": "O núcleo do PSP (PPSSPP) não suporta jogo em rede pelo RetroArch - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). O PPSSPP tem rede ad-hoc própria, mas é outro mecanismo, separado do netplay do RetroArch."
   }
@@ -957,11 +965,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 97334,
-   "segundos": 11.3,
+   "segundos": 11.2,
    "travou": false,
    "erros": []
   },
-  "foto": "086 PlayStation Portable - Grand Theft Auto Liberty City Stories.png",
+  "foto": "084 PlayStation Portable - Grand Theft Auto Liberty City Stories.png",
   "jogar_junto": {
    "pulado": "O núcleo do PSP (PPSSPP) não suporta jogo em rede pelo RetroArch - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). O PPSSPP tem rede ad-hoc própria, mas é outro mecanismo, separado do netplay do RetroArch."
   }
@@ -977,7 +985,7 @@
    "travou": false,
    "erros": []
   },
-  "foto": "087 PlayStation Portable - Grand Theft Auto Vice City Stories.png",
+  "foto": "085 PlayStation Portable - Grand Theft Auto Vice City Stories.png",
   "jogar_junto": {
    "pulado": "O núcleo do PSP (PPSSPP) não suporta jogo em rede pelo RetroArch - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). O PPSSPP tem rede ad-hoc própria, mas é outro mecanismo, separado do netplay do RetroArch."
   }
@@ -995,7 +1003,7 @@
     "[libretro WARN] [sceDisplay] Video out requested, not supported: mode=0 size=512,272"
    ]
   },
-  "foto": "088 PlayStation Portable - Killzone Liberation.png",
+  "foto": "086 PlayStation Portable - Killzone Liberation.png",
   "jogar_junto": {
    "pulado": "O núcleo do PSP (PPSSPP) não suporta jogo em rede pelo RetroArch - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). O PPSSPP tem rede ad-hoc própria, mas é outro mecanismo, separado do netplay do RetroArch."
   }
@@ -1007,13 +1015,13 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 84025,
-   "segundos": 11.4,
+   "segundos": 11.3,
    "travou": false,
    "erros": [
     "[libretro WARN] [sceDisplay] Video out requested, not supported: mode=0 size=512,272"
    ]
   },
-  "foto": "089 PlayStation Portable - Metal Gear Solid Peace Walker V2 00 USA .png",
+  "foto": "087 PlayStation Portable - Metal Gear Solid Peace Walker V2 00 USA .png",
   "jogar_junto": {
    "pulado": "O núcleo do PSP (PPSSPP) não suporta jogo em rede pelo RetroArch - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). O PPSSPP tem rede ad-hoc própria, mas é outro mecanismo, separado do netplay do RetroArch."
   }
@@ -1025,11 +1033,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 1416699,
-   "segundos": 17.7,
+   "segundos": 17.6,
    "travou": false,
    "erros": []
   },
-  "foto": "090 PlayStation Portable - Monster Hunter Freedom Unite.png",
+  "foto": "088 PlayStation Portable - Monster Hunter Freedom Unite.png",
   "jogar_junto": {
    "pulado": "O núcleo do PSP (PPSSPP) não suporta jogo em rede pelo RetroArch - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). O PPSSPP tem rede ad-hoc própria, mas é outro mecanismo, separado do netplay do RetroArch."
   }
@@ -1041,11 +1049,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 448961,
-   "segundos": 11.5,
+   "segundos": 11.4,
    "travou": false,
    "erros": []
   },
-  "foto": "091 PlayStation Portable - Twisted Metal Head On.png",
+  "foto": "089 PlayStation Portable - Twisted Metal Head On.png",
   "jogar_junto": {
    "pulado": "O núcleo do PSP (PPSSPP) não suporta jogo em rede pelo RetroArch - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). O PPSSPP tem rede ad-hoc própria, mas é outro mecanismo, separado do netplay do RetroArch."
   }
@@ -1057,11 +1065,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 47656,
-   "segundos": 13.2,
+   "segundos": 13.1,
    "travou": false,
    "erros": []
   },
-  "foto": "092 Sega 32X - Knuckles' Chaotix.png",
+  "foto": "090 Sega 32X - Knuckles' Chaotix.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1077,11 +1085,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 7570,
-   "segundos": 11.7,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
-  "foto": "093 Sega 32X - Star Wars Arcade.png",
+  "foto": "091 Sega 32X - Star Wars Arcade.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1097,11 +1105,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 427566,
-   "segundos": 11.6,
+   "segundos": 11.5,
    "travou": false,
    "erros": []
   },
-  "foto": "094 Sega 32X - Virtua Fighter.png",
+  "foto": "092 Sega 32X - Virtua Fighter.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1117,11 +1125,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 405363,
-   "segundos": 13.3,
+   "segundos": 13.2,
    "travou": false,
    "erros": []
   },
-  "foto": "095 Sega CD - Sonic CD.png",
+  "foto": "093 Sega CD - Sonic CD.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1135,16 +1143,13 @@
   "titulo": "Armada",
   "jogadores": 4,
   "abrir": {
-   "abre_e_mostra_imagem": false,
-   "foto_bytes": 0,
-   "segundos": 12.5,
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 107003,
+   "segundos": 13.4,
    "travou": false,
-   "erros": [
-    "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
-    "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
-    "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value."
-   ]
+   "erros": []
   },
+  "foto": "094 Sega Dreamcast - Armada.png",
   "jogar_junto": {
    "pulado": "O núcleo do Dreamcast (Flycast) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Multiplayer só vale no mesmo computador."
   }
@@ -1155,17 +1160,12 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 67492,
-   "segundos": 13.6,
+   "foto_bytes": 58602,
+   "segundos": 13.2,
    "travou": false,
-   "erros": [
-    "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
-    "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
-    "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
-    "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value."
-   ]
+   "erros": []
   },
-  "foto": "097 Sega Dreamcast - Capcom Vs SNK 2 Millionaire Fighting 200.png",
+  "foto": "095 Sega Dreamcast - Capcom Vs SNK 2 Millionaire Fighting 200.png",
   "jogar_junto": {
    "pulado": "O núcleo do Dreamcast (Flycast) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Multiplayer só vale no mesmo computador."
   }
@@ -1176,18 +1176,14 @@
   "jogadores": 4,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 291001,
-   "segundos": 14.9,
+   "foto_bytes": 58602,
+   "segundos": 13.2,
    "travou": false,
    "erros": [
-    "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
-    "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
-    "[libretro INFO] [BOOT] USA region not supported. Using Europe instead",
-    "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
-    "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value."
+    "[libretro INFO] [BOOT] USA region not supported. Using Europe instead"
    ]
   },
-  "foto": "098 Sega Dreamcast - Gauntlet Legends.png",
+  "foto": "096 Sega Dreamcast - Gauntlet Legends.png",
   "jogar_junto": {
    "pulado": "O núcleo do Dreamcast (Flycast) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Multiplayer só vale no mesmo computador."
   }
@@ -1198,17 +1194,12 @@
   "jogadores": 4,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 822815,
-   "segundos": 17.3,
+   "foto_bytes": 58602,
+   "segundos": 13.2,
    "travou": false,
-   "erros": [
-    "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
-    "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
-    "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
-    "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value."
-   ]
+   "erros": []
   },
-  "foto": "099 Sega Dreamcast - GigaWing 2.png",
+  "foto": "097 Sega Dreamcast - GigaWing 2.png",
   "jogar_junto": {
    "pulado": "O núcleo do Dreamcast (Flycast) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Multiplayer só vale no mesmo computador."
   }
@@ -1219,18 +1210,14 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 243674,
-   "segundos": 14.1,
+   "foto_bytes": 58602,
+   "segundos": 13.2,
    "travou": false,
    "erros": [
-    "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
-    "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
-    "[libretro INFO] [BOOT] USA region not supported. Using Europe instead",
-    "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
-    "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value."
+    "[libretro INFO] [BOOT] USA region not supported. Using Europe instead"
    ]
   },
-  "foto": "100 Sega Dreamcast - Marvel Vs Capcom 2 New Age of Heroes.png",
+  "foto": "098 Sega Dreamcast - Marvel Vs Capcom 2 New Age of Heroes.png",
   "jogar_junto": {
    "pulado": "O núcleo do Dreamcast (Flycast) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Multiplayer só vale no mesmo computador."
   }
@@ -1240,17 +1227,15 @@
   "titulo": "Marvel Vs Capcom Clash of Super Heroes",
   "jogadores": 2,
   "abrir": {
-   "abre_e_mostra_imagem": false,
-   "foto_bytes": 0,
-   "segundos": 68.7,
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 58602,
+   "segundos": 13.2,
    "travou": false,
    "erros": [
-    "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
-    "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
-    "[libretro INFO] [BOOT] USA region not supported. Using Europe instead",
-    "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value."
+    "[libretro INFO] [BOOT] USA region not supported. Using Europe instead"
    ]
   },
+  "foto": "099 Sega Dreamcast - Marvel Vs Capcom Clash of Super Heroes.png",
   "jogar_junto": {
    "pulado": "O núcleo do Dreamcast (Flycast) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Multiplayer só vale no mesmo computador."
   }
@@ -1262,11 +1247,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 46473,
-   "segundos": 11.8,
+   "segundos": 11.7,
    "travou": false,
    "erros": []
   },
-  "foto": "102 Sega Saturn - Saturn Bomberman.png",
+  "foto": "100 Sega Saturn - Saturn Bomberman.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1286,7 +1271,7 @@
    "travou": false,
    "erros": []
   },
-  "foto": "103 Super Nintendo - BS F ZERO.png",
+  "foto": "101 Super Nintendo - BS F ZERO.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1302,11 +1287,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 185997,
-   "segundos": 11.1,
+   "segundos": 11.3,
    "travou": false,
    "erros": []
   },
-  "foto": "104 Super Nintendo - BS F ZERO Grand Prix 2.png",
+  "foto": "102 Super Nintendo - BS F ZERO Grand Prix 2.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1322,11 +1307,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 346224,
-   "segundos": 11.2,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
-  "foto": "105 Super Nintendo - BS F Zero Deluxe.png",
+  "foto": "103 Super Nintendo - BS F Zero Deluxe.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1342,11 +1327,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 404304,
-   "segundos": 11.2,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
-  "foto": "106 Super Nintendo - Biker Mice From Mars.png",
+  "foto": "104 Super Nintendo - Biker Mice From Mars.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1366,7 +1351,7 @@
    "travou": false,
    "erros": []
   },
-  "foto": "107 Super Nintendo - Donkey Kong Country.png",
+  "foto": "105 Super Nintendo - Donkey Kong Country.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1382,11 +1367,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 267243,
-   "segundos": 13.2,
+   "segundos": 13.1,
    "travou": false,
    "erros": []
   },
-  "foto": "108 Super Nintendo - Donkey Kong Country 2 Diddy's Kong Quest.png",
+  "foto": "106 Super Nintendo - Donkey Kong Country 2 Diddy's Kong Quest.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1402,11 +1387,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 347705,
-   "segundos": 13.3,
+   "segundos": 13.2,
    "travou": false,
    "erros": []
   },
-  "foto": "109 Super Nintendo - Donkey Kong Country 3 Dixie Kong's Doubl.png",
+  "foto": "107 Super Nintendo - Donkey Kong Country 3 Dixie Kong's Doubl.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1422,11 +1407,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 329805,
-   "segundos": 13.2,
+   "segundos": 13.1,
    "travou": false,
    "erros": []
   },
-  "foto": "110 Super Nintendo - F ZERO.png",
+  "foto": "108 Super Nintendo - F ZERO.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1442,11 +1427,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 291217,
-   "segundos": 11.2,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
-  "foto": "111 Super Nintendo - Goof Troop.png",
+  "foto": "109 Super Nintendo - Goof Troop.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1466,7 +1451,7 @@
    "travou": false,
    "erros": []
   },
-  "foto": "112 Super Nintendo - Killer Instinct.png",
+  "foto": "110 Super Nintendo - Killer Instinct.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1482,11 +1467,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 2073,
-   "segundos": 11.1,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
-  "foto": "113 Super Nintendo - Mickey To Donald Magical Adventure 3.png",
+  "foto": "111 Super Nintendo - Mickey To Donald Magical Adventure 3.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1502,11 +1487,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 103061,
-   "segundos": 13.1,
+   "segundos": 13.0,
    "travou": false,
    "erros": []
   },
-  "foto": "114 Super Nintendo - Mortal Kombat 3.png",
+  "foto": "112 Super Nintendo - Mortal Kombat 3.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1522,11 +1507,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 103061,
-   "segundos": 11.1,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
-  "foto": "115 Super Nintendo - Mortal Kombat 3.png",
+  "foto": "113 Super Nintendo - Mortal Kombat 3.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1546,7 +1531,7 @@
    "travou": false,
    "erros": []
   },
-  "foto": "116 Super Nintendo - Ninja Gaiden Trilogy.png",
+  "foto": "114 Super Nintendo - Ninja Gaiden Trilogy.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1562,11 +1547,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 2073,
-   "segundos": 13.3,
+   "segundos": 13.0,
    "travou": false,
    "erros": []
   },
-  "foto": "117 Super Nintendo - Rock N' Roll Racing.png",
+  "foto": "115 Super Nintendo - Rock N' Roll Racing.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1582,11 +1567,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 2073,
-   "segundos": 11.1,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
-  "foto": "118 Super Nintendo - Street Fighter II Turbo Hyper Fighting.png",
+  "foto": "116 Super Nintendo - Street Fighter II Turbo Hyper Fighting.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1602,11 +1587,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 97479,
-   "segundos": 11.1,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
-  "foto": "119 Super Nintendo - Super Bomberman 4.png",
+  "foto": "117 Super Nintendo - Super Bomberman 4.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1626,7 +1611,7 @@
    "travou": false,
    "erros": []
   },
-  "foto": "120 Super Nintendo - Super Mario Kart.png",
+  "foto": "118 Super Nintendo - Super Mario Kart.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1646,7 +1631,7 @@
    "travou": false,
    "erros": []
   },
-  "foto": "121 Super Nintendo - Super Mario World.png",
+  "foto": "119 Super Nintendo - Super Mario World.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1662,11 +1647,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 59118,
-   "segundos": 11.1,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
-  "foto": "122 Super Nintendo - Top Gear 3000.png",
+  "foto": "120 Super Nintendo - Top Gear 3000.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -1674,12 +1659,6 @@
    "hospedeiro_vivo": true,
    "erros": []
   }
- },
- {
-  "console": "Xbox 360",
-  "titulo": "Gears of War Judgment",
-  "jogadores": 2,
-  "situacao": "emulador de fora (Xenia): testar com o professor"
  },
  {
   "console": "Xbox 360",
@@ -1700,13 +1679,13 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 11185,
-   "segundos": 13.2,
+   "segundos": 13.1,
    "travou": false,
    "erros": [
     "[ERROR] [Disc] Failed to set initial disc index. Expected #1 \"\", Detected #1 \"\"."
    ]
   },
-  "foto": "126 ZX Spectrum - Match Day II.png",
+  "foto": "123 ZX Spectrum - Match Day II.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",

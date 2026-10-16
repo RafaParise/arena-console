@@ -5,7 +5,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 97479,
-      "segundos": 11.2,
+      "segundos": 11.0,
       "travou": false,
       "erros": []
     },
@@ -23,7 +23,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 235564,
-      "segundos": 11.2,
+      "segundos": 11.1,
       "travou": false,
       "erros": []
     },
@@ -41,7 +41,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 336143,
-      "segundos": 11.1,
+      "segundos": 11.0,
       "travou": false,
       "erros": [
         "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented."
@@ -63,7 +63,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 40997,
-      "segundos": 11.1,
+      "segundos": 11.0,
       "travou": false,
       "erros": []
     },
@@ -81,7 +81,7 @@
     "abre": {
       "abre_e_mostra_imagem": false,
       "foto_bytes": 1796,
-      "segundos": 11.1,
+      "segundos": 11.0,
       "travou": false,
       "erros": []
     },
@@ -99,7 +99,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 50874,
-      "segundos": 11.5,
+      "segundos": 11.4,
       "travou": false,
       "erros": []
     },
@@ -120,7 +120,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 29288,
-      "segundos": 12.4,
+      "segundos": 12.3,
       "travou": false,
       "erros": []
     },
@@ -138,7 +138,7 @@
     "abre": {
       "abre_e_mostra_imagem": false,
       "foto_bytes": 1848,
-      "segundos": 11.1,
+      "segundos": 11.0,
       "travou": false,
       "erros": []
     },
@@ -155,15 +155,11 @@
     "jogo": "Marvel vs. Capcom 2 - New Age of Heroes (Europe).cue",
     "abre": {
       "abre_e_mostra_imagem": true,
-      "foto_bytes": 243674,
-      "segundos": 14.2,
+      "foto_bytes": 58602,
+      "segundos": 13.3,
       "travou": false,
       "erros": [
-        "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
-        "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
-        "[libretro INFO] [BOOT] USA region not supported. Using Europe instead",
-        "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
-        "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value."
+        "[libretro INFO] [BOOT] USA region not supported. Using Europe instead"
       ]
     },
     "jogar_junto": {
@@ -172,12 +168,9 @@
       "recusa_do_nucleo": "[libretro INFO] [BOOT] USA region not supported. Using Europe instead",
       "hospedeiro_vivo": true,
       "erros": [
-        "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
-        "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value.",
         "[libretro INFO] [BOOT] USA region not supported. Using Europe instead",
         "[ERROR] [Netplay] O núcleo não tem suporte para Netplay.",
-        "[ERROR] [Netplay] Falha em inicializar a Netplay.",
-        "[ERROR] [Environ] GET_VARIABLE: reicast_dump_unique_textures - Invalid value."
+        "[ERROR] [Netplay] Falha em inicializar a Netplay."
       ]
     }
   },
@@ -187,7 +180,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 7933,
-      "segundos": 11.4,
+      "segundos": 11.3,
       "travou": false,
       "erros": [
         "[libretro WARN] [sceDisplay] Video out requested, not supported: mode=0 size=512,272"
@@ -210,7 +203,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 28984,
-      "segundos": 11.5,
+      "segundos": 11.6,
       "travou": false,
       "erros": []
     },
