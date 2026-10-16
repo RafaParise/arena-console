@@ -33,6 +33,7 @@ dizer a pasta system pelo caminho relativo (pasta_sistema_relativa).
 """
 import hashlib
 import os
+import re
 import shutil
 import stat
 import tempfile
@@ -67,6 +68,16 @@ PREFIXO = "ARENA-sem-acento-"
 # ele guarda certo: o cache foi para retroarch\system (conferido em 16/10/2026).
 GRAVAM_EM_ANSI = ("mupen64plus_next_libretro.dll", "vice_")
 
+# O que o Windows nao aceita num nome de arquivo. O nome do jogo nao tem
+# nada disso, mas o NFKD (abaixo) pode criar: a barra de largura dupla "＼"
+# vira "\", e o "：" vira ":". Revisao de seguranca de 16/10/2026: sem esta
+# troca, um jogo chamado "＼..＼..＼x.st" fazia a copia sair da pasta da
+# ponte e ir para C:\x.st, por cima do que estivesse la.
+PROIBIDOS_NO_NOME = re.compile(r'[<>:"/\\|?*\x00-\x1f]')
+# Os nomes que o Windows reserva para aparelhos: "CON.st" e' a tela, nao um
+# arquivo (e o "ＣＯＮ" de largura dupla vira "CON").
+RESERVADOS = re.compile(r"^(con|prn|aux|nul|com[0-9]|lpt[0-9])$", re.IGNORECASE)
+
 
 def sem_acento(caminho):
     """So letras e simbolos do ASCII (sem acento, sem cedilha)?"""
@@ -78,12 +89,17 @@ def nome_sem_acento(nome):
     "Acao.st". O RetroArch da ao estado (F2) o nome do jogo: com um nome so
     para todos ("jogo.st", ate 15/10/2026), os jogos que passavam pela ponte
     gravavam o estado um por cima do outro. O nome sem nenhuma letra do
-    ASCII (todo em japones, por exemplo) vira "jogo"."""
+    ASCII (todo em japones, por exemplo) vira "jogo". Barra, dois-pontos e
+    os outros sinais que o Windows nao aceita viram "_": a copia nunca sai
+    da pasta da ponte."""
     base, extensao = os.path.splitext(nome)
     # NFKD separa a letra do acento ("ç" vira "c" + cedilha); o ASCII fica so
     # com a letra.
-    base = unicodedata.normalize("NFKD", base).encode("ascii", "ignore").decode("ascii").strip(" .")
-    return (base or "jogo") + (extensao.lower() if sem_acento(extensao) else "")
+    base = unicodedata.normalize("NFKD", base).encode("ascii", "ignore").decode("ascii")
+    base = PROIBIDOS_NO_NOME.sub("_", base).strip(" .")
+    if not base or RESERVADOS.match(base):
+        base = "jogo"
+    return base + (extensao.lower() if sem_acento(extensao) and not PROIBIDOS_NO_NOME.search(extensao) else "")
 
 
 def pasta_sistema_relativa(nucleo, pasta_sistema, pasta_trabalho):
@@ -195,6 +211,9 @@ def preparar(nucleo, pasta_sistema, caminho_jogo):
             pasta_jogo = os.path.join(ponte, "jogo")
             os.makedirs(pasta_jogo)
             copia = os.path.join(pasta_jogo, nome_sem_acento(os.path.basename(caminho_jogo)))
+            # Conferencia final: a copia fica DENTRO da pasta do jogo, sempre.
+            if os.path.dirname(os.path.abspath(copia)) != os.path.abspath(pasta_jogo):
+                raise OSError("nome de jogo que sairia da pasta da ponte: %s" % ascii(os.path.basename(caminho_jogo)))
             _copiar(caminho_jogo, copia)
         marca = _marca(copia)
     except OSError:

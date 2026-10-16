@@ -80,6 +80,40 @@ class TestPonteSemAcento(unittest.TestCase):
         self.assertEqual(ponte.nome_sem_acento("disco.dsé"), "disco")
         self.assertEqual(ponte.nome_sem_acento("system"), "system")
 
+    def test_nome_com_barra_de_largura_dupla_nao_sai_da_ponte(self):
+        # Revisao de seguranca de 16/10/2026: o NFKD troca a barra de largura
+        # dupla ("＼" e "／") pela barra de verdade, e o "：" pelos dois-pontos.
+        # Sem a troca por "_", "＼..＼..＼x.st" ia para C:\x.st.
+        esperados = {
+            "\uff3c..\uff3c..\uff3cx.st": "_.._.._x.st",
+            "C\uff1a\uff3cUsers\uff3cx.st": "C__Users_x.st",
+            "\uff0f..\uff0fx.st": "_.._x.st",
+            "a\uff1fb\uff0ac\uff02.st": "a_b_c_.st",
+            "\uff23\uff2f\uff2e.st": "jogo.st",                  # CON: a tela, nao um arquivo
+            "\uff2c\uff30\uff34\uff11.st": "jogo.st",           # LPT1: a impressora
+        }
+        for nome, limpo in esperados.items():
+            self.assertEqual(ponte.nome_sem_acento(nome), limpo)
+            jogo = os.path.join(self.com_acento, nome)
+            shutil.copyfile(self.jogo, jogo)
+            caminho, _opcoes, devolver = ponte.preparar(HATARI, self.sistema, jogo)
+            self.assertTrue(caminho.startswith(self.temporaria), caminho)
+            self.assertEqual(os.path.basename(os.path.dirname(caminho)), "jogo")
+            self.assertTrue(os.path.isfile(caminho))
+            devolver()
+        self.assertFalse(os.path.exists(os.path.join(os.path.splitdrive(self.base)[0] + os.sep, "x.st")))
+
+    def test_conferencia_final_barra_o_nome_que_sairia_da_ponte(self):
+        original = ponte.nome_sem_acento
+        ponte.nome_sem_acento = lambda nome: "..\\..\\fora.st"
+        try:
+            with self.assertRaises(OSError):
+                ponte.preparar(HATARI, self.sistema, self.jogo)
+        finally:
+            ponte.nome_sem_acento = original
+        self.assertFalse(os.path.exists(os.path.join(self.temporaria, "fora.st")))
+        self.assertEqual([n for n in os.listdir(self.temporaria) if n.startswith(ponte.PREFIXO)], [])
+
     def test_jogo_chamado_system_nao_bate_na_pasta_das_bios(self):
         jogo = os.path.join(self.com_acento, "system.st")
         shutil.copyfile(self.jogo, jogo)
