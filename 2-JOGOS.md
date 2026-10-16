@@ -696,6 +696,22 @@ a tela preta no Saturn Bomberman, mesmo esperando 60 segundos. Com a
 `mpr-17933.bin`, o jogo aparece em cerca de 32 segundos. PS2, Sega CD, PC
 Engine CD, Neo Geo e os outros da tabela não têm BIOS livre.
 
+**PS2 sem BIOS: o Play! foi testado e ainda não entra.** O Play! é um
+emulador de PS2 de código aberto (licença BSD) que imita a BIOS. Em
+15/10/2026, ele foi testado com os 37 jogos de PS2 do professor, num Ryzen 5
+5600G:
+
+| O que se mediu | Resultado |
+|---|---|
+| Jogos com imagem | 33 de 37 (Dynasty Warriors 6, Guitar Hero III, Mortal Kombat Deadly Alliance e SOCOM não mostraram nada em 4 minutos) |
+| Velocidade | de 47% a 100% da do console: Gun 47%, Black 51%, God Hand 53%, Burnout 3 54%; God of War 80%; Gran Turismo 4 e Dragon Quest VIII 100% |
+| Fechar o jogo | o RetroArch fica preso ("Unloading core...") e só sai derrubado: 3 de 3 pela janela, como o aluno fecha |
+| Pasta com acento | o emulador cai na hora (como a do professor, "Pedagógicos") |
+
+Num Celeron da escola, que é bem mais lento, a velocidade cairia muito
+abaixo disso. Por isso o PS2 continua pelo PCSX2, com a BIOS do console. O
+Play! volta a ser avaliado quando fechar direito.
+
 #### BIOS livres: as que vêm com o ARENA
 
 Alguns consoles têm uma BIOS livre, escrita do zero por voluntários, que

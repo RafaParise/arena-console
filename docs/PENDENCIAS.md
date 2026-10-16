@@ -16,9 +16,12 @@ Primeiro, o que já estava pedido:
 1. Feito: o Java ME (FreeJ2ME-Plus com o Java do ARENA, `fc788dd`), as
    versões antigas no histórico e nos Releases (`v0.9` do professor e `v1.0`
    do aluno DOOK3DS, `1cdb034`) e o `CREDITOS.md` (`009722f`).
-2. Saturn e PS1 sem a BIOS da empresa (Kronos ou YabaSanshiro com BIOS
-   imitada; a OpenBIOS do PCSX-Redux), com a escolha entre o original e o
-   livre. Avaliar o Play! para o PS2.
+2. Feito: a escolha entre o original e o livre (`servidor\jeitos_de_abrir.py`):
+   o PS1 com a OpenBIOS (`f50cdac`); o GameCube e o Wii pelo Dolphin de fora
+   ou pelo núcleo do RetroArch, com os arquivos de apoio `dolphin-emu\Sys`.
+   O Saturn não tem jeito livre (tela preta sem a BIOS, nos três
+   emuladores). O Play! (PS2 sem BIOS) não entrou: o RetroArch fica preso
+   ao fechar e ele cai em pasta com acento (números no guia 2).
 3. Biblioteca de jogos livres para mais consoles, como a do MS-DOS
    (homebrew de licença aberta e os 28 jogos do MAME liberados em
    mamedev.org).
