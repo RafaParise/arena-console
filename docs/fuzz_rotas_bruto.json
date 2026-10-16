@@ -381,7 +381,7 @@
     "rota": "/api/biblioteca-online",
     "metodo": "GET",
     "categoria": "dados_corretos",
-    "status": 503,
+    "status": 200,
     "ok": true,
     "motivo": "ok",
     "extra": ""
@@ -399,7 +399,7 @@
     "rota": "/api/biblioteca-online",
     "metodo": "GET",
     "categoria": "tipo_errado",
-    "status": 503,
+    "status": 200,
     "ok": true,
     "motivo": "ok",
     "extra": "campo=q"
@@ -417,7 +417,7 @@
     "rota": "/api/biblioteca-online",
     "metodo": "GET",
     "categoria": "emoji",
-    "status": 503,
+    "status": 200,
     "ok": true,
     "motivo": "ok",
     "extra": "campo=q"
@@ -429,7 +429,7 @@
     "status": 200,
     "ok": true,
     "motivo": "ok",
-    "extra": "falhas=0/20"
+    "extra": "falhas=0/2"
   },
   {
     "rota": "/api/capa",
@@ -2073,7 +2073,7 @@
     "rota": "/api/capa/atualizar",
     "metodo": "POST",
     "categoria": "dados_corretos",
-    "status": 503,
+    "status": 404,
     "ok": true,
     "motivo": "ok",
     "extra": ""
@@ -2121,7 +2121,7 @@
     "status": 200,
     "ok": true,
     "motivo": "ok",
-    "extra": "falhas=0/20"
+    "extra": "falhas=0/2"
   },
   {
     "rota": "/api/amigo/adicionar",

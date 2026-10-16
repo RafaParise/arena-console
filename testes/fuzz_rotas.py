@@ -64,6 +64,11 @@ def preparar_ambiente(destino):
 
 
 ROTAS_LENTAS = {"/api/barreiras": 60}
+# As que vao a internet quando ela existe (16/10/2026: com internet, a busca da
+# capa passava dos 5 s, e o fuzz contava "conexao falhou"). Prazo maior, e a
+# repeticao rapida so 2 vezes: 20 buscas seguidas viravam 20 pedidos a quem
+# guarda as capas e os jogos (o banco de capas, o archive.org).
+ROTAS_DA_INTERNET = {"/api/capa/atualizar": 60, "/api/biblioteca-online": 30}
 
 
 def requisicao(metodo, caminho, corpo=None, timeout=5):
@@ -219,7 +224,7 @@ def testar_rota(metodo, caminho, campos_ok, campos_caminho, relatorio):
     # Rotas lentas de proposito (auditoria 2): o diagnostico de lentidao
     # pergunta ao Windows por PowerShell (~5 s aqui, mais num Celeron). A tela
     # espera sem prazo; so o fuzz precisava saber.
-    prazo = ROTAS_LENTAS.get(caminho, 5)
+    prazo = ROTAS_LENTAS.get(caminho) or ROTAS_DA_INTERNET.get(caminho, 5)
 
     def enviar(corpo):
         if metodo == "GET":
@@ -280,12 +285,13 @@ def testar_rota(metodo, caminho, campos_ok, campos_caminho, relatorio):
 
     # 7. pedidos repetidos rapido
     falhas_repeticao = 0
-    for _ in range(20):
+    vezes = 2 if caminho in ROTAS_DA_INTERNET else 20
+    for _ in range(vezes):
         status, texto = enviar(campos_ok)
         if status is None:
             falhas_repeticao += 1
     registrar("repeticao_rapida", 200 if falhas_repeticao == 0 else None, "",
-              extra="falhas=%d/20" % falhas_repeticao)
+              extra="falhas=%d/%d" % (falhas_repeticao, vezes))
 
 
 def main():
