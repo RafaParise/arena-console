@@ -328,13 +328,34 @@ def sessao(jogo, plataforma, modesto, pasta):
                     processo.kill()
 
 
-def sessao_certa(r, sem_bios=False):
-    """A sessao fez tudo o que podia conferir? (Sem comandos -- a resposta
-    instantanea -- so o "abre" vale; sem a BIOS, a foto escura e' esperada.)"""
+def tem_estado_salvo(nucleo):
+    """O nucleo sabe salvar estado (F2)? A ficha dele diz (retroarch\\info,
+    savestate = "false" quando nao). Achado de 16/10/2026: o do Java ME
+    (FreeJ2ME-Plus) nao sabe -- o jogo roda num Java fora do RetroArch --, e a
+    matriz cobrava o estado dele como falha."""
+    ficha = os.path.join(RAIZ, "retroarch", "info", nucleo.replace(".dll", ".info"))
+    try:
+        with open(ficha, encoding="utf-8", errors="replace") as arquivo:
+            return not re.search(r'^savestate\s*=\s*"false"', arquivo.read(), re.M)
+    except OSError:
+        return True
+
+
+def chaves_da_sessao(r, sem_bios=False, sem_estado=False):
+    """O que a sessao confere. Sem comandos (a resposta instantanea), so o
+    "abre"; sem a BIOS, a foto escura e' esperada; sem estado salvo no nucleo,
+    nao ha estado para salvar nem carregar."""
     chaves = ("abre",) if r.get("comandos") else ("abre", "mostra_imagem", "salva_estado", "carrega_estado")
     if sem_bios:
         chaves = tuple(c for c in chaves if c != "mostra_imagem")
-    return all(r.get(c) for c in chaves)
+    if sem_estado:
+        chaves = tuple(c for c in chaves if c not in ("salva_estado", "carrega_estado"))
+    return chaves
+
+
+def sessao_certa(r, sem_bios=False, sem_estado=False):
+    """A sessao fez tudo o que podia conferir?"""
+    return all(r.get(c) for c in chaves_da_sessao(r, sem_bios, sem_estado))
 
 
 def main():
@@ -348,9 +369,12 @@ def main():
             sem_bios = arena.bios.falta_para_o_console(plataforma["id"], arena.PASTA_SISTEMA)
             if sem_bios:
                 item["sem_bios"] = sem_bios
+            sem_estado = not tem_estado_salvo(plataforma["core"])
+            if sem_estado:
+                item["sem_estado_salvo"] = True
             for modesto in (False, True):
                 r = sessao(jogo, plataforma, modesto, os.path.join(trabalho, "%02d_%s" % (n, int(modesto))))
-                if not sessao_certa(r, bool(sem_bios)):
+                if not sessao_certa(r, bool(sem_bios), sem_estado):
                     # Uma segunda chance, anotada: o nucleo do Dreamcast (Flycast)
                     # cai as vezes neste teste ("[GPF] unhandled access"). O que
                     # falhou na primeira vez fica no resultado -- e a tabela mostra.
@@ -381,10 +405,8 @@ def main():
         for modo, r in (("normal", n), ("modesto", m)):
             # Sem comandos (resposta instantanea), so o "abre" vale nesta sessao.
             # Sem a BIOS obrigatoria, a tela preta e' o esperado (o ARENA avisa).
-            chaves = ("abre",) if r.get("comandos") else ("abre", "mostra_imagem", "salva_estado", "carrega_estado")
-            if item.get("sem_bios"):
-                chaves = tuple(c for c in chaves if c != "mostra_imagem")
-            for chave in chaves:
+            # Sem estado salvo no nucleo (o Java ME), nao ha estado a conferir.
+            for chave in chaves_da_sessao(r, bool(item.get("sem_bios")), bool(item.get("sem_estado_salvo"))):
                 if not r.get(chave):
                     falhas.append("%s (%s): %s" % (item["console"], modo, chave))
         if n.get("comandos") and m.get("comandos"):
@@ -403,6 +425,9 @@ def main():
     for item in tabela:
         if item.get("sem_bios"):
             print("[SEM BIOS] %s: %s" % (item["console"], item["sem_bios"][:110]))
+        if item.get("sem_estado_salvo"):
+            print("[SEM ESTADO SALVO] %s: o nucleo nao salva estado (savestate = \"false\" na ficha dele)"
+                  % item["console"])
     for falha in falhas:
         print("[FALHOU]", falha)
     print("\nConsoles: %d | falhas: %d\nResultado: %s" % (len(tabela), len(falhas), destino))
