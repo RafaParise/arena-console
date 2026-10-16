@@ -289,7 +289,9 @@ Jogo de **vários discos** (PS1, Saturn...): deixe todos na mesma pasta, com
 `(Disc 1)`, `(Disc 2)` no nome — o ARENA junta num jogo só e troca o disco
 pelo menu. **PS3** precisa do firmware oficial instalado uma vez pelo RPCS3
 (menu *File → Install Firmware*). **Xbox 360** precisa de processador com
-AVX.
+AVX. **Thomson MO/TO:** a fita (`.k7`) e o disquete (`.fd`, `.sap`)
+começam pelo **Start** do controle (a partida automática do emulador fica
+desligada).
 
 ---
 
