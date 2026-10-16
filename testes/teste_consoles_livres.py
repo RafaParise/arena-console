@@ -350,21 +350,33 @@ def imagem_de_verdade(foto, cor=None):
 
 
 def abrir(jogo, nucleo, pasta, sistema, quadros, plataforma=None):
-    """Roda o jogo e devolve (foto, texto do registro, travou, usou a ponte).
+    """Roda o jogo e devolve (foto, texto do registro, travou, o jeito da
+    pasta com acento: "" quando nao precisou de nenhum).
     O nucleo que nao abre caminho com acento (o Hatari) vai pela MESMA ponte
-    que o ARENA usa (servidor\\ponte_sem_acento.py). As opcoes do RetroArch
-    do proprio console (consoles.json -> opcoes_retroarch) e o Java do ARENA
-    (usa_java) entram como no ARENA."""
+    que o ARENA usa (servidor\\ponte_sem_acento.py), e o que grava na system
+    em ANSI (o VICE) recebe a pasta system relativa, como no ARENA. As opcoes
+    do RetroArch do proprio console (consoles.json -> opcoes_retroarch) e o
+    Java do ARENA (usa_java) entram como no ARENA."""
     plataforma = plataforma or {}
     os.makedirs(pasta)
     cfg = base.config_base(pasta, plataforma.get("opcoes_retroarch", {}))
     ambiente = ambiente_sem_outro_java() if plataforma.get("usa_java") else None
     opcoes = {"system_directory": sistema}
     jogo_do_nucleo, devolver = jogo, None
-    ponte = ponte_sem_acento.precisa(nucleo, sistema, jogo)
-    if ponte:
+    pasta_ra = os.path.dirname(RETROARCH)
+    ponte = ""
+    if ponte_sem_acento.precisa(nucleo, sistema, jogo):
+        ponte = "pela ponte sem acento"
         jogo_do_nucleo, opcoes_da_ponte, devolver = ponte_sem_acento.preparar(nucleo, sistema, jogo)
         opcoes.update(opcoes_da_ponte)
+    else:
+        # A pasta de trabalho do RetroArch e' a que tem a system dentro, como
+        # a retroarch\ do ARENA.
+        relativa = ponte_sem_acento.pasta_sistema_relativa(nucleo, sistema, os.path.dirname(sistema))
+        if relativa:
+            ponte = "com a pasta system relativa"
+            opcoes["system_directory"] = relativa
+            pasta_ra = os.path.dirname(sistema)
     # A pasta system so com as BIOS livres (o --appendconfig aceita varios
     # arquivos separados por "|"; o ultimo vale).
     extra = os.path.join(pasta, "system.cfg")
@@ -377,7 +389,7 @@ def abrir(jogo, nucleo, pasta, sistema, quadros, plataforma=None):
                         "--appendconfig", cfg + "|" + extra, "--verbose", "--log-file", registro,
                         "--max-frames=%d" % quadros, "--max-frames-ss", "--max-frames-ss-path=" + foto,
                         jogo_do_nucleo],
-                       cwd=os.path.dirname(RETROARCH), timeout=150, env=ambiente,
+                       cwd=pasta_ra, timeout=150, env=ambiente,
                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         travou = False
     except subprocess.TimeoutExpired:
@@ -463,9 +475,18 @@ def main():
                     shutil.copyfile(foto, os.path.join(fotos, "%s - %s.png" % (item["console"], rotulo)))
                 print("   %-17s imagem: %-3s (%s)%s%s" % (rotulo, "sim" if ok else "NAO", detalhe,
                                                          " TRAVOU" if travou else "",
-                                                         " [pela ponte sem acento]" if ponte else ""))
+                                                         " [%s]" % ponte if ponte else ""))
                 if not ok or travou:
                     falhas.append("%s, %s: sem imagem (%s)" % (plataforma["nome"], rotulo, detalhe))
+                if rotulo == "pasta com acento":
+                    # O nucleo que grava em ANSI cria a pasta com o "ó" virado
+                    # em "Ã³", fora da pasta do jogo (achado de 15/10/2026).
+                    torto = trabalho.encode("utf-8").decode("cp1252", "replace")
+                    if os.path.isdir(torto):
+                        falhas.append("%s: gravou numa pasta de nome estragado (%s)" % (plataforma["nome"], torto))
+                        limpeza.apagar_pasta(torto)
+                    if plataforma["core"].startswith("vice_") and not os.path.isdir(os.path.join(sistema, "vice")):
+                        falhas.append("%s: o VICE nao criou a pasta vice dele na system certa" % plataforma["nome"])
                 if regras.get("registro"):
                     achou = bool(re.search(regras["registro"], texto))
                     print("   %-17s registro: %s" % ("", "confere" if achou else "NAO confere"))

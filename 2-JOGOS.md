@@ -810,6 +810,16 @@ nome do jogo, só sem o acento ("Ação.st" vira "Acao.st"): cada jogo tem o
 seu estado (F2). Até 15/10/2026, toda cópia se chamava `jogo`, e o estado
 de um jogo ficava por cima do de outro.
 
+**Nintendo 64 e Commodore numa pasta com acento:** o mupen64plus-next e o
+VICE abrem o jogo, mas gravam os arquivos deles (o cache de imagem e o banco
+de jogos `mupen64plus.ini` do N64; a pasta `vice`) pelo jeito antigo do
+Windows, em que o "ó" vira "Ã³". Até 15/10/2026, isso criava, fora do ARENA,
+uma pasta de nome estragado (como `Criador De Apps PedagÃ³gicos`): ela só tem
+cache e pode ser apagada. Agora o ARENA dá a eles a pasta das BIOS pelo
+caminho curto (`system`, a partir da pasta do RetroArch), e tudo fica dentro
+do ARENA. De quebra, o N64 passou a ler o banco de jogos, com o ajuste certo
+de cada jogo.
+
 **Fliperama (MAME e FBNeo):** cada placa tem a sua BIOS em `.zip`
 (`neogeo.zip`, `pgm.zip`, `naomi.zip`...), que vai na mesma pasta dos jogos
 dela. O cartão do jogo avisa qual falta.

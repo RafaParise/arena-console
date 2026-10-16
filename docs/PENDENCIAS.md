@@ -55,12 +55,6 @@ Depois do Release, nesta ordem:
 
 Achados de 15/10 que esperam conserto:
 
-- Na rodada final, o N64 (mupen64plus-next) gravou o cache de shaders, o de
-  texturas e o `mupen64plus.ini` numa pasta de nome estragado,
-  `C:\Projetos\Criador De Apps PedagÃ³gicos\arena-console\retroarch\system`.
-  Ali também ficou uma pasta `vice` vazia, do VICE. Os dois núcleos gravam
-  pelo caminho em ANSI quando o ARENA está numa pasta com acento. É só
-  cache: a pasta pode ser apagada.
 - O servidor escuta a descoberta de colegas (UDP 55436) em todas as redes,
   mesmo com a rede fechada. Por isso o Firewall do Windows pergunta na
   primeira vez que um Python novo roda. Avaliar escutar só com a rede
@@ -170,6 +164,10 @@ pasta dos pacotes" ajudaria quem nunca usou computador.
 - Pôr a "Social preview" pelo site (Settings → General).
 - As BIOS que faltam estão listadas em `BIOS\LEIA - O QUE FALTA.txt`.
 - O `mslugx.zip` está danificado. Só uma cópia nova resolve.
+- Apagar, se quiser, a pasta `C:\Projetos\Criador De Apps PedagÃ³gicos` (o
+  nome estragado de "Pedagógicos"): só tem o cache do N64 da rodada final de
+  15/10, gravado ali pelo caminho em ANSI. Desde 16/10 o ARENA não grava mais
+  lá (guia 2, "Nintendo 64 e Commodore numa pasta com acento").
 - Testes de sala: Jogar Junto em 5 notebooks, o Celeron, os controles na
   mão e o pen drive.
 - BIOS livre por sala limpa (`docs\SALA-LIMPA-BIOS.md`): se quiser, um

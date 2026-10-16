@@ -92,6 +92,26 @@ class TestPonteSemAcento(unittest.TestCase):
             self.assertTrue(os.path.isfile(os.path.join(opcoes["system_directory"], "tos.img")))
             devolver()
 
+    def test_n64_e_vice_recebem_a_pasta_system_relativa(self):
+        # Eles abrem o jogo com acento, mas gravam na system pelo caminho em
+        # ANSI (o "ó" virava "Ã³", numa pasta fora do ARENA).
+        retroarch = self.com_acento
+        for nucleo in ("mupen64plus_next_libretro.dll", "C:\\x\\cores\\vice_x64_libretro.dll",
+                       "vice_xplus4_libretro.dll"):
+            self.assertEqual(ponte.pasta_sistema_relativa(nucleo, self.sistema, retroarch), "system")
+        # Os outros nucleos, a pasta sem acento e a system fora da pasta de trabalho: nada muda.
+        self.assertIsNone(ponte.pasta_sistema_relativa(HATARI, self.sistema, retroarch))
+        self.assertIsNone(ponte.pasta_sistema_relativa("snes9x_libretro.dll", self.sistema, retroarch))
+        self.assertIsNone(ponte.pasta_sistema_relativa(None, self.sistema, retroarch))
+        self.assertIsNone(ponte.pasta_sistema_relativa("vice_x64_libretro.dll", "C:\\ARENA\\retroarch\\system",
+                                                       "C:\\ARENA\\retroarch"))
+        self.assertIsNone(ponte.pasta_sistema_relativa("vice_x64_libretro.dll", self.sistema, self.temporaria))
+        self.assertIsNone(ponte.pasta_sistema_relativa("vice_x64_libretro.dll", self.sistema, self.sistema))
+        self.assertIsNone(ponte.pasta_sistema_relativa("vice_x64_libretro.dll", "E:\\Pedagógicos\\system",
+                                                       "C:\\ARENA\\retroarch"))
+        acento_dentro = os.path.join(self.com_acento, "pasta ç", "system")
+        self.assertIsNone(ponte.pasta_sistema_relativa("vice_x64_libretro.dll", acento_dentro, retroarch))
+
     def test_sem_gravar_nada_volta_e_a_pasta_some(self):
         caminho, _opcoes, devolver = ponte.preparar(HATARI, self.sistema, self.jogo)
         self.assertFalse(devolver())
@@ -201,6 +221,9 @@ class TestPonteNoArquivoDaPartida(unittest.TestCase):
     def test_a_pasta_da_ponte_chega_ao_retroarch(self):
         self.assertEqual(self.pasta_system({"system_directory": "C:\\Temp\\ARENA-sem-acento\\system"}),
                          "C:\\Temp\\ARENA-sem-acento\\system")
+
+    def test_a_pasta_relativa_do_n64_chega_ao_retroarch(self):
+        self.assertEqual(self.pasta_system({"system_directory": "system"}), "system")
 
     def test_sem_a_ponte_vale_a_pasta_do_arena(self):
         self.assertEqual(os.path.normcase(self.pasta_system({})), os.path.normcase(self.sistema))

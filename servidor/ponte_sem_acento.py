@@ -25,6 +25,11 @@ C:\ProgramData, onde o Windows deixa so quem criou a pasta mexer no que esta
 dentro. Nunca a pasta Public do Windows, que e' de todos: la outro usuario
 poderia trocar o disquete no meio do jogo, e o ARENA levaria a troca de volta
 para a pasta do aluno.
+
+Outro caso, mais leve (rodada final de 15/10/2026): o nucleo que ABRE o jogo
+com acento, mas GRAVA na pasta system pelo caminho em ANSI, o jeito antigo
+do Windows, em que o "ó" vira "Ã³". Para ele nao precisa de copia: basta
+dizer a pasta system pelo caminho relativo (pasta_sistema_relativa).
 """
 import hashlib
 import os
@@ -52,6 +57,16 @@ NUCLEOS = {
 }
 PREFIXO = "ARENA-sem-acento-"
 
+# Os nucleos que abrem o jogo com acento, mas gravam na pasta system pelo
+# caminho em ANSI (rodada final de 15/10/2026): o N64 (mupen64plus-next)
+# gravou o cache de shaders, o de texturas e o mupen64plus.ini numa pasta de
+# nome estragado, fora do ARENA ("...\Criador De Apps PedagÃ³gicos\..."), e
+# o VICE (os Commodore) criou ali a pasta vice dele. Com a pasta system dita
+# pelo caminho relativo ("system", a partir da pasta do RetroArch), o texto
+# fica sem acento e o Windows completa o resto pela pasta de trabalho, que
+# ele guarda certo: o cache foi para retroarch\system (conferido em 16/10/2026).
+GRAVAM_EM_ANSI = ("mupen64plus_next_libretro.dll", "vice_")
+
 
 def sem_acento(caminho):
     """So letras e simbolos do ASCII (sem acento, sem cedilha)?"""
@@ -69,6 +84,23 @@ def nome_sem_acento(nome):
     # com a letra.
     base = unicodedata.normalize("NFKD", base).encode("ascii", "ignore").decode("ascii").strip(" .")
     return (base or "jogo") + (extensao.lower() if sem_acento(extensao) else "")
+
+
+def pasta_sistema_relativa(nucleo, pasta_sistema, pasta_trabalho):
+    """A pasta system dita a partir da pasta de trabalho do RetroArch
+    ("system"), para o nucleo que grava em ANSI, quando o caminho dela tem
+    acento. None quando nao precisa: outro nucleo, caminho sem acento, ou a
+    system fora da pasta de trabalho (o caminho relativo teria acento ou "..")."""
+    nome = os.path.basename(str(nucleo or "")).lower()
+    if not nome.startswith(GRAVAM_EM_ANSI) or sem_acento(pasta_sistema):
+        return None
+    try:
+        relativa = os.path.relpath(pasta_sistema, pasta_trabalho)
+    except ValueError:              # outra unidade (a system no E:, o RetroArch no C:)
+        return None
+    if not sem_acento(relativa) or relativa == os.curdir or relativa.split(os.sep)[0] == os.pardir:
+        return None
+    return relativa
 
 
 def precisa(nucleo, pasta_sistema, caminho_jogo):

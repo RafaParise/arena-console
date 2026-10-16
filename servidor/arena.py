@@ -1877,7 +1877,8 @@ def gravar_override(config, custo=None, extras=None, em_partida=False,
     opcoes["screenshot_directory"] = PASTA_CAPTURAS
     # A pasta das BIOS e' a do ARENA, a nao ser que a partida mande outra:
     # a ponte sem acento do Hatari (servidor\ponte_sem_acento.py) manda a
-    # copia dela, numa pasta sem acento.
+    # copia dela, numa pasta sem acento, e o N64 e o VICE recebem a mesma
+    # pasta pelo caminho relativo ("system").
     opcoes["system_directory"] = (extras or {}).get("system_directory") or PASTA_SISTEMA
     opcoes["cheat_database_path"] = PASTA_CHEATS
     opcoes["input_remapping_directory"] = PASTA_REMAPS
@@ -2767,6 +2768,16 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
                 print("[ARENA] Pasta com acento: o jogo abre por %s." % os.path.dirname(caminho_do_nucleo))
             except OSError as falha:
                 print("[ARENA] Nao consegui preparar a pasta sem acento: %s" % falha)
+        elif "system_directory" not in opcoes_jogo:
+            # O N64 e o VICE abrem o jogo com acento, mas gravam na pasta
+            # system pelo caminho em ANSI: o cache deles ia parar numa pasta
+            # de nome estragado, fora do ARENA. Para eles, a pasta system vai
+            # relativa a pasta do RetroArch (servidor\ponte_sem_acento.py).
+            relativa = ponte_sem_acento.pasta_sistema_relativa(jogo.get("core"), PASTA_SISTEMA, pasta_trabalho)
+            if relativa:
+                opcoes_jogo["system_directory"] = relativa
+                chaves_da_ponte = ["system_directory"]
+                print("[ARENA] Pasta com acento: o nucleo recebe a pasta system pelo caminho curto (%s)." % relativa)
         copia_nucleo = None
         if ligacao.get("nucleo"):
             try:
