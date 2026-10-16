@@ -68,6 +68,15 @@ def main():
         caminho = os.path.join(RAIZ, jogo["arquivo"])
         pasta = os.path.join(trabalho, "%03d" % n)
         item["abrir"] = base.abrir(jogo["plataforma_nome"], caminho, nucleo, pasta)
+        # Abertura lenta: o logo do Dreamcast com a BIOS, a abertura escura do
+        # Micro Machines 2. Tela preta nos primeiros 10 s nao e' "nao abre"
+        # (16/10/2026: os tres "NAO ABRE" da rodada de 15/10 eram isso). Sem
+        # travar e sem erro no registro, mais uma vez com 40 s.
+        abrir = item["abrir"]
+        if not abrir["abre_e_mostra_imagem"] and not abrir["travou"] and not abrir["erros"]:
+            pasta = pasta + "_40s"
+            item["abrir"] = dict(base.abrir(jogo["plataforma_nome"], caminho, nucleo, pasta, quadros=2400),
+                                 segunda_vez_com_40s=True)
         # FBNeo mostra uma tela de erro (que da foto!) quando falta arquivo
         # do romset: isso nao e' "abriu".
         if any("is required" in erro for erro in item["abrir"]["erros"]):
@@ -95,7 +104,10 @@ def main():
         print("%-45s %-9s junto: %-12s %s" % (jogo["titulo"][:45], abre, junto_txt,
                                                "; ".join(item["abrir"]["erros"])[:120]))
         saida.append(item)
-    destino = os.path.join(RAIZ, "docs", "abrir_todos_bruto.json")
+    # Com filtro de console, o resultado parcial fica na pasta do teste: no
+    # docs, ele tomaria o lugar do completo (o da rodada final).
+    destino = (os.path.join(trabalho, "abrir_todos_bruto.json") if filtro
+               else os.path.join(RAIZ, "docs", "abrir_todos_bruto.json"))
     with open(destino, "w", encoding="utf-8") as arquivo:
         json.dump(saida, arquivo, ensure_ascii=False, indent=1)
     print("\nFotos: %s\nResultado: %s" % (fotos, destino))

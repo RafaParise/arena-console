@@ -36,7 +36,12 @@ CFG = os.path.join(RAIZ, "retroarch", "retroarch.cfg")
 _EMU = os.path.join(RAIZ, "emuladores")
 # O que o RetroArch grava ao abrir um jogo: a configuracao (ao fechar) e o
 # historico e os favoritos (dados\builtin).
-DO_RETROARCH = [CFG, os.path.join(RAIZ, "dados", "builtin")]
+DO_RETROARCH = [CFG, os.path.join(RAIZ, "dados", "builtin"),
+                # O Dreamcast (Flycast) guarda na system os cartoes de memoria
+                # (VMU, os saves) e a memoria do console (dc_nvmem.bin: data,
+                # idioma), e regrava os dois ao fechar: o dc_nvmem.bin do
+                # professor mudou no meio da rodada final de 15/10/2026.
+                os.path.join(RAIZ, "retroarch", "system", "dc")]
 # O que os emuladores de fora gravam ao ligar um jogo: cartoes de memoria,
 # saves, perfil, tempo de jogo, historico e a configuracao que o ARENA
 # completa a cada jogo.

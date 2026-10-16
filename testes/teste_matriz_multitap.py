@@ -94,12 +94,15 @@ def registro(pasta):
 
 
 def erros_importantes(texto):
+    # "GET_VARIABLE: ... - Invalid value." e' o nucleo perguntando por uma
+    # opcao que ele mesmo nao declarou (o Flycast, reicast_dump_unique_textures,
+    # 16/10/2026): nao diz nada do jogo.
     return [l.strip()[:150] for l in texto.splitlines()
             if re.search(r"\[ERROR\]|required|não tem suporte|not support", l)
-            and not re.search(r"(?i)midi|áudio|audio|autoconf|mmdevice", l)][:6]
+            and not re.search(r"(?i)midi|áudio|audio|autoconf|mmdevice|GET_VARIABLE: .* - Invalid value", l)][:6]
 
 
-def abrir(console, jogo, nucleo, pasta):
+def abrir(console, jogo, nucleo, pasta, quadros=600):
     os.makedirs(pasta)
     cfg = config_base(pasta, {})
     foto = os.path.join(pasta, "foto.png")
@@ -107,9 +110,9 @@ def abrir(console, jogo, nucleo, pasta):
     inicio = time.monotonic()
     try:
         subprocess.run([RETROARCH, "-L", os.path.join(RAIZ, "retroarch", "cores", nucleo + "_libretro.dll"),
-                        "--appendconfig", cfg, "--verbose", "--log-file", log, "--max-frames=600",
+                        "--appendconfig", cfg, "--verbose", "--log-file", log, "--max-frames=%d" % quadros,
                         "--max-frames-ss", "--max-frames-ss-path=" + foto, jogo],
-                       cwd=os.path.dirname(RETROARCH), timeout=90,
+                       cwd=os.path.dirname(RETROARCH), timeout=90 + quadros // 30,
                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         travou = False
     except subprocess.TimeoutExpired:

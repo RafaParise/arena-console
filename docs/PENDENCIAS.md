@@ -28,7 +28,10 @@ Primeiro, o que já estava pedido:
 4. Feito o levantamento (`docs\SALA-LIMPA-BIOS.md`): dá só para homebrew, no
    Intellivision e no ColecoVision; o Odyssey 2 não vale a pena. Recomendação:
    não fazer agora (abaixo, em "Depende do Rafael").
-5. Testes com as BIOS e os jogos do professor em todos os consoles.
+5. Feito: os jogos do professor abrem em todos os consoles (a rodada final de
+   15/10 e, de novo, os 3 "NAO ABRE" dela, que eram aberturas lentas). Das
+   BIOS dele, só a do Dreamcast tem alternativa livre: o jeito livre dele
+   entrou (`80a7d35`). O `protege_cfg` passou a guardar a `system\dc`.
 6. Fundos animados e GIF:
    - a nave rosa do F-Zero está vermelha;
    - mais naves do F-Zero: a que pisca e explode ao encostar, a roxa e a
