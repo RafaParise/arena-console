@@ -27,11 +27,13 @@ import time
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RETROARCH = os.path.join(RAIZ, "retroarch", "retroarch.exe")
-PORTA_COMANDO = 55355
-
 sys.path.insert(0, os.path.join(RAIZ, "servidor"))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import jogos_de_teste  # noqa: E402  (acha o jogo tambem em subpasta)
+import porta_de_comando  # noqa: E402
+# A 55355 do RetroArch, ou outra se o Windows reservou a faixa dela
+# (testes\porta_de_comando.py).
+PORTA_COMANDO = porta_de_comando.livre()
 spec_a = importlib.util.spec_from_file_location("arena_matriz", os.path.join(RAIZ, "servidor", "arena.py"))
 arena = importlib.util.module_from_spec(spec_a)
 spec_a.loader.exec_module(arena)
