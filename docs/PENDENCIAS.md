@@ -42,7 +42,15 @@ Primeiro, o que já estava pedido:
    consertos de segurança: a cópia da ponte não sai da pasta dela, a lista
    de amigos só muda deste computador, e o código curto com dois donos não
    vira escolha no chute.
-8. O `INICIAR-ARENA.bat`/`.ps1` do professor (fora do git), por último.
+8. Feito: o `INICIAR-ARENA.bat`/`.ps1` do professor (fora do git, de
+   propósito). O erro: o OmniRoute passou a exigir chave de API, e o
+   `omniroute setup-claude` recebia "401 Authentication required", não
+   criava perfil nenhum e o script parava no passo 4 com uma mensagem que
+   não dizia o motivo. Agora ele pede a chave (sem mostrá-la), reaproveita
+   os perfis, liga o OmniRoute com os scripts liberados (o Windows bloqueava
+   o `omniroute.ps1` na janela nova), pula o plugin já instalado e libera só
+   os comandos do projeto (sem o `python:*`, e barrando o `git add -A` e o
+   `push --force`). O plano dele passou a ser este arquivo.
 9. Um Release com tudo.
 
 Depois do Release, nesta ordem:
@@ -76,6 +84,9 @@ Depois do Release, nesta ordem:
   GameCube e o Wii pelo núcleo, copiar também a
   `retroarch\system\dolphin-emu\Sys`; sem ela, os dois seguem pelo Dolphin
   de fora, sem pergunta.
+- Rodar o `INICIAR-ARENA.bat` de novo: no passo 4 ele pede a chave de API do
+  OmniRoute (no painel, http://localhost:20128, na parte de chaves). O
+  caminho com a chave certa eu não pude testar: só você tem a chave.
 - As BIOS que faltam estão listadas em `BIOS\LEIA - O QUE FALTA.txt`.
 - O `mslugx.zip` está danificado. Só uma cópia nova resolve.
 - O botão "Gerenciar catálogo" (o editor do acervo autorizado, escondido
