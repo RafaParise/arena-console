@@ -4574,12 +4574,17 @@ def dentro_da_pasta(caminho, pasta):
 # apagar perfil, mudar configuracao, instalar cheat e mandar abrir jogo.
 # O jogo em si (netplay do RetroArch) nunca passa por aqui: usa a porta
 # 55435 dele, direto, separada desta.
+#
+# Revisao de 16/10/2026: sairam da lista o /api/amigo/codigo e o
+# /api/amigo/testar, que so a tela deste computador chama. Abertos, outro
+# computador da sala adicionava a si mesmo como amigo do aluno (o
+# /api/amigo/codigo grava na lista de amigos) e passava a receber, na
+# sincronizacao, os recordes e as sessoes dele; e o /api/amigo/testar fazia
+# este computador procurar qualquer endereco a pedido de fora.
 ROTAS_REDE_EXTERNA = frozenset((
     "/api/colegas",         # GET - quem esta online, pra tela de amigos
     "/api/ranking",         # GET - placar compartilhado
     "/api/jogo/impressao",  # GET - confere se e o mesmo arquivo de jogo
-    "/api/amigo/testar",    # POST - "esse endereco responde?"
-    "/api/amigo/codigo",    # POST - adicionar amigo pelo codigo
     "/api/partida/testar",  # POST - pre-voo do Jogar Junto
     "/api/partida/cheguei", # POST - o convidado chegou (o anfitriao esperava)
     "/api/sinc/ola",        # POST - handshake da sincronizacao

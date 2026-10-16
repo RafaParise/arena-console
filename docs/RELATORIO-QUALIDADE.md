@@ -80,7 +80,11 @@ documentos, ferramentas, testes). As pastas que não são código do ARENA:
 rede** (`ROTAS_REDE_EXTERNA`): `/api/amigo/codigo`, `/api/amigo/testar`,
 `/api/colegas`, `/api/jogo/impressao`, `/api/partida/testar`, `/api/ranking`,
 `/api/sinc/ola`, `/api/sinc/receber`. As outras 55 recusam pedido de outro
-computador. Quem chama: a tela chama 61 (uma delas, `/api/capa`, pelo
+computador. (Atualização de 16/10/2026: hoje são 7. Entrou a
+`/api/partida/cheguei`, em 14/10, e saíram a `/api/amigo/codigo` e a
+`/api/amigo/testar`, que só a tela deste computador chama: abertas, outro
+computador da sala se punha como amigo do aluno e passava a receber os
+recordes dele.) Quem chama: a tela chama 61 (uma delas, `/api/capa`, pelo
 endereço que o próprio servidor põe no catálogo); o `PARTIDA.bat` chama 5;
 outro ARENA pela rede, 2. Nenhuma rota sem quem a chame, e nenhuma rota pedida
 pela tela que o servidor não tenha. A lista, com a função da tela que chama
@@ -478,7 +482,7 @@ segundo).
 | Sair da pasta pela rota da capa | `testes\teste_travessia_capa.py` | 6 tentativas (`..\`, `../`, caminho absoluto), todas bloqueadas |
 | 50 pedidos ao mesmo tempo | `testes\teste_concorrencia.py` | 0 respostas 5xx; `config.json` e `controles.json` válidos; `arena.db` íntegro (`PRAGMA integrity_check`) |
 | Longa duração (acelerada) | `testes\teste_longa_duracao.py` | 45.626 pedidos, 0 falhas de conexão; memória +0,4 MB e alças +2 depois de aquecer |
-| Quem da rede chama o quê (a) | `testes\teste_acesso_de_rede.py` | Só as 8 rotas da partida e da sincronização atendem outro computador; as outras (inclusive as 5 novas de 03/10: BIOS e Arrumar) respondem 403, e a configuração não muda |
+| Quem da rede chama o quê (a) | `testes\teste_acesso_de_rede.py` | Só as 8 rotas (7 desde 16/10/2026) da partida e da sincronização atendem outro computador; as outras (inclusive as 5 novas de 03/10: BIOS e Arrumar) respondem 403, e a configuração não muda |
 | Site qualquer mandando comando (b): outra origem e DNS rebinding | `testes\teste_dns_rebinding.py` + `Content-Type` obrigatório | Host de site estranho: 403; a configuração não muda |
 | "Aceitar conexões da rede" sem reabrir | `testes\teste_rede_sem_reabrir.py` | Liga e desliga na hora, aguenta 12 cliques colados |
 | Acervo com SHA-256 errado | `testes\teste_acervo_sha256.py` | Recusado |

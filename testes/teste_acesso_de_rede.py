@@ -80,7 +80,6 @@ def main():
             ("GET", "/api/colegas", None),
             ("GET", "/api/ranking", None),
             ("POST", "/api/sinc/ola", {}),
-            ("POST", "/api/amigo/testar", {"url": "127.0.0.1:8777"}),
         ]:
             status, resp = requisicao(metodo, caminho, corpo)
             passou = status != 403
@@ -111,6 +110,12 @@ def main():
             # O botao Arrumar (03/10/2026): mexe em arquivo de jogo.
             ("POST", "/api/jogo/arrumar", {"jogo_id": "x", "acao": "disco_solto"}),
             ("GET", "/api/arrumar/progresso?tarefa=x", None),
+            # A lista de amigos (16/10/2026): aberto, o /api/amigo/codigo
+            # deixava outro computador se pôr como amigo do aluno e receber
+            # os recordes dele; o /api/amigo/testar procurava qualquer
+            # endereço a pedido de fora. Só a tela deste computador chama.
+            ("POST", "/api/amigo/codigo", {"codigo": "abc123"}),
+            ("POST", "/api/amigo/testar", {"url": "127.0.0.1:8777"}),
         ]:
             status, resp = requisicao(metodo, caminho, corpo)
             passou = status == 403
