@@ -51,7 +51,11 @@ Primeiro, o que já estava pedido:
    o `omniroute.ps1` na janela nova), pula o plugin já instalado e libera só
    os comandos do projeto (sem o `python:*`, e barrando o `git add -A` e o
    `push --force`). O plano dele passou a ser este arquivo.
-9. Um Release com tudo.
+9. Feito (16/10): o Release v2026.10.16. O pacote completo é um download só,
+   o `ARENA-2026.10.16.zip` (528 MB; 66 consoles, 63 núcleos, o Java do Java ME,
+   os arquivos de apoio do Dolphin e as BIOS livres, a OpenBIOS inclusive); ao
+   lado, o de atualização (12 MB), para quem já usa o ARENA. Antes, a rodada
+   final inteira: 110 de 110 (`fdb8e77`).
 
 Depois do Release, nesta ordem:
 
