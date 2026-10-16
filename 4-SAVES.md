@@ -431,6 +431,11 @@ para casa, ou só guardar em lugar seguro.
 Pronto. Vai aparecer um arquivo na pasta `backup`, com o nome
 `meu-progresso-2026-09-06_1430.zip`.
 
+**Para achar o arquivo:** clique em **Mostrar na pasta**, ao lado dele, na
+lista. A pasta `backup` abre no Explorador do Windows com o seu pacote já
+marcado (em azul): é esse arquivo que você copia para o pen drive. Os outros
+que estão ali são as cópias de segurança automáticas; deixe-os lá.
+
 Dentro dele vão:
 
 | Item | Volta ao importar? |

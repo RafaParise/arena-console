@@ -5975,6 +5975,25 @@ class Manipulador(BaseHTTPRequestHandler):
                 return self.erro(erro, 404)
             return self.responder_json(dict(ok=True, **resultado))
 
+        if caminho == "/api/pacote/mostrar":
+            # Abre o Explorador do Windows na pasta backup com o pacote ja
+            # marcado: quem nunca usou computador ve qual arquivo levar no pen
+            # drive, no meio das copias de seguranca (observacao da Fase 7 da
+            # auditoria 3). So deste computador (nao esta em
+            # ROTAS_REDE_EXTERNA) e so pacote da lista, nunca caminho.
+            nome = os.path.basename(str(dados.get("arquivo", "")))
+            if nome not in {p["nome"] for p in listar_pacotes()}:
+                return self.erro("Não achei esse pacote na pasta backup. Clique em Montar meu pacote de novo.", 404)
+            alvo = os.path.join(PASTA_BACKUP, nome)
+            if not hasattr(os, "startfile"):
+                return self.erro("Mostrar na pasta só funciona no Windows. O pacote fica em %s: abra pelo "
+                                 "gerenciador de arquivos." % alvo)
+            try:
+                subprocess.Popen(["explorer.exe", "/select,", alvo])
+            except OSError as falha:
+                return self.erro(traduzir_erro_do_sistema(falha, "abrir a pasta"))
+            return self.responder_json({"ok": True, "pasta": os.path.relpath(PASTA_BACKUP, RAIZ), "arquivo": nome})
+
         if caminho == "/api/backup":
             anterior = ultima_copia()
             destino = fazer_backup()

@@ -116,6 +116,9 @@ def main():
             # endereço a pedido de fora. Só a tela deste computador chama.
             ("POST", "/api/amigo/codigo", {"codigo": "abc123"}),
             ("POST", "/api/amigo/testar", {"url": "127.0.0.1:8777"}),
+            # O "Mostrar na pasta" dos pacotes (16/10/2026): abre o
+            # Explorador deste computador.
+            ("POST", "/api/pacote/mostrar", {"arquivo": "meu-progresso.zip"}),
         ]:
             status, resp = requisicao(metodo, caminho, corpo)
             passou = status == 403

@@ -145,8 +145,7 @@ Depois do Release, nesta ordem:
      `--atualizar` e, para os consoles novos, copiar para ela as pastas
      `retroarch\cores` e `retroarch\info` do pacote novo (guia 6).
 
-Também: o botão "Gerenciar catálogo" (acervo) nunca aparece, e um "Abrir a
-pasta dos pacotes" ajudaria quem nunca usou computador.
+Também: o botão "Gerenciar catálogo" (acervo) nunca aparece.
 
 ## Depende do Rafael
 

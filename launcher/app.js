@@ -1704,11 +1704,28 @@ function desenharPacotes(lista) {
     const arquivo = document.createElement("code");
     arquivo.textContent = pacote.nome;
 
-    linha.append(nome, arquivo, trazer);
+    // Abre a pasta backup com o pacote marcado: é o arquivo que vai no pen
+    // drive, no meio das cópias de segurança.
+    const mostrar = document.createElement("button");
+    mostrar.type = "button";
+    mostrar.className = "botao jogo-placar";
+    mostrar.textContent = "Mostrar na pasta";
+    mostrar.addEventListener("click", () => mostrarPacote(pacote.nome));
+
+    linha.append(nome, arquivo, mostrar, trazer);
     lote.append(linha);
   }
 
   $("#listaPacotes").replaceChildren(lote);
+}
+
+async function mostrarPacote(arquivo) {
+  try {
+    await pedir("/api/pacote/mostrar", "POST", { arquivo });
+    recado("A pasta abriu com o seu pacote marcado: é esse arquivo que você leva no pen drive.");
+  } catch (falha) {
+    recado(falha.message, true);
+  }
 }
 
 async function exportarPacote() {
@@ -1718,7 +1735,7 @@ async function exportarPacote() {
   try {
     const dados = await pedir("/api/exportar", "POST", {});
     recado(`Pronto: ${dados.itens} arquivos, ${dados.tamanho_mb} MB. ` +
-           `Está em backup\\${dados.arquivo}`);
+           `Está em backup\\${dados.arquivo}. Para achar o arquivo, clique em Mostrar na pasta.`);
     const estadoNovo = await pedir("/api/estado");
     desenharPacotes(estadoNovo.pacotes || []);
   } catch (falha) {
