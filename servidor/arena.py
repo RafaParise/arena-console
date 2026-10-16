@@ -1070,9 +1070,16 @@ def ajustar_para_driver(opcoes, driver, perfil):
         opcoes["video_hard_sync"] = "false" if perfil == "desempenho" else "true"
         opcoes["video_hard_sync_frames"] = "0"
 
-    # WASAPI em modo exclusivo entrega o menor atraso de som, mas toma a
-    # placa de som para si. Reservado ao perfil de maior qualidade.
-    opcoes["audio_wasapi_exclusive_mode"] = "true" if perfil == "qualidade" else "false"
+    # Som pelo misturador do Windows (WASAPI compartilhado) em todo perfil.
+    # Ate 16/10/2026 o Qualidade e o Ultra tomavam a placa de som para si
+    # (modo exclusivo), pelo menor atraso. Medido neste Ryzen com um fone sem
+    # fio (JBL Quantum 810), o mesmo jogo de Super Nintendo, 4.300 quadros:
+    # exclusivo, 51,97 quadros/s e 21,3% de variacao no tempo de cada quadro
+    # (o jogo 13% mais lento, e tremido); compartilhado, 59,89 e 2,2%. O fone
+    # consome o som no relogio dele, e a sincronia pelo som segura o jogo nesse
+    # ritmo; no compartilhado, o Windows acerta a diferenca sozinho. O
+    # exclusivo continua nos Ajustes avancados ("Som so para o jogo").
+    opcoes["audio_wasapi_exclusive_mode"] = "false"
     opcoes["audio_wasapi_float_format"] = "true"
     return opcoes
 
@@ -1670,8 +1677,10 @@ def opcoes_efetivas(config, custo=None, controles_ligados=None):
 #     ate 30/09/2026 a "prioridade alta" prometida aqui nunca acontecia);
 #   - o ARENA para de vigiar a rede e de anunciar na rede enquanto o jogo
 #     roda, entao nao ha nenhuma tarefa de fundo disputando o processador;
-#   - a placa de som passa a ser do jogo em modo exclusivo (WASAPI), o que
-#     tira o misturador do Windows do caminho;
+#   - o som com a menor espera (32 ms). A placa de som so para o jogo (o
+#     modo exclusivo do WASAPI) saiu daqui em 16/10/2026: com um fone sem
+#     fio, deixava o jogo 13% mais lento e tremido (ver ajustar_para_driver).
+#     Quem quiser liga em Ajustes -> Avancado -> "Som so para o jogo";
 #   - tela cheia sem borda (nao a exclusiva - motivo abaixo);
 #   - filtros, voltar no tempo e resposta instantanea saem de cena.
 #
@@ -1688,9 +1697,9 @@ def opcoes_efetivas(config, custo=None, controles_ligados=None):
 # Para sair: feche o jogo com F10.
 
 ULTRA_DESEMPENHO = {
-    # Som direto na placa, sem o misturador do Windows no meio.
+    # Som com a menor espera. Sem o modo exclusivo (ver ajustar_para_driver):
+    # vale o que o aluno escolheu em "Som so para o jogo".
     "audio_driver": "wasapi",
-    "audio_wasapi_exclusive_mode": "true",
     "audio_latency": "32",
     "audio_resampler_quality": "1",
 

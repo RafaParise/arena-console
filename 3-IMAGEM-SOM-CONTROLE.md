@@ -538,7 +538,9 @@ teste automático do ARENA):
 - o ARENA **para de vigiar a rede** enquanto você joga — nenhuma tarefa de
   fundo disputando o processador. Volta sozinho ao fechar o jogo, inclusive
   se o jogo nem chegar a abrir;
-- a placa de som passa a ser do jogo, sem o misturador do Windows no meio;
+- o som com a menor espera (32 ms). Até 16/10/2026 o Ultra também tomava a
+  placa de som só para o jogo (o **Som exclusivo**); saiu porque, com um fone
+  sem fio, o jogo ficava 13% mais lento e tremido (veja **Som**, abaixo);
 - tela cheia sem borda (não a exclusiva — em placa de vídeo integrada a
   exclusiva às vezes engasga a troca de tela e o menu não aparece); no PS2
   (PCSX2) e no GameCube/Wii (Dolphin) também abre em tela cheia;
@@ -865,7 +867,7 @@ O ARENA muda os dois de uma vez.
 | Filtros de tela | desligado | desligado | ligado |
 | Suavizar imagem | desligado | ligado | ligado |
 | Atraso do som | 96 ms | 64 ms | 32 ms |
-| Som exclusivo | não | não | sim |
+| Som exclusivo | não | não | não |
 | Menu | leve | completo | completo |
 | Voltar no tempo e Resposta instantânea | desligados | desligados | desligados |
 
@@ -899,7 +901,7 @@ segundo, e o PS1 gastava 5 vezes o processador.
 | Opção | O que faz |
 |---|---|
 | **Motor de audio** | `wasapi` é o caminho mais curto até a placa de som. Deixe assim |
-| **Som exclusivo** | Menor atraso, mas o jogo toma a placa de som só para ele. Nada mais toca enquanto joga |
+| **Som exclusivo** | Menor atraso, mas o jogo toma a placa de som só para ele. Nada mais toca enquanto joga. Desligado em todo nível desde 16/10/2026 (leia abaixo) |
 | **Atraso do som** | Menor responde mais rápido, maior evita chiado |
 | **Volume** | 0 é o volume original do console |
 
@@ -914,6 +916,29 @@ segundo, e o PS1 gastava 5 vezes o processador.
 
 Se você baixar demais, o som começa a estalar. É o sinal de que passou do
 ponto: suba um nível.
+
+#### Por que o Som exclusivo vem desligado
+
+O jogo de console anda no ritmo do som: o emulador entrega um pedacinho de
+som por quadro e espera a placa de som pedir o próximo. É como uma esteira de
+fábrica que só anda quando o caixa lá na ponta pega a caixa anterior. No
+**Som exclusivo**, o caixa é o próprio fone. Alguns fones sem fio ou USB
+"pegam a caixa" no relógio deles, um pouco mais devagar, e a esteira inteira
+anda nesse ritmo. No modo comum (o compartilhado), o Windows fica no meio e
+acerta a diferença sozinho.
+
+Medido em 16/10/2026, no computador do professor, com um fone sem fio, o
+mesmo jogo de Super Nintendo por 4.300 quadros:
+
+| Som | Quadros por segundo | Variação no tempo de cada quadro |
+|---|---|---|
+| Exclusivo | 51,97 (o jogo 13% mais lento) | 21,3% (tremido) |
+| Compartilhado (o de agora) | 59,89 | 2,2% |
+
+Por isso nenhum nível liga mais o Som exclusivo sozinho, nem o Ultra. Com a
+caixa de som do notebook, ele costuma funcionar: quem quiser liga em
+**Ajustes → Avançado → Som só para o jogo** e confere se o jogo continua
+liso.
 
 ---
 
@@ -979,6 +1004,7 @@ saber qual resolveu.
 |---|---|
 | **Jogo travando** | 1. Desça para Desempenho · 2. Ligue Vídeo em segundo plano · 3. Desligue Filtros de tela · 4. Fila de imagens para 3 |
 | **Som picotando** | 1. Atraso do som para 96 · 2. Desligue Som exclusivo · 3. Se persistir, 128 |
+| **Jogo lento e tremido com fone sem fio ou USB** | Desligue Som exclusivo (Ajustes → Avançado → Som só para o jogo) |
 | **Controle demorando** | 1. Desligue Vídeo em segundo plano · 2. Atraso do som para 32 · 3. Fila de imagens para 2 · 4. Em jogo 2D e PC forte: ligue a **Resposta instantânea** (Ajustes → Avançado; custa de 4 a 12 vezes o processador, guia 6) |
 | **Imagem borrada** | Desligue Suavizar imagem, ligue Escala inteira |
 | **Imagem cortando ao meio** | Ligue Sincronizar com o monitor |

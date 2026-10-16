@@ -296,7 +296,11 @@ núcleo é 2,3 vezes mais forte. Como ficou:
   **saída de som segurando o ritmo**: com um headset sem fio desligado, o
   SNES deu 52 FPS e 22% de variação; sem seguir o som, 60. O COLETAR agora
   mede de novo sem a sincronia pelo som quando o FPS sai baixo e diz qual
-  dos dois foi.
+  dos dois foi. **Causa achada em 16/10/2026:** o modo exclusivo do som
+  (WASAPI), que o perfil Qualidade e o Ultra ligavam. Com o mesmo fone sem
+  fio, 4.300 quadros: exclusivo, 51,97 quadros/s e 21,3% de variação;
+  compartilhado, 59,89 e 2,2%. Nenhum perfil liga mais o exclusivo sozinho
+  (`arena.ajustar_para_driver`); quem quiser liga em Ajustes → Avançado.
 - **Primeiro resultado (02/10/2026):** reprovou a memória do servidor (64,4 MB,
   teto 64). Causa: o índice de títulos de fliperama criado no mesmo dia (+13
   MB). Consertado (busca direta no banco, bancos soltos depois da lista):

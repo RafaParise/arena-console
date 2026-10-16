@@ -288,8 +288,8 @@
       "tipo": "bool",
       "custo": "nada",
       "nota_minima": 3,
-      "explica": "O jogo toma a placa de som para ele.",
-      "exemplo": "O som fica mais rápido e mais limpo, mas nada mais toca enquanto você joga: nem música, nem vídeo, nem chamada."
+      "explica": "O jogo toma a placa de som para ele. Com alguns fones sem fio ou USB, o jogo fica mais lento e tremido: se acontecer, desligue.",
+      "exemplo": "É como pegar o microfone só para você: a voz chega mais rápido, mas ninguém mais fala. Com o fone errado é pior: o fone escuta no ritmo dele, e o jogo espera. Medido com um fone sem fio: 52 quadros por segundo, e não 60."
     },
     {
       "chave": "audio_latency",
