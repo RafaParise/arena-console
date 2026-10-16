@@ -25,8 +25,9 @@ Primeiro, o que já estava pedido:
 3. Feito: a biblioteca de jogos livres por console (`servidor\biblioteca_livre.json`,
    37 jogos de 15 consoles, baixados de quem publicou, com a marca conferida).
    Do mamedev.org, 20 dos 28: os 8 da Video Klein são de pôquer e aposta.
-4. Sala limpa das BIOS pequenas (Odyssey 2, ColecoVision e Intellivision):
-   primeiro, levantar a documentação pública e dizer se dá.
+4. Feito o levantamento (`docs\SALA-LIMPA-BIOS.md`): dá só para homebrew, no
+   Intellivision e no ColecoVision; o Odyssey 2 não vale a pena. Recomendação:
+   não fazer agora (abaixo, em "Depende do Rafael").
 5. Testes com as BIOS e os jogos do professor em todos os consoles.
 6. Fundos animados e GIF:
    - a nave rosa do F-Zero está vermelha;
@@ -179,6 +180,10 @@ pasta dos pacotes" ajudaria quem nunca usou computador.
 - O `mslugx.zip` está danificado. Só uma cópia nova resolve.
 - Testes de sala: Jogar Junto em 5 notebooks, o Celeron, os controles na
   mão e o pen drive.
+- BIOS livre por sala limpa (`docs\SALA-LIMPA-BIOS.md`): se quiser, um
+  projeto de aula para o Intellivision (uma turma escreve a especificação,
+  outra, que nunca viu o original, escreve o código). Eu não posso garantir
+  a sala limpa: já posso ter visto o código original nos meus dados.
 
 ## Limites conhecidos (registrados, sem conserto)
 
