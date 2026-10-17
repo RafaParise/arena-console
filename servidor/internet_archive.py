@@ -17,11 +17,12 @@ import hashlib
 import json
 import os
 import re
-import subprocess
 import urllib.parse
 import urllib.error
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
+
+import baixar
 
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -81,18 +82,15 @@ def _ler(url, segundos=None):
     """O JSON de 'url', ou FalhaDeRede com a frase certa (rede ou login)."""
     segundos = segundos or SEGUNDOS_BUSCA
     try:
-        resultado = subprocess.run(
-            ["curl.exe", "--fail", "--silent", "--show-error", "--location",
-             "--max-time", str(segundos), "-A", "ARENA/1.0", url],
-            capture_output=True)
-    except (OSError, subprocess.SubprocessError):
+        codigo, dados = baixar.rodar(url, segundos)
+    except OSError:
         raise FalhaDeRede(MENSAGEM_REDE)
-    if resultado.returncode != 0:
+    if codigo != 0:
         raise FalhaDeRede(MENSAGEM_REDE)
-    if parece_pagina_de_login(resultado.stdout):
+    if parece_pagina_de_login(dados):
         raise FalhaDeRede(MENSAGEM_PORTAL)
     try:
-        return json.loads(resultado.stdout.decode("utf-8"))
+        return json.loads(dados.decode("utf-8"))
     except (ValueError, UnicodeDecodeError):
         raise FalhaDeRede(MENSAGEM_REDE)
 
@@ -282,11 +280,10 @@ def instalar(identificador, nome_arquivo, plataforma=""):
         # queda de rede NO MEIO DO DOWNLOAD (diferente da busca de
         # metadados, ja tratada acima) vazava como CalledProcessError cru.
         try:
-            subprocess.run(
-                ["curl.exe", "--fail", "--silent", "--show-error", "--location",
-                 "--max-time", "120", "-A", "ARENA/1.0", "-o", temporario, url],
-                check=True)
-        except (OSError, subprocess.SubprocessError):
+            codigo, _nada = baixar.rodar(url, 120, destino=temporario)
+        except OSError:
+            codigo = -1
+        if codigo != 0:
             raise FalhaDeRede(
                 "O download caiu no meio do caminho. Confira a internet e "
                 "tente de novo.")

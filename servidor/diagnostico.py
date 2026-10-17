@@ -59,6 +59,7 @@ PROGRAMA = [
     "servidor/nomes_arcade.py", "servidor/processos.py", "servidor/capas_do_disco.py",
     "servidor/como_colocar.py", "servidor/ponte_sem_acento.py", "servidor/java_do_arena.py",
     "servidor/jeitos_de_abrir.py", "servidor/biblioteca_livre.py", "servidor/lossless.py", "servidor/navegadores.py",
+    "servidor/plataforma.py", "servidor/baixar.py",
     "servidor/filtros/pixel-nitido.slangp", "servidor/filtros/fsr.slangp",
     "servidor/filtros/catmull-rom.slangp", "servidor/filtros/rcas.slangp", "servidor/filtros/suave.slangp",
     "servidor/consoles.json", "servidor/graficos.json", "servidor/recursos.json",

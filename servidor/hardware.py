@@ -7,15 +7,32 @@ Descobre processador, memoria, tipo de disco e sistema operacional.
 Tudo pela biblioteca padrao e pelas APIs do proprio Windows. Nada de
 'pip install', nada de programa externo, nada de 'wmic' (que foi removido
 das versoes recentes do Windows).
+
+No Linux (item 13 do plano de 15/10/2026), as mesmas perguntas vao aos
+arquivos que o proprio Linux mantem: /proc (memoria, processador), /sys
+(placa de video, tela, disco removivel) e /proc/self/mountinfo (o sistema de
+arquivos e o numero do disco). Tambem sem programa externo e sem senha.
 """
 
 import ctypes
+import glob
 import os
 import platform
 import re
 import socket
 import sys
 import time
+
+NO_WINDOWS = sys.platform.startswith("win")
+
+
+def _ler(caminho):
+    """O texto de um arquivo do Linux (/proc, /sys), ou "" se nao der."""
+    try:
+        with open(caminho, encoding="utf-8", errors="replace") as arquivo:
+            return arquivo.read()
+    except OSError:
+        return ""
 
 
 # ---------------------------------------------------------------------------
@@ -36,8 +53,26 @@ class _MemoryStatusEx(ctypes.Structure):
     ]
 
 
+def _memoria_linux():
+    """/proc/meminfo: MemTotal e MemAvailable (o que da para usar sem tirar
+    nada de ninguem), em kB."""
+    campos = {}
+    for linha in _ler("/proc/meminfo").splitlines():
+        nome, _sep, valor = linha.partition(":")
+        partes = valor.split()
+        if partes and partes[0].isdigit():
+            campos[nome.strip()] = int(partes[0]) * 1024
+    total = campos.get("MemTotal")
+    if not total:
+        return {"total_gb": 4.0, "livre_gb": 1.0}
+    livre = campos.get("MemAvailable", campos.get("MemFree", 0))
+    return {"total_gb": round(total / (1024 ** 3), 1), "livre_gb": round(livre / (1024 ** 3), 1)}
+
+
 def memoria():
     """Devolve total e livre de RAM em GB."""
+    if not NO_WINDOWS:
+        return _memoria_linux()
     try:
         status = _MemoryStatusEx()
         status.dwLength = ctypes.sizeof(_MemoryStatusEx)
@@ -72,6 +107,15 @@ def processador():
         except Exception:
             nome = ""
 
+    else:
+        # Linux: o /proc/cpuinfo (o "model name" no PC; no ARM, o "Model" ou
+        # o "Hardware" da placa).
+        for linha in _ler("/proc/cpuinfo").splitlines():
+            chave, _sep, valor = linha.partition(":")
+            if chave.strip() in ("model name", "Model", "Hardware") and valor.strip():
+                nome = valor.strip()
+                break
+
     if not nome:
         nome = platform.processor() or "Processador desconhecido"
 
@@ -92,6 +136,12 @@ CODIGOS_INSTRUCOES = {"avx": 39, "avx2": 40}
 def instrucoes():
     """{'avx': bool, 'avx2': bool}; None se nao der para perguntar."""
     if not sys.platform.startswith("win"):
+        # Linux: as "flags" do /proc/cpuinfo (no ARM nao ha AVX: None).
+        for linha in _ler("/proc/cpuinfo").splitlines():
+            chave, _sep, valor = linha.partition(":")
+            if chave.strip() == "flags":
+                marcas = set(valor.split())
+                return {nome: nome in marcas for nome in CODIGOS_INSTRUCOES}
         return {"avx": None, "avx2": None}
     resultado = {}
     for nome, codigo in CODIGOS_INSTRUCOES.items():
@@ -282,10 +332,64 @@ VALIDADE_DA_MEDIDA_S = 7 * 24 * 3600
 MEDIDAS_GUARDADAS = 64        # uma por computador da sala, com folga
 
 
+def _sem_escapes(texto):
+    r"""O /proc/self/mountinfo escreve espaco e acento em octal (\040)."""
+    return re.sub(r"\\([0-7]{3})", lambda m: chr(int(m.group(1), 8)), texto)
+
+
+def montagem(pasta):
+    """Linux: {"ponto", "tipo", "origem", "dispositivo"} da montagem que
+    guarda a pasta (a mais funda que contem o caminho), ou None."""
+    alvo = os.path.realpath(pasta)
+    melhor = None
+    for linha in _ler("/proc/self/mountinfo").splitlines():
+        partes = linha.split()
+        if "-" not in partes or len(partes) < 7:
+            continue
+        separador = partes.index("-")
+        ponto = _sem_escapes(partes[4])
+        dentro = alvo == ponto or alvo.startswith(ponto.rstrip("/") + "/")
+        if dentro and (melhor is None or len(ponto) >= len(melhor["ponto"])):
+            melhor = {"ponto": ponto, "tipo": partes[separador + 1] if len(partes) > separador + 1 else "",
+                      "origem": _sem_escapes(partes[separador + 2]) if len(partes) > separador + 2 else "",
+                      "dispositivo": partes[2]}
+    return melhor
+
+
+def _disco_linux(pasta):
+    """("removivel" ou "fixo", ponto de montagem) do disco da pasta. Removivel
+    e' o que o Linux marca assim (/sys/block/.../removable) ou o que chega
+    pela USB (o HD externo diz "fixo", mas sai do computador igual)."""
+    m = montagem(pasta)
+    if not m:
+        return "desconhecido", ""
+    if m["tipo"] in ("nfs", "nfs4", "cifs", "smb3", "9p", "fuse.sshfs"):
+        return "rede", m["ponto"]
+    caminho = os.path.realpath("/sys/dev/block/" + m["dispositivo"])
+    if not caminho.startswith("/sys/devices"):
+        return "desconhecido", m["ponto"]
+    removivel = _ler(os.path.join(caminho, "removable")).strip() or \
+        _ler(os.path.join(os.path.dirname(caminho), "removable")).strip()
+    return ("removivel" if removivel == "1" or "/usb" in caminho else "fixo"), m["ponto"]
+
+
 def numero_do_volume(pasta):
     """Numero de serie do disco (volume) onde a pasta esta, ou None.
     Muda quando o ARENA vai para outro pen drive ou outro disco."""
     if not sys.platform.startswith("win"):
+        # Linux: o UUID do sistema de arquivos (o mesmo pen drive tem o mesmo
+        # em qualquer computador), pela lista /dev/disk/by-uuid.
+        m = montagem(pasta)
+        if not m:
+            return None
+        try:
+            maior, menor = (int(x) for x in m["dispositivo"].split(":"))
+            procurado = os.makedev(maior, menor)
+            for nome in os.listdir("/dev/disk/by-uuid"):
+                if os.stat(os.path.join("/dev/disk/by-uuid", nome)).st_rdev == procurado:
+                    return nome.upper()
+        except (OSError, ValueError):
+            pass
         return None
     try:
         unidade = os.path.splitdrive(os.path.abspath(pasta))[0]
@@ -364,6 +468,8 @@ def disco(pasta, guardar_em=None):
             tipo = TIPOS_DISCO.get(codigo, "desconhecido")
         except Exception:
             pass
+    else:
+        tipo, unidade = _disco_linux(pasta)
 
     medida = (medir_velocidade_guardada(pasta, guardar_em) if guardar_em
               else medir_velocidade(pasta))
@@ -445,10 +551,16 @@ def sistema_de_arquivos(pasta):
     na auditoria: este projeto tem jogos de PS2 reais passando disso
     (Gran Turismo 4, 4,95 GB) -- copiar um arquivo assim para um pen
     drive em FAT32 falha ou trunca no meio, sem o ARENA saber por que o
-    jogo "nao abre". So funciona no Windows; None nos outros.
+    jogo "nao abre". No Linux, o tipo da montagem (vfat, exfat, ntfs3...),
+    com o mesmo nome que o Windows da.
     """
     if not sys.platform.startswith("win"):
-        return None
+        m = montagem(pasta)
+        if not m:
+            return None
+        nomes = {"vfat": "FAT32", "msdos": "FAT", "exfat": "exFAT", "ntfs": "NTFS", "ntfs3": "NTFS",
+                 "fuseblk": "NTFS"}
+        return nomes.get(m["tipo"], m["tipo"] or None)
     try:
         raiz = os.path.splitdrive(os.path.abspath(pasta))[0] + "\\"
         nome_buffer = ctypes.create_unicode_buffer(256)
@@ -469,7 +581,9 @@ def sistema_de_arquivos(pasta):
 def sistema():
     """Nome do sistema operacional, do jeito que o usuario reconhece."""
     if not sys.platform.startswith("win"):
-        return "%s %s" % (platform.system(), platform.release())
+        import plataforma
+        arquitetura = "64 bits" if sys.maxsize > 2 ** 32 else "32 bits"
+        return "%s (%s, %s)" % (plataforma.descricao(), platform.machine() or "?", arquitetura)
 
     nome, build = "", ""
     try:
@@ -579,6 +693,69 @@ def placa_da_tela_principal():
         return ""
 
 
+FABRICANTES_PCI = {"0x1002": "AMD", "0x8086": "Intel", "0x10de": "NVIDIA", "0x1af4": "virtio (maquina virtual)",
+                   "0x15ad": "VMware", "0x1234": "QEMU", "0x80ee": "VirtualBox"}
+
+
+def _nome_no_pci_ids(fabricante, modelo):
+    """O nome comercial na lista pci.ids que o proprio Linux traz (a mesma do
+    lspci), sem chamar programa nenhum. "" se a lista nao estiver la."""
+    procurado_fab, procurado_mod = fabricante[2:].lower(), modelo[2:].lower()
+    for lista in ("/usr/share/hwdata/pci.ids", "/usr/share/misc/pci.ids", "/usr/share/pci.ids"):
+        texto = _ler(lista)
+        if not texto:
+            continue
+        no_fabricante = False
+        for linha in texto.splitlines():
+            if not linha or linha.startswith("#"):
+                continue
+            if not linha.startswith("\t"):
+                no_fabricante = linha[:4].lower() == procurado_fab
+            elif no_fabricante and not linha.startswith("\t\t") and linha[1:5].lower() == procurado_mod:
+                return linha[5:].strip()
+    return ""
+
+
+def _placa_linux():
+    """(nome, integrada) da placa ligada na tela, pelo /sys/class/drm. A
+    integrada: Intel (menos as Arc), AMD com pouca memoria propria (as APU
+    reservam ate 2 GB da RAM) e placa de maquina virtual."""
+    escolhida = None
+    for cartao in sorted(glob.glob("/sys/class/drm/card[0-9]*")):
+        if "-" in os.path.basename(cartao):
+            continue
+        dispositivo = os.path.join(cartao, "device")
+        fabricante = _ler(os.path.join(dispositivo, "vendor")).strip()
+        if not fabricante:
+            continue
+        ligada = any(_ler(os.path.join(c, "status")).strip() == "connected"
+                     for c in glob.glob(cartao + "-*"))
+        if escolhida is None or (ligada and not escolhida[2]):
+            escolhida = (dispositivo, fabricante, ligada)
+    if not escolhida:
+        return "", True
+    dispositivo, fabricante, _ligada = escolhida
+    modelo = _ler(os.path.join(dispositivo, "device")).strip()
+    nome = _nome_no_pci_ids(fabricante, modelo) if modelo else ""
+    marca = FABRICANTES_PCI.get(fabricante, "")
+    if nome and marca and marca.lower() not in nome.lower():
+        nome = "%s %s" % (marca, nome)
+    nome = nome or ("%s %s" % (marca, modelo)).strip() or "placa de video"
+    try:
+        memoria_propria = int(_ler(os.path.join(dispositivo, "mem_info_vram_total")).strip() or 0)
+    except ValueError:
+        memoria_propria = 0
+    if fabricante == "0x8086":
+        integrada = "arc" not in nome.lower()
+    elif fabricante == "0x1002":
+        integrada = (0 < memoria_propria <= 2 * 1024 ** 3) or any(m in nome.lower() for m in INTEGRADAS)
+    elif fabricante == "0x10de":
+        integrada = False
+    else:
+        integrada = True
+    return nome, integrada
+
+
 def placa_video():
     """Descobre a placa de video e se ela e integrada ou dedicada.
 
@@ -596,8 +773,11 @@ def placa_video():
     integrada. O ARENA achava que era placa dedicada, dava nota 4 e o PS1
     ia para 6x -- o texto do CTR saia quebrado. Sem administrador.
     """
-    nome = placa_da_tela_principal() if sys.platform.startswith("win") else ""
-    if not nome and sys.platform.startswith("win"):
+    if not sys.platform.startswith("win"):
+        nome, integrada = _placa_linux()
+        return {"nome": nome or "placa de video desconhecida", "integrada": integrada, "conhecida": bool(nome)}
+    nome = placa_da_tela_principal()
+    if not nome:
         try:
             import winreg
             base = (r"SYSTEM\CurrentControlSet\Control\Class"
@@ -640,7 +820,15 @@ def driver_video():
 
     Placas Intel HD anteriores a 2015 nao tem Vulkan. Forcar Vulkan nelas
     faz o RetroArch abrir e fechar na hora, sem mensagem nenhuma.
+
+    No Linux nao ha DirectX: vulkan (se a libvulkan carrega) ou glcore.
     """
+    if not sys.platform.startswith("win"):
+        try:
+            ctypes.CDLL("libvulkan.so.1")
+            return "vulkan"
+        except OSError:
+            return "glcore"
     for biblioteca, motor in (("vulkan-1.dll", "vulkan"), ("d3d11.dll", "d3d11")):
         try:
             ctypes.CDLL(biblioteca)
@@ -664,7 +852,8 @@ class Info(ctypes.Structure):
                 ("pApplicationInfo", ctypes.c_void_p), ("enabledLayerCount", ctypes.c_uint32),
                 ("ppEnabledLayerNames", ctypes.c_void_p), ("enabledExtensionCount", ctypes.c_uint32),
                 ("ppEnabledExtensionNames", ctypes.c_void_p)]
-vk = ctypes.WinDLL("vulkan-1.dll")
+import sys
+vk = ctypes.WinDLL("vulkan-1.dll") if sys.platform.startswith("win") else ctypes.CDLL("libvulkan.so.1")
 vk.vkCreateInstance.argtypes = [ctypes.POINTER(Info), ctypes.c_void_p, ctypes.POINTER(ctypes.c_void_p)]
 vk.vkEnumeratePhysicalDevices.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint32), ctypes.c_void_p]
 vk.vkDestroyInstance.argtypes = [ctypes.c_void_p, ctypes.c_void_p]
@@ -679,9 +868,8 @@ print("placas=%d" % n.value)
 
 def vulkan_tem_placa(limite=10):
     """True/False: o Vulkan enxerga alguma placa de video? None = nao deu
-    para saber (sem Windows, demorou demais) -- quem chama nao muda nada."""
-    if not sys.platform.startswith("win"):
-        return None
+    para saber (demorou demais) -- quem chama nao muda nada. No Linux, a
+    mesma pergunta a libvulkan.so.1."""
     try:
         import subprocess
         r = subprocess.run([sys.executable, "-c", _PERGUNTA_VULKAN], capture_output=True,
@@ -729,8 +917,18 @@ def altura_da_tela():
     tela_4k). DESKTOPVERTRES (117) do GetDeviceCaps nao depende da escala
     do Windows. Os tipos vao declarados (a alca de 64 bits cortada pela
     metade ja foi bug aqui: SetPriorityClass sem tipos), numa copia propria
-    da user32 para nao mexer em quem mais usa a mesma funcao."""
+    da user32 para nao mexer em quem mais usa a mesma funcao.
+
+    No Linux: a primeira resolucao (a nativa) da saida ligada na tela, em
+    /sys/class/drm/card*-*/modes, sem precisar da sessao grafica."""
     if os.name != "nt":
+        for saida in sorted(glob.glob("/sys/class/drm/card[0-9]*-*")):
+            if _ler(os.path.join(saida, "status")).strip() != "connected":
+                continue
+            primeira = (_ler(os.path.join(saida, "modes")).split() or [""])[0]
+            m = re.match(r"(\d+)x(\d+)", primeira)
+            if m:
+                return int(m.group(2))
         return 0
     try:
         usuario, gdi = ctypes.WinDLL("user32"), ctypes.WinDLL("gdi32")

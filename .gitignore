@@ -39,6 +39,8 @@ dados/*.cfg
 # Runtime pesado que não entra no git — copiar manualmente para rodar
 # (Python embutido e o RetroArch inteiro; ver LEIA-ME.md)
 servidor/python/
+# O Python do Linux (ferramentas\preparar_linux.py poe no lugar)
+servidor/python-linux/
 
 # ---------------------------------------------------------------------------
 # jogos/, emuladores/ e retroarch/: mantém só a estrutura de pastas vazias

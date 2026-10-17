@@ -20,9 +20,9 @@ novo, para ninguem baixar sem ela.
 import hashlib
 import json
 import os
-import subprocess
 import threading
 
+import baixar
 from internet_archive import FalhaDeRede, parece_pagina_de_login
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -117,12 +117,10 @@ def instalar(ident, aceite=False, pasta_livres=None):
     temporario = "%s.%d.baixando" % (final, threading.get_ident())
     try:
         try:
-            feito = subprocess.run(
-                ["curl.exe", "--fail", "--silent", "--show-error", "--location", "--max-time", str(SEGUNDOS),
-                 "-A", "ARENA/1.0", "-o", temporario, jogo["baixar"]], capture_output=True)
-        except (OSError, subprocess.SubprocessError):
+            codigo, _nada = baixar.rodar(jogo["baixar"], SEGUNDOS, destino=temporario)
+        except OSError:
             raise FalhaDeRede(MENSAGEM_REDE)
-        if feito.returncode != 0 or not os.path.isfile(temporario):
+        if codigo != 0 or not os.path.isfile(temporario):
             raise FalhaDeRede(MENSAGEM_REDE)
         with open(temporario, "rb") as arquivo:
             comeco = arquivo.read(512)

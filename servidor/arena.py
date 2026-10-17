@@ -88,6 +88,9 @@ import arrumar     # noqa: E402  (o botao Arrumar: o arquivo do jogo no lugar ce
 import ponte_sem_acento  # noqa: E402  (nucleo que nao abre pasta com acento: o Hatari -- 14/10/2026)
 import java_do_arena  # noqa: E402  (o Java que vem junto, para o Java ME -- 15/10/2026)
 import jeitos_de_abrir  # noqa: E402  (o original ou o livre: a tela pergunta -- 15/10/2026)
+# Windows ou Linux: os nomes que mudam de um para o outro (item 13, 17/10/2026).
+# "plataforma_do_sistema" porque "plataforma" ja e' o console, aqui dentro.
+import plataforma as plataforma_do_sistema  # noqa: E402
 
 PASTA_LAUNCHER = os.path.join(RAIZ, "launcher")
 PASTA_DADOS = os.path.join(RAIZ, "dados")
@@ -112,7 +115,7 @@ PASTA_PERFIS_CONTROLE = os.path.join(PASTA_RETROARCH, "autoconfig")
 PASTA_CACHE = os.path.join(PASTA_RETROARCH, "cache")
 PASTA_BACKUP = os.path.join(RAIZ, "backup")
 
-EXECUTAVEL_RETROARCH = os.path.join(PASTA_RETROARCH, "retroarch.exe")
+EXECUTAVEL_RETROARCH = plataforma_do_sistema.executavel_do_retroarch(PASTA_RETROARCH)
 ARQUIVO_CONSOLES = os.path.join(PASTA_SERVIDOR, "consoles.json")
 ARQUIVO_BANCO = os.path.join(PASTA_DADOS, "arena.db")
 ARQUIVO_CONFIG = os.path.join(PASTA_DADOS, "config.json")
@@ -2008,7 +2011,8 @@ def carregar_catalogo():
     """Le consoles.json uma vez e guarda na memoria (nunca muda em uso)."""
     if _cache["catalogo"] is None:
         with open(ARQUIVO_CONSOLES, "r", encoding="utf-8") as arquivo:
-            _cache["catalogo"] = json.load(arquivo)["plataformas"]
+            # No Linux, os nucleos sao .so (o consoles.json guarda o .dll).
+            _cache["catalogo"] = plataforma_do_sistema.nucleos_deste_sistema(json.load(arquivo)["plataformas"])
     return _cache["catalogo"]
 
 
@@ -2308,8 +2312,8 @@ def jogo_aberto_agora(jogo):
 # ---------------------------------------------------------------------------
 
 def nome_curto_do_core(arquivo_core):
-    """'swanstation_libretro.dll' -> 'swanstation'."""
-    return os.path.basename(arquivo_core).replace("_libretro.dll", "").lower()
+    """'swanstation_libretro.dll' (ou .so, no Linux) -> 'swanstation'."""
+    return plataforma_do_sistema.nome_curto_do_nucleo(arquivo_core)
 
 
 ARQUIVO_QUEDAS = os.path.join(PASTA_DADOS, "fechamentos.json")
@@ -2979,6 +2983,11 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             extras = {}
             if sys.platform.startswith("win"):
                 extras["creationflags"] = processos.ACIMA_DO_NORMAL
+            else:
+                # Linux: o emulador numa sessao propria. O Ctrl+C no terminal
+                # do ARENA nao o derruba, e o que ele abrir (o Java do Java
+                # ME) fica no grupo dele, que a caixa fecha no fim.
+                extras["start_new_session"] = True
             # Java ME: o nucleo abre o "javaw" que achar no PATH. O do ARENA
             # (emuladores\Java) vai na frente, so para este RetroArch.
             if plataforma_jogo.get("usa_java") and not jogo.get("externo"):

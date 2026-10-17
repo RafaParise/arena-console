@@ -12,13 +12,13 @@ indexador.py). O aluno clica quando quiser tentar.
 import difflib
 import os
 import re
-import subprocess
 import threading
 import time
 import urllib.parse
 import zipfile
 import zlib
 
+import baixar
 import capas_do_disco
 import nomes_arcade
 
@@ -148,18 +148,16 @@ def _anotar_falha(tipo):
 
 
 def _baixar(url, destino, segundos=15):
-    """Baixa com o curl do Windows (sem instalar nada). True se chegou."""
+    """Baixa com o curl do Windows (sem instalar nada; no Linux, o curl ou o
+    Python: servidor\\baixar.py). True se chegou."""
     try:
-        resultado = subprocess.run(
-            ["curl.exe", "--fail", "--silent", "--show-error", "--location",
-             "--max-time", str(segundos), "-A", "ARENA/1.0", "-o", destino, url],
-            capture_output=True)
-    except (OSError, subprocess.SubprocessError):
+        codigo, _nada = baixar.rodar(url, segundos, destino=destino)
+    except OSError:
         _anotar_falha("rede")
         return False
-    if resultado.returncode in CODIGOS_DE_REDE:
+    if codigo in CODIGOS_DE_REDE:
         _anotar_falha("rede")
-    return resultado.returncode == 0 and os.path.isfile(destino) and os.path.getsize(destino) > 0
+    return codigo == 0 and os.path.isfile(destino) and os.path.getsize(destino) > 0
 
 
 def _parece_pagina_de_login(caminho):

@@ -26,6 +26,8 @@ o processo, acabou o ajuste.
 
 import ctypes
 import ctypes.wintypes as w
+import os
+import signal
 import sys
 
 # Classes de prioridade (SetPriorityClass, documentacao da Microsoft).
@@ -234,10 +236,18 @@ def _kernel32_caixa():
 def caixa_que_fecha_os_filhos(pid):
     """Poe o processo numa caixa que, quando fechada (fechar_caixa), encerra
     tudo o que ainda estiver dentro dela: os filhos que ele abriu e que
-    ficaram para tras. Devolve a alca da caixa, ou None (fora do Windows, ou
-    se o Windows recusar: o jogo abre do mesmo jeito)."""
+    ficaram para tras. Devolve a alca da caixa, ou None (se o sistema
+    recusar: o jogo abre do mesmo jeito).
+
+    No Linux (item 13), a caixa e' o grupo de processos do emulador: o ARENA
+    o abre numa sessao propria (start_new_session, ver arena.py), e tudo o
+    que ele abrir fica no mesmo grupo. So vale se o processo for o chefe do
+    grupo: senao, fechar a caixa derrubaria o proprio ARENA."""
     if not _no_windows():
-        return None
+        try:
+            return ("grupo", pid) if os.getpgid(pid) == pid else None
+        except (OSError, AttributeError):
+            return None
     try:
         k = _kernel32_caixa()
         caixa = k.CreateJobObjectW(None, None)
@@ -263,7 +273,13 @@ def caixa_que_fecha_os_filhos(pid):
 
 
 def fechar_caixa(caixa):
-    """Fecha a caixa: o Windows encerra o que tiver sobrado dentro dela."""
+    """Fecha a caixa: o sistema encerra o que tiver sobrado dentro dela."""
+    if isinstance(caixa, tuple) and caixa[0] == "grupo":
+        try:
+            os.killpg(caixa[1], signal.SIGKILL)
+        except (OSError, AttributeError):
+            pass                   # o grupo ja acabou: nada sobrou
+        return
     if caixa:
         try:
             _kernel32().CloseHandle(caixa)
