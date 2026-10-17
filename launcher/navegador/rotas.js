@@ -337,6 +337,7 @@ window.ArenaRotas = (function () {
   const BIOS_NA_PASTA = /^(neogeo|pgm|naomi|naomi2|awbios|stvbios|skns|cpzn1|cpzn2|nss|playch10|megatech|megaplay|decocass|qsound)([ ._-].*)?\.(zip|7z)$/i;
   const IGNORAR = new Set(["leia.txt", "leia-me.txt", "_console.txt", "readme.txt", "licenca.txt", "license.txt",
                            "thumbs.db", "desktop.ini", ".gitkeep"]);
+  const CAPAS_EXTENSOES = [".png", ".jpg", ".jpeg", ".webp"];
 
   async function indexarAqui() {
     const porPasta = new Map();
@@ -390,6 +391,12 @@ window.ArenaRotas = (function () {
     // Como no indexador do Windows: a extensao precisa ser de algum console,
     // e a pasta decide qual (o .PRG na pasta do Atari ST e' do Atari ST).
     const aceitas = extensoesConhecidas();
+    // A capa com o mesmo nome do jogo, ao lado dele (Contra.nes -> Contra.png),
+    // o primeiro lugar onde o indexador do Windows procura.
+    const imagens = new Map();
+    for (const item of itens) {
+      if (!item.pasta && CAPAS_EXTENSOES.includes(extensao(item.nome))) imagens.set(semExtensao(item.nome).toLowerCase(), item.nome);
+    }
     for (const item of itens) {
       if (item.pasta) {
         if (nivel < 2) await varrer(pasta + "/" + item.nome, p, origem, jogos, nivel + 1);
@@ -400,13 +407,15 @@ window.ArenaRotas = (function () {
       if (!aceitas.has(extensao(item.nome))) continue;
       const caminho = pasta + "/" + item.nome;
       const titulo = limparTitulo(item.nome);
+      const aoLado = imagens.get(semExtensao(item.nome).toLowerCase());
       jogos.push({
         id: caminho.toLowerCase(), titulo: titulo, ordenacao: ordenacao(titulo), plataforma: p.id,
         plataforma_nome: p.nome, arquivo: caminho, origem: origem, origem_rotulo: ORIGENS[origem],
         pede_placar: !!p.pede_placar, jogadores_do_jogo: p.jogadores_max || 2, jogadores_max: p.jogadores_max || 2,
         rede_propria: false, motivo_jogadores: "", tamanho_mb: null, ambiguo: false, discorda: null,
         discorda_nome: null, corrigido: false, sugestao: null,
-        capas: ["retroarch/thumbnails/" + p.id + "/Named_Boxarts/" + semExtensao(item.nome) + ".png"],
+        capas: (aoLado ? [pasta + "/" + aoLado] : []).concat(
+          ["retroarch/thumbnails/" + p.id + "/Named_Boxarts/" + semExtensao(item.nome) + ".png"]),
         romset: null, nome_banco: null, avisos: [],
       });
     }
@@ -464,6 +473,13 @@ window.ArenaRotas = (function () {
       const noPen = new Set(doPen.map(chave));
       lista = doPen.concat(junto.filter(function (j) { return !noPen.has(chave(j)); }));
     } else {
+      // O que vem junto fica com a capa do igual do pen drive (a que o
+      // Windows ja baixou para retroarch\thumbnails).
+      const gemeos = new Map(doPen.map(function (j) { return [chave(j), j]; }));
+      for (const j of junto) {
+        const gemeo = gemeos.get(chave(j));
+        if (gemeo && gemeo.capas && gemeo.capas.length) j.capas = gemeo.capas.slice();
+      }
       const nosQueVem = new Set(junto.map(chave));
       lista = doPen.filter(function (j) { return !nosQueVem.has(chave(j)); }).concat(junto);
     }
@@ -754,21 +770,60 @@ window.ArenaRotas = (function () {
   // ------------------------------------------------------------------------
   // Recordes e tempo de jogo (so deste navegador)
   // ------------------------------------------------------------------------
+  // As mesmas regras do Windows (arena.SQL_RANKING_PLACAR e _TEMPO): partida
+  // de 30 s ou menos nao conta; cada jogo mostra os 5 primeiros, e empate
+  // divide a posicao (o RANK do SQLite).
+  const SEGUNDOS_PARA_CONTAR = 30;
+  const POSICOES = 5;
+
   async function registrarTempo(jogo, ms) {
+    const segundos = Math.round(ms / 1000);
+    if (segundos <= SEGUNDOS_PARA_CONTAR) return;
     try {
-      const tempos = (await ArenaBanco.ler("coisas", "tempos")) || {};
-      tempos[jogo.id] = { titulo: jogo.titulo, plataforma: jogo.plataforma_nome,
-                          minutos: Math.round(((tempos[jogo.id] || {}).minutos || 0) + ms / 60000) };
-      await ArenaBanco.gravar("coisas", "tempos", tempos);
+      const sessoes = (await ArenaBanco.ler("coisas", "sessoes")) || [];
+      sessoes.push({ jogo_id: jogo.id, jogo: jogo.titulo, apelido: E.config.apelido, segundos: segundos });
+      await ArenaBanco.gravar("coisas", "sessoes", sessoes.slice(-2000));
     } catch (erro) { /* sem banco: o tempo desta vez se perde */ }
+  }
+
+  // [{jogo_id, jogo, apelido, ...}] -> os POSICOES primeiros de cada jogo, com
+  // "posicao", na ordem do jogo e da posicao. 'juntar' soma ou pega o maior.
+  function ranquear(linhas, campo, juntar) {
+    const porChave = new Map();
+    for (const l of linhas) {
+      const chave = l.jogo_id + "\u0000" + l.apelido;
+      const antes = porChave.get(chave);
+      porChave.set(chave, antes ? juntar(antes, l) : Object.assign({}, l));
+    }
+    const porJogo = new Map();
+    for (const l of porChave.values()) {
+      if (!porJogo.has(l.jogo_id)) porJogo.set(l.jogo_id, []);
+      porJogo.get(l.jogo_id).push(l);
+    }
+    const saida = [];
+    for (const grupo of porJogo.values()) {
+      grupo.sort(function (a, b) { return b[campo] - a[campo]; });
+      let posicao = 0;
+      let anterior = null;
+      grupo.forEach(function (l, i) {
+        if (l[campo] !== anterior) { posicao = i + 1; anterior = l[campo]; }
+        l.posicao = posicao;
+        if (posicao <= POSICOES) saida.push(l);
+      });
+    }
+    return saida.sort(function (a, b) {
+      return String(a.jogo).localeCompare(String(b.jogo), "pt-BR") || a.posicao - b.posicao;
+    });
   }
 
   async function ranking() {
     const placar = (await ArenaBanco.ler("coisas", "placar")) || [];
-    const tempos = (await ArenaBanco.ler("coisas", "tempos")) || {};
-    const pontos = placar.slice().sort(function (a, b) { return b.pontos - a.pontos; }).slice(0, 50);
-    const tempo = Object.values(tempos).sort(function (a, b) { return b.minutos - a.minutos; }).slice(0, 50);
-    return { pontos: pontos, tempo: tempo, ok: true };
+    const sessoes = (await ArenaBanco.ler("coisas", "sessoes")) || [];
+    return {
+      placar: ranquear(placar, "pontos", function (a, b) { return b.pontos > a.pontos ? Object.assign({}, b) : a; }),
+      tempo: ranquear(sessoes.map(function (s) { return Object.assign({ partidas: 1 }, s); }), "segundos",
+                      function (a, b) { a.segundos += b.segundos; a.partidas += 1; return a; }),
+    };
   }
 
   // ------------------------------------------------------------------------
@@ -920,7 +975,7 @@ window.ArenaRotas = (function () {
           };
         }
         case "/api/ranking": return ranking();
-        case "/api/conquistas": return { conquistas: [], ok: true };
+        case "/api/conquistas": return { jogadores: [] };
         case "/api/colegas": return { colegas: [] };
         case "/api/partida/estado": return { ativa: false };
         case "/api/partida/procurar": return { partidas: [], amigos: [] };
@@ -949,10 +1004,10 @@ window.ArenaRotas = (function () {
         const pontos = parseInt((corpo || {}).pontos, 10);
         if (!jogo || !(pontos >= 0)) throw falha("Diga quantos pontos você fez.");
         const placar = (await ArenaBanco.ler("coisas", "placar")) || [];
-        placar.push({ apelido: E.config.apelido, jogo: jogo.titulo, plataforma: jogo.plataforma_nome, pontos: pontos,
-                      quando: new Date().toLocaleString("pt-BR") });
-        await ArenaBanco.gravar("coisas", "placar", placar.slice(-500));
-        return { ok: true, recorde: false, posicao: null };
+        placar.push({ jogo_id: jogo.id, jogo: jogo.titulo, apelido: limparApelido(corpo.apelido || E.config.apelido),
+                      pontos: pontos, quando: Date.now() });
+        await ArenaBanco.gravar("coisas", "placar", placar.slice(-2000));
+        return { ok: true, pendentes: 0 };
       }
       case "/api/estado/apagar": {
         const jogo = E.jogos.find(function (j) { return j.id === (corpo || {}).jogo_id; });

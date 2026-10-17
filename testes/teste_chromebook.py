@@ -22,20 +22,22 @@ lista feita pelo indexador do Windows (dados\manifesto.js):
      4. cada um dos 5 jogos que vem junto abre, roda (quadros por segundo
         medidos dentro do quadro do jogo) e volta para a tela;
      5. o F2 grava o estado, e ele aparece em "Saves e cheats" depois;
-     6. o jogo do pen drive, antes de escolher a pasta, explica o que fazer.
+     6. o jogo do pen drive, antes de escolher a pasta, explica o que fazer;
+     7. a capa do pen drive aparece, tambem no jogo que vem junto; a
+        pontuacao registrada aparece em Recordes; a foto do perfil fica.
      MEDE a memoria do navegador inteiro com a tela parada (depois de 30 s,
      como o teste dos navegadores) e com o jogo do VIC-20 aberto.
   B. A PASTA DO PEN DRIVE (so Edge e Chrome, os que tem o seletor de pasta):
      a mesma tela por endereco local (http://127.0.0.1, ?navegador=1), com o
      seletor de pasta trocado por uma pasta do proprio navegador (o teste
      nao consegue clicar no seletor de verdade; os comandos sao os mesmos):
-     7. escolher a pasta: a lista vem do dados\manifesto.json dela (e o
+     8. escolher a pasta: a lista vem do dados\manifesto.json dela (e o
         repetido passa a ser o do pen drive, onde o save fica);
-     8. o jogo do pen drive abre direto da pasta;
-     9. o save vai para retroarch\saves\<nucleo> da pasta (o mesmo do Windows);
-    10. pasta sem manifesto: o ARENA faz a lista sozinho;
-    11. guardar um jogo neste navegador (sem pen drive): entra na lista e abre;
-    12. o Testar este Chromebook mede um jogo de cada console e guarda o
+     9. o jogo do pen drive abre direto da pasta;
+    10. o save vai para retroarch\saves\<nucleo> da pasta (o mesmo do Windows);
+    11. pasta sem manifesto: o ARENA faz a lista sozinho;
+    12. guardar um jogo neste navegador (sem pen drive): entra na lista e abre;
+    13. o Testar este Chromebook mede um jogo de cada console e guarda o
         relatorio que o professor baixa.
   C. DESEMPENHO (Edge): se esta maquina tiver jogos de NES, Super Nintendo,
      Mega Drive e PS1 em jogos\pessoais, mede cada um com o processador
@@ -46,6 +48,7 @@ lista feita pelo indexador do Windows (dados\manifesto.js):
 Uso: servidor\python\python.exe testes\teste_chromebook.py [--saida=arquivo.json] [--so=edge,chrome,firefox]
         [--sem-desempenho | --so-desempenho]
 """
+import base64
 import functools
 import http.server
 import json
@@ -168,6 +171,18 @@ JOGAR = r"""
 """
 
 
+def png_quadrado(lado=16, cor=(220, 40, 60)):
+    """Um PNG de verdade, pequeno, para a capa e a foto do teste."""
+    import struct
+    import zlib
+
+    def bloco(tipo, dados):
+        return struct.pack(">I", len(dados)) + tipo + dados + struct.pack(">I", zlib.crc32(tipo + dados) & 0xffffffff)
+    linhas = b"".join(b"\x00" + bytes(cor) * lado for _ in range(lado))
+    return (b"\x89PNG\r\n\x1a\n" + bloco(b"IHDR", struct.pack(">IIBBBBB", lado, lado, 8, 2, 0, 0, 0))
+            + bloco(b"IDAT", zlib.compress(linhas)) + bloco(b"IEND", b""))
+
+
 def esperar(nav, expressao, segundos=20):
     fim = time.monotonic() + segundos
     while time.monotonic() < fim:
@@ -199,6 +214,9 @@ def montar_copia(destino):
     # tambem vem junto, e a lista mostra cada jogo uma vez so).
     shutil.copyfile(os.path.join(LIVRES, "CHIP-8", "slipperyslope.ch8"),
                     os.path.join(destino, "jogos", "pessoais", "CHIP-8", "escorregador.ch8"))
+    # A capa ao lado do jogo (o primeiro lugar onde o indexador procura).
+    with open(os.path.join(destino, "jogos", "pessoais", "CHIP-8", "slipperyslope.png"), "wb") as arquivo:
+        arquivo.write(png_quadrado())
     shutil.copyfile(os.path.join(RAIZ, "ARENA-CHROMEBOOK.html"), os.path.join(destino, "ARENA-CHROMEBOOK.html"))
     r = subprocess.run([PYTHON, os.path.join(destino, "servidor", "indexador.py")], cwd=destino,
                        capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=180)
@@ -224,6 +242,11 @@ def parte_a(nav, endereco):
         "['btnAmigos', 'btnSincronizar', 'btnAcervo'].every((id) => getComputedStyle(document.getElementById(id)).display === 'none')"
         " && ['avancado', 'emuladores', 'controles'].every((a) => getComputedStyle(document.querySelector("
         "'#gavetaAjustes .aba[data-aba=\"' + a + '\"]')).display === 'none')")
+    # A capa: o jogo que vem junto fica com a do igual do pen drive.
+    r["capa"] = esperar(nav, "(() => { const c = Array.from(document.querySelectorAll('#listaJogos .jogo'))"
+                             ".find((e) => e.textContent.includes('Slippery Slope'));"
+                             " const i = c && c.querySelector('img.capa-imagem');"
+                             " return !!(i && i.complete && i.naturalWidth > 0); })()", 10)
     # A memoria do navegador inteiro: com a tela parada e com um jogo aberto.
     # Espera ASSENTAR como o teste dos navegadores: no primeiro meio minuto,
     # o perfil novo de teste faz o navegador gastar uns 200 MB a mais.
@@ -243,6 +266,16 @@ def parte_a(nav, endereco):
         "(async () => { const j = ArenaRotas.estado.jogos.find((x) => x.titulo === 'Slippery Slope' && x.origem === 'vem_com');"
         " const d = await (await fetch('/api/jogo?id=' + encodeURIComponent(j.id))).json();"
         " return d.estados && d.estados[0] && d.estados[0].existe; })()")
+    # Os recordes: a pontuacao registrada aparece na gaveta Recordes.
+    nav.avaliar("fetch('/api/placar', {method: 'POST', headers: {'Content-Type': 'application/json'},"
+                " body: JSON.stringify({jogo_id: 'vem-com/CHIP-8/slipperyslope.ch8', pontos: 1234, apelido: 'teste'})})"
+                ".then(() => document.getElementById('btnRecordes').click()); 1")
+    r["recorde"] = esperar(nav, "document.getElementById('rankingPontos').textContent.includes('1.234')", 10)
+    # A foto do perfil, guardada no navegador e mostrada pela tela.
+    foto = "data:image/png;base64," + base64.b64encode(png_quadrado(24, (30, 120, 220))).decode("ascii")
+    nav.avaliar("fetch('/api/perfil/foto', {method: 'POST', headers: {'Content-Type': 'application/json'},"
+                " body: JSON.stringify({imagem: %s})}).then(() => carregarEstado()); 1" % json.dumps(foto))
+    r["foto"] = esperar(nav, "(document.getElementById('perfilFoto').src || '').startsWith('data:image/png')", 10)
     # O jogo do pen drive sem a pasta escolhida: o recado tem de dizer o que fazer.
     r["sem_pasta"] = nav.avaliar(
         "(async () => { const j = ArenaRotas.estado.jogos.find((x) => x.origem === 'pessoais' && x.plataforma === 'chip8');"
@@ -267,6 +300,9 @@ def conferir_a(r):
                                  for j in jogos)),
         ("o F2 grava o estado e ele aparece em Saves e cheats", r.get("estado_guardado") is True),
         ("o jogo do pen drive sem a pasta explica o que fazer", "escolha a pasta do ARENA" in (r.get("sem_pasta") or "")),
+        ("a capa do pen drive aparece (também no jogo que vem junto)", r.get("capa") is True),
+        ("a pontuação registrada aparece em Recordes", r.get("recorde") is True),
+        ("a foto do perfil fica guardada e aparece", r.get("foto") is True),
     ]
 
 
