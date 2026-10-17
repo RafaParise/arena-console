@@ -147,6 +147,14 @@ def jeitos_da_cena(nucleo):
             jeitos.append((degrau, "%s, esticado pelo bilinear" % degrau, opcao, "", sem_filtro_borrado))
             jeitos.append((degrau + "+fsr", "%s, esticado pelo FSR" % degrau, opcao, "fsr", com_filtro))
         # Na resolucao de hoje, os outros jeitos de esticar.
+        if nucleo == "mupen64plus_next":
+            # O parallel-rdp (Vulkan): desenha como o N64 de verdade (o HUD
+            # do Mario Kart sai certo); o ARENA o liga da nota 4 da placa.
+            for degrau in ("1x", "2x"):
+                jeitos.append(("parallel_" + degrau, "parallel-rdp %s" % degrau,
+                               {"mupen64plus-rdp-plugin": "parallel",
+                                "mupen64plus-parallel-rdp-synchronous": "True",
+                                "mupen64plus-parallel-rdp-upscaling": degrau}, "", sem_filtro_borrado))
         for filtro, rotulo in (("easu", "so o EASU do FSR"), ("catmull", "Catmull-Rom"),
                                ("lanczos", "Lanczos 2"), ("rcas", "so a nitidez (RCAS)"),
                                ("pixel", "pixel nitido")):
@@ -455,13 +463,19 @@ def main():
     if "--alvo" in sys.argv:
         import modo_alvo
         modo_alvo.entrar()
+    # --nota-placa=N: o "hoje" como se a placa tirasse a nota N (para saber
+    # se ela aguenta o degrau de cima antes de mudar a nota de verdade).
+    if argumento("nota-placa"):
+        arena.CAPACIDADE["nota_gpu"] = int(argumento("nota-placa"))
+        arena.CAPACIDADE["nota"] = max(arena.CAPACIDADE["nota"], int(argumento("nota-placa")))
     agora = datetime.datetime.now().strftime("%Y-%m-%d_%H%M")
     saida = argumento("saida", os.path.join(tempfile.gettempdir(), "medir_escala_%s.json" % agora))
     pasta_fotos = argumento("fotos", os.path.splitext(saida)[0] + "_fotos")
     os.makedirs(pasta_fotos, exist_ok=True)
     cenas = [c for c in argumento("cenas", ",".join(CENAS)).split(",") if c in CENAS]
     so_jeitos = argumento("jeitos")
-    relatorio = {"data": agora, "modo_alvo": "--alvo" in sys.argv, "maquina": a_maquina(),
+    relatorio = {"data": agora, "modo_alvo": "--alvo" in sys.argv,
+                 "nota_placa_simulada": argumento("nota-placa"), "maquina": a_maquina(),
                  "assentar_s": ASSENTAR, "medindo_s": MEDINDO, "resultados": [], "cenas": {}}
     print("Maquina:", json.dumps(relatorio["maquina"], ensure_ascii=False))
     placa = UsoDaPlaca()

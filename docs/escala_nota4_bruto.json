@@ -1,0 +1,140 @@
+{
+ "data": "2026-10-17_0816",
+ "modo_alvo": false,
+ "nota_placa_simulada": "4",
+ "maquina": {
+  "processador": "AMD Ryzen 5 5600G with Radeon Graphics",
+  "placa": {
+   "nome": "AMD Radeon(TM) Graphics",
+   "integrada": true,
+   "conhecida": true
+  },
+  "motor_de_video": "vulkan",
+  "tela": "1440x900",
+  "hz": 60,
+  "nota": 4,
+  "nota_gpu": 4,
+  "vsync_da_amd": "3"
+ },
+ "assentar_s": 3,
+ "medindo_s": 10,
+ "resultados": [
+  {
+   "cena": "ps1",
+   "jogo": "CTR Crash Team Racing",
+   "nucleo": "swanstation",
+   "jeito": "hoje",
+   "rotulo": "o ARENA de hoje",
+   "resolucao_interna": "6",
+   "filtro": "fsr.slangp",
+   "suavizar": "true",
+   "quadros_por_segundo": 60.0,
+   "processador_pct_de_um_nucleo": 11.1,
+   "placa_pct": 53.6,
+   "placa_pct_maior": 79.2,
+   "foto": "ps1_hoje.png"
+  },
+  {
+   "cena": "psp",
+   "jogo": "Burnout Legends",
+   "nucleo": "ppsspp",
+   "jeito": "hoje",
+   "rotulo": "o ARENA de hoje",
+   "resolucao_interna": "1920x1088",
+   "filtro": "fsr.slangp",
+   "suavizar": "true",
+   "quadros_por_segundo": 60.0,
+   "processador_pct_de_um_nucleo": 8.7,
+   "placa_pct": 16.6,
+   "placa_pct_maior": 17.5,
+   "foto": "psp_hoje.png"
+  },
+  {
+   "cena": "n64",
+   "jogo": "Mario Kart 64",
+   "nucleo": "mupen64plus_next",
+   "jeito": "hoje",
+   "rotulo": "o ARENA de hoje",
+   "resolucao_interna": "3",
+   "filtro": "fsr.slangp",
+   "suavizar": "true",
+   "quadros_por_segundo": 60.0,
+   "processador_pct_de_um_nucleo": 20.3,
+   "placa_pct": 10.0,
+   "placa_pct_maior": 10.3,
+   "foto": "n64_hoje.png"
+  },
+  {
+   "cena": "n64",
+   "jogo": "Mario Kart 64",
+   "nucleo": "mupen64plus_next",
+   "jeito": "parallel_1x",
+   "rotulo": "parallel-rdp 1x",
+   "resolucao_interna": "3",
+   "filtro": "",
+   "suavizar": "true",
+   "quadros_por_segundo": 60.0,
+   "processador_pct_de_um_nucleo": 19.8,
+   "placa_pct": 5.0,
+   "placa_pct_maior": 6.0,
+   "foto": "n64_parallel_1x.png"
+  },
+  {
+   "cena": "n64",
+   "jogo": "Mario Kart 64",
+   "nucleo": "mupen64plus_next",
+   "jeito": "parallel_2x",
+   "rotulo": "parallel-rdp 2x",
+   "resolucao_interna": "3",
+   "filtro": "",
+   "suavizar": "true",
+   "quadros_por_segundo": 59.9,
+   "processador_pct_de_um_nucleo": 25.8,
+   "placa_pct": 6.3,
+   "placa_pct_maior": 6.5,
+   "foto": "n64_parallel_2x.png"
+  },
+  {
+   "cena": "dreamcast",
+   "jogo": "Gauntlet Legends",
+   "nucleo": "flycast",
+   "jeito": "hoje",
+   "rotulo": "o ARENA de hoje",
+   "resolucao_interna": "1280x960",
+   "filtro": "rcas.slangp",
+   "suavizar": "true",
+   "quadros_por_segundo": 60.0,
+   "processador_pct_de_um_nucleo": 34.8,
+   "placa_pct": 12.2,
+   "placa_pct_maior": 13.1,
+   "foto": "dreamcast_hoje.png"
+  }
+ ],
+ "cenas": {
+  "ps1": {
+   "jogo": "CTR Crash Team Racing",
+   "quadro": 6300,
+   "o_que": "a abertura em 3D (a nave do Nitros Oxide)",
+   "erro": null
+  },
+  "psp": {
+   "jogo": "Burnout Legends",
+   "quadro": 3000,
+   "o_que": "a tela-titulo, com corrida em 3D atras",
+   "erro": null
+  },
+  "n64": {
+   "jogo": "Mario Kart 64",
+   "quadro": 2100,
+   "o_que": "a corrida de demonstracao",
+   "erro": null
+  },
+  "dreamcast": {
+   "jogo": "Gauntlet Legends",
+   "quadro": 7000,
+   "o_que": "a abertura em 3D",
+   "erro": null
+  }
+ },
+ "_leia": "Medicao do item 10 (ferramentas/medir_escala.py --nota-placa=4), 17/10/2026, no Ryzen 5 5600G (Radeon integrada Vega 7, tela 1440x900, vsync forcado pelo driver): o 'hoje' de cada console como se a placa tirasse a nota 4, e o parallel-rdp do N64 em 1x e 2x. Base da decisao de hardware.teto_da_placa (o Ryzen de mesa com Vega vai a 4 nos nucleos do RetroArch)."
+}
