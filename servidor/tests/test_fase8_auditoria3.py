@@ -90,6 +90,10 @@ class TestPacoteDeAtualizacao(unittest.TestCase):
 
     def test_so_o_programa(self):
         import zipfile
+        if montador.falta_no_navegador():
+            # Os nucleos do navegador sao gerados (nao estao no git): sem
+            # eles, a montagem para de proposito (exigir_o_navegador).
+            self.skipTest("sem os nucleos do navegador nesta copia (ferramentas\\preparar_nucleos_navegador.py)")
         pasta = tempfile.mkdtemp(prefix="arena_zip_atualizacao_")
         try:
             caminho = os.path.join(pasta, "atualizacao.zip")
@@ -99,7 +103,10 @@ class TestPacoteDeAtualizacao(unittest.TestCase):
         finally:
             shutil.rmtree(pasta, ignore_errors=True)
         for esperado in ("ARENA/ARENA.bat", "ARENA/LICENSE", "ARENA/servidor/arena.py",
-                         "ARENA/launcher/app.js", "ARENA/ferramentas/coletar_maquina.py"):
+                         "ARENA/launcher/app.js", "ARENA/ferramentas/coletar_maquina.py",
+                         # O ARENA do Chromebook vai junto (item 12, 17/10/2026).
+                         "ARENA/ARENA-CHROMEBOOK.html", "ARENA/launcher/navegador/rotas.js",
+                         "ARENA/launcher/navegador/nucleos/lista.js", "ARENA/launcher/navegador/livres.js"):
             self.assertIn(esperado, nomes)
         for nome in nomes:
             self.assertTrue(nome.startswith("ARENA/"), nome)

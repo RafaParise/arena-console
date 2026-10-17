@@ -1,5 +1,5 @@
 {
-  "_leia": "Os jogos livres que os testes abrem no núcleo de verdade (testes\\teste_consoles_livres.py). Só os testes usam: não vão no pacote dos alunos. Cada um com autor, licença, a versão exata e a marca (sha256). O conferidor de publicação só deixa ir ao GitHub o arquivo desta pasta que tem a marca registrada aqui.",
+  "_leia": "Os jogos livres que os testes abrem no núcleo de verdade (testes\\teste_consoles_livres.py). Só os testes usam, menos os 5 de console que abre no navegador: esses vão embutidos no ARENA do Chromebook (launcher\\navegador\\livres.js, feito por ferramentas\\montar_navegador.py), para ele ter jogo na primeira vez e para o Testar este Chromebook. Cada um com autor, licença, a versão exata e a marca (sha256). O conferidor de publicação só deixa ir ao GitHub o arquivo desta pasta que tem a marca registrada aqui.",
   "arquivos": [
     {
       "origem": "Apple II/DIAFLW_Release.2mg",

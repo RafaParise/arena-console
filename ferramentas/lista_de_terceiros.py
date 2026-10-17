@@ -43,6 +43,20 @@ PROGRAMAS = [
     ("Java do Java ME: OpenJDK 21 (Eclipse Temurin), reduzido com o jlink",
      "GPL-2.0 com a exceção Classpath (os textos vão em emuladores\\Java\\legal)",
      "https://github.com/adoptium/temurin21-binaries", "emuladores\\Java"),
+    ("RetroArch 1.22.2 para navegador (WebAssembly), o do ARENA do Chromebook: o build oficial do libretro "
+     "(buildbot.libretro.com/stable/1.22.2/emscripten), só convertido para abrir do pen drive "
+     "(ferramentas\\preparar_nucleos_navegador.py)",
+     "GPL-3.0 (o RetroArch); cada núcleo, a licença dele (tabela do Chromebook, abaixo)",
+     "https://github.com/libretro/RetroArch", "launcher\\navegador\\nucleos"),
+]
+
+# O que o ARENA usa e nao distribui (o Lossless Scaling, de quem comprou).
+NAO_VEM = [
+    "Não vem no ARENA, mas o ARENA usa se estiver no computador de quem comprou:",
+    "o **Lossless Scaling** (programa pago, da Steam). Ele não é distribuído",
+    "aqui de jeito nenhum; o `servidor\\lossless.py` só o acha, ajusta o perfil",
+    "\"ARENA\" dele e o abre junto com o jogo (guia 3, \"Lossless Scaling\"). O",
+    "`.gitignore` e o montador do pacote barram a pasta dele.",
 ]
 
 # Nucleos cujo codigo-fonte NAO fica no GitHub do libretro.
@@ -87,6 +101,34 @@ def bios_livres():
     return [projetos[nome] for nome in sorted(projetos)]
 
 
+def do_chromebook():
+    """(nucleos, jogos) do ARENA do Chromebook: cada nucleo do navegador
+    (consoles.json -> core_navegador) com os consoles e a licenca do .info
+    dele, e os jogos livres que vem junto (os de testes\\jogos_livres com
+    console no navegador, os mesmos do launcher\\navegador\\livres.js)."""
+    import json
+    with open(os.path.join(RAIZ, "servidor", "consoles.json"), encoding="utf-8") as f:
+        plataformas = json.load(f)["plataformas"]
+    consoles = {}
+    for p in plataformas:
+        if p.get("core_navegador"):
+            consoles.setdefault(p["core_navegador"], []).append(p["nome"])
+    nucleos_web = []
+    for nucleo in sorted(consoles):
+        info = os.path.join(RAIZ, "retroarch", "info", nucleo + "_libretro.info")
+        dados = ler_info(info) if os.path.isfile(info) else {}
+        nucleos_web.append((dados.get("display_name", nucleo), nucleo, ", ".join(consoles[nucleo]),
+                            dados.get("license", "ver o projeto")))
+    nomes = {p["id"]: p["nome"] for p in plataformas if p.get("core_navegador")}
+    try:
+        with open(os.path.join(RAIZ, "testes", "jogos_livres", "lista.json"), encoding="utf-8") as f:
+            jogos = [dict(j, console_nome=nomes[j["console"]]) for j in json.load(f)["arquivos"]
+                     if j["console"] in nomes]
+    except (OSError, ValueError, KeyError):
+        jogos = []
+    return nucleos_web, sorted(jogos, key=lambda j: j["origem"])
+
+
 def montar(pasta):
     if os.path.isdir(os.path.join(pasta, "retroarch", "cores")) and pasta != RAIZ:
         lista = nucleos(os.path.join(pasta, "retroarch"))
@@ -118,6 +160,7 @@ def montar(pasta):
     ]
     for nome, licenca, fonte, onde in PROGRAMAS:
         linhas.append("| %s | %s | <%s> | `%s` |" % (nome, licenca, fonte, onde))
+    linhas += [""] + NAO_VEM
     livres = bios_livres()
     linhas += [
         "",
@@ -156,6 +199,40 @@ def montar(pasta):
     if fora:
         linhas += ["", "Código-fonte fora do libretro:", ""]
         linhas += ["- `%s`: <%s>" % par for par in fora]
+    nucleos_web, jogos = do_chromebook()
+    linhas += [
+        "",
+        "## Núcleos do ARENA no Chromebook (%d)" % len(nucleos_web),
+        "",
+        "No Chromebook, o ARENA roda dentro do navegador (`ARENA-CHROMEBOOK.html`),",
+        "com estes núcleos na versão que o libretro compila para WebAssembly, do",
+        "mesmo RetroArch 1.22.2: dois arquivos cada um em `launcher\\navegador\\nucleos`",
+        "(o programa e o emulador compactado). A licença é a do mesmo núcleo",
+        "(o `.info` dele); o código-fonte, o repositório dele em",
+        "<https://github.com/libretro>.",
+        "",
+        "| Núcleo | Arquivos | Consoles | Licença |",
+        "|---|---|---|---|",
+    ]
+    for exibicao, nucleo, consoles, licenca in nucleos_web:
+        linhas.append("| %s | `%s.js`, `%s.wasm.js` | %s | %s |" % (
+            exibicao.replace("|", "/"), nucleo, nucleo, consoles, licenca.replace("|", " / ")))
+    if jogos:
+        linhas += [
+            "",
+            "## Jogos livres que vêm junto no Chromebook (%d)" % len(jogos),
+            "",
+            "Para o Chromebook ter jogo na primeira vez e para o \"Testar este",
+            "Chromebook\" medir sem pen drive, vão embutidos em",
+            "`launcher\\navegador\\livres.js` estes jogos de licença livre (os mesmos de",
+            "`testes\\jogos_livres`, conferidos pela marca SHA-256 da `lista.json`):",
+            "",
+            "| Jogo | Console | Autor | Licença | Código-fonte |",
+            "|---|---|---|---|---|",
+        ]
+        for j in jogos:
+            linhas.append("| %s | %s | %s | %s | <%s> |" % (j["jogo"], j["console_nome"], j["autor"], j["licenca"],
+                                                       j["fonte"]))
     linhas.append("")
     return "\n".join(linhas)
 

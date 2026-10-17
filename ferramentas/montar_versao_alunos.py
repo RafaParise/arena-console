@@ -14,6 +14,10 @@ O QUE ENTRA (lista fechada -- o que nao esta aqui, nao vai):
     o CREDITOS.md (quem fez o que);
   - servidor\ (o ARENA e o Python embutido), sem testes;
   - launcher\ (a tela);
+  - o ARENA do Chromebook (17/10/2026): o ARENA-CHROMEBOOK.html e
+    launcher\navegador, com os nucleos do RetroArch para navegador (uns 90
+    MB, ferramentas\preparar_nucleos_navegador.py) e os 5 jogos livres que
+    vem junto (ferramentas\montar_navegador.py). A montagem para se faltar;
   - RetroArch: o programa, so os 48 nucleos que o ARENA usa (de 195), os
     perfis de controle, o menu rgui, os filtros de tela, os bancos de
     nomes de fliperama (FBNeo e MAME);
@@ -78,7 +82,9 @@ ARQUIVOS_DA_RAIZ = ["ARENA.bat", "VERIFICAR.bat", "PARTIDA.bat", "COLETAR.bat", 
                     # (Fase 8 da auditoria 3, o pacote do GitHub).
                     "LICENSE", "TERCEIROS.md",
                     # Quem fez o que, a comecar pelo aluno DOOK3DS (15/10/2026).
-                    "CREDITOS.md"]
+                    "CREDITOS.md",
+                    # O ARENA do Chromebook: a entrada (item 12, 17/10/2026).
+                    "ARENA-CHROMEBOOK.html"]
 # Do ferramentas\, so o que o COLETAR.bat usa.
 FERRAMENTAS = ["coletar_maquina.py", "medir_arena.py"]
 # Jogo pequeno do proprio projeto para conferir que o RetroArch da versao
@@ -200,6 +206,7 @@ def espelhar(origem, destino, extra=()):
 def atualizar(destino):
     """Troca so o programa do ARENA numa versao que ja esta em uso.
     Devolve (copiados, tirados, quantos arquivos de quem usou, problemas)."""
+    exigir_o_navegador()
     de_quem_usou = coisas_de_quem_usou(destino)
     antes = retrato(destino, de_quem_usou)
     copiados, tirados = [], []
@@ -290,6 +297,36 @@ def nucleos_usados():
     return usados, [p["pasta"] for p in dados["plataformas"] if p.get("pasta")]
 
 
+def falta_no_navegador(raiz=RAIZ):
+    """O que falta para o ARENA do Chromebook (ARENA-CHROMEBOOK.html, item 12
+    de 15/10/2026) abrir os jogos: os nucleos do RetroArch para navegador
+    (ferramentas\\preparar_nucleos_navegador.py) e os jogos livres que vem
+    junto (ferramentas\\montar_navegador.py). Nenhum dos dois esta no git:
+    sao gerados e vao no pacote. Devolve a lista do que falta."""
+    pasta = os.path.join(raiz, "launcher", "navegador")
+    faltam = [rel for rel in ("dados.js", "livres.js", os.path.join("nucleos", "lista.js"))
+              if not os.path.isfile(os.path.join(pasta, rel))]
+    dados = json.load(open(os.path.join(raiz, "servidor", "consoles.json"), encoding="utf-8"))
+    for nucleo in sorted({p["core_navegador"] for p in dados["plataformas"] if p.get("core_navegador")}):
+        for fim in (".js", ".wasm.js"):
+            if not os.path.isfile(os.path.join(pasta, "nucleos", nucleo + fim)):
+                faltam.append(os.path.join("nucleos", nucleo + fim))
+    return faltam
+
+
+def exigir_o_navegador():
+    """Para antes de montar (ou de atualizar) se faltar o ARENA do Chromebook:
+    o --atualizar espelha o launcher\\, e um launcher\\navegador incompleto
+    aqui tiraria os nucleos da versao dos alunos."""
+    falta = falta_no_navegador()
+    if falta:
+        raise SystemExit(
+            "Falta o ARENA do Chromebook em launcher\\navegador (%s%s). Nada foi mexido. Rode antes:\n"
+            "  servidor\\python\\python.exe ferramentas\\preparar_nucleos_navegador.py\n"
+            "  servidor\\python\\python.exe ferramentas\\montar_navegador.py"
+            % (", ".join(falta[:3]), " e mais %d" % (len(falta) - 3) if len(falta) > 3 else ""))
+
+
 def limpar_retroarch_cfg(origem, destino):
     """Copia o retroarch.cfg sem nada de quem usou: apelido de rede,
     enderecos, senhas e o caminho da maquina do professor (o ARENA corrige
@@ -334,6 +371,7 @@ def montar(destino, com_bios=False):
     """Monta a versao. Devolve o resumo (texto)."""
     if os.path.basename(os.path.normpath(destino)) != NOME_DESTINO:
         raise SystemExit("Por seguranca, o destino tem que se chamar %s." % NOME_DESTINO)
+    exigir_o_navegador()
     if os.path.isdir(destino):
         de_quem_usou = coisas_de_quem_usou(destino)
         if de_quem_usou:
@@ -673,6 +711,12 @@ def conferir(destino, com_bios=False):
             if pago in arquivos:
                 problemas.append("programa pago (Lossless Scaling) na versao: %s"
                                  % os.path.relpath(os.path.join(atual, pago), destino))
+    # O ARENA do Chromebook foi inteiro (a entrada, a tela e os nucleos).
+    falta = falta_no_navegador(destino)
+    if not os.path.isfile(os.path.join(destino, "ARENA-CHROMEBOOK.html")):
+        falta.insert(0, "ARENA-CHROMEBOOK.html")
+    if falta:
+        problemas.append("faltou o ARENA do Chromebook na versao: %s" % ", ".join(falta[:5]))
     # Abre numa copia temporaria (a versao fica intacta).
     if not porta_livre():
         problemas.append("nao deu para abrir: o ARENA de verdade esta aberto (porta 8777)")
@@ -835,6 +879,7 @@ def zip_de_atualizacao(caminho_zip):
     nao o pacote completo, que traz o RetroArch e os emuladores ja
     configurados). Dentro do .zip tudo fica em ARENA\\, como no completo."""
     import zipfile
+    exigir_o_navegador()
     temporario = caminho_zip + ".fazendo"
     with zipfile.ZipFile(temporario, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=6) as z:
         for origem, rel in arquivos_do_programa():

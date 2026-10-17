@@ -28,6 +28,7 @@ por voluntários para qualquer um copiar.
 | RPCS3 (PlayStation 3) | GPL-2.0 | <https://github.com/RPCS3/rpcs3> | `emuladores\RPCS3` |
 | Xenia Canary (Xbox 360) | BSD-3-Clause | <https://github.com/xenia-canary/xenia-canary> | `emuladores\Xenia` |
 | Java do Java ME: OpenJDK 21 (Eclipse Temurin), reduzido com o jlink | GPL-2.0 com a exceção Classpath (os textos vão em emuladores\Java\legal) | <https://github.com/adoptium/temurin21-binaries> | `emuladores\Java` |
+| RetroArch 1.22.2 para navegador (WebAssembly), o do ARENA do Chromebook: o build oficial do libretro (buildbot.libretro.com/stable/1.22.2/emscripten), só convertido para abrir do pen drive (ferramentas\preparar_nucleos_navegador.py) | GPL-3.0 (o RetroArch); cada núcleo, a licença dele (tabela do Chromebook, abaixo) | <https://github.com/libretro/RetroArch> | `launcher\navegador\nucleos` |
 
 Não vem no ARENA, mas o ARENA usa se estiver no computador de quem comprou:
 o **Lossless Scaling** (programa pago, da Steam). Ele não é distribuído
@@ -126,3 +127,64 @@ que a lista depois da tabela aponta.
 Código-fonte fora do libretro:
 
 - `freej2me_libretro.dll`: <https://github.com/TASEmulators/freej2me-plus/tree/8f87bf1497e7a9738a32d1909379376a1faca7dd>
+
+## Núcleos do ARENA no Chromebook (34)
+
+No Chromebook, o ARENA roda dentro do navegador (`ARENA-CHROMEBOOK.html`),
+com estes núcleos na versão que o libretro compila para WebAssembly, do
+mesmo RetroArch 1.22.2: dois arquivos cada um em `launcher\navegador\nucleos`
+(o programa e o emulador compactado). A licença é a do mesmo núcleo
+(o `.info` dele); o código-fonte, o repositório dele em
+<https://github.com/libretro>.
+
+| Núcleo | Arquivos | Consoles | Licença |
+|---|---|---|---|
+| Arduboy (Ardens) | `ardens.js`, `ardens.wasm.js` | Arduboy | MIT |
+| Arcade (FinalBurn Neo) | `fbneo.js`, `fbneo.wasm.js` | Neo Geo e fliperamas (FBNeo) | Non-commercial |
+| Nintendo - NES / Famicom (FCEUmm) | `fceumm.js`, `fceumm.wasm.js` | Nintendo (NES) | GPLv2 |
+| Nintendo - Game Boy / Color (Gambatte) | `gambatte.js`, `gambatte.wasm.js` | Game Boy e Game Boy Color | GPLv2 |
+| Coleco - ColecoVision (Gearcoleco) | `gearcoleco.js`, `gearcoleco.wasm.js` | ColecoVision | GPLv3 |
+| Sega - MS/GG/SG-1000 (Gearsystem) | `gearsystem.js`, `gearsystem.wasm.js` | Sega SG-1000 | GPLv3 |
+| Sega - MS/GG/MD/CD (Genesis Plus GX) | `genesis_plus_gx.js`, `genesis_plus_gx.wasm.js` | Mega Drive, Master System e Game Gear, Sega CD | Non-commercial |
+| Handheld Electronic (GW) | `gw.js`, `gw.wasm.js` | Game & Watch | zlib |
+| Atari - Lynx (Handy) | `handy.js`, `handy.wasm.js` | Atari Lynx | Zlib |
+| CHIP-8/S-CHIP/XO-CHIP (JAXE) | `jaxe.js`, `jaxe.wasm.js` | CHIP-8 | MIT |
+| LowRes NX | `lowresnx.js`, `lowresnx.wasm.js` | LowRes NX | zlib |
+| SNK - Neo Geo Pocket / Color (Beetle NeoPop) | `mednafen_ngp.js`, `mednafen_ngp.wasm.js` | Neo Geo Pocket | GPLv2 |
+| NEC - PC Engine / CD (Beetle PCE FAST) | `mednafen_pce_fast.js`, `mednafen_pce_fast.wasm.js` | PC Engine | GPLv2 |
+| Nintendo - Virtual Boy (Beetle VB) | `mednafen_vb.js`, `mednafen_vb.wasm.js` | Virtual Boy | GPLv2 |
+| Bandai - WonderSwan/Color (Beetle Wonderswan) | `mednafen_wswan.js`, `mednafen_wswan.wasm.js` | WonderSwan | GPLv2 |
+| Nintendo - Game Boy Advance (mGBA) | `mgba.js`, `mgba.wasm.js` | Game Boy Advance | MPLv2.0 |
+| Magnavox - Odyssey2 / Philips Videopac+ (O2EM) | `o2em.js`, `o2em.wasm.js` | Magnavox Odyssey 2 | Artistic License |
+| The 3DO Company - 3DO (Opera) | `opera.js`, `opera.wasm.js` | 3DO | LGPL/Non-commercial |
+| Sony - PlayStation (PCSX ReARMed) | `pcsx_rearmed.js`, `pcsx_rearmed.wasm.js` | PlayStation | GPLv2 |
+| Sega - MS/GG/MD/CD/32X (PicoDrive) | `picodrive.js`, `picodrive.wasm.js` | Sega 32X | MAME |
+| ScummVM | `scummvm.js`, `scummvm.wasm.js` | ScummVM | GPLv3 |
+| Nintendo - SNES / SFC (Snes9x) | `snes9x.js`, `snes9x.wasm.js` | Super Nintendo | Non-commercial |
+| Bandai - Tamagotchi P1 (TamaLIBretro) | `tamalibretro.js`, `tamalibretro.wasm.js` | Tamagotchi | GPL-2.0 |
+| Thomson - MO/TO (Theodore) | `theodore.js`, `theodore.wasm.js` | Thomson MO/TO | GPLv3 |
+| TIC-80 | `tic80.js`, `tic80.wasm.js` | TIC-80 | MIT |
+| MicroW8 | `uw8.js`, `uw8.wasm.js` | MicroW8 | The Unlicense |
+| Uzebox (Uzem) | `uzem.js`, `uzem.wasm.js` | Uzebox | MIT |
+| GCE - Vectrex (vecx) | `vecx.js`, `vecx.wasm.js` | Vectrex | GPLv3 |
+| Commodore - C128 (VICE x128) | `vice_x128.js`, `vice_x128.wasm.js` | Commodore 128 | GPLv2 |
+| Commodore - C64 (VICE x64, fast) | `vice_x64.js`, `vice_x64.wasm.js` | Commodore 64 | GPLv2 |
+| Commodore - PET (VICE xpet) | `vice_xpet.js`, `vice_xpet.wasm.js` | Commodore PET | GPLv2 |
+| Commodore - PLUS/4 (VICE xplus4) | `vice_xplus4.js`, `vice_xplus4.wasm.js` | Commodore Plus/4 | GPLv2 |
+| Commodore - VIC-20 (VICE xvic) | `vice_xvic.js`, `vice_xvic.wasm.js` | Commodore VIC-20 | GPLv2 |
+| WASM-4 | `wasm4.js`, `wasm4.wasm.js` | WASM-4 | ISC |
+
+## Jogos livres que vêm junto no Chromebook (5)
+
+Para o Chromebook ter jogo na primeira vez e para o "Testar este
+Chromebook" medir sem pen drive, vão embutidos em
+`launcher\navegador\livres.js` estes jogos de licença livre (os mesmos de
+`testes\jogos_livres`, conferidos pela marca SHA-256 da `lista.json`):
+
+| Jogo | Console | Autor | Licença | Código-fonte |
+|---|---|---|---|---|
+| Evade | Arduboy | Modus Create | MIT | <https://github.com/ModusCreateOrg/evade-arduboy-game> |
+| Slippery Slope | CHIP-8 | John Earnest | CC0 (domínio público), como todo o Chip8 Community Archive | <https://github.com/JohnEarnest/chip8Archive> |
+| Skip Ahead | MicroW8 | Dennis Ranke (exoticorn) | Unlicense (domínio público) | <https://github.com/exoticorn/microw8> |
+| Intervallo | Commodore Plus/4 | Zalka Ernő (ern0) | MIT | <https://github.com/ern0/intervallo> |
+| Baguel | Commodore VIC-20 | Marco Giorgini (MGProduction) | MIT | <https://github.com/mgproduction/baguel> |
