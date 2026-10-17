@@ -171,7 +171,9 @@ Cada guia tem passos numerados e uma tabela de problemas no fim.
 
 Tudo é **Python 3.13 puro** (só a biblioteca padrão) e uma tela em
 **HTML + CSS + JavaScript sem framework**. O servidor roda em `127.0.0.1:8777`
-e a tela abre como janela de aplicativo no Edge que já vem no Windows.
+e a tela abre no navegador padrão do computador (`servidor\navegadores.py`):
+Edge, Chrome, Brave e Vivaldi como janela de aplicativo, sem abas; Firefox
+numa janela nova. Dá para escolher em Ajustes → Simples → Abrir a tela em.
 
 ```
 ARENA\

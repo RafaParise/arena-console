@@ -318,6 +318,13 @@ Dois cliques em **`ARENA.bat`**. A janela preta deve mostrar:
 O navegador abre no ARENA. A lista fica vazia — está certo, ainda não há
 jogos. Para adicionar, veja o **documento 2** (`2-JOGOS.md`).
 
+O ARENA abre no **navegador padrão** do computador, seja ele o Edge, o
+Chrome, o Firefox, o Brave, o Vivaldi ou o Opera: a tela é um site que roda
+dentro do seu computador, sem internet, então funciona em qualquer um. Edge,
+Chrome, Brave e Vivaldi abrem como um programa, sem abas nem barra de
+endereço; Firefox e Opera, numa janela nova. Para escolher outro: **Ajustes
+→ Simples → Abrir a tela em** (vale na próxima vez que abrir o ARENA).
+
 **Se aparecer `[ERRO] O Python nao foi encontrado`:** volte ao passo 2.
 
 ---

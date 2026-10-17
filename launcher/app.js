@@ -322,6 +322,7 @@ async function carregarEstado() {
   $("#chaveTravar").setAttribute("aria-pressed",
     dados.config.travar_teclas ? "true" : "false");
   mostrarLossless(dados.lossless, dados.config);
+  mostrarNavegadores(dados.navegadores, dados.config);
   desenharFechamentos(dados.fechamentos || []);
 
   $("#perfilApelido").textContent = dados.config.apelido || "(sem apelido)";
@@ -1584,6 +1585,28 @@ const EXPLICA_ESCALA_TELA = {
   original: "Sem filtro: o emulador só estica a imagem. É o mais leve, mas o pixel sai " +
     "borrado ou de tamanhos diferentes.",
 };
+
+// Em que navegador a tela abre (servidor/navegadores.py, item 11): os que o
+// servidor achou neste computador, com o padrao marcado.
+function mostrarNavegadores(situacao, config) {
+  const lista = $("#listaNavegador");
+  if (!lista || !situacao) return;
+  const escolhido = (config && config.navegador) || "automatico";
+  const padrao = (situacao.instalados || []).find((n) => n.codigo === situacao.padrao);
+  lista.replaceChildren();
+  const automatico = document.createElement("option");
+  automatico.value = "automatico";
+  automatico.textContent = "O navegador padrão do computador" +
+    (padrao ? " (" + padrao.nome + ")" : "") + " — recomendado";
+  lista.append(automatico);
+  for (const navegador of situacao.instalados || []) {
+    const opcao = document.createElement("option");
+    opcao.value = navegador.codigo;
+    opcao.textContent = navegador.nome;
+    lista.append(opcao);
+  }
+  lista.value = [...lista.options].some((o) => o.value === escolhido) ? escolhido : "automatico";
+}
 
 // O Lossless Scaling de quem comprou (servidor\lossless.py). O bloco so
 // aparece se o programa estiver nesta maquina.
@@ -4442,6 +4465,17 @@ function ligarEventos() {
                    : "Ligado. Feche e abra o ARENA para valer.")
         : "Desligado. Só este computador acessa.");
     } catch (falha) {
+      recado(falha.message, true);
+    }
+  });
+
+  $("#listaNavegador").addEventListener("change", async (evento) => {
+    const lista = evento.currentTarget;
+    try {
+      await salvarConfig({ navegador: lista.value });
+      recado("Pronto. Vale na próxima vez que você abrir o ARENA.");
+    } catch (falha) {
+      lista.value = (estado.config && estado.config.navegador) || "automatico";
       recado(falha.message, true);
     }
   });

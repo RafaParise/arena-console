@@ -36,7 +36,6 @@ import urllib.error
 import urllib.parse
 import urllib.request
 import uuid
-import webbrowser
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
@@ -74,6 +73,9 @@ import capas_online     # noqa: E402
 import graficos    # noqa: E402
 import hardware    # noqa: E402
 import lossless    # noqa: E402  (o Lossless Scaling de quem comprou -- item 10, 17/10/2026)
+import navegadores  # noqa: E402  (em que navegador a tela abre -- item 11, 17/10/2026)
+# O que a configuracao aceita em "navegador".
+NAVEGADORES_ACEITOS = ("automatico",) + tuple(c[0] for c in navegadores.CONHECIDOS)
 import indexador   # noqa: E402  (precisam vir depois do ajuste de sys.path)
 import integridade  # noqa: E402  (zip de fliperama danificado)
 import jogadores   # noqa: E402  (quantos jogadores cada jogo aceita)
@@ -1215,6 +1217,9 @@ def config_padrao():
         # tela inteira. "automatico" escolhe pelo console, pela placa e pelo
         # perfil (item 10 dos pedidos de 15/10/2026).
         "escala_da_tela": "automatico",
+        # Em que navegador a tela abre (servidor/navegadores.py):
+        # "automatico" = o padrao do computador; ou o codigo de um deles.
+        "navegador": "automatico",
         # Motor de video do PCSX2 (PS2): "automatico" deixa o PCSX2 escolher
         # (no 2.8 ele escolhe DirectX 12 em placa Intel e AMD com nivel 12).
         "motor_ps2": "automatico",
@@ -1354,6 +1359,8 @@ def ler_config_do_disco():
     config["rpcn_ativo"] = bool(salvo.get("rpcn_ativo"))
     if salvo.get("escala_da_tela") in graficos.ESCALAS:
         config["escala_da_tela"] = salvo["escala_da_tela"]
+    if salvo.get("navegador") in NAVEGADORES_ACEITOS:
+        config["navegador"] = salvo["navegador"]
     if salvo.get("preset_grafico_externo") in ("automatico", "leve", "bonito"):
         config["preset_grafico_externo"] = salvo["preset_grafico_externo"]
     # tuple(): um valor que nao e' texto (lista, por exemplo) num dict daria
@@ -4994,6 +5001,11 @@ class Manipulador(BaseHTTPRequestHandler):
                 # da Steam (servidor\lossless.py). A tela so mostra o bloco
                 # dele se ele estiver nesta maquina.
                 "lossless": lossless.situacao(RAIZ),
+                # Os navegadores deste computador e o padrao dele (a tela
+                # oferece a escolha em Ajustes -> Simples).
+                "navegadores": {"padrao": navegadores.padrao_do_computador(),
+                                "instalados": [{"codigo": n["codigo"], "nome": n["nome"]}
+                                               for n in navegadores.instalados()]},
                 "rede_ps2": {
                     "driver_instalado": graficos.npcap_instalado(),
                     "jogos": next(
@@ -6390,6 +6402,8 @@ class Manipulador(BaseHTTPRequestHandler):
                 config["modo_desempenho"] = bool(dados["modo_desempenho"])
             if dados.get("escala_da_tela") in graficos.ESCALAS:
                 config["escala_da_tela"] = dados["escala_da_tela"]
+            if dados.get("navegador") in NAVEGADORES_ACEITOS:
+                config["navegador"] = dados["navegador"]
             if dados.get("preset_grafico_externo") in ("automatico", "leve", "bonito"):
                 config["preset_grafico_externo"] = dados["preset_grafico_externo"]
             if dados.get("motor_ps2") in tuple(graficos.MOTORES_PCSX2):
@@ -7095,45 +7109,26 @@ def ha_internet_agora():
     return bool(VIGIA["internet"]) or internet_disponivel()
 
 
-_LOCALAPPDATA = os.environ.get("LOCALAPPDATA", "")
-
-NAVEGADORES = [
-    r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
-    r"C:\Program Files\Google\Chrome\Application\chrome.exe",
-    r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
-    # Instalacao SEM administrador (o instalador do Chrome cai aqui
-    # quando falta privilegio -- exatamente o caso normal de notebook de
-    # aluno, sem admin nenhum). Achado real na auditoria: sem isto, o
-    # ARENA nao encontrava o navegador e caia, sem avisar, para uma aba
-    # comum em vez da janela "modo app".
-    os.path.join(_LOCALAPPDATA, "Google", "Chrome", "Application", "chrome.exe"),
-    os.path.join(_LOCALAPPDATA, "Microsoft", "Edge", "Application", "msedge.exe"),
-]
-
-
 def abrir_janela(endereco):
-    """Abre o ARENA como janela de aplicativo, sem abas nem barra de
-    endereco, para parecer um programa e nao um site.
+    """Abre a tela do ARENA no navegador do aluno (servidor/navegadores.py).
 
-    Usa o navegador que ja existe no Windows em vez de embutir uma
+    Usa o navegador que ja existe no computador em vez de embutir uma
     interface propria. Motivo pratico: o navegador ja esta na maquina e ja
     esta na memoria. Uma janela grafica propria custaria de 15 a 25 MB a
     mais de RAM, o que pesa justamente nas maquinas de 4 GB.
+
+    Desde 17/10/2026 (item 11 dos pedidos de 15/10: "qualquer navegador
+    padrao que o aluno tenha"), vale o escolhido em Ajustes ou o PADRAO do
+    computador; antes, o Edge ou o Chrome primeiro, sempre. Os da familia
+    Chromium abrem como janela de aplicativo (--app, sem abas nem barra de
+    endereco); o Firefox, numa janela nova.
     """
-    for caminho in NAVEGADORES:
-        if os.path.isfile(caminho):
-            try:
-                subprocess.Popen([
-                    caminho,
-                    "--app=" + endereco,
-                    "--window-size=1180,760",
-                    "--disable-features=Translate,AutofillServerCommunication",
-                ])
-                return
-            except OSError:
-                continue
-    # Nenhum encontrado: abre do jeito comum, em aba.
-    webbrowser.open(endereco)
+    try:
+        preferido = carregar_config().get("navegador", "automatico")
+    except Exception:
+        preferido = "automatico"
+    usado = navegadores.abrir(endereco, preferido)
+    print("[ARENA] Tela aberta: %s." % ("numa aba do navegador padrao" if usado == "aba" else usado))
 
 
 # O servidor HTTP que esta no ar agora, e se ele esta sendo trocado.
