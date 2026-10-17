@@ -44,7 +44,7 @@ lista feita pelo indexador do Windows (dados\manifesto.js):
      reprova.
 
 Uso: servidor\python\python.exe testes\teste_chromebook.py [--saida=arquivo.json] [--so=edge,chrome,firefox]
-        [--sem-desempenho]
+        [--sem-desempenho | --so-desempenho]
 """
 import functools
 import http.server
@@ -372,16 +372,27 @@ def conferir_b(r):
     ]
 
 
+# A BIOS que cada console da parte C pede (retroarch\system desta maquina):
+# vai para a copia temporaria, para provar a BIOS vinda do pen drive.
+BIOS_DA_PARTE_C = {"Sega CD": ["bios_CD_E.bin", "bios_CD_U.bin", "bios_CD_J.bin"]}
+
+
 def jogos_desta_maquina():
     """Um jogo de cada console pesado, se o ARENA de verdade tiver (so para
-    medir; nunca sai desta maquina: vai para a copia temporaria)."""
+    medir; nunca sai desta maquina: vai para a copia temporaria). O Sega CD
+    so com a BIOS dele; o Neo Geo, com o neogeo.zip na pasta do jogo."""
     pessoais = os.path.join(RAIZ, "jogos", "pessoais")
+    sistema = os.path.join(RAIZ, "retroarch", "system")
     escolhas = [("NES", ".nes"), ("Super Nintendo", ".smc"), ("Super Nintendo", ".sfc"), ("Mega Drive", ".md"),
-                ("Game Boy Advance", ".gba"), ("PS1", ".chd")]
+                ("Game Boy Advance", ".gba"), ("PS1", ".chd"), ("Sega CD", ".chd"), ("Neo Geo", "kof97.zip")]
     achados = {}
     for pasta, extensao in escolhas:
         caminho = os.path.join(pessoais, pasta)
         if pasta in achados or not os.path.isdir(caminho):
+            continue
+        if pasta in BIOS_DA_PARTE_C and not any(os.path.isfile(os.path.join(sistema, b)) for b in BIOS_DA_PARTE_C[pasta]):
+            continue
+        if pasta == "Neo Geo" and not os.path.isfile(os.path.join(caminho, "neogeo.zip")):
             continue
         for nome in sorted(os.listdir(caminho)):
             if nome.lower().endswith(extensao) and os.path.getsize(os.path.join(caminho, nome)) < 700 * 1048576:
@@ -390,10 +401,25 @@ def jogos_desta_maquina():
     return achados
 
 
+def levar_bios_da_parte_c(destino, nomes):
+    """A BIOS de cada console escolhido, na copia: retroarch\\system e, no Neo
+    Geo, o neogeo.zip ao lado do jogo (onde o FBNeo procura)."""
+    for console_ in nomes:
+        for bios in BIOS_DA_PARTE_C.get(console_, []):
+            origem = os.path.join(RAIZ, "retroarch", "system", bios)
+            if os.path.isfile(origem):
+                shutil.copyfile(origem, os.path.join(destino, "retroarch", "system", bios))
+        if console_ == "Neo Geo":
+            shutil.copyfile(os.path.join(RAIZ, "jogos", "pessoais", "Neo Geo", "neogeo.zip"),
+                            os.path.join(destino, "jogos", "pessoais", "Neo Geo", "neogeo.zip"))
+
+
 def jogar_medindo(nav, jogo_id, lento):
     """Abre o jogo, mede os quadros por segundo com o processador freado
     'lento' vezes e a memoria do navegador inteiro com o jogo rodando, e volta."""
     r = {}
+    # A resposta do jogo anterior nao pode valer para este.
+    nav.avaliar("window.__resposta = null; 1")
     nav.avaliar("(async () => { const resposta = await fetch('/api/jogar', {method: 'POST', headers: "
                 "{'Content-Type': 'application/json'}, body: JSON.stringify({jogo_id: %s, apelido: 'teste'})});"
                 " window.__resposta = await resposta.json(); })(); 1" % json.dumps(jogo_id))
@@ -454,6 +480,8 @@ def main():
     so = argumento("so", "")
     if so:
         lista = [n for n in lista if n[0] in so.split(",")]
+    if "--so-desempenho" in sys.argv:          # so a parte C (os jogos desta maquina)
+        lista = []
     if not os.path.isfile(os.path.join(RAIZ, "launcher", "navegador", "nucleos", "lista.js")):
         print("Faltam os nucleos do navegador: rode ferramentas\\preparar_nucleos_navegador.py.")
         return 2
@@ -508,6 +536,7 @@ def main():
                 pasta = os.path.join(destino, "jogos", "pessoais", console_)
                 os.makedirs(pasta, exist_ok=True)
                 shutil.copyfile(arquivo, os.path.join(pasta, os.path.basename(arquivo)))
+            levar_bios_da_parte_c(destino, nomes)
             subprocess.run([PYTHON, os.path.join(destino, "servidor", "indexador.py")], cwd=destino,
                            capture_output=True, timeout=300)
             print("== Desempenho no Edge (jogos desta maquina, numa copia temporaria)")
@@ -515,7 +544,8 @@ def main():
                 nav.antes_de_cada_pagina(ANTES_DA_PAGINA + PASTA_FALSA)
                 nav.abrir("http://127.0.0.1:%d/launcher/index.html?navegador=1" % porta, espera=1)
                 esperar(nav, "document.querySelectorAll('#listaJogos .jogo').length >= 5", 40)
-                nav.avaliar("window.__espelhar('ARENA', %s)" % json.dumps(arquivos_da_copia(destino, "jogos", "dados")))
+                nav.avaliar("window.__espelhar('ARENA', %s)" % json.dumps(
+                    arquivos_da_copia(destino, "jogos", "dados", os.path.join("retroarch", "system"))))
                 nav.avaliar("document.getElementById('btnPastaArena').click(); 1")
                 esperar(nav, "ArenaPasta.situacao().tem", 15)
                 nav.avaliar("document.getElementById('campoApelidoInicial').value = 'teste'; "

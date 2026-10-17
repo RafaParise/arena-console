@@ -712,6 +712,10 @@ window.ArenaRotas = (function () {
     try {
       const pedido = await arquivosDoJogo(jogo);
       const bios = await biosDoConsole(p);
+      // O Neo Geo: o ARENA do Windows guarda o neogeo.zip na pasta do jogo
+      // (onde o FBNeo procura), e ele ja veio junto com o jogo.
+      const aoLado = new Set(pedido.arquivos.map(function (a) { return a.nome.toLowerCase(); }));
+      bios.faltam = bios.faltam.filter(function (b) { return !aoLado.has(String(b.destino).toLowerCase()); });
       if (bios.faltam.length) {
         throw falha(p.nome + " precisa da BIOS: " + bios.faltam.map(function (b) { return b.o_que || b.destino; }).join("; ") +
           ". Ponha na pasta BIOS do ARENA (guia 2-JOGOS.md).");
