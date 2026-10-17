@@ -56,6 +56,7 @@ Ele nasceu nas aulas do curso técnico de **Desenvolvimento de Sistemas**
 | 🏆 **Recordes da turma** | Placar com posição por jogo, conquistas e sincronização entre os computadores da sala — até sem rede, levando a "mala" no pen drive |
 | 🧰 **Conserta sozinho** | `VERIFICAR.bat` confere e conserta a pasta; `PARTIDA.bat` explica por que a partida a dois não conecta; a tela explica por que um jogo não abriu |
 | 🔒 **Seguro para menores** | Sem gravação de vídeo e sem transmissão ao vivo. Só o que o Jogar Junto precisa fica aberto à rede |
+| 💻 **Também no Chromebook** | O mesmo pen drive abre no Chromebook, dentro do Chrome (`ARENA-CHROMEBOOK.html`), sem instalar nada: a mesma tela, 35 consoles e o mesmo save do Windows ([`docs/CHROMEBOOK.md`](docs/CHROMEBOOK.md)) |
 
 ## Baixar e usar
 
@@ -123,7 +124,7 @@ o GameCube e o Wii dentro do RetroArch.
 
 | | Mínimo | Bom |
 |---|---|---|
-| Sistema | Windows 10 ou 11, **64 bits** | |
+| Sistema | Windows 10 ou 11, **64 bits**; ou um Chromebook (35 consoles, pelo `ARENA-CHROMEBOOK.html`) | |
 | Processador | 2 núcleos (Celeron, Pentium) | 4 núcleos ou mais |
 | Memória | 4 GB | 8 GB |
 | Espaço | 4 GB, mais os jogos | SSD ou pen drive USB 3.0 |
@@ -175,9 +176,15 @@ e a tela abre no navegador padrão do computador (`servidor\navegadores.py`):
 Edge, Chrome, Brave e Vivaldi como janela de aplicativo, sem abas; Firefox
 numa janela nova. Dá para escolher em Ajustes → Simples → Abrir a tela em.
 
+No **Chromebook**, a mesma tela roda sem o Python: o `launcher\navegador`
+responde dentro da própria página os pedidos que a tela faria ao servidor,
+e os jogos rodam no mesmo RetroArch, compilado para WebAssembly
+([`docs/CHROMEBOOK.md`](docs/CHROMEBOOK.md)).
+
 ```
 ARENA\
 ├── ARENA.bat · VERIFICAR.bat · PARTIDA.bat · COLETAR.bat · RODAR_TESTES.bat
+├── ARENA-CHROMEBOOK.html   a entrada no Chromebook (ou em qualquer navegador)
 ├── servidor\     o servidor, o banco (SQLite), o catálogo, a rede e os ajustes
 │   ├── arena.py         as rotas da API, o banco, a sincronização e o Jogar Junto
 │   ├── indexador.py     acha os jogos nas pastas
@@ -186,6 +193,7 @@ ARENA\
 │   ├── consoles.json    os 66 consoles
 │   └── tests\           a bateria de testes (RODAR_TESTES.bat)
 ├── launcher\     a tela (index.html, app.js, estilo.css e os fundos em pixel art)
+│   └── navegador\   o servidor dentro da página e os núcleos em WebAssembly (Chromebook)
 ├── testes\       testes de ponta a ponta com os emuladores de verdade
 ├── ferramentas\  montar a versão dos alunos, medir o computador, a rodada de testes
 └── docs\         relatórios das auditorias, a máquina-alvo, os roteiros de sala

@@ -1,0 +1,632 @@
+{
+ "_leia": "testes\\teste_chromebook.py: o ARENA no navegador numa copia do ARENA. Parte A: aberto do arquivo (file://) em cada navegador; quadros_s = voltas do laco do RetroArch por segundo, medidas dentro do quadro do jogo; memoria_*_mb = memoria privada do navegador inteiro (todos os processos), sem janela, a tela parada depois de 30 s. Parte B: a pasta do pen drive por http://127.0.0.1, com o seletor de pasta trocado por uma pasta do proprio navegador (OPFS). Parte C: no Edge, os jogos desta maquina (numa copia temporaria; nenhum sai dela), com o processador normal (1) e freado 4 vezes pelo protocolo de depuracao (Emulation.setCPUThrottlingRate); a memoria inclui a copia do pen drive de teste que passou pelo navegador.",
+ "data": "2026-10-17 18:57",
+ "resultados": [
+  {
+   "lista_pronta": true,
+   "pronta_s": 0.0,
+   "no_navegador": true,
+   "origens": {
+    "pessoais": 6,
+    "vem_com": 5
+   },
+   "manifesto": "windows",
+   "escondidos": true,
+   "capa": true,
+   "memoria_parada_mb": 295,
+   "memoria_com_jogo_mb": 482,
+   "jogos": [
+    {
+     "titulo": "Evade",
+     "abriu_camada": true,
+     "rodando": true,
+     "abrir_s": 0.2,
+     "quadros_s": 60,
+     "imagens_s": 60,
+     "erros_do_emulador": [],
+     "voltou": true
+    },
+    {
+     "titulo": "Slippery Slope",
+     "abriu_camada": true,
+     "rodando": true,
+     "abrir_s": 0.2,
+     "quadros_s": 60,
+     "imagens_s": 60,
+     "erros_do_emulador": [],
+     "voltou": true
+    },
+    {
+     "titulo": "Skip Ahead",
+     "abriu_camada": true,
+     "rodando": true,
+     "abrir_s": 0.2,
+     "quadros_s": 60,
+     "imagens_s": 60,
+     "erros_do_emulador": [],
+     "voltou": true
+    },
+    {
+     "titulo": "Intervallo",
+     "abriu_camada": true,
+     "rodando": true,
+     "abrir_s": 0.2,
+     "quadros_s": 60,
+     "imagens_s": 60,
+     "erros_do_emulador": [],
+     "voltou": true
+    },
+    {
+     "titulo": "Baguel",
+     "abriu_camada": true,
+     "rodando": true,
+     "abrir_s": 0.2,
+     "quadros_s": 59.8,
+     "imagens_s": 59.8,
+     "erros_do_emulador": [],
+     "voltou": true
+    }
+   ],
+   "estado_guardado": true,
+   "recorde": true,
+   "foto": true,
+   "sem_pasta": "Para abrir os jogos do pen drive, escolha a pasta do ARENA uma vez (botão no alto da lista).",
+   "erros": [],
+   "codigo": "edge",
+   "navegador": "Microsoft Edge",
+   "parte": "A",
+   "conferencias": [
+    [
+     "a tela abre pelo ARENA-CHROMEBOOK.html, sem erro de JavaScript",
+     true
+    ],
+    [
+     "a lista: os 11 do pen drive (a do Windows) e os 5 que vem junto, sem repetir",
+     true
+    ],
+    [
+     "o que so existe no Windows nao aparece",
+     true
+    ],
+    [
+     "os 5 jogos que vem junto abrem, rodam e voltam",
+     true
+    ],
+    [
+     "o F2 grava o estado e ele aparece em Saves e cheats",
+     true
+    ],
+    [
+     "o jogo do pen drive sem a pasta explica o que fazer",
+     true
+    ],
+    [
+     "a capa do pen drive aparece (também no jogo que vem junto)",
+     true
+    ],
+    [
+     "a pontuação registrada aparece em Recordes",
+     true
+    ],
+    [
+     "a foto do perfil fica guardada e aparece",
+     true
+    ]
+   ]
+  },
+  {
+   "lista_pronta": true,
+   "pronta_s": 0.0,
+   "no_navegador": true,
+   "origens": {
+    "pessoais": 6,
+    "vem_com": 5
+   },
+   "manifesto": "windows",
+   "escondidos": true,
+   "capa": true,
+   "memoria_parada_mb": 305,
+   "memoria_com_jogo_mb": 504,
+   "jogos": [
+    {
+     "titulo": "Evade",
+     "abriu_camada": true,
+     "rodando": true,
+     "abrir_s": 0.3,
+     "quadros_s": 59.8,
+     "imagens_s": 59.8,
+     "erros_do_emulador": [],
+     "voltou": true
+    },
+    {
+     "titulo": "Slippery Slope",
+     "abriu_camada": true,
+     "rodando": true,
+     "abrir_s": 0.3,
+     "quadros_s": 59.8,
+     "imagens_s": 59.8,
+     "erros_do_emulador": [],
+     "voltou": true
+    },
+    {
+     "titulo": "Skip Ahead",
+     "abriu_camada": true,
+     "rodando": true,
+     "abrir_s": 0.3,
+     "quadros_s": 60,
+     "imagens_s": 60,
+     "erros_do_emulador": [],
+     "voltou": true
+    },
+    {
+     "titulo": "Intervallo",
+     "abriu_camada": true,
+     "rodando": true,
+     "abrir_s": 0.3,
+     "quadros_s": 60,
+     "imagens_s": 60,
+     "erros_do_emulador": [],
+     "voltou": true
+    },
+    {
+     "titulo": "Baguel",
+     "abriu_camada": true,
+     "rodando": true,
+     "abrir_s": 0.2,
+     "quadros_s": 59.8,
+     "imagens_s": 59.8,
+     "erros_do_emulador": [],
+     "voltou": true
+    }
+   ],
+   "estado_guardado": true,
+   "recorde": true,
+   "foto": true,
+   "sem_pasta": "Para abrir os jogos do pen drive, escolha a pasta do ARENA uma vez (botão no alto da lista).",
+   "erros": [],
+   "codigo": "chrome",
+   "navegador": "Chrome for Testing 155.0.8059.84",
+   "parte": "A",
+   "conferencias": [
+    [
+     "a tela abre pelo ARENA-CHROMEBOOK.html, sem erro de JavaScript",
+     true
+    ],
+    [
+     "a lista: os 11 do pen drive (a do Windows) e os 5 que vem junto, sem repetir",
+     true
+    ],
+    [
+     "o que so existe no Windows nao aparece",
+     true
+    ],
+    [
+     "os 5 jogos que vem junto abrem, rodam e voltam",
+     true
+    ],
+    [
+     "o F2 grava o estado e ele aparece em Saves e cheats",
+     true
+    ],
+    [
+     "o jogo do pen drive sem a pasta explica o que fazer",
+     true
+    ],
+    [
+     "a capa do pen drive aparece (também no jogo que vem junto)",
+     true
+    ],
+    [
+     "a pontuação registrada aparece em Recordes",
+     true
+    ],
+    [
+     "a foto do perfil fica guardada e aparece",
+     true
+    ]
+   ]
+  },
+  {
+   "lista_pronta": true,
+   "pronta_s": 0.0,
+   "no_navegador": true,
+   "origens": {
+    "pessoais": 6,
+    "vem_com": 5
+   },
+   "manifesto": "windows",
+   "escondidos": true,
+   "capa": true,
+   "memoria_parada_mb": 852,
+   "memoria_com_jogo_mb": 978,
+   "jogos": [
+    {
+     "titulo": "Evade",
+     "abriu_camada": true,
+     "rodando": true,
+     "abrir_s": 0.2,
+     "quadros_s": 59.8,
+     "imagens_s": 59.8,
+     "erros_do_emulador": [],
+     "voltou": true
+    },
+    {
+     "titulo": "Slippery Slope",
+     "abriu_camada": true,
+     "rodando": true,
+     "abrir_s": 0.2,
+     "quadros_s": 59.5,
+     "imagens_s": 59.5,
+     "erros_do_emulador": [],
+     "voltou": true
+    },
+    {
+     "titulo": "Skip Ahead",
+     "abriu_camada": true,
+     "rodando": true,
+     "abrir_s": 0.2,
+     "quadros_s": 59.8,
+     "imagens_s": 59.8,
+     "erros_do_emulador": [],
+     "voltou": true
+    },
+    {
+     "titulo": "Intervallo",
+     "abriu_camada": true,
+     "rodando": true,
+     "abrir_s": 0.2,
+     "quadros_s": 60,
+     "imagens_s": 60,
+     "erros_do_emulador": [],
+     "voltou": true
+    },
+    {
+     "titulo": "Baguel",
+     "abriu_camada": true,
+     "rodando": true,
+     "abrir_s": 0.2,
+     "quadros_s": 59.5,
+     "imagens_s": 59.5,
+     "erros_do_emulador": [],
+     "voltou": true
+    }
+   ],
+   "estado_guardado": true,
+   "recorde": true,
+   "foto": true,
+   "sem_pasta": "Para abrir os jogos do pen drive, escolha a pasta do ARENA uma vez (botão no alto da lista).",
+   "erros": [],
+   "codigo": "firefox",
+   "navegador": "Mozilla Firefox 158.0",
+   "parte": "A",
+   "conferencias": [
+    [
+     "a tela abre pelo ARENA-CHROMEBOOK.html, sem erro de JavaScript",
+     true
+    ],
+    [
+     "a lista: os 11 do pen drive (a do Windows) e os 5 que vem junto, sem repetir",
+     true
+    ],
+    [
+     "o que so existe no Windows nao aparece",
+     true
+    ],
+    [
+     "os 5 jogos que vem junto abrem, rodam e voltam",
+     true
+    ],
+    [
+     "o F2 grava o estado e ele aparece em Saves e cheats",
+     true
+    ],
+    [
+     "o jogo do pen drive sem a pasta explica o que fazer",
+     true
+    ],
+    [
+     "a capa do pen drive aparece (também no jogo que vem junto)",
+     true
+    ],
+    [
+     "a pontuação registrada aparece em Recordes",
+     true
+    ],
+    [
+     "a foto do perfil fica guardada e aparece",
+     true
+    ]
+   ]
+  },
+  {
+   "copiados": 15,
+   "pasta_liberada": true,
+   "origens": {
+    "pessoais": 11
+   },
+   "manifesto": true,
+   "aviso_some": true,
+   "jogo_do_pen": {
+    "resposta": {
+     "ok": true,
+     "emulador": "RetroArch 1.22.2 no navegador",
+     "alerta_maquina": null
+    },
+    "rodando": true,
+    "voltou": true
+   },
+   "save_no_pen": 16,
+   "estado_no_pen": 1871,
+   "lista_feita_aqui": 11,
+   "guardado": true,
+   "guardado_abre": {
+    "titulo": "Guardado Aqui",
+    "abriu_camada": true,
+    "rodando": true,
+    "abrir_s": 0.2,
+    "quadros_s": 60,
+    "imagens_s": 60,
+    "erros_do_emulador": [],
+    "voltou": true
+   },
+   "teste_do_chromebook": [
+    [
+     "Arduboy",
+     59.9
+    ],
+    [
+     "CHIP-8",
+     59.9
+    ],
+    [
+     "Commodore Plus/4",
+     59.9
+    ],
+    [
+     "Commodore VIC-20",
+     60
+    ],
+    [
+     "MicroW8",
+     59.9
+    ]
+   ],
+   "erros": [],
+   "codigo": "edge",
+   "navegador": "Microsoft Edge",
+   "parte": "B",
+   "conferencias": [
+    [
+     "escolher a pasta: a lista vem do manifesto.json dela",
+     true
+    ],
+    [
+     "o jogo do pen drive abre direto da pasta",
+     true
+    ],
+    [
+     "o save vai para retroarch\\saves\\<nucleo> da pasta",
+     true
+    ],
+    [
+     "pasta sem manifesto: o ARENA faz a lista sozinho",
+     true
+    ],
+    [
+     "guardar um jogo neste navegador: ele entra na lista e abre",
+     true
+    ],
+    [
+     "Testar este Chromebook mede um jogo de cada console e guarda o relatório",
+     true
+    ],
+    [
+     "sem erro de JavaScript",
+     true
+    ]
+   ]
+  },
+  {
+   "copiados": 15,
+   "pasta_liberada": true,
+   "origens": {
+    "pessoais": 11
+   },
+   "manifesto": true,
+   "aviso_some": true,
+   "jogo_do_pen": {
+    "resposta": {
+     "ok": true,
+     "emulador": "RetroArch 1.22.2 no navegador",
+     "alerta_maquina": null
+    },
+    "rodando": true,
+    "voltou": true
+   },
+   "save_no_pen": 16,
+   "estado_no_pen": 1871,
+   "lista_feita_aqui": 11,
+   "guardado": true,
+   "guardado_abre": {
+    "titulo": "Guardado Aqui",
+    "abriu_camada": true,
+    "rodando": true,
+    "abrir_s": 0.2,
+    "quadros_s": 60,
+    "imagens_s": 60,
+    "erros_do_emulador": [],
+    "voltou": true
+   },
+   "teste_do_chromebook": [
+    [
+     "Arduboy",
+     60
+    ],
+    [
+     "CHIP-8",
+     59.9
+    ],
+    [
+     "Commodore Plus/4",
+     59.9
+    ],
+    [
+     "Commodore VIC-20",
+     60
+    ],
+    [
+     "MicroW8",
+     59.9
+    ]
+   ],
+   "erros": [],
+   "codigo": "chrome",
+   "navegador": "Chrome for Testing 155.0.8059.84",
+   "parte": "B",
+   "conferencias": [
+    [
+     "escolher a pasta: a lista vem do manifesto.json dela",
+     true
+    ],
+    [
+     "o jogo do pen drive abre direto da pasta",
+     true
+    ],
+    [
+     "o save vai para retroarch\\saves\\<nucleo> da pasta",
+     true
+    ],
+    [
+     "pasta sem manifesto: o ARENA faz a lista sozinho",
+     true
+    ],
+    [
+     "guardar um jogo neste navegador: ele entra na lista e abre",
+     true
+    ],
+    [
+     "Testar este Chromebook mede um jogo de cada console e guarda o relatório",
+     true
+    ],
+    [
+     "sem erro de JavaScript",
+     true
+    ]
+   ]
+  },
+  {
+   "parte": "C",
+   "desempenho": [
+    {
+     "quadros_s": 59.9,
+     "imagens_s": 59.9,
+     "memoria_mb": 530,
+     "voltou": true,
+     "console": "NES",
+     "jogo": "Contra",
+     "processador_freado": 1
+    },
+    {
+     "quadros_s": 60.0,
+     "imagens_s": 60.0,
+     "memoria_mb": 493,
+     "voltou": true,
+     "console": "Super Nintendo",
+     "jogo": "BS F ZERO",
+     "processador_freado": 1
+    },
+    {
+     "quadros_s": 59.9,
+     "imagens_s": 60.4,
+     "memoria_mb": 504,
+     "voltou": true,
+     "console": "Mega Drive",
+     "jogo": "Golden Axe",
+     "processador_freado": 1
+    },
+    {
+     "quadros_s": 59.9,
+     "imagens_s": 19.9,
+     "memoria_mb": 957,
+     "voltou": true,
+     "console": "PS1",
+     "jogo": "Crash Bandicoot",
+     "processador_freado": 1
+    },
+    {
+     "quadros_s": 59.7,
+     "imagens_s": 59.7,
+     "memoria_mb": 828,
+     "voltou": true,
+     "console": "Sega CD",
+     "jogo": "Sonic CD",
+     "processador_freado": 1
+    },
+    {
+     "quadros_s": 59.9,
+     "imagens_s": 59.9,
+     "memoria_mb": 733,
+     "voltou": true,
+     "console": "Neo Geo",
+     "jogo": "The King of Fighters '97",
+     "processador_freado": 1
+    },
+    {
+     "quadros_s": 59.7,
+     "imagens_s": 59.7,
+     "memoria_mb": 847,
+     "voltou": true,
+     "console": "NES",
+     "jogo": "Contra",
+     "processador_freado": 4
+    },
+    {
+     "quadros_s": 59.9,
+     "imagens_s": 59.9,
+     "memoria_mb": 538,
+     "voltou": true,
+     "console": "Super Nintendo",
+     "jogo": "BS F ZERO",
+     "processador_freado": 4
+    },
+    {
+     "quadros_s": 59.9,
+     "imagens_s": 60.4,
+     "memoria_mb": 534,
+     "voltou": true,
+     "console": "Mega Drive",
+     "jogo": "Golden Axe",
+     "processador_freado": 4
+    },
+    {
+     "quadros_s": 59.0,
+     "imagens_s": 19.5,
+     "memoria_mb": 995,
+     "voltou": true,
+     "console": "PS1",
+     "jogo": "Crash Bandicoot",
+     "processador_freado": 4
+    },
+    {
+     "quadros_s": 59.9,
+     "imagens_s": 59.9,
+     "memoria_mb": 973,
+     "voltou": true,
+     "console": "Sega CD",
+     "jogo": "Sonic CD",
+     "processador_freado": 4
+    },
+    {
+     "quadros_s": 59.9,
+     "imagens_s": 59.9,
+     "memoria_mb": 720,
+     "voltou": true,
+     "console": "Neo Geo",
+     "jogo": "The King of Fighters '97",
+     "processador_freado": 4
+    }
+   ],
+   "conferencias": []
+  }
+ ]
+}

@@ -493,6 +493,25 @@ novo e reescreve as configurações na abertura.
 Use o pacote (acima). Serve quando a outra máquina já tem o ARENA com os
 jogos, e você só quer seus saves e recordes.
 
+#### No Chromebook
+
+O mesmo pen drive abre no Chromebook pelo `ARENA-CHROMEBOOK.html` (guia 1,
+Parte C). Com a pasta do ARENA liberada (o botão **Escolher a pasta do
+ARENA**, no alto da lista), o save e os 10 save states vão para o mesmo
+lugar do Windows, `retroarch\saves` e `retroarch\states`: salvou no
+Chromebook, continua no Windows, e o contrário também. Quase todo console
+usa o mesmo emulador nos dois, então o arquivo é o mesmo.
+
+Duas diferenças:
+
+- **PlayStation e PC Engine:** no Chromebook o emulador é outro (o PCSX
+  ReARMed no lugar do SwanStation; o Beetle PCE Fast no lugar do Beetle
+  PCE). O save de um vale no outro quando o jogo ainda não tem save lá (no
+  PC Engine, só do Windows para o Chromebook). Depois que os dois têm,
+  cada um fica com o seu: jogue cada jogo desses num lugar só.
+- **Sem a pasta liberada** (ou no Firefox): o save fica guardado dentro do
+  navegador, naquela conta do Chromebook, e não vai para o pen drive.
+
 ---
 
 ### Onde cada coisa mora

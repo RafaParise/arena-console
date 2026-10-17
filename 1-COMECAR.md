@@ -7,6 +7,7 @@ Preparar a mídia e montar o ARENA. Faça uma vez; depois é copiar e colar.
 - Parte A — Preparar o pen drive ou o SSD
 - Parte B — Instalação (o jeito fácil: baixar o ARENA pronto do GitHub; ou
   montar peça por peça)
+- Parte C — No Chromebook (o mesmo pen drive, dentro do Chrome)
 
 ---
 
@@ -488,5 +489,40 @@ passo. Ele precisa ter acesso de administrador (a conta de quem cuida do
 computador). Em computador de escola, às vezes o antivírus é controlado à
 distância, pela equipe de informática. Aí um aluno comum não consegue mexer
 nele.
+
+---
+
+## Parte C — No Chromebook
+
+O mesmo pen drive abre no Chromebook, dentro do próprio Chrome, sem
+instalar nada. A tela é a mesma do Windows.
+
+1. No Chromebook, abra o **Arquivos**, o pen drive, a pasta do ARENA, e
+   clique em **ARENA-CHROMEBOOK.html**.
+2. Escolha o apelido. Os jogos livres que vêm com o ARENA já estão na lista.
+3. Para os **seus** jogos, clique em **Escolher a pasta do ARENA** (no alto
+   da lista) e escolha a pasta do ARENA no pen drive. É uma vez só: nos
+   outros dias, o Chrome pergunta se pode e você clica em **Permitir**.
+4. Jogue como no Windows: **Esc** abre o menu, **F2** salva, **F4** carrega,
+   **F10** fecha. O botão **Voltar ao ARENA** aparece no alto quando você
+   mexe o mouse. Em tela cheia, para sair dela, segure o **Esc**.
+
+O save fica no pen drive, no mesmo lugar do Windows (`retroarch\saves`): o
+jogo salvo no Chromebook continua salvo no Windows, e o contrário também.
+
+O que muda no Chromebook: rodam **35 dos 66 consoles** (NES, Super
+Nintendo, Game Boy, GBA, Mega Drive, PlayStation, Neo Geo e outros). Os
+outros aparecem com o aviso "só roda no ARENA do Windows". Não há jogo em
+rede nem os emuladores de fora (PS2, GameCube, Wii, PS3, Xbox 360).
+
+**Chromebook sem pen drive:** em **Ajustes → Máquina → Guardar um jogo
+neste navegador**, escolha o arquivo do jogo (um jogo pequeno, de
+cartucho). Ele fica guardado no Chrome, nesta conta.
+
+**Para o professor:** em **Ajustes → Máquina → Testar este Chromebook**, o
+ARENA abre um jogo de cada console, mede quantos quadros por segundo o
+Chromebook consegue e monta um relatório para baixar. Os detalhes, os
+números e o que fazer se a escola bloquear algo estão em
+`docs\CHROMEBOOK.md`.
 
 ---

@@ -79,7 +79,15 @@ Depois do Release, nesta ordem:
     `testes/teste_navegadores.py`, numa cópia do ARENA: 30 de 30 no Edge, no
     Chrome for Testing e no Firefox (sem instalar nada), com os números de
     abertura, memória e processador.
-12. Chromebook.
+12. Feito (17/10): o ARENA no Chromebook, com o relatório em
+    `docs/CHROMEBOOK.md`. No Chromebook gerenciado o Linux vem desligado,
+    então o ARENA roda dentro do próprio Chrome (`ARENA-CHROMEBOOK.html`),
+    aberto do pen drive: a mesma tela, o mesmo RetroArch 1.22.2 em
+    WebAssembly (34 núcleos, 35 consoles), o mesmo save do Windows no pen
+    drive. Teste novo, `testes/teste_chromebook.py`: 41 de 41 no Edge, no
+    Chrome e no Firefox; NES, Super Nintendo e Mega Drive a 60 quadros com
+    o processador freado 4 vezes. Falta o teste num Chromebook da escola
+    (em "Depende do Rafael").
 13. Linux, idêntico.
 14. Android: antes, um emulador de Android de código aberto para os
     testes; depois, o APK nos Releases.
@@ -99,6 +107,14 @@ Achado de 16/10 que espera conserto:
 
 ## Depende do Rafael
 
+- **O teste no Chromebook da escola** (item 12, `docs/CHROMEBOOK.md`, "O
+  teste no Chromebook da escola"): abrir o `ARENA-CHROMEBOOK.html` do pen
+  drive, Ajustes → Máquina → Testar este Chromebook, Baixar o relatório e
+  trazer o arquivo `teste-do-chromebook-<data>.json`. E conferir à mão o
+  controle USB, o som, a tela cheia e o botão Escolher a pasta do ARENA.
+  Se a escola bloquear abrir arquivo do pen drive no Chrome, a saída é
+  publicar a versão do navegador num endereço (o GitHub Pages do ARENA,
+  por exemplo): decisão sua.
 - **O seu ARENA está no "Gráfico igual ao console original", no perfil
   Desempenho e no Ultra**: todo jogo desenhado no tamanho do console. Para
   ver a escala nova por inteiro: Ajustes → Simples → Automático; Ajustes →
