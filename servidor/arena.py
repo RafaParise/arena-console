@@ -2557,6 +2557,12 @@ def jogadores_pedidos(plataforma, jogo):
     return jogadores.numero_sem_regra(plataforma, jogo.get("titulo"))
 
 
+def nota_da_placa_de_fora():
+    """A nota da placa para os emuladores de fora (PCSX2, Dolphin, RPCS3,
+    Xenia): na integrada, mesmo na forte, para no 3 (hardware.capacidade)."""
+    return CAPACIDADE.get("nota_gpu_de_fora", CAPACIDADE.get("nota_gpu"))
+
+
 def preparar_lossless(jogo, config):
     """A partida pelo Lossless Scaling, se o aluno ligou e da para usar.
 
@@ -2697,7 +2703,7 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             escrito = graficos.escrever_config_pcsx2(
                 jogo["externo"]["caminho"],
                 ultra=bool(config.get("ultra_desempenho")),
-                nota=CAPACIDADE["nota"], nota_gpu=CAPACIDADE.get("nota_gpu"),
+                nota=CAPACIDADE["nota"], nota_gpu=nota_da_placa_de_fora(),
                 modesto=grafico_original(config), abaixo=nivel_abaixo(config),
                 preset=None if preset == "automatico" else preset,
                 jogadores=jogo.get("jogadores_max", 2),
@@ -2731,7 +2737,7 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             pasta = graficos.escrever_config_dolphin(
                 jogo["externo"]["caminho"], controles.controles_xinput(),
                 console=console,
-                nota=CAPACIDADE["nota"], nota_gpu=CAPACIDADE.get("nota_gpu"),
+                nota=CAPACIDADE["nota"], nota_gpu=nota_da_placa_de_fora(),
                 modesto=grafico_original(config), abaixo=nivel_abaixo(config),
                 ultra=bool(config.get("ultra_desempenho")),
                 preset=None if preset == "automatico" else preset)
@@ -2763,7 +2769,7 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             preset = config.get("preset_grafico_externo", "automatico")
             escrito = graficos.escrever_config_xenia(
                 jogo["externo"]["caminho"], CAPACIDADE["nota"],
-                CAPACIDADE.get("nota_gpu"),
+                nota_da_placa_de_fora(),
                 modesto=grafico_original(config),
                 ultra=bool(config.get("ultra_desempenho")),
                 preset=None if preset == "automatico" else preset,
@@ -2775,7 +2781,7 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             preset = config.get("preset_grafico_externo", "automatico")
             escrito = graficos.escrever_config_rpcs3(
                 jogo["externo"]["caminho"], CAPACIDADE["nota"],
-                CAPACIDADE.get("nota_gpu"),
+                nota_da_placa_de_fora(),
                 modesto=grafico_original(config), abaixo=nivel_abaixo(config),
                 ultra=bool(config.get("ultra_desempenho")),
                 preset=None if preset == "automatico" else preset)

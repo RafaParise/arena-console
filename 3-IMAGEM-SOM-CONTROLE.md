@@ -429,7 +429,9 @@ ficar perto da resolução da tela em vez de parar em 1440p:
 | Nintendo 64 | tamanho original | 2x |
 
 O ARENA confere a tela na hora de abrir o jogo: ligar a TV 4K depois já
-vale. Placa integrada não entra (a imagem continua como antes), e o
+vale. Placa integrada não entra (a imagem continua como antes) — salvo o
+Ryzen de mesa com Vega (série G) e o 8000G, que desenham como uma
+dedicada de entrada nos consoles do RetroArch (medido em 17/10/2026) —, e o
 **Gráfico igual ao console original** continua vencendo tudo. PS2, GameCube,
 Wii, PS3 e Xbox 360 ficam no que a placa aguenta: 4K neles derruba qualquer
 placa média. Os consoles 2D já ficam nítidos em qualquer tela pelo pixel
@@ -1179,6 +1181,18 @@ Pense numa foto pequena que precisa virar um cartaz:
 - **Jogo 3D já desenhado do tamanho da tela ou maior** (o PS1 em 4x numa tela
   de 900 linhas, por exemplo): nenhum filtro — não há o que esticar.
 - **Nível mínimo** ("bonecos de papelão") e **Original**: nenhum filtro.
+
+Nos **emuladores de fora**, o jogo desenhado no tamanho do console ganha o
+filtro que o próprio emulador traz, escolhido pelo ARENA:
+
+| Console (emulador) | Quando | Filtro |
+|---|---|---|
+| PS2 (PCSX2) | desenhado em 1x | o **CAS** da AMD, que afia e estica |
+| PS3 (RPCS3) | até os 720p dele | o **FSR** da AMD |
+| GameCube e Wii (Dolphin) | desenhado em 1x | o **Catmull-Rom** |
+| Xbox 360 (Xenia) | máquina forte | o **FSR** (já era assim) |
+
+Desenhado maior que isso, ou no nível mínimo, eles ficam como sempre.
 
 #### Quanto pesa (medido)
 

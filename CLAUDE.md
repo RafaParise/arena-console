@@ -149,8 +149,11 @@ professor da rede estadual de SP.
   do registro do Windows, que guarda placas que já saíram do computador.
   Uma GeForce antiga fazia a Radeon integrada passar por dedicada e
   quebrava o texto do PS1.
-- A nota da placa é separada da nota geral, e placa integrada não passa
-  de 3.
+- A nota da placa é separada da nota geral (`hardware.teto_da_placa`):
+  integrada não passa de 3, salvo o Ryzen de mesa com Vega (série G) e o
+  8000G, que vão a 4 nos núcleos do RetroArch (medido em 17/10/2026). Nos
+  emuladores de fora, toda integrada fica no 3 (`nota_gpu_de_fora`).
+  Dedicada antiga e fraca (GeForce 210, GT 710...) para em 2.
 
 **Por console:**
 - **N64:** `parallel-rdp` (Vulkan) só com nota da placa a partir de 4

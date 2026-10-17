@@ -12,6 +12,7 @@ das versoes recentes do Windows).
 import ctypes
 import os
 import platform
+import re
 import socket
 import sys
 import time
@@ -810,13 +811,46 @@ def capacidade(info=None, pasta_raiz=None):
     nota = max(1, min(5, round(pontos / 2.0)))
 
     # Nota separada para o que depende da PLACA DE VIDEO: resolucao
-    # interna, filtro de textura, anti-serrilhado. Placa integrada nao
-    # passa de 3, por melhor que seja o processador.
+    # interna, filtro de textura, anti-serrilhado (teto_da_placa).
     gpu = info.get("gpu", {})
-    if gpu.get("integrada", True):
-        nota_gpu = min(nota, 3)
-    else:
-        nota_gpu = nota
+    nota_gpu = min(nota, teto_da_placa(gpu, info.get("cpu", "")))
+    # Os emuladores de fora (PS2, GameCube e Wii, PS3, Xbox 360) pesam muito
+    # mais que os nucleos do RetroArch: com a nota 4, o PCSX2 desenharia o PS2
+    # em 4x e o RPCS3 o PS3 a 150%. Na placa integrada, mesmo na forte, eles
+    # ficam no 3 -- o que foi medido (17/10/2026) foram so os nucleos.
+    nota_gpu_de_fora = min(nota_gpu, 3) if gpu.get("integrada", True) else nota_gpu
 
-    return {"nota": nota, "nota_gpu": nota_gpu, "pontos": pontos,
-            "gpu_integrada": bool(gpu.get("integrada", True))}
+    return {"nota": nota, "nota_gpu": nota_gpu, "nota_gpu_de_fora": nota_gpu_de_fora,
+            "pontos": pontos, "gpu_integrada": bool(gpu.get("integrada", True))}
+
+
+# Ryzen de mesa com placa Vega dentro (serie G e GE, do 2000 ao 5000) e o
+# Ryzen 8000G (Radeon 760M/780M): desenham como uma dedicada de entrada.
+# Medido no Ryzen 5 5600G do professor (Vega 7, tela 1440x900) em 16 e
+# 17/10/2026 (ferramentas\medir_escala.py): PSP em 1920x1088 com 12,4% da
+# placa, PS1 em 6x com 14,3%, Dreamcast em 1280x960 com 11,1%, sempre a 60
+# quadros. O "jogo travando e som picotando" de 25/09 (placa_video) era outra
+# coisa: o aumento de textura xBRZ do PSP (no processador) e o som exclusivo
+# com o fone sem fio (16/10, arena.ajustar_para_driver).
+_APU_DE_MESA = re.compile(r"ryzen\s+\d\s+(pro\s+)?([2-5]\d{3}|8[67]\d0)ge?\b", re.I)
+# Dedicadas antigas e fracas (ate 2014, mais ou menos): com a nota cheia da
+# maquina, o PSP iria a 1920x1088 numa GeForce 210. A placa para no 2.
+_DEDICADAS_FRACAS = re.compile(
+    r"geforce\s+(210|310|315|405|8[3-6]00|9[3-5]00|gt\s*(2[1-4]0|4[1-4]0|5[12]0|6[1-4]0|7[0-3]0))"
+    r"|radeon\s+(hd\s*(4[2-5]|5[45]|6[234]|7[34]|8[34])\d0|r5\s*2[34]0|r7\s*240)"
+    r"|quadro\s+nvs", re.I)
+
+
+def teto_da_placa(gpu, processador=""):
+    """Ate que nota da placa (1 a 5) esta placa de video vai.
+
+    - integrada comum: 3, por melhor que seja o processador (a memoria e' a
+      do sistema, dividida com ele);
+    - Ryzen de mesa com Vega (G/GE) e Ryzen 8000G: 4 (medido, acima);
+    - dedicada antiga e fraca: 2;
+    - outra dedicada: 5 (vale a nota da maquina).
+    """
+    nome = (gpu or {}).get("nome", "") or ""
+    if (gpu or {}).get("integrada", True):
+        return 4 if _APU_DE_MESA.search(processador or "") else 3
+    return 2 if _DEDICADAS_FRACAS.search(nome) else 5
