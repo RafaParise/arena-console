@@ -16,6 +16,7 @@ Usado por testes\teste_java_me_pelo_arena.py e testes\teste_jeitos_pelo_arena.py
 import json
 import os
 import shutil
+import socket
 import subprocess
 import tempfile
 import time
@@ -23,7 +24,27 @@ import urllib.request
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
 RAIZ = os.path.dirname(AQUI)
-PORTA = 8787          # a da copia; a do ARENA de verdade e' a 8777
+
+
+def _porta_da_copia(preferida=8787):
+    """A 8787, se nada estiver escutando nela; senao, uma livre que o Windows
+    der. Achado de 17/10/2026: o proxy Headroom (do kit de IA do professor)
+    escuta na 8787. A conferencia antiga perguntava /api/estado, via o 404
+    dele como "porta livre", e o teste conversava com o proxy, nao com a
+    copia. Agora a porta e' testada de verdade: tentando ocupa-la."""
+    for porta in (preferida, 0):
+        teste = socket.socket()
+        try:
+            teste.bind(("127.0.0.1", porta))
+            return teste.getsockname()[1]
+        except OSError:
+            continue
+        finally:
+            teste.close()
+    return preferida
+
+
+PORTA = _porta_da_copia()   # a da copia; a do ARENA de verdade e' a 8777
 
 # A foto do CONTEUDO da janela (PrintWindow com PW_RENDERFULLCONTENT): vale
 # mesmo com outra janela por cima. A primeira versao fotografava a tela, e um
@@ -98,14 +119,19 @@ def porta_ocupada():
 
 
 def subir_servidor(copia, registro):
-    """Abre o servidor da copia (sem a janela, na PORTA) e espera ele responder."""
+    """Abre o servidor da copia (sem a janela, na PORTA) e espera ele responder.
+    Se ele fechar sozinho ao abrir (a porta tomada, por exemplo), avisa na
+    hora em vez de esperar o minuto inteiro."""
     with open(registro, "w", encoding="utf-8") as saida:
         processo = subprocess.Popen([os.path.join(RAIZ, "servidor", "python", "python.exe"),
                                      os.path.join(copia, "servidor", "arena.py")], cwd=copia,
                                     env=dict(os.environ, ARENA_SEM_JANELA="1", PYTHONIOENCODING="utf-8",
                                              ARENA_PORTA=str(PORTA)),
                                     stdin=subprocess.DEVNULL, stdout=saida, stderr=subprocess.STDOUT)
-    esperar(responde, 60)
+    esperar(lambda: responde() or processo.poll() is not None, 60)
+    if processo.poll() is not None:
+        raise OSError("o servidor da copia fechou ao abrir (codigo %s); veja %s"
+                      % (processo.returncode, registro))
     return processo
 
 

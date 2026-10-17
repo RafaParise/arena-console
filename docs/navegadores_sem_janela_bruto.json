@@ -1,0 +1,253 @@
+{
+ "data": "2026-10-17 12:46",
+ "tela": "1366x768",
+ "resultados": [
+  {
+   "codigo": "edge",
+   "navegador": "Microsoft Edge",
+   "com_janela": false,
+   "pronta_ms": 550,
+   "quadros_por_segundo": 60.0,
+   "processador_pct_parado": 27.3,
+   "memoria_mb": 366.7,
+   "processos": 16,
+   "foto": "tela_edge.png",
+   "jogos": 10,
+   "cartoes": 10,
+   "sem_rolagem_lateral": true,
+   "ajustes_abre": true,
+   "abas": {
+    "simples": true,
+    "avancado": true,
+    "maquina": true,
+    "controles": true,
+    "emuladores": true
+   },
+   "escalas": [
+    "automatico",
+    "pixel",
+    "nitido",
+    "suave",
+    "original"
+   ],
+   "escala_gravada": "nitido",
+   "navegadores": [
+    "automatico",
+    "edge"
+   ],
+   "busca_por": "DIAFL",
+   "cartoes_na_busca": 1,
+   "detalhes_aparecem": true,
+   "tema_troca": true,
+   "biblioteca_abre": true,
+   "erros": [],
+   "conferencias": [
+    [
+     "tela pronta, com os 10 jogos",
+     true
+    ],
+    [
+     "nenhum erro de JavaScript",
+     true
+    ],
+    [
+     "nada vaza para os lados",
+     true
+    ],
+    [
+     "Ajustes abre e as 5 abas mostram o painel",
+     true
+    ],
+    [
+     "Escala da tela: 5 escolhas e a troca grava",
+     true
+    ],
+    [
+     "Abrir a tela em: o padrao e os instalados",
+     true
+    ],
+    [
+     "a busca filtra",
+     true
+    ],
+    [
+     "o jogo clicado mostra os detalhes",
+     true
+    ],
+    [
+     "o tema troca",
+     true
+    ],
+    [
+     "a Biblioteca abre",
+     true
+    ]
+   ]
+  },
+  {
+   "codigo": "chrome",
+   "navegador": "Chrome for Testing 155.0.8059.84",
+   "com_janela": false,
+   "pronta_ms": 342,
+   "quadros_por_segundo": 60.0,
+   "processador_pct_parado": 3.9,
+   "memoria_mb": 379.3,
+   "processos": 11,
+   "foto": "tela_chrome.png",
+   "jogos": 10,
+   "cartoes": 10,
+   "sem_rolagem_lateral": true,
+   "ajustes_abre": true,
+   "abas": {
+    "simples": true,
+    "avancado": true,
+    "maquina": true,
+    "controles": true,
+    "emuladores": true
+   },
+   "escalas": [
+    "automatico",
+    "pixel",
+    "nitido",
+    "suave",
+    "original"
+   ],
+   "escala_gravada": "nitido",
+   "navegadores": [
+    "automatico",
+    "edge"
+   ],
+   "busca_por": "DIAFL",
+   "cartoes_na_busca": 1,
+   "detalhes_aparecem": true,
+   "tema_troca": true,
+   "biblioteca_abre": true,
+   "erros": [],
+   "conferencias": [
+    [
+     "tela pronta, com os 10 jogos",
+     true
+    ],
+    [
+     "nenhum erro de JavaScript",
+     true
+    ],
+    [
+     "nada vaza para os lados",
+     true
+    ],
+    [
+     "Ajustes abre e as 5 abas mostram o painel",
+     true
+    ],
+    [
+     "Escala da tela: 5 escolhas e a troca grava",
+     true
+    ],
+    [
+     "Abrir a tela em: o padrao e os instalados",
+     true
+    ],
+    [
+     "a busca filtra",
+     true
+    ],
+    [
+     "o jogo clicado mostra os detalhes",
+     true
+    ],
+    [
+     "o tema troca",
+     true
+    ],
+    [
+     "a Biblioteca abre",
+     true
+    ]
+   ]
+  },
+  {
+   "codigo": "firefox",
+   "navegador": "Mozilla Firefox 158.0",
+   "com_janela": false,
+   "pronta_ms": 487,
+   "quadros_por_segundo": 60.0,
+   "processador_pct_parado": 1.1,
+   "memoria_mb": 403.1,
+   "processos": 2,
+   "foto": "tela_firefox.png",
+   "jogos": 10,
+   "cartoes": 10,
+   "sem_rolagem_lateral": true,
+   "ajustes_abre": true,
+   "abas": {
+    "simples": true,
+    "avancado": true,
+    "maquina": true,
+    "controles": true,
+    "emuladores": true
+   },
+   "escalas": [
+    "automatico",
+    "pixel",
+    "nitido",
+    "suave",
+    "original"
+   ],
+   "escala_gravada": "nitido",
+   "navegadores": [
+    "automatico",
+    "edge"
+   ],
+   "busca_por": "DIAFL",
+   "cartoes_na_busca": 1,
+   "detalhes_aparecem": true,
+   "tema_troca": true,
+   "biblioteca_abre": true,
+   "erros": [],
+   "conferencias": [
+    [
+     "tela pronta, com os 10 jogos",
+     true
+    ],
+    [
+     "nenhum erro de JavaScript",
+     true
+    ],
+    [
+     "nada vaza para os lados",
+     true
+    ],
+    [
+     "Ajustes abre e as 5 abas mostram o painel",
+     true
+    ],
+    [
+     "Escala da tela: 5 escolhas e a troca grava",
+     true
+    ],
+    [
+     "Abrir a tela em: o padrao e os instalados",
+     true
+    ],
+    [
+     "a busca filtra",
+     true
+    ],
+    [
+     "o jogo clicado mostra os detalhes",
+     true
+    ],
+    [
+     "o tema troca",
+     true
+    ],
+    [
+     "a Biblioteca abre",
+     true
+    ]
+   ]
+  }
+ ],
+ "_leia": "Teste da tela do ARENA em cada navegador (testes/teste_navegadores.py), 17/10/2026, no Ryzen 5 5600G, numa copia do ARENA com os 10 jogos livres, tela 1366x768, SEM janela (headless). O roteiro (as 10 conferencias) vale; o processador e a memoria NAO comparam navegadores: sem janela, cada um desenha de um jeito. Os numeros com janela ficam em navegadores_com_janela_bruto.json."
+}

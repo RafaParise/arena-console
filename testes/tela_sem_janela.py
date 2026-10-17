@@ -272,6 +272,11 @@ class Navegador:
         time.sleep(segundos)
         self.comando("Runtime.evaluate", expression="1")
 
+    def antes_de_cada_pagina(self, codigo):
+        """JavaScript que roda antes do da pagina, em toda pagina aberta
+        (a mesma funcao do testes\\firefox_bidi.py, no Firefox)."""
+        self.comando("Page.addScriptToEvaluateOnNewDocument", source=codigo)
+
     def abrir(self, url, largura=1366, altura=768, escala=1, espera=2.5, tema=None):
         """Abre a pagina numa tela de largura x altura (pontos CSS) com a
         escala do Windows ('escala' 2 = 200%: 1920x1080 a 200% e' uma tela
