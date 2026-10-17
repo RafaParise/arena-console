@@ -151,9 +151,10 @@ window.ArenaRotas = (function () {
   }
 
   function placaDeVideo() {
+    let gl = null;
     try {
-      const gl = document.createElement("canvas").getContext("webgl2") ||
-                 document.createElement("canvas").getContext("webgl");
+      gl = document.createElement("canvas").getContext("webgl2") ||
+           document.createElement("canvas").getContext("webgl");
       if (!gl) return { nome: "sem WebGL", webgl2: false };
       const info = gl.getExtension("WEBGL_debug_renderer_info");
       const nome = info ? gl.getParameter(info.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER);
@@ -161,6 +162,11 @@ window.ArenaRotas = (function () {
                gl instanceof WebGL2RenderingContext };
     } catch (erro) {
       return { nome: "desconhecida", webgl2: false };
+    } finally {
+      // So para ler o nome: a placa devolve a memoria na hora (o jogo abre
+      // o dele, no quadro do jogo).
+      const fim = gl && gl.getExtension("WEBGL_lose_context");
+      if (fim) fim.loseContext();
     }
   }
 

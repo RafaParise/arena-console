@@ -23,6 +23,8 @@ lista feita pelo indexador do Windows (dados\manifesto.js):
         medidos dentro do quadro do jogo) e volta para a tela;
      5. o F2 grava o estado, e ele aparece em "Saves e cheats" depois;
      6. o jogo do pen drive, antes de escolher a pasta, explica o que fazer.
+     MEDE a memoria do navegador inteiro com a tela parada (depois de 30 s,
+     como o teste dos navegadores) e com o jogo do VIC-20 aberto.
   B. A PASTA DO PEN DRIVE (so Edge e Chrome, os que tem o seletor de pasta):
      a mesma tela por endereco local (http://127.0.0.1, ?navegador=1), com o
      seletor de pasta trocado por uma pasta do proprio navegador (o teste
@@ -38,7 +40,8 @@ lista feita pelo indexador do Windows (dados\manifesto.js):
   C. DESEMPENHO (Edge): se esta maquina tiver jogos de NES, Super Nintendo,
      Mega Drive e PS1 em jogos\pessoais, mede cada um com o processador
      normal e freado 4 vezes (o Chromebook da escola e' uns 3 vezes mais
-     lento que o Ryzen). So mede: nao reprova.
+     lento que o Ryzen), e a memoria com cada um aberto. So mede: nao
+     reprova.
 
 Uso: servidor\python\python.exe testes\teste_chromebook.py [--saida=arquivo.json] [--so=edge,chrome,firefox]
         [--sem-desempenho]
@@ -62,10 +65,21 @@ import firefox_bidi  # noqa: E402
 import limpeza  # noqa: E402
 import navegadores_de_teste  # noqa: E402
 import tela_sem_janela  # noqa: E402
+from teste_navegadores import _tempo_e_memoria  # noqa: E402  (a memoria privada dos processos)
 
 LIVRES = os.path.join(AQUI, "jogos_livres")
 PYTHON = os.path.join(RAIZ, "servidor", "python", "python.exe")
 SEGUNDOS_DE_JOGO = 6
+ASSENTAR = 30     # segundos com a tela parada antes de medir a memoria
+LEIA_DO_RESULTADO = (
+    "testes\\teste_chromebook.py: o ARENA no navegador numa copia do ARENA. Parte A: aberto do arquivo "
+    "(file://) em cada navegador; quadros_s = voltas do laco do RetroArch por segundo, medidas dentro do "
+    "quadro do jogo; memoria_*_mb = memoria privada do navegador inteiro (todos os processos), sem janela, "
+    "a tela parada depois de 30 s. Parte B: a pasta do pen drive por http://127.0.0.1, com o seletor de "
+    "pasta trocado por uma pasta do proprio navegador (OPFS). Parte C: no Edge, os jogos desta maquina "
+    "(numa copia temporaria; nenhum sai dela), com o processador normal (1) e freado 4 vezes pelo "
+    "protocolo de depuracao (Emulation.setCPUThrottlingRate); a memoria inclui a copia do pen drive de "
+    "teste que passou pelo navegador.")
 
 # Antes do JavaScript da pagina: guarda os erros (o mesmo do teste dos
 # navegadores) e, so na parte B, troca o seletor de pasta por uma pasta do
@@ -210,6 +224,15 @@ def parte_a(nav, endereco):
         "['btnAmigos', 'btnSincronizar', 'btnAcervo'].every((id) => getComputedStyle(document.getElementById(id)).display === 'none')"
         " && ['avancado', 'emuladores', 'controles'].every((a) => getComputedStyle(document.querySelector("
         "'#gavetaAjustes .aba[data-aba=\"' + a + '\"]')).display === 'none')")
+    # A memoria do navegador inteiro: com a tela parada e com um jogo aberto.
+    # Espera ASSENTAR como o teste dos navegadores: no primeiro meio minuto,
+    # o perfil novo de teste faz o navegador gastar uns 200 MB a mais.
+    time.sleep(ASSENTAR)
+    r["memoria_parada_mb"] = round(_tempo_e_memoria(nav.pids())[1])
+    com_jogo = jogar_medindo(nav, "vem-com/VIC-20/baguel.d64", 1)
+    r["memoria_com_jogo_mb"] = com_jogo.get("memoria_mb")
+    print("    memoria: a tela parada %s MB; com o VIC-20 rodando %s MB" % (r["memoria_parada_mb"],
+                                                                         r["memoria_com_jogo_mb"]))
     r["jogos"] = []
     for titulo in ("Evade", "Slippery Slope", "Skip Ahead", "Intervallo", "Baguel"):
         resultado = jogar(nav, titulo, salvar=(titulo == "Slippery Slope"))
@@ -367,28 +390,54 @@ def jogos_desta_maquina():
     return achados
 
 
-def parte_c(nav, endereco, nomes):
-    """Desempenho dos consoles pesados, com o processador normal e freado."""
-    resultados = []
-    nav.antes_de_cada_pagina(ANTES_DA_PAGINA)
-    for lento in (1, 4):
+def jogar_medindo(nav, jogo_id, lento):
+    """Abre o jogo, mede os quadros por segundo com o processador freado
+    'lento' vezes e a memoria do navegador inteiro com o jogo rodando, e volta."""
+    r = {}
+    nav.avaliar("(async () => { const resposta = await fetch('/api/jogar', {method: 'POST', headers: "
+                "{'Content-Type': 'application/json'}, body: JSON.stringify({jogo_id: %s, apelido: 'teste'})});"
+                " window.__resposta = await resposta.json(); })(); 1" % json.dumps(jogo_id))
+    if not esperar(nav, "ArenaPartida.rodando() || (window.__resposta && window.__resposta.ok === false)", 60):
+        r["erro"] = "nao comecou em 60 s"
+    if not nav.avaliar("ArenaPartida.rodando()"):
+        r["erro"] = r.get("erro") or (nav.avaliar("window.__resposta && window.__resposta.erro") or "nao abriu")
+        if nav.avaliar("ArenaPartida.aberto()"):
+            nav.avaliar("ArenaPartida.fechar('teste'); 1")
+        return r
+    time.sleep(3)
+    if lento != 1:            # so o CDP (Edge, Chrome) freia o processador
+        nav.comando("Emulation.setCPUThrottlingRate", rate=lento)
+    a = nav.avaliar("ArenaPartida.medir()")
+    time.sleep(8)
+    b = nav.avaliar("ArenaPartida.medir()")
+    if lento != 1:
         nav.comando("Emulation.setCPUThrottlingRate", rate=1)
-        nav.abrir(endereco, largura=1366, altura=768, espera=1)
-        esperar(nav, "document.querySelectorAll('#listaJogos .jogo').length >= 5", 40)
-        nav.avaliar("document.getElementById('campoApelidoInicial').value = 'teste'; "
-                    "document.getElementById('btnSalvarApelido').click(); 1")
+    if a and b:
+        segundos = (b["agora"] - a["agora"]) / 1000
+        r["quadros_s"] = round((b["voltas"] - a["voltas"]) / segundos, 1)
+        r["imagens_s"] = round((b["imagens"] - a["imagens"]) / segundos, 1)
+    r["memoria_mb"] = round(_tempo_e_memoria(nav.pids())[1])
+    nav.avaliar("ArenaPartida.sair(); 1")
+    r["voltou"] = esperar(nav, "!ArenaPartida.aberto()", 15)
+    return r
+
+
+def parte_c(nav, nomes):
+    """Desempenho dos consoles pesados, com o processador normal e freado,
+    e a memoria do navegador com cada jogo aberto."""
+    resultados = []
+    for lento in (1, 4):
         for console_, arquivo in nomes.items():
             jogo = nav.avaliar("(() => { const j = ArenaRotas.estado.jogos.find((x) => "
                                "x.arquivo.replace(/\\\\/g, '/').endsWith(%s));"
-                               " return j ? j.titulo : null; })()" % json.dumps("/" + os.path.basename(arquivo)))
+                               " return j ? [j.id, j.titulo] : null; })()" % json.dumps("/" + os.path.basename(arquivo)))
             if not jogo:
                 continue
-            nav.comando("Emulation.setCPUThrottlingRate", rate=lento)
-            r = jogar(nav, jogo, segundos=8)
-            nav.comando("Emulation.setCPUThrottlingRate", rate=1)
-            r.update({"console": console_, "processador_freado": lento})
+            r = jogar_medindo(nav, jogo[0], lento)
+            r.update({"console": console_, "jogo": jogo[1], "processador_freado": lento})
             resultados.append(r)
-            print("    x%d %-16s %-36s %s" % (lento, console_, jogo[:36], r.get("erro") or "%s q/s" % r.get("quadros_s")))
+            print("    x%d %-16s %-30s %s" % (lento, console_, jogo[1][:30], r.get("erro") or
+                                           "%s q/s, %s MB" % (r.get("quadros_s"), r.get("memoria_mb"))))
     return resultados
 
 
@@ -469,15 +518,17 @@ def main():
                 nav.avaliar("window.__espelhar('ARENA', %s)" % json.dumps(arquivos_da_copia(destino, "jogos", "dados")))
                 nav.avaliar("document.getElementById('btnPastaArena').click(); 1")
                 esperar(nav, "ArenaPasta.situacao().tem", 15)
-                desempenho = parte_c(nav, "http://127.0.0.1:%d/launcher/index.html?navegador=1" % porta, nomes)
+                nav.avaliar("document.getElementById('campoApelidoInicial').value = 'teste'; "
+                            "document.getElementById('btnSalvarApelido').click(); 1")
+                desempenho = parte_c(nav, nomes)
         resultados.append({"parte": "C", "desempenho": desempenho, "conferencias": []})
     finally:
         if servidor:
             servidor.shutdown()
         limpeza.apagar_pasta(trabalho)
     with open(saida, "w", encoding="utf-8") as arquivo:
-        json.dump({"data": time.strftime("%Y-%m-%d %H:%M"), "resultados": resultados}, arquivo,
-                  ensure_ascii=False, indent=1)
+        json.dump({"_leia": LEIA_DO_RESULTADO, "data": time.strftime("%Y-%m-%d %H:%M"), "resultados": resultados},
+                  arquivo, ensure_ascii=False, indent=1)
     falhas = sum(1 for r in resultados for _item, passou in r["conferencias"] if not passou)
     total = sum(len(r["conferencias"]) for r in resultados)
     print()
