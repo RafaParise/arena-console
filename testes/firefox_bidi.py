@@ -152,16 +152,23 @@ class NavegadorFirefox:
         return caminho
 
     def pids(self):
-        """Os processos deste Firefox (os que usam o perfil deste teste)."""
-        comando = ("Get-CimInstance Win32_Process -Filter \"Name = 'firefox.exe'\" | Where-Object "
-                   "{ $_.CommandLine -like '*%s*' -or $_.ParentProcessId -eq %d } | "
-                   "ForEach-Object { $_.ProcessId }" % (self.perfil, self.proc.pid if self.proc else 0))
+        """Os processos deste Firefox: os que usam o perfil deste teste e os
+        filhos deles (as abas e a placa de video). Achado de 17/10/2026: no
+        Windows, o Firefox abre por um "processo lancador" que inicia o
+        navegador de verdade e sai -- os processos das abas nao sao filhos do
+        que o teste abriu."""
+        comando = ("$todos = Get-CimInstance Win32_Process -Filter \"Name = 'firefox.exe'\"; "
+                   "$principais = @($todos | Where-Object { $_.CommandLine -like '*%s*' } | "
+                   "ForEach-Object { $_.ProcessId }); "
+                   "$todos | Where-Object { $principais -contains $_.ProcessId -or "
+                   "$principais -contains $_.ParentProcessId } | ForEach-Object { $_.ProcessId }"
+                   % self.perfil.replace("'", "''"))
         try:
             saida = subprocess.run(["powershell", "-NoProfile", "-NonInteractive", "-Command", comando],
                                    capture_output=True, text=True, timeout=30).stdout
         except (OSError, subprocess.TimeoutExpired):
             return []
-        return sorted({int(p) for p in saida.split() if p.strip().isdigit()} | {self.proc.pid})
+        return sorted({int(p) for p in saida.split() if p.strip().isdigit()})
 
 
 if __name__ == "__main__":

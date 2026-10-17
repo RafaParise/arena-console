@@ -31,7 +31,7 @@ como o aluno, pela propria pagina, sem depender do protocolo de cada
 navegador (CDP no Edge e no Chrome; WebDriver BiDi no Firefox).
 
 Uso: servidor\python\python.exe testes\teste_navegadores.py [--saida=arquivo.json] [--fotos=pasta]
-        [--janela]
+        [--janela] [--so=edge,chrome,firefox]
   --janela: cada navegador abre com janela de verdade, como o ARENA abre (o
   Edge e o Chrome em modo aplicativo, o Firefox numa janela comum). Sem ela,
   sem janela: o roteiro vale igual, mas a memoria e o processador nao --
@@ -41,6 +41,7 @@ Uso: servidor\python\python.exe testes\teste_navegadores.py [--saida=arquivo.jso
 import ctypes
 import json
 import os
+import subprocess
 import sys
 import tempfile
 import time
@@ -56,6 +57,8 @@ import navegadores_de_teste  # noqa: E402
 import tela_sem_janela  # noqa: E402
 
 LIVRES = os.path.join(AQUI, "jogos_livres")
+ASSENTAR = 30      # segundos com a tela parada antes de medir o processador
+PARADO = 10        # segundos de medicao da tela parada
 ENDERECO = "http://127.0.0.1:%d/" % copia.PORTA
 
 # Antes do JavaScript da pagina: guarda os erros, anota quando a lista de
@@ -186,6 +189,36 @@ def _tempo_e_memoria(pids):
     return segundos, memoria / (1024 * 1024)
 
 
+def tipos_dos_processos(pids):
+    """{pid: "pagina" ou "resto"} pela linha de comando de cada processo.
+
+    A pagina e' o que desenha a aba do ARENA e a placa de video: no Chromium
+    (Edge, Chrome), os processos --type=renderer e --type=gpu-process; no
+    Firefox, os -contentproc "tab" e "gpu". O resto e' o navegador em si
+    (atualizar componentes, montar o perfil novo...), que o perfil de verdade
+    do aluno ja fez."""
+    if not pids:
+        return {}
+    comando = ("$ids = @(%s); Get-CimInstance Win32_Process | Where-Object { $ids -contains $_.ProcessId } "
+               "| Select-Object ProcessId, CommandLine | ConvertTo-Json -Compress"
+               % ",".join(str(p) for p in pids))
+    saida = subprocess.run(["powershell", "-NoProfile", "-NonInteractive", "-Command", comando],
+                           capture_output=True, text=True, timeout=60).stdout.strip()
+    try:
+        lidos = json.loads(saida) if saida else []
+    except ValueError:
+        lidos = []
+    if isinstance(lidos, dict):
+        lidos = [lidos]
+    tipos = {}
+    for processo in lidos:
+        linha = processo.get("CommandLine") or ""
+        pagina = ("--type=renderer" in linha or "--type=gpu-process" in linha
+                  or ("-contentproc" in linha and (" tab" in linha or " gpu" in linha)))
+        tipos[int(processo["ProcessId"])] = "pagina" if pagina else "resto"
+    return tipos
+
+
 def medir_um(codigo, nome, programa, protocolo, pasta_fotos, janela=False):
     resultado = {"codigo": codigo, "navegador": nome, "com_janela": janela}
     abrir = (firefox_bidi.NavegadorFirefox(programa, janela=janela) if protocolo == "bidi"
@@ -208,13 +241,26 @@ def medir_um(codigo, nome, programa, protocolo, pasta_fotos, janela=False):
         time.sleep(3)
         q1 = nav.avaliar("window.__teste.quadros")
         resultado["quadros_por_segundo"] = round((q1 - q0) / 3, 1)
+        # O navegador com perfil novo trabalha no primeiro minuto (componentes,
+        # indices do perfil): espera ASSENTAR antes de medir a tela parada.
+        time.sleep(ASSENTAR)
         pids = nav.pids()
-        cpu0, _ = _tempo_e_memoria(pids)
+        tipos = tipos_dos_processos(pids)
+        da_pagina = [p for p in pids if tipos.get(p) == "pagina"]
+        do_resto = [p for p in pids if tipos.get(p) != "pagina"]
+        cpu_pagina0, _ = _tempo_e_memoria(da_pagina)
+        cpu_resto0, _ = _tempo_e_memoria(do_resto)
         t0 = time.monotonic()
-        time.sleep(10)
-        cpu1, memoria = _tempo_e_memoria(pids)
-        resultado["processador_pct_parado"] = round(100 * (cpu1 - cpu0) / (time.monotonic() - t0), 1)
-        resultado["memoria_mb"] = round(memoria, 1)
+        time.sleep(PARADO)
+        cpu_pagina1, memoria_pagina = _tempo_e_memoria(da_pagina)
+        cpu_resto1, memoria_resto = _tempo_e_memoria(do_resto)
+        segundos = time.monotonic() - t0
+        resultado["processador_pct_pagina"] = round(100 * (cpu_pagina1 - cpu_pagina0) / segundos, 1)
+        resultado["processador_pct_resto"] = round(100 * (cpu_resto1 - cpu_resto0) / segundos, 1)
+        resultado["processador_pct_parado"] = round(resultado["processador_pct_pagina"]
+                                                    + resultado["processador_pct_resto"], 1)
+        resultado["memoria_mb_pagina"] = round(memoria_pagina, 1)
+        resultado["memoria_mb"] = round(memoria_pagina + memoria_resto, 1)
         resultado["processos"] = len(pids)
         resultado["foto"] = os.path.basename(nav.foto(os.path.join(pasta_fotos, "tela_%s.png" % codigo)))
         resultado.update(json.loads(nav.avaliar(ROTEIRO)))
@@ -257,6 +303,9 @@ def main():
         print("A porta %d ja esta ocupada (outro teste aberto?)." % copia.PORTA)
         return 2
     lista = navegadores_de_teste.prontos()
+    so = argumento("so", "")
+    if so:
+        lista = [n for n in lista if n[0] in so.split(",")]
     trabalho, destino = copia.nova_pasta()
     servidor = None
     resultados = []
@@ -280,9 +329,11 @@ def main():
                 print("  [%s] %s" % ("OK" if passou else "FALHOU", item))
             if r.get("erros"):
                 print("  erros:", r["erros"][:5])
-            print("  pronta em %s ms | %s quadros/s | parado: %s%% de um nucleo, %s MB em %s processos"
-                  % (r.get("pronta_ms"), r.get("quadros_por_segundo"), r.get("processador_pct_parado"),
-                     r.get("memoria_mb"), r.get("processos")))
+            print("  pronta em %s ms | %s quadros/s | parado: a pagina %s%% de um nucleo (%s MB), "
+                  "o resto do navegador %s%% | %s MB em %s processos"
+                  % (r.get("pronta_ms"), r.get("quadros_por_segundo"), r.get("processador_pct_pagina"),
+                     r.get("memoria_mb_pagina"), r.get("processador_pct_resto"), r.get("memoria_mb"),
+                     r.get("processos")))
     finally:
         if servidor:
             servidor.kill()

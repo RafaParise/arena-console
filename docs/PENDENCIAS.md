@@ -73,7 +73,12 @@ Depois do Release, nesta ordem:
       sem fio (agora 60, variação de 21% para 2%), e a nota da placa (o
       Ryzen de mesa com Vega vai a 4 nos núcleos do RetroArch; a dedicada
       antiga para em 2).
-11. O ARENA em qualquer navegador (não só o Edge), com testes.
+11. Feito (17/10): o ARENA em qualquer navegador, com o relatório em
+    `docs/NAVEGADORES.md`. A tela abre no navegador padrão do aluno (ou no
+    escolhido em Ajustes → Simples → Abrir a tela em). Teste novo,
+    `testes/teste_navegadores.py`, numa cópia do ARENA: 30 de 30 no Edge, no
+    Chrome for Testing e no Firefox (sem instalar nada), com os números de
+    abertura, memória e processador.
 12. Chromebook.
 13. Linux, idêntico.
 14. Android: antes, um emulador de Android de código aberto para os

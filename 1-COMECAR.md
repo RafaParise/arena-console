@@ -324,6 +324,9 @@ dentro do seu computador, sem internet, então funciona em qualquer um. Edge,
 Chrome, Brave e Vivaldi abrem como um programa, sem abas nem barra de
 endereço; Firefox e Opera, numa janela nova. Para escolher outro: **Ajustes
 → Simples → Abrir a tela em** (vale na próxima vez que abrir o ARENA).
+No computador fraco, prefira o Edge ou o Chrome: a tela funciona igual nos
+três, mas o Firefox gasta umas 2,5 vezes mais memória (os números estão em
+`docs\NAVEGADORES.md`).
 
 **Se aparecer `[ERRO] O Python nao foi encontrado`:** volte ao passo 2.
 
