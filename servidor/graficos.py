@@ -332,45 +332,17 @@ def gravar_opcoes_dos_nucleos(nota, extras=None, nota_gpu=None, modesto=False, a
             altura_tela = hardware.altura_da_tela()
         except Exception:
             altura_tela = 0
-    tela_4k = tela_4k_vale(nota_gpu, altura_tela)
     linhas = ["# Gerado pelo ARENA conforme a potencia desta maquina.",
               "# Para mudar, edite servidor/graficos.json - nao este arquivo."]
 
     dados = carregar_graficos()
-    da_placa = set(dados.get("_usa_nota_gpu", []))
     bloco_abaixo = dados.get("abaixo_do_original", {})
     # Nucleos que so aparecem no bloco abaixo do original (o pulo de quadros
     # do Lynx, do 32X...) entram na lista so quando o nivel esta ligado.
     com_abaixo = {nucleo for nivel in niveis for nucleo in bloco_abaixo.get(nivel, {})}
 
     for nome_curto in sorted(set(dados["nucleos"]) | com_abaixo):
-        # Resolucao interna, filtro de textura e anti-serrilhado dependem
-        # da PLACA de video. Num PC com placa integrada, esses consoles
-        # usam a nota menor mesmo que o processador seja bom.
-        alvo = nota_gpu if (nota_gpu is not None and nome_curto in da_placa) else nota
-        opcoes = opcoes_do_nucleo(nome_curto, alvo)
-
-        # Excecoes conhecidas por nucleo: defeito que a nota de hardware
-        # nao prevê, porque e conhecimento do emulador, nao da maquina.
-        # Modo modesto: resolucao nativa e nada mais, por cima de tudo.
-        # Para quando ate o perfil leve ainda esta pesado - o caso do
-        # Celeron de dois nucleos com grafico integrado.
-        if modesto:
-            opcoes.update(dados.get("modesto", {}).get(nome_curto, {}))
-            # Abaixo do original: por cima do original, o "minimo" por cima
-            # do "leve".
-            for nivel in niveis:
-                opcoes.update(bloco_abaixo.get(nivel, {}).get(nome_curto, {}))
-        else:
-            excecao = dados.get("excecoes", {}).get(nome_curto, {})
-            for bloco in sorted(excecao.get("por_nota", []),
-                                key=lambda b: b.get("nota_minima", 0)):
-                if alvo >= bloco.get("nota_minima", 0):
-                    opcoes.update(bloco.get("opcoes", {}))
-            # Tela 4K com placa dedicada: os 3D leves desenham perto da
-            # resolucao da tela (graficos.json -> tela_4k).
-            if tela_4k:
-                opcoes.update(dados.get("tela_4k", {}).get("nucleos", {}).get(nome_curto, {}))
+        opcoes = opcoes_finais_do_nucleo(nome_curto, nota, nota_gpu, modesto, altura_tela, abaixo)
         if not opcoes:
             continue
         for chave in sorted(opcoes):
@@ -396,13 +368,170 @@ def gravar_opcoes_dos_nucleos(nota, extras=None, nota_gpu=None, modesto=False, a
     return len(linhas) - 2 - (1 if do_aluno else 0) - len(do_aluno)
 
 
-def filtro_de_tela(plataforma):
-    """Caminho do filtro de tela (shader) para este console, ou "".
+def opcoes_finais_do_nucleo(nome_curto, nota, nota_gpu=None, modesto=False, altura_tela=0,
+                            abaixo=""):
+    """As opcoes que o ARENA grava para UM nucleo (as mesmas do
+    gravar_opcoes_dos_nucleos): a escada da nota, o modesto e os niveis
+    abaixo, as excecoes e a tela 4K. Serve para saber, antes de abrir o
+    jogo, em que resolucao ele vai ser desenhado."""
+    niveis = niveis_abaixo_ate(abaixo)
+    if niveis:
+        modesto = True    # abaixo do original comeca no original
+    dados = carregar_graficos()
+    # Resolucao interna, filtro de textura e anti-serrilhado dependem da
+    # PLACA de video. Num PC com placa integrada, esses consoles usam a nota
+    # menor mesmo que o processador seja bom.
+    alvo = nota_gpu if (nota_gpu is not None and nome_curto in set(dados.get("_usa_nota_gpu", []))) else nota
+    opcoes = opcoes_do_nucleo(nome_curto, alvo)
+    if modesto:
+        # Modo modesto: resolucao nativa e nada mais, por cima de tudo. Para
+        # quando ate o perfil leve ainda esta pesado -- o caso do Celeron de
+        # dois nucleos com grafico integrado. Abaixo do original: por cima do
+        # original, o "minimo" por cima do "leve".
+        opcoes.update(dados.get("modesto", {}).get(nome_curto, {}))
+        for nivel in niveis:
+            opcoes.update(dados.get("abaixo_do_original", {}).get(nivel, {}).get(nome_curto, {}))
+    else:
+        # Excecoes conhecidas por nucleo: defeito que a nota de hardware nao
+        # preve, porque e' conhecimento do emulador, nao da maquina.
+        excecao = dados.get("excecoes", {}).get(nome_curto, {})
+        for bloco in sorted(excecao.get("por_nota", []), key=lambda b: b.get("nota_minima", 0)):
+            if alvo >= bloco.get("nota_minima", 0):
+                opcoes.update(bloco.get("opcoes", {}))
+        # Tela 4K com placa dedicada: os 3D leves desenham perto da
+        # resolucao da tela (graficos.json -> tela_4k).
+        if tela_4k_vale(nota_gpu, altura_tela):
+            opcoes.update(dados.get("tela_4k", {}).get("nucleos", {}).get(nome_curto, {}))
+    return opcoes
 
-    So os consoles de desenho 2D (graficos.json -> shaders -> plataformas)
-    recebem filtro: o "pixel nitido" (sharp-bilinear), que deixa todo pixel
-    do mesmo tamanho em qualquer tela -- 1366x768 ou 4K -- quase sem custo.
-    Console 3D ganha definicao pela resolucao interna, sem filtro.
+
+# ---------------------------------------------------------------------------
+# Escala da tela: do quadro pronto ate a tela inteira (item 10, 15/10/2026)
+# ---------------------------------------------------------------------------
+# O console desenha pequeno (256x224 no Super Nintendo, 480x272 no PSP) ou,
+# nos de 3D, no tamanho que a placa aguenta (a resolucao interna). Falta o
+# ultimo passo: esticar ate a tela. E' o que o Lossless Scaling faz. Os
+# filtros (servidor\filtros, graficos.json -> escala):
+#   pixel    -> pixel nitido (sharp-bilinear), para desenho 2D;
+#   nitido   -> FSR 1 da AMD, para 3D desenhado menor que a tela, placa boa;
+#   catmull  -> Catmull-Rom, o mesmo para a placa media (metade do custo);
+#   rcas     -> so a nitidez do FSR, placa fraca e modos de folga;
+#   suave    -> desenho 2D arredondado (ScaleFX), para quem gosta.
+# Medido em 16/10/2026 (ferramentas\medir_escala.py, docs\escala_antes_bruto.json),
+# em pontos de placa a mais sobre o bilinear: pixel +1, rcas +1, catmull
+# +2,5, nitido (FSR) +5, suave +5,7. O custo e' por ponto da TELA, quase
+# fixo: subir a resolucao interna, quando a placa aguenta, vale mais que
+# qualquer filtro (PSP 4x: 12,4% da placa; 2x + FSR: 13,5%).
+PASTA_FILTROS = os.path.join(PASTA_SERVIDOR, "filtros")
+# O que o aluno escolhe (Ajustes -> Imagem -> Escala da tela).
+ESCALAS = ("automatico", "pixel", "nitido", "suave", "original")
+ARQUIVOS_DOS_FILTROS = {"pixel": "pixel-nitido.slangp", "nitido": "fsr.slangp",
+                        "catmull": "catmull-rom.slangp", "rcas": "rcas.slangp",
+                        "suave": "suave.slangp"}
+
+# Linhas que cada nucleo desenha no tamanho do console (1x): a base da conta
+# da resolucao interna.
+ALTURA_NATIVA = {"swanstation": 240, "pcsx_rearmed": 240, "ppsspp": 272, "mupen64plus_next": 240,
+                 "flycast": 480, "mednafen_saturn": 240, "melonds": 384, "dolphin": 528,
+                 "pcsx2": 448, "opera": 240, "virtualjaguar": 240, "same_cdi": 280}
+
+
+def altura_interna(nome_curto, opcoes):
+    """Linhas que o nucleo vai desenhar, pelas opcoes dele (0 = nao sei)."""
+    opcoes = opcoes or {}
+
+    def multiplo(texto):
+        achado = re.search(r"(\d+)", str(texto or ""))
+        return int(achado.group(1)) if achado else 0
+
+    def altura_de(texto):
+        achado = re.search(r"(\d+)\s*x\s*(\d+)", str(texto or ""))
+        return int(achado.group(2)) if achado else 0
+
+    nativa = ALTURA_NATIVA.get(nome_curto, 0)
+    if nome_curto == "swanstation":
+        return nativa * (multiplo(opcoes.get("swanstation_GPU_ResolutionScale")) or 1)
+    if nome_curto == "ppsspp":
+        return altura_de(opcoes.get("ppsspp_internal_resolution")) or nativa
+    if nome_curto == "mupen64plus_next":
+        if opcoes.get("mupen64plus-rdp-plugin") == "parallel":
+            return nativa * (multiplo(opcoes.get("mupen64plus-parallel-rdp-upscaling")) or 1)
+        return nativa * (multiplo(opcoes.get("mupen64plus-EnableNativeResFactor")) or 1)
+    if nome_curto == "flycast":
+        return altura_de(opcoes.get("reicast_internal_resolution")) or nativa
+    if nome_curto == "melonds":
+        if opcoes.get("melonds_opengl_renderer") != "enabled":
+            return nativa
+        return nativa * (multiplo(opcoes.get("melonds_opengl_resolution")) or 1)
+    if nome_curto == "dolphin":
+        return altura_de(opcoes.get("dolphin_efb_scale")) or nativa
+    if nome_curto == "pcsx2":
+        return nativa * (multiplo(opcoes.get("pcsx2_upscale_multiplier")) or 1)
+    return nativa
+
+
+def caminho_do_filtro(nome):
+    """O preset do ARENA (servidor\\filtros) -- so se ele e o shader que ele
+    cita existirem. Sem o pacote de shaders do RetroArch, ligar o filtro
+    deixaria a tela preta."""
+    arquivo = ARQUIVOS_DOS_FILTROS.get(nome)
+    if not arquivo:
+        return ""
+    caminho = os.path.join(PASTA_FILTROS, arquivo)
+    try:
+        with open(caminho, encoding="utf-8") as preset:
+            citado = re.search(r'^#reference\s+"([^"]+)"', preset.read(), re.M)
+    except OSError:
+        return ""
+    if citado and not os.path.isfile(os.path.normpath(os.path.join(PASTA_FILTROS, citado.group(1)))):
+        return ""
+    return caminho
+
+
+def jeito_da_escala(plataforma, escolha="automatico", nome_curto=None, opcoes_nucleo=None,
+                    altura_tela=0, nota_gpu=3, folga=False):
+    """Qual filtro de escala (pixel, nitido, catmull, rcas, suave ou "") vale.
+
+    'folga': o perfil Desempenho, o Ultra e a partida a dois -- o jogo
+    precisa de toda a placa, e o 3D fica so com a nitidez (rcas).
+    """
+    if escolha == "original" or not plataforma:
+        return ""
+    tabela = carregar_graficos().get("escala", {})
+    de_pixel = set(tabela.get("pixel") or [])
+    de_3d = set(tabela.get("tres_d") or [])
+    if plataforma not in de_pixel and plataforma not in de_3d:
+        return ""        # Vectrex, Game & Watch...: o nucleo ja desenha grande
+    if escolha == "pixel":
+        return "pixel"
+    if escolha == "nitido":
+        return "nitido"
+    if escolha == "suave":
+        return "suave" if plataforma in de_pixel else "nitido"
+    # Automatico.
+    if plataforma in de_pixel:
+        return "pixel"
+    linhas = altura_interna(nome_curto, opcoes_nucleo) if nome_curto else 0
+    limite = float(tabela.get("esticar_ate_da_tela", 0.95))
+    # Do tamanho da tela ou maior, nao ha o que esticar: o bilinear so encolhe.
+    if linhas and altura_tela and linhas >= limite * altura_tela:
+        return ""
+    if folga or (nota_gpu or 0) <= 2:
+        return "rcas"
+    return "nitido" if (nota_gpu or 0) >= 4 else "catmull"
+
+
+def filtro_da_escala(plataforma, escolha="automatico", nome_curto=None, opcoes_nucleo=None,
+                     altura_tela=0, nota_gpu=3, folga=False):
+    """Caminho do filtro da escala para este jogo, ou ""."""
+    return caminho_do_filtro(jeito_da_escala(plataforma, escolha, nome_curto, opcoes_nucleo,
+                                             altura_tela, nota_gpu, folga))
+
+
+def filtro_de_tela(plataforma):
+    """O pixel nitido, se este console e' de desenho 2D (graficos.json ->
+    escala -> pixel), ou "". E' o que a tela de estado e a abertura do ARENA
+    mostram; o filtro de cada jogo sai de filtro_da_escala.
 
     So entra se o arquivo existir: sem o pacote de shaders, ligar o filtro
     deixaria a tela preta.
@@ -412,14 +541,9 @@ def filtro_de_tela(plataforma):
     RetroArch 1.22 IGNORA (o registro dizia "Loading stock shader"). Nenhum
     filtro chegou a aparecer. Agora vai pela linha de comando (--set-shader).
     """
-    tabela = carregar_graficos().get("shaders", {})
-    if plataforma not in (tabela.get("plataformas") or []):
+    if plataforma not in (carregar_graficos().get("escala", {}).get("pixel") or []):
         return ""
-    escolhido = tabela.get("pixel") or ""
-    if not escolhido:
-        return ""
-    caminho = os.path.join(PASTA_RETROARCH, escolhido.replace("/", os.sep))
-    return caminho if os.path.isfile(caminho) else ""
+    return caminho_do_filtro("pixel")
 
 
 # ---------------------------------------------------------------------------

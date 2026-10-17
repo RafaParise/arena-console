@@ -1,0 +1,5 @@
+# Filtro do ARENA: pixel nitido (sharp-bilinear), para jogo de desenho 2D.
+# Estica a imagem ate a tela com todo pixel do mesmo tamanho e a borda limpa,
+# em 1366x768, 1080p ou 4K. Uma conta so por ponto da tela: quase nao pesa.
+# Quem escolhe: servidor\graficos.py -> filtro_da_escala.
+#reference "../../retroarch/shaders/shaders_slang/pixel-art-scaling/sharp-bilinear-simple.slangp"

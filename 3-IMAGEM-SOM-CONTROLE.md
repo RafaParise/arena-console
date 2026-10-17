@@ -432,8 +432,8 @@ O ARENA confere a tela na hora de abrir o jogo: ligar a TV 4K depois já
 vale. Placa integrada não entra (a imagem continua como antes), e o
 **Gráfico igual ao console original** continua vencendo tudo. PS2, GameCube,
 Wii, PS3 e Xbox 360 ficam no que a placa aguenta: 4K neles derruba qualquer
-placa média. Os consoles 2D já ficam nítidos em qualquer tela pelo filtro
-de pixel nítido.
+placa média. Os consoles 2D já ficam nítidos em qualquer tela pelo pixel
+nítido (veja **Escala da tela**, mais abaixo).
 
 ---
 
@@ -544,7 +544,8 @@ teste automático do ARENA):
 - tela cheia sem borda (não a exclusiva — em placa de vídeo integrada a
   exclusiva às vezes engasga a troca de tela e o menu não aparece); no PS2
   (PCSX2) e no GameCube/Wii (Dolphin) também abre em tela cheia;
-- filtros, voltar no tempo e resposta instantânea saem de cena.
+- voltar no tempo e resposta instantânea saem de cena; da **Escala da tela**
+  fica só o mais leve (pixel nítido no 2D, só a nitidez no 3D).
 
 **O que ele não faz**, e não adianta prometer:
 
@@ -864,7 +865,8 @@ O ARENA muda os dois de uma vez.
 | Fila de imagens | 3 | 2 | 2 |
 | Vídeo em segundo plano | ligado | ligado | desligado |
 | Atraso de quadro automático | desligado | ligado | ligado |
-| Filtros de tela | desligado | desligado | ligado |
+| Escala da tela: jogo 2D | pixel nítido | pixel nítido | pixel nítido |
+| Escala da tela: jogo 3D menor que a tela | só nitidez | pela placa | pela placa |
 | Suavizar imagem | desligado | ligado | ligado |
 | Atraso do som | 96 ms | 64 ms | 32 ms |
 | Som exclusivo | não | não | não |
@@ -885,7 +887,7 @@ segundo, e o PS1 gastava 5 vezes o processador.
 |---|---|---|
 | **Suavizar imagem** | Borra um pouco, disfarça o pixel | Pixel quadrado e nítido |
 | **Escala inteira** | Todo pixel do mesmo tamanho | Preenche mais a tela, alguns pixels ficam maiores |
-| **Filtros de tela** | Efeito de TV antiga. **Pesa muito** | Imagem limpa e rápida |
+| **Shaders do menu do RetroArch** (`Esc` → Shaders) | Efeito de TV antiga. **Pesa muito** | Imagem limpa e rápida |
 | **Sincronizar com o monitor** | Sem imagem cortada ao meio | Responde um pouco mais rápido, mas corta |
 | **Vídeo em segundo plano** | Ajuda muito em PC fraco | Menos atraso no controle |
 | **Atraso de quadro automático** | O RetroArch mede e reduz sozinho | Você controla no manual |
@@ -1002,7 +1004,7 @@ saber qual resolveu.
 
 | Problema | O que fazer, na ordem |
 |---|---|
-| **Jogo travando** | 1. Desça para Desempenho · 2. Ligue Vídeo em segundo plano · 3. Desligue Filtros de tela · 4. Fila de imagens para 3 |
+| **Jogo travando** | 1. Desça para Desempenho · 2. Ligue Vídeo em segundo plano · 3. Escala da tela → Original · 4. Fila de imagens para 3 |
 | **Som picotando** | 1. Atraso do som para 96 · 2. Desligue Som exclusivo · 3. Se persistir, 128 |
 | **Jogo lento e tremido com fone sem fio ou USB** | Desligue Som exclusivo (Ajustes → Avançado → Som só para o jogo) |
 | **Controle demorando** | 1. Desligue Vídeo em segundo plano · 2. Atraso do som para 32 · 3. Fila de imagens para 2 · 4. Em jogo 2D e PC forte: ligue a **Resposta instantânea** (Ajustes → Avançado; custa de 4 a 12 vezes o processador, guia 6) |
@@ -1138,37 +1140,86 @@ fraca roda o mesmo jogo sem engasgar. Você não escolhe nada.
 
 ---
 
-### Sobre o ReShade
+### Escala da tela: o jogo em tela cheia, bonito
 
-Não dá para usar ReShade aqui, e você não vai sentir falta.
+Um console antigo desenha pequeno: o Super Nintendo, 256×224 pontos; o
+PSP, 480×272. A tela do computador tem muito mais (1366×768, 1920×1080, 4K).
+Alguém precisa **esticar** o desenho até a tela inteira — e esticar mal é o
+que deixa o jogo borrado ou com pixels de tamanhos diferentes. É o que o
+programa **Lossless Scaling** faz nos jogos de PC; no ARENA, quem faz é a
+**Escala da tela** (Ajustes → Simples), em todo jogo, sem você mexer.
 
-ReShade injeta uma DLL dentro de jogos de PC. Os emuladores não funcionam
-assim. O que o RetroArch tem no lugar é o **sistema de shaders**, que faz a
-mesma coisa — melhora cor, nitidez e aparência — mas foi feito para
-emulador, é mais leve e não precisa injetar nada em lugar nenhum.
+Pense numa foto pequena que precisa virar um cartaz:
 
-O ARENA liga um shader só, o **pixel nítido** (sharp-bilinear), e só nos
-consoles de desenho 2D — NES, Super Nintendo, Mega Drive, Neo Geo,
-fliperama, Game Boy, PC Engine, computadores antigos e parecidos:
+- ampliar de qualquer jeito deixa tudo borrado (o **bilinear**, que era o
+  padrão);
+- um bom fotógrafo amplia procurando as bordas, e o cartaz fica nítido
+  (os **filtros de escala**).
 
-| O que faz | Por que |
+| Escolha | O que faz | Bom para |
+|---|---|---|
+| **Automático** (recomendado) | O ARENA escolhe pelo console, pela placa de vídeo e pelo nível | Todo mundo |
+| **Pixel nítido** | Todo pixel vira um quadradinho do mesmo tamanho, como azulejo bem assentado | Jogo 2D |
+| **Nítido (FSR da AMD)** | Procura as bordas antes de esticar, como quem passa o contorno do desenho a limpo | Jogo 3D, placa boa |
+| **Suave** | Arredonda o pixel art, como se o desenho fosse refeito à mão | Quem gosta (pesa mais) |
+| **Original** | Sem filtro: só estica | O mais leve |
+
+#### O que o Automático escolhe
+
+- **Jogo 2D** (NES, Super Nintendo, Mega Drive, Game Boy, fliperama,
+  computadores antigos...): o **pixel nítido**, em todo nível — até no
+  **Desempenho**, no **Ultra** e no **gráfico igual ao console original**.
+- **Jogo 3D desenhado menor que a tela** (PS1, PSP, Nintendo 64, Dreamcast,
+  Saturn, DS...): o filtro que a placa de vídeo aguenta:
+  - placa boa: o **FSR** da AMD;
+  - placa média (a integrada comum): o **Catmull-Rom**, que entrega quase a
+    mesma nitidez pela metade do custo;
+  - placa fraca, e no **Desempenho**, no **Ultra**, no **gráfico original**
+    e na **partida a dois**: só a **nitidez** do FSR (o RCAS), o mais leve.
+- **Jogo 3D já desenhado do tamanho da tela ou maior** (o PS1 em 4x numa tela
+  de 900 linhas, por exemplo): nenhum filtro — não há o que esticar.
+- **Nível mínimo** ("bonecos de papelão") e **Original**: nenhum filtro.
+
+#### Quanto pesa (medido)
+
+Medido em 16/10/2026 no computador do professor (Radeon integrada, tela
+1440×900, 60 quadros por segundo garantidos), pela ferramenta
+`ferramentas\medir_escala.py`. É quanto da placa de vídeo cada filtro gasta
+**a mais** que esticar sem filtro:
+
+| Filtro | Placa a mais |
 |---|---|
-| Deixa **todo pixel do mesmo tamanho** e com borda limpa | Esticar 2D numa tela que não é múltipla exata (1366×768, 1080p, 4K) deixa uns pixels mais largos que outros, ou borra tudo |
-| Custa quase nada | Uma conta só por ponto da tela: roda até na placa do Celeron |
+| Pixel nítido | +1% |
+| Só a nitidez (RCAS) | +1% |
+| Catmull-Rom | +2,5% |
+| FSR | +5% |
+| Suave (ScaleFX) | +5,7% |
 
-Ele entra quando o **Filtro de tela** está ligado — sozinho no nível
-Qualidade, ou na mão em **Ajustes → Avançado → Imagem**. Console 3D (PS1,
-N64, PSP, Dreamcast...) fica sem filtro: ele ganha definição pela
-resolução interna, que já é ajustada pela placa.
+O custo é por ponto da **tela**, quase o mesmo em todo jogo. Por isso o
+filtro não substitui a **resolução interna**: no PSP, desenhar em 4x (12,4%
+da placa) custou menos que desenhar em 2x e esticar com o FSR (13,5%), e o 4x
+é desenho de verdade. Quando a placa aguenta, o ARENA sobe a resolução; o
+filtro entra para esticar o que ficou menor que a tela.
 
-Até 01/10/2026 o filtro **nunca chegava ao jogo**: o ARENA o escrevia num
-lugar que o RetroArch atual ignora. Agora vai pela linha de comando
-(`--set-shader`). TV de tubo (CRT) e grade de LCD continuam no menu do
-RetroArch (`Esc` → Shaders), para quem quiser.
+#### E o ReShade? E o Lossless Scaling?
 
-**O filtro precisa do pacote de shaders** (`retroarch\shaders\shaders_slang`,
-que já vem no ARENA). Se a pasta sumir, o ARENA desliga o filtro em
-silêncio — o jogo abre normal, só sem o efeito.
+**ReShade** injeta uma DLL dentro de jogos de PC; emulador não funciona
+assim. O RetroArch tem o **sistema de shaders**, feito para emulador, e é
+dele que saem os filtros do ARENA (`servidor\filtros`, que apontam para o
+pacote `retroarch\shaders\shaders_slang`, já incluído). Se a pasta dos
+shaders sumir, o ARENA desliga o filtro em silêncio — o jogo abre normal.
+
+**Lossless Scaling** é um programa pago, da Steam. As técnicas abertas que
+ele usa por dentro (FSR, xBR, Anime4K, pixel nítido) são as mesmas que o
+RetroArch tem, e o ARENA usa essas. O que só ele tem é o LS1 (a escala
+própria) e a **geração de quadros** (de 30 para 60). O programa não vem
+no ARENA: ele é de quem comprou.
+
+TV de tubo (CRT) e grade de LCD continuam no menu do RetroArch (`Esc` →
+Shaders), para quem quiser. Até 01/10/2026 o filtro **nunca chegava ao
+jogo** (o ARENA o escrevia num lugar que o RetroArch atual ignora); desde
+então vai pela linha de comando (`--set-shader`). Até 17/10/2026 só o nível
+Qualidade ligava o pixel nítido, e os jogos 3D eram esticados sem filtro.
 
 ---
 
@@ -1364,7 +1415,7 @@ Faça na ordem. Uma coisa por vez, testando entre elas.
 |---|---|
 | 1 | Ajustes → Simples → **Desempenho** |
 | 2 | `graficos.json`: baixe a resolução interna daquele console |
-| 3 | Ajustes → Avançado → desligue **Filtros de tela** |
+| 3 | Ajustes → Simples → **Escala da tela** → Original |
 | 4 | Ajustes → Avançado → ligue **Vídeo em segundo plano** |
 | 5 | Ajustes → Avançado → **Fila de imagens** para 3 |
 
@@ -1378,7 +1429,7 @@ abertos, bateria), não o computador.
 ### O que pesa mais, na ordem
 
 1. **Resolução interna** — dobrar é quatro vezes mais trabalho
-2. **Filtro de tela (shader)** — o pixel nítido do ARENA quase não pesa; CRT do menu pesa muito
+2. **Escala da tela** — pixel nítido e nitidez quase não pesam, o FSR pesa um pouco (+5% da placa, medido); CRT do menu pesa muito
 3. **Filtro de textura** — xBR e xBRZ pesam, Bilinear é barato
 4. **Anisotrópico** — barato em placa moderna
 5. **Mipmap** — praticamente de graça, e melhora a imagem

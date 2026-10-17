@@ -1,0 +1,9 @@
+# Filtro do ARENA: FSR 1 da AMD (licenca MIT), para jogo 3D desenhado menor
+# que a tela. Dois passos: o EASU estica a imagem procurando as bordas (nao
+# borra como o bilinear), e o RCAS devolve a nitidez.
+# O preset do RetroArch liga um "grao de filme" (FSR_FILMGRAIN 0,3), um
+# chuvisco por cima do jogo: aqui ele fica desligado.
+# Quem escolhe: servidor\graficos.py -> filtro_da_escala.
+#reference "../../retroarch/shaders/shaders_slang/edge-smoothing/fsr/fsr.slangp"
+FSR_SHARPENING = "0.200000"
+FSR_FILMGRAIN = "0.000000"

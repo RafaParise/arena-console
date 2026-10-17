@@ -184,16 +184,6 @@
       "exemplo": "Pense numa foto pequena ampliada: ligado, ela fica lisinha e meio borrada; desligado, dá para contar os quadradinhos."
     },
     {
-      "chave": "video_shader_enable",
-      "grupo": "imagem",
-      "nome": "Filtro de tela",
-      "tipo": "bool",
-      "custo": "baixo",
-      "nota_minima": 3,
-      "explica": "Nos consoles 2D, deixa todo pixel do mesmo tamanho e nítido em qualquer tela, até 4K. Console 3D fica sem filtro.",
-      "exemplo": "É o que o ReShade faz em jogos de PC, só que feito para emulador e bem mais leve. Sem ele, esticar um jogo de Super Nintendo deixa uns quadradinhos mais largos que outros."
-    },
-    {
       "chave": "video_vsync",
       "grupo": "imagem",
       "nome": "Sincronizar com o monitor",

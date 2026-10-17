@@ -266,20 +266,36 @@ class TestGraficos(unittest.TestCase):
     def test_filtro_de_tela_nenhum(self):
         with open(os.path.join(self.dir, "graficos.json"), "w",
                   encoding="utf-8") as f:
-            f.write('{"nucleos": {}, "shaders": {}}')
+            f.write('{"nucleos": {}, "escala": {}}')
         self.mod.carregar_graficos()
         self.assertEqual(self.mod.filtro_de_tela("snes"), "")
 
     def test_filtro_de_tela_so_console_da_lista(self):
+        # 17/10/2026: a lista mora em graficos.json -> escala -> pixel, e o
+        # filtro e' o preset do ARENA (servidoriltros), que cita o shader
+        # do RetroArch.
         with open(os.path.join(self.dir, "graficos.json"), "w",
                   encoding="utf-8") as f:
-            f.write('{"nucleos": {}, "shaders": {"pixel": "nao/existe.slangp", '
-                    '"plataformas": ["snes"]}}')
+            f.write('{"nucleos": {}, "escala": {"pixel": ["snes"], "tres_d": ["ps1"]}}')
         self.mod.carregar_graficos()
-        # Arquivo que nao existe: nada (senao a tela ficaria preta).
-        self.assertEqual(self.mod.filtro_de_tela("snes"), "")
-        self.assertEqual(self.mod.filtro_de_tela("ps1"), "")
-        self.assertEqual(self.mod.filtro_de_tela(None), "")
+        antes = self.mod.PASTA_FILTROS
+        try:
+            # Preset que cita um shader que nao existe: nada (senao a tela
+            # ficaria preta).
+            self.mod.PASTA_FILTROS = self.dir
+            with open(os.path.join(self.dir, "pixel-nitido.slangp"), "w", encoding="utf-8") as f:
+                f.write('#reference "nao/existe.slangp"\n')
+            self.assertEqual(self.mod.filtro_de_tela("snes"), "")
+            with open(os.path.join(self.dir, "existe.slangp"), "w", encoding="utf-8") as f:
+                f.write("shaders = 0\n")
+            with open(os.path.join(self.dir, "pixel-nitido.slangp"), "w", encoding="utf-8") as f:
+                f.write('#reference "existe.slangp"\n')
+            self.assertEqual(self.mod.filtro_de_tela("snes"),
+                             os.path.join(self.dir, "pixel-nitido.slangp"))
+            self.assertEqual(self.mod.filtro_de_tela("ps1"), "")
+            self.assertEqual(self.mod.filtro_de_tela(None), "")
+        finally:
+            self.mod.PASTA_FILTROS = antes
 
 
 class TestAcervo(unittest.TestCase):

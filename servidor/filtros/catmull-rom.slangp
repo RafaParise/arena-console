@@ -1,0 +1,7 @@
+# Filtro do ARENA: Catmull-Rom, para jogo 3D desenhado menor que a tela, em
+# placa media (a integrada comum). E' o jeito classico de esticar foto, em
+# dois passos simples (vertical e horizontal): bem mais nitido que o
+# bilinear e metade do custo do FSR. Medido em 16/10/2026 (Radeon integrada,
+# 1440x900): +2,5 pontos de placa; o FSR, +5.
+# Quem escolhe: servidor\graficos.py -> filtro_da_escala.
+#reference "../../retroarch/shaders/shaders_slang/interpolation/catmull-rom-fast.slangp"

@@ -1,0 +1,7 @@
+# Filtro do ARENA: desenho 2D arredondado (ScaleFX), para quem gosta. Ele
+# procura as bordas do pixel art e as arredonda, como um desenho a mao.
+# Escolha do aluno (Ajustes -> Imagem -> Escala da tela -> Suave); o
+# automatico usa o pixel nitido. Medido em 16/10/2026 (Radeon integrada,
+# 1440x900): +5,7 pontos de placa; o xBR, +8,8.
+# Quem escolhe: servidor\graficos.py -> filtro_da_escala.
+#reference "../../retroarch/shaders/shaders_slang/edge-smoothing/scalefx/scalefx.slangp"

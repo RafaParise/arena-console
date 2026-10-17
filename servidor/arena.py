@@ -1210,6 +1210,10 @@ def config_padrao():
         # "automatico" (decide pela nota da maquina), "leve" ou "bonito".
         # Vale para os emuladores externos (PCSX2, RPCS3, Xenia).
         "preset_grafico_externo": "automatico",
+        # Escala da tela (graficos.ESCALAS): o filtro que estica o jogo ate a
+        # tela inteira. "automatico" escolhe pelo console, pela placa e pelo
+        # perfil (item 10 dos pedidos de 15/10/2026).
+        "escala_da_tela": "automatico",
         # Motor de video do PCSX2 (PS2): "automatico" deixa o PCSX2 escolher
         # (no 2.8 ele escolhe DirectX 12 em placa Intel e AMD com nivel 12).
         "motor_ps2": "automatico",
@@ -1341,6 +1345,8 @@ def ler_config_do_disco():
     if salvo.get("abaixo_do_original") in graficos.NIVEIS_ABAIXO:
         config["abaixo_do_original"] = salvo["abaixo_do_original"]
     config["rpcn_ativo"] = bool(salvo.get("rpcn_ativo"))
+    if salvo.get("escala_da_tela") in graficos.ESCALAS:
+        config["escala_da_tela"] = salvo["escala_da_tela"]
     if salvo.get("preset_grafico_externo") in ("automatico", "leve", "bonito"):
         config["preset_grafico_externo"] = salvo["preset_grafico_externo"]
     # tuple(): um valor que nao e' texto (lista, por exemplo) num dict daria
@@ -1794,7 +1800,7 @@ def remapeamento_da_partida(opcoes, caminho_core, caminho_jogo):
 
 def gravar_override(config, custo=None, extras=None, em_partida=False,
                     opcoes_de_nucleo=None, remapear=None, plataforma=None,
-                    devolver_filtro=False, controles_ligados=None):
+                    devolver_filtro=False, controles_ligados=None, nucleo=None):
     """Monta o arquivo de configuracao extra que o RetroArch vai ler.
 
     'opcoes_de_nucleo': caminho de uma COPIA do arquivo de opcoes de nucleo
@@ -1803,7 +1809,9 @@ def gravar_override(config, custo=None, extras=None, em_partida=False,
 
     'plataforma' + 'devolver_filtro': devolve (arquivo, filtro de tela) --
     o filtro vai na linha de comando (--set-shader), porque o RetroArch
-    ignora video_shader vindo de arquivo (ver graficos.filtro_de_tela)."""
+    ignora video_shader vindo de arquivo (ver graficos.filtro_de_tela).
+    'nucleo' (o .dll que vai abrir): com ele, o filtro sabe em que
+    resolucao o jogo vai ser desenhado (graficos.altura_interna)."""
     opcoes = opcoes_efetivas(config, custo, controles_ligados)
 
     if not em_partida:
@@ -1926,14 +1934,34 @@ def gravar_override(config, custo=None, extras=None, em_partida=False,
     # deixar nada fora dela.
     opcoes["cache_directory"] = PASTA_CACHE
 
-    # Filtro de tela: so com o perfil (ou o aluno) pedindo, e so se este
-    # console tiver filtro. Sem filtro, a chave vai "false": nada de filtro
-    # velho salvo no menu do RetroArch aparecendo por cima.
+    # Escala da tela (item 10 dos pedidos de 15/10/2026): o filtro que estica
+    # o quadro pronto ate a tela inteira, como o Lossless Scaling -- pelo
+    # console, pela resolucao interna, pela placa e pelo perfil
+    # (graficos.jeito_da_escala). Vale tambem no grafico original e no nivel
+    # leve, com os filtros baratos: desenhar pequeno e esticar bonito e'
+    # justamente o pedido. So o nivel minimo ("bonecos de papelao") e a
+    # escolha "Original" ficam sem. Sem filtro, a chave vai "false": nada de
+    # filtro velho salvo no menu do RetroArch aparecendo por cima.
     filtro = ""
-    if opcoes.get("video_shader_enable") == "true":
-        filtro = graficos.filtro_de_tela(plataforma)
-        if not filtro:
-            opcoes["video_shader_enable"] = "false"
+    escolha = config.get("escala_da_tela", "automatico")
+    if plataforma and nivel_abaixo(config) != "minimo" and escolha != "original":
+        nome_core = nome_curto_do_core(nucleo) if nucleo else None
+        altura_tela = hardware.altura_da_tela()
+        modesto = grafico_original(config)
+        opcoes_nucleo = (graficos.opcoes_finais_do_nucleo(
+            nome_core, CAPACIDADE["nota"], CAPACIDADE.get("nota_gpu"), modesto=modesto,
+            altura_tela=altura_tela, abaixo=nivel_abaixo(config)) if nome_core else None)
+        # Folga: o jogo precisa de toda a placa (ou a maquina e' fraca).
+        folga = bool(em_partida or modesto or config.get("ultra_desempenho")
+                     or perfil_para(config, custo) == "desempenho")
+        jeito = graficos.jeito_da_escala(plataforma, escolha, nome_core, opcoes_nucleo, altura_tela,
+                                         CAPACIDADE.get("nota_gpu", 3), folga)
+        filtro = graficos.caminho_do_filtro(jeito)
+        if filtro and jeito == "rcas":
+            # O RCAS afia o quadro ainda pequeno; quem estica depois e' o
+            # RetroArch, e esticar sem suavizar faria degraus.
+            opcoes["video_smooth"] = "true"
+    opcoes["video_shader_enable"] = "true" if filtro else "false"
 
     linhas = ["# Gerado pelo ARENA. Nao edite a mao: sera reescrito."]
     # Nenhum valor pode quebrar a linha nem fechar as aspas antes da hora:
@@ -2826,7 +2854,7 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             em_partida=bool(partida), opcoes_de_nucleo=copia_nucleo,
             remapear=(os.path.join(PASTA_CORES, jogo["core"]), caminho_jogo),
             plataforma=jogo.get("plataforma"), devolver_filtro=True,
-            controles_ligados=controles.contar_controles())
+            controles_ligados=controles.contar_controles(), nucleo=jogo.get("core"))
         comando = [
             EXECUTAVEL_RETROARCH,
             "-L", os.path.join(PASTA_CORES, jogo["core"]),
@@ -6276,6 +6304,8 @@ class Manipulador(BaseHTTPRequestHandler):
 
             if "modo_desempenho" in dados:
                 config["modo_desempenho"] = bool(dados["modo_desempenho"])
+            if dados.get("escala_da_tela") in graficos.ESCALAS:
+                config["escala_da_tela"] = dados["escala_da_tela"]
             if dados.get("preset_grafico_externo") in ("automatico", "leve", "bonito"):
                 config["preset_grafico_externo"] = dados["preset_grafico_externo"]
             if dados.get("motor_ps2") in tuple(graficos.MOTORES_PCSX2):
@@ -7247,7 +7277,7 @@ def principal():
                                     " (integrada)" if MAQUINA["gpu"]["integrada"] else ""))
         print("  Imagem:   nota %d/5, placa %d/5, %d ajustes%s"
               % (CAPACIDADE["nota"], CAPACIDADE.get("nota_gpu", 0), quantas,
-                 ", filtro de pixel nitido nos consoles 2D" if shader else ""))
+                 ", escala da tela com filtro (pixel nitido no 2D, nitidez no 3D)" if shader else ""))
     except OSError as falha:
         print("  Imagem:   nao consegui gravar os ajustes (%s)" % falha)
 

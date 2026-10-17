@@ -1,0 +1,6 @@
+# Filtro do ARENA: so a nitidez do FSR (o RCAS da AMD, licenca MIT), para
+# jogo 3D em placa fraca, no perfil Desempenho, no Ultra e na partida a dois.
+# Afia o quadro ainda pequeno; o RetroArch estica depois com o bilinear.
+# Medido em 16/10/2026 (Radeon integrada, 1440x900): +1 ponto de placa.
+# Quem escolhe: servidor\graficos.py -> filtro_da_escala.
+#reference "../../retroarch/shaders/shaders_slang/sharpen/rca_sharpen.slangp"

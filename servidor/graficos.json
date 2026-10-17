@@ -15,10 +15,9 @@
     "potencia da maquina. Nota alta nao protege de escolher um plugin que",
     "quebra o HUD de um jogo especifico."
   ],
-  "shaders": {
-    "_leia": "Filtro de tela por cima do jogo, pela placa de video. Vale so quando o perfil ou o aluno liga o 'Filtro de tela', e so nos consoles de desenho 2D (pixel): deixa todo pixel do mesmo tamanho e nitido em qualquer tela, de 1366x768 a 4K, quase sem custo. Console 3D ganha definicao pela resolucao interna e fica sem filtro. Achado de 01/10/2026: o RetroArch 1.22 ignora a chave video_shader do arquivo de configuracao, entao o ARENA passa o filtro pela linha de comando (--set-shader). Antes, nenhum filtro chegava a aparecer -- e o da nota 4 era uma grade de Game Boy Color, que mudaria a cor de qualquer jogo.",
-    "pixel": "shaders/shaders_slang/pixel-art-scaling/sharp-bilinear-simple.slangp",
-    "plataformas": [
+  "escala": {
+    "_leia": "Escala da tela (item 10 dos pedidos de 15/10/2026): o ultimo passo, do quadro pronto ate a tela inteira -- o que o Lossless Scaling faz. 'pixel': consoles de desenho 2D, com o pixel nitido (servidor/filtros/pixel-nitido.slangp), que deixa todo pixel do mesmo tamanho em qualquer tela. 'tres_d': consoles de 3D; se o jogo e' desenhado menor que a tela (menos de 'esticar_ate_da_tela' da altura dela), um filtro estica: o FSR da AMD na placa boa (nota 4 ou mais), o Catmull-Rom na media (3) e so a nitidez (RCAS) na fraca e nos modos de folga (Desempenho, Ultra, partida a dois). Do tamanho da tela ou maior, sem filtro. Medido em 16/10/2026, em pontos de placa a mais: pixel +1, RCAS +1, Catmull-Rom +2,5, FSR +5 (docs/escala_antes_bruto.json). Os outros consoles (Vectrex, Game & Watch) ja desenham grande. Achado de 01/10/2026: o RetroArch 1.22 ignora a chave video_shader do arquivo de configuracao; o filtro vai pela linha de comando (--set-shader).",
+    "pixel": [
       "tic80",
       "wasm4",
       "lowresnx",
@@ -66,8 +65,25 @@
       "spectrum",
       "amstrad",
       "dos",
-      "scummvm"
-    ]
+      "scummvm",
+      "tamagotchi",
+      "j2me"
+    ],
+    "tres_d": [
+      "ps1",
+      "psp",
+      "n64",
+      "dreamcast",
+      "saturn",
+      "nds",
+      "threedo",
+      "jaguar",
+      "cdi",
+      "gamecube",
+      "wii",
+      "ps2"
+    ],
+    "esticar_ate_da_tela": 0.95
   },
   "nucleos": {
     "swanstation": {

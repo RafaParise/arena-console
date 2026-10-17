@@ -198,6 +198,8 @@ async function carregarEstado() {
 
   $("#listaNivelGrafico").value = nivelDoGrafico(dados.config);
   explicarNivelGrafico();
+  $("#listaEscalaTela").value = dados.config.escala_da_tela || "automatico";
+  explicarEscalaTela();
 
   $("#chaveRpcn").setAttribute("aria-pressed",
     dados.config.rpcn_ativo ? "true" : "false");
@@ -1563,6 +1565,29 @@ const RECADO_NIVEL_GRAFICO = {
   leve: "Abaixo do original: leve.",
   minimo: "Abaixo do original: mínimo (bonecos de papelão).",
 };
+
+// Escala da tela (item 10 dos pedidos de 15/10/2026): o ultimo passo, do
+// quadro pronto ate a tela inteira, como o Lossless Scaling. Quem escolhe o
+// filtro de cada jogo e' o servidor (graficos.jeito_da_escala).
+const EXPLICA_ESCALA_TELA = {
+  automatico: "O jogo é desenhado no tamanho que o computador aguenta e esticado até a " +
+    "tela inteira, como uma foto ampliada por um bom fotógrafo. No 2D, todo pixel fica do " +
+    "mesmo tamanho; no 3D, as bordas ficam firmes. O ARENA escolhe o filtro pela placa de " +
+    "vídeo: nas fracas, o mais leve.",
+  pixel: "Cada pixel vira um quadradinho do mesmo tamanho e de borda limpa, como azulejo bem " +
+    "assentado. Perfeito no 2D; no 3D, o jogo fica com cara de blocos. Quase não pesa.",
+  nitido: "O FSR, da AMD, procura as bordas antes de esticar, como quem amplia um desenho " +
+    "passando o contorno a limpo. O mais bonito no 3D, e pesa um pouco mais na placa de vídeo.",
+  suave: "Arredonda os pixels dos jogos 2D, como se o desenho fosse refeito à mão. No 3D, usa " +
+    "o FSR. É o que mais pesa.",
+  original: "Sem filtro: o emulador só estica a imagem. É o mais leve, mas o pixel sai " +
+    "borrado ou de tamanhos diferentes.",
+};
+
+function explicarEscalaTela() {
+  const valor = $("#listaEscalaTela").value;
+  $("#explicaEscalaTela").textContent = EXPLICA_ESCALA_TELA[valor] || EXPLICA_ESCALA_TELA.automatico;
+}
 
 function nivelDoGrafico(config) {
   if (!config) return "normal";
@@ -4390,6 +4415,19 @@ function ligarEventos() {
                    : "Ligado. Feche e abra o ARENA para valer.")
         : "Desligado. Só este computador acessa.");
     } catch (falha) {
+      recado(falha.message, true);
+    }
+  });
+
+  $("#listaEscalaTela").addEventListener("change", async (evento) => {
+    const lista = evento.currentTarget;
+    try {
+      await salvarConfig({ escala_da_tela: lista.value });
+      explicarEscalaTela();
+      recado("Pronto. Vale no próximo jogo.");
+    } catch (falha) {
+      lista.value = (estado.config && estado.config.escala_da_tela) || "automatico";
+      explicarEscalaTela();
       recado(falha.message, true);
     }
   });

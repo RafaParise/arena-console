@@ -100,12 +100,14 @@ Por onde o jogo fala com a placa de vídeo.
 | **d3d11** | Ótimo no Windows quando não há Vulkan |
 | **glcore** | Rede de segurança, funciona em quase tudo |
 
-#### Filtro de tela
+#### Escala da tela (era o "Filtro de tela")
 
-O mais perto de um ReShade que existe aqui — e feito para emulador, então
-bem mais leve. Ligado, os consoles 2D ganham o **pixel nítido**: todo
-pixel do mesmo tamanho, sem borrão, em qualquer tela (até 4K). Consoles 3D
-ficam sem filtro.
+Desde 17/10/2026 o filtro que estica o jogo até a tela saiu daqui e virou a
+**Escala da tela**, em **Ajustes → Simples**: todo jogo já abre esticado
+com o filtro certo (pixel nítido no 2D; FSR, Catmull-Rom ou só a nitidez no
+3D, pela placa de vídeo). Para desligar, escolha **Original**. Detalhes e o
+custo medido de cada filtro no guia 3 (**Escala da tela**). O "Filtro de
+tela" que ficou desligado numa configuração antiga não vale mais.
 
 Usa o pacote de shaders que já vem em `retroarch\shaders\shaders_slang`.
 Sem ele, o ARENA desliga o filtro sozinho e o jogo abre normal.

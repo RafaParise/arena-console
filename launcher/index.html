@@ -413,6 +413,19 @@
     <div class="perfis" id="listaPerfis"></div>
 
     <div class="opcao">
+      <span class="opcao-rotulo">Escala da tela</span>
+      <select class="opcao-controle" id="listaEscalaTela" aria-label="Escala da tela"
+              aria-describedby="explicaEscalaTela">
+        <option value="automatico">Automático (recomendado)</option>
+        <option value="pixel">Pixel nítido</option>
+        <option value="nitido">Nítido (FSR da AMD)</option>
+        <option value="suave">Suave (desenho arredondado)</option>
+        <option value="original">Original (sem filtro)</option>
+      </select>
+    </div>
+    <p class="explica" id="explicaEscalaTela"></p>
+
+    <div class="opcao">
       <span class="opcao-rotulo">Fundo animado</span>
       <select class="opcao-controle" id="listaFundoAnimado" aria-label="Fundo animado"
               aria-describedby="ajudaFundoAnimado">
