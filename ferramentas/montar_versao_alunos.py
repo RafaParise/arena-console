@@ -665,6 +665,14 @@ def conferir(destino, com_bios=False):
         for atual, _sub, arquivos in os.walk(destino):
             if proibido in arquivos and not atual.endswith("servidor"):
                 problemas.append("arquivo pessoal: %s" % os.path.relpath(os.path.join(atual, proibido), destino))
+    # O Lossless Scaling e' programa pago, de quem comprou na Steam: o ARENA
+    # so usa o da maquina (servidor\lossless.py), nunca leva junto (item 10,
+    # 17/10/2026).
+    for atual, _sub, arquivos in os.walk(destino):
+        for pago in ("LosslessScaling.exe", "LosslessScaling.dll", "Lossless.dll"):
+            if pago in arquivos:
+                problemas.append("programa pago (Lossless Scaling) na versao: %s"
+                                 % os.path.relpath(os.path.join(atual, pago), destino))
     # Abre numa copia temporaria (a versao fica intacta).
     if not porta_livre():
         problemas.append("nao deu para abrir: o ARENA de verdade esta aberto (porta 8777)")

@@ -73,6 +73,7 @@ import biblioteca_livre  # noqa: E402  (jogos livres de mais consoles, baixados 
 import capas_online     # noqa: E402
 import graficos    # noqa: E402
 import hardware    # noqa: E402
+import lossless    # noqa: E402  (o Lossless Scaling de quem comprou -- item 10, 17/10/2026)
 import indexador   # noqa: E402  (precisam vir depois do ajuste de sys.path)
 import integridade  # noqa: E402  (zip de fliperama danificado)
 import jogadores   # noqa: E402  (quantos jogadores cada jogo aceita)
@@ -1227,6 +1228,12 @@ def config_padrao():
         "favoritos": [],
         "recentes": [],
         "travar_teclas": False,
+        # Lossless Scaling (servidor\lossless.py): so para quem comprou o
+        # programa na Steam. Ligado, o jogo abre numa janela do tamanho do
+        # desenho e o programa estica ate a tela; "mais quadros" liga a
+        # geracao de quadros dele (LSFG).
+        "lossless_scaling": False,
+        "lossless_mais_quadros": False,
         "tipo_controle": "xbox360",
         # Por console: direcional, analogicos, vibracao e se o jogador 2
         # vira mouse ou teclado.
@@ -1363,6 +1370,8 @@ def ler_config_do_disco():
         if isinstance(guardado, list):
             config[chave] = [str(x)[:300] for x in guardado][:limite]
     config["travar_teclas"] = bool(salvo.get("travar_teclas"))
+    config["lossless_scaling"] = bool(salvo.get("lossless_scaling"))
+    config["lossless_mais_quadros"] = bool(salvo.get("lossless_mais_quadros"))
     if isinstance(salvo.get("tipo_controle"), str):
         config["tipo_controle"] = salvo["tipo_controle"][:24]
     if isinstance(salvo.get("perfil_controle"), dict):
@@ -2548,6 +2557,51 @@ def jogadores_pedidos(plataforma, jogo):
     return jogadores.numero_sem_regra(plataforma, jogo.get("titulo"))
 
 
+def preparar_lossless(jogo, config):
+    """A partida pelo Lossless Scaling, se o aluno ligou e da para usar.
+
+    Devolve None (o jogo abre como sempre, com a escala do ARENA) ou
+    {"opcoes": a janela do RetroArch, "executavel": o LosslessScaling.exe}.
+    Ver servidor\\lossless.py: o programa e' de quem comprou, e o ARENA so
+    o acha, ajusta o perfil "ARENA" dele (com ele fechado) e abre junto.
+    """
+    if not config.get("lossless_scaling") or jogo.get("externo"):
+        return None
+    achado = lossless.achar(RAIZ)
+    if not achado:
+        print("[ARENA] Lossless Scaling ligado nos Ajustes, mas o programa nao esta nesta "
+              "maquina: o jogo abre com a escala do ARENA.")
+        return None
+    if not achado["licenca"]:
+        print("[ARENA] Este Lossless Scaling nao esta instalado pela Steam desta conta do "
+              "Windows, e ele mesmo se recusa a escalar: o jogo abre com a escala do ARENA.")
+        return None
+    plataforma = jogo.get("plataforma")
+    desenho_2d = plataforma in (graficos.carregar_graficos().get("escala", {}).get("pixel") or [])
+    nome_core = nome_curto_do_core(jogo.get("core", ""))
+    altura_tela = hardware.altura_da_tela()
+    opcoes_nucleo = graficos.opcoes_finais_do_nucleo(
+        nome_core, CAPACIDADE["nota"], CAPACIDADE.get("nota_gpu"), modesto=grafico_original(config),
+        altura_tela=altura_tela, abaixo=nivel_abaixo(config))
+    trocas = lossless.trocas_para_o_jogo(desenho_2d, CAPACIDADE.get("nota_gpu"),
+                                         bool(config.get("lossless_mais_quadros")),
+                                         lossless.frequencia_da_tela())
+    try:
+        gravou, motivo = lossless.gravar_perfil(trocas)
+    except (OSError, ValueError) as falha:
+        gravou, motivo = False, str(falha)
+    if not gravou:
+        # Aberto pelo dono antes do jogo: o ARENA nao pode ajustar o perfil
+        # (o LS regrava o arquivo ao fechar). O jogo abre como sempre.
+        print("[ARENA] Lossless Scaling: %s. O jogo abre com a escala do ARENA; "
+              "feche o Lossless Scaling para o ARENA usa-lo." % motivo)
+        return None
+    return {"opcoes": lossless.janela_para_o_lossless(
+                plataforma, desenho_2d, graficos.altura_interna(nome_core, opcoes_nucleo),
+                lossless.tamanho_da_tela()),
+            "executavel": achado["executavel"]}
+
+
 def executar_jogo(jogo, apelido, config, custo=None, partida=None):
     """Abre o RetroArch, espera fechar e grava a sessao.
 
@@ -2615,6 +2669,8 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
     # Leva de volta o disquete que o jogo gravou na pasta sem acento (so o
     # Hatari usa: servidor\ponte_sem_acento.py).
     devolver_ponte = None
+    # A partida pelo Lossless Scaling (preparar_lossless), ou None.
+    pelo_lossless = None
 
     if jogo.get("externo"):
         # Emulador de fora: o RetroArch fica de lado nesta plataforma.
@@ -2838,6 +2894,16 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
                                      "input_player%d_analog_dpad_mode" % n]
         if copia_nucleo:
             so_desta_partida.append("core_options_path")
+        # Lossless Scaling (de quem comprou e ligou nos Ajustes): o
+        # RetroArch abre numa janela do tamanho do desenho e o programa
+        # estica ate a tela. A janela vale so nesta partida; o filtro do
+        # ARENA fica de fora (quem estica e' o Lossless Scaling).
+        config_da_partida = config
+        pelo_lossless = None if partida else preparar_lossless(jogo, config)
+        if pelo_lossless:
+            opcoes_jogo.update(pelo_lossless["opcoes"])
+            so_desta_partida += list(pelo_lossless["opcoes"])
+            config_da_partida = dict(config, escala_da_tela="original")
         cfg_antes = graficos.valores_no_retroarch_cfg(so_desta_partida)
         # ORDEM IMPORTA. As opcoes vem antes do arquivo do jogo.
         #
@@ -2850,7 +2916,7 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         #
         # Agora: retroarch -L core --appendconfig X --host JOGO
         override, filtro = gravar_override(
-            config, custo, opcoes_jogo,
+            config_da_partida, custo, opcoes_jogo,
             em_partida=bool(partida), opcoes_de_nucleo=copia_nucleo,
             remapear=(os.path.join(PASTA_CORES, jogo["core"]), caminho_jogo),
             plataforma=jogo.get("plataforma"), devolver_filtro=True,
@@ -2938,6 +3004,12 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             cache_antes = graficos.preparar_cache_ps1(placa, cache_do_ps1) if cuidar_cache_ps1 else -1
 
             ULTIMO_PROBLEMA.clear()
+            if pelo_lossless and lossless.abrir(pelo_lossless["executavel"]):
+                # O Lossless Scaling leva um instante para abrir; a escala
+                # sozinha dele (AutoScale) pega a janela do jogo quando ela
+                # aparece.
+                print("[ARENA] Lossless Scaling aberto junto com o jogo.")
+                time.sleep(2)
             aberto_em = time.time()
             processo = subprocess.Popen(comando, cwd=pasta_trabalho, **extras)
             # Java ME: o RetroArch entra numa caixa do Windows; fechada no
@@ -2990,6 +3062,8 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             # Volta tudo ao normal, abrindo o jogo ou nao.
             VIGIA["suspenso"] = False
             processos.fechar_caixa(caixa)
+            if pelo_lossless and lossless.fechar_o_que_o_arena_abriu():
+                print("[ARENA] Lossless Scaling fechado junto com o jogo.")
             if acelerar:
                 processos.prioridade_do_arena(processos.NORMAL)
                 processos.memoria_do_arena(processos.MEMORIA_NORMAL)
@@ -4910,6 +4984,10 @@ class Manipulador(BaseHTTPRequestHandler):
                     for p in carregar_catalogo()
                     if p["id"] in graficos.consoles_com_botoes()],
                 "externos": graficos.situacao_dos_externos(carregar_catalogo()),
+                # O Lossless Scaling de quem comprou: achado, versao, licenca
+                # da Steam (servidor\lossless.py). A tela so mostra o bloco
+                # dele se ele estiver nesta maquina.
+                "lossless": lossless.situacao(RAIZ),
                 "rede_ps2": {
                     "driver_instalado": graficos.npcap_instalado(),
                     "jogos": next(
@@ -6343,6 +6421,9 @@ class Manipulador(BaseHTTPRequestHandler):
                     pass
             if "travar_teclas" in dados:
                 config["travar_teclas"] = bool(dados["travar_teclas"])
+            for chave in ("lossless_scaling", "lossless_mais_quadros"):
+                if chave in dados:
+                    config[chave] = bool(dados[chave])
             if "ultra_desempenho" in dados:
                 config["ultra_desempenho"] = bool(dados["ultra_desempenho"])
                 # Ultra sem prioridade nao faz sentido: ligam juntos.

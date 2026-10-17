@@ -51,7 +51,9 @@ PROGRAMA = [
     "servidor/motivo_do_erro.py", "servidor/bios.py", "servidor/bios_catalogo.py", "servidor/arrumar.py",
     "servidor/nomes_arcade.py", "servidor/processos.py", "servidor/capas_do_disco.py",
     "servidor/como_colocar.py", "servidor/ponte_sem_acento.py", "servidor/java_do_arena.py",
-    "servidor/jeitos_de_abrir.py", "servidor/biblioteca_livre.py",
+    "servidor/jeitos_de_abrir.py", "servidor/biblioteca_livre.py", "servidor/lossless.py",
+    "servidor/filtros/pixel-nitido.slangp", "servidor/filtros/fsr.slangp",
+    "servidor/filtros/catmull-rom.slangp", "servidor/filtros/rcas.slangp", "servidor/filtros/suave.slangp",
     "servidor/consoles.json", "servidor/graficos.json", "servidor/recursos.json",
     "servidor/perfis_controle.json", "servidor/biblioteca_livre.json",
 ]

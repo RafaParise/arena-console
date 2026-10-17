@@ -29,6 +29,12 @@ por voluntários para qualquer um copiar.
 | Xenia Canary (Xbox 360) | BSD-3-Clause | <https://github.com/xenia-canary/xenia-canary> | `emuladores\Xenia` |
 | Java do Java ME: OpenJDK 21 (Eclipse Temurin), reduzido com o jlink | GPL-2.0 com a exceção Classpath (os textos vão em emuladores\Java\legal) | <https://github.com/adoptium/temurin21-binaries> | `emuladores\Java` |
 
+Não vem no ARENA, mas o ARENA usa se estiver no computador de quem comprou:
+o **Lossless Scaling** (programa pago, da Steam). Ele não é distribuído
+aqui de jeito nenhum; o `servidor\lossless.py` só o acha, ajusta o perfil
+"ARENA" dele e o abre junto com o jogo (guia 3, "Lossless Scaling"). O
+`.gitignore` e o montador do pacote barram a pasta dele.
+
 ## BIOS livres (4)
 
 Ficam em `servidor\bios_livres`, sem mudança nenhuma, com o texto da

@@ -321,6 +321,7 @@ async function carregarEstado() {
     dados.config.ultra_desempenho ? "true" : "false");
   $("#chaveTravar").setAttribute("aria-pressed",
     dados.config.travar_teclas ? "true" : "false");
+  mostrarLossless(dados.lossless, dados.config);
   desenharFechamentos(dados.fechamentos || []);
 
   $("#perfilApelido").textContent = dados.config.apelido || "(sem apelido)";
@@ -1583,6 +1584,32 @@ const EXPLICA_ESCALA_TELA = {
   original: "Sem filtro: o emulador só estica a imagem. É o mais leve, mas o pixel sai " +
     "borrado ou de tamanhos diferentes.",
 };
+
+// O Lossless Scaling de quem comprou (servidor\lossless.py). O bloco so
+// aparece se o programa estiver nesta maquina.
+function mostrarLossless(situacao, config) {
+  const bloco = $("#blocoLossless");
+  if (!bloco) return;
+  bloco.hidden = !(situacao && situacao.achado);
+  if (bloco.hidden) return;
+  const versao = situacao.versao ? ", versão " + situacao.versao : "";
+  let texto = "Achado (" + situacao.origem + versao + "). ";
+  if (!situacao.licenca) {
+    texto += "Mas ele não está instalado pela Steam desta conta do Windows, e sem isso ele mesmo " +
+      "se recusa a abrir: o jogo continua com a escala do ARENA.";
+  } else if (!situacao.configuracao) {
+    texto += "Abra o Lossless Scaling uma vez por conta própria, para ele criar a configuração dele.";
+  } else {
+    texto += "Pronto para usar.";
+  }
+  if (situacao.aberto) {
+    texto += " Agora ele está aberto: feche-o antes do jogo, para o ARENA poder ajustá-lo.";
+  }
+  $("#estadoLossless").textContent = texto;
+  $("#chaveLossless").setAttribute("aria-pressed", config.lossless_scaling ? "true" : "false");
+  $("#chaveLosslessQuadros").setAttribute("aria-pressed",
+    config.lossless_mais_quadros ? "true" : "false");
+}
 
 function explicarEscalaTela() {
   const valor = $("#listaEscalaTela").value;
@@ -4531,6 +4558,27 @@ function ligarEventos() {
       recado(falha.message, true);
     }
   });
+
+  for (const [seletor, chave, ligado, desligado] of [
+    ["#chaveLossless", "lossless_scaling",
+      "Lossless Scaling ligado. Vale no próximo jogo do RetroArch.",
+      "Lossless Scaling desligado: vale a escala do ARENA."],
+    ["#chaveLosslessQuadros", "lossless_mais_quadros",
+      "Mais quadros ligado. Vale no próximo jogo pelo Lossless Scaling.",
+      "Mais quadros desligado."],
+  ]) {
+    $(seletor).addEventListener("click", async (evento) => {
+      const botao = evento.currentTarget;
+      const novo = botao.getAttribute("aria-pressed") !== "true";
+      try {
+        await salvarConfig({ [chave]: novo });
+        botao.setAttribute("aria-pressed", novo ? "true" : "false");
+        recado(novo ? ligado : desligado);
+      } catch (falha) {
+        recado(falha.message, true);
+      }
+    });
+  }
 
   $("#chaveUltra").addEventListener("click", async (evento) => {
     const botao = evento.currentTarget;

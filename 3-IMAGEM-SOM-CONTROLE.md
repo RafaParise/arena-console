@@ -1213,13 +1213,79 @@ shaders sumir, o ARENA desliga o filtro em silêncio — o jogo abre normal.
 ele usa por dentro (FSR, xBR, Anime4K, pixel nítido) são as mesmas que o
 RetroArch tem, e o ARENA usa essas. O que só ele tem é o LS1 (a escala
 própria) e a **geração de quadros** (de 30 para 60). O programa não vem
-no ARENA: ele é de quem comprou.
+no ARENA: ele é de quem comprou. Quem tem pode ligar a integração em
+**Ajustes → Emuladores → Lossless Scaling** (leia a seção logo abaixo).
 
 TV de tubo (CRT) e grade de LCD continuam no menu do RetroArch (`Esc` →
 Shaders), para quem quiser. Até 01/10/2026 o filtro **nunca chegava ao
 jogo** (o ARENA o escrevia num lugar que o RetroArch atual ignora); desde
 então vai pela linha de comando (`--set-shader`). Até 17/10/2026 só o nível
 Qualidade ligava o pixel nítido, e os jogos 3D eram esticados sem filtro.
+
+---
+
+### Lossless Scaling (para quem comprou)
+
+O **Lossless Scaling** é um programa pago, vendido na Steam. Ele estica a
+janela de um jogo até a tela inteira com as técnicas dele e pode **criar
+quadros** entre os do jogo. Ele não vem no ARENA, nem no GitHub: é de quem
+comprou, e o próprio programa confere isso — só funciona se a Steam da sua
+conta do Windows o tiver instalado.
+
+Se ele estiver no seu computador (na pasta do ARENA, em `emuladores` ou
+instalado pela Steam), aparece o bloco **Ajustes → Emuladores → Lossless
+Scaling**, dizendo onde o achou, a versão e se a licença vale. Ligando
+**Usar o Lossless Scaling**, em cada jogo do RetroArch o ARENA:
+
+1. escreve um perfil chamado **ARENA** na configuração do programa, ajustado
+   para aquele jogo — no 2D, o pixel nítido dele; no 3D, o LS1 (a escala
+   própria dele), no modo rápido se a placa for média. Só o perfil ARENA
+   muda; os seus ficam como estão, e antes da primeira mudança o ARENA guarda
+   uma cópia (`Settings.xml.antes-do-arena`, na pasta do programa);
+2. abre o jogo numa **janela do tamanho em que ele é desenhado** (o PSP, por
+   exemplo, em 960×544), no meio da tela;
+3. abre o Lossless Scaling junto, que estica essa janela sozinho, sem você
+   apertar nada;
+4. fecha o programa quando o jogo fecha, e desliga a escala sozinha do
+   perfil ARENA, para ele não mexer no jogo normal do ARENA se você abrir o
+   Lossless Scaling por conta própria depois.
+
+**Feche o Lossless Scaling antes de abrir o jogo**: com ele aberto, o ARENA
+não consegue ajustá-lo (o programa regrava a configuração ao fechar), e o
+jogo abre normal, com a escala do ARENA. Também não vale na partida a dois
+(o atraso pesa mais ali) nem nos emuladores de fora (PCSX2, Dolphin, RPCS3,
+Xenia), que já desenham grande sozinhos.
+
+#### Mais quadros (a geração de quadros)
+
+Pense num desenho animado feito à mão: o desenhista principal faz as poses
+mais importantes, e um ajudante desenha os quadros do meio, para o movimento
+ficar liso. A **geração de quadros** é esse ajudante: cria um quadro entre
+dois do jogo. Ela só ajuda em jogo que roda **abaixo** de 60 quadros por
+segundo (muito jogo de PSP e de PS2 roda a 30). Num jogo que já tem 60, não
+há o que acrescentar, e ela só gasta placa e atrasa um pouco o controle. Por
+isso vem desligada.
+
+#### Quanto pesa (medido)
+
+Medido em 17/10/2026 no computador do professor (Radeon integrada, tela
+1440×900), o mesmo jogo de PSP, a 60 quadros por segundo:
+
+| Jeito | Placa de vídeo (RetroArch + Lossless Scaling) |
+|---|---|
+| Só o ARENA, em tela cheia | ~12,4% |
+| ARENA + Lossless Scaling (LS1) | 3,5% + 9,0% = 12,5% |
+| ARENA + Lossless Scaling + mais quadros | 6,7% + 33,8% = 40,5% |
+
+Ou seja: a escala do próprio ARENA dá o mesmo resultado pelo mesmo custo,
+sem o programa e sem o pequeno atraso de captura que ele acrescenta (ele
+"fotografa" a janela do jogo a cada quadro antes de esticar). O Lossless
+Scaling vale pelo jeito de esticar dele (o LS1) e pela geração de quadros.
+
+Uma curiosidade: **a foto da tela (`F8` ou print) não mostra a imagem
+esticada pelo Lossless Scaling**. O programa marca a janela dele como "fora
+das capturas" (é o jeito de ele não se fotografar sem querer), e a foto pega
+o que está embaixo: a janela pequena do jogo.
 
 ---
 
