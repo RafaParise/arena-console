@@ -59,10 +59,20 @@ Primeiro, o que já estava pedido:
 
 Depois do Release, nesta ordem:
 
-10. Tela cheia com escala otimizada em todo jogo (como o Lossless
-    Scaling): integrar o Lossless Scaling do professor, se a licença
-    deixar; se não, as mesmas técnicas no ARENA. Inclui o 4K nas placas
-    boas e números de desempenho antes e depois.
+10. Feito (16 e 17/10): a escala da tela, com o relatório e os números em
+    `docs\ESCALA-DA-TELA.md`.
+    - Todo jogo esticado até a tela com o filtro certo (pixel nítido no 2D;
+      FSR, Catmull-Rom ou só a nitidez no 3D, pela placa), também nos
+      emuladores de fora (CAS no PCSX2, FSR no RPCS3, Catmull-Rom no
+      Dolphin). Escolha em Ajustes → Simples → Escala da tela.
+    - O Lossless Scaling de quem comprou: o ARENA o acha, confere a licença
+      da Steam, ajusta o perfil "ARENA" e o abre junto com o jogo
+      (`servidor\lossless.py`). O programa não vai no pacote nem no git: é
+      pago e o próprio motor dele confere a instalação pela Steam.
+    - No caminho: o som exclusivo deixava o jogo a 52 quadros com o fone
+      sem fio (agora 60, variação de 21% para 2%), e a nota da placa (o
+      Ryzen de mesa com Vega vai a 4 nos núcleos do RetroArch; a dedicada
+      antiga para em 2).
 11. O ARENA em qualquer navegador (não só o Edge), com testes.
 12. Chromebook.
 13. Linux, idêntico.
@@ -83,6 +93,21 @@ Achado de 16/10 que espera conserto:
   avisarem, antes do item 15 (o Docker e o WSL criam essas reservas).
 
 ## Depende do Rafael
+
+- **O seu ARENA está no "Gráfico igual ao console original", no perfil
+  Desempenho e no Ultra**: todo jogo desenhado no tamanho do console. Para
+  ver a escala nova por inteiro: Ajustes → Simples → Automático; Ajustes →
+  Máquina → Nível do gráfico → Normal (`docs\ESCALA-DA-TELA.md`).
+- Medir a escala no notebook da escola: copiar os jogos das cenas (CTR,
+  Burnout Legends, Mario Kart 64, Gauntlet Legends, Super Bomberman 4) e
+  rodar `servidor\python\python.exe ferramentas\medir_escala.py`. E
+  conferir lá se o N64 pelo parallel-rdp roda liso: aqui ele gastou um
+  terço do processador do GLideN64 (22% contra 76% de um núcleo no modo
+  alvo); se rodar, ele pode valer já na placa média.
+- O Lossless Scaling foi tirado da pasta da Steam e posto em
+  `arena-console\Lossless Scaling`: ele funciona dali, mas não se atualiza
+  mais sozinho. O ARENA também o acha na pasta da Steam
+  (`steamapps\common`), se você preferir devolver.
 
 - Mandar ao Suporte do GitHub o pedido de limpeza do PR #1 e do cache. O
   texto está pronto em `backup\git\pedido-ao-suporte-do-github.txt`.
