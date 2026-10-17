@@ -1558,6 +1558,13 @@ def escrever_config_pcsx2(caminho_executavel, ultra=False, nota=None,
         linhas_gs += ["upscale_multiplier = " + escala,
                       "MaxAnisotropy = " + aniso,
                       "texture_preloading = " + pre_carga]
+        # Escala da tela (item 10, 17/10/2026): desenhado no tamanho do PS2
+        # (1x), o CAS da AMD, que vem no proprio PCSX2, estica ate a tela
+        # afiando as bordas (CASMode 2, "Sharpen and Resize") -- o papel do
+        # FSR nos nucleos do RetroArch. Acima de 1x o PCSX2 ja desenha grande;
+        # no nivel minimo, nada a mais.
+        cas = escala == "1" and abaixo != "minimo"
+        linhas_gs += ["CASMode = %d" % (2 if cas else 0), "CASSharpness = 50"]
         # Mistura de cores (accurate_blending_unit: 0 minima, 1 basica --
         # padrao do PCSX2 --, 2 media, 3 alta, 4 total, 5 maxima): "Basica" no
         # leve, no grafico original e na placa integrada automatica. Fora
@@ -1819,6 +1826,14 @@ def opcoes_de_imagem_dolphin(nota=None, nota_gpu=None, modesto=False, ultra=Fals
         gfx_settings["MSAA"] = "1"
         gfx_settings["SSAA"] = "False"
         gfx_melhorias["MaxAnisotropy"] = "2" if forte else "0"
+        # Escala da tela (item 10, 17/10/2026): desenhado no tamanho do
+        # console (1x), o Dolphin estica ate a tela pelo Catmull-Rom
+        # (OutputResampling 4; a lista no Dolphin.exe: 0 padrao, 1 bilinear,
+        # 2 B-Spline, 3 Mitchell, 4 Catmull-Rom, 5 pixel nitido, 6 area) -- o
+        # mesmo da placa media nos nucleos do RetroArch. No nivel minimo, o
+        # padrao.
+        gfx_melhorias["OutputResampling"] = ("4" if gfx_settings["InternalResolution"] == "1"
+                                             and "minimo" not in niveis else "0")
     # Ultra: tela cheia e sem a pergunta "parar o jogo?". Sem ultra, nada
     # aqui: o que a pessoa escolheu na tela do Dolphin fica (a volta do que
     # o ultra mudou e' feita em escrever_config_dolphin, pela anotacao).
@@ -2340,6 +2355,12 @@ def escrever_config_rpcs3(caminho_executavel, nota, nota_gpu=None, modesto=False
                       "Anisotropic Filter Override": "0", "MSAA": "Disabled"})
     video["Relaxed ZCULL Sync"] = "true" if niveis else "false"
     video["Accurate ZCULL stats"] = "false" if niveis else "true"
+    # Escala da tela (item 10, 17/10/2026): desenhado ate os 720p do PS3
+    # (100%), o FSR da AMD, que vem no proprio RPCS3, estica ate a tela --
+    # o papel do FSR nos nucleos do RetroArch. No nivel minimo, o bilinear.
+    video["Output Scaling Mode"] = ("FidelityFX Super Resolution"
+                                    if int(video["Resolution Scale"]) <= 100 and "minimo" not in niveis
+                                    else "Bilinear")
 
     for chave, valor in video.items():
         texto = _trocar_valor_yaml(texto, "Video", chave, valor)
