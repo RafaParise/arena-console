@@ -1092,6 +1092,26 @@ def gravar_atomico(caminho, texto):
                     pass
 
 
+def arquivo_do_navegador():
+    """dados\\manifesto.js, ao lado do manifesto.json (segue o ARQUIVO_MANIFESTO
+    que os testes trocam por um temporario)."""
+    return os.path.splitext(ARQUIVO_MANIFESTO)[0] + ".js"
+
+
+def gravar_manifesto_do_navegador(texto):
+    """A mesma lista de jogos para o ARENA do Chromebook (ARENA-CHROMEBOOK.html,
+    item 12 do plano de 15/10/2026). Aberta do pen drive, a pagina do
+    navegador nao pode ler um .json (o Chrome nao deixa ler arquivo em
+    file://), mas pode abrir um script: este e' o manifesto.json embrulhado
+    em window.ARENA_MANIFESTO. Com ele, o Chromebook mostra os mesmos jogos,
+    com as mesmas capas, sem refazer a lista. Os caminhos ja sao relativos.
+    Pen drive protegido contra gravacao: o Chromebook refaz a lista sozinho."""
+    try:
+        gravar_atomico(arquivo_do_navegador(), "window.ARENA_MANIFESTO = %s;\n" % texto)
+    except OSError:
+        pass
+
+
 def indexar(forcar=False):
     """Funcao principal. Devolve o manifesto e grava em disco.
 
@@ -1103,6 +1123,9 @@ def indexar(forcar=False):
         salvo = ler_manifesto_salvo()
         if salvo and salvo.get("assinatura") == assinatura:
             salvo["reaproveitado"] = True
+            if not os.path.isfile(arquivo_do_navegador()):
+                gravar_manifesto_do_navegador(json.dumps(
+                    dict(salvo, reaproveitado=False), ensure_ascii=False, separators=(",", ":")))
             return salvo
 
     por_id, por_extensao = carregar_plataformas()
@@ -1149,6 +1172,7 @@ def indexar(forcar=False):
     # separators sem espaco extra deixa o arquivo menor e a leitura mais rapida.
     texto = json.dumps(manifesto, ensure_ascii=False, separators=(",", ":"))
     gravar_atomico(ARQUIVO_MANIFESTO, texto)
+    gravar_manifesto_do_navegador(texto)
 
     return manifesto
 

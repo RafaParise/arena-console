@@ -37,12 +37,12 @@
       <img id="perfilMini" class="perfil-mini" alt="" hidden>
       <span id="perfilMiniNome">Perfil</span>
     </button>
-    <button class="botao" id="btnAmigos" type="button">Amigos</button>
+    <button class="botao" id="btnAmigos" type="button" data-so-windows>Amigos</button>
     <button class="botao" id="btnRecordes" type="button">Recordes</button>
     <button class="botao" id="btnConquistas" type="button">Conquistas</button>
-    <button class="botao" id="btnAcervo" type="button">Biblioteca</button>
+    <button class="botao" id="btnAcervo" type="button" data-so-windows>Biblioteca</button>
     <button class="botao botao-tema" id="btnTema" type="button" aria-label="Alternar modo de cor">☾ Escuro</button>
-    <button class="botao" id="btnSincronizar" type="button">
+    <button class="botao" id="btnSincronizar" type="button" data-so-windows>
       Enviar recordes <span class="selo" id="seloPendentes" hidden>0</span>
     </button>
     <button class="botao" id="btnAjustes" type="button">Ajustes</button>
@@ -65,7 +65,7 @@
 <!-- Aparece quando um jogo abre e fica ate ele fechar. A mensagem nao da
      para aparecer DENTRO do jogo com seguranca (ver faixaTeclas no app.js),
      entao fica aqui, grande, onde o aluno ve ao abrir e a cada Alt+Tab. -->
-<div class="faixa-teclas" id="faixaTeclas" role="status" hidden>
+<div class="faixa-teclas" id="faixaTeclas" role="status" hidden data-so-windows>
   <span class="faixa-teclas-titulo">No jogo:</span>
   <span class="faixa-tecla"><kbd>F2</kbd> salva</span>
   <span class="faixa-tecla"><kbd>F4</kbd> volta ao save</span>
@@ -83,10 +83,10 @@
       <span class="trilho-conta" id="contaTodos">0</span>
     </button>
     <ul class="trilho-lista" id="listaPlataformas"></ul>
-    <button class="botao botao--largo" id="btnComoColocar" type="button">Como colocar jogos</button>
-    <button class="botao botao--largo" id="btnCriarPastas" type="button">Criar pastas dos consoles</button>
+    <button class="botao botao--largo" id="btnComoColocar" type="button" data-so-windows>Como colocar jogos</button>
+    <button class="botao botao--largo" id="btnCriarPastas" type="button" data-so-windows>Criar pastas dos consoles</button>
     <button class="botao botao--largo" id="btnAtualizar" type="button">Atualizar lista</button>
-    <button class="botao botao--largo" id="btnBuscarCapas" type="button"
+    <button class="botao botao--largo" id="btnBuscarCapas" type="button" data-so-windows
             title="Procura na internet a capa de cada jogo que está sem (PS3 e PSP pegam o ícone do próprio disco, sem internet)">Buscar capas que faltam</button>
   </nav>
 
@@ -101,6 +101,13 @@
         <button class="filtro-rapido" id="btnRecentes" type="button">Recentes</button>
       </div>
       <span class="filtro-conta" id="contaVisivel"></span>
+    </div>
+
+    <!-- So no Chromebook (launcher\navegador\tela.js): ate a pasta do ARENA
+         no pen drive estar liberada. -->
+    <div class="aviso aviso-pasta" id="avisoPasta" data-so-navegador hidden role="status">
+      <p id="avisoPastaTexto"></p>
+      <button class="botao botao--principal" id="btnPastaArena" type="button">Escolher a pasta do ARENA</button>
     </div>
 
     <div class="rolagem">
@@ -136,16 +143,16 @@
       </dl>
       <div class="detalhes-acoes">
         <button class="botao botao--principal" id="btnJogarSelecionado" type="button" disabled>Jogar agora</button>
-        <button class="botao" id="btnMultiplayerSelecionado" type="button" disabled
+        <button class="botao" id="btnMultiplayerSelecionado" type="button" disabled data-so-windows
                 aria-describedby="dicaMesmoComputador">Desafio em rede</button>
         <p class="detalhes-dica" id="dicaMesmoComputador" hidden></p>
         <button class="botao" id="btnGerirSelecionado" type="button" disabled>Saves e cheats</button>
         <button class="botao" id="btnPlacarSelecionado" type="button" hidden>Registrar pontos</button>
-        <button class="botao" id="btnEscolherConsole" type="button" hidden>Escolher console</button>
+        <button class="botao" id="btnEscolherConsole" type="button" hidden data-so-windows>Escolher console</button>
       </div>
       <div class="detalhes-acoes">
-        <button class="botao" id="btnAtualizarCapa" type="button" disabled>Buscar capa</button>
-        <label class="botao" for="campoEnviarCapa" id="lblEnviarCapa">Enviar capa</label>
+        <button class="botao" id="btnAtualizarCapa" type="button" disabled data-so-windows>Buscar capa</button>
+        <label class="botao" for="campoEnviarCapa" id="lblEnviarCapa" data-so-windows>Enviar capa</label>
         <input id="campoEnviarCapa" type="file" accept="image/png,image/jpeg,image/webp" hidden>
       </div>
     </div>
@@ -164,7 +171,7 @@
 
   <div class="abas" role="tablist">
     <button class="aba ativo" role="tab" data-aba="perfil" type="button">Meu perfil</button>
-    <button class="aba" role="tab" data-aba="rede" type="button">Amigos</button>
+    <button class="aba" role="tab" data-aba="rede" type="button" data-so-windows>Amigos</button>
   </div>
 
   <div class="aba-conteudo" data-painel="perfil">
@@ -202,7 +209,7 @@
       </ul>
     </div>
 
-    <div>
+    <div data-so-windows>
       <h3 class="grupo-titulo">Começar do zero</h3>
       <p class="explica">Apaga o perfil e as configurações. Os jogos ficam.</p>
 
@@ -401,18 +408,18 @@
 
   <div class="abas" role="tablist">
     <button class="aba ativo" role="tab" data-aba="simples" type="button">Simples</button>
-    <button class="aba" role="tab" data-aba="avancado" type="button">Avançado</button>
+    <button class="aba" role="tab" data-aba="avancado" type="button" data-so-windows>Avançado</button>
     <button class="aba" role="tab" data-aba="maquina" type="button">Máquina</button>
-    <button class="aba" role="tab" data-aba="controles" type="button">Controles</button>
-    <button class="aba" role="tab" data-aba="emuladores" type="button">Emuladores</button>
+    <button class="aba" role="tab" data-aba="controles" type="button" data-so-windows>Controles</button>
+    <button class="aba" role="tab" data-aba="emuladores" type="button" data-so-windows>Emuladores</button>
   </div>
 
   <!-- Aba simples -->
   <div class="aba-conteudo" data-painel="simples">
-    <p class="explica">Automático é o recomendado.</p>
-    <div class="perfis" id="listaPerfis"></div>
+    <p class="explica" data-so-windows>Automático é o recomendado.</p>
+    <div class="perfis" id="listaPerfis" data-so-windows></div>
 
-    <div class="opcao">
+    <div class="opcao" data-so-windows>
       <span class="opcao-rotulo">Escala da tela</span>
       <select class="opcao-controle" id="listaEscalaTela" aria-label="Escala da tela"
               aria-describedby="explicaEscalaTela">
@@ -423,7 +430,7 @@
         <option value="original">Original (sem filtro)</option>
       </select>
     </div>
-    <p class="explica" id="explicaEscalaTela"></p>
+    <p class="explica" id="explicaEscalaTela" data-so-windows></p>
 
     <div class="opcao">
       <span class="opcao-rotulo">Fundo animado</span>
@@ -436,7 +443,7 @@
       <span class="opcao-ajuda" id="ajudaFundoAnimado">O céu (tema escuro) e o campo (tema claro) atrás da tela. Parado não gasta nada.</span>
     </div>
 
-    <div class="opcao">
+    <div class="opcao" data-so-windows>
       <span class="opcao-rotulo">Abrir a tela em</span>
       <select class="opcao-controle" id="listaNavegador" aria-label="Navegador da tela do ARENA"
               aria-describedby="ajudaNavegador">
@@ -467,6 +474,38 @@
   <!-- Aba amigos -->
   <!-- Aba máquina -->
   <div class="aba-conteudo" data-painel="maquina" hidden>
+    <div id="blocoChromebook" data-so-navegador hidden>
+      <h3 class="grupo-titulo">Este Chromebook</h3>
+      <p class="explica">
+        No Chromebook, o ARENA roda dentro do navegador, com o mesmo RetroArch
+        do Windows. O teste abre um jogo de cada console, um por vez, e mede
+        quantos quadros por segundo ele consegue: 60 é o certo. Leva uns dois
+        minutos; não mexa enquanto isso.
+      </p>
+      <div class="controle-acoes">
+        <button class="botao botao--principal" id="btnTestarChromebook" type="button">Testar este Chromebook</button>
+        <button class="botao" id="btnBaixarRelatorio" type="button" disabled>Baixar o relatório</button>
+      </div>
+      <ul class="controles teste-chromebook" id="listaTesteChromebook"></ul>
+      <ul class="onde-lista">
+        <li><span>Pasta do ARENA</span><code id="chromebookPasta">—</code></li>
+      </ul>
+      <button class="botao" id="btnOutraPasta" type="button">Escolher a pasta do ARENA</button>
+
+      <h3 class="grupo-titulo">Guardar um jogo neste navegador</h3>
+      <p class="explica">
+        Para o Chromebook sem pen drive: o jogo fica guardado dentro do
+        navegador, nesta conta. Serve para jogo pequeno, de cartucho; jogo de
+        CD fica no pen drive.
+      </p>
+      <div class="opcao">
+        <span class="opcao-rotulo">Console</span>
+        <select class="opcao-controle" id="listaConsoleGuardar" aria-label="Console do jogo que vai ser guardado"></select>
+      </div>
+      <label class="botao" for="campoGuardarJogo">Escolher o arquivo do jogo</label>
+      <input id="campoGuardarJogo" type="file" multiple hidden>
+    </div>
+
     <dl class="maquina">
       <div><dt>Processador</dt><dd id="hwCpu">—</dd></div>
       <div><dt>Núcleos</dt><dd id="hwNucleos">—</dd></div>
@@ -474,15 +513,15 @@
       <div><dt>Disco</dt><dd id="hwDisco">—</dd></div>
       <div><dt>Sistema</dt><dd id="hwSistema">—</dd></div>
       <div><dt>Motor gráfico</dt><dd id="hwMotor">—</dd></div>
-      <div><dt>Perfil aplicado</dt><dd id="hwPerfil">—</dd></div>
-      <div><dt>Bibliotecas gráficas</dt><dd id="hwRuntime">—</dd></div>
+      <div data-so-windows><dt>Perfil aplicado</dt><dd id="hwPerfil">—</dd></div>
+      <div data-so-windows><dt>Bibliotecas gráficas</dt><dd id="hwRuntime">—</dd></div>
       <div><dt>Capacidade</dt><dd id="hwCapacidade">—</dd></div>
       <div><dt>Espaço livre</dt><dd id="hwEspaco">—</dd></div>
-      <div><dt>Velocidade de gravação</dt><dd id="hwVelocidade">—</dd></div>
+      <div data-so-windows><dt>Velocidade de gravação</dt><dd id="hwVelocidade">—</dd></div>
       <div><dt>Internet</dt><dd id="hwInternet">—</dd></div>
     </dl>
 
-    <div id="blocoRuntime" hidden>
+    <div id="blocoRuntime" hidden data-so-windows>
       <h3 class="grupo-titulo">Bibliotecas gráficas ausentes</h3>
       <p class="explica">Necessário para abrir os jogos.</p>
       <button class="botao botao--principal" id="btnRepararRuntime" type="button">
@@ -490,7 +529,7 @@
       </button>
     </div>
 
-    <div>
+    <div data-so-windows>
       <h3 class="grupo-titulo">O que está deixando este computador lento</h3>
       <p class="explica">
         O ARENA procura o que pesa no Windows: programas que abrem sozinhos,
@@ -503,7 +542,7 @@
       <ul class="barreiras" id="listaBarreiras"></ul>
     </div>
 
-    <div>
+    <div data-so-windows>
       <h3 class="grupo-titulo">Computador modesto</h3>
       <p class="explica">
         Mesmo o perfil Desempenho, da aba Simples, deixa a imagem melhor que
@@ -523,7 +562,7 @@
       <p class="explica" id="explicaNivelGrafico"></p>
     </div>
 
-    <div>
+    <div data-so-windows>
       <h3 class="grupo-titulo">Modo desempenho</h3>
       <p class="explica">Dá prioridade ao jogo enquanto ele estiver aberto.</p>
       <div class="opcao">
@@ -546,19 +585,19 @@
       </div>
     </div>
 
-    <div>
+    <div data-so-windows>
       <h3 class="grupo-titulo">Jogos que fecharam sozinhos</h3>
       <p class="explica">Histórico de jogos encerrados inesperadamente.</p>
       <ul class="controles" id="listaFechamentos"></ul>
     </div>
 
-    <div>
+    <div data-so-windows>
       <h3 class="grupo-titulo">Cópia de segurança</h3>
       <p class="explica">Guarda automaticamente as 3 cópias mais recentes.</p>
       <button class="botao" id="btnBackup" type="button">Fazer cópia agora</button>
     </div>
 
-    <div>
+    <div data-so-windows>
       <h3 class="grupo-titulo">Levar meu progresso para outro lugar</h3>
       <p class="explica">Junta saves, cheats e recordes em um pacote portátil.</p>
       <button class="botao botao--principal" id="btnExportar" type="button">
@@ -924,14 +963,14 @@
 
   <div class="abas" role="tablist">
     <button class="aba ativo" role="tab" data-aba="estados" type="button">Save states</button>
-    <button class="aba" role="tab" data-aba="cheats" type="button">Cheats</button>
+    <button class="aba" role="tab" data-aba="cheats" type="button" data-so-windows>Cheats</button>
   </div>
 
   <!-- Save states -->
   <div class="aba-conteudo" data-painel="estados">
     <h3 class="jogo-nome" id="jogoNomeEstados">—</h3>
 
-    <div class="opcao">
+    <div class="opcao" data-so-windows>
       <span class="opcao-rotulo">Console deste jogo</span>
       <select class="opcao-controle" id="listaConsoleJogo"
               aria-label="Console deste jogo"></select>
@@ -1159,6 +1198,9 @@
 
 <div class="recado" id="recado" hidden></div>
 
+<!-- No Chromebook (aberta do pen drive), o servidor mora na propria pagina:
+     launcher\navegador\servidor.js. No Windows, este arquivo nao faz nada. -->
+<script src="navegador/servidor.js"></script>
 <script src="pixel-sprites.js"></script>
 <script src="galaxy-background.js"></script>
 <script src="field-background.js"></script>

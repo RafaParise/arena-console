@@ -119,3 +119,11 @@ BIOS/
 # Programa pago da Steam (Lossless Scaling): o ARENA so usa o de quem comprou
 # (servidor/lossless.py) e nunca leva junto -- nem no git, nem no pacote.
 /Lossless Scaling/
+
+# ARENA no navegador (o Chromebook, item 12): os nucleos do RetroArch para
+# navegador (ferramentas\preparar_nucleos_navegador.py, uns 90 MB) e os jogos
+# livres embutidos (ferramentas\montar_navegador.py, copia de testes\jogos_livres)
+# vem no pacote, nao no git.
+launcher/navegador/nucleos/*
+!launcher/navegador/nucleos/LEIA.txt
+launcher/navegador/livres.js

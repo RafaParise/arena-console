@@ -1,0 +1,15 @@
+Núcleos do RetroArch para navegador (a versão do Chromebook)
+
+Aqui ficam os emuladores que o ARENA usa quando abre no Chromebook (ou em
+qualquer navegador) pelo ARENA-CHROMEBOOK.html: o mesmo RetroArch 1.22.2 do
+Windows, na versão que o libretro compila para WebAssembly.
+
+Eles vêm prontos no pacote do ARENA. Quem monta o pacote a partir do código
+(github.com/RafaParise/arena-console) gera esta pasta com:
+
+    servidor\python\python.exe ferramentas\preparar_nucleos_navegador.py
+
+A ferramenta baixa o RetroArch para navegador do site oficial do libretro,
+confere a marca SHA-256 e converte cada núcleo para abrir direto do pen
+drive. Cada núcleo tem dois arquivos: o .js (o programa) e o .wasm.js (o
+emulador compactado). A lista.js diz quais vieram.

@@ -1,11 +1,12 @@
 {
-  "_leia": "Catalogo de plataformas do ARENA, ate a geracao do PlayStation 2. 'custo' vai de 1 (trivial) a 5 (pesadissimo) e e comparado com a capacidade medida da maquina para classificar o desempenho. 'peso' decide se a plataforma aparece em maquina fraca. 'arquivos_sistema' e apenas a QUANTIDADE esperada na pasta system: o ARENA nunca lista, nomeia nem baixa esses arquivos. 'apelidos' sao os nomes de pasta que apontam para esta plataforma. 'tamanho_max_mb' e o tamanho maximo da midia original, usado para desempatar extensao ambigua. 'externo' e o emulador de fora que o ARENA prefere quando encontra a pasta em emuladores/. Se nao encontrar, usa o nucleo do RetroArch normalmente. 'pasta' e o nome da pasta oficial daquele console dentro de jogos/. A pasta e quem decide o console de arquivos com extensao ambigua. 'jogadores_por_jogo' e' quantos jogadores aceitam os jogos ja conferidos (pedaco do nome -> numero; palavra inteira, sem pontuacao): vale quando o jogo nao esta no dados\\jogadores.txt do professor, e e' com ele que esse arquivo nasce. Mora aqui, no programa, para valer em qualquer copia (antes so existia nos dados de quem montou). 'usa_java' diz que o nucleo abre o Java (o Java ME): o ARENA poe o Java que vem com ele (emuladores\\Java) na frente do PATH do RetroArch. 'opcoes_retroarch' sao opcoes do RetroArch que valem so neste console, por cima de todas as outras (o motivo fica em 'opcoes_retroarch_motivo').",
+  "_leia": "Catalogo de plataformas do ARENA, ate a geracao do PlayStation 2. 'custo' vai de 1 (trivial) a 5 (pesadissimo) e e comparado com a capacidade medida da maquina para classificar o desempenho. 'peso' decide se a plataforma aparece em maquina fraca. 'arquivos_sistema' e apenas a QUANTIDADE esperada na pasta system: o ARENA nunca lista, nomeia nem baixa esses arquivos. 'apelidos' sao os nomes de pasta que apontam para esta plataforma. 'tamanho_max_mb' e o tamanho maximo da midia original, usado para desempatar extensao ambigua. 'externo' e o emulador de fora que o ARENA prefere quando encontra a pasta em emuladores/. Se nao encontrar, usa o nucleo do RetroArch normalmente. 'pasta' e o nome da pasta oficial daquele console dentro de jogos/. A pasta e quem decide o console de arquivos com extensao ambigua. 'jogadores_por_jogo' e' quantos jogadores aceitam os jogos ja conferidos (pedaco do nome -> numero; palavra inteira, sem pontuacao): vale quando o jogo nao esta no dados\\jogadores.txt do professor, e e' com ele que esse arquivo nasce. Mora aqui, no programa, para valer em qualquer copia (antes so existia nos dados de quem montou). 'usa_java' diz que o nucleo abre o Java (o Java ME): o ARENA poe o Java que vem com ele (emuladores\\Java) na frente do PATH do RetroArch. 'opcoes_retroarch' sao opcoes do RetroArch que valem so neste console, por cima de todas as outras (o motivo fica em 'opcoes_retroarch_motivo'). 'core_navegador' e' o nucleo do RetroArch para navegador (WebAssembly, o RetroArch 1.22.2 que o libretro compila para a web) que a versao do Chromebook usa (ARENA-CHROMEBOOK.html, ferramentas\\preparar_nucleos_navegador.py); console sem ele fica so no Windows.",
   "plataformas": [
     {
       "id": "tic80",
       "nome": "TIC-80",
       "descricao": "Console de fantasia. E aqui que ficam os jogos da turma.",
       "core": "tic80_libretro.dll",
+      "core_navegador": "tic80",
       "extensoes": [
         ".tic"
       ],
@@ -24,6 +25,7 @@
       "nome": "WASM-4",
       "descricao": "Console de fantasia moderno, para jogos pequenos.",
       "core": "wasm4_libretro.dll",
+      "core_navegador": "wasm4",
       "extensoes": [
         ".wasm"
       ],
@@ -42,6 +44,7 @@
       "nome": "LowRes NX",
       "descricao": "Console de fantasia com editor embutido.",
       "core": "lowresnx_libretro.dll",
+      "core_navegador": "lowresnx",
       "extensoes": [
         ".nx"
       ],
@@ -60,6 +63,7 @@
       "nome": "Uzebox",
       "descricao": "Console aberto feito com um microcontrolador.",
       "core": "uzem_libretro.dll",
+      "core_navegador": "uzem",
       "extensoes": [
         ".uze"
       ],
@@ -77,6 +81,7 @@
       "nome": "CHIP-8",
       "descricao": "Maquina virtual de 1977 para jogos simples. Boa para aprender a programar.",
       "core": "jaxe_libretro.dll",
+      "core_navegador": "jaxe",
       "extensoes": [
         ".ch8",
         ".sc8",
@@ -101,6 +106,7 @@
       "nome": "Arduboy",
       "descricao": "Console de bolso de codigo aberto, de 2015, do tamanho de um cartao de credito.",
       "core": "ardens_libretro.dll",
+      "core_navegador": "ardens",
       "extensoes": [
         ".hex",
         ".arduboy"
@@ -120,6 +126,7 @@
       "nome": "MicroW8",
       "descricao": "Console de fantasia para jogos minusculos: cada cartucho cabe em 256 bytes.",
       "core": "uw8_libretro.dll",
+      "core_navegador": "uw8",
       "extensoes": [
         ".uw8"
       ],
@@ -246,6 +253,7 @@
       "nome": "Atari Lynx",
       "descricao": "Portatil colorido de 1989.",
       "core": "handy_libretro.dll",
+      "core_navegador": "handy",
       "extensoes": [
         ".lnx"
       ],
@@ -308,6 +316,7 @@
       "nome": "Nintendo (NES)",
       "descricao": "8 bits. Roda em qualquer maquina.",
       "core": "fceumm_libretro.dll",
+      "core_navegador": "fceumm",
       "extensoes": [
         ".nes",
         ".fds",
@@ -330,6 +339,7 @@
       "nome": "Super Nintendo",
       "descricao": "16 bits. Roda em qualquer maquina.",
       "core": "snes9x_libretro.dll",
+      "core_navegador": "snes9x",
       "extensoes": [
         ".sfc",
         ".smc",
@@ -356,6 +366,7 @@
       "nome": "Game Boy e Game Boy Color",
       "descricao": "Portatil 8 bits.",
       "core": "gambatte_libretro.dll",
+      "core_navegador": "gambatte",
       "extensoes": [
         ".gb",
         ".gbc"
@@ -377,6 +388,7 @@
       "nome": "Game Boy Advance",
       "descricao": "Portatil 32 bits.",
       "core": "mgba_libretro.dll",
+      "core_navegador": "mgba",
       "extensoes": [
         ".gba"
       ],
@@ -395,6 +407,7 @@
       "nome": "Virtual Boy",
       "descricao": "O portatil vermelho de 1995.",
       "core": "mednafen_vb_libretro.dll",
+      "core_navegador": "mednafen_vb",
       "extensoes": [
         ".vb",
         ".vboy"
@@ -432,6 +445,7 @@
       "nome": "Game & Watch",
       "descricao": "Os jogos de tela de cristal liquido.",
       "core": "gw_libretro.dll",
+      "core_navegador": "gw",
       "extensoes": [
         ".mgw"
       ],
@@ -583,6 +597,7 @@
       "nome": "Sega SG-1000",
       "descricao": "Primeiro console da Sega.",
       "core": "gearsystem_libretro.dll",
+      "core_navegador": "gearsystem",
       "extensoes": [
         ".sg"
       ],
@@ -601,6 +616,7 @@
       "nome": "Mega Drive, Master System e Game Gear",
       "descricao": "Um nucleo cobre as tres.",
       "core": "genesis_plus_gx_libretro.dll",
+      "core_navegador": "genesis_plus_gx",
       "extensoes": [
         ".md",
         ".gen",
@@ -634,6 +650,7 @@
       "nome": "Sega 32X",
       "descricao": "Expansao 32 bits do Mega Drive.",
       "core": "picodrive_libretro.dll",
+      "core_navegador": "picodrive",
       "extensoes": [
         ".32x"
       ],
@@ -652,6 +669,7 @@
       "nome": "Sega CD",
       "descricao": "Expansao em CD do Mega Drive.",
       "core": "genesis_plus_gx_libretro.dll",
+      "core_navegador": "genesis_plus_gx",
       "extensoes": [
         ".cue",
         ".chd",
@@ -740,6 +758,7 @@
       "nome": "PlayStation",
       "descricao": "32 bits. Roda ate em maquina modesta.",
       "core": "swanstation_libretro.dll",
+      "core_navegador": "pcsx_rearmed",
       "extensoes": [
         ".pbp",
         ".m3u",
@@ -852,6 +871,7 @@
       "descricao": "Neo Geo e muitos fliperamas (Capcom, Konami...) pelo FBNeo, mais leve que o MAME.",
       "aviso_ao_abrir": "É fliperama: aperte Select (Back) para pôr uma ficha e depois Start. Sem ficha, o jogo fica na demonstração.",
       "core": "fbneo_libretro.dll",
+      "core_navegador": "fbneo",
       "extensoes": [
         ".zip",
         ".7z"
@@ -880,6 +900,7 @@
       "nome": "Neo Geo Pocket",
       "descricao": "Portatil da SNK.",
       "core": "mednafen_ngp_libretro.dll",
+      "core_navegador": "mednafen_ngp",
       "extensoes": [
         ".ngp",
         ".ngc"
@@ -926,6 +947,7 @@
       "nome": "PC Engine",
       "descricao": "16 bits japones, em cartucho.",
       "core": "mednafen_pce_libretro.dll",
+      "core_navegador": "mednafen_pce_fast",
       "extensoes": [
         ".pce",
         ".sgx"
@@ -966,6 +988,7 @@
       "nome": "WonderSwan",
       "descricao": "Portatil da Bandai.",
       "core": "mednafen_wswan_libretro.dll",
+      "core_navegador": "mednafen_wswan",
       "extensoes": [
         ".ws",
         ".wsc"
@@ -1004,6 +1027,7 @@
       "nome": "3DO",
       "descricao": "Console multimidia de 1993.",
       "core": "opera_libretro.dll",
+      "core_navegador": "opera",
       "extensoes": [
         ".iso",
         ".cue",
@@ -1047,6 +1071,7 @@
       "nome": "Magnavox Odyssey 2",
       "descricao": "Console de 1978.",
       "core": "o2em_libretro.dll",
+      "core_navegador": "o2em",
       "extensoes": [
         ".bin"
       ],
@@ -1065,6 +1090,7 @@
       "nome": "ColecoVision",
       "descricao": "Console de 1982.",
       "core": "gearcoleco_libretro.dll",
+      "core_navegador": "gearcoleco",
       "extensoes": [
         ".col"
       ],
@@ -1099,6 +1125,7 @@
       "nome": "Vectrex",
       "descricao": "Console com tela vetorial propria.",
       "core": "vecx_libretro.dll",
+      "core_navegador": "vecx",
       "extensoes": [
         ".vec"
       ],
@@ -1138,6 +1165,7 @@
       "nome": "Commodore 64",
       "descricao": "O microcomputador mais vendido da historia.",
       "core": "vice_x64_libretro.dll",
+      "core_navegador": "vice_x64",
       "extensoes": [
         ".d64",
         ".t64",
@@ -1161,6 +1189,7 @@
       "nome": "Commodore 128",
       "descricao": "O sucessor do Commodore 64, de 1985, com o BASIC 7.0 e 128 KB de memoria.",
       "core": "vice_x128_libretro.dll",
+      "core_navegador": "vice_x128",
       "extensoes": [
         ".d64",
         ".d71",
@@ -1189,6 +1218,7 @@
       "nome": "Commodore VIC-20",
       "descricao": "O primeiro computador a vender um milhao de unidades, de 1980.",
       "core": "vice_xvic_libretro.dll",
+      "core_navegador": "vice_xvic",
       "extensoes": [
         ".prg",
         ".d64",
@@ -1222,6 +1252,7 @@
       "nome": "Commodore Plus/4",
       "descricao": "Computador da Commodore de 1984, da familia do C16.",
       "core": "vice_xplus4_libretro.dll",
+      "core_navegador": "vice_xplus4",
       "extensoes": [
         ".prg",
         ".d64",
@@ -1252,6 +1283,7 @@
       "nome": "Commodore PET",
       "descricao": "O primeiro computador da Commodore, de 1977, com o monitor de letras verdes embutido.",
       "core": "vice_xpet_libretro.dll",
+      "core_navegador": "vice_xpet",
       "extensoes": [
         ".prg",
         ".d64",
@@ -1400,6 +1432,7 @@
       "nome": "Thomson MO/TO",
       "descricao": "Os computadores franceses MO5, TO7 e TO8, dos anos 1980, os das escolas da Franca.",
       "core": "theodore_libretro.dll",
+      "core_navegador": "theodore",
       "extensoes": [
         ".fd",
         ".sap",
@@ -1449,6 +1482,7 @@
       "nome": "ScummVM",
       "descricao": "Aventuras de apontar e clicar.",
       "core": "scummvm_libretro.dll",
+      "core_navegador": "scummvm",
       "extensoes": [
         ".scummvm",
         ".svm"
@@ -1467,6 +1501,7 @@
       "nome": "Tamagotchi",
       "descricao": "O bichinho virtual original (1997). So existe UM jogo - o arquivo tama.b, tirado de um conjunto de ROMs do MAME.",
       "core": "tamalibretro_libretro.dll",
+      "core_navegador": "tamalibretro",
       "extensoes": [
         ".b",
         ".bin"

@@ -40,6 +40,13 @@ PROGRAMA = [
     "ARENA.bat", "LEIA-ME.md",
     "launcher/index.html", "launcher/estilo.css", "launcher/app.js",
     "launcher/pixel-sprites.js", "launcher/galaxy-background.js", "launcher/field-background.js",
+    # O ARENA no navegador (o Chromebook, item 12 de 15/10/2026): a entrada e o
+    # servidor que mora na pagina. Os nucleos (launcher\navegador\nucleos) e os
+    # jogos que vem junto (livres.js) sao gerados e vem no pacote.
+    "ARENA-CHROMEBOOK.html", "launcher/navegador/servidor.js", "launcher/navegador/dados.js",
+    "launcher/navegador/banco.js", "launcher/navegador/pasta.js", "launcher/navegador/partida.js",
+    "launcher/navegador/rotas.js", "launcher/navegador/tela.js", "launcher/navegador/jogo.html",
+    "launcher/navegador/jogo.js", "launcher/navegador/estilo.css",
     "servidor/arena.py", "servidor/indexador.py", "servidor/identificador.py",
     "servidor/hardware.py", "servidor/cheats.py", "servidor/graficos.py",
     "servidor/controles.py", "servidor/acervo.py", "servidor/barreiras.py",

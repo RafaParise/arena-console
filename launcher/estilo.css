@@ -1835,3 +1835,7 @@ input::placeholder { color: var(--texto-apagado); }
 @media (max-width: 560px) {
   .como-colocar dl { grid-template-columns: 1fr; }
 }
+
+/* ARENA no navegador (o Chromebook, launcher\navegador): o que so existe no
+   Windows some da tela. No Windows, o html nunca tem data-navegador. */
+html[data-navegador="true"] [data-so-windows] { display: none !important; }
