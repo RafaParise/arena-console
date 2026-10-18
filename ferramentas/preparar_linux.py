@@ -21,7 +21,13 @@ ferramenta poe no lugar:
      ver servidor\plataforma.py): a libjack.so.0 vazia (o Ubuntu 24.04 nao
      tem o JACK; ferramentas\jack_vazio.py) e a libgomp.so.1 do GCC, que o
      nucleo do Dreamcast (Flycast) pede, a do Debian 10 (funciona em todo
-     Linux de 2018 para ca).
+     Linux de 2018 para ca);
+  5. os emuladores de fora do Linux, nas MESMAS versoes dos do Windows e nas
+     mesmas pastas (o ARENA usa a mesma pasta de dados nos dois sistemas,
+     servidor\plataforma.py): o PCSX2 2.8.2 (PS2), o RPCS3 0.0.42-20058
+     (PS3) e o Xenia Canary 0bd090d (Xbox 360), os AppImage oficiais. O
+     GameCube e o Wii vao pelo nucleo do Dolphin (o Dolphin nao publica
+     versao portatil para Linux).
 
 Cada download confere a marca SHA-256: a do Python, pela lista oficial do
 projeto; a do RetroArch (o buildbot nao publica), pela do arquivo baixado em
@@ -29,7 +35,7 @@ projeto; a do RetroArch (o buildbot nao publica), pela do arquivo baixado em
 (7-zip.org, livre) no computador de quem monta o pacote.
 
 Uso:
-    servidor\python\python.exe ferramentas\preparar_linux.py
+    servidor\python\python.exe ferramentas\preparar_linux.py [--sem-externos]
 """
 import hashlib
 import io
@@ -81,6 +87,21 @@ LIBGOMP = {
     "dentro": "./usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0",
     "nome": "libgomp.so.1",
 }
+# Os emuladores de fora do Linux: as mesmas versoes dos do Windows, com a
+# marca SHA-256 que o proprio GitHub publica de cada arquivo (conferida em
+# 18/10/2026). (pasta dentro de emuladores, endereco, marca, tamanho)
+EXTERNOS = [
+    (os.path.join("PCSX2", "PCSX2"),
+     "https://github.com/PCSX2/pcsx2/releases/download/v2.8.2/pcsx2-v2.8.2-linux-appimage-x64-Qt.AppImage",
+     "0c46bb6a88aa2782b10853a7b07cf3387ba99cbef2b966372cd2315b8571abea", 60119544),
+    (os.path.join("RPCS3", "RPCS3"),
+     "https://github.com/RPCS3/rpcs3-binaries-linux/releases/download/"
+     "build-4514ad6216f61ac309f970f29c75fd7d586830dc/rpcs3-v0.0.42-20058-4514ad62_linux64.AppImage",
+     "691d017e7b566eb4d4745f2f58dce3dd895467df2c0f1c9be17af3f65b3aa0fa", 94026641),
+    (os.path.join("Xenia", "Xenia"),
+     "https://github.com/xenia-canary/xenia-canary/releases/download/0bd090d/xenia_canary_linux.AppImage",
+     "046bb14ae1a4130eeb237a365706fb6aa6df77323494894f7189e2b7d2cbdaad", 17832440),
+]
 DENTRO_DO_7Z = "RetroArch-Linux-x86_64"
 APPIMAGE = "RetroArch-Linux-x86_64.AppImage"
 PERFIS_DE_CONTROLE = ("udev", "linuxraw")
@@ -249,6 +270,19 @@ def preparar_bibliotecas():
           % (tamanho_jack, LIBGOMP["nome"], len(dados) // 1024), flush=True)
 
 
+def preparar_externos():
+    """Os AppImage dos emuladores de fora, ao lado dos .exe do Windows."""
+    for pasta, endereco, sha256, tamanho in EXTERNOS:
+        nome = endereco.rsplit("/", 1)[-1]
+        origem = baixado({"endereco": endereco, "arquivo": os.path.join("linux-externos", nome),
+                          "sha256": sha256, "tamanho": tamanho})
+        destino = os.path.join(RAIZ, "emuladores", pasta, nome)
+        os.makedirs(os.path.dirname(destino), exist_ok=True)
+        if not (os.path.isfile(destino) and os.path.getsize(destino) == tamanho and marca(destino) == sha256):
+            shutil.copyfile(origem, destino)
+        print("  emulador de fora: emuladores\\%s\\%s (%.0f MB)" % (pasta, nome, tamanho / 1048576), flush=True)
+
+
 def principal():
     sete = achar_7zip()
     trabalho = tempfile.mkdtemp(prefix="arena_preparar_linux_")
@@ -258,6 +292,8 @@ def principal():
         faltam = preparar_nucleos(sete, os.path.join(trabalho, "nucleos"))
         preparar_bibliotecas()
         preparar_python(trabalho)
+        if "--sem-externos" not in sys.argv:
+            preparar_externos()
         print("Pronto. No Linux, o ARENA abre pelo ARENA.sh.")
         if faltam:
             print("Estes consoles ficam so no Windows (o libretro nao tem o nucleo para Linux): %s" % ", ".join(faltam))

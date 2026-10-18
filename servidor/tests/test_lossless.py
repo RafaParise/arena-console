@@ -236,5 +236,21 @@ class Steam(unittest.TestCase):
             limpeza.apagar_pasta(pasta)
 
 
+class SoNoWindows(unittest.TestCase):
+    """O Lossless Scaling e' programa do Windows: no Linux (item 13), mesmo
+    com a pasta dele no pen drive, o ARENA nao o oferece."""
+
+    @unittest.skipIf(os.name == "nt", "no Windows o Lossless Scaling abre")
+    def test_no_linux_nao_acha(self):
+        pasta = tempfile.mkdtemp(prefix="arena_teste_ls_linux_")
+        try:
+            os.makedirs(os.path.join(pasta, "Lossless Scaling"))
+            open(os.path.join(pasta, "Lossless Scaling", lossless.EXECUTAVEL), "wb").close()
+            self.assertIsNone(lossless.achar(pasta))
+            self.assertEqual(lossless.situacao(pasta), {"achado": False})
+        finally:
+            limpeza.apagar_pasta(pasta)
+
+
 if __name__ == "__main__":
     unittest.main()

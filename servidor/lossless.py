@@ -214,7 +214,12 @@ def versao_do_arquivo(caminho):
 
 
 def achar(raiz):
-    """O LS desta maquina: {"executavel", "origem", "versao", "licenca"} ou None."""
+    """O LS desta maquina: {"executavel", "origem", "versao", "licenca"} ou None.
+    No Linux, None: o Lossless Scaling e' um programa do Windows (o mesmo pen
+    drive pode trazer a pasta dele, mas la ele nao abre), e o jogo fica com
+    a escala do proprio ARENA (item 13, 18/10/2026)."""
+    if os.name != "nt":
+        return None
     for origem, pasta in lugares_para_procurar(raiz):
         executavel = os.path.join(pasta, EXECUTAVEL)
         if os.path.isfile(executavel):

@@ -26,6 +26,9 @@ achar_python() {
     PYTHON=""
     _origem="$PWD/servidor/python-linux"
     if [ -f "$_origem/bin/python3.13" ]; then
+        # Do zip sem a permissao de executar, numa pasta que aceita (a da
+        # conta): basta marcar. No pen drive FAT32 isto nao pega, e segue.
+        [ -x "$_origem/bin/python3.13" ] || chmod u+x "$_origem/bin/python3.13" 2>/dev/null
         if [ -x "$_origem/bin/python3.13" ] && "$_origem/bin/python3.13" -c "" 2>/dev/null; then
             PYTHON="$_origem/bin/python3.13"
             return 0

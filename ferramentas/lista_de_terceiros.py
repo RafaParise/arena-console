@@ -48,6 +48,23 @@ PROGRAMAS = [
      "(ferramentas\\preparar_nucleos_navegador.py)",
      "GPL-3.0 (o RetroArch); cada núcleo, a licença dele (tabela do Chromebook, abaixo)",
      "https://github.com/libretro/RetroArch", "launcher\\navegador\\nucleos"),
+    # O mesmo pen drive no Linux (item 13, 18/10/2026).
+    ("Python 3.13 para Linux (python-build-standalone, o do uv)", "PSF License (o Python); BSD-3-Clause "
+     "(a montagem)", "https://github.com/astral-sh/python-build-standalone", "servidor\\python-linux"),
+    ("RetroArch 1.22.2 para Linux (o AppImage oficial do libretro)", "GPL-3.0",
+     "https://github.com/libretro/RetroArch", "retroarch\\RetroArch-Linux-x86_64.AppImage"),
+    ("libgomp do GCC 8 (Debian 10), que o núcleo do Dreamcast pede no Linux",
+     "GPL-3.0 com a exceção das bibliotecas do GCC", "https://archive.debian.org/debian/pool/main/g/gcc-8/",
+     "retroarch\\bibliotecas-linux\\libgomp.so.1"),
+    ("libjack.so.0 vazia: escrita pelo ARENA, sem nada do JACK (só os nomes das funções, que devolvem 0; "
+     "ferramentas\\jack_vazio.py)", "GPL-3.0 (a do ARENA)", "https://github.com/RafaParise/arena-console",
+     "retroarch\\bibliotecas-linux\\libjack.so.0"),
+    ("PCSX2 2.8.2 para Linux (AppImage oficial)", "GPL-3.0 ou posterior", "https://github.com/PCSX2/pcsx2",
+     "emuladores\\PCSX2\\PCSX2"),
+    ("RPCS3 0.0.42 para Linux (AppImage oficial)", "GPL-2.0", "https://github.com/RPCS3/rpcs3",
+     "emuladores\\RPCS3\\RPCS3"),
+    ("Xenia Canary para Linux (AppImage oficial)", "BSD-3-Clause", "https://github.com/xenia-canary/xenia-canary",
+     "emuladores\\Xenia\\Xenia"),
 ]
 
 # O que o ARENA usa e nao distribui (o Lossless Scaling, de quem comprou).
@@ -75,14 +92,15 @@ def ler_info(caminho):
     return dados
 
 
-def nucleos(pasta_retroarch):
-    """(nome do arquivo, nome de exibicao, licenca, versao) dos nucleos da pasta."""
+def nucleos(pasta_retroarch, extensao=".dll"):
+    """(nome do arquivo, nome de exibicao, licenca, versao) dos nucleos da
+    pasta: os do Windows (.dll) ou, com extensao=".so", os do Linux."""
     saida = []
     cores = os.path.join(pasta_retroarch, "cores")
     for nome in sorted(os.listdir(cores)) if os.path.isdir(cores) else []:
-        if not nome.lower().endswith("_libretro.dll"):
+        if not nome.lower().endswith("_libretro" + extensao):
             continue
-        info = os.path.join(pasta_retroarch, "info", nome[:-4] + ".info")
+        info = os.path.join(pasta_retroarch, "info", nome[:-len(extensao)] + ".info")
         dados = ler_info(info) if os.path.isfile(info) else {}
         saida.append((nome, dados.get("display_name", nome), dados.get("license", "ver o projeto"),
                       dados.get("display_version", "")))
@@ -132,11 +150,14 @@ def do_chromebook():
 def montar(pasta):
     if os.path.isdir(os.path.join(pasta, "retroarch", "cores")) and pasta != RAIZ:
         lista = nucleos(os.path.join(pasta, "retroarch"))
+        lista_linux = nucleos(os.path.join(pasta, "retroarch"), ".so")
     else:
         sys.path.insert(0, os.path.join(RAIZ, "ferramentas"))
         import montar_versao_alunos as montador
         usados, _pastas = montador.nucleos_usados()
         lista = [n for n in nucleos(os.path.join(RAIZ, "retroarch")) if n[0].lower() in usados]
+        usados_linux = {os.path.splitext(n)[0] + ".so" for n in usados}
+        lista_linux = [n for n in nucleos(os.path.join(RAIZ, "retroarch"), ".so") if n[0].lower() in usados_linux]
     linhas = [
         "# Programas de outros projetos",
         "",
@@ -199,6 +220,21 @@ def montar(pasta):
     if fora:
         linhas += ["", "Código-fonte fora do libretro:", ""]
         linhas += ["- `%s`: <%s>" % par for par in fora]
+    if lista_linux:
+        linhas += [
+            "",
+            "## Núcleos do RetroArch no Linux (%d)" % len(lista_linux),
+            "",
+            "Os mesmos núcleos, na versão para Linux do mesmo RetroArch 1.22.2 (o",
+            "`RetroArch_cores.7z` do libretro): ficam ao lado dos do Windows, em",
+            "`retroarch\\cores`, com a mesma licença (o mesmo `.info`) e o mesmo",
+            "código-fonte. Só a extensão muda: `.so` no lugar de `.dll`.",
+            "",
+            "| Núcleo | Arquivo | Licença |",
+            "|---|---|---|",
+        ]
+        for arquivo, exibicao, licenca, _versao in lista_linux:
+            linhas.append("| %s | `%s` | %s |" % (exibicao.replace("|", "/"), arquivo, licenca.replace("|", " / ")))
     nucleos_web, jogos = do_chromebook()
     linhas += [
         "",

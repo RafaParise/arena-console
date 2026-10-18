@@ -45,6 +45,7 @@ Uso:
     servidor\python\python.exe ferramentas\montar_versao_alunos.py [--com-bios] [--destino PASTA]
     servidor\python\python.exe ferramentas\montar_versao_alunos.py --atualizar [--destino PASTA]
     servidor\python\python.exe ferramentas\montar_versao_alunos.py --zip-atualizacao ARQUIVO.zip
+    servidor\python\python.exe ferramentas\montar_versao_alunos.py --zip-completo ARQUIVO.zip [--destino PASTA]
 (o ultimo monta o pacote de atualizacao do Release: so o programa, o mesmo
 conjunto que o --atualizar troca.)
 
@@ -84,7 +85,12 @@ ARQUIVOS_DA_RAIZ = ["ARENA.bat", "VERIFICAR.bat", "PARTIDA.bat", "COLETAR.bat", 
                     # Quem fez o que, a comecar pelo aluno DOOK3DS (15/10/2026).
                     "CREDITOS.md",
                     # O ARENA do Chromebook: a entrada (item 12, 17/10/2026).
-                    "ARENA-CHROMEBOOK.html"]
+                    "ARENA-CHROMEBOOK.html",
+                    # O mesmo pen drive no Linux (item 13, 18/10/2026).
+                    "ARENA.sh", "VERIFICAR.sh", "PARTIDA.sh", "ARENA.desktop"]
+# Linux: o que roda direto (a permissao de executar vai marcada no zip; sem
+# ela, o ARENA.sh e o ARENA dao um jeito, ver servidor\achar_python.sh).
+EXECUTAVEIS_DO_LINUX = ["*.sh", "*.desktop", "*.appimage", "python3.13"]
 # Do ferramentas\, so o que o COLETAR.bat usa.
 FERRAMENTAS = ["coletar_maquina.py", "medir_arena.py"]
 # Jogo pequeno do proprio projeto para conferir que o RetroArch da versao
@@ -224,6 +230,13 @@ def atualizar(destino):
         if mudou(origem, alvo):
             copiar_arquivo(origem, alvo)
             copiados.append(os.path.join("ferramentas", nome))
+    # O Linux (item 13): so acrescenta e troca programa (o RetroArch e os
+    # emuladores do Linux, os nucleos .so), nunca a configuracao de ninguem.
+    for origem, rel in partes_do_linux():
+        alvo = os.path.join(destino, rel)
+        if mudou(origem, alvo):
+            copiar_arquivo(origem, alvo)
+            copiados.append(rel)
     problemas = []
     depois = retrato(destino, de_quem_usou)
     if depois != antes or coisas_de_quem_usou(destino) != de_quem_usou:
@@ -295,6 +308,36 @@ def nucleos_usados():
             if p.get(chave):
                 usados.add(p[chave].lower())
     return usados, [p["pasta"] for p in dados["plataformas"] if p.get("pasta")]
+
+
+def partes_do_linux():
+    """(origem, caminho no pacote) do que o mesmo pen drive precisa para
+    abrir no Linux, fora do servidor\\ (o Python do Linux mora la): o
+    RetroArch do Linux (o AppImage), os nucleos .so que o ARENA usa, os
+    perfis de controle do Linux, as bibliotecas de reserva e os AppImage
+    dos emuladores de fora (ferramentas\\preparar_linux.py poe tudo no lugar)."""
+    ra = os.path.join(RAIZ, "retroarch")
+    lista = []
+    appimage = os.path.join(ra, "RetroArch-Linux-x86_64.AppImage")
+    if os.path.isfile(appimage):
+        lista.append((appimage, os.path.join("retroarch", os.path.basename(appimage))))
+    usados, _pastas = nucleos_usados()
+    for nome in sorted(os.path.splitext(n)[0] + ".so" for n in usados):
+        origem = os.path.join(ra, "cores", nome)
+        if os.path.isfile(origem):
+            lista.append((origem, os.path.join("retroarch", "cores", nome)))
+    for pasta in (os.path.join("autoconfig", "udev"), os.path.join("autoconfig", "linuxraw"), "bibliotecas-linux"):
+        for atual, _subs, nomes in os.walk(os.path.join(ra, pasta)):
+            for nome in sorted(nomes):
+                origem = os.path.join(atual, nome)
+                lista.append((origem, os.path.relpath(origem, RAIZ)))
+    emuladores = os.path.join(RAIZ, "emuladores")
+    for emu, pasta in (("PCSX2", "PCSX2"), ("RPCS3", "RPCS3"), ("Xenia", "Xenia")):
+        onde = os.path.join(emuladores, emu, pasta)
+        for nome in (sorted(os.listdir(onde)) if os.path.isdir(onde) else []):
+            if nome.lower().endswith(".appimage"):
+                lista.append((os.path.join(onde, nome), os.path.join("emuladores", emu, pasta, nome)))
+    return lista
 
 
 def falta_no_navegador(raiz=RAIZ):
@@ -410,6 +453,10 @@ def montar(destino, com_bios=False):
         minusculo = nome.lower()
         if minusculo.endswith(".dll") or minusculo in ("retroarch.exe", "qt.conf", "retroarch.default.cfg"):
             copiar_arquivo(caminho, os.path.join(RA_D, nome))
+    # O Linux: o AppImage, os nucleos .so, os perfis de controle de la, as
+    # bibliotecas de reserva e os emuladores de fora (partes_do_linux).
+    for origem, rel in partes_do_linux():
+        copiar_arquivo(origem, os.path.join(destino, rel))
     limpar_retroarch_cfg(os.path.join(RA, "retroarch.cfg"), os.path.join(RA_D, "retroarch.cfg"))
     os.makedirs(os.path.join(RA_D, "cores"))
     os.makedirs(os.path.join(RA_D, "info"), exist_ok=True)
@@ -872,6 +919,38 @@ def arquivos_do_programa():
     return lista
 
 
+def gravar_no_zip(z, origem, nome_no_zip):
+    """Grava o arquivo no zip com a permissao do Linux: de executar nos
+    EXECUTAVEIS_DO_LINUX (o unzip e o gerenciador de arquivos do Linux
+    respeitam), de ler e gravar no resto. No Windows nada muda."""
+    import zipfile
+    info = zipfile.ZipInfo.from_file(origem, nome_no_zip)
+    info.create_system = 3                                    # Unix: a permissao vale
+    executavel = any(fnmatch.fnmatch(os.path.basename(origem).lower(), p) for p in EXECUTAVEIS_DO_LINUX)
+    info.external_attr = ((0o100755 if executavel else 0o100644) << 16)
+    info.compress_type = zipfile.ZIP_DEFLATED
+    with open(origem, "rb") as arquivo, z.open(info, "w") as saida:
+        shutil.copyfileobj(arquivo, saida, 1 << 20)
+
+
+def zip_completo(pasta, caminho_zip):
+    """O pacote COMPLETO (o do Release): a versao montada inteira, dentro de
+    ARENA\\ no zip, com a permissao de executar dos arquivos do Linux."""
+    import zipfile
+    temporario = caminho_zip + ".fazendo"
+    with zipfile.ZipFile(temporario, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=6) as z:
+        for atual, subpastas, nomes in os.walk(pasta):
+            subpastas.sort()
+            for nome in sorted(nomes):
+                origem = os.path.join(atual, nome)
+                gravar_no_zip(z, origem, "ARENA/" + os.path.relpath(origem, pasta).replace("\\", "/"))
+    os.replace(temporario, caminho_zip)
+    with zipfile.ZipFile(caminho_zip) as z:
+        if z.testzip() is not None:
+            raise SystemExit("arquivo estragado no zip completo")
+        return len(z.namelist())
+
+
 def zip_de_atualizacao(caminho_zip):
     """O pacote de ATUALIZACAO (Fase 8 da auditoria 3): so o programa, para
     copiar por cima de um ARENA em uso sem trocar a configuracao dos
@@ -883,7 +962,7 @@ def zip_de_atualizacao(caminho_zip):
     temporario = caminho_zip + ".fazendo"
     with zipfile.ZipFile(temporario, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=6) as z:
         for origem, rel in arquivos_do_programa():
-            z.write(origem, "ARENA/" + rel.replace("\\", "/"))
+            gravar_no_zip(z, origem, "ARENA/" + rel.replace("\\", "/"))
     os.replace(temporario, caminho_zip)
     with zipfile.ZipFile(caminho_zip) as z:
         if z.testzip() is not None:
@@ -897,6 +976,14 @@ def principal():
     if "--destino" in sys.argv:
         destino = os.path.abspath(sys.argv[sys.argv.index("--destino") + 1])
     inicio = time.time()
+    if "--zip-completo" in sys.argv:
+        caminho = os.path.abspath(sys.argv[sys.argv.index("--zip-completo") + 1])
+        if not parece_versao_dos_alunos(destino):
+            print("Nao achei a versao montada em %s (monte antes, sem --zip-completo)." % destino)
+            return 1
+        quantos = zip_completo(destino, caminho)
+        print("Pacote completo: %s (%d arquivos, %.0f MB)." % (caminho, quantos, os.path.getsize(caminho) / 1024 ** 2))
+        return 0
     if "--zip-atualizacao" in sys.argv:
         caminho = os.path.abspath(sys.argv[sys.argv.index("--zip-atualizacao") + 1])
         quantos = zip_de_atualizacao(caminho)

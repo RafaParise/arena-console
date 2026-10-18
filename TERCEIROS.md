@@ -29,6 +29,13 @@ por voluntários para qualquer um copiar.
 | Xenia Canary (Xbox 360) | BSD-3-Clause | <https://github.com/xenia-canary/xenia-canary> | `emuladores\Xenia` |
 | Java do Java ME: OpenJDK 21 (Eclipse Temurin), reduzido com o jlink | GPL-2.0 com a exceção Classpath (os textos vão em emuladores\Java\legal) | <https://github.com/adoptium/temurin21-binaries> | `emuladores\Java` |
 | RetroArch 1.22.2 para navegador (WebAssembly), o do ARENA do Chromebook: o build oficial do libretro (buildbot.libretro.com/stable/1.22.2/emscripten), só convertido para abrir do pen drive (ferramentas\preparar_nucleos_navegador.py) | GPL-3.0 (o RetroArch); cada núcleo, a licença dele (tabela do Chromebook, abaixo) | <https://github.com/libretro/RetroArch> | `launcher\navegador\nucleos` |
+| Python 3.13 para Linux (python-build-standalone, o do uv) | PSF License (o Python); BSD-3-Clause (a montagem) | <https://github.com/astral-sh/python-build-standalone> | `servidor\python-linux` |
+| RetroArch 1.22.2 para Linux (o AppImage oficial do libretro) | GPL-3.0 | <https://github.com/libretro/RetroArch> | `retroarch\RetroArch-Linux-x86_64.AppImage` |
+| libgomp do GCC 8 (Debian 10), que o núcleo do Dreamcast pede no Linux | GPL-3.0 com a exceção das bibliotecas do GCC | <https://archive.debian.org/debian/pool/main/g/gcc-8/> | `retroarch\bibliotecas-linux\libgomp.so.1` |
+| libjack.so.0 vazia: escrita pelo ARENA, sem nada do JACK (só os nomes das funções, que devolvem 0; ferramentas\jack_vazio.py) | GPL-3.0 (a do ARENA) | <https://github.com/RafaParise/arena-console> | `retroarch\bibliotecas-linux\libjack.so.0` |
+| PCSX2 2.8.2 para Linux (AppImage oficial) | GPL-3.0 ou posterior | <https://github.com/PCSX2/pcsx2> | `emuladores\PCSX2\PCSX2` |
+| RPCS3 0.0.42 para Linux (AppImage oficial) | GPL-2.0 | <https://github.com/RPCS3/rpcs3> | `emuladores\RPCS3\RPCS3` |
+| Xenia Canary para Linux (AppImage oficial) | BSD-3-Clause | <https://github.com/xenia-canary/xenia-canary> | `emuladores\Xenia\Xenia` |
 
 Não vem no ARENA, mas o ARENA usa se estiver no computador de quem comprou:
 o **Lossless Scaling** (programa pago, da Steam). Ele não é distribuído
@@ -127,6 +134,77 @@ que a lista depois da tabela aponta.
 Código-fonte fora do libretro:
 
 - `freej2me_libretro.dll`: <https://github.com/TASEmulators/freej2me-plus/tree/8f87bf1497e7a9738a32d1909379376a1faca7dd>
+
+## Núcleos do RetroArch no Linux (61)
+
+Os mesmos núcleos, na versão para Linux do mesmo RetroArch 1.22.2 (o
+`RetroArch_cores.7z` do libretro): ficam ao lado dos do Windows, em
+`retroarch\cores`, com a mesma licença (o mesmo `.info`) e o mesmo
+código-fonte. Só a extensão muda: `.so` no lugar de `.dll`.
+
+| Núcleo | Arquivo | Licença |
+|---|---|---|
+| Sinclair - ZX 81 (EightyOne) | `81_libretro.so` | GPLv3 |
+| Atari - 5200 (a5200) | `a5200_libretro.so` | GPLv2 |
+| Arduboy (Ardens) | `ardens_libretro.so` | MIT |
+| Atari - 400/800/600XL/800XL/130XE/5200 (Atari800) | `atari800_libretro.so` | GPLv2 |
+| MSX/SVI/ColecoVision/SG-1000 (blueMSX) | `bluemsx_libretro.so` | GPLv2 |
+| Amstrad - CPC/GX4000 (Caprice32) | `cap32_libretro.so` | GPLv2 |
+| Nintendo - GameCube / Wii (Dolphin) | `dolphin_libretro.so` | GPLv2+ |
+| DOS (DOSBox-Pure) | `dosbox_pure_libretro.so` | GPLv2 |
+| Arcade (FinalBurn Neo) | `fbneo_libretro.so` | Non-commercial |
+| Nintendo - NES / Famicom (FCEUmm) | `fceumm_libretro.so` | GPLv2 |
+| Sega - Dreamcast/Naomi (Flycast) | `flycast_libretro.so` | GPLv2 |
+| Mattel - Intellivision (FreeIntv) | `freeintv_libretro.so` | GPLv3 |
+| Sinclair - ZX Spectrum (Fuse) | `fuse_libretro.so` | GPLv3 |
+| Nintendo - Game Boy / Color (Gambatte) | `gambatte_libretro.so` | GPLv2 |
+| Coleco - ColecoVision (Gearcoleco) | `gearcoleco_libretro.so` | GPLv3 |
+| Sega - MS/GG/SG-1000 (Gearsystem) | `gearsystem_libretro.so` | GPLv3 |
+| Sega - MS/GG/MD/CD (Genesis Plus GX) | `genesis_plus_gx_libretro.so` | Non-commercial |
+| Handheld Electronic (GW) | `gw_libretro.so` | zlib |
+| Atari - Lynx (Handy) | `handy_libretro.so` | Zlib |
+| Atari - ST/STE/TT/Falcon (Hatari) | `hatari_libretro.so` | GPLv2 |
+| CHIP-8/S-CHIP/XO-CHIP (JAXE) | `jaxe_libretro.so` | MIT |
+| LowRes NX | `lowresnx_libretro.so` | zlib |
+| Arcade (MAME) | `mame_libretro.so` | GPLv2+ |
+| SNK - Neo Geo Pocket / Color (Beetle NeoPop) | `mednafen_ngp_libretro.so` | GPLv2 |
+| NEC - PC Engine / SuperGrafx / CD (Beetle PCE) | `mednafen_pce_libretro.so` | GPLv2 |
+| NEC - PC-FX (Beetle PC-FX) | `mednafen_pcfx_libretro.so` | GPLv2 |
+| Sega - Saturn (Beetle Saturn) | `mednafen_saturn_libretro.so` | GPLv2 |
+| Nintendo - Virtual Boy (Beetle VB) | `mednafen_vb_libretro.so` | GPLv2 |
+| Bandai - WonderSwan/Color (Beetle Wonderswan) | `mednafen_wswan_libretro.so` | GPLv2 |
+| Nintendo - DS (melonDS) | `melonds_libretro.so` | GPLv3 |
+| Nintendo - Game Boy Advance (mGBA) | `mgba_libretro.so` | MPLv2.0 |
+| Nintendo - Nintendo 64 (Mupen64Plus-Next) | `mupen64plus_next_libretro.so` | GPLv2 |
+| Magnavox - Odyssey2 / Philips Videopac+ (O2EM) | `o2em_libretro.so` | Artistic License |
+| The 3DO Company - 3DO (Opera) | `opera_libretro.so` | LGPL/Non-commercial |
+| Sony - PlayStation 2 (LRPS2) | `pcsx2_libretro.so` | GPL |
+| Sony - PlayStation (PCSX ReARMed) | `pcsx_rearmed_libretro.so` | GPLv2 |
+| Sega - MS/GG/MD/CD/32X (PicoDrive) | `picodrive_libretro.so` | MAME |
+| Nintendo - Pokemon Mini (PokeMini) | `pokemini_libretro.so` | GPLv3 |
+| Watara - Supervision (Potator) | `potator_libretro.so` | Public Domain |
+| Sony - PlayStation Portable (PPSSPP) | `ppsspp_libretro.so` | GPLv2 |
+| Atari - 7800 (ProSystem) | `prosystem_libretro.so` | GPLv2 |
+| Commodore - Amiga (PUAE) | `puae_libretro.so` | GPLv2 |
+| Philips - CDi (SAME CDi) | `same_cdi_libretro.so` | GPLv2+ |
+| ScummVM | `scummvm_libretro.so` | GPLv3 |
+| Nintendo - SNES / SFC (Snes9x) | `snes9x_libretro.so` | Non-commercial |
+| Atari - 2600 (Stella) | `stella_libretro.so` | GPLv2 |
+| Sony - PlayStation (SwanStation) | `swanstation_libretro.so` | GPLv3 |
+| Bandai - Tamagotchi P1 (TamaLIBretro) | `tamalibretro_libretro.so` | GPL-2.0 |
+| Thomson - MO/TO (Theodore) | `theodore_libretro.so` | GPLv3 |
+| TIC-80 | `tic80_libretro.so` | MIT |
+| MicroW8 | `uw8_libretro.so` | The Unlicense |
+| Uzebox (Uzem) | `uzem_libretro.so` | MIT |
+| GCE - Vectrex (vecx) | `vecx_libretro.so` | GPLv3 |
+| Commodore - C128 (VICE x128) | `vice_x128_libretro.so` | GPLv2 |
+| Commodore - C64 (VICE x64, fast) | `vice_x64_libretro.so` | GPLv2 |
+| Commodore - PET (VICE xpet) | `vice_xpet_libretro.so` | GPLv2 |
+| Commodore - PLUS/4 (VICE xplus4) | `vice_xplus4_libretro.so` | GPLv2 |
+| Commodore - VIC-20 (VICE xvic) | `vice_xvic_libretro.so` | GPLv2 |
+| Vircon32 | `vircon32_libretro.so` | 3-clause BSD |
+| Atari - Jaguar (Virtual Jaguar) | `virtualjaguar_libretro.so` | GPLv3 |
+| WASM-4 | `wasm4_libretro.so` | ISC |
 
 ## Núcleos do ARENA no Chromebook (34)
 
