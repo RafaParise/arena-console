@@ -15,7 +15,11 @@ no mesmo pen drive. O que muda e' pouco, e mora aqui:
     "fceumm_libretro.so");
   - o Python que vem junto: servidor\python (Windows) ou servidor/python-linux;
   - o Linux de dentro do Chromebook (o ChromeOS deixa a marca dele), que o
-    ARENA reconhece para explicar o que muda la.
+    ARENA reconhece para explicar o que muda la;
+  - o Android (item 14): o mesmo servidor roda dentro do app do ARENA, com o
+    Python do Android; o RetroArch e' uma tela do app, os nucleos vem dentro
+    do APK, e o que so o app sabe fazer o servidor pede pela ponte
+    (servidor/ponte_android.py).
 
 O resto do ARENA pergunta aqui, em vez de cada modulo testar o sistema do
 seu jeito.
@@ -30,14 +34,19 @@ import urllib.parse
 
 WINDOWS = sys.platform.startswith("win")
 LINUX = sys.platform.startswith("linux")
+# O Python do Android (o 3.13 do APK) se apresenta como "android" (PEP 738).
+ANDROID = sys.platform == "android"
 
 # O RetroArch do Linux (stable 1.22.2 do libretro): um AppImage, um arquivo
 # so que roda sem instalar (ver retroarch_que_roda).
 APPIMAGE_RETROARCH = "RetroArch-Linux-x86_64.AppImage"
 # O nome do programa do RetroArch deste sistema, para as frases da tela, e o
 # conferidor do pacote (o VERIFICAR.bat do Windows, o VERIFICAR.sh do Linux).
-NOME_DO_RETROARCH = "retroarch.exe" if WINDOWS else APPIMAGE_RETROARCH
-VERIFICAR = "VERIFICAR.bat" if WINDOWS else "VERIFICAR.sh"
+# No Android, o RetroArch vem dentro do APK: o arquivo da pasta retroarch so
+# marca que ele esta la (o servidor/android_inicio.py o escreve).
+RETROARCH_DO_ANDROID = "retroarch-android.txt"
+NOME_DO_RETROARCH = "retroarch.exe" if WINDOWS else (RETROARCH_DO_ANDROID if ANDROID else APPIMAGE_RETROARCH)
+VERIFICAR = "VERIFICAR.bat" if WINDOWS else ("APK do ARENA (instale de novo)" if ANDROID else "VERIFICAR.sh")
 # As bibliotecas que o RetroArch do Linux pede e que alguns Linux nao trazem
 # (ferramentas\preparar_linux.py poe aqui): entram so onde faltam.
 PASTA_DAS_BIBLIOTECAS = "bibliotecas-linux"
@@ -53,9 +62,11 @@ def no_chromebook():
 
 
 def nome_do_sistema():
-    """'windows', 'chromeos' (o Linux do Chromebook) ou 'linux'."""
+    """'windows', 'android', 'chromeos' (o Linux do Chromebook) ou 'linux'."""
     if WINDOWS:
         return "windows"
+    if ANDROID:
+        return "android"
     if no_chromebook():
         return "chromeos"
     return "linux" if LINUX else sys.platform
@@ -65,6 +76,9 @@ def descricao():
     """O nome do sistema para a tela ('Windows 11', 'Debian 13 (Linux 6.6)')."""
     if WINDOWS:
         return "%s %s" % (platform.system(), platform.release())
+    if ANDROID:
+        # O app conta qual Android e qual aparelho ("Android 15 (Google Pixel 6)").
+        return os.environ.get("ARENA_ANDROID_SISTEMA") or "Android"
     nome = ""
     try:
         with open("/etc/os-release", encoding="utf-8") as arquivo:
@@ -77,13 +91,27 @@ def descricao():
     return ("ChromeOS, " + base) if no_chromebook() else base
 
 
+# Os nucleos que no Android tem outro nome (o mesmo nucleo, compilado de
+# outro jeito): o N64 na versao para a placa dos celulares (OpenGL ES 3) e o
+# MAME atual com o nome do Android.
+NO_ANDROID_COM_OUTRO_NOME = {"mupen64plus_next_libretro": "mupen64plus_next_gles3_libretro",
+                             "mame_libretro": "mamearcade_libretro"}
+
+
 def arquivo_do_nucleo(nome):
     """'fceumm_libretro.dll' (o nome do consoles.json) -> o arquivo deste
-    sistema: o mesmo no Windows, 'fceumm_libretro.so' no Linux."""
+    sistema: o mesmo no Windows, 'fceumm_libretro.so' no Linux,
+    'fceumm_libretro_android.so' no Android."""
     if not nome or WINDOWS:
         return nome
     base, extensao = os.path.splitext(nome)
-    return base + ".so" if extensao.lower() in (".dll", ".so", ".dylib") else nome
+    if extensao.lower() not in (".dll", ".so", ".dylib"):
+        return nome
+    if ANDROID:
+        if base.endswith("_android"):
+            return nome
+        return NO_ANDROID_COM_OUTRO_NOME.get(base, base) + "_android.so"
+    return base + ".so"
 
 
 CAMPOS_DE_NUCLEO = ("core", "core_netplay", "core_sem_bios")
@@ -92,8 +120,9 @@ CAMPOS_DE_NUCLEO = ("core", "core_netplay", "core_sem_bios")
 def nucleos_deste_sistema(plataformas):
     """O catalogo (consoles.json) com o nome dos nucleos deste sistema: no
     Linux, cada "core", "core_netplay" e "core_sem_bios" passa de .dll para
-    .so. No Windows, devolve a mesma lista. Quem le o consoles.json chama
-    isto uma vez, e o resto do ARENA nem fica sabendo."""
+    .so (no Android, para _android.so). No Windows, devolve a mesma lista.
+    Quem le o consoles.json chama isto uma vez, e o resto do ARENA nem fica
+    sabendo."""
     if WINDOWS:
         return plataformas
     for p in plataformas:
@@ -104,16 +133,67 @@ def nucleos_deste_sistema(plataformas):
 
 
 def nome_curto_do_nucleo(arquivo):
-    """'swanstation_libretro.dll' ou '.so' -> 'swanstation'."""
+    """'swanstation_libretro.dll', '.so' ou '_android.so' -> 'swanstation'. O
+    nucleo de outro nome no Android volta ao nome de sempre (as opcoes dele
+    sao as mesmas)."""
     base = os.path.basename(arquivo or "")
-    for fim in ("_libretro.dll", "_libretro.so", "_libretro.dylib"):
+    for fim in ("_libretro.dll", "_libretro.so", "_libretro_android.so", "_libretro.dylib"):
         if base.lower().endswith(fim):
-            return base[:-len(fim)].lower()
+            curto = base[:-len(fim)].lower()
+            for de_sempre, do_android in NO_ANDROID_COM_OUTRO_NOME.items():
+                if curto + "_libretro" == do_android:
+                    return de_sempre[:-len("_libretro")]
+            return curto
     return base.lower()
 
 
+def nome_do_info(arquivo):
+    """O arquivo de informacoes do nucleo (retroarch/info): o nome dele sem a
+    extensao e, no Android, sem o "_android" ('fceumm_libretro.info')."""
+    base = os.path.splitext(os.path.basename(arquivo or ""))[0]
+    if base.endswith("_android"):
+        base = base[:-len("_android")]
+    return base + ".info"
+
+
+def nucleos_presentes(pasta_cores):
+    """Os nucleos deste sistema (nomes em minusculas): os da pasta e, no
+    Android, tambem os que vieram no APK e ainda nao sairam dele (saem na
+    primeira vez que o console abre: preparar_nucleo)."""
+    try:
+        nomes = {e.name.lower() for e in os.scandir(pasta_cores) if e.is_file()}
+    except OSError:
+        nomes = set()
+    if ANDROID:
+        import ponte_android
+        nomes |= {n.lower() for n in ponte_android.nucleos_do_apk()}
+    return nomes
+
+
+def tem_nucleo(caminho):
+    """O nucleo esta aqui? No Android, vale tambem o que esta no APK."""
+    if os.path.isfile(caminho):
+        return True
+    if ANDROID:
+        import ponte_android
+        return os.path.basename(caminho) in ponte_android.nucleos_do_apk()
+    return False
+
+
+def preparar_nucleo(caminho):
+    """Antes de abrir o jogo: no Android, o nucleo sai do APK para a pasta de
+    nucleos do app (uma vez por APK). No Windows e no Linux, ja esta la."""
+    if ANDROID:
+        import ponte_android
+        return ponte_android.preparar_nucleo(caminho)
+    return os.path.isfile(caminho)
+
+
 def executavel_do_retroarch(pasta_retroarch):
-    """O programa do RetroArch deste sistema, dentro da pasta retroarch."""
+    """O programa do RetroArch deste sistema, dentro da pasta retroarch (no
+    Android, a marca de que ele veio no APK)."""
+    if ANDROID:
+        return os.path.join(pasta_retroarch, RETROARCH_DO_ANDROID)
     return os.path.join(pasta_retroarch, "retroarch.exe" if WINDOWS else APPIMAGE_RETROARCH)
 
 
@@ -133,7 +213,10 @@ _TRAVA_DO_RETROARCH = threading.Lock()
 
 def pasta_de_cache():
     """Linux: ~/.cache/arena (ou a do XDG_CACHE_HOME), o lugar padrao do
-    freedesktop para o que se pode refazer a qualquer hora."""
+    freedesktop para o que se pode refazer a qualquer hora. Android: a pasta
+    de cache do app (o app conta qual e')."""
+    if ANDROID and os.environ.get("ARENA_ANDROID_CACHE"):
+        return os.path.join(os.environ["ARENA_ANDROID_CACHE"], "arena")
     base = os.environ.get("XDG_CACHE_HOME") or os.path.join(os.path.expanduser("~"), ".cache")
     return os.path.join(base, "arena")
 
@@ -258,14 +341,29 @@ def comando_do_retroarch(executavel, arquivo_cfg):
     """O comeco da linha de comando do RetroArch. No Windows, so o
     retroarch.exe: ele le o retroarch.cfg da propria pasta. No Linux, o
     RetroArch procuraria a configuracao em ~/.config/retroarch; o --config
-    manda usar a do ARENA, a mesma do Windows, no pen drive."""
+    manda usar a do ARENA, a mesma do Windows, no pen drive. No Android, o
+    app abre o RetroArch do APK com o resto da linha (ponte_android)."""
     if WINDOWS:
         return [executavel]
+    if ANDROID:
+        return [executavel, "--config", arquivo_cfg]
     return [retroarch_que_roda(executavel), "--config", arquivo_cfg]
 
 
+def abrir_programa(comando, **extras):
+    """subprocess.Popen(comando, **extras). No Android, o RetroArch e' uma
+    tela do app: quem abre e' o app, e o que volta se espera igual (wait)."""
+    if ANDROID:
+        import ponte_android
+        return ponte_android.abrir_retroarch(comando, **extras)
+    return subprocess.Popen(comando, **extras)
+
+
 def python_que_veio_junto(pasta_servidor):
-    """O Python que vem no pacote para este sistema (pode nao existir)."""
+    """O Python que vem no pacote para este sistema (pode nao existir). No
+    Android, o do APK, que ja esta rodando."""
+    if ANDROID:
+        return sys.executable
     if WINDOWS:
         return os.path.join(pasta_servidor, "python", "python.exe")
     return os.path.join(pasta_servidor, "python-linux", "bin", "python3.13")
@@ -283,9 +381,15 @@ def _sem_janela():
 def abrir_pasta(pasta):
     """Abre a pasta no gerenciador de arquivos deste sistema: o Explorador
     no Windows; no Linux, o do proprio computador (Arquivos, Dolphin, Nemo,
-    Thunar...), pelo xdg-open, o jeito padrao do freedesktop, ou pelo gio."""
+    Thunar...), pelo xdg-open, o jeito padrao do freedesktop, ou pelo gio. No
+    Android, o gerenciador de arquivos do aparelho, pelo app."""
     if WINDOWS:
         os.startfile(pasta)
+        return
+    if ANDROID:
+        import ponte_android
+        if not ponte_android.abrir_pasta(pasta):
+            raise SemGerenciadorDeArquivos("o aparelho nao abriu a pasta")
         return
     for programa in (["xdg-open"], ["gio", "open"]):
         if shutil.which(programa[0]):
@@ -313,6 +417,9 @@ def mostrar_arquivo(arquivo):
     qual arquivo levar. No Windows, o explorer /select."""
     if WINDOWS:
         subprocess.Popen(["explorer.exe", "/select,", arquivo])
+        return
+    if ANDROID:
+        abrir_pasta(os.path.dirname(os.path.abspath(arquivo)))
         return
     if not any(shutil.which(p) for p in ("gdbus", "dbus-send", "xdg-open", "gio")):
         raise SemGerenciadorDeArquivos("sem gdbus, dbus-send, xdg-open nem gio")
@@ -358,6 +465,29 @@ MOTORES_DO_WINDOWS = {"video_driver": "d3d11", "input_driver": "dinput", "input_
 # motor_de_som_do_linux.
 MOTORES_DO_LINUX = {"video_driver": "glcore", "input_driver": "x", "input_joypad_driver": "udev",
                     "microphone_driver": "alsa", "midi_driver": "alsa"}
+# Android (item 14): o RetroArch do Android tem poucos motores, e cada chave
+# so aceita os dele (MOTORES_QUE_O_ANDROID_TEM); o resto vira o padrao dele.
+# O video pelo OpenGL ES ("gl") ou pelo Vulkan; o som pelo OpenSL ES; o
+# teclado e o controle pelo proprio Android. Os que so o Android tem
+# (MOTORES_SO_DO_ANDROID) voltam ao de cada sistema no Windows e no Linux.
+MOTORES_SO_DO_ANDROID = {
+    "video_driver": (),
+    "input_driver": ("android",),
+    "input_joypad_driver": ("android",),
+    "audio_driver": ("opensl", "aaudio"),
+    "microphone_driver": ("sl", "aaudio"),
+    "midi_driver": (),
+}
+MOTORES_QUE_O_ANDROID_TEM = {
+    "video_driver": ("gl", "vulkan", "null"),
+    "input_driver": ("android", "null"),
+    "input_joypad_driver": ("android", "null"),
+    "audio_driver": ("opensl", "null"),
+    "microphone_driver": ("null",),
+    "midi_driver": ("null",),
+}
+MOTORES_DO_ANDROID = {"video_driver": "gl", "input_driver": "android", "input_joypad_driver": "android",
+                      "audio_driver": "opensl", "microphone_driver": "null", "midi_driver": "null"}
 
 
 def motor_de_som_do_linux():
@@ -373,10 +503,39 @@ def motor_de_som_do_linux():
     return "alsa"
 
 
+def ajustes_do_android(opcoes, pasta_retroarch, filtro):
+    """O arquivo da partida no Android: ganha a tela de toque (o controle
+    desenhado na tela, que some quando um controle de verdade e' ligado) e
+    uma folga no som (o celular barato estala com menos de 64 ms; o padrao
+    do RetroArch do Android e' 128). Os filtros de tela do ARENA (.slangp) so
+    rodam no Vulkan: no OpenGL ES ("gl"), ficam de fora. Devolve o filtro que
+    vale ("" sem nenhum)."""
+    toque = os.path.join(pasta_retroarch, "overlays", "gamepads", "neo-retropad", "neo-retropad.cfg")
+    if os.path.isfile(toque):
+        opcoes["input_overlay_enable"] = "true"
+        opcoes["input_overlay"] = toque
+        opcoes["input_overlay_hide_when_gamepad_connected"] = "true"
+    try:
+        if int(str(opcoes.get("audio_latency") or 0)) < 64:
+            opcoes["audio_latency"] = "64"
+    except ValueError:
+        opcoes["audio_latency"] = "64"
+    if str(opcoes.get("video_driver", "")).strip().lower() != "vulkan":
+        filtro = ""
+        opcoes["video_shader_enable"] = "false"
+    return filtro
+
+
 def motores_deste_sistema(opcoes):
     """As opcoes do RetroArch ({chave: valor}) com os motores deste sistema
     (ver acima). Troca no proprio dicionario e o devolve."""
-    estrangeiros = MOTORES_SO_DO_LINUX if WINDOWS else MOTORES_SO_DO_WINDOWS
+    if ANDROID:
+        for chave, valores in MOTORES_QUE_O_ANDROID_TEM.items():
+            if chave in opcoes and str(opcoes[chave]).strip().lower() not in valores:
+                opcoes[chave] = MOTORES_DO_ANDROID[chave]
+        return opcoes
+    outro = MOTORES_SO_DO_LINUX if WINDOWS else MOTORES_SO_DO_WINDOWS
+    estrangeiros = {chave: outro[chave] + MOTORES_SO_DO_ANDROID[chave] for chave in outro}
     for chave, valores in estrangeiros.items():
         if str(opcoes.get(chave, "")).strip().lower() in valores:
             if WINDOWS:

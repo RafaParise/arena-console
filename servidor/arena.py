@@ -92,6 +92,7 @@ import jeitos_de_abrir  # noqa: E402  (o original ou o livre: a tela pergunta --
 # "plataforma_do_sistema" porque "plataforma" ja e' o console, aqui dentro.
 import plataforma as plataforma_do_sistema  # noqa: E402
 import portas  # noqa: E402  (as faixas que o Windows reserva a cada reinicio -- 18/10/2026)
+import ponte_android  # noqa: E402  (no Android, o que o servidor pede ao app -- item 14, 18/10/2026)
 
 PASTA_LAUNCHER = os.path.join(RAIZ, "launcher")
 PASTA_DADOS = os.path.join(RAIZ, "dados")
@@ -1118,16 +1119,22 @@ def carregar_recursos():
     return _recursos_cache["dados"]
 
 
-def recursos_deste_sistema(dados, windows=None):
+def recursos_deste_sistema(dados, windows=None, android=None):
     """No Linux (item 13), cada recurso com "no_linux" troca as opcoes e o
     texto pelos de la (o som pulse ou alsa, o controle udev), e o que tem
-    "so_windows" sai da lista (o som so para o jogo e' do WASAPI). No
+    "so_windows" sai da lista (o som so para o jogo e' do WASAPI). No Android
+    (item 14), vale o "no_android", e sai tambem o que tem "fora_do_android"
+    (o som e o controle: o RetroArch do Android so tem um de cada). No
     Windows, fica como esta."""
     windows = plataforma_do_sistema.WINDOWS if windows is None else windows
+    android = plataforma_do_sistema.ANDROID if android is None else android
     recursos = []
     for recurso in dados.get("recursos", []):
         if windows:
             recursos.append(recurso)
+        elif android:
+            if not recurso.get("so_windows") and not recurso.get("fora_do_android"):
+                recursos.append(dict(recurso, **recurso.get("no_android", {})))
         elif not recurso.get("so_windows"):
             recursos.append(dict(recurso, **recurso.get("no_linux", {})))
     return dict(dados, recursos=recursos)
@@ -1807,7 +1814,7 @@ def remapeamento_da_partida(opcoes, caminho_core, caminho_jogo):
     tipos = {c: v for c, v in opcoes.items() if c.startswith("input_libretro_device_p")}
     if not tipos:
         return None
-    nome_info = os.path.splitext(os.path.basename(caminho_core))[0] + ".info"
+    nome_info = plataforma_do_sistema.nome_do_info(caminho_core)
     nome_nucleo = None
     try:
         with open(os.path.join(PASTA_RETROARCH, "info", nome_info), encoding="utf-8") as arquivo:
@@ -2009,6 +2016,10 @@ def gravar_override(config, custo=None, extras=None, em_partida=False,
     # O som, o controle e o teclado deste sistema: no Linux, o WASAPI vira o
     # PulseAudio (ou o ALSA) e o XInput vira o udev (servidor\plataforma.py).
     plataforma_do_sistema.motores_deste_sistema(opcoes)
+    # Android (item 14): a tela de toque, a folga do som e os filtros so com
+    # o Vulkan (servidor\plataforma.py).
+    if plataforma_do_sistema.ANDROID:
+        filtro = plataforma_do_sistema.ajustes_do_android(opcoes, PASTA_RETROARCH, filtro)
 
     linhas = ["# Gerado pelo ARENA. Nao edite a mao: sera reescrito."]
     # Nenhum valor pode quebrar a linha nem fechar as aspas antes da hora:
@@ -2096,10 +2107,8 @@ def avaliar_plataformas(forcar=False):
     bios.instalar_livres(PASTA_SISTEMA)
     tem_sistema = contar_arquivos_sistema() > 0
 
-    try:
-        cores = {e.name.lower() for e in os.scandir(PASTA_CORES) if e.is_file()}
-    except OSError:
-        cores = set()
+    # Os nucleos deste sistema (no Android, tambem os que vem no APK).
+    cores = plataforma_do_sistema.nucleos_presentes(PASTA_CORES)
 
     resultado = []
     for plataforma in carregar_catalogo():
@@ -2972,6 +2981,9 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         # exatamente o sintoma relatado.
         #
         # Agora: retroarch -L core --appendconfig X --host JOGO
+        #
+        # No Android, o nucleo sai do APK na primeira vez (plataforma.py).
+        plataforma_do_sistema.preparar_nucleo(os.path.join(PASTA_CORES, jogo["core"]))
         override, filtro = gravar_override(
             config_da_partida, custo, opcoes_jogo,
             em_partida=bool(partida), opcoes_de_nucleo=copia_nucleo,
@@ -3076,7 +3088,8 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
                 print("[ARENA] Lossless Scaling aberto junto com o jogo.")
                 time.sleep(2)
             aberto_em = time.time()
-            processo = subprocess.Popen(comando, cwd=pasta_trabalho, **extras)
+            # No Android, quem abre o RetroArch e' o app (plataforma.py).
+            processo = plataforma_do_sistema.abrir_programa(comando, cwd=pasta_trabalho, **extras)
             # Java ME: o RetroArch entra numa caixa do Windows; fechada no
             # fim, ela encerra o Java que tiver ficado para tras (o RetroArch
             # que cai deixava o Java aberto, escondido: processos.py).
@@ -5102,13 +5115,24 @@ class Manipulador(BaseHTTPRequestHandler):
                 "internet": VIGIA["internet"],
                 "pacotes": listar_pacotes(),
                 "pastas": {
-                    "saves": PASTA_SAVES,
-                    "capturas": PASTA_CAPTURAS,
-                    "jogos": os.path.join(PASTA_JOGOS, "pessoais"),
-                    "sistema": PASTA_SISTEMA,
-                    "raiz": RAIZ,
+                    "saves": caminho_para_mostrar(PASTA_SAVES),
+                    "capturas": caminho_para_mostrar(PASTA_CAPTURAS),
+                    "jogos": caminho_para_mostrar(os.path.join(PASTA_JOGOS, "pessoais")),
+                    "sistema": caminho_para_mostrar(PASTA_SISTEMA),
+                    "raiz": caminho_para_mostrar(RAIZ),
                 },
+                # No Android (item 14): a pasta do ARENA escolhida no
+                # aparelho ("" = a do app) e se o Android so deixa ler nela.
+                "android": dict(ponte_android.ESTADO) if plataforma_do_sistema.ANDROID else None,
             })
+
+        if caminho == "/api/android/pastas":
+            # As pastas do ARENA deste aparelho (Ajustes -> Maquina, so no Android).
+            if not plataforma_do_sistema.ANDROID:
+                return self.erro("Isto é só do ARENA do Android. Neste computador, use a própria pasta do ARENA.", 404)
+            return self.responder_json({"atual": ponte_android.ESTADO.get("pasta", ""),
+                                        "so_leitura": ponte_android.ESTADO.get("so_leitura", False),
+                                        "pastas": ponte_android.pastas_do_arena()})
 
         if caminho == "/api/catalogo":
             corpo = montar_catalogo()
@@ -5404,6 +5428,23 @@ class Manipulador(BaseHTTPRequestHandler):
             return self.erro_interno(falha)
 
     def api_post(self, caminho, dados):
+
+        # ---- Android: a pasta do ARENA no aparelho e a permissao (item 14) --
+        if caminho in ("/api/android/pasta", "/api/android/permissao"):
+            if not plataforma_do_sistema.ANDROID:
+                return self.erro("Isto é só do ARENA do Android. Neste computador, use a própria pasta do ARENA.", 404)
+            if caminho == "/api/android/permissao":
+                ponte_android.pedir_permissao()
+                return self.responder_json({"ok": True})
+            escolhida = str(dados.get("caminho") or "")
+            if escolhida and not ponte_android.parece_arena(escolhida):
+                return self.erro("Essa pasta não parece um ARENA: falta a pasta jogos (e a retroarch ou a "
+                                 "launcher). Escolha a pasta de cima, a que tem essas pastas dentro.")
+            with TRAVA_JOGO:
+                if JOGO_EM_ANDAMENTO.get("ativo"):
+                    return self.erro("Feche o jogo antes de trocar a pasta do ARENA.", 409)
+            ponte_android.escolher_pasta(escolhida)
+            return self.responder_json({"ok": True, "reabrindo": True})
 
         # ---- recebe recordes de outro ARENA (papel de servidor) ----------
         if caminho == "/api/sinc/receber":
@@ -5856,7 +5897,7 @@ class Manipulador(BaseHTTPRequestHandler):
                 pasta = os.path.dirname(caminho_externo)
             else:
                 core = os.path.join(PASTA_CORES, plataforma["core"])
-                if not os.path.isfile(core):
+                if not plataforma_do_sistema.preparar_nucleo(core):
                     with TRAVA_JOGO:
                         JOGO_EM_ANDAMENTO["ativo"] = False
                         JOGO_EM_ANDAMENTO["titulo"] = ""
@@ -5882,7 +5923,7 @@ class Manipulador(BaseHTTPRequestHandler):
 
             def rodar():
                 try:
-                    subprocess.Popen(comando, cwd=pasta).wait()
+                    plataforma_do_sistema.abrir_programa(comando, cwd=pasta).wait()
                 except OSError as falha:
                     print("[ARENA] Nao consegui abrir a BIOS: %s" % falha)
                 finally:
@@ -6592,7 +6633,7 @@ class Manipulador(BaseHTTPRequestHandler):
                     return self.erro(
                         "Não achei o %s na pasta retroarch. A pasta tem que se chamar retroarch (guia 1); rode o %s "
                         "para conferir." % (plataforma_do_sistema.NOME_DO_RETROARCH, plataforma_do_sistema.VERIFICAR))
-                if not os.path.isfile(os.path.join(PASTA_CORES, core_do_jeito)):
+                if not plataforma_do_sistema.tem_nucleo(os.path.join(PASTA_CORES, core_do_jeito)):
                     sugestao = ""
                     if dados_externo:
                         sugestao = (" Ou instale o %s na pasta emuladores."
@@ -6683,7 +6724,7 @@ class Manipulador(BaseHTTPRequestHandler):
             # a BIOS de verdade). Quem escolheu na pergunta ja sabe.
             aviso_sem_bios = livre.get("aviso", "") if len(lista_jeitos) == 1 else ""
             if (plataforma.get("core_sem_bios") and not caminho_externo and jeito != "livre"
-                    and os.path.isfile(os.path.join(PASTA_CORES, plataforma["core_sem_bios"]))
+                    and plataforma_do_sistema.tem_nucleo(os.path.join(PASTA_CORES, plataforma["core_sem_bios"]))
                     and not bios.tem_a_bios(plataforma["id"], PASTA_SISTEMA)):
                 jogo["core"] = plataforma["core_sem_bios"]
                 aviso_sem_bios = plataforma.get("sem_bios_aviso", "")
@@ -6691,7 +6732,7 @@ class Manipulador(BaseHTTPRequestHandler):
             aviso_netplay = ""
             if modo in ("hospedar", "entrar", "assistir") and plataforma.get("core_netplay"):
                 core_netplay = os.path.join(PASTA_CORES, plataforma["core_netplay"])
-                if not os.path.isfile(core_netplay):
+                if not plataforma_do_sistema.tem_nucleo(core_netplay):
                     with TRAVA_JOGO:
                         JOGO_EM_ANDAMENTO["ativo"] = False
                         JOGO_EM_ANDAMENTO["titulo"] = ""
@@ -7171,6 +7212,13 @@ def ha_internet_agora():
     return bool(VIGIA["internet"]) or internet_disponivel()
 
 
+def caminho_para_mostrar(caminho):
+    """O caminho que a tela mostra. No Android, as pastas de quem usa sao
+    atalhos (servidor\\android_inicio.py): vale o lugar de verdade, o da
+    pasta do ARENA no cartao ou na memoria do aparelho."""
+    return os.path.realpath(caminho) if plataforma_do_sistema.ANDROID else caminho
+
+
 def abrir_janela(endereco):
     """Abre a tela do ARENA no navegador do aluno (servidor/navegadores.py).
 
@@ -7185,6 +7233,13 @@ def abrir_janela(endereco):
     Chromium abrem como janela de aplicativo (--app, sem abas nem barra de
     endereco); o Firefox, numa janela nova.
     """
+    if plataforma_do_sistema.ANDROID:
+        # No Android, a tela e' a do proprio app (a ArenaActivity, com o
+        # endereco do servidor): ele so espera o aviso de que o servidor
+        # ja escuta (item 14).
+        ponte_android.tela_pronta(endereco)
+        print("[ARENA] Tela do app do ARENA avisada.")
+        return
     try:
         preferido = carregar_config().get("navegador", "automatico")
     except Exception:
@@ -7312,7 +7367,7 @@ def organizar_bios(esperar=3.0):
 
 
 def avisar_portas_reservadas():
-    """Achado de 16/10/2026 (servidor\portas.py): o Windows reserva faixas de
+    """Achado de 16/10/2026 (servidor\\portas.py): o Windows reserva faixas de
     porta a cada reinicio, e a porta do ARENA que cair numa delas nao abre.
     Diz na janela preta qual e o que fazer."""
     for bloqueada in portas.portas_bloqueadas():
@@ -7464,10 +7519,11 @@ def principal():
             print("  janela preta, ou abra %s no navegador." % local)
         else:
             print("\n  [ERRO] Nao foi possivel abrir o servidor: %s" % falha)
-        try:
-            input("\n  Pressione Enter para fechar. ")
-        except (EOFError, KeyboardInterrupt):
-            pass
+        if not plataforma_do_sistema.ANDROID:     # no Android, o stdin e' o fio do app
+            try:
+                input("\n  Pressione Enter para fechar. ")
+            except (EOFError, KeyboardInterrupt):
+                pass
         return
 
     threading.Thread(target=rodar_vigia, daemon=True).start()
@@ -7485,7 +7541,7 @@ def principal():
     threading.Thread(target=avisar_portas_reservadas, daemon=True).start()
     # Linux: o RetroArch sai do AppImage para a pasta de cache da conta ja
     # agora, e nao no primeiro jogo (servidor\plataforma.py, item 13).
-    if not plataforma_do_sistema.WINDOWS and os.path.isfile(EXECUTAVEL_RETROARCH):
+    if plataforma_do_sistema.LINUX and os.path.isfile(EXECUTAVEL_RETROARCH):
         threading.Thread(target=plataforma_do_sistema.retroarch_que_roda, args=(EXECUTAVEL_RETROARCH,),
                          daemon=True).start()
     # ARENA_SEM_JANELA=1: so o servidor, sem abrir a tela (testes

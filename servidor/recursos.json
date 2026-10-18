@@ -165,6 +165,14 @@
           "glcore"
         ],
         "exemplo": "Deixe no automático. Vulkan é o caminho mais curto, mas placa antiga não tem; aí vale o glcore (o OpenGL). O ARENA testa e escolhe o que existe. O d3d11 é só do Windows."
+      },
+      "no_android": {
+        "opcoes": [
+          "automatico",
+          "gl",
+          "vulkan"
+        ],
+        "exemplo": "Deixe no automático: o gl (o OpenGL ES, o padrão do Android). O Vulkan pode deixar o jogo mais leve num celular bom, mas em aparelho barato às vezes tropeça; se a imagem sumir ou piscar, volte para o automático."
       }
     },
     {
@@ -288,7 +296,8 @@
         ],
         "explica": "Deixe no que o ARENA escolheu: pulse quando o Linux tem o servidor de som (o PulseAudio, ou o PipeWire, que fala como ele); alsa quando não tem.",
         "exemplo": "São caminhos diferentes até a caixa de som. O pulse divide o som com os outros programas, como o Windows faz; o alsa vai direto na placa de som."
-      }
+      },
+      "fora_do_android": true
     },
     {
       "chave": "audio_wasapi_exclusive_mode",
@@ -377,7 +386,8 @@
         ],
         "explica": "udev é o jeito do Linux ler todos os controles: Xbox, PS4, PS5, Switch Pro e genéricos. Troque para sdl2 só se o seu não aparecer.",
         "exemplo": "No Windows são dois idiomas (xinput e dinput); o Linux fala um só com todos os controles, o udev. O sdl2 é um tradutor que existe nos dois sistemas."
-      }
+      },
+      "fora_do_android": true
     },
     {
       "chave": "input_autodetect_enable",

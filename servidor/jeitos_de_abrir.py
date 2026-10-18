@@ -24,6 +24,7 @@ qual usar e pode lembrar a resposta (config.json -> jeito_de_abrir).
 import os
 
 import bios
+import plataforma as plataforma_do_sistema  # "plataforma", aqui, e' o console
 
 JEITOS = ("externo", "original", "livre")
 
@@ -48,7 +49,7 @@ def _livre_pronto(plataforma, pasta_cores, pasta_sistema):
     if not livre:
         return False
     nucleo = livre.get("core") or plataforma.get("core")
-    if not nucleo or not os.path.isfile(os.path.join(pasta_cores, nucleo)):
+    if not nucleo or not plataforma_do_sistema.tem_nucleo(os.path.join(pasta_cores, nucleo)):
         return False
     arquivo = livre.get("bios")
     pasta = pasta_do_livre(plataforma, pasta_sistema) or pasta_sistema
@@ -61,7 +62,7 @@ def _original_pronto(plataforma, pasta_cores, pasta_sistema, externo):
     o nucleo dele "costuma nem abrir o jogo") e ter a BIOS de verdade, quando
     o console pede uma (as livres nao contam: elas sao o jeito "livre")."""
     nucleo = plataforma.get("core")
-    if not nucleo or not os.path.isfile(os.path.join(pasta_cores, nucleo)):
+    if not nucleo or not plataforma_do_sistema.tem_nucleo(os.path.join(pasta_cores, nucleo)):
         return False
     if externo and (plataforma.get("externo") or {}).get("obrigatorio"):
         return False

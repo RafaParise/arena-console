@@ -12,6 +12,11 @@ No Linux (item 13 do plano de 15/10/2026), as mesmas perguntas vao aos
 arquivos que o proprio Linux mantem: /proc (memoria, processador), /sys
 (placa de video, tela, disco removivel) e /proc/self/mountinfo (o sistema de
 arquivos e o numero do disco). Tambem sem programa externo e sem senha.
+
+No Android (item 14), o /proc vale igual (memoria, nucleos), e o que o
+Android esconde do Python -- o nome do processador e da placa de video, o
+Vulkan, a tela, se a pasta do ARENA esta num cartao -- o app conta ao abrir
+o servidor, nas variaveis ARENA_ANDROID_* (ArenaServico.java).
 """
 
 import ctypes
@@ -24,6 +29,12 @@ import sys
 import time
 
 NO_WINDOWS = sys.platform.startswith("win")
+NO_ANDROID = sys.platform == "android"
+
+
+def do_app(nome):
+    """No Android, o que o app contou ao abrir o servidor (ARENA_ANDROID_<nome>)."""
+    return os.environ.get("ARENA_ANDROID_" + nome, "").strip()
 
 
 def _ler(caminho):
@@ -96,7 +107,10 @@ def processador():
     E instantaneo e nao depende de programa externo.
     """
     nome = ""
-    if sys.platform.startswith("win"):
+    if NO_ANDROID and do_app("PROCESSADOR"):
+        # O chip do aparelho ("Qualcomm SM6125", "MediaTek MT6765").
+        nome = do_app("PROCESSADOR")
+    elif sys.platform.startswith("win"):
         try:
             import winreg
             chave = winreg.OpenKey(
@@ -470,6 +484,9 @@ def disco(pasta, guardar_em=None):
             pass
     else:
         tipo, unidade = _disco_linux(pasta)
+        if NO_ANDROID and do_app("PASTA_REMOVIVEL") in ("0", "1"):
+            # O Android sabe se a pasta do ARENA esta num cartao ou pen drive.
+            tipo = "removivel" if do_app("PASTA_REMOVIVEL") == "1" else "fixo"
 
     medida = (medir_velocidade_guardada(pasta, guardar_em) if guardar_em
               else medir_velocidade(pasta))
@@ -638,6 +655,10 @@ def identidade_da_maquina():
     import hashlib
     import uuid as _uuid
 
+    if NO_ANDROID and do_app("ID"):
+        # No Android o nome da maquina e' sempre "localhost" e o endereco da
+        # placa de rede fica escondido: o app sorteia um codigo na instalacao.
+        return hashlib.sha1(do_app("ID").encode("utf-8")).hexdigest()[:12]
     pedacos = []
     try:
         pedacos.append(socket.gethostname())
@@ -666,7 +687,10 @@ def identidade_da_maquina():
 def placa_da_tela_principal():
     """Nome da placa de video que desenha a tela principal (ou "" se nao
     der para saber). Usa EnumDisplayDevicesW, da propria API do Windows; no
-    Linux, a placa do /sys/class/drm que tem uma tela ligada (_placa_linux)."""
+    Linux, a placa do /sys/class/drm que tem uma tela ligada (_placa_linux);
+    no Android, a que o OpenGL ES do aparelho diz ("Adreno (TM) 610")."""
+    if NO_ANDROID:
+        return do_app("GPU")
     if not sys.platform.startswith("win"):
         return _placa_linux()[0]
     try:
@@ -780,7 +804,10 @@ def placa_video():
     # No Linux, o /sys diz tambem o fabricante e a memoria propria da placa:
     # vale mais que o nome para saber se ela e' integrada (ver _placa_linux).
     integrada_pelo_sistema = None
-    if not sys.platform.startswith("win"):
+    if NO_ANDROID:
+        # Toda placa de celular e de tablet divide a memoria com o sistema.
+        integrada_pelo_sistema = True
+    elif not sys.platform.startswith("win"):
         do_sistema, integrada_do_sistema = _placa_linux()
         if nome and nome == do_sistema:
             integrada_pelo_sistema = integrada_do_sistema
@@ -831,7 +858,12 @@ def driver_video():
     faz o RetroArch abrir e fechar na hora, sem mensagem nenhuma.
 
     No Linux nao ha DirectX: vulkan (se a libvulkan carrega) ou glcore.
+
+    No Android, o OpenGL ES ("gl"), o padrao do RetroArch de la: o Vulkan
+    dos aparelhos baratos ainda tropeca. Quem quiser liga em Ajustes.
     """
+    if NO_ANDROID:
+        return "gl"
     if not sys.platform.startswith("win"):
         try:
             ctypes.CDLL("libvulkan.so.1")
@@ -849,7 +881,10 @@ def driver_video():
 
 def motor_sem_vulkan():
     """O motor quando o Vulkan nao serve: d3d11 no Windows (se o d3d11.dll
-    carrega); senao, e no Linux (que nao tem DirectX), glcore."""
+    carrega); senao, e no Linux (que nao tem DirectX), glcore; no Android,
+    o OpenGL ES."""
+    if NO_ANDROID:
+        return "gl"
     if sys.platform.startswith("win"):
         try:
             ctypes.CDLL("d3d11.dll")
@@ -941,7 +976,11 @@ def altura_da_tela():
     da user32 para nao mexer em quem mais usa a mesma funcao.
 
     No Linux: a primeira resolucao (a nativa) da saida ligada na tela, em
-    /sys/class/drm/card*-*/modes, sem precisar da sessao grafica."""
+    /sys/class/drm/card*-*/modes, sem precisar da sessao grafica. No
+    Android: o lado menor da tela do aparelho (deitado, e' a altura)."""
+    if NO_ANDROID:
+        m = re.match(r"(\d+)x(\d+)", do_app("TELA"))
+        return min(int(m.group(1)), int(m.group(2))) if m else 0
     if os.name != "nt":
         for saida in sorted(glob.glob("/sys/class/drm/card[0-9]*-*")):
             if _ler(os.path.join(saida, "status")).strip() != "connected":
@@ -971,7 +1010,10 @@ def altura_da_tela():
 def resumo(pasta_raiz):
     """Junta tudo num dicionario so, pronto para a tela."""
     ram = memoria()
-    info_disco = disco(pasta_raiz, guardar_em=os.path.join(pasta_raiz, "dados", "disco_medido.json"))
+    # No Android, o programa fica na memoria do app; o disco que importa e' o
+    # da pasta do ARENA (a dos jogos), para onde a pasta jogos aponta.
+    medir = os.path.realpath(os.path.join(pasta_raiz, "jogos")) if NO_ANDROID else pasta_raiz
+    info_disco = disco(medir, guardar_em=os.path.join(pasta_raiz, "dados", "disco_medido.json"))
     total_nucleos = nucleos()
 
     gpu = placa_video()
@@ -987,6 +1029,7 @@ def resumo(pasta_raiz):
         "sistema": sistema(),
         "driver_video": driver_video(),
         "runtime_ok": runtime_visual_c(),
+        "android": NO_ANDROID,
         "removivel": info_disco["removivel"],
         # Perfil: define quais plataformas aparecem na lista.
         "perfil_maquina": ("completo"
@@ -1028,6 +1071,14 @@ def capacidade(info=None, pasta_raiz=None):
 
     # 0..10 vira 1..5
     nota = max(1, min(5, round(pontos / 2.0)))
+
+    # Android: celular tem 8 nucleos e 8 GB e nem por isso e' um PC de nota
+    # 4 -- os nucleos sao pequenos. Ali vale tambem a velocidade MEDIDA de um
+    # nucleo (velocidade_de_um_nucleo, comparada ao notebook-alvo): abaixo da
+    # do alvo, a nota para no 2; ate uma vez e meia, no 3.
+    if info.get("android"):
+        relativa = (info.get("velocidade") or {}).get("relativa_ao_alvo") or 0
+        nota = min(nota, 2 if relativa < 1.0 else 3 if relativa < 1.5 else 4)
 
     # Nota separada para o que depende da PLACA DE VIDEO: resolucao
     # interna, filtro de textura, anti-serrilhado (teto_da_placa).

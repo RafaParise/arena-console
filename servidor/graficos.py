@@ -35,6 +35,9 @@ import time
 import threading
 
 import plataforma
+# O mesmo modulo com outro nome, para as funcoes que recebem o console num
+# parametro chamado "plataforma".
+import plataforma as plataforma_do_sistema
 
 _TRAVA = threading.Lock()
 
@@ -634,6 +637,10 @@ def achar_externo_detalhado(plataforma):
     externo = plataforma.get("externo")
     if not externo:
         return None, None, None
+    if plataforma_do_sistema.ANDROID:
+        # No Android nao ha emulador de fora: o PS2, o GameCube e o Wii vao
+        # pelos nucleos do RetroArch; o PS3 e o Xbox 360 ficam no computador.
+        return None, None, externo
 
     base = os.path.join(PASTA_EMULADORES, externo["pasta"])
     if not os.path.isdir(base):

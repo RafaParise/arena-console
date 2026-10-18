@@ -26,6 +26,8 @@ import json
 import os
 import threading
 
+import plataforma
+
 PASTA_SERVIDOR = os.path.dirname(os.path.abspath(__file__))
 RAIZ = os.path.dirname(PASTA_SERVIDOR)
 PASTA_DADOS = os.path.join(RAIZ, "dados")
@@ -376,7 +378,12 @@ def contar_controles():
     Achado de 02/10/2026 (teste de longa duracao): a versao anterior usava o
     joyGetPosEx do winmm, 16 vezes por contagem -- e ele DEIXA ALCAS DO
     WINDOWS ABERTAS quando o controle esta desligado (24 por contagem;
-    181.570 em 3 minutos de pedidos). Raw Input nao abre nada."""
+    181.570 em 3 minutos de pedidos). Raw Input nao abre nada.
+
+    No Android (item 14), quem conta e' o app, pelo proprio Android."""
+    if plataforma.ANDROID:
+        import ponte_android
+        return ponte_android.controles()
     try:
         with _TRAVA_CONTAGEM:
             return controles_sem_xinput() + len(controles_xinput())

@@ -637,6 +637,9 @@ def fechar_programa(nome):
     nome = str(nome or "").strip().lower()
     if sys.platform.startswith("linux"):
         return _fechar_no_linux(nome)
+    if not sys.platform.startswith("win"):
+        # No Android, cada app se fecha pela tela dos apps abertos (item 14).
+        return False, "Neste aparelho, feche o app pela tela dos apps abertos (o botão quadrado ou o gesto de subir)."
     if nome not in FECHAVEIS:
         return False, "Esse programa não está na lista dos que o ARENA pode fechar. Feche-o pelo próprio programa."
     r = subprocess.run(["taskkill", "/IM", nome + ".exe", "/F"], capture_output=True,
