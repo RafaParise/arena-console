@@ -15,8 +15,11 @@ nem no git):
   jdk\        o Java que as ferramentas do Android pedem (o mesmo Temurin
               21 do Java ME, ferramentas\preparar_java.py);
   sdk\        as ferramentas de linha de comando do Android, o adb, o
-              emulador, a imagem do Android 15 (AOSP), a plataforma 35 e as
-              build-tools (para montar o APK sem o Android Studio);
+              emulador, a imagem do Android 15 (AOSP), a plataforma 35, as
+              build-tools (para montar o APK sem o Android Studio) e o NDK
+              22.0.7026061 (o compilador de C do Android, a versao que o
+              RetroArch 1.22.2 pede no build.gradle dele: compila o RetroArch
+              com o remendo do ARENA e o lancador do Python);
   avd\        o aparelho virtual "ARENA".
 
 As ferramentas de linha de comando vem conferidas pela marca da lista
@@ -55,7 +58,8 @@ NOME_DO_AVD = "ARENA"
 LISTA = "https://dl.google.com/android/repository/repository2-3.xml"
 REPOSITORIO = "https://dl.google.com/android/repository/"
 IMAGEM = "system-images;android-35;default;x86_64"
-PACOTES = ["platform-tools", "emulator", "platforms;android-35", "build-tools;35.0.0", IMAGEM]
+NDK = "ndk;22.0.7026061"
+PACOTES = ["platform-tools", "emulator", "platforms;android-35", "build-tools;35.0.0", IMAGEM, NDK]
 
 
 def ambiente():
@@ -125,7 +129,7 @@ def sdkmanager(*argumentos, respostas=""):
 
 
 def preparar_pacotes():
-    print("Aceitando as licencas do SDK do Android e baixando o emulador e a imagem (uns 1,5 GB)...", flush=True)
+    print("Aceitando as licencas do SDK do Android e baixando o emulador, a imagem e o NDK (uns 2,5 GB)...", flush=True)
     sdkmanager("--licenses", respostas="y\n" * 20)
     feito = sdkmanager(*PACOTES, respostas="y\n" * 20)
     faltam = [p for p in PACOTES if not os.path.isdir(os.path.join(SDK, *p.split(";")))]

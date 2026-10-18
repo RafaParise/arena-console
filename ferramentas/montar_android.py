@@ -6,9 +6,12 @@ apk no github para download ... sempre a ideia e' baixar e ja usar, simples
 e rapido". O APK do ARENA e':
 
   - o RetroArch 1.22.2 OFICIAL para Android (o RetroArch.apk do libretro, o
-    mesmo RetroArch do Windows, do Linux e do Chromebook), sem mudar uma
-    linha do codigo dele: so o nome do aplicativo, o icone e a tela que abre
-    primeiro;
+    mesmo RetroArch do Windows, do Linux e do Chromebook): muda o nome do
+    aplicativo, o icone, a tela que abre primeiro e uma peca so, a
+    biblioteca do RetroArch (lib\<abi>\libretroarch-activity.so), compilada
+    do codigo oficial da mesma versao com o remendo do ARENA
+    (ferramentas\compilar_retroarch_android.py): com ele, o Android recebe a
+    mesma linha de comando do Windows e do Linux, e o jogo em rede junto;
   - na frente, a tela de sempre do ARENA (launcher\), com o servidor dentro
     da pagina do ARENA do Chromebook (launcher\navegador), numa tela do
     Android escrita aqui (android\src\...\ArenaActivity.java), que abre cada
@@ -34,7 +37,8 @@ Passo a passo (cada download confere a marca SHA-256):
      bancos de dados de jogos, os filtros de tela e os temas de menu, uns
      280 MB);
   4. a ArenaActivity e' compilada com o javac e o d8 do SDK do Android
-     (ferramentas\preparar_android.py), sem o Android Studio;
+     (ferramentas\preparar_android.py), sem o Android Studio, e a biblioteca
+     do RetroArch troca pela remendada (compilada uma vez e guardada);
   5. o apktool remonta, o zipalign alinha e o apksigner assina com a chave do
      ARENA. A chave fica FORA do git, em %LOCALAPPDATA%\ARENA-android\
      assinatura: guarde-a bem. Sem ela, a versao seguinte do APK nao instala
@@ -66,6 +70,7 @@ RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(RAIZ, "testes"))
 sys.path.insert(0, os.path.join(RAIZ, "ferramentas"))
 sys.path.insert(0, os.path.join(RAIZ, "servidor"))
+import compilar_retroarch_android as retroarch_remendado  # noqa: E402
 import limpeza  # noqa: E402
 import preparar_android as sdk  # noqa: E402  (o JDK e o SDK do Android, em %LOCALAPPDATA%\ARENA-android)
 import preparar_linux  # noqa: E402  (o cache e o download com a marca)
@@ -441,6 +446,8 @@ def montar_apk(abi, teste, atualizar, trabalho):
     for outra in os.listdir(os.path.join(pasta, "lib")):
         if outra != abi:
             limpeza.apagar_pasta(os.path.join(pasta, "lib", outra))
+    # A biblioteca do RetroArch: a do codigo oficial com o remendo do ARENA.
+    shutil.copyfile(retroarch_remendado.biblioteca(abi), os.path.join(pasta, "lib", abi, "libretroarch-activity.so"))
     gerar_icones(os.path.join(pasta, "res"))
     assets = os.path.join(pasta, "assets")
     por_a_tela(assets, teste)

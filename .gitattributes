@@ -15,6 +15,10 @@
 *.desktop text eol=lf
 Dockerfile text eol=lf
 
+# O remendo do RetroArch do Android (android\retroarch): o git apply confere
+# linha por linha, e o código do RetroArch é LF; com CRLF, nada encaixa.
+*.patch text eol=lf
+
 # BIOS livres e jogos livres dos testes: o ARENA e o conferidor conferem cada
 # arquivo pela marca (SHA-256), byte a byte. Sem conversão de final de linha,
 # senão o config.ini do C-BIOS baixado no Windows ganharia CRLF, a marca não

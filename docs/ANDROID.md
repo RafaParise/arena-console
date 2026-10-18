@@ -28,7 +28,23 @@ computador, e o teste fala com ele pelo `adb`.
 
 O APK é o **RetroArch 1.22.2 oficial para Android** (o `RetroArch.apk` do
 libretro, o mesmo RetroArch do Windows, do Linux e do Chromebook) com a tela
-do ARENA na frente. Nada do código do RetroArch muda:
+do ARENA na frente. Do RetroArch, muda uma peça só: a biblioteca dele
+(`libretroarch-activity.so`), compilada do código oficial da mesma versão
+com um remendo de 50 linhas (`android/retroarch/arena-args.patch`). O
+RetroArch oficial do Android só aceita alguns pedidos de quem o abre (o
+jogo, o núcleo, o arquivo de configuração) e não tem como pedir a partida em
+rede; com o remendo, ele recebe a mesma linha de comando do Windows e do
+Linux (`-L`, `--appendconfig`, `--host`, `--connect`...). Sem esse pedido,
+funciona como o oficial.
+
+A compilação (`ferramentas/compilar_retroarch_android.py`) usa o mesmo NDK
+da biblioteca oficial (r22, 7026061), o mesmo `Android.mk` do RetroArch e a
+mesma versão mínima do Android, e saiu igual à oficial: os mesmos 11.002
+símbolos (11.075 no arm64) e as mesmas seções, com 192 bytes de código a
+mais no x86_64 (o do remendo). A tela de Informações do RetroArch mostra a
+versão `69a4f0e-arena`, a da etiqueta v1.22.2 com a marca do remendo (a
+licença do RetroArch, a GPLv3, pede que a versão modificada diga que é
+modificada).
 
 | O quê | Como |
 |---|---|

@@ -1,0 +1,102 @@
+Remendo do ARENA para o RetroArch 1.22.2 do Android (GPLv3, como o RetroArch)
+
+O que muda: o RetroArch do Android passa a aceitar a linha de comando inteira
+num extra da intent, "ARGS" (um argumento por linha): a mesma linha que o
+ARENA usa no Windows e no Linux (-c, -L, --appendconfig, --set-shader,
+--host, --connect, --port, --nick e o jogo). O oficial do Android so le
+alguns extras (ROM, LIBRETRO, CONFIGFILE, ...) e nao tem como pedir o jogo
+em rede. Sem o extra ARGS, tudo fica como no oficial.
+
+Base: a etiqueta v1.22.2 do libretro (commit 69a4f0ea1e8aaf442ae4858f2e7f2b31a1776576),
+https://github.com/libretro/RetroArch/archive/refs/tags/v1.22.2.tar.gz
+Modificado pelo ARENA em 18/10/2026. Quem aplica e compila:
+ferramentas/compilar_retroarch_android.py.
+
+diff --git a/frontend/drivers/platform_unix.c b/frontend/drivers/platform_unix.c
+index e4ffe0f..0052b4b 100644
+--- a/frontend/drivers/platform_unix.c
++++ b/frontend/drivers/platform_unix.c
+@@ -1518,6 +1518,28 @@ static void frontend_unix_get_env(int *argc,
+       }
+    }
+ 
++   /* ARENA: the whole command line, one argument per line
++    * (e.g. "-L", core, "--appendconfig", cfg, "--host", content).
++    * See content_load_init_wrap(). */
++   CALL_OBJ_METHOD_PARAM(env, jstr, obj, android_app->getStringExtra,
++         (*env)->NewStringUTF(env, "ARGS"));
++
++   if (android_app->getStringExtra && jstr)
++   {
++      static char *arena_args = NULL;
++      const char *argv = (*env)->GetStringUTFChars(env, jstr, 0);
++
++      free(arena_args);
++      arena_args = (argv && *argv) ? strdup(argv) : NULL;
++      (*env)->ReleaseStringUTFChars(env, jstr, argv);
++
++      __android_log_print(ANDROID_LOG_INFO,
++         "RetroArch", "[ENV] Command line (ARGS): \"%s\".\n",
++         arena_args ? arena_args : "");
++      if (args)
++         args->arena_args = arena_args;
++   }
++
+    /* Internal Storage */
+    CALL_OBJ_METHOD_PARAM(env, jstr, obj, android_app->getStringExtra,
+          (*env)->NewStringUTF(env, "SDCARD"));
+diff --git a/retroarch_types.h b/retroarch_types.h
+index 2d0aac5..36a5967 100644
+--- a/retroarch_types.h
++++ b/retroarch_types.h
+@@ -246,6 +246,11 @@ struct rarch_main_wrap
+    const char *state_path;
+    const char *config_path;
+    const char *libretro_path;
++#ifdef ANDROID
++   /* ARENA: the whole command line from the "ARGS" intent extra,
++    * one argument per line. See content_load_init_wrap(). */
++   const char *arena_args;
++#endif
+    int argc;
+    uint8_t flags;
+ };
+diff --git a/tasks/task_content.c b/tasks/task_content.c
+index 5c0e91f..b60ee8d 100644
+--- a/tasks/task_content.c
++++ b/tasks/task_content.c
+@@ -1336,6 +1336,24 @@ static void content_load_init_wrap(
+       const struct rarch_main_wrap *args,
+       int *argc, char **argv)
+ {
++#ifdef ANDROID
++   /* ARENA: with the "ARGS" extra, the arguments are exactly the ones
++    * sent, after "retroarch", as on a desktop command line. */
++   if (args->arena_args)
++   {
++      char *copy = strdup(args->arena_args);
++      char *save = NULL;
++      char *arg  = copy ? strtok_r(copy, "\n", &save) : NULL;
++
++      *argc = 0;
++      argv[(*argc)++] = strldup("retroarch", sizeof("retroarch"));
++      for (; arg && *argc < MAX_ARGS - 1; arg = strtok_r(NULL, "\n", &save))
++         argv[(*argc)++] = strdup(arg);
++      free(copy);
++      return;
++   }
++#endif
++
+    *argc = 0;
+    argv[(*argc)++] = strldup("retroarch", sizeof("retroarch"));
+ 
+@@ -1415,6 +1433,9 @@ static bool content_load(content_ctx_info_t *info,
+    wrap_args->state_path     = NULL;
+    wrap_args->config_path    = NULL;
+    wrap_args->libretro_path  = NULL;
++#ifdef ANDROID
++   wrap_args->arena_args     = NULL;
++#endif
+    wrap_args->flags          = 0;
+    wrap_args->argc           = 0;
+ 
