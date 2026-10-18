@@ -104,7 +104,8 @@ async function pedir(rota, metodo = "GET", corpo = null) {
   } catch (falha) {
     perderContato();
     const erro = new Error(
-      "O ARENA parou de responder. Espere uns segundos: ele costuma voltar sozinho. Se não voltar, feche a janela preta e abra o ARENA.bat de novo."
+      "O ARENA parou de responder. Espere uns segundos: ele costuma voltar sozinho. Se não voltar, " +
+      comoAbrirDeNovo() + "."
     );
     erro.causa = falha;
     throw erro;
@@ -115,6 +116,14 @@ async function pedir(rota, metodo = "GET", corpo = null) {
     throw new Error(dados.erro || "O servidor não respondeu como esperado.");
   }
   return dados;
+}
+
+// O jeito de abrir o ARENA de novo: no computador, pelo ARENA.bat (a janela
+// preta e' o servidor); no Android, pelo icone (item 14).
+function comoAbrirDeNovo() {
+  return estado.sistemaDoComputador === "android"
+    ? "feche o ARENA na tela dos apps abertos e abra pelo ícone de novo"
+    : "feche a janela preta e abra o ARENA.bat de novo";
 }
 
 // Servidor fora do ar: a tela espera e volta sozinha.
@@ -150,7 +159,7 @@ async function esperarServidorVoltar() {
     }
     const segundos = Math.round((Date.now() - semServidorDesde) / 1000);
     $("#semServidorTempo").textContent = segundos >= 30
-      ? ` Já são ${segundos} s. Se não voltar, feche a janela preta e abra o ARENA.bat de novo.`
+      ? ` Já são ${segundos} s. Se não voltar, ${comoAbrirDeNovo()}.`
       : "";
   }
 }
@@ -296,6 +305,13 @@ async function carregarEstado() {
   // O mesmo pen drive abre no Linux (item 13): lá o tipo de controle é
   // outro (udev ou sdl2), e a numeração dos botões do Xbox também.
   estado.sistemaDoComputador = dados.sistema_do_computador || "windows";
+  // No Android (item 14), o que e' so do computador some (a escolha do
+  // navegador, o tipo de controle: o RetroArch de la tem um so) e aparece a
+  // pasta do ARENA no aparelho.
+  if (estado.sistemaDoComputador === "android") {
+    for (const elemento of document.querySelectorAll("[data-fora-do-android]")) elemento.hidden = true;
+    mostrarAndroid(dados.android || {});
+  }
   prepararTipoDeControle(dados.recursos || []);
   $("#listaDriverControleTopo").value = estado.efetivas.input_joypad_driver ||
     (estado.sistemaDoComputador === "windows" ? "xinput" : "udev");
@@ -2356,6 +2372,16 @@ function capturar(linha, valor, botaoDefinir, jogador, botao) {
     16: ["botao", "8"],
   };
   const XBOX_DO_NAVEGADOR = estado.sistemaDoComputador === "windows" ? XINPUT_DO_NAVEGADOR : UDEV_DO_NAVEGADOR;
+  // No Android, o RetroArch numera cada botao pelo codigo de tecla do
+  // proprio Android (o mesmo de todos os perfis de controle de la,
+  // retroarch/autoconfig/android: o botao de baixo e' o 96), e os gatilhos
+  // sao botoes tambem. Vale para qualquer controle que o navegador reconhece.
+  const ANDROID_DO_NAVEGADOR = {
+    0: ["botao", "96"], 1: ["botao", "97"], 2: ["botao", "99"], 3: ["botao", "100"],
+    4: ["botao", "102"], 5: ["botao", "103"], 6: ["botao", "104"], 7: ["botao", "105"],
+    8: ["botao", "109"], 9: ["botao", "108"], 10: ["botao", "106"], 11: ["botao", "107"],
+    16: ["botao", "110"],
+  };
 
   // Controle: o navegador só entrega o estado, então a gente olha a cada
   // quadro até algum botão estar apertado.
@@ -2374,6 +2400,15 @@ function capturar(linha, valor, botaoDefinir, jogador, botao) {
         if (!pad.buttons[i].pressed) continue;
         if (padrao && DIRECIONAL_DO_NAVEGADOR[i]) {
           gravar("hat", DIRECIONAL_DO_NAVEGADOR[i]);
+        } else if (padrao && estado.sistemaDoComputador === "android") {
+          const traduzido = ANDROID_DO_NAVEGADOR[i];
+          if (!traduzido) {
+            encerrar();
+            desenharMapa();
+            recado("Esse botão o RetroArch não lê neste controle. Clique em Definir e aperte outro.", true);
+            return;
+          }
+          gravar(traduzido[0], traduzido[1]);
         } else if (xinput) {
           const traduzido = XBOX_DO_NAVEGADOR[i];
           if (!traduzido) {
@@ -2408,6 +2443,94 @@ function capturar(linha, valor, botaoDefinir, jogador, botao) {
   botaoDefinir.onclick = () => { encerrar(); desenharMapa(); };
 }
 
+// --------------------------------------------------------------------------
+// A pasta do ARENA no aparelho (Android, item 14)
+// --------------------------------------------------------------------------
+// A de agora, as que o aparelho tem e as permissoes (servidor/ponte_android.py).
+// Trocar de pasta abre o servidor de novo; a tela volta sozinha.
+
+function mostrarAndroid(android) {
+  const bloco = $("#blocoAndroid");
+  if (!bloco) return;
+  bloco.hidden = false;
+  $("#estadoAndroidPasta").textContent = android.pasta
+    ? "Usando a pasta " + android.pasta + (android.so_leitura
+      ? ". O Android só deixa ler nela: os jogos e as BIOS vêm de lá; os saves ficam no aparelho."
+      : ".")
+    : "Usando a pasta do próprio app (com os jogos livres que vêm junto). Se houver uma pasta do ARENA no " +
+      "aparelho, escolha abaixo.";
+  $("#btnAndroidPermissao").hidden = !!android.permissao;
+  $("#btnAndroidTodos").hidden = !android.so_leitura;
+  $("#btnAndroidPastaDoApp").hidden = !android.pasta;
+  $("#btnAndroidProcurar").onclick = procurarPastasAndroid;
+  $("#btnAndroidPastaDoApp").onclick = () => usarPastaAndroid("");
+  $("#btnAndroidPermissao").onclick = () => pedirPermissaoAndroid(false);
+  $("#btnAndroidTodos").onclick = () => pedirPermissaoAndroid(true);
+  procurarPastasAndroid();
+}
+
+async function procurarPastasAndroid() {
+  const lista = $("#listaAndroidPastas");
+  try {
+    const dados = await pedir("/api/android/pastas");
+    lista.replaceChildren(...dados.pastas.map((pasta) => {
+      const item = document.createElement("li");
+      const nome = document.createElement("span");
+      nome.textContent = pasta.nome + " (" + pasta.onde + ")";
+      const lugar = document.createElement("code");
+      lugar.textContent = pasta.caminho;
+      item.append(nome, lugar);
+      if (pasta.caminho !== dados.atual) {
+        const botao = document.createElement("button");
+        botao.className = "botao";
+        botao.type = "button";
+        botao.textContent = "Usar esta";
+        botao.onclick = () => usarPastaAndroid(pasta.caminho);
+        item.append(botao);
+      }
+      return item;
+    }));
+    if (!dados.pastas.length) {
+      const item = document.createElement("li");
+      item.textContent = "Nenhuma pasta do ARENA neste aparelho por enquanto.";
+      lista.append(item);
+    }
+  } catch (falha) {
+    recado(falha.message, true);
+  }
+}
+
+async function usarPastaAndroid(caminho) {
+  try {
+    await pedir("/api/android/pasta", "POST", { caminho });
+    recado("Abrindo o ARENA com a pasta nova...");
+    perderContato();          // o servidor abre de novo; a tela volta sozinha
+  } catch (falha) {
+    recado(falha.message, true);
+  }
+}
+
+async function pedirPermissaoAndroid(todosOsArquivos) {
+  try {
+    await pedir("/api/android/permissao", "POST", { todos_os_arquivos: todosOsArquivos });
+  } catch (falha) {
+    recado(falha.message, true);
+  }
+}
+
+// O botao voltar do Android (ArenaActivity.onBackPressed): fecha o que estiver
+// aberto, como o Esc; sem nada aberto, o ARENA vai para tras. No modo de
+// reserva, quem responde e' o do launcher/navegador/android.js.
+if (!window.ARENA_ANDROID_VOLTAR) {
+  window.ARENA_ANDROID_VOLTAR = () => {
+    const aberto = [...document.querySelectorAll(".gaveta, .modal")].some((painel) => !painel.hidden) ||
+      document.body.dataset.soFundo === "true";
+    if (!aberto) return "nao";
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    return "sim";
+  };
+}
+
 // No Linux, as opções do tipo de controle são as de lá (o recursos.json diz
 // quais, em "no_linux"): o udev lê todos os controles; o sdl2 é a reserva.
 // No Windows, ficam as do index.html (xinput e dinput).
@@ -2418,7 +2541,8 @@ const NOME_DO_TIPO_DE_CONTROLE = {
 
 function prepararTipoDeControle(recursos) {
   const lista = $("#listaDriverControleTopo");
-  if (!lista || estado.sistemaDoComputador === "windows" || lista.dataset.sistema === "linux") return;
+  if (!lista || estado.sistemaDoComputador === "windows" || estado.sistemaDoComputador === "android" ||
+      lista.dataset.sistema === "linux") return;
   const recurso = recursos.find((r) => r.chave === "input_joypad_driver");
   const opcoes = (recurso && recurso.opcoes) || ["udev", "sdl2"];
   lista.replaceChildren(...opcoes.map((valor) => {
@@ -4923,7 +5047,7 @@ async function iniciar() {
     await carregarEstado();
     await carregarCatalogo();
   } catch (falha) {
-    aviso("O ARENA parou de responder. Feche tudo e abra o ARENA.bat de novo.");
+    aviso(`O ARENA parou de responder. Para voltar, ${comoAbrirDeNovo()}.`);
   }
 }
 

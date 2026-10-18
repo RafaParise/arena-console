@@ -5447,7 +5447,7 @@ class Manipulador(BaseHTTPRequestHandler):
             if not plataforma_do_sistema.ANDROID:
                 return self.erro("Isto é só do ARENA do Android. Neste computador, use a própria pasta do ARENA.", 404)
             if caminho == "/api/android/permissao":
-                ponte_android.pedir_permissao()
+                ponte_android.pedir_permissao(bool(dados.get("todos_os_arquivos")))
                 return self.responder_json({"ok": True})
             escolhida = str(dados.get("caminho") or "")
             if escolhida and not ponte_android.parece_arena(escolhida):

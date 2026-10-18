@@ -443,7 +443,20 @@
       <span class="opcao-ajuda" id="ajudaFundoAnimado">O céu (tema escuro) e o campo (tema claro) atrás da tela. Parado não gasta nada.</span>
     </div>
 
-    <div class="opcao" data-so-windows>
+    <div class="onde" id="blocoAndroid" hidden>
+      <h3>A pasta do ARENA neste aparelho</h3>
+      <p class="explica" id="estadoAndroidPasta" role="status">—</p>
+      <ul class="onde-lista" id="listaAndroidPastas"></ul>
+      <p class="explica">
+        <button class="botao" id="btnAndroidProcurar" type="button">Procurar de novo</button>
+        <button class="botao" id="btnAndroidPastaDoApp" type="button">Usar a pasta do app</button>
+        <button class="botao" id="btnAndroidPermissao" type="button" hidden>Deixar o ARENA ver os arquivos</button>
+        <button class="botao" id="btnAndroidTodos" type="button" hidden>Deixar gravar no cartão</button>
+      </p>
+      <p class="explica">Copie a pasta do ARENA do pen drive para o cartão ou para a memória do aparelho (ou ligue o pen drive pelo cabo OTG) e escolha aqui. Os jogos, as BIOS e os saves são os mesmos do computador. Os recordes e o apelido ficam no aparelho; para levar os recordes a outro ARENA, use a sincronização (Amigos).</p>
+    </div>
+
+    <div class="opcao" data-so-windows data-fora-do-android>
       <span class="opcao-rotulo">Abrir a tela em</span>
       <select class="opcao-controle" id="listaNavegador" aria-label="Navegador da tela do ARENA"
               aria-describedby="ajudaNavegador">
@@ -614,7 +627,7 @@
   <div class="aba-conteudo" data-painel="controles" hidden>
     <p class="explica">Conecte o controle antes de abrir o jogo.</p>
 
-    <div class="opcao">
+    <div class="opcao" data-fora-do-android>
       <span class="opcao-rotulo">Tipo de controle</span>
       <select class="opcao-controle" id="listaDriverControleTopo"
               aria-label="Tipo de conexão do controle">

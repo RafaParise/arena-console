@@ -88,10 +88,12 @@ public class ArenaServico extends Service {
     static volatile boolean pronto = false;
     static volatile boolean desistiu = false;
     static volatile ArenaServico atual;
-    // O segredo desta abertura: so a tela do ARENA o tem (um cookie do
-    // WebView), e o servidor recusa o pedido local sem ele. No Android,
+    // O segredo da abertura do servidor: so a tela do ARENA o tem (um cookie
+    // do WebView), e o servidor recusa o pedido local sem ele. No Android,
     // qualquer app do aparelho alcanca o 127.0.0.1 (servidor/ponte_android.py).
-    static final String SEGREDO = sortearSegredo();
+    // Um novo a cada abertura do servidor: o de um servidor que caiu nao vale
+    // para o seguinte (revisao de seguranca de 18/10/2026).
+    static volatile String segredo = "";
 
     static String sortearSegredo() {
         byte[] sorteado = new byte[32];
@@ -263,6 +265,7 @@ public class ArenaServico extends Service {
     // ------------------------------------------------------------------
 
     void abrirOServidor(boolean reaberto) {
+        segredo = sortearSegredo();
         try {
             prepararOsArquivos();
         } catch (IOException falha) {
@@ -297,7 +300,7 @@ public class ArenaServico extends Service {
             Log.e(TAG, "nao abri o servidor: " + falha);
         }
         servidor = null;
-        pronto = false;
+        semServidor();
         if (saindo) return;
         if (reabrindo) {
             reabrindo = false;
@@ -322,6 +325,14 @@ public class ArenaServico extends Service {
      *  vale: ele vem do proprio Python do ARENA, depois que ele abriu a
      *  porta. Conferir so a porta poderia achar outro app que a tomou antes,
      *  e a tela entregaria o segredo a ele. */
+    /** O servidor caiu (ou vai reabrir): a tela para de falar com a porta e
+     *  esquece o segredo ate o aviso "pronto" do proximo (ArenaActivity). */
+    void semServidor() {
+        pronto = false;
+        ArenaActivity quem = tela.get();
+        if (quem != null) quem.servidorFora();
+    }
+
     void marcarPronto() {
         if (pronto) return;
         pronto = true;
@@ -397,6 +408,7 @@ public class ArenaServico extends Service {
      *  permissao de arquivos). A tela de sempre se reconecta sozinha. */
     void reabrir() {
         reabrindo = true;
+        semServidor();
         Process p = servidor;
         if (p != null) p.destroy();
     }
@@ -601,7 +613,9 @@ public class ArenaServico extends Service {
         // Os certificados do proprio Android (as capas e a biblioteca livre
         // baixam por HTTPS): o OpenSSL do Python le a pasta do sistema.
         a.put("SSL_CERT_DIR", "/system/etc/security/cacerts");
-        a.put("ARENA_ANDROID_SEGREDO", SEGREDO);
+        a.put("ARENA_ANDROID_SEGREDO", segredo);
+        a.put("ARENA_ANDROID_PERMISSAO", Build.VERSION.SDK_INT < 23 || checkSelfPermission(
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED ? "1" : "0");
         String pasta = guardado.getString("pasta", "");
         a.put("ARENA_PASTA", pasta);
         a.put("ARENA_ANDROID_DADOS", new File(getFilesDir(), "arena-dados").getPath());

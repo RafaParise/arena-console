@@ -41,7 +41,9 @@ SISTEMA = os.environ.get("ARENA_ANDROID_SISTEMA", "")  # "Android 15 (Google Pix
 # drive (uma por linha).
 RAIZES = [r for r in os.environ.get("ARENA_ANDROID_RAIZES", "").splitlines() if r.strip()]
 # A pasta do ARENA desta abertura e se ela so deixa ler (android_inicio.py).
-ESTADO = {"pasta": "", "so_leitura": False}
+ESTADO = {"pasta": "", "so_leitura": False,
+          # O Android deixou o app ler os arquivos? (o app conta ao abrir)
+          "permissao": os.environ.get("ARENA_ANDROID_PERMISSAO", "") == "1"}
 # O segredo desta abertura (o app sorteia; outro app do aparelho nao le o
 # ambiente deste processo). So a tela do ARENA o tem, num cookie que o app poe
 # no WebView: no Android, qualquer app do aparelho alcanca o 127.0.0.1:8777,
@@ -390,6 +392,8 @@ def escolher_pasta(caminho):
     avisar({"pedido": "escolher_pasta", "caminho": caminho or ""})
 
 
-def pedir_permissao():
-    """Pede ao app a permissao de arquivos do Android (a tela do sistema)."""
-    avisar({"pedido": "permissao"})
+def pedir_permissao(todos_os_arquivos=False):
+    """Pede ao app a permissao de arquivos do Android (a tela do sistema).
+    Com todos_os_arquivos, a do Android 11 em diante que deixa gravar no
+    cartao e no pen drive ("Acesso a todos os arquivos")."""
+    avisar({"pedido": "permissao", "todos_os_arquivos": bool(todos_os_arquivos)})

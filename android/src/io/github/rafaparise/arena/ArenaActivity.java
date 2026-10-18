@@ -218,18 +218,31 @@ public class ArenaActivity extends Activity {
         else startService(servico);
     }
 
-    /** O servidor avisou que ja escuta (ArenaServico.marcarPronto). */
+    /** O servidor avisou que ja escuta (ArenaServico.marcarPronto): a tela
+     *  ganha o segredo desta abertura e abre (ou recarrega) a pagina. */
     void servidorPronto() {
         runOnUiThread(new Runnable() {
             public void run() {
-                if (modoNavegador || telaDoServidor) return;
+                if (modoNavegador || !ArenaServico.pronto) return;
                 telaDoServidor = true;
                 CookieManager biscoitos = CookieManager.getInstance();
                 biscoitos.setAcceptCookie(true);
-                biscoitos.setCookie(SERVIDOR, "arena_segredo=" + ArenaServico.SEGREDO
+                biscoitos.setCookie(SERVIDOR, "arena_segredo=" + ArenaServico.segredo
                         + "; Path=/; HttpOnly; SameSite=Strict");
                 biscoitos.flush();
                 tela.loadUrl(SERVIDOR);
+            }
+        });
+    }
+
+    /** O servidor caiu ou vai reabrir: o segredo sai ja. Ate o proximo
+     *  "pronto", nada da tela vai para a porta (shouldInterceptRequest):
+     *  um app que a tomasse no intervalo nao recebe nada. */
+    void servidorFora() {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                CookieManager.getInstance().removeAllCookies(null);
+                CookieManager.getInstance().flush();
             }
         });
     }
@@ -386,7 +399,8 @@ public class ArenaActivity extends Activity {
         cabecalhos.put("X-Content-Type-Options", "nosniff");
         if (daPasta) cabecalhos.put("Content-Security-Policy", "sandbox; default-src 'none'");
         try {
-            r.setStatusCodeAndReasonPhrase(codigo, codigo == 200 ? "OK" : "Not Found");
+            r.setStatusCodeAndReasonPhrase(codigo, codigo == 200 ? "OK"
+                    : codigo == 503 ? "Service Unavailable" : "Not Found");
         } catch (IllegalArgumentException falha) {
             // codigo invalido: fica o padrao
         }
@@ -403,6 +417,12 @@ public class ArenaActivity extends Activity {
         @Override
         public WebResourceResponse shouldInterceptRequest(WebView vista, WebResourceRequest pedido) {
             Uri endereco = pedido.getUrl();
+            if (!modoNavegador && endereco.toString().startsWith(SERVIDOR) && !ArenaServico.pronto) {
+                // O servidor do ARENA ainda nao avisou que abriu: nada vai
+                // para a porta (outro app pode estar nela); a tela espera.
+                return resposta("text/html", new java.io.ByteArrayInputStream(
+                        ABRINDO.getBytes(java.nio.charset.StandardCharsets.UTF_8)), 503);
+            }
             if (!CASA.equals(endereco.getHost())) return null;          // capa da internet: segue normal
             String caminho = endereco.getPath() == null ? "/" : endereco.getPath();
             if (caminho.contains("..")) return resposta("text/plain", null, 404);
