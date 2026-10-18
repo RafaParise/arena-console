@@ -151,6 +151,45 @@ def do_chromebook():
     return nucleos_web, sorted(jogos, key=lambda j: j["origem"])
 
 
+# O APK do Android (item 14): o que ele leva de outros projetos. O RetroArch
+# vai com UMA mudanca (a biblioteca dele, compilada do codigo oficial com o
+# remendo do ARENA); a licenca dele, a GPL-3.0, pede que isso fique dito.
+DO_APK = [
+    ("RetroArch 1.22.2 para Android (o RetroArch.apk oficial do libretro), **com uma mudança**: a biblioteca "
+     "`lib/<abi>/libretroarch-activity.so` compilada do código oficial (a etiqueta v1.22.2) com o remendo "
+     "`android/retroarch/arena-args.patch` do ARENA (a linha de comando inteira pela intent), em 18/10/2026, por "
+     "`ferramentas/compilar_retroarch_android.py`. O resto do RetroArch.apk vai como veio",
+     "GPL-3.0", "https://github.com/libretro/RetroArch (a etiqueta v1.22.2) + o remendo, neste repositório"),
+    ("Recursos do RetroArch que vêm no RetroArch.apk (menu, perfis de controle do Android, controle de toque, "
+     "informações dos núcleos, filtros de som e imagem)",
+     "os de cada repositório: retroarch-assets (CC BY 4.0), common-overlays, retroarch-joypad-autoconfig, "
+     "libretro-core-info e os filtros do RetroArch", "https://github.com/libretro"),
+    ("Python 3.13.16 para Android: o CPython compilado pelo Chaquopy (os pacotes \"target\" do Maven Central), "
+     "sem mudança, com o OpenSSL, o SQLite, o libffi, o bzip2 e o xz dele",
+     "PSF License (o Python); MIT (o Chaquopy); Apache-2.0 (o OpenSSL); domínio público (o SQLite); MIT "
+     "(o libffi); bzip2 e xz, as deles", "https://github.com/chaquo/chaquopy e https://www.python.org/downloads/source/"),
+    ("O lançador do Python (`lib/<abi>/libarenapython.so`): escrito pelo ARENA (`android/python/lancador.c`)",
+     "GPL-3.0 (a do ARENA)", "https://github.com/RafaParise/arena-console"),
+]
+
+
+def nucleos_do_android():
+    """(arquivo, nome, licenca) dos nucleos do APK (ferramentas\\android_nucleos.json),
+    com a licenca do .info do mesmo nucleo (o nome sem o "_android")."""
+    import json
+    try:
+        with open(os.path.join(RAIZ, "ferramentas", "android_nucleos.json"), encoding="utf-8") as f:
+            nomes = sorted(json.load(f).get("arm64-v8a", {}))
+    except (OSError, ValueError):
+        return []
+    lista = []
+    for nome in nomes:
+        info = os.path.join(RAIZ, "retroarch", "info", nome.replace("_libretro_android.so", "_libretro.info"))
+        dados = ler_info(info) if os.path.isfile(info) else {}
+        lista.append((nome, dados.get("display_name", nome), dados.get("license", "ver o projeto")))
+    return lista
+
+
 def montar(pasta):
     if os.path.isdir(os.path.join(pasta, "retroarch", "cores")) and pasta != RAIZ:
         lista = nucleos(os.path.join(pasta, "retroarch"))
@@ -273,6 +312,64 @@ def montar(pasta):
         for j in jogos:
             linhas.append("| %s | %s | %s | %s | <%s> |" % (j["jogo"], j["console_nome"], j["autor"], j["licenca"],
                                                        j["fonte"]))
+    linhas += [
+        "",
+        "## O APK do Android",
+        "",
+        "O APK do ARENA (Releases do GitHub, um por tipo de processador) leva o",
+        "servidor e a tela do ARENA (GPL-3.0) e estes programas de outros",
+        "projetos. Um deles vai **com mudança**, dita na tabela e no",
+        "`docs/ANDROID.md`: a GPL-3.0 do RetroArch pede que a versão modificada",
+        "diga que é modificada e onde está o código dela.",
+        "",
+        "| Programa | Licença | Código-fonte |",
+        "|---|---|---|",
+    ]
+    for nome, licenca, fonte in DO_APK:
+        linhas.append("| %s | %s | %s |" % (nome, licenca, fonte))
+    do_android = nucleos_do_android()
+    if do_android:
+        linhas += [
+            "",
+            "### Núcleos do RetroArch no APK do Android (%d)" % len(do_android),
+            "",
+            "Os mesmos núcleos, na versão para Android que o libretro publica (o",
+            "\"nightly\", com a marca SHA-256 de cada um em",
+            "`ferramentas/android_nucleos.json`), com a licença do mesmo `.info` e o",
+            "mesmo código-fonte (<https://github.com/libretro>).",
+            "",
+            "| Núcleo | Arquivo | Licença |",
+            "|---|---|---|",
+        ]
+        for arquivo, exibicao, licenca in do_android:
+            linhas.append("| %s | `%s` | %s |" % (exibicao.replace("|", "/"), arquivo, licenca.replace("|", " / ")))
+    try:
+        import json
+        with open(os.path.join(RAIZ, "testes", "jogos_livres", "lista.json"), encoding="utf-8") as f:
+            todos = json.load(f)["arquivos"]
+        with open(os.path.join(RAIZ, "servidor", "consoles.json"), encoding="utf-8") as f:
+            consoles = {p["id"]: p for p in json.load(f)["plataformas"]}
+        no_apk = [j for j in todos if (consoles.get(j["console"]) or {}).get("pasta")
+                  and "freej2me" not in str(consoles[j["console"]].get("core", ""))
+                  and os.path.splitext(j["origem"])[1].lower()
+                  in [e.lower() for e in consoles[j["console"]].get("extensoes", [])]]
+    except (OSError, ValueError, KeyError):
+        no_apk = []
+    if no_apk:
+        linhas += [
+            "",
+            "### Jogos livres que vêm no APK (%d)" % len(no_apk),
+            "",
+            "Sem pasta do ARENA no aparelho, o ARENA do Android põe estes jogos na",
+            "pasta dele (os de `testes\\jogos_livres` que o Android abre), cada um",
+            "com o texto da licença ao lado:",
+            "",
+            "| Jogo | Console | Autor | Licença | Código-fonte |",
+            "|---|---|---|---|---|",
+        ]
+        for j in sorted(no_apk, key=lambda j: j["origem"]):
+            linhas.append("| %s | %s | %s | %s | <%s> |" % (j["jogo"], consoles[j["console"]]["nome"], j["autor"],
+                                                       j["licenca"], j["fonte"]))
     linhas.append("")
     return "\n".join(linhas)
 

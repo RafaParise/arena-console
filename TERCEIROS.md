@@ -269,3 +269,107 @@ Chromebook" medir sem pen drive, vão embutidos em
 | Skip Ahead | MicroW8 | Dennis Ranke (exoticorn) | Unlicense (domínio público) | <https://github.com/exoticorn/microw8> |
 | Intervallo | Commodore Plus/4 | Zalka Ernő (ern0) | MIT | <https://github.com/ern0/intervallo> |
 | Baguel | Commodore VIC-20 | Marco Giorgini (MGProduction) | MIT | <https://github.com/mgproduction/baguel> |
+
+## O APK do Android
+
+O APK do ARENA (Releases do GitHub, um por tipo de processador) leva o
+servidor e a tela do ARENA (GPL-3.0) e estes programas de outros
+projetos. Um deles vai **com mudança**, dita na tabela e no
+`docs/ANDROID.md`: a GPL-3.0 do RetroArch pede que a versão modificada
+diga que é modificada e onde está o código dela.
+
+| Programa | Licença | Código-fonte |
+|---|---|---|
+| RetroArch 1.22.2 para Android (o RetroArch.apk oficial do libretro), **com uma mudança**: a biblioteca `lib/<abi>/libretroarch-activity.so` compilada do código oficial (a etiqueta v1.22.2) com o remendo `android/retroarch/arena-args.patch` do ARENA (a linha de comando inteira pela intent), em 18/10/2026, por `ferramentas/compilar_retroarch_android.py`. O resto do RetroArch.apk vai como veio | GPL-3.0 | https://github.com/libretro/RetroArch (a etiqueta v1.22.2) + o remendo, neste repositório |
+| Recursos do RetroArch que vêm no RetroArch.apk (menu, perfis de controle do Android, controle de toque, informações dos núcleos, filtros de som e imagem) | os de cada repositório: retroarch-assets (CC BY 4.0), common-overlays, retroarch-joypad-autoconfig, libretro-core-info e os filtros do RetroArch | https://github.com/libretro |
+| Python 3.13.16 para Android: o CPython compilado pelo Chaquopy (os pacotes "target" do Maven Central), sem mudança, com o OpenSSL, o SQLite, o libffi, o bzip2 e o xz dele | PSF License (o Python); MIT (o Chaquopy); Apache-2.0 (o OpenSSL); domínio público (o SQLite); MIT (o libffi); bzip2 e xz, as deles | https://github.com/chaquo/chaquopy e https://www.python.org/downloads/source/ |
+| O lançador do Python (`lib/<abi>/libarenapython.so`): escrito pelo ARENA (`android/python/lancador.c`) | GPL-3.0 (a do ARENA) | https://github.com/RafaParise/arena-console |
+
+### Núcleos do RetroArch no APK do Android (62)
+
+Os mesmos núcleos, na versão para Android que o libretro publica (o
+"nightly", com a marca SHA-256 de cada um em
+`ferramentas/android_nucleos.json`), com a licença do mesmo `.info` e o
+mesmo código-fonte (<https://github.com/libretro>).
+
+| Núcleo | Arquivo | Licença |
+|---|---|---|
+| Sinclair - ZX 81 (EightyOne) | `81_libretro_android.so` | GPLv3 |
+| Atari - 5200 (a5200) | `a5200_libretro_android.so` | GPLv2 |
+| Apple II (AppleWin) | `applewin_libretro_android.so` | GPLv2 |
+| Arduboy (Ardens) | `ardens_libretro_android.so` | MIT |
+| Atari - 400/800/600XL/800XL/130XE/5200 (Atari800) | `atari800_libretro_android.so` | GPLv2 |
+| MSX/SVI/ColecoVision/SG-1000 (blueMSX) | `bluemsx_libretro_android.so` | GPLv2 |
+| Amstrad - CPC/GX4000 (Caprice32) | `cap32_libretro_android.so` | GPLv2 |
+| Nintendo - GameCube / Wii (Dolphin) | `dolphin_libretro_android.so` | GPLv2+ |
+| DOS (DOSBox-Pure) | `dosbox_pure_libretro_android.so` | GPLv2 |
+| Arcade (FinalBurn Neo) | `fbneo_libretro_android.so` | Non-commercial |
+| Nintendo - NES / Famicom (FCEUmm) | `fceumm_libretro_android.so` | GPLv2 |
+| Sega - Dreamcast/Naomi (Flycast) | `flycast_libretro_android.so` | GPLv2 |
+| Mattel - Intellivision (FreeIntv) | `freeintv_libretro_android.so` | GPLv3 |
+| Sinclair - ZX Spectrum (Fuse) | `fuse_libretro_android.so` | GPLv3 |
+| Nintendo - Game Boy / Color (Gambatte) | `gambatte_libretro_android.so` | GPLv2 |
+| Coleco - ColecoVision (Gearcoleco) | `gearcoleco_libretro_android.so` | GPLv3 |
+| Sega - MS/GG/SG-1000 (Gearsystem) | `gearsystem_libretro_android.so` | GPLv3 |
+| Sega - MS/GG/MD/CD (Genesis Plus GX) | `genesis_plus_gx_libretro_android.so` | Non-commercial |
+| Handheld Electronic (GW) | `gw_libretro_android.so` | zlib |
+| Atari - Lynx (Handy) | `handy_libretro_android.so` | Zlib |
+| Atari - ST/STE/TT/Falcon (Hatari) | `hatari_libretro_android.so` | GPLv2 |
+| CHIP-8/S-CHIP/XO-CHIP (JAXE) | `jaxe_libretro_android.so` | MIT |
+| LowRes NX | `lowresnx_libretro_android.so` | zlib |
+| Arcade (MAME/Arcade) | `mamearcade_libretro_android.so` | GPLv2+ |
+| SNK - Neo Geo Pocket / Color (Beetle NeoPop) | `mednafen_ngp_libretro_android.so` | GPLv2 |
+| NEC - PC Engine / SuperGrafx / CD (Beetle PCE) | `mednafen_pce_libretro_android.so` | GPLv2 |
+| NEC - PC-FX (Beetle PC-FX) | `mednafen_pcfx_libretro_android.so` | GPLv2 |
+| Sega - Saturn (Beetle Saturn) | `mednafen_saturn_libretro_android.so` | GPLv2 |
+| Nintendo - Virtual Boy (Beetle VB) | `mednafen_vb_libretro_android.so` | GPLv2 |
+| Bandai - WonderSwan/Color (Beetle Wonderswan) | `mednafen_wswan_libretro_android.so` | GPLv2 |
+| Nintendo - DS (melonDS) | `melonds_libretro_android.so` | GPLv3 |
+| Nintendo - Game Boy Advance (mGBA) | `mgba_libretro_android.so` | MPLv2.0 |
+| Nintendo - Nintendo 64 (Mupen64Plus-Next GLES3) | `mupen64plus_next_gles3_libretro_android.so` | GPLv2 |
+| Magnavox - Odyssey2 / Philips Videopac+ (O2EM) | `o2em_libretro_android.so` | Artistic License |
+| The 3DO Company - 3DO (Opera) | `opera_libretro_android.so` | LGPL/Non-commercial |
+| Sony - PlayStation 2 (LRPS2) | `pcsx2_libretro_android.so` | GPL |
+| Sony - PlayStation (PCSX ReARMed) | `pcsx_rearmed_libretro_android.so` | GPLv2 |
+| Sega - MS/GG/MD/CD/32X (PicoDrive) | `picodrive_libretro_android.so` | MAME |
+| Nintendo - Pokemon Mini (PokeMini) | `pokemini_libretro_android.so` | GPLv3 |
+| Watara - Supervision (Potator) | `potator_libretro_android.so` | Public Domain |
+| Sony - PlayStation Portable (PPSSPP) | `ppsspp_libretro_android.so` | GPLv2 |
+| Atari - 7800 (ProSystem) | `prosystem_libretro_android.so` | GPLv2 |
+| Commodore - Amiga (PUAE) | `puae_libretro_android.so` | GPLv2 |
+| Philips - CDi (SAME CDi) | `same_cdi_libretro_android.so` | GPLv2+ |
+| ScummVM | `scummvm_libretro_android.so` | GPLv3 |
+| Nintendo - SNES / SFC (Snes9x) | `snes9x_libretro_android.so` | Non-commercial |
+| Atari - 2600 (Stella) | `stella_libretro_android.so` | GPLv2 |
+| Sony - PlayStation (SwanStation) | `swanstation_libretro_android.so` | GPLv3 |
+| Bandai - Tamagotchi P1 (TamaLIBretro) | `tamalibretro_libretro_android.so` | GPL-2.0 |
+| Thomson - MO/TO (Theodore) | `theodore_libretro_android.so` | GPLv3 |
+| TIC-80 | `tic80_libretro_android.so` | MIT |
+| MicroW8 | `uw8_libretro_android.so` | The Unlicense |
+| Uzebox (Uzem) | `uzem_libretro_android.so` | MIT |
+| GCE - Vectrex (vecx) | `vecx_libretro_android.so` | GPLv3 |
+| Commodore - C128 (VICE x128) | `vice_x128_libretro_android.so` | GPLv2 |
+| Commodore - C64 (VICE x64, fast) | `vice_x64_libretro_android.so` | GPLv2 |
+| Commodore - PET (VICE xpet) | `vice_xpet_libretro_android.so` | GPLv2 |
+| Commodore - PLUS/4 (VICE xplus4) | `vice_xplus4_libretro_android.so` | GPLv2 |
+| Commodore - VIC-20 (VICE xvic) | `vice_xvic_libretro_android.so` | GPLv2 |
+| Vircon32 | `vircon32_libretro_android.so` | 3-clause BSD |
+| Atari - Jaguar (Virtual Jaguar) | `virtualjaguar_libretro_android.so` | GPLv3 |
+| WASM-4 | `wasm4_libretro_android.so` | ISC |
+
+### Jogos livres que vêm no APK (8)
+
+Sem pasta do ARENA no aparelho, o ARENA do Android põe estes jogos na
+pasta dele (os de `testes\jogos_livres` que o Android abre), cada um
+com o texto da licença ao lado:
+
+| Jogo | Console | Autor | Licença | Código-fonte |
+|---|---|---|---|---|
+| DIAFLW | Apple II | Randall Frank | MIT | <https://github.com/randall-frank/DIAFLW> |
+| Evade | Arduboy | Modus Create | MIT | <https://github.com/ModusCreateOrg/evade-arduboy-game> |
+| Slippery Slope | CHIP-8 | John Earnest | CC0 (domínio público), como todo o Chip8 Community Archive | <https://github.com/JohnEarnest/chip8Archive> |
+| NOBORUNOCA | MSX | Hiromasa Tanaka (h1romas4) | MIT (código e recursos: gráficos e música) | <https://github.com/h1romas4/noborunoca> |
+| Skip Ahead | MicroW8 | Dennis Ranke (exoticorn) | Unlicense (domínio público) | <https://github.com/exoticorn/microw8> |
+| Intervallo | Commodore Plus/4 | Zalka Ernő (ern0) | MIT | <https://github.com/ern0/intervallo> |
+| Baguel | Commodore VIC-20 | Marco Giorgini (MGProduction) | MIT | <https://github.com/mgproduction/baguel> |
+| Factory 2023 | ZX81 | Sebastien Andrivet | GPL-3.0 | <https://github.com/andrivet/Factory-2023> |
