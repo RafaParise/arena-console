@@ -526,3 +526,29 @@ números e o que fazer se a escola bloquear algo estão em
 `docs\CHROMEBOOK.md`.
 
 ---
+
+## Parte D — No Linux
+
+O mesmo pen drive abre no Linux (Ubuntu, Mint, Debian, Fedora e outros, de
+2018 para cá, 64 bits), sem instalar nada e sem senha de administrador. É o
+mesmo ARENA: a mesma tela, os mesmos 66 consoles, o mesmo save do Windows.
+
+1. No Linux, abra a pasta do ARENA no gerenciador de arquivos, clique com o
+   botão direito num espaço vazio e escolha **Abrir no terminal**.
+2. Digite `sh ARENA.sh` e aperte Enter. A tela abre no navegador do
+   computador, como no Windows. Na primeira vez, o ARENA prepara o RetroArch
+   (uns segundos); nas outras, abre direto.
+3. Não feche a janela do terminal enquanto joga: ela é a "janela preta" do
+   Linux. Para fechar o ARENA, feche a janela ou aperte **Ctrl+C** nela.
+
+Para abrir com dois cliques nas outras vezes: `sh ARENA.sh --atalho` põe o
+ARENA no menu de aplicativos deste computador. Nos gerenciadores de arquivos
+que deixam (o do KDE, o do Mint), o `ARENA.desktop` da pasta também abre.
+
+O que muda no Linux: o som vai pelo PulseAudio (ou pelo ALSA) e o controle
+pelo udev, o jeito do Linux; o Lossless Scaling (programa do Windows) não
+aparece. O resto é igual, inclusive o PS2, o PS3 e o Xbox 360, com os
+emuladores do Linux usando a mesma pasta de dados dos do Windows. Para
+conferir a pasta, `sh VERIFICAR.sh`. Os detalhes estão em `docs\LINUX.md`.
+
+---

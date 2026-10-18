@@ -57,6 +57,7 @@ Ele nasceu nas aulas do curso técnico de **Desenvolvimento de Sistemas**
 | 🧰 **Conserta sozinho** | `VERIFICAR.bat` confere e conserta a pasta; `PARTIDA.bat` explica por que a partida a dois não conecta; a tela explica por que um jogo não abriu |
 | 🔒 **Seguro para menores** | Sem gravação de vídeo e sem transmissão ao vivo. Só o que o Jogar Junto precisa fica aberto à rede |
 | 💻 **Também no Chromebook** | O mesmo pen drive abre no Chromebook, dentro do Chrome (`ARENA-CHROMEBOOK.html`), sem instalar nada: a mesma tela, 35 consoles e o mesmo save do Windows ([`docs/CHROMEBOOK.md`](docs/CHROMEBOOK.md)) |
+| 🐧 **Também no Linux** | O mesmo pen drive abre no Linux (`sh ARENA.sh`), sem instalar nada e sem administrador: o mesmo ARENA, os 66 consoles e o mesmo save do Windows ([`docs/LINUX.md`](docs/LINUX.md)) |
 
 ## Baixar e usar
 
@@ -124,7 +125,7 @@ o GameCube e o Wii dentro do RetroArch.
 
 | | Mínimo | Bom |
 |---|---|---|
-| Sistema | Windows 10 ou 11, **64 bits**; ou um Chromebook (35 consoles, pelo `ARENA-CHROMEBOOK.html`) | |
+| Sistema | Windows 10 ou 11, **64 bits**; Linux de 64 bits de 2018 para cá (Ubuntu 18.04, Debian 10, Mint 19, Fedora 28 ou mais novos, pelo `ARENA.sh`); ou um Chromebook (35 consoles, pelo `ARENA-CHROMEBOOK.html`) | |
 | Processador | 2 núcleos (Celeron, Pentium) | 4 núcleos ou mais |
 | Memória | 4 GB | 8 GB |
 | Espaço | 4 GB, mais os jogos | SSD ou pen drive USB 3.0 |
@@ -181,15 +182,22 @@ responde dentro da própria página os pedidos que a tela faria ao servidor,
 e os jogos rodam no mesmo RetroArch, compilado para WebAssembly
 ([`docs/CHROMEBOOK.md`](docs/CHROMEBOOK.md)).
 
+No **Linux**, roda o mesmo servidor, com o Python portátil do Linux
+(`servidor/python-linux`), o RetroArch 1.22.2 do Linux (o AppImage) e os
+núcleos `.so` ao lado dos `.dll`. O que muda de um sistema para o outro
+mora em `servidor/plataforma.py` ([`docs/LINUX.md`](docs/LINUX.md)).
+
 ```
 ARENA\
 ├── ARENA.bat · VERIFICAR.bat · PARTIDA.bat · COLETAR.bat · RODAR_TESTES.bat
+├── ARENA.sh · VERIFICAR.sh · PARTIDA.sh · RODAR_TESTES.sh · ARENA.desktop   (Linux)
 ├── ARENA-CHROMEBOOK.html   a entrada no Chromebook (ou em qualquer navegador)
 ├── servidor\     o servidor, o banco (SQLite), o catálogo, a rede e os ajustes
 │   ├── arena.py         as rotas da API, o banco, a sincronização e o Jogar Junto
 │   ├── indexador.py     acha os jogos nas pastas
 │   ├── hardware.py      mede o computador
 │   ├── graficos.py      a configuração de cada emulador
+│   ├── plataforma.py    o que muda entre o Windows e o Linux
 │   ├── consoles.json    os 66 consoles
 │   └── tests\           a bateria de testes (RODAR_TESTES.bat)
 ├── launcher\     a tela (index.html, app.js, estilo.css e os fundos em pixel art)

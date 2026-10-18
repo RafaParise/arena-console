@@ -88,7 +88,17 @@ Depois do Release, nesta ordem:
     Chrome e no Firefox; NES, Super Nintendo e Mega Drive a 60 quadros com
     o processador freado 4 vezes. Falta o teste num Chromebook da escola
     (em "Depende do Rafael").
-13. Linux, idêntico.
+13. Linux, idêntico: feito o ARENA do Linux (17 e 18/10), com o relatório
+    em `docs/LINUX.md`. O mesmo pen drive abre no Linux pelo `ARENA.sh`: o
+    mesmo servidor e a mesma tela, o Python portátil do Linux, o RetroArch
+    1.22.2 do Linux (o AppImage, que sai para `~/.cache/arena` sem FUSE), os
+    63 núcleos `.so`, o Java ME com o Java do Linux, o PS2, o PS3 e o Xbox
+    360 com os emuladores do Linux usando a mesma pasta de dados dos do
+    Windows, e o mesmo `retroarch.cfg` (caminhos e motores traduzidos a cada
+    abertura). A bateria inteira passa no Linux (532 de 532, 17/10).
+    **Falta rodar o teste de ponta a ponta** (`testes/teste_linux.py`): o
+    serviço do WSL travou na madrugada de 18/10 (a máquina virtual do
+    contêiner não fecha sem reiniciar o Windows; ver "Depende do Rafael").
 14. Android: antes, um emulador de Android de código aberto para os
     testes; depois, o APK nos Releases.
 15. Testes nos sistemas virtuais (Docker e WSL), com números e
@@ -106,6 +116,12 @@ Achado de 16/10 que espera conserto:
   avisarem, antes do item 15 (o Docker e o WSL criam essas reservas).
 
 ## Depende do Rafael
+
+- **Reiniciar o Windows** quando puder: na madrugada de 18/10 a máquina
+  virtual do contêiner de testes (WSLC) travou, e o serviço do WSL ficou
+  "parando" (o Windows não deixa encerrá-la de outro jeito). Depois do
+  reinício, o teste de ponta a ponta do Linux (`testes/teste_linux.py`) e
+  os itens 14 e 15 seguem sozinhos.
 
 - **O teste no Chromebook da escola** (item 12, `docs/CHROMEBOOK.md`, "O
   teste no Chromebook da escola"): abrir o `ARENA-CHROMEBOOK.html` do pen

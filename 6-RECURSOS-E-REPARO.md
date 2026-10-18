@@ -311,7 +311,8 @@ O que o pacote de atualização traz e substitui:
 
 ```
 ARENA.bat · VERIFICAR.bat · PARTIDA.bat · COLETAR.bat · LEIA-ME e guias 1 a 6
-LICENSE · TERCEIROS.md · servidor\ (com o Python embutido) · launcher\ · ferramentas\
+ARENA.sh · VERIFICAR.sh · PARTIDA.sh · ARENA.desktop (os do Linux)
+LICENSE · TERCEIROS.md · servidor\ (com o Python embutido do Windows e o do Linux) · launcher\ · ferramentas\
 ```
 
 O que é **seu** e não vem no pacote de atualização:
@@ -357,7 +358,8 @@ Dolphin de fora, sem perguntar, e o `VERIFICAR.bat` avisa que ela falta.
 
 **Depois de copiar:**
 
-1. Dois cliques em **`VERIFICAR.bat`**.
+1. Dois cliques em **`VERIFICAR.bat`** (no Linux, `sh VERIFICAR.sh`, no
+   terminal aberto na pasta do ARENA).
 2. Abra o ARENA.
 3. Clique em **Atualizar lista**.
 
