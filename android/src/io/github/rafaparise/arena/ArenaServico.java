@@ -67,7 +67,11 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.lang.ref.WeakReference;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyStore;
 import java.security.SecureRandom;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
+import java.util.Enumeration;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
@@ -611,8 +615,9 @@ public class ArenaServico extends Service {
         a.put("HOME", getFilesDir().getPath());
         a.put("TMPDIR", getCacheDir().getPath());
         // Os certificados do proprio Android (as capas e a biblioteca livre
-        // baixam por HTTPS): o OpenSSL do Python le a pasta do sistema.
-        a.put("SSL_CERT_DIR", "/system/etc/security/cacerts");
+        // baixam por HTTPS), num arquivo so (certificados()).
+        File certificados = certificados();
+        if (certificados != null) a.put("SSL_CERT_FILE", certificados.getPath());
         a.put("ARENA_ANDROID_SEGREDO", segredo);
         a.put("ARENA_ANDROID_PERMISSAO", Build.VERSION.SDK_INT < 23 || checkSelfPermission(
                 android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED ? "1" : "0");
@@ -641,6 +646,35 @@ public class ArenaServico extends Service {
             }
         }
         return a;
+    }
+
+    /** Os certificados em que o Android confia, num arquivo PEM para o
+     *  OpenSSL do Python. A pasta do sistema (/system/etc/security/cacerts)
+     *  nao serve direto: os nomes dos arquivos la sao do jeito antigo do
+     *  OpenSSL, e o OpenSSL 3 do Python nao os acha. Vao os do sistema e os
+     *  que a pessoa (ou a escola) instalou no aparelho, como no Windows, que
+     *  confia nos certificados instalados no computador. Feito a cada
+     *  abertura do servico (leva uma fracao de segundo). */
+    File certificados() {
+        File arquivo = new File(getFilesDir(), "certificados.pem");
+        try {
+            KeyStore loja = KeyStore.getInstance("AndroidCAStore");
+            loja.load(null, null);
+            StringBuilder pem = new StringBuilder();
+            for (Enumeration<String> nomes = loja.aliases(); nomes.hasMoreElements(); ) {
+                Certificate c = loja.getCertificate(nomes.nextElement());
+                if (!(c instanceof X509Certificate)) continue;
+                pem.append("-----BEGIN CERTIFICATE-----\n")
+                        .append(android.util.Base64.encodeToString(c.getEncoded(), android.util.Base64.DEFAULT))
+                        .append("-----END CERTIFICATE-----\n");
+            }
+            ArenaActivity.copiar(new java.io.ByteArrayInputStream(pem.toString().getBytes(StandardCharsets.US_ASCII)),
+                    arquivo);
+            return arquivo;
+        } catch (Exception falha) {
+            Log.w(TAG, "sem os certificados do Android: " + falha);
+            return arquivo.isFile() ? arquivo : null;
+        }
     }
 
     String abiDoApk() {
