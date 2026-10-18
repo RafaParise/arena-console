@@ -12,11 +12,16 @@
 FROM debian:trixie-slim
 
 ENV DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 LC_ALL=C.UTF-8
+# O que NAO vem aqui de proposito: a libjack (o Ubuntu 24.04 de desktop nao
+# traz; o ARENA leva a vazia) e a libgomp (o ARENA leva a de reserva). A
+# libgpg-error vem: todo Linux com o systemd tem (o Debian "slim" nao).
+# x11-apps: o xwd, que fotografa a tela virtual; git: os testes das
+# ferramentas de publicar.
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        ca-certificates procps xvfb xauth x11-utils \
+        ca-certificates procps xvfb xauth x11-utils x11-apps \
         libgl1 libgl1-mesa-dri libegl1 libgles2 libvulkan1 mesa-vulkan-drivers \
         libasound2t64 libpulse0 libglib2.0-0t64 libfontconfig1 libfreetype6 libxkbcommon0 \
-        libudev1 libusb-1.0-0 libsdl2-2.0-0 zstd xz-utils file \
+        libudev1 libusb-1.0-0 libsdl2-2.0-0 libgpg-error0 zstd xz-utils file git \
     && rm -rf /var/lib/apt/lists/*
 
 # Um usuario comum, sem senha de administrador (o ARENA nunca pede).
