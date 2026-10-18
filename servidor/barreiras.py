@@ -277,7 +277,10 @@ def _memoria_e_energia(rapido=False):
 
 def coletar_fatos():
     """Tudo o que avaliar() precisa. Nunca levanta erro: o que falhar fica
-    registrado em fatos['nao_deu_para_ler']. No Linux, coletar_fatos_linux."""
+    registrado em fatos['nao_deu_para_ler']. No Linux, coletar_fatos_linux;
+    no Android, coletar_fatos_android."""
+    if sys.platform == "android":
+        return coletar_fatos_android()
     if sys.platform.startswith("linux"):
         return coletar_fatos_linux()
     fatos = {"nao_deu_para_ler": []}
@@ -595,7 +598,7 @@ def diagnosticar(disco_mecanico=None):
     fatos = coletar_fatos()
     if disco_mecanico is not None:
         fatos["disco_mecanico"] = disco_mecanico
-    barreiras = avaliar_linux(fatos) if fatos.get("sistema") == "linux" else avaliar(fatos)
+    barreiras = avaliar_do_sistema(fatos)
     # Da lista de processos guarda so os 15 mais pesados: a lista inteira
     # diria demais sobre o que o aluno usa, e nao ajuda a decidir nada.
     procs = _processos(fatos)
@@ -612,8 +615,17 @@ def diagnosticar(disco_mecanico=None):
 IDS_RAPIDOS = ("memoria", "bateria", "economia_bateria")
 
 
+def avaliar_do_sistema(fatos):
+    """A avaliacao do sistema de onde vieram os fatos."""
+    if fatos.get("sistema") == "android":
+        return avaliar_android(fatos)
+    if fatos.get("sistema") == "linux":
+        return avaliar_linux(fatos)
+    return avaliar(fatos)
+
+
 def avaliar_rapido(fatos):
-    avaliacao = avaliar_linux(fatos) if fatos.get("sistema") == "linux" else avaliar(fatos)
+    avaliacao = avaliar_do_sistema(fatos)
     return [b for b in avaliacao if b["id"] in IDS_RAPIDOS and b["gravidade"] == "alta"]
 
 
@@ -621,6 +633,8 @@ def checagem_rapida():
     """Chamada ao abrir um jogo: memoria quase cheia, notebook na bateria,
     economia de bateria ligada. Leva milissegundos. Nunca levanta erro."""
     try:
+        if sys.platform == "android":
+            return avaliar_rapido(coletar_fatos_android(rapido=True))
         if sys.platform.startswith("linux"):
             return avaliar_rapido(dict(_memoria_e_energia_linux(rapido=True), sistema="linux"))
         if not sys.platform.startswith("win"):
@@ -904,6 +918,96 @@ def avaliar_linux(fatos, proprios=("python3.13", "python3", "python", "retroarch
                             "Sem o driver da placa, os jogos 3D ficam lentíssimos ou nem abrem.",
                             "O TI instala o driver da placa de vídeo (o Ubuntu oferece em Drivers Adicionais).",
                             ACOES_TI))
+    barreiras.sort(key=lambda b: GRAVIDADE[b["gravidade"]])
+    return barreiras
+
+
+# ---------------------------------------------------------------------------
+# 4. O mesmo no Android (item 14)
+# ---------------------------------------------------------------------------
+# No Android, o ARENA enxerga a memoria (/proc/meminfo), o tempo ligado
+# (/proc/uptime) e o espaco da pasta do ARENA; a bateria e a economia de
+# bateria quem conta e' o app (servidor/ponte_android.py). Os outros apps o
+# Android esconde. Os achados tem o mesmo "id" dos do Windows e do Linux (a
+# checagem rapida, ao abrir o jogo, vale igual); o texto e' o do aparelho.
+
+def coletar_fatos_android(rapido=False):
+    """Tudo o que avaliar_android() precisa. Nunca levanta erro."""
+    fatos = {"nao_deu_para_ler": [], "sistema": "android"}
+    try:
+        lidos = _memoria_e_energia_linux(rapido=True)
+        for chave in ("memoria_total_mb", "memoria_livre_mb", "memoria_em_uso_pct", "ligado_ha_horas"):
+            if chave in lidos:
+                fatos[chave] = lidos[chave]
+    except Exception as falha:           # nunca trava
+        fatos["nao_deu_para_ler"].append("memoria: %s" % falha)
+    try:
+        import ponte_android
+        energia = ponte_android.energia()
+    except Exception as falha:
+        energia = {}
+        fatos["nao_deu_para_ler"].append("bateria: %s" % falha)
+    if energia:
+        fatos["tem_bateria"] = bool(energia.get("tem_bateria"))
+        fatos["bateria_pct"] = energia.get("bateria_pct")
+        fatos["na_tomada"] = bool(energia.get("na_tomada"))
+        fatos["economia_de_bateria"] = bool(energia.get("economia"))
+    if rapido:
+        return fatos
+    try:
+        import shutil
+        pasta = os.path.realpath(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "jogos"))
+        uso = shutil.disk_usage(pasta)
+        fatos["disco_livre_gb"] = round(uso.free / 1024 ** 3, 1)
+        fatos["disco_livre_pct"] = round(100.0 * uso.free / uso.total, 1)
+    except OSError as falha:
+        fatos["nao_deu_para_ler"].append("espaco: %s" % falha)
+    return fatos
+
+
+def avaliar_android(fatos):
+    """O mesmo que avaliar(), com o que vale e o que se faz no aparelho."""
+    barreiras = []
+    total_mb = fatos.get("memoria_total_mb") or 0
+    livre = fatos.get("memoria_livre_mb")
+    if isinstance(livre, (int, float)) and total_mb:
+        if livre < 500 or fatos.get("memoria_em_uso_pct", 0) >= 90:
+            barreiras.append(_b("memoria", "alta", "Memória quase cheia",
+                                "Só %d MB livres de %d MB (%d%% em uso)." % (
+                                    livre, total_mb, fatos.get("memoria_em_uso_pct", 0)),
+                                "Sem memória livre, o Android fecha apps sozinho, e o jogo engasga.",
+                                "Feche os outros apps (na tela dos apps abertos, arraste cada um para fora). No "
+                                "ARENA, ligue o modo modesto.", ACOES_ALUNO))
+        elif livre < 1000 and total_mb <= 4500:
+            barreiras.append(_b("memoria", "media", "Pouca memória livre",
+                                "%d MB livres de %d MB." % (livre, total_mb),
+                                "Num aparelho de 4 GB, abaixo de 1 GB livre os jogos começam a engasgar.",
+                                "Feche os apps que não estiver usando antes de jogar.", ACOES_ALUNO))
+    pct = fatos.get("bateria_pct")
+    if fatos.get("tem_bateria") and fatos.get("na_tomada") is False and isinstance(pct, (int, float)) and pct < 20:
+        barreiras.append(_b("bateria", "alta", "Bateria fraca",
+                            "Fora da tomada, com %d%%." % pct,
+                            "Com a bateria fraca, o Android segura o processador para durar mais.",
+                            "Ligue o carregador antes de jogar.", ACOES_ALUNO))
+    if fatos.get("economia_de_bateria"):
+        barreiras.append(_b("economia_bateria", "alta", "Economia de bateria ligada",
+                            "A economia de bateria do Android está ativa.",
+                            "Ela corta o desempenho de propósito.",
+                            "Desligue a Economia de bateria nas configurações rápidas (puxe a barra de cima da "
+                            "tela).", ACOES_ALUNO))
+    livre_gb = fatos.get("disco_livre_gb")
+    if isinstance(livre_gb, (int, float)) and livre_gb < 1:
+        barreiras.append(_b("disco_cheio", "alta", "Pouco espaço onde fica a pasta do ARENA",
+                            "Só %s GB livres." % livre_gb,
+                            "Sem espaço, o jogo não grava o save nem o estado.",
+                            "Apague o que não usa (fotos e vídeos ocupam muito) ou leve jogos para outro lugar.",
+                            ACOES_ALUNO))
+    horas = fatos.get("ligado_ha_horas")
+    if isinstance(horas, (int, float)) and horas >= 168:
+        barreiras.append(_b("ligado", "baixa", "Aparelho ligado há muito tempo",
+                            "Ligado direto há %d dias." % int(horas // 24),
+                            "Com o tempo, os apps vão deixando memória presa.",
+                            "Reinicie o aparelho de vez em quando.", ACOES_ALUNO))
     barreiras.sort(key=lambda b: GRAVIDADE[b["gravidade"]])
     return barreiras
 

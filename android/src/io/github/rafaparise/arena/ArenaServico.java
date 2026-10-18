@@ -433,6 +433,8 @@ public class ArenaServico extends Service {
                 fecharORetroArch();
             } else if (tipo.equals("controles")) {
                 responder(numero, "quantos", contarControles());
+            } else if (tipo.equals("energia")) {
+                responder(energia().put("id", numero));
             } else if (tipo.equals("abrir_pasta")) {
                 responder(numero, "ok", abrirAPasta(pedido.optString("caminho")));
             } else if (tipo.equals("escolher_pasta")) {
@@ -555,6 +557,23 @@ public class ArenaServico extends Service {
         } catch (InterruptedException falha) {
             Thread.currentThread().interrupt();
         }
+    }
+
+    /** A bateria e a economia de bateria (o painel do que deixa o jogo
+     *  lento, servidor/barreiras.py). */
+    JSONObject energia() throws JSONException {
+        Intent bateria = registerReceiver(null, new android.content.IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        int nivel = bateria != null ? bateria.getIntExtra(android.os.BatteryManager.EXTRA_LEVEL, -1) : -1;
+        int escala = bateria != null ? bateria.getIntExtra(android.os.BatteryManager.EXTRA_SCALE, 100) : 100;
+        int tomada = bateria != null ? bateria.getIntExtra(android.os.BatteryManager.EXTRA_PLUGGED, 0) : 0;
+        boolean presente = bateria != null && bateria.getBooleanExtra(android.os.BatteryManager.EXTRA_PRESENT, false);
+        android.os.PowerManager poder = (android.os.PowerManager) getSystemService(Context.POWER_SERVICE);
+        JSONObject saida = new JSONObject();
+        saida.put("tem_bateria", presente && nivel >= 0);
+        saida.put("bateria_pct", nivel >= 0 && escala > 0 ? nivel * 100 / escala : JSONObject.NULL);
+        saida.put("na_tomada", tomada != 0);
+        saida.put("economia", poder != null && poder.isPowerSaveMode());
+        return saida;
     }
 
     int contarControles() {

@@ -245,6 +245,15 @@ def controles():
     return int(resposta.get("quantos") or 0)
 
 
+def energia():
+    """A bateria e a economia de bateria do aparelho (o app pergunta ao
+    Android): {tem_bateria, bateria_pct, na_tomada, economia}, ou {}."""
+    try:
+        return perguntar({"pedido": "energia"}, limite=2.0)
+    except OSError:
+        return {}
+
+
 def abrir_pasta(caminho):
     """Abre a pasta no gerenciador de arquivos do aparelho. False se o
     aparelho nao tem um que abra pasta (quem chamou mostra o caminho)."""

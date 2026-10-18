@@ -513,6 +513,51 @@ class RotasDoAndroid(unittest.TestCase):
             self.assertEqual(self.pedir("/api/android/pastas")[0], 404)
 
 
+class Lentidao(unittest.TestCase):
+    """O que deixa o jogo lento, no aparelho (servidor\\barreiras.py): a memoria
+    pelo /proc, a bateria e a economia de bateria pelo app."""
+
+    MEMINFO = "MemTotal:        3891200 kB\nMemFree:          100000 kB\nMemAvailable:     307200 kB\n"
+
+    def setUp(self):
+        self.antes = ponte_android.CANAL
+
+    def tearDown(self):
+        ponte_android.CANAL = self.antes
+
+    def test_os_achados_do_aparelho(self):
+        import barreiras
+        fatos = {"sistema": "android", "memoria_total_mb": 3800, "memoria_livre_mb": 300, "memoria_em_uso_pct": 92,
+                 "tem_bateria": True, "bateria_pct": 15, "na_tomada": False, "economia_de_bateria": True,
+                 "disco_livre_gb": 0.5}
+        ids = [b["id"] for b in barreiras.avaliar_do_sistema(fatos)]
+        self.assertEqual(sorted(ids), ["bateria", "disco_cheio", "economia_bateria", "memoria"])
+        # Na tomada, com a bateria boa e sem economia: nada.
+        tranquilo = dict(fatos, memoria_livre_mb=2500, memoria_em_uso_pct=40, bateria_pct=80, na_tomada=True,
+                         economia_de_bateria=False, disco_livre_gb=20)
+        self.assertEqual(barreiras.avaliar_do_sistema(tranquilo), [])
+
+    def test_a_checagem_rapida_com_o_app(self):
+        import barreiras
+        ponte_android.CANAL = AppDeMentira(respostas={"energia": {"tem_bateria": True, "bateria_pct": 12,
+                                                                  "na_tomada": False, "economia": True}})
+        lidos = {"/proc/meminfo": self.MEMINFO, "/proc/uptime": "3600.5 1000.0\n"}
+        with mock.patch.object(barreiras, "_ler_linux", side_effect=lambda c: lidos.get(c, "")):
+            fatos = barreiras.coletar_fatos_android(rapido=True)
+            self.assertEqual(fatos["memoria_livre_mb"], 300)
+            self.assertEqual(fatos["bateria_pct"], 12)
+            rapidos = sorted(b["id"] for b in barreiras.avaliar_rapido(fatos))
+        self.assertEqual(rapidos, ["bateria", "economia_bateria", "memoria"])
+
+    def test_sem_o_app_so_a_memoria(self):
+        import barreiras
+        ponte_android.CANAL = None
+        with mock.patch.object(barreiras, "_ler_linux", side_effect=lambda c: self.MEMINFO if "meminfo" in c else ""):
+            fatos = barreiras.coletar_fatos_android(rapido=True)
+        self.assertNotIn("bateria_pct", fatos)
+        self.assertEqual([b["id"] for b in barreiras.avaliar_android(fatos)], ["memoria"])
+
+
 class Hardware(unittest.TestCase):
     def test_o_que_o_app_conta(self):
         ambiente = {"ARENA_ANDROID_GPU": "Adreno (TM) 610", "ARENA_ANDROID_PROCESSADOR": "Qualcomm SM6125",
