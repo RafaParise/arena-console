@@ -20,10 +20,18 @@
  * Esta tela roda num processo a parte (":tela", no AndroidManifest.xml): o
  * RetroArch pode fechar o processo dele ao sair do jogo, e a tela continua.
  *
- * Seguranca: a pagina so vem de dentro do APK (https://arena.local/, que nao
- * existe na internet: quem responde e' o shouldInterceptRequest daqui). Link
- * para fora abre no navegador do aparelho, nunca dentro desta tela, e a
- * ponte so le e grava dentro da pasta do ARENA escolhida e da pasta do app.
+ * Seguranca (revisao de 18/10/2026):
+ *   - a pagina so vem de dentro do APK (https://arena.local/launcher/, que
+ *     nao existe na internet: quem responde e' o shouldInterceptRequest
+ *     daqui), a navegacao fica presa a ela, e link para fora abre no
+ *     navegador do aparelho;
+ *   - o arquivo da pasta do ARENA (a capa, o manifesto, o jogo) sai so como
+ *     imagem ou dado, nunca como pagina ou script (nosniff e sandbox): um
+ *     .html posto na pasta nao vira uma pagina com a ponte;
+ *   - a ponte so atende quando a pagina da frente e' a tela do ARENA, so le
+ *     e grava dentro da pasta do ARENA escolhida (e de tres pastas do app),
+ *     so abre nucleo que veio no APK (pelo nome exato da lista dele) e tira
+ *     da configuracao que a pagina manda as chaves de caminho e de plugin.
  */
 package io.github.rafaparise.arena;
 
@@ -65,10 +73,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ArenaActivity extends Activity {
     static final String CASA = "arena.local";
@@ -78,6 +91,17 @@ public class ArenaActivity extends Activity {
     // O RetroArch de dentro do APK (o mesmo codigo do RetroArch oficial).
     static final String RETROARCH = "com.retroarch.browser.retroactivity.RetroActivityFuture";
 
+    // O nome de um nucleo do Android ("fceumm_libretro_android.so").
+    static final Pattern NOME_DE_NUCLEO = Pattern.compile("[A-Za-z0-9_]+_libretro_android\\.so");
+    // Uma linha do retroarch.cfg: chave = "valor".
+    static final Pattern LINHA_CFG = Pattern.compile("^\\s*([a-z0-9_]+)\\s*=\\s*\"([^\"\\r\\n]*)\"\\s*$");
+    // O que da pasta do ARENA a pagina pode ler, e com que tipo (o resto vai
+    // como dado: nunca roda).
+    static final Set<String> TIPOS_DA_PASTA = new HashSet<String>(Arrays.asList("png", "jpg", "jpeg", "gif", "webp",
+            "json", "txt"));
+    // As pastas do app onde a pagina pode gravar (o jogo livre que vem no APK,
+    // o guardado no aparelho e a lista dos discos).
+    static final String[] PASTAS_DO_APP = {"livres/", "guardados/", "listas/"};
     static final Map<String, String> TIPOS = new HashMap<String, String>();
     static {
         TIPOS.put("html", "text/html");
@@ -99,6 +123,13 @@ public class ArenaActivity extends Activity {
 
     WebView tela;
     SharedPreferences guardado;
+    // O endereco da pagina da frente (o onPageStarted o atualiza): a ponte so
+    // atende a tela do ARENA.
+    volatile String paginaAtual = "";
+
+    boolean paginaDoArena() {
+        return paginaAtual.startsWith("https://" + CASA + "/launcher/");
+    }
 
     @Override
     protected void onCreate(Bundle estado) {
@@ -204,9 +235,15 @@ public class ArenaActivity extends Activity {
     }
 
     static WebResourceResponse resposta(String tipo, InputStream dados, int codigo) {
+        return resposta(tipo, dados, codigo, false);
+    }
+
+    static WebResourceResponse resposta(String tipo, InputStream dados, int codigo, boolean daPasta) {
         WebResourceResponse r = new WebResourceResponse(tipo, "utf-8", dados);
         Map<String, String> cabecalhos = new HashMap<String, String>();
         cabecalhos.put("Cache-Control", "no-store");
+        cabecalhos.put("X-Content-Type-Options", "nosniff");
+        if (daPasta) cabecalhos.put("Content-Security-Policy", "sandbox; default-src 'none'");
         try {
             r.setStatusCodeAndReasonPhrase(codigo, codigo == 200 ? "OK" : "Not Found");
         } catch (IllegalArgumentException falha) {
@@ -217,6 +254,11 @@ public class ArenaActivity extends Activity {
     }
 
     class Cliente extends WebViewClient {
+        @Override
+        public void onPageStarted(WebView vista, String endereco, android.graphics.Bitmap icone) {
+            paginaAtual = endereco == null ? "" : endereco;
+        }
+
         @Override
         public WebResourceResponse shouldInterceptRequest(WebView vista, WebResourceRequest pedido) {
             Uri endereco = pedido.getUrl();
@@ -231,11 +273,15 @@ public class ArenaActivity extends Activity {
                 // nao e' do APK: pode ser da pasta do ARENA (capa, manifesto)
             }
             // 2. a pasta do ARENA escolhida (as capas em retroarch/thumbnails,
-            //    o dados/manifesto.json, os jogos que a pagina le)
-            File arquivo = dentroDaPasta(relativo);
+            //    o dados/manifesto.json, os jogos que a pagina le): so como
+            //    imagem ou dado, e nunca como a pagina da frente.
+            File arquivo = pedido.isForMainFrame() ? null : dentroDaPasta(relativo);
             if (arquivo != null && arquivo.isFile()) {
+                int ponto = relativo.lastIndexOf('.');
+                String extensao = ponto < 0 ? "" : relativo.substring(ponto + 1).toLowerCase(Locale.ROOT);
+                String tipo = TIPOS_DA_PASTA.contains(extensao) ? tipoDe(relativo) : "application/octet-stream";
                 try {
-                    return resposta(tipoDe(relativo), new FileInputStream(arquivo), 200);
+                    return resposta(tipo, new FileInputStream(arquivo), 200, true);
                 } catch (IOException falha) {
                     Log.w(TAG, "nao li " + arquivo + ": " + falha);
                 }
@@ -246,7 +292,11 @@ public class ArenaActivity extends Activity {
         @Override
         public boolean shouldOverrideUrlLoading(WebView vista, WebResourceRequest pedido) {
             Uri endereco = pedido.getUrl();
-            if (CASA.equals(endereco.getHost())) return false;
+            if (CASA.equals(endereco.getHost())) {
+                // So a tela do ARENA abre aqui (a ponte e' dela).
+                String caminho = endereco.getPath() == null ? "" : endereco.getPath();
+                return !caminho.startsWith("/launcher/");
+            }
             // Link para fora: no navegador do aparelho, nunca nesta tela
             // (a ponte so vale para a pagina do ARENA).
             try {
@@ -364,21 +414,70 @@ public class ArenaActivity extends Activity {
         }
     }
 
-    /** O nucleo, na pasta de nucleos do app (de onde o RetroArch carrega). */
+    /** A hora em que este APK foi instalado (ou atualizado). */
+    long instalacao() {
+        try {
+            return getPackageManager().getPackageInfo(getPackageName(), 0).lastUpdateTime;
+        } catch (PackageManager.NameNotFoundException falha) {
+            return 0;
+        }
+    }
+
+    static String lerTexto(File arquivo) {
+        try {
+            InputStream entrada = new FileInputStream(arquivo);
+            try {
+                byte[] dados = new byte[(int) Math.min(arquivo.length(), 4096)];
+                int lidos = entrada.read(dados);
+                return lidos > 0 ? new String(dados, 0, lidos, "UTF-8") : "";
+            } finally {
+                entrada.close();
+            }
+        } catch (IOException falha) {
+            return "";
+        }
+    }
+
+    /** O nucleo, na pasta de nucleos do app (de onde o RetroArch carrega).
+     *  So o que veio no APK, pelo nome exato da lista dele; o ja tirado do
+     *  APK vale so se foi tirado desta instalacao (a marca ao lado). */
     File nucleo(String nome) throws IOException {
+        String abi = abiDoApk();
+        String[] doApk = getAssets().list("arena-nucleos/" + abi);
+        if (!NOME_DE_NUCLEO.matcher(nome).matches() || doApk == null || !Arrays.asList(doApk).contains(nome)) {
+            throw new IOException("Este console nao tem nucleo neste APK.");
+        }
         File pasta = new File(getApplicationInfo().dataDir, "cores");
         pasta.mkdirs();
         File destino = new File(pasta, nome);
-        String origem = "arena-nucleos/" + abiDoApk() + "/" + nome;
-        long tamanho = -1;
-        try {
-            tamanho = getAssets().openFd(origem).getLength();
-        } catch (IOException falha) {
-            // compactado no APK: o tamanho so se sabe lendo
+        if (!destino.getCanonicalPath().equals(new File(pasta.getCanonicalPath(), nome).getPath())) {
+            throw new IOException("Nome de nucleo invalido.");
         }
-        if (destino.isFile() && (tamanho < 0 || destino.length() == tamanho)) return destino;
-        copiar(getAssets().open(origem), destino);
+        File marca = new File(pasta, nome + ".arena");
+        String desta = String.valueOf(instalacao());
+        if (destino.isFile() && marca.isFile() && desta.equals(lerTexto(marca))) return destino;
+        copiar(getAssets().open("arena-nucleos/" + abi + "/" + nome), destino);
+        gravarTexto(marca, desta);
         return destino;
+    }
+
+    /** A configuracao que a pagina manda, so com o que e' ajuste: sem as
+     *  chaves de caminho (as pastas quem diz e' o ARENA, abaixo) e sem as de
+     *  plugin ou filtro (carregariam programa de fora). */
+    static String semCaminhos(String texto) {
+        StringBuilder saida = new StringBuilder();
+        for (String linha : texto.split("\n")) {
+            Matcher m = LINHA_CFG.matcher(linha);
+            if (!m.matches()) continue;
+            String chave = m.group(1);
+            if (chave.endsWith("_directory") || chave.endsWith("_path") || chave.endsWith("_dir")
+                    || chave.endsWith("_plugin") || chave.endsWith("_filter") || chave.startsWith("libretro_")
+                    || chave.startsWith("network_cmd") || chave.equals("video_shader")) {
+                continue;
+            }
+            saida.append(linha(chave, m.group(2)));
+        }
+        return saida.toString();
     }
 
     /** Poe as BIOS livres (as do ARENA, de licenca livre) na pasta system,
@@ -428,8 +527,8 @@ public class ArenaActivity extends Activity {
         biosLivres(sistema);
 
         File opcoes = new File(getFilesDir(), "arena-opcoes-do-nucleo.opt");
-        gravarTexto(opcoes, pedido.optString("opcoes", ""));
-        StringBuilder cfg = new StringBuilder(pedido.optString("configuracao", ""));
+        gravarTexto(opcoes, semCaminhos(pedido.optString("opcoes", "")));
+        StringBuilder cfg = new StringBuilder(semCaminhos(pedido.optString("configuracao", "")));
         cfg.append(linha("savefile_directory", saves.getPath()));
         cfg.append(linha("savestate_directory", estados.getPath()));
         cfg.append(linha("system_directory", sistema.getPath()));
@@ -464,6 +563,7 @@ public class ArenaActivity extends Activity {
     class Ponte {
         @JavascriptInterface
         public String sistema() {
+            if (!paginaDoArena()) return "{}";
             JSONObject saida = new JSONObject();
             try {
                 saida.put("android", Build.VERSION.RELEASE);
@@ -485,11 +585,13 @@ public class ArenaActivity extends Activity {
 
         @JavascriptInterface
         public boolean temPermissao() {
+            if (!paginaDoArena()) return false;
             return ArenaActivity.this.temPermissao();
         }
 
         @JavascriptInterface
         public void pedirPermissao() {
+            if (!paginaDoArena()) return;
             runOnUiThread(new Runnable() {
                 public void run() {
                     if (Build.VERSION.SDK_INT >= 23) {
@@ -503,6 +605,7 @@ public class ArenaActivity extends Activity {
         /** As pastas do ARENA achadas no aparelho: [{caminho, nome}]. */
         @JavascriptInterface
         public String pastasDoArena() {
+            if (!paginaDoArena()) return "[]";
             JSONArray saida = new JSONArray();
             for (File raiz : raizes()) {
                 List<File> candidatas = new ArrayList<File>();
@@ -536,6 +639,7 @@ public class ArenaActivity extends Activity {
 
         @JavascriptInterface
         public boolean escolherPasta(String caminho) {
+            if (!paginaDoArena()) return false;
             File pasta = new File(caminho);
             if (!pareceArena(pasta)) return false;
             guardado.edit().putString("pasta", pasta.getAbsolutePath()).apply();
@@ -544,12 +648,14 @@ public class ArenaActivity extends Activity {
 
         @JavascriptInterface
         public void esquecerPasta() {
+            if (!paginaDoArena()) return;
             guardado.edit().remove("pasta").apply();
         }
 
         /** [{nome, pasta, tamanho}] de uma pasta (caminho relativo a pasta do ARENA). */
         @JavascriptInterface
         public String listar(String relativo) {
+            if (!paginaDoArena()) return "[]";
             JSONArray saida = new JSONArray();
             File pasta = relativo.length() == 0 ? pastaDoArena() : dentroDaPasta(relativo);
             File[] itens = pasta != null ? pasta.listFiles() : null;
@@ -571,6 +677,7 @@ public class ArenaActivity extends Activity {
         /** O caminho inteiro de um arquivo da pasta do ARENA, ou "". */
         @JavascriptInterface
         public String caminho(String relativo) {
+            if (!paginaDoArena()) return "";
             File alvo = dentroDaPasta(relativo);
             return alvo != null ? alvo.getAbsolutePath() : "";
         }
@@ -580,10 +687,21 @@ public class ArenaActivity extends Activity {
          *  caminho inteiro, ou "". */
         @JavascriptInterface
         public String gravar(String relativo, String base64) {
+            if (!paginaDoArena()) return "";
             File alvo;
             if (relativo.startsWith("app:")) {
-                alvo = new File(getFilesDir(), relativo.substring(4));
-                if (!permitido(alvo)) return "";
+                String dentro = relativo.substring(4);
+                boolean pastaCerta = false;
+                for (String pasta : PASTAS_DO_APP) pastaCerta |= dentro.startsWith(pasta);
+                alvo = new File(getFilesDir(), dentro);
+                try {
+                    if (!pastaCerta || dentro.contains("..")
+                            || !alvo.getCanonicalPath().startsWith(getFilesDir().getCanonicalPath() + File.separator)) {
+                        return "";
+                    }
+                } catch (IOException falha) {
+                    return "";
+                }
             } else {
                 alvo = dentroDaPasta(relativo);
             }
@@ -600,6 +718,7 @@ public class ArenaActivity extends Activity {
 
         @JavascriptInterface
         public boolean apagar(String relativo) {
+            if (!paginaDoArena()) return false;
             File alvo = dentroDaPasta(relativo);
             return alvo != null && alvo.isFile() && alvo.delete();
         }
@@ -610,6 +729,7 @@ public class ArenaActivity extends Activity {
          *  ARENA_ANDROID_FIM (onResume). */
         @JavascriptInterface
         public String jogar(String texto) {
+            if (!paginaDoArena()) return "So a tela do ARENA abre jogo.";
             final JSONObject pedido;
             try {
                 pedido = new JSONObject(texto);
@@ -632,6 +752,7 @@ public class ArenaActivity extends Activity {
 
         @JavascriptInterface
         public void sair() {
+            if (!paginaDoArena()) return;
             runOnUiThread(new Runnable() {
                 public void run() {
                     finish();
