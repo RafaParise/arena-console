@@ -4898,11 +4898,15 @@ class Manipulador(BaseHTTPRequestHandler):
                     "Pedido recusado: ele não veio da tela do ARENA. "
                     "Abra o ARENA pelo ARENA.bat.", 403)
                 return False
-            # No Android, qualquer app do aparelho alcanca o 127.0.0.1: so a
-            # tela do ARENA tem o segredo desta abertura (o cookie que o app
-            # poe no WebView; servidor\ponte_android.py).
-            if (plataforma_do_sistema.ANDROID and caminho not in ROTAS_REDE_EXTERNA
-                    and not ponte_android.segredo_confere(self.headers.get("Cookie"))):
+            # No Android, qualquer app do aparelho alcanca o 127.0.0.1 (e o
+            # endereco do aparelho na rede): so a tela do ARENA tem o segredo
+            # desta abertura (o cookie que o app poe no WebView;
+            # servidor\ponte_android.py). Vale para TODA rota pedida do
+            # proprio aparelho, ate as abertas a rede: senao outro app gravaria
+            # recordes falsos (/api/sinc/receber) ou leria os apelidos
+            # (/api/ranking) com a rede fechada. Os colegas da rede chegam de
+            # outro endereco e seguem pelas ROTAS_REDE_EXTERNA, como sempre.
+            if plataforma_do_sistema.ANDROID and not ponte_android.segredo_confere(self.headers.get("Cookie")):
                 self.erro(
                     "Pedido recusado: ele não veio da tela do ARENA. "
                     "Abra o ARENA pelo ícone dele no aparelho.", 403)
@@ -7562,6 +7566,11 @@ def principal():
     if os.environ.get("ARENA_REABERTO") == "1":
         print("  Reaberto sozinho depois de uma queda. A tela que ja estava")
         print("  aberta volta sozinha em poucos segundos.")
+        # No Android, o app so mostra a tela depois deste aviso, que vem pelo
+        # fio dele: assim ele sabe que quem abriu a porta foi este servidor,
+        # e nao outro app do aparelho.
+        if plataforma_do_sistema.ANDROID:
+            ponte_android.tela_pronta(local)
     elif os.environ.get("ARENA_SEM_JANELA") != "1":
         # Sem espera: a porta ja escuta desde o Servidor(...) acima, e o
         # pedido da janela fica na fila do Windows ate o serve_forever logo

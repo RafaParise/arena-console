@@ -467,11 +467,17 @@ class RotasDoAndroid(unittest.TestCase):
     def test_sem_o_segredo_outro_app_nao_entra(self):
         for cookie in (None, "arena_segredo=chute", "outro=segredo-da-tela"):
             self.assertEqual(self.pedir("/api/android/pastas", cookie=cookie)[0], 403, cookie)
+            # Ate as rotas abertas a rede: do proprio aparelho, so com o segredo.
+            for rota in ("/api/ranking", "/api/colegas"):
+                self.assertEqual(self.pedir(rota, cookie=cookie)[0], 403, (rota, cookie))
+            self.assertEqual(self.pedir("/api/sinc/receber", {"placares": [], "sessoes": []}, cookie=cookie)[0],
+                             403, cookie)
             self.assertEqual(self.pedir("/api/android/pasta", {"caminho": self.arena_do_cartao},
                                         cookie=cookie)[0], 403, cookie)
         self.assertEqual(self.escolhas, [])
 
     def test_a_tela_do_arena_entra(self):
+        self.assertNotEqual(self.pedir("/api/ranking", cookie="arena_segredo=segredo-da-tela")[0], 403)
         estado, resposta = self.pedir("/api/android/pastas", cookie="arena_segredo=segredo-da-tela")
         self.assertEqual(estado, 200, resposta)
         self.assertEqual([p["caminho"] for p in resposta["pastas"]], [self.arena_do_cartao])
