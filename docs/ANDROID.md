@@ -45,6 +45,13 @@ de hoje, 207 MB) e **x86_64** (Chromebook Intel e o emulador). O pacote é
 APK pede o Android 7 ou mais novo e a permissão de arquivos (para ler a
 pasta do ARENA), como o RetroArch.
 
+Uma diferença de propósito para o RetroArch oficial: lá, as telas do
+RetroArch (a do jogo, a do menu e a de instalar núcleo) ficam abertas a
+qualquer app do aparelho, e a do jogo aceita o caminho de um núcleo. No APK
+do ARENA elas só abrem por dentro do ARENA; senão, outro app poderia fazer o
+RetroArch do ARENA carregar um programa dele, com a permissão de arquivos do
+ARENA.
+
 Montar: `ferramentas/montar_android.py` (detalhes no topo dele). A chave que
 assina o APK fica fora do git, em `%LOCALAPPDATA%\ARENA-android\assinatura`:
 **guarde uma cópia**; sem ela, o APK seguinte não instala por cima do

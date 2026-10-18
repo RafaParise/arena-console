@@ -337,6 +337,20 @@ def ajustar_manifesto(pasta, versao_nome, versao_codigo):
                 <category android:name="tv.ouya.intent.category.GAME"/>
             </intent-filter>
 ''', ""),
+        # As telas do RetroArch so abrem por dentro do ARENA. No RetroArch
+        # oficial elas ficam abertas a qualquer app do aparelho, e a do jogo
+        # aceita o caminho de um nucleo: outro app faria o RetroArch do ARENA
+        # carregar um programa dele, com a permissao de arquivos do ARENA.
+        ('<activity android:exported="true" android:launchMode="singleInstance" '
+         'android:name="com.retroarch.browser.mainmenu.MainMenuActivity">',
+         '<activity android:exported="false" android:launchMode="singleInstance" '
+         'android:name="com.retroarch.browser.mainmenu.MainMenuActivity">'),
+        ('android:exported="true" android:launchMode="singleInstance" '
+         'android:name="com.retroarch.browser.retroactivity.RetroActivityFuture"',
+         'android:exported="false" android:launchMode="singleInstance" '
+         'android:name="com.retroarch.browser.retroactivity.RetroActivityFuture"'),
+        ('<activity android:exported="true" android:name="com.retroarch.browser.debug.CoreSideloadActivity"/>',
+         '<activity android:exported="false" android:name="com.retroarch.browser.debug.CoreSideloadActivity"/>'),
         ("    </application>", ATIVIDADE_DO_ARENA + "    </application>"),
     ]
     for velho, novo in trocas:
