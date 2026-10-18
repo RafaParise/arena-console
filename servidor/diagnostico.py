@@ -4,7 +4,7 @@ ARENA - Verificar e reparar
 ============================
 Confere a instalacao inteira e conserta o que der para consertar sozinho.
 
-Roda pelo VERIFICAR.bat, ou pelo terminal:
+Roda pelo VERIFICAR.bat (no Linux, VERIFICAR.sh), ou pelo terminal:
     python diagnostico.py            confere e conserta
     python diagnostico.py --so-ver   so confere, nao mexe em nada
 
@@ -22,6 +22,8 @@ import time
 
 PASTA_SERVIDOR = os.path.dirname(os.path.abspath(__file__))
 RAIZ = os.path.dirname(PASTA_SERVIDOR)
+sys.path.insert(0, PASTA_SERVIDOR)
+import plataforma  # noqa: E402  (Windows ou Linux: item 13, 17/10/2026)
 
 PASTAS = [
     "dados", "backup", "launcher", "servidor",
@@ -38,6 +40,8 @@ PASTAS = [
 # dizia que estava tudo presente.
 PROGRAMA = [
     "ARENA.bat", "LEIA-ME.md",
+    # O mesmo pen drive abre no Linux (item 13, 17/10/2026).
+    "ARENA.sh", "servidor/achar_python.sh",
     "launcher/index.html", "launcher/estilo.css", "launcher/app.js",
     "launcher/pixel-sprites.js", "launcher/galaxy-background.js", "launcher/field-background.js",
     # O ARENA no navegador (o Chromebook, item 12 de 15/10/2026): a entrada e o
@@ -109,7 +113,34 @@ else:
 titulo("1b. Python embutido")
 
 pasta_python = caminho("servidor", "python")
-if not os.path.isdir(pasta_python):
+if not plataforma.WINDOWS:
+    # O Python portatil do Linux (servidor/python-linux). Os modulos de
+    # rede, banco, seguranca e identificacao sao os mesmos do Windows.
+    pasta_linux = caminho("servidor", "python-linux")
+    ESSENCIAIS_LINUX = {
+        "bin/python3.13": "o interpretador",
+        "lib/libpython3.13.so.1.0": "o nucleo",
+        "lib/python3.13/os.py": "a biblioteca padrao",
+    }
+    if not os.path.isdir(pasta_linux):
+        print("  nao existe. O ARENA.sh vai usar o Python do computador (3.11 ou mais novo).")
+        print("  Funciona, mas so nesta maquina - nao viaja no pen drive.")
+        atencao.append("Python do Linux ausente (servidor/python-linux)")
+    else:
+        faltando_py = [n for n in ESSENCIAIS_LINUX if not os.path.isfile(os.path.join(pasta_linux, *n.split("/")))]
+        for nome, oque in ESSENCIAIS_LINUX.items():
+            print("  %-26s %-6s %s" % (nome, "FALTA" if nome in faltando_py else "ok", oque))
+        dinamicos = os.path.join(pasta_linux, "lib", "python3.13", "lib-dynload")
+        presentes = os.listdir(dinamicos) if os.path.isdir(dinamicos) else []
+        faltando_so = [m for m in ("_socket", "_sqlite3", "_ssl", "_ctypes", "_hashlib", "_uuid")
+                       if not any(n.startswith(m + ".") for n in presentes)]
+        if faltando_py or faltando_so:
+            grave.append("Python do Linux incompleto: falta %s" % ", ".join(faltando_py + faltando_so))
+            print("  Copie de novo a pasta servidor/python-linux do pacote do ARENA.")
+        else:
+            ok.append("Python do Linux completo")
+            print("  modulos                    ok     rede, banco, seguranca e identificacao")
+elif not os.path.isdir(pasta_python):
     print("  nao existe. O ARENA vai tentar usar o Python do Windows.")
     print("  Funciona, mas so nesta maquina - nao viaja no pen drive.")
     atencao.append("Python embutido ausente")
@@ -322,19 +353,22 @@ else:
 # ---------------------------------------------------------------------------
 titulo("7. RetroArch e emuladores")
 
-exe = caminho("retroarch", "retroarch.exe")
+exe = caminho("retroarch", plataforma.NOME_DO_RETROARCH)
 if os.path.isfile(exe):
-    print("  ok     retroarch.exe encontrado")
+    print("  ok     %s encontrado" % plataforma.NOME_DO_RETROARCH)
     ok.append("retroarch presente")
 else:
-    atencao.append("retroarch.exe nao encontrado")
-    print("  FALTA  retroarch.exe em retroarch\\")
+    atencao.append("%s nao encontrado" % plataforma.NOME_DO_RETROARCH)
+    print("  FALTA  %s em %s" % (plataforma.NOME_DO_RETROARCH, os.path.join("retroarch", "")))
     print("         Sem ele o ARENA abre mas nenhum jogo inicia.")
 
 pasta_cores = caminho("retroarch", "cores")
 cores = []
 if os.path.isdir(pasta_cores):
-    cores = [n for n in os.listdir(pasta_cores) if n.lower().endswith(".dll")]
+    extensao_nucleo = ".dll" if plataforma.WINDOWS else ".so"
+    cores = [n for n in os.listdir(pasta_cores) if n.lower().endswith(extensao_nucleo)]
+    # O resto do verificador fala nos nomes do consoles.json (.dll).
+    cores = [os.path.splitext(n)[0] + ".dll" for n in cores]
 print("  %d emulador(es) instalado(s)" % len(cores))
 if not cores:
     atencao.append("nenhum emulador instalado")
@@ -348,10 +382,31 @@ if os.path.isdir(sistema):
         if os.path.isfile(os.path.join(sistema, n)) and not n.lower().endswith(".txt"))
 print("  %d arquivo(s) de sistema na pasta system" % quantos_sistema)
 
+# Linux: o RetroArch abre de uma copia na pasta de cache da conta (tirada do
+# AppImage na primeira vez, servidor/plataforma.py), e as bibliotecas que
+# alguns Linux nao trazem vem em retroarch/bibliotecas-linux.
+if not plataforma.WINDOWS:
+    pasta_bibliotecas = caminho("retroarch", plataforma.PASTA_DAS_BIBLIOTECAS)
+    reservas = sorted(n for n in os.listdir(pasta_bibliotecas) if ".so" in n) if os.path.isdir(
+        pasta_bibliotecas) else []
+    if reservas:
+        print("  ok     bibliotecas de reserva: %s" % ", ".join(reservas))
+    else:
+        atencao.append("faltam as bibliotecas de reserva do Linux (retroarch/%s)" % plataforma.PASTA_DAS_BIBLIOTECAS)
+        print("  FALTA  retroarch/%s (a libjack vazia e a libgomp)" % plataforma.PASTA_DAS_BIBLIOTECAS)
+        print("         No Ubuntu, o RetroArch nao abre sem a libjack. Copie de novo a pasta")
+        print("         retroarch do pacote do ARENA.")
+    copia = os.path.join(plataforma.pasta_de_cache(), "retroarch-%d" % os.path.getsize(exe)) if os.path.isfile(
+        exe) else ""
+    if copia and os.path.isfile(os.path.join(copia, "AppRun")):
+        print("  ok     RetroArch pronto para rodar em %s" % copia)
+    elif copia:
+        print("  ...    o RetroArch sai do AppImage no primeiro jogo (uns segundos, uma vez so)")
+
 # O Java ME abre o Java que vem no ARENA (servidor\java_do_arena.py). Sem a
 # pasta emuladores\Java, os jogos de celular so abrem se o computador tiver
 # Java instalado (15/10/2026).
-if "freej2me_libretro.dll" in [n.lower() for n in cores]:
+if "freej2me_libretro.dll" in [n.lower() for n in cores] and plataforma.WINDOWS:
     if os.path.isfile(caminho("emuladores", "Java", "bin", "javaw.exe")):
         print("  ok     Java do ARENA (para o Java ME) em emuladores\\Java")
     else:
@@ -402,7 +457,6 @@ except OSError:
 # e' onde uma copia que nao coube para de escrever. Jogo com esse tamanho
 # exato quase certamente veio cortado.
 LIMITE_FAT32 = 4 * 1024 * 1024 * 1024 - 1
-sys.path.insert(0, PASTA_SERVIDOR)
 import hardware  # noqa: E402
 sistema_arquivos = hardware.sistema_de_arquivos(RAIZ)
 if sistema_arquivos:
@@ -445,7 +499,8 @@ LIMITE_CAMINHO = 259
 FOLGA_NUCLEO_E_EXTENSAO = len("\\retroarch\\states\\") + 24 + len(".state.auto.png")
 pasta_jogos = caminho("jogos")
 compridos = []
-if os.path.isdir(pasta_jogos):
+# O limite de 260 letras e' so do Windows (no Linux, o caminho vai a 4.096).
+if os.path.isdir(pasta_jogos) and plataforma.WINDOWS:
     for atual, _subs, arquivos in os.walk(pasta_jogos):
         for nome in arquivos:
             nome_sem_ext = os.path.splitext(nome)[0]

@@ -293,8 +293,12 @@ async function carregarEstado() {
   prepararAbrirBios(dados.bios_consoles || []);
   $("#relogioPc").textContent = new Date().toLocaleString("pt-BR");
   $("#pastaBios").textContent = dados.pastas.sistema;
-  $("#listaDriverControleTopo").value =
-    estado.efetivas.input_joypad_driver || "xinput";
+  // O mesmo pen drive abre no Linux (item 13): lá o tipo de controle é
+  // outro (udev ou sdl2), e a numeração dos botões do Xbox também.
+  estado.sistemaDoComputador = dados.sistema_do_computador || "windows";
+  prepararTipoDeControle(dados.recursos || []);
+  $("#listaDriverControleTopo").value = estado.efetivas.input_joypad_driver ||
+    (estado.sistemaDoComputador === "windows" ? "xinput" : "udev");
 
   estado.amigos = estado.config.servidores || [];
   const codigo = $("#meuCodigoAmigo");
@@ -2341,6 +2345,17 @@ function capturar(linha, valor, botaoDefinir, jogador, botao) {
     8: ["botao", "7"], 9: ["botao", "6"], 10: ["botao", "8"], 11: ["botao", "9"],
     16: ["botao", "10"],
   };
+  // No Linux (udev ou sdl2), o mesmo controle Xbox tem outra numeração: a
+  // ordem dos botões no próprio Linux (A, B, X, Y, LB, RB, Back, Start,
+  // Xbox, L3, R3), e os gatilhos são os eixos 2 e 5. É a mesma do perfil
+  // pronto do RetroArch para ele (retroarch/autoconfig/udev).
+  const UDEV_DO_NAVEGADOR = {
+    0: ["botao", "0"], 1: ["botao", "1"], 2: ["botao", "2"], 3: ["botao", "3"],
+    4: ["botao", "4"], 5: ["botao", "5"], 6: ["eixo", "+2"], 7: ["eixo", "+5"],
+    8: ["botao", "6"], 9: ["botao", "7"], 10: ["botao", "9"], 11: ["botao", "10"],
+    16: ["botao", "8"],
+  };
+  const XBOX_DO_NAVEGADOR = estado.sistemaDoComputador === "windows" ? XINPUT_DO_NAVEGADOR : UDEV_DO_NAVEGADOR;
 
   // Controle: o navegador só entrega o estado, então a gente olha a cada
   // quadro até algum botão estar apertado.
@@ -2353,13 +2368,14 @@ function capturar(linha, valor, botaoDefinir, jogador, botao) {
       // O Chrome atual chama os controles XInput de "Xbox One Game
       // Controller (STANDARD GAMEPAD)", sem a palavra "XInput" (visto com
       // os GameSir, 25/09/2026). Outros navegadores ainda dizem "XInput".
-      const xinput = /xinput|xbox/i.test(pad.id);
+      // No Linux, o do Xbox 360 se chama "Microsoft X-Box 360 pad".
+      const xinput = /xinput|x-?box/i.test(pad.id);
       for (let i = 0; i < pad.buttons.length; i++) {
         if (!pad.buttons[i].pressed) continue;
         if (padrao && DIRECIONAL_DO_NAVEGADOR[i]) {
           gravar("hat", DIRECIONAL_DO_NAVEGADOR[i]);
         } else if (xinput) {
-          const traduzido = XINPUT_DO_NAVEGADOR[i];
+          const traduzido = XBOX_DO_NAVEGADOR[i];
           if (!traduzido) {
             encerrar();
             desenharMapa();
@@ -2390,6 +2406,33 @@ function capturar(linha, valor, botaoDefinir, jogador, botao) {
   estado.ouvindo = encerrar;
 
   botaoDefinir.onclick = () => { encerrar(); desenharMapa(); };
+}
+
+// No Linux, as opções do tipo de controle são as de lá (o recursos.json diz
+// quais, em "no_linux"): o udev lê todos os controles; o sdl2 é a reserva.
+// No Windows, ficam as do index.html (xinput e dinput).
+const NOME_DO_TIPO_DE_CONTROLE = {
+  udev: "udev — todos: Xbox, PS4, PS5, Switch Pro, genéricos",
+  sdl2: "sdl2 — se algum controle não aparecer no udev",
+};
+
+function prepararTipoDeControle(recursos) {
+  const lista = $("#listaDriverControleTopo");
+  if (!lista || estado.sistemaDoComputador === "windows" || lista.dataset.sistema === "linux") return;
+  const recurso = recursos.find((r) => r.chave === "input_joypad_driver");
+  const opcoes = (recurso && recurso.opcoes) || ["udev", "sdl2"];
+  lista.replaceChildren(...opcoes.map((valor) => {
+    const opcao = document.createElement("option");
+    opcao.value = valor;
+    opcao.textContent = NOME_DO_TIPO_DE_CONTROLE[valor] || valor;
+    return opcao;
+  }));
+  lista.dataset.sistema = "linux";
+  const ajuda = lista.parentElement && lista.parentElement.querySelector(".opcao-ajuda");
+  if (ajuda) {
+    ajuda.textContent = "No Linux, o udev lê todos os controles do mesmo jeito (no Windows são " +
+      "dois, o xinput e o dinput). Deixe em udev; use o sdl2 só se algum controle não aparecer.";
+  }
 }
 
 // --------------------------------------------------------------------------

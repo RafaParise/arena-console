@@ -10,7 +10,10 @@
     "'custo' é só informativo: nada, baixo, médio, alto.",
     "",
     "Você pode editar este arquivo. Chave que o RetroArch não reconhece é",
-    "ignorada sem quebrar nada."
+    "ignorada sem quebrar nada.",
+    "",
+    "No Linux (o mesmo pen drive abre lá), 'no_linux' troca o que muda:",
+    "as opções e o texto. 'so_windows' esconde o que só existe no Windows."
   ],
   "grupos": [
     {
@@ -154,7 +157,15 @@
       ],
       "custo": "nada",
       "explica": "Por onde o jogo fala com a placa de vídeo.",
-      "exemplo": "Deixe no automático. Vulkan é o caminho mais curto, mas placa antiga não tem. O ARENA testa e escolhe o que existe."
+      "exemplo": "Deixe no automático. Vulkan é o caminho mais curto, mas placa antiga não tem. O ARENA testa e escolhe o que existe.",
+      "no_linux": {
+        "opcoes": [
+          "automatico",
+          "vulkan",
+          "glcore"
+        ],
+        "exemplo": "Deixe no automático. Vulkan é o caminho mais curto, mas placa antiga não tem; aí vale o glcore (o OpenGL). O ARENA testa e escolhe o que existe. O d3d11 é só do Windows."
+      }
     },
     {
       "chave": "video_fullscreen",
@@ -269,7 +280,15 @@
       ],
       "custo": "nada",
       "explica": "Deixe no wasapi. É o caminho mais curto até a placa de som no Windows.",
-      "exemplo": "São caminhos diferentes até a caixa de som. wasapi é a estrada nova; dsound é a estrada velha, mais lenta mas que existe em qualquer PC."
+      "exemplo": "São caminhos diferentes até a caixa de som. wasapi é a estrada nova; dsound é a estrada velha, mais lenta mas que existe em qualquer PC.",
+      "no_linux": {
+        "opcoes": [
+          "pulse",
+          "alsa"
+        ],
+        "explica": "Deixe no que o ARENA escolheu: pulse quando o Linux tem o servidor de som (o PulseAudio, ou o PipeWire, que fala como ele); alsa quando não tem.",
+        "exemplo": "São caminhos diferentes até a caixa de som. O pulse divide o som com os outros programas, como o Windows faz; o alsa vai direto na placa de som."
+      }
     },
     {
       "chave": "audio_wasapi_exclusive_mode",
@@ -278,6 +297,7 @@
       "tipo": "bool",
       "custo": "nada",
       "nota_minima": 3,
+      "so_windows": true,
       "explica": "O jogo toma a placa de som para ele. Com alguns fones sem fio ou USB, o jogo fica mais lento e tremido: se acontecer, desligue.",
       "exemplo": "É como pegar o microfone só para você: a voz chega mais rápido, mas ninguém mais fala. Com o fone errado é pior: o fone escuta no ritmo dele, e o jogo espera. Medido com um fone sem fio: 52 quadros por segundo, e não 60."
     },
@@ -349,7 +369,15 @@
       ],
       "custo": "nada",
       "explica": "xinput cobre Xbox, PS4, PS5 e Switch Pro. Troque para dinput se o seu for antigo e não aparecer.",
-      "exemplo": "São dois idiomas que o Windows usa para falar com controle. Controle novo fala xinput; controle velho fala dinput. Se o seu não aparece, ele fala o outro idioma."
+      "exemplo": "São dois idiomas que o Windows usa para falar com controle. Controle novo fala xinput; controle velho fala dinput. Se o seu não aparece, ele fala o outro idioma.",
+      "no_linux": {
+        "opcoes": [
+          "udev",
+          "sdl2"
+        ],
+        "explica": "udev é o jeito do Linux ler todos os controles: Xbox, PS4, PS5, Switch Pro e genéricos. Troque para sdl2 só se o seu não aparecer.",
+        "exemplo": "No Windows são dois idiomas (xinput e dinput); o Linux fala um só com todos os controles, o udev. O sdl2 é um tradutor que existe nos dois sistemas."
+      }
     },
     {
       "chave": "input_autodetect_enable",
@@ -358,7 +386,7 @@
       "tipo": "bool",
       "custo": "nada",
       "explica": "Configura o controle na hora que você plugar.",
-      "exemplo": "Igual plugar um pen drive e o Windows já reconhecer. Deixe ligado: sem isso você teria que configurar cada botão na mão toda vez."
+      "exemplo": "Igual plugar um pen drive e o computador já reconhecer. Deixe ligado: sem isso você teria que configurar cada botão na mão toda vez."
     },
     {
       "chave": "input_max_users",

@@ -25,14 +25,22 @@ import platform
 import shutil
 import subprocess
 import sys
+import threading
 import urllib.parse
 
 WINDOWS = sys.platform.startswith("win")
 LINUX = sys.platform.startswith("linux")
 
-# O RetroArch do Linux (stable 1.22.2 do libretro): um AppImage, que o ARENA
-# abre direto, sem instalar (ver comando_do_appimage).
+# O RetroArch do Linux (stable 1.22.2 do libretro): um AppImage, um arquivo
+# so que roda sem instalar (ver retroarch_que_roda).
 APPIMAGE_RETROARCH = "RetroArch-Linux-x86_64.AppImage"
+# O nome do programa do RetroArch deste sistema, para as frases da tela, e o
+# conferidor do pacote (o VERIFICAR.bat do Windows, o VERIFICAR.sh do Linux).
+NOME_DO_RETROARCH = "retroarch.exe" if WINDOWS else APPIMAGE_RETROARCH
+VERIFICAR = "VERIFICAR.bat" if WINDOWS else "VERIFICAR.sh"
+# As bibliotecas que o RetroArch do Linux pede e que alguns Linux nao trazem
+# (ferramentas\preparar_linux.py poe aqui): entram so onde faltam.
+PASTA_DAS_BIBLIOTECAS = "bibliotecas-linux"
 
 
 def no_chromebook():
@@ -106,9 +114,139 @@ def nome_curto_do_nucleo(arquivo):
 
 def executavel_do_retroarch(pasta_retroarch):
     """O programa do RetroArch deste sistema, dentro da pasta retroarch."""
+    return os.path.join(pasta_retroarch, "retroarch.exe" if WINDOWS else APPIMAGE_RETROARCH)
+
+
+# ---------------------------------------------------------------------------
+# O RetroArch do Linux, pronto para rodar
+# ---------------------------------------------------------------------------
+# O AppImage se abre sozinho so com o FUSE 2, que o Ubuntu deixou de trazer
+# no 22.04 (o 24.04 tambem nao tem), e o pen drive FAT32 nem deixa executar
+# programa nenhum. Entao, na primeira vez, o ARENA tira o RetroArch de dentro
+# do AppImage (o proprio AppImage faz isso, com --appimage-extract: sem FUSE
+# e sem administrador) para a pasta de cache da conta,
+# ~/.cache/arena/retroarch-<tamanho do AppImage>, e dali em diante abre
+# direto de la. Tirar de novo so quando o AppImage mudar (outro tamanho).
+# Os jogos, os saves e a configuracao continuam no pen drive.
+_TRAVA_DO_RETROARCH = threading.Lock()
+
+
+def pasta_de_cache():
+    """Linux: ~/.cache/arena (ou a do XDG_CACHE_HOME), o lugar padrao do
+    freedesktop para o que se pode refazer a qualquer hora."""
+    base = os.environ.get("XDG_CACHE_HOME") or os.path.join(os.path.expanduser("~"), ".cache")
+    return os.path.join(base, "arena")
+
+
+def _roda(programa):
+    return os.path.isfile(programa) and os.access(programa, os.X_OK)
+
+
+def _apagar(pasta):
+    try:
+        if os.path.isdir(pasta):
+            shutil.rmtree(pasta)
+    except OSError as falha:
+        print("[ARENA] Nao consegui apagar %s: %s" % (pasta, falha))
+
+
+def _tirar_do_appimage(appimage, destino):
+    """Tira o RetroArch de dentro do AppImage para 'destino'. A copia do
+    AppImage vai antes para o cache: no pen drive ele pode nao ter permissao
+    de executar."""
+    montando = "%s.montando-%d" % (destino, os.getpid())
+    _apagar(montando)
+    os.makedirs(montando)
+    try:
+        copia = os.path.join(montando, "RetroArch.AppImage")
+        shutil.copyfile(appimage, copia)
+        os.chmod(copia, 0o755)
+        resultado = subprocess.run([copia, "--appimage-extract"], cwd=montando, capture_output=True,
+                                   timeout=600)
+        extraido = os.path.join(montando, "squashfs-root")
+        if resultado.returncode != 0 or not _roda(os.path.join(extraido, "AppRun")):
+            raise OSError("o AppImage nao se abriu: %s"
+                          % (resultado.stderr or resultado.stdout).decode("utf-8", "replace")[-300:].strip())
+        _apagar(destino)
+        os.replace(extraido, destino)
+    finally:
+        _apagar(montando)
+
+
+def _bibliotecas_do_sistema():
+    """Os nomes das bibliotecas que este Linux acha sozinho (o ldconfig -p,
+    que fica no /sbin: fora do PATH de quem nao e' administrador)."""
+    so_64 = platform.machine() == "x86_64"
+    for programa in ("/sbin/ldconfig", "/usr/sbin/ldconfig", shutil.which("ldconfig") or ""):
+        if not programa or not os.path.isfile(programa):
+            continue
+        try:
+            saida = subprocess.run([programa, "-p"], capture_output=True, text=True, timeout=30).stdout
+        except (OSError, subprocess.SubprocessError):
+            continue
+        return {linha.split()[0] for linha in saida.splitlines()
+                if " => " in linha and (not so_64 or "x86-64" in linha)}
+    return set()
+
+
+def _completar_bibliotecas(destino, pasta_bibliotecas):
+    """Poe ao lado das bibliotecas do RetroArch (usr/lib, que o AppRun ja
+    procura primeiro) so as que este Linux nao tem. A marca guarda a lista:
+    com bibliotecas novas no pacote, confere de novo."""
+    try:
+        nomes = sorted(n for n in os.listdir(pasta_bibliotecas) if ".so" in n)
+    except OSError:
+        return
+    marca = os.path.join(destino, ".arena-bibliotecas")
+    try:
+        with open(marca, encoding="utf-8") as arquivo:
+            if arquivo.read().split() == nomes:
+                return
+    except OSError:
+        pass
+    do_sistema = _bibliotecas_do_sistema()
+    for nome in nomes:
+        alvo = os.path.join(destino, "usr", "lib", nome)
+        if nome not in do_sistema and not os.path.exists(alvo):
+            shutil.copyfile(os.path.join(pasta_bibliotecas, nome), alvo)
+    with open(marca, "w", encoding="utf-8") as arquivo:
+        arquivo.write("\n".join(nomes) + "\n")
+
+
+def retroarch_que_roda(appimage):
+    """Linux: o programa que abre o RetroArch (o AppRun da copia tirada do
+    AppImage, ver acima), preparando a copia na primeira vez. Se nao der, o
+    proprio AppImage (com o FUSE 2, ele ainda abre). No Windows, o mesmo."""
     if WINDOWS:
-        return os.path.join(pasta_retroarch, "retroarch.exe")
-    return os.path.join(pasta_retroarch, APPIMAGE_RETROARCH)
+        return appimage
+    try:
+        tamanho = os.path.getsize(appimage)
+    except OSError:
+        return appimage
+    destino = os.path.join(pasta_de_cache(), "retroarch-%d" % tamanho)
+    programa = os.path.join(destino, "AppRun")
+    with _TRAVA_DO_RETROARCH:
+        if not _roda(programa):
+            try:
+                _tirar_do_appimage(appimage, destino)
+            except (OSError, subprocess.SubprocessError) as falha:
+                print("[ARENA] Nao consegui preparar o RetroArch do Linux (%s). Abrindo o AppImage direto." % falha)
+                return appimage
+        try:
+            _completar_bibliotecas(destino, os.path.join(os.path.dirname(appimage), PASTA_DAS_BIBLIOTECAS))
+        except OSError as falha:
+            print("[ARENA] Nao consegui completar as bibliotecas do RetroArch: %s" % falha)
+    return programa
+
+
+def comando_do_retroarch(executavel, arquivo_cfg):
+    """O comeco da linha de comando do RetroArch. No Windows, so o
+    retroarch.exe: ele le o retroarch.cfg da propria pasta. No Linux, o
+    RetroArch procuraria a configuracao em ~/.config/retroarch; o --config
+    manda usar a do ARENA, a mesma do Windows, no pen drive."""
+    if WINDOWS:
+        return [executavel]
+    return [retroarch_que_roda(executavel), "--config", arquivo_cfg]
 
 
 def python_que_veio_junto(pasta_servidor):

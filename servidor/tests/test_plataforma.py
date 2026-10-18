@@ -180,6 +180,46 @@ class Pastas(unittest.TestCase):
         self.assertNotIn("Pedag", comando[2])
 
 
+class RecursosDaTela(unittest.TestCase):
+    """O recursos.json no Linux: as opcoes de la ("no_linux") e sem o que
+    so existe no Windows ("so_windows")."""
+
+    def setUp(self):
+        import json
+        with open(os.path.join(PASTA_SERVIDOR, "recursos.json"), encoding="utf-8") as arquivo:
+            self.dados = json.load(arquivo)
+
+    def por_chave(self, windows):
+        import arena
+        return {r["chave"]: r for r in arena.recursos_deste_sistema(self.dados, windows=windows)["recursos"]}
+
+    def test_no_linux(self):
+        linux = self.por_chave(False)
+        self.assertEqual(linux["input_joypad_driver"]["opcoes"], ["udev", "sdl2"])
+        self.assertEqual(linux["audio_driver"]["opcoes"], ["pulse", "alsa"])
+        self.assertNotIn("d3d11", linux["video_driver"]["opcoes"])
+        self.assertNotIn("audio_wasapi_exclusive_mode", linux)
+        self.assertIn("udev", linux["input_joypad_driver"]["explica"])
+
+    def test_no_windows_fica_como_esta(self):
+        windows = self.por_chave(True)
+        self.assertEqual(windows["input_joypad_driver"]["opcoes"], ["xinput", "dinput"])
+        self.assertIn("d3d11", windows["video_driver"]["opcoes"])
+        self.assertIn("audio_wasapi_exclusive_mode", windows)
+
+    def test_o_padrao_do_arena_vale_nos_dois(self):
+        """O valor que o ARENA grava por padrao, traduzido para o sistema,
+        tem que estar entre as opcoes que a tela mostra nele."""
+        import arena
+        padrao = dict(arena.BASE_COMUM, **arena.AVANCADO_PADRAO)
+        for windows in (True, False):
+            recursos = self.por_chave(windows)
+            with no_windows(windows), mock.patch.object(plataforma, "motor_de_som_do_linux", return_value="pulse"):
+                traduzido = plataforma.motores_deste_sistema(dict(padrao))
+            for chave in ("audio_driver", "input_joypad_driver"):
+                self.assertIn(traduzido[chave], recursos[chave]["opcoes"], (windows, chave))
+
+
 class Sistema(unittest.TestCase):
     def test_nome_do_sistema(self):
         self.assertIn(plataforma.nome_do_sistema(), ("windows", "linux", "chromeos"))

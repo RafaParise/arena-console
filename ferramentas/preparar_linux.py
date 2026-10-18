@@ -15,7 +15,13 @@ ferramenta poe no lugar:
   3. o Python 3.13 portatil para Linux (o python-build-standalone, o mesmo
      que o uv usa), em servidor\python-linux. So os arquivos de verdade: o
      pacote traz atalhos (links) que pen drive exFAT nao aceita, e o ARENA
-     chama o python3.13 pelo nome.
+     chama o python3.13 pelo nome;
+  4. as bibliotecas que o RetroArch do Linux pede e que alguns Linux nao
+     trazem, em retroarch\bibliotecas-linux (o ARENA so as usa onde faltam,
+     ver servidor\plataforma.py): a libjack.so.0 vazia (o Ubuntu 24.04 nao
+     tem o JACK; ferramentas\jack_vazio.py) e a libgomp.so.1 do GCC, que o
+     nucleo do Dreamcast (Flycast) pede, a do Debian 10 (funciona em todo
+     Linux de 2018 para ca).
 
 Cada download confere a marca SHA-256: a do Python, pela lista oficial do
 projeto; a do RetroArch (o buildbot nao publica), pela do arquivo baixado em
@@ -26,6 +32,7 @@ Uso:
     servidor\python\python.exe ferramentas\preparar_linux.py
 """
 import hashlib
+import io
 import json
 import os
 import shutil
@@ -37,6 +44,7 @@ import urllib.request
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(RAIZ, "testes"))
+sys.path.insert(0, os.path.join(RAIZ, "ferramentas"))
 import limpeza  # noqa: E402
 
 CACHE = os.path.join(os.environ.get("LOCALAPPDATA") or tempfile.gettempdir(), "ARENA-montagem")
@@ -60,6 +68,18 @@ PYTHON = {
     "arquivo": os.path.join("python-linux", "python-x86_64.tar.gz"),
     # A da lista oficial (SHA256SUMS do lancamento 20261013).
     "sha256": "d0080766b6b74aeb81e1949ef0d9a20e6c17f7b160fb295a69b936ccb17660be",
+}
+# A libgomp do GCC 8 (Debian 10): o pacote oficial, com a marca da lista do
+# proprio Debian (dists/buster/main/binary-amd64/Packages, conferida em
+# 17/10/2026). Licenca: GPL 3 com a excecao das bibliotecas do GCC, que
+# deixa levar junto de qualquer programa.
+LIBGOMP = {
+    "endereco": "https://archive.debian.org/debian/pool/main/g/gcc-8/libgomp1_8.3.0-6_amd64.deb",
+    "arquivo": os.path.join("linux-bibliotecas", "libgomp1_8.3.0-6_amd64.deb"),
+    "sha256": "909fcd28491d7ebecf44ee2e8d0269b600271b0b6d236b19f2c0469cde162d21",
+    "tamanho": 75824,
+    "dentro": "./usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0",
+    "nome": "libgomp.so.1",
 }
 DENTRO_DO_7Z = "RetroArch-Linux-x86_64"
 APPIMAGE = "RetroArch-Linux-x86_64.AppImage"
@@ -195,6 +215,40 @@ def preparar_python(trabalho):
     print("  Python 3.13 para Linux: servidor\\python-linux (%.0f MB)" % (total / 1048576), flush=True)
 
 
+def tirar_do_deb(arquivo_deb, dentro):
+    """Os bytes de um arquivo de dentro de um pacote .deb. O .deb e' um
+    arquivo "ar" (o formato mais simples que existe: um cabecalho de 60
+    bytes antes de cada parte) com os arquivos num data.tar.xz."""
+    with open(arquivo_deb, "rb") as arquivo:
+        if arquivo.read(8) != b"!<arch>\n":
+            raise SystemExit("%s nao e' um pacote .deb." % os.path.basename(arquivo_deb))
+        while True:
+            cabecalho = arquivo.read(60)
+            if len(cabecalho) < 60:
+                break
+            nome = cabecalho[:16].decode("ascii").strip().rstrip("/")
+            tamanho = int(cabecalho[48:58].decode("ascii").strip())
+            conteudo = arquivo.read(tamanho)
+            if tamanho % 2:
+                arquivo.read(1)                 # cada parte comeca em posicao par
+            if nome.startswith("data.tar"):
+                with tarfile.open(fileobj=io.BytesIO(conteudo)) as pacote:
+                    return pacote.extractfile(dentro).read()
+    raise SystemExit("%s veio sem %s." % (os.path.basename(arquivo_deb), dentro))
+
+
+def preparar_bibliotecas():
+    import jack_vazio
+    pasta = os.path.join(RAIZ, "retroarch", "bibliotecas-linux")
+    os.makedirs(pasta, exist_ok=True)
+    _caminho, tamanho_jack = jack_vazio.escrever(os.path.join(pasta, "libjack.so.0"))
+    dados = tirar_do_deb(baixado(LIBGOMP), LIBGOMP["dentro"])
+    with open(os.path.join(pasta, LIBGOMP["nome"]), "wb") as saida:
+        saida.write(dados)
+    print("  bibliotecas de reserva: libjack.so.0 vazia (%d bytes) e %s (%d KB)"
+          % (tamanho_jack, LIBGOMP["nome"], len(dados) // 1024), flush=True)
+
+
 def principal():
     sete = achar_7zip()
     trabalho = tempfile.mkdtemp(prefix="arena_preparar_linux_")
@@ -202,6 +256,7 @@ def principal():
         print("Preparando o ARENA para Linux...", flush=True)
         preparar_retroarch(sete, os.path.join(trabalho, "ra"))
         faltam = preparar_nucleos(sete, os.path.join(trabalho, "nucleos"))
+        preparar_bibliotecas()
         preparar_python(trabalho)
         print("Pronto. No Linux, o ARENA abre pelo ARENA.sh.")
         if faltam:

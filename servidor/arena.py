@@ -116,6 +116,7 @@ PASTA_CACHE = os.path.join(PASTA_RETROARCH, "cache")
 PASTA_BACKUP = os.path.join(RAIZ, "backup")
 
 EXECUTAVEL_RETROARCH = plataforma_do_sistema.executavel_do_retroarch(PASTA_RETROARCH)
+ARQUIVO_CFG_RETROARCH = os.path.join(PASTA_RETROARCH, "retroarch.cfg")
 ARQUIVO_CONSOLES = os.path.join(PASTA_SERVIDOR, "consoles.json")
 ARQUIVO_BANCO = os.path.join(PASTA_DADOS, "arena.db")
 ARQUIVO_CONFIG = os.path.join(PASTA_DADOS, "config.json")
@@ -1108,12 +1109,27 @@ def carregar_recursos():
     if _recursos_cache["dados"] is None:
         try:
             with open(ARQUIVO_RECURSOS, "r", encoding="utf-8") as arquivo:
-                _recursos_cache["dados"] = json.load(arquivo)
+                _recursos_cache["dados"] = recursos_deste_sistema(json.load(arquivo))
         except (OSError, ValueError) as falha:
             print("[ARENA] recursos.json ilegivel (%s). Seguindo sem os "
                   "ajustes avancados." % falha)
             _recursos_cache["dados"] = {"grupos": [], "recursos": []}
     return _recursos_cache["dados"]
+
+
+def recursos_deste_sistema(dados, windows=None):
+    """No Linux (item 13), cada recurso com "no_linux" troca as opcoes e o
+    texto pelos de la (o som pulse ou alsa, o controle udev), e o que tem
+    "so_windows" sai da lista (o som so para o jogo e' do WASAPI). No
+    Windows, fica como esta."""
+    windows = plataforma_do_sistema.WINDOWS if windows is None else windows
+    recursos = []
+    for recurso in dados.get("recursos", []):
+        if windows:
+            recursos.append(recurso)
+        elif not recurso.get("so_windows"):
+            recursos.append(dict(recurso, **recurso.get("no_linux", {})))
+    return dict(dados, recursos=recursos)
 
 
 def recursos_visiveis():
@@ -1688,6 +1704,10 @@ def opcoes_efetivas(config, custo=None, controles_ligados=None):
     # ajuste salvo --, e a contagem antiga deixava alcas do Windows abertas.
     opcoes.update(controles.opcoes_do_retroarch(
         controles_ligados=controles_ligados or 0))
+
+    # O som e o controle deste sistema (no Linux, o pulse ou o alsa e o
+    # udev): vale para o jogo e para o que a tela mostra como escolhido.
+    plataforma_do_sistema.motores_deste_sistema(opcoes)
 
     # Filtro de tela: o perfil (ou o aluno) diz se quer; QUAL filtro e' se
     # o console aceita, so se sabe com o jogo na mao -- gravar_override().
@@ -2945,8 +2965,9 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             remapear=(os.path.join(PASTA_CORES, jogo["core"]), caminho_jogo),
             plataforma=jogo.get("plataforma"), devolver_filtro=True,
             controles_ligados=controles.contar_controles(), nucleo=jogo.get("core"))
-        comando = [
-            EXECUTAVEL_RETROARCH,
+        # No Linux, a copia que roda do RetroArch, com a configuracao do ARENA
+        # (servidor\plataforma.py); no Windows, o retroarch.exe.
+        comando = plataforma_do_sistema.comando_do_retroarch(EXECUTAVEL_RETROARCH, ARQUIVO_CFG_RETROARCH) + [
             "-L", os.path.join(PASTA_CORES, jogo["core"]),
             "--appendconfig", override,
         ]
@@ -5049,6 +5070,9 @@ class Manipulador(BaseHTTPRequestHandler):
                 "shader": os.path.basename(
                     graficos.filtro_de_tela("snes")) or None,
                 "porta_partida": graficos.PORTA_PARTIDA,
+                # "windows", "linux" ou "chromeos": a tela troca o que muda
+                # (o tipo de controle, a numeracao dos botoes do Xbox).
+                "sistema_do_computador": plataforma_do_sistema.nome_do_sistema(),
                 "recursos": recursos_visiveis(),
                 "grupos": carregar_recursos()["grupos"],
                 "jogo_em_andamento": dict(JOGO_EM_ANDAMENTO),
@@ -5835,9 +5859,10 @@ class Manipulador(BaseHTTPRequestHandler):
                         CAPACIDADE["nota"], extras, CAPACIDADE.get("nota_gpu"))
                 except OSError:
                     pass
-                comando = [EXECUTAVEL_RETROARCH, "-L", core,
-                           "--appendconfig", gravar_override(
-                               config, controles_ligados=controles.contar_controles())]
+                comando = plataforma_do_sistema.comando_do_retroarch(
+                    EXECUTAVEL_RETROARCH, ARQUIVO_CFG_RETROARCH) + [
+                        "-L", core, "--appendconfig", gravar_override(
+                            config, controles_ligados=controles.contar_controles())]
                 pasta = PASTA_RETROARCH
 
             def rodar():
@@ -6550,14 +6575,16 @@ class Manipulador(BaseHTTPRequestHandler):
             if not caminho_externo:
                 if not os.path.isfile(EXECUTAVEL_RETROARCH):
                     return self.erro(
-                        "Não achei o retroarch.exe na pasta retroarch. A pasta tem que se chamar retroarch (guia 1); rode o VERIFICAR.bat para conferir.")
+                        "Não achei o %s na pasta retroarch. A pasta tem que se chamar retroarch (guia 1); rode o %s "
+                        "para conferir." % (plataforma_do_sistema.NOME_DO_RETROARCH, plataforma_do_sistema.VERIFICAR))
                 if not os.path.isfile(os.path.join(PASTA_CORES, core_do_jeito)):
                     sugestao = ""
                     if dados_externo:
                         sugestao = (" Ou instale o %s na pasta emuladores."
                                     % dados_externo["nome"])
                     return self.erro(
-                        "Falta o núcleo deste console na pasta retroarch\\cores. Rode o VERIFICAR.bat (guia 6)." + sugestao)
+                        "Falta o núcleo deste console na pasta retroarch%scores. Rode o %s (guia 6)."
+                        % (os.sep, plataforma_do_sistema.VERIFICAR) + sugestao)
 
             caminho_rom = os.path.join(RAIZ, jogo["arquivo"])
             if not dentro_da_pasta(caminho_rom, PASTA_JOGOS) or not os.path.isfile(caminho_rom):
@@ -7381,7 +7408,8 @@ def principal():
         print("  Imagem:   nao consegui gravar os ajustes (%s)" % falha)
 
     if not os.path.isfile(EXECUTAVEL_RETROARCH):
-        print("  AVISO:    retroarch.exe nao encontrado em .\\retroarch")
+        print("  AVISO:    %s nao encontrado em %s" % (plataforma_do_sistema.NOME_DO_RETROARCH,
+                                                    os.path.join(".", "retroarch")))
 
     pendentes = contar_pendentes()
     if pendentes:
@@ -7429,6 +7457,11 @@ def principal():
     # A pasta BIOS: prateleiras, LEIA e a BIOS posta la vai para onde o
     # emulador procura, com o nome certo (servidor\bios.py).
     threading.Thread(target=organizar_bios, daemon=True).start()
+    # Linux: o RetroArch sai do AppImage para a pasta de cache da conta ja
+    # agora, e nao no primeiro jogo (servidor\plataforma.py, item 13).
+    if not plataforma_do_sistema.WINDOWS and os.path.isfile(EXECUTAVEL_RETROARCH):
+        threading.Thread(target=plataforma_do_sistema.retroarch_que_roda, args=(EXECUTAVEL_RETROARCH,),
+                         daemon=True).start()
     # ARENA_SEM_JANELA=1: so o servidor, sem abrir a tela (testes
     # automaticos -- a rodada completa abria dezenas de janelas -- e quem
     # quiser abrir a tela de outro computador).

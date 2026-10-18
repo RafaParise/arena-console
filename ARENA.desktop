@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=ARENA
+Comment=Abre o ARENA desta pasta (o mesmo que sh ARENA.sh no terminal)
+Exec=sh -c "cd \\"\\$(dirname \\"\\$1\\")\\" && exec sh ./ARENA.sh" sh %k
+Icon=applications-games
+Terminal=true
+Categories=Game;
