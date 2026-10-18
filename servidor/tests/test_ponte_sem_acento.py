@@ -3,7 +3,11 @@
 nao abre caminho com acento: com o ARENA em "...Pedagógicos\\...", a BIOS e
 o disquete vao por uma pasta sem acento, e o disquete volta se o jogo gravou
 nele. A abertura de verdade, com o "ó" no caminho, esta em
-testes\\teste_consoles_livres.py."""
+testes\\teste_consoles_livres.py.
+
+No Linux (item 13) a ponte nao existe (todo nucleo abre caminho com acento):
+aqui ela fica ligada nos testes da logica, que valem nos dois sistemas, e um
+teste so do Linux confere que la ela fica desligada."""
 import os
 import shutil
 import sys
@@ -34,10 +38,25 @@ class TestPonteSemAcento(unittest.TestCase):
         os.makedirs(self.temporaria)
         self.antes = tempfile.tempdir
         tempfile.tempdir = self.temporaria
+        self.ponte_antes = ponte.PRECISA_DA_PONTE
+        ponte.PRECISA_DA_PONTE = True
 
     def tearDown(self):
+        ponte.PRECISA_DA_PONTE = self.ponte_antes
         tempfile.tempdir = self.antes
         shutil.rmtree(self.base, ignore_errors=True)
+
+    @unittest.skipIf(os.name == "nt", "no Windows a ponte existe")
+    def test_no_linux_a_ponte_fica_desligada(self):
+        ponte.PRECISA_DA_PONTE = self.ponte_antes
+        self.assertFalse(ponte.PRECISA_DA_PONTE)
+        self.assertFalse(ponte.precisa("hatari_libretro.so", self.sistema, self.jogo))
+        self.assertIsNone(ponte.pasta_sistema_relativa("vice_x64_libretro.so", self.sistema, self.com_acento))
+
+    def test_o_nucleo_do_linux_tem_o_nome_do_windows_nas_listas(self):
+        self.assertEqual(ponte._nome_do_nucleo("/arena/retroarch/cores/hatari_libretro.so"), "hatari_libretro.dll")
+        self.assertEqual(ponte._nome_do_nucleo("C:\\x\\cores\\Hatari_Libretro.DLL"), "hatari_libretro.dll")
+        self.assertTrue(ponte.precisa("/arena/retroarch/cores/hatari_libretro.so", self.sistema, self.jogo))
 
     def test_so_o_nucleo_que_nao_aceita_acento_e_so_com_acento(self):
         self.assertTrue(ponte.precisa(HATARI, self.sistema, self.jogo))
@@ -105,7 +124,7 @@ class TestPonteSemAcento(unittest.TestCase):
 
     def test_conferencia_final_barra_o_nome_que_sairia_da_ponte(self):
         original = ponte.nome_sem_acento
-        ponte.nome_sem_acento = lambda nome: "..\\..\\fora.st"
+        ponte.nome_sem_acento = lambda nome: os.path.join("..", "..", "fora.st")
         try:
             with self.assertRaises(OSError):
                 ponte.preparar(HATARI, self.sistema, self.jogo)

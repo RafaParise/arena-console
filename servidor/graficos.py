@@ -33,6 +33,8 @@ import subprocess
 import time
 import threading
 
+import plataforma
+
 _TRAVA = threading.Lock()
 
 PASTA_SERVIDOR = os.path.dirname(os.path.abspath(__file__))
@@ -84,8 +86,33 @@ PASTA_EMULADORES = os.path.join(RAIZ, "emuladores")
 
 PASTAS_CONHECIDAS_ARENA = ("dados", "retroarch", "jogos", "launcher", "emuladores")
 
+# O caminho inteiro dos dois sistemas: o do Windows (C:\...) e o do Linux
+# (/media/...). O mesmo pen drive passa pelos dois (item 13, 17/10/2026): o
+# retroarch.cfg que o RetroArch do Linux gravou ao fechar chega no Windows
+# com /media/aluno/PEN/ARENA/..., e o do Windows chega no Linux com E:\...
 _PADRAO_LINHA_CAMINHO = re.compile(
-    r'^([a-zA-Z0-9_]+\s*=\s*)"([A-Za-z]:\\[^"]*)"\s*$')
+    r'^([a-zA-Z0-9_]+\s*=\s*)"([A-Za-z]:[\\/][^"]*|/[^"]*)"\s*$')
+# A forma do proprio RetroArch, ":\pasta": a pasta do programa. No Windows e'
+# a do retroarch.exe, dentro do ARENA. No Linux e' a pasta do programa dentro
+# do AppImage (fora do ARENA, e so de leitura): la, vira o caminho inteiro.
+_PADRAO_LINHA_RELATIVA = re.compile(r'^([a-zA-Z0-9_]+\s*=\s*)":[\\/]([^"]*)"\s*$')
+NO_WINDOWS = os.name == "nt"
+
+
+def _pedacos(caminho):
+    """Os nomes de pasta de um caminho, com \\ ou com / (dos dois sistemas)."""
+    return [p for p in re.split(r"[\\/]+", caminho) if p]
+
+
+def _no_arena(relativo, pasta=None):
+    """'retroarch\\states' (ou com /) -> o caminho deste sistema, dentro da
+    pasta atual do ARENA (ou de 'pasta')."""
+    return os.path.join(pasta or RAIZ, *_pedacos(relativo))
+
+
+def _comparavel(caminho):
+    """No Windows, maiuscula e minuscula sao a mesma pasta; no Linux, nao."""
+    return caminho.lower() if NO_WINDOWS else caminho
 
 
 # Chaves que o RetroArch usa por padrao (fora da pasta do ARENA) quando
@@ -128,6 +155,11 @@ VALORES_OBRIGATORIOS = {
     "network_cmd_enable": "false",
 }
 
+# Os motores (som, controle, video) que so existem no outro sistema viram os
+# deste: o retroarch.cfg que o RetroArch do Windows gravou chega no Linux com
+# o som "wasapi", e o do Linux chega no Windows com o "pulse" (item 13).
+MOTORES_POR_SISTEMA = set(plataforma.MOTORES_SO_DO_WINDOWS) | set(plataforma.MOTORES_SO_DO_LINUX)
+
 
 def _ja_dentro_do_arena(caminho, raiz_baixo):
     """O caminho aponta para dentro desta pasta do ARENA, para algo que existe?
@@ -140,12 +172,15 @@ def _ja_dentro_do_arena(caminho, raiz_baixo):
     tambem "comeca com" "...\\ARENA". Vale se o primeiro pedaco depois da
     raiz e' uma pasta do ARENA ou existe de verdade.
     """
-    if not caminho.lower().startswith(raiz_baixo):
+    if not _comparavel(caminho).startswith(raiz_baixo):
         return False
+    if not NO_WINDOWS and "\\" in caminho:
+        return False   # no Linux, a \\ seria parte do nome da pasta
     resto = caminho[len(raiz_baixo):]
     if resto and resto[0] not in "\\/":
         return False   # "...\ARENA-velho" nao e' "...\ARENA"
-    primeiro = resto.lstrip("\\/").replace("/", "\\").split("\\", 1)[0]
+    pedacos = _pedacos(resto)
+    primeiro = pedacos[0] if pedacos else ""
     return (not primeiro or primeiro.lower() in PASTAS_CONHECIDAS_ARENA
             or os.path.exists(os.path.join(RAIZ, primeiro)))
 
@@ -162,7 +197,7 @@ def corrigir_caminhos_retroarch_cfg():
     except OSError:
         return 0
 
-    raiz_baixo = RAIZ.lower()
+    raiz_baixo = _comparavel(RAIZ)
     trocados = 0
     achadas = set()
 
@@ -172,6 +207,13 @@ def corrigir_caminhos_retroarch_cfg():
             certo = '%s = "%s"\n' % (chave_da_linha, VALORES_OBRIGATORIOS[chave_da_linha])
             if linha != certo:
                 linhas[i] = certo
+                trocados += 1
+            continue
+        if chave_da_linha in MOTORES_POR_SISTEMA and "=" in linha:
+            valor = linha.split("=", 1)[1].strip().strip('"')
+            deste = plataforma.motores_deste_sistema({chave_da_linha: valor})[chave_da_linha]
+            if deste != valor:
+                linhas[i] = '%s = "%s"\n' % (chave_da_linha, deste)
                 trocados += 1
             continue
         if chave_da_linha in CHAVES_SEMPRE_DENTRO_DO_ARENA:
@@ -186,12 +228,17 @@ def corrigir_caminhos_retroarch_cfg():
                 continue
             achadas.add(chave_da_linha)
             valor = linha.split("=", 1)[1].strip().strip('"') if "=" in linha else ""
-            if valor.startswith((":\\", ":/")):
+            if valor.startswith((":\\", ":/")) and NO_WINDOWS:
                 continue
-            certo = os.path.join(RAIZ, CHAVES_SEMPRE_DENTRO_DO_ARENA[chave_da_linha])
+            certo = _no_arena(CHAVES_SEMPRE_DENTRO_DO_ARENA[chave_da_linha])
             if valor != certo:
                 linhas[i] = '%s = "%s"\n' % (chave_da_linha, certo)
                 trocados += 1
+            continue
+        relativa = None if NO_WINDOWS else _PADRAO_LINHA_RELATIVA.match(linha.rstrip("\n"))
+        if relativa:
+            linhas[i] = '%s"%s"\n' % (relativa.group(1), _no_arena(relativa.group(2), PASTA_RETROARCH))
+            trocados += 1
             continue
         m = _PADRAO_LINHA_CAMINHO.match(linha.rstrip("\n"))
         if not m:
@@ -208,32 +255,34 @@ def corrigir_caminhos_retroarch_cfg():
         # "<ARENA>\dados\ARENA\retroarch\saves". Nos retroarch.cfg de verdade
         # nenhum caminho tem duas pastas do ARENA dentro (conferido em
         # 11/10/2026); a pasta de cima com esse nome, sim, acontece.
-        velho_baixo = caminho_velho.lower()
+        # A barra do Windows e a do Linux valem igual: o caminho velho pode
+        # ter vindo do outro sistema.
+        velho_baixo = caminho_velho.replace("\\", "/").lower()
         ancoras = []
         for pasta in PASTAS_CONHECIDAS_ARENA:
-            indice = velho_baixo.rfind("\\" + pasta + "\\")
-            if velho_baixo.endswith("\\" + pasta):
+            indice = velho_baixo.rfind("/" + pasta + "/")
+            if velho_baixo.endswith("/" + pasta):
                 indice = len(velho_baixo) - len(pasta) - 1
             if indice != -1:
                 ancoras.append(indice)
         if ancoras:
             resto = caminho_velho[max(ancoras) + 1:]  # sem a barra inicial
-            linhas[i] = '%s"%s"\n' % (prefixo, os.path.join(RAIZ, resto))
+            linhas[i] = '%s"%s"\n' % (prefixo, _no_arena(resto))
             trocados += 1
         else:
             # Nenhuma pasta do ARENA dentro do caminho velho: se a chave
             # tem lugar certo conhecido, volta para ele.
             if chave in CHAVES_COM_LUGAR_CERTO:
                 relativo = CHAVES_COM_LUGAR_CERTO[chave].format(
-                    nome=os.path.basename(caminho_velho))
-                linhas[i] = '%s"%s"\n' % (prefixo, os.path.join(RAIZ, relativo))
+                    nome=(_pedacos(caminho_velho) or [""])[-1])
+                linhas[i] = '%s"%s"\n' % (prefixo, _no_arena(relativo))
                 trocados += 1
 
     # Chave que nem aparece no arquivo (RetroArch novo, nunca rodou): cria.
     for chave, relativo in CHAVES_SEMPRE_DENTRO_DO_ARENA.items():
         if chave in achadas:
             continue
-        certo = os.path.join(RAIZ, relativo)
+        certo = _no_arena(relativo)
         linhas.append('%s = "%s"\n' % (chave, certo))
         trocados += 1
 

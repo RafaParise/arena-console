@@ -665,7 +665,10 @@ def identidade_da_maquina():
 
 def placa_da_tela_principal():
     """Nome da placa de video que desenha a tela principal (ou "" se nao
-    der para saber). Usa EnumDisplayDevicesW, da propria API do Windows."""
+    der para saber). Usa EnumDisplayDevicesW, da propria API do Windows; no
+    Linux, a placa do /sys/class/drm que tem uma tela ligada (_placa_linux)."""
+    if not sys.platform.startswith("win"):
+        return _placa_linux()[0]
     try:
         import ctypes
         from ctypes import wintypes
@@ -773,11 +776,15 @@ def placa_video():
     integrada. O ARENA achava que era placa dedicada, dava nota 4 e o PS1
     ia para 6x -- o texto do CTR saia quebrado. Sem administrador.
     """
-    if not sys.platform.startswith("win"):
-        nome, integrada = _placa_linux()
-        return {"nome": nome or "placa de video desconhecida", "integrada": integrada, "conhecida": bool(nome)}
     nome = placa_da_tela_principal()
-    if not nome:
+    # No Linux, o /sys diz tambem o fabricante e a memoria propria da placa:
+    # vale mais que o nome para saber se ela e' integrada (ver _placa_linux).
+    integrada_pelo_sistema = None
+    if not sys.platform.startswith("win"):
+        do_sistema, integrada_do_sistema = _placa_linux()
+        if nome and nome == do_sistema:
+            integrada_pelo_sistema = integrada_do_sistema
+    elif not nome:
         try:
             import winreg
             base = (r"SYSTEM\CurrentControlSet\Control\Class"
@@ -802,6 +809,8 @@ def placa_video():
     limpo = " ".join((nome or "").split())
     minusculo = limpo.lower()
     integrada = any(marca in minusculo for marca in INTEGRADAS) if limpo else True
+    if integrada_pelo_sistema is not None:
+        integrada = integrada_pelo_sistema
 
     return {
         "nome": limpo or "placa de video desconhecida",
@@ -835,6 +844,18 @@ def driver_video():
             return motor
         except OSError:
             continue
+    return "glcore"
+
+
+def motor_sem_vulkan():
+    """O motor quando o Vulkan nao serve: d3d11 no Windows (se o d3d11.dll
+    carrega); senao, e no Linux (que nao tem DirectX), glcore."""
+    if sys.platform.startswith("win"):
+        try:
+            ctypes.CDLL("d3d11.dll")
+            return "d3d11"
+        except OSError:
+            pass
     return "glcore"
 
 

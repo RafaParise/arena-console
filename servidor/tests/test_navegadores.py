@@ -37,6 +37,27 @@ class Leitura(unittest.TestCase):
         self.assertEqual(navegadores.codigo_do_programa("/usr/bin/firefox-esr"), "firefox")
         self.assertIsNone(navegadores.codigo_do_programa(r"C:\x\navegador_novo.exe"))
 
+    def test_codigo_do_programa_no_linux(self):
+        """Item 13: o do sistema, o do Snap e o do Flatpak."""
+        casos = {"/usr/bin/google-chrome-stable": "chrome", "/snap/bin/chromium": "chromium",
+                 "/usr/bin/microsoft-edge": "edge", "/var/lib/flatpak/exports/bin/com.google.Chrome": "chrome",
+                 "/home/aluno/.local/share/flatpak/exports/bin/org.mozilla.firefox": "firefox",
+                 "/var/lib/flatpak/exports/bin/com.brave.Browser": "brave", "/usr/bin/navegador-novo": None}
+        for programa, esperado in casos.items():
+            with self.subTest(programa=programa):
+                self.assertEqual(navegadores.codigo_do_programa(programa), esperado)
+
+    def test_padrao_do_linux_pelo_mimeapps(self):
+        import tempfile
+        from unittest import mock
+        with tempfile.TemporaryDirectory() as pasta:
+            with open(os.path.join(pasta, "mimeapps.list"), "w", encoding="utf-8") as lista:
+                lista.write("[Added Associations]\nx-scheme-handler/http=org.mozilla.firefox.desktop;\n"
+                            "[Default Applications]\ntext/html=firefox.desktop\n"
+                            "x-scheme-handler/http=com.google.Chrome.desktop;firefox.desktop;\n")
+            with mock.patch.dict(os.environ, {"XDG_CONFIG_HOME": pasta}):
+                self.assertEqual(navegadores._padrao_do_mimeapps(), "com.google.Chrome.desktop")
+
     def test_progid_do_padrao(self):
         casos = {"MSEdgeHTM": "edge", "ChromeHTML": "chrome", "FirefoxURL-308046B0AF4A39CB": "firefox",
                  "BraveHTML": "brave", "VivaldiHTM.AB12CD": "vivaldi", "OperaStable": "opera",

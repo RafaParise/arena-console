@@ -12,10 +12,16 @@ Como o ARENA escolhe (escolher):
      ele ainda estiver no computador;
   2. o navegador PADRAO do computador -- o que abre os links. No Windows, o
      registro diz qual e' (UrlAssociations\http\UserChoice -> o ProgId -> o
-     programa), sem administrador; no Linux, o xdg-settings;
+     programa), sem administrador; no Linux, o xdg-settings (ou, sem ele, o
+     mimeapps.list que ele mesmo le);
   3. os outros que achar, na ordem da lista CONHECIDOS (o Edge primeiro:
      vem em todo Windows 10 e 11);
-  4. nenhum: o jeito do proprio Python (webbrowser), numa aba.
+  4. nenhum: o jeito do proprio Python (webbrowser), numa aba. No Linux do
+     Chromebook, e' o que abre a tela no Chrome do proprio ChromeOS.
+
+No Linux (item 13, 17/10/2026), o navegador pode estar no sistema (/usr/bin,
+/snap/bin, pelo PATH) ou no Flatpak: este deixa um atalho com o nome do
+aplicativo ("com.google.Chrome") em exports/bin, que abre como o programa.
 
 Como abre (comando):
   - Chromium (Edge, Chrome, Brave, Vivaldi, Chromium): "--app=", uma janela
@@ -59,6 +65,20 @@ PROGIDS = (("msedgehtm", "edge"), ("chromehtml", "chrome"), ("bravehtml", "brave
            ("operagxstable", "opera"), ("firefoxurl", "firefox"), ("librewolfhtml", "librewolf"),
            ("waterfoxurl", "waterfox"), ("floorpurl", "floorp"))
 TAMANHO_DA_JANELA = "1180,760"
+# Linux: o nome de cada navegador no Flatpak (o "flatpak run <nome>").
+FLATPAK = {"edge": ("com.microsoft.Edge",), "chrome": ("com.google.Chrome",), "brave": ("com.brave.Browser",),
+           "vivaldi": ("com.vivaldi.Vivaldi",),
+           "chromium": ("org.chromium.Chromium", "io.github.ungoogled_software.ungoogled_chromium"),
+           "opera": ("com.opera.Opera",), "firefox": ("org.mozilla.firefox",),
+           "librewolf": ("io.gitlab.librewolf-community",), "waterfox": ("net.waterfox.waterfox",),
+           "floorp": ("one.ablaze.floorp",)}
+
+
+def _pastas_do_flatpak():
+    """Onde o Flatpak deixa o atalho de cada aplicativo: o da conta e o do
+    computador."""
+    dados = os.environ.get("XDG_DATA_HOME") or os.path.join(os.path.expanduser("~"), ".local", "share")
+    return [os.path.join(dados, "flatpak", "exports", "bin"), "/var/lib/flatpak/exports/bin"]
 
 
 def _pastas_de_programas():
@@ -111,13 +131,14 @@ def programa_do_comando(comando):
 
 
 def codigo_do_programa(programa):
-    """O codigo da lista CONHECIDOS pelo nome do programa, ou None."""
-    nome = os.path.basename(programa or "").lower()
-    caminho = (programa or "").lower().replace("/", "\\")
-    if nome == "chrome.exe" and "\\chromium\\" in caminho:
+    """O codigo da lista CONHECIDOS pelo nome do programa, ou None. O caminho
+    pode ser do Windows ou do Linux (com \\ ou /), no Flatpak inclusive."""
+    caminho = (programa or "").lower().replace("\\", "/")
+    nome = caminho.rsplit("/", 1)[-1]
+    if nome == "chrome.exe" and "/chromium/" in caminho:
         return "chromium"
     for codigo, _nome, _familia, _caminhos, nomes in CONHECIDOS:
-        if nome in nomes:
+        if nome in nomes or nome in [n.lower() for n in FLATPAK.get(codigo, ())]:
             return codigo
     return None
 
@@ -140,6 +161,11 @@ def instalados():
                 if not nome.endswith(".exe") and codigo not in achados:
                     caminho = shutil.which(nome)
                     if caminho:
+                        achados[codigo] = caminho
+            for pasta in _pastas_do_flatpak():
+                for aplicativo in FLATPAK.get(codigo, ()):
+                    caminho = os.path.join(pasta, aplicativo)
+                    if codigo not in achados and os.path.isfile(caminho) and os.access(caminho, os.X_OK):
                         achados[codigo] = caminho
     lista = []
     for codigo, nome, familia, _caminhos, _nomes in CONHECIDOS:
@@ -182,10 +208,39 @@ def padrao_do_computador():
         saida = subprocess.run(["xdg-settings", "get", "default-web-browser"], capture_output=True,
                                text=True, timeout=5).stdout.strip().lower()
     except (OSError, subprocess.SubprocessError):
+        saida = ""
+    saida = saida or (_padrao_do_mimeapps() or "").lower()
+    if not saida:
         return None
     for codigo, _nome, _familia, _caminhos, nomes in CONHECIDOS:
-        if any(n.replace(".exe", "") in saida for n in nomes) or codigo in saida:
+        if (any(n.replace(".exe", "") in saida for n in nomes) or codigo in saida
+                or any(a.lower() in saida for a in FLATPAK.get(codigo, ()))):
             return codigo
+    return None
+
+
+def _padrao_do_mimeapps():
+    """Linux sem o xdg-settings: o navegador que abre os links, do
+    mimeapps.list ("x-scheme-handler/http=firefox.desktop"), ou None. A
+    ordem e' a da especificacao do freedesktop: a conta antes do computador."""
+    casa = os.path.expanduser("~")
+    config = os.environ.get("XDG_CONFIG_HOME") or os.path.join(casa, ".config")
+    dados = os.environ.get("XDG_DATA_HOME") or os.path.join(casa, ".local", "share")
+    for lista in (os.path.join(config, "mimeapps.list"), os.path.join(dados, "applications", "mimeapps.list"),
+                  "/etc/xdg/mimeapps.list", "/usr/share/applications/mimeapps.list"):
+        try:
+            with open(lista, encoding="utf-8", errors="replace") as arquivo:
+                secao = ""
+                for linha in arquivo:
+                    linha = linha.strip()
+                    if linha.startswith("["):
+                        secao = linha
+                    elif secao == "[Default Applications]" and linha.startswith("x-scheme-handler/http="):
+                        valor = linha.split("=", 1)[1].split(";")[0].strip()
+                        if valor:
+                            return valor
+        except OSError:
+            continue
     return None
 
 

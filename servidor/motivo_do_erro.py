@@ -92,7 +92,7 @@ def motivo_da_bios(texto, caminho_jogo, quem):
         return ("%s não abriu este jogo: ele é de fliperama (Naomi ou Atomiswave) e precisa da BIOS %s, "
                 "dentro da pasta retroarch\\system\\dc (o .zip inteiro, sem descompactar)."
                 % (quem, achado.group(1)))
-    nome = os.path.basename(caminho_jogo or "")
+    nome = os.path.basename((caminho_jogo or "").replace("\\", "/"))   # \ ou /, dos dois sistemas
     if "ROM loading failed" in texto and (nome.startswith("BS ") or nome.lower().endswith(".bs")):
         return ("%s não abriu este jogo de Satellaview (o \"BS\" do nome): ele precisa da BIOS BS-X.bin "
                 "(o cartucho \"BS-X - Sore wa Namae o Nusumareta Machi no Monogatari\"). %s"

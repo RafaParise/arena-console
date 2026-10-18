@@ -68,9 +68,16 @@ def bibliotecas_que_carregam(*nomes):
 class TestNotebookSemDriverDeVideo(unittest.TestCase):
 
     def test_sem_vulkan_o_automatico_vai_para_d3d11(self):
+        """No Linux nao ha DirectX: sem Vulkan, glcore (item 13)."""
         import hardware
         with mock.patch.object(hardware.ctypes, "CDLL", bibliotecas_que_carregam("d3d11.dll")):
-            self.assertEqual(hardware.driver_video(), "d3d11")
+            self.assertEqual(hardware.driver_video(), "d3d11" if os.name == "nt" else "glcore")
+
+    @unittest.skipIf(os.name == "nt", "a libvulkan e' a do Linux")
+    def test_no_linux_a_libvulkan_que_carrega_vale_vulkan(self):
+        import hardware
+        with mock.patch.object(hardware.ctypes, "CDLL", bibliotecas_que_carregam("libvulkan.so.1")):
+            self.assertEqual(hardware.driver_video(), "vulkan")
 
     def test_glcore_so_quando_nem_o_d3d11_existe(self):
         import hardware
@@ -87,7 +94,7 @@ class TestNotebookSemDriverDeVideo(unittest.TestCase):
             with mock.patch.object(arena.hardware, "vulkan_tem_placa", return_value=False), \
                     mock.patch("ctypes.CDLL", bibliotecas_que_carregam("d3d11.dll")):
                 arena.conferir_vulkan()
-            self.assertEqual(arena.MAQUINA["driver_video"], "d3d11")
+            self.assertEqual(arena.MAQUINA["driver_video"], "d3d11" if os.name == "nt" else "glcore")
         finally:
             arena.MAQUINA["driver_video"] = antes
 
@@ -166,11 +173,43 @@ class TestCaminhosDoRetroarchCfgDepoisDeMudarDeLugar(unittest.TestCase):
         certos = {
             "savefile_directory": os.path.join(self.raiz, "retroarch", "saves"),
             "rgui_browser_directory": os.path.join(self.raiz, "BIOS"),   # existe, nao e' da lista
-            "system_directory": ":\\system",                              # forma do proprio RetroArch
         }
+        if os.name == "nt":
+            certos["system_directory"] = ":\\system"                     # forma do proprio RetroArch
         valores = self.corrigir(certos)
         for chave, valor in certos.items():
             self.assertEqual(valores[chave], valor, chave)
+
+    # O mesmo pen drive no Windows e no Linux (item 13, 17/10/2026): o
+    # retroarch.cfg gravado por um chega no outro.
+    def test_caminho_do_linux_e_do_windows_viram_o_deste_sistema(self):
+        valores = self.corrigir({
+            "savefile_directory": "/media/aluno/PEN/ARENA/retroarch/saves",
+            "playlist_directory": "E:\\ARENA\\dados",
+            "content_history_path": "/media/aluno/PEN/ARENA/dados/builtin/content_history.lpl",
+        })
+        self.assertEqual(valores["savefile_directory"], os.path.join(self.raiz, "retroarch", "saves"))
+        self.assertEqual(valores["playlist_directory"], os.path.join(self.raiz, "dados"))
+        self.assertEqual(valores["content_history_path"],
+                         os.path.join(self.raiz, "dados", "builtin", "content_history.lpl"))
+
+    def test_forma_do_retroarch_so_vale_no_windows(self):
+        """":\\system" e' a pasta do retroarch.exe; no Linux, a do programa
+        dentro do AppImage, que nao e' a do ARENA."""
+        valores = self.corrigir({"system_directory": ":\\system", "libretro_directory": ":\\cores",
+                                 "cache_directory": ":\\cache"})
+        if os.name == "nt":
+            self.assertEqual(valores["system_directory"], ":\\system")
+            self.assertEqual(valores["cache_directory"], ":\\cache")
+        else:
+            self.assertEqual(valores["system_directory"], os.path.join(self.raiz, "retroarch", "system"))
+            self.assertEqual(valores["libretro_directory"], os.path.join(self.raiz, "retroarch", "cores"))
+            self.assertEqual(valores["cache_directory"], os.path.join(self.raiz, "retroarch", "cache"))
+
+    @unittest.skipIf(os.name == "nt", "so no Linux a barra invertida e' parte do nome")
+    def test_no_linux_a_barra_do_windows_dentro_do_arena_e_consertada(self):
+        valores = self.corrigir({"savestate_directory": os.path.join(self.raiz, "retroarch") + "\\states"})
+        self.assertEqual(valores["savestate_directory"], os.path.join(self.raiz, "retroarch", "states"))
 
 
 if __name__ == "__main__":

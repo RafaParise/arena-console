@@ -106,8 +106,13 @@ class TestPonteDoJavaMe(unittest.TestCase):
         os.makedirs(self.temporaria)
         self.antes = tempfile.tempdir
         tempfile.tempdir = self.temporaria
+        # A logica da ponte vale nos dois sistemas; no Linux ela fica
+        # desligada (todo nucleo abre caminho com acento: test_ponte_sem_acento).
+        self.ponte_antes = ponte.PRECISA_DA_PONTE
+        ponte.PRECISA_DA_PONTE = True
 
     def tearDown(self):
+        ponte.PRECISA_DA_PONTE = self.ponte_antes
         tempfile.tempdir = self.antes
         shutil.rmtree(self.base, ignore_errors=True)
 

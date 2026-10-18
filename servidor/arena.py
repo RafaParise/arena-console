@@ -1664,6 +1664,9 @@ def opcoes_efetivas(config, custo=None, controles_ligados=None):
     driver = config.get("avancado", {}).get("video_driver", "automatico")
     if driver == "automatico":
         driver = MAQUINA["driver_video"]
+    # O motor escolhido no outro sistema (o d3d11, no Linux) vira o deste
+    # ANTES dos ajustes que dependem do motor (item 13).
+    driver = plataforma_do_sistema.motores_deste_sistema({"video_driver": driver})["video_driver"]
     ajustar_para_driver(opcoes, driver, nome_perfil)
 
     # Trava de seguranca: resposta instantanea custa de 4 a 12 vezes o
@@ -1981,6 +1984,10 @@ def gravar_override(config, custo=None, extras=None, em_partida=False,
             # RetroArch, e esticar sem suavizar faria degraus.
             opcoes["video_smooth"] = "true"
     opcoes["video_shader_enable"] = "true" if filtro else "false"
+
+    # O som, o controle e o teclado deste sistema: no Linux, o WASAPI vira o
+    # PulseAudio (ou o ALSA) e o XInput vira o udev (servidor\plataforma.py).
+    plataforma_do_sistema.motores_deste_sistema(opcoes)
 
     linhas = ["# Gerado pelo ARENA. Nao edite a mao: sera reescrito."]
     # Nenhum valor pode quebrar a linha nem fechar as aspas antes da hora:
@@ -3157,6 +3164,11 @@ def apagar_pasta_toda(caminho):
             pass
     shutil.rmtree(caminho, onexc=tirar_trava)
     return not os.path.exists(caminho)
+
+
+# Linux sem xdg-open nem gio (raro: so sistema minimo, sem area de trabalho).
+SEM_GERENCIADOR_DE_ARQUIVOS = ("Não achei um gerenciador de arquivos neste computador para abrir a pasta. "
+                               "Ela fica em %s: abra por ele.")
 
 
 def traduzir_erro_do_sistema(falha, acao):
@@ -5856,9 +5868,9 @@ class Manipulador(BaseHTTPRequestHandler):
             alvo = os.path.join(PASTA_JOGOS, "pessoais", plataforma["pasta"])
             try:
                 os.makedirs(alvo, exist_ok=True)
-                if not hasattr(os, "startfile"):
-                    return self.erro("Abrir a pasta só funciona no Windows. Ela fica em %s: abra pelo gerenciador de arquivos." % alvo)
-                os.startfile(alvo)
+                plataforma_do_sistema.abrir_pasta(alvo)
+            except plataforma_do_sistema.SemGerenciadorDeArquivos:
+                return self.erro(SEM_GERENCIADOR_DE_ARQUIVOS % alvo)
             except OSError as falha:
                 return self.erro(traduzir_erro_do_sistema(falha, "abrir a pasta"))
             return self.responder_json({"ok": True, "pasta": os.path.relpath(alvo, RAIZ)})
@@ -5902,9 +5914,9 @@ class Manipulador(BaseHTTPRequestHandler):
             try:
                 bios.criar_prateleiras(RAIZ)
                 os.makedirs(alvo, exist_ok=True)
-                if not hasattr(os, "startfile"):
-                    return self.erro("Abrir a pasta só funciona no Windows. Ela fica em %s: abra pelo gerenciador de arquivos." % alvo)
-                os.startfile(alvo)
+                plataforma_do_sistema.abrir_pasta(alvo)
+            except plataforma_do_sistema.SemGerenciadorDeArquivos:
+                return self.erro(SEM_GERENCIADOR_DE_ARQUIVOS % alvo)
             except OSError as falha:
                 return self.erro(traduzir_erro_do_sistema(falha, "abrir a pasta"))
             return self.responder_json({"ok": True, "pasta": os.path.relpath(alvo, RAIZ)})
@@ -6127,11 +6139,10 @@ class Manipulador(BaseHTTPRequestHandler):
             if nome not in {p["nome"] for p in listar_pacotes()}:
                 return self.erro("Não achei esse pacote na pasta backup. Clique em Montar meu pacote de novo.", 404)
             alvo = os.path.join(PASTA_BACKUP, nome)
-            if not hasattr(os, "startfile"):
-                return self.erro("Mostrar na pasta só funciona no Windows. O pacote fica em %s: abra pelo "
-                                 "gerenciador de arquivos." % alvo)
             try:
-                subprocess.Popen(["explorer.exe", "/select,", alvo])
+                plataforma_do_sistema.mostrar_arquivo(alvo)
+            except plataforma_do_sistema.SemGerenciadorDeArquivos:
+                return self.erro(SEM_GERENCIADOR_DE_ARQUIVOS % alvo)
             except OSError as falha:
                 return self.erro(traduzir_erro_do_sistema(falha, "abrir a pasta"))
             return self.responder_json({"ok": True, "pasta": os.path.relpath(PASTA_BACKUP, RAIZ), "arquivo": nome})
@@ -7259,17 +7270,14 @@ def organizar_bios(esperar=3.0):
 
 
 def conferir_vulkan():
-    """O automatico escolheu Vulkan porque o vulkan-1.dll carrega; se o
-    Vulkan nao enxergar placa nenhuma, troca para d3d11 (ou glcore) antes
-    do primeiro jogo -- senao o jogo abre e fecha sem explicar."""
+    """O automatico escolheu Vulkan porque o vulkan-1.dll (no Linux, a
+    libvulkan) carrega; se o Vulkan nao enxergar placa nenhuma, troca para
+    d3d11 (ou glcore; no Linux, glcore) antes do primeiro jogo -- senao o
+    jogo abre e fecha sem explicar."""
     if MAQUINA.get("driver_video") != "vulkan":
         return
     if hardware.vulkan_tem_placa() is False:
-        try:
-            ctypes_ok = __import__("ctypes").CDLL("d3d11.dll") is not None
-        except OSError:
-            ctypes_ok = False
-        MAQUINA["driver_video"] = "d3d11" if ctypes_ok else "glcore"
+        MAQUINA["driver_video"] = hardware.motor_sem_vulkan()
         print("[ARENA] O Vulkan desta maquina nao enxerga placa de video: "
               "motor automatico trocado para %s." % MAQUINA["driver_video"])
 

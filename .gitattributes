@@ -9,6 +9,12 @@
 *.cmd text eol=crlf
 *.ps1 text eol=crlf
 
+# Os do Linux (item 13) precisam de LF mesmo baixados no Windows: com CRLF, o
+# sh le "\r" no fim de cada linha e para no primeiro comando.
+*.sh text eol=lf
+*.desktop text eol=lf
+Dockerfile text eol=lf
+
 # BIOS livres e jogos livres dos testes: o ARENA e o conferidor conferem cada
 # arquivo pela marca (SHA-256), byte a byte. Sem conversão de final de linha,
 # senão o config.ini do C-BIOS baixado no Windows ganharia CRLF, a marca não

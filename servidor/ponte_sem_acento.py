@@ -30,6 +30,11 @@ Outro caso, mais leve (rodada final de 15/10/2026): o nucleo que ABRE o jogo
 com acento, mas GRAVA na pasta system pelo caminho em ANSI, o jeito antigo
 do Windows, em que o "ó" vira "Ã³". Para ele nao precisa de copia: basta
 dizer a pasta system pelo caminho relativo (pasta_sistema_relativa).
+
+No Linux (item 13, 17/10/2026) a ponte nao existe: la, o nome do arquivo e'
+uma sequencia de bytes em UTF-8, sem o "jeito ANSI" do Windows, e todo nucleo
+abre e grava caminho com acento (conferido com o Hatari no conteiner Linux,
+testes\teste_linux.py). O jogo abre direto, como no pen drive sem acento.
 """
 import hashlib
 import os
@@ -57,6 +62,8 @@ NUCLEOS = {
     "freej2me_libretro.dll": ["freej2me-lr.jar"],
 }
 PREFIXO = "ARENA-sem-acento-"
+# So o Windows precisa da ponte (ver o topo).
+PRECISA_DA_PONTE = os.name == "nt"
 
 # Os nucleos que abrem o jogo com acento, mas gravam na pasta system pelo
 # caminho em ANSI (rodada final de 15/10/2026): o N64 (mupen64plus-next)
@@ -102,13 +109,20 @@ def nome_sem_acento(nome):
     return base + (extensao.lower() if sem_acento(extensao) and not PROIBIDOS_NO_NOME.search(extensao) else "")
 
 
+def _nome_do_nucleo(nucleo):
+    """'C:\\...\\hatari_libretro.dll' ou '.../hatari_libretro.so' ->
+    'hatari_libretro.dll' (o nome das listas acima)."""
+    nome = os.path.basename(str(nucleo or "").replace("\\", "/")).lower()
+    return nome[:-3] + ".dll" if nome.endswith(".so") else nome
+
+
 def pasta_sistema_relativa(nucleo, pasta_sistema, pasta_trabalho):
     """A pasta system dita a partir da pasta de trabalho do RetroArch
     ("system"), para o nucleo que grava em ANSI, quando o caminho dela tem
     acento. None quando nao precisa: outro nucleo, caminho sem acento, ou a
     system fora da pasta de trabalho (o caminho relativo teria acento ou "..")."""
-    nome = os.path.basename(str(nucleo or "")).lower()
-    if not nome.startswith(GRAVAM_EM_ANSI) or sem_acento(pasta_sistema):
+    nome = _nome_do_nucleo(nucleo)
+    if not PRECISA_DA_PONTE or not nome.startswith(GRAVAM_EM_ANSI) or sem_acento(pasta_sistema):
         return None
     try:
         relativa = os.path.relpath(pasta_sistema, pasta_trabalho)
@@ -122,8 +136,8 @@ def pasta_sistema_relativa(nucleo, pasta_sistema, pasta_trabalho):
 def precisa(nucleo, pasta_sistema, caminho_jogo):
     """Este jogo precisa da ponte: o nucleo e' um dos que nao aceitam acento
     e o jogo tem acento -- ou a pasta da BIOS, quando ele usa uma?"""
-    nucleo = os.path.basename(str(nucleo or "")).lower()
-    if nucleo not in NUCLEOS:
+    nucleo = _nome_do_nucleo(nucleo)
+    if not PRECISA_DA_PONTE or nucleo not in NUCLEOS:
         return False
     return not sem_acento(caminho_jogo) or (bool(NUCLEOS[nucleo]) and not sem_acento(pasta_sistema))
 
@@ -196,7 +210,7 @@ def preparar(nucleo, pasta_sistema, caminho_jogo):
         raise OSError("nenhuma pasta sem acento para abrir o jogo (nem a temporária do Windows, nem a ProgramData)")
     limpar_sobras(base)
     ponte = tempfile.mkdtemp(prefix=PREFIXO, dir=base)
-    necessarios = NUCLEOS[os.path.basename(nucleo).lower()]
+    necessarios = NUCLEOS[_nome_do_nucleo(nucleo)]
     try:
         sistema = os.path.join(ponte, "system")
         os.makedirs(sistema)

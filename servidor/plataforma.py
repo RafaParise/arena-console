@@ -22,7 +22,10 @@ seu jeito.
 """
 import os
 import platform
+import shutil
+import subprocess
 import sys
+import urllib.parse
 
 WINDOWS = sys.platform.startswith("win")
 LINUX = sys.platform.startswith("linux")
@@ -30,7 +33,6 @@ LINUX = sys.platform.startswith("linux")
 # O RetroArch do Linux (stable 1.22.2 do libretro): um AppImage, que o ARENA
 # abre direto, sem instalar (ver comando_do_appimage).
 APPIMAGE_RETROARCH = "RetroArch-Linux-x86_64.AppImage"
-EXTENSAO_DO_NUCLEO = ".dll" if WINDOWS else ".so"
 
 
 def no_chromebook():
@@ -73,7 +75,7 @@ def arquivo_do_nucleo(nome):
     if not nome or WINDOWS:
         return nome
     base, extensao = os.path.splitext(nome)
-    return base + EXTENSAO_DO_NUCLEO if extensao.lower() in (".dll", ".so", ".dylib") else nome
+    return base + ".so" if extensao.lower() in (".dll", ".so", ".dylib") else nome
 
 
 CAMPOS_DE_NUCLEO = ("core", "core_netplay", "core_sem_bios")
@@ -114,3 +116,120 @@ def python_que_veio_junto(pasta_servidor):
     if WINDOWS:
         return os.path.join(pasta_servidor, "python", "python.exe")
     return os.path.join(pasta_servidor, "python-linux", "bin", "python3.13")
+
+
+class SemGerenciadorDeArquivos(OSError):
+    """Linux sem nenhum jeito conhecido de abrir uma pasta (sem o xdg-open e
+    sem o gio): quem chamou mostra o caminho para a pessoa abrir sozinha."""
+
+
+def _sem_janela():
+    return {"stdin": subprocess.DEVNULL, "stdout": subprocess.DEVNULL, "stderr": subprocess.DEVNULL}
+
+
+def abrir_pasta(pasta):
+    """Abre a pasta no gerenciador de arquivos deste sistema: o Explorador
+    no Windows; no Linux, o do proprio computador (Arquivos, Dolphin, Nemo,
+    Thunar...), pelo xdg-open, o jeito padrao do freedesktop, ou pelo gio."""
+    if WINDOWS:
+        os.startfile(pasta)
+        return
+    for programa in (["xdg-open"], ["gio", "open"]):
+        if shutil.which(programa[0]):
+            subprocess.Popen(programa + [pasta], start_new_session=True, **_sem_janela())
+            return
+    raise SemGerenciadorDeArquivos("sem xdg-open nem gio")
+
+
+# Linux: o pedido "mostre estes arquivos" do freedesktop (FileManager1), que
+# o Arquivos do GNOME, o Dolphin, o Nemo, o Caja e o Thunar entendem: abrem a
+# pasta com o arquivo ja marcado, como o explorer /select do Windows. Pelo
+# gdbus (do GLib) ou pelo dbus-send; sem nenhum dos dois (ou sem gerenciador
+# que entenda), abre so a pasta. Roda num sh a parte: o servidor nao espera.
+_MOSTRAR_NO_LINUX = (
+    "gdbus call --session --dest org.freedesktop.FileManager1 --object-path /org/freedesktop/FileManager1"
+    " --method org.freedesktop.FileManager1.ShowItems \"['$1']\" \"''\" >/dev/null 2>&1"
+    " || dbus-send --session --print-reply --dest=org.freedesktop.FileManager1 --type=method_call"
+    " /org/freedesktop/FileManager1 org.freedesktop.FileManager1.ShowItems \"array:string:$1\" string:"
+    " >/dev/null 2>&1"
+    " || xdg-open \"$2\" >/dev/null 2>&1 || gio open \"$2\"")
+
+
+def mostrar_arquivo(arquivo):
+    """Abre a pasta do arquivo com ele marcado: quem nunca usou computador ve
+    qual arquivo levar. No Windows, o explorer /select."""
+    if WINDOWS:
+        subprocess.Popen(["explorer.exe", "/select,", arquivo])
+        return
+    if not any(shutil.which(p) for p in ("gdbus", "dbus-send", "xdg-open", "gio")):
+        raise SemGerenciadorDeArquivos("sem gdbus, dbus-send, xdg-open nem gio")
+    completo = os.path.abspath(arquivo)
+    endereco = "file://" + urllib.parse.quote(completo)
+    subprocess.Popen(["sh", "-c", _MOSTRAR_NO_LINUX, "sh", endereco, os.path.dirname(completo)],
+                     start_new_session=True, **_sem_janela())
+
+
+# ---------------------------------------------------------------------------
+# Os motores do RetroArch de cada sistema
+# ---------------------------------------------------------------------------
+# O mesmo retroarch.cfg e as mesmas opcoes do ARENA passam pelos dois
+# sistemas (o pen drive vai do Windows para o Linux e volta). Alguns motores
+# so existem num deles: o som WASAPI e o controle XInput sao do Windows; o
+# PulseAudio e o udev, do Linux. O valor que so existe no outro sistema vira
+# o equivalente deste; o que existe nos dois (vulkan, glcore, sdl2...) fica
+# como esta. Sem isto, o RetroArch do Linux procuraria o "wasapi", nao
+# acharia, e abriria o jogo sem som.
+MOTORES_SO_DO_WINDOWS = {
+    "video_driver": ("d3d9", "d3d10", "d3d11", "d3d12", "gdi"),
+    "input_driver": ("dinput", "raw", "winraw"),
+    "input_joypad_driver": ("xinput", "dinput"),
+    "audio_driver": ("wasapi", "xaudio", "dsound"),
+    "microphone_driver": ("wasapi",),
+    "midi_driver": ("winmm",),
+}
+MOTORES_SO_DO_LINUX = {
+    "video_driver": ("xvideo", "drm"),
+    "input_driver": ("udev", "linuxraw", "x", "wayland"),
+    "input_joypad_driver": ("udev", "linuxraw"),
+    "audio_driver": ("alsa", "alsathread", "tinyalsa", "pulse", "pipewire", "jack", "oss"),
+    "microphone_driver": ("alsa", "alsathread", "pipewire"),
+    "midi_driver": ("alsa",),
+}
+# No Windows, o que o ARENA sempre usou.
+MOTORES_DO_WINDOWS = {"video_driver": "d3d11", "input_driver": "dinput", "input_joypad_driver": "xinput",
+                      "audio_driver": "wasapi", "microphone_driver": "wasapi", "midi_driver": "winmm"}
+# No Linux: o glcore no lugar do d3d11 (o seguro, quando o Vulkan nao
+# serve); o teclado pela janela (o "x": o RetroArch troca sozinho pelo do
+# Wayland quando a tela e' Wayland); o controle pelo udev (o padrao do Linux,
+# que reconhece o controle ligado com o jogo aberto); o som pelo
+# motor_de_som_do_linux.
+MOTORES_DO_LINUX = {"video_driver": "glcore", "input_driver": "x", "input_joypad_driver": "udev",
+                    "microphone_driver": "alsa", "midi_driver": "alsa"}
+
+
+def motor_de_som_do_linux():
+    """pulse quando ha o servidor de som do PulseAudio (ou o do PipeWire, que
+    fala como ele: o padrao do Ubuntu, do Fedora e do Mint de agora); senao,
+    alsa, direto na placa de som. O RetroArch que nao consegue abrir o som
+    nao tenta outro: o jogo abriria mudo."""
+    if os.environ.get("PULSE_SERVER"):
+        return "pulse"
+    pasta = os.environ.get("XDG_RUNTIME_DIR") or ("/run/user/%d" % os.getuid() if hasattr(os, "getuid") else "")
+    if pasta and os.path.exists(os.path.join(pasta, "pulse", "native")):
+        return "pulse"
+    return "alsa"
+
+
+def motores_deste_sistema(opcoes):
+    """As opcoes do RetroArch ({chave: valor}) com os motores deste sistema
+    (ver acima). Troca no proprio dicionario e o devolve."""
+    estrangeiros = MOTORES_SO_DO_LINUX if WINDOWS else MOTORES_SO_DO_WINDOWS
+    for chave, valores in estrangeiros.items():
+        if str(opcoes.get(chave, "")).strip().lower() in valores:
+            if WINDOWS:
+                opcoes[chave] = MOTORES_DO_WINDOWS[chave]
+            elif chave == "audio_driver":
+                opcoes[chave] = motor_de_som_do_linux()
+            else:
+                opcoes[chave] = MOTORES_DO_LINUX[chave]
+    return opcoes
