@@ -186,6 +186,13 @@ else:
          "indisponivel). Se a partida nao conectar, confira manualmente em "
          "Configuracoes > Rede e Internet.")
 
+# As faixas que o Windows reserva a cada reinicio (Hyper-V, WSL, Docker): a
+# porta da partida dentro de uma delas nao abre (servidor\portas.py).
+sys.path.insert(0, PASTA_SERVIDOR)
+import portas  # noqa: E402
+for bloqueada in portas.portas_bloqueadas():
+    torto(portas.frase(bloqueada), portas.O_QUE_FAZER)
+
 if porta_aberta("127.0.0.1", PORTA_PARTIDA, 1.0):
     certo("porta %d (partida) esta aberta - tem jogo em rede rodando"
           % PORTA_PARTIDA)

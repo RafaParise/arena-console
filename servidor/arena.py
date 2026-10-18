@@ -91,6 +91,7 @@ import jeitos_de_abrir  # noqa: E402  (o original ou o livre: a tela pergunta --
 # Windows ou Linux: os nomes que mudam de um para o outro (item 13, 17/10/2026).
 # "plataforma_do_sistema" porque "plataforma" ja e' o console, aqui dentro.
 import plataforma as plataforma_do_sistema  # noqa: E402
+import portas  # noqa: E402  (as faixas que o Windows reserva a cada reinicio -- 18/10/2026)
 
 PASTA_LAUNCHER = os.path.join(RAIZ, "launcher")
 PASTA_DADOS = os.path.join(RAIZ, "dados")
@@ -7310,6 +7311,14 @@ def organizar_bios(esperar=3.0):
     return feito
 
 
+def avisar_portas_reservadas():
+    """Achado de 16/10/2026 (servidor\portas.py): o Windows reserva faixas de
+    porta a cada reinicio, e a porta do ARENA que cair numa delas nao abre.
+    Diz na janela preta qual e o que fazer."""
+    for bloqueada in portas.portas_bloqueadas():
+        print("[ARENA] AVISO: %s %s" % (portas.frase(bloqueada), portas.O_QUE_FAZER))
+
+
 def conferir_vulkan():
     """O automatico escolheu Vulkan porque o vulkan-1.dll (no Linux, a
     libvulkan) carrega; se o Vulkan nao enxergar placa nenhuma, troca para
@@ -7471,6 +7480,9 @@ def principal():
     # A pasta BIOS: prateleiras, LEIA e a BIOS posta la vai para onde o
     # emulador procura, com o nome certo (servidor\bios.py).
     threading.Thread(target=organizar_bios, daemon=True).start()
+    # Porta do ARENA dentro das faixas que o Windows reservou neste reinicio
+    # (Hyper-V, WSL, Docker): avisa na janela preta, sem atrasar a abertura.
+    threading.Thread(target=avisar_portas_reservadas, daemon=True).start()
     # Linux: o RetroArch sai do AppImage para a pasta de cache da conta ja
     # agora, e nao no primeiro jogo (servidor\plataforma.py, item 13).
     if not plataforma_do_sistema.WINDOWS and os.path.isfile(EXECUTAVEL_RETROARCH):

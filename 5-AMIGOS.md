@@ -604,6 +604,17 @@ Teste nesta ordem, sem pular etapa.
 | 3 | No Prompt, `ping` no endereço dele | As máquinas não se enxergam. Volte ao passo 2 |
 | 4 | Ping responde mas o ARENA não | É o firewall dele |
 
+**Porta reservada pelo Windows.** O Windows separa faixas de porta para o
+Hyper-V, o WSL e o Docker, e elas mudam a cada vez que ele liga. Se a porta
+da partida (55435) ou a da descoberta dos colegas (55436) cair numa dessas
+faixas, ninguém consegue usá-la naquele dia: a partida não abre, sem
+explicar. O `PARTIDA.bat` e o `VERIFICAR.bat` conferem isso (sem senha de
+administrador), e a janela preta avisa ao abrir o ARENA. O que fazer:
+reiniciar o computador. Se acontecer sempre, o professor, com a senha de
+administrador, muda a faixa de portas do Windows para depois das do ARENA,
+uma vez só: `netsh int ipv4 set dynamic tcp start=56000 num=9536`, o mesmo
+com `udp`, e reinicia.
+
 ---
 
 ### Problemas

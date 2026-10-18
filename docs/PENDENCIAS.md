@@ -104,16 +104,10 @@ Depois do Release, nesta ordem:
 15. Testes nos sistemas virtuais (Docker e WSL), com números e
     descontando a perda de rodar dentro de outro sistema.
 
-Achado de 16/10 que espera conserto:
-
-- O Windows reserva faixas de porta para o Hyper-V e o WSL, e elas mudam a
-  cada reinício (`netsh interface ipv4 show excludedportrange protocol=udp`,
-  sem administrador). Em 16/10, de 55335 a 55434 (UDP): a 55355 dos comandos
-  de rede dos testes caiu dentro, e o RetroArch não atendia nada (os testes
-  já escolhem outra, `testes\porta_de_comando.py`). As portas do ARENA
-  ficaram de fora por uma: a 55435 (partida a dois) e a 55436 (descoberta).
-  Avaliar o `VERIFICAR.bat` e o `PARTIDA.bat` conferirem essas faixas e
-  avisarem, antes do item 15 (o Docker e o WSL criam essas reservas).
+Achado de 16/10, consertado em 18/10: as faixas de porta que o Windows
+reserva a cada reinício (Hyper-V, WSL, Docker). O `VERIFICAR.bat`, o
+`PARTIDA.bat` e a janela preta conferem as portas do ARENA contra elas
+(`servidor\portas.py`, sem administrador) e explicam o que fazer (guia 5).
 
 ## Depende do Rafael
 

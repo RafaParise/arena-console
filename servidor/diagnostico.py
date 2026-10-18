@@ -63,7 +63,7 @@ PROGRAMA = [
     "servidor/nomes_arcade.py", "servidor/processos.py", "servidor/capas_do_disco.py",
     "servidor/como_colocar.py", "servidor/ponte_sem_acento.py", "servidor/java_do_arena.py",
     "servidor/jeitos_de_abrir.py", "servidor/biblioteca_livre.py", "servidor/lossless.py", "servidor/navegadores.py",
-    "servidor/plataforma.py", "servidor/baixar.py",
+    "servidor/plataforma.py", "servidor/baixar.py", "servidor/portas.py",
     "servidor/filtros/pixel-nitido.slangp", "servidor/filtros/fsr.slangp",
     "servidor/filtros/catmull-rom.slangp", "servidor/filtros/rcas.slangp", "servidor/filtros/suave.slangp",
     "servidor/consoles.json", "servidor/graficos.json", "servidor/recursos.json",
@@ -572,6 +572,20 @@ else:
     print("  Se o ARENA ja estiver aberto, tudo bem. Se nao, feche o outro")
     print("  programa que esta usando essa porta.")
     atencao.append("porta %d ocupada" % porta)
+
+# As faixas de porta que o Windows reserva a cada reinicio (Hyper-V, WSL,
+# Docker): porta do ARENA dentro de uma delas nao abre (servidor\portas.py,
+# achado de 16/10/2026).
+if plataforma.WINDOWS:
+    import portas
+    bloqueadas = portas.portas_bloqueadas()
+    for bloqueada in bloqueadas:
+        atencao.append("porta %d (%s) reservada pelo Windows neste reinicio"
+                       % (bloqueada["porta"], bloqueada["protocolo"].upper()))
+        print("  ATENCAO  " + portas.frase(bloqueada))
+        print("           O que fazer: " + portas.O_QUE_FAZER)
+    if not bloqueadas:
+        print("  nenhuma porta do ARENA caiu nas faixas que o Windows reservou neste reinicio.")
 
 
 # ---------------------------------------------------------------------------
