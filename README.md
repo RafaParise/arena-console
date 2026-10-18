@@ -58,6 +58,7 @@ Ele nasceu nas aulas do curso técnico de **Desenvolvimento de Sistemas**
 | 🔒 **Seguro para menores** | Sem gravação de vídeo e sem transmissão ao vivo. Só o que o Jogar Junto precisa fica aberto à rede |
 | 💻 **Também no Chromebook** | O mesmo pen drive abre no Chromebook, dentro do Chrome (`ARENA-CHROMEBOOK.html`), sem instalar nada: a mesma tela, 35 consoles e o mesmo save do Windows ([`docs/CHROMEBOOK.md`](docs/CHROMEBOOK.md)) |
 | 🐧 **Também no Linux** | O mesmo pen drive abre no Linux (`sh ARENA.sh`), sem instalar nada e sem administrador: o mesmo ARENA, os 66 consoles e o mesmo save do Windows ([`docs/LINUX.md`](docs/LINUX.md)) |
+| 📱 **Também no Android** | O app do ARENA (o APK nos *Releases*): o mesmo servidor e a mesma tela, o Jogar Junto, os jogos e os saves da pasta do ARENA copiada para o aparelho ou no pen drive pelo cabo OTG ([`docs/ANDROID.md`](docs/ANDROID.md)) |
 
 ## Baixar e usar
 
@@ -125,7 +126,7 @@ o GameCube e o Wii dentro do RetroArch.
 
 | | Mínimo | Bom |
 |---|---|---|
-| Sistema | Windows 10 ou 11, **64 bits**; Linux de 64 bits de 2018 para cá (Ubuntu 18.04, Debian 10, Mint 19, Fedora 28 ou mais novos, pelo `ARENA.sh`); ou um Chromebook (35 consoles, pelo `ARENA-CHROMEBOOK.html`) | |
+| Sistema | Windows 10 ou 11, **64 bits**; Linux de 64 bits de 2018 para cá (Ubuntu 18.04, Debian 10, Mint 19, Fedora 28 ou mais novos, pelo `ARENA.sh`); um Chromebook (35 consoles, pelo `ARENA-CHROMEBOOK.html`); ou um celular ou tablet com Android 7 ou mais novo (o APK) | |
 | Processador | 2 núcleos (Celeron, Pentium) | 4 núcleos ou mais |
 | Memória | 4 GB | 8 GB |
 | Espaço | 4 GB, mais os jogos | SSD ou pen drive USB 3.0 |
@@ -187,6 +188,13 @@ No **Linux**, roda o mesmo servidor, com o Python portátil do Linux
 núcleos `.so` ao lado dos `.dll`. O que muda de um sistema para o outro
 mora em `servidor/plataforma.py` ([`docs/LINUX.md`](docs/LINUX.md)).
 
+No **Android**, o APK roda o mesmo servidor, com o Python 3.13.16 do Android,
+e a tela de sempre num WebView; o RetroArch é o 1.22.2 oficial do Android,
+com uma peça compilada do código oficial com um remendo do ARENA (a mesma
+linha de comando do Windows: `android/retroarch/arena-args.patch`). O que só
+o app sabe fazer, o servidor pede pela `servidor/ponte_android.py`
+([`docs/ANDROID.md`](docs/ANDROID.md)).
+
 ```
 ARENA\
 ├── ARENA.bat · VERIFICAR.bat · PARTIDA.bat · COLETAR.bat · RODAR_TESTES.bat
@@ -197,11 +205,13 @@ ARENA\
 │   ├── indexador.py     acha os jogos nas pastas
 │   ├── hardware.py      mede o computador
 │   ├── graficos.py      a configuração de cada emulador
-│   ├── plataforma.py    o que muda entre o Windows e o Linux
+│   ├── plataforma.py    o que muda entre o Windows, o Linux e o Android
+│   ├── ponte_android.py · android_inicio.py   o servidor dentro do app do Android
 │   ├── consoles.json    os 66 consoles
 │   └── tests\           a bateria de testes (RODAR_TESTES.bat)
 ├── launcher\     a tela (index.html, app.js, estilo.css e os fundos em pixel art)
 │   └── navegador\   o servidor dentro da página e os núcleos em WebAssembly (Chromebook)
+├── android\       o app do Android (a tela e o servidor em Java, o lançador do Python, o remendo do RetroArch)
 ├── testes\       testes de ponta a ponta com os emuladores de verdade
 ├── ferramentas\  montar a versão dos alunos, medir o computador, a rodada de testes
 └── docs\         relatórios das auditorias, a máquina-alvo, os roteiros de sala
