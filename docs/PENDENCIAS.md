@@ -99,8 +99,12 @@ Depois do Release, nesta ordem:
     **Falta rodar o teste de ponta a ponta** (`testes/teste_linux.py`): o
     serviço do WSL travou na madrugada de 18/10 (a máquina virtual do
     contêiner não fecha sem reiniciar o Windows; ver "Depende do Rafael").
-14. Android: antes, um emulador de Android de código aberto para os
-    testes; depois, o APK nos Releases.
+14. Android: em andamento (18/10), com o relatório em `docs/ANDROID.md`.
+    Feito o emulador de testes (o do AOSP, com o Android 15 de código
+    aberto: `ferramentas/preparar_android.py`) e o APK do ARENA (o RetroArch
+    1.22.2 oficial para Android com a tela do ARENA na frente e 62 núcleos:
+    `ferramentas/montar_android.py`). **Falta** o teste no emulador
+    (`testes/teste_android.py`) e o APK nos Releases.
 15. Testes nos sistemas virtuais (Docker e WSL), com números e
     descontando a perda de rodar dentro de outro sistema.
 
@@ -111,6 +115,10 @@ reserva a cada reinício (Hyper-V, WSL, Docker). O `VERIFICAR.bat`, o
 
 ## Depende do Rafael
 
+- **Autorizar religar o emulador do Android:** na madrugada de 18/10 o
+  Claude Code encerrou o emulador (a sessão estava parada e o computador
+  ficou com pouca memória). Para seguir o item 14, basta dizer que pode
+  religar; o teste desliga o emulador no fim.
 - **Reiniciar o Windows** quando puder: na madrugada de 18/10 a máquina
   virtual do contêiner de testes (WSLC) travou, e o serviço do WSL ficou
   "parando" (o Windows não deixa encerrá-la de outro jeito). Depois do
