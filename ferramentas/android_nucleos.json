@@ -1,0 +1,506 @@
+{
+ "_leia": [
+  "Os nucleos do Android do ARENA: o nightly do libretro (o 1.22.2 do Android nao publica nucleo separado), com a marca SHA-256 de cada zip conferida. Um nightly novo so entra pelo ferramentas\\montar_android.py --atualizar-nucleos."
+ ],
+ "arm64-v8a": {
+  "81_libretro_android.so": {
+   "sha256": "4736999826eb60d8972dadf08d17338832788d72a3bab10aa66bd1cf5909663b",
+   "tamanho": 149348
+  },
+  "a5200_libretro_android.so": {
+   "sha256": "6e1a705d997c8f2b96763529b7f5cda8e2346eaaabc299c86b85f746530ee901",
+   "tamanho": 97164
+  },
+  "applewin_libretro_android.so": {
+   "sha256": "fb4697858f2b672a9aba9aa0a273708d058742722d407857c116d09b917b0297",
+   "tamanho": 1543217
+  },
+  "ardens_libretro_android.so": {
+   "sha256": "4477ace01dd8ac1f7928718126dbd95f234f0fafe1662af4b9c2d9778929ef75",
+   "tamanho": 540000
+  },
+  "atari800_libretro_android.so": {
+   "sha256": "aeeb02f655888ee537a2bed3f89d8c8ae4ea627fdb477d1ba52729b024de2a7f",
+   "tamanho": 295086
+  },
+  "bluemsx_libretro_android.so": {
+   "sha256": "75a03a7b79c14851d74251c6e9c45561ef3d7ee00803149c024e232caae05807",
+   "tamanho": 739816
+  },
+  "cap32_libretro_android.so": {
+   "sha256": "afe6bad52b91c710dcae27232f8cd33495170e722e1d78db67858a93aed415e9",
+   "tamanho": 371872
+  },
+  "dolphin_libretro_android.so": {
+   "sha256": "bab6b55a7507ac57e9602c02611e166d89c7bfd8a84a742a2e9dfd91ca28951f",
+   "tamanho": 6418659
+  },
+  "dosbox_pure_libretro_android.so": {
+   "sha256": "a518a00c58835a7313ab14530f82beafac8b8d7b8db347be8623170ba581d2c2",
+   "tamanho": 1563440
+  },
+  "fbneo_libretro_android.so": {
+   "sha256": "b0a60a54c2568057658559262a05e057aba9691de58516dead9fbd9626ec19a0",
+   "tamanho": 16441195
+  },
+  "fceumm_libretro_android.so": {
+   "sha256": "9fa3d1ccc3ead911701a8c5d9910b6b65a91b1d1e21ad8a5bd4c4dfd16951040",
+   "tamanho": 445599
+  },
+  "flycast_libretro_android.so": {
+   "sha256": "19b2265a438a7dd6c3a1c47f63b6dc55dea02556dd7d4bfefbec17abaee80f0f",
+   "tamanho": 5939378
+  },
+  "freeintv_libretro_android.so": {
+   "sha256": "c0a9b4d7dc3db590921f5fc43f0330fb332fbae7e4dece934cf11a0a72355823",
+   "tamanho": 499832
+  },
+  "fuse_libretro_android.so": {
+   "sha256": "f756a8c21d78913b5bdb3d084da74216a617ae46ee5ab88f7331d7c99e230fe1",
+   "tamanho": 519917
+  },
+  "gambatte_libretro_android.so": {
+   "sha256": "b3fb0758c5931a3d1cb5ae40029320dbb8e047e6f9e25c58f4216a13886fa356",
+   "tamanho": 433996
+  },
+  "gearcoleco_libretro_android.so": {
+   "sha256": "de20bb27163d578b8838bffb29357e1abf373b4df1cdbe266ea3cad880d4dade",
+   "tamanho": 279427
+  },
+  "gearsystem_libretro_android.so": {
+   "sha256": "09924443e85a363c37124c3af4a691c0ebd62a1e2abbcc68bdedd7e525fe2e72",
+   "tamanho": 288596
+  },
+  "genesis_plus_gx_libretro_android.so": {
+   "sha256": "dab6c0dc33c97e40eb1affa89b6d6dc865c17c72a361109da8f2c63dc25c951c",
+   "tamanho": 1133708
+  },
+  "gw_libretro_android.so": {
+   "sha256": "afc7f1414bc10190a823e30ac8ffdad45b930dea241bd2b28da1f9f30adf73e5",
+   "tamanho": 148165
+  },
+  "handy_libretro_android.so": {
+   "sha256": "defae9137e766f60a17bf67322fd6ae948f53e3d80665d3aaeb5a3d501ec7d39",
+   "tamanho": 141020
+  },
+  "hatari_libretro_android.so": {
+   "sha256": "df3874ca063c2c2f2f500b8e0d3125e7d854b490f55b8ba7ebe7c2df140478f0",
+   "tamanho": 4867365
+  },
+  "jaxe_libretro_android.so": {
+   "sha256": "14f1a082fea6f1ef190c827b4f68981f3eac0503552c30f3409b8c2b621d26ff",
+   "tamanho": 11568
+  },
+  "lowresnx_libretro_android.so": {
+   "sha256": "dbc8981cbf3049f5f2f3398b56b23f9459e1784ae06ea9d249e2967002037af4",
+   "tamanho": 54350
+  },
+  "mamearcade_libretro_android.so": {
+   "sha256": "5eb75f4fd23a5565f070b9f8b42ddc149e6f9d43d9100b94103f34bc228130f4",
+   "tamanho": 61109299
+  },
+  "mednafen_ngp_libretro_android.so": {
+   "sha256": "e9dce39c6b03804b3c34c41ad35a18bc33604263b16a8c210bb8a97c9512e00b",
+   "tamanho": 152520
+  },
+  "mednafen_pce_libretro_android.so": {
+   "sha256": "d129ced0f310d692b840b1f38c8a3294609d6459e253bc03268f4969597237ba",
+   "tamanho": 485517
+  },
+  "mednafen_pcfx_libretro_android.so": {
+   "sha256": "d1fd3dd1493165cfb9f88d66dc9d67d1d18e30a814cb6924c6c217cd526ff5b5",
+   "tamanho": 404208
+  },
+  "mednafen_saturn_libretro_android.so": {
+   "sha256": "2a07d69afb9698e50e9d8c166344c503c0a8d013b9c6d872f07c7dbcab0b705d",
+   "tamanho": 1694836
+  },
+  "mednafen_vb_libretro_android.so": {
+   "sha256": "1360eaadb9d75127554b1b6d1e5a85987fa4d85a01d4fc1b16d3c2468226c922",
+   "tamanho": 129196
+  },
+  "mednafen_wswan_libretro_android.so": {
+   "sha256": "ee78fc2907bd30e86ac68ff525d6ba3299082f276f4430aba6c600508640902f",
+   "tamanho": 97945
+  },
+  "melonds_libretro_android.so": {
+   "sha256": "d077ff5bf3c147d1e16bbf33c3362dfb3daf8f42dc01464deb0f4c68841d33b3",
+   "tamanho": 690401
+  },
+  "mgba_libretro_android.so": {
+   "sha256": "4b82b9e34b1ec5b950892b621729ec23c754614b1a25afd7b0ca8e896c506380",
+   "tamanho": 419371
+  },
+  "mupen64plus_next_gles3_libretro_android.so": {
+   "sha256": "708364628ed9dc8032deca2ec90392e9775ca8fd6fdbe6716814cf2d8e0d3ff9",
+   "tamanho": 2201357
+  },
+  "o2em_libretro_android.so": {
+   "sha256": "6aed61ec32902d2f00f6e91bf4230ac44dd80189c68c778fd2b8666a4342ad87",
+   "tamanho": 110409
+  },
+  "opera_libretro_android.so": {
+   "sha256": "77badddba5539f58211764d13999e0ba489a90227f650256f1af818cb1737336",
+   "tamanho": 216102
+  },
+  "pcsx2_libretro_android.so": {
+   "sha256": "87436fa4622aeeb48bb171af9b32a8587642bf3d51d5d1b1ee76410878846b9d",
+   "tamanho": 3324345
+  },
+  "pcsx_rearmed_libretro_android.so": {
+   "sha256": "e6885d06e0f7c46bffd2e7d1937345411a3bf84735b8873f8c1ba9e3c6e51c01",
+   "tamanho": 532608
+  },
+  "picodrive_libretro_android.so": {
+   "sha256": "d4530c0992cb157e57207f4b44e68548bce2ed8533d66c7decd950b873cf9c64",
+   "tamanho": 604891
+  },
+  "pokemini_libretro_android.so": {
+   "sha256": "609cc9ed54c893e1e164bdd38e1fb2f255199e2a5661707da9cb023dd978f0b7",
+   "tamanho": 85574
+  },
+  "potator_libretro_android.so": {
+   "sha256": "96a31049210b35a7cd041422c1d775c1b5720380c85a5b03b4f6785ac8b07351",
+   "tamanho": 17960
+  },
+  "ppsspp_libretro_android.so": {
+   "sha256": "98d3b12f078c47dd4d76e06222a20a0f7424b08d562e196f53e725a95e465f1e",
+   "tamanho": 8184856
+  },
+  "prosystem_libretro_android.so": {
+   "sha256": "610df8f4b851b41ef4540b02c62be203671f2239d9a51ae67b0da6deca1ee412",
+   "tamanho": 47540
+  },
+  "puae_libretro_android.so": {
+   "sha256": "3480f221d0186eac6e4b6d4ca82564ca825b849d95336bf4437b0e227d34eb29",
+   "tamanho": 5842506
+  },
+  "same_cdi_libretro_android.so": {
+   "sha256": "a701c5b977971bf6bfae6b9c0ee6fd158a779240334a89d70bb22bb42b03d768",
+   "tamanho": 3117885
+  },
+  "scummvm_libretro_android.so": {
+   "sha256": "5e007308baf5ad257a6c07128dc078abe06f814540e20edf89b70e56f7b5fb81",
+   "tamanho": 34873822
+  },
+  "snes9x_libretro_android.so": {
+   "sha256": "83ed074f6ef3a94dfc1ec2f56c8ecc87fe70d84bdfcde9ad8ca50bc4b1192819",
+   "tamanho": 890362
+  },
+  "stella_libretro_android.so": {
+   "sha256": "f907e5e497419ef38fc26c4da97ce3594c5019702bba78cf111909a1b2da13b2",
+   "tamanho": 1459112
+  },
+  "swanstation_libretro_android.so": {
+   "sha256": "185f36f8a1a2eed0b441b17cd66ef3716a23036c63d8477eebe74c66348e099c",
+   "tamanho": 1739948
+  },
+  "tamalibretro_libretro_android.so": {
+   "sha256": "76761c5525db9bdd2e7d5aabf4a2f2b39f7907ed166fcec1db06eb2f8f6dfe89",
+   "tamanho": 30745
+  },
+  "theodore_libretro_android.so": {
+   "sha256": "5fcf8cdc6834df9d6fbc127d41b2c7d98a797fd4927bbe0b96948d536513be20",
+   "tamanho": 855022
+  },
+  "tic80_libretro_android.so": {
+   "sha256": "6b92e248985c705282edbb89afbdf037bcce4388bcb83edff9ac4b25dab438bb",
+   "tamanho": 1744783
+  },
+  "uw8_libretro_android.so": {
+   "sha256": "2f2215f7e84a74843458225dbc809b32688c2aa0df337a6bcc917b99914666f7",
+   "tamanho": 73339
+  },
+  "uzem_libretro_android.so": {
+   "sha256": "219605d29d60f1127b3714ef63cc6ca0677fbc910f519244d305c5dac7f8c518",
+   "tamanho": 93918
+  },
+  "vecx_libretro_android.so": {
+   "sha256": "a7aabdd0db1222052674acd1d46dc5a65a919b5e3f311afca1225fc11c40c2c8",
+   "tamanho": 39653
+  },
+  "vice_x128_libretro_android.so": {
+   "sha256": "238c9039d1c224668be327163a3da91cfff372d068acce9855f8e122e2017357",
+   "tamanho": 1408908
+  },
+  "vice_x64_libretro_android.so": {
+   "sha256": "c931f62384532f35d393b73a6c62388995b57f59dc2a44f99a0989b5df98ba4b",
+   "tamanho": 1300485
+  },
+  "vice_xpet_libretro_android.so": {
+   "sha256": "b787573a51fe0ac2e2ba62ac7e40ff89f63bac25f55dfd17d3d7e3a06d8e37e3",
+   "tamanho": 1005272
+  },
+  "vice_xplus4_libretro_android.so": {
+   "sha256": "ba7639f64e106b97436be1a7dc6d95fef4aaa5a16cec074d091ac422d9f93c2d",
+   "tamanho": 1077171
+  },
+  "vice_xvic_libretro_android.so": {
+   "sha256": "2703a531c4625379357dadabce673fe2fa8d5fe79acbecd7a98ee5a14474580c",
+   "tamanho": 1064203
+  },
+  "vircon32_libretro_android.so": {
+   "sha256": "1f3cbf0ac6aa6144477567465a095df5a536776b7ded81f2a090c3af4e60e969",
+   "tamanho": 774946
+  },
+  "virtualjaguar_libretro_android.so": {
+   "sha256": "1951a2c1c2cb88d632a23bb22f9f0ec1328ecce85f0c4bdfb8ff32d5176836ca",
+   "tamanho": 803563
+  },
+  "wasm4_libretro_android.so": {
+   "sha256": "e7cbd03ecd3a0ec7e59dc15e5e30a10c44768a728de9439e9bc19846aadd1a07",
+   "tamanho": 58523
+  }
+ },
+ "conferido_em": "2026-10-18",
+ "x86_64": {
+  "81_libretro_android.so": {
+   "sha256": "dfec37c1e0b8bc2221e0d30b7c1bb71e3b479618a7fe2a9647d4ad88ecdad204",
+   "tamanho": 148127
+  },
+  "a5200_libretro_android.so": {
+   "sha256": "f1ed3366cea0af925d69ca6640cb11e2a6214573b9780ab7d80c25eaef38cb7a",
+   "tamanho": 97987
+  },
+  "applewin_libretro_android.so": {
+   "sha256": "110822278ad296816565c09a3676caa9b6055b4de91f201adf72d2d77fcbeb78",
+   "tamanho": 1617705
+  },
+  "ardens_libretro_android.so": {
+   "sha256": "03913bafa2230381d9234b0c22ca2ee5117597e73bb92366095e34a52b2e098f",
+   "tamanho": 560403
+  },
+  "atari800_libretro_android.so": {
+   "sha256": "31fc215ec6684db85bbb23a5c132319133773de35b5f6567dedbc335c4828d1f",
+   "tamanho": 298855
+  },
+  "bluemsx_libretro_android.so": {
+   "sha256": "c6e76c4d7ff93e21c828a338631c78effd231ff18f8eddbd57f5e03086a3860f",
+   "tamanho": 752235
+  },
+  "cap32_libretro_android.so": {
+   "sha256": "6801ac6c076bcdf69ec3b00e913664efb9bbdd1f52e6863ec015de2dcdf73440",
+   "tamanho": 396914
+  },
+  "dolphin_libretro_android.so": {
+   "sha256": "a45a2f560a820cf53a90a0c134fb0c82fd45b0f4ca50d534d12a9340f7dde98d",
+   "tamanho": 6929619
+  },
+  "dosbox_pure_libretro_android.so": {
+   "sha256": "0ff3bffd9eb541561d211b155f2f70ddb1dca2c1db33dbbc48a098128cfcd03a",
+   "tamanho": 1635703
+  },
+  "fbneo_libretro_android.so": {
+   "sha256": "ef9d30c3b321c6253e69f2390a569ef1e8174e471f8eafdf9aea1a68192395e4",
+   "tamanho": 17398329
+  },
+  "fceumm_libretro_android.so": {
+   "sha256": "7cd2590e2a8de5080153e8044ceb9b51bed1e643e7a229b3c31a8e52bdad274e",
+   "tamanho": 462885
+  },
+  "flycast_libretro_android.so": {
+   "sha256": "03ff8aa2b5bb3f2a34eb894171f2cad6429a678305edf4da55b07661b259cb31",
+   "tamanho": 5941469
+  },
+  "freeintv_libretro_android.so": {
+   "sha256": "1bd803065fae1ce85a8dd827f2ed5d7f1553e7ba67c546a3a547b4baf9cd44da",
+   "tamanho": 503631
+  },
+  "fuse_libretro_android.so": {
+   "sha256": "c6ccb40390d2cfb2144e13f9025ededaf3b3e743e7a9db604979fb10dc28304e",
+   "tamanho": 535075
+  },
+  "gambatte_libretro_android.so": {
+   "sha256": "bf4be9b1c17970443c98f8006659d0845db24329c59dc08f6964e501a39352cc",
+   "tamanho": 435079
+  },
+  "gearcoleco_libretro_android.so": {
+   "sha256": "d8444d9da4cf69a8da35a8e64c475c1308385f2e92d7e1b89dbfc4d63433bf5a",
+   "tamanho": 290114
+  },
+  "gearsystem_libretro_android.so": {
+   "sha256": "ab8d85c3aca451c0964ec6ff60f50512b288d69eedb1331dd58f98ead5cf4e1d",
+   "tamanho": 295606
+  },
+  "genesis_plus_gx_libretro_android.so": {
+   "sha256": "42bba6b9190f73ad95b254a8f3ba99b904340a5e3d3c7d7b5286c6831a33b14f",
+   "tamanho": 1163851
+  },
+  "gw_libretro_android.so": {
+   "sha256": "e857c1c7ac095a7162666c09a54aef215fec0cbd3246259313c54ae1fcce7d53",
+   "tamanho": 152916
+  },
+  "handy_libretro_android.so": {
+   "sha256": "4801f075976d32903f8922acb3650c10272640a3b63517a7fb33313bf9ad08c3",
+   "tamanho": 142939
+  },
+  "hatari_libretro_android.so": {
+   "sha256": "08e8f647a7dee452ef8b04b10decffac7f466c6fad6fe78e5a7f2cb1e5548772",
+   "tamanho": 5363797
+  },
+  "jaxe_libretro_android.so": {
+   "sha256": "b03827ffd73e1639b35613f90e7f924975e2cdf8de7a0cd5e08023023fe67f6b",
+   "tamanho": 10650
+  },
+  "lowresnx_libretro_android.so": {
+   "sha256": "155edf7944e32fcc9843378e0f108be30762d29ae3d2c7542f0ce0a43b47e68a",
+   "tamanho": 56966
+  },
+  "mamearcade_libretro_android.so": {
+   "sha256": "d7e4fce34275859b2f4476e1b3adb7c5e5ef312400236c26aae8e3587ad961da",
+   "tamanho": 62645480
+  },
+  "mednafen_ngp_libretro_android.so": {
+   "sha256": "480859fab0e5ce661fb95a11a0cfd802261e43d780827a05e13a3fa72f1e0722",
+   "tamanho": 157727
+  },
+  "mednafen_pce_libretro_android.so": {
+   "sha256": "003ffec0d75c5f343ca3e448380560861a6adab9139b581a63a6b45e3155731b",
+   "tamanho": 523789
+  },
+  "mednafen_pcfx_libretro_android.so": {
+   "sha256": "2aca86e56e1c44725b3b2db192ac48832d091aaac60b7e0caaae981f10c73917",
+   "tamanho": 440333
+  },
+  "mednafen_saturn_libretro_android.so": {
+   "sha256": "107ede38d477783128acec2724f499116367fe40ffa6e4ed965fbf131cae3af3",
+   "tamanho": 2282238
+  },
+  "mednafen_vb_libretro_android.so": {
+   "sha256": "5f5d30246e1f377146e2d0f90e8c0f97035a846e6192c20a6e7146a13b55ca8a",
+   "tamanho": 129485
+  },
+  "mednafen_wswan_libretro_android.so": {
+   "sha256": "51eaff93cc1942c1279722de395c4f9fb59efcf0bc73dd002a1608413b29bb67",
+   "tamanho": 107193
+  },
+  "melonds_libretro_android.so": {
+   "sha256": "ff390b5967e3a06a8eab8235dc355ab55e4cf2636fdf10ff5ac145c085045cd3",
+   "tamanho": 701240
+  },
+  "mgba_libretro_android.so": {
+   "sha256": "4a29b61f57f1fc5eee1260b9ce07c6bfbdc063caf603796b0f4274e6f8f53e10",
+   "tamanho": 420304
+  },
+  "mupen64plus_next_gles3_libretro_android.so": {
+   "sha256": "ad5b5607d3fae518ce881b8d756a55d1d5f6f7bdf7008466765aa23cacb242fe",
+   "tamanho": 1324692
+  },
+  "o2em_libretro_android.so": {
+   "sha256": "dcfc80173bebe9ba833e38a3d19c4f8320714e59fce6a740689b9518bd994696",
+   "tamanho": 113324
+  },
+  "opera_libretro_android.so": {
+   "sha256": "f1843f43fbd76290b6d5409a4ef7b38cf2743ab4dc663ee8b8eca8afa083c893",
+   "tamanho": 235549
+  },
+  "pcsx2_libretro_android.so": {
+   "sha256": "b3e6eeb65d9a29216331684974424e8fcc7ee39179fee3bba538a5e6ea42aa4d",
+   "tamanho": 4052913
+  },
+  "pcsx_rearmed_libretro_android.so": {
+   "sha256": "de86addf4609b4b43bc3ac3d3bce00623a575b7cb8fb4c3476ec5e6b0b056b65",
+   "tamanho": 611652
+  },
+  "picodrive_libretro_android.so": {
+   "sha256": "19be969ea49a1de8679bf93dd69db5e79e4bd404b14aa5703b8d90165e0fbd83",
+   "tamanho": 620568
+  },
+  "pokemini_libretro_android.so": {
+   "sha256": "c107da7a3cfc8a929258eac4862d053ad8b65ec449855caf1daa6e3580379ba6",
+   "tamanho": 86999
+  },
+  "potator_libretro_android.so": {
+   "sha256": "846fca7eab67d5403189ac387daba811dd09498565eed2114994e5570f0789ad",
+   "tamanho": 18069
+  },
+  "ppsspp_libretro_android.so": {
+   "sha256": "d0022030b2b679e1f20d5940125b8f0aa1ee9a53d9ad7182c35b823488b9e1b9",
+   "tamanho": 8599887
+  },
+  "prosystem_libretro_android.so": {
+   "sha256": "f1ae30a9648877ad2dd8d5e3b95561474051451a9c5ac4a46f803f72927a226e",
+   "tamanho": 48370
+  },
+  "puae_libretro_android.so": {
+   "sha256": "8ac91f762b3a9e3a6dcc5e1d1594e05309c38b8aa717d700e5e9344fb2fb4dc4",
+   "tamanho": 6358494
+  },
+  "same_cdi_libretro_android.so": {
+   "sha256": "fe3ed010500678d47e69fc5c1c0f66283ceba58fb551498290c8d8427cf1460d",
+   "tamanho": 3330990
+  },
+  "scummvm_libretro_android.so": {
+   "sha256": "5c3ddaacb19a6e99f1949d923c9c36c075e15b2dbd33afc6be1b83abbf07dad7",
+   "tamanho": 35446314
+  },
+  "snes9x_libretro_android.so": {
+   "sha256": "32fafa427219f2d04e168a3f66112c1c21df0d2c315d1c27bce3398ebc281b5f",
+   "tamanho": 1007208
+  },
+  "stella_libretro_android.so": {
+   "sha256": "b53f9abc5eaf6f10136962498477f854d33580c5be59d86bf3f8d1be34ee9504",
+   "tamanho": 1487145
+  },
+  "swanstation_libretro_android.so": {
+   "sha256": "733b755d45f74f9724628640c7d400d4047032d6c47e0b5bc95c86ccdeba28f2",
+   "tamanho": 1788088
+  },
+  "tamalibretro_libretro_android.so": {
+   "sha256": "0d8664d109603fe79375206f8242ed711ceb065347a075e95cfd4977078263c4",
+   "tamanho": 34033
+  },
+  "theodore_libretro_android.so": {
+   "sha256": "a20e759899467624b63a8489cac28d9f3feef506268db4ac4236db7197411ea6",
+   "tamanho": 856133
+  },
+  "tic80_libretro_android.so": {
+   "sha256": "dae27021b5a89363a52aea1041128d20627cfbaa9a032e8f62dc6a0617b3fe61",
+   "tamanho": 1784984
+  },
+  "uw8_libretro_android.so": {
+   "sha256": "2f71ea31c6dc0849b922cb18f68b68ff983376b2f6b3326ac023d19e7aee6cd4",
+   "tamanho": 74381
+  },
+  "uzem_libretro_android.so": {
+   "sha256": "d4c55ab102cd09abdef5ed61fcbdc8cfb034717c6308dbc9db66609e3ed36898",
+   "tamanho": 93213
+  },
+  "vecx_libretro_android.so": {
+   "sha256": "6e06876605b10ca9130031d4962c877151eb251839f7b394e1d66d50af0ebc34",
+   "tamanho": 41081
+  },
+  "vice_x128_libretro_android.so": {
+   "sha256": "175e61c19886f489f2fc2078e47cc61398be20288fbe49ef91223cffd3636331",
+   "tamanho": 1465353
+  },
+  "vice_x64_libretro_android.so": {
+   "sha256": "8c5a7e71309eb9e23480f959733078847f6e47caf887dc63fc12aff7d17b3487",
+   "tamanho": 1347823
+  },
+  "vice_xpet_libretro_android.so": {
+   "sha256": "d28af65ea5e961e9b2ad5244f07b9aa8f56d69d864ff83b6684066d5c6455f08",
+   "tamanho": 1034597
+  },
+  "vice_xplus4_libretro_android.so": {
+   "sha256": "5b24d26abe9eb1ac4d7689fcbac2a4464a31a2e91aac6f86e53ed5612bd998eb",
+   "tamanho": 1108530
+  },
+  "vice_xvic_libretro_android.so": {
+   "sha256": "96bc4284444982058fc85ed1c2a02c4fdda6275327753bd625f7d8e2f3bc056b",
+   "tamanho": 1099845
+  },
+  "vircon32_libretro_android.so": {
+   "sha256": "57b557dee7c5e275ff528d067d04a0a28152416a305db7d9f6f722c799dde55d",
+   "tamanho": 787191
+  },
+  "virtualjaguar_libretro_android.so": {
+   "sha256": "d7f790208d6b98e1b8525539c0e5aa8f382b7da1cb113b6cca106a3f22864c6d",
+   "tamanho": 857407
+  },
+  "wasm4_libretro_android.so": {
+   "sha256": "3ea0adcdfc787f4f952470f47ffd8089cd106d5f73056702925d7215d8807869",
+   "tamanho": 59437
+  }
+ }
+}

@@ -58,7 +58,17 @@ window.ArenaRotas = (function () {
 
   function nucleos() { return (window.ARENA_NUCLEOS_LISTA || {}).nucleos || {}; }
 
-  function temNucleo(p) { return !!(p && p.core_navegador && nucleos()[p.core_navegador]); }
+  // No Android (item 14), o jogo abre no RetroArch nativo do APK
+  // (navegador\android.js): os nucleos sao os de la, nao os do navegador, e
+  // as frases falam do Android.
+  const ANDROID = !!window.ArenaNoAparelho;
+  const AQUI = ANDROID ? "o Android" : "o Chromebook";
+  function nucleoDaqui(p) { return ANDROID ? window.ArenaNoAparelho.nucleoDe(p) : (p && p.core_navegador) || ""; }
+
+  function temNucleo(p) {
+    if (ANDROID) return !!nucleoDaqui(p);
+    return !!(p && p.core_navegador && nucleos()[p.core_navegador]);
+  }
 
   function extensao(nome) {
     const corte = String(nome).lastIndexOf(".");
@@ -259,17 +269,19 @@ window.ArenaRotas = (function () {
   }
 
   function classificar(p) {
-    if (!p.core_navegador) {
-      return etiqueta("nao_abre", "Este console só roda no ARENA do Windows: o Chromebook não tem o emulador dele.");
+    if (!nucleoDaqui(p)) {
+      return etiqueta("nao_abre", "Este console só roda no ARENA do Windows: " + AQUI + " não tem o emulador dele.");
     }
     const velocidade = (((E.maquina || {}).velocidade) || {}).relativa_ao_alvo;
     if (typeof velocidade !== "number") return etiqueta("ajustes");
     const custo = Math.max(1, Math.min(5, parseInt(p.custo || 3, 10)));
     const regua = (p.requisitos || {}).velocidade || D.velocidade_por_custo[String(custo)];
-    const efetiva = velocidade / FOLGA_DO_NAVEGADOR;
+    // No Android o jogo roda nativo: sem a folga do navegador.
+    const efetiva = velocidade / (ANDROID ? 1 : FOLGA_DO_NAVEGADOR);
     if (efetiva >= regua[1]) return etiqueta("bem");
     if (efetiva >= regua[0]) return etiqueta("ajustes");
-    return etiqueta("pesado", "Este Chromebook está abaixo do que este console pede no navegador. Dá para tentar: " +
+    return etiqueta("pesado", (ANDROID ? "Este aparelho está abaixo do que este console pede. "
+      : "Este Chromebook está abaixo do que este console pede no navegador. ") + "Dá para tentar: " +
       "se travar, os jogos dele rodam melhor no ARENA do Windows.");
   }
 
@@ -586,7 +598,9 @@ window.ArenaRotas = (function () {
   async function listarEstados(jogo) {
     const p = POR_ID.get(jogo.plataforma);
     const espacos = [];
-    if (!p || !p.core_navegador) {
+    // No Android, o RetroArch nativo grava os estados direto na pasta do
+    // ARENA (retroarch/states), como no Windows.
+    if (!p || !p.core_navegador || ANDROID) {
       for (let n = 0; n < ESPACOS; n++) espacos.push({ espaco: n, existe: false, quando: null, tamanho_kb: null });
       return { espacos: espacos, tem_save: false };
     }
@@ -709,14 +723,48 @@ window.ArenaRotas = (function () {
   }
 
   function montarOpcoes(p) {
-    const tabela = (D.opcoes_nucleo[p.core_navegador] || {})[String(notaDaMaquina())] || {};
+    const opcoes = ANDROID ? (window.ARENA_ANDROID_DADOS || {}).opcoes_nucleo || {} : D.opcoes_nucleo;
+    const nucleo = ANDROID ? window.ArenaNoAparelho.nomeCurto(p) : p.core_navegador;
+    const tabela = (opcoes[nucleo] || {})[String(notaDaMaquina())] || {};
     return Object.keys(tabela).map(function (chave) { return linhaCfg(chave, tabela[chave]); }).join("\n") + "\n";
+  }
+
+  // No Android: o RetroArch nativo do APK abre o jogo direto do cartao (ou
+  // do pen drive), com a mesma configuracao do ARENA do Chromebook e as
+  // pastas do Windows (os saves e os estados em retroarch\, na pasta do ARENA).
+  async function jogarNoAndroid(jogo, p) {
+    const nucleo = nucleoDaqui(p);
+    if (!nucleo) throw falha((p ? p.nome : "Este console") + " só roda no ARENA do Windows: o Android não tem o emulador dele.");
+    if (E.partida && E.partida.ativo) throw falha("Já tem um jogo aberto. Feche ele antes de abrir outro.", 409);
+    let rom;
+    try {
+      rom = await window.ArenaNoAparelho.caminhoDoJogo(jogo);
+    } catch (erro) {
+      throw falha(erro.message, 409);
+    }
+    E.partida = { ativo: true, id: jogo.id, titulo: jogo.titulo, plataforma: p.id, inicio: Date.now() };
+    window.ARENA_ANDROID_FIM = function (segundos) {
+      registrarTempo(jogo, Math.max(0, segundos) * 1000);
+      E.partida = { ativo: false, ultimo: jogo.id, motivo: "fim" };
+    };
+    window.ARENA_ANDROID_ERRO = function (texto) {
+      E.problema = { jogo_id: jogo.id, titulo: jogo.titulo, texto: texto };
+      E.partida = { ativo: false };
+    };
+    const erro = window.ArenaNoAparelho.jogar({ nucleo: nucleo, rom: rom, configuracao: montarConfiguracao(p),
+                                               opcoes: montarOpcoes(p) });
+    if (erro) {
+      E.partida = { ativo: false };
+      throw falha(erro);
+    }
+    return { ok: true, emulador: "RetroArch " + D.retroarch + " no Android", alerta_maquina: null };
   }
 
   async function jogar(corpo) {
     const jogo = E.jogos.find(function (j) { return j.id === corpo.jogo_id; });
     if (!jogo) throw falha("Jogo não encontrado. Ele pode ter sido movido ou apagado. Clique em Atualizar lista e tente de novo.", 404);
     const p = POR_ID.get(jogo.plataforma);
+    if (ANDROID) return jogarNoAndroid(jogo, p);
     if (!p || !p.core_navegador) {
       throw falha((p ? p.nome : "Este console") + " só roda no ARENA do Windows: o Chromebook não tem o emulador dele.");
     }
@@ -834,9 +882,9 @@ window.ArenaRotas = (function () {
     const lista = D.consoles.map(function (p) {
       let estado = "pronta";
       let motivo = "";
-      if (!p.core_navegador) {
+      if (!nucleoDaqui(p)) {
         estado = "sem_core";
-        motivo = "Este console só roda no ARENA do Windows: o Chromebook não tem o emulador dele.";
+        motivo = "Este console só roda no ARENA do Windows: " + AQUI + " não tem o emulador dele.";
       } else if (!temNucleo(p)) {
         estado = "sem_core";
         motivo = "Falta o núcleo deste console nesta cópia do ARENA (launcher\\navegador\\nucleos).";
@@ -845,10 +893,13 @@ window.ArenaRotas = (function () {
       return {
         id: p.id, nome: p.nome, descricao: p.descricao, peso: p.peso, pasta: p.pasta, custo: p.custo || 3,
         jogadores_max: p.jogadores_max || 2, netplay: false,
-        netplay_motivo: "No Chromebook ainda não há jogo em rede: os jogadores jogam no mesmo Chromebook.",
+        netplay_motivo: ANDROID ? "No Android ainda não há jogo em rede: os jogadores jogam no mesmo aparelho."
+          : "No Chromebook ainda não há jogo em rede: os jogadores jogam no mesmo Chromebook.",
         estado: estado, motivo: motivo, classe: e.chave, classe_rotulo: e.rotulo, classe_cor: e.cor,
-        classe_detalhe: e.detalhe, emulador: p.core_navegador ? "RetroArch no navegador" : "só no Windows",
-        aceita_partida: false, motivo_sem_partida: "No Chromebook ainda não há jogo em rede.",
+        classe_detalhe: e.detalhe,
+        emulador: nucleoDaqui(p) ? (ANDROID ? "RetroArch no Android" : "RetroArch no navegador") : "só no Windows",
+        aceita_partida: false,
+        motivo_sem_partida: ANDROID ? "No Android ainda não há jogo em rede." : "No Chromebook ainda não há jogo em rede.",
         externo_sugerido: null, perfil_sugerido: "", jeitos: [],
       };
     });

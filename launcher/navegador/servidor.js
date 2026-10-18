@@ -38,8 +38,15 @@
   estilo.href = aqui + "estilo.css";
   document.head.appendChild(estilo);
   // async = false: rodam na ordem em que entram (os dados antes das rotas).
-  for (const nome of ["dados.js", "nucleos/lista.js", "livres.js", "banco.js", "pasta.js", "partida.js",
-                      "rotas.js", "tela.js"]) {
+  // No APK do Android (item 14), a ponte window.ArenaAndroid existe: os jogos
+  // abrem no RetroArch nativo (android.js, que troca a pasta.js), com as
+  // opcoes de todos os nucleos (android_dados.js, do montador do APK), e os
+  // nucleos do navegador nem vem.
+  const scripts = window.ArenaAndroid
+    ? ["dados.js", "android_dados.js", "livres.js", "banco.js", "pasta.js", "android.js", "partida.js", "rotas.js",
+       "tela.js"]
+    : ["dados.js", "nucleos/lista.js", "livres.js", "banco.js", "pasta.js", "partida.js", "rotas.js", "tela.js"];
+  for (const nome of scripts) {
     const script = document.createElement("script");
     script.src = aqui + nome;
     script.async = false;
