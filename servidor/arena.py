@@ -4893,12 +4893,21 @@ class Manipulador(BaseHTTPRequestHandler):
             # Pedido de OUTRA maquina nao passa por aqui: rebinding so ataca
             # o navegador deste computador, e amigo pela internet pode usar
             # um nome no lugar do IP.
-            if self.host_confiavel():
-                return True
-            self.erro(
-                "Pedido recusado: ele não veio da tela do ARENA. "
-                "Abra o ARENA pelo ARENA.bat.", 403)
-            return False
+            if not self.host_confiavel():
+                self.erro(
+                    "Pedido recusado: ele não veio da tela do ARENA. "
+                    "Abra o ARENA pelo ARENA.bat.", 403)
+                return False
+            # No Android, qualquer app do aparelho alcanca o 127.0.0.1: so a
+            # tela do ARENA tem o segredo desta abertura (o cookie que o app
+            # poe no WebView; servidor\ponte_android.py).
+            if (plataforma_do_sistema.ANDROID and caminho not in ROTAS_REDE_EXTERNA
+                    and not ponte_android.segredo_confere(self.headers.get("Cookie"))):
+                self.erro(
+                    "Pedido recusado: ele não veio da tela do ARENA. "
+                    "Abra o ARENA pelo ícone dele no aparelho.", 403)
+                return False
+            return True
         if caminho in ROTAS_REDE_EXTERNA:
             return True
         self.erro(

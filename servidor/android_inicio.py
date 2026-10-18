@@ -48,15 +48,24 @@ if AQUI not in sys.path:
 import ponte_android  # noqa: E402
 import plataforma  # noqa: E402
 
-# As pastas de quem usa, como ficam dentro da pasta do ARENA, e se o ARENA so
-# as le (servem mesmo numa pasta em que o Android nao deixa gravar).
+# As pastas de quem usa, como ficam dentro da pasta do ARENA, e onde ficam:
+#   LER     na pasta escolhida, mesmo que o Android so deixe ler (jogos, BIOS);
+#   GRAVAR  na pasta escolhida, se o Android deixa gravar nela (saves...);
+#   APP     sempre no app. O que o servidor grava e o RetroArch le
+#           (dados/arena_override.cfg, as listas com o caminho do nucleo, os
+#           ajustes de retroarch/config) nao fica onde outro app do aparelho
+#           com a permissao de arquivos tambem escreve; e os recordes e o
+#           apelido (dados de aluno) nao ficam onde outro app le. Entre
+#           aparelhos, os recordes vao pela sincronizacao em rede, como entre
+#           dois computadores (revisao de seguranca de 18/10/2026).
+LER, GRAVAR, APP = "ler", "gravar", "app"
 PASTAS_DE_QUEM_USA = [
-    ("jogos", True), ("BIOS", True), ("dados", False), ("backup", False),
-    ("retroarch/system", True), ("retroarch/thumbnails", True), ("retroarch/cheats", True),
-    ("retroarch/shaders", True),
-    ("retroarch/saves", False), ("retroarch/states", False), ("retroarch/screenshots", False),
-    ("retroarch/remaps", False), ("retroarch/config", False), ("retroarch/playlists", False),
-    ("retroarch/controles", False),
+    ("jogos", LER), ("BIOS", LER), ("retroarch/system", LER), ("retroarch/thumbnails", LER),
+    ("retroarch/cheats", LER),
+    ("retroarch/saves", GRAVAR), ("retroarch/states", GRAVAR), ("retroarch/screenshots", GRAVAR),
+    ("retroarch/remaps", GRAVAR),
+    ("dados", APP), ("backup", APP), ("retroarch/config", APP), ("retroarch/playlists", APP),
+    ("retroarch/controles", APP), ("retroarch/shaders", APP),
 ]
 # Do APK (os recursos do RetroArch do Android) para a pasta retroarch do app.
 DO_APK = [("assets/autoconfig/android/", "retroarch/autoconfig/android"),
@@ -138,9 +147,9 @@ def montar_as_pastas(escolhida, privada):
     if escolhida and not gravar:
         print("[ARENA] O Android nao deixa gravar em %s: os jogos e as BIOS vem de la; os saves e os "
               "recordes ficam no app." % escolhida)
-    for relativo, so_de_ler in PASTAS_DE_QUEM_USA:
+    for relativo, onde in PASTAS_DE_QUEM_USA:
         alvo = None
-        if escolhida and (gravar or so_de_ler):
+        if escolhida and (onde == LER or (onde == GRAVAR and gravar)):
             alvo = os.path.join(escolhida, *relativo.split("/"))
             if not os.path.isdir(alvo):
                 try:

@@ -14,6 +14,8 @@ import tempfile
 import threading
 import time
 import unittest
+import urllib.error
+import urllib.request
 import zipfile
 from unittest import mock
 
@@ -304,15 +306,27 @@ class PastaDoArena(unittest.TestCase):
 
     def test_os_atalhos_vao_para_a_pasta_escolhida(self):
         self.assertFalse(android_inicio.montar_as_pastas(self.escolhida, self.privada))
-        for relativo, _so_de_ler in android_inicio.PASTAS_DE_QUEM_USA:
+        for relativo, onde in android_inicio.PASTAS_DE_QUEM_USA:
             self.assertTrue(os.path.islink(os.path.join(self.raiz, *relativo.split("/"))), relativo)
-            self.assertEqual(self.alvo(relativo),
-                             os.path.realpath(os.path.join(self.escolhida, *relativo.split("/"))))
+            base = self.privada if onde == android_inicio.APP else self.escolhida
+            self.assertEqual(self.alvo(relativo), os.path.realpath(os.path.join(base, *relativo.split("/"))),
+                             relativo)
         self.assertEqual(ponte_android.ESTADO["pasta"], self.escolhida)
         # Um jogo posto pela pasta do app aparece na pasta escolhida.
         with open(os.path.join(self.raiz, "jogos", "x.nes"), "wb") as arquivo:
             arquivo.write(b"NES")
         self.assertTrue(os.path.isfile(os.path.join(self.escolhida, "jogos", "x.nes")))
+
+    def test_o_que_o_servidor_grava_fica_no_app(self):
+        """O arquivo da partida, a configuracao, os recordes, as listas com o
+        caminho do nucleo e os ajustes do RetroArch: nunca onde outro app do
+        aparelho escreve (revisao de seguranca de 18/10/2026)."""
+        android_inicio.montar_as_pastas(self.escolhida, self.privada)
+        for relativo in ("dados", "backup", "retroarch/config", "retroarch/playlists", "retroarch/controles",
+                         "retroarch/shaders"):
+            self.assertEqual(self.alvo(relativo), os.path.realpath(os.path.join(self.privada, *relativo.split("/"))),
+                             relativo)
+            self.assertFalse(os.path.exists(os.path.join(self.escolhida, *relativo.split("/"))), relativo)
 
     def test_sem_pasta_ou_com_a_pasta_fora_vale_a_do_app(self):
         for escolhida in ("", os.path.join(self.pasta, "pen-drive-que-saiu")):
@@ -387,6 +401,94 @@ class PastaDoArena(unittest.TestCase):
             achadas = [a["caminho"] for a in ponte_android.pastas_do_arena()]
         self.assertEqual(sorted(achadas), sorted([self.escolhida, outra]))
         self.assertFalse(ponte_android.parece_arena(os.path.join(self.pasta, "cartao", "Fotos")))
+
+
+class Segredo(unittest.TestCase):
+    """No Android, qualquer app do aparelho alcanca o 127.0.0.1: so a tela do
+    ARENA tem o segredo (o cookie que o app poe no WebView)."""
+
+    def test_so_o_cookie_certo_confere(self):
+        with mock.patch.object(ponte_android, "SEGREDO", "a1b2c3"):
+            self.assertTrue(ponte_android.segredo_confere("arena_segredo=a1b2c3"))
+            self.assertTrue(ponte_android.segredo_confere("outro=1; arena_segredo=a1b2c3"))
+            for errado in ("arena_segredo=a1b2c4", "arena_segredo=", "outro=a1b2c3", "", None, "=;;=\"x"):
+                self.assertFalse(ponte_android.segredo_confere(errado), errado)
+        with mock.patch.object(ponte_android, "SEGREDO", ""):
+            self.assertFalse(ponte_android.segredo_confere("arena_segredo="))
+
+
+class RotasDoAndroid(unittest.TestCase):
+    """O servidor de verdade (numa porta qualquer), com o Android imitado."""
+
+    @classmethod
+    def setUpClass(cls):
+        import arena
+        cls.arena = arena
+        cls.servidor = arena.Servidor(("127.0.0.1", 0), arena.Manipulador)
+        cls.porta = cls.servidor.server_address[1]
+        threading.Thread(target=cls.servidor.serve_forever, daemon=True).start()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.servidor.shutdown()
+        cls.servidor.server_close()
+
+    def setUp(self):
+        self.pasta = tempfile.mkdtemp(prefix="arena_android_")
+        self.arena_do_cartao = os.path.join(self.pasta, "ARENA")
+        for parte in ("jogos", "retroarch"):
+            os.makedirs(os.path.join(self.arena_do_cartao, parte))
+        self.escolhas = []
+        self.trocas = [mock.patch.object(plataforma, "ANDROID", True),
+                       mock.patch.object(ponte_android, "SEGREDO", "segredo-da-tela"),
+                       mock.patch.object(ponte_android, "RAIZES", [self.pasta]),
+                       mock.patch.object(ponte_android, "escolher_pasta", side_effect=self.escolhas.append)]
+        for troca in self.trocas:
+            troca.start()
+
+    def tearDown(self):
+        for troca in self.trocas:
+            troca.stop()
+        limpeza.apagar_pasta(self.pasta)
+
+    def pedir(self, rota, dados=None, cookie=None):
+        cabecalhos = {"Content-Type": "application/json"}
+        if cookie is not None:
+            cabecalhos["Cookie"] = cookie
+        pedido = urllib.request.Request("http://127.0.0.1:%d%s" % (self.porta, rota), headers=cabecalhos,
+                                        data=json.dumps(dados).encode("utf-8") if dados is not None else None,
+                                        method="POST" if dados is not None else "GET")
+        try:
+            with urllib.request.urlopen(pedido, timeout=10) as resposta:
+                return resposta.status, json.loads(resposta.read() or b"{}")
+        except urllib.error.HTTPError as erro:
+            return erro.code, json.loads(erro.read() or b"{}")
+
+    def test_sem_o_segredo_outro_app_nao_entra(self):
+        for cookie in (None, "arena_segredo=chute", "outro=segredo-da-tela"):
+            self.assertEqual(self.pedir("/api/android/pastas", cookie=cookie)[0], 403, cookie)
+            self.assertEqual(self.pedir("/api/android/pasta", {"caminho": self.arena_do_cartao},
+                                        cookie=cookie)[0], 403, cookie)
+        self.assertEqual(self.escolhas, [])
+
+    def test_a_tela_do_arena_entra(self):
+        estado, resposta = self.pedir("/api/android/pastas", cookie="arena_segredo=segredo-da-tela")
+        self.assertEqual(estado, 200, resposta)
+        self.assertEqual([p["caminho"] for p in resposta["pastas"]], [self.arena_do_cartao])
+        estado, resposta = self.pedir("/api/android/pasta", {"caminho": self.arena_do_cartao},
+                                      cookie="arena_segredo=segredo-da-tela")
+        self.assertEqual((estado, resposta.get("reabrindo")), (200, True), resposta)
+        self.assertEqual(self.escolhas, [self.arena_do_cartao])
+
+    def test_pasta_que_nao_e_arena_nao_entra(self):
+        estado, resposta = self.pedir("/api/android/pasta", {"caminho": self.pasta},
+                                      cookie="arena_segredo=segredo-da-tela")
+        self.assertEqual(estado, 400, resposta)
+        self.assertEqual(self.escolhas, [])
+
+    def test_fora_do_android_a_rota_nao_existe(self):
+        with mock.patch.object(plataforma, "ANDROID", False):
+            self.assertEqual(self.pedir("/api/android/pastas")[0], 404)
 
 
 class Hardware(unittest.TestCase):

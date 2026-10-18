@@ -24,6 +24,8 @@ Os nucleos do Android vem dentro do APK (assets\arena-nucleos\<abi>) e saem
 para a pasta de nucleos do app na primeira vez que o console abre
 (preparar_nucleo): o APK e' um zip, e o Python le o zip.
 """
+import hmac
+import http.cookies
 import json
 import os
 import subprocess
@@ -40,6 +42,26 @@ SISTEMA = os.environ.get("ARENA_ANDROID_SISTEMA", "")  # "Android 15 (Google Pix
 RAIZES = [r for r in os.environ.get("ARENA_ANDROID_RAIZES", "").splitlines() if r.strip()]
 # A pasta do ARENA desta abertura e se ela so deixa ler (android_inicio.py).
 ESTADO = {"pasta": "", "so_leitura": False}
+# O segredo desta abertura (o app sorteia; outro app do aparelho nao le o
+# ambiente deste processo). So a tela do ARENA o tem, num cookie que o app poe
+# no WebView: no Android, qualquer app do aparelho alcanca o 127.0.0.1:8777,
+# e sem o segredo ele mandaria no ARENA (revisao de seguranca de 18/10/2026).
+SEGREDO = os.environ.get("ARENA_ANDROID_SEGREDO", "")
+NOME_DO_COOKIE = "arena_segredo"
+
+
+def segredo_confere(cabecalho_cookie):
+    """O pedido trouxe o segredo da tela do ARENA (o cookie)? Sem segredo
+    nesta abertura, nada confere."""
+    if not SEGREDO or not cabecalho_cookie:
+        return False
+    try:
+        biscoitos = http.cookies.SimpleCookie()
+        biscoitos.load(cabecalho_cookie)
+    except http.cookies.CookieError:
+        return False
+    item = biscoitos.get(NOME_DO_COOKIE)
+    return bool(item) and hmac.compare_digest(item.value.encode("utf-8"), SEGREDO.encode("utf-8"))
 
 # O fio para o app (o stdout de verdade). O android_inicio.py preenche.
 CANAL = None
