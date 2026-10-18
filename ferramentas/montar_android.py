@@ -12,13 +12,16 @@ e rapido". O APK do ARENA e':
     do codigo oficial da mesma versao com o remendo do ARENA
     (ferramentas\compilar_retroarch_android.py): com ele, o Android recebe a
     mesma linha de comando do Windows e do Linux, e o jogo em rede junto;
-  - na frente, a tela de sempre do ARENA (launcher\), com o servidor dentro
-    da pagina do ARENA do Chromebook (launcher\navegador), numa tela do
-    Android escrita aqui (android\src\...\ArenaActivity.java), que abre cada
-    jogo no RetroArch nativo;
-  - os nucleos do Android de cada console do ARENA (60 dos 63: o do Java ME
+  - o SERVIDOR do ARENA, o mesmo do Windows e do Linux (servidor\), com o
+    Python 3.13.16 do Android (ferramentas\python_android.py), que o
+    ArenaServico.java roda no aparelho, e a tela de sempre do ARENA
+    (launcher\) num WebView, falando com ele em http://127.0.0.1:8777;
+  - de reserva, se o servidor nao abrir no aparelho, o servidor dentro da
+    pagina do ARENA do Chromebook (launcher\navegador), com a ponte da
+    ArenaActivity.java para abrir cada jogo no RetroArch nativo;
+  - os nucleos do Android de cada console do ARENA (62 dos 63: o do Java ME
     precisa de Java, que o Android nao tem), as BIOS livres e os jogos livres
-    dos testes.
+    dos testes (testes\jogos_livres), para a primeira abertura ja ter jogo.
 
 Um APK por tipo de processador: arm64-v8a (quase todo celular e tablet de
 hoje) e x86_64 (Chromebook Intel e o emulador dos testes).
@@ -71,6 +74,7 @@ sys.path.insert(0, os.path.join(RAIZ, "testes"))
 sys.path.insert(0, os.path.join(RAIZ, "ferramentas"))
 sys.path.insert(0, os.path.join(RAIZ, "servidor"))
 import compilar_retroarch_android as retroarch_remendado  # noqa: E402
+import python_android  # noqa: E402  (o Python do Android e o lancador)
 import limpeza  # noqa: E402
 import preparar_android as sdk  # noqa: E402  (o JDK e o SDK do Android, em %LOCALAPPDATA%\ARENA-android)
 import preparar_linux  # noqa: E402  (o cache e o download com a marca)
@@ -105,6 +109,14 @@ FORA_DO_APK = [os.path.join("assets", "database"), os.path.join("assets", "shade
 # A tela do ARENA que vai no APK: o launcher, menos os nucleos do navegador
 # (no APK quem joga e' o RetroArch nativo).
 FORA_DA_TELA = ["nucleos", "*.wasm.js", "__pycache__"]
+# O servidor que vai no APK: o mesmo do pacote, sem os testes e sem o Python
+# do Windows e o do Linux (o do Android vem pelo python_android).
+FORA_DO_SERVIDOR = ["tests", "python", "python-linux", "__pycache__", "*.pyc", "*.pyo", "*.log", "*.tmp",
+                    "achar_python.sh"]
+# Da raiz do ARENA: os guias, a licenca e os creditos (o servidor mostra os guias).
+DA_RAIZ_NO_APK = ["LEIA-ME.md", "1-COMECAR.md", "2-JOGOS.md", "3-IMAGEM-SOM-CONTROLE.md", "4-SAVES.md",
+                  "5-AMIGOS.md", "6-RECURSOS-E-REPARO.md", "LICENSE", "TERCEIROS.md", "CREDITOS.md"]
+PASTA_DOS_LIVRES = os.path.join(RAIZ, "testes", "jogos_livres")
 SAIDA = os.path.join(sdk.BASE, "apk")
 ASSINATURA = os.path.join(sdk.BASE, "assinatura")
 
@@ -299,6 +311,51 @@ def por_a_tela(assets, teste):
             arquivo.write("o APK de teste: chrome://inspect le o console da pagina\n")
 
 
+def por_o_servidor(assets):
+    """O servidor do ARENA (servidor\\), os guias e o modelo do retroarch.cfg
+    (o do pacote dos alunos, sem nada de quem usou: montar_versao_alunos)."""
+    destino = os.path.join(assets, "arena")
+    shutil.copytree(os.path.join(RAIZ, "servidor"), os.path.join(destino, "servidor"),
+                    ignore=shutil.ignore_patterns(*FORA_DO_SERVIDOR))
+    for nome in DA_RAIZ_NO_APK:
+        if os.path.isfile(os.path.join(RAIZ, nome)):
+            shutil.copyfile(os.path.join(RAIZ, nome), os.path.join(destino, nome))
+    cfg = os.path.join(RAIZ, "retroarch", "retroarch.cfg")
+    if os.path.isfile(cfg):
+        import montar_versao_alunos
+        montar_versao_alunos.limpar_retroarch_cfg(cfg, os.path.join(destino, "retroarch-modelo.cfg"))
+
+
+def por_os_jogos_livres(assets):
+    """Os jogos livres dos testes (licenca MIT, CC0 ou Unlicense, cada um com a
+    marca da lista.json) na pasta do console de cada um, com a licenca ao
+    lado: o servidor do Android os poe na pasta jogos do app quando nao ha
+    pasta do ARENA escolhida (android_inicio.py). Fica de fora o console sem
+    nucleo no Android (o Java ME) e o arquivo que o console nao abre direto."""
+    with open(os.path.join(PASTA_DOS_LIVRES, "lista.json"), encoding="utf-8") as arquivo:
+        lista = json.load(arquivo)["arquivos"]
+    with open(os.path.join(RAIZ, "servidor", "consoles.json"), encoding="utf-8") as arquivo:
+        consoles = {p["id"]: p for p in json.load(arquivo)["plataformas"]}
+    postos = 0
+    for item in lista:
+        console = consoles.get(item["console"]) or {}
+        if not console.get("pasta") or "freej2me" in str(console.get("core", "")):
+            continue
+        origem = os.path.join(PASTA_DOS_LIVRES, *item["origem"].split("/"))
+        extensao = os.path.splitext(origem)[1].lower()
+        if extensao not in [e.lower() for e in console.get("extensoes", [])] or marca(origem) != item["sha256"]:
+            continue
+        pasta = os.path.join(assets, "arena-livres", console["pasta"])
+        os.makedirs(pasta, exist_ok=True)
+        shutil.copyfile(origem, os.path.join(pasta, os.path.basename(origem)))
+        licenca = os.path.join(PASTA_DOS_LIVRES, *item.get("licenca_arquivo", "").split("/"))
+        if item.get("licenca_arquivo") and os.path.isfile(licenca):
+            shutil.copyfile(licenca, os.path.join(pasta, "LICENCA - %s.txt" % os.path.splitext(
+                os.path.basename(origem))[0]))
+        postos += 1
+    return postos
+
+
 def por_as_bios_livres(assets):
     """As BIOS livres (servidor\\bios_livres) no lugar delas dentro da pasta
     system (o "destino" da lista.json): a ArenaActivity copia as que faltam."""
@@ -316,6 +373,26 @@ def por_as_bios_livres(assets):
 # ---------------------------------------------------------------------------
 # O manifesto, o codigo, a assinatura
 # ---------------------------------------------------------------------------
+
+# O servidor do ARENA (ArenaServico.java), no mesmo processo da tela.
+SERVICO_DO_ARENA = '''        <service android:exported="false" android:name="io.github.rafaparise.arena.ArenaServico" android:process=":tela"/>
+'''
+# O que o servidor pede ao Android alem do RetroArch: ficar aberto durante o
+# jogo (o aviso na barra), receber os avisos da rede do Jogar Junto (o Wi-Fi
+# joga fora os de grupo sem a trava) e, no Android 11 em diante, gravar no
+# cartao e no pen drive (o "Acesso a todos os arquivos", que a pessoa liga).
+PERMISSOES_DO_SERVIDOR = '''    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE"/>
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
+'''
+# O WebView so fala sem HTTPS com o servidor do proprio aparelho.
+REDE_DO_ARENA = '''<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">127.0.0.1</domain>
+    </domain-config>
+</network-security-config>
+'''
 
 ATIVIDADE_DO_ARENA = '''        <activity android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode" android:exported="true" android:label="ARENA" android:launchMode="singleTask" android:name="io.github.rafaparise.arena.ArenaActivity" android:process=":tela" android:screenOrientation="sensorLandscape" android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
             <intent-filter>
@@ -356,7 +433,15 @@ def ajustar_manifesto(pasta, versao_nome, versao_codigo):
          'android:name="com.retroarch.browser.retroactivity.RetroActivityFuture"'),
         ('<activity android:exported="true" android:name="com.retroarch.browser.debug.CoreSideloadActivity"/>',
          '<activity android:exported="false" android:name="com.retroarch.browser.debug.CoreSideloadActivity"/>'),
-        ("    </application>", ATIVIDADE_DO_ARENA + "    </application>"),
+        ("    </application>", ATIVIDADE_DO_ARENA + SERVICO_DO_ARENA + "    </application>"),
+        ('    <uses-permission android:name="android.permission.VIBRATE"/>\n',
+         '    <uses-permission android:name="android.permission.VIBRATE"/>\n' + PERMISSOES_DO_SERVIDOR),
+        # O WebView so fala sem HTTPS com o 127.0.0.1; e nada do app vai para a
+        # copia na nuvem do Android: o apelido e os recordes (dados de aluno)
+        # ficam no aparelho (a sincronizacao do ARENA e' que leva).
+        ('<application android:allowAudioPlaybackCapture="true" android:allowBackup="true" ',
+         '<application android:allowAudioPlaybackCapture="true" android:allowBackup="false" '
+         'android:networkSecurityConfig="@xml/arena_rede" '),
     ]
     for velho, novo in trocas:
         if texto.count(velho) != 1:
@@ -364,6 +449,9 @@ def ajustar_manifesto(pasta, versao_nome, versao_codigo):
         texto = texto.replace(velho, novo)
     with open(caminho, "w", encoding="utf-8") as arquivo:
         arquivo.write(texto)
+    os.makedirs(os.path.join(pasta, "res", "xml"), exist_ok=True)
+    with open(os.path.join(pasta, "res", "xml", "arena_rede.xml"), "w", encoding="utf-8") as arquivo:
+        arquivo.write(REDE_DO_ARENA)
     nomes = os.path.join(pasta, "res", "values", "strings.xml")
     with open(nomes, encoding="utf-8") as arquivo:
         texto = arquivo.read().replace('<string name="app_name">RetroArch</string>', '<string name="app_name">ARENA</string>')
@@ -451,7 +539,12 @@ def montar_apk(abi, teste, atualizar, trabalho):
     gerar_icones(os.path.join(pasta, "res"))
     assets = os.path.join(pasta, "assets")
     por_a_tela(assets, teste)
+    por_o_servidor(assets)
+    livres = por_os_jogos_livres(assets)
     por_as_bios_livres(assets)
+    modulos = python_android.por_no_apk(pasta, abi)
+    print("  servidor do ARENA, Python %s (%d modulos nativos) e %d jogos livres" % (python_android.VERSAO, modulos,
+                                                                                    livres), flush=True)
     destino_nucleos = os.path.join(assets, "arena-nucleos", abi)
     os.makedirs(destino_nucleos)
     for nome, caminho in nucleos.items():

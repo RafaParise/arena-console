@@ -2,17 +2,23 @@
  * ARENA no Android (item 14 do plano de 15/10/2026).
  *
  * O APK do ARENA e' o RetroArch 1.22.2 oficial para Android (o mesmo RetroArch
- * do Windows, do Linux e do Chromebook) com esta tela na frente:
+ * do Windows, do Linux e do Chromebook) com esta tela na frente. Ela mostra a
+ * tela de sempre do ARENA (launcher/index.html, o mesmo app.js) num WebView,
+ * de um destes dois jeitos:
  *
- *   - a tela de sempre do ARENA (launcher/index.html, o mesmo app.js), num
- *     WebView, com o "servidor dentro da pagina" do ARENA do Chromebook
- *     (launcher/navegador): a lista de jogos, os ajustes, os recordes;
- *   - a ponte "ArenaAndroid" (a classe Ponte, abaixo), que a pagina chama
- *     para o que so o Android faz: achar a pasta do ARENA no aparelho (no
- *     cartao SD, no pen drive ligado no cabo OTG ou na memoria interna),
- *     listar e gravar arquivos dela e abrir o jogo no RetroArch NATIVO, com o
- *     nucleo certo (os nucleos vem dentro do APK e saem para a pasta do app
- *     na primeira vez que cada console abre).
+ *   - o de sempre: o SERVIDOR do ARENA, o mesmo do Windows e do Linux, roda
+ *     no aparelho (o ArenaServico, com o Python do APK), e a tela fala com
+ *     ele em http://127.0.0.1:8777, como no computador. Tudo o que o ARENA
+ *     faz vale aqui: o Jogar Junto, os amigos, os recordes, os cheats, as
+ *     capas e a biblioteca da internet. So esta tela tem o segredo da
+ *     abertura (um cookie): outro app do aparelho nao fala com o servidor;
+ *   - o de reserva, se o servidor nao abrir neste aparelho: o "servidor
+ *     dentro da pagina" do ARENA do Chromebook (launcher/navegador), com a
+ *     ponte "ArenaAndroid" (a classe Ponte, abaixo) para o que so o Android
+ *     faz: achar a pasta do ARENA no aparelho, listar e gravar arquivos dela
+ *     e abrir o jogo no RetroArch NATIVO, com o nucleo certo (os nucleos vem
+ *     dentro do APK e saem para a pasta do app na primeira vez que cada
+ *     console abre).
  *
  * Os saves ficam na pasta do ARENA (retroarch/saves e retroarch/states), os
  * mesmos do Windows: o jogo salvo no celular continua salvo no computador.
@@ -54,7 +60,9 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.ConsoleMessage;
+import android.webkit.CookieManager;
 import android.webkit.JavascriptInterface;
+import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
@@ -72,6 +80,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -88,6 +97,15 @@ public class ArenaActivity extends Activity {
     static final String ENDERECO = "https://" + CASA + "/launcher/index.html?navegador=1&android=1";
     static final String TAG = "ARENA";
     static final int PEDIDO_DE_PERMISSAO = 7;
+    static final int PERMISSAO_DA_ABERTURA = 8;
+    static final int TODOS_OS_ARQUIVOS = 9;
+    // O servidor do ARENA no aparelho (ArenaServico), como no computador.
+    static final String SERVIDOR = "http://127.0.0.1:" + ArenaServico.PORTA + "/";
+    // Enquanto o servidor abre (na primeira vez ele tira o programa do APK).
+    static final String ABRINDO = "<!doctype html><html><head><meta name=viewport content='width=device-width'>"
+            + "<style>body{margin:0;height:100vh;display:flex;align-items:center;justify-content:center;"
+            + "background:#0b0f1a;color:#e8ecf5;font:20px sans-serif}</style></head>"
+            + "<body>Abrindo o ARENA...</body></html>";
     // O RetroArch de dentro do APK (o mesmo codigo do RetroArch oficial).
     static final String RETROARCH = "com.retroarch.browser.retroactivity.RetroActivityFuture";
 
@@ -123,6 +141,11 @@ public class ArenaActivity extends Activity {
 
     WebView tela;
     SharedPreferences guardado;
+    // A tela de reserva (o servidor nao abriu neste aparelho).
+    volatile boolean modoNavegador = false;
+    // A tela do servidor ja foi carregada (o servidor reaberto nao recarrega:
+    // a pagina se reconecta sozinha, como no computador).
+    boolean telaDoServidor = false;
     // O endereco da pagina da frente (o onPageStarted o atualiza): a ponte so
     // atende a tela do ARENA.
     volatile String paginaAtual = "";
@@ -163,13 +186,113 @@ public class ArenaActivity extends Activity {
         tela.addJavascriptInterface(new Ponte(), "ArenaAndroid");
         setContentView(tela);
         esconderAsBarras();
+        ArenaServico.tela = new WeakReference<ArenaActivity>(this);
+        if (ArenaServico.desistiu) {
+            abrirModoNavegador();
+        } else if (ArenaServico.pronto) {
+            servidorPronto();
+        } else {
+            tela.loadDataWithBaseURL(null, ABRINDO, "text/html", "utf-8", null);
+            // Na primeira abertura, a permissao de arquivos (para achar a
+            // pasta do ARENA no aparelho); depois, so quando a pessoa pede.
+            if (Build.VERSION.SDK_INT >= 23 && !temPermissao() && !guardado.getBoolean("pediu_permissao", false)) {
+                guardado.edit().putBoolean("pediu_permissao", true).apply();
+                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSAO_DA_ABERTURA);
+            } else {
+                comecar();
+            }
+        }
+    }
+
+    /** Abre o servidor (o ArenaServico). Sem pasta escolhida e com uma pasta
+     *  do ARENA so no aparelho, ela vale sozinha: baixar e ja usar. */
+    void comecar() {
+        if (guardado.getString("pasta", "").length() == 0 && temPermissao()) {
+            List<File> achadas = new ArrayList<File>();
+            for (File c : candidatas(this)) if (pareceArena(c)) achadas.add(c);
+            if (achadas.size() == 1) guardado.edit().putString("pasta", achadas.get(0).getAbsolutePath()).apply();
+        }
+        Intent servico = new Intent(this, ArenaServico.class);
+        if (Build.VERSION.SDK_INT >= 26) startForegroundService(servico);
+        else startService(servico);
+    }
+
+    /** O servidor avisou que ja escuta (ArenaServico.marcarPronto). */
+    void servidorPronto() {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                if (modoNavegador || telaDoServidor) return;
+                telaDoServidor = true;
+                CookieManager biscoitos = CookieManager.getInstance();
+                biscoitos.setAcceptCookie(true);
+                biscoitos.setCookie(SERVIDOR, "arena_segredo=" + ArenaServico.SEGREDO
+                        + "; Path=/; HttpOnly; SameSite=Strict");
+                biscoitos.flush();
+                tela.loadUrl(SERVIDOR);
+            }
+        });
+    }
+
+    /** O servidor nao abriu neste aparelho: a tela de reserva, com o motivo
+     *  no registro do Android. */
+    void servidorNaoAbriu(final String motivo, final String ultimas) {
+        Log.e(TAG, motivo + "\n" + ultimas);
+        runOnUiThread(new Runnable() {
+            public void run() {
+                abrirModoNavegador();
+            }
+        });
+    }
+
+    void abrirModoNavegador() {
+        modoNavegador = true;
         tela.loadUrl(ENDERECO);
+    }
+
+    /** O servidor pediu a permissao de arquivos (Ajustes, a pasta do ARENA).
+     *  Com todosOsArquivos, a do Android 11 em diante que deixa gravar no
+     *  cartao e no pen drive (a tela do sistema, "Acesso a todos os
+     *  arquivos"). Na volta, o servidor abre de novo, enxergando a pasta. */
+    void pedirPermissao(final boolean todosOsArquivos) {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                if (todosOsArquivos && Build.VERSION.SDK_INT >= 30) {
+                    try {
+                        startActivityForResult(new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
+                                Uri.parse("package:" + getPackageName())), TODOS_OS_ARQUIVOS);
+                        return;
+                    } catch (RuntimeException falha) {
+                        Log.w(TAG, "sem a tela de todos os arquivos: " + falha);
+                    }
+                }
+                if (Build.VERSION.SDK_INT >= 23) {
+                    requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE}, PEDIDO_DE_PERMISSAO);
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int pedido, int resultado, Intent dados) {
+        super.onActivityResult(pedido, resultado, dados);
+        if (pedido == TODOS_OS_ARQUIVOS && ArenaServico.atual != null) ArenaServico.atual.reabrir();
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (ArenaServico.tela.get() == this) ArenaServico.tela = new WeakReference<ArenaActivity>(null);
+        super.onDestroy();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         esconderAsBarras();
+        ArenaServico.tela = new WeakReference<ArenaActivity>(this);
+        // Com o servidor, quem conta o tempo do jogo e' ele (como no computador).
+        if (!modoNavegador) return;
         // Voltou do jogo: quanto tempo durou (o RetroArch roda noutro
         // processo; a hora de abrir fica guardada, para valer mesmo se esta
         // tela tiver sido refeita no meio).
@@ -184,7 +307,18 @@ public class ArenaActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        avisarAPagina("window.ARENA_ANDROID_VOLTAR ? window.ARENA_ANDROID_VOLTAR() : 0");
+        if (modoNavegador) {
+            avisarAPagina("window.ARENA_ANDROID_VOLTAR ? window.ARENA_ANDROID_VOLTAR() : 0");
+            return;
+        }
+        // A tela fecha o que estiver aberto (uma janela, um ajuste); sem nada
+        // aberto, o ARENA vai para tras, como o botao de inicio do aparelho.
+        tela.evaluateJavascript("window.ARENA_ANDROID_VOLTAR ? String(window.ARENA_ANDROID_VOLTAR()) : 'nao'",
+                new ValueCallback<String>() {
+                    public void onReceiveValue(String resposta) {
+                        if (!"\"sim\"".equals(resposta)) moveTaskToBack(true);
+                    }
+                });
     }
 
     void esconderAsBarras() {
@@ -204,8 +338,15 @@ public class ArenaActivity extends Activity {
 
     @Override
     public void onRequestPermissionsResult(int pedido, String[] permissoes, int[] respostas) {
-        if (pedido == PEDIDO_DE_PERMISSAO) {
-            avisarAPagina("window.ARENA_ANDROID_PERMISSAO && window.ARENA_ANDROID_PERMISSAO(" + temPermissao() + ")");
+        if (pedido == PERMISSAO_DA_ABERTURA) {
+            comecar();
+        } else if (pedido == PEDIDO_DE_PERMISSAO) {
+            if (modoNavegador) {
+                avisarAPagina("window.ARENA_ANDROID_PERMISSAO && window.ARENA_ANDROID_PERMISSAO(" + temPermissao()
+                        + ")");
+            } else if (ArenaServico.atual != null) {
+                ArenaServico.atual.reabrir();
+            }
         }
     }
 
@@ -292,6 +433,9 @@ public class ArenaActivity extends Activity {
         @Override
         public boolean shouldOverrideUrlLoading(WebView vista, WebResourceRequest pedido) {
             Uri endereco = pedido.getUrl();
+            if (!modoNavegador && endereco.toString().startsWith(SERVIDOR)) {
+                return false;                                    // a tela do servidor do ARENA
+            }
             if (CASA.equals(endereco.getHost())) {
                 // So a tela do ARENA abre aqui (a ponte e' dela).
                 String caminho = endereco.getPath() == null ? "" : endereco.getPath();
@@ -350,9 +494,13 @@ public class ArenaActivity extends Activity {
     /** As raizes de armazenamento: a memoria interna e cada cartao SD ou
      *  pen drive (do getExternalFilesDirs, cortando o "/Android/data/..."). */
     List<File> raizes() {
+        return raizes(this);
+    }
+
+    static List<File> raizes(Context contexto) {
         List<File> lista = new ArrayList<File>();
         lista.add(Environment.getExternalStorageDirectory());
-        File[] doApp = getExternalFilesDirs(null);
+        File[] doApp = contexto.getExternalFilesDirs(null);
         for (File pasta : doApp) {
             if (pasta == null) continue;
             String caminho = pasta.getAbsolutePath();
@@ -363,6 +511,25 @@ public class ArenaActivity extends Activity {
             }
         }
         return lista;
+    }
+
+    /** Onde uma pasta do ARENA pode estar: cada raiz e as pastas ate dois
+     *  niveis dentro dela (DCIM/ARENA, Download/ARENA...). */
+    static List<File> candidatas(Context contexto) {
+        List<File> candidatas = new ArrayList<File>();
+        for (File raiz : raizes(contexto)) {
+            candidatas.add(raiz);
+            File[] dentro = raiz.listFiles();
+            if (dentro == null) continue;
+            for (File f : dentro) {
+                if (f.isDirectory() && !f.getName().startsWith(".") && !f.getName().equals("Android")) {
+                    candidatas.add(f);
+                    File[] netos = f.listFiles();
+                    if (netos != null) for (File n : netos) if (n.isDirectory()) candidatas.add(n);
+                }
+            }
+        }
+        return candidatas;
     }
 
     static File filhoSemMaiusculas(File pasta, String nome) {

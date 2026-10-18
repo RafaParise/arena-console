@@ -46,17 +46,43 @@ versão `69a4f0e-arena`, a da etiqueta v1.22.2 com a marca do remendo (a
 licença do RetroArch, a GPLv3, pede que a versão modificada diga que é
 modificada).
 
+O ARENA no Android é **o mesmo programa** do Windows e do Linux: o mesmo
+servidor (`servidor/`), a mesma tela (`launcher/`), os mesmos jogos e saves.
+O que muda é só quem abre o servidor e o RetroArch:
+
 | O quê | Como |
 |---|---|
-| A tela | A de sempre (`launcher/`), num WebView, com o servidor dentro da página do ARENA do Chromebook (`launcher/navegador`), servida de dentro do APK |
-| A ponte | `android/src/.../ArenaActivity.java`: acha a pasta do ARENA no aparelho, lista e grava arquivos dela, e abre o jogo no RetroArch **nativo** |
-| A pasta do ARENA | No cartão SD, no pen drive ligado pelo cabo OTG ou na memória do aparelho; os saves e os estados vão para `retroarch/saves` e `retroarch/states` dela: **os mesmos do Windows** |
+| O servidor | O de sempre (`servidor/arena.py`), com o **Python 3.13.16 para Android** (a mesma versão do Linux), que o `ArenaServico.java` roda no aparelho e reabre se ele cair (até 3 vezes, como o `ARENA.bat`). A abertura é o `servidor/android_inicio.py` |
+| O Python | O CPython 3.13.16 compilado para Android pelo [Chaquopy](https://chaquo.com) (licença MIT, os pacotes "target" do Maven Central), sem mudança no Python; o programa `python` é o lançador do ARENA (`android/python/lancador.c`, 20 linhas, compilado com o NDK): `ferramentas/python_android.py` |
+| A tela | A de sempre (`launcher/`), num WebView, falando com o servidor em `http://127.0.0.1:8777`, como no computador |
+| O RetroArch | O do APK (o oficial, com o remendo acima), aberto pelo app com a **mesma linha de comando do Windows**; o servidor espera o jogo fechar como espera o `retroarch.exe` (o processo do RetroArch termina ao sair do jogo) |
+| A pasta do ARENA | No cartão SD, no pen drive ligado pelo cabo OTG ou na memória do aparelho. Na primeira abertura, o app pede a permissão de arquivos e, se achar uma pasta do ARENA só, já usa ela: **baixar e já usar**. Os jogos, as BIOS, os saves, os estados, as capas, as fotos, os cheats e os remapeamentos são **os mesmos do Windows** |
+| Sem a pasta | Os 8 jogos livres dos testes (licença MIT, CC0 ou Unlicense, com a licença ao lado) vão para a pasta do app na primeira abertura |
 | Os núcleos | 62 dos 63 do ARENA, na versão para Android, dentro do APK; cada um sai do APK na primeira vez que o console abre |
-| Sem a pasta | Os jogos livres que vêm no APK (os mesmos do Chromebook) abrem direto; o aparelho também guarda jogos pequenos (Ajustes → Máquina) |
 | Os consoles | Os do Windows, menos o Java ME (o núcleo precisa de Java, que o Android não tem) e os emuladores de fora (PS3 e Xbox 360 não têm versão para Android); o PS2, o GameCube e o Wii vão pelos núcleos |
+| A reserva | Se o servidor não abrir no aparelho, a tela cai no "servidor dentro da página" do ARENA do Chromebook (`launcher/navegador`), com a ponte da `ArenaActivity.java` para abrir o jogo no RetroArch nativo |
+
+### O que fica no aparelho, de propósito
+
+No computador, tudo fica na pasta do ARENA. No Android, a pasta do ARENA no
+cartão ou na memória é **compartilhada**: qualquer app com a permissão de
+arquivos lê e grava nela. Por isso (revisão de segurança de 18/10/2026):
+
+- **ficam só no app**: o que o servidor grava e o RetroArch lê (o arquivo da
+  partida, a configuração, as listas com o caminho do núcleo, os ajustes do
+  RetroArch), e os **recordes e o apelido** (dados de aluno). Entre
+  aparelhos, os recordes vão pela sincronização em rede do ARENA, como entre
+  dois computadores;
+- **só a tela do ARENA fala com o servidor**: no Android, qualquer app do
+  aparelho alcança o `127.0.0.1`. O app sorteia um segredo a cada abertura,
+  passa ao servidor pelo ambiente (que outro app não lê) e à tela num cookie;
+  sem ele, o servidor recusa todo pedido do próprio aparelho. E a tela só
+  abre o servidor depois do aviso "pronto", que vem pelo fio privado do
+  próprio Python: um app que tomasse a porta antes nunca recebe o segredo;
+- nada do app vai para a cópia na nuvem do Android (`allowBackup` desligado).
 
 Um APK por tipo de processador: **arm64-v8a** (quase todo celular e tablet
-de hoje, 207 MB) e **x86_64** (Chromebook Intel e o emulador). O pacote é
+de hoje) e **x86_64** (Chromebook Intel e o emulador), uns 220 MB cada. O pacote é
 `io.github.rafaparise.arena`, para conviver com um RetroArch já instalado. O
 APK pede o Android 7 ou mais novo e a permissão de arquivos (para ler a
 pasta do ARENA), como o RetroArch.
@@ -75,14 +101,18 @@ anterior.
 
 ## O que muda no Android
 
-- **Sem jogo em rede** por enquanto (como no Chromebook): os jogadores jogam
-  no mesmo aparelho.
-- **Sem os filtros de tela do ARENA**: eles são do Vulkan; no Android vale a
-  escala do próprio RetroArch.
-- **Os saves e os estados** o RetroArch grava direto na pasta do ARENA; o
-  painel "Saves e cheats" da tela ainda não os lista no Android.
+- **O jogo em rede** (Amigos, Jogar Junto) é o do computador: o mesmo
+  servidor, os mesmos avisos na rede (o app segura a trava do Wi-Fi para eles
+  chegarem) e o RetroArch com `--host` e `--connect` (o remendo).
+- **Os filtros de tela do ARENA** (os `.slangp`) só rodam no Vulkan: no
+  OpenGL ES, o motor padrão do Android, ficam de fora. Em Ajustes → Avançado,
+  o motor gráfico oferece o `gl` e o `vulkan`; o som e o tipo de controle
+  saem da lista (o RetroArch do Android tem um de cada).
 - **Toque na tela:** o RetroArch mostra o controle na tela quando não há
-  controle ligado, e o esconde quando um controle é ligado.
+  controle ligado, e o esconde quando um controle é ligado; o som tem no
+  mínimo 64 ms (o celular barato estala com menos).
+- **A nota do aparelho** para pela velocidade medida de um núcleo: celular
+  tem 8 núcleos e 8 GB, mas os núcleos são pequenos.
 
 ## Os testes
 

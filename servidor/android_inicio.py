@@ -199,6 +199,38 @@ def tirar_do_apk(apk):
     return postos
 
 
+def por_os_jogos_livres(apk, escolhida):
+    """Sem pasta do ARENA escolhida, os jogos livres que vieram no APK (os dos
+    testes, de licenca livre, cada um com a licenca ao lado) vao para a pasta
+    jogos do app: a primeira abertura ja tem jogo. Uma vez so: o que a pessoa
+    apagar nao volta. Na pasta escolhida, nunca (ela e' de quem usa)."""
+    marca = caminho("jogos", ".arena-livres")
+    if escolhida or os.path.exists(marca):
+        return 0
+    postos = 0
+    prefixo = "assets/arena-livres/"
+    try:
+        with zipfile.ZipFile(apk) as pacote:
+            for item in pacote.infolist():
+                relativo = item.filename[len(prefixo):]
+                if not item.filename.startswith(prefixo) or item.is_dir() or ".." in relativo.split("/"):
+                    continue
+                alvo = caminho("jogos", relativo)
+                if os.path.exists(alvo):
+                    continue
+                os.makedirs(os.path.dirname(alvo), exist_ok=True)
+                with pacote.open(item) as de, open(alvo + ".parcial", "wb") as para:
+                    shutil.copyfileobj(de, para, 1 << 16)
+                os.replace(alvo + ".parcial", alvo)
+                postos += 1
+    except (OSError, zipfile.BadZipFile) as falha:
+        print("[ARENA] Nao consegui por os jogos livres do APK: %s" % falha)
+        return postos
+    with open(marca, "w", encoding="utf-8") as arquivo:
+        arquivo.write("Os jogos livres do APK ja vieram (servidor/android_inicio.py).\n")
+    return postos
+
+
 def preparar_o_cfg(escolhida):
     """O retroarch.cfg do app: na primeira vez, o da pasta escolhida ou o
     modelo; e sempre com o que o Android precisa (NO_CFG_DO_ANDROID)."""
@@ -237,6 +269,9 @@ def preparar():
     postos = tirar_do_apk(ponte_android.APK)
     if postos:
         print("[ARENA] Recursos do RetroArch do Android postos: %d arquivos." % postos)
+    livres = por_os_jogos_livres(ponte_android.APK, ponte_android.ESTADO.get("pasta"))
+    if livres:
+        print("[ARENA] Jogos livres do APK postos na pasta jogos do app: %d arquivos." % livres)
     preparar_o_cfg(ponte_android.ESTADO.get("pasta") or "")
 
 

@@ -375,6 +375,22 @@ class PastaDoArena(unittest.TestCase):
                                                     "neo-retropad", "neo-retropad.cfg")))
         self.assertFalse(os.path.exists(os.path.join(self.raiz, "retroarch", "database")))
 
+    def test_os_jogos_livres_so_na_pasta_do_app_e_uma_vez(self):
+        apk = apk_de_mentira(self.pasta, recursos={
+            "assets/arena-livres/MSX/noborunoca.rom": "MSX",
+            "assets/arena-livres/MSX/LICENCA - noborunoca.txt": "CC0"})
+        android_inicio.montar_as_pastas("", self.privada)
+        self.assertEqual(android_inicio.por_os_jogos_livres(apk, ""), 2)
+        jogo = os.path.join(self.raiz, "jogos", "MSX", "noborunoca.rom")
+        self.assertTrue(os.path.isfile(jogo))
+        os.remove(jogo)                                         # a pessoa apagou: nao volta
+        self.assertEqual(android_inicio.por_os_jogos_livres(apk, ""), 0)
+        self.assertFalse(os.path.exists(jogo))
+        # Com a pasta escolhida, nada entra nela.
+        android_inicio.montar_as_pastas(self.escolhida, self.privada)
+        self.assertEqual(android_inicio.por_os_jogos_livres(apk, self.escolhida), 0)
+        self.assertFalse(os.path.exists(os.path.join(self.escolhida, "jogos", "MSX")))
+
     def test_o_cfg_do_android(self):
         os.makedirs(os.path.join(self.raiz, "retroarch"))
         with open(os.path.join(self.escolhida, "retroarch", "retroarch.cfg"), "w", encoding="utf-8") as arquivo:
