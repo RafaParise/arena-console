@@ -277,10 +277,12 @@ def _memoria_e_energia(rapido=False):
 
 def coletar_fatos():
     """Tudo o que avaliar() precisa. Nunca levanta erro: o que falhar fica
-    registrado em fatos['nao_deu_para_ler']."""
+    registrado em fatos['nao_deu_para_ler']. No Linux, coletar_fatos_linux."""
+    if sys.platform.startswith("linux"):
+        return coletar_fatos_linux()
     fatos = {"nao_deu_para_ler": []}
     if not sys.platform.startswith("win"):
-        fatos["nao_deu_para_ler"].append("este diagnóstico é só para Windows")
+        fatos["nao_deu_para_ler"].append("este diagnóstico é para Windows e Linux")
         return fatos
     try:
         fatos.update(_memoria_e_energia())
@@ -593,7 +595,7 @@ def diagnosticar(disco_mecanico=None):
     fatos = coletar_fatos()
     if disco_mecanico is not None:
         fatos["disco_mecanico"] = disco_mecanico
-    barreiras = avaliar(fatos)
+    barreiras = avaliar_linux(fatos) if fatos.get("sistema") == "linux" else avaliar(fatos)
     # Da lista de processos guarda so os 15 mais pesados: a lista inteira
     # diria demais sobre o que o aluno usa, e nao ajuda a decidir nada.
     procs = _processos(fatos)
@@ -611,15 +613,18 @@ IDS_RAPIDOS = ("memoria", "bateria", "economia_bateria")
 
 
 def avaliar_rapido(fatos):
-    return [b for b in avaliar(fatos) if b["id"] in IDS_RAPIDOS and b["gravidade"] == "alta"]
+    avaliacao = avaliar_linux(fatos) if fatos.get("sistema") == "linux" else avaliar(fatos)
+    return [b for b in avaliacao if b["id"] in IDS_RAPIDOS and b["gravidade"] == "alta"]
 
 
 def checagem_rapida():
     """Chamada ao abrir um jogo: memoria quase cheia, notebook na bateria,
     economia de bateria ligada. Leva milissegundos. Nunca levanta erro."""
-    if not sys.platform.startswith("win"):
-        return []
     try:
+        if sys.platform.startswith("linux"):
+            return avaliar_rapido(dict(_memoria_e_energia_linux(rapido=True), sistema="linux"))
+        if not sys.platform.startswith("win"):
+            return []
         return avaliar_rapido(_memoria_e_energia(rapido=True))
     except Exception:
         return []
@@ -630,6 +635,8 @@ def fechar_programa(nome):
     taskkill sem administrador nao consegue fechar os do sistema). Devolve
     (ok, mensagem)."""
     nome = str(nome or "").strip().lower()
+    if sys.platform.startswith("linux"):
+        return _fechar_no_linux(nome)
     if nome not in FECHAVEIS:
         return False, "Esse programa não está na lista dos que o ARENA pode fechar. Feche-o pelo próprio programa."
     r = subprocess.run(["taskkill", "/IM", nome + ".exe", "/F"], capture_output=True,
@@ -637,6 +644,290 @@ def fechar_programa(nome):
     if r.returncode == 0:
         return True, "%s fechado." % FECHAVEIS[nome]
     return False, ("Não consegui fechar %s (talvez já estivesse fechado). Clique em Verificar agora para ver de novo." % FECHAVEIS[nome])
+
+
+# ---------------------------------------------------------------------------
+# 3. O mesmo no Linux (item 13 do plano de 15/10/2026)
+# ---------------------------------------------------------------------------
+# O ARENA do Linux mostra o mesmo painel: memoria, bateria, economia de
+# energia, programas pesados, atualizacao, disco, memoria virtual e driver de
+# video. O Linux conta tudo isso em arquivos de texto (/proc e /sys), que
+# qualquer conta le, sem administrador e sem programa de fora. Os achados tem
+# o mesmo "id" dos do Windows; o texto e' o do Linux (Monitor do Sistema no
+# lugar do Gerenciador de Tarefas, e assim por diante).
+
+FECHAVEIS_LINUX = {
+    "teams-for-linux": "Microsoft Teams", "teams": "Microsoft Teams", "discord": "Discord",
+    "spotify": "Spotify", "steam": "Steam", "steamwebhelper": "Steam", "zoom": "Zoom",
+    "skypeforlinux": "Skype", "telegram-deskto": "Telegram", "dropbox": "Dropbox", "slack": "Slack",
+}
+NAVEGADORES_LINUX = ("chrome", "chromium", "chromium-browse", "msedge", "firefox", "firefox-esr",
+                     "firefox-bin", "brave", "opera", "vivaldi-bin")
+# Quem atualiza o Linux (o nome curto do processo, ate 15 letras).
+ATUALIZACAO_LINUX = {"unattended-upgr", "apt", "apt-get", "apt-check", "dpkg", "packagekitd", "dnf", "yum",
+                     "rpm", "zypper", "pacman", "snapd", "gnome-software", "fwupd", "flatpak"}
+# Do sistema: nao entram na lista de "pesados".
+DO_SISTEMA_LINUX = {"systemd", "kthreadd", "xorg", "xwayland", "gnome-shell", "kwin_x11", "kwin_wayland",
+                    "plasmashell", "cinnamon", "pipewire", "pulseaudio", "wireplumber", "dbus-daemon",
+                    "kworker", "ksoftirqd", "rcu_sched", "Xorg"}
+# Motor de video que nao e' o da placa: a tela desenhada pelo processador.
+SEM_DRIVER_LINUX = {"simpledrm", "efifb", "vesafb", "simplefb"}
+
+
+def _ler_linux(caminho):
+    try:
+        with open(caminho, encoding="utf-8", errors="replace") as arquivo:
+            return arquivo.read()
+    except OSError:
+        return ""
+
+
+def _memoria_e_energia_linux(rapido=False):
+    """Memoria (/proc/meminfo), bateria (/sys/class/power_supply), economia
+    de energia (o perfil da plataforma), tempo ligado (/proc/uptime) e, fora
+    do modo rapido, o disco do sistema, a memoria virtual e o video."""
+    import glob
+    import shutil
+    fatos = {}
+    memoria = {}
+    for linha in _ler_linux("/proc/meminfo").splitlines():
+        partes = linha.split()
+        if len(partes) >= 2 and partes[1].isdigit():
+            memoria[partes[0].rstrip(":")] = int(partes[1])          # em kB
+    if memoria.get("MemTotal"):
+        livre = memoria.get("MemAvailable", memoria.get("MemFree", 0))
+        fatos["memoria_total_mb"] = round(memoria["MemTotal"] / 1024)
+        fatos["memoria_livre_mb"] = round(livre / 1024)
+        fatos["memoria_em_uso_pct"] = int(100 - 100.0 * livre / memoria["MemTotal"])
+    tomada, baterias = None, []
+    for fonte in glob.glob("/sys/class/power_supply/*"):
+        tipo = _ler_linux(os.path.join(fonte, "type")).strip()
+        if tipo == "Mains":
+            ligada = _ler_linux(os.path.join(fonte, "online")).strip()
+            if ligada in ("0", "1"):
+                tomada = bool(tomada) or ligada == "1"
+        elif tipo == "Battery" and _ler_linux(os.path.join(fonte, "scope")).strip() != "Device":
+            carga = _ler_linux(os.path.join(fonte, "capacity")).strip()
+            if carga.isdigit():
+                baterias.append(int(carga))
+    fatos["tem_bateria"] = bool(baterias)
+    fatos["bateria_pct"] = min(baterias) if baterias else None
+    fatos["na_tomada"] = tomada if baterias else True
+    perfil = _ler_linux("/sys/firmware/acpi/platform_profile").strip()
+    preferencias = {_ler_linux(p).strip() for p in
+                    glob.glob("/sys/devices/system/cpu/cpu[0-9]*/cpufreq/energy_performance_preference")}
+    fatos["economia_de_bateria"] = perfil in ("low-power", "quiet") or preferencias == {"power"}
+    tempo = _ler_linux("/proc/uptime").split()
+    if tempo:
+        fatos["ligado_ha_horas"] = round(float(tempo[0]) / 3600.0, 1)
+    if rapido:
+        return fatos
+    try:
+        uso = shutil.disk_usage("/")
+        fatos["disco_windows_livre_gb"] = round(uso.free / 1024 ** 3, 1)
+        fatos["disco_windows_livre_pct"] = round(100.0 * uso.free / uso.total, 1)
+    except OSError:
+        pass
+    fatos["memoria_virtual_mb"] = round(memoria.get("SwapTotal", 0) / 1024) if memoria else None
+    motores = set()
+    for cartao in glob.glob("/sys/class/drm/card[0-9]*"):
+        if "-" not in os.path.basename(cartao):
+            motor = os.path.join(cartao, "device", "driver")
+            if os.path.islink(motor):
+                motores.add(os.path.basename(os.readlink(motor)))
+    fatos["video"] = ", ".join(sorted(motores))
+    fatos["reinicio_pendente"] = os.path.exists("/var/run/reboot-required") or os.path.exists(
+        "/run/reboot-required")
+    fatos["processadores_logicos"] = os.cpu_count()
+    return fatos
+
+
+def _processos_linux(segundos=2.0):
+    """Os processos, juntos pelo nome: {nome, instancias, mb, cpu}. Duas
+    fotos do /proc com 'segundos' de intervalo, como as do Windows; a CPU
+    em % do processador inteiro."""
+    tique = os.sysconf("SC_CLK_TCK") if hasattr(os, "sysconf") else 100
+    pagina = os.sysconf("SC_PAGE_SIZE") if hasattr(os, "sysconf") else 4096
+
+    def foto():
+        tempos = {}
+        for pid in os.listdir("/proc"):
+            if not pid.isdigit():
+                continue
+            estado = _ler_linux("/proc/%s/stat" % pid)
+            fim = estado.rfind(")")
+            if fim < 0:
+                continue
+            nome = estado[estado.find("(") + 1:fim].lower()
+            campos = estado[fim + 2:].split()
+            try:
+                tempos[pid] = (nome, int(campos[11]) + int(campos[12]))
+            except (IndexError, ValueError):
+                continue
+        return tempos
+
+    antes, inicio = foto(), time.time()
+    time.sleep(segundos)
+    depois = foto()
+    passou = max(time.time() - inicio, 0.1)
+    nucleos = os.cpu_count() or 1
+    juntos = {}
+    for pid, (nome, tempo) in depois.items():
+        memoria = _ler_linux("/proc/%s/statm" % pid).split()
+        mb = int(memoria[1]) * pagina / 1024 ** 2 if len(memoria) > 1 and memoria[1].isdigit() else 0
+        cpu = 0.0
+        if pid in antes and antes[pid][0] == nome:
+            cpu = (tempo - antes[pid][1]) / tique / passou / nucleos * 100
+        item = juntos.setdefault(nome, {"nome": nome, "instancias": 0, "mb": 0, "cpu": 0.0})
+        item["instancias"] += 1
+        item["mb"] += int(mb)
+        item["cpu"] = round(item["cpu"] + cpu, 1)
+    return list(juntos.values())
+
+
+def coletar_fatos_linux():
+    """Tudo o que avaliar_linux() precisa. Nunca levanta erro."""
+    fatos = {"nao_deu_para_ler": [], "sistema": "linux"}
+    try:
+        fatos.update(_memoria_e_energia_linux())
+    except Exception as falha:           # nunca trava
+        fatos["nao_deu_para_ler"].append("memoria/energia: %s" % falha)
+    try:
+        fatos["processos"] = _processos_linux()
+    except Exception as falha:
+        fatos["nao_deu_para_ler"].append("processos: %s" % falha)
+    return fatos
+
+
+def avaliar_linux(fatos, proprios=("python3.13", "python3", "python", "retroarch")):
+    """O mesmo que avaliar(), com o que vale e o que se faz no Linux."""
+    barreiras = []
+    procs = _processos(fatos)
+    total_mb = fatos.get("memoria_total_mb") or 0
+
+    livre = fatos.get("memoria_livre_mb")
+    if isinstance(livre, (int, float)) and total_mb:
+        if livre < 800 or fatos.get("memoria_em_uso_pct", 0) >= 85:
+            barreiras.append(_b("memoria", "alta", "Memória quase cheia",
+                                "Só %d MB livres de %d MB (%d%% em uso)." % (
+                                    livre, total_mb, fatos.get("memoria_em_uso_pct", 0)),
+                                "Sem memória livre o Linux passa a usar o disco no lugar dela, e tudo trava.",
+                                "Feche programas que não está usando (veja a lista abaixo). No ARENA, ligue o modo modesto.",
+                                ACOES_ALUNO))
+        elif livre < 1500 and total_mb <= 4500:
+            barreiras.append(_b("memoria", "media", "Pouca memória livre",
+                                "%d MB livres de %d MB." % (livre, total_mb),
+                                "Numa máquina de 4 GB, abaixo de 1,5 GB livre os jogos começam a engasgar.",
+                                "Feche o que não estiver usando antes de jogar.", ACOES_ALUNO))
+
+    fechaveis = sorted({p["nome"] for p in procs if p["nome"] in FECHAVEIS_LINUX})
+    if fechaveis:
+        barreiras.append(_b("fechaveis", "media", "Programas em segundo plano que dá para fechar",
+                            ", ".join(sorted({FECHAVEIS_LINUX[n] for n in fechaveis})) + ".",
+                            "Ficam gastando memória e internet mesmo sem ninguém usar.",
+                            "Clique em Fechar. O ARENA fecha só estes, e só quando você manda.",
+                            ACOES_ALUNO, fechar=[{"processo": n, "nome": FECHAVEIS_LINUX[n]} for n in fechaveis]))
+    navegador = sum(p.get("mb", 0) for p in procs if p["nome"] in NAVEGADORES_LINUX)
+    if navegador >= 1200:
+        barreiras.append(_b("navegador", "media", "Navegador com muitas abas",
+                            "O navegador está usando %d MB." % navegador,
+                            "Cada aba aberta come memória, mesmo escondida.",
+                            "Feche as abas que não precisa (a janela do ARENA pode ficar).", ACOES_ALUNO))
+    outros = [p for p in procs if p["nome"] not in proprios and p["nome"] not in FECHAVEIS_LINUX
+              and p["nome"] not in NAVEGADORES_LINUX and p["nome"] not in ATUALIZACAO_LINUX
+              and p["nome"] not in DO_SISTEMA_LINUX and not p["nome"].startswith("kworker")
+              and (p.get("cpu", 0) >= 10 or p.get("mb", 0) >= 400)]
+    if outros:
+        outros.sort(key=lambda p: (-p.get("cpu", 0), -p.get("mb", 0)))
+        barreiras.append(_b("pesados", "media", "Programas pesados abertos",
+                            "; ".join("%s (%d MB, %s%% do processador)" % (p["nome"], p.get("mb", 0), p.get("cpu", 0))
+                                      for p in outros[:5]) + ".",
+                            "Disputam o processador e a memória com o jogo.",
+                            "Se não estiver usando, feche pelo próprio programa ou pelo Monitor do Sistema.",
+                            ACOES_ALUNO))
+    cpu_total = sum(p.get("cpu", 0) for p in procs if p["nome"] not in proprios)
+    if cpu_total >= 40:
+        barreiras.append(_b("cpu_ocupada", "alta", "Processador ocupado sem ninguém jogando",
+                            "Os outros programas estão usando %d%% do processador." % cpu_total,
+                            "Sobra pouco para o jogo, e ele fica lento.",
+                            "Espere terminar o que está rodando (uma atualização) ou feche os programas da lista.",
+                            ACOES_ALUNO))
+    atualizando = [p for p in procs if p["nome"] in ATUALIZACAO_LINUX and p.get("cpu", 0) >= 3]
+    if atualizando:
+        barreiras.append(_b("atualizando", "media", "O Linux está se atualizando agora",
+                            "Trabalhando: " + ", ".join(p["nome"] for p in atualizando) + ".",
+                            "A atualização usa disco e processador por um bom tempo.",
+                            "Se der, deixe terminar antes da aula. Não desligue no meio.", ACOES_ALUNO))
+    if fatos.get("reinicio_pendente"):
+        barreiras.append(_b("reiniciar", "media", "Falta reiniciar para terminar uma atualização",
+                            "O Linux está esperando um reinício.",
+                            "Até reiniciar, a atualização fica pela metade.",
+                            "Salve tudo e reinicie o computador.", ACOES_ALUNO))
+    horas = fatos.get("ligado_ha_horas")
+    if isinstance(horas, (int, float)) and horas >= 72:
+        barreiras.append(_b("ligado", "baixa", "Computador ligado há muito tempo",
+                            "Ligado direto há %d dias." % int(horas // 24),
+                            "Com o tempo, programas vão deixando memória presa.",
+                            "Reinicie o computador de vez em quando.", ACOES_ALUNO))
+    if fatos.get("tem_bateria") and fatos.get("na_tomada") is False:
+        barreiras.append(_b("bateria", "alta", "Notebook na bateria",
+                            "Fora da tomada (%s%%)." % fatos.get("bateria_pct"),
+                            "Na bateria, o Linux segura o processador para economizar.",
+                            "Ligue na tomada antes de jogar.", ACOES_ALUNO))
+    if fatos.get("economia_de_bateria"):
+        barreiras.append(_b("economia_bateria", "alta", "Economia de energia ligada",
+                            "O modo de economia de energia está ativo.",
+                            "Ele corta o desempenho de propósito.",
+                            "No menu do canto da tela (o da bateria), troque o modo de energia para Equilibrado "
+                            "ou Desempenho.", ACOES_ALUNO))
+    livre_pct = fatos.get("disco_windows_livre_pct")
+    livre_gb = fatos.get("disco_windows_livre_gb")
+    if isinstance(livre_pct, (int, float)) and (livre_pct < 10 or (livre_gb or 99) < 5):
+        barreiras.append(_b("disco_cheio", "alta", "Disco do sistema quase cheio",
+                            "Só %s GB livres (%s%%)." % (livre_gb, livre_pct),
+                            "Com o disco cheio, o Linux não tem onde gravar e fica lento.",
+                            "Apague o que não precisa (a Lixeira e a pasta Downloads costumam ter muito).",
+                            ACOES_ALUNO))
+    virtual = fatos.get("memoria_virtual_mb")
+    if virtual == 0 and total_mb and total_mb <= 8500:
+        barreiras.append(_b("sem_paginacao", "alta", "Memória virtual desligada",
+                            "O Linux está sem memória virtual (swap).",
+                            "Com pouca memória e sem swap, programas fecham sozinhos quando a memória acaba.",
+                            "O TI pode criar um arquivo de swap (ou ligar o zram).", ACOES_TI))
+    motores = {m.strip() for m in str(fatos.get("video") or "").split(",") if m.strip()}
+    if motores and motores <= SEM_DRIVER_LINUX:
+        barreiras.append(_b("driver_video", "alta", "Sem driver de vídeo de verdade",
+                            "O Linux está desenhando a tela sem o driver da placa (%s)." % ", ".join(sorted(motores)),
+                            "Sem o driver da placa, os jogos 3D ficam lentíssimos ou nem abrem.",
+                            "O TI instala o driver da placa de vídeo (o Ubuntu oferece em Drivers Adicionais).",
+                            ACOES_TI))
+    barreiras.sort(key=lambda b: GRAVIDADE[b["gravidade"]])
+    return barreiras
+
+
+def _fechar_no_linux(nome):
+    """Linux: pede para fechar (SIGTERM, o "feche, por favor") os processos
+    da propria conta com esse nome, so da lista FECHAVEIS_LINUX."""
+    import signal
+    if nome not in FECHAVEIS_LINUX:
+        return False, "Esse programa não está na lista dos que o ARENA pode fechar. Feche-o pelo próprio programa."
+    fechados = 0
+    for pid in os.listdir("/proc"):
+        if not pid.isdigit():
+            continue
+        try:
+            if os.stat("/proc/" + pid).st_uid != os.getuid():
+                continue
+            if _ler_linux("/proc/%s/comm" % pid).strip().lower() != nome:
+                continue
+            os.kill(int(pid), signal.SIGTERM)
+            fechados += 1
+        except OSError:
+            continue
+    if fechados:
+        return True, "%s fechado." % FECHAVEIS_LINUX[nome]
+    return False, ("Não consegui fechar %s (talvez já estivesse fechado). Clique em Verificar agora para ver de novo."
+                   % FECHAVEIS_LINUX[nome])
 
 
 if __name__ == "__main__":

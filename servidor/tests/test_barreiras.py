@@ -173,5 +173,47 @@ class TestBarreiras(unittest.TestCase):
         self.assertFalse(ok)
 
 
+
+class TestBarreirasDoLinux(unittest.TestCase):
+    """O mesmo painel no Linux (item 13): avaliar_linux com fatos
+    inventados, e a coleta de verdade quando o teste roda no Linux."""
+
+    def test_maquina_em_ordem_nao_acusa_nada(self):
+        fatos = {"sistema": "linux", "memoria_total_mb": 7800, "memoria_livre_mb": 5000, "memoria_em_uso_pct": 36,
+                 "tem_bateria": True, "na_tomada": True, "economia_de_bateria": False, "ligado_ha_horas": 3,
+                 "disco_windows_livre_pct": 50, "disco_windows_livre_gb": 80, "memoria_virtual_mb": 2048,
+                 "video": "i915", "processos": [{"nome": "gnome-shell", "mb": 500, "cpu": 3}]}
+        self.assertEqual(barreiras.avaliar_linux(fatos), [])
+
+    def test_o_que_pesa_no_linux(self):
+        fatos = {"memoria_total_mb": 4000, "memoria_livre_mb": 500, "memoria_em_uso_pct": 88,
+                 "tem_bateria": True, "na_tomada": False, "bateria_pct": 40, "economia_de_bateria": True,
+                 "memoria_virtual_mb": 0, "video": "simpledrm", "reinicio_pendente": True,
+                 "processos": [{"nome": "discord", "mb": 300, "cpu": 2}, {"nome": "unattended-upgr", "mb": 90, "cpu": 20}]}
+        achados = ids(barreiras.avaliar_linux(fatos))
+        for esperado in ("memoria", "bateria", "economia_bateria", "sem_paginacao", "driver_video",
+                         "reiniciar", "atualizando", "fechaveis"):
+            self.assertIn(esperado, achados)
+        texto = str(barreiras.avaliar_linux(fatos))
+        self.assertNotIn("Windows", texto)
+        self.assertNotIn("Gerenciador de Tarefas", texto)
+
+    def test_placa_com_driver_nao_acusa(self):
+        self.assertNotIn("driver_video", ids(barreiras.avaliar_linux({"video": "amdgpu, simpledrm"})))
+
+    def test_fechar_so_da_lista_do_linux(self):
+        ok, _mensagem = barreiras._fechar_no_linux("gnome-shell")
+        self.assertFalse(ok)
+
+    @unittest.skipUnless(sys.platform.startswith("linux"), "le o /proc e o /sys do Linux")
+    def test_coleta_de_verdade(self):
+        fatos = barreiras.coletar_fatos_linux()
+        self.assertEqual(fatos["sistema"], "linux")
+        self.assertGreater(fatos["memoria_total_mb"], 0)
+        self.assertTrue(fatos["processos"])
+        resultado = barreiras.diagnosticar()
+        self.assertIsInstance(resultado["barreiras"], list)
+
+
 if __name__ == "__main__":
     unittest.main()

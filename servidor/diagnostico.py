@@ -580,7 +580,7 @@ else:
         sys.path.insert(0, PASTA_SERVIDOR)
     try:
         import barreiras
-        print("  olhando o Windows (uns 5 segundos)...")
+        print("  olhando o computador (uns 5 segundos)...")
         diagnostico_maquina = barreiras.diagnosticar()
         achados = diagnostico_maquina["barreiras"]
         if not achados:
@@ -596,7 +596,7 @@ else:
         for motivo in diagnostico_maquina["nao_deu_para_ler"]:
             print("  (nao deu para ler: %s)" % motivo)
     except Exception as falha:          # o verificador nunca pode quebrar aqui
-        print("  nao foi possivel olhar o Windows: %s" % falha)
+        print("  nao foi possivel olhar o computador: %s" % falha)
 
 
 # ---------------------------------------------------------------------------

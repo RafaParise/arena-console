@@ -151,9 +151,9 @@ def _apagar(pasta):
 
 
 def _tirar_do_appimage(appimage, destino):
-    """Tira o RetroArch de dentro do AppImage para 'destino'. A copia do
+    """Tira o programa de dentro do AppImage para 'destino'. A copia do
     AppImage vai antes para o cache: no pen drive ele pode nao ter permissao
-    de executar."""
+    de executar. As copias de um AppImage antigo do mesmo programa saem."""
     montando = "%s.montando-%d" % (destino, os.getpid())
     _apagar(montando)
     os.makedirs(montando)
@@ -171,6 +171,11 @@ def _tirar_do_appimage(appimage, destino):
         os.replace(extraido, destino)
     finally:
         _apagar(montando)
+    prefixo = os.path.basename(destino).rsplit("-", 1)[0] + "-"
+    for nome in os.listdir(os.path.dirname(destino)):
+        velho = os.path.join(os.path.dirname(destino), nome)
+        if nome.startswith(prefixo) and nome[len(prefixo):].isdigit() and velho != destino:
+            _apagar(velho)
 
 
 def _bibliotecas_do_sistema():
@@ -213,30 +218,40 @@ def _completar_bibliotecas(destino, pasta_bibliotecas):
         arquivo.write("\n".join(nomes) + "\n")
 
 
-def retroarch_que_roda(appimage):
-    """Linux: o programa que abre o RetroArch (o AppRun da copia tirada do
-    AppImage, ver acima), preparando a copia na primeira vez. Se nao der, o
-    proprio AppImage (com o FUSE 2, ele ainda abre). No Windows, o mesmo."""
-    if WINDOWS:
-        return appimage
+def appimage_que_roda(appimage, nome, pasta_bibliotecas=None):
+    """Linux: o programa que abre o AppImage 'appimage' (o AppRun da copia
+    tirada dele em ~/.cache/arena/<nome>-<tamanho>, ver acima), preparando a
+    copia na primeira vez. Se nao der, o proprio AppImage (com o FUSE 2,
+    ele ainda abre). 'pasta_bibliotecas': as de reserva (so o RetroArch)."""
     try:
         tamanho = os.path.getsize(appimage)
     except OSError:
         return appimage
-    destino = os.path.join(pasta_de_cache(), "retroarch-%d" % tamanho)
+    destino = os.path.join(pasta_de_cache(), "%s-%d" % (nome, tamanho))
     programa = os.path.join(destino, "AppRun")
     with _TRAVA_DO_RETROARCH:
         if not _roda(programa):
             try:
                 _tirar_do_appimage(appimage, destino)
             except (OSError, subprocess.SubprocessError) as falha:
-                print("[ARENA] Nao consegui preparar o RetroArch do Linux (%s). Abrindo o AppImage direto." % falha)
+                print("[ARENA] Nao consegui preparar o %s do Linux (%s). Abrindo o AppImage direto."
+                      % (nome, falha))
                 return appimage
-        try:
-            _completar_bibliotecas(destino, os.path.join(os.path.dirname(appimage), PASTA_DAS_BIBLIOTECAS))
-        except OSError as falha:
-            print("[ARENA] Nao consegui completar as bibliotecas do RetroArch: %s" % falha)
+        if pasta_bibliotecas:
+            try:
+                _completar_bibliotecas(destino, pasta_bibliotecas)
+            except OSError as falha:
+                print("[ARENA] Nao consegui completar as bibliotecas do %s: %s" % (nome, falha))
     return programa
+
+
+def retroarch_que_roda(appimage):
+    """Linux: o programa que abre o RetroArch (appimage_que_roda, com as
+    bibliotecas de reserva). No Windows, o mesmo."""
+    if WINDOWS:
+        return appimage
+    return appimage_que_roda(appimage, "retroarch",
+                             os.path.join(os.path.dirname(appimage), PASTA_DAS_BIBLIOTECAS))
 
 
 def comando_do_retroarch(executavel, arquivo_cfg):
@@ -371,3 +386,66 @@ def motores_deste_sistema(opcoes):
             else:
                 opcoes[chave] = MOTORES_DO_LINUX[chave]
     return opcoes
+
+
+# ---------------------------------------------------------------------------
+# Os emuladores de fora no Linux
+# ---------------------------------------------------------------------------
+# O programa do Linux fica na MESMA pasta do de Windows (emuladores\PCSX2\
+# PCSX2, emuladores\RPCS3\RPCS3...) e le e grava os MESMOS arquivos: a BIOS,
+# os memory cards, a configuracao que o ARENA completa e os saves. No
+# Windows, cada um faz isso pelo modo portatil (o portable.txt ao lado do
+# .exe). No Linux:
+#   - o PCSX2 e o RPCS3 guardam tudo em $XDG_CONFIG_HOME/PCSX2 e
+#     $XDG_CONFIG_HOME/rpcs3: o ARENA aponta o XDG_CONFIG_HOME para a pasta
+#     de cima (emuladores\PCSX2), e a pasta de dados vira a mesma do Windows
+#     (no pen drive FAT32, exFAT ou NTFS, "rpcs3" e "RPCS3" sao a mesma
+#     pasta);
+#   - o Xenia recebe a pasta pelo --storage_root, e o Dolphin pelo -u (a
+#     pasta User, a mesma do Windows).
+
+def dados_do_externo(nome, caminho):
+    """(caminho para a configuracao, variaveis do ambiente, argumentos a mais)
+    do emulador de fora 'nome' cujo programa esta em 'caminho'. A pasta do
+    "caminho para a configuracao" e' onde o emulador le e grava (o
+    graficos.py escreve la). No Windows: (caminho, {}, [])."""
+    if WINDOWS or not caminho:
+        return caminho, {}, []
+    pasta = os.path.dirname(caminho)
+    acima = os.path.dirname(pasta)
+    programa = os.path.basename(caminho)
+    if nome == "PCSX2":
+        return os.path.join(acima, "PCSX2", programa), {"XDG_CONFIG_HOME": acima}, []
+    if nome == "RPCS3":
+        return os.path.join(acima, "rpcs3", programa), {"XDG_CONFIG_HOME": acima}, []
+    if nome == "Xenia":
+        return caminho, {}, ["--storage_root=" + pasta]
+    if nome == "Dolphin":
+        return caminho, {}, ["-u", os.path.join(pasta, "User")]
+    return caminho, {}, []
+
+
+def programa_que_roda(caminho, nome):
+    """Linux: o que executar para abrir o programa do emulador de fora. O
+    AppImage sai para o cache na primeira vez (appimage_que_roda); o
+    programa comum, no pen drive que nao deixa executar, vai para o cache
+    com a permissao de executar. No Windows, o mesmo caminho."""
+    if WINDOWS or not caminho:
+        return caminho
+    if caminho.lower().endswith(".appimage"):
+        return appimage_que_roda(caminho, nome.lower())
+    if _roda(caminho):
+        return caminho
+    try:
+        destino = os.path.join(pasta_de_cache(), "%s-%d" % (nome.lower(), os.path.getsize(caminho)))
+        copia = os.path.join(destino, os.path.basename(caminho))
+        with _TRAVA_DO_RETROARCH:
+            if not _roda(copia):
+                os.makedirs(destino, exist_ok=True)
+                shutil.copyfile(caminho, copia + ".copiando")
+                os.chmod(copia + ".copiando", 0o755)
+                os.replace(copia + ".copiando", copia)
+        return copia
+    except OSError as falha:
+        print("[ARENA] Nao consegui preparar o %s do Linux: %s" % (nome, falha))
+        return caminho

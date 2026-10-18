@@ -7,7 +7,6 @@ trocando plataforma.WINDOWS, para a logica dos dois ficar conferida em
 qualquer computador. O teste de verdade no Linux (o RetroArch abrindo o
 jogo) e' testes\\teste_linux.py, no conteiner."""
 import os
-import shutil
 import sys
 import tempfile
 import unittest
@@ -19,6 +18,9 @@ if PASTA_SERVIDOR not in sys.path:
 
 import graficos  # noqa: E402
 import plataforma  # noqa: E402
+
+sys.path.insert(0, os.path.join(os.path.dirname(PASTA_SERVIDOR), "testes"))
+import limpeza  # noqa: E402
 
 
 def no_windows(sim):
@@ -100,7 +102,7 @@ class Motores(unittest.TestCase):
                                               "PULSE_SERVER": "unix:/x"}):
                 self.assertEqual(plataforma.motor_de_som_do_linux(), "pulse")
         finally:
-            shutil.rmtree(pasta, ignore_errors=True)
+            limpeza.apagar_pasta(pasta)
 
 
 class CfgDosDoisSistemas(unittest.TestCase):
@@ -115,7 +117,7 @@ class CfgDosDoisSistemas(unittest.TestCase):
 
     def tearDown(self):
         graficos.RAIZ, graficos.PASTA_RETROARCH = self.antes
-        shutil.rmtree(self.base, ignore_errors=True)
+        limpeza.apagar_pasta(self.base)
 
     def corrigir(self, linhas, windows):
         cfg = os.path.join(graficos.PASTA_RETROARCH, "retroarch.cfg")
@@ -178,6 +180,58 @@ class Pastas(unittest.TestCase):
         self.assertEqual(comando[4], "file:///media/aluno/Pedag%C3%B3gicos/backup/meu%20progresso.zip")
         self.assertEqual(comando[5], "/media/aluno/Pedagógicos/backup")
         self.assertNotIn("Pedag", comando[2])
+
+
+class EmuladoresDeFora(unittest.TestCase):
+    """PS2, PS3, Xbox 360 (e o Dolphin, se houver): no Linux, o programa de
+    la fica na mesma pasta do de Windows e usa a mesma pasta de dados."""
+
+    def test_dados_no_linux(self):
+        base = os.path.join(os.sep, "pen", "ARENA", "emuladores")
+        with no_windows(False):
+            pcsx2 = plataforma.dados_do_externo("PCSX2", os.path.join(base, "PCSX2", "PCSX2", "pcsx2.AppImage"))
+            rpcs3 = plataforma.dados_do_externo("RPCS3", os.path.join(base, "RPCS3", "RPCS3", "rpcs3.AppImage"))
+            xenia = plataforma.dados_do_externo("Xenia", os.path.join(base, "Xenia", "Xenia", "xenia_canary"))
+            dolphin = plataforma.dados_do_externo("Dolphin", os.path.join(base, "Dolphin", "D", "dolphin-emu"))
+        self.assertEqual(pcsx2, (os.path.join(base, "PCSX2", "PCSX2", "pcsx2.AppImage"),
+                                 {"XDG_CONFIG_HOME": os.path.join(base, "PCSX2")}, []))
+        self.assertEqual(rpcs3[0], os.path.join(base, "RPCS3", "rpcs3", "rpcs3.AppImage"))
+        self.assertEqual(rpcs3[1], {"XDG_CONFIG_HOME": os.path.join(base, "RPCS3")})
+        self.assertEqual(xenia[2], ["--storage_root=" + os.path.join(base, "Xenia", "Xenia")])
+        self.assertEqual(dolphin[2], ["-u", os.path.join(base, "Dolphin", "D", "User")])
+
+    def test_no_windows_nada_muda(self):
+        with no_windows(True):
+            self.assertEqual(plataforma.dados_do_externo("PCSX2", "C:\\a\\pcsx2-qt.exe"),
+                             ("C:\\a\\pcsx2-qt.exe", {}, []))
+            self.assertEqual(plataforma.programa_que_roda("C:\\a\\pcsx2-qt.exe", "PCSX2"), "C:\\a\\pcsx2-qt.exe")
+
+    def test_acha_o_appimage_do_linux_pela_versao_no_nome(self):
+        catalogo = {"externo": {"nome": "PCSX2", "pasta": "PCSX2", "executaveis": ["pcsx2-qt.exe"],
+                                "executaveis_linux": ["pcsx2*.appimage", "pcsx2-qt"]}}
+        pasta = tempfile.mkdtemp(prefix="arena_externo_linux_")
+        try:
+            programa = os.path.join(pasta, "PCSX2", "PCSX2")
+            os.makedirs(programa)
+            for nome in ("pcsx2-qt.exe", "pcsx2-v2.8.1-linux-appimage-x64-Qt.AppImage"):
+                open(os.path.join(programa, nome), "wb").close()
+            with mock.patch.object(graficos, "PASTA_EMULADORES", pasta):
+                with mock.patch.object(graficos, "NO_WINDOWS", False):
+                    linux, _c, _d = graficos.achar_externo_detalhado(catalogo)
+                with mock.patch.object(graficos, "NO_WINDOWS", True):
+                    windows, _c, _d = graficos.achar_externo_detalhado(catalogo)
+            self.assertEqual(os.path.basename(linux), "pcsx2-v2.8.1-linux-appimage-x64-Qt.AppImage")
+            self.assertEqual(os.path.basename(windows), "pcsx2-qt.exe")
+        finally:
+            limpeza.apagar_pasta(pasta)
+
+    def test_o_catalogo_tem_o_programa_do_linux_de_cada_externo(self):
+        import json
+        with open(os.path.join(PASTA_SERVIDOR, "consoles.json"), encoding="utf-8") as arquivo:
+            externos = [p["externo"] for p in json.load(arquivo)["plataformas"] if p.get("externo")]
+        self.assertTrue(externos)
+        for externo in externos:
+            self.assertTrue(externo.get("executaveis_linux"), externo["nome"])
 
 
 class RecursosDaTela(unittest.TestCase):

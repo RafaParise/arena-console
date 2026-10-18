@@ -1473,6 +1473,10 @@ window.ARENA_DADOS = {
     "executaveis": [
      "Dolphin.exe"
     ],
+    "executaveis_linux": [
+     "dolphin*.appimage",
+     "dolphin-emu"
+    ],
     "motivo": "Opcional. O núcleo do RetroArch abre, mas o Dolphin de verdade roda bem melhor GameCube e Wii.",
     "nome": "Dolphin",
     "obrigatorio": false,
@@ -1517,6 +1521,10 @@ window.ARENA_DADOS = {
     ],
     "executaveis": [
      "Dolphin.exe"
+    ],
+    "executaveis_linux": [
+     "dolphin*.appimage",
+     "dolphin-emu"
     ],
     "motivo": "Opcional. O núcleo do RetroArch abre, mas o Dolphin de verdade roda bem melhor GameCube e Wii.",
     "nome": "Dolphin",
@@ -1764,6 +1772,10 @@ window.ARENA_DADOS = {
      "pcsx2x64-avx2.exe",
      "pcsx2x64.exe",
      "pcsx2.exe"
+    ],
+    "executaveis_linux": [
+     "pcsx2*.appimage",
+     "pcsx2-qt"
     ],
     "jogos_system_link": [
      "gran turismo 4"
@@ -2515,6 +2527,10 @@ window.ARENA_DADOS = {
     "executaveis": [
      "rpcs3.exe"
     ],
+    "executaveis_linux": [
+     "rpcs3*.appimage",
+     "rpcs3"
+    ],
     "motivo": "OBRIGATÓRIO. Não existe núcleo de PlayStation 3 no RetroArch - só o RPCS3 emula este console, e só em computador forte.",
     "nome": "RPCS3",
     "obrigatorio": true,
@@ -2564,6 +2580,11 @@ window.ARENA_DADOS = {
      "xenia_canary_netplay.exe",
      "xenia_edge.exe",
      "xenia.exe"
+    ],
+    "executaveis_linux": [
+     "xenia_canary",
+     "xenia_canary*.appimage",
+     "xenia_edge"
     ],
     "executavel_netplay": "xenia_canary_netplay.exe",
     "jogos_netplay": [

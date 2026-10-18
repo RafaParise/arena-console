@@ -25,6 +25,7 @@ PARTIDA A DOIS
 So biblioteca padrao.
 """
 
+import fnmatch
 import json
 import os
 import re
@@ -638,7 +639,11 @@ def achar_externo_detalhado(plataforma):
     if not os.path.isdir(base):
         return None, None, externo
 
-    procurados = [n.lower() for n in externo["executaveis"]]
+    # No Linux, os programas do Linux ("executaveis_linux", que podem ter *:
+    # o AppImage leva a versao no nome), na mesma pasta dos do Windows.
+    procurados = [n.lower() for n in (externo["executaveis"] if NO_WINDOWS
+                                      else externo.get("executaveis_linux", []))]
+    extensao_do_programa = ".exe" if NO_WINDOWS else ".appimage"
     # Se o nome exato mudar numa versao futura do emulador (ja aconteceu:
     # o proprio cadastro dos nomes nunca foi conferido contra um download
     # real do PCSX2), ainda reconhece por prefixo -- "PCSX2" cadastrado
@@ -652,9 +657,10 @@ def achar_externo_detalhado(plataforma):
     for raiz, subpastas, arquivos in os.walk(base):
         for arquivo in arquivos:
             nome_baixo = arquivo.lower()
-            if nome_baixo in procurados and nome_baixo not in achados:
-                achados[nome_baixo] = os.path.join(raiz, arquivo)
-            if (candidato_prefixo is None and nome_baixo.endswith(".exe")
+            padrao = next((p for p in procurados if fnmatch.fnmatch(nome_baixo, p)), None)
+            if padrao and padrao not in achados:
+                achados[padrao] = os.path.join(raiz, arquivo)
+            if (candidato_prefixo is None and nome_baixo.endswith(extensao_do_programa)
                     and nome_baixo.startswith(prefixo)):
                 candidato_prefixo = os.path.join(raiz, arquivo)
             if compactado is None and nome_baixo.endswith(EXTENSOES_COMPACTADO):
@@ -697,7 +703,10 @@ def falta_para_o_externo(nome_externo, caminho_executavel):
 
     PCSX2 (01/10/2026, versao dos alunos, que vem sem BIOS): sem BIOS de
     PS2 o cartao aparecia "pronto" e o PCSX2 abria so para reclamar dela.
-    Agora o ARENA avisa antes, e o cartao fica amarelo com este motivo."""
+    Agora o ARENA avisa antes, e o cartao fica amarelo com este motivo.
+
+    No Linux, a pasta que vale e' a de dados de la (plataforma.dados_do_externo)."""
+    caminho_executavel = plataforma.dados_do_externo(nome_externo, caminho_executavel)[0]
     if nome_externo == "PCSX2" and caminho_executavel and not tem_bios_pcsx2(caminho_executavel):
         return ("O PS2 precisa da BIOS do PlayStation 2 (um arquivo .bin de 4 MB), e ela "
                 "ainda não está aqui. Peça ao professor: o arquivo vai na pasta BIOS\\PS2 do "
@@ -726,7 +735,7 @@ def situacao_dos_externos(plataformas):
             "plataforma": plataforma["nome"],
             "id": plataforma["id"],
             "nome": externo["nome"],
-            "pasta": "emuladores\\" + externo["pasta"],
+            "pasta": os.path.join("emuladores", externo["pasta"]),
             "site": externo.get("site", ""),
             "motivo": externo.get("motivo", ""),
             "instalado": bool(caminho),

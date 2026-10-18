@@ -2715,14 +2715,26 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
     devolver_ponte = None
     # A partida pelo Lossless Scaling (preparar_lossless), ou None.
     pelo_lossless = None
+    # Linux: o que o emulador de fora precisa no ambiente (a pasta de dados
+    # dele, a mesma do Windows: servidor\plataforma.py, dados_do_externo).
+    ambiente_externo = {}
 
     if jogo.get("externo"):
         # Emulador de fora: o RetroArch fica de lado nesta plataforma.
         # Partida a dois e save state do ARENA nao valem aqui - quem
         # cuida disso passa a ser o proprio emulador.
-        comando = graficos.comando_externo(
-            jogo["externo"]["caminho"], jogo["externo"]["dados"], caminho_jogo)
-        pasta_trabalho = os.path.dirname(jogo["externo"]["caminho"])
+        programa_externo = jogo["externo"]["caminho"]
+        nome_externo = jogo["externo"]["dados"]["nome"]
+        # No Linux, a configuracao vai para a pasta de dados de la (no
+        # Windows, a do proprio .exe), e o programa que roda pode ser a
+        # copia tirada do AppImage. No Windows, nada muda.
+        caminho_dados, ambiente_externo, argumentos_externo = plataforma_do_sistema.dados_do_externo(
+            nome_externo, programa_externo)
+        jogo["externo"]["caminho"] = caminho_dados
+        comando = graficos.comando_externo(caminho_dados, jogo["externo"]["dados"], caminho_jogo)
+        comando = [plataforma_do_sistema.programa_que_roda(programa_externo, nome_externo)] + \
+            argumentos_externo + comando[1:]
+        pasta_trabalho = os.path.dirname(programa_externo)
 
         # O PCSX2 tem tela propria, mas le a configuracao antes de abrir.
         # O ARENA escreve o controle ali: dois analogicos, direcional
@@ -3023,6 +3035,8 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
                 if not java_do_arena.javaw():
                     print("[ARENA] Falta o Java do ARENA (emuladores\\Java): o jogo de Java ME "
                           "so abre se o computador tiver Java instalado.")
+            if ambiente_externo:
+                extras["env"] = dict(extras.get("env") or os.environ, **ambiente_externo)
             if acelerar:
                 processos.prioridade_do_arena(processos.ABAIXO_DO_NORMAL)
                 processos.memoria_do_arena(processos.MEMORIA_BAIXA)
