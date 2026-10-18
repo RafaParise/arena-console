@@ -449,3 +449,42 @@ def programa_que_roda(caminho, nome):
     except OSError as falha:
         print("[ARENA] Nao consegui preparar o %s do Linux: %s" % (nome, falha))
         return caminho
+
+
+def pasta_que_roda(pasta, nome, executavel):
+    """Linux: a pasta de um programa (o Java do Java ME, por exemplo) pronta
+    para rodar, e devolve o caminho do 'executavel' (relativo a ela) que
+    roda. Do zip sem a permissao de executar, numa pasta que aceita: so
+    marca. No pen drive que nao deixa (FAT32): a pasta vai inteira para
+    ~/.cache/arena/<nome>-<tamanho do executavel>, uma vez so. No Windows,
+    o proprio caminho."""
+    original = os.path.join(pasta, executavel)
+    if WINDOWS or _roda(original):
+        return original
+    try:
+        os.chmod(original, os.stat(original).st_mode | 0o100)
+    except OSError:
+        pass
+    if _roda(original):
+        return original
+    try:
+        destino = os.path.join(pasta_de_cache(), "%s-%d" % (nome, os.path.getsize(original)))
+        copia = os.path.join(destino, executavel)
+        with _TRAVA_DO_RETROARCH:
+            if not _roda(copia):
+                montando = "%s.montando-%d" % (destino, os.getpid())
+                _apagar(montando)
+                shutil.copytree(pasta, montando)
+                for atual, _subpastas, nomes in os.walk(os.path.join(montando, "bin")):
+                    for nome_arquivo in nomes:
+                        os.chmod(os.path.join(atual, nome_arquivo), 0o755)
+                for atual, _subpastas, nomes in os.walk(os.path.join(montando, "lib")):
+                    for nome_arquivo in nomes:
+                        if not nome_arquivo.endswith((".so", ".jsa", "modules")) and "." not in nome_arquivo:
+                            os.chmod(os.path.join(atual, nome_arquivo), 0o755)    # jspawnhelper e parecidos
+                _apagar(destino)
+                os.replace(montando, destino)
+        return copia
+    except OSError as falha:
+        print("[ARENA] Nao consegui preparar o %s do Linux: %s" % (nome, falha))
+        return original

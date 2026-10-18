@@ -15,17 +15,30 @@ com o jlink a partir do Eclipse Temurin 21 (ferramentas\preparar_java.py).
 Ao abrir um jogo de Java ME, o ARENA poe a pasta bin desse Java NA FRENTE do
 PATH, so para o RetroArch daquela partida. Nada muda no Windows, e o "javaw"
 que o nucleo acha e' o do ARENA, mesmo num computador com outro Java.
+
+No Linux (item 13, 18/10/2026) o nucleo chama "java", e o Java do Linux mora
+em emuladores\Java\linux (o mesmo Temurin 21, montado com o jlink pelo
+ferramentas\preparar_linux.py). No pen drive que nao deixa executar, ele vai
+para a pasta de cache da conta, como o Python (plataforma.pasta_que_roda).
 """
 import os
+
+import plataforma
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PASTA_JAVA = os.path.join(RAIZ, "emuladores", "Java")
 
 
 def javaw(pasta=PASTA_JAVA):
-    """O caminho do javaw.exe do ARENA, ou None se ele nao estiver la."""
-    caminho = os.path.join(pasta, "bin", "javaw.exe")
-    return caminho if os.path.isfile(caminho) else None
+    """O caminho do javaw.exe do ARENA (no Linux, o java do Java do Linux,
+    pronto para rodar), ou None se ele nao estiver la."""
+    if plataforma.WINDOWS:
+        caminho = os.path.join(pasta, "bin", "javaw.exe")
+        return caminho if os.path.isfile(caminho) else None
+    linux = os.path.join(pasta, "linux")
+    if not os.path.isfile(os.path.join(linux, "bin", "java")):
+        return None
+    return plataforma.pasta_que_roda(linux, "java", os.path.join("bin", "java"))
 
 
 def ambiente(base=None, pasta=PASTA_JAVA):
@@ -38,5 +51,5 @@ def ambiente(base=None, pasta=PASTA_JAVA):
     # No Windows o nome da variavel pode vir como "Path" ou "PATH".
     chave = next((nome for nome in variaveis if nome.upper() == "PATH"), "PATH")
     caminhos = [c for c in variaveis.get(chave, "").split(os.pathsep) if c]
-    variaveis[chave] = os.pathsep.join([os.path.join(pasta, "bin")] + caminhos)
+    variaveis[chave] = os.pathsep.join([os.path.dirname(javaw(pasta))] + caminhos)
     return variaveis

@@ -65,6 +65,9 @@ PROGRAMAS = [
      "emuladores\\RPCS3\\RPCS3"),
     ("Xenia Canary para Linux (AppImage oficial)", "BSD-3-Clause", "https://github.com/xenia-canary/xenia-canary",
      "emuladores\\Xenia\\Xenia"),
+    ("Java do Java ME para Linux: o mesmo OpenJDK 21 (Eclipse Temurin), reduzido com o jlink",
+     "GPL-2.0 com a exceção Classpath (os textos vão em emuladores\\Java\\linux\\legal)",
+     "https://github.com/adoptium/temurin21-binaries", "emuladores\\Java\\linux"),
 ]
 
 # O que o ARENA usa e nao distribui (o Lossless Scaling, de quem comprou).
@@ -79,6 +82,7 @@ NAO_VEM = [
 # Nucleos cujo codigo-fonte NAO fica no GitHub do libretro.
 FONTE_FORA_DO_LIBRETRO = {
     "freej2me_libretro.dll": "https://github.com/TASEmulators/freej2me-plus/tree/8f87bf1497e7a9738a32d1909379376a1faca7dd",
+    "freej2me_libretro.so": "https://github.com/TASEmulators/freej2me-plus/tree/8f87bf1497e7a9738a32d1909379376a1faca7dd",
 }
 
 

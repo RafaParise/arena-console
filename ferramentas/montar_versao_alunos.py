@@ -90,7 +90,8 @@ ARQUIVOS_DA_RAIZ = ["ARENA.bat", "VERIFICAR.bat", "PARTIDA.bat", "COLETAR.bat", 
                     "ARENA.sh", "VERIFICAR.sh", "PARTIDA.sh", "ARENA.desktop"]
 # Linux: o que roda direto (a permissao de executar vai marcada no zip; sem
 # ela, o ARENA.sh e o ARENA dao um jeito, ver servidor\achar_python.sh).
-EXECUTAVEIS_DO_LINUX = ["*.sh", "*.desktop", "*.appimage", "python3.13"]
+EXECUTAVEIS_DO_LINUX = ["*.sh", "*.desktop", "*.appimage", "python3.13", "java", "keytool", "rmiregistry",
+                        "jspawnhelper"]
 # Do ferramentas\, so o que o COLETAR.bat usa.
 FERRAMENTAS = ["coletar_maquina.py", "medir_arena.py"]
 # Jogo pequeno do proprio projeto para conferir que o RetroArch da versao
@@ -326,12 +327,15 @@ def partes_do_linux():
         origem = os.path.join(ra, "cores", nome)
         if os.path.isfile(origem):
             lista.append((origem, os.path.join("retroarch", "cores", nome)))
-    for pasta in (os.path.join("autoconfig", "udev"), os.path.join("autoconfig", "linuxraw"), "bibliotecas-linux"):
-        for atual, _subs, nomes in os.walk(os.path.join(ra, pasta)):
+    emuladores = os.path.join(RAIZ, "emuladores")
+    # O Java do Java ME para Linux (emuladores\Java\linux) vai junto com as
+    # pastas de programa do Linux.
+    for pasta in (os.path.join(ra, "autoconfig", "udev"), os.path.join(ra, "autoconfig", "linuxraw"),
+                  os.path.join(ra, "bibliotecas-linux"), os.path.join(emuladores, "Java", "linux")):
+        for atual, _subs, nomes in os.walk(pasta):
             for nome in sorted(nomes):
                 origem = os.path.join(atual, nome)
                 lista.append((origem, os.path.relpath(origem, RAIZ)))
-    emuladores = os.path.join(RAIZ, "emuladores")
     for emu, pasta in (("PCSX2", "PCSX2"), ("RPCS3", "RPCS3"), ("Xenia", "Xenia")):
         onde = os.path.join(emuladores, emu, pasta)
         for nome in (sorted(os.listdir(onde)) if os.path.isdir(onde) else []):

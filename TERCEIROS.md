@@ -36,6 +36,7 @@ por voluntários para qualquer um copiar.
 | PCSX2 2.8.2 para Linux (AppImage oficial) | GPL-3.0 ou posterior | <https://github.com/PCSX2/pcsx2> | `emuladores\PCSX2\PCSX2` |
 | RPCS3 0.0.42 para Linux (AppImage oficial) | GPL-2.0 | <https://github.com/RPCS3/rpcs3> | `emuladores\RPCS3\RPCS3` |
 | Xenia Canary para Linux (AppImage oficial) | BSD-3-Clause | <https://github.com/xenia-canary/xenia-canary> | `emuladores\Xenia\Xenia` |
+| Java do Java ME para Linux: o mesmo OpenJDK 21 (Eclipse Temurin), reduzido com o jlink | GPL-2.0 com a exceção Classpath (os textos vão em emuladores\Java\linux\legal) | <https://github.com/adoptium/temurin21-binaries> | `emuladores\Java\linux` |
 
 Não vem no ARENA, mas o ARENA usa se estiver no computador de quem comprou:
 o **Lossless Scaling** (programa pago, da Steam). Ele não é distribuído
@@ -135,7 +136,7 @@ Código-fonte fora do libretro:
 
 - `freej2me_libretro.dll`: <https://github.com/TASEmulators/freej2me-plus/tree/8f87bf1497e7a9738a32d1909379376a1faca7dd>
 
-## Núcleos do RetroArch no Linux (61)
+## Núcleos do RetroArch no Linux (63)
 
 Os mesmos núcleos, na versão para Linux do mesmo RetroArch 1.22.2 (o
 `RetroArch_cores.7z` do libretro): ficam ao lado dos do Windows, em
@@ -146,6 +147,7 @@ código-fonte. Só a extensão muda: `.so` no lugar de `.dll`.
 |---|---|---|
 | Sinclair - ZX 81 (EightyOne) | `81_libretro.so` | GPLv3 |
 | Atari - 5200 (a5200) | `a5200_libretro.so` | GPLv2 |
+| Apple II (AppleWin) | `applewin_libretro.so` | GPLv2 |
 | Arduboy (Ardens) | `ardens_libretro.so` | MIT |
 | Atari - 400/800/600XL/800XL/130XE/5200 (Atari800) | `atari800_libretro.so` | GPLv2 |
 | MSX/SVI/ColecoVision/SG-1000 (blueMSX) | `bluemsx_libretro.so` | GPLv2 |
@@ -156,6 +158,7 @@ código-fonte. Só a extensão muda: `.so` no lugar de `.dll`.
 | Nintendo - NES / Famicom (FCEUmm) | `fceumm_libretro.so` | GPLv2 |
 | Sega - Dreamcast/Naomi (Flycast) | `flycast_libretro.so` | GPLv2 |
 | Mattel - Intellivision (FreeIntv) | `freeintv_libretro.so` | GPLv3 |
+| Mobile - J2ME (FreeJ2ME-Plus) | `freej2me_libretro.so` | GPLv3 |
 | Sinclair - ZX Spectrum (Fuse) | `fuse_libretro.so` | GPLv3 |
 | Nintendo - Game Boy / Color (Gambatte) | `gambatte_libretro.so` | GPLv2 |
 | Coleco - ColecoVision (Gearcoleco) | `gearcoleco_libretro.so` | GPLv3 |

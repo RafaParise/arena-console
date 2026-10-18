@@ -27,7 +27,15 @@ ferramenta poe no lugar:
      servidor\plataforma.py): o PCSX2 2.8.2 (PS2), o RPCS3 0.0.42-20058
      (PS3) e o Xenia Canary 0bd090d (Xbox 360), os AppImage oficiais. O
      GameCube e o Wii vao pelo nucleo do Dolphin (o Dolphin nao publica
-     versao portatil para Linux).
+     versao portatil para Linux);
+  6. os dois nucleos que o 1.22.2 do Linux nao tem: o do Java ME, o .so do
+     mesmo FreeJ2ME-Plus 1.52 do .dll do Windows (o zip do projeto traz os
+     dois), e o do Apple II (AppleWin), o "nightly" do libretro (so ele tem
+     o do Linux; a marca muda a cada dia, entao a ferramenta confere que e'
+     um programa do Linux e mostra a marca do que baixou); e o Java do Java
+     ME para Linux em emuladores\Java\linux, o mesmo Temurin 21 do Windows,
+     reduzido com o jlink: o jlink do JDK do Windows monta o Java do Linux
+     quando recebe os modulos (jmods) do JDK do Linux da mesma versao.
 
 Cada download confere a marca SHA-256: a do Python, pela lista oficial do
 projeto; a do RetroArch (o buildbot nao publica), pela do arquivo baixado em
@@ -102,6 +110,30 @@ EXTERNOS = [
      "https://github.com/xenia-canary/xenia-canary/releases/download/0bd090d/xenia_canary_linux.AppImage",
      "046bb14ae1a4130eeb237a365706fb6aa6df77323494894f7189e2b7d2cbdaad", 17832440),
 ]
+# Os nucleos que faltam no 1.22.2 do Linux (ver o topo, item 6).
+FREEJ2ME = {
+    "endereco": "https://github.com/TASEmulators/freej2me-plus/releases/download/1.52/freej2me_libretro-v1.52.zip",
+    "arquivo": os.path.join("linux-nucleos", "freej2me_libretro-v1.52.zip"),
+    "sha256": "454ca45b0e19e630624f54f9f35ae2e7a0d69df0981bab0d251440eaa8ad9cef",
+    "tamanho": 83399,
+}
+APPLEWIN = "https://buildbot.libretro.com/nightly/linux/x86_64/latest/applewin_libretro.so.zip"
+# O Java do Java ME (o mesmo de ferramentas\preparar_java.py, 21.0.12.1+1).
+JDK_WINDOWS = {
+    "endereco": ("https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.12.1%2B1/"
+                 "OpenJDK21U-jdk_x64_windows_hotspot_21.0.12.1_1.zip"),
+    "arquivo": os.path.join("java", "OpenJDK21U-jdk_x64_windows_hotspot_21.0.12.1_1.zip"),
+    "sha256": "f9d6e191ab098c0d416e7d588a24420a8621cd2f4720dab2459b8b7b2d2d8b4e",
+    "tamanho": 205073461,
+}
+JDK_LINUX = {
+    "endereco": ("https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.12.1%2B1/"
+                 "OpenJDK21U-jdk_x64_linux_hotspot_21.0.12.1_1.tar.gz"),
+    "arquivo": os.path.join("java", "OpenJDK21U-jdk_x64_linux_hotspot_21.0.12.1_1.tar.gz"),
+    "sha256": "ce79869e1307ed8ee1e2baa86a412b1eb5b75d10a01006d788a6f968bcfaee94",
+    "tamanho": 207473347,
+}
+MODULOS_JAVA = ["java.base", "java.desktop", "java.rmi"]
 DENTRO_DO_7Z = "RetroArch-Linux-x86_64"
 APPIMAGE = "RetroArch-Linux-x86_64.AppImage"
 PERFIS_DE_CONTROLE = ("udev", "linuxraw")
@@ -270,6 +302,69 @@ def preparar_bibliotecas():
           % (tamanho_jack, LIBGOMP["nome"], len(dados) // 1024), flush=True)
 
 
+def preparar_nucleos_que_faltam():
+    """O freej2me_libretro.so (do zip do projeto, com a marca) e o
+    applewin_libretro.so (o nightly do libretro, conferido como programa do
+    Linux)."""
+    import zipfile
+    cores = os.path.join(RAIZ, "retroarch", "cores")
+    with zipfile.ZipFile(baixado(FREEJ2ME)) as pacote:
+        dados = pacote.read("freej2me_libretro.so")
+    with open(os.path.join(cores, "freej2me_libretro.so"), "wb") as saida:
+        saida.write(dados)
+    print("  nucleo do Java ME para Linux: freej2me_libretro.so (FreeJ2ME-Plus 1.52)", flush=True)
+    print("Baixando applewin_libretro.so.zip (nightly)...", flush=True)
+    with urllib.request.urlopen(APPLEWIN, timeout=60) as resposta:
+        conteudo = resposta.read()
+    with zipfile.ZipFile(io.BytesIO(conteudo)) as pacote:
+        dados = pacote.read("applewin_libretro.so")
+    if dados[:4] != b"\x7fELF" or b"retro_api_version" not in dados:
+        raise SystemExit("O applewin_libretro.so que chegou nao e' um nucleo do Linux. Nada foi mudado.")
+    with open(os.path.join(cores, "applewin_libretro.so"), "wb") as saida:
+        saida.write(dados)
+    print("  nucleo do Apple II para Linux: applewin_libretro.so (nightly, marca %s)"
+          % hashlib.sha256(dados).hexdigest(), flush=True)
+
+
+def preparar_java_linux(trabalho):
+    """O Java do Java ME para Linux, em emuladores\\Java\\linux (ver o topo)."""
+    import zipfile
+    jdk_windows = os.path.join(trabalho, "jdk-windows")
+    print("  montando o Java do Linux (jlink)...", flush=True)
+    with zipfile.ZipFile(baixado(JDK_WINDOWS)) as pacote:
+        pacote.extractall(jdk_windows)
+    jlink = next(os.path.join(atual, "jlink.exe") for atual, _s, nomes in os.walk(jdk_windows) if "jlink.exe" in nomes)
+    jmods = os.path.join(trabalho, "jmods-linux")
+    os.makedirs(jmods)
+    with tarfile.open(baixado(JDK_LINUX), "r:gz") as pacote:
+        for item in pacote.getmembers():
+            if item.isfile() and "/jmods/" in item.name and item.name.endswith(".jmod"):
+                with pacote.extractfile(item) as origem, open(os.path.join(jmods, os.path.basename(item.name)),
+                                                              "wb") as saida:
+                    shutil.copyfileobj(origem, saida, 1 << 20)
+    destino = os.path.join(RAIZ, "emuladores", "Java", "linux")
+    montando = destino + ".montando"
+    if os.path.isdir(montando):
+        limpeza.apagar_pasta(montando)
+    subprocess.run([jlink, "--module-path", jmods, "--add-modules", ",".join(MODULOS_JAVA), "--strip-debug",
+                    "--no-header-files", "--no-man-pages", "--compress=zip-9", "--output", montando], check=True)
+    with open(os.path.join(montando, "release"), encoding="utf-8") as arquivo:
+        release = arquivo.read()
+    cabecas = []
+    for programa in (("bin", "java"), ("lib", "server", "libjvm.so")):
+        with open(os.path.join(montando, *programa), "rb") as arquivo:
+            cabecas.append(arquivo.read(4))
+    # O release do jlink de outro sistema so diz a versao e os modulos; o
+    # que prova que e' do Linux e' o formato dos programas (ELF).
+    if 'JAVA_VERSION="21.0.12.1"' not in release or cabecas != [b"\x7fELF"] * 2:
+        raise SystemExit("O Java do Linux nao saiu como devia (release: %s). Nada foi mudado." % release[:200])
+    if os.path.isdir(destino):
+        limpeza.apagar_pasta(destino)
+    os.replace(montando, destino)
+    total = sum(os.path.getsize(os.path.join(a, n)) for a, _s, ns in os.walk(destino) for n in ns)
+    print("  Java do Java ME para Linux: emuladores\\Java\\linux (%.0f MB)" % (total / 1048576), flush=True)
+
+
 def preparar_externos():
     """Os AppImage dos emuladores de fora, ao lado dos .exe do Windows."""
     for pasta, endereco, sha256, tamanho in EXTERNOS:
@@ -290,10 +385,13 @@ def principal():
         print("Preparando o ARENA para Linux...", flush=True)
         preparar_retroarch(sete, os.path.join(trabalho, "ra"))
         faltam = preparar_nucleos(sete, os.path.join(trabalho, "nucleos"))
+        preparar_nucleos_que_faltam()
+        faltam = [n for n in faltam if not os.path.isfile(os.path.join(RAIZ, "retroarch", "cores", n))]
         preparar_bibliotecas()
         preparar_python(trabalho)
         if "--sem-externos" not in sys.argv:
             preparar_externos()
+        preparar_java_linux(trabalho)
         print("Pronto. No Linux, o ARENA abre pelo ARENA.sh.")
         if faltam:
             print("Estes consoles ficam so no Windows (o libretro nao tem o nucleo para Linux): %s" % ", ".join(faltam))

@@ -406,7 +406,14 @@ if not plataforma.WINDOWS:
 # O Java ME abre o Java que vem no ARENA (servidor\java_do_arena.py). Sem a
 # pasta emuladores\Java, os jogos de celular so abrem se o computador tiver
 # Java instalado (15/10/2026).
-if "freej2me_libretro.dll" in [n.lower() for n in cores] and plataforma.WINDOWS:
+if "freej2me_libretro.dll" in [n.lower() for n in cores] and not plataforma.WINDOWS:
+    if os.path.isfile(caminho("emuladores", "Java", "linux", "bin", "java")):
+        print("  ok     Java do ARENA para Linux (para o Java ME) em emuladores/Java/linux")
+    else:
+        atencao.append("falta o Java do ARENA para Linux (emuladores/Java/linux)")
+        print("  FALTA  o Java do ARENA para Linux, em emuladores/Java/linux")
+        print("         Sem ele, os jogos de Java ME so abrem se o computador tiver Java.")
+elif "freej2me_libretro.dll" in [n.lower() for n in cores]:
     if os.path.isfile(caminho("emuladores", "Java", "bin", "javaw.exe")):
         print("  ok     Java do ARENA (para o Java ME) em emuladores\\Java")
     else:
