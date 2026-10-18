@@ -31,8 +31,10 @@ ferramenta poe no lugar:
   6. os dois nucleos que o 1.22.2 do Linux nao tem: o do Java ME, o .so do
      mesmo FreeJ2ME-Plus 1.52 do .dll do Windows (o zip do projeto traz os
      dois), e o do Apple II (AppleWin), o "nightly" do libretro (so ele tem
-     o do Linux; a marca muda a cada dia, entao a ferramenta confere que e'
-     um programa do Linux e mostra a marca do que baixou); e o Java do Java
+     o do Linux). O nightly muda de um dia para o outro no mesmo endereco:
+     vale o conferido em 18/10/2026 (a marca fica aqui, e o arquivo, no
+     cache de quem monta). Um nightly diferente so entra se alguem conferir
+     e confirmar a marca nova (--aceitar-applewin=<marca>); e o Java do Java
      ME para Linux em emuladores\Java\linux, o mesmo Temurin 21 do Windows,
      reduzido com o jlink: o jlink do JDK do Windows monta o Java do Linux
      quando recebe os modulos (jmods) do JDK do Linux da mesma versao.
@@ -43,7 +45,7 @@ projeto; a do RetroArch (o buildbot nao publica), pela do arquivo baixado em
 (7-zip.org, livre) no computador de quem monta o pacote.
 
 Uso:
-    servidor\python\python.exe ferramentas\preparar_linux.py [--sem-externos]
+    servidor\python\python.exe ferramentas\preparar_linux.py [--sem-externos] [--aceitar-applewin=<marca>]
 """
 import hashlib
 import io
@@ -117,7 +119,13 @@ FREEJ2ME = {
     "sha256": "454ca45b0e19e630624f54f9f35ae2e7a0d69df0981bab0d251440eaa8ad9cef",
     "tamanho": 83399,
 }
-APPLEWIN = "https://buildbot.libretro.com/nightly/linux/x86_64/latest/applewin_libretro.so.zip"
+APPLEWIN = {
+    "endereco": "https://buildbot.libretro.com/nightly/linux/x86_64/latest/applewin_libretro.so.zip",
+    "arquivo": os.path.join("linux-nucleos", "applewin_libretro.so.zip"),
+    # O nightly de 17/10/2026 (04:49 GMT), o que foi aberto no ARENA do Linux.
+    "sha256": "57fb09796e4316cb238b1c124589de77a9846da2d2f053fb9033fc010e6de063",
+    "tamanho": 1508030,
+}
 # O Java do Java ME (o mesmo de ferramentas\preparar_java.py, 21.0.12.1+1).
 JDK_WINDOWS = {
     "endereco": ("https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.12.1%2B1/"
@@ -313,16 +321,30 @@ def preparar_nucleos_que_faltam():
     with open(os.path.join(cores, "freej2me_libretro.so"), "wb") as saida:
         saida.write(dados)
     print("  nucleo do Java ME para Linux: freej2me_libretro.so (FreeJ2ME-Plus 1.52)", flush=True)
-    print("Baixando applewin_libretro.so.zip (nightly)...", flush=True)
-    with urllib.request.urlopen(APPLEWIN, timeout=60) as resposta:
-        conteudo = resposta.read()
-    with zipfile.ZipFile(io.BytesIO(conteudo)) as pacote:
+    applewin = dict(APPLEWIN)
+    aceita = next((a.split("=", 1)[1] for a in sys.argv if a.startswith("--aceitar-applewin=")), None)
+    if aceita:
+        # Quem monta conferiu o nightly novo e confirma a marca dele.
+        applewin["sha256"] = aceita.lower()
+        applewin.pop("tamanho")
+    caminho_zip = os.path.join(CACHE, applewin["arquivo"])
+    if os.path.isfile(caminho_zip) and marca(caminho_zip) != applewin["sha256"]:
+        print("O applewin_libretro.so.zip do cache tem outra marca (%s): baixando de novo." % marca(caminho_zip))
+        os.remove(caminho_zip)
+    try:
+        caminho_zip = baixado(applewin)
+    except SystemExit:
+        novo = os.path.join(CACHE, applewin["arquivo"])
+        raise SystemExit("O nightly do AppleWin mudou desde 18/10/2026 (marca nova: %s). Confira o arquivo\n"
+                         "  %s\nantes de usar e, se estiver certo, rode de novo com --aceitar-applewin=<marca nova>.\n"
+                         "Nada foi mudado." % (marca(novo) if os.path.isfile(novo) else "?", novo))
+    with zipfile.ZipFile(caminho_zip) as pacote:
         dados = pacote.read("applewin_libretro.so")
     if dados[:4] != b"\x7fELF" or b"retro_api_version" not in dados:
         raise SystemExit("O applewin_libretro.so que chegou nao e' um nucleo do Linux. Nada foi mudado.")
     with open(os.path.join(cores, "applewin_libretro.so"), "wb") as saida:
         saida.write(dados)
-    print("  nucleo do Apple II para Linux: applewin_libretro.so (nightly, marca %s)"
+    print("  nucleo do Apple II para Linux: applewin_libretro.so (nightly de 17/10/2026, marca %s)"
           % hashlib.sha256(dados).hexdigest(), flush=True)
 
 
