@@ -2133,6 +2133,12 @@ def avaliar_plataformas(forcar=False):
             # sistema do RetroArch importam: quem manda e ele.
             estado = "pronta"
             motivo = ""
+        elif not core_ok and plataforma_do_sistema.ANDROID:
+            # No Android nao ha emulador de fora, e o nucleo que nao veio no APK
+            # nao se baixa (o Java ME precisa de Java; o PS3 e o Xbox 360 nao
+            # tem versao para Android): o console fica no computador.
+            estado = "falta_externo" if (plataforma.get("externo") or {}).get("obrigatorio") else "sem_core"
+            motivo = "Este console não tem versão para Android: jogue ele no computador, com a mesma pasta do ARENA."
         elif not core_ok:
             externo_obrigatorio = (plataforma.get("externo") or {}).get("obrigatorio")
             if externo_obrigatorio and not plataforma["core"]:

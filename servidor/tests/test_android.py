@@ -558,6 +558,29 @@ class Lentidao(unittest.TestCase):
         self.assertEqual([b["id"] for b in barreiras.avaliar_android(fatos)], ["memoria"])
 
 
+class Catalogo(unittest.TestCase):
+    """Os consoles no Android: os nucleos do APK contam, e o console sem
+    versao para Android diz que fica no computador."""
+
+    def test_os_consoles_no_android(self):
+        import arena
+        nucleos = ["fceumm_libretro_android.so", "snes9x_libretro_android.so"]
+        antes = (arena._cache["catalogo"], arena._cache["plataformas"])
+        try:
+            with no_android(), mock.patch.object(ponte_android, "_NUCLEOS", {"lista": nucleos}), \
+                    mock.patch.object(arena.graficos, "achar_externo", return_value=(None, None)):
+                arena._cache["catalogo"] = None
+                arena._cache["plataformas"] = (0.0, None)
+                consoles = {p["id"]: p for p in arena.avaliar_plataformas(forcar=True)}
+        finally:
+            arena._cache["catalogo"], arena._cache["plataformas"] = antes
+        self.assertNotIn(consoles["nes"]["estado"], ("sem_core", "falta_externo"))
+        for console in ("ps3", "j2me"):
+            self.assertIn(consoles[console]["estado"], ("sem_core", "falta_externo"), console)
+            self.assertIn("não tem versão para Android", consoles[console]["motivo"], console)
+            self.assertNotIn("emuladores", consoles[console]["motivo"], console)
+
+
 class Hardware(unittest.TestCase):
     def test_o_que_o_app_conta(self):
         ambiente = {"ARENA_ANDROID_GPU": "Adreno (TM) 610", "ARENA_ANDROID_PROCESSADOR": "Qualcomm SM6125",
