@@ -8,6 +8,8 @@ Preparar a mídia e montar o ARENA. Faça uma vez; depois é copiar e colar.
 - Parte B — Instalação (o jeito fácil: baixar o ARENA pronto do GitHub; ou
   montar peça por peça)
 - Parte C — No Chromebook (o mesmo pen drive, dentro do Chrome)
+- Parte D — No Linux (o mesmo pen drive, sem instalar nada)
+- Parte E — No celular ou no tablet Android (o app do ARENA)
 
 ---
 
@@ -552,3 +554,50 @@ emuladores do Linux usando a mesma pasta de dados dos do Windows. Para
 conferir a pasta, `sh VERIFICAR.sh`. Os detalhes estão em `docs\LINUX.md`.
 
 ---
+
+## Parte E — No celular ou no tablet Android
+
+O mesmo ARENA, num app: a mesma tela, o mesmo Jogar Junto, os mesmos jogos e
+saves do Windows. Precisa do Android 7 ou mais novo.
+
+1. **Baixar.** Na página de *Releases* do ARENA no GitHub, baixe o
+   `ARENA-...-arm64-v8a.apk` (quase todo celular e tablet). O `x86_64` é só
+   para Chromebook com processador Intel e para o emulador de testes.
+2. **Instalar.** Abra o arquivo baixado. O Android pergunta se deixa o
+   navegador (ou o Arquivos) instalar apps de fora da loja: permita. O ARENA
+   não vem da Play Store; o APK é assinado pelo ARENA, e a versão seguinte
+   instala por cima, sem perder nada.
+3. **Abrir.** Na primeira vez, o ARENA pede para ver os arquivos do
+   aparelho (permita: é para achar a pasta do ARENA) e leva uns segundos se
+   preparando. Sem pasta do ARENA no aparelho, ele abre com 8 jogos livres
+   que vêm junto.
+4. **Os seus jogos.** Copie a pasta do ARENA do pen drive para a memória do
+   aparelho ou para o cartão (ou ligue o pen drive pelo cabo OTG). Em
+   **Ajustes → A pasta do ARENA neste aparelho**, escolha a pasta; se houver
+   uma só, o ARENA já usa ela na primeira abertura. Os jogos, as BIOS e os
+   saves são os do computador.
+   - Alguns Android só deixam ler no cartão: o ARENA avisa, os jogos abrem
+     de lá e os saves ficam no aparelho. O botão **Deixar gravar no
+     cartão** abre a tela do Android que libera.
+5. **Jogar.** Sem controle, o jogo mostra um controle desenhado na tela;
+   com um controle ligado (pelo cabo OTG ou por Bluetooth), ele some. Para
+   sair do jogo, o botão **voltar** do aparelho abre o menu do RetroArch:
+   escolha **Sair do RetroArch**. Num teclado, o **F10** duas vezes.
+6. **Jogar Junto.** Como no computador: os dois aparelhos na mesma rede
+   Wi-Fi, com **Aceitar conexões** ligado em quem hospeda.
+
+O que muda no Android:
+
+- Os **recordes e o apelido ficam no aparelho**: a pasta do ARENA no
+  cartão ou na memória é aberta a outros apps, e esses são dados de aluno.
+  Para levar os recordes a outro ARENA, use a sincronização (Amigos).
+- Os filtros de tela do ARENA só valem com o motor **Vulkan** (Ajustes →
+  Avançado → Motor gráfico); no padrão do Android (o `gl`), o jogo sai sem
+  filtro.
+- Não há o Java ME, o PS3 nem o Xbox 360 (não têm versão para Android); o
+  PS2, o GameCube e o Wii vão pelos núcleos do RetroArch, em aparelho bom.
+- Enquanto o ARENA está aberto, o Android mostra "ARENA aberto" na barra:
+  é o que deixa o ARENA aberto durante o jogo. Para fechar de vez, tire o
+  ARENA da tela dos apps abertos.
+
+Os detalhes estão em `docs/ANDROID.md`.
