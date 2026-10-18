@@ -3,18 +3,27 @@ r"""O ARENA no Android, no emulador (item 14 do plano de 15/10/2026).
 
 Num aparelho virtual (o emulador do AOSP, com o Android 15 de codigo aberto:
 ferramentas\preparar_android.py), sem janela, o APK de teste do ARENA
-(ferramentas\montar_android.py --abi x86_64 --teste):
+(ferramentas\montar_android.py --abi x86_64 --teste), instalado do zero:
 
   A. instala e ganha a permissao de arquivos, como o aluno daria;
-  B. a tela do ARENA abre (a foto da tela tem imagem de verdade) e a pagina
-     carrega sem erro, com a ponte do Android e os nucleos do APK;
-  C. a pasta do ARENA no aparelho: o teste poe uma (/sdcard/ARENA, com um
-     jogo livre de CHIP-8 em jogos/pessoais), a pagina acha e o jogo entra
-     na lista;
-  D. um jogo livre que vem no APK abre no RetroArch nativo (a tela de cima e'
-     a do RetroArch, e a foto tem a imagem do jogo) e, de volta a tela do
-     ARENA, o tempo de jogo conta;
-  E. o jogo da pasta do ARENA abre do mesmo jeito.
+  B. o teste poe uma pasta do ARENA no aparelho (/sdcard/ARENA, com um jogo
+     livre de CHIP-8 e um de MSX), e o ARENA abre: o servidor de verdade
+     (o mesmo do Windows, com o Python do APK) sobe, a tela de sempre carrega
+     do 127.0.0.1:8777 e a pasta do ARENA e' achada sozinha (so ha uma);
+  C. o /api/estado diz "android", a pasta escolhida e o RetroArch do APK; a
+     lista tem os dois jogos da pasta;
+  D. o jogo de CHIP-8 abre no RetroArch nativo (a tela de cima e' a do
+     RetroArch, e a foto tem a imagem do jogo); o F10 duas vezes (a tecla de
+     sair do ARENA) fecha o jogo, e o servidor ve o processo do RetroArch
+     terminar, como ve o retroarch.exe no Windows;
+  E. a partida a dois: o jogo de MSX hospedado (o --host que o RetroArch do
+     Android so aceita pelo remendo android\retroarch\arena-args.patch) e a
+     porta 55435 escutando dentro do aparelho;
+  F. "Usar a pasta do app": o servidor reabre (o segredo novo, a tela
+     recarrega sozinha) e a lista passa a ter os jogos livres do APK; um
+     deles abre;
+  G. o segredo: o mesmo /api/estado pedido de fora da tela do ARENA (pelo
+     adb, chegando como um pedido do proprio aparelho) e' recusado (403).
 
 A pagina e' lida pelo protocolo de depuracao do WebView (o APK de teste
 deixa), pelo adb. No fim, o emulador desliga (--manter-ligado para nao).
@@ -29,6 +38,7 @@ import socket
 import subprocess
 import sys
 import time
+import urllib.error
 import urllib.request
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
@@ -43,9 +53,13 @@ ADB = os.path.join(sdk.SDK, "platform-tools", "adb.exe")
 EMULADOR = os.path.join(sdk.SDK, "emulator", "emulator.exe")
 PACOTE = "io.github.rafaparise.arena"
 TELA_DO_ARENA = PACOTE + "/io.github.rafaparise.arena.ArenaActivity"
+SERVIDOR = "http://127.0.0.1:8777"
 FOTOS = os.path.join(os.environ.get("TEMP", "."), "teste_android_fotos")
 PORTA_DE_DEPURACAO = 9333
-SEGUNDOS_DE_JOGO = 35          # partida de 30 s ou menos nao conta tempo (rotas.js)
+PORTA_DE_FORA = 8778           # o adb leva para o 8777 do aparelho (o pedido sem o segredo)
+PORTA_DA_PARTIDA = 55435
+SEGUNDOS_DE_JOGO = 35          # partida curta demais nao conta tempo
+F10 = "140"                    # a tecla de sair do jogo do ARENA (input_exit_emulator), duas vezes
 
 
 def adb(*argumentos, segundos=120):
@@ -107,32 +121,31 @@ def tela_de_cima():
     return ""
 
 
-class Pagina:
-    """A pagina do ARENA no WebView, pelo protocolo de depuracao (CDP)."""
+def processo_do_retroarch():
+    """O pid do processo principal do app (o do RetroArch), ou ""."""
+    return adb_texto("shell", "pidof", PACOTE).strip()
 
-    def __init__(self):
-        pid = ""
-        for _ in range(30):
+
+class Pagina:
+    """A tela do ARENA no WebView, pelo protocolo de depuracao (CDP)."""
+
+    def __init__(self, endereco=SERVIDOR, segundos=240):
+        fim = time.monotonic() + segundos
+        alvo = None
+        while time.monotonic() < fim and not alvo:
             pid = adb_texto("shell", "pidof", PACOTE + ":tela").strip()
             if pid:
-                break
-            time.sleep(1)
-        if not pid:
-            raise SystemExit("A tela do ARENA (o processo :tela) nao abriu.")
-        adb("forward", "tcp:%d" % PORTA_DE_DEPURACAO, "localabstract:webview_devtools_remote_%s" % pid)
-        alvo = None
-        for _ in range(30):
-            try:
-                with urllib.request.urlopen("http://127.0.0.1:%d/json" % PORTA_DE_DEPURACAO, timeout=5) as r:
-                    paginas = json.loads(r.read())
-                alvo = next((p for p in paginas if "arena.local" in p.get("url", "")), None)
-            except (OSError, ValueError):
-                alvo = None
-            if alvo:
-                break
-            time.sleep(1)
+                adb("forward", "tcp:%d" % PORTA_DE_DEPURACAO, "localabstract:webview_devtools_remote_%s" % pid)
+                try:
+                    with urllib.request.urlopen("http://127.0.0.1:%d/json" % PORTA_DE_DEPURACAO, timeout=5) as r:
+                        paginas = json.loads(r.read())
+                    alvo = next((p for p in paginas if p.get("url", "").startswith(endereco)), None)
+                except (OSError, ValueError):
+                    alvo = None
+            if not alvo:
+                time.sleep(2)
         if not alvo:
-            raise SystemExit("Nao achei a pagina do ARENA no WebView (o APK e' o de teste?).")
+            raise SystemExit("A tela do servidor do ARENA (%s) nao apareceu no WebView em %d s." % (endereco, segundos))
         self.ws = _WebSocket(alvo["webSocketDebuggerUrl"])
         self.n = 0
 
@@ -151,32 +164,58 @@ class Pagina:
                 return resultado.get("result", {}).get("value")
 
     def pedir(self, rota, corpo=None):
-        opcoes = "{}" if corpo is None else json.dumps({"method": "POST", "body": json.dumps(corpo)})
-        return self.avaliar("fetch(%s, %s).then(r => r.json())" % (json.dumps(rota), opcoes))
+        """Um pedido da propria tela (com o cookie do segredo, como o app.js)."""
+        opcoes = {"headers": {"Content-Type": "application/json"}}
+        if corpo is not None:
+            opcoes.update(method="POST", body=json.dumps(corpo))
+        return self.avaliar("fetch(%s, %s).then(r => r.json()).catch(e => ({erro: String(e)}))"
+                            % (json.dumps(rota), json.dumps(opcoes)))
 
     def fechar(self):
-        self.ws.fechar()
+        try:
+            self.ws.fechar()
+        except OSError:
+            pass
         adb("forward", "--remove", "tcp:%d" % PORTA_DE_DEPURACAO)
 
 
 def esperar(condicao, segundos):
     fim = time.monotonic() + segundos
     while time.monotonic() < fim:
-        if condicao():
-            return True
+        try:
+            if condicao():
+                return True
+        except (OSError, RuntimeError, ValueError):
+            pass
         time.sleep(1)
     return False
 
 
-def jogar(pagina, jogo, resultado, falhas, rotulo):
+def sair_do_jogo():
+    """O F10 duas vezes (input_exit_emulator, com o quit_press_twice do ARENA).
+    Se o RetroArch nao fechar, o adb root fecha o processo dele."""
+    for _ in range(2):
+        adb("shell", "input", "keyevent", F10)
+        time.sleep(1.5)
+    if esperar(lambda: not processo_do_retroarch(), 20):
+        return "F10"
+    adb("root", segundos=60)
+    time.sleep(3)
+    pid = processo_do_retroarch()
+    if pid:
+        adb("shell", "kill", pid)
+    return "kill"
+
+
+def jogar(pagina, jogo, resultado, falhas, rotulo, extra=None, durante=None):
     """Abre o jogo pela rota da tela, confere o RetroArch na frente e a foto,
-    volta para a tela do ARENA e confere que o tempo contou."""
+    fecha pelo F10 e confere que o servidor viu o jogo terminar."""
     antes = time.monotonic()
-    resposta = pagina.pedir("/api/jogar", {"jogo_id": jogo["id"]})
-    if not resposta or resposta.get("ok") is False:
+    resposta = pagina.pedir("/api/jogar", dict({"jogo_id": jogo["id"]}, **(extra or {})))
+    if not resposta or resposta.get("ok") is False or resposta.get("erro"):
         falhas.append("%s: /api/jogar respondeu %s" % (rotulo, resposta))
         return
-    abriu = esperar(lambda: "RetroActivityFuture" in tela_de_cima(), 60)
+    abriu = esperar(lambda: "RetroActivityFuture" in tela_de_cima(), 90)
     resultado[rotulo + "_abriu_s"] = round(time.monotonic() - antes, 1)
     if not abriu:
         falhas.append("%s: o RetroArch nao ficou na frente (%s)" % (rotulo, tela_de_cima()))
@@ -186,15 +225,51 @@ def jogar(pagina, jogo, resultado, falhas, rotulo):
     resultado[rotulo + "_foto"] = {"arquivo": caminho, "cores": cores, "a_mais_comum": round(maior, 3)}
     if cores < 2 or maior > 0.995:
         falhas.append("%s: a tela do jogo nao tem imagem (%d cores)" % (rotulo, cores))
+    if durante:
+        durante()
     time.sleep(max(0, SEGUNDOS_DE_JOGO - (time.monotonic() - antes)))
-    adb("shell", "am", "start", "-n", TELA_DO_ARENA)            # de volta a tela do ARENA
+    resultado[rotulo + "_saiu_por"] = sair_do_jogo()
     voltou = esperar(lambda: "ArenaActivity" in tela_de_cima(), 30)
     if not voltou:
-        falhas.append("%s: a tela do ARENA nao voltou" % rotulo)
-        return
-    fechado = esperar(lambda: not (pagina.pedir("/api/estado") or {}).get("jogo_em_andamento", {}).get("ativo"), 30)
+        adb("shell", "am", "start", "-n", TELA_DO_ARENA)
+    fechado = esperar(lambda: not (pagina.pedir("/api/estado") or {}).get("jogo_em_andamento", {}).get("ativo"),
+                      30)
+    resultado[rotulo + "_fechou_s"] = round(time.monotonic() - antes, 1)
     if not fechado:
-        falhas.append("%s: a tela nao viu o jogo fechar" % rotulo)
+        falhas.append("%s: o servidor nao viu o jogo fechar" % rotulo)
+
+
+def porta_da_partida_escuta():
+    """O RetroArch hospedando: a porta 55435 de dentro do aparelho atende (pelo adb)."""
+    adb("forward", "tcp:%d" % PORTA_DA_PARTIDA, "tcp:%d" % PORTA_DA_PARTIDA)
+    try:
+        with socket.create_connection(("127.0.0.1", PORTA_DA_PARTIDA), timeout=5) as conexao:
+            conexao.settimeout(5)
+            try:
+                return len(conexao.recv(4)) > 0      # o RetroArch fala primeiro (o cabecalho do netplay)
+            except socket.timeout:
+                return True
+    except OSError:
+        return False
+    finally:
+        adb("forward", "--remove", "tcp:%d" % PORTA_DA_PARTIDA)
+
+
+def pedido_de_fora():
+    """O /api/estado pedido sem a tela do ARENA: pelo adb, ele chega ao
+    servidor como um pedido do proprio aparelho (o que outro app faria)."""
+    adb("forward", "tcp:%d" % PORTA_DE_FORA, "tcp:8777")
+    try:
+        pedido = urllib.request.Request("http://127.0.0.1:%d/api/estado" % PORTA_DE_FORA,
+                                        headers={"Host": "127.0.0.1:8777"})
+        with urllib.request.urlopen(pedido, timeout=10) as resposta:
+            return resposta.status
+    except urllib.error.HTTPError as erro:
+        return erro.code
+    except OSError as falha:
+        return str(falha)
+    finally:
+        adb("forward", "--remove", "tcp:%d" % PORTA_DE_FORA)
 
 
 def principal():
@@ -210,77 +285,106 @@ def principal():
     processo, ligou = ligar_emulador()
     resultado["emulador_ligou_s"] = round(ligou, 1)
     resultado["android"] = adb_texto("shell", "getprop", "ro.build.version.release").strip()
+    pagina = None
     try:
-        # A. instalar, com a permissao de arquivos (o aluno toca em Permitir)
+        # A. instalar do zero, com a permissao de arquivos (o aluno toca em Permitir)
+        adb("uninstall", PACOTE, segundos=120)
         antes = time.monotonic()
-        instalou = adb("install", "-r", apk, segundos=600)
+        instalou = adb("install", apk, segundos=600)
         resultado["instalou_s"] = round(time.monotonic() - antes, 1)
         if instalou.returncode != 0:
             raise SystemExit("O APK nao instalou: %s" % (instalou.stdout + instalou.stderr).decode("utf-8", "replace"))
         for permissao in ("READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"):
             adb("shell", "pm", "grant", PACOTE, "android.permission." + permissao)
-        # C. a pasta do ARENA no aparelho, com um jogo livre de CHIP-8
+        adb("shell", "appops", "set", PACOTE, "MANAGE_EXTERNAL_STORAGE", "allow")
+        # B. a pasta do ARENA no aparelho, com um jogo de CHIP-8 e um de MSX
         with open(os.path.join(RAIZ, "testes", "jogos_livres", "lista.json"), encoding="utf-8") as arquivo:
-            chip8 = next(j for j in json.load(arquivo)["arquivos"] if j["console"] == "chip8")
+            livres = json.load(arquivo)["arquivos"]
         adb("shell", "rm", "-rf", "/sdcard/ARENA")
-        adb("shell", "mkdir", "-p", "/sdcard/ARENA/jogos/pessoais/CHIP-8", "/sdcard/ARENA/retroarch")
-        adb("push", os.path.join(RAIZ, "testes", "jogos_livres", *chip8["origem"].split("/")),
-            "/sdcard/ARENA/jogos/pessoais/CHIP-8/" + os.path.basename(chip8["origem"]))
-        # B. a tela abre
-        adb("shell", "am", "force-stop", PACOTE)
+        for console, pasta_console in (("chip8", "CHIP-8"), ("msx", "MSX")):
+            item = next(j for j in livres if j["console"] == console)
+            adb("shell", "mkdir", "-p", "/sdcard/ARENA/jogos/%s" % pasta_console, "/sdcard/ARENA/retroarch")
+            adb("push", os.path.join(RAIZ, "testes", "jogos_livres", *item["origem"].split("/")),
+                "/sdcard/ARENA/jogos/%s/%s" % (pasta_console, os.path.basename(item["origem"])))
         adb("logcat", "-c")
         antes = time.monotonic()
         adb("shell", "am", "start", "-n", TELA_DO_ARENA)
         pagina = Pagina()
-        pronta = esperar(lambda: pagina.avaliar("!!(window.ArenaRotas && window.ArenaNoAparelho && "
-                                                "document.querySelector('#listaJogos, .jogos, main'))"), 60)
-        resultado["tela_abriu_s"] = round(time.monotonic() - antes, 1)
+        pronta = esperar(lambda: pagina.avaliar("document.readyState === 'complete' && !!window.fetch"), 60)
+        resultado["servidor_e_tela_s"] = round(time.monotonic() - antes, 1)
         if not pronta:
-            falhas.append("B: a pagina do ARENA nao ficou pronta")
-        time.sleep(3)
+            falhas.append("B: a tela do servidor nao terminou de carregar")
+        time.sleep(4)
         caminho, cores, maior = foto("tela")
         resultado["tela_foto"] = {"arquivo": caminho, "cores": cores, "a_mais_comum": round(maior, 3)}
         if cores < 3:
             falhas.append("B: a foto da tela do ARENA nao tem imagem")
-        sistema = pagina.avaliar("window.ArenaNoAparelho.sistema")
-        resultado["sistema"] = {k: sistema.get(k) for k in ("android", "abi", "modelo")}
-        resultado["nucleos_no_apk"] = len(sistema.get("nucleos", []))
-        if resultado["nucleos_no_apk"] < 50:
-            falhas.append("B: o APK veio com poucos nucleos (%d)" % resultado["nucleos_no_apk"])
-        # C. a pagina acha a pasta
-        situacao = pagina.avaliar("ArenaPasta.escolher().then(s => s, e => ({erro: String(e.message)}))")
-        resultado["pasta"] = situacao
-        if not (situacao or {}).get("tem"):
-            falhas.append("C: a pasta do ARENA no aparelho nao foi achada (%s)" % situacao)
-        pagina.avaliar("location.reload()")
-        time.sleep(2)
-        pagina.fechar()
-        pagina = Pagina()
-        esperar(lambda: pagina.avaliar("!!window.ArenaRotas"), 60)
+        # C. o estado e a lista
+        estado = pagina.pedir("/api/estado") or {}
+        android = estado.get("android") or {}
+        resultado["estado"] = {"sistema": estado.get("sistema_do_computador"), "pasta": android.get("pasta"),
+                               "so_leitura": android.get("so_leitura"), "retroarch": estado.get("retroarch_presente"),
+                               "cpu": (estado.get("maquina") or {}).get("cpu"),
+                               "gpu": ((estado.get("maquina") or {}).get("gpu") or {}).get("nome"),
+                               "nota": (estado.get("capacidade") or {}).get("nota")}
+        if estado.get("sistema_do_computador") != "android":
+            falhas.append("C: o servidor nao disse android (%s)" % (estado.get("erro") or estado.get("sistema_do_computador")))
+        if not str(android.get("pasta") or "").rstrip("/").endswith("/ARENA"):
+            falhas.append("C: a pasta do ARENA do aparelho nao foi escolhida sozinha (%s)" % android.get("pasta"))
+        if not estado.get("retroarch_presente"):
+            falhas.append("C: o servidor nao achou o RetroArch do APK")
         catalogo = pagina.pedir("/api/catalogo") or {}
         jogos = catalogo.get("jogos", [])
         resultado["jogos_na_lista"] = len(jogos)
-        livre = next((j for j in jogos if j.get("origem") == "vem_com"), None)
-        da_pasta = next((j for j in jogos if j.get("plataforma") == "chip8" and j.get("origem") != "vem_com"), None)
-        if not livre:
-            falhas.append("C: os jogos livres que vem no APK nao estao na lista")
-        if not da_pasta:
-            falhas.append("C: o jogo da pasta do ARENA nao entrou na lista")
-        # D e E. os jogos no RetroArch nativo
-        if livre:
-            jogar(pagina, livre, resultado, falhas, "D_livre")
-        if da_pasta:
-            jogar(pagina, da_pasta, resultado, falhas, "E_da_pasta")
-        # O que a pagina escreveu no console vai para o registro do Android
-        # (ArenaActivity.onConsoleMessage, com a etiqueta ARENA).
-        registro = adb_texto("logcat", "-d", "-s", "ARENA", segundos=60)
-        erros = [l.strip() for l in registro.splitlines() if "Uncaught" in l or "TypeError" in l
-                 or "ReferenceError" in l or "SyntaxError" in l]
-        resultado["erros_da_pagina"] = erros[:10]
-        if erros:
-            falhas.append("B: erro de JavaScript na pagina: %s" % erros[0][:200])
+        chip8 = next((j for j in jogos if j.get("plataforma") == "chip8"), None)
+        msx = next((j for j in jogos if j.get("plataforma") == "msx"), None)
+        if not (chip8 and msx):
+            falhas.append("C: os jogos da pasta do ARENA nao estao na lista (%d jogos)" % len(jogos))
+        # D. o jogo no RetroArch nativo, e o fim visto pelo servidor
+        if chip8:
+            jogar(pagina, chip8, resultado, falhas, "D_chip8")
+        # E. a partida hospedada: o --host pelo remendo
+        if msx:
+            escuta = {}
+            jogar(pagina, msx, resultado, falhas, "E_partida", extra={"partida": "hospedar"},
+                  durante=lambda: escuta.update(ok=porta_da_partida_escuta()))
+            resultado["E_porta_55435_escutando"] = escuta.get("ok")
+            if not escuta.get("ok"):
+                falhas.append("E: o RetroArch hospedando nao abriu a porta 55435 (o --host nao chegou?)")
+        # G. sem o segredo, nada (o que outro app do aparelho faria)
+        resultado["G_pedido_de_fora"] = pedido_de_fora()
+        if resultado["G_pedido_de_fora"] != 403:
+            falhas.append("G: o pedido sem o segredo nao foi recusado (%s)" % resultado["G_pedido_de_fora"])
+        # F. a pasta do app: o servidor reabre e a lista tem os jogos livres do APK
+        antes = time.monotonic()
+        resposta = pagina.pedir("/api/android/pasta", {"caminho": ""})
+        if not (resposta or {}).get("reabrindo"):
+            falhas.append("F: a troca para a pasta do app nao foi aceita (%s)" % resposta)
         pagina.fechar()
+        time.sleep(5)
+        pagina = Pagina()
+        esperar(lambda: (pagina.pedir("/api/estado") or {}).get("sistema_do_computador") == "android", 120)
+        resultado["F_reabriu_s"] = round(time.monotonic() - antes, 1)
+        catalogo = pagina.pedir("/api/catalogo") or {}
+        jogos = catalogo.get("jogos", [])
+        resultado["F_jogos_livres"] = len(jogos)
+        if len(jogos) < 5:
+            falhas.append("F: a pasta do app nao recebeu os jogos livres do APK (%d jogos)" % len(jogos))
+        zx81 = next((j for j in jogos if j.get("plataforma") == "zx81"), None)
+        if zx81:
+            jogar(pagina, zx81, resultado, falhas, "F_livre")
+        # Os erros: da pagina (o console dela vai para o logcat com a etiqueta
+        # ARENA) e do servidor (ARENA-servidor).
+        registro = adb_texto("logcat", "-d", "-s", "ARENA", "ARENA-servidor", segundos=60)
+        erros = [l.strip() for l in registro.splitlines() if "Uncaught" in l or "TypeError" in l
+                 or "ReferenceError" in l or "SyntaxError" in l or "Traceback" in l]
+        resultado["erros"] = erros[:10]
+        resultado["servidor_registro"] = [l.strip() for l in registro.splitlines() if "ARENA-servidor" in l][:40]
+        if erros:
+            falhas.append("erro na tela ou no servidor: %s" % erros[0][:200])
     finally:
+        if pagina:
+            pagina.fechar()
         adb("shell", "am", "force-stop", PACOTE)
         if "--manter-ligado" not in sys.argv:
             desligar_emulador(processo)

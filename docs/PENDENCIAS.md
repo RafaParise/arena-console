@@ -101,10 +101,15 @@ Depois do Release, nesta ordem:
     contêiner não fecha sem reiniciar o Windows; ver "Depende do Rafael").
 14. Android: em andamento (18/10), com o relatório em `docs/ANDROID.md`.
     Feito o emulador de testes (o do AOSP, com o Android 15 de código
-    aberto: `ferramentas/preparar_android.py`) e o APK do ARENA (o RetroArch
-    1.22.2 oficial para Android com a tela do ARENA na frente e 62 núcleos:
-    `ferramentas/montar_android.py`). **Falta** o teste no emulador
-    (`testes/teste_android.py`) e o APK nos Releases.
+    aberto: `ferramentas/preparar_android.py`) e o APK do ARENA
+    (`ferramentas/montar_android.py`): o RetroArch 1.22.2 oficial para
+    Android com uma peça compilada do código oficial com o remendo do ARENA
+    (a mesma linha de comando do Windows, e com ela o Jogar Junto), o
+    **servidor de verdade do ARENA** com o Python 3.13.16 do Android, a tela
+    de sempre, 62 núcleos e os jogos livres. Revisado em segurança: só a
+    tela do ARENA fala com o servidor, e o que ele grava (e os recordes)
+    fica no app. **Falta** o teste no emulador (`testes/teste_android.py`,
+    pronto para rodar) e o APK nos Releases.
 15. Testes nos sistemas virtuais (Docker e WSL), com números e
     descontando a perda de rodar dentro de outro sistema.
 
