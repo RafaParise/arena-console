@@ -125,7 +125,15 @@ ASSINATURAS = {
     ".webp": (b"RIFF",),
     ".woff": (b"wOFF",), ".woff2": (b"wOF2",),
     ".ttf": (b"\x00\x01\x00\x00", b"true"), ".otf": (b"OTTO",),
+    # Video do papel de parede (docs\imagens). O MP4 comeca com o tamanho
+    # do "ftyp" em 4 bytes, depois a marca "ftyp" e o tipo (isom, mp41...).
+    ".mp4": (b"\x00\x00\x00\x18ftyp", b"\x00\x00\x00\x1cftyp",
+             b"\x00\x00\x00\x20ftyp"),
+    ".webm": (b"\x1a\x45\xdf\xa3",),
 }
+
+# Onde o "ftyp" tem que aparecer no MP4 (logo depois do cabecalho).
+OFFSET_FTYP = 4
 
 
 def binario_permitido(caminho, dados):
@@ -133,7 +141,23 @@ def binario_permitido(caminho, dados):
     assinaturas = ASSINATURAS.get(extensao)
     if not assinaturas or not any(dados.startswith(a) for a in assinaturas):
         return False
-    return extensao != ".webp" or dados[8:12] == b"WEBP"
+    if extensao == ".webp":
+        return dados[8:12] == b"WEBP"
+    if extensao == ".mp4":
+        # O MP4 comeca com a caixa "ftyp": 4 bytes de tamanho, a marca
+        # "ftyp", a marca principal (isom, mp41, mp42...) e as marcas
+        # compativeis. Uma BIOS renomeada para .mp4 nao passa.
+        if dados[OFFSET_FTYP:OFFSET_FTYP + 4] != b"ftyp":
+            return False
+        principal = dados[OFFSET_FTYP + 4:OFFSET_FTYP + 8]
+        if principal not in (b"isom", b"iso2", b"mp41", b"mp42", b"avc1", b"dash"):
+            return False
+        # e alguma marca compativel tem que estar na lista depois
+        compativeis = dados[OFFSET_FTYP + 16:OFFSET_FTYP + 16 + 32]
+        return any(compativeis[i:i + 4] in (b"isom", b"iso2", b"mp41", b"mp42",
+                                           b"avc1", b"dash")
+                   for i in range(0, len(compativeis) - 3, 4))
+    return True
 
 
 # Os arquivos livres conferidos: a pasta e a lista que registra cada um.

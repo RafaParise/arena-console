@@ -127,6 +127,34 @@ class TestConferirAntesDePublicar(unittest.TestCase):
         self.assertEqual(codigo, 1, saida)
         self.assertIn("arquivo binario (nao e' imagem nem fonte)", self.tipos(achados, "bloqueantes"))
 
+    def test_video_mp4_de_verdade_passa(self):
+        """O video do papel de parede (docs\\imagens) tem que poder ir:
+        o conferidor reconhece o cabecalho 'ftyp' do MP4."""
+        caminho = os.path.join(self.repo, "docs", "imagens", "fundo.mp4")
+        os.makedirs(os.path.dirname(caminho), exist_ok=True)
+        with open(caminho, "wb") as arquivo:
+            arquivo.write(b"\x00\x00\x00\x18ftypisom\x00\x00\x02\x00isomiso2avc1mp41"
+                          + bytes(range(64)))
+        git(self.repo, "add", "docs/imagens/fundo.mp4")
+        git(self.repo, "commit", "-q", "-m", "video")
+        codigo, saida, achados = self.rodar()
+        self.assertEqual(codigo, 0, saida)
+        self.assertNotIn("arquivo binario (nao e' imagem nem fonte)",
+                         self.tipos(achados, "bloqueantes"))
+
+    def test_binario_renomeado_para_mp4_nao_passa(self):
+        """Abrir a excecao do MP4 nao pode deixar passar uma BIOS
+        renomeada: o 'ftyp' e o tipo tem que estar no lugar."""
+        caminho = os.path.join(self.repo, "docs", "imagens", "falso.mp4")
+        os.makedirs(os.path.dirname(caminho), exist_ok=True)
+        with open(caminho, "wb") as arquivo:
+            arquivo.write(b"\x00\x01SONY PS2 BIOS" + bytes(range(256)))
+        git(self.repo, "add", "docs/imagens/falso.mp4")
+        git(self.repo, "commit", "-q", "-m", "video?")
+        codigo, saida, achados = self.rodar()
+        self.assertEqual(codigo, 1, saida)
+        self.assertIn("arquivo binario (nao e' imagem nem fonte)", self.tipos(achados, "bloqueantes"))
+
     def commitar_livre(self, dados, marca):
         """Uma BIOS livre (servidor/bios_livres) com a lista.json dizendo a marca."""
         caminho = os.path.join(self.repo, "servidor", "bios_livres", "C-BIOS", "roms", "cbios_sub.rom")
