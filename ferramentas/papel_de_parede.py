@@ -61,7 +61,11 @@ LOGICO_L = 160                 # a cena tem 160 pontos de lado
 ALTURA_CENA = 90               # a altura logica da cena no launcher
 LOGICO_H_MIN = 80              # o ceu nao fica curto demais nem alto demais
 LOGICO_H_MAX = 120
-PASSO = 3                      # 3/60 s: um quadro dos 20 por segundo do fundo
+FPS_VIDEO = 30                 # quadros por segundo do video (papel de parede)
+# O passo da cena tem de caber no quadro do video: se o video e' de 30 fps,
+# cada quadro anda 2/60 s da cena. Se nao combinar, a animacao roda
+# acelerada (ou em camera lenta) e nao bate com o que se ve no launcher.
+PASSO_CENA = max(1, int(round(60.0 / FPS_VIDEO)))
 SEMENTE = 20261019             # o sorteio sai sempre igual
 
 # O que esta preso a um numero fixo e' o que fica perto do chao: o planeta
@@ -276,7 +280,7 @@ def gerar_video(nav, pasta, saida, quadros, escala, logico_h, largura, altura, f
     nav.avaliar("window.__fundoEscuro.disparar('meteoros')")
     quadros_capturados = []
     for _i in range(quadros):
-        nav.avaliar("window.__fundoEscuro.avancar(1, %d)" % PASSO)
+        nav.avaliar("window.__fundoEscuro.avancar(1, %d)" % PASSO_CENA)
         pontos = pontos_da_cena(nav, LOGICO_L, logico_h)
         quadros_capturados.append(ampliar(pontos, LOGICO_L, logico_h, escala))
     # Ida e volta: a mesma lista, ao contrario. O video fecha em loop.
@@ -284,7 +288,7 @@ def gerar_video(nav, pasta, saida, quadros, escala, logico_h, largura, altura, f
     for i, indice in enumerate(ordem):
         _gravar_png(os.path.join(pasta_quadros, "q_%04d.png" % i), largura, altura,
                     quadros_capturados[indice])
-    comando = [ffmpeg, "-y", "-loglevel", "error", "-framerate", "20",
+    comando = [ffmpeg, "-y", "-loglevel", "error", "-framerate", str(FPS_VIDEO),
                "-i", os.path.join(pasta_quadros, "q_%04d.png"),
                "-c:v", "libx264", "-preset", "slow", "-crf", "4",
                "-pix_fmt", "yuv444p", "-movflags", "+faststart", saida]

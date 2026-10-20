@@ -254,5 +254,34 @@ class TestCena(unittest.TestCase):
             self.mod.ajustar_cena(texto, 100)
 
 
+class TestVideoAnimado(unittest.TestCase):
+    """O video tem de andar na mesma velocidade que a cena do launcher.
+
+    A cena avanca 'PASSO_CENA' de 1/60 s por quadro. Se o video for
+    gravado com outra taxa de quadros, a animacao do papel de parede
+    roda mais rapida (ou mais devagar) do que no launcher. Foi um bug
+    real: o video estava em 30 fps, mas a cena andava 3/60 s (o
+    equivalente a 20 fps), e o wallpaper corria 1,5x mais rapido.
+    """
+
+    def setUp(self):
+        self.mod = carregar()
+
+    def test_passo_da_cena_combina_com_o_fps_do_video(self):
+        self.assertAlmostEqual(
+            self.mod.PASSO_CENA, 60.0 / self.mod.FPS_VIDEO, places=6,
+            msg="o passo da cena tem de caber no quadro do video")
+
+    def test_passo_da_cena_e_inteiro(self):
+        """O passo e' um numero de quadros do 1/60 s: tem de ser inteiro,
+        senao a cena anda um tempo fracionado e os quadros saem tortos."""
+        self.assertIsInstance(self.mod.PASSO_CENA, int)
+        self.assertGreaterEqual(self.mod.PASSO_CENA, 1)
+
+    def test_fps_do_video_e_um_numero_valido(self):
+        self.assertGreater(self.mod.FPS_VIDEO, 0)
+        self.assertLessEqual(self.mod.FPS_VIDEO, 60)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

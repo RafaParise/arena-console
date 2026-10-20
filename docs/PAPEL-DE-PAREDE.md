@@ -93,6 +93,79 @@ para fechar em loop sem o pulo do fim) é material complementar: para ele
 ficar animado na tela é preciso um visualizador externo (Lively, Wallpaper
 Engine). O PNG é o papel de parede que funciona sozinho.
 
+## O papel de parede animado (Lively Wallpaper)
+
+Para a cena ficar **se mexendo** na área de trabalho, o projeto usa o
+**Lively Wallpaper** (`lively-community/lively`), que é gratuito e
+funciona sem administrador.
+
+Instalação usada (por usuário, silenciosa, sem mexer no sistema todo):
+
+```
+lively_setup_x86_full_v2210.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP- /CURRENTUSER
+```
+
+O instalador oficial vem com SHA-256 conferido contra o `digest` da
+release no GitHub (v2.2.1.0). Depois de instalado:
+
+- a pasta fica em `%LOCALAPPDATA%\Programs\Lively Wallpaper`;
+- ele já se registra para iniciar com o Windows (`HKCU\...\Run\Lively`);
+- o wallpaper importado fica em
+  `%LOCALAPPDATA%\Lively Wallpaper\Library\SaveData\wptmp\<id>\`.
+
+Para aplicar o vídeo pela linha de comando (sem navegar na interface):
+
+```
+"Lively.exe" setwp --file "C:\...\arena-papel-de-parede-1440x900.mp4" --monitor 1
+```
+
+O `--monitor 1` é o número do monitor (a tela principal desta máquina é
+a 1, com 1440×900).
+
+**A CLI separada (`Livelycu.exe`) não funciona nesta versão.** O verbo
+`setwp` dela quebra com `SetWallpaperOptions appears to be immutable`;
+o mesmo erro aparece em todos os verbos com opções. Por isso o comando
+acima é enviado para o próprio `Lively.exe`, que entende o mesmo
+comando.
+
+**O Lively não pode ser aberto como administrador.** O log dele avisa
+`Process is running elevated, UI may not function properly` e a interface
+não funciona direito. Para subir na sessão normal do Windows:
+
+```
+explorer.exe "C:\Users\<usuario>\AppData\Local\Programs\Lively Wallpaper\Lively.exe"
+```
+
+### Configuração otimizada
+
+Em `%LOCALAPPDATA%\Lively Wallpaper\Settings.json`:
+
+| Chave | Valor | Por quê |
+|---|---|---|
+| `AppFullscreenPause` | `1` | pausa em tela cheia (jogo, vídeo) |
+| `AppFocusPause` | `0` | **não** pausa só por passar o mouse no ícone |
+| `BatteryPause` | `1` | pausa na bateria fraca |
+| `PowerSaveModePause` | `1` | pausa no modo de economia de energia |
+| `RemoteDesktopPause` | `1` | pausa em sessão remota |
+| `VideoPlayer` | `5` | mpv (usa a GPU e repete em loop) |
+| `VideoPlayerHwAccel` | `true` | acelera por hardware quando a placa deixa |
+| `GenerateTile` / `LiveTile` | `false` | não gera miniatura a cada importação |
+| `AutoUpdate` / `CheckForUpdate` | `false` | não vai na internet sozinho |
+
+O papel de parede volta sozinho quando o Lively abre: ele restaura a
+última escolha (aparece no log como `Restoring wallpaper`).
+
+### Quanto custa
+
+Com o wallpaper rodando nesta máquina (Radeon do Ryzen 5 5600G, 12
+threads): **~1,4 s de CPU em 10 s** (≈14% de um núcleo, ≈1,2% da máquina
+toda) e **~130 MB** de RAM.
+
+O mpv que vem com o Lively é a build da Microsoft Store, que **não tem
+decodificação por hardware** (`Unsupported hwdec: d3d11`). Por isso a
+decodificação é por software. Como a cena é pixel art de blocos grandes,
+isso não pesa no visual — mas é o limite do que este ambiente faz.
+
 ## Arquivos
 
 | Arquivo | O que é |
