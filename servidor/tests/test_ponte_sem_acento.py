@@ -10,6 +10,7 @@ aqui ela fica ligada nos testes da logica, que valem nos dois sistemas, e um
 teste so do Linux confere que la ela fica desligada."""
 import os
 import shutil
+import stat
 import sys
 import tempfile
 import unittest
@@ -233,6 +234,37 @@ class TestPonteSemAcento(unittest.TestCase):
         ponte.limpar_sobras(self.temporaria)
         self.assertFalse(os.path.exists(velha))
         self.assertTrue(os.path.exists(nova))
+
+    def test_a_limpeza_nao_segue_atalho(self):
+        # Um atalho com o nome da ponte, plantado na temporaria, apontando
+        # para uma pasta do aluno com um arquivo somente leitura.
+        do_aluno = os.path.join(self.base, "do_aluno")
+        os.makedirs(do_aluno)
+        protegido = os.path.join(do_aluno, "recorde.txt")
+        with open(protegido, "w", encoding="utf-8") as arquivo:
+            arquivo.write("100")
+        os.chmod(protegido, stat.S_IREAD)
+        atalho = os.path.join(self.temporaria, ponte.PREFIXO + "atalho")
+        # E um atalho direto para o arquivo: o chmod da limpeza o seguiria.
+        atalho_do_arquivo = os.path.join(self.temporaria, ponte.PREFIXO + "arquivo")
+        try:
+            os.symlink(do_aluno, atalho, target_is_directory=True)
+            os.symlink(protegido, atalho_do_arquivo)
+        except OSError:
+            os.chmod(protegido, stat.S_IWRITE)
+            self.skipTest("este sistema nao deixa criar link")
+        try:
+            # idade=-1: toda sobra conta como velha.
+            ponte.limpar_sobras(self.temporaria, idade=-1)
+            ponte._apagar(atalho)
+            ponte._apagar(atalho_do_arquivo)
+            self.assertTrue(os.path.isfile(protegido))
+            self.assertFalse(os.access(protegido, os.W_OK))
+        finally:
+            os.chmod(protegido, stat.S_IWRITE)
+            for caminho in (atalho, atalho_do_arquivo):
+                if os.path.lexists(caminho):
+                    os.unlink(caminho) if os.path.islink(caminho) else os.rmdir(caminho)
 
     def test_sem_pasta_sem_acento_avisa(self):
         tempfile.tempdir = self.com_acento

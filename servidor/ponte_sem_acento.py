@@ -174,10 +174,22 @@ def _copiar(origem, destino):
     os.replace(temporario, destino)
 
 
+def _e_atalho(caminho):
+    """Link simbolico (ou a juncao do Windows): aponta para outro lugar."""
+    return os.path.islink(caminho) or os.path.isjunction(caminho)
+
+
 def _apagar(pasta):
     """Apaga a pasta da ponte, ate arquivo somente leitura (o disquete
     protegido contra gravacao). O que nao sair fica para a proxima limpeza."""
     def tirar_protecao(funcao, alvo, _erro):
+        # O chmod segue o atalho: num atalho, ele mudaria a permissao do
+        # arquivo para onde ele aponta, fora da ponte (revisao de seguranca
+        # de 20/10/2026). Atalho nunca e' desprotegido. E so vale tentar de
+        # novo o que apaga: o rmtree do Linux tambem avisa do os.open, que
+        # sem os argumentos dele dava TypeError e derrubava a limpeza.
+        if _e_atalho(alvo) or funcao not in (os.unlink, os.remove, os.rmdir):
+            return
         try:
             os.chmod(alvo, stat.S_IWRITE)
             funcao(alvo)
@@ -191,19 +203,28 @@ def _apagar(pasta):
 
 def limpar_sobras(base, idade=12 * 3600):
     """Apaga as pastas de pontes velhas (de um jogo que nao fechou direito).
-    So as de mais de 12 horas: nunca a de um jogo que ainda esta aberto."""
+    So as de mais de 12 horas: nunca a de um jogo que ainda esta aberto.
+    So pasta de verdade e do proprio usuario: no Linux, a temporaria (/tmp)
+    e' de todos, e outro usuario poderia deixar ali um atalho com o nome da
+    ponte apontando para os arquivos do aluno (revisao de 20/10/2026)."""
     try:
         nomes = os.listdir(base)
     except OSError:
         return
     agora = time.time()
     for nome in nomes:
+        if not nome.startswith(PREFIXO):
+            continue
         caminho = os.path.join(base, nome)
         try:
-            velha = agora - os.path.getmtime(caminho) > idade
+            info = os.lstat(caminho)
         except OSError:
             continue
-        if nome.startswith(PREFIXO) and velha and os.path.isdir(caminho):
+        if not stat.S_ISDIR(info.st_mode) or _e_atalho(caminho):
+            continue
+        if hasattr(os, "getuid") and info.st_uid != os.getuid():
+            continue
+        if agora - info.st_mtime > idade:
             _apagar(caminho)
 
 
