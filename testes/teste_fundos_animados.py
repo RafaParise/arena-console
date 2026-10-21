@@ -42,12 +42,18 @@ FOTO_DO_CANVAS = """(() => {
 })()"""
 
 
+# O servidor do teste abre numa porta so dele (ARENA_PORTA): assim o teste
+# roda com o ARENA de verdade aberto na 8777 (20/10/2026: o papel de parede
+# animado usa o ARENA aberto).
+PORTA = 8792
+
+
 def porta_ocupada():
     import socket
     s = socket.socket()
     s.settimeout(0.5)
     try:
-        return s.connect_ex(("127.0.0.1", 8777)) == 0
+        return s.connect_ex(("127.0.0.1", PORTA)) == 0
     finally:
         s.close()
 
@@ -65,22 +71,22 @@ def main():
         print("Sem Edge nem Chrome nesta maquina: nada a testar.")
         return 0
     if porta_ocupada():
-        print("O ARENA ja esta aberto (porta 8777): feche e rode de novo.")
+        print("A porta %d (a do teste) esta ocupada: feche o que a usa e rode de novo." % PORTA)
         return 1
     servidor = subprocess.Popen([os.path.join(RAIZ, "servidor", "python", "python.exe"),
                                  os.path.join(RAIZ, "servidor", "arena.py")], cwd=RAIZ,
-                                env=dict(os.environ, ARENA_SEM_JANELA="1"),
+                                env=dict(os.environ, ARENA_SEM_JANELA="1", ARENA_PORTA=str(PORTA)),
                                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     try:
         for _ in range(150):
             try:
-                urllib.request.urlopen("http://127.0.0.1:8777/api/estado", timeout=1).read()
+                urllib.request.urlopen("http://127.0.0.1:%d/api/estado" % PORTA, timeout=1).read()
                 break
             except OSError:
                 time.sleep(0.2)
         with Navegador() as nav:
             nav.comando("Performance.enable")
-            nav.abrir("http://127.0.0.1:8777", 1366, 768, 1)
+            nav.abrir("http://127.0.0.1:%d" % PORTA, 1366, 768, 1)
             nav.avaliar("window.__erros = 0; const e0 = console.error; console.error = function () "
                         "{ window.__erros++; e0.apply(console, arguments); }; 1")
 
