@@ -113,10 +113,14 @@ Depois do Release, nesta ordem:
     **servidor de verdade do ARENA** com o Python 3.13.16 do Android, a tela
     de sempre, 62 núcleos e os jogos livres. Revisado em segurança: só a
     tela do ARENA fala com o servidor, e o que ele grava (e os recordes)
-    fica no app. **Falta** o teste no emulador (`testes/teste_android.py`,
-    pronto para rodar) e o APK nos Releases. Em 20/10, o APK de teste foi
-    remontado com o servidor de agora e o teste começou, mas o Claude Code
-    o encerrou de novo porque a memória do computador ficou crítica.
+    fica no app. **O teste no emulador passou em 21/10** (com a sua
+    autorização para religar o emulador): instalação, tela, a pasta do
+    ARENA do aparelho, o CHIP-8 no RetroArch nativo com o F10 fechando, a
+    partida hospedada abrindo a porta 55435, o pedido de fora recusado e a
+    pasta do app com os jogos livres (`docs/ANDROID.md`). O que ele achou
+    está consertado: os jogos livres do APK fora da lista, o "Failed to
+    fetch" na troca de pasta e o teclado com setas tomado por controle.
+    **Falta** o APK nos Releases (com a versão nova do pacote).
 15. Testes nos sistemas virtuais (Docker e WSL), com números e
     descontando a perda de rodar dentro de outro sistema.
 16. **Feito em 20/10** (adiantado, com o 13 ao 15 parados à espera do

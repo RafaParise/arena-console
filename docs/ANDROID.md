@@ -118,11 +118,40 @@ anterior.
 
 `testes/teste_android.py` liga o emulador sem janela, instala o APK de teste
 (`montar_android.py --abi x86_64 --teste`), confere a tela, a pasta do ARENA
-no aparelho e um jogo livre e um da pasta no RetroArch nativo (a foto da
-tela de cada um), com os tempos, em `docs/android_bruto.json`.
+no aparelho e um jogo livre e um da pasta no RetroArch nativo (a foto que o
+próprio RetroArch tira no F8, só com o quadro do jogo), com os tempos, em
+`docs/android_bruto.json`. As teclas vão pelo teclado de PC do emulador,
+seguradas como as de uma pessoa.
 
-**A conferir:** o teste ainda não rodou inteiro. O emulador ligou, o
-RetroArch oficial instalou nele (2 s) e abriu; na madrugada de 18/10 o
-Claude Code encerrou o emulador porque o computador ficou com pouca memória
-(a sessão estava parada), e ele só volta a ser ligado com a autorização do
-Rafael.
+**A rodada de 21/10/2026** (Android 15 no emulador, 2 núcleos e 2 GB, o
+vídeo desenhado pelo processador): **tudo certo**. O APK instala em 5,5 s; o
+servidor e a tela abrem em 9 s, e a pasta do ARENA do aparelho é achada
+sozinha, com os 2 jogos dela. O jogo de CHIP-8 abre no RetroArch nativo em
+1,7 s, com imagem; o F10 duas vezes fecha o jogo e o servidor vê o fim. A
+partida hospedada leva o `--host --port 55435` ao RetroArch (o remendo) e a
+porta 55435 abre dentro do aparelho. O pedido de fora da tela do ARENA é
+recusado (403). Na pasta do app, o servidor reabre em 6 s com os 8 jogos
+livres do APK, e o de ZX81 abre, com imagem, e fecha pelo F10.
+
+**O que o teste achou, já consertado:**
+
+- Os jogos livres do APK iam para `jogos/<console>`, e a lista só procura
+  nas origens (`jogos/livres`, `jogos/turma`, `jogos/pessoais`): a pasta do
+  app abria vazia. Agora eles vão para `jogos/livres`.
+- A troca da pasta do ARENA às vezes mostrava "Failed to fetch": o app
+  fechava o servidor antes de a resposta chegar à tela. Agora o servidor
+  responde e só depois pede a troca.
+- O teclado que se diz teclado e mais alguma coisa (o do emulador se diz
+  teclado e direcional) o RetroArch toma por um controle, e o F10, o Esc e
+  o F2 param de funcionar. O ARENA agora diz ao RetroArch qual é o teclado
+  (`input_android_physical_keyboard`). O teclado de PC comum, que se diz só
+  teclado, já funcionava.
+- O `config.ini` do C-BIOS do MSX tinha `\` no caminho das ROMs (achado no
+  Linux, ver `docs/LINUX.md`). No Android deve ser igual, porque o caminho
+  com `\` também não existe lá, mas isso não foi conferido no emulador (o
+  teste abre o CHIP-8 e o ZX81). O conserto vale para os dois.
+
+**O que é do Android, não do ARENA:** na primeira tela cheia de cada app, o
+Android mostra o aviso "Tela cheia: para sair, deslize de cima para baixo"
+e espera um toque em "Entendi"; até lá, o aviso fica na frente do jogo e
+pega as teclas. O aluno toca uma vez e ele não volta.
