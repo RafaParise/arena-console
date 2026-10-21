@@ -247,6 +247,12 @@ def _tirar_do_appimage(appimage, destino):
         resultado = subprocess.run([copia, "--appimage-extract"], cwd=montando, capture_output=True,
                                    timeout=600)
         extraido = os.path.join(montando, "squashfs-root")
+        # O AppImage feito com as ferramentas novas (o do RPCS3) tira o
+        # programa para "AppDir" e deixa "squashfs-root" como atalho para
+        # ela (./AppDir): vai a pasta de verdade, senao o atalho movido
+        # apontaria para o nada (achado do testes/teste_linux.py, 20/10/2026).
+        if os.path.islink(extraido):
+            extraido = os.path.realpath(extraido)
         if resultado.returncode != 0 or not _roda(os.path.join(extraido, "AppRun")):
             raise OSError("o AppImage nao se abriu: %s"
                           % (resultado.stderr or resultado.stdout).decode("utf-8", "replace")[-300:].strip())

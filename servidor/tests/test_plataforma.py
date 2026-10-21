@@ -61,6 +61,52 @@ class Nucleos(unittest.TestCase):
             self.assertTrue(plataforma.executavel_do_retroarch("r").endswith("retroarch.exe"))
 
 
+class TirarDoAppImage(unittest.TestCase):
+    """O AppImage sai para o cache sem FUSE (plataforma._tirar_do_appimage)."""
+
+    def setUp(self):
+        self.pasta = tempfile.mkdtemp(prefix="arena_appimage_")
+
+    def tearDown(self):
+        limpeza.apagar_pasta(self.pasta)
+
+    def extrair(self, com_atalho):
+        appimage = os.path.join(self.pasta, "Programa.AppImage")
+        with open(appimage, "wb") as arquivo:
+            arquivo.write(b"AppImage de mentira")
+
+        def tirar(comando, cwd, **_):
+            base = os.path.join(cwd, "AppDir" if com_atalho else "squashfs-root")
+            os.makedirs(os.path.join(base, "usr"))
+            with open(os.path.join(base, "AppRun"), "w", encoding="utf-8") as arquivo:
+                arquivo.write("#!/bin/sh\n")
+            if com_atalho:
+                os.symlink("./AppDir", os.path.join(cwd, "squashfs-root"), target_is_directory=True)
+            return mock.Mock(returncode=0, stdout=b"", stderr=b"")
+
+        destino = os.path.join(self.pasta, "cache", "programa-19")
+        os.makedirs(os.path.dirname(destino))
+        with mock.patch.object(plataforma.subprocess, "run", side_effect=tirar), \
+                mock.patch.object(plataforma, "_roda", side_effect=os.path.isfile), \
+                mock.patch.object(plataforma.os, "chmod"):
+            plataforma._tirar_do_appimage(appimage, destino)
+        return destino
+
+    def test_a_pasta_squashfs_root(self):
+        destino = self.extrair(com_atalho=False)
+        self.assertTrue(os.path.isfile(os.path.join(destino, "AppRun")))
+
+    def test_o_atalho_para_appdir_leva_a_pasta_de_verdade(self):
+        try:
+            destino = self.extrair(com_atalho=True)
+        except OSError as falha:
+            if getattr(falha, "winerror", None) == 1314:      # Windows sem o Modo de Desenvolvedor
+                self.skipTest("este Windows nao deixa criar link")
+            raise
+        self.assertFalse(os.path.islink(destino))
+        self.assertTrue(os.path.isfile(os.path.join(destino, "AppRun")))
+
+
 class Motores(unittest.TestCase):
     """O som, o controle e o video que so existem num dos sistemas."""
 
