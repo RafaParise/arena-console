@@ -130,10 +130,9 @@ if not plataforma.WINDOWS:
         faltando_py = [n for n in ESSENCIAIS_LINUX if not os.path.isfile(os.path.join(pasta_linux, *n.split("/")))]
         for nome, oque in ESSENCIAIS_LINUX.items():
             print("  %-26s %-6s %s" % (nome, "FALTA" if nome in faltando_py else "ok", oque))
-        dinamicos = os.path.join(pasta_linux, "lib", "python3.13", "lib-dynload")
-        presentes = os.listdir(dinamicos) if os.path.isdir(dinamicos) else []
-        faltando_so = [m for m in ("_socket", "_sqlite3", "_ssl", "_ctypes", "_hashlib", "_uuid")
-                       if not any(n.startswith(m + ".") for n in presentes)]
+        # Soltos na lib-dynload ou embutidos no libpython (plataforma.py).
+        faltando_so = plataforma.modulos_que_faltam_no_python_linux(
+            pasta_linux, ("_socket", "_sqlite3", "_ssl", "_ctypes", "_hashlib", "_uuid"))
         if faltando_py or faltando_so:
             grave.append("Python do Linux incompleto: falta %s" % ", ".join(faltando_py + faltando_so))
             print("  Copie de novo a pasta servidor/python-linux do pacote do ARENA.")

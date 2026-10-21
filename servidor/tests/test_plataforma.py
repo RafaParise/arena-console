@@ -61,6 +61,35 @@ class Nucleos(unittest.TestCase):
             self.assertTrue(plataforma.executavel_do_retroarch("r").endswith("retroarch.exe"))
 
 
+class ModulosDoPythonLinux(unittest.TestCase):
+    """O VERIFICAR.sh acha os modulos soltos e os embutidos no libpython."""
+
+    MODULOS = ("_socket", "_ssl", "_dbm", "_tkinter")
+
+    def test_soltos_embutidos_e_os_que_faltam(self):
+        pasta = tempfile.mkdtemp(prefix="arena_python_linux_")
+        self.addCleanup(limpeza.apagar_pasta, pasta)
+        soltos = os.path.join(pasta, "lib", "python3.13", "lib-dynload")
+        os.makedirs(soltos)
+        with open(os.path.join(soltos, "_dbm.cpython-313-x86_64-linux-gnu.so"), "wb") as arquivo:
+            arquivo.write(b"\x7fELF")
+        # Sem o libpython, o embutido nao tem onde estar.
+        self.assertEqual(plataforma.modulos_que_faltam_no_python_linux(pasta, self.MODULOS),
+                         ["_socket", "_ssl", "_tkinter"])
+        with open(os.path.join(pasta, "lib", "libpython3.13.so.1.0"), "wb") as arquivo:
+            # PyInit__sslx nao e' o _ssl: o nome termina no zero do C.
+            arquivo.write(b"\x7fELF...PyInit__socket\x00...PyInit__sslx\x00...")
+        self.assertEqual(plataforma.modulos_que_faltam_no_python_linux(pasta, self.MODULOS),
+                         ["_ssl", "_tkinter"])
+
+    def test_o_python_do_pacote_esta_completo(self):
+        pasta = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "python-linux")
+        if not os.path.isdir(pasta):
+            self.skipTest("sem o Python do Linux nesta pasta")
+        self.assertEqual(plataforma.modulos_que_faltam_no_python_linux(
+            pasta, ("_socket", "_sqlite3", "_ssl", "_ctypes", "_hashlib", "_uuid")), [])
+
+
 class TirarDoAppImage(unittest.TestCase):
     """O AppImage sai para o cache sem FUSE (plataforma._tirar_do_appimage)."""
 

@@ -375,6 +375,26 @@ def python_que_veio_junto(pasta_servidor):
     return os.path.join(pasta_servidor, "python-linux", "bin", "python3.13")
 
 
+def modulos_que_faltam_no_python_linux(pasta_linux, modulos):
+    """Os modulos (de C) que o Python portatil do Linux nao tem. Cada um vem
+    solto, na lib-dynload, ou embutido no proprio libpython: o
+    python-build-standalone embute a rede, o banco e a seguranca (_socket,
+    _sqlite3, _ssl...), e so poucos vem soltos (o _dbm, o _tkinter). O
+    embutido deixa no libpython a funcao que o liga (PyInit_<nome>), que e' o
+    que o Python procura. Sem olhar o libpython, o VERIFICAR.sh dizia que o
+    Python estava incompleto (rodada de 20/10/2026). Le sem executar nada:
+    vale tambem no pen drive que nao deixa executar."""
+    import mmap
+    soltos = os.path.join(pasta_linux, "lib", "python3.13", "lib-dynload")
+    presentes = os.listdir(soltos) if os.path.isdir(soltos) else []
+    faltam = [m for m in modulos if not any(n.startswith(m + ".") for n in presentes)]
+    libpython = os.path.join(pasta_linux, "lib", "libpython3.13.so.1.0")
+    if not faltam or not os.path.isfile(libpython) or not os.path.getsize(libpython):
+        return faltam           # (o mmap nao abre arquivo vazio)
+    with open(libpython, "rb") as arquivo, mmap.mmap(arquivo.fileno(), 0, access=mmap.ACCESS_READ) as dados:
+        return [m for m in faltam if dados.find(b"PyInit_" + m.encode("ascii") + b"\x00") < 0]
+
+
 class SemGerenciadorDeArquivos(OSError):
     """Linux sem nenhum jeito conhecido de abrir uma pasta (sem o xdg-open e
     sem o gio): quem chamou mostra o caminho para a pessoa abrir sozinha."""
