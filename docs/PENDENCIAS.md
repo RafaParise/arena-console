@@ -88,20 +88,22 @@ Depois do Release, nesta ordem:
     Chrome e no Firefox; NES, Super Nintendo e Mega Drive a 60 quadros com
     o processador freado 4 vezes. Falta o teste num Chromebook da escola
     (em "Depende do Rafael").
-13. Linux, idêntico: feito o ARENA do Linux (17 e 18/10), com o relatório
-    em `docs/LINUX.md`. O mesmo pen drive abre no Linux pelo `ARENA.sh`: o
+13. **Feito (17 a 21/10):** o ARENA do Linux, idêntico, com o relatório em
+    `docs/LINUX.md`. O mesmo pen drive abre no Linux pelo `ARENA.sh`: o
     mesmo servidor e a mesma tela, o Python portátil do Linux, o RetroArch
     1.22.2 do Linux (o AppImage, que sai para `~/.cache/arena` sem FUSE), os
     63 núcleos `.so`, o Java ME com o Java do Linux, o PS2, o PS3 e o Xbox
     360 com os emuladores do Linux usando a mesma pasta de dados dos do
     Windows, e o mesmo `retroarch.cfg` (caminhos e motores traduzidos a cada
     abertura). A bateria inteira passa no Linux (532 de 532, 17/10). O
-    teste de ponta a ponta (`testes/teste_linux.py`) rodou em 20/10: 29 de
-    32 aberturas com imagem, o servidor, o `ARENA.sh`, o `VERIFICAR.sh`, o
-    PCSX2 e o RPCS3. O que ele achou já está consertado (MSX, Java ME com
-    acento, RPCS3, o falso "Python incompleto"). **Falta a rodada que
-    confirma os consertos** (MSX, Java ME com acento e o Xenia): o contêiner
-    travou de novo em 20/10, às 22h (ver "Depende do Rafael").
+    teste de ponta a ponta (`testes/teste_linux.py`) de 21/10: **32 de 32**
+    aberturas com imagem (também numa pasta com acento), o servidor, o
+    `ARENA.sh`, o `VERIFICAR.sh`, o PCSX2, o RPCS3 e o Xenia, sem nenhuma
+    falha. O que as rodadas acharam está consertado: o MSX (o `config.ini`
+    do C-BIOS com barra invertida, que também valia para o Android), o Java
+    ME com acento, o RPCS3, o falso "Python incompleto" e, na revisão, o
+    Xbox 360 do Linux (o ajuste e o Xenia Netplay, que só existe para
+    Windows).
 14. Android: em andamento (18/10), com o relatório em `docs/ANDROID.md`.
     Feito o emulador de testes (o do AOSP, com o Android 15 de código
     aberto: `ferramentas/preparar_android.py`) e o APK do ARENA
@@ -142,21 +144,10 @@ reserva a cada reinício (Hyper-V, WSL, Docker). O `VERIFICAR.bat`, o
 
 ## Depende do Rafael
 
-- **O teste do Android no emulador (item 14):** o Claude Code encerrou o
-  emulador duas vezes (18/10 e 20/10, às 22h30) porque a memória do
-  computador ficou crítica, e a regra dele é não religar sem você pedir.
-  Há três saídas, à sua escolha: (1) fechar os programas grandes e dizer
-  "pode religar o emulador"; (2) abrir o Claude Code com a variável
-  `CLAUDE_CODE_DISABLE_BG_SHELL_PRESSURE_REAP=1`, que desliga esse
-  encerramento; ou (3) rodar você mesmo, numa janela do terminal,
-  `servidor\python\python.exe testes\teste_android.py` (uns 15 minutos; ele
-  desliga o emulador no fim).
-- **Reiniciar o Windows** quando puder: o contêiner de testes do Linux
-  (WSLC) travou de novo em 20/10, às 22h (como em 18/10). Já tentei sem
-  reiniciar: encerrar a sessão dele, `wsl --shutdown` e fechar o processo
-  da sessão; a máquina virtual (`vmmemwslc`) roda como serviço do Windows,
-  e só o reinício a solta. Depois dele, a rodada que confirma o Linux e o
-  item 15 seguem sozinhos.
+- **Se o contêiner do Linux travar de novo** (o WSLC travou em 18 e em
+  20/10): só reiniciar o Windows o solta. A máquina virtual dele
+  (`vmmemwslc`) roda como serviço do Windows, e nem `wsl --shutdown` nem
+  fechar a sessão adiantam. O reinício de 21/10 resolveu.
 
 - **O teste no Chromebook da escola** (item 12, `docs/CHROMEBOOK.md`, "O
   teste no Chromebook da escola"): abrir o `ARENA-CHROMEBOOK.html` do pen

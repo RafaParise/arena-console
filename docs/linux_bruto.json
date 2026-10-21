@@ -1,5 +1,5 @@
 {
- "quando": "2026-10-21 00:46:43",
+ "quando": "2026-10-21 14:01:46",
  "partes": [
   "A",
   "B",
@@ -9,7 +9,7 @@
   "F"
  ],
  "sistema": "Debian GNU/Linux 13 (trixie) (Linux 6.18.54.1)",
- "retroarch_tirar_do_appimage_s": 0.17,
+ "retroarch_tirar_do_appimage_s": 0.1,
  "retroarch_ja_pronto_s": 0.001,
  "retroarch": "/home/aluno/.cache/arena/retroarch-10390008/AppRun",
  "jogos": [
@@ -21,9 +21,10 @@
    "imagem": true,
    "detalhe": "1575x1080, 215 cores, a mais comum em 96%",
    "travou": false,
-   "segundos": 30.9,
+   "segundos": 30.8,
+   "pela_ponte": false,
    "quadros": 1800,
-   "quadros_por_segundo": 58.3
+   "quadros_por_segundo": 58.5
   },
   {
    "parte": "B",
@@ -33,45 +34,49 @@
    "imagem": true,
    "detalhe": "1575x1080, 215 cores, a mais comum em 96%",
    "travou": false,
-   "segundos": 30.6,
-   "quadros": 1800,
-   "quadros_por_segundo": 58.8
-  },
-  {
-   "parte": "A",
-   "console": "arduboy",
-   "jogo": "Evade",
-   "nucleo": "ardens_libretro.so",
-   "imagem": true,
-   "detalhe": "384x192, 14 cores, a mais comum em 97%",
-   "travou": false,
-   "segundos": 15.3,
-   "quadros": 900,
-   "quadros_por_segundo": 58.8
-  },
-  {
-   "parte": "B",
-   "console": "arduboy",
-   "jogo": "Evade",
-   "nucleo": "ardens_libretro.so",
-   "imagem": true,
-   "detalhe": "384x192, 14 cores, a mais comum em 97%",
-   "travou": false,
-   "segundos": 15.3,
-   "quadros": 900,
-   "quadros_por_segundo": 58.8
-  },
-  {
-   "parte": "A",
-   "console": "atarist",
-   "jogo": "Rayoïd",
-   "nucleo": "hatari_libretro.so",
-   "imagem": true,
-   "detalhe": "1439x1079, 3412 cores, a mais comum em 60%",
-   "travou": false,
    "segundos": 30.5,
+   "pela_ponte": false,
+   "quadros": 1800,
+   "quadros_por_segundo": 59.0
+  },
+  {
+   "parte": "A",
+   "console": "arduboy",
+   "jogo": "Evade",
+   "nucleo": "ardens_libretro.so",
+   "imagem": true,
+   "detalhe": "384x192, 14 cores, a mais comum em 97%",
+   "travou": false,
+   "segundos": 15.2,
+   "pela_ponte": false,
+   "quadros": 900,
+   "quadros_por_segundo": 59.0
+  },
+  {
+   "parte": "B",
+   "console": "arduboy",
+   "jogo": "Evade",
+   "nucleo": "ardens_libretro.so",
+   "imagem": true,
+   "detalhe": "384x192, 14 cores, a mais comum em 97%",
+   "travou": false,
+   "segundos": 15.2,
+   "pela_ponte": false,
+   "quadros": 900,
+   "quadros_por_segundo": 59.2
+  },
+  {
+   "parte": "A",
+   "console": "atarist",
+   "jogo": "Rayoïd",
+   "nucleo": "hatari_libretro.so",
+   "imagem": true,
+   "detalhe": "1439x1079, 3412 cores, a mais comum em 60%",
+   "travou": false,
+   "segundos": 30.4,
+   "pela_ponte": false,
    "quadros": 1500,
-   "quadros_por_segundo": 49.2
+   "quadros_por_segundo": 49.3
   },
   {
    "parte": "B",
@@ -81,9 +86,10 @@
    "imagem": true,
    "detalhe": "1439x1079, 3412 cores, a mais comum em 60%",
    "travou": false,
-   "segundos": 30.6,
+   "segundos": 30.4,
+   "pela_ponte": false,
    "quadros": 1500,
-   "quadros_por_segundo": 49.1
+   "quadros_por_segundo": 49.4
   },
   {
    "parte": "A",
@@ -93,9 +99,10 @@
    "imagem": true,
    "detalhe": "384x192, 14 cores, a mais comum em 71%",
    "travou": false,
-   "segundos": 10.2,
+   "segundos": 10.1,
+   "pela_ponte": false,
    "quadros": 600,
-   "quadros_por_segundo": 58.9
+   "quadros_por_segundo": 59.2
   },
   {
    "parte": "B",
@@ -106,6 +113,7 @@
    "detalhe": "384x192, 14 cores, a mais comum em 71%",
    "travou": false,
    "segundos": 10.1,
+   "pela_ponte": false,
    "quadros": 600,
    "quadros_por_segundo": 59.2
   },
@@ -118,8 +126,9 @@
    "detalhe": "960x720, 199 cores, a mais comum em 86%",
    "travou": false,
    "segundos": 10.2,
+   "pela_ponte": false,
    "quadros": 600,
-   "quadros_por_segundo": 58.6
+   "quadros_por_segundo": 58.9
   },
   {
    "parte": "B",
@@ -129,31 +138,34 @@
    "imagem": true,
    "detalhe": "960x720, 199 cores, a mais comum em 86%",
    "travou": false,
-   "segundos": 10.3,
+   "segundos": 10.2,
+   "pela_ponte": false,
    "quadros": 600,
-   "quadros_por_segundo": 58.3
+   "quadros_por_segundo": 58.9
   },
   {
    "parte": "A",
    "console": "msx",
    "jogo": "NOBORUNOCA",
    "nucleo": "bluemsx_libretro.so",
-   "imagem": false,
-   "detalhe": "816x720, 99 cores, a mais comum em 43%, o registro nao diz \"falling back to 'MSX2\\\\+ - C-BIOS'\"",
+   "imagem": true,
+   "detalhe": "816x720, 99 cores, a mais comum em 43%",
    "travou": false,
    "segundos": 15.2,
+   "pela_ponte": false,
    "quadros": 900,
-   "quadros_por_segundo": 59.0
+   "quadros_por_segundo": 59.2
   },
   {
    "parte": "B",
    "console": "msx",
    "jogo": "NOBORUNOCA",
    "nucleo": "bluemsx_libretro.so",
-   "imagem": false,
-   "detalhe": "816x720, 99 cores, a mais comum em 43%, o registro nao diz \"falling back to 'MSX2\\\\+ - C-BIOS'\"",
+   "imagem": true,
+   "detalhe": "816x720, 99 cores, a mais comum em 43%",
    "travou": false,
    "segundos": 15.2,
+   "pela_ponte": false,
    "quadros": 900,
    "quadros_por_segundo": 59.2
   },
@@ -165,9 +177,10 @@
    "imagem": true,
    "detalhe": "1194x863, 899 cores, a mais comum em 49%",
    "travou": false,
-   "segundos": 24.4,
+   "segundos": 24.3,
+   "pela_ponte": false,
    "quadros": 1200,
-   "quadros_por_segundo": 49.2
+   "quadros_por_segundo": 49.3
   },
   {
    "parte": "B",
@@ -178,8 +191,9 @@
    "detalhe": "1194x863, 899 cores, a mais comum em 49%",
    "travou": false,
    "segundos": 24.3,
+   "pela_ponte": false,
    "quadros": 1200,
-   "quadros_por_segundo": 49.3
+   "quadros_por_segundo": 49.4
   },
   {
    "parte": "A",
@@ -189,9 +203,10 @@
    "imagem": true,
    "detalhe": "1119x852, 394 cores, a mais comum em 53%",
    "travou": false,
-   "segundos": 30.3,
+   "segundos": 30.2,
+   "pela_ponte": false,
    "quadros": 1500,
-   "quadros_por_segundo": 49.5
+   "quadros_por_segundo": 49.6
   },
   {
    "parte": "B",
@@ -202,8 +217,9 @@
    "detalhe": "1119x852, 394 cores, a mais comum em 53%",
    "travou": false,
    "segundos": 30.2,
+   "pela_ponte": false,
    "quadros": 1500,
-   "quadros_por_segundo": 49.6
+   "quadros_por_segundo": 49.7
   },
   {
    "parte": "A",
@@ -214,6 +230,7 @@
    "detalhe": "960x720, 14 cores, a mais comum em 53%",
    "travou": false,
    "segundos": 30.2,
+   "pela_ponte": false,
    "quadros": 1500,
    "quadros_por_segundo": 49.6
   },
@@ -226,6 +243,7 @@
    "detalhe": "960x720, 14 cores, a mais comum em 53%",
    "travou": false,
    "segundos": 30.2,
+   "pela_ponte": false,
    "quadros": 1500,
    "quadros_por_segundo": 49.7
   },
@@ -237,21 +255,23 @@
    "imagem": true,
    "detalhe": "540x720, 256 cores, a mais comum em 91%",
    "travou": false,
-   "segundos": 17.0,
+   "segundos": 16.0,
+   "pela_ponte": false,
    "quadros": 900,
-   "quadros_por_segundo": 53.1
+   "quadros_por_segundo": 56.1
   },
   {
    "parte": "B",
    "console": "j2me",
    "jogo": "Shooter",
    "nucleo": "freej2me_libretro.so",
-   "imagem": false,
-   "detalhe": "960x720, 1 cores, a mais comum em 100%",
+   "imagem": true,
+   "detalhe": "540x720, 256 cores, a mais comum em 91%",
    "travou": false,
-   "segundos": 15.7,
+   "segundos": 15.5,
+   "pela_ponte": true,
    "quadros": 900,
-   "quadros_por_segundo": 57.3
+   "quadros_por_segundo": 57.9
   },
   {
    "parte": "A",
@@ -261,9 +281,10 @@
    "imagem": true,
    "detalhe": "960x720, 98 cores, a mais comum em 75%, (90, 40, 0)",
    "travou": false,
-   "segundos": 10.8,
+   "segundos": 10.3,
+   "pela_ponte": false,
    "quadros": 600,
-   "quadros_por_segundo": 55.6
+   "quadros_por_segundo": 58.3
   },
   {
    "parte": "B",
@@ -274,8 +295,9 @@
    "detalhe": "960x720, 98 cores, a mais comum em 75%, (90, 40, 0)",
    "travou": false,
    "segundos": 10.3,
+   "pela_ponte": false,
    "quadros": 600,
-   "quadros_por_segundo": 58.3
+   "quadros_por_segundo": 58.4
   },
   {
    "parte": "A",
@@ -286,8 +308,9 @@
    "detalhe": "1056x798, 10 cores, a mais comum em 63%, (101, 208, 69)",
    "travou": false,
    "segundos": 30.3,
+   "pela_ponte": false,
    "quadros": 1500,
-   "quadros_por_segundo": 49.5
+   "quadros_por_segundo": 49.6
   },
   {
    "parte": "B",
@@ -298,6 +321,7 @@
    "detalhe": "1056x798, 10 cores, a mais comum em 63%, (101, 208, 69)",
    "travou": false,
    "segundos": 30.2,
+   "pela_ponte": false,
    "quadros": 1500,
    "quadros_por_segundo": 49.6
   },
@@ -310,6 +334,7 @@
    "detalhe": "911x689, 918 cores, a mais comum em 56%, (122, 65, 50)",
    "travou": false,
    "segundos": 30.5,
+   "pela_ponte": false,
    "quadros": 1500,
    "quadros_por_segundo": 49.2
   },
@@ -321,57 +346,62 @@
    "imagem": true,
    "detalhe": "911x689, 918 cores, a mais comum em 56%, (122, 65, 50)",
    "travou": false,
-   "segundos": 30.5,
+   "segundos": 30.4,
+   "pela_ponte": false,
    "quadros": 1500,
+   "quadros_por_segundo": 49.3
+  },
+  {
+   "parte": "A",
+   "console": "supervision",
+   "jogo": "programa de teste",
+   "nucleo": "potator_libretro.so",
+   "imagem": true,
+   "detalhe": "480x480, 12 cores, a mais comum em 67%, (0, 0, 0)",
+   "travou": false,
+   "segundos": 5.1,
+   "pela_ponte": false,
+   "quadros": 300,
+   "quadros_por_segundo": 58.6
+  },
+  {
+   "parte": "B",
+   "console": "supervision",
+   "jogo": "programa de teste",
+   "nucleo": "potator_libretro.so",
+   "imagem": true,
+   "detalhe": "480x480, 12 cores, a mais comum em 67%, (0, 0, 0)",
+   "travou": false,
+   "segundos": 5.2,
+   "pela_ponte": false,
+   "quadros": 300,
+   "quadros_por_segundo": 58.0
+  },
+  {
+   "parte": "A",
+   "console": "thomson",
+   "jogo": "programa de teste (cartucho do MO5)",
+   "nucleo": "theodore_libretro.so",
+   "imagem": true,
+   "detalhe": "1680x1080, 7 cores, a mais comum em 88%, (255, 0, 0)",
+   "travou": false,
+   "segundos": 12.2,
+   "pela_ponte": false,
+   "quadros": 600,
+   "quadros_por_segundo": 49.0
+  },
+  {
+   "parte": "B",
+   "console": "thomson",
+   "jogo": "programa de teste (cartucho do MO5)",
+   "nucleo": "theodore_libretro.so",
+   "imagem": true,
+   "detalhe": "1680x1080, 7 cores, a mais comum em 88%, (255, 0, 0)",
+   "travou": false,
+   "segundos": 12.2,
+   "pela_ponte": false,
+   "quadros": 600,
    "quadros_por_segundo": 49.2
-  },
-  {
-   "parte": "A",
-   "console": "supervision",
-   "jogo": "programa de teste",
-   "nucleo": "potator_libretro.so",
-   "imagem": true,
-   "detalhe": "480x480, 12 cores, a mais comum em 67%, (0, 0, 0)",
-   "travou": false,
-   "segundos": 5.2,
-   "quadros": 300,
-   "quadros_por_segundo": 58.0
-  },
-  {
-   "parte": "B",
-   "console": "supervision",
-   "jogo": "programa de teste",
-   "nucleo": "potator_libretro.so",
-   "imagem": true,
-   "detalhe": "480x480, 12 cores, a mais comum em 67%, (0, 0, 0)",
-   "travou": false,
-   "segundos": 5.2,
-   "quadros": 300,
-   "quadros_por_segundo": 58.0
-  },
-  {
-   "parte": "A",
-   "console": "thomson",
-   "jogo": "programa de teste (cartucho do MO5)",
-   "nucleo": "theodore_libretro.so",
-   "imagem": true,
-   "detalhe": "1680x1080, 7 cores, a mais comum em 88%, (255, 0, 0)",
-   "travou": false,
-   "segundos": 12.2,
-   "quadros": 600,
-   "quadros_por_segundo": 49.0
-  },
-  {
-   "parte": "B",
-   "console": "thomson",
-   "jogo": "programa de teste (cartucho do MO5)",
-   "nucleo": "theodore_libretro.so",
-   "imagem": true,
-   "detalhe": "1680x1080, 7 cores, a mais comum em 88%, (255, 0, 0)",
-   "travou": false,
-   "segundos": 12.2,
-   "quadros": 600,
-   "quadros_por_segundo": 49.0
   },
   {
    "parte": "A",
@@ -382,6 +412,7 @@
    "detalhe": "1920x1080, 13952 cores, a mais comum em 72%, (255, 0, 0)",
    "travou": false,
    "segundos": 10.6,
+   "pela_ponte": false,
    "quadros": 600,
    "quadros_por_segundo": 56.4
   },
@@ -393,9 +424,10 @@
    "imagem": true,
    "detalhe": "1920x1080, 13952 cores, a mais comum em 72%, (255, 0, 0)",
    "travou": false,
-   "segundos": 10.5,
+   "segundos": 10.4,
+   "pela_ponte": false,
    "quadros": 600,
-   "quadros_por_segundo": 57.2
+   "quadros_por_segundo": 57.5
   }
  ],
  "servidor_abriu_s": 0.61,
@@ -405,7 +437,7 @@
   "processador": null,
   "driver_video": "vulkan"
  },
- "servidor_memoria_mb": 46.1,
+ "servidor_memoria_mb": 45.9,
  "jogo_abriu_s": 8.5,
  "tela_do_jogo": {
   "largura": 1280,
@@ -413,41 +445,39 @@
   "cores": 2,
   "a_mais_comum": 0.783
  },
- "retroarch_memoria_mb": 149.4,
+ "retroarch_memoria_mb": 144.4,
  "sessoes_encerradas": 1,
- "arena_sh_abriu_s": 0.9,
+ "arena_sh_abriu_s": 0.6,
  "arena_sh_cache": [
   "python-3.13-32338272",
-  "retroarch-10390008"
+  "retroarch-10390008.montando-1254"
  ],
- "arena_sh_saida": "inux 6.18.54.1) (x86_64, 64 bits)\n  Video:    motor detectado -> vulkan\n  Modo:     economico (maquina modesta ou midia removivel)\n            rede a cada 60s, copia a cada 15 min\n  Video:    placa de video desconhecida (integrada)\n  Imagem:   nota 4/5, placa 4/5, 77 ajustes, escala da tela com filtro (pixel nitido no 2D, nitidez no 3D)\n  Rede:     fechada (so este computador)\n  Endereco: http://127.0.0.1:8791\n  Para encerrar, feche esta janela.\n==============================================================\n\n  Encerrando...\n  Pronto. Pode retirar o pen drive com seguranca.\n\n  ARENA encerrado.\n",
- "verificar_sh": "RESUMO\n============================================================\n  Tudo certo:   11\n  Consertado:   0\n  Atencao:      3\n  Grave:        1\n   [atencao]   pasta faltando: jogos/livres\n   [atencao]   pasta faltando: jogos/turma\n   [atencao]   faltam os arquivos de apoio do Dolphin (retroarch\\system\\dolphin-emu\\Sys)\n   [grave]     Python do Linux incompleto: falta _socket, _sqlite3, _ssl, _ctypes, _hashlib, _uuid\n\n  Tem coisa que eu nao consigo consertar sozinho. Veja acima.\n\n  (modo so conferir: nada foi alterado)\n\n  ---\n  Para testes automatizados:  sh RODAR_TESTES.sh\n\n",
+ "arena_sh_saida": "quina modesta ou midia removivel)\n            rede a cada 60s, copia a cada 15 min\n  Video:    placa de video desconhecida (integrada)\n  Imagem:   nota 4/5, placa 4/5, 77 ajustes, escala da tela com filtro (pixel nitido no 2D, nitidez no 3D)\n  Rede:     fechada (so este computador)\n  Endereco: http://127.0.0.1:8791\n  Para encerrar, feche esta janela.\n==============================================================\n\n  Encerrando...\n[ARENA] O Vulkan desta maquina nao enxerga placa de video: motor automatico trocado para glcore.\n  Pronto. Pode retirar o pen drive com seguranca.\n\n  ARENA encerrado.\n",
+ "verificar_sh": "RESUMO\n============================================================\n  Tudo certo:   12\n  Consertado:   0\n  Atencao:      3\n  Grave:        0\n   [atencao]   pasta faltando: jogos/livres\n   [atencao]   pasta faltando: jogos/turma\n   [atencao]   faltam os arquivos de apoio do Dolphin (retroarch\\system\\dolphin-emu\\Sys)\n\n  Nada a consertar. O ARENA esta saudavel.\n\n  (modo so conferir: nada foi alterado)\n\n  ---\n  Para testes automatizados:  sh RODAR_TESTES.sh\n\n",
  "externos": {
   "PCSX2": {
    "tirar_do_appimage_s": 0.5,
    "abriu": true,
+   "codigo": 1,
    "saida": "PCSX2 v2.8.2\nhttps://pcsx2.net/\n\nUsage: /home/aluno/.cache/arena/pcsx2-60119544/AppRun [parameters] [--] [boot filename]\n\n  -help: Displays this information and exits.\n  -version: Displays version inf",
    "programa": "/home/aluno/.cache/arena/pcsx2-60119544/AppRun"
   },
   "RPCS3": {
-   "tirar_do_appimage_s": 2.3,
+   "tirar_do_appimage_s": 0.7,
    "abriu": true,
+   "codigo": 0,
    "saida": "No AppImage path found, checking for executable\nFound exec path: /home/aluno/.cache/arena/rpcs3-94026641/usr/bin/rpcs3\n[TSC calibration] Available clock sources: 'tsc hyperv_clocksource_tsc_page hyper",
    "programa": "/home/aluno/.cache/arena/rpcs3-94026641/AppRun"
   },
   "Xenia": {
-   "tirar_do_appimage_s": 0.2,
-   "abriu": false,
-   "saida": "",
+   "tirar_do_appimage_s": 0.1,
+   "abriu": true,
+   "codigo": null,
+   "saida": "i> 00000518 VulkanPresenter: Created 1280x720 swapchain with format 44, color space 0, presentation mode 0",
    "programa": "/home/aluno/.cache/arena/xenia-17832440/AppRun"
   }
  },
- "segundos": 664.2,
- "falhas": [
-  "MSX, pasta comum: sem imagem (816x720, 99 cores, a mais comum em 43%, o registro nao diz \"falling back to 'MSX2\\\\+ - C-BIOS'\")",
-  "MSX, pasta com acento: sem imagem (816x720, 99 cores, a mais comum em 43%, o registro nao diz \"falling back to 'MSX2\\\\+ - C-BIOS'\")",
-  "Java ME (celular antigo), pasta com acento: sem imagem (960x720, 1 cores, a mais comum em 100%)",
-  "F: o Xenia do Linux nao abriu ()"
- ],
- "segundos_com_o_conteiner": 675.2
+ "segundos": 660.4,
+ "falhas": [],
+ "segundos_com_o_conteiner": 665.3
 }

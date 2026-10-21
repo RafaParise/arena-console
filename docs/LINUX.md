@@ -128,6 +128,20 @@ para uma pasta nova, sem acento e só da conta, e o jogo abre de lá.
 RPCS3) tira o programa para uma pasta `AppDir` e deixa `squashfs-root` como
 atalho para ela; o ARENA leva a pasta de verdade para o cache.
 
+**O C-BIOS do MSX com barra.** O pacote do C-BIOS traz o `config.ini` das
+máquinas MSX e MSX2+ com `\` no caminho das ROMs (só o do MSX2 usa `/`). O
+blueMSX do Linux (e do Android) junta esse caminho à pasta `system` e procura
+um arquivo com `\` no nome: não acha, dá a máquina por incompleta e liga o
+MSX2 no lugar do MSX2+. O ARENA leva esses dois arquivos com `/`, que vale
+nos três sistemas, e troca a cópia antiga que já estava no pen drive (a
+marca dela fica em `sha256_antigos`, na `servidor/bios_livres/lista.json`).
+
+**O Xenia do Linux.** O AppImage (`xenia_canary_linux.AppImage`) é o Canary
+com outro nome de arquivo: grava o mesmo `xenia-canary.config.toml` do
+Windows, na pasta que recebe pelo `--storage_root`, e o ARENA ajusta esse
+arquivo (a placa, a escala, o teclado). A ajuda dele (`--help`) sai sem
+escrever nada; o teste o abre sem jogo e confere que ele cria a tela.
+
 **Um `retroarch.cfg` para os dois sistemas.** A cada abertura, o ARENA
 reescreve os caminhos que apontam para a pasta do outro sistema e troca os
 motores que só existem num deles (o som WASAPI vira PulseAudio ou ALSA; o
@@ -146,23 +160,26 @@ controle XInput vira udev; o d3d11 vira glcore), e o contrário no Windows.
   banco; o `ARENA.sh` com o Python que não pode ser executado; o
   `VERIFICAR.sh`; e os emuladores de fora. O resultado, com os tempos, vai
   para `docs/linux_bruto.json`.
-- **A rodada de 20/10/2026** (Debian 13 no contêiner, 11 minutos): **29 de
+- **A rodada de 21/10/2026** (Debian 13 no contêiner, 11 minutos): **32 de
   32** aberturas com imagem de verdade (os 16 consoles dos jogos livres,
-  numa pasta comum e numa com acento). O servidor abriu em 0,6 s e um jogo
-  pelo `/api/jogar` em 8,5 s (46 MB de memória o servidor, 149 MB o
-  RetroArch). O `ARENA.sh` abriu com o Python que não podia ser executado
+  numa pasta comum e numa com acento; o Java ME com acento pela ponte), e
+  nenhuma falha. O servidor abriu em 0,6 s e um jogo pelo `/api/jogar` em
+  8,5 s (46 MB de memória o servidor, 144 MB o RetroArch), com a sessão no
+  banco. O `ARENA.sh` abriu com o Python que não podia ser executado
   (copiado para `~/.cache/arena`) e fechou pelo Ctrl+C. O `VERIFICAR.sh`
-  terminou, e o PCSX2 e o RPCS3 saíram do AppImage e abriram.
-- **O que essa rodada achou, já consertado:** o MSX sem jogo (o núcleo do
-  1.22.2 do Linux), o Java ME preto numa pasta com acento (a ponte), o
-  RPCS3 que não saía do AppImage (o `AppDir`), o "[grave] Python do Linux
-  incompleto" do `VERIFICAR.sh`, que era falso (os módulos vêm dentro do
-  `libpython`), e as bibliotecas que faltavam no contêiner.
-- **A conferir na próxima rodada:** o contêiner travou de novo em 20/10, às
-  22h (a máquina virtual do WSLC não fecha sem reiniciar o Windows). Falta
-  confirmar o MSX (a foto já mostra o jogo, mas o registro do núcleo novo
-  não traz a frase que o teste procura), o Java ME com acento pela ponte e
-  o Xenia, que não respondeu ao `--help` no contêiner.
+  terminou sem nada grave. O PCSX2, o RPCS3 e o Xenia saíram do AppImage e
+  abriram (o Xenia criou a tela pelo Vulkan e ficou aberto).
+- **O que as rodadas de 20 e 21/10 acharam, já consertado:** o MSX sem jogo
+  (o núcleo do 1.22.2 do Linux não tem a troca para o C-BIOS) e o MSX2 no
+  lugar do MSX2+ (a barra invertida do `config.ini` do C-BIOS); o Java ME
+  preto numa pasta com acento (a ponte); o RPCS3 que não saía do AppImage
+  (o `AppDir`); o "[grave] Python do Linux incompleto" do `VERIFICAR.sh`,
+  que era falso (os módulos vêm dentro do `libpython`); as bibliotecas que
+  faltavam no contêiner; e, na revisão do código, o Xbox 360 do Linux, que
+  não recebia os ajustes do ARENA (o nome do `config.toml`) e, nos jogos
+  com rede local, tentava abrir o Xenia Netplay do Windows.
+- **Quando falha,** o registro do RetroArch fica junto das fotos
+  (`registros/`): foi ele que mostrou o MSX2 no lugar do MSX2+.
 
 ## O que não dá para ter igual
 
@@ -170,7 +187,9 @@ controle XInput vira udev; o d3d11 vira glcore), e o contrário no Windows.
   GameCube e o Wii abrem pelo núcleo do Dolphin (o mesmo do Windows).
 - **Xbox 360:** o Xenia do Linux é experimental (muitos jogos não abrem), e,
   como no Windows, exige processador com AVX e placa com Vulkan: não roda
-  no notebook da escola.
+  no notebook da escola. A rede local dos jogos de Xbox 360 (o Systemlink)
+  vem do Xenia Netplay, que só existe para Windows: no Linux, esses jogos
+  abrem pelo Canary, sem a rede.
 - **Apple II e MSX:** os núcleos do Linux são do *nightly* do libretro. O do
   Apple II não existe no 1.22.2 do Linux, e o do MSX de lá é mais velho que
   o do Windows e não troca sozinho para a BIOS livre (o C-BIOS) quando falta
