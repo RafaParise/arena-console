@@ -31,10 +31,14 @@ ferramenta poe no lugar:
   6. os dois nucleos que o 1.22.2 do Linux nao tem: o do Java ME, o .so do
      mesmo FreeJ2ME-Plus 1.52 do .dll do Windows (o zip do projeto traz os
      dois), e o do Apple II (AppleWin), o "nightly" do libretro (so ele tem
-     o do Linux). O nightly muda de um dia para o outro no mesmo endereco:
-     vale o conferido em 18/10/2026 (a marca fica aqui, e o arquivo, no
-     cache de quem monta). Um nightly diferente so entra se alguem conferir
-     e confirmar a marca nova (--aceitar-applewin=<marca>); e o Java do Java
+     o do Linux); e o do MSX (blueMSX) tambem do nightly: o do 1.22.2 do
+     Linux e' mais velho que o do Windows e nao troca sozinho para o C-BIOS
+     (a BIOS livre) quando falta a BIOS da empresa, entao nao abria jogo
+     nenhum (achado do testes\teste_linux.py em 20/10/2026). O nightly muda
+     de um dia para o outro no mesmo endereco: vale o conferido (a marca fica
+     aqui, e o arquivo, no cache de quem monta). Um nightly diferente so
+     entra se alguem conferir e confirmar a marca nova
+     (--aceitar-applewin=<marca>, --aceitar-bluemsx=<marca>); e o Java do Java
      ME para Linux em emuladores\Java\linux, o mesmo Temurin 21 do Windows,
      reduzido com o jlink: o jlink do JDK do Windows monta o Java do Linux
      quando recebe os modulos (jmods) do JDK do Linux da mesma versao.
@@ -46,6 +50,7 @@ projeto; a do RetroArch (o buildbot nao publica), pela do arquivo baixado em
 
 Uso:
     servidor\python\python.exe ferramentas\preparar_linux.py [--sem-externos] [--aceitar-applewin=<marca>]
+                                                              [--aceitar-bluemsx=<marca>]
 """
 import hashlib
 import io
@@ -125,7 +130,19 @@ APPLEWIN = {
     # O nightly de 17/10/2026 (04:49 GMT), o que foi aberto no ARENA do Linux.
     "sha256": "57fb09796e4316cb238b1c124589de77a9846da2d2f053fb9033fc010e6de063",
     "tamanho": 1508030,
+    "nome": "applewin_libretro.so", "opcao": "--aceitar-applewin", "console": "Apple II",
+    "conferido": "18/10/2026",
 }
+BLUEMSX = {
+    "endereco": "https://buildbot.libretro.com/nightly/linux/x86_64/latest/bluemsx_libretro.so.zip",
+    "arquivo": os.path.join("linux-nucleos", "bluemsx_libretro.so.zip"),
+    # O nightly de 20/10/2026 (06:37 GMT): ja troca sozinho para o C-BIOS.
+    "sha256": "8c0386230ddac04065dc4e4c17ac62d807fb9690d96749f69741e47a71baf28d",
+    "tamanho": 731663,
+    "nome": "bluemsx_libretro.so", "opcao": "--aceitar-bluemsx", "console": "MSX",
+    "conferido": "20/10/2026",
+}
+NUCLEOS_DO_NIGHTLY = [APPLEWIN, BLUEMSX]
 # O Java do Java ME (o mesmo de ferramentas\preparar_java.py, 21.0.12.1+1).
 JDK_WINDOWS = {
     "endereco": ("https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.12.1%2B1/"
@@ -310,10 +327,41 @@ def preparar_bibliotecas():
           % (tamanho_jack, LIBGOMP["nome"], len(dados) // 1024), flush=True)
 
 
+def nucleo_do_nightly(cores, nucleo):
+    """Um nucleo do nightly do libretro (NUCLEOS_DO_NIGHTLY), conferido pela
+    marca e como programa do Linux, na pasta cores."""
+    import zipfile
+    item = dict(nucleo)
+    aceita = next((a.split("=", 1)[1] for a in sys.argv if a.startswith(item["opcao"] + "=")), None)
+    if aceita:
+        # Quem monta conferiu o nightly novo e confirma a marca dele.
+        item["sha256"] = aceita.lower()
+        item.pop("tamanho")
+    caminho_zip = os.path.join(CACHE, item["arquivo"])
+    if os.path.isfile(caminho_zip) and marca(caminho_zip) != item["sha256"]:
+        print("O %s.zip do cache tem outra marca (%s): baixando de novo." % (item["nome"], marca(caminho_zip)))
+        os.remove(caminho_zip)
+    try:
+        caminho_zip = baixado(item)
+    except SystemExit:
+        novo = os.path.join(CACHE, item["arquivo"])
+        raise SystemExit("O nightly do %s mudou desde %s (marca nova: %s). Confira o arquivo\n"
+                         "  %s\nantes de usar e, se estiver certo, rode de novo com %s=<marca nova>.\n"
+                         "Nada foi mudado." % (item["nome"], item["conferido"],
+                                               marca(novo) if os.path.isfile(novo) else "?", novo, item["opcao"]))
+    with zipfile.ZipFile(caminho_zip) as pacote:
+        dados = pacote.read(item["nome"])
+    if dados[:4] != b"\x7fELF" or b"retro_api_version" not in dados:
+        raise SystemExit("O %s que chegou nao e' um nucleo do Linux. Nada foi mudado." % item["nome"])
+    with open(os.path.join(cores, item["nome"]), "wb") as saida:
+        saida.write(dados)
+    print("  nucleo do %s para Linux: %s (nightly de %s, marca %s)"
+          % (item["console"], item["nome"], item["conferido"], hashlib.sha256(dados).hexdigest()), flush=True)
+
+
 def preparar_nucleos_que_faltam():
-    """O freej2me_libretro.so (do zip do projeto, com a marca) e o
-    applewin_libretro.so (o nightly do libretro, conferido como programa do
-    Linux)."""
+    """O freej2me_libretro.so (do zip do projeto, com a marca) e os do
+    nightly do libretro (NUCLEOS_DO_NIGHTLY: o AppleWin e o blueMSX)."""
     import zipfile
     cores = os.path.join(RAIZ, "retroarch", "cores")
     with zipfile.ZipFile(baixado(FREEJ2ME)) as pacote:
@@ -321,31 +369,8 @@ def preparar_nucleos_que_faltam():
     with open(os.path.join(cores, "freej2me_libretro.so"), "wb") as saida:
         saida.write(dados)
     print("  nucleo do Java ME para Linux: freej2me_libretro.so (FreeJ2ME-Plus 1.52)", flush=True)
-    applewin = dict(APPLEWIN)
-    aceita = next((a.split("=", 1)[1] for a in sys.argv if a.startswith("--aceitar-applewin=")), None)
-    if aceita:
-        # Quem monta conferiu o nightly novo e confirma a marca dele.
-        applewin["sha256"] = aceita.lower()
-        applewin.pop("tamanho")
-    caminho_zip = os.path.join(CACHE, applewin["arquivo"])
-    if os.path.isfile(caminho_zip) and marca(caminho_zip) != applewin["sha256"]:
-        print("O applewin_libretro.so.zip do cache tem outra marca (%s): baixando de novo." % marca(caminho_zip))
-        os.remove(caminho_zip)
-    try:
-        caminho_zip = baixado(applewin)
-    except SystemExit:
-        novo = os.path.join(CACHE, applewin["arquivo"])
-        raise SystemExit("O nightly do AppleWin mudou desde 18/10/2026 (marca nova: %s). Confira o arquivo\n"
-                         "  %s\nantes de usar e, se estiver certo, rode de novo com --aceitar-applewin=<marca nova>.\n"
-                         "Nada foi mudado." % (marca(novo) if os.path.isfile(novo) else "?", novo))
-    with zipfile.ZipFile(caminho_zip) as pacote:
-        dados = pacote.read("applewin_libretro.so")
-    if dados[:4] != b"\x7fELF" or b"retro_api_version" not in dados:
-        raise SystemExit("O applewin_libretro.so que chegou nao e' um nucleo do Linux. Nada foi mudado.")
-    with open(os.path.join(cores, "applewin_libretro.so"), "wb") as saida:
-        saida.write(dados)
-    print("  nucleo do Apple II para Linux: applewin_libretro.so (nightly de 17/10/2026, marca %s)"
-          % hashlib.sha256(dados).hexdigest(), flush=True)
+    for nucleo in NUCLEOS_DO_NIGHTLY:
+        nucleo_do_nightly(cores, nucleo)
 
 
 def preparar_java_linux(trabalho):
