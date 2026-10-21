@@ -31,10 +31,16 @@ com acento, mas GRAVA na pasta system pelo caminho em ANSI, o jeito antigo
 do Windows, em que o "ó" vira "Ã³". Para ele nao precisa de copia: basta
 dizer a pasta system pelo caminho relativo (pasta_sistema_relativa).
 
-No Linux (item 13, 17/10/2026) a ponte nao existe: la, o nome do arquivo e'
-uma sequencia de bytes em UTF-8, sem o "jeito ANSI" do Windows, e todo nucleo
-abre e grava caminho com acento (conferido com o Hatari no conteiner Linux,
-testes\teste_linux.py). O jogo abre direto, como no pen drive sem acento.
+No Linux (item 13, 17/10/2026), o nome do arquivo e' uma sequencia de bytes
+em UTF-8, sem o "jeito ANSI" do Windows, e quase todo nucleo abre e grava
+caminho com acento (conferido com o Hatari no conteiner Linux,
+testes\teste_linux.py): o jogo abre direto, como no pen drive sem acento. A
+excecao e' o Java ME (20/10/2026): o FreeJ2ME-Plus abre o Java com
+"-Dfile.encoding=ISO_8859_1" e manda o caminho do jogo por um cano, que o
+Java le em Latin-1. O "ó" (dois bytes em UTF-8) vira "Ã³", o Java procura um
+arquivo que nao existe e a tela fica preta, com qualquer lingua do sistema
+(conferido no conteiner com C, POSIX e C.UTF-8). Ele vai pela ponte tambem
+fora do Windows (PONTE_EM_TODO_SISTEMA).
 """
 import hashlib
 import os
@@ -62,8 +68,10 @@ NUCLEOS = {
     "freej2me_libretro.dll": ["freej2me-lr.jar"],
 }
 PREFIXO = "ARENA-sem-acento-"
-# So o Windows precisa da ponte (ver o topo).
+# No Windows, todo nucleo da lista vai pela ponte (ver o topo).
 PRECISA_DA_PONTE = os.name == "nt"
+# No Linux e no Android, so o que le o caminho em Latin-1: o Java ME.
+PONTE_EM_TODO_SISTEMA = ("freej2me_libretro.dll",)
 
 # Os nucleos que abrem o jogo com acento, mas gravam na pasta system pelo
 # caminho em ANSI (rodada final de 15/10/2026): o N64 (mupen64plus-next)
@@ -137,7 +145,7 @@ def precisa(nucleo, pasta_sistema, caminho_jogo):
     """Este jogo precisa da ponte: o nucleo e' um dos que nao aceitam acento
     e o jogo tem acento -- ou a pasta da BIOS, quando ele usa uma?"""
     nucleo = _nome_do_nucleo(nucleo)
-    if not PRECISA_DA_PONTE or nucleo not in NUCLEOS:
+    if nucleo not in NUCLEOS or not (PRECISA_DA_PONTE or nucleo in PONTE_EM_TODO_SISTEMA):
         return False
     return not sem_acento(caminho_jogo) or (bool(NUCLEOS[nucleo]) and not sem_acento(pasta_sistema))
 
@@ -207,7 +215,7 @@ def preparar(nucleo, pasta_sistema, caminho_jogo):
     lugar sem acento ou a copia falhar."""
     base = pasta_da_ponte()
     if not base:
-        raise OSError("nenhuma pasta sem acento para abrir o jogo (nem a temporária do Windows, nem a ProgramData)")
+        raise OSError("nenhuma pasta sem acento para abrir o jogo (nem a temporária do sistema, nem a ProgramData)")
     limpar_sobras(base)
     ponte = tempfile.mkdtemp(prefix=PREFIXO, dir=base)
     necessarios = NUCLEOS[_nome_do_nucleo(nucleo)]

@@ -53,6 +53,16 @@ class TestPonteSemAcento(unittest.TestCase):
         self.assertFalse(ponte.precisa("hatari_libretro.so", self.sistema, self.jogo))
         self.assertIsNone(ponte.pasta_sistema_relativa("vice_x64_libretro.so", self.sistema, self.com_acento))
 
+    def test_o_java_me_vai_pela_ponte_tambem_fora_do_windows(self):
+        # O FreeJ2ME-Plus le o caminho em Latin-1 em qualquer sistema
+        # (conferido no conteiner Linux em 20/10/2026).
+        ponte.PRECISA_DA_PONTE = False
+        jogo = os.path.join(self.com_acento, "Jogo Ação.jar")
+        self.assertTrue(ponte.precisa("/arena/retroarch/cores/freej2me_libretro.so", self.sistema, jogo))
+        self.assertFalse(ponte.precisa("/arena/retroarch/cores/hatari_libretro.so", self.sistema, self.jogo))
+        sem = os.path.join(self.base, "sem", "jogo.jar")
+        self.assertFalse(ponte.precisa("freej2me_libretro.so", os.path.join(self.base, "sem"), sem))
+
     def test_o_nucleo_do_linux_tem_o_nome_do_windows_nas_listas(self):
         self.assertEqual(ponte._nome_do_nucleo("/arena/retroarch/cores/hatari_libretro.so"), "hatari_libretro.dll")
         self.assertEqual(ponte._nome_do_nucleo("C:\\x\\cores\\Hatari_Libretro.DLL"), "hatari_libretro.dll")
