@@ -48,11 +48,46 @@
     return lista.map(function (linhas) { return fazer(linhas, paleta); });
   }
 
+  // O mesmo sprite girado de 90 em 90 graus (quartos = 1, 2 ou 3, no sentido
+  // do relogio). Em pixel art, girar de 90 em 90 nao perde nada: cada ponto so
+  // muda de lugar, copiado um a um. Serve para a estrela do Diddy e o
+  // rolamento do Kiddy (20/10/2026).
+  function girar(sprite, quartos) {
+    quartos = ((quartos % 4) + 4) % 4;
+    const deitado = quartos % 2 === 1;
+    const w = deitado ? sprite.h : sprite.w, h = deitado ? sprite.w : sprite.h;
+    const origem = sprite.tela.getContext('2d').getImageData(0, 0, sprite.w, sprite.h).data;
+    const tela = document.createElement('canvas');
+    tela.width = w;
+    tela.height = h;
+    const c = tela.getContext('2d');
+    const destino = c.createImageData(w, h);
+    for (let y = 0; y < sprite.h; y++) {
+      for (let x = 0; x < sprite.w; x++) {
+        let nx = x, ny = y;
+        if (quartos === 1) { nx = sprite.h - 1 - y; ny = x; }
+        else if (quartos === 2) { nx = sprite.w - 1 - x; ny = sprite.h - 1 - y; }
+        else if (quartos === 3) { nx = y; ny = sprite.w - 1 - x; }
+        const de = (y * sprite.w + x) * 4, para = (ny * w + nx) * 4;
+        for (let i = 0; i < 4; i++) destino.data[para + i] = origem[de + i];
+      }
+    }
+    c.putImageData(destino, 0, 0);
+    const espelho = document.createElement('canvas');
+    espelho.width = w;
+    espelho.height = h;
+    const e = espelho.getContext('2d');
+    e.translate(w, 0);
+    e.scale(-1, 1);
+    e.drawImage(tela, 0, 0);
+    return { tela: tela, espelho: espelho, w: w, h: h };
+  }
+
   // Cola o sprite com o canto de cima a esquerda em (x, y), virado para
   // a direita (dir = 1) ou para a esquerda (dir = -1).
   function colar(ctx, sprite, x, y, dir) {
     ctx.drawImage(dir === -1 ? sprite.espelho : sprite.tela, Math.round(x), Math.round(y));
   }
 
-  window.SpritesRetro = { fazer: fazer, quadros: quadros, colar: colar };
+  window.SpritesRetro = { fazer: fazer, quadros: quadros, girar: girar, colar: colar };
 })();
