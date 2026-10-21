@@ -32,6 +32,7 @@ import identificador
 import jogadores
 import nomes_arcade
 import integridade
+import plataforma as plataforma_do_sistema
 import zipfile
 
 # ---------------------------------------------------------------------------
@@ -1020,9 +1021,11 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None,
                 "jogadores_max": ligacao["jogadores"],
                 # Jogo com rede PROPRIA (System Link do PS2/Xbox 360): a tela
                 # do Jogar Junto explica que da para ligar 2 computadores
-                # pelo menu de dentro do jogo.
+                # pelo menu de dentro do jogo. O do Xbox 360 vem do Xenia
+                # Netplay, que so existe para Windows.
                 "rede_propria": bool(graficos.jogo_tem_system_link_ps2(plataforma, titulo)
-                                     or graficos.jogo_tem_netplay_xbox360(plataforma, titulo)),
+                                     or (plataforma_do_sistema.WINDOWS
+                                         and graficos.jogo_tem_netplay_xbox360(plataforma, titulo))),
                 # Frase para o aluno quando o jogo aceita mais do que o
                 # emulador deste console permite (vazio no resto).
                 "motivo_jogadores": ligacao["motivo"],

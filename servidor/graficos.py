@@ -2167,6 +2167,25 @@ def _trocar_valor_toml(texto, chave, valor):
     return padrao.sub(lambda m: m.group(1) + valor, texto, count=1)
 
 
+# O nome do config.toml vem de dentro de cada Xenia (xenia_canary.exe grava o
+# xenia-canary.config.toml). O AppImage do Linux e' o Canary com outro nome de
+# arquivo (xenia_canary_linux.AppImage) e grava o mesmo xenia-canary.config.toml
+# (visto no conteiner em 21/10/2026).
+_CONFIG_DO_XENIA_APPIMAGE = (("xenia_canary_netplay", "xenia-canary-netplay"),
+                             ("xenia_canary", "xenia-canary"),
+                             ("xenia_edge", "xenia-edge"))
+
+
+def nome_do_config_xenia(caminho_executavel):
+    """O nome do config.toml do Xenia que esta em 'caminho_executavel'."""
+    nome = os.path.splitext(os.path.basename(caminho_executavel))[0]
+    if caminho_executavel.lower().endswith(".appimage"):
+        for comeco, config in _CONFIG_DO_XENIA_APPIMAGE:
+            if nome.lower().startswith(comeco):
+                return config + ".config.toml"
+    return nome.replace("_", "-") + ".config.toml"
+
+
 def escrever_config_xenia(caminho_executavel, nota, nota_gpu=None, modesto=False,
                           ultra=False, preset=None, controles_xinput=None,
                           placa="any"):
@@ -2192,10 +2211,7 @@ def escrever_config_xenia(caminho_executavel, nota, nota_gpu=None, modesto=False
     - nao inventamos um do zero, pra nao perder as centenas de opcoes que
     so o Xenia sabe o valor certo.
     """
-    pasta = os.path.dirname(caminho_executavel)
-    nome_exe = os.path.splitext(os.path.basename(caminho_executavel))[0]
-    nome_config = nome_exe.replace("_", "-") + ".config.toml"
-    destino = os.path.join(pasta, nome_config)
+    destino = os.path.join(os.path.dirname(caminho_executavel), nome_do_config_xenia(caminho_executavel))
 
     if not os.path.isfile(destino):
         return None
@@ -2311,10 +2327,7 @@ def escrever_config_netplay_xbox360(caminho_executavel):
     inventar um arquivo do zero e perder as centenas de opcoes que so o
     Xenia sabe o valor certo.
     """
-    pasta = os.path.dirname(caminho_executavel)
-    nome_exe = os.path.splitext(os.path.basename(caminho_executavel))[0]
-    nome_config = nome_exe.replace("_", "-") + ".config.toml"
-    destino = os.path.join(pasta, nome_config)
+    destino = os.path.join(os.path.dirname(caminho_executavel), nome_do_config_xenia(caminho_executavel))
 
     if not os.path.isfile(destino):
         return False

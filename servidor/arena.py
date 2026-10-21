@@ -2818,7 +2818,10 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             plataforma_360 = next((p for p in carregar_catalogo()
                                    if p["id"] == jogo.get("plataforma")), None)
             externo_360 = (plataforma_360 or {}).get("externo") or {}
-            if (plataforma_360 and externo_360.get("executavel_netplay") and
+            # O Xenia Netplay so existe para Windows (.exe): no Linux, o
+            # .exe ao lado do AppImage nao abre, e o jogo vai pelo Canary
+            # (revisao de 21/10/2026).
+            if (plataforma_do_sistema.WINDOWS and plataforma_360 and externo_360.get("executavel_netplay") and
                     graficos.jogo_tem_netplay_xbox360(plataforma_360, jogo["titulo"])):
                 caminho_netplay = os.path.join(
                     os.path.dirname(jogo["externo"]["caminho"]),
@@ -6908,7 +6911,7 @@ class Manipulador(BaseHTTPRequestHandler):
                         "pra ENTRAR numa partida de outra máquina - falta o "
                         "driver de rede pra também hospedar. Ver Ajustes -> "
                         "Emuladores.")
-            elif (caminho_externo and dados_externo["nome"] == "Xenia" and
+            elif (caminho_externo and dados_externo["nome"] == "Xenia" and plataforma_do_sistema.WINDOWS and
                   graficos.jogo_tem_netplay_xbox360(plataforma, jogo["titulo"])):
                 resposta["aviso"] = (
                     "Este jogo tem rede local de verdade (Systemlink) - o "
