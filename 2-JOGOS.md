@@ -761,7 +761,10 @@ O Vircon32, console de fantasia de código aberto, também traz a BIOS dele
 OpenGL: o RetroArch troca de motor sozinho para esse console.
 
 Ninguém precisa mexer nela. Ao abrir, o ARENA copia para `retroarch\system`
-só o que falta. **As duas funções continuam valendo:** a BIOS de verdade, se
+só o que falta (e atualiza a cópia antiga de um arquivo livre que mudou,
+como o `config.ini` do C-BIOS, que em 21/10/2026 ganhou `/` no lugar de `\`
+para o MSX abrir no Linux e no Android). **As duas funções continuam
+valendo:** a BIOS de verdade, se
 você puser na pasta `BIOS`, passa na frente da livre (no MSX, o próprio
 emulador escolhe: tenta a máquina original e, sem a BIOS dela, liga a do
 C-BIOS; no Atari ST, o TOS original entra no lugar do EmuTOS).

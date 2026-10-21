@@ -1,5 +1,5 @@
 {
-  "_leia": "As BIOS livres que vêm com o ARENA (servidor\\bios_livres.py). Cada arquivo diz de onde sai (origem, dentro desta pasta), para onde o ARENA o copia (destino, dentro de retroarch\\system) e a marca dele (sha256). O ARENA só copia o que falta e nunca troca uma BIOS que já está lá. O conferidor de publicação só deixa ir ao GitHub o arquivo desta pasta que tem a marca registrada aqui.",
+  "_leia": "As BIOS livres que vêm com o ARENA (quem as instala é o servidor\\bios.py). Cada arquivo diz de onde sai (origem, dentro desta pasta), para onde o ARENA o copia (destino, dentro de retroarch\\system) e a marca dele (sha256). O ARENA só copia o que falta e nunca troca uma BIOS que já está lá; a exceção é a cópia antiga do próprio arquivo livre (a marca dela fica em sha256_antigos), quando ele muda aqui (o que mudou, em mudanca). O conferidor de publicação só deixa ir ao GitHub o arquivo desta pasta que tem a marca registrada aqui.",
   "projetos": {
     "C-BIOS": {
       "nome": "C-BIOS",
@@ -52,7 +52,9 @@
       "console": "msx",
       "origem": "C-BIOS/configs/blueMSX/MSX - C-BIOS/config.ini",
       "destino": "Machines/MSX - C-BIOS/config.ini",
-      "sha256": "6c3e65f0ac9741d46c83b75931f5bb47242e350cc8bf4d8ee300d17474654eb0"
+      "sha256": "415df050e17addc0e119489503c4c6f6e97756b024b2af1ddab4c0d1769bd659",
+      "mudanca": "Os caminhos das ROMs com barra (/) no lugar da barra invertida do pacote: no Linux e no Android, o blueMSX não acha a ROM pelo caminho com \\ e não liga esta máquina (21/10/2026). O MSX2 do mesmo pacote já vinha com /.",
+      "sha256_antigos": ["6c3e65f0ac9741d46c83b75931f5bb47242e350cc8bf4d8ee300d17474654eb0"]
     },
     {
       "projeto": "C-BIOS",
@@ -115,7 +117,9 @@
       "console": "msx",
       "origem": "C-BIOS/configs/blueMSX/MSX2+ - C-BIOS/config.ini",
       "destino": "Machines/MSX2+ - C-BIOS/config.ini",
-      "sha256": "627c4f437040e1b9d46d03cfe2cc8673a8f342bb43dc78adc2651ad7d8c194b0"
+      "sha256": "bf65f47b8eb34b930cd838193bfaa6e2befd52f23cf2a6fb5e2eab0cd10a31fa",
+      "mudanca": "Os caminhos das ROMs com barra (/) no lugar da barra invertida do pacote: no Linux e no Android, o blueMSX não acha a ROM pelo caminho com \\ e liga o MSX2 no lugar do MSX2+ (21/10/2026). O MSX2 do mesmo pacote já vinha com /.",
+      "sha256_antigos": ["627c4f437040e1b9d46d03cfe2cc8673a8f342bb43dc78adc2651ad7d8c194b0"]
     },
     {
       "projeto": "C-BIOS",

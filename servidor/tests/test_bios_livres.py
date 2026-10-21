@@ -9,6 +9,7 @@ testes\\teste_consoles_livres.py."""
 import hashlib
 import json
 import os
+import re
 import shutil
 import sys
 import tempfile
@@ -72,6 +73,36 @@ class TestBiosLivres(unittest.TestCase):
         self.assertTrue(os.path.isfile(os.path.join(self.sistema, "Machines", "MSX2+ - C-BIOS",
                                                     "cbios_main_msx2+.rom")))
         self.assertEqual(bios.instalar_livres(self.sistema), {})   # na segunda vez, nada
+
+    def test_caminhos_das_maquinas_com_barra(self):
+        """No Linux e no Android, o blueMSX so acha a ROM pelo caminho com "/";
+        com "\\", dava a maquina por incompleta (achado de 21/10/2026)."""
+        for maquina in MAQUINAS_CBIOS:
+            caminho = os.path.join(bios.PASTA_LIVRES, "C-BIOS", "configs", "blueMSX", maquina, "config.ini")
+            with open(caminho, "rb") as arquivo:
+                texto = arquivo.read().decode("ascii")
+            self.assertIn('"Machines/%s/' % maquina, texto)
+            self.assertNotIn("\\", texto, maquina)
+
+    def test_troca_so_a_copia_antiga_da_livre(self):
+        """O config.ini antigo do C-BIOS (o do pacote, com "\\") continua
+        contando como livre e o ARENA o troca pelo novo. O que nao e' copia
+        antiga (o config de outra origem) fica: test_instala_so_o_que_falta."""
+        mudados = [i for i in bios.livres()["arquivos"] if i.get("sha256_antigos")]
+        self.assertEqual({i["destino"] for i in mudados},
+                         {"Machines/MSX - C-BIOS/config.ini", "Machines/MSX2+ - C-BIOS/config.ini"})
+        destinos = {}
+        for item in mudados:
+            with open(os.path.join(bios.PASTA_LIVRES, *item["origem"].split("/")), "rb") as arquivo:
+                novo = arquivo.read()
+            antigo = re.sub(rb'"Machines/[^"]*"', lambda m: m.group().replace(b"/", b"\\"), novo)
+            self.assertIn(hashlib.sha256(antigo).hexdigest(), item["sha256_antigos"], item["destino"])
+            destinos[item["destino"]] = self.gravar(item["destino"], antigo)
+            self.assertTrue(bios.e_livre(destinos[item["destino"]]))
+        bios.instalar_livres(self.sistema)
+        for item in mudados:
+            self.assertEqual(_sha(destinos[item["destino"]]), item["sha256"], item["destino"])
+        self.assertEqual(bios.instalar_livres(self.sistema), {})
 
     def test_arquivo_mexido_na_pasta_do_arena_nao_instala(self):
         copia = os.path.join(self.base, "bios_livres")

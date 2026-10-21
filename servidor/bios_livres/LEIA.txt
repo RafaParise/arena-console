@@ -10,6 +10,9 @@ ARENA:
     Abre os jogos de cartucho (.rom). Não tem o MSX-BASIC nem o leitor de
     disquete: jogo de disquete (.dsk) e de fita (.cas) continua pedindo a
     BIOS de verdade (a pasta Machines do blueMSX, na pasta BIOS\MSX).
+    Uma mudança do ARENA: no config.ini das máquinas MSX e MSX2+, o
+    caminho das ROMs usa / no lugar de \ (como o do MSX2 já vinha). Com \,
+    o blueMSX do Linux e do Android não acha as ROMs.
 
   EmuTOS 1.4 (Atari ST) - licença GPL 2 - https://emutos.sourceforge.io/
     Liga o computador e abre os jogos. É a imagem de 192 KB em inglês
@@ -32,7 +35,8 @@ ARENA:
     com as duas, o ARENA pergunta qual usar.
 
 Ninguém precisa mexer aqui. Ao abrir, o ARENA copia para retroarch\system só
-o que estiver faltando, e nunca troca uma BIOS que já está lá. A BIOS de
+o que estiver faltando, e nunca troca uma BIOS que já está lá (só atualiza a
+cópia antiga de um arquivo livre que mudou aqui). A BIOS de
 verdade, se você puser na pasta BIOS do ARENA, passa na frente da livre (no
 PlayStation, o ARENA pergunta qual das duas usar e lembra a resposta).
 

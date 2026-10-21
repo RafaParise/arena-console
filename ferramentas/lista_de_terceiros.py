@@ -111,16 +111,27 @@ def nucleos(pasta_retroarch, extensao=".dll"):
     return saida
 
 
-def bios_livres():
-    """Os projetos da servidor\\bios_livres\\lista.json (as BIOS livres que o
-    pacote leva), na ordem do nome."""
+def _lista_das_bios_livres():
     import json
     try:
         with open(os.path.join(RAIZ, "servidor", "bios_livres", "lista.json"), encoding="utf-8") as f:
-            projetos = json.load(f).get("projetos", {})
+            return json.load(f)
     except (OSError, ValueError):
-        return []
+        return {}
+
+
+def bios_livres():
+    """Os projetos da servidor\\bios_livres\\lista.json (as BIOS livres que o
+    pacote leva), na ordem do nome."""
+    projetos = _lista_das_bios_livres().get("projetos", {})
     return [projetos[nome] for nome in sorted(projetos)]
+
+
+def bios_livres_mudadas():
+    """[(origem, o que mudou)]: os arquivos das BIOS livres que o ARENA nao
+    leva como o projeto publica (o "mudanca" da lista.json)."""
+    return [(item["origem"], item["mudanca"]) for item in _lista_das_bios_livres().get("arquivos", [])
+            if item.get("mudanca")]
 
 
 def do_chromebook():
@@ -226,13 +237,16 @@ def montar(pasta):
         linhas.append("| %s | %s | <%s> | `%s` |" % (nome, licenca, fonte, onde))
     linhas += [""] + NAO_VEM
     livres = bios_livres()
+    mudadas = bios_livres_mudadas()
+    como = "como cada projeto publica (salvo o que vai abaixo)," if mudadas else "sem mudança nenhuma,"
     linhas += [
         "",
         "## BIOS livres (%d)" % len(livres),
         "",
-        "Ficam em `servidor\\bios_livres`, sem mudança nenhuma, com o texto da",
+        "Ficam em `servidor\\bios_livres`, %s com o texto da" % como,
         "licença ao lado; a `lista.json` dessa pasta guarda a marca (SHA-256) de",
-        "cada arquivo. O ARENA as copia para `retroarch\\system` só onde falta.",
+        "cada arquivo. O ARENA as copia para `retroarch\\system` só onde falta%s." % (
+            " (e troca a cópia antiga de um arquivo que mudou)" if mudadas else ""),
         "",
         "| BIOS | Console | Licença | Código-fonte | Pasta |",
         "|---|---|---|---|---|",
@@ -241,6 +255,9 @@ def montar(pasta):
         linhas.append("| %s %s | %s | %s | <%s> | `servidor\\bios_livres\\%s` |" % (
             projeto["nome"], projeto.get("versao", ""), projeto.get("console", ""), projeto.get("licenca", ""),
             projeto.get("codigo_fonte") or projeto.get("site", ""), projeto["nome"]))
+    if mudadas:
+        linhas += ["", "O que mudou em relação ao que o projeto publica:", ""]
+        linhas += ["- `%s`: %s" % (origem, mudanca) for origem, mudanca in mudadas]
     linhas += [
         "",
         "## Núcleos do RetroArch (%d)" % len(lista),

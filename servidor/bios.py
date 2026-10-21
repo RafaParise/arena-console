@@ -494,6 +494,12 @@ def _firmware_do_ps3(raiz):
 # escolhe e' o proprio nucleo: o blueMSX tenta a maquina de verdade (MSX2+)
 # e, sem a BIOS dela, liga a "MSX2+ - C-BIOS" (o registro diz "'MSX2+' is
 # incomplete, falling back to 'MSX2+ - C-BIOS'", visto em 14/10/2026).
+#
+# Quando um arquivo livre muda aqui (o config.ini do C-BIOS ganhou "/" no
+# lugar de "\" em 21/10/2026: no Linux, o blueMSX nao achava as ROMs), a
+# marca da copia antiga fica em "sha256_antigos": ela continua contando como
+# livre e e' a unica coisa ja instalada que o ARENA troca (e' dele, nunca
+# BIOS de verdade).
 
 def livres():
     """A lista.json das BIOS livres ({"projetos": {...}, "arquivos": [...]}),
@@ -533,13 +539,38 @@ def _tamanhos_livres():
     return tamanhos
 
 
+def _marcas(item):
+    """As marcas de um arquivo livre: a de agora e as das copias antigas."""
+    return {item["sha256"], *item.get("sha256_antigos", ())}
+
+
 def e_livre(caminho):
     """O arquivo e' uma BIOS livre do ARENA (e nao a BIOS do console)? Pela
-    marca SHA-256 da lista.json."""
+    marca SHA-256 da lista.json (a de agora ou a de uma copia antiga)."""
     try:
         if os.path.getsize(caminho) not in _tamanhos_livres():
             return False
-        return sha256_do_arquivo(caminho) in {item["sha256"] for item in livres()["arquivos"]}
+        marca = sha256_do_arquivo(caminho)
+        return any(marca in _marcas(item) for item in livres()["arquivos"])
+    except OSError:
+        return False
+
+
+# As copias antigas que o sistema nao deixou trocar (somente leitura, pasta
+# protegida): o ARENA nao tenta de novo a cada pedido enquanto estiver aberto.
+_TROCAS_RECUSADAS = set()
+
+
+def _copia_antiga(destino, item):
+    """'destino' e' uma copia antiga deste arquivo livre (a marca dele esta
+    em "sha256_antigos")? So ela o ARENA troca. (A troca de "\\" por "/" nao
+    mudou o tamanho; se um arquivo livre mudar de tamanho, o e_livre, que
+    filtra pelo tamanho de agora, deixa de reconhecer a copia antiga.)"""
+    antigos = item.get("sha256_antigos")
+    if not antigos or destino in _TROCAS_RECUSADAS:
+        return False
+    try:
+        return sha256_do_arquivo(destino) in antigos
     except OSError:
         return False
 
@@ -558,13 +589,15 @@ def nomes_livres(relativo):
 
 def instalar_livres(pasta_sistema):
     """Passo 4: copia para retroarch\\system as BIOS livres que faltam. Nunca
-    troca arquivo que ja esta la, nem instala o que nao bate com a marca da
-    lista (arquivo mexido na pasta do ARENA). Devolve {projeto: arquivos
+    troca arquivo que ja esta la (salvo a copia antiga do proprio arquivo
+    livre: _copia_antiga), nem instala o que nao bate com a marca da lista
+    (arquivo mexido na pasta do ARENA). Devolve {projeto: arquivos
     copiados}."""
     copiados = {}
     for item in livres()["arquivos"]:
         destino = os.path.join(pasta_sistema, *item["destino"].split("/"))
-        if os.path.exists(destino):
+        trocar = os.path.exists(destino)
+        if trocar and not _copia_antiga(destino, item):
             continue
         try:
             with open(os.path.join(PASTA_LIVRES, *item["origem"].split("/")), "rb") as arquivo:
@@ -573,6 +606,8 @@ def instalar_livres(pasta_sistema):
                 continue
             _gravar(destino, dados)
         except OSError:
+            if trocar:
+                _TROCAS_RECUSADAS.add(destino)
             continue
         copiados[item["projeto"]] = copiados.get(item["projeto"], 0) + 1
     return copiados
@@ -1044,9 +1079,28 @@ def _gravar(destino, dados):
     # Nome unico por thread: a arrumacao da abertura e o jogo que vai abrir
     # podem instalar a mesma BIOS livre ao mesmo tempo (15/10/2026).
     temporario = "%s.%d.instalando" % (destino, threading.get_ident())
-    with open(temporario, "wb") as arquivo:
-        arquivo.write(dados)
-    os.replace(temporario, destino)
+    try:
+        with open(temporario, "wb") as arquivo:
+            arquivo.write(dados)
+        # No Windows, a troca falha por um instante quando outra thread le o
+        # destino ou troca o mesmo arquivo: tenta de novo por pouco tempo
+        # (como o arena.gravar_texto_atomico). E o temporario nunca fica
+        # para tras: sobravam config.ini.<thread>.instalando na pasta das
+        # maquinas do MSX (revisao de 21/10/2026).
+        for tentativa in range(5):
+            try:
+                os.replace(temporario, destino)
+                return
+            except PermissionError:
+                if tentativa == 4:
+                    raise
+                time.sleep(0.05)
+    finally:
+        if os.path.exists(temporario):
+            try:
+                os.remove(temporario)
+            except OSError:
+                pass
 
 
 def _ler_conferidos(caminho):
