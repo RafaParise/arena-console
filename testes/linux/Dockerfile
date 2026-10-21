@@ -16,11 +16,15 @@ ENV DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 LC_ALL=C.UTF-8
 # traz; o ARENA leva a vazia) e a libgomp (o ARENA leva a de reserva). A
 # libgpg-error vem: todo Linux com o systemd tem (o Debian "slim" nao).
 # x11-apps: o xwd, que fotografa a tela virtual; git: os testes das
-# ferramentas de publicar.
+# ferramentas de publicar. O libOpenGL, o harfbuzz e o fribidi vem em todo
+# Linux com tela (o GTK e o Qt dependem deles), mas nao no "slim": sem eles,
+# o PCSX2 (libOpenGL.so.0, libharfbuzz.so.0) e o Xenia (libfribidi.so.0) nem
+# abriam no conteiner (testes\teste_linux.py, 20/10/2026).
 RUN apt-get update && apt-get install -y --no-install-recommends \
         ca-certificates procps xvfb xauth x11-utils x11-apps \
-        libgl1 libgl1-mesa-dri libegl1 libgles2 libvulkan1 mesa-vulkan-drivers \
+        libgl1 libgl1-mesa-dri libegl1 libgles2 libvulkan1 mesa-vulkan-drivers libopengl0 \
         libasound2t64 libpulse0 libglib2.0-0t64 libfontconfig1 libfreetype6 libxkbcommon0 \
+        libharfbuzz0b libfribidi0 \
         libudev1 libusb-1.0-0 libsdl2-2.0-0 libgpg-error0 zstd xz-utils file git \
     && rm -rf /var/lib/apt/lists/*
 
