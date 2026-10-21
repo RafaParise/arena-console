@@ -12,7 +12,8 @@ Debian sem tela (o Xvfb faz a tela), numa copia do ARENA:
      mesma conferencia de testes\teste_consoles_livres.py, com o Java ME
      no Java do Linux e o Apple II no nucleo do nightly;
   B. os mesmos jogos com a pasta num caminho com acento ("Pedagógicos"):
-     no Linux, sem a ponte sem acento do Windows;
+     direto, sem a ponte sem acento do Windows; so o Java ME vai pela ponte,
+     como o ARENA faz no Linux (servidor\ponte_sem_acento.py);
   C. pelo servidor do ARENA, como a tela faz (POST /api/jogar): o jogo
      abre, a tela tem imagem (a foto do Xvfb, pelo xwd), e a sessao fica no
      banco quando o jogo fecha;
@@ -21,7 +22,9 @@ Debian sem tela (o Xvfb faz a tela), numa copia do ARENA:
      ele vai para ~/.cache/arena);
   E. o VERIFICAR.sh confere a copia;
   F. os emuladores de fora do Linux (PCSX2, RPCS3, Xenia) saem do AppImage
-     e abrem.
+     e abrem;
+  G. (so quando pedida) as medidas do item 15, as mesmas do Windows
+     (testes\medidas_virtuais.py): quem a pede e' o testes\teste_sistemas_virtuais.py.
 
 Os tempos ficam no resultado (o item 15 usa: quanto custa rodar num
 sistema virtual).
@@ -29,7 +32,7 @@ sistema virtual).
 No Windows, este mesmo arquivo monta a imagem do conteiner, se faltar
 (testes\linux\Dockerfile, pelo WSLC, sem administrador), roda a si mesmo
 dentro dele e guarda o resultado em docs\linux_bruto.json:
-    servidor\python\python.exe testes\teste_linux.py [A,B,C,D,E,F] [pedaco do console]
+    servidor\python\python.exe testes\teste_linux.py [A,B,C,D,E,F,G] [pedaco do console]
 """
 import json
 import os
@@ -67,7 +70,7 @@ RETROARCH_VAZIAS = {"system", "saves", "states", "screenshots", "cache", "remaps
 # No Windows: o conteiner
 # ---------------------------------------------------------------------------
 
-def pelo_conteiner(argumentos):
+def pelo_conteiner(argumentos, copiar_para=None):
     imagens = subprocess.run([CONTAINER, "image", "list"], capture_output=True, text=True, errors="replace").stdout
     if IMAGEM not in imagens:
         print("Montando a imagem %s (uma vez so)..." % IMAGEM, flush=True)
@@ -83,13 +86,16 @@ def pelo_conteiner(argumentos):
         with open(resultado, encoding="utf-8") as arquivo:
             dados = json.load(arquivo)
         dados["segundos_com_o_conteiner"] = round(time.monotonic() - inicio, 1)
+        if copiar_para:                 # o teste do item 15 le o resultado daqui
+            with open(copiar_para, "w", encoding="utf-8") as arquivo:
+                json.dump(dados, arquivo, ensure_ascii=False, indent=1)
         if not argumentos:              # so a rodada inteira vai para o docs
             with open(os.path.join(RAIZ, "docs", "linux_bruto.json"), "w", encoding="utf-8") as arquivo:
                 json.dump(dados, arquivo, ensure_ascii=False, indent=1)
             print("Resultado: docs\\linux_bruto.json")
-        fotos = os.path.join(saida, "fotos")
-        if os.path.isdir(fotos):
-            print("Fotos: %s" % fotos)
+        for pasta, rotulo in (("fotos", "Fotos"), ("registros", "Registros das falhas")):
+            if os.path.isdir(os.path.join(saida, pasta)):
+                print("%s: %s" % (rotulo, os.path.join(saida, pasta)))
     return codigo
 
 
@@ -233,6 +239,7 @@ def parte_a_b(resultado, falhas, filtro, partes):
     import bios
     import java_do_arena
     import plataforma
+    import ponte_sem_acento
     import teste_consoles_livres as livres
     import limpeza
     graficos = livres.base.graficos
@@ -292,6 +299,12 @@ def parte_a_b(resultado, falhas, filtro, partes):
                 pasta = os.path.join(trabalho, "rodada")
                 os.makedirs(pasta)
                 cfg = livres.base.config_base(pasta, p.get("opcoes_retroarch", {}))
+                # O jogo e a BIOS pela ponte sem acento, quando o ARENA
+                # tambem os mandaria por ela (arena.py, antes de abrir o jogo).
+                devolver = None
+                if ponte_sem_acento.precisa(caminho_nucleo, sistema, jogo):
+                    jogo, opcoes_ponte, devolver = ponte_sem_acento.preparar(caminho_nucleo, sistema, jogo)
+                    sistema = opcoes_ponte.get("system_directory", sistema)
                 extra = os.path.join(pasta, "system.cfg")
                 with open(extra, "w", encoding="utf-8") as arquivo:
                     arquivo.write('system_directory = "%s"\n' % sistema)
@@ -308,6 +321,9 @@ def parte_a_b(resultado, falhas, filtro, partes):
                     travou = False
                 except subprocess.TimeoutExpired:
                     travou = True
+                finally:
+                    if devolver:
+                        devolver()
                 segundos = time.monotonic() - antes
                 ok, detalhe = livres.imagem_de_verdade(foto, item.get("cor"))
                 texto = open(registro, encoding="utf-8", errors="ignore").read() if os.path.exists(registro) else ""
@@ -315,10 +331,17 @@ def parte_a_b(resultado, falhas, filtro, partes):
                     import re
                     ok = bool(re.search(regras["registro"], texto))
                     detalhe += "" if ok else ", o registro nao diz %r" % regras["registro"]
+                if (not ok or travou) and texto:    # o registro diz por que falhou
+                    registros = os.path.join(SAIDA, "registros")
+                    os.makedirs(registros, exist_ok=True)
+                    with open(os.path.join(registros, "%s - %s.log" % (item["console"], rotulo)), "w",
+                              encoding="utf-8") as arquivo:
+                        arquivo.write(texto)
                 if os.path.isfile(foto):
                     shutil.copyfile(foto, os.path.join(fotos, "%s - %s.png" % (item["console"], rotulo)))
                 rodadas.append({"parte": parte, "console": item["console"], "jogo": item["jogo"], "nucleo": nucleo,
                                 "imagem": ok, "detalhe": detalhe, "travou": travou, "segundos": round(segundos, 1),
+                                "pela_ponte": bool(devolver),
                                 "quadros": quadros, "quadros_por_segundo": round(quadros / segundos, 1) if segundos else 0})
                 print("   %s %-12s %-17s imagem: %-3s (%s)%s" % (parte, item["console"], rotulo, "sim" if ok else "NAO",
                                                               detalhe, " TRAVOU" if travou else ""), flush=True)
@@ -474,13 +497,52 @@ def parte_e(resultado, falhas):
         falhas.append("E: o VERIFICAR.sh nao achou o RetroArch do Linux")
 
 
+def abre_sem_jogo(comando, sinal, segundos=60, aberto_depois=3):
+    """Abre o Xenia sem jogo (a pasta de trabalho dele, --storage_root, e' um
+    temporario) e espera a frase 'sinal' na saida (a prova de que a tela
+    abriu); vale so se ele continua aberto 'aberto_depois' segundos depois
+    dela (o que cai logo apos criar a tela nao conta). Depois fecha o grupo
+    inteiro. Devolve (abriu, amostra da saida, codigo de saida ou None se
+    ficou aberto)."""
+    import limpeza
+    pasta = tempfile.mkdtemp(prefix="arena_externo_")
+    saida = os.path.join(pasta, "saida.txt")
+
+    def ler():
+        with open(saida, encoding="utf-8", errors="replace") as arquivo:
+            return arquivo.read()
+    try:
+        with open(saida, "wb") as arquivo:
+            processo = subprocess.Popen(comando + ["--storage_root=" + pasta], cwd=pasta, stdin=subprocess.DEVNULL,
+                                        stdout=arquivo, stderr=subprocess.STDOUT, start_new_session=True)
+        fim = time.monotonic() + segundos
+        texto = ""
+        while time.monotonic() < fim and processo.poll() is None and sinal not in texto:
+            time.sleep(0.5)
+            texto = ler()
+        if sinal in texto and processo.poll() is None:
+            time.sleep(aberto_depois)
+        codigo = processo.poll()
+        if codigo is None:
+            os.killpg(processo.pid, signal.SIGKILL)
+            processo.wait()
+        texto = ler()
+        linha = next((l for l in texto.splitlines() if sinal in l), texto[-200:])
+        return sinal in texto and codigo is None, linha.strip()[:200], codigo
+    finally:
+        limpeza.apagar_pasta(pasta)
+
+
 def parte_f(resultado, falhas):
-    """F: os emuladores de fora do Linux saem do AppImage e abrem."""
+    """F: os emuladores de fora do Linux saem do AppImage e abrem. O PCSX2 e
+    o RPCS3 respondem a ajuda (ou a versao); o Xenia nao escreve nada na
+    ajuda (sai com 0 e calado, achado de 21/10/2026): ele abre sem jogo e
+    vale quando cria a tela (o Vulkan, aqui o llvmpipe do Mesa)."""
     import plataforma
     externos = {}
     for nome, pasta, argumento in (("PCSX2", os.path.join("PCSX2", "PCSX2"), "-help"),
                                    ("RPCS3", os.path.join("RPCS3", "RPCS3"), "--version"),
-                                   ("Xenia", os.path.join("Xenia", "Xenia"), "--help")):
+                                   ("Xenia", os.path.join("Xenia", "Xenia"), None)):
         onde = os.path.join(COPIA, "emuladores", pasta)
         appimage = next((os.path.join(onde, n) for n in sorted(os.listdir(onde)) if n.lower().endswith(".appimage")),
                         None) if os.path.isdir(onde) else None
@@ -490,23 +552,47 @@ def parte_f(resultado, falhas):
         inicio = time.monotonic()
         programa = plataforma.programa_que_roda(appimage, nome)
         tirar = round(time.monotonic() - inicio, 1)
+        codigo = None
         try:
-            feito = subprocess.run([programa, argumento], capture_output=True, timeout=60, stdin=subprocess.DEVNULL)
-            abriu = feito.returncode in (0, 1) and bool(feito.stdout or feito.stderr)
-            amostra = (feito.stdout or feito.stderr).decode("utf-8", "replace")[:200]
+            if argumento:
+                feito = subprocess.run([programa, argumento], capture_output=True, timeout=60,
+                                       stdin=subprocess.DEVNULL)
+                codigo = feito.returncode
+                abriu = codigo in (0, 1) and bool(feito.stdout or feito.stderr)
+                amostra = (feito.stdout or feito.stderr).decode("utf-8", "replace")[:200]
+            else:
+                abriu, amostra, codigo = abre_sem_jogo([programa], "VulkanPresenter: Created")
         except (OSError, subprocess.TimeoutExpired) as falha:
             abriu, amostra = False, str(falha)
-        externos[nome] = {"tirar_do_appimage_s": tirar, "abriu": abriu, "saida": amostra,
+        externos[nome] = {"tirar_do_appimage_s": tirar, "abriu": abriu, "codigo": codigo, "saida": amostra,
                           "programa": programa}
         if not programa.endswith("AppRun") or not abriu:
-            falhas.append("F: o %s do Linux nao abriu (%s)" % (nome, amostra[:120]))
+            falhas.append("F: o %s do Linux nao abriu (codigo %s: %s)" % (nome, codigo, amostra[:120]))
     resultado["externos"] = externos
+
+
+def parte_g(resultado, falhas):
+    """As medidas do item 15 (testes/medidas_virtuais.py), as mesmas do
+    Windows: o processador, o RetroArch do Linux sem freio em quatro nucleos
+    e a gravacao em disco, aqui dentro do conteiner."""
+    import medidas_virtuais
+    import plataforma
+    pasta = os.path.join(COPIA, "retroarch")
+    programa = plataforma.retroarch_que_roda(os.path.join(pasta, plataforma.APPIMAGE_RETROARCH))
+    medidas = medidas_virtuais.medir_aqui(programa, os.path.join(pasta, "cores"), ".so",
+                                          antes_do_comando=["--config", os.path.join(pasta, "retroarch.cfg")])
+    resultado["medidas"] = medidas
+    for console, medida in medidas["nucleos"].items():
+        print("  %-6s %s" % (console, medida.get("fps") or medida), flush=True)
+    if not any(m.get("fps") for m in medidas["nucleos"].values()):
+        falhas.append("G: nenhum nucleo deu a medida (%s)" % medidas["nucleos"])
 
 
 def dentro_do_linux(argumentos):
     sys.path.insert(0, os.path.join(COPIA, "servidor"))
     sys.path.insert(0, os.path.join(COPIA, "testes"))
-    escolha = next((a for a in argumentos if set(a.upper()) <= set("ABCDEF,") and a), "A,B,C,D,E,F")
+    # As partes vem em maiusculas ("A,F"); o filtro, em minusculas ("gba" nao e' G, B e A).
+    escolha = next((a for a in argumentos if a and a == a.upper() and set(a) <= set("ABCDEFG,")), "A,B,C,D,E,F")
     partes = set(escolha.upper().replace(",", ""))
     filtro = " ".join(a for a in argumentos if a != escolha and not a.startswith("--")).lower()
     os.makedirs(SAIDA, exist_ok=True)
@@ -532,6 +618,13 @@ def dentro_do_linux(argumentos):
         if "F" in partes:
             print("== F: os emuladores de fora do Linux", flush=True)
             parte_f(resultado, falhas)
+        if "G" in partes:
+            print("== G: as medidas do item 15", flush=True)
+            parte_g(resultado, falhas)
+    except Exception as erro:           # o erro vai para o resultado, nao so para a tela
+        import traceback
+        falhas.append("erro no teste: %s" % "".join(traceback.format_exception_only(type(erro), erro)).strip())
+        traceback.print_exc()
     finally:
         tela.terminate()
         resultado["segundos"] = round(time.monotonic() - inicio, 1)
