@@ -358,16 +358,22 @@ def por_os_jogos_livres(assets):
 
 def por_as_bios_livres(assets):
     """As BIOS livres (servidor\\bios_livres) no lugar delas dentro da pasta
-    system (o "destino" da lista.json): a ArenaActivity copia as que faltam."""
+    system (o "destino" da lista.json): a ArenaActivity copia as que faltam.
+    As marcas das copias antigas ("sha256_antigos") vao para
+    arena-bios-antigas.txt (destino, tab, marca): so essas ela troca."""
     pasta = os.path.join(RAIZ, "servidor", "bios_livres")
     with open(os.path.join(pasta, "lista.json"), encoding="utf-8") as arquivo:
         lista = json.load(arquivo)
+    antigas = []
     for item in lista.get("arquivos", []):
         origem = os.path.join(pasta, *item["origem"].split("/"))
         if os.path.isfile(origem) and marca(origem) == item["sha256"]:
             alvo = os.path.join(assets, "arena-bios", *item["destino"].split("/"))
             os.makedirs(os.path.dirname(alvo), exist_ok=True)
             shutil.copyfile(origem, alvo)
+            antigas += ["%s\t%s\n" % (item["destino"], antiga) for antiga in item.get("sha256_antigos", ())]
+    with open(os.path.join(assets, "arena-bios-antigas.txt"), "w", encoding="utf-8", newline="\n") as arquivo:
+        arquivo.writelines(antigas)
 
 
 # ---------------------------------------------------------------------------

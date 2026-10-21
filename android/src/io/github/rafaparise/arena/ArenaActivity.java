@@ -668,25 +668,66 @@ public class ArenaActivity extends Activity {
     }
 
     /** Poe as BIOS livres (as do ARENA, de licenca livre) na pasta system,
-     *  so as que faltam: nunca troca a que ja esta la. */
+     *  so as que faltam: nunca troca a que ja esta la, salvo a copia antiga
+     *  de um arquivo livre que mudou (igual ao bios.instalar_livres). */
     void biosLivres(File sistema) {
         try {
             String[] nomes = getAssets().list("arena-bios");
             if (nomes == null) return;
-            for (String nome : nomes) copiarArvore("arena-bios/" + nome, new File(sistema, nome));
+            Map<String, Set<String>> antigas = biosAntigas();
+            for (String nome : nomes) copiarArvore("arena-bios/" + nome, new File(sistema, nome), antigas);
         } catch (IOException falha) {
             Log.w(TAG, "BIOS livres: " + falha);
         }
     }
 
-    void copiarArvore(String origem, File destino) throws IOException {
+    /** {caminho em arena-bios: marcas SHA-256 das copias antigas}. Vem da
+     *  lista.json ("sha256_antigos"), que o montar_android.py poe em
+     *  arena-bios-antigas.txt: caminho, tab e marca, uma por linha. Exemplo:
+     *  o config.ini do C-BIOS com "\" (o blueMSX do Android nao achava as
+     *  ROMs; trocado por "/" em 21/10/2026). */
+    Map<String, Set<String>> biosAntigas() {
+        Map<String, Set<String>> antigas = new HashMap<>();
+        try (java.io.BufferedReader texto = new java.io.BufferedReader(new java.io.InputStreamReader(
+                getAssets().open("arena-bios-antigas.txt"), "UTF-8"))) {
+            String linha;
+            while ((linha = texto.readLine()) != null) {
+                String[] partes = linha.split("\t");
+                if (partes.length != 2) continue;
+                String caminho = "arena-bios/" + partes[0];
+                if (!antigas.containsKey(caminho)) antigas.put(caminho, new HashSet<String>());
+                antigas.get(caminho).add(partes[1].trim().toLowerCase(Locale.ROOT));
+            }
+        } catch (IOException falha) {
+            // APK sem a lista: nada a trocar
+        }
+        return antigas;
+    }
+
+    void copiarArvore(String origem, File destino, Map<String, Set<String>> antigas) throws IOException {
         String[] dentro = getAssets().list(origem);
         if (dentro != null && dentro.length > 0) {
             destino.mkdirs();
-            for (String nome : dentro) copiarArvore(origem + "/" + nome, new File(destino, nome));
-        } else if (!destino.exists()) {
+            for (String nome : dentro) copiarArvore(origem + "/" + nome, new File(destino, nome), antigas);
+        } else if (!destino.exists() || copiaAntiga(destino, antigas.get(origem))) {
             destino.getParentFile().mkdirs();
             copiar(getAssets().open(origem), destino);
+        }
+    }
+
+    /** O arquivo tem a marca de uma copia antiga (e' do ARENA: pode trocar)? */
+    static boolean copiaAntiga(File arquivo, Set<String> marcas) {
+        if (marcas == null || !arquivo.isFile()) return false;
+        try (InputStream entrada = new FileInputStream(arquivo)) {
+            java.security.MessageDigest resumo = java.security.MessageDigest.getInstance("SHA-256");
+            byte[] bloco = new byte[1 << 16];
+            int lidos;
+            while ((lidos = entrada.read(bloco)) > 0) resumo.update(bloco, 0, lidos);
+            StringBuilder marca = new StringBuilder();
+            for (byte b : resumo.digest()) marca.append(String.format(Locale.ROOT, "%02x", b));
+            return marcas.contains(marca.toString());
+        } catch (IOException | java.security.NoSuchAlgorithmException falha) {
+            return false;
         }
     }
 
