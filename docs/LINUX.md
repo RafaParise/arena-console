@@ -1,4 +1,4 @@
-# O ARENA no Linux — item 13 (17 e 18/10/2026)
+# O ARENA no Linux — item 13 (17 a 20/10/2026)
 
 Pedido do Rafael: "uma versão do ARENA para linux perfeitamente idêntico sem
 alterar nada; se tiver alguma função ou recurso impossível de rodar no linux,
@@ -41,7 +41,7 @@ grava fora da pasta dele é só a **pasta de cache da conta**
 |---|---|---|
 | Python 3.13 portátil (79 MB) | `servidor/python-linux` | python-build-standalone (o do `uv`) |
 | RetroArch 1.22.2 (o mesmo do Windows) | `retroarch/RetroArch-Linux-x86_64.AppImage` | AppImage oficial do libretro |
-| Os 63 núcleos (os mesmos consoles) | `retroarch/cores/*.so`, ao lado dos `.dll` | `RetroArch_cores.7z` do 1.22.2; o do Java ME, do FreeJ2ME-Plus 1.52 (o mesmo do `.dll`); o do Apple II, do *nightly* do libretro |
+| Os 63 núcleos (os mesmos consoles) | `retroarch/cores/*.so`, ao lado dos `.dll` | `RetroArch_cores.7z` do 1.22.2; o do Java ME, do FreeJ2ME-Plus 1.52 (o mesmo do `.dll`); o do Apple II e o do MSX, do *nightly* do libretro |
 | Perfis de controle do Linux | `retroarch/autoconfig/udev` e `linuxraw` | o mesmo 7z do RetroArch |
 | Bibliotecas de reserva | `retroarch/bibliotecas-linux` | a `libjack.so.0` vazia (escrita pelo ARENA) e a `libgomp.so.1` do Debian 10 |
 | Java do Java ME (58 MB) | `emuladores/Java/linux` | o mesmo Temurin 21.0.12.1, reduzido com o `jlink` |
@@ -73,7 +73,7 @@ Raspberry Pi, o ARENA que roda é o do navegador: `ARENA-CHROMEBOOK.html`.)
 | GameCube e Wii | Pelo núcleo do Dolphin (o Dolphin não publica versão portátil para Linux). Um Dolphin do Linux posto em `emuladores/Dolphin` também vale |
 | Java ME | O núcleo `.so` do mesmo FreeJ2ME-Plus, com o Java do ARENA para Linux |
 | "O que deixa este computador lento" | O mesmo painel, lido do Linux: memória, bateria, economia de energia, programas pesados, atualização rodando, disco, memória virtual (swap) e driver de vídeo |
-| Ponte sem acento | **Não precisa**: no Linux todo núcleo abre caminho com acento |
+| Ponte sem acento | **Só para o Java ME**: no Linux os outros núcleos abrem caminho com acento direto (ver "As técnicas") |
 | Prioridade do jogo e economia de energia | O Linux não deixa um programa sem administrador subir a prioridade: o emulador abre numa sessão própria (o Linux divide o processador por sessão), e o servidor parado fica perto de 0% |
 | Lossless Scaling | É um programa do Windows: no Linux não aparece, e o jogo fica com a escala do próprio ARENA |
 | Gravação e transmissão | Desligadas, como no Windows (os dados dos alunos) |
@@ -115,6 +115,19 @@ a pasta de dados vira a mesma do Windows. O Xenia recebe a pasta pelo
 quando recebe os módulos (`jmods`) do JDK do Linux da mesma versão: o mesmo
 Temurin, os mesmos três módulos, 58 MB.
 
+**O Java ME numa pasta com acento.** O núcleo do Java ME abre o Java com o
+texto em Latin-1 (`-Dfile.encoding=ISO_8859_1`) e manda o caminho do jogo
+por um cano. No Linux, o caminho é UTF-8, e o "ó" de "Pedagógicos" chega ao
+Java como dois caracteres: ele não acha o jogo e a tela fica preta, com
+qualquer língua do sistema (conferido no contêiner com C, POSIX e C.UTF-8).
+Por isso o Java ME vai pela mesma ponte sem acento do Windows
+(`servidor/ponte_sem_acento.py`): o jogo e a metade Java do emulador vão
+para uma pasta nova, sem acento e só da conta, e o jogo abre de lá.
+
+**O AppImage novo.** O AppImage feito com as ferramentas mais novas (o do
+RPCS3) tira o programa para uma pasta `AppDir` e deixa `squashfs-root` como
+atalho para ela; o ARENA leva a pasta de verdade para o cache.
+
 **Um `retroarch.cfg` para os dois sistemas.** A cada abertura, o ARENA
 reescreve os caminhos que apontam para a pasta do outro sistema e troca os
 motores que só existem num deles (o som WASAPI vira PulseAudio ou ALSA; o
@@ -133,13 +146,23 @@ controle XInput vira udev; o d3d11 vira glcore), e o contrário no Windows.
   banco; o `ARENA.sh` com o Python que não pode ser executado; o
   `VERIFICAR.sh`; e os emuladores de fora. O resultado, com os tempos, vai
   para `docs/linux_bruto.json`.
-- **A conferir:** o teste de ponta a ponta ainda não rodou. Na madrugada de
-  18/10, a máquina virtual do contêiner travou (o serviço do WSL ficou
-  "parando" e o Windows não a deixou encerrar); ele volta a funcionar
-  depois de reiniciar o Windows. Até lá, o que está provado é a bateria
-  inteira no Linux e as partes separadas: o AppImage extraído no contêiner
-  e as bibliotecas que faltavam (a `libjack` no RetroArch, a `libgomp` no
-  Dreamcast), conferidas uma a uma.
+- **A rodada de 20/10/2026** (Debian 13 no contêiner, 11 minutos): **29 de
+  32** aberturas com imagem de verdade (os 16 consoles dos jogos livres,
+  numa pasta comum e numa com acento). O servidor abriu em 0,6 s e um jogo
+  pelo `/api/jogar` em 8,5 s (46 MB de memória o servidor, 149 MB o
+  RetroArch). O `ARENA.sh` abriu com o Python que não podia ser executado
+  (copiado para `~/.cache/arena`) e fechou pelo Ctrl+C. O `VERIFICAR.sh`
+  terminou, e o PCSX2 e o RPCS3 saíram do AppImage e abriram.
+- **O que essa rodada achou, já consertado:** o MSX sem jogo (o núcleo do
+  1.22.2 do Linux), o Java ME preto numa pasta com acento (a ponte), o
+  RPCS3 que não saía do AppImage (o `AppDir`), o "[grave] Python do Linux
+  incompleto" do `VERIFICAR.sh`, que era falso (os módulos vêm dentro do
+  `libpython`), e as bibliotecas que faltavam no contêiner.
+- **A conferir na próxima rodada:** o contêiner travou de novo em 20/10, às
+  22h (a máquina virtual do WSLC não fecha sem reiniciar o Windows). Falta
+  confirmar o MSX (a foto já mostra o jogo, mas o registro do núcleo novo
+  não traz a frase que o teste procura), o Java ME com acento pela ponte e
+  o Xenia, que não respondeu ao `--help` no contêiner.
 
 ## O que não dá para ter igual
 
@@ -148,8 +171,11 @@ controle XInput vira udev; o d3d11 vira glcore), e o contrário no Windows.
 - **Xbox 360:** o Xenia do Linux é experimental (muitos jogos não abrem), e,
   como no Windows, exige processador com AVX e placa com Vulkan: não roda
   no notebook da escola.
-- **Apple II:** o núcleo do Linux é o *nightly* do libretro (o do 1.22.2 do
-  Linux não existe); o ARENA leva o conferido em 17/10/2026.
+- **Apple II e MSX:** os núcleos do Linux são do *nightly* do libretro. O do
+  Apple II não existe no 1.22.2 do Linux, e o do MSX de lá é mais velho que
+  o do Windows e não troca sozinho para a BIOS livre (o C-BIOS) quando falta
+  a BIOS da empresa. O ARENA leva os conferidos (o do Apple II em
+  18/10/2026, o do MSX em 20/10/2026), pela marca.
 - **Prioridade alta para o emulador:** sem administrador, o Linux não deixa
   subir a prioridade de um programa. O efeito parecido vem da sessão
   própria do emulador (ver a tabela).
