@@ -117,8 +117,10 @@ Depois do Release, nesta ordem:
     o encerrou de novo porque a memória do computador ficou crítica.
 15. Testes nos sistemas virtuais (Docker e WSL), com números e
     descontando a perda de rodar dentro de outro sistema.
-16. (Pedido de 20/10, para depois do 13 ao 15.) O fundo animado do tema
-    claro: personagens em tamanhos proporcionais entre si (o Ryu estava
+16. **Feito em 20/10** (adiantado, com o 13 ao 15 parados à espera do
+    Rafael): o fundo novo (`launcher/field-background.js`, guia 3) e o GIF
+    do README gravado de novo. O pedido: o fundo animado do tema
+    claro, com personagens em tamanhos proporcionais entre si (o Ryu estava
     pequeno perto do Link; o Mario, o Sonic e o Bomberman, fora de
     proporção; a bomba e a explosão ficam como estão). Cenas novas: Ryu e
     Ken treinando (cada um com o seu hadouken, o shoryuken do Ken com o
