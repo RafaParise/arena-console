@@ -14,8 +14,10 @@ e faz as contas e' o testes\teste_sistemas_virtuais.py.
      caixa de som: so o trabalho do emulador), sem esperar a tela nem o som,
      com um jogo livre de cada nucleo (testes\jogos_livres) e as BIOS
      livres. Pelo metodo das duas rodadas do ferramentas\medir_arena.py: 60
-     quadros e 3000; quadros por segundo = (3000 - 60) / (tempo da longa -
-     tempo da curta), o que tira o tempo de abrir e fechar o RetroArch.
+     quadros e uma rodada longa (3000, ou mais, ate durar uns 8 s);
+     quadros por segundo = (quadros da longa - 60) / (tempo da longa -
+     tempo da curta), o que tira o tempo de abrir e fechar o RetroArch. So
+     com a configuracao da medida (--config), nunca por cima da do ARENA.
   3. A gravacao em disco (hardware.medir_velocidade), na pasta de trabalho.
 
 Uso (cada sistema roda com o proprio Python do ARENA):
@@ -36,9 +38,11 @@ for _pasta in (AQUI, os.path.join(RAIZ, "servidor")):
         sys.path.insert(0, _pasta)
 
 QUADROS = (60, 3000)
-# Os nucleos medidos: os de computador antigo e de console que abrem com jogo
-# livre e BIOS livre (o processador faz todo o trabalho; nenhum usa a placa).
-CONSOLES = ("msx", "vic20", "zx81", "chip8")
+# Os nucleos medidos: os de computador antigo que abrem com jogo livre e BIOS
+# livre (o processador faz todo o trabalho; nenhum usa a placa). O CHIP-8
+# ficou de fora: e' leve demais, e 3000 quadros passam no tempo de abrir e
+# fechar o RetroArch (a conta dava zero ou negativo, 21/10/2026).
+CONSOLES = ("msx", "vic20", "zx81")
 
 
 def jogos_da_medida():
@@ -93,15 +97,50 @@ def segundos_de(comando, limite=300):
     return time.perf_counter() - inicio
 
 
-def fps_sem_freio(montar_comando):
+# A rodada longa precisa durar uns segundos: com 3000 quadros, o MSX do
+# Windows acabava em 0,1 s, e o ruido de abrir e fechar o RetroArch engolia a
+# conta (21/10/2026). A de 3000 vira a rodada de prova, que diz quantos
+# quadros dao uns SEGUNDOS_DA_LONGA.
+SEGUNDOS_DA_LONGA = 8.0
+QUADROS_NO_MAXIMO = 400000
+
+
+REPETICOES = 2      # cada medida sai duas vezes: a diferenca entre elas mostra o ruido
+
+
+def _uma_medida(montar_comando, medir):
+    curta = medir(montar_comando(QUADROS[0]))
+    if curta is None:
+        return {"fps": None, "curta_s": None}
+    quadros, longa = QUADROS[1], medir(montar_comando(QUADROS[1]))
+    # Ate a longa durar uns segundos, em degraus (de 4 a 20 vezes mais
+    # quadros por vez): a estimativa tirada de uma rodada curta demais e'
+    # quase so ruido, e o salto direto passava muito do ponto.
+    for _ in range(3):
+        if longa is None or longa - curta >= SEGUNDOS_DA_LONGA / 2:
+            break
+        rapidez = (quadros - QUADROS[0]) / max(longa - curta, 0.05)
+        proximos = int(min(QUADROS_NO_MAXIMO, max(quadros * 4, min(rapidez * SEGUNDOS_DA_LONGA, quadros * 20))))
+        if proximos <= quadros:
+            break
+        quadros, longa = proximos, medir(montar_comando(proximos))
+    if longa is None or longa <= curta:
+        return {"fps": None, "curta_s": round(curta, 2), "longa_s": longa, "quadros": quadros}
+    return {"fps": round((quadros - QUADROS[0]) / (longa - curta), 1), "curta_s": round(curta, 2),
+            "longa_s": round(longa, 2), "quadros": quadros}
+
+
+def fps_sem_freio(montar_comando, medir=segundos_de):
     """Quadros por segundo pelo metodo das duas rodadas. 'montar_comando'
-    recebe o numero de quadros e devolve a linha de comando."""
-    curta = segundos_de(montar_comando(QUADROS[0]))
-    longa = segundos_de(montar_comando(QUADROS[1]))
-    if curta is None or longa is None or longa <= curta:
-        return {"fps": None, "curta_s": curta, "longa_s": longa}
-    return {"fps": round((QUADROS[1] - QUADROS[0]) / (longa - curta), 1), "curta_s": round(curta, 2),
-            "longa_s": round(longa, 2)}
+    recebe o numero de quadros e devolve a linha de comando; 'medir' diz
+    quantos segundos ela levou (no Android, pelo adb). A curta (60 quadros)
+    e' o tempo de abrir e fechar; a longa tem quadros bastantes para durar
+    uns SEGUNDOS_DA_LONGA. Sai a media das rodadas que deram certo (quantas,
+    em "rodadas_boas"), com cada uma ao lado."""
+    rodadas = [_uma_medida(montar_comando, medir) for _ in range(REPETICOES)]
+    boas = [r["fps"] for r in rodadas if r.get("fps")]
+    return {"fps": round(sum(boas) / len(boas), 1) if boas else None, "rodadas_boas": len(boas),
+            "rodadas": rodadas}
 
 
 def velocidade_do_processador():
@@ -117,10 +156,13 @@ def gravacao_em_disco(pasta):
         return {"erro": str(falha)}
 
 
-def medir_aqui(programa, pasta_nucleos, extensao, antes_do_comando=()):
+def medir_aqui(programa, pasta_nucleos, extensao):
     """Todas as medidas neste sistema. 'programa' e' o RetroArch daqui
-    (retroarch.exe; no Linux, o AppRun do AppImage tirado para o cache), e
-    'antes_do_comando', o que vai entre ele e o -L (no Linux, o --config)."""
+    (retroarch.exe; no Linux, o AppRun do AppImage tirado para o cache). O
+    RetroArch roda so com a configuracao da medida (--config): por cima da
+    do ARENA (--appendconfig), algum ajuste de jogo o prendia em uns 90
+    quadros por segundo em qualquer nucleo (visto no Windows em 21/10/2026),
+    e a medida deixava de medir o processador."""
     import bios
     import limpeza
     resultado = {"quando": time.strftime("%Y-%m-%d %H:%M:%S"), "sistema": sys.platform,
@@ -138,8 +180,8 @@ def medir_aqui(programa, pasta_nucleos, extensao, antes_do_comando=()):
                 continue
             copia = os.path.join(trabalho, os.path.basename(jogo))
             shutil.copyfile(jogo, copia)
-            medida = fps_sem_freio(lambda quadros: [programa] + list(antes_do_comando) + [
-                "-L", arquivo_nucleo, "--appendconfig", cfg, "--max-frames=%d" % quadros, copia])
+            medida = fps_sem_freio(lambda quadros: [
+                programa, "--config", cfg, "-L", arquivo_nucleo, "--max-frames=%d" % quadros, copia])
             resultado["nucleos"][console] = dict(medida, nucleo=nucleo)
         resultado["disco"] = gravacao_em_disco(trabalho)
     finally:

@@ -579,8 +579,7 @@ def parte_g(resultado, falhas):
     import plataforma
     pasta = os.path.join(COPIA, "retroarch")
     programa = plataforma.retroarch_que_roda(os.path.join(pasta, plataforma.APPIMAGE_RETROARCH))
-    medidas = medidas_virtuais.medir_aqui(programa, os.path.join(pasta, "cores"), ".so",
-                                          antes_do_comando=["--config", os.path.join(pasta, "retroarch.cfg")])
+    medidas = medidas_virtuais.medir_aqui(programa, os.path.join(pasta, "cores"), ".so")
     resultado["medidas"] = medidas
     for console, medida in medidas["nucleos"].items():
         print("  %-6s %s" % (console, medida.get("fps") or medida), flush=True)

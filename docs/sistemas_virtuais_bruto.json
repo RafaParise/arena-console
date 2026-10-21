@@ -1,0 +1,202 @@
+{
+ "quando": "2026-10-21 14:04:51",
+ "medidas": {
+  "W": {
+   "quando": "2026-10-21 14:03:38",
+   "sistema": "win32",
+   "processador": {
+    "operacoes_por_segundo": 7572889,
+    "relativa_ao_alvo": 2.37,
+    "referencia_provisoria": true
+   },
+   "nucleos": {
+    "msx": {
+     "fps": 5789.6,
+     "rodadas_boas": 2,
+     "rodadas": [
+      {
+       "fps": 5888.9,
+       "curta_s": 0.9,
+       "longa_s": 11.08,
+       "quadros": 60000
+      },
+      {
+       "fps": 5690.3,
+       "curta_s": 0.58,
+       "longa_s": 11.11,
+       "quadros": 60000
+      }
+     ],
+     "nucleo": "bluemsx_libretro"
+    },
+    "vic20": {
+     "fps": 2838.9,
+     "rodadas_boas": 2,
+     "rodadas": [
+      {
+       "fps": 2839.6,
+       "curta_s": 0.63,
+       "longa_s": 9.61,
+       "quadros": 25563
+      },
+      {
+       "fps": 2838.2,
+       "curta_s": 0.61,
+       "longa_s": 9.44,
+       "quadros": 25128
+      }
+     ],
+     "nucleo": "vice_xvic_libretro"
+    },
+    "zx81": {
+     "fps": 2064.3,
+     "rodadas_boas": 2,
+     "rodadas": [
+      {
+       "fps": 2068.2,
+       "curta_s": 0.58,
+       "longa_s": 9.58,
+       "quadros": 18685
+      },
+      {
+       "fps": 2060.4,
+       "curta_s": 0.57,
+       "longa_s": 9.53,
+       "quadros": 18524
+      }
+     ],
+     "nucleo": "81_libretro"
+    }
+   },
+   "disco": {
+    "escrita_mbs": 549.8,
+    "leitura_mbs": 930.3,
+    "escrita_ms": 14.6,
+    "amostra_mb": 8.0,
+    "confirmacao_ms": 12.7
+   }
+  },
+  "A": {
+   "quando": "2026-10-21 13:55:32",
+   "sistema": "android",
+   "emulador_ligou_s": 0.0,
+   "nucleos": {
+    "msx": {
+     "fps": 3106.8,
+     "rodadas_boas": 2,
+     "rodadas": [
+      {
+       "fps": 3144.4,
+       "curta_s": 0.33,
+       "longa_s": 8.04,
+       "quadros": 24297
+      },
+      {
+       "fps": 3069.1,
+       "curta_s": 0.09,
+       "longa_s": 6.32,
+       "quadros": 19168
+      }
+     ],
+     "nucleo": "bluemsx_libretro"
+    },
+    "vic20": {
+     "fps": 83.3,
+     "rodadas_boas": 1,
+     "rodadas": [
+      {
+       "fps": 83.3,
+       "curta_s": 0.89,
+       "longa_s": 36.18,
+       "quadros": 3000
+      },
+      {
+       "fps": null,
+       "curta_s": null
+      }
+     ],
+     "nucleo": "vice_xvic_libretro"
+    },
+    "zx81": {
+     "fps": 892.2,
+     "rodadas_boas": 2,
+     "rodadas": [
+      {
+       "fps": 937.6,
+       "curta_s": 0.27,
+       "longa_s": 13.0,
+       "quadros": 12000
+      },
+      {
+       "fps": 846.9,
+       "curta_s": 0.36,
+       "longa_s": 14.46,
+       "quadros": 12000
+      }
+     ],
+     "nucleo": "81_libretro"
+    }
+   },
+   "processador": {
+    "operacoes_por_segundo": 3426241,
+    "relativa_ao_alvo": 1.07,
+    "referencia_provisoria": true
+   },
+   "disco": {
+    "escrita_mbs": 211.5,
+    "leitura_mbs": 1952.5,
+    "escrita_ms": 37.8,
+    "amostra_mb": 8.0,
+    "confirmacao_ms": 25.8
+   }
+  }
+ },
+ "contas": {
+  "W": {
+   "processador_relativo_ao_windows": 1.0,
+   "nucleos": {
+    "msx": {
+     "medido_fps": 5789.6,
+     "estimado_sem_a_perda_fps": 5789.6,
+     "medido_sobre_windows": 1.0,
+     "estimado_sobre_windows": 1.0
+    },
+    "vic20": {
+     "medido_fps": 2838.9,
+     "estimado_sem_a_perda_fps": 2838.9,
+     "medido_sobre_windows": 1.0,
+     "estimado_sobre_windows": 1.0
+    },
+    "zx81": {
+     "medido_fps": 2064.3,
+     "estimado_sem_a_perda_fps": 2064.3,
+     "medido_sobre_windows": 1.0,
+     "estimado_sobre_windows": 1.0
+    }
+   }
+  },
+  "A": {
+   "processador_relativo_ao_windows": 0.452,
+   "nucleos": {
+    "msx": {
+     "medido_fps": 3106.8,
+     "estimado_sem_a_perda_fps": 6873.5,
+     "medido_sobre_windows": 0.537,
+     "estimado_sobre_windows": 1.187
+    },
+    "vic20": {
+     "medido_fps": 83.3,
+     "estimado_sem_a_perda_fps": 184.3,
+     "medido_sobre_windows": 0.029,
+     "estimado_sobre_windows": 0.065
+    },
+    "zx81": {
+     "medido_fps": 892.2,
+     "estimado_sem_a_perda_fps": 1973.9,
+     "medido_sobre_windows": 0.432,
+     "estimado_sobre_windows": 0.956
+    }
+   }
+  }
+ }
+}
