@@ -95,10 +95,13 @@ Depois do Release, nesta ordem:
     63 núcleos `.so`, o Java ME com o Java do Linux, o PS2, o PS3 e o Xbox
     360 com os emuladores do Linux usando a mesma pasta de dados dos do
     Windows, e o mesmo `retroarch.cfg` (caminhos e motores traduzidos a cada
-    abertura). A bateria inteira passa no Linux (532 de 532, 17/10).
-    **Falta rodar o teste de ponta a ponta** (`testes/teste_linux.py`): o
-    serviço do WSL travou na madrugada de 18/10 (a máquina virtual do
-    contêiner não fecha sem reiniciar o Windows; ver "Depende do Rafael").
+    abertura). A bateria inteira passa no Linux (532 de 532, 17/10). O
+    teste de ponta a ponta (`testes/teste_linux.py`) rodou em 20/10: 29 de
+    32 aberturas com imagem, o servidor, o `ARENA.sh`, o `VERIFICAR.sh`, o
+    PCSX2 e o RPCS3. O que ele achou já está consertado (MSX, Java ME com
+    acento, RPCS3, o falso "Python incompleto"). **Falta a rodada que
+    confirma os consertos** (MSX, Java ME com acento e o Xenia): o contêiner
+    travou de novo em 20/10, às 22h (ver "Depende do Rafael").
 14. Android: em andamento (18/10), com o relatório em `docs/ANDROID.md`.
     Feito o emulador de testes (o do AOSP, com o Android 15 de código
     aberto: `ferramentas/preparar_android.py`) e o APK do ARENA
@@ -109,9 +112,26 @@ Depois do Release, nesta ordem:
     de sempre, 62 núcleos e os jogos livres. Revisado em segurança: só a
     tela do ARENA fala com o servidor, e o que ele grava (e os recordes)
     fica no app. **Falta** o teste no emulador (`testes/teste_android.py`,
-    pronto para rodar) e o APK nos Releases.
+    pronto para rodar) e o APK nos Releases. Em 20/10, o APK de teste foi
+    remontado com o servidor de agora e o teste começou, mas o Claude Code
+    o encerrou de novo porque a memória do computador ficou crítica.
 15. Testes nos sistemas virtuais (Docker e WSL), com números e
     descontando a perda de rodar dentro de outro sistema.
+16. (Pedido de 20/10, para depois do 13 ao 15.) O fundo animado do tema
+    claro: personagens em tamanhos proporcionais entre si (o Ryu estava
+    pequeno perto do Link; o Mario, o Sonic e o Bomberman, fora de
+    proporção; a bomba e a explosão ficam como estão). Cenas novas: Ryu e
+    Ken treinando (cada um com o seu hadouken, o shoryuken do Ken com o
+    punho de fogo, o tatsumaki senpukyaku) e saindo andando; o Tails com o
+    Sonic; o Luigi com o Mario, logo depois do Yoshi; um Yoshi roxo que vem
+    pelo ar, pousa perto do verde e os dois comem a fruta do arbusto, que
+    balança como no jogo, some ao ser comida e volta depois que eles saem;
+    na turma do Donkey Kong, o DK anda, rola e corre, o Diddy dá a estrela
+    e corre, a Dixie gira o cabelo e corre e o bebê do DKC 3 rola e corre
+    atrás; o coelho branco maior, com uma coelha de jubinha caramelo
+    (caramelo com uma listra marrom nas costas) e um coelho médio, sem
+    juba, todo preto, maior que a coelha; o Mega Man redesenhado, com um
+    companheiro de um dos jogos.
 
 Achado de 16/10, consertado em 18/10: as faixas de porta que o Windows
 reserva a cada reinício (Hyper-V, WSL, Docker). O `VERIFICAR.bat`, o
@@ -120,15 +140,21 @@ reserva a cada reinício (Hyper-V, WSL, Docker). O `VERIFICAR.bat`, o
 
 ## Depende do Rafael
 
-- **Autorizar religar o emulador do Android:** na madrugada de 18/10 o
-  Claude Code encerrou o emulador (a sessão estava parada e o computador
-  ficou com pouca memória). Para seguir o item 14, basta dizer que pode
-  religar; o teste desliga o emulador no fim.
-- **Reiniciar o Windows** quando puder: na madrugada de 18/10 a máquina
-  virtual do contêiner de testes (WSLC) travou, e o serviço do WSL ficou
-  "parando" (o Windows não deixa encerrá-la de outro jeito). Depois do
-  reinício, o teste de ponta a ponta do Linux (`testes/teste_linux.py`) e
-  os itens 14 e 15 seguem sozinhos.
+- **O teste do Android no emulador (item 14):** o Claude Code encerrou o
+  emulador duas vezes (18/10 e 20/10, às 22h30) porque a memória do
+  computador ficou crítica, e a regra dele é não religar sem você pedir.
+  Há três saídas, à sua escolha: (1) fechar os programas grandes e dizer
+  "pode religar o emulador"; (2) abrir o Claude Code com a variável
+  `CLAUDE_CODE_DISABLE_BG_SHELL_PRESSURE_REAP=1`, que desliga esse
+  encerramento; ou (3) rodar você mesmo, numa janela do terminal,
+  `servidor\python\python.exe testes\teste_android.py` (uns 15 minutos; ele
+  desliga o emulador no fim).
+- **Reiniciar o Windows** quando puder: o contêiner de testes do Linux
+  (WSLC) travou de novo em 20/10, às 22h (como em 18/10). Já tentei sem
+  reiniciar: encerrar a sessão dele, `wsl --shutdown` e fechar o processo
+  da sessão; a máquina virtual (`vmmemwslc`) roda como serviço do Windows,
+  e só o reinício a solta. Depois dele, a rodada que confirma o Linux e o
+  item 15 seguem sozinhos.
 
 - **O teste no Chromebook da escola** (item 12, `docs/CHROMEBOOK.md`, "O
   teste no Chromebook da escola"): abrir o `ARENA-CHROMEBOOK.html` do pen
