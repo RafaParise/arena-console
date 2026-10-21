@@ -261,7 +261,7 @@ servidor\python\python.exe ferramentas\gravar_fundo_gif.py --tema escuro --visit
 ```
 
 Eles gravam `docs\imagens\arena-escuro.gif` (960 × 480, 6,1 MB),
-`docs\imagens\arena-claro.gif` (960 × 480, 5,7 MB) e
+`docs\imagens\arena-claro.gif` (960 × 480, 6,5 MB) e
 `docs\imagens\arena-escuro-curto.gif` (1280 × 640, só a Rainbow Road com os
 nove karts, 943 KB: a "Social preview" do GitHub aceita até 1 MB). Para
 conferir o GIF sem abri-lo quadro a quadro, ponha
