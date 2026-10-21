@@ -654,7 +654,9 @@ Atrás da lista de jogos há uma cena em pixel art: o **céu** no tema escuro
 Metroides flutuando, cometa, chuva de meteoros, satélite, OVNI e, de vez em
 quando, um foguete) e o **campo** no tema claro (sol, nuvens, girassóis,
 borboletas de várias cores, abelhas, passarinhos, sementes ao vento,
-coelho pulando e balão).
+balão, o arbusto das frutinhas do Yoshi e três coelhos pulando juntos: o
+branco, o maior, a coelha caramelo de jubinha, com a listra marrom nas
+costas, e o preto, médio).
 
 A cada 20 a 35 s passa uma **visita de um jogo famoso de 8 ou 16 bits**,
 uma de cada vez, sem repetir até passarem todas (são 17 no céu e 21 no
@@ -662,23 +664,23 @@ campo):
 
 | Céu (tema escuro) | Campo (tema claro) |
 |---|---|
-| **F-Zero** (SNES): as quatro máquinas — Blue Falcon, Golden Fox, Wild Goose e Fire Stingray — alcançam três naves sem piloto numa pista de luz: a roxa, a verde e a que pisca, que explode quando uma das quatro encosta nela. É a primeira visita, uns 7 s depois de abrir | **Super Mario Bros.** (NES): o Mario corre e pula por cima do Goomba. É a primeira visita do campo |
-| **Kirby na Warp Star** (NES): cruza o céu deixando estrelinhas coloridas | **Sonic** (Mega Drive): passa correndo, pula em bola e pega o anel |
+| **F-Zero** (SNES): as quatro máquinas — Blue Falcon, Golden Fox, Wild Goose e Fire Stingray — alcançam três naves sem piloto numa pista de luz: a roxa, a verde e a que pisca, que explode quando uma das quatro encosta nela. É a primeira visita, uns 7 s depois de abrir | **Super Mario Bros.** (NES): o Mario e o Luigi correm juntos e pulam por cima do Goomba (o Luigi pula mais alto); o Goomba leva um susto e vai atrás deles. Os dois chegam sempre logo depois do Yoshi |
+| **Kirby na Warp Star** (NES): cruza o céu deixando estrelinhas coloridas | **Sonic e Tails** (Mega Drive): o Sonic passa correndo, pula em bola e pega o anel; o Tails vem atrás e, no mesmo lugar, sobe girando as caudas |
 | **Space Invaders**: três invasores entram marchando lá em cima; perto da lua, descem uma linha e voltam mais depressa, como no jogo | **Duck Hunt** (NES): dois patos sobem e o cachorro aparece rindo na grama |
 | **Arwing** (Star Fox, SNES): duas naves em formação; a da frente gira no meio do caminho | **Kirby** (Game Boy): flutua estufado pelo céu, levado pela brisa |
-| **Super Sonic e o Dr. Robotnik** (Sonic 3 & Knuckles, Mega Drive): o Egg Mobile foge tremendo, e o Super Sonic dourado vem atrás soltando faíscas | **Yoshi** (Super Mario World, SNES): para diante de uma frutinha, estica a língua, come e segue feliz |
+| **Super Sonic e o Dr. Robotnik** (Sonic 3 & Knuckles, Mega Drive): o Egg Mobile foge tremendo, e o Super Sonic dourado vem atrás soltando faíscas | **Yoshi** (Super Mario World, SNES): o verde vem correndo e o roxo vem pelo ar, batendo as pernas, e pousa do outro lado do arbusto; cada um estica a língua e come a frutinha do seu lado. Os dois vão embora juntos, e as frutinhas brotam de novo. É a primeira visita do campo |
 | **Nave da Samus** (Super Metroid, SNES): cruza o céu devagar, com as luzes piscando e os jatos dos motores | **Link** (Zelda: A Link to the Past, SNES): corta um tufo de grama, acha uma rupia e a ergue sobre a cabeça |
 | **Mario de capa** (Super Mario World, SNES): sobe no pulo e plana lá no alto, mergulhando e subindo de novo | **Wiggler** (Super Mario World, SNES): a lagarta da florzinha passeia devagar, cada gomo no seu passo |
 | **Meta Knight** (Kirby Super Star, SNES): chega batendo as asas, a espada brilha e ele sai num risco | **Monty Mole** (Super Mario World, SNES): a terra treme, a toupeira espia do buraco, pula para fora e sai correndo |
 | **Vic Viper** (Gradius III, SNES): faz ondas pelo céu com as duas *options* atrás, atirando junto | **Lakitu** (Super Mario World, SNES): cruza o céu na nuvem, pescando com um cogumelo 1-UP na linha |
-| **Ristar** (Mega Drive): a estrelinha cruza o céu em arco, girando, com um rastro dourado | **Donkey Kong e Diddy** (Donkey Kong Country, SNES): o DK passa rolando, e o Diddy pula para pegar a banana |
+| **Ristar** (Mega Drive): a estrelinha cruza o céu em arco, girando, com um rastro dourado | **A turma dos Kongs** (Donkey Kong Country 1 a 3, SNES): o Donkey Kong anda na frente, sai rolando (pega a banana) e corre; o Diddy dá a estrela e corre; a Dixie gira o rabo de cavalo, bate com o cabelo e corre; e o Kiddy, o bebê do DKC 3, rola e corre atrás |
 | **ToeJam & Earl** (Mega Drive): os dois passam devagar no pedaço de foguete, com a chama piscando | **Tails** (Sonic 2, Mega Drive): cruza o céu voando, com as caudas girando como hélice |
 | **Starman** (EarthBound, SNES): aparece num risco de luz, flutua um pouco e some do mesmo jeito | **Knuckles** (Sonic & Knuckles, Mega Drive): chega planando, pousa deslizando na grama, pula e sai planando |
 | **Earthworm Jim** (SNES e Mega Drive): passa a toda velocidade no foguete de bolso, soltando fumaça | **Chocobo** (Final Fantasy VI, SNES): passa correndo, levantando poeira, e solta uma pena |
 | **Super Mario Kart** (SNES) e **Mario Kart 64**: nove karts disputam uma volta na Rainbow Road, a pista de arco-íris — Mario, Luigi, Peach, Toad, Yoshi, Bowser, Koopa Troopa, Donkey Kong e Wario | **Rabites** (Secret of Mana, SNES): dois ou três coelhinhos-monstro atravessam o campo aos pulos |
 | **Lunar Whale** (Final Fantasy IV, SNES): a nave-baleia sobe devagar até a lua e passa por ela | **Mr. Saturn** (EarthBound, SNES): atravessa bem devagar, dá um pulinho ("boing!") e solta um coração |
-| **Koopa Clown Car** (Super Mario World, SNES): o Bowser passa pelo alto do céu na xícara de palhaço, balançando, com a hélice girando | **Ryu** (Street Fighter II, SNES): para no meio do campo e solta o Hadouken, a bola de energia azul que atravessa a tela |
-| **Sparkster** (Rocket Knight Adventures, Mega Drive): o gambá de armadura azul cruza o céu na diagonal, na mochila-foguete, de espada na mão | **Mega Man X** (SNES): corre, dá a arrancada com rastro e atira com o X Buster |
+| **Koopa Clown Car** (Super Mario World, SNES): o Bowser passa pelo alto do céu na xícara de palhaço, balançando, com a hélice girando | **Ryu e Ken** (Street Fighter II, SNES): treinam juntos. Os dois soltam o Hadouken ao mesmo tempo (o do Ryu azul, o do Ken de fogo) e as bolas se anulam no meio; depois vêm o Shoryuken de cada um (o do Ken com o punho em chamas) e o Tatsumaki Senpukyaku, o chute girando no ar, e os dois vão embora andando |
+| **Sparkster** (Rocket Knight Adventures, Mega Drive): o gambá de armadura azul cruza o céu na diagonal, na mochila-foguete, de espada na mão | **Mega Man X e Zero** (SNES): o X corre, dá a arrancada com rastro, para, carrega o X Buster e solta o tiro carregado; o Zero vem atrás e dá o golpe do sabre verde |
 | | **Bomberman** (Super Bomberman, SNES): deixa a bomba, sai andando, e ela explode em cruz |
 | | **Bonk** (PC Engine): o homem das cavernas de cabeça enorme passa aos pulos |
 | | **Ao longe, no pé do morro**, pequenos: a turma do Mario (Mario, Luigi, Peach e Toad) passa andando |

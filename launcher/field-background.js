@@ -344,51 +344,130 @@
     }
   }
 
-  // Coelho aos pulos de verdade (02/10/2026: antes o corpo subia e descia
-  // inteiro, sem perna nenhuma). Cada pulo: agacha, estica as pernas no ar
-  // e cai agachado de novo.
-  const PALETA_COELHO = { E: '#e8ddd0', H: '#f2ece4', B: '#e8ddd0', K: '#2b1c12', n: '#ff8fb0', T: '#ffffff',
-                          F: '#d8ccbc' };
-  const QUADROS_COELHO = S.quadros([
-    ['......E.E.',          // agachado (antes e depois do pulo)
-     '......E.E.',
-     '.....HHHH.',
-     '..BBBHKHH.',
-     '.BBBBBHHn.',
-     'TBBBBBBH..',
-     '.BBBBBBB..',
-     '..FF...FF.'],
-    ['.......EE.',          // no ar: pernas de tras esticadas, as da frente na frente
-     '......HEE.',
-     '.....HKHH.',
-     'TBBBBBHHn.',
-     '.BBBBBBH..',
-     'FF......F.']
-  ], PALETA_COELHO);
-  let coelho = null;
+  // Os coelhos aos pulos de verdade (02/10/2026: antes o corpo subia e
+  // descia inteiro, sem perna nenhuma). Pedido do Rafael (20/10/2026): o
+  // coelho branco maior, com uma coelha caramelo de jubinha (com a listra
+  // marrom nas costas) e um coelho preto medio, sem juba, maior que ela.
+  // Cada pulo: agacha, estica as pernas no ar e cai agachado de novo; os tres
+  // vao para o mesmo lado, cada um no seu tempo.
+  // B pelo, b sombra, E orelha, e dentro da orelha, K olho, n nariz, T rabo,
+  // F patas; na coelha, J a jubinha e L a listra das costas.
+  const COELHO_BRANCO = S.quadros([
+    ['.........k.k...',
+     '........kEkEk..',
+     '.......kEeEek..',
+     '.......kEeEek..',
+     '.......kEeEek..',
+     '....kkkBBBBBk..',
+     '...kbBBBBBKBBk.',
+     '..kbBBBBBBBBBnk',
+     '.kBBBBBBBBBBBk.',
+     'kTBBBBBBBBBbk..',
+     '.kbBBBBBBBBbk..',
+     '..kFFFkkFFFFk..',
+     '...kkk..kkkk...'],   // agachado (antes e depois do pulo)
+    ['...............',
+     '...............',
+     '..........k.k..',
+     '.........kEkEk.',
+     '........kEeEek.',
+     '........kEeEek.',
+     '....kkkkBBBBBk.',
+     '.kkkbBBBBBBKBnk',
+     'kTBBBBBBBBBBBk.',
+     '.kbBBBBBBBBBk..',
+     '.kkbbBBBBbbk...',
+     'kFFFkkkkkFFFk..',
+     '.kkk.....kkk...']   // no ar: as pernas de tras esticadas
+  ], { B: '#f4f0ea', b: '#d4cabc', E: '#f4f0ea', e: '#ffb0c0', K: '#3a1a1a', n: '#ff8fb0', T: '#ffffff', F: '#e0d6c8', k: '#5a4c44' });
+  const COELHO_PRETO = S.quadros([
+    ['........k.k...',
+     '.......kEkEk..',
+     '......kEeEek..',
+     '......kEeEek..',
+     '...kkkBBBBBk..',
+     '..kbBBBBBWKBk.',
+     '.kbBBBBBBBBBnk',
+     'kBBBBBBBBBBBk.',
+     'kTBBBBBBBBBbk.',
+     '.kbBBBBBBBbk..',
+     '..kFFkkFFFk...',
+     '...kk..kkk....'],   // agachado
+    ['..............',
+     '..............',
+     '..............',
+     '.........k.k..',
+     '........kEkEk.',
+     '.......kEeEek.',
+     '...kkkkBBBBBk.',
+     '.kkbBBBBBBWKnk',
+     'kTBBBBBBBBBBk.',
+     '.kbBBBBBBBBbk.',
+     'kFFkkkkkkFFk..',
+     '.kk......kk...']   // no ar
+  ], { B: '#26262e', b: '#44445a', E: '#26262e', e: '#8a6a78', W: '#ffffff', K: '#000000', n: '#c87890', T: '#3a3a48', F: '#3a3a48', k: '#0c0c12' });
+  const COELHA_CARAMELO = S.quadros([
+    ['.......k.k...',
+     '......kEkEk..',
+     '.....kJEeEJk.',
+     '...kkJJJCCJJk',
+     '..kLLJJCCKCnk',
+     '.kLLCJJJCCCJk',
+     'kTCCCCCJJJJk.',
+     'kTCCCCCCCCCk.',
+     '.kCCCCCCCCCk.',
+     '..kFFkkFFFk..',
+     '...kk..kkk...'],   // agachada (a jubinha em volta da cabeca)
+    ['.............',
+     '.............',
+     '.............',
+     '........k.k..',
+     '.......kEkEk.',
+     '......kJEeEJk',
+     '.kkkkkJJCKCnk',
+     'kTLLLLJJJCCk.',
+     '.kCCCCCCCCJk.',
+     'kFFkkkkkFFk..',
+     '.kk.....kk...']   // no ar
+  ], { C: '#d8a060', J: '#f4d09a', L: '#7a4a20', E: '#d8a060', e: '#ffb0b8', K: '#2a1408', n: '#e07890', T: '#f4e4c8', F: '#c08850', k: '#4a2a10' });
+  // O branco na frente; a coelha e o preto logo atras, cada um num tempo
+  // de pulo (fase) e com o seu pulo (alto).
+  const TRIO_COELHOS = [{ sprites: COELHO_BRANCO, atras: 0, fase: 0, alto: 6 },
+                        { sprites: COELHA_CARAMELO, atras: 23, fase: 15, alto: 5 },
+                        { sprites: COELHO_PRETO, atras: 44, fase: 29, alto: 5.5 }];
+  let coelhos = null;
   let esperaCoelho = 900 + sorteio() * 1200;
 
   function desenharCoelho(passo) {
-    if (!coelho) {
+    if (!coelhos) {
       esperaCoelho -= passo;
       if (esperaCoelho <= 0) {
         const dir = aleatorio() < 0.5 ? 1 : -1;
-        coelho = { dir: dir, x: dir === 1 ? -10 : W + 2, chao: H - 4 - Math.floor(aleatorio() * 5), fase: 0 };
+        const chao = H - 4 - Math.floor(aleatorio() * 4);
+        coelhos = { dir: dir, bando: TRIO_COELHOS.map(function (c) {
+          return { sprites: c.sprites, fase: c.fase, alto: c.alto, chao: chao,
+                   x: dir === 1 ? -c.sprites[0].w - c.atras : W + 2 + c.atras };
+        }) };
       }
       return;
     }
-    coelho.fase += passo;
     const ciclo = 46;                                  // um pulo a cada ~0,8 s
-    const p = (coelho.fase % ciclo) / ciclo;
-    let quadro = QUADROS_COELHO[0], altura = 0;
-    if (p >= 0.3) {                                    // no ar
-      quadro = QUADROS_COELHO[1];
-      altura = Math.sin(((p - 0.3) / 0.7) * Math.PI) * 6;
-      coelho.x += coelho.dir * 0.9 * passo;
+    const dir = coelhos.dir;
+    // De tras para a frente: o da frente fica por cima.
+    for (let i = coelhos.bando.length - 1; i >= 0; i--) {
+      const c = coelhos.bando[i];
+      c.fase += passo;
+      const p = (c.fase % ciclo) / ciclo;
+      let quadro = c.sprites[0], altura = 0;
+      if (p >= 0.3) {                                  // no ar
+        quadro = c.sprites[1];
+        altura = Math.sin(((p - 0.3) / 0.7) * Math.PI) * c.alto;
+        c.x += dir * 0.9 * passo;
+      }
+      S.colar(ctx, quadro, c.x, c.chao - quadro.h - altura, dir);
     }
-    S.colar(ctx, quadro, coelho.x, coelho.chao - quadro.h - altura, coelho.dir);
-    if (coelho.x < -14 || coelho.x > W + 4) {
-      coelho = null;
+    if (coelhos.bando.every(function (c) { return dir === 1 ? c.x > W + 4 : c.x < -c.sprites[0].w - 4; })) {
+      coelhos = null;
       esperaCoelho = 2000 + aleatorio() * 2400;
     }
   }
@@ -506,87 +585,333 @@
   // ------------------------------------------------------------------
   const CHAO = H - 4;              // onde pisa quem anda na grama
 
-  // Super Mario Bros. (NES, 1985): o Mario corre e pula por cima do Goomba.
-  const PALETA_MARIO = { R: '#d82800', H: '#8a4b00', S: '#ffb070', E: '#000000', O: '#2038ec' };
+  // Super Mario Bros. (NES, 1985): o Mario e o Luigi correm juntos e pulam
+  // por cima do Goomba -- o Luigi pula mais alto, como no jogo. Pedido do
+  // Rafael (20/10/2026): na medida do Yoshi e do Link (antes o Mario era
+  // pequeno demais), o Luigi mais alto e mais magro que o Mario, e os dois
+  // chegam logo depois do Yoshi (ver desenharVisitas). R e G a roupa, H
+  // cabelo e sapato, S pele, K olho, M bigode, B macacao, Y botao.
   const MARIO = S.quadros([
-    ['..RRRR..', '.RRRRRRR', '.HHSSES.', 'HSHSSSSS', 'HSHHSSSH', '.SSSSSS.',
-     '.RROORR.', 'RROOOORR', 'SSOOOOSS', '.OO..OO.', 'HH....HH'],
-    ['..RRRR..', '.RRRRRRR', '.HHSSES.', 'HSHSSSSS', 'HSHHSSSH', '.SSSSSS.',
-     '..RORR..', '.RROORR.', '.SOOOOS.', '..OOOO..', '..HHHH..'],
-    ['..RRRR.S', '.RRRRRRS', '.HHSSESR', 'HSHSSSSS', 'HSHHSSSH', '.SSSSSS.',      // pulo
-     'RROORRR.', 'SROOOOR.', '.OOOOOO.', 'OO...OO.', 'H.....HH']
-  ], PALETA_MARIO);
+    ['....kkkkk......',
+     '...kRRRRRkkk...',
+     '..kRRRRRRRRRk..',
+     '..kHHHSSKSkk...',
+     '.kHSHSSSKSSSk..',
+     '.kHSHHSSSKSSSk.',
+     '.kHHSSSSMMMMk..',
+     '..kkSSSSSSSk...',
+     '..kRRRBRRRkk...',
+     '.kRRRRBBRRRSk..',
+     'kSSRRBBYBBSSk..',
+     'kSSkBBBBBBBk...',
+     '.kkBBBBkBBBkk..',
+     '.kHHHkk.kkHHHk.',
+     'kHHHHk...kHHHHk',
+     '.kkkk.....kkkk.'],   // andando (pernas abertas)
+    ['....kkkkk......',
+     '...kRRRRRkkk...',
+     '..kRRRRRRRRRk..',
+     '..kHHHSSKSkk...',
+     '.kHSHSSSKSSSk..',
+     '.kHSHHSSSKSSSk.',
+     '.kHHSSSSMMMMk..',
+     '..kkSSSSSSSk...',
+     '...kRRBRRRk....',
+     '..kRRRBBRRRk...',
+     '..kRRBBYBBSk...',
+     '..kSSBBBBBSk...',
+     '...kBBBBBBk....',
+     '...kHHHHHHk....',
+     '..kHHHHkHHHk...',
+     '...kkkk.kkk....'],   // andando (pernas juntas)
+    ['...........kk..',
+     '....kkkkk.kSSk.',
+     '...kRRRRRkkSSk.',
+     '..kRRRRRRRRRRk.',
+     '..kHHHSSKSkRRk.',
+     '.kHSHSSSKSSRRk.',
+     '.kHSHHSSSKSRRk.',
+     '.kHHSSSSMMMRRk.',
+     '..kkSSSSSSRRk..',
+     '.kRRRRBRRRBRk..',
+     'kRRRRRBBBBBk...',
+     'kSSkBBYBBYBk...',
+     'kSSkBBBBBBBBk..',
+     '.kkBBBkkkBBBk..',
+     '.kHHHk...kHHHk.',
+     '..kkk.....kkk..']   // pulo (o punho para o alto)
+  ], { R: '#e02818', H: '#7a4010', S: '#ffb878', K: '#101010', M: '#4a2408', B: '#2848e8', Y: '#ffd23f', k: '#1a1622' });
+  const LUIGI = S.quadros([
+    ['....kkkkk......',
+     '...kGGGGGkkk...',
+     '..kGGGGGGGGGk..',
+     '..kHHHSSKSkk...',
+     '.kHSHSSSKSSSk..',
+     '.kHSHSSSSKSSSk.',
+     '.kHSHHSSSKSSSk.',
+     '.kHHSSSSMMMMk..',
+     '..kkSSSSSSSk...',
+     '..kGGGBGGGkk...',
+     '.kGGGGBBGGGSk..',
+     'kSSGGBBYBBSSk..',
+     'kSSkBBBBBBBk...',
+     '.kkBBBBkBBBk...',
+     '..kBBBk.kBBBk..',
+     '.kHHHk...kHHHk.',
+     'kHHHHk...kHHHHk',
+     '.kkkk.....kkkk.'],   // andando (pernas abertas)
+    ['....kkkkk......',
+     '...kGGGGGkkk...',
+     '..kGGGGGGGGGk..',
+     '..kHHHSSKSkk...',
+     '.kHSHSSSKSSSk..',
+     '.kHSHSSSSKSSSk.',
+     '.kHSHHSSSKSSSk.',
+     '.kHHSSSSMMMMk..',
+     '..kkSSSSSSSk...',
+     '...kGGBGGGk....',
+     '..kGGGBBGGGk...',
+     '..kGGBBYBBSk...',
+     '..kSSBBBBBSk...',
+     '...kBBBBBBk....',
+     '...kBBBBBBk....',
+     '...kHHHHHHk....',
+     '..kHHHHkHHHk...',
+     '...kkkk.kkk....'],   // andando (pernas juntas)
+    ['...........kk..',
+     '....kkkkk.kSSk.',
+     '...kGGGGGkkSSk.',
+     '..kGGGGGGGGGGk.',
+     '..kHHHSSKSkGGk.',
+     '.kHSHSSSKSSGGk.',
+     '.kHSHSSSSKSGGk.',
+     '.kHSHHSSSKSGGk.',
+     '.kHHSSSSMMMGGk.',
+     '..kkSSSSSSGGk..',
+     '.kGGGGBGGGBGk..',
+     'kGGGGGBBBBBk...',
+     'kSSkBBYBBYBk...',
+     'kSSkBBBBBBBBk..',
+     '.kkBBBkkkBBBk..',
+     '..kBBBk.kBBBk..',
+     '.kHHHk...kHHHk.',
+     '..kkk.....kkk..']   // pulo (o punho para o alto)
+  ], { G: '#2fae3a', H: '#7a4010', S: '#ffb878', K: '#101010', M: '#4a2408', B: '#2848e8', Y: '#ffd23f', k: '#1a1622' });
   const GOOMBA = S.quadros([
-    ['..GGGG..', '.GGGGGG.', 'GWKGGKWG', 'GGGGGGGG', '.TTTTTT.', '..TTTT..', '.BB..BB.'],
-    ['..GGGG..', '.GGGGGG.', 'GWKGGKWG', 'GGGGGGGG', '.TTTTTT.', '..TTTT..', 'BB....BB']
-  ], { G: '#a0522d', W: '#ffffff', K: '#000000', T: '#f2c38a', B: '#3b2412' });
+    ['.....kkkk.....',
+     '...kkGGGGkk...',
+     '..kGGGGGGGGk..',
+     '.kGGKKGGKKGGk.',
+     '.kGGWKGGKWGGk.',
+     'kGGGWKGGKWGGGk',
+     'kGGGGGGGGGGGGk',
+     '.kgGGGGGGGGgk.',
+     '..kkTTTTTTkk..',
+     '..kTTTTTTTTk..',
+     '.kBBBBkkBBBBk.',
+     '..kkkk..kkkk..'],   // andando
+    ['.....kkkk.....',
+     '...kkGGGGkk...',
+     '..kGGGGGGGGk..',
+     '.kGGKKGGKKGGk.',
+     '.kGGWKGGKWGGk.',
+     'kGGGWKGGKWGGGk',
+     'kGGGGGGGGGGGGk',
+     '.kgGGGGGGGGgk.',
+     '..kkTTTTTTkk..',
+     '..kTTTTTTTTk..',
+     '..kBBBkkBBBk..',
+     '...kkk..kkk...']   // andando (o outro pe)
+  ], { G: '#a0522d', g: '#7a3a1e', W: '#ffffff', K: '#101010', T: '#f2c38a', B: '#3b2412', k: '#2a160a' });
 
   function iniciarMario() {
     const dir = aleatorio() < 0.5 ? 1 : -1;
-    return { dir: dir, x: dir === 1 ? -10 : W + 2, altura: 0, vy: 0, noAr: false,
-             goomba: dir === 1 ? W + 2 : -10, desenhar: desenharMario };
+    const w = MARIO[0].w;
+    // O Goomba entra primeiro; o Mario e o Luigi chegam correndo depois (o
+    // encontro cai perto do meio do campo) e pulam quando chegam perto dele.
+    return { dir: dir, goomba: dir === 1 ? W + 2 : -GOOMBA[0].w - 2, virou: false, susto: 0, desenhar: desenharMario,
+             irmaos: [{ sprites: MARIO, x: dir === 1 ? -w - 90 : W + 90, altura: 0, vy: 0, noAr: false, pulo: 2.0 },
+                      { sprites: LUIGI, x: dir === 1 ? -w - 110 : W + 110, altura: 0, vy: 0, noAr: false, pulo: 2.3 }] };
   }
 
   function desenharMario(passo) {
-    this.x += this.dir * 0.55 * passo;
-    this.goomba -= this.dir * 0.12 * passo;
-    const perto = this.dir === 1 ? this.goomba - this.x : this.x - this.goomba;
-    if (!this.noAr && perto > 0 && perto < 16) { this.noAr = true; this.vy = 1.6; }
-    if (this.noAr) {
-      this.altura += this.vy * passo;
-      this.vy -= 0.11 * passo;
-      if (this.altura <= 0) { this.altura = 0; this.noAr = false; }
+    // O Goomba anda devagar ao encontro deles; depois que os dois passam por
+    // cima, ele da um pulinho de susto, vira e vai atras (sai mais depressa).
+    const gw = GOOMBA[0].w;
+    if (!this.virou && this.irmaos.every(function (irmao) {
+      return this.dir === 1 ? irmao.x > this.goomba + gw : irmao.x + irmao.sprites[0].w < this.goomba;
+    }, this)) { this.virou = true; this.susto = 1; }
+    if (this.susto > 0) this.susto = Math.max(0, this.susto - passo / 16);
+    this.goomba += (this.virou ? this.dir * 0.3 : -this.dir * 0.25) * passo * (this.susto > 0 ? 0 : 1);
+    const pulinho = Math.round(Math.sin(this.susto * Math.PI) * 3);
+    S.colar(ctx, GOOMBA[Math.floor(t / (this.virou ? 7 : 14)) % 2], this.goomba, CHAO - GOOMBA[0].h - pulinho,
+            this.virou ? this.dir : -this.dir);
+    let foram = true;
+    for (const irmao of this.irmaos) {
+      const w = irmao.sprites[0].w;
+      // A distancia da frente dele ate o Goomba (negativa: ja esta por cima).
+      const perto = this.dir === 1 ? this.goomba - (irmao.x + w) : irmao.x - (this.goomba + GOOMBA[0].w);
+      if (!irmao.noAr && perto > -2 && perto < 6) { irmao.noAr = true; irmao.vy = irmao.pulo; }
+      irmao.x += this.dir * (irmao.noAr ? 0.75 : 0.55) * passo;
+      if (irmao.noAr) {
+        irmao.altura += irmao.vy * passo;
+        irmao.vy -= 0.11 * passo;
+        if (irmao.altura <= 0) { irmao.altura = 0; irmao.noAr = false; }
+      }
+      const quadro = irmao.noAr ? irmao.sprites[2] : irmao.sprites[Math.floor(t / 5) % 2];
+      S.colar(ctx, quadro, irmao.x, CHAO - quadro.h - irmao.altura, this.dir);
+      if (this.dir === 1 ? irmao.x < W + 2 : irmao.x > -w - 2) foram = false;
     }
-    S.colar(ctx, GOOMBA[Math.floor(t / 14) % 2], this.goomba, CHAO - 7, -this.dir);
-    const quadro = this.noAr ? MARIO[2] : MARIO[Math.floor(t / 5) % 2];
-    S.colar(ctx, quadro, this.x, CHAO - quadro.h - this.altura, this.dir);
-    const marioFora = this.dir === 1 ? this.x > W + 2 : this.x < -10;
-    const goombaFora = this.dir === 1 ? this.goomba < -10 : this.goomba > W + 2;
-    return !(marioFora && goombaFora);
+    const goombaFoi = this.virou ? (this.dir === 1 ? this.goomba > W + 2 : this.goomba < -gw - 2)
+      : (this.dir === 1 ? this.goomba < -gw - 2 : this.goomba > W + 2);
+    return !(foram && goombaFoi);
   }
 
   // Sonic the Hedgehog (Mega Drive, 1991): passa correndo, pula em bola e
-  // pega o anel dourado no meio do campo.
-  const PALETA_SONIC = { b: '#2251ff', s: '#ffcc99', w: '#ffffff', k: '#000000', r: '#e8202a' };
+  // pega o anel dourado no meio do campo. Pedido do Rafael (20/10/2026):
+  // maior (antes era o menor do campo) e com o Tails correndo atras, que
+  // no mesmo lugar sobe girando as caudas, como no Sonic 2.
   const SONIC = S.quadros([
-    ['bbb.......', '.bbbbb....', 'bbbbbbbw..', '.bbbbbwkw.', 'bbbbbsss..', '.bbbssss..',
-     '..bbss.ww.', '..bbbb....', '.rr..rr...', 'rr....rr..'],
-    ['bbb.......', '.bbbbb....', 'bbbbbbbw..', '.bbbbbwkw.', 'bbbbbsss..', '.bbbssss..',
-     '..bbss.ww.', '..bbbb....', '..rrrr....', '...rr.....']
-  ], PALETA_SONIC);
-  const SONIC_BOLA = S.fazer(['..bbbb..', '.bbwbbb.', 'bbbbbwbb', 'bwbbbbbb', 'bbbbbbwb', 'bbwbbbbb',
-                              '.bbbwbb.', '..bbbb..'], { b: '#2251ff', w: '#7fa6ff' });
+    ['......kkkk......',
+     '....kkBBBBkk....',
+     '.kkkBBBBBBBBk...',
+     'kBBBBBBBBBWWWk..',
+     '.kbBBBBBBWWKWk..',
+     '.kkBBBBBBWWKWSk.',
+     'kbBBBBBBBSSSSSKk',
+     '.kkBBBBBBBSSSkk.',
+     '...kkBBBSSBBGGk.',
+     '..kGGBBSSSBkkk..',
+     '...kkkBSSBk.....',
+     '...kkBBkkBBkkk..',
+     '..kRRGRk.kRRGRk.',
+     '.kRRRRk...kRRRRk',
+     '..kkkk.....kkkk.'],   // correndo (pernas abertas)
+    ['......kkkk......',
+     '....kkBBBBkk....',
+     '.kkkBBBBBBBBk...',
+     'kBBBBBBBBBWWWk..',
+     '.kbBBBBBBWWKWk..',
+     '.kkBBBBBBWWKWSk.',
+     'kbBBBBBBBSSSSSKk',
+     '.kkBBBBBBBSSSkk.',
+     '...kkBBBSSBkk...',
+     '...kGBBSSSBGk...',
+     '....kkBSSBkk....',
+     '.....kBBBBk.....',
+     '....kRRGRRk.....',
+     '...kRRRRRRRk....',
+     '....kkkkkkk.....']   // correndo (pernas juntas)
+  ], { B: '#2251ff', b: '#1638b8', S: '#ffcc99', W: '#ffffff', K: '#101010', R: '#e8202a', G: '#f4f4f4', k: '#0c1640' });
+  const SONIC_BOLA = S.quadros([
+    ['.....kkkk.....',
+     '...kkBBBBkk...',
+     '..kBBBBBBBBk..',
+     '.kBBLBBBBBBBk.',
+     '.kBLBBBBBbBBk.',
+     'kBBBBBBBBBBbBk',
+     'kBLBBBbbBBBBBk',
+     'kBBBBbbbbBBBBk',
+     'kBbBBBBbBBBLBk',
+     '.kBBbBBBBBLBk.',
+     '.kBBBBBBBLBBk.',
+     '..kBBBBBBBBk..',
+     '...kkBBBBkk...',
+     '.....kkkk.....'],   // a bola (o giro do pulo)
+    ['.....kkkk.....',
+     '...kkBBBBkk...',
+     '..kBBBBBBBBk..',
+     '.kBBBBBBBLBBk.',
+     '.kBBbBBBBBLBk.',
+     'kBbBBBBBBBBBBk',
+     'kBBBBBbbBBBLBk',
+     'kBBBBbbbbBBBBk',
+     'kBLBBBBbBBBbBk',
+     '.kBLBBBBBbBBk.',
+     '.kBBLBBBBBBBk.',
+     '..kBBBBBBBBk..',
+     '...kkBBBBkk...',
+     '.....kkkk.....']   // a bola, um quarto de volta
+  ], { B: '#2251ff', b: '#1638b8', L: '#7fa6ff', k: '#0c1640' });
+  const TAILS_CHAO = S.quadros([
+    ['.........k..k..',
+     '........kOkkOk.',
+     '.......kOOOOOk.',
+     '...k..kOOWWKOk.',
+     '..kWk.kOOWWKWk.',
+     '.kWOOkkOOWWWWNk',
+     'kWOOOOkoOWWWkk.',
+     '.kWOOOOOOWWk...',
+     '..kOOWOOOWGk...',
+     '...kOOkOOOkk...',
+     '....kkkOOkOOk..',
+     '.....kRGk.kRGk.',
+     '....kRRRk.kRRRk',
+     '.....kkk...kkk.'],   // correndo, as caudas para cima
+    ['.........k..k..',
+     '........kOkkOk.',
+     '.......kOOOOOk.',
+     '......kOOWWKOk.',
+     '......kOOWWKWk.',
+     '......kOOWWWWNk',
+     '..kkkkkoOWWWkk.',
+     '.kWOOOOOOWWk...',
+     'kWOOOWOOOWGk...',
+     '.kWOOOOOOOk....',
+     '..kOOkkkOOk....',
+     '...kk..kRGk....',
+     '......kRRRRk...',
+     '.......kkkk....']   // correndo, as caudas para baixo
+  ], { O: '#f0a020', o: '#c87810', W: '#ffffff', K: '#1a3a8a', N: '#101010', R: '#e8202a', G: '#f4f4f4', k: '#3a1e06' });
   const ANEL = S.fazer(['.YYY.', 'Y...Y', 'Y...Y', 'Y...Y', '.YYY.'], { Y: '#ffd23f' });
 
   function iniciarSonic() {
     const dir = aleatorio() < 0.5 ? 1 : -1;
-    return { dir: dir, x: dir === 1 ? -12 : W + 2, altura: 0, vy: 0, noAr: false,
+    const w = SONIC[0].w;
+    return { dir: dir, x: dir === 1 ? -w : W + 2, altura: 0, vy: 0, noAr: false, pulouEm: null,
+             tails: { x: dir === 1 ? -w - 22 : W + 24, altura: 0, vy: 0, noAr: false },
              anel: { x: 50 + aleatorio() * 60, pego: -1 }, poeira: [], desenhar: desenharSonic };
   }
 
   function desenharSonic(passo) {
+    const w = SONIC[0].w;
     this.x += this.dir * 0.85 * passo;       // rapido, mas da para ver quem e'
-    const ate = this.dir === 1 ? this.anel.x - this.x : this.x - this.anel.x;
-    if (!this.noAr && this.anel.pego < 0 && ate > 0 && ate < 22) { this.noAr = true; this.vy = 1.9; }
+    const ate = this.dir === 1 ? this.anel.x - (this.x + w / 2) : (this.x + w / 2) - this.anel.x;
+    if (!this.noAr && this.anel.pego < 0 && ate > 0 && ate < 18) {
+      this.noAr = true; this.vy = 1.9; this.pulouEm = this.x;
+    }
     if (this.noAr) {
       this.altura += this.vy * passo;
       this.vy -= 0.13 * passo;
       if (this.altura <= 0) { this.altura = 0; this.noAr = false; }
     }
-    if (this.anel.pego < 0 && Math.abs(this.x + 4 - this.anel.x) < 4 && this.altura > 6) this.anel.pego = 0;
+    if (this.anel.pego < 0 && Math.abs(this.x + w / 2 - this.anel.x - 2) < 5 && this.altura > 6) this.anel.pego = 0;
+    // O Tails corre atras e, onde o Sonic pulou, sobe girando as caudas.
+    const tails = this.tails;
+    tails.x += this.dir * 0.85 * passo;
+    if (!tails.noAr && this.pulouEm !== null && (this.dir === 1 ? tails.x >= this.pulouEm : tails.x <= this.pulouEm)) {
+      tails.noAr = true; tails.vy = 1.5; this.pulouEm = null;
+    }
+    if (tails.noAr) {
+      tails.altura += tails.vy * passo;
+      tails.vy -= 0.09 * passo;
+      if (tails.altura <= 0) { tails.altura = 0; tails.noAr = false; }
+    }
     if (this.anel.pego < 0) {
-      S.colar(ctx, ANEL, this.anel.x, CHAO - 22 + Math.round(Math.sin(t * 0.1)), 1);
+      S.colar(ctx, ANEL, this.anel.x, CHAO - 26 + Math.round(Math.sin(t * 0.1)), 1);
     } else if (this.anel.pego < 30) {                 // brilhinho de anel pego
       this.anel.pego += passo;
       ctx.fillStyle = 'rgba(255,240,140,' + (1 - this.anel.pego / 30).toFixed(2) + ')';
       const r = 2 + this.anel.pego / 6;
       for (let i = 0; i < 6; i++) {
         const a = i * Math.PI / 3;
-        ctx.fillRect(Math.round(this.anel.x + 2 + Math.cos(a) * r), Math.round(CHAO - 20 + Math.sin(a) * r), 1, 1);
+        ctx.fillRect(Math.round(this.anel.x + 2 + Math.cos(a) * r), Math.round(CHAO - 24 + Math.sin(a) * r), 1, 1);
       }
     }
-    if (passo && !this.noAr && aleatorio() < 0.6) {
-      this.poeira.push({ x: this.x + (this.dir === 1 ? 0 : 9), y: CHAO - 1, vida: 1 });
+    for (const corredor of [this, tails]) {
+      if (passo && !corredor.noAr && aleatorio() < 0.5) {
+        this.poeira.push({ x: corredor.x + (this.dir === 1 ? 1 : w - 2), y: CHAO - 1, vida: 1 });
+      }
     }
     for (const p of this.poeira) { p.vida -= 0.05 * passo; p.y -= 0.05 * passo; }
     this.poeira = this.poeira.filter(function (p) { return p.vida > 0; });
@@ -594,9 +919,12 @@
       ctx.fillStyle = 'rgba(255,255,255,' + (p.vida * 0.6).toFixed(2) + ')';
       ctx.fillRect(Math.round(p.x), Math.round(p.y), 1, 1);
     }
-    const quadro = this.noAr ? SONIC_BOLA : SONIC[Math.floor(t / 3) % 2];
+    const qt = tails.noAr ? TAILS[Math.floor(t / 3) % 4] : TAILS_CHAO[Math.floor(t / 3) % 2];
+    S.colar(ctx, qt, tails.x, CHAO - qt.h - tails.altura, this.dir);
+    const quadro = this.noAr ? SONIC_BOLA[Math.floor(t / 2) % 2] : SONIC[Math.floor(t / 3) % 2];
     S.colar(ctx, quadro, this.x, CHAO - quadro.h - this.altura, this.dir);
-    return this.dir === 1 ? this.x < W + 4 || this.poeira.length > 0 : this.x > -14 || this.poeira.length > 0;
+    const fora = this.dir === 1 ? tails.x > W + 2 : tails.x < -w - 2;
+    return !fora || this.poeira.length > 0;
   }
 
   // Duck Hunt (NES, 1984): dois patos sobem batendo as asas, e depois o
@@ -657,12 +985,15 @@
   // Mais visitas de 16 bits (lote campo-a, 13/10/2026): Yoshi, Link,
   // o Wiggler, o Monty Mole e o Lakitu.
   // ------------------------------------------------------------------
-  // Yoshi (Super Mario World, SNES, 1990): vem correndo pela grama, para
-  // diante de uma frutinha vermelha, estica a lingua, come e segue feliz.
-  // G verde, d verde escuro, W branco, K olho, R sela, O espinhos e botas.
-  const PALETA_YOSHI = { G: '#4cd640', d: '#219a34', W: '#ffffff', K: '#101010', R: '#ee3226', O: '#f68a1e',
-                         k: '#0f3a16' };
-  const YOSHI = S.quadros([
+  // Yoshi (Super Mario World, SNES, 1990): o arbusto das frutinhas fica
+  // sempre no campo, com as frutinhas balancando como no jogo. O Yoshi verde
+  // vem correndo pela grama e o roxo vem pelo ar, batendo as pernas (o pulo
+  // flutuante do Yoshi); o roxo passa por cima do arbusto e pousa do outro
+  // lado. Cada um estica a lingua, come a frutinha do seu lado e vai embora
+  // feliz; depois que os dois saem, as frutinhas brotam de novo. Pedido do
+  // Rafael (20/10/2026); logo depois chegam o Mario e o Luigi.
+  // G verde (ou roxo), d escuro, W branco, K olho, R sela, O espinhos e botas.
+  const DESENHO_YOSHI = [
     ['......kk........',        // correndo
      '.....kWWk.......',
      '....kWWKWkkk....',
@@ -727,7 +1058,13 @@
      'kGGdkdGGGGdk....',
      '.kkkkOOOOOk.....',
      '.....kkkkk......']
-  ], PALETA_YOSHI);
+  ];
+  const PALETA_YOSHI = { G: '#4cd640', d: '#219a34', W: '#ffffff', K: '#101010', R: '#ee3226', O: '#f68a1e',
+                         k: '#0f3a16' };
+  const PALETA_YOSHI_ROXO = { G: '#b070f0', d: '#7a3ac0', W: '#ffffff', K: '#101010', R: '#ee3226', O: '#f68a1e',
+                              k: '#2a0f45' };
+  const YOSHI = S.quadros(DESENHO_YOSHI, PALETA_YOSHI);
+  const YOSHI_ROXO = S.quadros(DESENHO_YOSHI, PALETA_YOSHI_ROXO);
   const FRUTA_YOSHI = S.fazer([
     '.gl.',
     'RWRR',
@@ -736,54 +1073,131 @@
   ], { l: '#4caf3a', R: '#ee2030', W: '#ffd6d6', D: '#a01020', g: '#2e7d1f' });
   const CORACAO_YOSHI = [[0, 0], [1, 0], [3, 0], [4, 0], [0, 1], [1, 1], [2, 1], [3, 1], [4, 1],
                          [1, 2], [2, 2], [3, 2], [2, 3]];
+  const ARBUSTO_DESENHO = S.quadros([
+    ['.......kkkkk..........',
+     '....kkkGGGGGkk.kkk....',
+     '...kGGGGGGGGGGkGGGk...',
+     '..kGGGLLGGGGGGGGGGGk..',
+     '.kGGLLGGGGGGGLLGGGGGk.',
+     'kGGGGGGGGGGGLLGGGGGGGk',
+     'kGGGGGdGGGGGGGGGdGGGGk',
+     'kGdGGGGGGGdGGGGGGGGdGk',
+     '.kGGdGGGGGGGGGdGGGGGk.',
+     '..kddddddddddddddddk..',
+     '...kkkkkkkkkkkkkkkk...']   // o arbusto das frutinhas (Super Mario World)
+  ], { G: '#3cb043', L: '#7ed957', d: '#23802f', k: '#103a16' });
+  const ARBUSTO_YOSHI = ARBUSTO_DESENHO[0];
+  // O arbusto mora no campo: as duas frutinhas (onde ficam no arbusto e se
+  // ja foram comidas) e quanto falta para cada uma brotar de novo (0 a 1).
+  const arbusto = { x: 98, frutas: [{ dx: 3, dy: 1, fase: 0, comida: false, broto: 1 },
+                                    { dx: 14, dy: 0, fase: 2.1, comida: false, broto: 1 }] };
+
+  function desenharArbusto(passo) {
+    const y = CHAO + 1 - ARBUSTO_YOSHI.h;
+    S.colar(ctx, ARBUSTO_YOSHI, arbusto.x, y, 1);
+    for (const f of arbusto.frutas) {
+      if (f.comida) continue;
+      if (f.broto < 1) f.broto = Math.min(1, f.broto + passo / 30);
+      // A frutinha balanca no galho, de um lado para o outro (como no jogo).
+      const fx = Math.round(arbusto.x + f.dx + Math.sin(t * 0.1 + f.fase) * 1.2), fy = y + f.dy - 2;
+      if (f.broto >= 1) {
+        S.colar(ctx, FRUTA_YOSHI, fx, fy, 1);
+      } else {
+        // Brotando: um pontinho que cresce, com um brilho em volta.
+        const r = Math.max(1, Math.round(f.broto * 3));
+        ctx.fillStyle = '#ee2030';
+        ctx.fillRect(fx + 2 - Math.ceil(r / 2), fy + 2 - Math.ceil(r / 2), r, r);
+        ctx.fillStyle = 'rgba(255,255,255,' + (1 - f.broto).toFixed(2) + ')';
+        ctx.fillRect(fx - 1, fy, 1, 1);
+        ctx.fillRect(fx + 4, fy + 1, 1, 1);
+        ctx.fillRect(fx + 2, fy - 2, 1, 1);
+      }
+    }
+  }
+
+  // Onde fica a frutinha i agora (o meio dela, para a lingua alcancar).
+  function frutaDoArbusto(i) {
+    const f = arbusto.frutas[i];
+    return { x: arbusto.x + f.dx + 2, y: CHAO + 1 - ARBUSTO_YOSHI.h + f.dy };
+  }
 
   function iniciarYoshi() {
     const dir = aleatorio() < 0.5 ? 1 : -1;
-    return { dir: dir, x: dir === 1 ? -YOSHI[0].w : W, fase: 'correndo', relogio: 0,
-             fruta: Math.round(62 + aleatorio() * 34), lingua: 0, puxou: false, comeu: false,
-             haste: 1, balanco: 0, poeira: [], coracao: -1, desenhar: desenharYoshi };
+    const w = YOSHI[0].w;
+    // Se uma visita anterior foi cortada (os testes chamam outra no meio),
+    // as frutinhas estao no arbusto de novo.
+    for (const f of arbusto.frutas) { f.comida = false; f.broto = 1; }
+    // Cada um come a frutinha do seu lado: o verde a de perto, o roxo a de
+    // la (ele passa voando por cima do arbusto e pousa do outro lado).
+    const perto = dir === 1 ? 0 : 1, longe = 1 - perto;
+    const fp = frutaDoArbusto(perto), fl = frutaDoArbusto(longe);
+    return { dir: dir, desenhar: desenharYoshi, poeira: [], brotar: false,
+             yoshis: [
+               { sprites: YOSHI, fruta: perto, x: dir === 1 ? -w : W, dir: dir, alvo: dir === 1 ? fp.x - 21 : fp.x + 21 - w,
+                 fase: 'correndo', relogio: 0, altura: 0, lingua: 0, coracao: -1, espera: 0 },
+               { sprites: YOSHI_ROXO, fruta: longe, x: dir === 1 ? -w - 30 : W + 30, dir: dir,
+                 alvo: dir === 1 ? fl.x + 21 - w : fl.x - 21, fase: 'voando', relogio: 0, altura: 34, lingua: 0,
+                 coracao: -1, espera: 0 }] };
   }
 
   function desenharYoshi(passo) {
-    const w = YOSHI[0].w, topo = CHAO - YOSHI[0].h;
-    const boca = this.dir === 1 ? this.x + 10 : this.x + w - 11;    // de onde a lingua sai
-    const alcance = this.dir === 1 ? this.fruta + 3 - boca : boca - this.fruta;
-    let quadro = YOSHI[1];
-    this.relogio += passo;
-    if (this.fase === 'correndo') {
-      this.x += this.dir * 0.6 * passo;
-      quadro = YOSHI[Math.floor(t / 4) % 2];
-      if (!this.comeu && alcance <= 11) { this.fase = 'parando'; this.relogio = 0; }
-      if (this.comeu) this.haste = Math.max(0, this.haste - passo / 90);   // o talo vazio some aos poucos
-    } else if (this.fase === 'parando') {
-      if (this.relogio >= 10) { this.fase = 'lingua'; this.relogio = 0; }
-    } else if (this.fase === 'lingua') {
-      quadro = YOSHI[2];
-      const p = Math.min(1, this.relogio / 20);                     // estica e recolhe
-      this.lingua = Math.max(1, Math.round(Math.sin(p * Math.PI) * alcance));
-      if (p >= 0.5 && !this.puxou) { this.puxou = true; this.balanco = 1; }
-      if (p >= 1) { this.fase = 'mastigando'; this.relogio = 0; this.comeu = true; }
-    } else if (this.fase === 'mastigando') {
-      quadro = Math.floor(this.relogio / 6) % 2 === 0 ? YOSHI[3] : YOSHI[1];
-      if (this.relogio >= 42) { this.fase = 'correndo'; this.coracao = 0; }
+    const w = YOSHI[0].w;
+    for (const y of this.yoshis) {
+      y.relogio += passo;
+      const sprites = y.sprites;
+      let quadro = sprites[1];
+      const boca = y.dir === 1 ? y.x + 10 : y.x + w - 11;      // de onde a lingua sai
+      const fruta = frutaDoArbusto(y.fruta);
+      const alcance = Math.max(1, Math.abs(fruta.x - boca));
+      if (y.fase === 'correndo') {
+        // Ate o lugar de comer (sem passar dele) ou, depois de comer, embora.
+        const falta = y.comeu ? y.dir * 99 : y.alvo - y.x;
+        y.x += Math.sign(falta) * Math.min(Math.abs(falta), 0.6 * passo);
+        quadro = sprites[Math.floor(t / 4) % 2];
+        if (!y.comeu && Math.abs(y.alvo - y.x) < 0.01) { y.fase = 'parando'; y.relogio = 0; }
+      } else if (y.fase === 'voando') {
+        // O pulo flutuante: as pernas batendo, descendo devagar ate o lugar
+        // do outro lado do arbusto.
+        const falta = y.alvo - y.x;
+        y.x += Math.sign(falta) * Math.min(Math.abs(falta), 0.7 * passo);
+        const resta = Math.abs(y.alvo - y.x);
+        y.altura = Math.min(y.altura, 6 + resta * 0.3) + Math.sin(t * 0.3) * 0.3;
+        if (resta < 0.01) y.altura = Math.max(0, y.altura - 0.8 * passo);
+        quadro = sprites[Math.floor(t / 2) % 2];
+        if (passo && aleatorio() < 0.6) {
+          this.poeira.push({ x: y.x + (y.dir === 1 ? 5 : w - 6) + aleatorio() * 4, y: CHAO - y.altura, vida: 1 });
+        }
+        if (resta < 0.01 && y.altura <= 0) {
+          // Pousou: vira para o arbusto (a frutinha esta atras dele).
+          y.altura = 0; y.dir = -y.dir; y.fase = 'parando'; y.relogio = 0;
+        }
+      } else if (y.fase === 'parando') {
+        if (y.relogio >= 10) { y.fase = 'lingua'; y.relogio = 0; }
+      } else if (y.fase === 'lingua') {
+        quadro = sprites[2];
+        const p = Math.min(1, y.relogio / 20);                    // estica e recolhe
+        y.lingua = Math.max(1, Math.round(Math.sin(p * Math.PI) * alcance));
+        if (p >= 0.5 && !arbusto.frutas[y.fruta].comida) arbusto.frutas[y.fruta].comida = true;
+        if (p >= 1) { y.fase = 'mastigando'; y.relogio = 0; }
+      } else if (y.fase === 'mastigando') {
+        quadro = Math.floor(y.relogio / 6) % 2 === 0 ? sprites[3] : sprites[1];
+        if (y.relogio >= 42) { y.coracao = 0; y.fase = 'pronto'; y.relogio = 0; }
+      } else if (y.fase === 'pronto') {
+        // Quem comeu primeiro espera o outro terminar.
+        if (this.yoshis.every(function (o) { return o.fase === 'pronto'; })) {
+          // O roxo vira de novo e os dois vao embora juntos, para o mesmo lado.
+          for (const o of this.yoshis) { o.dir = this.dir; o.comeu = true; o.fase = 'correndo'; o.relogio = 0; }
+        }
+      }
+      y.quadro = quadro;
+      y.boca = boca;
     }
-    // O talo da frutinha (balanca quando ela e' arrancada).
-    if (this.haste > 0) {
-      this.balanco = Math.max(0, this.balanco - passo / 30);
-      const hx = this.fruta + 1, a = this.haste.toFixed(2);
-      const torto = Math.round(Math.sin(t * 0.9) * 1.4 * this.balanco);
-      ctx.fillStyle = 'rgba(46,125,31,' + a + ')';
-      ctx.fillRect(hx, CHAO - 4, 1, 4);
-      ctx.fillRect(hx + torto, CHAO - 7, 1, 3);
-      ctx.fillStyle = 'rgba(76,175,58,' + a + ')';
-      ctx.fillRect(hx - 1, CHAO - 3, 1, 1);
-      ctx.fillRect(hx + 1, CHAO - 5, 1, 1);
-    }
-    if (!this.puxou) S.colar(ctx, FRUTA_YOSHI, this.fruta, CHAO - 11, 1);
-    // Poeira das botas.
-    const fora = this.dir === 1 ? this.x > W + 1 : this.x < -w - 1;
-    if (passo && this.fase === 'correndo' && !fora && aleatorio() < 0.5) {
-      this.poeira.push({ x: this.x + (this.dir === 1 ? 3 : w - 4), y: CHAO - 1, vida: 1 });
+    // Poeira das botas e do pulo flutuante.
+    for (const y of this.yoshis) {
+      const dentro = y.dir === 1 ? y.x < W + 1 : y.x > -w - 1;
+      if (passo && y.fase === 'correndo' && dentro && aleatorio() < 0.5) {
+        this.poeira.push({ x: y.x + (y.dir === 1 ? 3 : w - 4), y: CHAO - 1, vida: 1 });
+      }
     }
     for (const p of this.poeira) { p.vida -= 0.05 * passo; p.y -= 0.05 * passo; }
     this.poeira = this.poeira.filter(function (p) { return p.vida > 0; });
@@ -791,23 +1205,35 @@
       ctx.fillStyle = 'rgba(255,255,255,' + (p.vida * 0.6).toFixed(2) + ')';
       ctx.fillRect(Math.round(p.x), Math.round(p.y), 1, 1);
     }
-    S.colar(ctx, quadro, this.x, topo, this.dir);
-    // A lingua cor-de-rosa (ponta mais grossa), com a fruta presa na volta.
-    if (this.fase === 'lingua') {
-      const ponta = this.dir === 1 ? boca + this.lingua - 1 : boca - this.lingua + 1;
-      ctx.fillStyle = '#ff6a9a';
-      ctx.fillRect(Math.round(this.dir === 1 ? boca : ponta), topo + 7, this.lingua, 1);
-      ctx.fillRect(Math.round(this.dir === 1 ? ponta - 1 : ponta), topo + 7, 2, 2);
-      if (this.puxou) S.colar(ctx, FRUTA_YOSHI, ponta - (this.dir === 1 ? 2 : 1), CHAO - 11, 1);
+    for (const y of this.yoshis) {
+      const topo = CHAO - w - y.altura;
+      S.colar(ctx, y.quadro, y.x, topo, y.dir);
+      // A lingua cor-de-rosa (ponta mais grossa), com a frutinha presa na volta.
+      if (y.fase === 'lingua') {
+        const ponta = y.dir === 1 ? y.boca + y.lingua - 1 : y.boca - y.lingua + 1;
+        ctx.fillStyle = '#ff6a9a';
+        ctx.fillRect(Math.round(y.dir === 1 ? y.boca : ponta), topo + 7, y.lingua, 1);
+        ctx.fillRect(Math.round(y.dir === 1 ? ponta - 1 : ponta), topo + 7, 2, 2);
+        if (arbusto.frutas[y.fruta].comida) S.colar(ctx, FRUTA_YOSHI, ponta - (y.dir === 1 ? 2 : 1), topo + 6, 1);
+      }
+      // Coracaozinho (que delicia!) subindo e sumindo.
+      if (y.coracao >= 0 && y.coracao < 50) {
+        y.coracao += passo;
+        ctx.fillStyle = 'rgba(255,92,138,' + Math.max(0, 1 - y.coracao / 50).toFixed(2) + ')';
+        const cx = Math.round(y.x + (y.dir === 1 ? 4 : w - 9)), cy = Math.round(topo - 4 - y.coracao / 8);
+        for (const p of CORACAO_YOSHI) ctx.fillRect(cx + p[0], cy + p[1], 1, 1);
+      }
     }
-    // Coracaozinho (que delicia!) subindo e sumindo.
-    if (this.coracao >= 0 && this.coracao < 50) {
-      this.coracao += passo;
-      ctx.fillStyle = 'rgba(255,92,138,' + Math.max(0, 1 - this.coracao / 50).toFixed(2) + ')';
-      const cx = Math.round(this.x + (this.dir === 1 ? 4 : w - 9)), cy = Math.round(topo - 4 - this.coracao / 8);
-      for (const p of CORACAO_YOSHI) ctx.fillRect(cx + p[0], cy + p[1], 1, 1);
+    const foram = this.yoshis.every(function (y) {
+      return y.comeu && (y.dir === 1 ? y.x > W + 1 : y.x < -w - 1) && y.coracao >= 50;
+    });
+    if (!foram || this.poeira.length) return true;
+    // Os dois foram embora: as frutinhas brotam de novo no arbusto.
+    if (!this.brotar) {
+      this.brotar = true;
+      for (const f of arbusto.frutas) if (f.comida) { f.comida = false; f.broto = 0; }
     }
-    return !(fora && this.haste <= 0 && !this.poeira.length && (this.coracao < 0 || this.coracao >= 50));
+    return arbusto.frutas.some(function (f) { return f.broto < 1; });
   }
 
   // The Legend of Zelda: A Link to the Past (SNES, 1991): o Link vem
@@ -1322,9 +1748,13 @@
     return this.dir === 1 ? this.x < W + 1 : this.x > -w - 1;
   }
 
-  // Donkey Kong Country (SNES, 1994): o Donkey Kong passa rolando (o ataque
-  // de rolar) e o Diddy Kong vem correndo atras e pula para pegar a banana
-  // que gira no ar.
+  // Donkey Kong Country (SNES, 1994 a 1996): a turma dos Kongs passa em fila,
+  // cada um com o seu golpe (pedido do Rafael, 20/10/2026). O Donkey Kong
+  // anda na frente, sai rolando (pega a banana pelo caminho, como no jogo) e
+  // depois sai correndo; o Diddy da a estrela e corre; a Dixie gira o rabo
+  // de cavalo e bate com o cabelo, e corre; e o Kiddy, o bebe do DKC 3, rola
+  // e corre atras. A estrela e a bola do Kiddy sao o mesmo desenho girado
+  // de 90 em 90 graus (S.girar).
   const DONKEY = S.quadros([
     ['.......DD.....',
      '.....BBBD.....',
@@ -1384,41 +1814,201 @@
      '..............']
   ], { B: '#8a4a1e', L: '#b8743c', D: '#5a2a0e', T: '#f2c088', K: '#1a0e06', R: '#e02a2a',
      Y: '#ffd23f', W: '#ffffff' });
+  const DONKEY_ANDA = S.quadros([
+    ['.......kkk..........',
+     '.....kkBBBkk........',
+     '....kBBBBBBBk.......',
+     '...kBBBBBBBBBk......',
+     '...kBBBTTTTTTTk.....',
+     '..kBBBTTWKTWKTk.....',
+     '..kBBBBTTTTTTTTk....',
+     '..kBBBBBTTTTTTTTk...',
+     '.kBBBBBBTTKKKKTk....',
+     'kBBBBBBBBTTTTTk.....',
+     'kBBBLBBBRRRRBBBk....',
+     'kBBLLBBBRYYRBBBBk...',
+     '.kBBBBBBBRRBBBBBBk..',
+     '..kBBBBBBBBBBkBBBBk.',
+     '..kBBBBkBBBBk.kBBBk.',
+     '.kBBBBk.kBBBBkkTTTk.',
+     'kTTTTk...kTTTTkTTTk.',
+     '.kkkk.....kkkk.kkk..'],   // andando (o braco da frente para a frente)
+    ['.......kkk..........',
+     '.....kkBBBkk........',
+     '....kBBBBBBBk.......',
+     '...kBBBBBBBBBk......',
+     '...kBBBTTTTTTTk.....',
+     '..kBBBTTWKTWKTk.....',
+     '..kBBBBTTTTTTTTk....',
+     '..kBBBBBTTTTTTTTk...',
+     '.kBBBBBBTTKKKKTk....',
+     'kBBBBBBBBTTTTTk.....',
+     'kBBBLBBBRRRRBBBkk...',
+     'kBBLLBBBRYYRBBBBBk..',
+     '.kBBBBBBBRRBBBBBBBk.',
+     '..kBBBBBBBBBBBkBBBk.',
+     '...kBBBBBBBBkkkTTTk.',
+     '....kBBBBBBk..kTTTk.',
+     '...kTTTTTTTTk..kkk..',
+     '....kkkkkkkk........']   // andando (o outro passo)
+  ], { B: '#8a4a1e', L: '#b8743c', D: '#5a2a0e', T: '#f2c088', K: '#1a0e06', W: '#ffffff', R: '#e02a2a', Y: '#ffd23f', k: '#2a1206' });
   const DIDDY = S.quadros([
-    ['....RRRR....',
-     '...RRRRRR...',
-     '...RRRRRRRR.',
-     '..TBTTWKT...',
-     '..TBTTTTTT..',
-     '...BBTTTT...',
-     '.B.BRYRB....',
-     'B..BRRRBT...',
-     'B...RRRR....',
-     '.BBBB..BB...',
-     '..TT....TT..'],
-    ['....RRRR....',
-     '...RRRRRR...',
-     '...RRRRRRRR.',
-     '..TBTTWKT...',
-     '..TBTTTTTT..',
-     '...BBTTTT...',
-     '.B.BRYRB....',
-     'B..BRRRBT...',
-     'B...RRRR....',
-     '.BB.BBB.....',
-     '....TTT.....'],
-    ['....RRRR....',
-     '...RRRRRR..T',
-     '...RRRRRRRRB',
-     '..TBTTWKT.B.',
-     '..TBTTTTTB..',
-     '...BBTTTB...',
-     '.B.BRYRB....',
-     'B..BRRRR....',
-     'B...RRRR....',
-     '.BBB..BB....',
-     '..TT...TT...']
-  ], { R: '#e02a2a', B: '#7a4018', T: '#f0b878', K: '#1a0e06', Y: '#ffd23f', W: '#ffffff' });
+    ['.....kkkk......',
+     '....kRRRRkk....',
+     '...kRRRRRRRkk..',
+     '...kRRRRRRRRRk.',
+     '..kBBTTWKTkkk..',
+     '..kBTTTTTTTk...',
+     '..kkBTTTTTk....',
+     '.kBkRRYRRBk....',
+     'kBkkRRRRRBTk...',
+     'kBkkRRRRRkk....',
+     '.kBBBBkkBBk....',
+     '..kkBBk.kBBk...',
+     '..kTTk..kTTk...',
+     '...kk....kk....'],   // correndo
+    ['.....kkkk......',
+     '....kRRRRkk....',
+     '...kRRRRRRRkk..',
+     '...kRRRRRRRRRk.',
+     '..kBBTTWKTkkk..',
+     '..kBTTTTTTTk...',
+     '..kkBTTTTTk....',
+     '.kBkRRYRRBk....',
+     'kBkkRRRRRBTk...',
+     'kBkkRRRRRkk....',
+     '.kBBBkBBBk.....',
+     '..kkkBBBk......',
+     '....kTTTk......',
+     '.....kkk.......'],   // correndo (o outro passo)
+    ['...............',
+     '...............',
+     '.k...kkkk...k..',
+     'kTk.kRRRRk.kTk.',
+     'kBBkRRRRRRkBBk.',
+     '.kBBRRRRRRBBk..',
+     '..kBTTWKTBkk...',
+     '...kTTTTTTk....',
+     '...kRRYRRk.....',
+     '...kRRRRRk.....',
+     '..kBBkkkBBk....',
+     '.kBBk...kBBk...',
+     'kTTk.....kTTk..',
+     '.kk.......kk...']   // a estrela (bracos e pernas abertos)
+  ], { R: '#e02a2a', B: '#7a4018', T: '#f0b878', K: '#1a0e06', Y: '#ffd23f', W: '#ffffff', k: '#2a1206' });
+  const DIXIE = S.quadros([
+    ['.kk............',
+     'kYYk...kkk.....',
+     'kYYYkkkPPPk....',
+     '.kYYbbPPPPPk...',
+     '..kYYBBBBBPk...',
+     '...kkBTTWKTk...',
+     '....kBTTTTTTk..',
+     '....kBBTTTTk...',
+     '...kPPPPPBk....',
+     '..kBBPPPPBBk...',
+     '...kBBBBBBk....',
+     '...kBBkkBBk....',
+     '..kTTTkkTTTk...',
+     '...kkk..kkk....'],   // correndo (o rabo de cavalo para tras)
+    ['..kk...........',
+     '.kYYk..kkk.....',
+     'kYYYkkkPPPk....',
+     '.kYYbbPPPPPk...',
+     '..kYYBBBBBPk...',
+     '...kkBTTWKTk...',
+     '....kBTTTTTTk..',
+     '....kBBTTTTk...',
+     '...kPPPPPBk....',
+     '..kBBPPPPBBk...',
+     '...kBBBBBBk....',
+     '....kBBBBk.....',
+     '....kTTTTk.....',
+     '.....kkkk......'],   // correndo (o outro passo)
+    ['...............',
+     '.......kkk.....',
+     '.kkkkkkPPPkk...',
+     'kYYYYbbPPPPPk..',
+     'kyYYYYYBBBBPk..',
+     '.kkkkkBTTWKTk..',
+     '.....kBTTTTTTk.',
+     '.....kBBTTTTk..',
+     '....kPPPPPBk...',
+     '...kBBPPPPBBk..',
+     '....kBBBBBBk...',
+     '....kBBkkBBk...',
+     '...kTTTkkTTTk..',
+     '....kkk..kkk...'],   // girando: o cabelo para um lado
+    ['..................',
+     '.......kkk........',
+     '......kPPPkkkkkkk.',
+     '.....kPPPPPbbYYYYk',
+     '.....kBBBBBYYYYYyk',
+     '.....kBTTWKTkkkkk.',
+     '.....kBTTTTTTk....',
+     '.....kBBTTTTk.....',
+     '....kPPPPPBk......',
+     '...kBBPPPPBBk.....',
+     '....kBBBBBBk......',
+     '....kBBkkBBk......',
+     '...kTTTkkTTTk.....',
+     '....kkk..kkk......']   // girando: o cabelo para o outro lado (a chicotada)
+  ], { P: '#ff5fa8', p: '#d83a86', Y: '#ffd23f', y: '#e0a800', b: '#7fd0ff', B: '#a8643a', T: '#f2c898', K: '#1a0e06', W: '#ffffff', k: '#2a1206' });
+  const KIDDY = S.quadros([
+    ['.......kk.......',
+     '.....kkBBkk.....',
+     '...kkBBBBBBkk...',
+     '..kBBBBBBBBBBk..',
+     '.kBBBTTTTTTTBBk.',
+     '.kBBTTWKTTWKTBk.',
+     'kBBBTTTTTTTTTTTk',
+     'kBBBTTKWWWWKTTk.',
+     '.kBBBTTKKKKTTk..',
+     '..kBBBTTTTTTk...',
+     '.kCCCCCCCCCCk...',
+     'kCCCCCcCCCCCCk..',
+     'kTCCCCcCCCCCTk..',
+     '.kCCCCCCCCCCk...',
+     '.kCCCCkkCCCCk...',
+     '.kTTTTkkTTTTk...',
+     '..kkkk..kkkk....'],   // correndo
+    ['.......kk.......',
+     '.....kkBBkk.....',
+     '...kkBBBBBBkk...',
+     '..kBBBBBBBBBBk..',
+     '.kBBBTTTTTTTBBk.',
+     '.kBBTTWKTTWKTBk.',
+     'kBBBTTTTTTTTTTTk',
+     'kBBBTTKWWWWKTTk.',
+     '.kBBBTTKKKKTTk..',
+     '..kBBBTTTTTTk...',
+     '.kCCCCCCCCCCk...',
+     'kCCCCCcCCCCCCk..',
+     'kCCCCCcCCCCCTk..',
+     '.kCCCCCCCCCCk...',
+     '..kCCCCCCCCk....',
+     '..kTTTTTTTTk....',
+     '...kkkkkkkk.....'],   // correndo (o outro passo)
+    ['...............',
+     '...............',
+     '...............',
+     '.....kkkkk.....',
+     '...kkCCCCCkk...',
+     '..kCCCCCCCCCk..',
+     '.kCCcCCBBBCCCk.',
+     '.kCcCCBTTTBCCk.',
+     'kCCCCBTTWTTBCCk',
+     'kCCCCBTTTTTBCCk',
+     'kCCCCCBTKTBCCCk',
+     'kCcCCCCBBBCCCCk',
+     '.kCCcCCCCCCCCk.',
+     '.kCCCCCCCCcCCk.',
+     '..kCCCCCCCCCk..',
+     '...kkCCCCCkk...',
+     '.....kkkkk.....']   // a bola (rolando)
+  ], { C: '#8ec8ff', c: '#5a98e0', B: '#9a5a2a', T: '#f2c088', K: '#1a0e06', W: '#ffffff', k: '#1e1430' });
+  const ESTRELA_DIDDY = [0, 1, 2, 3].map(function (q) { return S.girar(DIDDY[2], q); });
+  const BOLA_KIDDY = [0, 1, 2, 3].map(function (q) { return S.girar(KIDDY[2], q); });
   const BANANA_DKC = S.quadros([
     ['......b',
      '.....Yb',
@@ -1442,58 +2032,126 @@
   // A banana gira: de frente, de lado, de costas (o espelho) e de volta.
   const GIRO_BANANA = [[0, 1], [1, 1], [2, 1], [1, -1], [0, -1], [1, -1], [2, -1], [1, 1]];
 
+  // Cada Kong: onde comeca (atras do da frente), onde faz o golpe (contado
+  // da borda por onde entrou) e quanto o golpe anda.
+  const TURMA_KONG = [
+    { nome: 'donkey', atras: 20, golpe: 30 },
+    { nome: 'diddy', atras: 45, golpe: 55 },
+    { nome: 'dixie', atras: 66, golpe: 75 },
+    { nome: 'kiddy', atras: 120, golpe: 60 }
+  ];
+
   function iniciarDonkey() {
     const dir = aleatorio() < 0.5 ? 1 : -1;
-    return { dir: dir, x: dir === 1 ? -16 : W + 2, giro: 0,
-             diddy: dir === 1 ? -46 : W + 32, altura: 0, vy: 0, noAr: false,
-             banana: { x: 55 + aleatorio() * 50, pega: -1 }, poeira: [], desenhar: desenharDonkey };
+    return { dir: dir, desenhar: desenharDonkey, poeira: [], faiscas: [],
+             banana: { x: 62 + aleatorio() * 20, pega: -1 },
+             kongs: TURMA_KONG.map(function (k) {
+               return { nome: k.nome, golpe: k.golpe, fase: 'chegando', relogio: 0, altura: 0,
+                        x: dir === 1 ? -k.atras : W + k.atras - 14 };
+             }) };
+  }
+
+  // Quanto o Kong ja entrou no campo, a partir da borda de onde veio.
+  function entrou(visita, k) {
+    return visita.dir === 1 ? k.x : W - k.x;
   }
 
   function desenharDonkey(passo) {
-    this.x += this.dir * 0.95 * passo;
-    this.giro += 0.95 * passo;
-    this.diddy += this.dir * 0.85 * passo;
-    // O Diddy pula com a banana logo a frente: o alto do pulo cai em cima dela.
-    const meio = this.banana.x + 3;
-    const ate = this.dir === 1 ? meio - (this.diddy + 6) : (this.diddy + 6) - meio;
-    if (!this.noAr && this.banana.pega < 0 && ate > 0 && ate < 14) { this.noAr = true; this.vy = 1.7; }
-    if (this.noAr) {
-      this.altura += this.vy * passo;
-      this.vy -= 0.11 * passo;
-      if (this.altura <= 0) { this.altura = 0; this.noAr = false; }
+    const dir = this.dir;
+    for (const k of this.kongs) {
+      k.relogio += passo;
+      let vel = 0.5;
+      if (k.fase === 'chegando' && entrou(this, k) >= k.golpe) { k.fase = 'golpe'; k.relogio = 0; }
+      if (k.nome === 'donkey') {
+        // Anda devagar, rola depressa por uns 60 pontos e sai correndo.
+        if (k.fase === 'chegando') { vel = 0.4; k.quadro = DONKEY_ANDA[Math.floor(t / 8) % 2]; }
+        else if (k.fase === 'golpe') {
+          vel = 1.0;
+          k.giro = (k.giro || 0) + passo;
+          k.quadro = DONKEY[Math.floor(k.giro / 9) % 4];
+          if (passo && aleatorio() < 0.5) {
+            this.poeira.push({ x: k.x + (dir === 1 ? 3 : 10), y: CHAO - 1 - Math.floor(aleatorio() * 2), vida: 1 });
+          }
+          if (k.relogio >= 60) { k.fase = 'saindo'; k.relogio = 0; }
+        } else { vel = 0.95; k.quadro = DONKEY_ANDA[Math.floor(t / 4) % 2]; }
+      } else if (k.nome === 'diddy') {
+        // A estrela: duas voltas inteiras de lado, de maos e pes no chao.
+        if (k.fase === 'golpe') {
+          vel = 0.7;
+          k.quadro = ESTRELA_DIDDY[Math.floor(k.relogio / 8) % 4];
+          if (k.relogio >= 64) { k.fase = 'saindo'; k.relogio = 0; }
+        } else {
+          vel = k.fase === 'saindo' ? 0.9 : 0.5;
+          k.quadro = DIDDY[Math.floor(t / (k.fase === 'saindo' ? 3 : 4)) % 2];
+        }
+      } else if (k.nome === 'dixie') {
+        // Gira o rabo de cavalo tres vezes no lugar e da a chicotada.
+        if (k.fase === 'golpe') {
+          vel = 0;
+          const chicote = k.relogio >= 36;
+          k.quadro = chicote ? DIXIE[3] : DIXIE[2 + Math.floor(k.relogio / 3) % 2];
+          if (chicote && !k.bateu) {
+            k.bateu = true;
+            const ponta = dir === 1 ? k.x + DIXIE[3].w + 1 : k.x - 2;
+            for (let i = 0; i < 6; i++) {
+              const a = i * Math.PI / 3;
+              this.faiscas.push({ x: ponta, y: CHAO - 12, vx: Math.cos(a) * 0.4, vy: Math.sin(a) * 0.4, vida: 1 });
+            }
+          }
+          if (k.relogio >= 50) { k.fase = 'saindo'; k.relogio = 0; }
+        } else {
+          vel = k.fase === 'saindo' ? 0.9 : 0.5;
+          k.quadro = DIXIE[Math.floor(t / (k.fase === 'saindo' ? 3 : 4)) % 2];
+        }
+      } else {
+        // O Kiddy rola, como o Donkey, e depois corre atras dos outros.
+        if (k.fase === 'golpe') {
+          vel = 0.9;
+          k.quadro = BOLA_KIDDY[Math.floor(k.relogio / 5) % 4];
+          if (k.relogio >= 60) { k.fase = 'saindo'; k.relogio = 0; }
+        } else {
+          vel = k.fase === 'saindo' ? 0.85 : 0.5;
+          k.quadro = KIDDY[Math.floor(t / (k.fase === 'saindo' ? 3 : 5)) % 2];
+        }
+      }
+      k.x += dir * vel * passo;
     }
-    if (this.banana.pega < 0 && this.altura > 6 && Math.abs(this.diddy + 6 - meio) < 5) this.banana.pega = 0;
-    if (this.banana.pega < 0) {
+    // A banana gira no ar; o Donkey a pega rolando por ela.
+    const banana = this.banana, dk = this.kongs[0];
+    if (banana.pega < 0 && dk.fase === 'golpe' && Math.abs(dk.x + 7 - banana.x - 3) < 6) banana.pega = 0;
+    if (banana.pega < 0) {
       const g = GIRO_BANANA[Math.floor(t / 5) % 8];
-      S.colar(ctx, BANANA_DKC[g[0]], this.banana.x, CHAO - 23 + Math.round(Math.sin(t * 0.08)), g[1]);
-    } else if (this.banana.pega < 24) {                 // estrelinha onde estava a banana
-      this.banana.pega += passo;
-      const r = 1 + Math.floor(this.banana.pega / 6);
-      const y = CHAO - 20;
-      ctx.fillStyle = 'rgba(255,240,140,' + Math.max(0, 1 - this.banana.pega / 24).toFixed(2) + ')';
-      ctx.fillRect(Math.round(meio), y, 1, 1);
-      ctx.fillRect(Math.round(meio) - r, y, 1, 1);
-      ctx.fillRect(Math.round(meio) + r, y, 1, 1);
-      ctx.fillRect(Math.round(meio), y - r, 1, 1);
-      ctx.fillRect(Math.round(meio), y + r, 1, 1);
+      S.colar(ctx, BANANA_DKC[g[0]], banana.x, CHAO - 12 + Math.round(Math.sin(t * 0.08)), g[1]);
+    } else if (banana.pega < 24) {                    // estrelinha onde estava a banana
+      banana.pega += passo;
+      const r = 1 + Math.floor(banana.pega / 6), x = Math.round(banana.x + 3), y = CHAO - 10;
+      ctx.fillStyle = 'rgba(255,240,140,' + Math.max(0, 1 - banana.pega / 24).toFixed(2) + ')';
+      ctx.fillRect(x, y, 1, 1);
+      ctx.fillRect(x - r, y, 1, 1);
+      ctx.fillRect(x + r, y, 1, 1);
+      ctx.fillRect(x, y - r, 1, 1);
+      ctx.fillRect(x, y + r, 1, 1);
     }
-    // Poeira de terra levantada pelo rolamento.
-    const rolando = this.dir === 1 ? this.x < W + 2 : this.x > -16;
-    if (passo && rolando && aleatorio() < 0.5) {
-      this.poeira.push({ x: this.x + (this.dir === 1 ? 3 : 10), y: CHAO - 1 - Math.floor(aleatorio() * 2), vida: 1 });
-    }
+    // Poeira do rolamento e faiscas da chicotada da Dixie.
     for (const p of this.poeira) { p.vida -= 0.06 * passo; p.y -= 0.04 * passo; }
     this.poeira = this.poeira.filter(function (p) { return p.vida > 0; });
     for (const p of this.poeira) {
       ctx.fillStyle = 'rgba(232,212,160,' + (p.vida * 0.7).toFixed(2) + ')';
       ctx.fillRect(Math.round(p.x), Math.round(p.y), 1, 1);
     }
-    // Um quarto de volta a cada ~9 pontos andados (a bola tem 12 de largura).
-    S.colar(ctx, DONKEY[Math.floor(this.giro / 9) % 4], this.x, CHAO - 13, this.dir);
-    const diddy = this.noAr ? DIDDY[2] : DIDDY[Math.floor(t / 4) % 2];
-    S.colar(ctx, diddy, this.diddy, CHAO - diddy.h - this.altura, this.dir);
-    const diddyFora = this.dir === 1 ? this.diddy > W + 2 : this.diddy < -14;
-    return rolando || !diddyFora || this.poeira.length > 0;
+    for (const f of this.faiscas) { f.vida -= 0.05 * passo; f.x += f.vx * passo; f.y += f.vy * passo; }
+    this.faiscas = this.faiscas.filter(function (f) { return f.vida > 0; });
+    for (const f of this.faiscas) {
+      ctx.fillStyle = 'rgba(255,230,120,' + f.vida.toFixed(2) + ')';
+      ctx.fillRect(Math.round(f.x), Math.round(f.y), 1, 1);
+    }
+    // De tras para a frente: o da frente fica por cima.
+    for (let i = this.kongs.length - 1; i >= 0; i--) {
+      const k = this.kongs[i];
+      S.colar(ctx, k.quadro, k.x, CHAO - k.quadro.h, dir);
+    }
+    const foram = this.kongs.every(function (k) { return dir === 1 ? k.x > W + 2 : k.x < -22; });
+    return !foram || this.poeira.length > 0 || this.faiscas.length > 0;
   }
 
   // Sonic the Hedgehog 2 (Mega Drive, 1992): o Tails cruza o ceu voando, as
@@ -1939,109 +2597,609 @@
     return dentro || !!this.coracao;
   }
 
-  // Street Fighter II (SNES 1992): o Ryu entra andando, para no meio do campo
-  // e solta o Hadouken, a bola de energia azul que atravessa a tela.
-  const PALETA_RYU = { H: '#3a2414', R: '#e8202a', S: '#f2b880', E: '#101010', W: '#ffffff', g: '#c8ccd8',
-                       K: '#1a1a22' };
-  const RYU = S.quadros([
-    ['...HHH....', '..HRRRR...', '.RRSSES...', 'R..SSSS...', '..WWWWW...', '.WgWWWWS..', '.SWWKWWW..',
-     '..WWKWW...', '..WW.WW...', '..WW.WW...', '..SS.SS...'],
-    ['...HHH....', '..HRRRR...', '.RRSSES...', 'R..SSSS...', '..WWWWW...', '.SWWWWgW..', '..WWKWWS..',
-     '..WWKWW...', '..WW.WW...', '.WW...WW..', '.SS...SS..'],
-    ['..HHH.....', '.HRRRR....', 'RRSSES....', '..SSSS....', '.WWWWWWWSS', '.WgWWWWWSS', '.WWKWWW...',     // Hadouken
-     '.WWWWWW...', '.WW..WW...', 'WW....WW..', 'SS....SS..']
-  ], PALETA_RYU);
-  const HADOUKEN = S.quadros([
-    ['...cCC...', '.cCCWWC..', 'cCWWWWWCc', '.cCCWWC..', '...cCC...'],
-    ['..cCC....', '.cCWWWCc.', 'cCWWWWWWC', '.cCWWWCc.', '..cCC....']
+  // Street Fighter II (SNES 1992): o Ryu e o Ken treinando juntos (pedido do
+  // Rafael, 20/10/2026; antes era o Ryu sozinho, pequeno perto do Link).
+  // Cada um entra por um lado e para de frente para o outro. Os dois soltam
+  // o Hadouken ao mesmo tempo -- o do Ryu azul, o do Ken de fogo -- e as
+  // bolas se anulam no meio, como no jogo. Depois vem o Shoryuken de cada um
+  // (o do Ken com o punho em chamas), o Tatsumaki Senpukyaku dos dois (o
+  // chute girando no ar) e, no fim, os dois vao embora andando juntos.
+  // Os dois tem o MESMO desenho, com paletas diferentes: no Ken, a faixa da
+  // testa (h) vira cabelo loiro e as pontas dela (f) somem.
+  // k contorno, H cabelo, h faixa, f pontas da faixa, S pele, s sombra da
+  // pele, E olho, W quimono, g dobra do quimono, B faixa da cintura, R luva.
+  const PALETA_RYU = { k: '#1a1622', H: '#4a2c18', h: '#e8202a', f: '#e8202a', S: '#f2b880', s: '#c8875a',
+                       E: '#101010', W: '#ffffff', g: '#c4c8d4', B: '#2a2a2a', R: '#c81e1e' };
+  const PALETA_KEN = { k: '#1a1622', H: '#f2c43a', h: '#f2c43a', S: '#f2b880', s: '#c8875a',
+                       E: '#101010', W: '#e8302a', g: '#a81c18', B: '#2a2a2a', R: '#4a3a30' };
+  const LUTADOR = [
+    ['......kkkk........',      // 0 guarda
+     '.....kHHHHk.......',
+     '...fkhhhhhhk......',
+     '..f.kHSSSESk......',
+     '.f..kHSSSSSSk.....',
+     '.....kSssSSk......',
+     '....kWkSSkWWk.....',
+     '...kWWWkkWWWWkk...',
+     '..kWWgWWWWWWWRRk..',
+     '..kWgWWWWWkkkRRk..',
+     '..kgWWWRRk...kk...',
+     '...kWWWRRk........',
+     '...kBBBBBBk.......',
+     '..kWWWgWWWWk......',
+     '..kWWgk.kWWWk.....',
+     '.kWWgk...kWWWk....',
+     '.kWWk.....kWWk....',
+     'kSSk......kSSSk...',
+     'kkkk.......kkkk...'],
+    ['......kkkk........',      // 1 andando (pernas abertas)
+     '.....kHHHHk.......',
+     '...fkhhhhhhk......',
+     '..f.kHSSSESk......',
+     '.f..kHSSSSSSk.....',
+     '.....kSssSSk......',
+     '....kWkSSkWWk.....',
+     '...kWWWkkWWWk.....',
+     '...kWgWWWWWWkk....',
+     '...kWgWWWWkRRk....',
+     '...kgWWWWWkRRk....',
+     '....kWWWWWkkk.....',
+     '....kBBBBBk.......',
+     '...kWWWgWWWk......',
+     '..kWWgk.kWWWk.....',
+     '..kWWk...kWWk.....',
+     '.kWWk.....kWWk....',
+     'kSSk......kSSSk...',
+     'kkk........kkkk...'],
+    ['......kkkk........',      // 2 andando (pernas juntas)
+     '.....kHHHHk.......',
+     '...fkhhhhhhk......',
+     '..f.kHSSSESk......',
+     '.f..kHSSSSSSk.....',
+     '.....kSssSSk......',
+     '....kWkSSkWWk.....',
+     '...kWWWkkWWWk.....',
+     '...kWgWWWWWWkk....',
+     '...kWgWWWWkRRk....',
+     '...kgWWWWWkRRk....',
+     '....kWWWWWkkk.....',
+     '....kBBBBBk.......',
+     '....kWWgWWk.......',
+     '....kWWgWWk.......',
+     '....kWWkWWk.......',
+     '....kWWkWWk.......',
+     '...kSSSkSSSk......',
+     '...kkkkkkkkk......'],
+    ['.......kkkk.........',    // 3 Hadouken: as maos juntas, atras
+     '......kHHHHk........',
+     '....fkhhhhhhk.......',
+     '...f.kHSSSESk.......',
+     '..f..kHSSSSSSk......',
+     '......kSssSSk.......',
+     '.....kWkSSkWk.......',
+     '....kWWWkkWWWk......',
+     '..kkWWWWWWWWWk......',
+     '.kRRkWgWWWWWk.......',
+     '.kRRRkWWWWWk........',
+     '..kkkWWWWWWk........',
+     '....kBBBBBBk........',
+     '...kWWWgWWWWk.......',
+     '..kWWWk.kWWWWk......',
+     '.kWWgk...kWWWWk.....',
+     'kWWk.......kWWk.....',
+     'kSSk.......kSSSk....',
+     'kkkk........kkkk....'],
+    ['.....kkkk...........',    // 4 Hadouken: solta, os bracos esticados
+     '....kHHHHk..........',
+     '..fkhhhhhhk.........',
+     '.f.kHSSSESk.........',
+     'f..kHSSSSSSk........',
+     '....kSssSSk.........',
+     '...kWkSSkWWkkkkkk...',
+     '..kWWWkkWWWWWWWRRk..',
+     '..kWgWWWWWWWWWWRRRk.',
+     '..kWgWWWWWkkkkkRRk..',
+     '..kgWWWWWk....kkk...',
+     '...kWWWWWk..........',
+     '...kBBBBBBk.........',
+     '..kWWWgWWWWk........',
+     '.kWWWk..kWWWk.......',
+     'kWWgk....kWWWk......',
+     'kWWk......kWWWk.....',
+     'kSSk.......kSSSk....',
+     'kkkk........kkkkk...'],
+    ['......kkkk....',          // 5 agachado (antes e depois do Shoryuken)
+     '.....kHHHHk...',
+     '...fkhhhhhhk..',
+     '..f.kHSSSESk..',
+     '.f..kHSSSSSSk.',
+     '.....kSssSSk..',
+     '...kkWkSSkWk..',
+     '..kWWWWkkWWWk.',
+     '..kWgWWWWWkRRk',
+     '..kgWWWWWWkRRk',
+     '..kWWWWWWkkkk.',
+     '..kBBBBBBBk...',
+     '.kWWWWgWWWWk..',
+     'kWWWWk.kWWWWk.',
+     'kSSSk...kSSSk.',
+     'kkkk.....kkkk.'],
+    ['.........kk...',          // 6 Shoryuken: o punho para o alto
+     '........kRRk..',
+     '........kRRk..',
+     '........kWWk..',
+     '.......kWWk...',
+     '..kkkk.kWWk...',
+     '.kHHHHkWWk....',
+     'fkhhhhhkWk....',
+     '.kHSSSESkk....',
+     '.kHSSSSSSk....',
+     '..kSssSSk.....',
+     '.kWWkSSkWk....',
+     'kWWWWkkWWWk...',
+     'kRRkWgWWWWk...',
+     'kRRkWWWWWk....',
+     '.kkkBBBBBk....',
+     '...kWWWWWWk...',
+     '...kWWWWWWWk..',
+     '...kWWk.kWWk..',
+     '..kWWk..kSSk..',
+     '..kSSk...kk...',
+     '..kkk.........'],
+    ['......kkkk............',  // 7 Tatsumaki: a perna esticada
+     '.....kHHHHk...........',
+     '...fkhhhhhhk..........',
+     '..f.kHSSSESk..........',
+     '.f..kHSSSSSSk.........',
+     '.....kSssSSk..........',
+     '..kkkWkSSkWWkkk.......',
+     '.kRRWWWkkWWWWRRk......',
+     '..kkWWgWWWWWkkk.......',
+     '....kWgWWWWk..........',
+     '....kBBBBBBkkkkkkkkk..',
+     '....kWWWgWWWWWWWWWWSSk',
+     '....kWWgWWWWWWWWWWWSSk',
+     '...kWWWk.kkkkkkkkkkkk.',
+     '...kWWk...............',
+     '..kSSk................',
+     '..kkk.................'],
+    ['......kkkk......',        // 8 Tatsumaki: de frente, no meio do giro
+     '.....kHHHHk.....',
+     '....khhhhhhk....',
+     '....kSESSESk....',
+     '....kSSSSSSk....',
+     '.....kSssSk.....',
+     '.kkkkWkSSkWkkkk.',
+     'kRRWWWWkkWWWWRRk',
+     '.kkkWWWWWWWWkkk.',
+     '....kWWgWWWk....',
+     '....kBBBBBBk....',
+     '...kWWWWWWWWk...',
+     '...kWWWkkWWWk...',
+     '...kWWk..kWWk...',
+     '....kSSkkSSk....',
+     '....kkk..kkk....']
+  ];
+  const RYU = S.quadros(LUTADOR, PALETA_RYU);
+  const KEN = S.quadros(LUTADOR, PALETA_KEN);
+  // O meio do corpo em cada quadro (a coluna), para o lutador nao pular de
+  // lugar ao trocar de quadro nem ao virar.
+  const MEIO_LUTADOR = [7, 7, 7, 8, 6, 7, 5, 8, 7.5];
+  // O Hadouken do Ryu (azul) e o do Ken (de fogo), com a cabeca a direita.
+  const BOLA_RYU = S.quadros([
+    ['......cCCc..', '..c..cCWWCc.', '.cCccCWWWWCc', 'cCCCCWWWWWWC', '.cCccCWWWWCc', '..c..cCWWCc.', '......cCCc..'],
+    ['......cCCc..', '...c.cCWWCc.', '..cCcCWWWWCc', '.cCCCWWWWWWC', 'cCccCCWWWWCc', '.....cCWWCc.', '......cCCc..']
   ], { c: '#2f6bff', C: '#7fb0ff', W: '#ffffff' });
+  const BOLA_KEN = S.quadros([
+    ['.....c.cc...', '..c.cCcCCc..', '.cC.cCWWWCc.', 'cCCcCWWwwWCc', '.cCCCWWwWWCc', '..ccCCWWWCc.', '....c.cCc...'],
+    ['....c..cc...', '.c..cCcCCc..', '..cCcCWWWCc.', '.cCCCWWwwWCc', 'cCcCCWWwWWCc', '...cCCWWWCc.', '.....ccCc...']
+  ], { c: '#c81e00', C: '#ff7a1a', W: '#ffd23f', w: '#fff6c0' });
 
   function iniciarRyu() {
-    const dir = aleatorio() < 0.5 ? 1 : -1;
-    const para = W / 2 - 5 + (aleatorio() - 0.5) * 30;
-    return { dir: dir, x: dir === 1 ? -10 : W + 2, para: para, golpe: -1, bola: null, desenhar: desenharRyu };
+    // x de cada lutador e' o meio do corpo.
+    const ryu = 36 + Math.round(aleatorio() * 10);
+    return { fase: 'chegando', relogio: 0, saida: aleatorio() < 0.5 ? 1 : -1, proxima: 'hadouken',
+             ryu: { x: -12, marca: ryu, dir: 1, altura: 0, quadro: 1, giro: 0 },
+             ken: { x: W + 12, marca: ryu + 72, dir: -1, altura: 0, quadro: 1, giro: 0 },
+             bolas: [], estouro: null, chamas: [], desenhar: desenharRyuKen };
   }
 
-  function desenharRyu(passo) {
-    const chegou = this.dir === 1 ? this.x >= this.para : this.x <= this.para;
-    if (this.golpe < 0 && chegou) this.golpe = 0;
-    let quadro;
-    if (this.golpe >= 0 && this.golpe < 70) {          // "Ha-dou-ken!": prepara, solta, segura a pose
-      this.golpe += passo;
-      quadro = RYU[this.golpe > 20 ? 2 : 0];
-      if (this.golpe > 20 && !this.bola) this.bola = { x: this.x + (this.dir === 1 ? 10 : -9) };
-    } else {
-      this.x += this.dir * 0.4 * passo;
-      quadro = RYU[Math.floor(t / 7) % 2];
-    }
-    if (this.bola) {
-      this.bola.x += this.dir * 1.1 * passo;
-      S.colar(ctx, HADOUKEN[Math.floor(t / 3) % 2], this.bola.x, CHAO - 10, this.dir);
-    }
-    S.colar(ctx, quadro, this.x, CHAO - quadro.h, this.dir);
-    const fora = this.dir === 1 ? this.x > W + 2 : this.x < -10;
-    const bolaFora = !this.bola || (this.dir === 1 ? this.bola.x > W + 2 : this.bola.x < -10);
-    return !(fora && bolaFora);
+  // Anda ate a marca sem passar dela (o teste acelera o passo 8 vezes).
+  function andarAte(lutador, passo) {
+    const falta = lutador.marca - lutador.x;
+    lutador.x += Math.sign(falta) * Math.min(Math.abs(falta), 0.42 * passo);
+    const chegou = Math.abs(lutador.marca - lutador.x) < 0.01;
+    lutador.quadro = chegou ? 0 : 1 + Math.floor(t / 7) % 2;
+    return chegou;
   }
 
-  // Mega Man X (SNES 1993): corre, da a arrancada com rastro e atira com o
-  // canhao do braco (o tiro amarelo do X Buster).
-  const PALETA_X = { B: '#2f5bff', b: '#7fb8ff', S: '#ffc8a0', E: '#101010', R: '#e8202a', C: '#9fd8ff',
-                     W: '#ffffff' };
+  // O golpe que sobe: agacha, sobe com o punho para o alto, cai e agacha de
+  // novo (r e' o relogio do golpe; antes dele, o lutador espera em guarda).
+  function shoryuken(lutador, r) {
+    lutador.altura = 0;
+    if (r < 0 || r >= 42) lutador.quadro = 0;
+    else if (r < 8 || r >= 34) lutador.quadro = 5;
+    else {
+      lutador.quadro = 6;
+      lutador.altura = Math.round(Math.sin(((r - 8) / 26) * Math.PI) * 16);
+    }
+    // Sobe andando um pouco para a frente.
+    return r < 8 ? 0 : Math.min(26, r - 8) * 0.2;
+  }
+
+  function desenharRyuKen(passo) {
+    const ryu = this.ryu, ken = this.ken;
+    this.relogio += passo;
+    const r = this.relogio;
+    const de = function (fase) { this.fase = fase; this.relogio = 0; }.bind(this);
+    if (this.fase === 'chegando') {
+      const a = andarAte(ryu, passo), b = andarAte(ken, passo);
+      if (a && b) de('guarda');
+    } else if (this.fase === 'guarda') {
+      // Os dois em guarda, balancando de leve, antes de cada golpe.
+      ryu.quadro = ken.quadro = Math.floor(r / 12) % 2;
+      if (r >= 40) de(this.proxima);
+    } else if (this.fase === 'hadouken') {
+      ryu.quadro = ken.quadro = r < 14 ? 3 : 4;
+      if (r >= 14 && !this.soltou) {
+        this.soltou = true;
+        this.bolas = [{ de: 'ryu', x: ryu.x + 9, dir: 1 }, { de: 'ken', x: ken.x - 9 - BOLA_KEN[0].w, dir: -1 }];
+      }
+      if (r >= 54 && !this.bolas.length && !this.estouro) { this.proxima = 'shoryuken'; de('guarda'); }
+    } else if (this.fase === 'shoryuken') {
+      // Primeiro o do Ryu, depois o do Ken (com o punho em chamas).
+      ryu.x = ryu.marca + shoryuken(ryu, r);
+      ken.x = ken.marca - shoryuken(ken, r - 60);
+      if (passo && ken.quadro === 6) {
+        // As chamas do punho do Ken, que ficam para tras enquanto ele sobe.
+        for (let i = 0; i < 2; i++) {
+          this.chamas.push({ x: ken.x - 6 + aleatorio() * 4, y: CHAO - 21 - ken.altura + aleatorio() * 6, vida: 1 });
+        }
+      }
+      if (r >= 110) {
+        ryu.marca = ryu.x; ken.marca = ken.x;
+        // O Tatsumaki leva cada um ate perto do outro, sem se cruzarem.
+        this.curso = Math.max(0, ((ken.x - 8) - (ryu.x + 8) - 10) / 2);
+        this.proxima = 'tatsumaki';
+        de('guarda');
+      }
+    } else if (this.fase === 'tatsumaki') {
+      // Os dois sobem girando um na direcao do outro e param perto.
+      const giro = Math.floor(r / 4) % 4, no_ar = r >= 6 && r < 66;
+      for (const lutador of [ryu, ken]) {
+        lutador.quadro = no_ar ? (giro % 2 ? 8 : 7) : 5;
+        lutador.giro = no_ar && giro === 2 ? -lutador.dir : 0;
+        lutador.altura = no_ar ? Math.min(6, (r - 6) * 0.6, (66 - r) * 0.6) : 0;
+      }
+      const andou = this.curso * Math.max(0, Math.min(r, 66) - 6) / 60;
+      ryu.x = ryu.marca + andou;
+      ken.x = ken.marca - andou;
+      if (r >= 74) { this.proxima = 'saindo'; de('guarda'); }
+    } else if (this.fase === 'saindo') {
+      // Viram para o mesmo lado e vao embora andando, um ao lado do outro.
+      for (const lutador of [ryu, ken]) {
+        lutador.dir = this.saida;
+        lutador.x += this.saida * 0.42 * passo;
+        lutador.quadro = 1 + Math.floor((t + (lutador === ken ? 3 : 0)) / 7) % 2;
+      }
+    }
+    // As bolas: as duas se encontram no meio e se anulam num estouro.
+    for (const bola of this.bolas) bola.x += bola.dir * 0.9 * passo;
+    if (this.bolas.length === 2 && this.bolas[0].x + BOLA_RYU[0].w >= this.bolas[1].x) {
+      this.estouro = { x: (this.bolas[0].x + BOLA_RYU[0].w + this.bolas[1].x) / 2, vida: 0 };
+      this.bolas = [];
+    }
+    for (const bola of this.bolas) {
+      const sprites = bola.de === 'ryu' ? BOLA_RYU : BOLA_KEN;
+      S.colar(ctx, sprites[Math.floor(t / 3) % 2], bola.x, CHAO - 15, bola.dir);
+    }
+    if (this.estouro) {
+      const e = this.estouro;
+      e.vida += passo;
+      const k = e.vida / 30;
+      if (k >= 1) {
+        this.estouro = null;
+      } else {
+        // Dois aneis que se abrem (azul do Ryu e laranja do Ken) e um
+        // clarao branco em cruz no comeco.
+        const y = CHAO - 12, x = Math.round(e.x), luz = (1 - k).toFixed(2);
+        for (const [raio, cor, n] of [[2 + k * 11, 'rgba(127,176,255,', 12], [1 + k * 7, 'rgba(255,160,40,', 8]]) {
+          ctx.fillStyle = cor + luz + ')';
+          for (let i = 0; i < n; i++) {
+            const a = i * 2 * Math.PI / n + k;
+            ctx.fillRect(Math.round(x + Math.cos(a) * raio), Math.round(y + Math.sin(a) * raio * 0.8), 1, 1);
+          }
+        }
+        if (k < 0.45) {
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(x - 1, y - 1, 3, 3);
+          ctx.fillRect(x - 3, y, 7, 1);
+          ctx.fillRect(x, y - 3, 1, 7);
+        }
+      }
+    }
+    for (const c of this.chamas) { c.vida -= 0.06 * passo; c.y += 0.25 * passo; }
+    this.chamas = this.chamas.filter(function (c) { return c.vida > 0; });
+    for (const c of this.chamas) {
+      ctx.fillStyle = c.vida > 0.6 ? '#ffe066' : c.vida > 0.3 ? '#ff7a1a' : '#c81e00';
+      ctx.fillRect(Math.round(c.x), Math.round(c.y), 1, 1);
+    }
+    for (const [lutador, sprites] of [[ryu, RYU], [ken, KEN]]) {
+      const q = sprites[lutador.quadro], meio = MEIO_LUTADOR[lutador.quadro];
+      const dir = lutador.giro || lutador.dir;
+      S.colar(ctx, q, lutador.x - (dir === 1 ? meio : q.w - 1 - meio), CHAO - q.h - lutador.altura, dir);
+    }
+    // O fogo no punho do Ken, enquanto ele sobe.
+    if (ken.quadro === 6) {
+      const fx = Math.round(ken.x - 6), fy = CHAO - 22 - Math.round(ken.altura);
+      ctx.fillStyle = '#ff7a1a';
+      ctx.fillRect(fx, fy - 1, 4, 2);
+      ctx.fillStyle = '#ffe066';
+      ctx.fillRect(fx + 1, fy - 2 - (Math.floor(t / 3) % 2), 2, 2);
+    }
+    if (this.fase !== 'saindo') return true;
+    const fora = function (l) { return l.dir === 1 ? l.x - 12 > W : l.x + 12 < 0; };
+    return !(fora(ryu) && fora(ken) && !this.chamas.length);
+  }
+
+  // Mega Man X (SNES 1993): o X corre, da a arrancada com rastro, para,
+  // carrega o canhao do braco (o X Buster) e solta o tiro carregado; o Zero,
+  // o parceiro dele em todos os Mega Man X, vem atras, para e da o golpe do
+  // sabre verde (o Z-Saber). Depois os dois saem correndo. Redesenhados em
+  // 20/10/2026 (pedido do Rafael: o X estava irreconhecivel): o capacete
+  // redondo com a joia vermelha e o disco da orelha, o peito azul-claro, as
+  // botas grandes; o Zero com o capacete vermelho de aleta branca, a joia
+  // azul, o cabelo loiro comprido, as ombreiras brancas e a joia verde.
   const MEGAMAN_X = S.quadros([
-    ['...BBBB...', '..BbbbbB..', '..BbSSER..', '..BBSSSB..', '.bBBbbBBb.', 'bbBBbbBBbb', '..BBBBBBCC',
-     '..BBbbBB..', '..BB..BB..', '.bBB..BBb.', '.BBB..BBB.'],
-    ['...BBBB...', '..BbbbbB..', '..BbSSER..', '..BBSSSB..', '.bBBbbBBb.', 'bbBBbbBBbb', '..BBBBBBCC',
-     '..BBbbBB..', '.BB....BB.', 'bBB....BBb', 'BBB.....BB']
-  ], PALETA_X);
+    ['.....kkkkk......',
+     '....kBBBBBk.....',
+     '...kBBBRBBBk....',
+     '..kBBBBBBBBBk...',
+     '..kBCCBSSSSBk...',
+     '..kBCCBSWKSSk...',
+     '..kBBBBSSSSk....',
+     '...kbBCCCbkk....',
+     '..kBBCCCCCBBk...',
+     '.kBBbCCCCbBBCk..',
+     '.kCCkbBBBbkCCk..',
+     '..kkBBBkBBBkk...',
+     '..kCBBk.kBBCk...',
+     '.kBBBBk.kBBBBk..',
+     '..kkkk...kkkk...'],   // correndo
+    ['.....kkkkk......',
+     '....kBBBBBk.....',
+     '...kBBBRBBBk....',
+     '..kBBBBBBBBBk...',
+     '..kBCCBSSSSBk...',
+     '..kBCCBSWKSSk...',
+     '..kBBBBSSSSk....',
+     '...kbBCCCbkk....',
+     '...kBCCCCCBBk...',
+     '..kBbCCCCbBBCk..',
+     '..kCCbBBBbkCCk..',
+     '...kkBBBBBkkk...',
+     '....kCBBBCk.....',
+     '...kBBBBBBBk....',
+     '....kkkkkkk.....'],   // correndo (o outro passo)
+    ['.....kkkkk........',
+     '....kBBBBBk.......',
+     '...kBBBRBBBk......',
+     '..kBBBBBBBBBk.....',
+     '..kBCCBSSSSBk.....',
+     '..kBCCBSWKSSk.....',
+     '..kBBBBSSSSkkkk...',
+     '...kbBCCCbBBBBBk..',
+     '..kBBCCCCCbBBBBbk.',
+     '.kBBbCCCCbBBBBBk..',
+     '.kCCkbBBBbkkkkk...',
+     '..kkBBBkBBBk......',
+     '..kCBBk.kBBCk.....',
+     '.kBBBBk.kBBBBk....',
+     '..kkkk...kkkk.....']   // atirando: o braco vira o canhao (X Buster)
+  ], { B: '#2f5bff', b: '#1c3aa8', C: '#7fd0ff', R: '#ff2a3a', S: '#ffc8a0', W: '#ffffff', K: '#1a3a8a', k: '#0c1640' });
+  const ZERO = S.quadros([
+    ['.......kkkk.......',
+     '......kRRRRk......',
+     '....kkRRBRRWk.....',
+     '...kYRRRRRRWWk....',
+     '..kYYRSSSSRkk.....',
+     '.kYYYRSWKSSk......',
+     'kYYYyRSSSSk.......',
+     'kYYYykkRRkkk......',
+     'kYYykWWRRRWWk.....',
+     '.kYykWkRGRkWkk....',
+     '..kykkkRRRkkk.....',
+     '...k.kkkWkkk......',
+     '....kRRkkkRRk.....',
+     '...kWRRk.kRRWk....',
+     '..kRRRRk.kRRRRk...',
+     '...kkkk...kkkk....'],   // correndo (o cabelo voando para tras)
+    ['.......kkkk.......',
+     '......kRRRRk......',
+     '....kkRRBRRWk.....',
+     '..kkYRRRRRRWWk....',
+     '.kYYYRSSSSRkk.....',
+     'kYYYyRSWKSSk......',
+     'kYYYyRSSSSk.......',
+     '.kYYykkRRkkk......',
+     '.kYykWWRRRWWk.....',
+     '..kykWkRGRkWkk....',
+     '...k.kkRRRkkk.....',
+     '.....kkkWkkk......',
+     '.....kRRRRRk......',
+     '.....kWRRRWk......',
+     '....kRRRRRRRk.....',
+     '.....kkkkkkk......'],   // correndo (o outro passo)
+    ['.......kkkk.......',
+     '......kRRRRk......',
+     '....kkRRBRRWk.....',
+     '...kYRRRRRRWWk....',
+     '..kYYRSSSSRkk.....',
+     '.kYYYRSWKSSk......',
+     'kYYYyRSSSSkkk.....',
+     'kYYYykkRRkkkkkk...',
+     'kYYykWWRRRWWkkkk..',
+     '.kYykWkRGRWWkkk...',
+     '..kykkkRRRkk......',
+     '...k.kkkWkkkk.....',
+     '....kRRkkkkRRk....',
+     '...kWRRk..kRRWk...',
+     '..kRRRRk..kRRRRk..',
+     '...kkkk....kkkk...']   // o golpe do sabre (o braco esticado para a frente)
+  ], { R: '#e8202a', r: '#a81420', W: '#ffffff', w: '#c8ccd8', B: '#3a8aff', Y: '#ffd23f', y: '#e0a800', S: '#ffc8a0', K: '#101010', G: '#3cd060', k: '#2a2a36', k: '#1a0a0e' });
   const TIRO_X = S.fazer(['.YY.', 'YWWY', '.YY.'], { Y: '#ffe066', W: '#ffffff' });
+  // O tiro carregado: maior, amarelo-esverdeado, com a cauda de luz.
+  const TIRO_CARREGADO = S.fazer(['..yYYYy..', '.yYWWWYy.', 'yYWWWWWYy', 'yYWWWWWYy', 'yYWWWWWYy', '.yYWWWYy.',
+                                  '..yYYYy..'], { Y: '#ffe066', y: '#7dff6a', W: '#ffffff' });
 
   function iniciarMegaManX() {
     const dir = aleatorio() < 0.5 ? 1 : -1;
-    return { dir: dir, x: dir === 1 ? -10 : W + 2, vel: 0.5, arrancada: -1, rastro: [], tiros: [],
-             proximoTiro: 40 + aleatorio() * 30, desenhar: desenharMegaManX };
+    const w = MEGAMAN_X[0].w;
+    return { dir: dir, desenhar: desenharMegaManX, rastro: [], tiros: [], faiscas: [], corte: -1,
+             x: { x: dir === 1 ? -w : W + 2, fase: 'correndo', relogio: 0, para: 90 + aleatorio() * 16 },
+             zero: { x: dir === 1 ? -w - 26 : W + 28, fase: 'correndo', relogio: 0 } };
   }
 
   function desenharMegaManX(passo) {
-    const meio = this.dir === 1 ? this.x > W * 0.3 : this.x < W * 0.7;
-    if (this.arrancada < 0 && meio) this.arrancada = 0;
-    let vel = 0.5;
-    if (this.arrancada >= 0 && this.arrancada < 40) {            // a arrancada (dash)
-      this.arrancada += passo;
-      vel = 1.6;
-      if (passo) this.rastro.push({ x: this.x, vida: 1 });
+    const dir = this.dir, x = this.x, zero = this.zero, w = MEGAMAN_X[0].w;
+    const entrou = function (p) { return dir === 1 ? p.x : W - p.x; };
+    x.relogio += passo;
+    zero.relogio += passo;
+    let velX = 0.55;
+    if (x.fase === 'correndo') {
+      if (!x.arrancou && entrou(x) >= 34) { x.fase = 'arrancada'; x.relogio = 0; x.arrancou = true; }
+      if (entrou(x) >= x.para) { x.fase = 'carregando'; x.relogio = 0; }
+    } else if (x.fase === 'arrancada') {
+      velX = 1.6;
+      if (passo) this.rastro.push({ x: x.x, vida: 1 });
+      if (x.relogio >= 30) { x.fase = 'correndo'; x.relogio = 0; }
+    } else if (x.fase === 'carregando') {
+      // As faiscas vem de longe e se juntam na boca do canhao.
+      velX = 0;
+      if (passo && aleatorio() < 0.8) {
+        const a = aleatorio() * Math.PI * 2;
+        this.faiscas.push({ a: a, r: 9, vida: 1 });
+      }
+      if (x.relogio >= 40) {
+        x.fase = 'atirando'; x.relogio = 0;
+        this.tiros.push({ x: x.x + (dir === 1 ? w - 1 : 1 - TIRO_CARREGADO.w), grande: true });
+      }
+    } else if (x.fase === 'atirando') {
+      velX = 0;
+      if (x.relogio >= 24) { x.fase = 'saindo'; x.relogio = 0; }
+    } else {
+      velX = 0.8;
     }
-    this.x += this.dir * vel * passo;
-    this.proximoTiro -= passo;
-    if (this.proximoTiro <= 0) {
-      this.tiros.push({ x: this.x + (this.dir === 1 ? 10 : -4) });
-      this.proximoTiro = 50;
+    x.x += dir * velX * passo;
+    // O Zero para atras do X quando ele carrega e da o golpe quando ele atira.
+    let velZ = zero.fase === 'saindo' ? 0.8 : 0.55;
+    const atras = dir === 1 ? x.x - zero.x : zero.x - x.x;
+    if (zero.fase === 'correndo' && (x.fase === 'carregando' || x.fase === 'atirando') && atras <= 30) {
+      zero.fase = 'parado'; zero.relogio = 0;
     }
+    if (zero.fase === 'parado') {
+      velZ = 0;
+      if (x.fase === 'atirando' || x.fase === 'saindo') { zero.fase = 'sabre'; zero.relogio = 0; this.corte = 0; }
+    } else if (zero.fase === 'sabre') {
+      velZ = 0;
+      if (zero.relogio >= 26) { zero.fase = 'saindo'; zero.relogio = 0; }
+    }
+    zero.x += dir * velZ * passo;
+    // O rastro da arrancada.
     for (const r of this.rastro) r.vida -= 0.07 * passo;
     this.rastro = this.rastro.filter(function (r) { return r.vida > 0; });
     ctx.globalAlpha = 0.35;
-    for (const r of this.rastro) S.colar(ctx, MEGAMAN_X[1], r.x, CHAO - 11, this.dir);
+    for (const r of this.rastro) S.colar(ctx, MEGAMAN_X[1], r.x, CHAO - MEGAMAN_X[1].h, dir);
     ctx.globalAlpha = 1;
+    // Os tiros (o carregado e maior e deixa uma cauda).
     for (const tiro of this.tiros) {
-      tiro.x += this.dir * 1.8 * passo;
-      S.colar(ctx, TIRO_X, tiro.x, CHAO - 6, this.dir);
+      tiro.x += dir * 1.8 * passo;
+      const sprite = tiro.grande ? TIRO_CARREGADO : TIRO_X;
+      const y = CHAO - (tiro.grande ? 12 : 6);
+      if (tiro.grande) {
+        ctx.fillStyle = 'rgba(125,255,106,0.6)';
+        ctx.fillRect(Math.round(tiro.x - dir * 6 + (dir === 1 ? 0 : sprite.w)), y + 3, 6, 1);
+      }
+      S.colar(ctx, sprite, tiro.x, y, dir);
     }
-    this.tiros = this.tiros.filter(function (tiro) { return tiro.x > -6 && tiro.x < W + 6; });
-    S.colar(ctx, MEGAMAN_X[Math.floor(t / (vel > 1 ? 3 : 6)) % 2], this.x, CHAO - 11, this.dir);
-    const fora = this.dir === 1 ? this.x > W + 2 : this.x < -10;
-    return !(fora && this.tiros.length === 0);
+    this.tiros = this.tiros.filter(function (tiro) { return tiro.x > -12 && tiro.x < W + 12; });
+    // O Zero, com o sabre e o arco verde do golpe.
+    const qz = zero.fase === 'sabre' && zero.relogio < 18 ? ZERO[2]
+      : zero.fase === 'parado' || zero.fase === 'sabre' ? ZERO[0] : ZERO[Math.floor(t / 4) % 2];
+    S.colar(ctx, qz, zero.x, CHAO - qz.h, dir);
+    if (this.corte >= 0 && this.corte < 18) {
+      this.corte += passo;
+      const mao = zero.x + (dir === 1 ? 13 : ZERO[2].w - 14), my = CHAO - 9;
+      const luz = Math.max(0, 1 - this.corte / 18);
+      for (let a = -1.5; a <= 0.6; a += 0.16) {
+        const px = Math.round(mao + dir * Math.cos(a) * 9), py = Math.round(my + Math.sin(a) * 9);
+        ctx.fillStyle = 'rgba(125,255,125,' + luz.toFixed(2) + ')';
+        ctx.fillRect(px, py, 1, 1);
+        ctx.fillStyle = 'rgba(255,255,255,' + (luz * 0.8).toFixed(2) + ')';
+        ctx.fillRect(Math.round(mao + dir * Math.cos(a) * 7), Math.round(my + Math.sin(a) * 7), 1, 1);
+      }
+    }
+    // O X (o canhao esticado enquanto carrega e atira).
+    const qx = x.fase === 'carregando' || x.fase === 'atirando' ? MEGAMAN_X[2]
+      : MEGAMAN_X[Math.floor(t / (velX > 1 ? 3 : 4)) % 2];
+    S.colar(ctx, qx, x.x, CHAO - qx.h, dir);
+    // As faiscas da carga, e o canhao piscando quando ela esta cheia.
+    const bocaX = x.x + (dir === 1 ? w + 1 : -2), bocaY = CHAO - 8;
+    for (const f of this.faiscas) { f.r -= 0.35 * passo; f.vida = f.r / 9; }
+    this.faiscas = this.faiscas.filter(function (f) { return f.r > 0.5; });
+    if (x.fase === 'carregando') {
+      for (const f of this.faiscas) {
+        ctx.fillStyle = f.r > 5 ? '#7dff6a' : '#ffe066';
+        ctx.fillRect(Math.round(bocaX + Math.cos(f.a) * f.r), Math.round(bocaY + Math.sin(f.a) * f.r * 0.7), 1, 1);
+      }
+      if (x.relogio > 20 && Math.floor(t / 3) % 2 === 0) {
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(Math.round(bocaX) - 1, bocaY - 1, 2, 2);
+      }
+    } else {
+      this.faiscas = [];
+    }
+    const fora = function (p) { return dir === 1 ? p.x > W + 2 : p.x < -w - 4; };
+    return !(fora(x) && fora(zero) && this.tiros.length === 0);
   }
 
   // Super Bomberman (SNES 1993): o Bomberman para, deixa a bomba e sai
-  // andando; a bomba pisca, e as chamas saem em cruz.
-  const PALETA_BOMBER = { P: '#ff4fa0', K: '#3a3a4a', W: '#ffffff', w: '#d8dde8', S: '#ffc8a0', E: '#101010',
-                          B: '#2f5bff' };
+  // andando; a bomba pisca, e as chamas saem em cruz. Redesenhado em
+  // 20/10/2026 (pedido do Rafael: estava fora de proporcao): a cabeca grande e
+  // redonda do capacete, a antena com a bolinha rosa e o visor com os olhos,
+  // na medida do Link. A bomba e a explosao ficaram como eram.
   const BOMBERMAN = S.quadros([
-    ['....P....', '....K....', '..WWWWW..', '.WWWWWWW.', '.WSSSSSW.', '.WSESESW.', '.wSSSSSw.',
-     '..WWWWW..', '.PWBBBWP.', '..WWWWW..', '..PP.PP..'],
-    ['....P....', '....K....', '..WWWWW..', '.WWWWWWW.', '.WSSSSSW.', '.WSESESW.', '.wSSSSSw.',
-     '..WWWWW..', '.PWBBBWP.', '..WWWWW..', '.PP...PP.']
-  ], PALETA_BOMBER);
+    ['......kk.......',
+     '.....kPPk......',
+     '....kkkAkkk....',
+     '...kWWWWWWWk...',
+     '..kWWWWWWWWWk..',
+     '..kWWSSSSSSWk..',
+     '..kWSSSKSSKSk..',
+     '..kWSSSKSSKSk..',
+     '..kwWSSSSSSWk..',
+     '...kwWWWWWWk...',
+     '..kPWBBBBBWPk..',
+     '...kWBBbBBWk...',
+     '...kWWkkkWWk...',
+     '..kPPPk.kPPPk..',
+     '...kkk...kkk...'],   // andando (pernas abertas)
+    ['......kk.......',
+     '.....kPPk......',
+     '....kkkAkkk....',
+     '...kWWWWWWWk...',
+     '..kWWWWWWWWWk..',
+     '..kWWSSSSSSWk..',
+     '..kWSSSKSSKSk..',
+     '..kWSSSKSSKSk..',
+     '..kwWSSSSSSWk..',
+     '...kwWWWWWWk...',
+     '..kPWBBBBBWPk..',
+     '...kWBBbBBWk...',
+     '....kWWWWkk....',
+     '....kPPPPk.....',
+     '.....kkkk......']   // andando (pernas juntas)
+  ], { P: '#ff5fa8', p: '#c83a7a', W: '#ffffff', w: '#c8d0e0', S: '#ffc8a0', K: '#101010', B: '#2f5bff', b: '#1f3cb8', A: '#5a5a6a', k: '#1a1a2a' });
   const BOMBA = S.quadros([
     ['....Y.', '...F..', '.KKKK.', 'KKwKKK', 'KwKKKK', 'KKKKKK', '.KKKK.'],
     ['...Y..', '...F..', '.KKKK.', 'KKwKKK', 'KwKKKK', 'KKKKKK', '.KKKK.']
@@ -2049,14 +3207,14 @@
 
   function iniciarBomberman() {
     const dir = aleatorio() < 0.5 ? 1 : -1;
-    return { dir: dir, x: dir === 1 ? -10 : W + 2, larga: W / 2 + (aleatorio() - 0.5) * 50, bomba: null,
+    return { dir: dir, x: dir === 1 ? -BOMBERMAN[0].w : W + 2, larga: W / 2 + (aleatorio() - 0.5) * 50, bomba: null,
              desenhar: desenharBomberman };
   }
 
   function desenharBomberman(passo) {
     this.x += this.dir * 0.45 * passo;
     if (!this.bomba && (this.dir === 1 ? this.x >= this.larga : this.x <= this.larga)) {
-      this.bomba = { x: Math.round(this.x + 1), vida: 0 };
+      this.bomba = { x: Math.round(this.x + (BOMBERMAN[0].w - 6) / 2), vida: 0 };
     }
     if (this.bomba && this.bomba.vida < 150) {
       this.bomba.vida += passo;
@@ -2076,8 +3234,8 @@
         ctx.fillRect(cx, cy - braco + 2, 1, braco);
       }
     }
-    S.colar(ctx, BOMBERMAN[Math.floor(t / 6) % 2], this.x, CHAO - 11, this.dir);
-    const fora = this.dir === 1 ? this.x > W + 2 : this.x < -10;
+    S.colar(ctx, BOMBERMAN[Math.floor(t / 6) % 2], this.x, CHAO - BOMBERMAN[0].h, this.dir);
+    const fora = this.dir === 1 ? this.x > W + 2 : this.x < -BOMBERMAN[0].w - 2;
     return !(fora && (!this.bomba || this.bomba.vida >= 150));
   }
 
@@ -2161,13 +3319,30 @@
                     yoshi: iniciarYoshi, link: iniciarLink, wiggler: iniciarWiggler, monty: iniciarMonty, lakitu: iniciarLakitu, donkey: iniciarDonkey, tails: iniciarTails, knuckles: iniciarKnuckles, chocobo: iniciarChocobo, rabites: iniciarRabites, saturno: iniciarSaturno,
                     ryu: iniciarRyu, megamanx: iniciarMegaManX, bomberman: iniciarBomberman, bonk: iniciarBonk,
                     turmalonge: iniciarTurmaLonge, sonictailslonge: iniciarSonicTailsLonge };
-  let filaDeVisitas = ['mario'];
+  // As visitas que chegam logo depois de outra (pedido do Rafael, 20/10/2026:
+  // o Mario e o Luigi aparecem assim que o Yoshi vai embora). Elas nao
+  // entram no sorteio: vem sempre com a outra.
+  const DEPOIS_DE = { yoshi: 'mario' };
+  const SO_DEPOIS = Object.keys(DEPOIS_DE).map(function (n) { return DEPOIS_DE[n]; });
+  let filaDeVisitas = ['yoshi'];
   let visita = null;
+  let seguinte = null;          // a visita que vem logo depois desta
   let esperaVisita = 420;       // ~7 s depois de abrir
 
+  function iniciarVisita(nome) {
+    const nova = VISITAS[nome]();
+    nova.nome = nome;
+    return nova;
+  }
+
   function proximaVisita() {
+    if (seguinte) {
+      const nome = seguinte;
+      seguinte = null;
+      return iniciarVisita(nome);
+    }
     if (!filaDeVisitas.length) {
-      filaDeVisitas = Object.keys(VISITAS);
+      filaDeVisitas = Object.keys(VISITAS).filter(function (n) { return SO_DEPOIS.indexOf(n) < 0; });
       for (let i = filaDeVisitas.length - 1; i > 0; i--) {          // embaralha
         const j = Math.floor(aleatorio() * (i + 1));
         const troca = filaDeVisitas[i];
@@ -2175,7 +3350,7 @@
         filaDeVisitas[j] = troca;
       }
     }
-    return VISITAS[filaDeVisitas.shift()]();
+    return iniciarVisita(filaDeVisitas.shift());
   }
 
   function desenharVisitas(passo) {
@@ -2185,9 +3360,11 @@
       return;
     }
     if (!visita.desenhar(passo)) {
+      seguinte = DEPOIS_DE[visita.nome] || null;
       visita = null;
       // 20 a 35 s; no "Visualizar animação", 1,5 a 4 s (quem abriu quer ver).
-      esperaVisita = soFundo() ? 90 + aleatorio() * 150 : 1200 + aleatorio() * 900;
+      // A que vem logo depois (o Mario depois do Yoshi) chega em meio segundo.
+      esperaVisita = seguinte ? 30 : soFundo() ? 90 + aleatorio() * 150 : 1200 + aleatorio() * 900;
     }
   }
 
@@ -2197,7 +3374,7 @@
   // Para os testes chamarem uma visita na hora (testes\\teste_fundos_animados.py).
   window.__fundoClaro = {
     visitas: Object.keys(VISITAS),
-    chamar: function (nome) { if (VISITAS[nome]) visita = VISITAS[nome](); return !!visita; },
+    chamar: function (nome) { if (VISITAS[nome]) { visita = iniciarVisita(nome); seguinte = null; } return !!visita; },
     rodando: function () { return !!visita; },
     velocidade: function (v) { velocidade = Math.max(1, Math.min(16, Number(v) || 1)); return velocidade; },
     soltarCoelho: function () { esperaCoelho = 0; return true; },
@@ -2228,6 +3405,7 @@
     desenharNuvens(passo);
     desenharBando(passo);
     desenharGirassois();
+    desenharArbusto(passo);
     desenharCoelho(passo);
     desenharVisitas(passo);
     desenharAbelhas(passo);
