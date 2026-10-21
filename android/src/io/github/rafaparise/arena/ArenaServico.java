@@ -433,6 +433,8 @@ public class ArenaServico extends Service {
                 fecharORetroArch();
             } else if (tipo.equals("controles")) {
                 responder(numero, "quantos", contarControles());
+            } else if (tipo.equals("teclado")) {
+                responder(numero, "nome", tecladoFisico());
             } else if (tipo.equals("energia")) {
                 responder(energia().put("id", numero));
             } else if (tipo.equals("abrir_pasta")) {
@@ -588,6 +590,31 @@ public class ArenaServico extends Service {
             }
         }
         return quantos;
+    }
+
+    /** O nome do teclado de letras ligado que o RetroArch nao reconhece
+     *  sozinho, ou "". O RetroArch do Android so trata como teclado, sozinho,
+     *  o aparelho que se diz SO teclado (o teclado de PC comum). O que se diz
+     *  teclado e mais alguma coisa (direcional, por exemplo) vira controle, e o
+     *  F10, o Esc e o F2 do ARENA param de funcionar: o ARENA diz a ele qual e'
+     *  o teclado (input_android_physical_keyboard; visto no emulador, cujo
+     *  teclado "qwerty2" se diz teclado e direcional, em 21/10/2026). */
+    String tecladoFisico() {
+        for (int id : InputDevice.getDeviceIds()) {
+            InputDevice d = InputDevice.getDevice(id);
+            if (d == null || d.isVirtual()) continue;
+            int fontes = d.getSources();
+            if (d.getKeyboardType() != InputDevice.KEYBOARD_TYPE_ALPHABETIC
+                    || (fontes & InputDevice.SOURCE_KEYBOARD) != InputDevice.SOURCE_KEYBOARD
+                    || fontes == InputDevice.SOURCE_KEYBOARD
+                    || (fontes & InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD
+                    || (fontes & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK) {
+                continue;
+            }
+            String nome = d.getName();
+            if (nome != null && !nome.isEmpty() && nome.indexOf('"') < 0 && nome.indexOf('\n') < 0) return nome;
+        }
+        return "";
     }
 
     /** Abre a pasta no gerenciador de arquivos do aparelho (o Arquivos do

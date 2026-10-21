@@ -529,18 +529,23 @@ def motor_de_som_do_linux():
     return "alsa"
 
 
-def ajustes_do_android(opcoes, pasta_retroarch, filtro):
+def ajustes_do_android(opcoes, pasta_retroarch, filtro, teclado=""):
     """O arquivo da partida no Android: ganha a tela de toque (o controle
     desenhado na tela, que some quando um controle de verdade e' ligado) e
     uma folga no som (o celular barato estala com menos de 64 ms; o padrao
     do RetroArch do Android e' 128). Os filtros de tela do ARENA (.slangp) so
-    rodam no Vulkan: no OpenGL ES ("gl"), ficam de fora. Devolve o filtro que
-    vale ("" sem nenhum)."""
+    rodam no Vulkan: no OpenGL ES ("gl"), ficam de fora. 'teclado': o nome
+    do teclado de verdade ligado (ponte_android.teclado_fisico): sem ele, o
+    RetroArch toma o teclado com setas por um controle e as teclas do ARENA
+    (F10, Esc, F2...) nao funcionam. Devolve o filtro que vale ("" sem
+    nenhum)."""
     toque = os.path.join(pasta_retroarch, "overlays", "gamepads", "neo-retropad", "neo-retropad.cfg")
     if os.path.isfile(toque):
         opcoes["input_overlay_enable"] = "true"
         opcoes["input_overlay"] = toque
         opcoes["input_overlay_hide_when_gamepad_connected"] = "true"
+    if teclado:
+        opcoes["input_android_physical_keyboard"] = teclado
     try:
         if int(str(opcoes.get("audio_latency") or 0)) < 64:
             opcoes["audio_latency"] = "64"

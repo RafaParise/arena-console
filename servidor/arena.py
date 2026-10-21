@@ -2019,7 +2019,9 @@ def gravar_override(config, custo=None, extras=None, em_partida=False,
     # Android (item 14): a tela de toque, a folga do som e os filtros so com
     # o Vulkan (servidor\plataforma.py).
     if plataforma_do_sistema.ANDROID:
-        filtro = plataforma_do_sistema.ajustes_do_android(opcoes, PASTA_RETROARCH, filtro)
+        import ponte_android
+        filtro = plataforma_do_sistema.ajustes_do_android(opcoes, PASTA_RETROARCH, filtro,
+                                                          teclado=ponte_android.teclado_fisico())
 
     linhas = ["# Gerado pelo ARENA. Nao edite a mao: sera reescrito."]
     # Nenhum valor pode quebrar a linha nem fechar as aspas antes da hora:
@@ -5465,8 +5467,17 @@ class Manipulador(BaseHTTPRequestHandler):
             with TRAVA_JOGO:
                 if JOGO_EM_ANDAMENTO.get("ativo"):
                     return self.erro("Feche o jogo antes de trocar a pasta do ARENA.", 409)
-            ponte_android.escolher_pasta(escolhida)
-            return self.responder_json({"ok": True, "reabrindo": True})
+            # Responde antes de pedir a troca: o app fecha este servidor para
+            # abrir o da pasta nova, e a resposta as vezes nao chegava a tela,
+            # que mostrava "Failed to fetch" (teste no emulador, 21/10/2026).
+            self.responder_json({"ok": True, "reabrindo": True})
+            self.wfile.flush()
+
+            def trocar_depois():
+                time.sleep(0.5)
+                ponte_android.escolher_pasta(escolhida)
+            threading.Thread(target=trocar_depois, daemon=True).start()
+            return
 
         # ---- recebe recordes de outro ARENA (papel de servidor) ----------
         if caminho == "/api/sinc/receber":

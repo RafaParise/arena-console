@@ -202,8 +202,11 @@ def tirar_do_apk(apk):
 def por_os_jogos_livres(apk, escolhida):
     """Sem pasta do ARENA escolhida, os jogos livres que vieram no APK (os dos
     testes, de licenca livre, cada um com a licenca ao lado) vao para a pasta
-    jogos do app: a primeira abertura ja tem jogo. Uma vez so: o que a pessoa
-    apagar nao volta. Na pasta escolhida, nunca (ela e' de quem usa)."""
+    jogos/livres do app (o "Acervo livre": a lista so procura jogo nas
+    origens do indexador.ORIGENS; em jogos/<console>, ficava vazia, achado do
+    teste no emulador de 21/10/2026): a primeira abertura ja tem jogo. Uma
+    vez so: o que a pessoa apagar nao volta. Na pasta escolhida, nunca (ela
+    e' de quem usa)."""
     marca = caminho("jogos", ".arena-livres")
     if escolhida or os.path.exists(marca):
         return 0
@@ -215,7 +218,7 @@ def por_os_jogos_livres(apk, escolhida):
                 relativo = item.filename[len(prefixo):]
                 if not item.filename.startswith(prefixo) or item.is_dir() or ".." in relativo.split("/"):
                     continue
-                alvo = caminho("jogos", relativo)
+                alvo = caminho("jogos", "livres", relativo)
                 if os.path.exists(alvo):
                     continue
                 os.makedirs(os.path.dirname(alvo), exist_ok=True)

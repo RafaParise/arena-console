@@ -187,6 +187,11 @@ class Motores(unittest.TestCase):
             opcoes = {"video_driver": "vulkan", "audio_latency": "96"}
             self.assertEqual(plataforma.ajustes_do_android(opcoes, pasta, "/x/fsr.slangp"), "/x/fsr.slangp")
             self.assertEqual(opcoes["audio_latency"], "96")
+            self.assertNotIn("input_android_physical_keyboard", opcoes)     # sem teclado ligado, nada
+            # O teclado de verdade ligado: o RetroArch passa a trata-lo como
+            # teclado (sem isso, o com setas virava controle e o F10 nao fechava).
+            plataforma.ajustes_do_android(opcoes, pasta, "", teclado="qwerty2")
+            self.assertEqual(opcoes["input_android_physical_keyboard"], "qwerty2")
         finally:
             limpeza.apagar_pasta(pasta)
 
@@ -381,7 +386,11 @@ class PastaDoArena(unittest.TestCase):
             "assets/arena-livres/MSX/LICENCA - noborunoca.txt": "CC0"})
         android_inicio.montar_as_pastas("", self.privada)
         self.assertEqual(android_inicio.por_os_jogos_livres(apk, ""), 2)
-        jogo = os.path.join(self.raiz, "jogos", "MSX", "noborunoca.rom")
+        # Numa origem que a lista procura (o "Acervo livre"): em jogos/MSX, a
+        # lista ficava vazia (teste no emulador, 21/10/2026).
+        import indexador
+        self.assertIn("livres", indexador.ORIGENS)
+        jogo = os.path.join(self.raiz, "jogos", "livres", "MSX", "noborunoca.rom")
         self.assertTrue(os.path.isfile(jogo))
         os.remove(jogo)                                         # a pessoa apagou: nao volta
         self.assertEqual(android_inicio.por_os_jogos_livres(apk, ""), 0)
@@ -389,7 +398,7 @@ class PastaDoArena(unittest.TestCase):
         # Com a pasta escolhida, nada entra nela.
         android_inicio.montar_as_pastas(self.escolhida, self.privada)
         self.assertEqual(android_inicio.por_os_jogos_livres(apk, self.escolhida), 0)
-        self.assertFalse(os.path.exists(os.path.join(self.escolhida, "jogos", "MSX")))
+        self.assertFalse(os.path.exists(os.path.join(self.escolhida, "jogos", "livres", "MSX")))
 
     def test_o_cfg_do_android(self):
         os.makedirs(os.path.join(self.raiz, "retroarch"))
@@ -500,6 +509,11 @@ class RotasDoAndroid(unittest.TestCase):
         estado, resposta = self.pedir("/api/android/pasta", {"caminho": self.arena_do_cartao},
                                       cookie="arena_segredo=segredo-da-tela")
         self.assertEqual((estado, resposta.get("reabrindo")), (200, True), resposta)
+        # A troca vem depois da resposta: o app fecha este servidor para abrir
+        # o da pasta nova, e antes a resposta as vezes nao chegava a tela.
+        fim = time.monotonic() + 5
+        while not self.escolhas and time.monotonic() < fim:
+            time.sleep(0.05)
         self.assertEqual(self.escolhas, [self.arena_do_cartao])
 
     def test_pasta_que_nao_e_arena_nao_entra(self):

@@ -245,6 +245,18 @@ def controles():
     return int(resposta.get("quantos") or 0)
 
 
+def teclado_fisico():
+    """O nome do teclado de verdade ligado ao aparelho, ou "" (o app pergunta
+    ao Android). O RetroArch so o trata como teclado se o ARENA disser qual
+    e' (plataforma.ajustes_do_android)."""
+    try:
+        resposta = perguntar({"pedido": "teclado"}, limite=2.0)
+    except OSError:
+        return ""
+    nome = str(resposta.get("nome") or "")
+    return "" if any(c in nome for c in '"\r\n') else nome
+
+
 def energia():
     """A bateria e a economia de bateria do aparelho (o app pergunta ao
     Android): {tem_bateria, bateria_pct, na_tomada, economia}, ou {}."""
