@@ -168,7 +168,9 @@ LISTAS_DE_LIVRES = {
 
 
 def livres_conferidos():
-    """{caminho no git: sha256} de cada arquivo que as listas de livres registram."""
+    """{caminho no git: {sha256}} de cada arquivo que as listas de livres
+    registram: a marca de agora e as das versoes antigas (sha256_antigos),
+    que continuam no historico do git."""
     saida = {}
     for pasta, lista in LISTAS_DE_LIVRES.items():
         try:
@@ -177,7 +179,7 @@ def livres_conferidos():
         except (OSError, ValueError):
             continue
         for item in dados.get("arquivos", []):
-            saida[pasta + item["origem"]] = item["sha256"]
+            saida[pasta + item["origem"]] = {item["sha256"], *item.get("sha256_antigos", ())}
     return saida
 
 
@@ -316,7 +318,7 @@ def principal(argumentos):
         if any(c in livres for c in caminhos[sha]):
             marca = hashlib.sha256(dados).hexdigest()
             for caminho in sorted(c for c in caminhos[sha] if c in livres):
-                if livres[caminho] == marca:
+                if marca in livres[caminho]:
                     conferidos.add(caminho)
                 else:
                     achado(bloqueantes, "arquivo livre diferente do conferido", caminho,

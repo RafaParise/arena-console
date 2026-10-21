@@ -155,14 +155,16 @@ class TestConferirAntesDePublicar(unittest.TestCase):
         self.assertEqual(codigo, 1, saida)
         self.assertIn("arquivo binario (nao e' imagem nem fonte)", self.tipos(achados, "bloqueantes"))
 
-    def commitar_livre(self, dados, marca):
+    def commitar_livre(self, dados, marca, antigos=()):
         """Uma BIOS livre (servidor/bios_livres) com a lista.json dizendo a marca."""
         caminho = os.path.join(self.repo, "servidor", "bios_livres", "C-BIOS", "roms", "cbios_sub.rom")
         os.makedirs(os.path.dirname(caminho), exist_ok=True)
         with open(caminho, "wb") as arquivo:
             arquivo.write(dados)
-        lista = {"arquivos": [{"origem": "C-BIOS/roms/cbios_sub.rom", "sha256": marca}]}
-        escrever(self.repo, "servidor/bios_livres/lista.json", json.dumps(lista))
+        item = {"origem": "C-BIOS/roms/cbios_sub.rom", "sha256": marca}
+        if antigos:
+            item["sha256_antigos"] = list(antigos)
+        escrever(self.repo, "servidor/bios_livres/lista.json", json.dumps({"arquivos": [item]}))
         git(self.repo, "add", "servidor/bios_livres")
         git(self.repo, "commit", "-q", "-m", "BIOS livre")
 
@@ -171,6 +173,20 @@ class TestConferirAntesDePublicar(unittest.TestCase):
         self.commitar_livre(dados, hashlib.sha256(dados).hexdigest())
         codigo, saida, _ = self.rodar()
         self.assertEqual(codigo, 0, saida)
+
+    def test_versao_antiga_da_livre_no_historico_passa(self):
+        """O arquivo livre que mudou (o config.ini do C-BIOS, 21/10/2026): a
+        versao antiga continua no historico, com a marca em sha256_antigos."""
+        antigo = b"\x00C-BIOS antigo" + bytes(range(256)) * 8
+        novo = b"\x00C-BIOS novo" + bytes(range(256)) * 8
+        self.commitar_livre(antigo, hashlib.sha256(antigo).hexdigest())
+        self.commitar_livre(novo, hashlib.sha256(novo).hexdigest(), [hashlib.sha256(antigo).hexdigest()])
+        codigo, saida, _ = self.rodar()
+        self.assertEqual(codigo, 0, saida)
+        self.commitar_livre(novo, hashlib.sha256(novo).hexdigest())     # sem a marca antiga, o historico barra
+        codigo, saida, achados = self.rodar()
+        self.assertEqual(codigo, 1, saida)
+        self.assertIn("arquivo livre diferente do conferido", self.tipos(achados, "bloqueantes"))
 
     def test_bios_livre_com_um_byte_trocado_barra(self):
         dados = b"\x00C-BIOS" + bytes(range(256)) * 8
