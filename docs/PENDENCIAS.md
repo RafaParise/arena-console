@@ -121,15 +121,15 @@ Depois do Release, nesta ordem:
     está consertado: os jogos livres do APK fora da lista, o "Failed to
     fetch" na troca de pasta e o teclado com setas tomado por controle.
     **Falta** o APK nos Releases (com a versão nova do pacote).
-15. Testes nos sistemas virtuais (Docker e WSL), com números e
-    descontando a perda de rodar dentro de outro sistema: **em andamento
-    (21/10)**, com o relatório em `docs/SISTEMAS-VIRTUAIS.md`. Medidos o
-    Windows e o Android do emulador: o processador do aparelho virtual faz
-    0,45 do Windows, e o RetroArch do Android, descontada essa perda, rende
-    como o do Windows (MSX 1,19; ZX81 0,96). Achado: o VIC-20 do Android
-    (o núcleo VICE) fica em uns 83 quadros por segundo mesmo sem freio.
-    **Falta** o Linux do contêiner: ele travou de novo às 12h34 (ver
-    "Depende do Rafael").
+15. **Feito (21/10):** os testes nos sistemas virtuais (Docker e WSL), com
+    números e descontando a perda, no relatório `docs/SISTEMAS-VIRTUAIS.md`.
+    O RetroArch do Linux, no contêiner do WSL, rende como o do Windows sem
+    desconto nenhum (de 0,94 a 1,08); o do Android, descontada a perda do
+    aparelho virtual (o processador dele faz 0,46 do Windows), também (MSX
+    1,19; ZX81 0,96). Achado: o VIC-20 do Android (o núcleo VICE) fica em
+    uns 83 quadros por segundo mesmo sem freio. No caminho, consertada a
+    medida do Linux (o RetroArch sem vídeo fechava na hora, e o tempo de 0,03
+    s virava bilhões de quadros por segundo).
 16. **Feito em 20/10** (adiantado, com o 13 ao 15 parados à espera do
     Rafael): o fundo novo (`launcher/field-background.js`, guia 3) e o GIF
     do README gravado de novo. O pedido: o fundo animado do tema
@@ -154,13 +154,6 @@ reserva a cada reinício (Hyper-V, WSL, Docker). O `VERIFICAR.bat`, o
 (`servidor\portas.py`, sem administrador) e explicam o que fazer (guia 5).
 
 ## Depende do Rafael
-
-- **Reiniciar o Windows quando puder:** o contêiner do Linux (WSLC) travou
-  de novo em 21/10, às 12h34 (como em 18 e 20/10), e falta medir o Linux
-  do item 15. Só o reinício o solta: a máquina virtual dele (`vmmemwslc`)
-  roda como serviço do Windows, e nem `wsl --shutdown` nem fechar a sessão
-  adiantam. Depois do reinício:
-  `servidor\python\python.exe testes\teste_sistemas_virtuais.py L`.
 
 - **O teste no Chromebook da escola** (item 12, `docs/CHROMEBOOK.md`, "O
   teste no Chromebook da escola"): abrir o `ARENA-CHROMEBOOK.html` do pen

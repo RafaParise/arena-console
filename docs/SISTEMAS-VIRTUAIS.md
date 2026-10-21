@@ -33,36 +33,61 @@ brutos ficam em `docs/sistemas_virtuais_bruto.json`.
 
 ## Os números (21/10/2026)
 
-| | Windows | Android (emulador) | Android ÷ Windows | Descontada a perda |
-|---|---:|---:|---:|---:|
-| Processador (operações por segundo) | 7,57 milhões | 3,43 milhões | 0,45 | — |
-| MSX (quadros por segundo) | 5.790 | 3.107 | 0,54 | **1,19** |
-| ZX81 (quadros por segundo) | 2.064 | 892 | 0,43 | **0,96** |
-| VIC-20 (quadros por segundo) | 2.839 | 83 | 0,03 | 0,07 (ver abaixo) |
-| Disco: gravação | 550 MB/s | 212 MB/s | 0,38 | — |
-| Disco: leitura | 930 MB/s | 1.953 MB/s | 2,1 | — |
+O Windows e o Linux foram medidos juntos, às 14h37, depois do reinício que
+soltou o contêiner; o Android, às 13h55.
 
-As duas repetições ficaram perto uma da outra: no Windows, MSX 5.889 e
-5.690, VIC-20 2.840 e 2.838, ZX81 2.068 e 2.060; no Android, MSX 3.144 e
+| | Windows | Linux (contêiner) | Linux ÷ Windows | Android (emulador) | Android ÷ Windows |
+|---|---:|---:|---:|---:|---:|
+| Processador (operações por segundo) | 7,44 milhões | 8,57 milhões | 1,15 | 3,43 milhões | 0,46 |
+| MSX (quadros por segundo) | 5.653 | 6.017 | 1,06 | 3.107 | 0,55 |
+| VIC-20 (quadros por segundo) | 2.787 | 3.021 | 1,08 | 83 | 0,03 |
+| ZX81 (quadros por segundo) | 2.018 | 1.899 | 0,94 | 892 | 0,44 |
+| Disco: gravação | 1.357 MB/s | 924 MB/s | 0,68 | 212 MB/s | 0,16 |
+| Disco: leitura | 991 MB/s | 8.291 MB/s | (da memória) | 1.953 MB/s | (da memória) |
+
+**Descontada a perda** (o medido ÷ a razão do processador):
+
+| | Linux | Android |
+|---|---:|---:|
+| MSX | 0,92 | **1,19** |
+| VIC-20 | 0,94 | 0,07 (ver abaixo) |
+| ZX81 | 0,82 | **0,96** |
+
+As duas repetições ficaram perto uma da outra: no Windows, MSX 5.566 e
+5.741, VIC-20 2.823 e 2.750, ZX81 1.965 e 2.071; no Linux, MSX 6.113 e
+5.920, VIC-20 3.027 e 3.016, ZX81 1.906 e 1.893; no Android, MSX 3.144 e
 3.069, ZX81 938 e 847.
 
-**Descontando a perda.** "Descontada a perda" é o medido no Android ÷ a
-perda do processador (0,45). O MSX e o ZX81 ficam perto de 1: o RetroArch do
-Android, por si, rende como o do Windows, e a lentidão no emulador é toda do
-aparelho virtual, cujo processador faz menos da metade do trabalho do
-Windows. Pela conta, um aparelho de verdade com o processador igual ao deste
-computador deve rodar esses consoles como o Windows (é a estimativa, não
-uma medida num aparelho).
+**O Android.** O MSX e o ZX81, descontada a perda, ficam perto de 1: o
+RetroArch do Android, por si, rende como o do Windows, e a lentidão no
+emulador é toda do aparelho virtual, cujo processador faz menos da metade do
+trabalho do Windows. Pela conta, um aparelho de verdade com o processador
+igual ao deste computador deve rodar esses consoles como o Windows (é a
+estimativa, não uma medida num aparelho).
+
+**O Linux.** No contêiner, o RetroArch do Linux rende como o do Windows
+**sem desconto nenhum**: de 0,94 a 1,08 do Windows. A conta do processador
+sai 1,15 lá dentro, mais rápida que no Windows, e por isso o "descontado"
+(0,82 a 0,94) fica abaixo do medido. Essa diferença provavelmente não é a
+máquina virtual: a conta é feita em Python, e o Python do Linux (o mesmo
+3.13, compilado de outro jeito) costuma rodar esse tipo de laço mais depressa
+que o do Windows. Na prática, o contêiner do WSL quase não tira nada do
+trabalho do processador, e um computador com Linux de verdade, com este
+processador, deve rodar esses consoles como o Windows, com uns 10% para
+mais ou para menos.
 
 **A margem.** A conta do processador do emulador variou ao longo do dia
 (de 0,45 a 0,70 do Windows, em sete medidas): o aparelho virtual divide o
 processador com o resto do computador. O desconto, então, tem margem de uns
 20% para cima ou para baixo.
 
-**O disco.** A gravação no aparelho virtual sai a 38% da do Windows (ela
-passa pelo disco virtual do emulador). A leitura sai mais rápida no
-Android, provavelmente porque o arquivo recém-gravado é lido da memória;
-para o ARENA, o número que conta é a gravação (os saves e o banco).
+**O disco.** A gravação varia muito de uma medida para outra: a do Windows
+saiu a 550 MB/s de manhã e a 1.357 MB/s à tarde, no mesmo dia. Medidas na
+mesma hora, a do contêiner do Linux sai a 68% da do Windows, e a do aparelho
+virtual bem abaixo (ela passa pelo disco virtual do emulador). A leitura sai
+mais rápida nos dois sistemas virtuais porque o arquivo recém-gravado é lido
+da memória; para o ARENA, o número que conta é a gravação (os saves e o
+banco).
 
 ## O que as medidas acharam
 
@@ -87,14 +112,24 @@ para o ARENA, o número que conta é a gravação (os saves e o banco).
     abria sem jogo e contava quadros do menu: o núcleo sai do APK no
     computador.
   - O CHIP-8 ficou de fora: é leve demais para esta conta.
+  - No Linux, sem vídeo, o RetroArch tentava o controle pelo X11 e fechava
+    na hora ("Cannot initialize input driver"): a medida liga o controle
+    `null` (no Windows e no Linux; o Android fica com o dele). E o tempo de
+    quem fechou com erro, 0,03 s, virava bilhões de quadros por segundo sem
+    ninguém perceber: agora a medida só aceita o RetroArch que termina com o
+    código 0 e a rodada longa que dura de verdade.
+  - O contêiner do WSL travou três vezes (18, 20 e 21/10), e só o reinício
+    do Windows o soltava: a máquina virtual dele roda como serviço do
+    Windows, e nem `wsl --shutdown` adiantava.
 
-## Falta
+## O que ficou de fora
 
-- **O Linux do contêiner (L):** o contêiner do WSL travou de novo em 21/10,
-  às 12h34 (a terceira vez, depois de 18 e 20/10), e só o reinício do Windows
-  o solta. Depois dele:
-  `servidor\python\python.exe testes\teste_sistemas_virtuais.py L`. As
-  medidas do Windows e do Android ficam guardadas e entram na mesma conta.
 - **O WSL sem contêiner:** este computador não tinha distribuição do WSL
   instalada (conferido em 17/10); o contêiner roda na máquina virtual do
   próprio WSL, então a perda dele deve ser a mesma do WSL.
+- **O vídeo:** fica de fora das contas de propósito. O do emulador do
+  Android é desenhado pelo processador (SwiftShader), e o contêiner nem tem
+  placa de vídeo.
+
+Para medir de novo: `servidor\python\python.exe testes\teste_sistemas_virtuais.py`
+(ou só uma parte: `W`, `L` ou `A`; o Android pede o emulador ligado).

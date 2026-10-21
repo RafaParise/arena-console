@@ -167,7 +167,8 @@ def _retroarch_no_android(ta, apk_local):
         ta.adb("shell", "rm", "-rf", NO_APARELHO)
         ta.adb("shell", "mkdir", "-p", NO_APARELHO)
         ta.adb("push", sistema, NO_APARELHO + "/", segundos=300)
-        opcoes = medidas_virtuais.cfg_sem_freio(local, NO_APARELHO + "/system")
+        # O controle do proprio Android (a medida de 21/10 foi assim).
+        opcoes = medidas_virtuais.cfg_sem_freio(local, NO_APARELHO + "/system", controle=None)
         with open(opcoes, encoding="utf-8") as arquivo:
             texto = arquivo.read().replace(local.replace("\\", "/"), NO_APARELHO).replace(local, NO_APARELHO)
         # A pasta "info" do RetroArch e' a do Windows: no aparelho, fica a do APK.

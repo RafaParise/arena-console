@@ -60,10 +60,14 @@ def jogos_da_medida():
     return saida
 
 
-def cfg_sem_freio(pasta, sistema):
+def cfg_sem_freio(pasta, sistema, controle="null"):
     """O retroarch.cfg da medida: sem video nem som de verdade, sem esperar
     a tela nem o som (o RetroArch corre o mais rapido que puder), sem nada
-    que pese a mais (rebobinar, adiantar quadro), as pastas na de trabalho."""
+    que pese a mais (rebobinar, adiantar quadro), as pastas na de trabalho.
+    'controle': o driver de controle. A medida nao precisa de controle, e
+    sem video o RetroArch do Linux tentava o do X11 ("x") e fechava na hora
+    ("Cannot initialize input driver", 21/10/2026). None deixa o do sistema
+    (o Android, medido assim em 21/10)."""
     opcoes = {
         "video_driver": "null", "audio_driver": "null", "audio_enable": "false", "video_vsync": "false",
         "audio_sync": "false", "video_threaded": "false", "rewind_enable": "false", "run_ahead_enabled": "false",
@@ -79,6 +83,8 @@ def cfg_sem_freio(pasta, sistema):
         "log_to_file": "false", "network_cmd_enable": "false", "global_core_options": "true",
         "core_options_path": os.path.join(pasta, "opcoes.opt"),
     }
+    if controle:
+        opcoes["input_driver"] = controle
     for chave in ("savefile_directory", "savestate_directory", "screenshot_directory", "cache_directory"):
         os.makedirs(opcoes[chave], exist_ok=True)
     caminho = os.path.join(pasta, "medida.cfg")
@@ -88,11 +94,16 @@ def cfg_sem_freio(pasta, sistema):
 
 
 def segundos_de(comando, limite=300):
-    """O tempo de parede de um comando (o RetroArch fecha sozinho no fim)."""
+    """O tempo de parede de um comando (o RetroArch fecha sozinho no fim, com
+    o codigo 0). Saiu com erro: None. Antes o tempo de quem caiu na hora
+    (0,03 s) virava bilhoes de quadros por segundo (o Linux, 21/10/2026)."""
     inicio = time.perf_counter()
     try:
-        subprocess.run(comando, timeout=limite, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        processo = subprocess.run(comando, timeout=limite, stdout=subprocess.DEVNULL,
+                                  stderr=subprocess.DEVNULL)
     except (subprocess.TimeoutExpired, OSError):    # travou, ou o programa nem abriu
+        return None
+    if processo.returncode != 0:
         return None
     return time.perf_counter() - inicio
 
@@ -124,7 +135,9 @@ def _uma_medida(montar_comando, medir):
         if proximos <= quadros:
             break
         quadros, longa = proximos, medir(montar_comando(proximos))
-    if longa is None or longa <= curta:
+    # A longa tem de durar de verdade: com o maximo de quadros e menos de um
+    # segundo a mais que a curta, o jogo nem rodou (a conta seria ruido).
+    if longa is None or longa - curta < SEGUNDOS_DA_LONGA / 8:
         return {"fps": None, "curta_s": round(curta, 2), "longa_s": longa, "quadros": quadros}
     return {"fps": round((quadros - QUADROS[0]) / (longa - curta), 1), "curta_s": round(curta, 2),
             "longa_s": round(longa, 2), "quadros": quadros}
