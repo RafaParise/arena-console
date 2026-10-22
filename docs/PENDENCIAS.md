@@ -165,9 +165,12 @@ Depois do Release, nesta ordem:
       testes da descoberta de colegas e da partida), o mamedev.org fora do
       ar (a biblioteca livre) e um jogo que estava fora da pasta (o BS
       F-Zero Deluxe). Depois do reinício de 22/10, com a porta livre e o
-      jogo de volta, os 4 de rede passaram e o das BIOS deu 19 de 19. Só a
-      biblioteca livre espera o mamedev.org voltar (às 5h50 de 22/10 ele
-      ainda não respondia).
+      jogo de volta, os 4 de rede passaram e o das BIOS deu 19 de 19; com o
+      mamedev.org de volta (11h de 22/10), a biblioteca livre passou
+      inteira (4 jogos baixados e abertos).
+
+    Com as 12 repetidas e passando (o orçamento 1b no item 18), a rodada
+    fechou 115 de 115.
 18. **Investigado (22/10): não é defeito do ARENA.** O orçamento 1b do modo
     alvo (do `arena.py` até os dados da tela, teto de 2,3 s) estourou três
     vezes: 3,2 e 3,05 s na rodada de 21/10 e 3,27 s às 6h24 de 22/10, já
@@ -212,6 +215,14 @@ reserva a cada reinício (Hyper-V, WSL, Docker). O `VERIFICAR.bat`, o
   Desempenho e no Ultra**: todo jogo desenhado no tamanho do console. Para
   ver a escala nova por inteiro: Ajustes → Simples → Automático; Ajustes →
   Máquina → Nível do gráfico → Normal (`docs\ESCALA-DA-TELA.md`).
+- **O seu ARENA está com o "Som só para o jogo" ligado** (o som exclusivo,
+  WASAPI, em Ajustes → Avançado → Som; no `dados\config.json`, grupo
+  `avancado`). Com o seu fone JBL Quantum, é o que deixa o Super Nintendo
+  a 52 quadros, e não 60 (o teste do modo alvo de 22/10 mediu 52,4 com o
+  som e 60,0 sem a sincronia pelo som). Desde 16/10 nenhum perfil liga essa
+  opção, e a tela explica o efeito. Desligar é com você: é configuração
+  sua (só a tela grava nesse grupo), e dado do usuário só muda com a sua
+  autorização.
 - Medir a escala no notebook da escola: copiar os jogos das cenas (CTR,
   Burnout Legends, Mario Kart 64, Gauntlet Legends, Super Bomberman 4) e
   rodar `servidor\python\python.exe ferramentas\medir_escala.py`. E
