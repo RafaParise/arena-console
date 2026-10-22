@@ -245,6 +245,14 @@
     setTimeout(function () { acabou("fechou"); }, 3000);
   }
 
+  // Para o controle de toque (navegador/toque.js, auditoria 4): os mesmos
+  // comandos que a tela pede por mensagem, e o canvas que recebe as teclas.
+  window.ArenaJogo = {
+    canvas: canvas,
+    comando: function (nome) { if (modulo && !terminou && COMANDOS[nome]) modulo[COMANDOS[nome]](); },
+    sair: sair,
+  };
+
   window.addEventListener("message", function (evento) {
     if (evento.source !== tela) return;
     const pedido = evento.data || {};

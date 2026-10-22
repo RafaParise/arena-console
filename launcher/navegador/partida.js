@@ -40,7 +40,12 @@ window.ArenaPartida = (function () {
     capa.setAttribute("aria-label", "Jogando " + titulo);
     const faixa = elemento("div", "partida-faixa");
     const nome = elemento("span", "partida-titulo", titulo);
-    const teclas = elemento("span", "partida-teclas", "Esc: menu · F2: salvar · F4: carregar · F10: sair");
+    // Na tela de toque, os botoes desenhados no jogo (navegador/toque.js).
+    const toque = (navigator.maxTouchPoints || 0) > 0 ||
+      (window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
+    const teclas = elemento("span", "partida-teclas", toque
+      ? "Botões na tela: MENU, SALVAR, CARREGAR e SAIR"
+      : "Esc: menu · F2: salvar · F4: carregar · F10: sair");
     const situacao = elemento("span", "partida-situacao", "Abrindo...");
     const telaCheia = botao("Tela cheia", "Entrar ou sair da tela cheia", alternarTelaCheia);
     const voltar = botao("Voltar ao ARENA", "Fechar o jogo e voltar ao ARENA", sair);

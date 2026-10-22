@@ -15,7 +15,10 @@
 // --------------------------------------------------------------------------
 (function () {
   const busca = new URLSearchParams(location.search);
-  const noNavegador = location.protocol === "file:" || busca.get("navegador") === "1";
+  // ARENA_SEMPRE_NAVEGADOR: a versao da internet (ferramentas/montar_site.py)
+  // nao tem o servidor Python atras, em nenhum endereco.
+  const noNavegador = location.protocol === "file:" || busca.get("navegador") === "1" ||
+    window.ARENA_SEMPRE_NAVEGADOR === true;
   window.ARENA_NO_NAVEGADOR = noNavegador;
   if (!noNavegador) return;
 
