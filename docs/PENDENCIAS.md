@@ -120,7 +120,8 @@ Depois do Release, nesta ordem:
     pasta do app com os jogos livres (`docs/ANDROID.md`). O que ele achou
     está consertado: os jogos livres do APK fora da lista, o "Failed to
     fetch" na troca de pasta e o teclado com setas tomado por controle.
-    **Falta** o APK nos Releases (com a versão nova do pacote).
+    **Feito (22/10):** o APK nos Releases, na versão 2026.10.22
+    (arm64-v8a e x86_64), depois de passar de novo no emulador.
 15. **Feito (21/10):** os testes nos sistemas virtuais (Docker e WSL), com
     números e descontando a perda, no relatório `docs/SISTEMAS-VIRTUAIS.md`.
     O RetroArch do Linux, no contêiner do WSL, rende como o do Windows sem
@@ -147,6 +148,32 @@ Depois do Release, nesta ordem:
     (caramelo com uma listra marrom nas costas) e um coelho médio, sem
     juba, todo preto, maior que a coelha; o Mega Man redesenhado, com um
     companheiro de um dos jogos.
+17. **Feito (22/10):** a versão 2026.10.22 no Release, com o pacote
+    completo (1.065 MB; descompactado, 2,6 GB, porque agora leva o Linux),
+    o de atualização (104 MB) e os dois APKs. A rodada final de 21/10 deu
+    103 de 115, e o que ela achou:
+    - consertado no ARENA: o PlayStation fechava sozinho com o filtro RCAS
+      e o vídeo em thread (o SwanStation; agora, com o RCAS, ele roda sem a
+      thread), o caso do notebook da escola; e a montagem do pacote do
+      zero, parada desde 18/10 (a pasta `retroarch\cores` já existia);
+    - consertado nos testes (o ARENA estava certo): o fuzz (o corte depois
+      do 414), a busca e o download do Internet Archive (o falso na camada
+      nova de download), o Android (o aviso de app parado engolia as
+      teclas) e a matriz de consoles (o núcleo junto, o Apple II pela ponte
+      sem acento e a foto das telas pequenas do CHIP-8 e do Arduboy);
+    - do computador de testes: a porta UDP 55436 reservada pelo Windows (4
+      testes da descoberta de colegas e da partida), o mamedev.org fora do
+      ar (a biblioteca livre) e um jogo que não está na pasta (ver "Depende
+      do Rafael").
+18. **A investigar:** o orçamento 1b do modo alvo (do `arena.py` até os
+    dados da tela) estourou duas vezes, 3,2 e 3,05 s, para o teto de 2,3 s;
+    a abertura sentida (1a) ficou em 1,36 s, dentro dos 10 s. O servidor
+    sozinho, no mesmo modo, entrega os dados em 0,8 a 1,0 s; a conferência
+    das portas reservadas não pesa; o navegador continua o Edge. Neste
+    computador, o fundo animado está em "sempre" e o tema é o claro: a
+    causa provável é o fundo novo de 20/10, desenhado já na abertura,
+    disputando o processador da caixa. Próximo passo: medir de novo com o
+    fundo no automático.
 
 Achado de 16/10, consertado em 18/10: as faixas de porta que o Windows
 reserva a cada reinício (Hyper-V, WSL, Docker). O `VERIFICAR.bat`, o
@@ -154,6 +181,14 @@ reserva a cada reinício (Hyper-V, WSL, Docker). O `VERIFICAR.bat`, o
 (`servidor\portas.py`, sem administrador) e explicam o que fazer (guia 5).
 
 ## Depende do Rafael
+
+- **A porta UDP 55436 que o Windows reservou neste reinício** (a faixa
+  55369 a 55468): a descoberta de colegas não abre neste computador, e 4
+  testes falham por isso (a descoberta e a partida aparecendo). Reiniciar o
+  Windows costuma trocar as faixas; o guia 5 explica o que fazer.
+- **O BS F-Zero Deluxe** não está mais em `jogos\pessoais\Super Nintendo`:
+  o teste das BIOS (`testes\teste_bios_consoles.py`) usa esse jogo com o
+  BS-X. Se ele foi tirado de propósito, o teste pode trocar de jogo.
 
 - **O teste no Chromebook da escola** (item 12, `docs/CHROMEBOOK.md`, "O
   teste no Chromebook da escola"): abrir o `ARENA-CHROMEBOOK.html` do pen

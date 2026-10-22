@@ -1,22 +1,613 @@
 [
  {
+  "console": "Apple II",
+  "titulo": "DIAFLW",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": false,
+   "foto_bytes": 0,
+   "segundos": 0.6,
+   "travou": false,
+   "erros": [
+    "[ERROR] [Content] Falha ao carregar o conteúdo."
+   ]
+  },
+  "jogar_junto": {
+   "pulado": "O núcleo do Apple II (AppleWin) não suporta jogo em rede - confirmado tentando hospedar em 14/10/2026, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Os 2 jogadores só valem no mesmo computador."
+  }
+ },
+ {
+  "console": "Arcade (MAME)",
+  "titulo": "Alien Arena",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 16630,
+   "segundos": 11.5,
+   "travou": false,
+   "erros": []
+  },
+  "foto": "001 Arcade (MAME) - Alien Arena.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
+  }
+ },
+ {
+  "console": "Arcade (MAME)",
+  "titulo": "Car Polo",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 20746,
+   "segundos": 10.9,
+   "travou": false,
+   "erros": []
+  },
+  "foto": "002 Arcade (MAME) - Car Polo.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
+  }
+ },
+ {
+  "console": "Arcade (MAME)",
+  "titulo": "Circus",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 32045,
+   "segundos": 10.9,
+   "travou": false,
+   "erros": []
+  },
+  "foto": "003 Arcade (MAME) - Circus.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
+  }
+ },
+ {
+  "console": "Arcade (MAME)",
+  "titulo": "Crash",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 37634,
+   "segundos": 10.9,
+   "travou": false,
+   "erros": []
+  },
+  "foto": "004 Arcade (MAME) - Crash.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
+  }
+ },
+ {
+  "console": "Arcade (MAME)",
+  "titulo": "Fax",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 10171,
+   "segundos": 10.9,
+   "travou": false,
+   "erros": []
+  },
+  "foto": "005 Arcade (MAME) - Fax.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
+  }
+ },
+ {
+  "console": "Arcade (MAME)",
+  "titulo": "Fire One",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 33301,
+   "segundos": 11.1,
+   "travou": false,
+   "erros": []
+  },
+  "foto": "006 Arcade (MAME) - Fire One.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
+  }
+ },
+ {
+  "console": "Arcade (MAME)",
+  "titulo": "Gridlee",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 102636,
+   "segundos": 11.0,
+   "travou": false,
+   "erros": []
+  },
+  "foto": "007 Arcade (MAME) - Gridlee.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
+  }
+ },
+ {
+  "console": "Arcade (MAME)",
+  "titulo": "Hard Hat",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 30701,
+   "segundos": 10.9,
+   "travou": false,
+   "erros": []
+  },
+  "foto": "008 Arcade (MAME) - Hard Hat.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
+  }
+ },
+ {
   "console": "Arcade (MAME)",
   "titulo": "Killer Instinct",
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 203940,
-   "segundos": 12.6,
+   "segundos": 11.2,
    "travou": false,
    "erros": []
   },
-  "foto": "000 Arcade (MAME) - Killer Instinct.png",
+  "foto": "009 Arcade (MAME) - Killer Instinct.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
+  }
+ },
+ {
+  "console": "Arcade (MAME)",
+  "titulo": "Looping",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 22197,
+   "segundos": 10.9,
+   "travou": false,
    "erros": []
+  },
+  "foto": "010 Arcade (MAME) - Looping.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
+  }
+ },
+ {
+  "console": "Arcade (MAME)",
+  "titulo": "Rip Cord",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 52886,
+   "segundos": 10.9,
+   "travou": false,
+   "erros": []
+  },
+  "foto": "011 Arcade (MAME) - Rip Cord.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
+  }
+ },
+ {
+  "console": "Arcade (MAME)",
+  "titulo": "Robby Roto",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 27073,
+   "segundos": 10.9,
+   "travou": false,
+   "erros": []
+  },
+  "foto": "012 Arcade (MAME) - Robby Roto.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
+  }
+ },
+ {
+  "console": "Arcade (MAME)",
+  "titulo": "Robot Bowl",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 28909,
+   "segundos": 10.9,
+   "travou": false,
+   "erros": []
+  },
+  "foto": "013 Arcade (MAME) - Robot Bowl.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
+  }
+ },
+ {
+  "console": "Arcade (MAME)",
+  "titulo": "Side Track",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 233945,
+   "segundos": 11.0,
+   "travou": false,
+   "erros": []
+  },
+  "foto": "014 Arcade (MAME) - Side Track.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
+  }
+ },
+ {
+  "console": "Arcade (MAME)",
+  "titulo": "Spectar",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 205548,
+   "segundos": 10.9,
+   "travou": false,
+   "erros": []
+  },
+  "foto": "015 Arcade (MAME) - Spectar.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
+  }
+ },
+ {
+  "console": "Arcade (MAME)",
+  "titulo": "Star Fire",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 13215,
+   "segundos": 11.2,
+   "travou": false,
+   "erros": []
+  },
+  "foto": "016 Arcade (MAME) - Star Fire.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
+  }
+ },
+ {
+  "console": "Arcade (MAME)",
+  "titulo": "Super Tank",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 19094,
+   "segundos": 12.9,
+   "travou": false,
+   "erros": []
+  },
+  "foto": "017 Arcade (MAME) - Super Tank.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
+  }
+ },
+ {
+  "console": "Arcade (MAME)",
+  "titulo": "Targ",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 34873,
+   "segundos": 10.9,
+   "travou": false,
+   "erros": []
+  },
+  "foto": "018 Arcade (MAME) - Targ.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
+  }
+ },
+ {
+  "console": "Arcade (MAME)",
+  "titulo": "Teeter Torture",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 12695,
+   "segundos": 10.9,
+   "travou": false,
+   "erros": []
+  },
+  "foto": "019 Arcade (MAME) - Teeter Torture.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
+  }
+ },
+ {
+  "console": "Arcade (MAME)",
+  "titulo": "Top Gunner",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 50531,
+   "segundos": 11.0,
+   "travou": false,
+   "erros": []
+  },
+  "foto": "020 Arcade (MAME) - Top Gunner.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
+  }
+ },
+ {
+  "console": "Arcade (MAME)",
+  "titulo": "Victory",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 3426,
+   "segundos": 10.9,
+   "travou": false,
+   "erros": []
+  },
+  "foto": "021 Arcade (MAME) - Victory.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
+  }
+ },
+ {
+  "console": "Arduboy",
+  "titulo": "Evade",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 4841,
+   "segundos": 10.8,
+   "travou": false,
+   "erros": []
+  },
+  "foto": "022 Arduboy - Evade.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -25,18 +616,52 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 4762,
-   "segundos": 11.1,
+   "foto_bytes": 4798,
+   "segundos": 10.8,
    "travou": false,
    "erros": []
   },
-  "foto": "001 Atari 2600 - Combat.png",
+  "foto": "023 Atari 2600 - Combat.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
+  }
+ },
+ {
+  "console": "Atari 2600",
+  "titulo": "Space Raid",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 15991,
+   "segundos": 10.8,
+   "travou": false,
    "erros": []
+  },
+  "foto": "024 Atari 2600 - Space Raid.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -46,17 +671,51 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 8699,
-   "segundos": 11.0,
+   "segundos": 10.8,
    "travou": false,
    "erros": []
   },
-  "foto": "002 Atari 2600 - Warlords.png",
+  "foto": "025 Atari 2600 - Warlords.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
+  }
+ },
+ {
+  "console": "CHIP-8",
+  "titulo": "Slippery Slope",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 2054,
+   "segundos": 11.0,
+   "travou": false,
    "erros": []
+  },
+  "foto": "026 CHIP-8 - Slippery Slope.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -66,17 +725,24 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 7273,
-   "segundos": 11.0,
+   "segundos": 10.8,
    "travou": false,
    "erros": []
   },
-  "foto": "003 ColecoVision - Slither.png",
+  "foto": "027 ColecoVision - Slither.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -86,11 +752,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 31547,
-   "segundos": 13.3,
+   "segundos": 13.1,
    "travou": false,
    "erros": []
   },
-  "foto": "004 Commodore 64 - International Karate.png",
+  "foto": "028 Commodore 64 - International Karate.png",
   "jogar_junto": {
    "pulado": "O núcleo do Commodore 64 (VICE) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Os 2 jogadores só valem no mesmo computador."
   }
@@ -102,11 +768,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 34475,
-   "segundos": 13.3,
+   "segundos": 13.1,
    "travou": false,
    "erros": []
   },
-  "foto": "005 Commodore 64 - Mule.png",
+  "foto": "029 Commodore 64 - Mule.png",
   "jogar_junto": {
    "pulado": "O núcleo do Commodore 64 (VICE) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Os 2 jogadores só valem no mesmo computador."
   }
@@ -118,11 +784,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 96717,
-   "segundos": 13.3,
+   "segundos": 13.1,
    "travou": false,
    "erros": []
   },
-  "foto": "006 Commodore 64 - Prince of Persia.png",
+  "foto": "030 Commodore 64 - Prince of Persia.png",
   "jogar_junto": {
    "pulado": "O núcleo do Commodore 64 (VICE) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Os 2 jogadores só valem no mesmo computador."
   }
@@ -134,11 +800,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 4101,
-   "segundos": 13.1,
+   "segundos": 12.9,
    "travou": false,
    "erros": []
   },
-  "foto": "007 Commodore Amiga - Alien Breed Disk1.png",
+  "foto": "031 Commodore Amiga - Alien Breed Disk1.png",
   "jogar_junto": {
    "pulado": "O núcleo do Amiga (PUAE) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Os 2 jogadores só valem no mesmo computador."
   }
@@ -150,13 +816,126 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 67668,
+   "segundos": 12.9,
+   "travou": false,
+   "erros": []
+  },
+  "foto": "032 Commodore Amiga - Top Gear 2 Disk2.png",
+  "jogar_junto": {
+   "pulado": "O núcleo do Amiga (PUAE) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Os 2 jogadores só valem no mesmo computador."
+  }
+ },
+ {
+  "console": "Commodore Plus/4",
+  "titulo": "Intervallo",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 77373,
    "segundos": 13.1,
    "travou": false,
    "erros": []
   },
-  "foto": "008 Commodore Amiga - Top Gear 2 Disk2.png",
+  "foto": "033 Commodore Plus4 - Intervallo.png",
   "jogar_junto": {
-   "pulado": "O núcleo do Amiga (PUAE) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Os 2 jogadores só valem no mesmo computador."
+   "pulado": "O núcleo do Plus/4 (VICE) não suporta jogo em rede - confirmado tentando hospedar em 14/10/2026, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Os 2 jogadores só valem no mesmo computador."
+  }
+ },
+ {
+  "console": "Commodore VIC-20",
+  "titulo": "Baguel",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 31176,
+   "segundos": 12.8,
+   "travou": false,
+   "erros": []
+  },
+  "foto": "034 Commodore VIC-20 - Baguel.png",
+  "jogar_junto": {
+   "pulado": "O núcleo do VIC-20 (VICE) não suporta jogo em rede - confirmado tentando hospedar em 14/10/2026, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Os 2 jogadores só valem no mesmo computador."
+  }
+ },
+ {
+  "console": "Game Boy Advance",
+  "titulo": "Blind Jump",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 6408,
+   "segundos": 10.9,
+   "travou": false,
+   "erros": []
+  },
+  "foto": "035 Game Boy Advance - Blind Jump.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
+  }
+ },
+ {
+  "console": "Game Boy e Game Boy Color",
+  "titulo": "Libbet And the Magic Floor",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 11775,
+   "segundos": 10.8,
+   "travou": false,
+   "erros": []
+  },
+  "foto": "036 Game Boy e Game Boy  - Libbet And the Magic Floor.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
+  }
+ },
+ {
+  "console": "Game Boy e Game Boy Color",
+  "titulo": "UCity",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 105081,
+   "segundos": 10.9,
+   "travou": false,
+   "erros": []
+  },
+  "foto": "037 Game Boy e Game Boy  - UCity.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -196,15 +975,49 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 2089,
-   "segundos": 11.0,
+   "segundos": 10.8,
    "travou": false,
    "erros": [
     "[ERROR] [Environ] SET_MESSAGE_EXT: FreeJ2ME system files not found!"
    ]
   },
-  "foto": "014 Java ME (celular ant - God of War Betrayal J2ME EN V0195.png",
+  "foto": "043 Java ME (celular ant - God of War Betrayal J2ME EN V0195.png",
   "jogar_junto": {
    "pulado": "O núcleo do Java ME (FreeJ2ME-Plus) não suporta jogo em rede - confirmado tentando hospedar em 15/10/2026, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"): o jogo roda no Java, fora do RetroArch."
+  }
+ },
+ {
+  "console": "Java ME (celular antigo)",
+  "titulo": "Shooter",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 2089,
+   "segundos": 10.8,
+   "travou": false,
+   "erros": [
+    "[ERROR] [Environ] SET_MESSAGE_EXT: FreeJ2ME system files not found!"
+   ]
+  },
+  "foto": "044 Java ME (celular ant - Shooter.png",
+  "jogar_junto": {
+   "pulado": "O núcleo do Java ME (FreeJ2ME-Plus) não suporta jogo em rede - confirmado tentando hospedar em 15/10/2026, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"): o jogo roda no Java, fora do RetroArch."
+  }
+ },
+ {
+  "console": "MSX",
+  "titulo": "NOBORUNOCA",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 11148,
+   "segundos": 10.8,
+   "travou": false,
+   "erros": []
+  },
+  "foto": "045 MSX - NOBORUNOCA.png",
+  "jogar_junto": {
+   "pulado": "O núcleo do MSX (blueMSX) não suporta jogo em rede - confirmado tentando hospedar em 14/10/2026, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Os 2 jogadores só valem no mesmo computador."
   }
  },
  {
@@ -214,17 +1027,51 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 457257,
-   "segundos": 11.3,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
-  "foto": "015 Mega Drive, Master S - Golden Axe.png",
+  "foto": "046 Mega Drive, Master S - Golden Axe.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
+  }
+ },
+ {
+  "console": "Mega Drive, Master System e Game Gear",
+  "titulo": "KleleAtoms",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 420385,
+   "segundos": 10.9,
+   "travou": false,
    "erros": []
+  },
+  "foto": "047 Mega Drive, Master S - KleleAtoms.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -234,17 +1081,24 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 40997,
-   "segundos": 11.0,
+   "segundos": 10.8,
    "travou": false,
    "erros": []
   },
-  "foto": "016 Mega Drive, Master S - Mega Bomberman.png",
+  "foto": "048 Mega Drive, Master S - Mega Bomberman.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -254,18 +1108,25 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 256111,
-   "segundos": 41.1,
+   "segundos": 40.9,
    "travou": false,
    "erros": [],
    "segunda_vez_com_40s": true
   },
-  "foto": "017 Mega Drive, Master S - Micro Machines 2 Turbo Tournament.png",
+  "foto": "049 Mega Drive, Master S - Micro Machines 2 Turbo Tournament.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -275,17 +1136,24 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 212480,
-   "segundos": 11.0,
+   "segundos": 10.8,
    "travou": false,
    "erros": []
   },
-  "foto": "018 Mega Drive, Master S - Sonic & Knuckles + Sonic the Hedgehog 2.png",
+  "foto": "050 Mega Drive, Master S - Sonic & Knuckles + Sonic the Hedgehog 2.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -295,17 +1163,24 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 464201,
-   "segundos": 11.1,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
-  "foto": "019 Mega Drive, Master S - Sonic the Hedgehog 3.png",
+  "foto": "051 Mega Drive, Master S - Sonic the Hedgehog 3.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -315,17 +1190,51 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 152297,
-   "segundos": 11.0,
+   "segundos": 10.8,
    "travou": false,
    "erros": []
   },
-  "foto": "020 Mega Drive, Master S - Streets of Rage 2.png",
+  "foto": "052 Mega Drive, Master S - Streets of Rage 2.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
+  }
+ },
+ {
+  "console": "MicroW8",
+  "titulo": "Skip Ahead",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 8637,
+   "segundos": 10.8,
+   "travou": false,
    "erros": []
+  },
+  "foto": "053 MicroW8 - Skip Ahead.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -335,17 +1244,24 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 100256,
-   "segundos": 11.6,
+   "segundos": 11.4,
    "travou": false,
    "erros": []
   },
-  "foto": "021 Neo Geo e fliperamas - Metal Slug X - Super Vehicle-001.png",
+  "foto": "054 Neo Geo e fliperamas - Metal Slug X - Super Vehicle-001.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -355,17 +1271,24 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 169621,
-   "segundos": 11.2,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
-  "foto": "022 Neo Geo e fliperamas - Teenage Mutant Ninja Turtles - Turtles i.png",
+  "foto": "055 Neo Geo e fliperamas - Teenage Mutant Ninja Turtles - Turtles i.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -375,17 +1298,24 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 28984,
-   "segundos": 11.4,
+   "segundos": 11.2,
    "travou": false,
    "erros": []
   },
-  "foto": "023 Neo Geo e fliperamas - The King of Fighters '97.png",
+  "foto": "056 Neo Geo e fliperamas - The King of Fighters '97.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -395,17 +1325,53 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 30273,
-   "segundos": 11.5,
+   "segundos": 11.3,
    "travou": false,
    "erros": []
   },
-  "foto": "024 Neo Geo e fliperamas - The King of Fighters 2002.png",
+  "foto": "057 Neo Geo e fliperamas - The King of Fighters 2002.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
+  }
+ },
+ {
+  "console": "Nintendo (NES)",
+  "titulo": "Concentration Room",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 238369,
+   "segundos": 10.8,
+   "travou": false,
+   "erros": [
+    "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented."
+   ]
+  },
+  "foto": "058 Nintendo (NES) - Concentration Room.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": [
+    "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -415,20 +1381,83 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 336143,
-   "segundos": 11.0,
+   "segundos": 10.8,
    "travou": false,
    "erros": [
     "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented."
    ]
   },
-  "foto": "025 Nintendo (NES) - Contra.png",
+  "foto": "059 Nintendo (NES) - Contra.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
    "erros": [
+    "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
+  }
+ },
+ {
+  "console": "Nintendo (NES)",
+  "titulo": "Nova the Squirrel",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 179186,
+   "segundos": 10.8,
+   "travou": false,
+   "erros": [
     "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented."
+   ]
+  },
+  "foto": "060 Nintendo (NES) - Nova the Squirrel.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": [
+    "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
+  }
+ },
+ {
+  "console": "Nintendo (NES)",
+  "titulo": "Thwaite",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 351702,
+   "segundos": 10.8,
+   "travou": false,
+   "erros": [
+    "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented."
+   ]
+  },
+  "foto": "061 Nintendo (NES) - Thwaite.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": [
+    "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
    ]
   }
  },
@@ -438,12 +1467,12 @@
   "jogadores": 4,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 78748,
-   "segundos": 11.8,
+   "foto_bytes": 458042,
+   "segundos": 12.5,
    "travou": false,
    "erros": []
   },
-  "foto": "026 Nintendo 64 - Bomberman 64.png",
+  "foto": "062 Nintendo 64 - Bomberman 64.png",
   "jogar_junto": {
    "pulado": "O núcleo do N64 (Mupen64Plus-Next) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa. Os 4 jogadores só valem no mesmo computador, com 4 controles."
   }
@@ -454,12 +1483,12 @@
   "jogadores": 4,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 324806,
-   "segundos": 12.1,
+   "foto_bytes": 682244,
+   "segundos": 14.4,
    "travou": false,
    "erros": []
   },
-  "foto": "027 Nintendo 64 - Diddy Kong Racing.png",
+  "foto": "063 Nintendo 64 - Diddy Kong Racing.png",
   "jogar_junto": {
    "pulado": "O núcleo do N64 (Mupen64Plus-Next) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa. Os 4 jogadores só valem no mesmo computador, com 4 controles."
   }
@@ -470,12 +1499,12 @@
   "jogadores": 4,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 954050,
-   "segundos": 12.1,
+   "foto_bytes": 1400779,
+   "segundos": 11.8,
    "travou": false,
    "erros": []
   },
-  "foto": "028 Nintendo 64 - F ZERO X.png",
+  "foto": "064 Nintendo 64 - F ZERO X.png",
   "jogar_junto": {
    "pulado": "O núcleo do N64 (Mupen64Plus-Next) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa. Os 4 jogadores só valem no mesmo computador, com 4 controles."
   }
@@ -486,12 +1515,12 @@
   "jogadores": 4,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 50874,
-   "segundos": 11.3,
+   "foto_bytes": 435421,
+   "segundos": 12.7,
    "travou": false,
    "erros": []
   },
-  "foto": "029 Nintendo 64 - GoldenEye 007.png",
+  "foto": "065 Nintendo 64 - GoldenEye 007.png",
   "jogar_junto": {
    "pulado": "O núcleo do N64 (Mupen64Plus-Next) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa. Os 4 jogadores só valem no mesmo computador, com 4 controles."
   }
@@ -502,12 +1531,12 @@
   "jogadores": 4,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 225364,
-   "segundos": 11.5,
+   "foto_bytes": 590887,
+   "segundos": 13.4,
    "travou": false,
    "erros": []
   },
-  "foto": "030 Nintendo 64 - Mario Kart 64.png",
+  "foto": "066 Nintendo 64 - Mario Kart 64.png",
   "jogar_junto": {
    "pulado": "O núcleo do N64 (Mupen64Plus-Next) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa. Os 4 jogadores só valem no mesmo computador, com 4 controles."
   }
@@ -518,12 +1547,12 @@
   "jogadores": 4,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 37075,
-   "segundos": 11.3,
+   "foto_bytes": 406434,
+   "segundos": 12.6,
    "travou": false,
    "erros": []
   },
-  "foto": "031 Nintendo 64 - Mario Party.png",
+  "foto": "067 Nintendo 64 - Mario Party.png",
   "jogar_junto": {
    "pulado": "O núcleo do N64 (Mupen64Plus-Next) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa. Os 4 jogadores só valem no mesmo computador, com 4 controles."
   }
@@ -534,12 +1563,12 @@
   "jogadores": 4,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 125404,
-   "segundos": 11.5,
+   "foto_bytes": 251652,
+   "segundos": 11.8,
    "travou": false,
    "erros": []
   },
-  "foto": "032 Nintendo 64 - Super Smash Bros.png",
+  "foto": "068 Nintendo 64 - Super Smash Bros.png",
   "jogar_junto": {
    "pulado": "O núcleo do N64 (Mupen64Plus-Next) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa. Os 4 jogadores só valem no mesmo computador, com 4 controles."
   }
@@ -568,18 +1597,25 @@
   "jogadores": 4,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 29288,
+   "foto_bytes": 43950,
    "segundos": 21.6,
    "travou": false,
    "erros": []
   },
-  "foto": "036 PlayStation - CTR Crash Team Racing.png",
+  "foto": "072 PlayStation - CTR Crash Team Racing.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -588,18 +1624,25 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 29288,
-   "segundos": 21.6,
+   "foto_bytes": 43950,
+   "segundos": 21.7,
    "travou": false,
    "erros": []
   },
-  "foto": "037 PlayStation - Crash Bandicoot.png",
+  "foto": "073 PlayStation - Crash Bandicoot.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -608,18 +1651,25 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 42018,
+   "foto_bytes": 66502,
    "segundos": 18.8,
    "travou": false,
    "erros": []
   },
-  "foto": "038 PlayStation - Crash Bandicoot 3 Warped.png",
+  "foto": "074 PlayStation - Crash Bandicoot 3 Warped.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -628,18 +1678,25 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 29288,
-   "segundos": 24.9,
+   "foto_bytes": 43950,
+   "segundos": 24.8,
    "travou": false,
    "erros": []
   },
-  "foto": "039 PlayStation - Legacy of Kain Soul Reaver.png",
+  "foto": "075 PlayStation - Legacy of Kain Soul Reaver.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -648,18 +1705,25 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 29288,
+   "foto_bytes": 43950,
    "segundos": 12.2,
    "travou": false,
    "erros": []
   },
-  "foto": "040 PlayStation - Metal Slug X.png",
+  "foto": "076 PlayStation - Metal Slug X.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -668,18 +1732,25 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 29288,
-   "segundos": 22.6,
+   "foto_bytes": 43950,
+   "segundos": 22.9,
    "travou": false,
    "erros": []
   },
-  "foto": "041 PlayStation - Twisted Metal 2.png",
+  "foto": "077 PlayStation - Twisted Metal 2.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -688,18 +1759,25 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 42018,
-   "segundos": 13.3,
+   "foto_bytes": 66502,
+   "segundos": 13.2,
    "travou": false,
    "erros": []
   },
-  "foto": "042 PlayStation - Vigilante 8.png",
+  "foto": "078 PlayStation - Vigilante 8.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -908,24 +1986,6 @@
  },
  {
   "console": "PlayStation 3",
-  "titulo": "Borderlands 2",
-  "jogadores": 2,
-  "situacao": "emulador de fora (RPCS3): testar com o professor"
- },
- {
-  "console": "PlayStation 3",
-  "titulo": "Dead Space 3",
-  "jogadores": 2,
-  "situacao": "emulador de fora (RPCS3): testar com o professor"
- },
- {
-  "console": "PlayStation 3",
-  "titulo": "Diablo III",
-  "jogadores": 4,
-  "situacao": "emulador de fora (RPCS3): testar com o professor"
- },
- {
-  "console": "PlayStation 3",
   "titulo": "Minecraft PlayStation 3 Edition",
   "jogadores": 4,
   "situacao": "emulador de fora (RPCS3): testar com o professor"
@@ -937,23 +1997,17 @@
   "situacao": "emulador de fora (RPCS3): testar com o professor"
  },
  {
-  "console": "PlayStation 3",
-  "titulo": "Resident Evil 5 Gold Edition",
-  "jogadores": 2,
-  "situacao": "emulador de fora (RPCS3): testar com o professor"
- },
- {
   "console": "PlayStation Portable",
   "titulo": "Burnout Legends",
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 430246,
-   "segundos": 12.4,
+   "foto_bytes": 448271,
+   "segundos": 11.9,
    "travou": false,
    "erros": []
   },
-  "foto": "083 PlayStation Portable - Burnout Legends.png",
+  "foto": "115 PlayStation Portable - Burnout Legends.png",
   "jogar_junto": {
    "pulado": "O núcleo do PSP (PPSSPP) não suporta jogo em rede pelo RetroArch - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). O PPSSPP tem rede ad-hoc própria, mas é outro mecanismo, separado do netplay do RetroArch."
   }
@@ -964,12 +2018,12 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 97334,
-   "segundos": 11.2,
+   "foto_bytes": 93036,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
-  "foto": "084 PlayStation Portable - Grand Theft Auto Liberty City Stories.png",
+  "foto": "116 PlayStation Portable - Grand Theft Auto Liberty City Stories.png",
   "jogar_junto": {
    "pulado": "O núcleo do PSP (PPSSPP) não suporta jogo em rede pelo RetroArch - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). O PPSSPP tem rede ad-hoc própria, mas é outro mecanismo, separado do netplay do RetroArch."
   }
@@ -980,12 +2034,12 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 120104,
-   "segundos": 11.3,
+   "foto_bytes": 112903,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
-  "foto": "085 PlayStation Portable - Grand Theft Auto Vice City Stories.png",
+  "foto": "117 PlayStation Portable - Grand Theft Auto Vice City Stories.png",
   "jogar_junto": {
    "pulado": "O núcleo do PSP (PPSSPP) não suporta jogo em rede pelo RetroArch - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). O PPSSPP tem rede ad-hoc própria, mas é outro mecanismo, separado do netplay do RetroArch."
   }
@@ -996,14 +2050,14 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 7933,
-   "segundos": 11.3,
+   "foto_bytes": 6601,
+   "segundos": 11.1,
    "travou": false,
    "erros": [
     "[libretro WARN] [sceDisplay] Video out requested, not supported: mode=0 size=512,272"
    ]
   },
-  "foto": "086 PlayStation Portable - Killzone Liberation.png",
+  "foto": "118 PlayStation Portable - Killzone Liberation.png",
   "jogar_junto": {
    "pulado": "O núcleo do PSP (PPSSPP) não suporta jogo em rede pelo RetroArch - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). O PPSSPP tem rede ad-hoc própria, mas é outro mecanismo, separado do netplay do RetroArch."
   }
@@ -1014,14 +2068,14 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 84025,
-   "segundos": 11.3,
+   "foto_bytes": 19404,
+   "segundos": 11.1,
    "travou": false,
    "erros": [
     "[libretro WARN] [sceDisplay] Video out requested, not supported: mode=0 size=512,272"
    ]
   },
-  "foto": "087 PlayStation Portable - Metal Gear Solid Peace Walker V2 00 USA .png",
+  "foto": "119 PlayStation Portable - Metal Gear Solid Peace Walker V2 00 USA .png",
   "jogar_junto": {
    "pulado": "O núcleo do PSP (PPSSPP) não suporta jogo em rede pelo RetroArch - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). O PPSSPP tem rede ad-hoc própria, mas é outro mecanismo, separado do netplay do RetroArch."
   }
@@ -1032,12 +2086,12 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 1416699,
-   "segundos": 17.6,
+   "foto_bytes": 1537199,
+   "segundos": 17.4,
    "travou": false,
    "erros": []
   },
-  "foto": "088 PlayStation Portable - Monster Hunter Freedom Unite.png",
+  "foto": "120 PlayStation Portable - Monster Hunter Freedom Unite.png",
   "jogar_junto": {
    "pulado": "O núcleo do PSP (PPSSPP) não suporta jogo em rede pelo RetroArch - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). O PPSSPP tem rede ad-hoc própria, mas é outro mecanismo, separado do netplay do RetroArch."
   }
@@ -1048,12 +2102,12 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 448961,
-   "segundos": 11.4,
+   "foto_bytes": 430555,
+   "segundos": 11.2,
    "travou": false,
    "erros": []
   },
-  "foto": "089 PlayStation Portable - Twisted Metal Head On.png",
+  "foto": "121 PlayStation Portable - Twisted Metal Head On.png",
   "jogar_junto": {
    "pulado": "O núcleo do PSP (PPSSPP) não suporta jogo em rede pelo RetroArch - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). O PPSSPP tem rede ad-hoc própria, mas é outro mecanismo, separado do netplay do RetroArch."
   }
@@ -1065,17 +2119,24 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 47656,
-   "segundos": 13.1,
+   "segundos": 12.8,
    "travou": false,
    "erros": []
   },
-  "foto": "090 Sega 32X - Knuckles' Chaotix.png",
+  "foto": "122 Sega 32X - Knuckles' Chaotix.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -1085,17 +2146,24 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 7570,
-   "segundos": 11.0,
+   "segundos": 10.8,
    "travou": false,
    "erros": []
   },
-  "foto": "091 Sega 32X - Star Wars Arcade.png",
+  "foto": "123 Sega 32X - Star Wars Arcade.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -1105,17 +2173,24 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 427566,
-   "segundos": 11.5,
+   "segundos": 11.3,
    "travou": false,
    "erros": []
   },
-  "foto": "092 Sega 32X - Virtua Fighter.png",
+  "foto": "124 Sega 32X - Virtua Fighter.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -1125,17 +2200,24 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 405363,
-   "segundos": 13.2,
+   "segundos": 13.0,
    "travou": false,
    "erros": []
   },
-  "foto": "093 Sega CD - Sonic CD.png",
+  "foto": "125 Sega CD - Sonic CD.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -1145,11 +2227,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 107003,
-   "segundos": 13.4,
+   "segundos": 13.1,
    "travou": false,
    "erros": []
   },
-  "foto": "094 Sega Dreamcast - Armada.png",
+  "foto": "126 Sega Dreamcast - Armada.png",
   "jogar_junto": {
    "pulado": "O núcleo do Dreamcast (Flycast) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Multiplayer só vale no mesmo computador."
   }
@@ -1161,11 +2243,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 58602,
-   "segundos": 13.2,
+   "segundos": 13.0,
    "travou": false,
    "erros": []
   },
-  "foto": "095 Sega Dreamcast - Capcom Vs SNK 2 Millionaire Fighting 200.png",
+  "foto": "127 Sega Dreamcast - Capcom Vs SNK 2 Millionaire Fighting 200.png",
   "jogar_junto": {
    "pulado": "O núcleo do Dreamcast (Flycast) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Multiplayer só vale no mesmo computador."
   }
@@ -1177,13 +2259,13 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 58602,
-   "segundos": 13.2,
+   "segundos": 13.0,
    "travou": false,
    "erros": [
     "[libretro INFO] [BOOT] USA region not supported. Using Europe instead"
    ]
   },
-  "foto": "096 Sega Dreamcast - Gauntlet Legends.png",
+  "foto": "128 Sega Dreamcast - Gauntlet Legends.png",
   "jogar_junto": {
    "pulado": "O núcleo do Dreamcast (Flycast) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Multiplayer só vale no mesmo computador."
   }
@@ -1195,11 +2277,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 58602,
-   "segundos": 13.2,
+   "segundos": 13.0,
    "travou": false,
    "erros": []
   },
-  "foto": "097 Sega Dreamcast - GigaWing 2.png",
+  "foto": "129 Sega Dreamcast - GigaWing 2.png",
   "jogar_junto": {
    "pulado": "O núcleo do Dreamcast (Flycast) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Multiplayer só vale no mesmo computador."
   }
@@ -1211,13 +2293,13 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 58602,
-   "segundos": 13.2,
+   "segundos": 13.0,
    "travou": false,
    "erros": [
     "[libretro INFO] [BOOT] USA region not supported. Using Europe instead"
    ]
   },
-  "foto": "098 Sega Dreamcast - Marvel Vs Capcom 2 New Age of Heroes.png",
+  "foto": "130 Sega Dreamcast - Marvel Vs Capcom 2 New Age of Heroes.png",
   "jogar_junto": {
    "pulado": "O núcleo do Dreamcast (Flycast) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Multiplayer só vale no mesmo computador."
   }
@@ -1229,13 +2311,13 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 58602,
-   "segundos": 13.2,
+   "segundos": 13.0,
    "travou": false,
    "erros": [
     "[libretro INFO] [BOOT] USA region not supported. Using Europe instead"
    ]
   },
-  "foto": "099 Sega Dreamcast - Marvel Vs Capcom Clash of Super Heroes.png",
+  "foto": "131 Sega Dreamcast - Marvel Vs Capcom Clash of Super Heroes.png",
   "jogar_junto": {
    "pulado": "O núcleo do Dreamcast (Flycast) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Multiplayer só vale no mesmo computador."
   }
@@ -1247,17 +2329,24 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 46473,
-   "segundos": 11.7,
+   "segundos": 11.4,
    "travou": false,
    "erros": []
   },
-  "foto": "100 Sega Saturn - Saturn Bomberman.png",
+  "foto": "132 Sega Saturn - Saturn Bomberman.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -1267,17 +2356,24 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 185997,
-   "segundos": 11.2,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
-  "foto": "101 Super Nintendo - BS F ZERO.png",
+  "foto": "133 Super Nintendo - BS F ZERO.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -1287,37 +2383,24 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 185997,
-   "segundos": 11.3,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
-  "foto": "102 Super Nintendo - BS F ZERO Grand Prix 2.png",
+  "foto": "134 Super Nintendo - BS F ZERO Grand Prix 2.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
-  }
- },
- {
-  "console": "Super Nintendo",
-  "titulo": "BS F Zero Deluxe",
-  "jogadores": 2,
-  "abrir": {
-   "abre_e_mostra_imagem": true,
-   "foto_bytes": 346224,
-   "segundos": 11.1,
-   "travou": false,
-   "erros": []
-  },
-  "foto": "103 Super Nintendo - BS F Zero Deluxe.png",
-  "jogar_junto": {
-   "conectou": true,
-   "convidado_diz": "Você se juntou como jogador 2",
-   "recusa_do_nucleo": "",
-   "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -1327,17 +2410,24 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 404304,
-   "segundos": 11.1,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
-  "foto": "104 Super Nintendo - Biker Mice From Mars.png",
+  "foto": "135 Super Nintendo - Biker Mice From Mars.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -1347,17 +2437,24 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 136698,
-   "segundos": 11.1,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
-  "foto": "105 Super Nintendo - Donkey Kong Country.png",
+  "foto": "136 Super Nintendo - Donkey Kong Country.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -1367,17 +2464,24 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 267243,
-   "segundos": 13.1,
+   "segundos": 13.2,
    "travou": false,
    "erros": []
   },
-  "foto": "106 Super Nintendo - Donkey Kong Country 2 Diddy's Kong Quest.png",
+  "foto": "137 Super Nintendo - Donkey Kong Country 2 Diddy's Kong Quest.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -1387,17 +2491,24 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 347705,
-   "segundos": 13.2,
+   "segundos": 13.0,
    "travou": false,
    "erros": []
   },
-  "foto": "107 Super Nintendo - Donkey Kong Country 3 Dixie Kong's Doubl.png",
+  "foto": "138 Super Nintendo - Donkey Kong Country 3 Dixie Kong's Doubl.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -1407,17 +2518,24 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 329805,
-   "segundos": 13.1,
+   "segundos": 12.9,
    "travou": false,
    "erros": []
   },
-  "foto": "108 Super Nintendo - F ZERO.png",
+  "foto": "139 Super Nintendo - F ZERO.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -1427,17 +2545,24 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 291217,
-   "segundos": 11.1,
+   "segundos": 11.6,
    "travou": false,
    "erros": []
   },
-  "foto": "109 Super Nintendo - Goof Troop.png",
+  "foto": "140 Super Nintendo - Goof Troop.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -1447,17 +2572,24 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 158161,
-   "segundos": 11.1,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
-  "foto": "110 Super Nintendo - Killer Instinct.png",
+  "foto": "141 Super Nintendo - Killer Instinct.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -1467,17 +2599,24 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 2073,
-   "segundos": 11.0,
+   "segundos": 10.8,
    "travou": false,
    "erros": []
   },
-  "foto": "111 Super Nintendo - Mickey To Donald Magical Adventure 3.png",
+  "foto": "142 Super Nintendo - Mickey To Donald Magical Adventure 3.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -1487,37 +2626,24 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 103061,
-   "segundos": 13.0,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
-  "foto": "112 Super Nintendo - Mortal Kombat 3.png",
+  "foto": "143 Super Nintendo - Mortal Kombat 3.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
-  }
- },
- {
-  "console": "Super Nintendo",
-  "titulo": "Mortal Kombat 3",
-  "jogadores": 2,
-  "abrir": {
-   "abre_e_mostra_imagem": true,
-   "foto_bytes": 103061,
-   "segundos": 11.0,
-   "travou": false,
-   "erros": []
-  },
-  "foto": "113 Super Nintendo - Mortal Kombat 3.png",
-  "jogar_junto": {
-   "conectou": true,
-   "convidado_diz": "Você se juntou como jogador 2",
-   "recusa_do_nucleo": "",
-   "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -1527,17 +2653,24 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 417221,
-   "segundos": 11.2,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
-  "foto": "114 Super Nintendo - Ninja Gaiden Trilogy.png",
+  "foto": "144 Super Nintendo - Ninja Gaiden Trilogy.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -1547,17 +2680,24 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 2073,
-   "segundos": 13.0,
+   "segundos": 12.8,
    "travou": false,
    "erros": []
   },
-  "foto": "115 Super Nintendo - Rock N' Roll Racing.png",
+  "foto": "145 Super Nintendo - Rock N' Roll Racing.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -1567,17 +2707,24 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 2073,
-   "segundos": 11.0,
+   "segundos": 10.8,
    "travou": false,
    "erros": []
   },
-  "foto": "116 Super Nintendo - Street Fighter II Turbo Hyper Fighting.png",
+  "foto": "146 Super Nintendo - Street Fighter II Turbo Hyper Fighting.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -1587,17 +2734,24 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 97479,
-   "segundos": 11.0,
+   "segundos": 10.8,
    "travou": false,
    "erros": []
   },
-  "foto": "117 Super Nintendo - Super Bomberman 4.png",
+  "foto": "147 Super Nintendo - Super Bomberman 4.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -1607,17 +2761,24 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 235564,
-   "segundos": 11.1,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
-  "foto": "118 Super Nintendo - Super Mario Kart.png",
+  "foto": "148 Super Nintendo - Super Mario Kart.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -1627,17 +2788,24 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 434351,
-   "segundos": 11.2,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
-  "foto": "119 Super Nintendo - Super Mario World.png",
+  "foto": "149 Super Nintendo - Super Mario World.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -1647,17 +2815,24 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 59118,
-   "segundos": 11.0,
+   "segundos": 10.8,
    "travou": false,
    "erros": []
   },
-  "foto": "120 Super Nintendo - Top Gear 3000.png",
+  "foto": "150 Super Nintendo - Top Gear 3000.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+   ]
   }
  },
  {
@@ -1679,21 +2854,42 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 11185,
-   "segundos": 13.1,
+   "segundos": 12.8,
    "travou": false,
    "erros": [
     "[ERROR] [Disc] Failed to set initial disc index. Expected #1 \"\", Detected #1 \"\"."
    ]
   },
-  "foto": "123 ZX Spectrum - Match Day II.png",
+  "foto": "153 ZX Spectrum - Match Day II.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
    "erros": [
-    "[ERROR] [Disc] Failed to set initial disc index. Expected #1 \"\", Detected #1 \"\"."
+    "[ERROR] [Disc] Failed to set initial disc index. Expected #1 \"\", Detected #1 \"\".",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
+    "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
    ]
+  }
+ },
+ {
+  "console": "ZX81",
+  "titulo": "Factory 2023",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 16258,
+   "segundos": 12.8,
+   "travou": false,
+   "erros": []
+  },
+  "foto": "154 ZX81 - Factory 2023.png",
+  "jogar_junto": {
+   "pulado": "O núcleo do ZX81 (EightyOne) não suporta jogo em rede - confirmado tentando hospedar em 14/10/2026, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Os 2 jogadores só valem no mesmo computador."
   }
  }
 ]

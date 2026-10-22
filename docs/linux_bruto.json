@@ -1,5 +1,5 @@
 {
- "quando": "2026-10-21 14:01:46",
+ "quando": "2026-10-22 00:59:10",
  "partes": [
   "A",
   "B",
@@ -21,10 +21,10 @@
    "imagem": true,
    "detalhe": "1575x1080, 215 cores, a mais comum em 96%",
    "travou": false,
-   "segundos": 30.8,
+   "segundos": 30.7,
    "pela_ponte": false,
    "quadros": 1800,
-   "quadros_por_segundo": 58.5
+   "quadros_por_segundo": 58.6
   },
   {
    "parte": "B",
@@ -34,10 +34,10 @@
    "imagem": true,
    "detalhe": "1575x1080, 215 cores, a mais comum em 96%",
    "travou": false,
-   "segundos": 30.5,
+   "segundos": 30.6,
    "pela_ponte": false,
    "quadros": 1800,
-   "quadros_por_segundo": 59.0
+   "quadros_por_segundo": 58.8
   },
   {
    "parte": "A",
@@ -63,7 +63,7 @@
    "segundos": 15.2,
    "pela_ponte": false,
    "quadros": 900,
-   "quadros_por_segundo": 59.2
+   "quadros_por_segundo": 59.1
   },
   {
    "parte": "A",
@@ -73,10 +73,10 @@
    "imagem": true,
    "detalhe": "1439x1079, 3412 cores, a mais comum em 60%",
    "travou": false,
-   "segundos": 30.4,
+   "segundos": 30.5,
    "pela_ponte": false,
    "quadros": 1500,
-   "quadros_por_segundo": 49.3
+   "quadros_por_segundo": 49.2
   },
   {
    "parte": "B",
@@ -180,7 +180,7 @@
    "segundos": 24.3,
    "pela_ponte": false,
    "quadros": 1200,
-   "quadros_por_segundo": 49.3
+   "quadros_por_segundo": 49.4
   },
   {
    "parte": "B",
@@ -232,7 +232,7 @@
    "segundos": 30.2,
    "pela_ponte": false,
    "quadros": 1500,
-   "quadros_por_segundo": 49.6
+   "quadros_por_segundo": 49.7
   },
   {
    "parte": "B",
@@ -255,10 +255,10 @@
    "imagem": true,
    "detalhe": "540x720, 256 cores, a mais comum em 91%",
    "travou": false,
-   "segundos": 16.0,
+   "segundos": 16.2,
    "pela_ponte": false,
    "quadros": 900,
-   "quadros_por_segundo": 56.1
+   "quadros_por_segundo": 55.6
   },
   {
    "parte": "B",
@@ -268,10 +268,10 @@
    "imagem": true,
    "detalhe": "540x720, 256 cores, a mais comum em 91%",
    "travou": false,
-   "segundos": 15.5,
+   "segundos": 15.6,
    "pela_ponte": true,
    "quadros": 900,
-   "quadros_por_segundo": 57.9
+   "quadros_por_segundo": 57.7
   },
   {
    "parte": "A",
@@ -294,10 +294,10 @@
    "imagem": true,
    "detalhe": "960x720, 98 cores, a mais comum em 75%, (90, 40, 0)",
    "travou": false,
-   "segundos": 10.3,
+   "segundos": 10.2,
    "pela_ponte": false,
    "quadros": 600,
-   "quadros_por_segundo": 58.4
+   "quadros_por_segundo": 58.6
   },
   {
    "parte": "A",
@@ -310,7 +310,7 @@
    "segundos": 30.3,
    "pela_ponte": false,
    "quadros": 1500,
-   "quadros_por_segundo": 49.6
+   "quadros_por_segundo": 49.5
   },
   {
    "parte": "B",
@@ -336,7 +336,7 @@
    "segundos": 30.5,
    "pela_ponte": false,
    "quadros": 1500,
-   "quadros_por_segundo": 49.2
+   "quadros_por_segundo": 49.1
   },
   {
    "parte": "B",
@@ -346,10 +346,10 @@
    "imagem": true,
    "detalhe": "911x689, 918 cores, a mais comum em 56%, (122, 65, 50)",
    "travou": false,
-   "segundos": 30.4,
+   "segundos": 30.5,
    "pela_ponte": false,
    "quadros": 1500,
-   "quadros_por_segundo": 49.3
+   "quadros_por_segundo": 49.2
   },
   {
    "parte": "A",
@@ -359,10 +359,10 @@
    "imagem": true,
    "detalhe": "480x480, 12 cores, a mais comum em 67%, (0, 0, 0)",
    "travou": false,
-   "segundos": 5.1,
+   "segundos": 5.2,
    "pela_ponte": false,
    "quadros": 300,
-   "quadros_por_segundo": 58.6
+   "quadros_por_segundo": 58.0
   },
   {
    "parte": "B",
@@ -437,7 +437,7 @@
   "processador": null,
   "driver_video": "vulkan"
  },
- "servidor_memoria_mb": 45.9,
+ "servidor_memoria_mb": 46.2,
  "jogo_abriu_s": 8.5,
  "tela_do_jogo": {
   "largura": 1280,
@@ -445,14 +445,14 @@
   "cores": 2,
   "a_mais_comum": 0.783
  },
- "retroarch_memoria_mb": 144.4,
+ "retroarch_memoria_mb": 146.0,
  "sessoes_encerradas": 1,
  "arena_sh_abriu_s": 0.6,
  "arena_sh_cache": [
   "python-3.13-32338272",
   "retroarch-10390008.montando-1254"
  ],
- "arena_sh_saida": "quina modesta ou midia removivel)\n            rede a cada 60s, copia a cada 15 min\n  Video:    placa de video desconhecida (integrada)\n  Imagem:   nota 4/5, placa 4/5, 77 ajustes, escala da tela com filtro (pixel nitido no 2D, nitidez no 3D)\n  Rede:     fechada (so este computador)\n  Endereco: http://127.0.0.1:8791\n  Para encerrar, feche esta janela.\n==============================================================\n\n  Encerrando...\n[ARENA] O Vulkan desta maquina nao enxerga placa de video: motor automatico trocado para glcore.\n  Pronto. Pode retirar o pen drive com seguranca.\n\n  ARENA encerrado.\n",
+ "arena_sh_saida": "inux 6.18.54.1) (x86_64, 64 bits)\n  Video:    motor detectado -> vulkan\n  Modo:     economico (maquina modesta ou midia removivel)\n            rede a cada 60s, copia a cada 15 min\n  Video:    placa de video desconhecida (integrada)\n  Imagem:   nota 4/5, placa 4/5, 77 ajustes, escala da tela com filtro (pixel nitido no 2D, nitidez no 3D)\n  Rede:     fechada (so este computador)\n  Endereco: http://127.0.0.1:8791\n  Para encerrar, feche esta janela.\n==============================================================\n\n  Encerrando...\n  Pronto. Pode retirar o pen drive com seguranca.\n\n  ARENA encerrado.\n",
  "verificar_sh": "RESUMO\n============================================================\n  Tudo certo:   12\n  Consertado:   0\n  Atencao:      3\n  Grave:        0\n   [atencao]   pasta faltando: jogos/livres\n   [atencao]   pasta faltando: jogos/turma\n   [atencao]   faltam os arquivos de apoio do Dolphin (retroarch\\system\\dolphin-emu\\Sys)\n\n  Nada a consertar. O ARENA esta saudavel.\n\n  (modo so conferir: nada foi alterado)\n\n  ---\n  Para testes automatizados:  sh RODAR_TESTES.sh\n\n",
  "externos": {
   "PCSX2": {
@@ -477,7 +477,7 @@
    "programa": "/home/aluno/.cache/arena/xenia-17832440/AppRun"
   }
  },
- "segundos": 660.4,
+ "segundos": 661.1,
  "falhas": [],
- "segundos_com_o_conteiner": 665.3
+ "segundos_com_o_conteiner": 668.4
 }

@@ -3,7 +3,7 @@
     "console": "Nintendo 64",
     "jogo": "Bomberman 64 (USA).n64",
     "abre_e_mostra_imagem": true,
-    "tamanho_captura_bytes": 72168,
+    "tamanho_captura_bytes": 454502,
     "salva_estado": true,
     "carrega_sem_travar": true
   },
@@ -27,7 +27,7 @@
     "console": "PlayStation",
     "jogo": "CTR - Crash Team Racing (USA).bin",
     "abre_e_mostra_imagem": true,
-    "tamanho_captura_bytes": 7105,
+    "tamanho_captura_bytes": 11139,
     "salva_estado": true,
     "carrega_sem_travar": true
   },
@@ -35,7 +35,7 @@
     "console": "Dreamcast",
     "jogo": "Marvel vs. Capcom 2 - New Age of Heroes (Europe).cue",
     "abre_e_mostra_imagem": true,
-    "tamanho_captura_bytes": 25900,
+    "tamanho_captura_bytes": 26165,
     "salva_estado": true,
     "carrega_sem_travar": true
   },
@@ -51,7 +51,7 @@
     "console": "PSP",
     "jogo": "Killzone - Liberation (USA) (En,Fr,De,Es,It,Nl,Pl,Ru).iso",
     "abre_e_mostra_imagem": true,
-    "tamanho_captura_bytes": 41645,
+    "tamanho_captura_bytes": 39062,
     "salva_estado": true,
     "carrega_sem_travar": true
   }
