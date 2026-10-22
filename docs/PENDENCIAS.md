@@ -164,18 +164,34 @@ Depois do Release, nesta ordem:
     - do computador de testes: a porta UDP 55436 reservada pelo Windows (4
       testes da descoberta de colegas e da partida), o mamedev.org fora do
       ar (a biblioteca livre) e um jogo que estava fora da pasta (o BS
-      F-Zero Deluxe, já recolocado pelo Rafael em 22/10).
-18. **A investigar:** o orçamento 1b do modo alvo (do `arena.py` até os
-    dados da tela) estourou duas vezes, 3,2 e 3,05 s, para o teto de 2,3 s;
-    a abertura sentida (1a) ficou em 1,36 s, dentro dos 10 s. O servidor
-    sozinho, no mesmo modo, entrega os dados em 0,8 a 1,0 s; a conferência
-    das portas reservadas não pesa; o navegador continua o Edge. Neste
-    computador rodam, desde depois da rodada de 16/10 (quando o 1b
-    passou), o papel de parede animado da área de trabalho, pelo Lively
-    (instalado em 19/10), e o fundo animado do ARENA em "sempre", com o
-    tema claro de 20/10. Os dois disputam o processador com a caixa do modo
-    alvo: são a causa provável. Próximo passo: medir de novo com o Lively
-    pausado e o fundo no automático, e depois com cada um ligado.
+      F-Zero Deluxe). Depois do reinício de 22/10, com a porta livre e o
+      jogo de volta, os 4 de rede passaram e o das BIOS deu 19 de 19. Só a
+      biblioteca livre espera o mamedev.org voltar (às 5h50 de 22/10 ele
+      ainda não respondia).
+18. **Investigado (22/10): não é defeito do ARENA.** O orçamento 1b do modo
+    alvo (do `arena.py` até os dados da tela, teto de 2,3 s) estourou três
+    vezes: 3,2 e 3,05 s na rodada de 21/10 e 3,27 s às 6h24 de 22/10, já
+    com o Lively parado (então ele não era a causa). A prova por
+    eliminação, às 10h45 de 22/10, com o ARENA na caixa do modo alvo:
+    - o servidor sozinho, sem janela: de 0,70 a 0,84 s;
+    - a tela aberta por um Edge de fora da caixa: de 0,68 a 0,72 s;
+    - como o aluno abre (o ARENA abre o Edge de dentro da caixa): de 0,84
+      a 1,14 s;
+    - o medidor também dentro da caixa, com o mesmo laço do teste: de 0,61
+      a 1,14 s;
+    - dentro da caixa, o `/api/estado` inteiro custa uns 30 ms na primeira
+      chamada, e o catálogo, uns 140 ms.
+
+    Repetido logo depois, o `teste_orcamentos_modo_alvo.py` passou
+    inteiro: 1b em 0,8 s e 1a em 0,81 s. Também não foi a recompilação do
+    `arena.py`: o bytecode já estava pronto desde a 01h41. Causa provável:
+    carga do computador na hora (às 6h24, 40 minutos depois do reinício e
+    logo depois de gerar os documentos das aulas). A caixa prende o ARENA
+    nos processadores 0 e 1, em prioridade abaixo do normal, e o trabalho
+    do Windows nesses dois passa na frente. O fundo animado não muda a
+    conta: nesta máquina ele anima também no "automático". Regra que fica
+    (`docs\MAQUINA-ALVO.md`, seção 7): medir com o computador sem carga e,
+    se o 1b estourar, repetir antes de procurar a causa no ARENA.
 
 Achado de 16/10, consertado em 18/10: as faixas de porta que o Windows
 reserva a cada reinício (Hyper-V, WSL, Docker). O `VERIFICAR.bat`, o
@@ -183,11 +199,6 @@ reserva a cada reinício (Hyper-V, WSL, Docker). O `VERIFICAR.bat`, o
 (`servidor\portas.py`, sem administrador) e explicam o que fazer (guia 5).
 
 ## Depende do Rafael
-
-- **A porta UDP 55436 que o Windows reservou neste reinício** (a faixa
-  55369 a 55468): a descoberta de colegas não abre neste computador, e 4
-  testes falham por isso (a descoberta e a partida aparecendo). Reiniciar o
-  Windows costuma trocar as faixas; o guia 5 explica o que fazer.
 
 - **O teste no Chromebook da escola** (item 12, `docs/CHROMEBOOK.md`, "O
   teste no Chromebook da escola"): abrir o `ARENA-CHROMEBOOK.html` do pen

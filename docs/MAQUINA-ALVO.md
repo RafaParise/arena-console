@@ -305,6 +305,15 @@ núcleo é 2,3 vezes mais forte. Como ficou:
   teto 64). Causa: o índice de títulos de fliperama criado no mesmo dia (+13
   MB). Consertado (busca direta no banco, bancos soltos depois da lista):
   43,9 MB. Depois: nenhum orçamento estourado.
+- **Alarme falso de 21 e 22/10/2026 (o 1b):** a abertura do servidor deu
+  3,05 a 3,27 s (teto 2,3) e, repetida às 10h50 de 22/10, 0,8 s. Separado
+  por eliminação: o servidor na caixa, com ou sem a tela, com o Edge aberto
+  de dentro ou de fora dela e com o medidor dentro, ficou de 0,61 a 1,14 s.
+  A caixa prende o ARENA nos processadores 0 e 1, em prioridade abaixo do
+  normal: o trabalho do Windows nesses dois (logo depois de reiniciar, um
+  papel de parede animado, outro teste) passa na frente. **Regra:** medir
+  com o computador sem carga e, se o 1b estourar, repetir antes de procurar
+  a causa no ARENA (`docs\PENDENCIAS.md`, item 18).
 
 **O que mudou na régua do projeto:** ela deixou de depender só da coleta na
 escola — toda mudança agora pode ser medida aqui, com os limites do
