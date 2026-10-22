@@ -3158,5 +3158,5 @@ window.ARENA_DADOS = {
    2.0
   ]
  },
- "versao": "2026.10.16"
+ "versao": "2026.10.22"
 };

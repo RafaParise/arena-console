@@ -62,7 +62,7 @@ Ele nasceu nas aulas do curso técnico de **Desenvolvimento de Sistemas**
 
 ## Baixar e usar
 
-1. Baixe o arquivo **`ARENA-2026.10.16.zip`** (uns 530 MB; descompactado, 1,4 GB) na página
+1. Baixe o arquivo **`ARENA-2026.10.22.zip`** (uns 1.065 MB; descompactado, 2,6 GB) na página
    [**Releases**](https://github.com/RafaParise/arena-console/releases/latest).
 2. **Antes de descompactar, desbloqueie o arquivo:** botão direito no `.zip`
    → **Propriedades** → marque **Desbloquear** (embaixo, em "Segurança") →
@@ -83,7 +83,7 @@ Ele nasceu nas aulas do curso técnico de **Desenvolvimento de Sistemas**
    jogos**, que diz a pasta, os formatos e o que falta para cada console.
 
 **Já usa o ARENA?** Para atualizar sem perder nada, baixe o
-`ARENA-2026.10.16-atualizacao.zip` (só o programa, uns 12 MB) e descompacte
+`ARENA-2026.10.22-atualizacao.zip` (só o programa, uns 104 MB) e descompacte
 no mesmo lugar, substituindo os arquivos: o passo a passo está no
 [guia 6](6-RECURSOS-E-REPARO.md). O pacote completo é para instalar do zero.
 O Java ME e o GameCube e o Wii dentro do RetroArch precisam de arquivos que
