@@ -71,6 +71,11 @@ ROTAS_LENTAS = {"/api/barreiras": 60}
 ROTAS_DA_INTERNET = {"/api/capa/atualizar": 60, "/api/biblioteca-online": 30}
 
 
+# A linha do pedido que o http.server do Python aceita (BaseHTTPRequestHandler
+# le no maximo 65536 bytes; passou disso, responde 414 e fecha).
+LINHA_MAXIMA = 65536
+
+
 def requisicao(metodo, caminho, corpo=None, timeout=5):
     url = ENDERECO + caminho
     dados = None
@@ -84,9 +89,24 @@ def requisicao(metodo, caminho, corpo=None, timeout=5):
             texto = resp.read().decode("utf-8", errors="replace")
             return resp.status, texto
     except urllib.error.HTTPError as e:
-        texto = e.read().decode("utf-8", errors="replace")
+        try:
+            texto = e.read().decode("utf-8", errors="replace")
+        except (ConnectionResetError, ConnectionAbortedError, BrokenPipeError):
+            # O 414 chegou, mas o servidor fecha a conexao logo depois e o
+            # Windows corta a leitura do resto da pagina (rodada de 21/10/2026).
+            # O codigo da resposta ja diz tudo.
+            texto = "conexao cortada pelo servidor depois da resposta %d" % e.code
         return e.code, texto
     except (urllib.error.URLError, TimeoutError, ConnectionError) as e:
+        motivo = getattr(e, "reason", e)
+        if len(caminho) > LINHA_MAXIMA and isinstance(motivo, (ConnectionResetError, ConnectionAbortedError,
+                                                                BrokenPipeError)):
+            # O http.server le so os primeiros 64 KB da linha do pedido,
+            # responde 414 e fecha; o resto do endereco ainda estava saindo, e
+            # o Windows corta a conexao antes de a resposta chegar (depende do
+            # tempo: passou numa rodada e falhou na seguinte, 21/10/2026). E' a
+            # mesma recusa cedo do 414. Tempo esgotado continua sendo falha.
+            return 414, "conexao cortada pelo servidor depois do 414 (endereco grande demais)"
         return None, str(e)
 
 

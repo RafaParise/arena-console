@@ -25,7 +25,6 @@ import importlib.util
 import json
 import os
 import socket
-import subprocess
 import sys
 import tempfile
 
@@ -98,17 +97,21 @@ def main():
                 itens and itens[0].get("plataforma") == "dos" and itens[0].get("plataforma_nome") == "MS-DOS", itens)
 
         print("2. O jogo baixado vai para o console certo")
-        real_run = ia.subprocess.run
+        # O download passa pelo servidor\baixar.py desde 17/10/2026 (o curl
+        # quando ha, senao o proprio Python): o falso entra no lugar dele.
+        real_rodar = ia.baixar.rodar
 
-        def curl_falso(comando, **kwargs):
-            destino = comando[comando.index("-o") + 1]
-            open(destino, "wb").write(conteudo)
-            return subprocess.CompletedProcess(comando, 0)
-        ia.subprocess.run = curl_falso
+        def baixar_falso(url, segundos, destino=None, **_extras):
+            if destino:
+                with open(destino, "wb") as arquivo:
+                    arquivo.write(conteudo)
+                return 0, b""
+            return 0, conteudo
+        ia.baixar.rodar = baixar_falso
         try:
             resultado = ia.instalar("jogo_com_mario", "mario.zip", "snes")   # a tela nao manda no console
         finally:
-            ia.subprocess.run = real_run
+            ia.baixar.rodar = real_rodar
         baixado = os.path.join(livres, "MS-DOS", "mario.zip")
         confere("baixado em jogos\\livres\\MS-DOS (nao em 'Internet Archive', nem no console pedido)",
                 os.path.isfile(baixado) and not os.path.exists(os.path.join(livres, "Internet Archive")),

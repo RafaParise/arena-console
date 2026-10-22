@@ -5,14 +5,14 @@
      recusado, arquivo nao fica instalado.
   3. caminho feliz -- baixa normal quando tudo bate.
 
-Monkeypatcha _ler() e subprocess.run() -- nao depende de rede de verdade.
-Usa uma pasta isolada, nao mexe em jogos\\livres real.
+Monkeypatcha _ler() e baixar.rodar() (o download passa por ele desde
+17/10/2026: o curl quando ha, senao o proprio Python) -- nao depende de rede
+de verdade. Usa uma pasta isolada, nao mexe em jogos\\livres real.
 """
 import hashlib
 import importlib.util
 import os
 import shutil
-import subprocess
 import sys
 import tempfile
 
@@ -26,6 +26,17 @@ def carregar(destino_livres):
     spec.loader.exec_module(ia)
     ia.PASTA_LIVRES = destino_livres
     return ia
+
+
+def baixar_que_grava(dados):
+    """O falso do baixar.rodar que grava 'dados' no arquivo de destino."""
+    def rodar(url, segundos, destino=None, **_extras):
+        if destino:
+            with open(destino, "wb") as arquivo:
+                arquivo.write(dados)
+            return 0, b""
+        return 0, dados
+    return rodar
 
 
 def meta_falsa(conteudo, nome_arquivo="jogo.zip"):
@@ -47,9 +58,9 @@ def main():
         ia = carregar(destino_livres)
         ia._ler = lambda url: meta
 
-        def run_falha(*args, **kwargs):
-            raise subprocess.CalledProcessError(1, "curl.exe")
-        ia.subprocess.run = run_falha
+        def baixar_falha(url, segundos, destino=None, **_extras):
+            return 56, b""      # o codigo do curl para a conexao que caiu no meio
+        ia.baixar.rodar = baixar_falha
 
         try:
             ia.instalar("item-teste", "jogo.zip")
@@ -68,13 +79,7 @@ def main():
         ia._ler = lambda url: meta
 
         conteudo_errado = b"CONTEUDO TROCADO, NAO E O DECLARADO NO METADADO"
-
-        def run_conteudo_errado(cmd, **kwargs):
-            destino_arquivo = cmd[cmd.index("-o") + 1]
-            with open(destino_arquivo, "wb") as f:
-                f.write(conteudo_errado)
-            return subprocess.CompletedProcess(cmd, 0)
-        ia.subprocess.run = run_conteudo_errado
+        ia.baixar.rodar = baixar_que_grava(conteudo_errado)
 
         try:
             ia.instalar("item-teste", "jogo.zip")
@@ -92,12 +97,7 @@ def main():
         ia = carregar(destino_livres)
         ia._ler = lambda url: meta
 
-        def run_conteudo_certo(cmd, **kwargs):
-            destino_arquivo = cmd[cmd.index("-o") + 1]
-            with open(destino_arquivo, "wb") as f:
-                f.write(conteudo)
-            return subprocess.CompletedProcess(cmd, 0)
-        ia.subprocess.run = run_conteudo_certo
+        ia.baixar.rodar = baixar_que_grava(conteudo)
 
         try:
             resultado = ia.instalar("item-teste", "jogo.zip")
