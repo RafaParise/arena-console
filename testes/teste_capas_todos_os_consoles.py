@@ -150,8 +150,11 @@ def main():
                 capas_do_disco.icone_do_disco(iso, "ps3") is None)
         halo = os.path.join(P, "XBOX360", "Halo 3 (Brazil) (En,Ja,Fr,De,Es,It,Pt,Zh,Ko).iso")
         if os.path.isfile(halo):
-            confere("Xbox 360 de verdade: Title ID do Halo 3 = 4D5307E6",
-                    capas_do_disco.title_id_do_xbox360(halo) == "4D5307E6", capas_do_disco.title_id_do_xbox360(halo))
+            # A capa oficial do Xbox 360 so vinha por http, sem criptografia, e
+            # saiu em 22/10/2026 (achado F4 da auditoria 4): nada mais baixa
+            # pelo disco do Xbox 360.
+            confere("Xbox 360 de verdade: nenhuma capa por http (a fonte sem criptografia saiu)",
+                    capas_online.capa_pelo_disco("xbox360", "Halo 3", halo) is None)
         mkwii = os.path.join(P, "Wii", "Mario Kart Wii (USA) (En,Fr,Es).rvz")
         if os.path.isfile(mkwii):
             confere("Wii de verdade (.rvz): codigo RMCE01", capas_do_disco.id_do_disco_nintendo(mkwii) == "RMCE01")
@@ -212,14 +215,13 @@ def main():
         finally:
             servidor_de_teste.derrubar(processo)
 
-        print("6. Com internet: PS2, Xbox 360 e GameCube de verdade")
+        print("6. Com internet: PS2 e GameCube de verdade")
         if not internet:
             print("  (sem internet agora: pulado)")
         else:
             capas_online.PASTA_MINIATURAS = os.path.join(pasta, "miniaturas")
             for console, arquivo, titulo, extensao in (
                     ("ps2", os.path.join(P, "PS2", "Crash Nitro Kart (USA).chd"), "Crash Nitro Kart", ".png"),
-                    ("xbox360", halo, "Halo 3", ".jpg"),
                     ("gamecube", os.path.join(P, "GameCube", "MKDD 3-4 Grand Prix.iso"), "MKDD 3 4 Grand Prix", ".png")):
                 if not os.path.isfile(arquivo):
                     print("  (sem %s: pulado)" % os.path.basename(arquivo))

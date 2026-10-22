@@ -62,7 +62,7 @@ De onde a capa vem:
 |---|---|
 | Quase todos (NES ao PS2, fliperama, MSX, Amiga, DOS...) | O banco de capas do próprio RetroArch (libretro-thumbnails, o do Atualizador Online dele). O ARENA baixa a lista do console e acha o jogo pelo nome **parecido**, na região do arquivo |
 | PS3 e PSP | Se o banco não tiver: o **ícone que vem dentro do disco** (`.iso`). Funciona **sem internet** |
-| Xbox 360 | Se o banco não tiver: a capa oficial do servidor do Xbox 360 (Microsoft), pelo código do jogo que fica no disco |
+| Xbox 360 | Só o banco do RetroArch. A capa oficial do servidor do Xbox 360 (Microsoft) saiu em 22/10/2026: ele só responde sem criptografia, e alguém na rede da escola poderia trocar a imagem no caminho |
 | GameCube e Wii | Se o banco não tiver: o GameTDB, de onde o próprio Dolphin baixa as capas, pelo código do disco |
 | Uzebox, Tamagotchi e Java ME | Não existe banco: só a capa que você colocar |
 

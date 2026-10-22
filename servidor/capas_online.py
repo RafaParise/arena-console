@@ -471,11 +471,11 @@ def capa_pelo_disco(plataforma_id, titulo_limpo, caminho_jogo, com_internet=True
             return "o ícone que vem no disco"
     if not com_internet:
         return None
-    if plataforma_id == "xbox360":
-        title_id = capas_do_disco.title_id_do_xbox360(caminho_jogo)
-        if title_id and _baixar_imagem([capas_do_disco.url_capa_xbox360(title_id)],
-                                       os.path.join(pasta, nome + ".jpg"), b"\xff\xd8\xff"):
-            return "a capa oficial do Xbox 360 (Microsoft)"
+    # A capa oficial do Xbox 360 saiu em 22/10/2026 (achado F4 da auditoria 4,
+    # pelo Claude Security): o servidor de imagens da Microsoft so responde
+    # sem criptografia (http), e quem esta no caminho da rede da escola
+    # trocaria a capa por qualquer imagem. O Xbox 360 fica com o banco do
+    # RetroArch, como os outros consoles.
     if plataforma_id in ("gamecube", "wii"):
         codigo = capas_do_disco.id_do_disco_nintendo(caminho_jogo)
         if codigo and _baixar_imagem(capas_do_disco.urls_capa_nintendo(codigo),
