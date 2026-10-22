@@ -37,6 +37,14 @@ LIMITES_ESPECIAIS = {
     # Abre CADA jogo de PS2 da pasta (37 em 10/10/2026), ~20 s cada, mais os
     # niveis de qualidade em 3 jogos; o jogo que nao comeca espera 60 s.
     os.path.join("testes", "teste_ps2_todos_os_jogos.py"): 2700,
+    # O Linux no conteiner do WSL (11 min em 21/10/2026: monta a copia, 32
+    # aberturas, o servidor, o ARENA.sh e os emuladores de fora) e o Android
+    # no emulador (uns 7 min, com o Android ligando a frio).
+    os.path.join("testes", "teste_linux.py"): 1800,
+    os.path.join("testes", "teste_android.py"): 1500,
+    # Cada console, em cada nivel do grafico: 676 s em 16/10/2026; em
+    # 21/10 passou dos 15 min e foi cortado no Mega Drive.
+    os.path.join("testes", "teste_matriz_consoles.py"): 2400,
 }
 
 # Arquivos DE VERDADE que nenhum teste deveria mudar. O retroarch.cfg volta
@@ -68,6 +76,9 @@ FORA_DA_RODADA = {
         "investigacao do PCSX2 (26/09): pede um PCSX2.ini de base e a foto",
     os.path.join("testes", "teste_xenia_abre.py"):
         "investigacao do Xenia (26/09): pede o jogo, o .exe e a foto",
+    os.path.join("testes", "teste_sistemas_virtuais.py"):
+        "medida do item 15 (21/10/2026), nao teste de passa ou falha: o Windows, o Linux do conteiner e o "
+        "Android, em mais de 15 min, e regrava os numeros publicados (docs\\sistemas_virtuais_bruto.json)",
 }
 
 # Achado de 01/10/2026: a rodada caiu no meio porque um teste escreveu
