@@ -6,6 +6,7 @@ servidor\\android_inicio.py).
 O Android e' imitado aqui trocando plataforma.ANDROID (e WINDOWS), e o app
 pelo outro lado do fio: um leitor que responde como o ArenaServico.java. O
 teste de verdade, no aparelho virtual, e' testes\\teste_android.py."""
+import http.client
 import io
 import json
 import os
@@ -500,6 +501,28 @@ class RotasDoAndroid(unittest.TestCase):
             self.assertEqual(self.pedir("/api/android/pasta", {"caminho": self.arena_do_cartao},
                                         cookie=cookie)[0], 403, cookie)
         self.assertEqual(self.escolhas, [])
+
+    def test_outro_app_por_outro_127_nao_escapa_do_segredo(self):
+        # Achado F3 da auditoria 4 (Claude Security): o app que liga o
+        # proprio soquete em 127.0.0.2 e conecta no 127.0.0.1 passava por
+        # "outro computador" e chegava sem o segredo as rotas abertas a rede.
+        for rota, dados in (("/api/ranking", None), ("/api/colegas", None),
+                            ("/api/sinc/receber", {"placares": [], "sessoes": []})):
+            conexao = http.client.HTTPConnection("127.0.0.1", self.porta, timeout=10,
+                                                 source_address=("127.0.0.2", 0))
+            try:
+                corpo = json.dumps(dados).encode("utf-8") if dados is not None else None
+                conexao.request("POST" if dados is not None else "GET", rota, body=corpo,
+                                headers={"Content-Type": "application/json"})
+                self.assertEqual(conexao.getresponse().status, 403, rota)
+            finally:
+                conexao.close()
+
+    def test_todo_loopback_e_deste_aparelho(self):
+        for endereco in ("127.0.0.1", "127.0.0.2", "127.255.255.254", "::1", "::ffff:127.0.0.2"):
+            self.assertTrue(self.arena.endereco_de_loopback(endereco), endereco)
+        for endereco in ("192.168.0.10", "10.0.2.15", "::ffff:192.168.0.10", "", None, "nao-e-ip"):
+            self.assertFalse(self.arena.endereco_de_loopback(endereco), endereco)
 
     def test_a_tela_do_arena_entra(self):
         self.assertNotEqual(self.pedir("/api/ranking", cookie="arena_segredo=segredo-da-tela")[0], 403)

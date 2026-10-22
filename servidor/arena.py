@@ -4873,7 +4873,12 @@ class Manipulador(BaseHTTPRequestHandler):
         """O pedido veio deste MESMO computador (qualquer um dos enderecos
         dele), e nao de outra maquina na rede?"""
         origem = self.client_address[0]
-        if origem == "127.0.0.1":
+        # Todo endereco de loopback (127.0.0.0/8, ::1 e ::ffff:127.x) e' deste
+        # aparelho. No Linux e no Android, qualquer programa liga o proprio
+        # soquete em 127.0.0.2 e conecta no 127.0.0.1: se so o 127.0.0.1
+        # contasse, ele passaria por "outro computador" e pularia o segredo
+        # do Android (achado F3 da auditoria 4, pelo Claude Security).
+        if endereco_de_loopback(origem):
             return True
         return origem in {e["ip"] for e in enderecos_locais()}
 
@@ -7137,6 +7142,17 @@ def classificar_endereco(ip, adaptador=""):
     if ip.startswith("127."):
         return "so_aqui", "Só este computador"
     return "outro", "Outra rede"
+
+
+def endereco_de_loopback(origem):
+    """O endereco e' o do proprio aparelho (127.0.0.0/8, ::1 ou o IPv4
+    127.x escrito como IPv6, ::ffff:127.x)?"""
+    try:
+        ip = ipaddress.ip_address(str(origem or "").split("%", 1)[0])
+    except ValueError:
+        return False
+    mapeado = getattr(ip, "ipv4_mapped", None)     # so o IPv6 tem
+    return (mapeado or ip).is_loopback
 
 
 _cache_enderecos = {"quando": 0.0, "lista": None}
