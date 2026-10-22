@@ -138,6 +138,68 @@ def arquivos(pasta):
     return achados
 
 
+def foto_tem_imagem(caminho):
+    """A foto mostra o jogo: pelo menos 1% dos pontos com outra cor que a do
+    fundo. O tamanho do arquivo nao serve para tela pequena: a do CHIP-8
+    (64x32) com o titulo do jogo da' 860 bytes, e a regra antiga (mais de
+    2000 bytes) dizia "sem imagem" (achado de 22/10/2026, com as fotos
+    conferidas a olho). Le o PNG do RetroArch so com a biblioteca padrao."""
+    import struct
+    import zlib
+    try:
+        with open(caminho, "rb") as arquivo:
+            dados = arquivo.read()
+        if len(dados) > 2000:
+            return True                       # a regra de sempre: foto grande tem imagem
+        if dados[:8] != b"\x89PNG\r\n\x1a\n":
+            return False
+        posicao, idat, largura, altura, bpp = 8, b"", 0, 0, 0
+        while posicao + 8 <= len(dados):
+            tamanho, tipo = struct.unpack(">I4s", dados[posicao:posicao + 8])
+            corpo = dados[posicao + 8:posicao + 8 + tamanho]
+            if tipo == b"IHDR":
+                largura, altura, profundidade, cor = struct.unpack(">IIBB", corpo[:10])
+                bpp = {2: 3, 6: 4, 0: 1, 4: 2}.get(cor, 0) if profundidade == 8 else 0
+            elif tipo == b"IDAT":
+                idat += corpo
+            posicao += 12 + tamanho
+        if not (largura and altura and bpp):
+            return len(dados) > 2000          # formato que nao sei ler: a regra antiga
+        cru = zlib.decompress(idat)
+        linha_bytes = largura * bpp
+        anterior = bytearray(linha_bytes)
+        contagem = {}
+        for y in range(altura):
+            inicio = y * (linha_bytes + 1)
+            filtro, linha = cru[inicio], bytearray(cru[inicio + 1:inicio + 1 + linha_bytes])
+            for i in range(linha_bytes):
+                esquerda = linha[i - bpp] if i >= bpp else 0
+                cima = anterior[i]
+                diagonal = anterior[i - bpp] if i >= bpp else 0
+                if filtro == 1:
+                    linha[i] = (linha[i] + esquerda) & 0xFF
+                elif filtro == 2:
+                    linha[i] = (linha[i] + cima) & 0xFF
+                elif filtro == 3:
+                    linha[i] = (linha[i] + ((esquerda + cima) >> 1)) & 0xFF
+                elif filtro == 4:
+                    p = esquerda + cima - diagonal
+                    pa, pb, pc = abs(p - esquerda), abs(p - cima), abs(p - diagonal)
+                    linha[i] = (linha[i] + (esquerda if pa <= pb and pa <= pc else cima if pb <= pc else diagonal)) & 0xFF
+            for x in range(0, linha_bytes, bpp):
+                cor = bytes(linha[x:x + bpp])
+                contagem[cor] = contagem.get(cor, 0) + 1
+            anterior = linha
+        fundo = max(contagem.values())
+        return (largura * altura - fundo) >= 0.01 * largura * altura
+    except (OSError, ValueError, zlib.error, struct.error):
+        return False
+
+
+def alguma_com_imagem(pasta, fotos):
+    return any(foto_tem_imagem(os.path.join(pasta, nome)) for nome in fotos)
+
+
 def escolher_jogos(filtro=""):
     """Um jogo por console do RetroArch (o emulador de fora fica de fora)."""
     plataformas, _ = indexador.carregar_plataformas()
@@ -191,8 +253,12 @@ def preparar_sessao(jogo, plataforma, modesto, pasta):
                                            arena.CAPACIDADE.get("nota_gpu"),
                                            modesto=arena.grafico_original(config),
                                            abaixo=arena.nivel_abaixo(config))
+        # O nucleo vai junto, como no /api/jogar: o filtro da escala e os
+        # ajustes por nucleo dependem dele (sem ele, o teste escolhia outro
+        # filtro que o do aluno -- achado de 22/10/2026).
         override, filtro = arena.gravar_override(config, custo, extras_controle, plataforma=jogo["plataforma"],
-                                                 devolver_filtro=True, controles_ligados=0)
+                                                 devolver_filtro=True, controles_ligados=0,
+                                                 nucleo=plataforma["core"])
     # So deste teste: comandos pela rede local, FPS no titulo, janela, e o
     # RetroArch sem gravar o retroarch.cfg real ao fechar.
     so_do_teste = {
@@ -228,6 +294,24 @@ def sessao(jogo, plataforma, modesto, pasta):
     override, filtro, pastas = preparar_sessao(jogo, plataforma, modesto, pasta)
     com_comandos = comandos_chegam(override)
     caminho_jogo = os.path.join(RAIZ, jogo["arquivo"])
+    # Nucleo que nao abre caminho com acento (Apple II, Atari ST): o jogo vai
+    # pela ponte sem acento, como no /api/jogar. Sem ela, o Apple II "fechava
+    # sozinho" so neste teste (achado de 22/10/2026: a pasta e' "Pedagógicos").
+    devolver_ponte = None
+    if arena.ponte_sem_acento.precisa(plataforma["core"], arena.PASTA_SISTEMA, caminho_jogo):
+        caminho_jogo, opcoes_ponte, devolver_ponte = arena.ponte_sem_acento.preparar(
+            plataforma["core"], arena.PASTA_SISTEMA, caminho_jogo)
+        with open(override, "a", encoding="utf-8") as arquivo:
+            arquivo.write("".join('%s = "%s"\n' % item for item in opcoes_ponte.items()))
+    try:
+        return _sessao_aberta(jogo, plataforma, modesto, pasta, override, filtro, pastas, com_comandos,
+                              caminho_jogo)
+    finally:
+        if devolver_ponte:
+            devolver_ponte()
+
+
+def _sessao_aberta(jogo, plataforma, modesto, pasta, override, filtro, pastas, com_comandos, caminho_jogo):
     linha = [RETROARCH, "-L", os.path.join(RAIZ, "retroarch", "cores", plataforma["core"]),
              "--appendconfig", override]
     if filtro:
@@ -310,14 +394,14 @@ def sessao(jogo, plataforma, modesto, pasta):
                     fotos = {k: v for k, v in arquivos(pastas["PASTA_CAPTURAS"]).items()
                              if k.lower().endswith(".png")}
                     maior = max(fotos.values()) if fotos else 0
-                    if maior > 2000 and maior == anterior:
+                    if maior and maior == anterior and alguma_com_imagem(pastas["PASTA_CAPTURAS"], fotos):
                         break
                     anterior = maior
-                if fotos and max(fotos.values()) > 2000:
+                if alguma_com_imagem(pastas["PASTA_CAPTURAS"], fotos):
                     break
                 time.sleep(3)
             resultado["foto_kb"] = round(max(fotos.values()) / 1024, 1) if fotos else 0
-            resultado["mostra_imagem"] = bool(fotos) and max(fotos.values()) > 2000
+            resultado["mostra_imagem"] = alguma_com_imagem(pastas["PASTA_CAPTURAS"], fotos)
 
             # 5. Fechar certo (como o F10) e o save do proprio jogo.
             comando("QUIT")
