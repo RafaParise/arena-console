@@ -157,6 +157,11 @@ CHAVES_COM_LUGAR_CERTO = {
 # da rede, em 0.0.0.0:55355 -- achado real na revisao pos-auditoria.
 VALORES_OBRIGATORIOS = {
     "network_cmd_enable": "false",
+    # "Fechar" no menu do jogo volta direto ao ARENA, e nao ao menu
+    # principal do RetroArch (auditoria 4, 22/10/2026). No celular sem
+    # teclado, era o unico caminho para sair do jogo, e levava a um menu
+    # que o aluno nao conhecia: ele acabava fechando o app.
+    "quit_on_close_content": "1",
 }
 
 # Os motores (som, controle, video) que so existem no outro sistema viram os

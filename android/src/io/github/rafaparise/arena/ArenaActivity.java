@@ -43,6 +43,8 @@ package io.github.rafaparise.arena;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -197,12 +199,41 @@ public class ArenaActivity extends Activity {
             // pasta do ARENA no aparelho); depois, so quando a pessoa pede.
             if (Build.VERSION.SDK_INT >= 23 && !temPermissao() && !guardado.getBoolean("pediu_permissao", false)) {
                 guardado.edit().putBoolean("pediu_permissao", true).apply();
-                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSAO_DA_ABERTURA);
+                explicarAntesDePedir();
             } else {
                 comecar();
             }
         }
+    }
+
+    /** Antes dos pedidos do Android (um fala em "fotos, videos e musica", o
+     *  outro em notificacoes), uma frase do ARENA dizendo para que servem
+     *  (auditoria 4, 22/10/2026: o aluno via os dois pedidos sem explicacao
+     *  logo ao abrir). Negar nao quebra nada: o ARENA abre com os jogos
+     *  livres, e a permissao fica em Ajustes -> Maquina. */
+    void explicarAntesDePedir() {
+        // O pedido de notificacoes so existe do Android 13 (API 33) em diante.
+        String perguntas = Build.VERSION.SDK_INT >= 33
+                ? "O Android vai fazer duas perguntas.\n\n"
+                  + "1. Ver os arquivos: é para o ARENA achar a pasta dele e os jogos do celular.\n"
+                  + "2. Mostrar notificações: é o aviso de que o ARENA está aberto, para o Android "
+                  + "não fechá-lo no meio do jogo.\n\n"
+                : "O Android vai perguntar se o ARENA pode ver os arquivos: é para achar a pasta "
+                  + "dele e os jogos do celular.\n\n";
+        new AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Dialog_Alert)
+                .setTitle("Antes de começar")
+                .setMessage(perguntas
+                        + "Se não quiser, toque em \"Não permitir\": o ARENA abre com os jogos livres. "
+                        + "Dá para mudar depois, em Ajustes → Máquina.")
+                .setCancelable(false)
+                .setPositiveButton("Continuar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface janela, int qual) {
+                        requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSAO_DA_ABERTURA);
+                    }
+                })
+                .show();
     }
 
     /** Abre o servidor (o ArenaServico). Sem pasta escolhida e com uma pasta

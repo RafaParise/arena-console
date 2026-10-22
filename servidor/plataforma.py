@@ -26,6 +26,7 @@ seu jeito.
 """
 import os
 import platform
+import re
 import shutil
 import subprocess
 import sys
@@ -529,6 +530,65 @@ def motor_de_som_do_linux():
     return "alsa"
 
 
+# Os botoes do ARENA no controle de toque (auditoria 4, 22/10/2026): no
+# computador, o F10 duas vezes sai do jogo e o Esc abre o menu; no celular
+# sem teclado nao havia nenhum dos dois. Os dois botoes entram em todos os
+# desenhos do neo-retropad (de pe, deitado e os "escondidos"), com nome
+# escrito. O SAIR pede confirmacao (o quit_press_twice do ARENA: "aperte de
+# novo para sair"), como o F10.
+PASTA_DO_TOQUE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "toque")
+BOTOES_DO_TOQUE = {
+    # nome do desenho -> [(comando, x, y, metade da largura, metade da altura, imagem)]
+    "portrait": [("menu_toggle", 0.30, 0.47, 0.13, 0.024, "arena-menu.png"),
+                 ("exit_emulator", 0.70, 0.47, 0.13, 0.024, "arena-sair.png")],
+    "landscape": [("menu_toggle", 0.15, 0.08, 0.06, 0.05, "arena-menu.png"),
+                  ("exit_emulator", 0.85, 0.08, 0.06, 0.05, "arena-sair.png")],
+}
+
+
+def controle_de_toque_do_arena(origem):
+    """Grava, ao lado do neo-retropad.cfg ('origem'), o controle de toque do
+    ARENA: o mesmo, com os botoes MENU e SAIR em cada desenho. Devolve o
+    caminho, ou None se nao deu (o jogo segue com o neo-retropad de sempre)."""
+    pasta = os.path.dirname(origem)
+    destino = os.path.join(pasta, "neo-retropad-arena.cfg")
+    try:
+        with open(origem, encoding="utf-8") as arquivo:
+            texto = arquivo.read()
+        quantos = int(re.search(r"^overlays\s*=\s*(\d+)", texto, re.M).group(1))
+        extras = []
+        for numero in range(quantos):
+            nome = re.search(r'^overlay%d_name\s*=\s*"?([^"\n]*)' % numero, texto, re.M)
+            descs = re.search(r"^overlay%d_descs\s*=\s*(\d+)" % numero, texto, re.M)
+            if not nome or not descs:
+                continue
+            botoes = BOTOES_DO_TOQUE["portrait" if "portrait" in nome.group(1) else "landscape"]
+            primeiro = int(descs.group(1))
+            texto = texto.replace(descs.group(0), "overlay%d_descs = %d" % (numero, primeiro + len(botoes)), 1)
+            for indice, (comando, x, y, largura, altura, imagem) in enumerate(botoes, primeiro):
+                extras.append('overlay%d_desc%d = "%s,%.2f,%.3f,rect,%.3f,%.3f"'
+                              % (numero, indice, comando, x, y, largura, altura))
+                extras.append('overlay%d_desc%d_overlay = "img/%s"' % (numero, indice, imagem))
+        if not extras:
+            return None
+        os.makedirs(os.path.join(pasta, "img"), exist_ok=True)
+        for imagem in ("arena-menu.png", "arena-sair.png"):
+            with open(os.path.join(PASTA_DO_TOQUE, imagem), "rb") as arquivo:
+                dados = arquivo.read()
+            alvo = os.path.join(pasta, "img", imagem)
+            if not os.path.isfile(alvo) or os.path.getsize(alvo) != len(dados):
+                with open(alvo, "wb") as arquivo:
+                    arquivo.write(dados)
+        temporario = destino + ".%d.tmp" % os.getpid()
+        with open(temporario, "w", encoding="utf-8", newline="\n") as arquivo:
+            arquivo.write(texto.rstrip("\n") + "\n\n# Os botoes do ARENA (servidor/plataforma.py)\n"
+                          + "\n".join(extras) + "\n")
+        os.replace(temporario, destino)
+        return destino
+    except (OSError, ValueError, AttributeError):
+        return None
+
+
 def ajustes_do_android(opcoes, pasta_retroarch, filtro, teclado=""):
     """O arquivo da partida no Android: ganha a tela de toque (o controle
     desenhado na tela, que some quando um controle de verdade e' ligado) e
@@ -542,10 +602,23 @@ def ajustes_do_android(opcoes, pasta_retroarch, filtro, teclado=""):
     toque = os.path.join(pasta_retroarch, "overlays", "gamepads", "neo-retropad", "neo-retropad.cfg")
     if os.path.isfile(toque):
         opcoes["input_overlay_enable"] = "true"
-        opcoes["input_overlay"] = toque
+        opcoes["input_overlay"] = controle_de_toque_do_arena(toque) or toque
         opcoes["input_overlay_hide_when_gamepad_connected"] = "true"
+        # De pe, o desenho de pe (com o menu no meio); deitado, o deitado.
+        # Sem isto, o de pe usava o deitado esticado (achado da auditoria 4).
+        opcoes["input_overlay_auto_rotate"] = "true"
+        # O controle de toque continua na tela com o menu aberto: o aluno anda
+        # no menu pelo direcional e confirma com o A, como num controle. O
+        # toque direto no menu (RGUI) erra a linha com o celular de pe: o
+        # menu ocupa so a faixa de cima (visto no emulador, auditoria 4).
+        opcoes["input_overlay_hide_in_menu"] = "false"
     if teclado:
         opcoes["input_android_physical_keyboard"] = teclado
+    # O menu do jogo aceita toque (auditoria 4, 22/10/2026): o celular sem
+    # teclado so saia do jogo fechando o app. Com o "Fechar" voltando ao
+    # ARENA (graficos.VALORES_OBRIGATORIOS), sair e' o botao SAIR do controle
+    # de toque, ou MENU e "Fechar".
+    opcoes["menu_pointer_enable"] = "true"
     try:
         if int(str(opcoes.get("audio_latency") or 0)) < 64:
             opcoes["audio_latency"] = "64"

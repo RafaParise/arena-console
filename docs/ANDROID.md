@@ -111,6 +111,24 @@ anterior.
 - **Toque na tela:** o RetroArch mostra o controle na tela quando não há
   controle ligado, e o esconde quando um controle é ligado; o som tem no
   mínimo 64 ms (o celular barato estala com menos).
+- **Sair do jogo e o menu, sem teclado** (auditoria 4, 22/10/2026). Antes,
+  só o F10 de um teclado fechava o jogo: no celular de toque, o aluno saía
+  fechando o app. Agora o controle de toque do ARENA
+  (`servidor/plataforma.py`, `controle_de_toque_do_arena`, a partir do
+  `neo-retropad`) tem dois botões com nome, em todos os desenhos:
+  - **SAIR**, tocado duas vezes (a primeira pede confirmação, como o F10),
+    fecha o jogo e volta ao ARENA;
+  - **MENU** abre o menu do jogo (salvar, carregar, reiniciar...). O
+    controle continua na tela com o menu aberto: anda-se pelo direcional,
+    **B (o de baixo) confirma e A volta**, como no controle de Xbox do
+    ARENA. "Fechar" volta ao ARENA (`quit_on_close_content`).
+  De pé, vale o desenho de pé (antes era o deitado esticado). No emulador,
+  o toque direto no menu (o RGUI) errava a linha com o celular de pé: por
+  isso o caminho é o controle de toque.
+- **Antes das permissões** (auditoria 4): uma janela do ARENA diz para que
+  servem os pedidos do Android (ver os arquivos e, do Android 13 em diante,
+  as notificações). Negar não quebra nada: o ARENA abre com os jogos
+  livres, e a permissão fica em Ajustes → Máquina.
 - **A nota do aparelho** para pela velocidade medida de um núcleo: celular
   tem 8 núcleos e 8 GB, mas os núcleos são pequenos.
 

@@ -196,6 +196,50 @@ class Motores(unittest.TestCase):
         finally:
             limpeza.apagar_pasta(pasta)
 
+    def test_o_menu_do_jogo_aceita_toque(self):
+        # Auditoria 4 (22/10/2026): o menu nao aceitava toque e o aluno sem
+        # teclado so saia do jogo fechando o app.
+        opcoes = {"video_driver": "gl", "menu_driver": "rgui", "menu_pointer_enable": "false"}
+        plataforma.ajustes_do_android(opcoes, tempfile.gettempdir(), "")
+        self.assertEqual(opcoes["menu_pointer_enable"], "true")
+
+    def test_controle_de_toque_com_menu_e_sair(self):
+        pasta = tempfile.mkdtemp(prefix="arena_android_")
+        try:
+            origem = os.path.join(pasta, "overlays", "gamepads", "neo-retropad", "neo-retropad.cfg")
+            os.makedirs(os.path.dirname(origem))
+            with open(origem, "w", encoding="utf-8") as arquivo:
+                arquivo.write('overlays = 2\noverlay0_name = "landscape-digital"\noverlay0_descs = 1\n'
+                              'overlay0_desc0 = "a,0.9,0.5,radial,0.03,0.05"\n'
+                              'overlay1_name = "portrait-digital"\noverlay1_descs = 1\n'
+                              'overlay1_desc0 = "a,0.9,0.6,radial,0.05,0.03"\n')
+            opcoes = {"video_driver": "gl"}
+            plataforma.ajustes_do_android(opcoes, pasta, "")
+            arena = os.path.join(os.path.dirname(origem), "neo-retropad-arena.cfg")
+            self.assertEqual(opcoes["input_overlay"], arena)
+            self.assertEqual(opcoes["input_overlay_auto_rotate"], "true")
+            with open(arena, encoding="utf-8") as arquivo:
+                texto = arquivo.read()
+            for numero in (0, 1):
+                self.assertIn("overlay%d_descs = 3" % numero, texto)
+                self.assertIn('overlay%d_desc1 = "menu_toggle,' % numero, texto)
+                self.assertIn('overlay%d_desc2 = "exit_emulator,' % numero, texto)
+                self.assertIn('overlay%d_desc2_overlay = "img/arena-sair.png"' % numero, texto)
+            for imagem in ("arena-menu.png", "arena-sair.png"):
+                self.assertTrue(os.path.isfile(os.path.join(os.path.dirname(origem), "img", imagem)))
+            # O de sempre fica intacto (o RetroArch do Android pode usa-lo).
+            with open(origem, encoding="utf-8") as arquivo:
+                self.assertIn("overlay0_descs = 1", arquivo.read())
+        finally:
+            limpeza.apagar_pasta(pasta)
+
+    def test_sem_neo_retropad_o_jogo_segue_sem_controle_do_arena(self):
+        self.assertIsNone(plataforma.controle_de_toque_do_arena(os.path.join(tempfile.gettempdir(), "nao-existe.cfg")))
+
+    def test_fechar_volta_ao_arena(self):
+        import graficos
+        self.assertEqual(graficos.VALORES_OBRIGATORIOS.get("quit_on_close_content"), "1")
+
 
 class Sistema(unittest.TestCase):
     def test_nome_e_descricao(self):
