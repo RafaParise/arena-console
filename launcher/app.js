@@ -3859,6 +3859,88 @@ let atrasoAcervo = null;
 
 // Como colocar jogos (pedido do Rafael, 02/10/2026): console por console,
 // que arquivo serve, onde vai, se pode ser .zip e se precisa de BIOS.
+// Os jogos baixados (auditoria 4, 22/10/2026; servidor\baixados.py): o ARENA
+// acha os jogos na pasta de downloads e leva cada um para a prateleira certa
+// so quando a pessoa toca em "Levar para o ARENA".
+async function abrirBaixados() {
+  abrirGaveta("gavetaBaixados");
+  const situacao = $("#estadoBaixados");
+  const lista = $("#listaBaixados");
+  situacao.textContent = "Procurando nos downloads...";
+  lista.replaceChildren();
+  try {
+    const dados = await pedir("/api/baixados");
+    if (dados.sem_permissao) {
+      situacao.textContent = "O ARENA ainda não pode ver os arquivos do celular. Para deixar: " +
+        "Ajustes → Máquina → Deixar o ARENA ver os arquivos. Depois, volte aqui.";
+      return;
+    }
+    const pastas = (dados.pastas || []).join(", ") || "nenhuma pasta de downloads";
+    if (!(dados.jogos || []).length) {
+      situacao.textContent = "Não achei jogos em " + pastas + ". Baixe o jogo e toque em " +
+        "Procurar de novo, ou veja Como colocar jogos.";
+      return;
+    }
+    situacao.textContent = "Achei " + dados.jogos.length + (dados.jogos.length === 1 ? " jogo" : " jogos") +
+      " em " + pastas + ".";
+    lista.replaceChildren(...dados.jogos.map(desenharBaixado));
+  } catch (falha) {
+    situacao.textContent = falha.message;
+  }
+}
+
+function desenharBaixado(jogo) {
+  const item = document.createElement("li");
+  const nome = document.createElement("span");
+  nome.className = "nome";
+  nome.textContent = jogo.nome + " (" + jogo.tamanho + ")";
+  const campo = document.createElement("label");
+  campo.className = "campo";
+  const rotulo = document.createElement("span");
+  rotulo.textContent = "Console";
+  const escolha = document.createElement("select");
+  if (!jogo.sugestao) {
+    const vazio = document.createElement("option");
+    vazio.value = "";
+    vazio.textContent = "Escolha o console";
+    escolha.append(vazio);
+  }
+  for (const opcao of jogo.opcoes || []) {
+    const item = document.createElement("option");
+    item.value = opcao.id;
+    item.textContent = opcao.nome;
+    escolha.append(item);
+  }
+  escolha.value = jogo.sugestao || "";
+  campo.append(rotulo, escolha);
+  const levar = document.createElement("button");
+  levar.className = "botao botao--principal";
+  levar.type = "button";
+  levar.textContent = "Levar para o ARENA";
+  levar.addEventListener("click", async () => {
+    if (!escolha.value) {
+      recado("Escolha de qual console é o jogo.", true);
+      escolha.focus();
+      return;
+    }
+    levar.disabled = true;
+    try {
+      await pedir("/api/baixados/levar", "POST", { arquivo: jogo.arquivo, console: escolha.value });
+      const console = escolha.options[escolha.selectedIndex].textContent;
+      item.replaceChildren(Object.assign(document.createElement("span"), {
+        className: "nome", textContent: jogo.nome + ": pronto, foi para o " + console + ".",
+      }));
+      recado(jogo.nome + " foi para o " + console + ". Já está na lista.");
+      await carregarCatalogo();
+    } catch (falha) {
+      levar.disabled = false;
+      recado(falha.message, true);
+    }
+  });
+  item.append(nome, campo, levar);
+  return item;
+}
+
 async function abrirComoColocar() {
   abrirGaveta("gavetaComoColocar");
   const lista = $("#listaComoColocar");
@@ -3903,7 +3985,7 @@ function desenharComoColocar() {
   abrir.addEventListener("click", async () => {
     try {
       await pedir("/api/pasta/abrir", "POST", { plataforma: console.id });
-      recado("Pasta aberta. Arraste o jogo para dentro e clique em Atualizar lista.");
+      recado("Pasta aberta. Ponha o jogo lá dentro e toque em Atualizar lista.");
     } catch (falha) {
       recado(falha.message, true);
     }
@@ -4356,6 +4438,10 @@ function ligarEventos() {
 
   $("#btnBuscarCapas").addEventListener("click", buscarCapasQueFaltam);
   $("#btnComoColocar").addEventListener("click", abrirComoColocar);
+  $("#btnVazioComo").addEventListener("click", abrirComoColocar);
+  for (const id of ["#btnBaixados", "#btnVazioBaixados", "#btnBaixadosDeNovo"]) {
+    $(id).addEventListener("click", abrirBaixados);
+  }
   $("#listaComoColocar").addEventListener("change", desenharComoColocar);
   $("#btnAjustes").addEventListener("click", () => abrirGaveta("gavetaAjustes"));
   // "Visualizar animação": esconde a tela inteira (o CSS de

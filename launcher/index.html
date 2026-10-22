@@ -84,6 +84,8 @@
     </button>
     <ul class="trilho-lista" id="listaPlataformas"></ul>
     <button class="botao botao--largo" id="btnComoColocar" type="button" data-so-windows>Como colocar jogos</button>
+    <button class="botao botao--largo" id="btnBaixados" type="button" data-so-windows
+            title="Acha os jogos que você baixou e leva cada um para a pasta certa (só com o seu toque)">Procurar jogos baixados</button>
     <button class="botao botao--largo" id="btnCriarPastas" type="button" data-so-windows>Criar pastas dos consoles</button>
     <button class="botao botao--largo" id="btnAtualizar" type="button">Atualizar lista</button>
     <button class="botao botao--largo" id="btnBuscarCapas" type="button" data-so-windows
@@ -117,10 +119,14 @@
       <div class="vazio" id="vazio" hidden>
         <h2 id="vazioTitulo">Nenhum jogo na lista ainda</h2>
         <p id="vazioTexto">
-          Coloque os arquivos dos jogos na pasta <code>jogos\pessoais</code> e clique em
-          Atualizar lista. O ARENA descobre sozinho de qual console é cada um.
-          Não sabe que arquivo serve? Clique em <strong>Como colocar jogos</strong>.
+          Baixou um jogo? Toque em <strong>Procurar jogos baixados</strong>: o ARENA acha e
+          leva cada um para a pasta certa. Ou coloque os jogos na pasta
+          <code>jogos › pessoais</code> do ARENA e toque em Atualizar lista.
         </p>
+        <div class="vazio-acoes" data-so-windows>
+          <button class="botao" id="btnVazioBaixados" type="button">Procurar jogos baixados</button>
+          <button class="botao" id="btnVazioComo" type="button">Como colocar jogos</button>
+        </div>
       </div>
     </div>
   </section>
@@ -325,6 +331,26 @@
 
 </aside>
 
+<!-- ===================== JOGOS BAIXADOS ===================== -->
+<!-- Auditoria 4 (22/10/2026), pedido do Rafael: achar os jogos baixados e
+     leva-los para a pasta certa, com permissao. servidor\baixados.py. -->
+<aside class="gaveta" id="gavetaBaixados" hidden aria-labelledby="tituloBaixados">
+  <div class="gaveta-cabeca">
+    <h2 id="tituloBaixados">Jogos baixados</h2>
+    <button class="botao botao--fechar" data-fechar="gavetaBaixados" type="button">Fechar</button>
+  </div>
+  <div class="aba-conteudo">
+    <p class="explica">
+      O ARENA olha a pasta de downloads e mostra os jogos que achou. Confira o
+      console e toque em <strong>Levar para o ARENA</strong>: o jogo vai para a
+      pasta certa. Nada sai do lugar sem você pedir.
+    </p>
+    <p class="explica" id="estadoBaixados" role="status" aria-live="polite">—</p>
+    <ul class="baixados-lista" id="listaBaixados"></ul>
+    <button class="botao" id="btnBaixadosDeNovo" type="button">Procurar de novo</button>
+  </div>
+</aside>
+
 <!-- ===================== COMO COLOCAR JOGOS ===================== -->
 <!-- Pedido do Rafael (02/10/2026): instrucoes claras, console por console.
      Os dados vem do servidor (servidor\como_colocar.py + consoles.json). -->
@@ -342,7 +368,7 @@
     </p>
     <ol class="passos-junto">
       <li>Escolha o console aqui embaixo e veja que arquivo serve.</li>
-      <li>Clique em <strong>Abrir a pasta</strong> e arraste o jogo para dentro.</li>
+      <li>Toque em <strong>Abrir a pasta</strong> e ponha o jogo lá dentro.</li>
       <li>Volte e clique em <strong>Atualizar lista</strong>.</li>
     </ol>
     <label class="campo">

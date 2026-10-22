@@ -82,6 +82,7 @@ import jogadores   # noqa: E402  (quantos jogadores cada jogo aceita)
 import processos   # noqa: E402  (prioridade e economia de energia -- 30/09/2026)
 import janela_preta  # noqa: E402  (servidor que caia ou travava -- 02/10/2026)
 import como_colocar  # noqa: E402  (como colocar os jogos de cada console -- 02/10/2026)
+import baixados  # noqa: E402  (os jogos baixados, levados para a prateleira -- auditoria 4, 22/10/2026)
 import motivo_do_erro  # noqa: E402  (por que o jogo nao abriu, pelo registro -- 02/10/2026)
 import bios        # noqa: E402  (nome, pasta e versao certa de cada BIOS -- 03/10/2026)
 import arrumar     # noqa: E402  (o botao Arrumar: o arquivo do jogo no lugar certo -- 03/10/2026)
@@ -5213,6 +5214,17 @@ class Manipulador(BaseHTTPRequestHandler):
             return self.responder_json(marca)
 
         # ---- acervo de jogos livres ---------------------------------------
+        if caminho == "/api/baixados":
+            # Os jogos que a pessoa baixou (servidor\baixados.py): so a lista,
+            # com o console sugerido. Nada sai do lugar sem o "Levar para o
+            # ARENA". So deste aparelho (nao esta em ROTAS_REDE_EXTERNA).
+            pastas = baixados.pastas_de_baixados()
+            sem_permissao = bool(plataforma_do_sistema.ANDROID and not ponte_android.ESTADO.get("permissao"))
+            return self.responder_json({
+                "ok": True, "pastas": [caminho_para_mostrar(p) for p in pastas],
+                "sem_permissao": sem_permissao,
+                "jogos": [] if sem_permissao else baixados.procurar(carregar_catalogo(), pastas)})
+
         if caminho == "/api/como-colocar":
             # O que falta aos emuladores de fora (BIOS do PS2, firmware do
             # PS3) vem da mesma conta que o cartao do jogo usa.
@@ -5997,6 +6009,22 @@ class Manipulador(BaseHTTPRequestHandler):
             except OSError as falha:
                 return self.erro(traduzir_erro_do_sistema(falha, "abrir a pasta"))
             return self.responder_json({"ok": True, "pasta": os.path.relpath(alvo, RAIZ)})
+
+        # ---- jogo baixado: levar para a prateleira (auditoria 4) ----------
+        # So o arquivo que a busca de /api/baixados acharia (de dentro das
+        # pastas de download, com a extensao do console escolhido); move e
+        # refaz a lista. So deste aparelho (nao esta em ROTAS_REDE_EXTERNA).
+        if caminho == "/api/baixados/levar":
+            try:
+                destino = baixados.levar(dados.get("arquivo"), str(dados.get("console", "")),
+                                         carregar_catalogo(), PASTA_JOGOS)
+            except baixados.NaoPode as falha:
+                return self.erro(str(falha))
+            except OSError as falha:
+                return self.erro(traduzir_erro_do_sistema(falha, "levar o jogo para o ARENA"))
+            limpar_caches()
+            total = manifesto(forcar=True)["total"]
+            return self.responder_json({"ok": True, "destino": caminho_para_mostrar(destino), "total": total})
 
         # ---- BIOS: conferir agora e abrir a prateleira -------------------
         # Conferir: o mesmo que o ARENA faz ao abrir (servidor\bios.py), na

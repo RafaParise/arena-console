@@ -13,6 +13,23 @@ Onde colocar cada jogo, como liberar console amarelo e quais programas precisam 
 
 Como adicionar jogos e como liberar os consoles que ficam amarelos.
 
+### O jeito mais fácil: Procurar jogos baixados
+
+Baixou um jogo no computador ou no celular? Toque em **Procurar jogos
+baixados** (na coluna da esquerda, ou na lista vazia). O ARENA olha a pasta
+de downloads (no celular, também os documentos do WhatsApp e do Telegram),
+mostra cada jogo que achou com o console já escolhido e só leva o jogo para
+a pasta certa quando você toca em **Levar para o ARENA**. É como uma
+estante que arruma o livro na prateleira certa, mas só quando você manda.
+
+- O ARENA olha só os arquivos com o final de algum console (`.nes`,
+  `.sfc`, `.gba`, `.iso`...). Fotos e documentos ficam de fora.
+- Quando o final serve a mais de um console (como `.iso` ou `.zip`), o
+  ARENA olha dentro do arquivo; se ainda assim não souber, você escolhe.
+- No celular, o ARENA precisa da permissão de ver os arquivos (Ajustes →
+  Máquina → Deixar o ARENA ver os arquivos).
+- Se já existe um jogo com o mesmo nome no console, nada é trocado.
+
 ---
 
 ### Capa dos jogos
