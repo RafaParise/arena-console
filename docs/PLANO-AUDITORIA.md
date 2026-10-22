@@ -531,6 +531,74 @@ Gradle nem biblioteca nova); ferramentas e testes em Python puro.
 - Fase 8 — Relatório, guias e rodada final. Parar e esperar a aprovação
   para juntar ao `main` e publicar.
 
+**Segunda mensagem, no mesmo dia, sem resumir:**
+
+> Utilize todas as melhores ferramentas implementadas no claude code para aprimorar o script que escrevi acima, para fazer engenharias reversas em aplicativos de android do gênero de sucesso para ter ideias de como melhorar a interface e adaptar recursos do windows, para tomada de decisões ou até mesmo adicionar processos e testes e tudo que precisa em uma auditoria para criar aplicativos profissionais, seguros e com uma interface intuitiva simples e seguindo o padrão do app no windows em questão de interface e onde fica cada configuração e etc...
+
+### O roteiro aprimorado (as ferramentas de hoje)
+
+**O que "profissional" quer dizer aqui** (os padrões de referência):
+
+- Segurança: OWASP MASVS 2 e MASTG para o Android, OWASP ASVS (nível 1)
+  para o servidor local, e o modelo de ameaças da sala de aula: outro
+  aluno na mesma rede, outro app no mesmo celular, um site aberto no
+  navegador, um pen drive trocado.
+- Android: as diretrizes de qualidade do Google para apps (o Voltar
+  sempre volta um passo, segundo plano, permissões, sem travar nem "app
+  não responde") e o Material Design 3 (alvo de toque de 48 dp).
+- Acessibilidade: WCAG 2.2 AA (contraste, tamanho, foco, texto
+  alternativo), a fonte grande do sistema e o leitor de tela.
+- Interface: as 10 heurísticas de Nielsen e as regras da Fase 7 das
+  auditorias anteriores (frase curta, ícone com texto, erro com o que
+  fazer).
+
+**As ferramentas, cada uma onde rende mais:**
+
+| Ferramenta | Para quê |
+|---|---|
+| Claude Security (varredura com painel adversarial de 3 votos) | Atacar o código inteiro; depois, só o que mudou, a cada fase |
+| `/security-review` e `code-review` | Revisar cada conjunto de mudanças antes do commit |
+| Android Lint, `apkanalyzer` e `aapt2` (do SDK) | O APK do ARENA: componentes exportados, WebView, permissões, depuração ligada |
+| Engenharia reversa (`leanrea`) e o uso no emulador | Os apps de sucesso de código aberto (Lemuroid, Dolphin, PPSSPP, RetroArch, ES-DE, melonDS): manifesto, telas e textos, e o uso real no emulador (fotos do primeiro uso, de colocar jogos e de sair do jogo). App fechado (Daijishō) só por informação pública, sem decompilar |
+| Monkey do Android, `am`, `cmd` e `dumpsys` | Estresse: milhares de toques aleatórios, matar e voltar, girar, pouca memória, sem rede, fonte grande, tema escuro, tela dividida; travamentos e "app não responde" |
+| Playwright (navegador sem janela) | A tela do ARENA em celular, tablet, notebook e Chromebook: clique por clique, fotos e a árvore de acessibilidade |
+| `design:accessibility-review`, `design:ux-copy` e `design:design-critique` | A tela e os textos de cada sistema, a partir das fotos |
+| `delegar` (os modelos gratuitos do kit) | Leitura em massa e rascunhos; o Claude confere antes de usar |
+
+**Os processos que ficam no ARENA:**
+
+1. Pronto quer dizer: teste junto com a mudança; a bateria e os testes da
+   área; revisão do código; revisão de segurança quando mexe em rede,
+   arquivo, ponte ou permissão; guia atualizado; um commit por mudança.
+2. Matriz de rastreabilidade no relatório: pedido → mudança → teste →
+   resultado.
+3. Classificação de cada achado: crítico (perde dado, invasão, trava a
+   aula), alto, médio ou baixo.
+4. Teste de paridade da tela: a mesma árvore de telas e ajustes no
+   Windows, no Linux, no Android e no Chromebook. O que é de um sistema
+   só aparece no mesmo lugar, marcado. Reprova se um ajuste mudar de
+   lugar ou sumir sem explicação.
+5. Teste de primeiro uso em cada sistema: sem jogos → passo a passo → o
+   jogo na lista, sem ajuda de ninguém.
+6. Antes de versão nova: a rodada final, o Android no emulador, o Monkey
+   e a varredura de segurança do que mudou.
+7. Roteiro manual para o que só aparelho de verdade confirma (celular
+   barato, tablet, Chromebook da escola, controle Bluetooth).
+
+**A interface: o padrão é o Windows.**
+
+- As mesmas abas, na mesma ordem e com os mesmos nomes, e cada ajuste no
+  mesmo lugar. O que não existe num sistema vem explicado ali mesmo;
+  nada some sem aviso.
+- No jogo, toda tecla do ARENA tem o equivalente no toque e no controle,
+  num mapa só, mostrado na ajuda.
+- Sem jogos: um passo a passo curto; o botão que abre a pasta certa em
+  cada sistema; "Procurar jogos baixados" (acha jogos na pasta Download
+  e pergunta antes de mover); arrastar e soltar no computador; e
+  "Adicionar jogo" pelo seletor de arquivos no Android e no Chromebook.
+- No Android: sair do jogo pelo Voltar (com "Sair do jogo" no menu) e
+  por um botão na tela, sem nunca precisar fechar o app.
+
 ### Progresso da auditoria 4
 
 - [ ] Fase 0 — Linha de base dos quatro sistemas e matriz de paridade
