@@ -163,17 +163,19 @@ Depois do Release, nesta ordem:
       sem acento e a foto das telas pequenas do CHIP-8 e do Arduboy);
     - do computador de testes: a porta UDP 55436 reservada pelo Windows (4
       testes da descoberta de colegas e da partida), o mamedev.org fora do
-      ar (a biblioteca livre) e um jogo que não está na pasta (ver "Depende
-      do Rafael").
+      ar (a biblioteca livre) e um jogo que estava fora da pasta (o BS
+      F-Zero Deluxe, já recolocado pelo Rafael em 22/10).
 18. **A investigar:** o orçamento 1b do modo alvo (do `arena.py` até os
     dados da tela) estourou duas vezes, 3,2 e 3,05 s, para o teto de 2,3 s;
     a abertura sentida (1a) ficou em 1,36 s, dentro dos 10 s. O servidor
     sozinho, no mesmo modo, entrega os dados em 0,8 a 1,0 s; a conferência
     das portas reservadas não pesa; o navegador continua o Edge. Neste
-    computador, o fundo animado está em "sempre" e o tema é o claro: a
-    causa provável é o fundo novo de 20/10, desenhado já na abertura,
-    disputando o processador da caixa. Próximo passo: medir de novo com o
-    fundo no automático.
+    computador rodam, desde depois da rodada de 16/10 (quando o 1b
+    passou), o papel de parede animado da área de trabalho, pelo Lively
+    (instalado em 19/10), e o fundo animado do ARENA em "sempre", com o
+    tema claro de 20/10. Os dois disputam o processador com a caixa do modo
+    alvo: são a causa provável. Próximo passo: medir de novo com o Lively
+    pausado e o fundo no automático, e depois com cada um ligado.
 
 Achado de 16/10, consertado em 18/10: as faixas de porta que o Windows
 reserva a cada reinício (Hyper-V, WSL, Docker). O `VERIFICAR.bat`, o
@@ -186,9 +188,6 @@ reserva a cada reinício (Hyper-V, WSL, Docker). O `VERIFICAR.bat`, o
   55369 a 55468): a descoberta de colegas não abre neste computador, e 4
   testes falham por isso (a descoberta e a partida aparecendo). Reiniciar o
   Windows costuma trocar as faixas; o guia 5 explica o que fazer.
-- **O BS F-Zero Deluxe** não está mais em `jogos\pessoais\Super Nintendo`:
-  o teste das BIOS (`testes\teste_bios_consoles.py`) usa esse jogo com o
-  BS-X. Se ele foi tirado de propósito, o teste pode trocar de jogo.
 
 - **O teste no Chromebook da escola** (item 12, `docs/CHROMEBOOK.md`, "O
   teste no Chromebook da escola"): abrir o `ARENA-CHROMEBOOK.html` do pen
