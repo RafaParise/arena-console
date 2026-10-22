@@ -1180,6 +1180,8 @@ Pense numa foto pequena que precisa virar um cartaz:
     mesma nitidez pela metade do custo;
   - placa fraca, e no **Desempenho**, no **Ultra**, no **gráfico original**
     e na **partida a dois**: só a **nitidez** do FSR (o RCAS), o mais leve.
+    No PlayStation, o RCAS vem com o vídeo sem thread: o emulador dele
+    (SwanStation) fechava sozinho com os dois juntos (achado de 22/10/2026).
 - **Jogo 3D já desenhado do tamanho da tela ou maior** (o PS1 em 4x numa tela
   de 900 linhas, por exemplo): nenhum filtro — não há o que esticar.
 - **Nível mínimo** ("bonecos de papelão") e **Original**: nenhum filtro.
