@@ -462,7 +462,9 @@ def montar(destino, com_bios=False):
     for origem, rel in partes_do_linux():
         copiar_arquivo(origem, os.path.join(destino, rel))
     limpar_retroarch_cfg(os.path.join(RA, "retroarch.cfg"), os.path.join(RA_D, "retroarch.cfg"))
-    os.makedirs(os.path.join(RA_D, "cores"))
+    # exist_ok: os nucleos .so do Linux (partes_do_linux, acima) ja criaram a
+    # pasta. Sem ele, a montagem do zero parava aqui desde 18/10/2026.
+    os.makedirs(os.path.join(RA_D, "cores"), exist_ok=True)
     os.makedirs(os.path.join(RA_D, "info"), exist_ok=True)
     for nome in os.listdir(os.path.join(RA, "cores")):
         if nome.lower() in usados:
