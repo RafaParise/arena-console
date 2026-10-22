@@ -161,6 +161,16 @@ class ArquivoDaPartida(unittest.TestCase):
         self.assertEqual(opcoes["video_smooth"], "true", "o RCAS estica pelo bilinear")
         self.assertEqual(self.partida("psp", "ppsspp_libretro.dll", em_partida=True)[0], "rcas.slangp")
 
+    def test_ps1_com_rcas_sem_video_em_thread(self):
+        # Achado de 22/10/2026: o SwanStation fechava sozinho com o RCAS e a
+        # thread (graficos.NUCLEOS_RCAS_SEM_THREAD). O PSP continua com ela.
+        filtro, opcoes = self.partida("ps1", "swanstation_libretro.dll", modo_modesto=True)
+        self.assertEqual(filtro, "rcas.slangp")       # no modesto, o PS1 desenha 1x e estica
+        self.assertEqual(opcoes["video_threaded"], "false")
+        filtro, opcoes = self.partida("psp", "ppsspp_libretro.dll", em_partida=True)
+        self.assertEqual(filtro, "rcas.slangp")
+        self.assertEqual(opcoes["video_threaded"], "true")
+
     def test_ps1_ja_do_tamanho_da_tela(self):
         filtro, opcoes = self.partida("ps1", "swanstation_libretro.dll")
         self.assertEqual(filtro, "")             # 4x = 960 linhas, a tela tem 900

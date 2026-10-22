@@ -481,6 +481,14 @@ ESCALAS = ("automatico", "pixel", "nitido", "suave", "original")
 ARQUIVOS_DOS_FILTROS = {"pixel": "pixel-nitido.slangp", "nitido": "fsr.slangp",
                         "catmull": "catmull-rom.slangp", "rcas": "rcas.slangp",
                         "suave": "suave.slangp"}
+# Achado de 22/10/2026 (rodada final, matriz de consoles): o SwanStation
+# (PlayStation) com o RCAS e o video em thread fecha sozinho no Vulkan
+# (0xC0000005 logo depois de "framebuffer size 0x0": o nucleo comeca com o
+# quadro vazio, e o RCAS e' um passo so, no tamanho do quadro). Sem a thread,
+# abre com o filtro; o FSR com a thread tambem. Os outros nucleos 3D (N64,
+# PSP, Dreamcast, Saturn) passam com o RCAS e a thread. Nestes, o RCAS
+# desliga a thread (arena.gravar_override).
+NUCLEOS_RCAS_SEM_THREAD = ("swanstation",)
 
 # Linhas que cada nucleo desenha no tamanho do console (1x): a base da conta
 # da resolucao interna.

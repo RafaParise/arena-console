@@ -2011,6 +2011,10 @@ def gravar_override(config, custo=None, extras=None, em_partida=False,
             # O RCAS afia o quadro ainda pequeno; quem estica depois e' o
             # RetroArch, e esticar sem suavizar faria degraus.
             opcoes["video_smooth"] = "true"
+            # O PlayStation (SwanStation) fecha sozinho com o RCAS e o video
+            # em thread (graficos.NUCLEOS_RCAS_SEM_THREAD, achado de 22/10/2026).
+            if nome_core in graficos.NUCLEOS_RCAS_SEM_THREAD:
+                opcoes["video_threaded"] = "false"
     opcoes["video_shader_enable"] = "true" if filtro else "false"
 
     # O som, o controle e o teclado deste sistema: no Linux, o WASAPI vira o
