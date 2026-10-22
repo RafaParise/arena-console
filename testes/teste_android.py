@@ -38,6 +38,7 @@ Uso:
 """
 import json
 import os
+import re
 import socket
 import subprocess
 import sys
@@ -154,16 +155,28 @@ def no_do_teclado():
 AVISOS_DO_SISTEMA = []
 
 
+BOTAO_ESPERAR = re.compile(r'text="(?:Wait|Esperar|Aguardar)"[^>]*?bounds="\[(\d+),(\d+)\]\[(\d+),(\d+)\]"')
+
+
 def sem_aviso_do_sistema():
     """Fecha o aviso "System UI isn't responding" (o Android do emulador,
-    logo depois de ligar, as vezes demora a responder; o aviso fica na frente
-    do jogo e pega as teclas: visto em 21/10/2026). Anota quando havia um."""
-    foco = next((l.strip() for l in adb_texto("shell", "dumpsys", "window", "windows").splitlines()
-                 if "mCurrentFocus" in l), "")
-    if "Not Responding" in foco or "isn't responding" in foco:
-        AVISOS_DO_SISTEMA.append(foco[-120:])
+    com o computador ocupado, as vezes demora a responder; o aviso fica na
+    frente do jogo e pega as teclas: visto em 21/10/2026). Procura em todas as
+    janelas (nao so na do foco) e toca em "Wait", achado na arvore da tela;
+    sem o botao, pede ao Android para fechar os avisos. Anota cada um."""
+    janelas = adb_texto("shell", "dumpsys", "window", "windows")
+    if "Not Responding" not in janelas and "isn't responding" not in janelas:
+        return
+    adb("shell", "uiautomator", "dump", "/data/local/tmp/arena_tela.xml", segundos=60)
+    achou = BOTAO_ESPERAR.search(adb_texto("shell", "cat", "/data/local/tmp/arena_tela.xml"))
+    if achou:
+        x1, y1, x2, y2 = (int(n) for n in achou.groups())
+        adb("shell", "input", "tap", str((x1 + x2) // 2), str((y1 + y2) // 2))
+        AVISOS_DO_SISTEMA.append("tocado o Wait")
+    else:
         adb("shell", "am", "broadcast", "-a", "android.intent.action.CLOSE_SYSTEM_DIALOGS")
-        time.sleep(2)
+        AVISOS_DO_SISTEMA.append("pedido para fechar os avisos")
+    time.sleep(2)
 
 
 def apertar(codigo):
