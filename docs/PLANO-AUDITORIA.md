@@ -4,9 +4,10 @@
 > para permitir continuar a auditoria depois de um `/clear`. Ver seção
 > "Estado atual" do `CLAUDE.md` pra saber em que fase a auditoria está.
 >
-> **Rodada atual: auditoria 3** (seção no fim deste arquivo). Relatórios:
-> auditoria 3 em `RELATORIO-QUALIDADE.md`, auditoria 2 em
-> `RELATORIO-AUDITORIA-2.md`, auditoria 1 em `RELATORIO-AUDITORIA-1.md`.
+> **Rodada atual: auditoria 4** (a última seção deste arquivo). Relatórios:
+> auditoria 4 em `RELATORIO-AUDITORIA-4.md`, auditoria 3 em
+> `RELATORIO-QUALIDADE.md`, auditoria 2 em `RELATORIO-AUDITORIA-2.md`,
+> auditoria 1 em `RELATORIO-AUDITORIA-1.md`.
 
 ---
 
@@ -478,3 +479,58 @@ Comece só pela Fase 0.
 - [x] Fase 6 — Portabilidade e robustez (10–11/10/2026) — rodada da área 14 de 14 (da pasta antiga e da nova, depois que as pastas mudaram de lugar no disco); a mudança mostrou que a correção de caminhos deixava passar a pasta que sobe um nível (F1) e escolhia a âncora pela ordem da lista (F2); notebook sem driver de vídeo cai no Direct3D 11 (4 testes novos); nenhum comando que peça administrador; bateria 310
 - [x] Fase 7 — Clareza para todos (09–11/10/2026) — 46 de 48 trechos reescritos em linguagem simples (+ o botão Registrar pontos, que não existia); acessibilidade 9 de 9 (o hidden não escondia, contraste AA, letra mínima 11 px, o foco agora entra na janela que abre); passo a passo das 5 pessoas conferido na tela de hoje
 - [x] Fase 8 — Relatório final e entrega (11–12/10/2026) — rodada completa 101 de 102 (o Dreamcast da matriz, repetido sozinho, passou); abertura 2,61 → 1,7–1,9 s; 35 gravações e 72 KB por abertura; 1 h parado com a tela: 0 gravações; E1–E5 (os testes não mexem mais em dado de quem joga; 5,5 GB soltos no `.git`, provados e limpos); bateria 323; juntada ao `main` (PR #1) e Release v2026.10.11
+
+---
+
+## Auditoria 4 (22/10/2026) — pedido do Rafael, sem resumir
+
+O pedido, de 22/10/2026 (por volta das 11h40), está abaixo inteiro, sem
+resumir, entre as duas linhas de `====`. O Rafael estava fora de casa,
+acompanhando pelo celular.
+
+==========================================================================
+
+Faça uma auditoria completa de todas as versões do Arena, começando pela versão de android que possui diversas limitações como precisar sair do aplicativo para poder sair do jogo, adaptar comandos de teclado para interface do android e adaptar recursos e funcionalidades do windows para android assim como para outros sistemas operacionais, analise os aplicativos do gênero de maior sucesso para implementar melhorias e ideias, depois passe para o linux, windows e chromebook. Por favor utilize as ferramentas, skills, scripts e plugins mais modernos e ja implementados ao claude para fazer essa auditoria completa, baseado na minha auditoria que antes constava na memória mas melhorando ela ainda mais com as novas ferramentas, implemente uma auditoria profissional, utilize um recurso que tem no claude para atacar o aplicativo e descobrir falhas de segurança e funcionalidade para corrigir, testes de strees diversos e simule o uso de todos os recursos no android, linux para ver se falta implementa algum recurso ou função ou adaptar para o ambiente do android, seus comandos e limitações, foque na inteface e capacidade do android de funcionamento para isso. E claro garanta uma interface intuitiva e simples de mexer, no android como no windows precisa ser claro e autoexplicativo cada função exemplo: não tem jogos na pasta, precisa ter um passo a passo simples de onde adicionar o jogo e se possível um link que direcione direto para pasta onde precisa colocar o jogo ou se possível um identificador que identifica roms no celular baixadas e que pede permissão para mover o arquivo para pasta correta ou algo do gênero, todas as funções e recursos do windows devem ser implementados em todas as versões e adaptados para as limitações de hardware ou de sistema operacional, não estou em casa no momento
+
+==========================================================================
+
+**Leitura adotada** (a mesma das auditorias 2 e 3): a "minha auditoria"
+é este arquivo, com as 8 fases e as 10 regras, que continuam valendo. O
+ramo é o `auditoria-4`, a partir do `main` (`8cf3371`, a versão
+2026.10.22). Com o Rafael fora de casa, as paradas viram registro no
+relatório, com a escolha recomendada e o porquê. A única parada de
+verdade é juntar ao `main` e publicar versão nova, que esperam a
+aprovação dele. Relatório: `docs\RELATORIO-AUDITORIA-4.md`; números
+brutos em `docs\auditoria4\`. Código do Android em Java, como já é (sem
+Gradle nem biblioteca nova); ferramentas e testes em Python puro.
+
+**As fases desta rodada:**
+
+- Fase 0 — Linha de base dos quatro sistemas: a bateria e os testes do
+  Android, do Linux e do Chromebook como referência; a matriz de
+  paridade (cada função da tela do Windows × Android, Linux e
+  Chromebook: igual, adaptada, falta ou impossível, com o porquê); os
+  atalhos de teclado e o equivalente em toque e em controle.
+- Fase 1 — Android: o uso real no emulador, tela por tela, com fotos; os
+  limites (sair do jogo sem sair do app, atalhos de teclado, voltar,
+  girar a tela, segundo plano, pouca memória, permissão de pasta); o
+  estresse (o Monkey do Android, matar e voltar, sem rede, armazenamento
+  cheio); e o conserto do que faltar.
+- Fase 2 — Os aplicativos de maior sucesso do gênero: o que fazem melhor
+  e o que serve ao ARENA (sala de aula, alunos menores, offline, sem
+  conta).
+- Fase 3 — Ataque de segurança e de funcionamento (Claude Security, com
+  a revisão adversarial), com foco no Android (a ponte da WebView, os
+  componentes exportados, o servidor local aberto a outros apps, as
+  pastas) e na rede da escola; corrigir o que for real.
+- Fase 4 — Primeiro uso claro em todos os sistemas: sem jogos na pasta,
+  o passo a passo e o botão que abre a pasta certa; no Android, achar os
+  jogos baixados e pedir permissão para levá-los ao lugar certo.
+- Fases 5, 6 e 7 — Linux, Windows e Chromebook: a mesma auditoria (uso,
+  estresse e paridade), adaptada a cada um.
+- Fase 8 — Relatório, guias e rodada final. Parar e esperar a aprovação
+  para juntar ao `main` e publicar.
+
+### Progresso da auditoria 4
+
+- [ ] Fase 0 — Linha de base dos quatro sistemas e matriz de paridade
