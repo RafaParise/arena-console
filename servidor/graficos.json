@@ -85,6 +85,19 @@
     ],
     "esticar_ate_da_tela": 0.95
   },
+  "formato_da_imagem": {
+    "_leia": "Formato da imagem (pedido do Rafael, 22/10/2026: 'a tela nao mais esta esticando ate a borda da tela como fazia antes'). O RetroArch usa a proporcao do console: o 4:3 fica com faixas pretas dos lados na tela larga. 'automatico' (graficos.proporcao_da_partida): os consoles desta lista (de TV e de computador, desenhados em 4:3) esticam ate a borda da tela, no maximo ate 'maximo_no_automatico' (16:9: no celular deitado, de 20:9, o 4:3 ate a borda ficaria largo demais; ai fica em 16:9, com faixa fina). Os outros ficam com a proporcao do nucleo: os portateis de tela quase quadrada (Game Boy, Game Gear, Neo Geo Pocket), o fliperama, o WonderSwan e o Vectrex (tem jogo em pe), e os que ja sao largos (PSP, TIC-80). 'esticar': todo jogo ate a borda. 'console': sempre a proporcao do nucleo.",
+    "esticar_no_automatico": [
+      "atari2600", "atari5200", "atari7800", "atari800", "jaguar", "atarist",
+      "nes", "snes", "n64", "gamecube", "wii",
+      "sg1000", "megadrive", "sega32x", "segacd", "saturn", "dreamcast",
+      "ps1", "ps2", "neogeo", "pcengine", "pcfx", "threedo", "cdi",
+      "odyssey2", "colecovision", "intellivision", "uzebox", "microw8",
+      "msx", "c64", "c128", "vic20", "plus4", "pet", "amiga", "spectrum", "zx81",
+      "amstrad", "apple2", "thomson", "dos", "scummvm"
+    ],
+    "maximo_no_automatico": 1.7778
+  },
   "nucleos": {
     "swanstation": {
       "_nome": "PlayStation",

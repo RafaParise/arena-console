@@ -208,7 +208,9 @@ async function carregarEstado() {
   $("#listaNivelGrafico").value = nivelDoGrafico(dados.config);
   explicarNivelGrafico();
   $("#listaEscalaTela").value = dados.config.escala_da_tela || "automatico";
+  $("#listaFormatoImagem").value = dados.config.formato_da_imagem || "automatico";
   explicarEscalaTela();
+  explicarFormatoImagem();
 
   $("#chaveRpcn").setAttribute("aria-pressed",
     dados.config.rpcn_ativo ? "true" : "false");
@@ -1654,6 +1656,23 @@ function mostrarLossless(situacao, config) {
   $("#chaveLossless").setAttribute("aria-pressed", config.lossless_scaling ? "true" : "false");
   $("#chaveLosslessQuadros").setAttribute("aria-pressed",
     config.lossless_mais_quadros ? "true" : "false");
+}
+
+// Formato da imagem (pedido do Rafael, 22/10/2026): servidor\graficos.py,
+// proporcao_da_partida.
+const EXPLICA_FORMATO_IMAGEM = {
+  automatico: "Os consoles de TV (do Atari ao PS2) esticam até a borda da tela, sem faixas " +
+    "pretas dos lados. Os portáteis de tela quadrada e o fliperama ficam no formato deles, " +
+    "para nada sair deformado. No celular deitado, estica só até o formato de TV larga.",
+  esticar: "Todo jogo enche a tela inteira, de borda a borda. O desenho fica um pouco mais " +
+    "largo que o original (no Game Boy e no fliperama em pé, bem mais).",
+  console: "A imagem fica no formato do console, como na TV da época: na tela larga, com " +
+    "faixas pretas dos lados.",
+};
+
+function explicarFormatoImagem() {
+  const valor = $("#listaFormatoImagem").value;
+  $("#explicaFormatoImagem").textContent = EXPLICA_FORMATO_IMAGEM[valor] || EXPLICA_FORMATO_IMAGEM.automatico;
 }
 
 function explicarEscalaTela() {
@@ -4731,6 +4750,19 @@ function ligarEventos() {
       recado("Pronto. Vale na próxima vez que você abrir o ARENA.");
     } catch (falha) {
       lista.value = (estado.config && estado.config.navegador) || "automatico";
+      recado(falha.message, true);
+    }
+  });
+
+  $("#listaFormatoImagem").addEventListener("change", async (evento) => {
+    const lista = evento.currentTarget;
+    try {
+      await salvarConfig({ formato_da_imagem: lista.value });
+      explicarFormatoImagem();
+      recado("Pronto. Vale no próximo jogo.");
+    } catch (falha) {
+      lista.value = (estado.config && estado.config.formato_da_imagem) || "automatico";
+      explicarFormatoImagem();
       recado(falha.message, true);
     }
   });

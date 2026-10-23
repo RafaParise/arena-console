@@ -1,6 +1,6 @@
 {
  "_leia": "testes\\teste_versao_web.py: a versao web (ferramentas\\montar_site.py) servida por http://127.0.0.1 no Edge sem janela, imitando o Chrome do Android (toque, 412x915, sem seletor de pasta); depois deitado (915x412) e no computador (1366x768, sem toque). Retangulos em pontos CSS: [esquerda, alto, direita, baixo].",
- "data": "2026-10-22 22:31",
+ "data": "2026-10-22 22:45",
  "celular": {
   "sw_sem_git": true,
   "de_pe": {

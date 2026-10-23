@@ -1245,6 +1245,11 @@ def config_padrao():
         # tela inteira. "automatico" escolhe pelo console, pela placa e pelo
         # perfil (item 10 dos pedidos de 15/10/2026).
         "escala_da_tela": "automatico",
+        # Formato da imagem (graficos.FORMATOS, pedido de 22/10/2026):
+        # "automatico" estica o 4:3 dos consoles de TV ate a borda da tela
+        # larga (ate 16:9); "esticar", todo jogo; "console", a proporcao do
+        # console (graficos.proporcao_da_partida).
+        "formato_da_imagem": "automatico",
         # Em que navegador a tela abre (servidor/navegadores.py):
         # "automatico" = o padrao do computador; ou o codigo de um deles.
         "navegador": "automatico",
@@ -1387,6 +1392,8 @@ def ler_config_do_disco():
     config["rpcn_ativo"] = bool(salvo.get("rpcn_ativo"))
     if salvo.get("escala_da_tela") in graficos.ESCALAS:
         config["escala_da_tela"] = salvo["escala_da_tela"]
+    if salvo.get("formato_da_imagem") in graficos.FORMATOS:
+        config["formato_da_imagem"] = salvo["formato_da_imagem"]
     if salvo.get("navegador") in NAVEGADORES_ACEITOS:
         config["navegador"] = salvo["navegador"]
     if salvo.get("preset_grafico_externo") in ("automatico", "leve", "bonito"):
@@ -2017,6 +2024,13 @@ def gravar_override(config, custo=None, extras=None, em_partida=False,
             if nome_core in graficos.NUCLEOS_RCAS_SEM_THREAD:
                 opcoes["video_threaded"] = "false"
     opcoes["video_shader_enable"] = "true" if filtro else "false"
+    # Formato da imagem (pedido do Rafael, 22/10/2026: "a tela nao mais esta
+    # esticando ate a borda"): o 4:3 esticado ate a borda da tela larga, ou a
+    # proporcao do console (graficos.proporcao_da_partida). Vale em todo
+    # nivel, ate no minimo: e' so onde a imagem cai na tela, nao pesa.
+    if plataforma:
+        opcoes.update(graficos.proporcao_da_partida(
+            plataforma, config.get("formato_da_imagem", "automatico"), hardware.tamanho_da_tela()))
 
     # O som, o controle e o teclado deste sistema: no Linux, o WASAPI vira o
     # PulseAudio (ou o ALSA) e o XInput vira o udev (servidor\plataforma.py).
@@ -2650,9 +2664,14 @@ def preparar_lossless(jogo, config):
     opcoes_nucleo = graficos.opcoes_finais_do_nucleo(
         nome_core, CAPACIDADE["nota"], CAPACIDADE.get("nota_gpu"), modesto=grafico_original(config),
         altura_tela=altura_tela, abaixo=nivel_abaixo(config))
+    # Formato da imagem: o LS so sabe "ate a borda" ou "o formato do jogo"
+    # (o "ate 16:9" da tela ultralarga fica no formato do jogo).
+    proporcao = graficos.proporcao_da_partida(plataforma, config.get("formato_da_imagem", "automatico"),
+                                              hardware.tamanho_da_tela())
     trocas = lossless.trocas_para_o_jogo(desenho_2d, CAPACIDADE.get("nota_gpu"),
                                          bool(config.get("lossless_mais_quadros")),
-                                         lossless.frequencia_da_tela())
+                                         lossless.frequencia_da_tela(),
+                                         esticar=proporcao["aspect_ratio_index"] == graficos.PROPORCAO_TELA_CHEIA)
     try:
         gravou, motivo = lossless.gravar_perfil(trocas)
     except (OSError, ValueError) as falha:
@@ -2783,7 +2802,9 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
                 controles_xinput=controles.controles_xinput(),
                 cartoes=cartoes_ps2,
                 integrada=bool(MAQUINA["gpu"].get("integrada", True)),
-                motor=config.get("motor_ps2", "automatico"))
+                motor=config.get("motor_ps2", "automatico"),
+                formato=graficos.formato_de_fora("ps2", config.get("formato_da_imagem", "automatico"),
+                                                 hardware.tamanho_da_tela()))
             if escrito:
                 print("[ARENA] Controle e qualidade do PCSX2 configurados "
                       "(%s jogadores)." % jogo.get("jogadores_max", 2))
@@ -2813,7 +2834,9 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
                 nota=CAPACIDADE["nota"], nota_gpu=nota_da_placa_de_fora(),
                 modesto=grafico_original(config), abaixo=nivel_abaixo(config),
                 ultra=bool(config.get("ultra_desempenho")),
-                preset=None if preset == "automatico" else preset)
+                preset=None if preset == "automatico" else preset,
+                formato=graficos.formato_de_fora(console, config.get("formato_da_imagem", "automatico"),
+                                                 hardware.tamanho_da_tela()))
             if pasta:
                 print("[ARENA] Controles e imagem do Dolphin configurados (%s)."
                       % ("Wii" if console == "wii" else "GameCube"))
@@ -2860,7 +2883,9 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
                 nota_da_placa_de_fora(),
                 modesto=grafico_original(config), abaixo=nivel_abaixo(config),
                 ultra=bool(config.get("ultra_desempenho")),
-                preset=None if preset == "automatico" else preset)
+                preset=None if preset == "automatico" else preset,
+                formato=graficos.formato_de_fora("ps3", config.get("formato_da_imagem", "automatico"),
+                                                 hardware.tamanho_da_tela()))
             if escrito:
                 print("[ARENA] Video do RPCS3 configurado.")
             if graficos.escrever_controles_rpcs3(jogo["externo"]["caminho"],
@@ -6573,6 +6598,8 @@ class Manipulador(BaseHTTPRequestHandler):
                 config["modo_desempenho"] = bool(dados["modo_desempenho"])
             if dados.get("escala_da_tela") in graficos.ESCALAS:
                 config["escala_da_tela"] = dados["escala_da_tela"]
+            if dados.get("formato_da_imagem") in graficos.FORMATOS:
+                config["formato_da_imagem"] = dados["formato_da_imagem"]
             if dados.get("navegador") in NAVEGADORES_ACEITOS:
                 config["navegador"] = dados["navegador"]
             if dados.get("preset_grafico_externo") in ("automatico", "leve", "bonito"):

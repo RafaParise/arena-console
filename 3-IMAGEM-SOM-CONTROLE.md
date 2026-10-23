@@ -1198,6 +1198,25 @@ filtro que o próprio emulador traz, escolhido pelo ARENA:
 
 Desenhado maior que isso, ou no nível mínimo, eles ficam como sempre.
 
+#### Formato da imagem: esticar até a borda
+
+A **Escala da tela** decide *como* o desenho é ampliado; o **Formato da
+imagem** (Ajustes → Simples, logo abaixo) decide *até onde*. Os consoles de
+TV desenhavam para a TV quadradona (4:3); a tela de hoje é larga (16:9 ou
+16:10). Sem esticar, sobram faixas pretas dos lados.
+
+| Escolha | O que faz |
+|---|---|
+| **Automático** (recomendado) | Os consoles de TV e os computadores antigos (do Atari ao PS2, GameCube e Wii) esticam até a borda. Os portáteis de tela quadrada (Game Boy, Game Gear, Neo Geo Pocket), o fliperama, o WonderSwan e o Vectrex (que têm jogo em pé) e o PSP ficam no formato deles. No celular deitado (tela mais larga que 16:9), estica só até 16:9 |
+| **Esticar até a borda** | Todo jogo enche a tela inteira; o desenho fica mais largo que o original |
+| **Do console (sem esticar)** | O formato da TV da época, com faixas pretas dos lados |
+
+Vale nos núcleos do RetroArch (Windows, Linux, Android e navegador), no PS2
+(PCSX2), no GameCube e Wii (Dolphin), no PS3 (RPCS3, que já é largo: só o
+"Esticar" muda) e no Lossless Scaling (o perfil "ARENA" passa a "Tela
+cheia"). Conferido com foto da tela em 22/10/2026: no Automático, o MSX vai
+de borda a borda numa tela de 1440×900; no "Do console", fica no 4:3 do meio.
+
 #### Quanto pesa (medido)
 
 Medido em 16/10/2026 no computador do professor (Radeon integrada, tela

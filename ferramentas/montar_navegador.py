@@ -112,6 +112,7 @@ def montar():
         "etiquetas": arena.CLASSES_ETIQUETA,
         "velocidade_por_custo": {str(k): v for k, v in arena.VELOCIDADE_POR_CUSTO.items()},
         "biblioteca_livre": livres,
+        "formato_da_imagem": graficos.regra_do_formato(),
         "pasta_do_nucleo": PASTA_DO_NUCLEO,
         "pastas_parecidas": PASTAS_PARECIDAS,
     }

@@ -483,6 +483,57 @@ def opcoes_finais_do_nucleo(nome_curto, nota, nota_gpu=None, modesto=False, altu
 PASTA_FILTROS = os.path.join(PASTA_SERVIDOR, "filtros")
 # O que o aluno escolhe (Ajustes -> Imagem -> Escala da tela).
 ESCALAS = ("automatico", "pixel", "nitido", "suave", "original")
+
+# Formato da imagem (pedido do Rafael, 22/10/2026: "a tela nao mais esta
+# esticando ate a borda da tela como fazia antes"): a proporcao da imagem do
+# jogo na tela (graficos.json -> formato_da_imagem). Os numeros sao os da
+# lista de proporcoes do RetroArch 1.22 (aspect_ratio_index): 20 "Config"
+# (vale o video_aspect_ratio), 22 "Do nucleo" e 24 "Tela cheia".
+FORMATOS = ("automatico", "esticar", "console")
+PROPORCAO_CONFIG, PROPORCAO_DO_NUCLEO, PROPORCAO_TELA_CHEIA = "20", "22", "24"
+
+
+def regra_do_formato():
+    """A regra do formato automatico (graficos.json), sem o _leia."""
+    regra = carregar_graficos().get("formato_da_imagem", {})
+    return {chave: valor for chave, valor in regra.items() if not chave.startswith("_")}
+
+
+def proporcao_da_partida(plataforma, formato, tela):
+    """As chaves de proporcao do RetroArch para a partida.
+
+    'tela': (largura, altura) da tela (hardware.tamanho_da_tela). No
+    automatico, o console da lista estica ate a borda (Tela cheia) se a
+    tela nao for mais larga que o maximo (16:9); se for (o celular deitado,
+    o monitor ultralargo), estica so ate o maximo. Tela desconhecida, ou em
+    pe: a proporcao do nucleo (esticar achataria o jogo)."""
+    if formato == "esticar":
+        return {"video_aspect_ratio_auto": "false", "aspect_ratio_index": PROPORCAO_TELA_CHEIA}
+    do_nucleo = {"video_aspect_ratio_auto": "false", "aspect_ratio_index": PROPORCAO_DO_NUCLEO}
+    regra = regra_do_formato()
+    largura, altura = tela or (0, 0)
+    if formato == "console" or plataforma not in regra.get("esticar_no_automatico", ()) or not altura:
+        return do_nucleo
+    proporcao = largura / float(altura)
+    maximo = float(regra.get("maximo_no_automatico", 16 / 9.0))
+    if proporcao < 4 / 3.0:
+        return do_nucleo
+    if proporcao <= maximo + 0.01:
+        return {"video_aspect_ratio_auto": "false", "aspect_ratio_index": PROPORCAO_TELA_CHEIA}
+    return {"video_aspect_ratio_auto": "false", "aspect_ratio_index": PROPORCAO_CONFIG,
+            "video_aspect_ratio": "%.4f" % maximo}
+
+
+def formato_de_fora(plataforma, formato, tela):
+    """O formato da imagem nos emuladores de fora (PCSX2, Dolphin, RPCS3),
+    pela mesma regra dos nucleos (proporcao_da_partida): "esticar" (ate a
+    borda), "16:9" (esticar so ate 16:9) ou "console"."""
+    indice = proporcao_da_partida(plataforma, formato, tela).get("aspect_ratio_index")
+    if indice == PROPORCAO_TELA_CHEIA:
+        return "esticar"
+    if indice == PROPORCAO_CONFIG:
+        return "16:9"
+    return "console"
 ARQUIVOS_DOS_FILTROS = {"pixel": "pixel-nitido.slangp", "nitido": "fsr.slangp",
                         "catmull": "catmull-rom.slangp", "rcas": "rcas.slangp",
                         "suave": "suave.slangp"}
@@ -1552,7 +1603,7 @@ def escrever_config_pcsx2(caminho_executavel, ultra=False, nota=None,
                           nota_gpu=None, modesto=False, preset=None,
                           jogadores=2, controles_xinput=(0, 1),
                           cartoes=("Mcd001.ps2", "Mcd002.ps2"), integrada=None,
-                          motor="automatico", abaixo=""):
+                          motor="automatico", abaixo="", formato=None):
     """Escreve o bloco de controle, teclas e qualidade grafica do PCSX2.
 
     Preserva tudo o que ja estiver no arquivo fora desses blocos - em
@@ -1678,6 +1729,11 @@ def escrever_config_pcsx2(caminho_executavel, ultra=False, nota=None,
     # O ARENA manda no motor de video: "automatico" grava -1 (o PCSX2
     # escolhe), para a volta ao automatico pela tela do ARENA valer.
     linhas_gs.append("Renderer = " + MOTORES_PCSX2.get(motor, "-1"))
+    # Formato da imagem (formato_de_fora, pedido de 22/10/2026): o PS2
+    # esticado ate a borda (Stretch), so ate 16:9, ou no formato do jogo
+    # ("Auto 4:3/3:2", o padrao do PCSX2; os nomes sao os do pcsx2-qt.exe).
+    if formato:
+        linhas_gs.append("AspectRatio = " + {"esticar": "Stretch", "16:9": "16:9"}.get(formato, "Auto 4:3/3:2"))
 
     # [EmuCore/GS] nao e' mais apagado inteiro: so as chaves do ARENA mudam,
     # o resto do que o PCSX2 guarda ali fica.
@@ -1851,7 +1907,7 @@ def console_do_disco_dolphin(caminho_jogo):
 
 
 def opcoes_de_imagem_dolphin(nota=None, nota_gpu=None, modesto=False, ultra=False,
-                             preset=None, abaixo=""):
+                             preset=None, abaixo="", formato=None):
     """O que o ARENA ajusta no Dolphin, por arquivo e secao.
 
     Achado de 30/09/2026: o Dolphin externo (GameCube e Wii) so recebia
@@ -1921,6 +1977,10 @@ def opcoes_de_imagem_dolphin(nota=None, nota_gpu=None, modesto=False, ultra=Fals
     if ultra:
         principal["Display"] = {"Fullscreen": "True"}
         principal["Interface"] = {"ConfirmStop": "False"}
+    # Formato da imagem (formato_de_fora): AspectRatio 0 "Auto", 1 "Force
+    # 16:9" e 3 "Stretch to Window" (a ordem da lista no Dolphin.exe).
+    if formato:
+        gfx_settings["AspectRatio"] = {"esticar": "3", "16:9": "1"}.get(formato, "0")
     gfx = {"Settings": gfx_settings, "Hacks": gfx_truques}
     if gfx_melhorias:
         gfx["Enhancements"] = gfx_melhorias
@@ -1981,7 +2041,7 @@ def _valor_ini(texto, secao, chave):
 
 def escrever_config_dolphin(caminho_executavel, controles_xinput, teclado=True,
                             console="gamecube", nota=None, nota_gpu=None,
-                            modesto=False, ultra=False, preset=None, abaixo=""):
+                            modesto=False, ultra=False, preset=None, abaixo="", formato=None):
     """Deixa o Dolphin portatil e escreve os controles de GameCube e Wii,
     e a imagem (ver opcoes_de_imagem_dolphin).
 
@@ -2032,7 +2092,7 @@ def escrever_config_dolphin(caminho_executavel, controles_xinput, teclado=True,
         gravar_atomico(os.path.join(pasta_config, "WiimoteNew.ini"),
                        "\n".join(cabecalho + wiimote) + "\n")
 
-        imagem = opcoes_de_imagem_dolphin(nota, nota_gpu, modesto, ultra, preset, abaixo)
+        imagem = opcoes_de_imagem_dolphin(nota, nota_gpu, modesto, ultra, preset, abaixo, formato)
         imagem["Dolphin.ini"].setdefault("Core", {}).update(portas)
         _anotar_ou_devolver_ultra_dolphin(pasta_config, ultra, imagem["Dolphin.ini"])
         for nome_arquivo, secoes in imagem.items():
@@ -2384,7 +2444,7 @@ def _trocar_valor_yaml(texto, secao, chave, valor):
 
 
 def escrever_config_rpcs3(caminho_executavel, nota, nota_gpu=None, modesto=False,
-                          ultra=False, preset=None, abaixo=""):
+                          ultra=False, preset=None, abaixo="", formato=None):
     """Escreve o bloco de video do RPCS3 (PlayStation 3), preservando o resto.
 
     Mesma logica do Xenia: so mexe se o RPCS3 ja criou o config.yml dele
@@ -2453,6 +2513,10 @@ def escrever_config_rpcs3(caminho_executavel, nota, nota_gpu=None, modesto=False
                                     if int(video["Resolution Scale"]) <= 100 and "minimo" not in niveis
                                     else "Bilinear")
 
+    # Formato da imagem (formato_de_fora): o PS3 ja e' 16:9; so o "esticar"
+    # enche a tela de outro formato (16:10, 4:3).
+    if formato:
+        video["Stretch To Display Area"] = "true" if formato == "esticar" else "false"
     for chave, valor in video.items():
         texto = _trocar_valor_yaml(texto, "Video", chave, valor)
 

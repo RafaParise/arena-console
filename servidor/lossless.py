@@ -391,8 +391,12 @@ def gravar_perfil(trocas=None, arquivo=None):
 # ---------------------------------------------------------------------------
 # O que o ARENA escolhe para cada jogo
 # ---------------------------------------------------------------------------
-def trocas_para_o_jogo(desenho_2d, nota_gpu, mais_quadros=False, hz=60):
+def trocas_para_o_jogo(desenho_2d, nota_gpu, mais_quadros=False, hz=60, esticar=False):
     """As trocas do perfil "ARENA" para este jogo, nesta maquina.
+
+    - Esticar (o Formato da imagem do ARENA, graficos.proporcao_da_partida,
+      pedido de 22/10/2026): o LS enche a tela inteira (ScalingFitMode
+      Fullscreen); senao, o formato do jogo (AspectRatio).
 
     - Jogo de pixel (2D): o pixel nitido do LS (SharpBilinear), o mesmo do
       ARENA. Jogo 3D: o LS1, a escala propria do LS, e na placa fraca o
@@ -402,7 +406,8 @@ def trocas_para_o_jogo(desenho_2d, nota_gpu, mais_quadros=False, hz=60):
       fraca, o tamanho rapido (LSFGSize PERFORMANCE) e o fluxo menor.
     """
     trocas = {"ScalingType": "SharpBilinear" if desenho_2d else "LS1",
-              "LS1Type": "BALANCED" if (nota_gpu or 0) >= 4 else "PERFORMANCE"}
+              "LS1Type": "BALANCED" if (nota_gpu or 0) >= 4 else "PERFORMANCE",
+              "ScalingFitMode": "Fullscreen" if esticar else "AspectRatio"}
     if mais_quadros:
         trocas.update({"FrameGeneration": "LSFG3", "LSFG3Mode1": "ADAPTIVE",
                        "LSFG3Target": str(int(hz or 60)),

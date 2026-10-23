@@ -965,22 +965,29 @@ def runtime_visual_c():
 # Resumo completo
 # ---------------------------------------------------------------------------
 
-def altura_da_tela():
-    """Linhas da tela principal em pixels de verdade -- 768, 1080, 2160 --,
-    sem a escala de 150% ou 200% do Windows. 0 se nao der para saber.
+def tamanho_da_tela():
+    """(largura, altura) da tela principal em pixels de verdade -- (1366,
+    768), (1920, 1080) --, sem a escala de 150% ou 200% do Windows. (0, 0)
+    se nao der para saber.
 
     Serve para o degrau "tela 4K" das opcoes de imagem (graficos.json ->
-    tela_4k). DESKTOPVERTRES (117) do GetDeviceCaps nao depende da escala
-    do Windows. Os tipos vao declarados (a alca de 64 bits cortada pela
-    metade ja foi bug aqui: SetPriorityClass sem tipos), numa copia propria
-    da user32 para nao mexer em quem mais usa a mesma funcao.
+    tela_4k) e para o formato da imagem (graficos.proporcao_da_partida: o
+    4:3 esticado ate a borda da tela larga). DESKTOPHORZRES (118) e
+    DESKTOPVERTRES (117) do GetDeviceCaps nao dependem da escala do Windows.
+    Os tipos vao declarados (a alca de 64 bits cortada pela metade ja foi
+    bug aqui: SetPriorityClass sem tipos), numa copia propria da user32
+    para nao mexer em quem mais usa a mesma funcao.
 
     No Linux: a primeira resolucao (a nativa) da saida ligada na tela, em
     /sys/class/drm/card*-*/modes, sem precisar da sessao grafica. No
-    Android: o lado menor da tela do aparelho (deitado, e' a altura)."""
+    Android: a tela do aparelho deitado (o jogo roda deitado): o lado maior
+    e' a largura."""
     if NO_ANDROID:
         m = re.match(r"(\d+)x(\d+)", do_app("TELA"))
-        return min(int(m.group(1)), int(m.group(2))) if m else 0
+        if not m:
+            return (0, 0)
+        lados = (int(m.group(1)), int(m.group(2)))
+        return (max(lados), min(lados))
     if os.name != "nt":
         for saida in sorted(glob.glob("/sys/class/drm/card[0-9]*-*")):
             if _ler(os.path.join(saida, "status")).strip() != "connected":
@@ -988,8 +995,8 @@ def altura_da_tela():
             primeira = (_ler(os.path.join(saida, "modes")).split() or [""])[0]
             m = re.match(r"(\d+)x(\d+)", primeira)
             if m:
-                return int(m.group(2))
-        return 0
+                return (int(m.group(1)), int(m.group(2)))
+        return (0, 0)
     try:
         usuario, gdi = ctypes.WinDLL("user32"), ctypes.WinDLL("gdi32")
         usuario.GetDC.restype = ctypes.c_void_p
@@ -998,13 +1005,19 @@ def altura_da_tela():
         gdi.GetDeviceCaps.argtypes = [ctypes.c_void_p, ctypes.c_int]
         dc = usuario.GetDC(None)
         if not dc:
-            return 0
+            return (0, 0)
         try:
-            return max(0, int(gdi.GetDeviceCaps(dc, 117)))
+            return (max(0, int(gdi.GetDeviceCaps(dc, 118))), max(0, int(gdi.GetDeviceCaps(dc, 117))))
         finally:
             usuario.ReleaseDC(None, dc)
     except (OSError, AttributeError, ValueError):
-        return 0
+        return (0, 0)
+
+
+def altura_da_tela():
+    """Linhas da tela principal (tamanho_da_tela): 768, 1080, 2160; 0 se
+    nao der para saber. No Android, o lado menor (deitado, e' a altura)."""
+    return tamanho_da_tela()[1]
 
 
 def resumo(pasta_raiz):
