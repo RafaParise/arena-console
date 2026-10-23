@@ -88,10 +88,14 @@ def montar(saida):
     basicos, total, maior = ["./"], 0, ("", 0)
     digital_tela, digital_nucleos = hashlib.sha256(), hashlib.sha256()
     for atual, pastas, arquivos in os.walk(saida):
-        pastas.sort()
-        if ".git" in os.path.relpath(atual, saida).split(os.sep):
-            continue
+        # O ramo gh-pages aberto como worktree tem um ARQUIVO .git na raiz (e
+        # o clone comum, uma pasta): nenhum dos dois vai para o site. Na
+        # lista do service worker, o .git (que o GitHub Pages nao serve)
+        # derrubaria a instalacao inteira no celular.
+        pastas[:] = sorted(p for p in pastas if p != ".git")
         for nome in sorted(arquivos):
+            if nome == ".git":
+                continue
             caminho = os.path.join(atual, nome)
             relativo = os.path.relpath(caminho, saida).replace(os.sep, "/")
             tamanho = os.path.getsize(caminho)

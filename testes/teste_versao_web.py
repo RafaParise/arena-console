@@ -253,6 +253,7 @@ def conferir(c, p):
     de_pe, guardado, deitado = c.get("de_pe") or {}, c.get("depois_de_guardar") or {}, c.get("deitado") or {}
     tela = p.get("tela") or {}
     return [
+        ("o .git do ramo gh-pages fica fora da lista do service worker", c.get("sw_sem_git") is True),
         ("o service worker fica no comando (abre de novo sem internet)", de_pe.get("service_worker") is True),
         ("de pé: os consoles numa faixa no alto, na largura toda",
          de_pe.get("corpo") == "column" and (de_pe.get("faixa") or [0, 999])[1] < 120
@@ -307,15 +308,22 @@ def main():
     celular, computador = {}, {}
     try:
         site = os.path.join(trabalho, "site")
+        # Como no ramo gh-pages aberto como worktree: um ARQUIVO .git na raiz,
+        # que o montador guarda e que nao pode ir para a lista do celular.
+        os.makedirs(site)
+        with open(os.path.join(site, ".git"), "w", encoding="utf-8") as arquivo:
+            arquivo.write("gitdir: ../.git/worktrees/gh-pages\n")
         montado = montar_site.montar(site)
+        with open(os.path.join(site, "sw.js"), encoding="utf-8") as arquivo:
+            celular["sw_sem_git"] = '".git' not in arquivo.read()
         servidor = servir(site)
         endereco = "http://127.0.0.1:%d/" % servidor.server_address[1]
         print("== Versao web %s (%s MB) em %s" % (montado["versao"], montado["total_mb"], endereco))
         try:
             with tela_sem_janela.Navegador(tamanho=(412, 915)) as nav:
-                celular = no_celular(nav, endereco, trabalho, fotos)
+                celular.update(no_celular(nav, endereco, trabalho, fotos))
         except (OSError, ValueError, KeyError, TypeError) as falha:
-            celular = {"falha": str(falha)}
+            celular["falha"] = str(falha)
         try:
             with tela_sem_janela.Navegador(tamanho=(1366, 768)) as nav:
                 computador = no_computador(nav, endereco, fotos)
