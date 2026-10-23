@@ -618,7 +618,19 @@ def montar(destino, com_bios=False):
         with open(os.path.join(xenia, "portable.txt"), "w", encoding="utf-8") as f:
             f.write("Criado pelo ARENA: guarda tudo do Xenia nesta pasta.\n")
 
-    # 5. Uma folha de rosto (UTF-8 com marca: o Bloco de Notas antigo
+    # 5. A configuracao do RetroArch e dos emuladores vai como MODELO
+    # (graficos.CONFIGURACOES_COM_MODELO, pedido de 22/10/2026): o pacote
+    # completo copiado por cima de um ARENA em uso troca so o modelo, e o
+    # ARENA so usa o modelo quando a configuracao de verdade ainda nao existe.
+    if os.path.join(RAIZ, "servidor") not in sys.path:
+        sys.path.insert(0, os.path.join(RAIZ, "servidor"))
+    import graficos
+    for rel in graficos.CONFIGURACOES_COM_MODELO:
+        caminho = os.path.join(destino, rel)
+        if os.path.isfile(caminho):
+            os.replace(caminho, caminho + graficos.SUFIXO_DO_MODELO)
+
+    # 6. Uma folha de rosto (UTF-8 com marca: o Bloco de Notas antigo
     # tambem mostra os acentos).
     with open(os.path.join(destino, "LEIA-PRIMEIRO.txt"), "w", encoding="utf-8-sig") as f:
         f.write(FOLHA_DE_ROSTO.format(bios=frase_das_bios(levadas) if com_bios else BIOS_FORA))
@@ -752,6 +764,14 @@ def conferir(destino, com_bios=False):
     for sobra in ("docs", "testes", "perfil", ".git", os.path.join("servidor", "tests")):
         if os.path.exists(os.path.join(destino, sobra)):
             problemas.append("pasta de desenvolvimento na versao: %s" % sobra)
+    # Copiar o pacote por cima nao pode apagar a configuracao de quem usa:
+    # ela so vai como modelo (graficos.CONFIGURACOES_COM_MODELO).
+    if os.path.join(RAIZ, "servidor") not in sys.path:
+        sys.path.insert(0, os.path.join(RAIZ, "servidor"))
+    import graficos
+    for rel in graficos.CONFIGURACOES_COM_MODELO:
+        if os.path.exists(os.path.join(destino, rel)):
+            problemas.append("configuracao de verdade no pacote (devia ir so o modelo .padrao): %s" % rel)
     for proibido in ("rpcn.yml", "arena.db", "config.json", "controles.json", "manifesto.json", "jogadores.txt"):
         for atual, _sub, arquivos in os.walk(destino):
             if proibido in arquivos and not atual.endswith("servidor"):

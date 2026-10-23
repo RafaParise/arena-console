@@ -1,0 +1,44 @@
+{
+ "conferencias": [
+  [
+   "o pacote leva a configuracao do RetroArch e dos emuladores so como modelo (.padrao)",
+   true
+  ],
+  [
+   "a primeira abertura poe a configuracao no lugar",
+   true
+  ],
+  [
+   "perfil, recordes, controles, jogos, BIOS, saves, estados e cartoes ficam iguais",
+   true
+  ],
+  [
+   "a configuracao mudada por quem usa continua a de quem usa",
+   true
+  ],
+  [
+   "a abertura depois da atualizacao nao troca nenhuma configuracao",
+   true
+  ]
+ ],
+ "segundos_montando": 14,
+ "modelos_no_pacote": [
+  "emuladores\\PCSX2\\PCSX2\\inis\\PCSX2.ini",
+  "emuladores\\RPCS3\\RPCS3\\config\\config.yml",
+  "emuladores\\Xenia\\Xenia\\xenia-canary-netplay.config.toml",
+  "emuladores\\Xenia\\Xenia\\xenia-canary.config.toml",
+  "retroarch\\retroarch.cfg"
+ ],
+ "configuracao_de_verdade_no_pacote": [],
+ "primeira_abertura": [
+  "retroarch\\retroarch.cfg",
+  "emuladores\\PCSX2\\PCSX2\\inis\\PCSX2.ini",
+  "emuladores\\RPCS3\\RPCS3\\config\\config.yml",
+  "emuladores\\Xenia\\Xenia\\xenia-canary.config.toml",
+  "emuladores\\Xenia\\Xenia\\xenia-canary-netplay.config.toml"
+ ],
+ "arquivos_copiados_por_cima": 12397,
+ "mudaram": [],
+ "segunda_abertura": [],
+ "data": "2026-10-22 22:51"
+}

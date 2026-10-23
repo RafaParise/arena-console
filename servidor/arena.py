@@ -7544,6 +7544,13 @@ def principal():
     if apagados_log:
         print("  Limpeza:  %d log(s) antigo(s) do RetroArch" % apagados_log)
 
+    # O pacote completo traz a configuracao do RetroArch e dos emuladores
+    # como modelo (graficos.CONFIGURACOES_COM_MODELO): so na primeira vez ela
+    # vira a de verdade, e copiar o zip novo por cima nao apaga a de quem usa.
+    instalados = graficos.instalar_configuracoes_que_faltam()
+    if instalados:
+        print("  Primeira vez: configuracao padrao de %d programa(s)" % len(instalados))
+
     # Pen drive muda de letra, pasta muda de lugar - conserta sozinho antes
     # de mais nada, senao o RetroArch abre com caminho de uma pasta que
     # nao existe mais nesta maquina.

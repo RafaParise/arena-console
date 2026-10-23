@@ -194,6 +194,48 @@ def _ja_dentro_do_arena(caminho, raiz_baixo):
             or os.path.exists(os.path.join(RAIZ, primeiro)))
 
 
+# Configuracao que o pacote leva como MODELO (pedido do Rafael, 22/10/2026:
+# "a atualizacao deve ser abrir a pasta compactada copiar tudo e arrastar
+# para o arena e atualiza sem perder nada de progresso, perfil, saves e nem
+# bios importantes ou suas configuracoes"). O pacote completo traz
+# "<arquivo>.padrao" (ferramentas\montar_versao_alunos.py), e o ARENA so
+# copia o modelo quando o arquivo de verdade ainda nao existe (a primeira
+# vez). Quem copia o zip novo por cima troca so o modelo: a configuracao de
+# quem usa fica como estava.
+SUFIXO_DO_MODELO = ".padrao"
+CONFIGURACOES_COM_MODELO = (
+    os.path.join("retroarch", "retroarch.cfg"),
+    os.path.join("emuladores", "PCSX2", "PCSX2", "inis", "PCSX2.ini"),
+    os.path.join("emuladores", "RPCS3", "RPCS3", "config", "config.yml"),
+    os.path.join("emuladores", "Xenia", "Xenia", "xenia-canary.config.toml"),
+    os.path.join("emuladores", "Xenia", "Xenia", "xenia-canary-netplay.config.toml"),
+)
+
+
+def instalar_configuracoes_que_faltam(raiz=None):
+    """Poe no lugar o modelo de cada configuracao que ainda nao existe
+    (CONFIGURACOES_COM_MODELO). Devolve os caminhos relativos instalados."""
+    raiz = raiz or RAIZ
+    instalados = []
+    for rel in CONFIGURACOES_COM_MODELO:
+        real = os.path.join(raiz, rel)
+        modelo = real + SUFIXO_DO_MODELO
+        if os.path.exists(real) or not os.path.isfile(modelo):
+            continue
+        temporario = "%s.%d.tmp" % (real, threading.get_ident())
+        try:
+            shutil.copyfile(modelo, temporario)
+            os.replace(temporario, real)
+            instalados.append(rel)
+        except OSError as falha:
+            print("[ARENA] Nao consegui por a configuracao padrao de %s: %s" % (rel, falha))
+            try:
+                os.remove(temporario)
+            except OSError:
+                pass
+    return instalados
+
+
 def corrigir_caminhos_retroarch_cfg():
     """Reescreve, dentro do retroarch.cfg, todo caminho que nao aponta mais
     para a pasta atual do ARENA, e desliga o que nunca pode ficar ligado

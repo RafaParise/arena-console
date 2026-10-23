@@ -296,12 +296,17 @@ quebra.
 
 ### Atualizar o ARENA sem perder nada
 
-Chegou uma versão nova? Use o **pacote de atualização**, e não o completo.
-Não apague nada.
+Chegou uma versão nova? Baixe, descompacte por cima e pronto: nada seu se
+perde. Não apague nada.
 
-1. Na página do Release, baixe o `ARENA-<versão>-atualizacao.zip` (só o
-   programa, uns 11 MB) e desbloqueie o arquivo como na instalação: botão
-   direito → **Propriedades** → **Desbloquear** → **OK**.
+1. Na página do Release, baixe um dos dois pacotes e desbloqueie o arquivo
+   como na instalação (botão direito → **Propriedades** → **Desbloquear** →
+   **OK**):
+   - `ARENA-<versão>-atualizacao.zip`: só o programa (uns 100 MB), o mais
+     rápido;
+   - `ARENA-<versão>.zip`: o completo (uns 1 GB). Também serve para
+     atualizar, e é o que traz os núcleos e os emuladores novos (versão com
+     console novo).
 2. Feche o ARENA (a janela preta também).
 3. Descompacte no mesmo lugar onde está a pasta `ARENA` (por exemplo, `C:\`
    ou a raiz do pen drive) e, quando o Windows perguntar, escolha
@@ -331,24 +336,31 @@ backup\       suas cópias
 Ao mandar substituir, o Windows só troca o que tem o mesmo nome. Tudo o que
 é seu fica.
 
-O **pacote completo** (`ARENA-<versão>.zip`) é para instalar do zero: ele traz
-também o RetroArch e os emuladores com a configuração do pacote. Descompactado
-por cima de um ARENA em uso, ele troca a configuração que você fez neles (os
-jogos, os saves, as BIOS e os recordes ficam).
+O **pacote completo** (`ARENA-<versão>.zip`) traz também o RetroArch, os
+núcleos e os emuladores, e pode ser descompactado por cima do mesmo jeito
+(pedido do Rafael, 22/10/2026). A configuração do RetroArch e dos emuladores
+vai nele só como **modelo** (`retroarch.cfg.padrao`, `PCSX2.ini.padrao`,
+`config.yml.padrao` e os dois do Xenia): o ARENA usa o modelo só na primeira
+vez, quando a configuração ainda não existe. Copiado por cima, o pacote troca
+o modelo e deixa a sua configuração como está. Conferido pelo
+`testes\teste_atualizar_por_cima.py`: o pacote de verdade copiado por cima de
+um ARENA em uso, com perfil, recordes, jogos, BIOS, saves, estados, cartões de
+memória e configuração mudada, e nada disso mudou.
+
+Os pacotes completos **até a versão 2026.10.22** ainda levavam a configuração
+de verdade: copiados por cima, trocam a configuração que você fez no RetroArch
+e nos emuladores (os jogos, os saves, as BIOS e os recordes ficam). Para eles,
+use o pacote de atualização.
 
 **Versão com console novo** (como a 2026.10.15, com 14): cada console novo
-precisa de um núcleo novo do RetroArch, e o pacote de atualização não mexe
-no `retroarch\`. Depois de atualizar, descompacte o pacote completo numa
-pasta qualquer e copie de lá só as pastas `retroarch\cores` e
-`retroarch\info` para dentro do seu `retroarch\`, substituindo os arquivos.
-Elas só têm os núcleos e a ficha de cada um: a sua configuração, os saves e
-os cheats ficam como estão.
+precisa de um núcleo novo do RetroArch, que só vem no pacote completo.
+Descompacte o completo por cima, como acima.
 
 **Java ME (jogos de celular antigo):** o emulador dele usa o Java que vem no
 pacote completo, na pasta `emuladores\Java` (uns 47 MB, só o programa). Se a
-sua versão ainda não tem essa pasta, copie-a do pacote completo para dentro
-do seu `emuladores\`. Sem ela, os jogos de Java ME só abrem num computador
-com Java instalado, e o `VERIFICAR.bat` avisa que ela falta.
+sua versão ainda não tem essa pasta, descompacte o pacote completo por cima.
+Sem ela, os jogos de Java ME só abrem num computador com Java instalado, e o
+`VERIFICAR.bat` avisa que ela falta.
 
 **GameCube e Wii dentro do RetroArch** (desde a 2026.10.16): o núcleo do
 Dolphin precisa dos arquivos de apoio dele, a pasta
