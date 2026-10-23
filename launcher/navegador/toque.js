@@ -64,6 +64,9 @@
     "#toque .topo{position:absolute;top:max(2vmin,env(safe-area-inset-top));left:0;right:0;display:flex;",
     "justify-content:center;gap:2vmin;pointer-events:none}",
     "#toque .topo .t{position:static}",
+    // Celular de pe: SELECT e START sobem para a altura do L e do R (embaixo,
+    // encostavam no direcional e no B). Deitado, cabem embaixo, no meio.
+    "@media (orientation:portrait){#toque .meio{bottom:48vmin!important}}",
   ].join("");
   document.head.appendChild(estilo);
 
@@ -151,8 +154,8 @@
 
   const l = botao("L", "pilula", "left:max(3vmin,env(safe-area-inset-left));bottom:48vmin");
   const r = botao("R", "pilula", "right:max(3vmin,env(safe-area-inset-right));bottom:48vmin");
-  const select = botao("SELECT", "pilula", "left:calc(50% - 19vmin);bottom:4vmin");
-  const start = botao("START", "pilula", "left:calc(50% + 3vmin);bottom:4vmin");
+  const select = botao("SELECT", "pilula meio", "left:calc(50% - 19vmin);bottom:4vmin");
+  const start = botao("START", "pilula meio", "left:calc(50% + 3vmin);bottom:4vmin");
   segurar(l, "l");
   segurar(r, "r");
   segurar(select, "select");

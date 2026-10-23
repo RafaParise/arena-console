@@ -15,6 +15,13 @@
   const $id = function (id) { return document.getElementById(id); };
   const SEGUNDOS_POR_JOGO = 8;
   let ultimoRelatorio = null;
+  // Celular e tablet (a versao da internet, auditoria 4): o caminho mais
+  // simples e' "Guardar um jogo": o arquivo (da pasta Download, por exemplo)
+  // fica guardado no aparelho. Escolher a pasta do ARENA so aparece onde o
+  // navegador sabe escolher pasta.
+  const NO_CELULAR = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+    !!(navigator.userAgentData && navigator.userAgentData.mobile);
+  const ESCOLHE_PASTA = typeof window.showDirectoryPicker === "function";
 
   function quandoPronto(fazer) {
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", fazer, { once: true });
@@ -41,6 +48,12 @@
       botao.textContent = "Permitir";
       botao.dataset.acao = "liberar";
       caixa.hidden = false;
+    } else if (NO_CELULAR) {
+      texto.textContent = "Os jogos livres que vêm com o ARENA já estão aqui. Para jogar um jogo seu, toque em " +
+        "Guardar um jogo e escolha o arquivo (o que você baixou fica na pasta Download). Ele fica guardado neste aparelho.";
+      botao.textContent = "Guardar um jogo";
+      botao.dataset.acao = "guardar";
+      caixa.hidden = !!(await temJogoGuardado());
     } else {
       texto.textContent = s.manifesto === "do_windows"
         ? "A lista veio do pen drive. Para abrir esses jogos, escolha a pasta do ARENA (a que tem o " +
@@ -59,7 +72,12 @@
     }
   }
 
+  async function temJogoGuardado() {
+    try { return (await ArenaBanco.contar("jogos", "meus/")) > 0; } catch (falha) { return false; }
+  }
+
   async function usarPasta(acao) {
+    if (acao === "guardar") { $id("campoGuardarJogo").click(); return; }
     try {
       const resposta = await fetch("/api/navegador/pasta", {
         method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ acao: acao }),
@@ -242,7 +260,8 @@
       const escolhido = $id("listaConsoleGuardar").value;
       const p = candidatos.find(function (c) { return c.id === escolhido; }) || (candidatos.length === 1 ? candidatos[0] : null);
       if (!p) {
-        recadoSeguro(candidatos.length ? arquivo.name + " serve a mais de um console: escolha qual na lista e mande de novo."
+        recadoSeguro(candidatos.length ? arquivo.name + " serve a mais de um console: em Ajustes → Máquina, escolha o " +
+          "console na lista de Guardar um jogo e mande de novo."
           : arquivo.name + ": nenhum console do navegador abre este tipo de arquivo.", true);
         continue;
       }
@@ -254,7 +273,9 @@
     if (guardados) {
       await ArenaRotas.montarLista();
       if (typeof carregarCatalogo === "function") await carregarCatalogo();
-      recadoSeguro(guardados === 1 ? "Jogo guardado neste navegador." : guardados + " jogos guardados neste navegador.");
+      const onde = NO_CELULAR ? "neste aparelho" : "neste navegador";
+      recadoSeguro(guardados === 1 ? "Jogo guardado " + onde + "." : guardados + " jogos guardados " + onde + ".");
+      await atualizarAviso();
     }
   }
 
@@ -280,9 +301,12 @@
     }
     const vazio = $id("vazioTexto");
     if (vazio) {
-      vazio.textContent = "Escolha a pasta do ARENA no pen drive (botão no alto) para ver os seus jogos, ou guarde " +
-        "um jogo neste navegador em Ajustes → Máquina.";
+      vazio.textContent = NO_CELULAR
+        ? "Toque em Guardar um jogo (na faixa dos consoles, no alto) e escolha o arquivo do jogo."
+        : "Escolha a pasta do ARENA no pen drive (botão no alto) para ver os seus jogos, ou guarde " +
+          "um jogo neste navegador em Ajustes → Máquina.";
     }
+    if (NO_CELULAR) textosDoCelular();
     const botaoPasta = $id("btnPastaArena");
     if (botaoPasta) botaoPasta.addEventListener("click", function () { usarPasta(botaoPasta.dataset.acao || "escolher"); });
     const outraPasta = $id("btnOutraPasta");
@@ -304,6 +328,35 @@
       if (antigo) { ultimoRelatorio = antigo; if (baixar) baixar.disabled = false; }
     }).catch(function () {});
   });
+
+  // No celular, o bloco "Este Chromebook" de Ajustes -> Maquina fala do
+  // aparelho; e a pasta do pen drive sai (o Chrome do Android nao escolhe
+  // pasta).
+  function textosDoCelular() {
+    const bloco = $id("blocoChromebook");
+    if (!bloco) return;
+    const titulos = bloco.querySelectorAll(".grupo-titulo");
+    if (titulos[0]) titulos[0].textContent = "Este aparelho";
+    if (titulos[1]) titulos[1].textContent = "Guardar um jogo neste aparelho";
+    const explicacoes = bloco.querySelectorAll(":scope > .explica");
+    if (explicacoes[0]) {
+      explicacoes[0].textContent = "No celular, o ARENA roda dentro do navegador, com o mesmo RetroArch do Windows. " +
+        "O teste abre um jogo de cada console, um por vez, e mede quantos quadros por segundo ele consegue: 60 é o " +
+        "certo. Leva uns dois minutos; não mexa enquanto isso.";
+    }
+    if (explicacoes[1]) {
+      explicacoes[1].textContent = "O jogo fica guardado dentro do navegador, neste aparelho. Serve para jogo " +
+        "pequeno, de cartucho. Se o nome do arquivo servir a mais de um console, escolha o console aqui antes.";
+    }
+    const testar = $id("btnTestarChromebook");
+    if (testar) testar.textContent = "Testar este aparelho";
+    if (!ESCOLHE_PASTA) {
+      const outra = $id("btnOutraPasta");
+      if (outra) outra.hidden = true;
+      const pasta = $id("chromebookPasta");
+      if (pasta && pasta.closest("ul")) pasta.closest("ul").hidden = true;
+    }
+  }
 
   window.ArenaTela = { atualizarAviso: atualizarAviso, testarChromebook: testarChromebook };
 })();

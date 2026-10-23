@@ -1255,6 +1255,43 @@ input::placeholder { color: var(--texto-apagado); }
   .acervo-formulario--inteiro { grid-column: auto; }
 }
 
+/* Celular de pe (auditoria 4, 22/10/2026): a coluna de consoles tomava quase
+   metade da tela e os cartoes ficavam estreitos. Abaixo de 700 px, os
+   consoles e os botoes da coluna viram uma faixa que rola para o lado (as
+   mesmas coisas, no mesmo lugar: no alto da lista), a grade de jogos fica
+   com a largura toda e as abas de cima numa faixa so. */
+@media (max-width: 700px) {
+  .corpo { flex-direction: column; }
+  .conteudo { min-height: 0; padding: .75rem; }
+  .trilho {
+    width: auto; flex-direction: row; align-items: center; gap: .4rem;
+    overflow-x: auto; overflow-y: hidden; padding: .5rem .75rem;
+    border-right: 0; border-bottom: 1px solid var(--borda);
+  }
+  .trilho-lista { flex-direction: row; gap: .4rem; margin: 0; }
+  /* Cada console vira uma "pilula", como os filtros dos apps de celular;
+     a escolhida ganha a borda verde (no computador, a borda da esquerda). */
+  .trilho-item, .trilho .botao--largo {
+    flex: 0 0 auto; width: auto; margin: 0; white-space: nowrap; min-height: 44px;
+  }
+  .trilho-item { border: 1px solid var(--borda); border-radius: 999px; padding: .4rem .85rem; }
+  .trilho-item.ativo { border-color: var(--pronto); }
+  .trilho-item--todos { font-family: var(--fonte-texto); font-size: var(--t-peq); }
+  .trilho-nome { overflow: visible; }
+  .marca { width: 100%; }
+  .topo-acoes {
+    width: 100%; min-width: 0; flex-shrink: 1; margin-left: 0;
+    flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start;
+  }
+  .topo-acoes > .botao { flex: 0 0 auto; white-space: nowrap; min-height: 44px; }
+}
+
+/* Celular (de pe ou deitado, como o app do Android): os consoles sem jogo
+   saem da lista. No computador eles ficam, para consulta. */
+@media (max-width: 700px), (max-height: 500px) {
+  .trilho-vazio { display: none; }
+}
+
 /* ========================= SELO DE PENDENTES ========================= */
 
 .selo {

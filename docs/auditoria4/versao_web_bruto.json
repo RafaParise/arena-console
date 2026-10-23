@@ -1,0 +1,296 @@
+{
+ "_leia": "testes\\teste_versao_web.py: a versao web (ferramentas\\montar_site.py) servida por http://127.0.0.1 no Edge sem janela, imitando o Chrome do Android (toque, 412x915, sem seletor de pasta); depois deitado (915x412) e no computador (1366x768, sem toque). Retangulos em pontos CSS: [esquerda, alto, direita, baixo].",
+ "data": "2026-10-22 21:20",
+ "celular": {
+  "de_pe": {
+   "jogos": 5,
+   "corpo": "column",
+   "faixa": [
+    412,
+    61
+   ],
+   "colunas": 2,
+   "rola_de_lado": false,
+   "consoles_visiveis": 5,
+   "consoles_com_jogo": 5,
+   "visiveis_sem_jogo": 0,
+   "aviso": [
+    "Os jogos livres que vêm com o ARENA já estão aqui. Para jogar um jogo seu, toque em Guardar um jogo e escolha o arquivo (o que você baixou fica na pasta Download). Ele fica guardado neste aparelho.",
+    "guardar"
+   ],
+   "guardar_na_faixa": true,
+   "titulos": [
+    "Evade",
+    "Slippery Slope",
+    "Skip Ahead",
+    "Intervallo",
+    "Baguel"
+   ],
+   "recado": "Tudo certo, teste!",
+   "service_worker": true
+  },
+  "depois_de_guardar": {
+   "jogos": 6,
+   "corpo": "column",
+   "faixa": [
+    412,
+    61
+   ],
+   "colunas": 2,
+   "rola_de_lado": false,
+   "consoles_visiveis": 5,
+   "consoles_com_jogo": 5,
+   "visiveis_sem_jogo": 0,
+   "aviso": null,
+   "guardar_na_faixa": true,
+   "titulos": [
+    "Evade",
+    "Slippery Slope",
+    "Skip Ahead",
+    "Intervallo",
+    "Baguel",
+    "Meu Jogo Teste"
+   ],
+   "recado": "Jogo guardado neste aparelho.",
+   "service_worker": true
+  },
+  "jogo_abriu": true,
+  "controle_de_pe": {
+   "visivel": true,
+   "meio": [
+    [
+     128,
+     680,
+     212,
+     717
+    ],
+    [
+     218,
+     680,
+     292,
+     717
+    ]
+   ],
+   "outros": [
+    [
+     12,
+     730,
+     177,
+     894
+    ],
+    [
+     342,
+     783,
+     400,
+     841
+    ],
+    [
+     288,
+     837,
+     346,
+     894
+    ],
+    [
+     288,
+     730,
+     346,
+     787
+    ],
+    [
+     235,
+     783,
+     293,
+     841
+    ]
+   ],
+   "sair": "✕ SAIR"
+  },
+  "teclas": [
+   "ArrowUp",
+   "KeyX"
+  ],
+  "sair_primeiro_toque": "TOQUE DE NOVO",
+  "aberto_depois_de_um_toque": true,
+  "fechou": true,
+  "deitado": {
+   "jogos": 6,
+   "corpo": "row",
+   "faixa": [
+    180,
+    342
+   ],
+   "colunas": 3,
+   "rola_de_lado": false,
+   "consoles_visiveis": 5,
+   "consoles_com_jogo": 5,
+   "visiveis_sem_jogo": 0,
+   "aviso": null,
+   "guardar_na_faixa": true,
+   "titulos": [
+    "Evade",
+    "Slippery Slope",
+    "Skip Ahead",
+    "Intervallo",
+    "Baguel",
+    "Meu Jogo Teste"
+   ],
+   "recado": "Abrindo Evade pelo RetroArch 1.22.2 no navegador. Aguarde uns segundos.",
+   "service_worker": true
+  },
+  "controle_deitado": {
+   "visivel": true,
+   "meio": [
+    [
+     379,
+     358,
+     464,
+     396
+    ],
+    [
+     470,
+     358,
+     543,
+     396
+    ]
+   ],
+   "outros": [
+    [
+     12,
+     227,
+     177,
+     391
+    ],
+    [
+     845,
+     280,
+     903,
+     338
+    ],
+    [
+     791,
+     334,
+     849,
+     391
+    ],
+    [
+     791,
+     227,
+     849,
+     284
+    ],
+    [
+     738,
+     280,
+     796,
+     338
+    ]
+   ],
+   "sair": "✕ SAIR"
+  }
+ },
+ "computador": {
+  "tela": {
+   "jogos": 5,
+   "corpo": "row",
+   "faixa": [
+    248,
+    698
+   ],
+   "colunas": 3,
+   "rola_de_lado": false,
+   "consoles_visiveis": 67,
+   "consoles_com_jogo": 5,
+   "visiveis_sem_jogo": 62,
+   "aviso": [
+    "Os jogos livres que vêm com o ARENA já estão aqui. Para os seus jogos, escolha a pasta do ARENA no pen drive (a que tem o ARENA-CHROMEBOOK.html). É uma vez só: o ARENA lembra.",
+    "escolher"
+   ],
+   "guardar_na_faixa": true,
+   "titulos": [
+    "Evade",
+    "Slippery Slope",
+    "Skip Ahead",
+    "Intervallo",
+    "Baguel"
+   ],
+   "recado": "Tudo certo, teste!",
+   "service_worker": true
+  },
+  "jogo_abriu": true,
+  "controle": null
+ },
+ "conferencias": [
+  [
+   "o service worker fica no comando (abre de novo sem internet)",
+   true
+  ],
+  [
+   "de pé: os consoles numa faixa no alto, na largura toda",
+   true
+  ],
+  [
+   "de pé: a grade de jogos com 2 colunas",
+   true
+  ],
+  [
+   "de pé: nada rola para o lado",
+   true
+  ],
+  [
+   "no celular: só os consoles com jogo aparecem na faixa",
+   true
+  ],
+  [
+   "o aviso oferece Guardar um jogo (e não a pasta)",
+   true
+  ],
+  [
+   "Guardar um jogo também está na faixa dos consoles",
+   true
+  ],
+  [
+   "o jogo guardado entra na lista e o aviso some",
+   true
+  ],
+  [
+   "o recado diz que o jogo ficou no aparelho",
+   true
+  ],
+  [
+   "o jogo abre com o controle na tela",
+   true
+  ],
+  [
+   "o direcional e o A chegam ao jogo (seta e X)",
+   true
+  ],
+  [
+   "de pé: SELECT e START não encostam no direcional nem no A/B/X/Y",
+   true
+  ],
+  [
+   "SAIR: o primeiro toque só pede confirmação",
+   true
+  ],
+  [
+   "SAIR: o segundo toque fecha o jogo",
+   true
+  ],
+  [
+   "deitado: nada rola para o lado",
+   true
+  ],
+  [
+   "deitado: SELECT e START não encostam no direcional nem no A/B/X/Y",
+   true
+  ],
+  [
+   "no computador: os consoles ficam na coluna da esquerda",
+   true
+  ],
+  [
+   "no computador: o jogo abre sem o controle na tela",
+   true
+  ]
+ ]
+}

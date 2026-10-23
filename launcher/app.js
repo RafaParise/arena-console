@@ -449,6 +449,8 @@ function desenharPlataformas() {
 
     botao.append(sinal, nome, conta);
     item.append(botao);
+    // Console sem jogo: no celular ele sai da faixa (estilo.css, auditoria 4).
+    item.classList.toggle("trilho-vazio", !(contagem[plataforma.id] > 0));
     lote.append(item);
   }
 

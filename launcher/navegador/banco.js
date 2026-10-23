@@ -105,6 +105,26 @@ window.ArenaBanco = (function () {
     });
   }
 
+  // Quantas chaves comecam com "prefixo", sem ler os valores (um jogo
+  // guardado pode ter megabytes).
+  function contar(gaveta, prefixo) {
+    prefixo = prefixo || "";
+    return abrir().then(function (aberta) {
+      if (!aberta) {
+        return Array.from(naMemoria.get(gaveta).keys()).filter(function (chave) {
+          return String(chave).startsWith(prefixo);
+        }).length;
+      }
+      return new Promise(function (pronto, falhou) {
+        const transacao = aberta.transaction(gaveta, "readonly");
+        const faixa = prefixo ? IDBKeyRange.bound(prefixo, prefixo + "￿") : undefined;
+        const pedido = transacao.objectStore(gaveta).count(faixa);
+        transacao.oncomplete = function () { pronto(pedido.result); };
+        transacao.onerror = function () { falhou(transacao.error); };
+      });
+    });
+  }
+
   async function soNaMemoria() {
     await abrir();
     return !!naMemoria;
@@ -119,6 +139,6 @@ window.ArenaBanco = (function () {
     return false;
   }
 
-  return { ler: ler, gravar: gravar, apagar: apagar, listar: listar, soNaMemoria: soNaMemoria,
+  return { ler: ler, gravar: gravar, apagar: apagar, listar: listar, contar: contar, soNaMemoria: soNaMemoria,
            pedirParaGuardar: pedirParaGuardar };
 })();

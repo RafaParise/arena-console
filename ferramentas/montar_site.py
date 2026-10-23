@@ -16,6 +16,7 @@ A pasta de saida (padrao: %LOCALAPPDATA%\ARENA-site) pode ser o ramo
 gh-pages aberto como worktree: a pasta .git dela fica intacta. Publicar:
 docs\WEB.md.
 """
+import hashlib
 import json
 import os
 import re
@@ -80,11 +81,17 @@ def montar(saida):
 
     # O que o service worker guarda ja na instalacao: tudo, menos os nucleos
     # (92 MB; cada um fica guardado quando abre o primeiro jogo dele).
+    # A "impressao digital" (sha256) do conteudo vai no nome da guarda: com o
+    # mesmo numero de versao, qualquer arquivo mudado ja faz o celular buscar
+    # a tela nova; e os nucleos tem guarda propria, que so troca quando um
+    # nucleo muda (sem baixar 92 MB de novo a cada conserto da tela).
     basicos, total, maior = ["./"], 0, ("", 0)
-    for atual, _pastas, arquivos in os.walk(saida):
+    digital_tela, digital_nucleos = hashlib.sha256(), hashlib.sha256()
+    for atual, pastas, arquivos in os.walk(saida):
+        pastas.sort()
         if ".git" in os.path.relpath(atual, saida).split(os.sep):
             continue
-        for nome in arquivos:
+        for nome in sorted(arquivos):
             caminho = os.path.join(atual, nome)
             relativo = os.path.relpath(caminho, saida).replace(os.sep, "/")
             tamanho = os.path.getsize(caminho)
@@ -93,11 +100,18 @@ def montar(saida):
                 maior = (relativo, tamanho)
             if tamanho >= LIMITE_DO_PAGES:
                 raise SystemExit("%s tem %d MB: o GitHub Pages nao aceita." % (relativo, tamanho // 1048576))
-            if not relativo.startswith("launcher/navegador/nucleos/") and relativo != ".nojekyll":
+            nucleo = relativo.startswith("launcher/navegador/nucleos/")
+            digital = digital_nucleos if nucleo else digital_tela
+            digital.update(relativo.encode("utf-8") + b"\0")
+            with open(caminho, "rb") as arquivo:
+                digital.update(arquivo.read())
+            if not nucleo and relativo != ".nojekyll":
                 basicos.append(relativo)
     with open(os.path.join(MODELOS, "sw.js"), encoding="utf-8") as arquivo:
         servico = arquivo.read()
-    servico = servico.replace("__VERSAO__", versao()).replace("__BASICOS__", json.dumps(sorted(basicos), indent=1))
+    servico = (servico.replace("__VERSAO__", versao() + "-" + digital_tela.hexdigest()[:10])
+               .replace("__NUCLEOS__", digital_nucleos.hexdigest()[:10])
+               .replace("__BASICOS__", json.dumps(sorted(basicos), indent=1)))
     with open(os.path.join(saida, "sw.js"), "w", encoding="utf-8", newline="\n") as arquivo:
         arquivo.write(servico)
     return {"saida": saida, "arquivos": len(basicos), "total_mb": round(total / 1048576.0, 1),
