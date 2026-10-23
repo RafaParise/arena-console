@@ -1,0 +1,7 @@
+# Filtro do ARENA: Anime4K (licenca MIT), para jogo com cara de desenho
+# animado. Ele afina as linhas do contorno ao esticar, como o modo Anime4K do
+# Lossless Scaling (pedido do Rafael, 22/10/2026: as funcoes do Lossless no
+# ARENA, por tecnicas abertas). Escolha do aluno (Ajustes -> Simples ->
+# Escala da tela -> Anime4K); o automatico nao usa.
+# Quem escolhe: servidor\graficos.py -> filtro_da_escala.
+#reference "../../retroarch/shaders/shaders_slang/sharpen/Anime4k.slangp"

@@ -1613,6 +1613,10 @@ const EXPLICA_ESCALA_TELA = {
     "passando o contorno a limpo. O mais bonito no 3D, e pesa um pouco mais na placa de vídeo.",
   suave: "Arredonda os pixels dos jogos 2D, como se o desenho fosse refeito à mão. No 3D, usa " +
     "o FSR. É o que mais pesa.",
+  anime4k: "Afina as linhas do contorno ao esticar, como o modo Anime4K do Lossless Scaling. " +
+    "Bom em jogo com cara de desenho animado; pesa como o FSR.",
+  inteiro: "Cada pixel vira 2, 3 ou 4 pontos da tela, sempre o mesmo número: o desenho fica " +
+    "perfeito, com uma borda preta em volta (o Integer do Lossless Scaling). Quase não pesa.",
   original: "Sem filtro: o emulador só estica a imagem. É o mais leve, mas o pixel sai " +
     "borrado ou de tamanhos diferentes.",
 };

@@ -1196,7 +1196,18 @@ Pense numa foto pequena que precisa virar um cartaz:
 | **Pixel nítido** | Todo pixel vira um quadradinho do mesmo tamanho, como azulejo bem assentado | Jogo 2D |
 | **Nítido (FSR da AMD)** | Procura as bordas antes de esticar, como quem passa o contorno do desenho a limpo | Jogo 3D, placa boa |
 | **Suave** | Arredonda o pixel art, como se o desenho fosse refeito à mão | Quem gosta (pesa mais) |
+| **Anime4K** | Afina as linhas do contorno ao esticar (o modo Anime4K do Lossless Scaling) | Jogo com cara de desenho animado |
+| **Inteiro** | Cada pixel vira 2, 3 ou 4 pontos, sempre o mesmo número, com borda preta em volta (o Integer do Lossless) | Quem quer o pixel perfeito |
 | **Original** | Sem filtro: só estica | O mais leve |
+
+As funções do Lossless Scaling, no ARENA (22/10/2026): o FSR, o pixel
+nítido (SharpBilinear), o Anime4K, o Inteiro e o "sem filtro" (Nearest)
+estão na lista acima; o xBR fica com o **Suave** (os dois arredondam o pixel
+art, e o xBR pesou mais: +8,8 pontos de placa contra +5,7); o "Tela cheia" e
+o "Proporção" do Lossless são o **Formato da imagem**, logo abaixo. O LS1, o
+NIS e o SGSR não vêm no RetroArch 1.22 (o LS1 é fechado; o FSR faz o mesmo
+papel), e a geração de quadros (LSFG) só existe no Lossless de quem comprou:
+o ARENA continua usando o programa de verdade quando ele está na máquina.
 
 #### O que o Automático escolhe
 

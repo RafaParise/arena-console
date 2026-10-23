@@ -524,7 +524,11 @@ def opcoes_finais_do_nucleo(nome_curto, nota, nota_gpu=None, modesto=False, altu
 # qualquer filtro (PSP 4x: 12,4% da placa; 2x + FSR: 13,5%).
 PASTA_FILTROS = os.path.join(PASTA_SERVIDOR, "filtros")
 # O que o aluno escolhe (Ajustes -> Imagem -> Escala da tela).
-ESCALAS = ("automatico", "pixel", "nitido", "suave", "original")
+# Anime4K e Inteiro (22/10/2026): as funcoes do Lossless Scaling que o ARENA
+# ainda nao tinha, por tecnicas abertas. O xBR do Lossless fica com o
+# "suave" (ScaleFX): os dois arredondam o pixel art, e o xBR pesou mais
+# (+8,8 pontos de placa contra +5,7, medido em 16/10/2026).
+ESCALAS = ("automatico", "pixel", "nitido", "suave", "anime4k", "inteiro", "original")
 
 # Formato da imagem (pedido do Rafael, 22/10/2026: "a tela nao mais esta
 # esticando ate a borda da tela como fazia antes"): a proporcao da imagem do
@@ -576,7 +580,7 @@ def formato_de_fora(plataforma, formato, tela):
     if indice == PROPORCAO_CONFIG:
         return "16:9"
     return "console"
-ARQUIVOS_DOS_FILTROS = {"pixel": "pixel-nitido.slangp", "nitido": "fsr.slangp",
+ARQUIVOS_DOS_FILTROS = {"pixel": "pixel-nitido.slangp", "nitido": "fsr.slangp", "anime4k": "anime4k.slangp",
                         "catmull": "catmull-rom.slangp", "rcas": "rcas.slangp",
                         "suave": "suave.slangp"}
 # Achado de 22/10/2026 (rodada final, matriz de consoles): o SwanStation
@@ -654,8 +658,8 @@ def jeito_da_escala(plataforma, escolha="automatico", nome_curto=None, opcoes_nu
     'folga': o perfil Desempenho, o Ultra e a partida a dois -- o jogo
     precisa de toda a placa, e o 3D fica so com a nitidez (rcas).
     """
-    if escolha == "original" or not plataforma:
-        return ""
+    if escolha in ("original", "inteiro") or not plataforma:
+        return ""        # o Inteiro e' o video_scale_integer, sem filtro (arena.gravar_override)
     tabela = carregar_graficos().get("escala", {})
     de_pixel = set(tabela.get("pixel") or [])
     de_3d = set(tabela.get("tres_d") or [])
@@ -667,6 +671,8 @@ def jeito_da_escala(plataforma, escolha="automatico", nome_curto=None, opcoes_nu
         return "nitido"
     if escolha == "suave":
         return "suave" if plataforma in de_pixel else "nitido"
+    if escolha == "anime4k":
+        return "anime4k"
     # Automatico.
     if plataforma in de_pixel:
         return "pixel"

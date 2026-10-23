@@ -2036,6 +2036,10 @@ def gravar_override(config, custo=None, extras=None, em_partida=False,
             if nome_core in graficos.NUCLEOS_RCAS_SEM_THREAD:
                 opcoes["video_threaded"] = "false"
     opcoes["video_shader_enable"] = "true" if filtro else "false"
+    # Escala "Inteiro" (o Integer do Lossless Scaling): todo pixel do mesmo
+    # tamanho, no maior multiplo que cabe na tela, com borda preta em volta.
+    if escolha == "inteiro":
+        opcoes["video_scale_integer"] = "true"
     # Formato da imagem (pedido do Rafael, 22/10/2026: "a tela nao mais esta
     # esticando ate a borda"): o 4:3 esticado ate a borda da tela larga, ou a
     # proporcao do console (graficos.proporcao_da_partida). Vale em todo

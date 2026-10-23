@@ -98,6 +98,11 @@ class Regra(unittest.TestCase):
         # Console que o nucleo ja desenha grande (Vectrex): nada, nem pedido.
         self.assertEqual(self.jeito("vectrex", escolha="nitido"), "")
         self.assertEqual(self.jeito(None), "")
+        # As funcoes do Lossless que faltavam (22/10/2026): o Anime4K e o
+        # Inteiro (este sem filtro: e' a escala inteira do RetroArch).
+        self.assertEqual(self.jeito("snes", escolha="anime4k"), "anime4k")
+        self.assertEqual(self.jeito("ps1", escolha="anime4k"), "anime4k")
+        self.assertEqual(self.jeito("snes", escolha="inteiro"), "")
 
 
 class Presets(unittest.TestCase):
@@ -188,6 +193,17 @@ class ArquivoDaPartida(unittest.TestCase):
         # desligado (o computador do professor) ganha a escala do mesmo jeito.
         filtro, _ = self.partida("snes", "snes9x_libretro.dll", avancado={"video_shader_enable": "false"})
         self.assertEqual(filtro, "pixel-nitido.slangp")
+
+    def test_anime4k_e_inteiro(self):
+        # Conferidos de verdade em 22/10/2026 (MSX, 1440x900): o Anime4K
+        # compila sem erro e enche a tela; o Inteiro deixa a borda preta.
+        filtro, opcoes = self.partida("snes", "snes9x_libretro.dll", escala_da_tela="anime4k")
+        self.assertEqual(filtro, "anime4k.slangp")
+        self.assertEqual(opcoes["video_scale_integer"], "false")
+        filtro, opcoes = self.partida("snes", "snes9x_libretro.dll", escala_da_tela="inteiro")
+        self.assertEqual(filtro, "")
+        self.assertEqual(opcoes["video_scale_integer"], "true")
+        self.assertEqual(opcoes["video_shader_enable"], "false")
 
 
 class Configuracao(unittest.TestCase):
