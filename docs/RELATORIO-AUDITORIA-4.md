@@ -30,8 +30,10 @@ eu autorizo").
 | As funções do Lossless Scaling | Anime4K e Inteiro (as que faltavam); mapa Lossless → ARENA no guia 3 | `b2f8418` | Foto da tela: Anime4K compila e enche a tela; Inteiro com borda |
 | Instalar no A12 pelo cabo | `ferramentas\instalar_no_celular.py` (32 bits → abre a versão web) | (este relatório) | Teste de unidade; no emulador |
 
-Bateria do servidor ao fim: **650 testes, OK** (7 pulados de propósito).
-Versão web: 19/19. Chromebook: 41/41. Atualizar por cima: 5/5.
+Bateria do servidor ao fim: **651 testes, OK** no Windows e **651 OK no Linux** (o Debian 13 do
+contêiner do WSL; um teste do Java ME era só do Windows e reprovava lá desde 18/10: corrigido).
+Versão web: 19/19. Chromebook: 41/41. Atualizar por cima: 5/5. Android no emulador: inteiro;
+estresse (Monkey de 3.000 toques, matar e voltar, girar, pouca memória, sem rede): 5/5.
 
 ---
 
@@ -80,6 +82,25 @@ mesmo pedido de fora da tela é recusado (403). O aviso de "app sem resposta"
 que apareceu uma vez é do emulador lento (desenho por software, 2 núcleos):
 o teste toca em "Esperar", como já fazia. Fotos em
 `%TEMP%\teste_android_fotos`.
+
+### Estresse (novo: `testes\teste_android_estresse.py`)
+
+No mesmo emulador, em 23/10 (`docs\auditoria4\android_estresse_bruto.json`),
+**5 de 5**:
+
+| Passo | Resultado |
+|---|---|
+| Monkey: 3.000 toques, deslizes e teclas ao acaso dentro do app (a tela do ARENA e o RetroArch) | foi até o fim em 154 s, sem queda e sem travamento do ARENA |
+| Matar e voltar (o Android fecha o app à força) | abre de novo |
+| Girar a tela (deitado e de pé) | a tela do ARENA continua na frente |
+| Pouca memória (o aviso de memória crítica do Android a cada processo do app) | continua vivo |
+| Sem rede (Wi-Fi e dados desligados) | abre de novo, offline |
+
+Achado no próprio teste: a primeira rodada parou em 93 toques porque o
+Monkey desiste no primeiro "não responde" de qualquer app, e o do sistema
+apareceu no emulador lento. Com o Monkey indo até o fim e anotando só as
+quedas e os travamentos do ARENA, a rodada mede o que interessa. O teste
+agora reprova se o Monkey não chegar a 90% dos toques.
 
 ---
 

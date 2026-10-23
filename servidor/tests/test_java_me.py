@@ -74,6 +74,10 @@ class TestJavaDoArena(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.base, ignore_errors=True)
 
+    # O javaw.exe e o "Path" com letra minuscula sao do Windows; no Linux, o
+    # teste de baixo (a bateria do Linux de 23/10/2026 reprovava este aqui:
+    # la o Java do ARENA e' o emuladores\Java\linux).
+    @unittest.skipUnless(sys.platform.startswith("win"), "o javaw.exe e o \"Path\" sao do Windows")
     def test_o_java_do_arena_vai_na_frente_do_path(self):
         with open(os.path.join(self.java, "bin", "javaw.exe"), "wb") as arquivo:
             arquivo.write(b"MZ")
@@ -83,6 +87,18 @@ class TestJavaDoArena(unittest.TestCase):
         self.assertEqual(ambiente["Path"].split(os.pathsep)[0], os.path.join(self.java, "bin"))
         self.assertIn(r"C:\Program Files\Java\bin", ambiente["Path"])
         self.assertNotIn("PATH", ambiente)
+
+    @unittest.skipIf(sys.platform.startswith("win"), "o java do Linux (emuladores\\Java\\linux)")
+    def test_no_linux_o_java_do_arena_vai_na_frente_do_path(self):
+        java = os.path.join(self.java, "linux", "bin", "java")
+        os.makedirs(os.path.dirname(java))
+        with open(java, "w", encoding="utf-8") as arquivo:
+            arquivo.write("#!/bin/sh\n")
+        os.chmod(java, 0o755)
+        ambiente = java_do_arena.ambiente({"PATH": "/usr/bin:/bin", "X": "1"}, pasta=self.java)
+        self.assertEqual(ambiente["PATH"].split(os.pathsep)[0], os.path.dirname(java_do_arena.javaw(self.java)))
+        self.assertIn("/usr/bin", ambiente["PATH"])
+        self.assertEqual(ambiente["X"], "1")
         self.assertEqual(ambiente["X"], "1")
 
     def test_sem_o_java_do_arena_o_path_fica_como_esta(self):

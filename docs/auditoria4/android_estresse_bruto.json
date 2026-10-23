@@ -1,0 +1,51 @@
+{
+ "quando": "2026-10-23 18:53:51",
+ "toques": 3000,
+ "emulador_ligou_s": 52.2,
+ "abriu": true,
+ "Monkey: toques ao acaso": {
+  "eventos": 3000,
+  "travou": [],
+  "avisos_de_outros_apps": [],
+  "terminou": true,
+  "segundos": 154.1,
+  "app_vivo": true,
+  "quedas_novas": [],
+  "tela": "topResumedActivity=ActivityRecord{e9eaec8 u0 io.github.rafaparise.arena/.ArenaActivity t204}"
+ },
+ "matar e voltar": {
+  "voltou": true,
+  "segundos": 6.9,
+  "app_vivo": true,
+  "quedas_novas": [],
+  "tela": "topResumedActivity=ActivityRecord{f334d31 u0 io.github.rafaparise.arena/.ArenaActivity t208}"
+ },
+ "girar a tela": {
+  "fotos": [
+   "estresse-girar-1.png",
+   "estresse-girar-0.png"
+  ],
+  "na_frente": true,
+  "segundos": 19.1,
+  "app_vivo": true,
+  "quedas_novas": [],
+  "tela": "topResumedActivity=ActivityRecord{f334d31 u0 io.github.rafaparise.arena/.ArenaActivity t208}"
+ },
+ "pouca memoria": {
+  "processos": [
+   "io.github.rafaparise.arena:tela"
+  ],
+  "segundos": 5.4,
+  "app_vivo": true,
+  "quedas_novas": [],
+  "tela": "topResumedActivity=ActivityRecord{f334d31 u0 io.github.rafaparise.arena/.ArenaActivity t208}"
+ },
+ "sem rede": {
+  "abriu_sem_rede": true,
+  "segundos": 15.4,
+  "app_vivo": true,
+  "quedas_novas": [],
+  "tela": "topResumedActivity=ActivityRecord{359b733 u0 io.github.rafaparise.arena/.ArenaActivity t209}"
+ },
+ "avisos_do_sistema_fechados": []
+}
