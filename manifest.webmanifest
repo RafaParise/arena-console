@@ -1,0 +1,16 @@
+{
+  "name": "ARENA",
+  "short_name": "ARENA",
+  "description": "A central de jogos retrô da turma, no navegador: celular, tablet e Chromebook, sem instalar nada.",
+  "lang": "pt-BR",
+  "start_url": "./launcher/index.html?navegador=1",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "any",
+  "background_color": "#12121a",
+  "theme_color": "#12121a",
+  "icons": [
+    {"src": "icone-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
+    {"src": "icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+  ]
+}
