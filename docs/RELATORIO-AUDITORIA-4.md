@@ -13,7 +13,8 @@ Máquina das medições: Ryzen 5 5600G com a Vega integrada, tela 1440×900 —
 o emulador do AOSP (Android 15, 1080×2400). **Nada foi juntado ao `main` nem
 publicado como versão nova**: isso espera o Rafael. A versão web foi
 publicada no GitHub Pages, com a autorização dele ("pode preparar por favor,
-eu autorizo").
+eu autorizo"), e o ramo `auditoria-4` foi enviado ao GitHub como cópia de
+segurança, pelo `sincronizar_github.py` (que confere antes: 0 bloqueios).
 
 ## Resumo
 
@@ -263,7 +264,9 @@ verificar a melhor ordem de implementação".
    aceitar "Permitir depuração USB" e rodar
    `servidor\python\python.exe ferramentas\instalar_no_celular.py` (ou pedir
    ao Claude). Ela mostra o que vai copiar (BIOS, saves e os jogos que o
-   celular roda) e pergunta antes.
+   celular roda) e pergunta antes. Os APKs de 64 bits com esta rodada já
+   estão montados (23/10, 19h, em `%LOCALAPPDATA%\ARENA-android\apk`): a
+   ferramenta pega o mais novo.
 3. **No seu computador**: Ajustes → Simples → **Formato da imagem** (o
    Automático já estica até a borda) e Ajustes → Máquina → **Desempenho que
    aprende**. Se quiser o jogo esticado também no Lossless, deixe ele fechado
