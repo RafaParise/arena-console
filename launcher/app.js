@@ -216,6 +216,9 @@ async function carregarEstado() {
 
   $("#chaveRpcn").setAttribute("aria-pressed",
     dados.config.rpcn_ativo ? "true" : "false");
+  $("#chaveDesempenho").setAttribute("aria-pressed",
+    dados.config.ajuste_pelo_desempenho === false ? "false" : "true");
+  mostrarDesempenho(dados.desempenho || {});
 
   $("#listaPresetGrafico").value = dados.config.preset_grafico_externo || "automatico";
   atualizarExplicaPreset();
@@ -1738,6 +1741,32 @@ const EXPLICA_BOTOES_NA_TELA = {
 function explicarBotoesNaTela() {
   const valor = $("#listaBotoesNaTela").value;
   $("#explicaBotoesNaTela").textContent = EXPLICA_BOTOES_NA_TELA[valor] || EXPLICA_BOTOES_NA_TELA.automatico;
+}
+
+// Desempenho que aprende (servidor\desempenho.py): os consoles que ficaram
+// no limite e jogam um degrau mais leve.
+function mostrarDesempenho(porConsole) {
+  const lista = $("#listaDesempenho");
+  if (!lista) return;
+  const nomes = new Map((estado.plataformas || []).map((p) => [p.id, p.nome]));
+  const itens = Object.entries(porConsole || {}).filter(([, d]) => d && d.degrau > 0)
+    .map(([id, d]) => {
+      const item = document.createElement("li");
+      const nome = document.createElement("span");
+      nome.textContent = nomes.get(id) || id;
+      const texto = document.createElement("code");
+      texto.textContent = d.degrau + (d.degrau === 1 ? " degrau mais leve" : " degraus mais leve") +
+        (d.quando ? " (desde " + String(d.quando).slice(0, 10).split("-").reverse().join("/") + ")" : "");
+      item.append(nome, texto);
+      return item;
+    });
+  if (!itens.length) {
+    const item = document.createElement("li");
+    item.textContent = "Nenhum console ficou no limite até agora.";
+    itens.push(item);
+  }
+  lista.replaceChildren(...itens);
+  $("#btnDesempenhoZerar").hidden = !Object.values(porConsole || {}).some((d) => d && d.degrau > 0);
 }
 
 function explicarFormatoImagem() {
@@ -4901,6 +4930,29 @@ function ligarEventos() {
       await pedir("/api/perfil/foto", "POST", { remover: true });
       atualizarFotoPerfil(false);
       recado("Foto de perfil removida.");
+    } catch (falha) {
+      recado(falha.message, true);
+    }
+  });
+
+  $("#chaveDesempenho").addEventListener("click", async (evento) => {
+    const botao = evento.currentTarget;
+    const novo = botao.getAttribute("aria-pressed") !== "true";
+    try {
+      await salvarConfig({ ajuste_pelo_desempenho: novo });
+      botao.setAttribute("aria-pressed", novo ? "true" : "false");
+      recado(novo ? "Pronto: o ARENA ajusta o gráfico pelo desempenho."
+        : "Desligado: o gráfico fica como o perfil escolhido, mesmo se pesar.");
+    } catch (falha) {
+      recado(falha.message, true);
+    }
+  });
+
+  $("#btnDesempenhoZerar").addEventListener("click", async () => {
+    try {
+      const resposta = await pedir("/api/desempenho/zerar", "POST", {});
+      mostrarDesempenho((resposta && resposta.desempenho) || {});
+      recado("Pronto: todo console volta ao gráfico normal no próximo jogo.");
     } catch (falha) {
       recado(falha.message, true);
     }

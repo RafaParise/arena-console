@@ -84,6 +84,7 @@ import janela_preta  # noqa: E402  (servidor que caia ou travava -- 02/10/2026)
 import como_colocar  # noqa: E402  (como colocar os jogos de cada console -- 02/10/2026)
 import baixados  # noqa: E402  (os jogos baixados, levados para a prateleira -- auditoria 4, 22/10/2026)
 import motivo_do_erro  # noqa: E402  (por que o jogo nao abriu, pelo registro -- 02/10/2026)
+import desempenho  # noqa: E402  (o jogo pesado demais deixa o grafico mais leve -- auditoria 4)
 import bios        # noqa: E402  (nome, pasta e versao certa de cada BIOS -- 03/10/2026)
 import arrumar     # noqa: E402  (o botao Arrumar: o arquivo do jogo no lugar certo -- 03/10/2026)
 import ponte_sem_acento  # noqa: E402  (nucleo que nao abre pasta com acento: o Hatari -- 14/10/2026)
@@ -1253,6 +1254,10 @@ def config_padrao():
         # Botoes na tela do Android (plataforma.BOTOES_NA_TELA, pedido de
         # 22/10/2026): "automatico" some com um controle de verdade ligado.
         "botoes_na_tela": "automatico",
+        # Desempenho que aprende (servidor/desempenho.py, pedido de
+        # 22/10/2026): o console que ficou no limite ganha um degrau mais
+        # leve na proxima partida, so no Automatico.
+        "ajuste_pelo_desempenho": True,
         # Em que navegador a tela abre (servidor/navegadores.py):
         # "automatico" = o padrao do computador; ou o codigo de um deles.
         "navegador": "automatico",
@@ -1399,6 +1404,8 @@ def ler_config_do_disco():
         config["formato_da_imagem"] = salvo["formato_da_imagem"]
     if salvo.get("botoes_na_tela") in plataforma_do_sistema.BOTOES_NA_TELA:
         config["botoes_na_tela"] = salvo["botoes_na_tela"]
+    if "ajuste_pelo_desempenho" in salvo:
+        config["ajuste_pelo_desempenho"] = bool(salvo["ajuste_pelo_desempenho"])
     if salvo.get("navegador") in NAVEGADORES_ACEITOS:
         config["navegador"] = salvo["navegador"]
     if salvo.get("preset_grafico_externo") in ("automatico", "leve", "bonito"):
@@ -2617,6 +2624,25 @@ def anotar_motivo_do_erro(jogo, desde, partida=None):
         return None
 
 
+def anotar_desempenho(jogo, medida, config):
+    """Depois do jogo: guarda se o emulador ficou no limite e, se o console
+    desceu um degrau, diz ao aluno por que o grafico vai mudar (sem passar por
+    cima do motivo de um jogo que nao abriu). Nunca derruba nada."""
+    try:
+        antes, depois = desempenho.registrar(jogo.get("plataforma"), medida)
+        if depois > antes and config.get("ajuste_pelo_desempenho", True):
+            texto = ("ficou pesado para esta maquina. Na proxima vez, o ARENA deixa o grafico deste "
+                     "console mais leve (Ajustes -> Maquina desfaz).")
+            print("[ARENA] Desempenho: %s %s" % (jogo.get("titulo", "o jogo"), texto))
+            if not ULTIMO_PROBLEMA:
+                ULTIMO_PROBLEMA.update({"jogo_id": jogo["id"], "titulo": jogo.get("titulo", ""),
+                                        "texto": texto[0].upper() + texto[1:]})
+        elif depois < antes:
+            print("[ARENA] Desempenho: %s rodou folgado; voltou um degrau." % jogo.get("plataforma"))
+    except Exception as falha:   # noqa: BLE001 -- medir e' bonus, nunca derruba
+        print("[ARENA] Nao consegui anotar o desempenho: %s" % falha)
+
+
 def ler_fechamentos():
     try:
         with open(ARQUIVO_QUEDAS, "r", encoding="utf-8") as arquivo:
@@ -2701,6 +2727,13 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
     o aluno joga.
     """
     sessao_uuid = uuid.uuid4().hex
+    # Desempenho que aprende: o console que ficou no limite antes joga um
+    # degrau mais leve, so no Automatico (servidor/desempenho.py).
+    degrau = desempenho.degrau(jogo.get("plataforma")) if config.get("ajuste_pelo_desempenho", True) else 0
+    config = desempenho.config_da_partida(config, jogo.get("plataforma"))
+    if degrau:
+        print("[ARENA] Desempenho: %s joga %d degrau(s) mais leve (ficou no limite antes)."
+              % (jogo.get("plataforma"), degrau))
 
     # Definidos antes do 'try': se gravar as opcoes falhar (pen drive
     # protegido...), o jogo ainda abre, so sem esses ajustes -- em vez de
@@ -3144,7 +3177,9 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
                 caixa = processos.caixa_que_fecha_os_filhos(processo.pid)
             if acelerar and processos.tirar_da_economia_de_energia(processo.pid):
                 print("[ARENA] Emulador fora da economia de energia do Windows.")
+            medidor = desempenho.Medidor(getattr(processo, "pid", 0)).comecar()
             codigo = processo.wait()
+            medida = medidor.parar()
             processos.fechar_caixa(caixa)
             caixa = None
 
@@ -3181,6 +3216,7 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             # dizem ate o nome de cada arquivo que falta).
             if not jogo.get("externo"):
                 anotar_motivo_do_erro(jogo, aberto_em, partida)
+            anotar_desempenho(jogo, medida, config)
         except OSError as falha:
             print("[ARENA] Nao foi possivel abrir o RetroArch: %s" % falha)
         finally:
@@ -5170,6 +5206,8 @@ class Manipulador(BaseHTTPRequestHandler):
                 "grupos": carregar_recursos()["grupos"],
                 "jogo_em_andamento": dict(JOGO_EM_ANDAMENTO),
                 "ultimo_problema": dict(ULTIMO_PROBLEMA) or None,
+                # Desempenho que aprende: o degrau de cada console (Ajustes -> Maquina).
+                "desempenho": desempenho.ler(),
                 "pendentes": contar_pendentes(),
                 "mala": {
                     "caminho": caminho_da_mala(),
@@ -6045,6 +6083,13 @@ class Manipulador(BaseHTTPRequestHandler):
         # So o arquivo que a busca de /api/baixados acharia (de dentro das
         # pastas de download, com a extensao do console escolhido); move e
         # refaz a lista. So deste aparelho (nao esta em ROTAS_REDE_EXTERNA).
+        # Desempenho que aprende: volta um console (ou todos) ao normal.
+        # So deste computador (nao esta em ROTAS_REDE_EXTERNA).
+        if caminho == "/api/desempenho/zerar":
+            plataforma = dados.get("plataforma")
+            desempenho.zerar(str(plataforma) if plataforma else None)
+            return self.responder_json({"ok": True, "desempenho": desempenho.ler()})
+
         if caminho == "/api/baixados/levar":
             try:
                 destino = baixados.levar(dados.get("arquivo"), str(dados.get("console", "")),
@@ -6608,6 +6653,8 @@ class Manipulador(BaseHTTPRequestHandler):
                 config["formato_da_imagem"] = dados["formato_da_imagem"]
             if dados.get("botoes_na_tela") in plataforma_do_sistema.BOTOES_NA_TELA:
                 config["botoes_na_tela"] = dados["botoes_na_tela"]
+            if "ajuste_pelo_desempenho" in dados:
+                config["ajuste_pelo_desempenho"] = bool(dados["ajuste_pelo_desempenho"])
             if dados.get("navegador") in NAVEGADORES_ACEITOS:
                 config["navegador"] = dados["navegador"]
             if dados.get("preset_grafico_externo") in ("automatico", "leve", "bonito"):

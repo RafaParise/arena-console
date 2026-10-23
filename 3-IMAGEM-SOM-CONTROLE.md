@@ -722,6 +722,36 @@ segundo. Medido no Ryzen (02/10/2026), com visita na tela: 0,6% de um
 núcleo no campo e 1,1% no céu; parada, zero.
 Quando o jogo cobre a janela do ARENA, o navegador para de desenhar.
 
+### Desempenho que aprende
+
+Pedido do Rafael (22/10/2026): o ARENA "deve saber identificar queda de
+desempenho [...] para entender as melhores configurações no automático".
+
+Durante o jogo, a cada 2 segundos, o ARENA olha quanto o emulador ocupa da
+**thread mais ocupada** dele (o laço do jogo) e da **placa de vídeo** (no
+Windows, o mesmo contador do Gerenciador de Tarefas). O ARENA joga com o
+vsync: o jogo que roda na velocidade certa espera a tela a cada quadro, e
+nenhum dos dois fica cravado. Ficou acima de 95% em mais de um quarto do
+tempo (com pelo menos 30 segundos de jogo)? O console ficou **no limite**, e
+na próxima partida ele joga um **degrau mais leve**:
+
+| Degrau | O que muda |
+|---|---|
+| 1 | o perfil **Desempenho** (filtro de escala leve, vídeo em thread); nos emuladores de fora, o gráfico **Leve** |
+| 2 | e o **gráfico igual ao do console** (desenhado no tamanho dele) |
+| 3 | e o nível **leve**, abaixo do original |
+
+Três partidas seguidas sem aperto devolvem um degrau. Vale **só no
+Automático**: quem escolheu o perfil ou o nível do gráfico à mão manda
+sempre. Em **Ajustes → Máquina → Desempenho que aprende** ficam a chave
+para desligar, a lista dos consoles que desceram e o botão **Voltar todos
+ao normal**. Não desenha nada na tela e não precisa de administrador; os
+números ficam em `dados\desempenho.json`.
+
+Por que não os quadros por segundo: o RetroArch 1.22 só põe o FPS no título
+da janela junto com o contador desenhado em cima do jogo, e o registro dele
+não guarda a média (os dois conferidos em 22/10/2026).
+
 ### O que está deixando o computador lento
 
 Em **Ajustes → Máquina**, o botão **Verificar agora** olha o Windows (leva

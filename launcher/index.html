@@ -595,6 +595,23 @@
     </div>
 
     <div data-so-windows>
+      <h3 class="grupo-titulo">Desempenho que aprende</h3>
+      <p class="explica">
+        Durante o jogo, o ARENA olha se o processador ou a placa de vídeo
+        ficaram no limite. Se ficaram, na próxima vez aquele console joga com o
+        gráfico mais leve (só no Automático: o que você escolhe à mão fica).
+        Três partidas tranquilas seguidas devolvem o gráfico de antes.
+      </p>
+      <div class="opcao">
+        <span class="opcao-rotulo">Ajustar pelo desempenho</span>
+        <button class="chave opcao-controle" id="chaveDesempenho"
+                aria-pressed="true" aria-label="Ajustar o gráfico pelo desempenho"></button>
+      </div>
+      <ul class="onde-lista" id="listaDesempenho"></ul>
+      <button class="botao" id="btnDesempenhoZerar" type="button" hidden>Voltar todos ao normal</button>
+    </div>
+
+    <div data-so-windows>
       <h3 class="grupo-titulo">O que está deixando este computador lento</h3>
       <p class="explica">
         O ARENA procura o que pesa no Windows: programas que abrem sozinhos,
