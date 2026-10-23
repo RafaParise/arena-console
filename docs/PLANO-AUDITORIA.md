@@ -535,6 +535,49 @@ Gradle nem biblioteca nova); ferramentas e testes em Python puro.
 
 > Utilize todas as melhores ferramentas implementadas no claude code para aprimorar o script que escrevi acima, para fazer engenharias reversas em aplicativos de android do gênero de sucesso para ter ideias de como melhorar a interface e adaptar recursos do windows, para tomada de decisões ou até mesmo adicionar processos e testes e tudo que precisa em uma auditoria para criar aplicativos profissionais, seguros e com uma interface intuitiva simples e seguindo o padrão do app no windows em questão de interface e onde fica cada configuração e etc...
 
+**Mensagens da noite de 22/10/2026, sem resumir:**
+
+> continuar pot gentileza até o final e por favor continue a trabalhar sozinho quando o limite da sessaão voltar para eu dormir enquanro você trabalha, o claude code está atualizado, se puder fazer isso e deixar ações manuais por ultimo eu agradeço muito
+
+> no meu celular samsung a12 4gb 64 gb de memória e andoroid 12 ele diz o seguinte ao instalar o arena: Como o app não é compatível com seu smartphone, ele não foi instalado, a iéia é do arena ser também a salvação de versões de aondroid mais antigas também, a idéia é que qualquer computador mesmo desatualizado possa usar o arnea como porta de salvação de entreterimento no computador, mas primeiro finalize todo o projeto e só no final junto com as etapas manuais vem essa opção para eu verificar a melhor ordem de implementação por gentileza
+
+> por favor faça uma engenharia reversa com o lossless scalling e implemente todas suas funções, tpecnicas e tudo que ele faz no arena, de forma que ocorra automáticamente que precisa ser verificado também, e a tela não mais está esticando até a borda da tela como fazia antes, então precisa ser verificado. O ARENA de android tamb´pem deve ser possível fazer as mesmas funções como controle configurável automáticamente ou manual, escolher entre os bitões da tela ou não, 8 jogadores, jogar com amigo cada um em seu telefone conectados pelo hotspot do player um que o player 2 se conecta, pelo wi-fi cada um em sua casa ou no mesmo wifi (se for implementação grande deixa oara depois), por gentileza eu gostaria que depois da auditoria instale no meu telefone a versão mais atualizada possível do arena atravpes do cabo usbc adaptado e configurado finamente para meu samsung a12 e com todas as bios, emuladores e tudo que tenho localmente de configurações assim como a engenharia reversa do lossless scalling que seja configurado finamente para meu telefone, para meu computadir também onde rodo o claude code por gentileza, mas ele deve saber identificar queda de desempenho, hardware e software para entender as melhores configurações no automático, e deve ter a opçlão personalizada, tanto para implementações da engenharia reversa do lossless como tudo que o arena já faz para melhorar a experiência, para promover uma experiência fluida mesmo que dependendo do hardware seja um grafico feio
+
+> tem que ser feito de forma que possa ter tudo implementado e instalado no guthub, o arena deve ser sempre baixar e jogar, e a atualização deve ser abrir a pasta compactada copiar tudo e arrastar para o arena e atualiza sem perder nada de progresso, perfil, saves e nem bios importantes ou suas configurações, tudo integro
+
+**Leitura adotada para essas mensagens:**
+
+- Trabalho sozinho durante a noite: um agendamento da sessão retoma o
+  trabalho depois do limite; as ações manuais ficam para o fim do relatório.
+- O Galaxy A12 (Android 12) recusa o APK com "não é compatível": o mais
+  provável é o Android de 32 bits (o APK só tem arm64-v8a e x86_64). A
+  versão web resolve já. O APK de 32 bits e o computador antigo entram como
+  opções no fim, com a ordem recomendada, para o Rafael decidir; a
+  instalação no A12 dele pelo cabo, depois da auditoria, entra nessa mesma
+  lista.
+- Lossless Scaling: é um programa pago e fechado. Abrir o código dele para
+  copiar algoritmo fere a licença, e o repositório é público. A leitura é a
+  mesma da regra dos apps fechados do roteiro abaixo: só informação pública
+  (página da Steam, guias, notas de versão) e o uso do programa. As funções
+  dele entram no ARENA por técnicas abertas (FSR, NIS, CAS, escala inteira,
+  esticar até a borda), no automático e com a opção personalizada. A
+  geração de quadros (LSFG) não cabe em Python puro sem instalar nada; para
+  ela, o ARENA continua usando o Lossless de quem comprou (item 10).
+- "A tela não estica até a borda": o RetroArch sempre usou a proporção do
+  console (faixas pretas no 4:3 em tela larga), e o perfil "ARENA" que o
+  ARENA grava no Lossless usa o modo "Aspect ratio". Entra a opção "Formato
+  da imagem" (Automático, Esticar até a borda, Do console), nos núcleos e
+  nos emuladores de fora.
+- Android: botões na tela (automático, sempre ou nunca), controles,
+  até 8 jogadores e o Jogar Junto pelo roteador do celular ou pelo mesmo
+  Wi-Fi. Pela internet (cada um em casa) fica para depois, por ser grande.
+- O automático deve perceber a queda de desempenho e o hardware e
+  escolher sozinho, com a opção personalizada.
+- Tudo vai pelo GitHub (o código, o pacote e o APK): baixar e jogar. A
+  atualização é copiar o zip novo por cima da pasta do ARENA, sem perder
+  progresso, perfil, saves, BIOS nem configurações; o pacote nunca leva
+  arquivo que apague dado de quem usa, e um teste confere isso.
+
 ### O roteiro aprimorado (as ferramentas de hoje)
 
 **O que "profissional" quer dizer aqui** (os padrões de referência):
@@ -602,3 +645,25 @@ Gradle nem biblioteca nova); ferramentas e testes em Python puro.
 ### Progresso da auditoria 4
 
 - [ ] Fase 0 — Linha de base dos quatro sistemas e matriz de paridade
+  (bateria, Chromebook 41/41 e versão web 18/18 passam; a matriz falta)
+- [~] Fase 1 — Android: sair do jogo e menu pelo toque (`d05ff26`),
+  permissões explicadas antes de pedir, Procurar jogos baixados
+  (`07f0491`); faltam os botões na tela (automático/sempre/nunca), 8
+  jogadores, o Jogar Junto pelo roteador do celular, os textos "PC", o
+  Voltar no jogo, o Monkey e o Lint
+- [~] Fase 2 — Apps de sucesso: a pesquisa roda de novo (o limite da
+  sessão derrubou a primeira)
+- [~] Fase 3 — Segurança: F3 (`c95688f`) e F4 (`38306a7`) corrigidos; a
+  segunda varredura parou no limite da sessão e será retomada
+- [x] Fase 4 — Primeiro uso: Procurar jogos baixados (Windows e Android) e
+  Guardar um jogo (versão web e Chromebook)
+- [~] Versão web para o celular que não instala o APK (`333c0ca`,
+  `665126a`): pronta e testada; falta publicar no GitHub Pages e o
+  `docs\WEB.md`
+- [ ] Mensagens da noite de 22/10: Formato da imagem (esticar até a
+  borda), as funções do Lossless por técnicas abertas e o automático que
+  percebe queda de desempenho, a atualização por cima sem perder nada
+  (teste), o APK de 32 bits e a instalação no A12 (no fim, com o Rafael)
+- [ ] Fases 5, 6 e 7 — Linux, Windows e Chromebook
+- [ ] Fase 8 — Relatório (`docs\RELATORIO-AUDITORIA-4.md`), guias, rodada
+  final; ações manuais no fim
