@@ -589,7 +589,14 @@ def controle_de_toque_do_arena(origem):
         return None
 
 
-def ajustes_do_android(opcoes, pasta_retroarch, filtro, teclado=""):
+# Botoes na tela (pedido do Rafael, 22/10/2026: "escolher entre os botoes da
+# tela ou nao"): "automatico" aparece no toque e some com um controle de
+# verdade ligado; "sempre" fica mesmo com o controle; "nunca" so com controle
+# (o menu abre pelo controle, com L3 + R3, ou pelo Voltar do aparelho).
+BOTOES_NA_TELA = ("automatico", "sempre", "nunca")
+
+
+def ajustes_do_android(opcoes, pasta_retroarch, filtro, teclado="", botoes="automatico"):
     """O arquivo da partida no Android: ganha a tela de toque (o controle
     desenhado na tela, que some quando um controle de verdade e' ligado) e
     uma folga no som (o celular barato estala com menos de 64 ms; o padrao
@@ -600,10 +607,12 @@ def ajustes_do_android(opcoes, pasta_retroarch, filtro, teclado=""):
     (F10, Esc, F2...) nao funcionam. Devolve o filtro que vale ("" sem
     nenhum)."""
     toque = os.path.join(pasta_retroarch, "overlays", "gamepads", "neo-retropad", "neo-retropad.cfg")
-    if os.path.isfile(toque):
+    if botoes == "nunca":
+        opcoes["input_overlay_enable"] = "false"
+    elif os.path.isfile(toque):
         opcoes["input_overlay_enable"] = "true"
         opcoes["input_overlay"] = controle_de_toque_do_arena(toque) or toque
-        opcoes["input_overlay_hide_when_gamepad_connected"] = "true"
+        opcoes["input_overlay_hide_when_gamepad_connected"] = "false" if botoes == "sempre" else "true"
         # De pe, o desenho de pe (com o menu no meio); deitado, o deitado.
         # Sem isto, o de pe usava o deitado esticado (achado da auditoria 4).
         opcoes["input_overlay_auto_rotate"] = "true"

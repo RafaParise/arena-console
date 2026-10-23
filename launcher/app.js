@@ -209,8 +209,10 @@ async function carregarEstado() {
   explicarNivelGrafico();
   $("#listaEscalaTela").value = dados.config.escala_da_tela || "automatico";
   $("#listaFormatoImagem").value = dados.config.formato_da_imagem || "automatico";
+  $("#listaBotoesNaTela").value = dados.config.botoes_na_tela || "automatico";
   explicarEscalaTela();
   explicarFormatoImagem();
+  explicarBotoesNaTela();
 
   $("#chaveRpcn").setAttribute("aria-pressed",
     dados.config.rpcn_ativo ? "true" : "false");
@@ -312,6 +314,8 @@ async function carregarEstado() {
   // pasta do ARENA no aparelho.
   if (estado.sistemaDoComputador === "android") {
     for (const elemento of document.querySelectorAll("[data-fora-do-android]")) elemento.hidden = true;
+    for (const elemento of document.querySelectorAll("[data-so-android]")) elemento.hidden = false;
+    falarDeAparelho();
     mostrarAndroid(dados.android || {});
   }
   prepararTipoDeControle(dados.recursos || []);
@@ -1669,6 +1673,72 @@ const EXPLICA_FORMATO_IMAGEM = {
   console: "A imagem fica no formato do console, como na TV da época: na tela larga, com " +
     "faixas pretas dos lados.",
 };
+
+// No Android, a tela fala de "aparelho", e nao de "computador" (achado A7
+// da auditoria 4: o aluno lia "o seu computador" no celular). Vale para o
+// texto que ja esta na tela e para o que chega depois (recados, cartoes); o
+// que fala do computador de proposito leva data-manter-computador.
+const COMPUTADOR = /\b([Cc])omputador(es)?\b/g;
+
+function trocarComputador(texto) {
+  return texto.replace(COMPUTADOR, function (_tudo, letra, plural) {
+    return (letra === "C" ? "A" : "a") + "parelho" + (plural ? "s" : "");
+  });
+}
+
+function falarDeAparelho(raiz) {
+  const comeco = raiz || document.body;
+  const elemento = comeco && (comeco.nodeType === Node.ELEMENT_NODE ? comeco : comeco.parentElement);
+  if (!comeco || (elemento && elemento.closest("[data-manter-computador]"))) return;
+  if (comeco.nodeType === Node.TEXT_NODE) {
+    if (COMPUTADOR.test(comeco.nodeValue)) comeco.nodeValue = trocarComputador(comeco.nodeValue);
+    COMPUTADOR.lastIndex = 0;
+    return;
+  }
+  const andarilho = document.createTreeWalker(comeco, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT, {
+    acceptNode: function (no) {
+      if (no.nodeType === Node.ELEMENT_NODE) {
+        if (no.hasAttribute("data-manter-computador") || /^(SCRIPT|STYLE|CODE)$/.test(no.tagName)) {
+          return NodeFilter.FILTER_REJECT;
+        }
+        for (const atributo of ["title", "aria-label", "placeholder"]) {
+          const valor = no.getAttribute(atributo);
+          if (valor && /omputador/.test(valor)) no.setAttribute(atributo, trocarComputador(valor));
+        }
+        return NodeFilter.FILTER_SKIP;
+      }
+      return /omputador/.test(no.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+    },
+  });
+  const textos = [];
+  while (andarilho.nextNode()) textos.push(andarilho.currentNode);
+  for (const no of textos) no.nodeValue = trocarComputador(no.nodeValue);
+  if (!raiz && !falarDeAparelho.vigia && window.MutationObserver) {
+    falarDeAparelho.vigia = new MutationObserver(function (mudancas) {
+      for (const mudanca of mudancas) {
+        if (mudanca.type === "characterData") falarDeAparelho(mudanca.target);
+        for (const no of mudanca.addedNodes || []) falarDeAparelho(no);
+      }
+    });
+    falarDeAparelho.vigia.observe(document.body, { childList: true, subtree: true, characterData: true });
+  }
+}
+
+// Botoes na tela do Android (servidor\plataforma.py, BOTOES_NA_TELA).
+const EXPLICA_BOTOES_NA_TELA = {
+  automatico: "O controle desenhado na tela aparece quando você joga pelo toque e some sozinho " +
+    "quando um controle de verdade (Bluetooth ou cabo) é ligado. No jogo, MENU abre o menu (nele, " +
+    "o direcional anda, o B confirma e o A volta) e SAIR, tocado duas vezes, fecha o jogo.",
+  sempre: "O controle da tela fica sempre, mesmo com um controle de verdade ligado (bom para " +
+    "dividir: um no toque, outro no controle).",
+  nunca: "Sem botões na tela: só com controle de verdade. O menu do jogo abre apertando os dois " +
+    "analógicos (L3 + R3) ou o Voltar do aparelho.",
+};
+
+function explicarBotoesNaTela() {
+  const valor = $("#listaBotoesNaTela").value;
+  $("#explicaBotoesNaTela").textContent = EXPLICA_BOTOES_NA_TELA[valor] || EXPLICA_BOTOES_NA_TELA.automatico;
+}
 
 function explicarFormatoImagem() {
   const valor = $("#listaFormatoImagem").value;
@@ -4750,6 +4820,19 @@ function ligarEventos() {
       recado("Pronto. Vale na próxima vez que você abrir o ARENA.");
     } catch (falha) {
       lista.value = (estado.config && estado.config.navegador) || "automatico";
+      recado(falha.message, true);
+    }
+  });
+
+  $("#listaBotoesNaTela").addEventListener("change", async (evento) => {
+    const lista = evento.currentTarget;
+    try {
+      await salvarConfig({ botoes_na_tela: lista.value });
+      explicarBotoesNaTela();
+      recado("Pronto. Vale no próximo jogo.");
+    } catch (falha) {
+      lista.value = (estado.config && estado.config.botoes_na_tela) || "automatico";
+      explicarBotoesNaTela();
       recado(falha.message, true);
     }
   });

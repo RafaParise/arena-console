@@ -473,6 +473,17 @@
     </div>
     <p class="explica" id="explicaFormatoImagem"></p>
 
+    <div class="opcao" data-so-android hidden>
+      <span class="opcao-rotulo">Botões na tela</span>
+      <select class="opcao-controle" id="listaBotoesNaTela" aria-label="Botões na tela"
+              aria-describedby="explicaBotoesNaTela">
+        <option value="automatico">Automático (recomendado)</option>
+        <option value="sempre">Sempre</option>
+        <option value="nunca">Nunca (só com controle)</option>
+      </select>
+    </div>
+    <p class="explica" id="explicaBotoesNaTela" data-so-android hidden></p>
+
     <div class="opcao">
       <span class="opcao-rotulo">Fundo animado</span>
       <select class="opcao-controle" id="listaFundoAnimado" aria-label="Fundo animado"
@@ -494,7 +505,7 @@
         <button class="botao" id="btnAndroidPermissao" type="button" hidden>Deixar o ARENA ver os arquivos</button>
         <button class="botao" id="btnAndroidTodos" type="button" hidden>Deixar gravar no cartão</button>
       </p>
-      <p class="explica">Copie a pasta do ARENA do pen drive para o cartão ou para a memória do aparelho (ou ligue o pen drive pelo cabo OTG) e escolha aqui. Os jogos, as BIOS e os saves são os mesmos do computador. Os recordes e o apelido ficam no aparelho; para levar os recordes a outro ARENA, use a sincronização (Amigos).</p>
+      <p class="explica" data-manter-computador>Copie a pasta do ARENA do pen drive para o cartão ou para a memória do aparelho (ou ligue o pen drive pelo cabo OTG) e escolha aqui. Os jogos, as BIOS e os saves são os mesmos do computador. Os recordes e o apelido ficam no aparelho; para levar os recordes a outro ARENA, use a sincronização (Amigos).</p>
     </div>
 
     <div class="opcao" data-so-windows data-fora-do-android>

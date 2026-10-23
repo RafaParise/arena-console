@@ -129,6 +129,25 @@ anterior.
   servem os pedidos do Android (ver os arquivos e, do Android 13 em diante,
   as notificações). Negar não quebra nada: o ARENA abre com os jogos
   livres, e a permissão fica em Ajustes → Máquina.
+- **Botões na tela** (auditoria 4, pedido de 22/10/2026: "escolher entre
+  os botões da tela ou não"): Ajustes → Simples, só no Android.
+  **Automático** (o controle desenhado some quando um controle de verdade é
+  ligado), **Sempre** ou **Nunca** (só com controle; o menu abre com L3 +
+  R3). A ajuda lembra: no menu, o direcional anda, o B confirma e o A volta.
+- **"Aparelho", e não "computador"** (achado A7): no Android, a tela troca
+  sozinha "computador" por "aparelho", também nos recados que chegam
+  depois. O texto que fala do computador de propósito (a pasta copiada do
+  pen drive) leva `data-manter-computador`.
+- **Até 8 jogadores e o Jogar Junto**: valem as mesmas regras do Windows.
+  Os jogadores de cada jogo vêm do `servidor\multitap.json` (cada controle
+  ligado vira o próximo jogador), e o Jogar Junto passa pelo mesmo
+  RetroArch (o `--host` e o `--connect` chegam ao RetroArch do app pelo
+  remendo `arena-args.patch`). Pelo roteador do celular (um faz o roteador,
+  o outro entra nele) ou pelo mesmo Wi-Fi, o anúncio da partida chega
+  porque o serviço do ARENA segura o "multicast" do Wi-Fi
+  (`WifiManager.MulticastLock`); sem ele, muito Android joga fora o anúncio.
+  **Falta conferir com dois celulares de verdade** (roteiro no relatório da
+  auditoria 4). Pela internet, cada um em casa, fica para depois.
 - **A nota do aparelho** para pela velocidade medida de um núcleo: celular
   tem 8 núcleos e 8 GB, mas os núcleos são pequenos.
 

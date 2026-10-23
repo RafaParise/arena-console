@@ -1250,6 +1250,9 @@ def config_padrao():
         # larga (ate 16:9); "esticar", todo jogo; "console", a proporcao do
         # console (graficos.proporcao_da_partida).
         "formato_da_imagem": "automatico",
+        # Botoes na tela do Android (plataforma.BOTOES_NA_TELA, pedido de
+        # 22/10/2026): "automatico" some com um controle de verdade ligado.
+        "botoes_na_tela": "automatico",
         # Em que navegador a tela abre (servidor/navegadores.py):
         # "automatico" = o padrao do computador; ou o codigo de um deles.
         "navegador": "automatico",
@@ -1394,6 +1397,8 @@ def ler_config_do_disco():
         config["escala_da_tela"] = salvo["escala_da_tela"]
     if salvo.get("formato_da_imagem") in graficos.FORMATOS:
         config["formato_da_imagem"] = salvo["formato_da_imagem"]
+    if salvo.get("botoes_na_tela") in plataforma_do_sistema.BOTOES_NA_TELA:
+        config["botoes_na_tela"] = salvo["botoes_na_tela"]
     if salvo.get("navegador") in NAVEGADORES_ACEITOS:
         config["navegador"] = salvo["navegador"]
     if salvo.get("preset_grafico_externo") in ("automatico", "leve", "bonito"):
@@ -2040,7 +2045,8 @@ def gravar_override(config, custo=None, extras=None, em_partida=False,
     if plataforma_do_sistema.ANDROID:
         import ponte_android
         filtro = plataforma_do_sistema.ajustes_do_android(opcoes, PASTA_RETROARCH, filtro,
-                                                          teclado=ponte_android.teclado_fisico())
+                                                          teclado=ponte_android.teclado_fisico(),
+                                                          botoes=config.get("botoes_na_tela", "automatico"))
 
     linhas = ["# Gerado pelo ARENA. Nao edite a mao: sera reescrito."]
     # Nenhum valor pode quebrar a linha nem fechar as aspas antes da hora:
@@ -6600,6 +6606,8 @@ class Manipulador(BaseHTTPRequestHandler):
                 config["escala_da_tela"] = dados["escala_da_tela"]
             if dados.get("formato_da_imagem") in graficos.FORMATOS:
                 config["formato_da_imagem"] = dados["formato_da_imagem"]
+            if dados.get("botoes_na_tela") in plataforma_do_sistema.BOTOES_NA_TELA:
+                config["botoes_na_tela"] = dados["botoes_na_tela"]
             if dados.get("navegador") in NAVEGADORES_ACEITOS:
                 config["navegador"] = dados["navegador"]
             if dados.get("preset_grafico_externo") in ("automatico", "leve", "bonito"):

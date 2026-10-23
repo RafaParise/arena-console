@@ -919,6 +919,7 @@ window.ARENA_DADOS = {
    "video_swap_interval": "1"
   },
   "bios": {},
+  "botoes_na_tela": "automatico",
   "codigo_proprio": false,
   "dispositivo_id": "",
   "escala_da_tela": "automatico",

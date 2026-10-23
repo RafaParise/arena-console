@@ -233,6 +233,26 @@ class Motores(unittest.TestCase):
         finally:
             limpeza.apagar_pasta(pasta)
 
+    def test_botoes_na_tela_automatico_sempre_e_nunca(self):
+        # Pedido do Rafael (22/10/2026): "escolher entre os botoes da tela ou nao".
+        pasta = tempfile.mkdtemp(prefix="arena_android_")
+        try:
+            origem = os.path.join(pasta, "overlays", "gamepads", "neo-retropad", "neo-retropad.cfg")
+            os.makedirs(os.path.dirname(origem))
+            with open(origem, "w", encoding="utf-8") as arquivo:
+                arquivo.write('overlays = 1\noverlay0_name = "landscape-digital"\noverlay0_descs = 1\n'
+                              'overlay0_desc0 = "a,0.9,0.5,radial,0.03,0.05"\n')
+            esperado = {"automatico": ("true", "true"), "sempre": ("true", "false"), "nunca": ("false", None)}
+            for botoes, (ligado, some_com_controle) in esperado.items():
+                with self.subTest(botoes=botoes):
+                    opcoes = {"video_driver": "gl"}
+                    plataforma.ajustes_do_android(opcoes, pasta, "", botoes=botoes)
+                    self.assertEqual(opcoes["input_overlay_enable"], ligado)
+                    self.assertEqual(opcoes.get("input_overlay_hide_when_gamepad_connected"), some_com_controle)
+            self.assertEqual(plataforma.BOTOES_NA_TELA[0], "automatico")
+        finally:
+            limpeza.apagar_pasta(pasta)
+
     def test_sem_neo_retropad_o_jogo_segue_sem_controle_do_arena(self):
         self.assertIsNone(plataforma.controle_de_toque_do_arena(os.path.join(tempfile.gettempdir(), "nao-existe.cfg")))
 
