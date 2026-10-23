@@ -644,26 +644,27 @@ Gradle nem biblioteca nova); ferramentas e testes em Python puro.
 
 ### Progresso da auditoria 4
 
-- [ ] Fase 0 — Linha de base dos quatro sistemas e matriz de paridade
-  (bateria, Chromebook 41/41 e versão web 18/18 passam; a matriz falta)
-- [~] Fase 1 — Android: sair do jogo e menu pelo toque (`d05ff26`),
-  permissões explicadas antes de pedir, Procurar jogos baixados
-  (`07f0491`); faltam os botões na tela (automático/sempre/nunca), 8
-  jogadores, o Jogar Junto pelo roteador do celular, os textos "PC", o
-  Voltar no jogo, o Monkey e o Lint
-- [~] Fase 2 — Apps de sucesso: a pesquisa roda de novo (o limite da
-  sessão derrubou a primeira)
-- [~] Fase 3 — Segurança: F3 (`c95688f`) e F4 (`38306a7`) corrigidos; a
-  segunda varredura parou no limite da sessão e será retomada
+- [~] Fase 0 — Linha de base: bateria 647, Chromebook 41/41, versão web
+  19/19, Android no emulador inteiro; a matriz de paridade completa fica
+  para a próxima rodada (o resumo está no relatório)
+- [x] Fase 1 — Android: sair do jogo e menu pelo toque (`d05ff26`),
+  permissões explicadas, Procurar jogos baixados (`07f0491`), botões na tela
+  e "aparelho" (`f148a9c`), 8 jogadores e Jogar Junto pelas regras do
+  Windows; APK de teste inteiro no emulador. Ficam o Monkey, o Lint e o
+  Voltar no jogo (registrados)
+- [x] Fase 2 — Apps de sucesso: Lemuroid (código e APK) e a pesquisa
+  (modelos gratuitos do kit, conferida); ideias no relatório
+- [x] Fase 3 — Segurança: F3 (`c95688f`) e F4 (`38306a7`); revisão das
+  mudanças da noite sem achado; recomendada a varredura das mudanças do
+  ramo na próxima sessão
 - [x] Fase 4 — Primeiro uso: Procurar jogos baixados (Windows e Android) e
   Guardar um jogo (versão web e Chromebook)
-- [~] Versão web para o celular que não instala o APK (`333c0ca`,
-  `665126a`): pronta e testada; falta publicar no GitHub Pages e o
-  `docs\WEB.md`
-- [ ] Mensagens da noite de 22/10: Formato da imagem (esticar até a
-  borda), as funções do Lossless por técnicas abertas e o automático que
-  percebe queda de desempenho, a atualização por cima sem perder nada
-  (teste), o APK de 32 bits e a instalação no A12 (no fim, com o Rafael)
-- [ ] Fases 5, 6 e 7 — Linux, Windows e Chromebook
-- [ ] Fase 8 — Relatório (`docs\RELATORIO-AUDITORIA-4.md`), guias, rodada
-  final; ações manuais no fim
+- [x] Versão web publicada (`docs\WEB.md`): https://rafaparise.github.io/arena-console/
+- [x] Mensagens da noite de 22/10: Formato da imagem (`477e05a`),
+  atualizar por cima (`cc7f714`), desempenho que aprende (`0808dd9`),
+  Anime4K e Inteiro (`b2f8418`), ferramenta de instalar no celular; o APK
+  de 32 bits e a ordem das opções de aparelho antigo ficam com o Rafael
+- [~] Fases 5, 6 e 7 — Windows e Chromebook conferidos nesta rodada; o
+  Linux pela bateria no WSL (ver relatório)
+- [x] Fase 8 — Relatório (`docs\RELATORIO-AUDITORIA-4.md`) com as ações
+  manuais no fim; juntar ao `main` e a versão nova esperam o Rafael

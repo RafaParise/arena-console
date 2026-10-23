@@ -148,6 +148,16 @@ anterior.
   (`WifiManager.MulticastLock`); sem ele, muito Android joga fora o anúncio.
   **Falta conferir com dois celulares de verdade** (roteiro no relatório da
   auditoria 4). Pela internet, cada um em casa, fica para depois.
+- **Instalar pelo cabo** (auditoria 4): `servidor\python\python.exe
+  ferramentas\instalar_no_celular.py`, com a Depuração USB ligada no
+  celular. Ela lê o aparelho (modelo, Android, 32 ou 64 bits), instala o
+  APK certo (o montado aqui ou o do Release do GitHub) por cima do que
+  houver, copia para `/sdcard/ARENA` as BIOS, os saves e os jogos dos
+  consoles que o celular roda (mostra o tamanho e pergunta antes) e abre o
+  ARENA. A configuração de imagem do computador não vai: o celular escolhe
+  pela nota dele e pelo desempenho que aprende. **Celular de 32 bits** (o
+  Galaxy A12, o mais provável): o APK ainda não serve, e a ferramenta abre a
+  versão web no navegador do celular (`docs\WEB.md`).
 - **A nota do aparelho** para pela velocidade medida de um núcleo: celular
   tem 8 núcleos e 8 GB, mas os núcleos são pequenos.
 
