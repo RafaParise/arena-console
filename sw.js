@@ -11,7 +11,7 @@
 // Duas guardas: a da tela (troca a cada montagem que muda algum arquivo) e a
 // dos nucleos (so troca quando um nucleo muda: 92 MB nao se baixam de novo a
 // cada conserto da tela). As duas levam a "impressao digital" do conteudo.
-const VERSAO = "2026.10.22-31e514de60";
+const VERSAO = "2026.10.22-20b97afdaa";
 const GUARDA = "arena-" + VERSAO;
 const NUCLEOS = "arena-nucleos-88782bb925";
 const BASICOS = [

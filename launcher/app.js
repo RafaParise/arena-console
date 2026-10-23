@@ -208,10 +208,17 @@ async function carregarEstado() {
   $("#listaNivelGrafico").value = nivelDoGrafico(dados.config);
   explicarNivelGrafico();
   $("#listaEscalaTela").value = dados.config.escala_da_tela || "automatico";
+  $("#listaFormatoImagem").value = dados.config.formato_da_imagem || "automatico";
+  $("#listaBotoesNaTela").value = dados.config.botoes_na_tela || "automatico";
   explicarEscalaTela();
+  explicarFormatoImagem();
+  explicarBotoesNaTela();
 
   $("#chaveRpcn").setAttribute("aria-pressed",
     dados.config.rpcn_ativo ? "true" : "false");
+  $("#chaveDesempenho").setAttribute("aria-pressed",
+    dados.config.ajuste_pelo_desempenho === false ? "false" : "true");
+  mostrarDesempenho(dados.desempenho || {});
 
   $("#listaPresetGrafico").value = dados.config.preset_grafico_externo || "automatico";
   atualizarExplicaPreset();
@@ -310,6 +317,8 @@ async function carregarEstado() {
   // pasta do ARENA no aparelho.
   if (estado.sistemaDoComputador === "android") {
     for (const elemento of document.querySelectorAll("[data-fora-do-android]")) elemento.hidden = true;
+    for (const elemento of document.querySelectorAll("[data-so-android]")) elemento.hidden = false;
+    falarDeAparelho();
     mostrarAndroid(dados.android || {});
   }
   prepararTipoDeControle(dados.recursos || []);
@@ -1604,6 +1613,10 @@ const EXPLICA_ESCALA_TELA = {
     "passando o contorno a limpo. O mais bonito no 3D, e pesa um pouco mais na placa de vídeo.",
   suave: "Arredonda os pixels dos jogos 2D, como se o desenho fosse refeito à mão. No 3D, usa " +
     "o FSR. É o que mais pesa.",
+  anime4k: "Afina as linhas do contorno ao esticar, como o modo Anime4K do Lossless Scaling. " +
+    "Bom em jogo com cara de desenho animado; pesa como o FSR.",
+  inteiro: "Cada pixel vira 2, 3 ou 4 pontos da tela, sempre o mesmo número: o desenho fica " +
+    "perfeito, com uma borda preta em volta (o Integer do Lossless Scaling). Quase não pesa.",
   original: "Sem filtro: o emulador só estica a imagem. É o mais leve, mas o pixel sai " +
     "borrado ou de tamanhos diferentes.",
 };
@@ -1654,6 +1667,115 @@ function mostrarLossless(situacao, config) {
   $("#chaveLossless").setAttribute("aria-pressed", config.lossless_scaling ? "true" : "false");
   $("#chaveLosslessQuadros").setAttribute("aria-pressed",
     config.lossless_mais_quadros ? "true" : "false");
+}
+
+// Formato da imagem (pedido do Rafael, 22/10/2026): servidor\graficos.py,
+// proporcao_da_partida.
+const EXPLICA_FORMATO_IMAGEM = {
+  automatico: "Os consoles de TV (do Atari ao PS2) esticam até a borda da tela, sem faixas " +
+    "pretas dos lados. Os portáteis de tela quadrada e o fliperama ficam no formato deles, " +
+    "para nada sair deformado. No celular deitado, estica só até o formato de TV larga.",
+  esticar: "Todo jogo enche a tela inteira, de borda a borda. O desenho fica um pouco mais " +
+    "largo que o original (no Game Boy e no fliperama em pé, bem mais).",
+  console: "A imagem fica no formato do console, como na TV da época: na tela larga, com " +
+    "faixas pretas dos lados.",
+};
+
+// No Android, a tela fala de "aparelho", e nao de "computador" (achado A7
+// da auditoria 4: o aluno lia "o seu computador" no celular). Vale para o
+// texto que ja esta na tela e para o que chega depois (recados, cartoes); o
+// que fala do computador de proposito leva data-manter-computador.
+const COMPUTADOR = /\b([Cc])omputador(es)?\b/g;
+
+function trocarComputador(texto) {
+  return texto.replace(COMPUTADOR, function (_tudo, letra, plural) {
+    return (letra === "C" ? "A" : "a") + "parelho" + (plural ? "s" : "");
+  });
+}
+
+function falarDeAparelho(raiz) {
+  const comeco = raiz || document.body;
+  const elemento = comeco && (comeco.nodeType === Node.ELEMENT_NODE ? comeco : comeco.parentElement);
+  if (!comeco || (elemento && elemento.closest("[data-manter-computador]"))) return;
+  if (comeco.nodeType === Node.TEXT_NODE) {
+    if (COMPUTADOR.test(comeco.nodeValue)) comeco.nodeValue = trocarComputador(comeco.nodeValue);
+    COMPUTADOR.lastIndex = 0;
+    return;
+  }
+  const andarilho = document.createTreeWalker(comeco, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT, {
+    acceptNode: function (no) {
+      if (no.nodeType === Node.ELEMENT_NODE) {
+        if (no.hasAttribute("data-manter-computador") || /^(SCRIPT|STYLE|CODE)$/.test(no.tagName)) {
+          return NodeFilter.FILTER_REJECT;
+        }
+        for (const atributo of ["title", "aria-label", "placeholder"]) {
+          const valor = no.getAttribute(atributo);
+          if (valor && /omputador/.test(valor)) no.setAttribute(atributo, trocarComputador(valor));
+        }
+        return NodeFilter.FILTER_SKIP;
+      }
+      return /omputador/.test(no.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+    },
+  });
+  const textos = [];
+  while (andarilho.nextNode()) textos.push(andarilho.currentNode);
+  for (const no of textos) no.nodeValue = trocarComputador(no.nodeValue);
+  if (!raiz && !falarDeAparelho.vigia && window.MutationObserver) {
+    falarDeAparelho.vigia = new MutationObserver(function (mudancas) {
+      for (const mudanca of mudancas) {
+        if (mudanca.type === "characterData") falarDeAparelho(mudanca.target);
+        for (const no of mudanca.addedNodes || []) falarDeAparelho(no);
+      }
+    });
+    falarDeAparelho.vigia.observe(document.body, { childList: true, subtree: true, characterData: true });
+  }
+}
+
+// Botoes na tela do Android (servidor\plataforma.py, BOTOES_NA_TELA).
+const EXPLICA_BOTOES_NA_TELA = {
+  automatico: "O controle desenhado na tela aparece quando você joga pelo toque e some sozinho " +
+    "quando um controle de verdade (Bluetooth ou cabo) é ligado. No jogo, MENU abre o menu (nele, " +
+    "o direcional anda, o B confirma e o A volta) e SAIR, tocado duas vezes, fecha o jogo.",
+  sempre: "O controle da tela fica sempre, mesmo com um controle de verdade ligado (bom para " +
+    "dividir: um no toque, outro no controle).",
+  nunca: "Sem botões na tela: só com controle de verdade. O menu do jogo abre apertando os dois " +
+    "analógicos (L3 + R3) ou o Voltar do aparelho.",
+};
+
+function explicarBotoesNaTela() {
+  const valor = $("#listaBotoesNaTela").value;
+  $("#explicaBotoesNaTela").textContent = EXPLICA_BOTOES_NA_TELA[valor] || EXPLICA_BOTOES_NA_TELA.automatico;
+}
+
+// Desempenho que aprende (servidor\desempenho.py): os consoles que ficaram
+// no limite e jogam um degrau mais leve.
+function mostrarDesempenho(porConsole) {
+  const lista = $("#listaDesempenho");
+  if (!lista) return;
+  const nomes = new Map((estado.plataformas || []).map((p) => [p.id, p.nome]));
+  const itens = Object.entries(porConsole || {}).filter(([, d]) => d && d.degrau > 0)
+    .map(([id, d]) => {
+      const item = document.createElement("li");
+      const nome = document.createElement("span");
+      nome.textContent = nomes.get(id) || id;
+      const texto = document.createElement("code");
+      texto.textContent = d.degrau + (d.degrau === 1 ? " degrau mais leve" : " degraus mais leve") +
+        (d.quando ? " (desde " + String(d.quando).slice(0, 10).split("-").reverse().join("/") + ")" : "");
+      item.append(nome, texto);
+      return item;
+    });
+  if (!itens.length) {
+    const item = document.createElement("li");
+    item.textContent = "Nenhum console ficou no limite até agora.";
+    itens.push(item);
+  }
+  lista.replaceChildren(...itens);
+  $("#btnDesempenhoZerar").hidden = !Object.values(porConsole || {}).some((d) => d && d.degrau > 0);
+}
+
+function explicarFormatoImagem() {
+  const valor = $("#listaFormatoImagem").value;
+  $("#explicaFormatoImagem").textContent = EXPLICA_FORMATO_IMAGEM[valor] || EXPLICA_FORMATO_IMAGEM.automatico;
 }
 
 function explicarEscalaTela() {
@@ -4735,6 +4857,32 @@ function ligarEventos() {
     }
   });
 
+  $("#listaBotoesNaTela").addEventListener("change", async (evento) => {
+    const lista = evento.currentTarget;
+    try {
+      await salvarConfig({ botoes_na_tela: lista.value });
+      explicarBotoesNaTela();
+      recado("Pronto. Vale no próximo jogo.");
+    } catch (falha) {
+      lista.value = (estado.config && estado.config.botoes_na_tela) || "automatico";
+      explicarBotoesNaTela();
+      recado(falha.message, true);
+    }
+  });
+
+  $("#listaFormatoImagem").addEventListener("change", async (evento) => {
+    const lista = evento.currentTarget;
+    try {
+      await salvarConfig({ formato_da_imagem: lista.value });
+      explicarFormatoImagem();
+      recado("Pronto. Vale no próximo jogo.");
+    } catch (falha) {
+      lista.value = (estado.config && estado.config.formato_da_imagem) || "automatico";
+      explicarFormatoImagem();
+      recado(falha.message, true);
+    }
+  });
+
   $("#listaEscalaTela").addEventListener("change", async (evento) => {
     const lista = evento.currentTarget;
     try {
@@ -4786,6 +4934,29 @@ function ligarEventos() {
       await pedir("/api/perfil/foto", "POST", { remover: true });
       atualizarFotoPerfil(false);
       recado("Foto de perfil removida.");
+    } catch (falha) {
+      recado(falha.message, true);
+    }
+  });
+
+  $("#chaveDesempenho").addEventListener("click", async (evento) => {
+    const botao = evento.currentTarget;
+    const novo = botao.getAttribute("aria-pressed") !== "true";
+    try {
+      await salvarConfig({ ajuste_pelo_desempenho: novo });
+      botao.setAttribute("aria-pressed", novo ? "true" : "false");
+      recado(novo ? "Pronto: o ARENA ajusta o gráfico pelo desempenho."
+        : "Desligado: o gráfico fica como o perfil escolhido, mesmo se pesar.");
+    } catch (falha) {
+      recado(falha.message, true);
+    }
+  });
+
+  $("#btnDesempenhoZerar").addEventListener("click", async () => {
+    try {
+      const resposta = await pedir("/api/desempenho/zerar", "POST", {});
+      mostrarDesempenho((resposta && resposta.desempenho) || {});
+      recado("Pronto: todo console volta ao gráfico normal no próximo jogo.");
     } catch (falha) {
       recado(falha.message, true);
     }

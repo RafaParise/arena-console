@@ -690,6 +690,23 @@ window.ArenaRotas = (function () {
     return chave + ' = "' + String(valor).replace(/"/g, "") + '"';
   }
 
+  // Formato da imagem (a mesma regra do servidor: graficos.py,
+  // proporcao_da_partida; pedido de 22/10/2026). A tela e' esta janela.
+  function proporcaoDaPartida(p) {
+    const formato = (E.config && E.config.formato_da_imagem) || "automatico";
+    const regra = D.formato_da_imagem || {};
+    const cheia = { video_aspect_ratio_auto: "false", aspect_ratio_index: "24" };
+    const doNucleo = { video_aspect_ratio_auto: "false", aspect_ratio_index: "22" };
+    if (formato === "esticar") return cheia;
+    const largura = window.innerWidth, altura = window.innerHeight;
+    if (formato === "console" || !(regra.esticar_no_automatico || []).includes(p.id) || !altura) return doNucleo;
+    const proporcao = largura / altura;
+    const maximo = Number(regra.maximo_no_automatico) || 16 / 9;
+    if (proporcao < 4 / 3) return doNucleo;
+    if (proporcao <= maximo + 0.01) return cheia;
+    return { video_aspect_ratio_auto: "false", aspect_ratio_index: "20", video_aspect_ratio: maximo.toFixed(4) };
+  }
+
   function montarConfiguracao(p) {
     const opcoes = Object.assign({}, D.base_retroarch);
     // Em todo jogo: o menu do Esc em portugues, as teclas do ARENA, a
@@ -711,6 +728,7 @@ window.ArenaRotas = (function () {
       notification_show_autoconfig: "false",
       input_autodetect_enable: "true",
     });
+    Object.assign(opcoes, proporcaoDaPartida(p));
     Object.assign(opcoes, p.opcoes_retroarch || {});
     return Object.keys(opcoes).map(function (chave) { return linhaCfg(chave, opcoes[chave]); }).join("\n") + "\n";
   }
@@ -990,6 +1008,7 @@ window.ArenaRotas = (function () {
     const c = E.config;
     if (["claro", "escuro"].includes(dados.tema)) c.tema = dados.tema;
     if (["automatico", "sempre", "parado"].includes(dados.fundo_animado)) c.fundo_animado = dados.fundo_animado;
+    if (["automatico", "esticar", "console"].includes(dados.formato_da_imagem)) c.formato_da_imagem = dados.formato_da_imagem;
     if ("apelido" in dados) c.apelido = limparApelido(dados.apelido);
     if (dados.favorito) {
       const alvo = String(dados.favorito).slice(0, 300);
