@@ -18,7 +18,7 @@ on:
   workflow_dispatch:
   push:
     branches: [auditoria-4]
-    paths: [".github/workflows/nucleo-ps2-android.yml"]
+    paths: [".github/workflows/nucleo-ps2-android.yml", "ferramentas/remendos/**"]
 
 permissions:
   contents: read
@@ -56,6 +56,26 @@ jobs:
           git checkout --detach FETCH_HEAD
           git submodule update --init --recursive --depth 1 --jobs 4
           git log -1 --format='commit %H%n%s'
+
+      - name: Baixar os remendos do ARENA (so a pasta ferramentas/remendos)
+        uses: actions/checkout@v4
+        with:
+          path: arena
+          sparse-checkout: ferramentas/remendos
+          sparse-checkout-cone-mode: true
+
+      - name: Aplicar os remendos do ARENA no ARMSX2
+        working-directory: armsx2
+        run: |
+          # O nucleo do ARMSX2 so le o controle 1 e nao abre sem jogo. Os remendos (texto simples, no
+          # repositorio do ARENA) ligam os jogadores 2 a 8 e o menu da BIOS. Se o codigo fixado mudar e o
+          # remendo nao encaixar mais, o trabalho PARA aqui: nada e' compilado pela metade.
+          for remendo in ../arena/ferramentas/remendos/*.patch; do
+            echo "remendo: $remendo"
+            git apply --check "$remendo"
+            git apply "$remendo"
+          done
+          git diff --stat
 
       - name: Instalar o NDK
         run: |
@@ -103,6 +123,14 @@ jobs:
           test "$LSE" -lt 80
           mkdir -p ../saida
           cp "$SO" ../saida/armsx2_libretro_android.so
+          # A pasta resources que o nucleo exige em system/pcsx2/resources (sem ela ele nao liga): a MESMA
+          # que o app do ARMSX2 monta (platforms/android/app/build.gradle.kts, generateSharedResources).
+          mkdir -p ../saida/resources
+          cp -r bin/resources/. ../saida/resources/
+          rm -rf ../saida/resources/shaders/dx11
+          cp bin/resources-overlay/armsx2_overrides.yaml ../saida/resources/
+          cp platforms/android/app/src/main/assets/resources/patches.zip ../saida/resources/
+          du -sh ../saida/resources
           cd ../saida
           sha256sum armsx2_libretro_android.so | tee armsx2_libretro_android.so.sha256
           ls -l armsx2_libretro_android.so
@@ -112,6 +140,7 @@ jobs:
             echo "Codigo-fonte: https://github.com/ARMSX2/ARMSX2 no commit $ARMSX2_COMMIT (GPL-3.0)."
             echo "Receita: .gitlab-ci.yml do ARMSX2 (nucleo libretro, Android) + $MARCHA."
             echo "NDK $NDK_VERSION, API $API. Instrucoes LSE soltas no codigo: $LSE."
+            echo "Remendos do ARENA aplicados (ferramentas/remendos): $(cd ../arena/ferramentas/remendos && sha256sum *.patch | tr '\n' ' ')"
           } > LEIA.txt
 
       - name: Guardar o nucleo

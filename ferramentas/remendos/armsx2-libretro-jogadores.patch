@@ -1,0 +1,77 @@
+--- a/pcsx2-libretro/Main.cpp
++++ b/pcsx2-libretro/Main.cpp
+@@ -239,6 +239,17 @@
+ 		s_base_settings->SetIntValue("EmuCore/GS", "Renderer",
+ 			static_cast<int>(GSRendererType::VK));
+ 		s_base_settings->SetBoolValue("InputSources", "SDL", false);
++		// ARENA: um DualShock 2 para cada jogador do libretro. O PCSX2 so liga o Pad1 por padrao, e o jogo
++		// so enxerga o controle que o PS2 acha ligado. Pad1 e Pad2 sempre; Pad3..Pad5 com o multitap da
++		// porta 1 e Pad6..Pad8 com o da porta 2 (o multitap vem de [Pad] MultitapPort1/MultitapPort2).
++		s_base_settings->SetStringValue("Pad1", "Type", "DualShock2");
++		s_base_settings->SetStringValue("Pad2", "Type", "DualShock2");
++		const bool arena_multitap1 = s_base_settings->GetBoolValue("Pad", "MultitapPort1", false);
++		const bool arena_multitap2 = s_base_settings->GetBoolValue("Pad", "MultitapPort2", false);
++		static const char* const kArenaPads[] = {"Pad3", "Pad4", "Pad5", "Pad6", "Pad7", "Pad8"};
++		for (unsigned i = 0; i < 6; i++)
++			s_base_settings->SetStringValue(kArenaPads[i], "Type",
++				((i < 3) ? arena_multitap1 : arena_multitap2) ? "DualShock2" : "None");
+ 		// Audio goes out through retro_run pulling the stream ring; the Null
+ 		// backend keeps SPU2 mixing into the ring with no device thread.
+ 		s_base_settings->SetStringValue("SPU2/Output", "Backend", "Null");
+@@ -1652,7 +1663,9 @@
+ 	else
+ 		log_cb = FallbackLog;
+ 
+-	bool support_no_game = false;
++	// ARENA: sem jogo, o PS2 liga a BIOS e mostra o menu dela (memory card, idioma, data e hora,
++	// filmes): o retro_load_game ja trata a falta de jogo como "sem disco".
++	bool support_no_game = true;
+ 	cb(RETRO_ENVIRONMENT_SET_SUPPORT_NO_GAME, &support_no_game);
+ 
+ 	InstallFrontendVFS(cb);
+@@ -2138,7 +2151,21 @@
+ 	// bind slots (bypasses InputManager entirely).
+ 	if (VMManager::HasValidVM())
+ 	{
+-		if (PadBase* pad = Pad::GetPad(0))
++		// ARENA: um jogador do libretro por pad do PS2, na ordem do PS2: 1A, [1B 1C 1D se o multitap da
++		// porta 1 esta ligado], 2A, [2B 2C 2D se o da porta 2 esta]. Pad = a posicao do PCSX2 (0=1A, 1=2A,
++		// 2..4=1B..1D, 5..7=2B..2D).
++		u8 arena_pads[8];
++		unsigned arena_jogadores = 0;
++		arena_pads[arena_jogadores++] = 0;
++		if (EmuConfig.Pad.MultitapPort0_Enabled)
++			for (u8 p = 2; p <= 4; p++)
++				arena_pads[arena_jogadores++] = p;
++		arena_pads[arena_jogadores++] = 1;
++		if (EmuConfig.Pad.MultitapPort1_Enabled)
++			for (u8 p = 5; p <= 7; p++)
++				arena_pads[arena_jogadores++] = p;
++		for (unsigned jogador = 0; jogador < arena_jogadores; jogador++)
++		if (PadBase* pad = Pad::GetPad(arena_pads[jogador]))
+ 		{
+ 			static constexpr struct
+ 			{
+@@ -2163,17 +2190,17 @@
+ 				{RETRO_DEVICE_ID_JOYPAD_R3, PadDualshock2::Inputs::PAD_R3},
+ 			};
+ 			for (const auto& m : bmap)
+-				pad->Set(m.ds2, input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, m.retro) ? 1.0f : 0.0f);
++				pad->Set(m.ds2, input_state_cb(jogador, RETRO_DEVICE_JOYPAD, 0, m.retro) ? 1.0f : 0.0f);
+ 
+ 			// Analog sticks: split each axis into the two directional slots.
+ 			const auto axis = [](s16 v, bool positive) {
+ 				const float f = std::clamp(static_cast<float>(v) / 32767.0f, -1.0f, 1.0f);
+ 				return positive ? std::max(f, 0.0f) : std::max(-f, 0.0f);
+ 			};
+-			const s16 lx = input_state_cb(0, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_X);
+-			const s16 ly = input_state_cb(0, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_Y);
+-			const s16 rx = input_state_cb(0, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_RIGHT, RETRO_DEVICE_ID_ANALOG_X);
+-			const s16 ry = input_state_cb(0, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_RIGHT, RETRO_DEVICE_ID_ANALOG_Y);
++			const s16 lx = input_state_cb(jogador, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_X);
++			const s16 ly = input_state_cb(jogador, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_Y);
++			const s16 rx = input_state_cb(jogador, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_RIGHT, RETRO_DEVICE_ID_ANALOG_X);
++			const s16 ry = input_state_cb(jogador, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_RIGHT, RETRO_DEVICE_ID_ANALOG_Y);
+ 			pad->Set(PadDualshock2::Inputs::PAD_L_RIGHT, axis(lx, true));
+ 			pad->Set(PadDualshock2::Inputs::PAD_L_LEFT, axis(lx, false));
+ 			pad->Set(PadDualshock2::Inputs::PAD_L_DOWN, axis(ly, true));

@@ -1003,6 +1003,32 @@ def preparar_bios_pcsx2(caminho_executavel, pasta_sistema):
         return None
 
 
+def preparar_bios_do_nucleo_ps2(pasta_sistema):
+    """Os nucleos de PS2 do RetroArch (o ARMSX2 e o PCSX2 do libretro, o do Android) procuram a BIOS em
+    retroarch\\system\\pcsx2\\bios. Copia para la as BIOS de PS2 que o ARENA reconhece pelo CONTEUDO em
+    retroarch\\system (o professor as renomeia), sem trocar nem apagar o que ja estiver la. A extensao
+    vai em minusculas (".BIN" vira ".bin": o nucleo procura por ela). Devolve os nomes copiados."""
+    import bios as bios_do_arena
+    destino = os.path.join(pasta_sistema, "pcsx2", "bios")
+    copiadas = []
+    try:
+        achadas = bios_do_arena.bios_de_playstation("ps2", pasta_sistema)
+        if not achadas:
+            return copiadas
+        os.makedirs(destino, exist_ok=True)
+        ja = {nome.lower() for nome in os.listdir(destino)}
+        for origem in achadas:
+            base, extensao = os.path.splitext(os.path.basename(origem))
+            nome = base + extensao.lower()
+            if nome.lower() in ja:       # ja esta la (ou e' outro arquivo com esse nome): nunca se troca
+                continue
+            shutil.copy2(origem, os.path.join(destino, nome))
+            copiadas.append(nome)
+    except OSError:
+        return copiadas
+    return copiadas
+
+
 def preparar_portatil_pcsx2(caminho_executavel):
     """Liga o modo portatil do PCSX2 e traz os memory cards de Documentos.
 

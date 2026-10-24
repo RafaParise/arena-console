@@ -1396,6 +1396,9 @@ input::placeholder { color: var(--texto-apagado); }
 .volume--cheio { border-color: #bd7184; }
 .volume--cheio .volume-barra > span { background: #ff8fa6; }
 #listaPastasDoCartao code, #listaCandidatasDoCartao code { font-size: var(--t-micro); overflow-wrap: anywhere; }
+#navegadorDoCartao { margin: .7rem 0; padding: .6rem .75rem; border: 1px solid var(--borda); border-radius: 10px; }
+#listaDoNavegador { max-height: 18rem; overflow-y: auto; }
+#listaDoNavegador li button { width: 100%; text-align: left; }
 #listaPastasDoCartao .botao, #listaCandidatasDoCartao .botao { align-self: flex-start; }
 #celularPainel .maquina { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
 #celularCaminhosLista code { font-size: var(--t-micro); overflow-wrap: anywhere; }

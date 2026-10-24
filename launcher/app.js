@@ -1784,6 +1784,7 @@ async function mostrarArmazenamento() {
   $("#armazenamentoAviso").hidden = !texto;
   $("#armazenamentoAviso").textContent = texto;
   $("#btnCartaoProcurar").hidden = !cartao;
+  $("#btnCartaoEscolher").hidden = !cartao;
   $("#btnMedirCartao").hidden = !cartao;
 }
 
@@ -1878,6 +1879,47 @@ async function procurarJogosNoCartao() {
   } finally {
     botao.disabled = false;
     botao.textContent = "Procurar jogos no cartão";
+  }
+}
+
+// Escolher a pasta do cartao passo a passo (servidor: /api/armazenamento/listar): quando a busca
+// nao acha, ou o professor sabe onde estao os jogos. So aparecem nomes de pasta.
+async function navegarNoCartao(caminho) {
+  const cartao = cartaoNoAparelho();
+  const painel = $("#navegadorDoCartao");
+  if (!cartao) {
+    recado("Não achei nenhum cartão de memória no aparelho. Encaixe o cartão, feche o ARENA e abra de novo.", true);
+    return;
+  }
+  try {
+    const r = await pedir("/api/armazenamento/listar", "POST", caminho ? { caminho } : { volume: cartao.id });
+    estado.navegador = r;
+    painel.hidden = false;
+    const relativo = r.caminho.startsWith(r.raiz) ? r.caminho.slice(r.raiz.length).replace(/^[\\/]+/, "") : r.caminho;
+    const onde = relativo ? "Cartão › " + relativo.split(/[\\/]/).join(" › ") : "Cartão (o começo)";
+    $("#navegadorOnde").textContent = onde + (r.serve
+      ? ` — esta pasta tem ${r.consoles} pasta${r.consoles === 1 ? "" : "s"} de console: dá para jogar dela.`
+      : " — abra as pastas até chegar na que tem as pastas dos consoles dentro (PS1, Super Nintendo...).");
+    $("#btnNavegadorSubir").hidden = !r.pai;
+    $("#btnNavegadorUsar").hidden = !r.serve;
+    const itens = r.pastas.map((pasta) => {
+      const item = document.createElement("li");
+      const botao = document.createElement("button");
+      botao.className = "botao";
+      botao.type = "button";
+      botao.textContent = pasta.nome;
+      botao.onclick = () => navegarNoCartao(pasta.caminho);
+      item.append(botao);
+      return item;
+    });
+    if (!itens.length || r.cortado) {
+      const aviso = document.createElement("li");
+      aviso.textContent = r.cortado ? "Há mais pastas do que cabem na lista." : "Não há pastas aqui dentro.";
+      itens.push(aviso);
+    }
+    $("#listaDoNavegador").replaceChildren(...itens);
+  } catch (falha) {
+    recado(falha.message, true);
   }
 }
 
@@ -5280,6 +5322,17 @@ function ligarEventos() {
 
   $("#btnAparelhoDeNovo").addEventListener("click", () => mostrarAparelho());
   $("#btnCartaoProcurar").addEventListener("click", procurarJogosNoCartao);
+  $("#btnCartaoEscolher").addEventListener("click", () => navegarNoCartao());
+  $("#btnNavegadorSubir").addEventListener("click", () => {
+    if (estado.navegador && estado.navegador.pai) navegarNoCartao(estado.navegador.pai);
+  });
+  $("#btnNavegadorUsar").addEventListener("click", async () => {
+    const aqui = estado.navegador;
+    if (!aqui || !aqui.serve) return;
+    await usarPastaDoCartao({ caminho: aqui.caminho, onde: aqui.caminho.split(/[\\/]/).slice(-1)[0] });
+    $("#navegadorDoCartao").hidden = true;
+  });
+  $("#btnNavegadorFechar").addEventListener("click", () => { $("#navegadorDoCartao").hidden = true; });
   $("#btnMedirInterno").addEventListener("click", () => medirVelocidade("interno"));
   $("#btnMedirCartao").addEventListener("click", () => medirVelocidade("cartao"));
   $("#btnCelularProcurar").addEventListener("click", () => procurarCelularNoCabo());

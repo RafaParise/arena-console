@@ -34,6 +34,7 @@ interno 106 MB/s: jogo de disco roda direto do cartao; a copia para o interno
 (cache) e' uma escolha, como no Lemuroid (que copia o jogo para o cache interno
 ao jogar, com limite escolhido e limpeza do mais antigo).
 """
+import heapq
 import json
 import os
 import re
@@ -345,38 +346,94 @@ def ligar_extras(pasta_dos_jogos, extras=None):
 # Procurar pastas de jogos num volume (so olha nomes de pasta, nunca abre arquivo)
 # ---------------------------------------------------------------------------
 
-def procurar_pastas_de_jogos(raiz, consoles=None, limite_s=8.0, profundidade=5, relogio=time.monotonic):
+# Nomes de pasta que costumam levar aos jogos: a busca olha estas primeiro (num cartao grande, listar
+# pasta e' lento, e as pastas de fotos, musicas e apps nao levam a lugar nenhum).
+NOMES_DE_JOGOS = {"arena", "jogos", "games", "game", "roms", "rom", "pessoais", "turma", "livres",
+                  "emuladores", "emulation"}
+PISTAS_DE_JOGOS = ("arena", "jogo", "game", "rom", "emul", "retro", "projeto", "download")
+
+
+def _prioridade_do_nome(nome):
+    """0 = nome de pasta de jogos de verdade; 1 = tem pista no nome; 2 = o resto."""
+    minusculo = nome.lower()
+    if minusculo in NOMES_DE_JOGOS:
+        return 0
+    return 1 if any(pista in minusculo for pista in PISTAS_DE_JOGOS) else 2
+
+
+def procurar_pastas_de_jogos(raiz, consoles=None, limite_s=25.0, profundidade=6, relogio=time.monotonic):
     """{candidatas: [{caminho, consoles, onde}], completo, pastas_vistas}: as pastas do volume com
-    pelo menos 2 pastas de console do ARENA dentro. Para no tempo limite (completo=False)."""
+    pelo menos 2 pastas de console do ARENA dentro. So olha nomes de pasta (uma listagem por pasta).
+    Vai primeiro pelos nomes que levam a jogos; para no tempo limite (completo=False)."""
     consoles = nomes_de_pastas_de_console() if consoles is None else consoles
     inicio = relogio()
-    fila = [(raiz, 0)]
+    # (prioridade, nivel, ordem, caminho): a menor sai primeiro. A pasta filha herda a pista da de cima.
+    fila = [(0, 0, 0, raiz)]
+    ordem = 0
     candidatas, vistas, completo = [], 0, True
     while fila:
         if relogio() - inicio > limite_s:
             completo = False
             break
-        atual, nivel = fila.pop(0)
+        prioridade, nivel, _ordem, atual = heapq.heappop(fila)
         vistas += 1
-        achados = _consoles_dentro(atual, consoles)
-        if achados >= 2:
-            relativo = os.path.relpath(atual, raiz)
-            candidatas.append({"caminho": atual, "consoles": achados,
-                               "onde": " › ".join(p for p in relativo.split(os.sep) if p and p != ".")})
-            continue
-        if nivel >= profundidade:
-            continue
         try:
             with os.scandir(atual) as itens:
                 filhas = sorted(i.name for i in itens if i.is_dir(follow_symlinks=False))
         except OSError:
             continue
+        achados = sum(1 for nome in filhas if nome.lower() in consoles)
+        if achados >= 2:
+            relativo = os.path.relpath(atual, raiz)
+            onde = " › ".join(p for p in relativo.split(os.sep) if p and p != ".")
+            candidatas.append({"caminho": atual, "consoles": achados, "onde": onde or "Cartão"})
+            continue
+        if nivel >= profundidade:
+            continue
         for nome in filhas:
             if nome.startswith(".") or nome.lower() in PASTAS_QUE_NAO_SE_ABRE:
                 continue
-            fila.append((os.path.join(atual, nome), nivel + 1))
+            ordem += 1
+            propria = _prioridade_do_nome(nome)
+            herdada = prioridade + 1 if prioridade < 2 else 2
+            heapq.heappush(fila, (min(propria, herdada), nivel + 1, ordem, os.path.join(atual, nome)))
     candidatas.sort(key=lambda c: (-c["consoles"], c["onde"].lower()))
     return {"candidatas": candidatas[:12], "completo": completo, "pastas_vistas": vistas}
+
+
+MAXIMO_DE_PASTAS_NA_LISTA = 400
+
+
+def listar_subpastas(caminho, raizes=None, consoles=None):
+    """Para a tela de escolher a pasta, passo a passo: as subpastas de 'caminho' (so nomes), de onde
+    se veio e se a pasta serve como pasta de jogos. (dados, None) ou (None, "o que fazer")."""
+    if not isinstance(caminho, str) or not caminho.strip() or "\x00" in caminho:
+        return None, "Escolha uma pasta da lista."
+    real = os.path.realpath(os.path.abspath(os.path.normpath(caminho.strip())))
+    lista = _raizes(raizes)
+    indice = volume_da_pasta(real, lista)
+    if indice is None:
+        return None, "Escolha uma pasta que esteja na memória do aparelho ou no cartão de memória."
+    if not os.path.isdir(real):
+        return None, "Essa pasta não está no aparelho agora. Volte e escolha outra."
+    base = os.path.realpath(lista[indice])
+    relativo = [] if real == base else os.path.relpath(real, base).split(os.sep)
+    if relativo and relativo[0].lower() == "android":
+        return None, ("Essa pasta é de dados de outros aplicativos. Volte e escolha a pasta onde você "
+                      "guardou os jogos.")
+    consoles = nomes_de_pastas_de_console() if consoles is None else consoles
+    try:
+        with os.scandir(real) as itens:
+            nomes = sorted(i.name for i in itens if i.is_dir(follow_symlinks=False))
+    except OSError:
+        return None, "O ARENA não conseguiu abrir essa pasta. Volte e escolha outra."
+    visiveis = [n for n in nomes if not n.startswith(".") and n.lower() not in PASTAS_QUE_NAO_SE_ABRE]
+    aqui = sum(1 for n in nomes if n.lower() in consoles)
+    return {"caminho": real, "volume": id_do_volume(lista[indice], indice), "raiz": base,
+            "pai": "" if real == base else os.path.dirname(real),
+            "pastas": [{"nome": n, "caminho": os.path.join(real, n)} for n in visiveis[:MAXIMO_DE_PASTAS_NA_LISTA]],
+            "cortado": len(visiveis) > MAXIMO_DE_PASTAS_NA_LISTA,
+            "consoles": aqui, "serve": aqui >= 1}, None
 
 
 # ---------------------------------------------------------------------------

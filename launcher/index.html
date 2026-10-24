@@ -630,8 +630,18 @@
       <ul class="onde-lista" id="listaCandidatasDoCartao"></ul>
       <div class="controle-acoes">
         <button class="botao" id="btnCartaoProcurar" type="button">Procurar jogos no cartão</button>
+        <button class="botao" id="btnCartaoEscolher" type="button">Escolher a pasta no cartão</button>
         <button class="botao" id="btnMedirInterno" type="button">Medir a memória do aparelho</button>
         <button class="botao" id="btnMedirCartao" type="button">Medir o cartão</button>
+      </div>
+      <div id="navegadorDoCartao" hidden>
+        <p class="explica" id="navegadorOnde" role="status"></p>
+        <div class="controle-acoes">
+          <button class="botao" id="btnNavegadorSubir" type="button">Subir uma pasta</button>
+          <button class="botao botao--principal" id="btnNavegadorUsar" type="button" hidden>Jogar desta pasta</button>
+          <button class="botao" id="btnNavegadorFechar" type="button">Fechar</button>
+        </div>
+        <ul class="onde-lista" id="listaDoNavegador"></ul>
       </div>
       <p class="explica" id="armazenamentoVelocidade" role="status" hidden></p>
     </div>

@@ -1752,7 +1752,7 @@ window.ARENA_DADOS = {
   },
   {
    "android": {
-    "core": "pcsx2_libretro.dll",
+    "core": "armsx2_libretro.dll",
     "livre": {
      "aviso": "Este PlayStation 2 liga pelo Play!, que imita a BIOS: alguns jogos não abrem ou travam. Se isso acontecer, ponha a BIOS do console na pasta BIOS (guia 2).",
      "core": "play_libretro.dll",

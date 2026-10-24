@@ -390,7 +390,7 @@ REDE_DO_ARENA = '''<?xml version="1.0" encoding="utf-8"?>
 </network-security-config>
 '''
 
-ATIVIDADE_DO_ARENA = '''        <activity android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode" android:exported="true" android:label="ARENA" android:launchMode="singleTask" android:name="io.github.rafaparise.arena.ArenaActivity" android:process=":tela" android:screenOrientation="sensorLandscape" android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
+ATIVIDADE_DO_ARENA = '''        <activity android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode" android:exported="true" android:label="ARENA" android:launchMode="singleTask" android:name="io.github.rafaparise.arena.ArenaActivity" android:process=":tela" android:screenOrientation="fullUser" android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>

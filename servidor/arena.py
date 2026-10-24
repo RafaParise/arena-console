@@ -3010,6 +3010,12 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         instaladas = bios.instalar_livres(PASTA_SISTEMA)
         if instaladas:
             print("[ARENA] BIOS livres postas antes do jogo: %s." % ", ".join(sorted(instaladas)))
+        # PS2 pelo nucleo do RetroArch (o caminho do Android; no computador abre pelo PCSX2 de fora):
+        # o nucleo procura a BIOS em system\pcsx2\bios, e o jeito livre (Play!) nao precisa de nenhuma.
+        if jogo.get("plataforma") == "ps2" and jogo.get("jeito") != "livre":
+            levadas = graficos.preparar_bios_do_nucleo_ps2(PASTA_SISTEMA)
+            if levadas:
+                print("[ARENA] BIOS do PS2 levadas para a pasta do nucleo: %s." % ", ".join(levadas))
         # O jeito livre com a BIOS livre numa pasta so dela (a OpenBIOS do
         # PS1, em retroarch\system\OpenBIOS): o nucleo recebe essa pasta como
         # a pasta das BIOS. Solta na system, ela passaria na frente da BIOS
@@ -5615,6 +5621,17 @@ class Manipulador(BaseHTTPRequestHandler):
                 return self.erro("Escolha um dos volumes da lista. Se o cartão não aparece, encaixe-o e abra o "
                                  "ARENA de novo.")
             return self.responder_json(dict(armazenamento.procurar_pastas_de_jogos(volume["caminho"]), ok=True))
+
+        if caminho == "/api/armazenamento/listar":
+            # Escolher a pasta passo a passo (so nomes de pasta): sem 'caminho', comeca na raiz do volume.
+            pedido = str(dados.get("caminho") or "")
+            if not pedido:
+                volume = next((v for v in armazenamento.volumes() if v["id"] == str(dados.get("volume", ""))), None)
+                pedido = volume["caminho"] if volume and volume["montado"] else ""
+            da_pasta, erro = armazenamento.listar_subpastas(pedido)
+            if erro:
+                return self.erro(erro)
+            return self.responder_json(dict(da_pasta, ok=True))
 
         if caminho == "/api/armazenamento/usar":
             # As pastas de jogos do proprio ARENA (livres, turma, pessoais) nao entram de novo pelo cartao.

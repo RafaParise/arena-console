@@ -259,21 +259,28 @@ def playstation(caminho):
     return resultado
 
 
-def tem_bios_de_ps1(pasta_sistema):
-    """Ha alguma BIOS de PS1 em retroarch\\system (reconhecida pelo conteudo)?
-    Sem ela, o ARENA abre os jogos de PS1 pelo PCSX ReARMed, que imita a BIOS
-    (consoles.json -> core_sem_bios)."""
+def bios_de_playstation(console, pasta_sistema):
+    """Os arquivos de retroarch\\system que sao BIOS de PlayStation do console ("ps1" ou "ps2"),
+    reconhecidos pelo conteudo e nao pelo nome (o professor as renomeia), em ordem de nome."""
     try:
-        nomes = os.listdir(pasta_sistema)
+        nomes = sorted(os.listdir(pasta_sistema), key=str.lower)
     except OSError:
-        return False
+        return []
+    achadas = []
     for nome in nomes:
         caminho = os.path.join(pasta_sistema, nome)
         if os.path.isfile(caminho):
             achado = playstation(caminho)
-            if achado and achado[0] == "ps1":
-                return True
-    return False
+            if achado and achado[0] == console:
+                achadas.append(caminho)
+    return achadas
+
+
+def tem_bios_de_ps1(pasta_sistema):
+    """Ha alguma BIOS de PS1 em retroarch\\system (reconhecida pelo conteudo)?
+    Sem ela, o ARENA abre os jogos de PS1 pelo PCSX ReARMed, que imita a BIOS
+    (consoles.json -> core_sem_bios)."""
+    return bool(bios_de_playstation("ps1", pasta_sistema))
 
 
 def tem_a_bios(plataforma_id, pasta_sistema):
@@ -292,6 +299,10 @@ def tem_bios_original(plataforma_id, pasta_sistema):
     e sem esse cuidado o ARENA perguntaria entre duas coisas iguais."""
     if plataforma_id == "ps1":
         return tem_bios_de_ps1(pasta_sistema)
+    if plataforma_id == "ps2":
+        # A BIOS do PS2 nao tem lugar fixo (o catalogo a reconhece pelo conteudo): so conta a que esta
+        # em retroarch\\system. No celular, e' o que deixa o PS2 abrir pelo nucleo com a BIOS de verdade.
+        return bool(bios_de_playstation("ps2", pasta_sistema))
     for entrada in catalogo.do_console(plataforma_id):
         relativo = entrada.get("destino")
         if relativo and estado(pasta_sistema, relativo) in ATIVA:

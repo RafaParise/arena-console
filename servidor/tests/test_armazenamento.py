@@ -334,6 +334,72 @@ class AcharPastasDeJogos(Base):
         achado = armazenamento.procurar_pastas_de_jogos(self.cartao, CONSOLES)["candidatas"]
         self.assertEqual([c["caminho"] for c in achado], [muitas, poucas])
 
+    def test_cada_pasta_e_listada_uma_vez_so(self):
+        """No cartao de verdade, listar pasta e' o que custa: uma listagem por pasta (antes eram duas)."""
+        self.jogos_no_cartao("jogos")
+        listagens = []
+        original = os.scandir
+
+        def contando(caminho):
+            listagens.append(os.path.normcase(os.path.abspath(str(caminho))))
+            return original(caminho)
+
+        with mock.patch.object(armazenamento.os, "scandir", side_effect=contando):
+            armazenamento.procurar_pastas_de_jogos(self.cartao, CONSOLES)
+        self.assertEqual(len(listagens), len(set(listagens)))
+
+    def test_vai_primeiro_pelos_nomes_que_levam_a_jogos(self):
+        """Num cartao cheio de pastas, a busca acha 'ARENA/jogos' antes de abrir as outras, mesmo com
+        poucos segundos: o que se mede no celular e' o tempo para listar pasta."""
+        for i in range(40):
+            self.criar("1234-5678", "pasta%02d" % i, "dentro%d" % i)
+        procurada = self.jogos_no_cartao("Projetos", "ARENA", "jogos")
+        passos = iter(x * 0.5 for x in range(0, 10000))          # 0,5 s por pasta listada; limite de 4 s
+        achado = armazenamento.procurar_pastas_de_jogos(self.cartao, CONSOLES, limite_s=4, relogio=lambda: next(passos))
+        self.assertEqual([c["caminho"] for c in achado["candidatas"]], [procurada])
+        self.assertFalse(achado["completo"])
+
+    def test_a_prioridade_do_nome(self):
+        self.assertEqual([armazenamento._prioridade_do_nome(n) for n in ("ARENA", "Jogos", "Meus Jogos", "DCIM2", "roms")],
+                         [0, 0, 1, 2, 0])
+
+
+class EscolherPassoAPasso(Base):
+
+    def test_lista_as_subpastas_e_diz_se_serve(self):
+        jogos = self.jogos_no_cartao("Projetos", "ARENA", "jogos")
+        self.criar("1234-5678", "Projetos", "ARENA", "BIOS")
+        self.criar("1234-5678", "Projetos", ".oculta")
+        dados, erro = armazenamento.listar_subpastas(os.path.join(self.cartao, "Projetos", "ARENA"), self.raizes, CONSOLES)
+        self.assertIsNone(erro)
+        self.assertEqual([p["nome"] for p in dados["pastas"]], ["BIOS", "jogos"])
+        self.assertEqual((dados["consoles"], dados["serve"]), (0, False))
+        self.assertEqual(os.path.realpath(dados["pai"]), os.path.realpath(os.path.join(self.cartao, "Projetos")))
+        dentro, erro = armazenamento.listar_subpastas(jogos, self.raizes, CONSOLES)
+        self.assertEqual((dentro["consoles"], dentro["serve"]), (3, True))
+        self.assertEqual(dentro["volume"], "cartao-1234-5678")
+
+    def test_na_raiz_do_volume_nao_ha_para_onde_subir(self):
+        dados, _ = armazenamento.listar_subpastas(self.cartao, self.raizes, CONSOLES)
+        self.assertEqual(dados["pai"], "")
+
+    def test_nao_deixa_sair_do_aparelho_nem_entrar_nos_dados_dos_apps(self):
+        for pedido in ("", None, "   ", self.dados, os.path.join(self.pasta, "fora"), self.cartao + "\x00"):
+            dados, erro = armazenamento.listar_subpastas(pedido, self.raizes, CONSOLES)
+            self.assertIsNone(dados, pedido)
+            self.assertTrue(erro, pedido)
+        apps = self.criar("1234-5678", "Android", "data", "com.x")
+        dados, erro = armazenamento.listar_subpastas(apps, self.raizes, CONSOLES)
+        self.assertIsNone(dados)
+        self.assertIn("dados de outros aplicativos", erro)
+
+    def test_lista_enorme_e_cortada(self):
+        for i in range(armazenamento.MAXIMO_DE_PASTAS_NA_LISTA + 5):
+            os.makedirs(os.path.join(self.cartao, "p%04d" % i))
+        dados, _ = armazenamento.listar_subpastas(self.cartao, self.raizes, CONSOLES)
+        self.assertEqual(len(dados["pastas"]), armazenamento.MAXIMO_DE_PASTAS_NA_LISTA)
+        self.assertTrue(dados["cortado"])
+
 
 class Velocidade(Base):
 
@@ -467,6 +533,19 @@ class RotasDoServidor(Base):
             estado, resposta = self.pedir("/api/armazenamento/procurar", {"volume": ruim})
             self.assertEqual(estado, 400, ruim)
             self.assertIn("Escolha um dos volumes", resposta["erro"])
+
+    def test_escolher_a_pasta_passo_a_passo(self):
+        estado, resposta = self.pedir("/api/armazenamento/listar", {"volume": "cartao-1234-5678"})
+        self.assertEqual(estado, 200)
+        self.assertEqual((resposta["pai"], resposta["raiz"] == os.path.realpath(self.cartao)), ("", True))
+        self.assertEqual([p["nome"] for p in resposta["pastas"]], ["Projetos"])        # do cartao de mentira
+        estado, resposta = self.pedir("/api/armazenamento/listar", {"caminho": self.cartao_com_jogos})
+        self.assertEqual((estado, resposta["serve"], resposta["consoles"]), (200, True, 3))
+        estado, resposta = self.pedir("/api/armazenamento/listar", {"caminho": self.dados})
+        self.assertEqual(estado, 400)
+        self.assertIn("memória do aparelho ou no cartão", resposta["erro"])
+        estado, resposta = self.pedir("/api/armazenamento/listar", {"volume": "nao-existe"})
+        self.assertEqual(estado, 400)
 
     def test_pondo_e_tirando_o_cartao_da_lista(self):
         if not self.pode_ligar():

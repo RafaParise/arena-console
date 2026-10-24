@@ -809,7 +809,7 @@
       "descricao": "Exige maquina forte. Nao roda em PC de 4 GB.",
       "core": "pcsx2_libretro.dll",
       "android": {
-        "core": "pcsx2_libretro.dll",
+        "core": "armsx2_libretro.dll",
         "livre": {
           "nome": "Play! (livre, sem BIOS)",
           "core": "play_libretro.dll",

@@ -19,6 +19,11 @@
    "sha256": "4477ace01dd8ac1f7928718126dbd95f234f0fafe1662af4b9c2d9778929ef75",
    "tamanho": 540000
   },
+  "armsx2_libretro_android.so": {
+   "origem": "construido por .github/workflows/nucleo-ps2-android.yml (ARMSX2 commit 90126bdfea, ARMv8.0); SHA-256 do .so 04574ad0fe85447ef446a37a08d679e97aa43a5ec523409818ab2639964d95b8",
+   "sha256": "6491dc710b2e8d949d9e44405c6c1357bfb3fb8030ec54c67b1972419cf969f0",
+   "tamanho": 12646294
+  },
   "atari800_libretro_android.so": {
    "sha256": "aeeb02f655888ee537a2bed3f89d8c8ae4ea627fdb477d1ba52729b024de2a7f",
    "tamanho": 295086
