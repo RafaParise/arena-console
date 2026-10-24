@@ -1243,17 +1243,52 @@ def ini_padrao_do_armsx2(motor_do_nucleo, nota_gpu=None, modesto=False, abaixo="
 # aceita cartoes de 8, 16, 32 e 64 MB; o de 8 MB e' o padrao do console e o mais compativel, e o de 64 e' o maximo.
 TAMANHOS_DE_CARTAO_PS2 = (8, 16, 32, 64)
 CARTOES_DO_PS2_PADRAO = {"slot1_mb": 8, "slot2_mb": 64}
+# A entrada 1 tambem pode ser o PocketStation: um cartao no formato do PlayStation 1 (128 KB), o mesmo que o ARENA do
+# computador usa para os jogos de PS1 no PS2. "slot1_tipo": "ps1" (PocketStation) ou "ps2" (cartao do PS2, o padrao).
+NOME_DO_CARTAO_POCKETSTATION = "PocketStation.mcr"
+TAMANHO_DO_CARTAO_PS1 = 128 * 1024
 
 
 def limpar_cartoes_ps2(valor):
-    """{"slot1_mb": 8, "slot2_mb": 64} com so os tamanhos que existem; o que nao serve volta ao padrao."""
+    """{"slot1_mb": 8, "slot2_mb": 64} com so os tamanhos que existem; o que nao serve volta ao padrao.
+    "slot1_tipo" ("ps1" ou "ps2") so aparece se vier valido: sem ele a entrada 1 e' um cartao do PS2."""
     limpo = dict(CARTOES_DO_PS2_PADRAO)
     if isinstance(valor, dict):
-        for chave in limpo:
+        for chave in list(limpo):
             tamanho = valor.get(chave)
             if isinstance(tamanho, int) and not isinstance(tamanho, bool) and tamanho in TAMANHOS_DE_CARTAO_PS2:
                 limpo[chave] = tamanho
+        if valor.get("slot1_tipo") in ("ps1", "ps2"):
+            limpo["slot1_tipo"] = valor["slot1_tipo"]
     return limpo
+
+
+def cartao_ps1_vazio():
+    """Os 128 KB de um cartao de PlayStation 1 recem-formatado, com a mesma estrutura de um cartao de verdade:
+    1024 quadros de 128 bytes. Quadro 0: 'MC'. Quadros 1 a 15: o diretorio, todos livres (0xA0). Quadros 16 a 35: a
+    lista de setores ruins (vazia). Quadros 36 a 55: setores de reposicao. Do 56 em diante: os 15 blocos de dados,
+    em 0xFF. Cada quadro de controle termina com um byte de conferencia: o XOR dos 127 bytes de antes."""
+    imagem = bytearray(b"\xff" * TAMANHO_DO_CARTAO_PS1)
+
+    def fechar(quadro):
+        conferencia = 0
+        for byte in quadro[:127]:
+            conferencia ^= byte
+        quadro[127] = conferencia
+        return quadro
+
+    imagem[0:128] = fechar(bytearray(b"MC" + bytes(126)))
+    livre = bytearray(128)
+    livre[0] = 0xA0
+    livre[8:10] = b"\xff\xff"
+    for numero in range(1, 16):
+        imagem[numero * 128:(numero + 1) * 128] = fechar(bytearray(livre))
+    ruim = bytearray(128)
+    ruim[0:4] = b"\xff\xff\xff\xff"
+    for numero in range(16, 36):
+        imagem[numero * 128:(numero + 1) * 128] = fechar(bytearray(ruim))
+    imagem[36 * 128:56 * 128] = bytes(20 * 128)
+    return bytes(imagem)
 
 
 def nome_do_cartao_ps2(slot, megabytes):
@@ -1272,21 +1307,26 @@ def preparar_cartoes_do_ps2(pasta_sistema, cartoes=None):
     nomes = {}
     for slot in (1, 2):
         megabytes = escolha["slot%d_mb" % slot]
-        nome = nome_do_cartao_ps2(slot, megabytes)
+        e_pocketstation = slot == 1 and escolha.get("slot1_tipo") == "ps1"
+        nome = NOME_DO_CARTAO_POCKETSTATION if e_pocketstation else nome_do_cartao_ps2(slot, megabytes)
         nomes[slot] = nome
         caminho = os.path.join(pasta, nome)
         if os.path.exists(caminho):
             continue
-        tamanho = megabytes * 1024 * 1024 // 512 * 528
         try:
             os.makedirs(pasta, exist_ok=True)
             temporario = "%s.%d.tmp" % (caminho, threading.get_ident())
-            bloco = b"\xff" * (1 << 20)
-            with open(temporario, "wb") as arquivo:
-                restante = tamanho
-                while restante > 0:
-                    arquivo.write(bloco[:min(len(bloco), restante)])
-                    restante -= len(bloco)
+            if e_pocketstation:
+                with open(temporario, "wb") as arquivo:
+                    arquivo.write(cartao_ps1_vazio())
+            else:
+                tamanho = megabytes * 1024 * 1024 // 512 * 528
+                bloco = b"\xff" * (1 << 20)
+                with open(temporario, "wb") as arquivo:
+                    restante = tamanho
+                    while restante > 0:
+                        arquivo.write(bloco[:min(len(bloco), restante)])
+                        restante -= len(bloco)
             os.replace(temporario, caminho)
         except OSError as falha:
             print("[ARENA] Nao consegui criar o cartao %s do PS2: %s" % (nome, falha))
@@ -1640,6 +1680,10 @@ def chaves_gerenciadas_pelo_arena():
     # do Dreamcast, 16/10/2026): fora daqui, o "ligado" do jeito livre ficaria
     # no arquivo e valeria tambem no jeito original.
     chaves.update(chaves_do_jeito_livre())
+    # Os acessorios (servidor\acessorios.json): a chave do VMU na tela, do Rumble Pak... e' do ARENA tambem. Quando a
+    # pessoa volta o acessorio ao padrao, a linha antiga some do arquivo e o emulador volta ao que ele faz sozinho.
+    import acessorios
+    chaves.update(acessorios.chaves_de_opcao())
     return chaves
 
 

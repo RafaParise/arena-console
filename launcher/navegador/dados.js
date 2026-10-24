@@ -894,6 +894,7 @@ window.ARENA_DADOS = {
  },
  "config_padrao": {
   "abaixo_do_original": "",
+  "acessorios": {},
   "ajuste_pelo_desempenho": true,
   "ajustes_dos_nucleos": {},
   "ajustes_ini_dos_nucleos": {},

@@ -306,6 +306,7 @@ async function carregarEstado() {
   desenharJeitos();
   desenharBios(dados.bios_consoles || [], dados.bios_disponiveis || []);
   desenharCartoes(dados.memory_cards || []);
+  desenharAcessorios(dados.acessorios || []);
   prepararAbrirBios(dados.bios_consoles || []);
   $("#relogioPc").textContent = new Date().toLocaleString("pt-BR");
   $("#pastaBios").textContent = dados.pastas.sistema;
@@ -3478,6 +3479,143 @@ function desenharFechamentos(lista) {
 // Memory cards
 // --------------------------------------------------------------------------
 
+// --------------------------------------------------------------------------
+// Acessórios dos consoles (VMU, Rumble Pak, multitap, pistola de luz...)
+// --------------------------------------------------------------------------
+
+function desenharAcessorios(lista) {
+  estado.acessorios = lista || [];
+  const seletor = $("#listaAcessoriosConsole");
+  if (!seletor) return;
+  const anterior = seletor.value;
+  seletor.replaceChildren(...estado.acessorios.map((grupo) => {
+    const opcao = document.createElement("option");
+    opcao.value = grupo.console;
+    opcao.textContent = `${grupo.nome} (${grupo.acessorios.length})`;
+    return opcao;
+  }));
+  if (anterior && estado.acessorios.some((grupo) => grupo.console === anterior)) {
+    seletor.value = anterior;
+  }
+  mostrarAcessoriosDoConsole();
+}
+
+function mostrarAcessoriosDoConsole() {
+  const caixa = $("#listaAcessorios");
+  const grupo = (estado.acessorios || []).find(
+    (item) => item.console === $("#listaAcessoriosConsole").value);
+  if (!grupo) {
+    const vazio = document.createElement("p");
+    vazio.className = "explica";
+    vazio.textContent = "Nenhum console com acessórios nesta versão do ARENA.";
+    caixa.replaceChildren(vazio);
+    return;
+  }
+  caixa.replaceChildren(...grupo.acessorios.map(desenharUmAcessorio));
+}
+
+function desenharUmAcessorio(acessorio) {
+  const cartao = document.createElement("div");
+  cartao.className = "acessorio";
+
+  const nome = document.createElement("strong");
+  nome.className = "acessorio-nome";
+  nome.textContent = acessorio.nome;
+
+  const texto = document.createElement("p");
+  texto.className = "explica";
+  texto.textContent = acessorio.texto;
+  cartao.append(nome, texto);
+
+  if (acessorio.so_alguns_jogos) {
+    const aviso = document.createElement("p");
+    aviso.className = "opcao-ajuda";
+    aviso.textContent = "Só faz efeito nos jogos feitos para este acessório.";
+    cartao.append(aviso);
+  }
+  for (const controle of acessorio.controles) {
+    cartao.append(desenharUmControleDeAcessorio(acessorio, controle));
+  }
+  return cartao;
+}
+
+function desenharUmControleDeAcessorio(acessorio, controle) {
+  const linha = document.createElement("div");
+  linha.className = "opcao";
+
+  const rotulo = document.createElement("span");
+  rotulo.className = "opcao-rotulo";
+  rotulo.textContent = controle.rotulo;
+  linha.append(rotulo);
+
+  if (controle.tipo === "chave") {
+    const botao = document.createElement("button");
+    botao.type = "button";
+    botao.className = "chave opcao-controle";
+    botao.setAttribute("aria-pressed", controle.valor ? "true" : "false");
+    botao.setAttribute("aria-label", controle.rotulo);
+    botao.addEventListener("click", async () => {
+      const novo = botao.getAttribute("aria-pressed") !== "true";
+      if (await mudarAcessorio(acessorio.id, controle.id, novo)) {
+        botao.setAttribute("aria-pressed", novo ? "true" : "false");
+        controle.valor = novo;
+      }
+    });
+    linha.append(botao);
+  } else {
+    const seletor = document.createElement("select");
+    seletor.className = "opcao-controle";
+    seletor.setAttribute("aria-label", controle.rotulo);
+    for (const [valor, rotuloDaEscolha] of controle.escolhas) {
+      const opcao = document.createElement("option");
+      opcao.value = valor;
+      opcao.textContent = rotuloDaEscolha;
+      seletor.append(opcao);
+    }
+    seletor.value = String(controle.valor);
+    seletor.addEventListener("change", async () => {
+      if (await mudarAcessorio(acessorio.id, controle.id, seletor.value)) {
+        controle.valor = seletor.value;
+      } else {
+        seletor.value = String(controle.valor);
+      }
+    });
+    linha.append(seletor);
+  }
+  return linha;
+}
+
+// Grava UMA escolha e devolve se deu certo. O servidor guarda só o que a
+// pessoa mexeu (o resto fica como o emulador escolhe).
+async function mudarAcessorio(acessorioId, controleId, valor) {
+  const atual = JSON.parse(JSON.stringify((estado.config || {}).acessorios || {}));
+  atual[acessorioId] = Object.assign({}, atual[acessorioId], { [controleId]: valor });
+  try {
+    await salvarConfig({ acessorios: atual });
+    recado("Pronto. Vale no próximo jogo que você abrir.");
+    return true;
+  } catch (falha) {
+    recado(falha.message, true);
+    return false;
+  }
+}
+
+async function voltarAcessoriosAoPadrao() {
+  const grupo = (estado.acessorios || []).find(
+    (item) => item.console === $("#listaAcessoriosConsole").value);
+  if (!grupo) return;
+  const atual = JSON.parse(JSON.stringify((estado.config || {}).acessorios || {}));
+  for (const acessorio of grupo.acessorios) delete atual[acessorio.id];
+  try {
+    await salvarConfig({ acessorios: atual });
+    const dados = await pedir("/api/estado");
+    desenharAcessorios(dados.acessorios || []);
+    recado("Os acessórios deste console voltaram ao padrão. Vale no próximo jogo.");
+  } catch (falha) {
+    recado(falha.message, true);
+  }
+}
+
 function desenharCartoes(lista) {
   const caixa = $("#listaCartoes");
 
@@ -5394,6 +5532,9 @@ function ligarEventos() {
       recado(falha.message, true);
     }
   });
+
+  $("#listaAcessoriosConsole").addEventListener("change", mostrarAcessoriosDoConsole);
+  $("#btnAcessoriosPadrao").addEventListener("click", voltarAcessoriosAoPadrao);
 
   $("#listaPresetGrafico").addEventListener("change", async (evento) => {
     try {

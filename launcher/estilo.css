@@ -1133,6 +1133,18 @@ input::placeholder { color: var(--texto-apagado); }
 .chave[aria-pressed="true"] { background: var(--azul); }
 .chave[aria-pressed="true"]::after { transform: translateX(18px); background: #ffffff; }
 
+/* ---- acessorios dos consoles (VMU, Rumble Pak, multitap...) ---- */
+.acessorio {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.8rem;
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+}
+.acessorio-nome { font-size: var(--t-peq); }
+.acessorio > .explica { margin: 0; }
+
 /* ========================= RECORDES ========================= */
 
 .ranking-jogo { margin-bottom: var(--gap-g); }

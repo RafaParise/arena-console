@@ -86,6 +86,7 @@ import baixados  # noqa: E402  (os jogos baixados, levados para a prateleira -- 
 import motivo_do_erro  # noqa: E402  (por que o jogo nao abriu, pelo registro -- 02/10/2026)
 import desempenho  # noqa: E402  (o jogo pesado demais deixa o grafico mais leve -- auditoria 4)
 import bios        # noqa: E402  (nome, pasta e versao certa de cada BIOS -- 03/10/2026)
+import acessorios  # noqa: E402  (VMU, Rumble Pak, multitap, pistola de luz... ligar e desligar -- 24/10/2026)
 import arrumar     # noqa: E402  (o botao Arrumar: o arquivo do jogo no lugar certo -- 03/10/2026)
 import ponte_sem_acento  # noqa: E402  (nucleo que nao abre pasta com acento: o Hatari -- 14/10/2026)
 import java_do_arena  # noqa: E402  (o Java que vem junto, para o Java ME -- 15/10/2026)
@@ -1244,6 +1245,9 @@ def config_padrao():
         # Ajuste fino por emulador (graficos.limpar_ajustes_dos_nucleos): as opcoes do nucleo que a pessoa
         # quer diferentes do que o ARENA escolhe, {"armsx2": {"armsx2_upscale": "2x"}}.
         "ajustes_dos_nucleos": {},
+        # Os acessorios de cada console que a pessoa ligou, desligou ou escolheu (acessorios.limpar_estado):
+        # {"dc_vmu_tela_1": {"tela": true, "lugar": "Lower Right"}}. Controle que ela nunca mexeu nao entra.
+        "acessorios": {},
         # O mesmo, direto no .ini do emulador (graficos.limpar_ajustes_ini): {"armsx2": {"EmuCore/GS": {...}}}.
         "ajustes_ini_dos_nucleos": {},
         # Os memory cards do PS2 do celular, em MB (graficos.limpar_cartoes_ps2): o 1 e' o padrao do console (o da
@@ -1412,6 +1416,7 @@ def ler_config_do_disco():
     if salvo.get("abaixo_do_original") in graficos.NIVEIS_ABAIXO:
         config["abaixo_do_original"] = salvo["abaixo_do_original"]
     config["ajustes_dos_nucleos"] = graficos.limpar_ajustes_dos_nucleos(salvo.get("ajustes_dos_nucleos"))
+    config["acessorios"] = acessorios.limpar_estado(salvo.get("acessorios"))
     config["ajustes_ini_dos_nucleos"] = graficos.limpar_ajustes_ini(salvo.get("ajustes_ini_dos_nucleos"))
     config["cartoes_ps2"] = graficos.limpar_cartoes_ps2(salvo.get("cartoes_ps2"))
     config["rpcn_ativo"] = bool(salvo.get("rpcn_ativo"))
@@ -2792,8 +2797,14 @@ def preparar_o_ps2_do_android(config, jogo=None, sem_jogo=False, degrau=0):
     # O .ini do nucleo (o que ele nao mostra como opcao): o padrao do ARENA e, por cima, o da pessoa.
     ini = graficos.ini_padrao_do_armsx2(opcoes.get("armsx2_renderer"), CAPACIDADE.get("nota_gpu"),
                                         grafico_original(config), nivel_abaixo(config))
-    # Os memory cards: o 1 (8 MB, o da BIOS) e o 2 (64 MB, o maximo) em system/pcsx2/memcards, dentro da pasta do ARENA.
-    for secao, chaves in graficos.preparar_cartoes_do_ps2(PASTA_SISTEMA, config.get("cartoes_ps2")).items():
+    # Os memory cards em system/pcsx2/memcards, dentro da pasta do ARENA: por padrao o PocketStation na entrada 1 (pedido
+    # do Rafael, 24/10/2026) e o maior cartao do PS2 (64 MB) na 2. A escolha vem de Acessorios; quem ja tinha mexido nos
+    # tamanhos pelo config.json antigo (cartoes_ps2) continua valendo.
+    cartoes = acessorios.cartoes_ps2(config.get("acessorios"))
+    antigo = graficos.limpar_cartoes_ps2(config.get("cartoes_ps2"))
+    if antigo != graficos.limpar_cartoes_ps2(None):
+        cartoes = dict(antigo, slot1_tipo=antigo.get("slot1_tipo", "ps2"))
+    for secao, chaves in graficos.preparar_cartoes_do_ps2(PASTA_SISTEMA, cartoes).items():
         ini.setdefault(secao, {}).update(chaves)
     for secao, chaves in graficos.limpar_ajustes_ini(config.get("ajustes_ini_dos_nucleos")).get("armsx2", {}).items():
         ini.setdefault(secao, {}).update(chaves)
@@ -2852,6 +2863,8 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         # PS2 pelo nucleo do ARMSX2 (o do Android): arquivos de apoio, BIOS, motor de video, ajuste fino e .ini.
         if nome_core == "armsx2" and jogo.get("jeito") != "livre":
             extras_core.update(preparar_o_ps2_do_android(config, jogo, degrau=degrau_que_vale))
+        # Os acessorios que a pessoa ligou (VMU na tela, Rumble Pak...): entram antes do ajuste fino, que manda em tudo.
+        extras_core.update(acessorios.opcoes_do_nucleo(config.get("acessorios"), jogo["plataforma"], nome_core))
         # O ajuste fino que a pessoa pediu para este emulador manda em tudo (config.json -> ajustes_dos_nucleos).
         extras_core.update(graficos.ajustes_finos_do_nucleo(config.get("ajustes_dos_nucleos"), nome_core))
         # Avisa o console de que o controle tem analogico. Sem isto, no
@@ -2871,6 +2884,8 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             usar_analogico=escolhas.get("analogico_esq", True),
             vibracao=escolhas.get("vibracao", True),
             dispositivo_extra=escolhas.get("extra"))
+        # O acessorio escolhido para uma porta (pistola de luz na 2, mouse na 1...) vale mais que o tipo padrao do console.
+        extras_controle.update(acessorios.opcoes_de_porta(config.get("acessorios"), jogo["plataforma"], nome_core))
         # opcoes_do_console cobre ate 4 portas; o 5o jogador em diante (PS1 e
         # Saturn com adaptador) recebe o mesmo tipo de controle do 1o.
         for n in range(5, jogadores_ligacao + 1):
@@ -5290,6 +5305,10 @@ class Manipulador(BaseHTTPRequestHandler):
                          for p in carregar_catalogo() if p["id"] == "ps2"), []),
                 },
                 "bios_disponiveis": graficos.bios_disponiveis(PASTA_SISTEMA),
+                # Os acessorios de cada console (VMU, Rumble Pak, multitap...) com o que esta ligado agora.
+                "acessorios": acessorios.para_a_tela(
+                    config.get("acessorios"), plataforma_do_sistema.nome_do_sistema(),
+                    {p["id"]: p["nome"] for p in carregar_catalogo()}),
                 "memory_cards": graficos.listar_memory_cards(PASTA_SAVES),
                 # "escolhiveis": os arquivos que o nucleo daquele console
                 # deixa escolher de verdade. Vazio = o nucleo acha a BIOS
@@ -6888,6 +6907,10 @@ class Manipulador(BaseHTTPRequestHandler):
             if isinstance(dados.get("ajustes_dos_nucleos"), dict):
                 # O ajuste fino por emulador inteiro de uma vez ({} limpa): a tela manda o que quer que fique.
                 config["ajustes_dos_nucleos"] = graficos.limpar_ajustes_dos_nucleos(dados["ajustes_dos_nucleos"])
+
+            if isinstance(dados.get("acessorios"), dict):
+                # Os acessorios inteiros de uma vez ({} volta tudo ao padrao): a tela manda o que quer que fique.
+                config["acessorios"] = acessorios.limpar_estado(dados["acessorios"])
 
             if isinstance(dados.get("bios"), dict):
                 validas = {p["id"] for p in carregar_catalogo()}

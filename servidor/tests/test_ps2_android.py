@@ -473,9 +473,23 @@ class CartoesDoPs2(unittest.TestCase):
             arena.preparar_o_ps2_do_android(arena.config_padrao(), {"arquivo": "x.chd"})
         with open(graficos.arquivo_de_ajustes_do_armsx2(self.pasta), encoding="utf-8") as arquivo:
             texto = arquivo.read()
-        self.assertIn("MemoryCards/Slot1_Filename = Mcd001.ps2", texto)
+        # O padrao (pedido do Rafael, 24/10/2026): o PocketStation na entrada 1 e o maior cartao do PS2 na 2.
+        self.assertIn("MemoryCards/Slot1_Filename = PocketStation.mcr", texto)
         self.assertIn("MemoryCards/Slot2_Filename = Mcd002-64MB.ps2", texto)
         self.assertIn("EmuCore/WarnAboutUnsafeSettings = false", texto)
+        self.assertEqual(os.path.getsize(os.path.join(self.memcards, "PocketStation.mcr")), 131072)
+
+    def test_a_pessoa_troca_a_entrada_1_pelo_cartao_do_ps2(self):
+        import arena
+        config = arena.config_padrao()
+        config["acessorios"] = {"ps2_cartoes": {"entrada1": "8", "entrada2": "32"}}
+        with mock.patch.object(arena, "PASTA_SISTEMA", self.pasta), \
+                mock.patch.object(arena.plataforma_do_sistema, "preparar_recursos", return_value=0):
+            arena.preparar_o_ps2_do_android(config, {"arquivo": "x.chd"})
+        with open(graficos.arquivo_de_ajustes_do_armsx2(self.pasta), encoding="utf-8") as arquivo:
+            texto = arquivo.read()
+        self.assertIn("MemoryCards/Slot1_Filename = Mcd001.ps2", texto)
+        self.assertIn("MemoryCards/Slot2_Filename = Mcd002-32MB.ps2", texto)
 
     def test_a_escolha_da_pessoa_vale(self):
         import arena
