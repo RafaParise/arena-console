@@ -3,11 +3,15 @@ r"""Compila o RetroArch 1.22.2 do Android com o remendo do ARENA (item 14).
 
 O APK do ARENA e' o RetroArch.apk oficial (ferramentas\montar_android.py)
 com uma troca so: a biblioteca do RetroArch (lib\<abi>\libretroarch-activity.so)
-sai do codigo oficial da mesma versao com o remendo
-android\retroarch\arena-args.patch. Com ele, o RetroArch do Android recebe a
-mesma linha de comando do Windows e do Linux, e com ela o jogo em rede
-(--host e --connect): o oficial do Android so le alguns extras da intent
-(ROM, LIBRETRO, CONFIGFILE...) e nao tem como pedir partida em rede.
+sai do codigo oficial da mesma versao com os remendos de android\retroarch\
+(em ordem de nome):
+  - arena-args.patch: o RetroArch do Android recebe a mesma linha de comando do
+    Windows e do Linux, e com ela o jogo em rede (--host e --connect): o oficial
+    do Android so le alguns extras da intent (ROM, LIBRETRO, CONFIGFILE...) e nao
+    tem como pedir partida em rede;
+  - arena-controles.patch: os controles ja ligados entram na ordem em que foram
+    CONECTADOS (o primeiro conectado e' o jogador 1); o oficial registra quem
+    apertar primeiro.
 
 Do codigo oficial ate a biblioteca:
   1. o codigo da etiqueta v1.22.2 do GitHub do libretro, conferido pela
@@ -27,6 +31,7 @@ SDK (ferramentas\preparar_android.py, que tambem instala o NDK).
 Uso:
     servidor\python\python.exe ferramentas\compilar_retroarch_android.py [--abi x86_64]
 """
+import hashlib
 import json
 import os
 import shutil
@@ -49,7 +54,12 @@ FONTE = {
     "tamanho": 71629881,
 }
 DENTRO_DO_TAR = "RetroArch-1.22.2/"
-REMENDO = os.path.join(RAIZ, "android", "retroarch", "arena-args.patch")
+PASTA_DOS_REMENDOS = os.path.join(RAIZ, "android", "retroarch")
+
+
+def remendos():
+    """Os remendos do ARENA para o RetroArch, em ordem de nome."""
+    return [os.path.join(PASTA_DOS_REMENDOS, n) for n in sorted(os.listdir(PASTA_DOS_REMENDOS)) if n.endswith(".patch")]
 NDK = os.path.join(sdk.SDK, *sdk.NDK.split(";"))
 VERSAO_DO_GIT = "69a4f0e-arena"     # a etiqueta v1.22.2 e' o commit 69a4f0ea1e8a...
 CODIGO = os.path.join(sdk.BASE, "retroarch-1.22.2")
@@ -63,7 +73,9 @@ BIBLIOTECAS_DO_ANDROID = {"libandroid.so", "libEGL.so", "libGLESv2.so", "liblog.
 
 
 def marca_do_remendo():
-    return preparar_linux.marca(REMENDO)
+    """Uma marca so para todos os remendos (nome e conteudo de cada um, em ordem)."""
+    juntas = "|".join("%s=%s" % (os.path.basename(r), preparar_linux.marca(r)) for r in remendos())
+    return hashlib.sha256(juntas.encode("utf-8")).hexdigest()
 
 
 def marca_esperada():
@@ -109,12 +121,13 @@ def codigo_remendado():
     # O git apply sem repositorio em volta: o GIT_CEILING_DIRECTORIES impede
     # que ele ache um repositorio numa pasta de cima.
     ambiente = dict(os.environ, GIT_CEILING_DIRECTORIES=os.path.dirname(montando))
-    for passo in (["--check"], []):
-        feito = subprocess.run(["git", "apply"] + passo + ["--verbose", REMENDO], cwd=montando, env=ambiente,
-                               capture_output=True, text=True)
-        if feito.returncode != 0:
-            raise SystemExit("O remendo do ARENA nao encaixa no RetroArch 1.22.2:\n%s"
-                             % (feito.stdout + feito.stderr)[-2000:])
+    for remendo in remendos():
+        for passo in (["--check"], []):
+            feito = subprocess.run(["git", "apply"] + passo + ["--verbose", remendo], cwd=montando, env=ambiente,
+                                   capture_output=True, text=True)
+            if feito.returncode != 0:
+                raise SystemExit("O remendo %s do ARENA nao encaixa no RetroArch 1.22.2:\n%s"
+                                 % (os.path.basename(remendo), (feito.stdout + feito.stderr)[-2000:]))
     gravar_marca(os.path.join(montando, ".arena-remendo.json"), marca)
     os.replace(montando, CODIGO)
     return CODIGO
@@ -136,8 +149,9 @@ def conferir(biblioteca):
     oficial."""
     with open(biblioteca, "rb") as arquivo:
         dados = arquivo.read()
-    if b"[ENV] Command line (ARGS)" not in dados or VERSAO_DO_GIT.encode() not in dados:
-        raise SystemExit("A biblioteca compilada nao tem o remendo do ARENA: %s" % biblioteca)
+    if (b"[ENV] Command line (ARGS)" not in dados or b"[ARENA] Controles na ordem" not in dados
+            or VERSAO_DO_GIT.encode() not in dados):
+        raise SystemExit("A biblioteca compilada nao tem os remendos do ARENA: %s" % biblioteca)
     pedidas = bibliotecas_pedidas(biblioteca)
     if pedidas != BIBLIOTECAS_DO_ANDROID:
         raise SystemExit("A biblioteca compilada pede ao Android outras bibliotecas que a oficial: %s"

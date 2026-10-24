@@ -13,6 +13,7 @@ import sys
 import tempfile
 import time
 import unittest
+from unittest import mock
 
 PASTA_SERVIDOR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if PASTA_SERVIDOR not in sys.path:
@@ -118,6 +119,49 @@ class VelocidadeDoEmulador(unittest.TestCase):
             self.assertEqual(desempenho.mediana([]), 0.0)
         finally:
             limpeza.apagar_pasta(pasta)
+
+
+class VelocidadeDeCadaJogo(unittest.TestCase):
+    def setUp(self):
+        self.pasta = tempfile.mkdtemp(prefix="arena_velocidade_jogos_")
+        self.arquivo = os.path.join(self.pasta, "dados", "velocidade_dos_jogos.json")
+
+    def tearDown(self):
+        limpeza.apagar_pasta(self.pasta)
+
+    def test_guarda_a_mediana_do_jogo(self):
+        self.assertEqual(desempenho.registrar_jogo("jogos/a.chd", [20.0, 22.0, 24.0] * 4, self.arquivo), 22.0)
+        guardado = desempenho.velocidades_dos_jogos(self.arquivo)["jogos/a.chd"]
+        self.assertEqual((guardado["velocidade"], guardado["amostras"]), (22.0, 12))
+
+    def test_partida_curta_nao_guarda_nada(self):
+        self.assertIsNone(desempenho.registrar_jogo("jogos/a.chd", [50.0] * 3, self.arquivo))
+        self.assertIsNone(desempenho.registrar_jogo("", [50.0] * 20, self.arquivo))
+        self.assertEqual(desempenho.velocidades_dos_jogos(self.arquivo), {})
+
+    def test_a_partida_nova_troca_a_velha_e_o_arquivo_tem_teto(self):
+        desempenho.registrar_jogo("x", [30.0] * 12, self.arquivo)
+        desempenho.registrar_jogo("x", [95.0] * 12, self.arquivo)
+        self.assertEqual(desempenho.velocidades_dos_jogos(self.arquivo)["x"]["velocidade"], 95.0)
+        with mock.patch.object(desempenho, "MAXIMO_DE_JOGOS", 3):
+            for n in range(5):
+                desempenho.registrar_jogo("jogo%d" % n, [80.0] * 12, self.arquivo)
+        self.assertLessEqual(len(desempenho.velocidades_dos_jogos(self.arquivo)), 3)
+
+    def test_arquivo_estragado_nao_derruba(self):
+        os.makedirs(os.path.dirname(self.arquivo))
+        with open(self.arquivo, "w", encoding="utf-8") as saida:
+            saida.write("{ isto nao e json")
+        self.assertEqual(desempenho.velocidades_dos_jogos(self.arquivo), {})
+        self.assertEqual(desempenho.registrar_jogo("a", [60.0] * 12, self.arquivo), 60.0)
+
+    def test_a_frase_diz_a_verdade_e_o_que_fazer(self):
+        self.assertIn("Rodou bem", desempenho.frase_da_velocidade(99.0))
+        self.assertIn("pode engasgar", desempenho.frase_da_velocidade(80.0))
+        lento = desempenho.frase_da_velocidade(22.0)
+        self.assertIn("22%", lento)
+        self.assertIn("câmera lenta", lento)
+        self.assertIn("Prefira", lento)
 
 
 class Degraus(unittest.TestCase):

@@ -2302,6 +2302,7 @@ def montar_catalogo():
     # cruzar pelo 'plataforma' que cada jogo ja carrega.
     jogos = []
     problemas = ler_problemas()
+    medidos = desempenho.velocidades_dos_jogos()
     for jogo in manifesto()["jogos"]:
         if jogo["plataforma"] not in por_id:
             continue
@@ -2311,6 +2312,12 @@ def montar_catalogo():
             jogo = dict(jogo)
             jogo["avisos"] = list(jogo.get("avisos") or []) + [
                 {"texto": "Da última vez: " + problema["texto"], "ultima_vez": True}]
+        if jogo["id"] in medidos:
+            # A velocidade que o emulador mediu neste aparelho na ultima partida (PS2 do Android).
+            jogo = dict(jogo)
+            jogo["avisos"] = list(jogo.get("avisos") or []) + [
+                {"texto": desempenho.frase_da_velocidade(medidos[jogo["id"]]["velocidade"]),
+                 "velocidade_medida": medidos[jogo["id"]]["velocidade"]}]
         if jogo.get("capas"):
             # A tela nunca le o disco direto: pede a arte ao servidor, que
             # confere se o caminho esta mesmo dentro da pasta de jogos.
@@ -2667,6 +2674,9 @@ def anotar_desempenho(jogo, medida, config):
         if velocidades:
             print("[ARENA] Desempenho: %s rodou a %d%% da velocidade do console (mediana de %d medidas)."
                   % (jogo.get("titulo", "o jogo"), round(desempenho.mediana(velocidades)), len(velocidades)))
+            if desempenho.registrar_jogo(jogo.get("id"), velocidades) is not None:
+                with TRAVA_CACHE:
+                    _cache["resposta"] = (0.0, None)      # o painel do jogo mostra a velocidade nova
         if depois > antes and config.get("ajuste_pelo_desempenho", True):
             texto = ("ficou pesado para esta maquina. Na proxima vez, o ARENA deixa o grafico deste "
                      "console mais leve (Ajustes -> Maquina desfaz).")

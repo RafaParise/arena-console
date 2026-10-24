@@ -347,6 +347,62 @@ def registrar(plataforma, medida, arquivo=None):
     return antes, depois
 
 
+# A velocidade medida de CADA jogo (so onde o emulador diz a velocidade: o PS2 do Android), num arquivo a parte do
+# degrau por console: no PS2 a diferenca entre um jogo e outro e' enorme, e o aluno merece saber, no painel do jogo,
+# que aquele ali anda em camera lenta neste aparelho.
+ARQUIVO_JOGOS = os.path.join(os.path.dirname(PASTA_SERVIDOR), "dados", "velocidade_dos_jogos.json")
+MAXIMO_DE_JOGOS = 400
+
+
+def registrar_jogo(jogo_id, velocidades, arquivo=None):
+    """Guarda a velocidade mediana (e quantas medidas) deste jogo na ultima partida. Devolve a mediana, ou None se
+    nao houve medida suficiente."""
+    if not jogo_id or len(velocidades or []) < AMOSTRAS_MINIMAS_VELOCIDADE:
+        return None
+    destino = arquivo or ARQUIVO_JOGOS
+    valor = round(mediana(velocidades), 1)
+    with _TRAVA:
+        try:
+            with open(destino, encoding="utf-8") as entrada:
+                dados = json.load(entrada)
+            dados = dados if isinstance(dados, dict) else {}
+        except (OSError, ValueError):
+            dados = {}
+        dados[str(jogo_id)] = {"velocidade": valor, "amostras": len(velocidades),
+                               "quando": time.strftime("%Y-%m-%d %H:%M")}
+        if len(dados) > MAXIMO_DE_JOGOS:                  # os mais antigos saem primeiro
+            for velha in sorted(dados, key=lambda k: dados[k].get("quando", ""))[:len(dados) - MAXIMO_DE_JOGOS]:
+                dados.pop(velha, None)
+        os.makedirs(os.path.dirname(destino), exist_ok=True)
+        temporario = "%s.%d.tmp" % (destino, threading.get_ident())
+        with open(temporario, "w", encoding="utf-8") as saida:
+            json.dump(dados, saida, ensure_ascii=False, indent=1, sort_keys=True)
+        os.replace(temporario, destino)
+    return valor
+
+
+def velocidades_dos_jogos(arquivo=None):
+    """{jogo_id: {"velocidade", "amostras", "quando"}} dos jogos ja medidos."""
+    try:
+        with open(arquivo or ARQUIVO_JOGOS, encoding="utf-8") as entrada:
+            dados = json.load(entrada)
+        return dados if isinstance(dados, dict) else {}
+    except (OSError, ValueError):
+        return {}
+
+
+def frase_da_velocidade(velocidade):
+    """O que dizer ao aluno de um jogo que rodou a 'velocidade' por cento do tempo real neste aparelho."""
+    valor = int(round(velocidade))
+    if velocidade >= 95:
+        return "Rodou bem neste aparelho da última vez (%d%% da velocidade)." % valor
+    if velocidade >= 70:
+        return ("Rodou a %d%% da velocidade neste aparelho da última vez: pode engasgar, principalmente nas "
+                "cenas pesadas." % valor)
+    return ("Rodou a %d%% da velocidade neste aparelho da última vez: fica em câmera lenta. Prefira um jogo "
+            "mais leve deste console, ou outro console." % valor)
+
+
 def degrau(plataforma, arquivo=None):
     return int((ler(arquivo).get(plataforma) or {}).get("degrau") or 0)
 

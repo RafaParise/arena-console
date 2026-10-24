@@ -1,0 +1,133 @@
+Remendo do ARENA para o RetroArch 1.22.2 do Android (GPLv3, como o RetroArch)
+
+O que muda: o RetroArch do Android so registra um controle quando ele manda o
+PRIMEIRO evento, e por isso o jogador 1 era quem apertasse (ou mexesse) primeiro
+depois do jogo abrir, nao quem foi conectado primeiro. Agora, na primeira leitura
+de eventos, os controles de jogo que ja estao ligados entram na ordem do numero
+que o Android da a cada aparelho (cresce a cada conexao): o primeiro conectado e'
+o jogador 1, o segundo o jogador 2, e assim por diante. Quem chegar depois entra
+como sempre, no primeiro evento. Teclado, tela de toque e o dispositivo "Virtual"
+nao viram controle.
+
+Base: a etiqueta v1.22.2 do libretro (commit 69a4f0ea1e8aaf442ae4858f2e7f2b31a1776576),
+https://github.com/libretro/RetroArch/archive/refs/tags/v1.22.2.tar.gz
+Modificado pelo ARENA em 24/10/2026. Quem aplica e compila:
+ferramentas/compilar_retroarch_android.py (depois do arena-args.patch).
+
+--- a/input/drivers/android_input.c
++++ b/input/drivers/android_input.c
+@@ -152,6 +152,7 @@
+    int mouse_x_delta, mouse_y_delta;
+    int mouse_l, mouse_r, mouse_m, mouse_wu, mouse_wd;
+    bool mouse_activated;
++   bool arena_ordenou;                          /* ARENA: os controles ja ligados entraram na ordem de conexao */
+    unsigned pads_connected;
+    unsigned pointer_count;
+    sensor_t accelerometer_state;                /* float alignment */
+@@ -1368,6 +1369,93 @@
+    android->pads_connected++;
+ }
+ 
++/* ARENA: registra os controles que JA estao ligados na ordem em que foram CONECTADOS (o numero que o Android da a
++ * cada aparelho cresce a cada conexao), e nao na ordem do primeiro botao apertado: o primeiro controle ligado e'
++ * o jogador 1. Os que chegarem depois entram como sempre, no primeiro evento. So controles de jogo (gamepad ou
++ * joystick): teclado, tela de toque e o dispositivo "Virtual" (id negativo) ficam de fora. */
++static void android_input_arena_conectar_na_ordem(android_input_t *android,
++      struct android_app *android_app)
++{
++   jmethodID getDeviceIds   = NULL;
++   jmethodID getDevice      = NULL;
++   jmethodID getSources     = NULL;
++   jclass class             = NULL;
++   jintArray ids            = NULL;
++   jint lista[64];
++   int quantos              = 0;
++   int registrados          = 0;
++   int i, j;
++   JNIEnv *env              = (JNIEnv*)jni_thread_getenv();
++
++   if (!env)
++      return;
++
++   FIND_CLASS(env, class, "android/view/InputDevice");
++   if (!class)
++      return;
++
++   GET_STATIC_METHOD_ID(env, getDeviceIds, class, "getDeviceIds", "()[I");
++   GET_STATIC_METHOD_ID(env, getDevice, class, "getDevice",
++         "(I)Landroid/view/InputDevice;");
++   GET_METHOD_ID(env, getSources, class, "getSources", "()I");
++   if (!getDeviceIds || !getDevice || !getSources)
++      return;
++
++   ids = (jintArray)(*env)->CallStaticObjectMethod(env, class, getDeviceIds);
++   if (!ids)
++      return;
++
++   quantos = (int)(*env)->GetArrayLength(env, ids);
++   if (quantos > 64)
++      quantos = 64;
++   (*env)->GetIntArrayRegion(env, ids, 0, quantos, lista);
++   (*env)->DeleteLocalRef(env, ids);
++
++   /* em ordem crescente (o Android ja entrega assim; garante) */
++   for (i = 1; i < quantos; i++)
++   {
++      jint atual = lista[i];
++      for (j = i - 1; j >= 0 && lista[j] > atual; j--)
++         lista[j + 1] = lista[j];
++      lista[j + 1] = atual;
++   }
++
++   for (i = 0; i < quantos && android->pads_connected < MAX_USERS; i++)
++   {
++      jobject device = NULL;
++      jint fontes    = 0;
++      char nome[256];
++      int fabricante = 0;
++      int produto    = 0;
++      int porta      = -1;
++      int id         = (int)lista[i];
++
++      if (id < 0)
++         continue;
++
++      CALL_OBJ_STATIC_METHOD_PARAM(env, device, class, getDevice, (jint)id);
++      if (!device)
++         continue;
++      CALL_INT_METHOD(env, fontes, device, getSources);
++      (*env)->DeleteLocalRef(env, device);
++
++      if (   (fontes & AINPUT_SOURCE_GAMEPAD)  != AINPUT_SOURCE_GAMEPAD
++          && (fontes & AINPUT_SOURCE_JOYSTICK) != AINPUT_SOURCE_JOYSTICK)
++         continue;
++      if (android_input_get_id_port(android, id, 0) >= 0)
++         continue;
++      nome[0] = '\0';
++      if (   !engine_lookup_name(nome, &fabricante, &produto, sizeof(nome), id)
++          || strstr(nome, "Virtual"))
++         continue;
++
++      handle_hotplug(android, android_app, &porta, id, (int)fontes);
++      registrados++;
++   }
++
++   RARCH_LOG("[ARENA] Controles na ordem em que foram conectados: %d.\n", registrados);
++}
++
+ static int android_input_get_id(AInputEvent *event)
+ {
+    int id = AInputEvent_getDeviceId(event);
+@@ -1516,6 +1604,12 @@
+ {
+    AInputEvent              *event = NULL;
+    struct android_app *android_app = (struct android_app*)g_android;
++
++   if (!android->arena_ordenou)
++   {
++      android->arena_ordenou = true;
++      android_input_arena_conectar_na_ordem(android, android_app);
++   }
+ 
+    /* Read all pending events. */
+    while (AInputQueue_hasEvents(android_app->inputQueue))
