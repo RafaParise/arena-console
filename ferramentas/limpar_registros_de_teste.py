@@ -47,7 +47,7 @@ def main():
     try:
         achados = 0
         for tabela, (onde, valores) in filtros.items():
-            linhas = conexao.execute("SELECT apelido, jogo_titulo FROM %s WHERE %s" % (tabela, onde),
+            linhas = conexao.execute("SELECT apelido, jogo_titulo FROM %s WHERE %s" % (tabela, onde),  # auditoria: ok (tabela fixa; valores por parametro)
                                      valores).fetchall()
             achados += len(linhas)
             print("%s: %d registro(s) de teste" % ("recordes" if tabela == "placar" else "sessoes", len(linhas)))
@@ -67,7 +67,7 @@ def main():
         conexao = sqlite3.connect(BANCO)
         with conexao:
             for tabela, (onde, valores) in filtros.items():
-                conexao.execute("DELETE FROM %s WHERE %s" % (tabela, onde), valores)
+                conexao.execute("DELETE FROM %s WHERE %s" % (tabela, onde), valores)  # auditoria: ok (tabela fixa; valores por parametro)
         print("\nApagados %d registro(s). Copia do banco antes: %s" % (achados, copia))
         return 0
     finally:

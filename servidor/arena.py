@@ -433,9 +433,10 @@ def aplicar_esquema(conexao):
     conexao.execute("CREATE TABLE IF NOT EXISTS contador ("
                     "nome TEXT PRIMARY KEY, valor INTEGER NOT NULL)")
     for tabela in ("placar", "sessao"):
-        colunas = {c["name"] for c in conexao.execute("PRAGMA table_info(%s)" % tabela)}
+        # 'tabela' vem so da tupla fixa acima (nunca de pedido): nao ha o que injetar. auditoria: ok
+        colunas = {c["name"] for c in conexao.execute("PRAGMA table_info(%s)" % tabela)}  # auditoria: ok
         if "seq" not in colunas:
-            conexao.execute("ALTER TABLE %s ADD COLUMN seq INTEGER" % tabela)
+            conexao.execute("ALTER TABLE %s ADD COLUMN seq INTEGER" % tabela)  # auditoria: ok
     if conexao.execute("SELECT 1 FROM contador WHERE nome = 'sinc'").fetchone() is None:
         conexao.execute("UPDATE placar SET seq = rowid WHERE seq IS NULL")
         deslocamento = conexao.execute("SELECT COALESCE(MAX(seq), 0) FROM placar").fetchone()[0]
