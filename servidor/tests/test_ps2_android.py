@@ -297,42 +297,254 @@ class AjusteFinoDosNucleos(unittest.TestCase):
         self.assertEqual(graficos.ajustes_finos_do_nucleo(entrada, "fceumm"), {})
 
 
-class RemendoDoNucleo(unittest.TestCase):
-    """O remendo e' texto escrito a mao: confere o formato (um erro de conta de linhas so apareceria no
-    GitHub, depois de baixar o ARMSX2 inteiro)."""
+class IniDoPs2(unittest.TestCase):
+    """O que o ARENA grava no armsx2-libretro.ini (o que o nucleo nao mostra como opcao)."""
 
-    CAMINHO = os.path.join(RAIZ, "ferramentas", "remendos", "armsx2-libretro-jogadores.patch")
+    INI = ("[UI]\nSettingsVersion = 1\n\n[EmuCore/GS]\nRenderer = 14\ntexture_preloading = 2\n"
+           "HWDownloadMode = 0\n\n[EmuCore]\nAutoTune = false\n")
+
+    def setUp(self):
+        self.pasta = tempfile.mkdtemp(prefix="arena_ini_ps2_")
+        self.sistema = os.path.join(self.pasta, "system")
+        self.caminho = graficos.arquivo_ini_do_armsx2(self.sistema)
+
+    def tearDown(self):
+        limpeza.apagar_pasta(self.pasta)
+
+    def criar(self, texto=None):
+        os.makedirs(os.path.dirname(self.caminho))
+        with open(self.caminho, "w", encoding="utf-8", newline="\n") as arquivo:
+            arquivo.write(self.INI if texto is None else texto)
+
+    def ler(self):
+        with open(self.caminho, encoding="utf-8") as arquivo:
+            return arquivo.read()
+
+    def test_limpa_o_que_nao_tem_cara_de_ini(self):
+        entrada = {"armsx2": {"EmuCore/GS": {"texture_preloading": 1, "GSBackThreadMode": True,
+                                             "ruim": "a\nb", "com espaco": "1", "longo": "x" * 200},
+                              "Secao Ruim": {"a": "1"}, "[": {"a": "1"}},
+                   "Nome Ruim": {"EmuCore": {"a": "1"}}, "outro": [1]}
+        self.assertEqual(graficos.limpar_ajustes_ini(entrada),
+                         {"armsx2": {"EmuCore/GS": {"texture_preloading": "1", "GSBackThreadMode": "true"}}})
+        self.assertEqual(graficos.limpar_ajustes_ini(None), {})
+
+    def test_o_padrao_vem_do_graficos_json_por_motor_e_nivel(self):
+        self.assertEqual(graficos.ini_padrao_do_armsx2("OpenGL")["EmuCore/GS"]["GSBackThreadMode"], "0")   # explicito
+        self.assertEqual(graficos.ini_padrao_do_armsx2("Vulkan")["EmuCore/GS"]["GSBackThreadMode"], "1")
+        self.assertEqual(graficos.ini_padrao_do_armsx2(None), graficos.ini_padrao_do_armsx2("OpenGL"))
+
+    def test_sem_o_arquivo_do_nucleo_nao_cria_nada(self):
+        self.assertEqual(graficos.aplicar_ini_do_armsx2(self.sistema, {"EmuCore": {"AutoTune": "true"}}), [])
+        self.assertFalse(os.path.exists(self.caminho))                  # so a partir da segunda abertura
+
+    def test_troca_acrescenta_e_mantem_o_resto(self):
+        self.criar()
+        mudou = graficos.aplicar_ini_do_armsx2(self.sistema, {
+            "EmuCore/GS": {"texture_preloading": "1", "GSBackThreadMode": "1"}, "EmuCore": {"AutoTune": "true"},
+            "Novo/Secao": {"x": "y"}})
+        self.assertEqual(len(mudou), 4)
+        texto = self.ler()
+        self.assertIn("texture_preloading = 1", texto)
+        self.assertNotIn("texture_preloading = 2", texto)
+        self.assertIn("GSBackThreadMode = 1", texto)
+        self.assertIn("Renderer = 14", texto)                             # o resto fica
+        self.assertIn("HWDownloadMode = 0", texto)
+        self.assertIn("SettingsVersion = 1", texto)
+        self.assertIn("[Novo/Secao]\nx = y", texto)
+        self.assertEqual(graficos._valor_ini(texto, "EmuCore", "AutoTune"), "true")
+
+    def test_nao_regrava_o_que_ja_esta_igual(self):
+        self.criar()
+        ajustes = {"EmuCore/GS": {"texture_preloading": "2"}}
+        antes = os.stat(self.caminho).st_mtime_ns
+        self.assertEqual(graficos.aplicar_ini_do_armsx2(self.sistema, ajustes), [])
+        self.assertEqual(os.stat(self.caminho).st_mtime_ns, antes)
+
+    def test_arquivo_com_marca_de_ordem_de_bytes_e_aceito(self):
+        self.criar()
+        with open(self.caminho, "rb") as arquivo:
+            dados = arquivo.read()
+        with open(self.caminho, "wb") as arquivo:
+            arquivo.write(b"\xef\xbb\xbf" + dados)
+        self.assertEqual(len(graficos.aplicar_ini_do_armsx2(self.sistema, {"EmuCore": {"AutoTune": "true"}})), 1)
+        self.assertEqual(graficos._valor_ini(self.ler(), "EmuCore", "AutoTune"), "true")
+
+
+class PreparoDoPs2NoAndroid(unittest.TestCase):
+    """arena.preparar_o_ps2_do_android: o que o ARENA faz antes de abrir o PS2 (jogo ou menu da BIOS)."""
+
+    @classmethod
+    def setUpClass(cls):
+        import arena
+        cls.arena = arena
+
+    def setUp(self):
+        self.pasta = tempfile.mkdtemp(prefix="arena_preparo_ps2_")
+        self.sistema = os.path.join(self.pasta, "system")
+        os.makedirs(os.path.join(self.sistema, "pcsx2", "inis"))
+        self.trocas = [mock.patch.object(self.arena, "PASTA_SISTEMA", self.sistema),
+                       mock.patch.object(self.arena.plataforma_do_sistema, "preparar_recursos", return_value=0)]
+        for troca in self.trocas:
+            troca.start()
+        self.ini = graficos.arquivo_ini_do_armsx2(self.sistema)
+
+    def tearDown(self):
+        for troca in reversed(self.trocas):
+            troca.stop()
+        limpeza.apagar_pasta(self.pasta)
+
+    def com_ini(self):
+        with open(self.ini, "w", encoding="utf-8", newline="\n") as arquivo:
+            arquivo.write("[UI]\nSettingsVersion = 1\n\n[EmuCore/GS]\ntexture_preloading = 2\n")
+
+    def ler_ini(self):
+        with open(self.ini, encoding="utf-8") as arquivo:
+            return arquivo.read()
+
+    def test_primeira_abertura_devolve_as_opcoes_e_ainda_nao_cria_o_ini(self):
+        opcoes = self.arena.preparar_o_ps2_do_android(self.arena.config_padrao(), {"arquivo": "jogos/x (USA).chd"})
+        self.assertEqual(opcoes, {"armsx2_renderer": "OpenGL", "armsx2_bios": "auto"})
+        self.assertFalse(os.path.exists(self.ini))
+
+    def test_com_o_ini_do_nucleo_poe_a_pre_carga_parcial(self):
+        self.com_ini()
+        self.arena.preparar_o_ps2_do_android(self.arena.config_padrao(), {"arquivo": "x.chd"})
+        self.assertEqual(graficos._valor_ini(self.ler_ini(), "EmuCore/GS", "texture_preloading"), "1")
+        self.assertEqual(graficos._valor_ini(self.ler_ini(), "EmuCore/GS", "GSBackThreadMode"), "0")  # OpenGL: sem a thread
+
+    def test_o_menu_da_bios_passa_pela_abertura_do_ps2(self):
+        opcoes = self.arena.preparar_o_ps2_do_android(self.arena.config_padrao(), None, sem_jogo=True)
+        self.assertEqual(opcoes["armsx2_fast_boot"], "disabled")
+        jogo = self.arena.preparar_o_ps2_do_android(self.arena.config_padrao(), {"arquivo": "x.chd"})
+        self.assertNotIn("armsx2_fast_boot", jogo)                       # no jogo vale o da escada (graficos.json)
+
+    def test_o_vulkan_pedido_liga_a_thread_de_fundo(self):
+        self.com_ini()
+        config = self.arena.config_padrao()
+        config["ajustes_dos_nucleos"] = {"armsx2": {"armsx2_renderer": "Vulkan"}}
+        opcoes = self.arena.preparar_o_ps2_do_android(config, {"arquivo": "x.chd"})
+        self.assertEqual(opcoes["armsx2_renderer"], "Vulkan")
+        self.assertEqual(graficos._valor_ini(self.ler_ini(), "EmuCore/GS", "GSBackThreadMode"), "1")
+
+    def test_o_ajuste_ini_da_pessoa_vale_por_cima(self):
+        self.com_ini()
+        config = self.arena.config_padrao()
+        config["ajustes_ini_dos_nucleos"] = {"armsx2": {"EmuCore/GS": {"texture_preloading": "2"}}}
+        self.arena.preparar_o_ps2_do_android(config, {"arquivo": "x.chd"})
+        self.assertEqual(graficos._valor_ini(self.ler_ini(), "EmuCore/GS", "texture_preloading"), "2")
+
+    def test_a_bios_da_regiao_do_jogo(self):
+        bios_dir = os.path.join(self.sistema, "pcsx2", "bios")
+        os.makedirs(bios_dir)
+        for nome, regiao in (("americana.bin", "A"), ("europeia.bin", "E")):
+            with open(os.path.join(bios_dir, nome), "wb") as arquivo:
+                arquivo.write(bios_de_ps2_de_mentira(regiao))
+        opcoes = self.arena.preparar_o_ps2_do_android(self.arena.config_padrao(), {"arquivo": "jogo (Europe).chd"})
+        self.assertEqual(opcoes["armsx2_bios"], "europeia.bin")
+
+
+class ArquivoDeAjustesDoPs2(unittest.TestCase):
+    """arena-overrides.ini: o que o nucleo remendado le a cada abertura, inclusive a primeira."""
+
+    def setUp(self):
+        self.pasta = tempfile.mkdtemp(prefix="arena_ajustes_ps2_")
+        self.sistema = os.path.join(self.pasta, "system")
+        self.caminho = graficos.arquivo_de_ajustes_do_armsx2(self.sistema)
+
+    def tearDown(self):
+        limpeza.apagar_pasta(self.pasta)
+
+    def test_grava_a_secao_overrides_com_secao_barra_chave(self):
+        self.assertTrue(graficos.gravar_ajustes_do_armsx2(self.sistema, {
+            "EmuCore/GS": {"texture_preloading": "1", "GSBackThreadMode": "1"}, "EmuCore": {"AutoTune": "true"}}))
+        with open(self.caminho, encoding="utf-8") as arquivo:
+            linhas = [l for l in arquivo.read().splitlines() if l and not l.startswith("#")]
+        self.assertEqual(linhas, ["[Overrides]", "EmuCore/AutoTune = true", "EmuCore/GS/GSBackThreadMode = 1",
+                                  "EmuCore/GS/texture_preloading = 1"])
+
+    def test_vale_na_primeira_abertura_e_so_regrava_se_mudou(self):
+        self.assertFalse(os.path.exists(os.path.join(self.sistema, "pcsx2", "inis", "armsx2-libretro.ini")))
+        ajustes = {"EmuCore/GS": {"texture_preloading": "1"}}
+        self.assertTrue(graficos.gravar_ajustes_do_armsx2(self.sistema, ajustes))
+        antes = os.stat(self.caminho).st_mtime_ns
+        self.assertFalse(graficos.gravar_ajustes_do_armsx2(self.sistema, ajustes))
+        self.assertEqual(os.stat(self.caminho).st_mtime_ns, antes)
+        self.assertTrue(graficos.gravar_ajustes_do_armsx2(self.sistema, {"EmuCore/GS": {"texture_preloading": "0"}}))
+
+    def test_o_preparo_do_ps2_grava_o_arquivo_mesmo_sem_o_ini_do_nucleo(self):
+        import arena
+        with mock.patch.object(arena, "PASTA_SISTEMA", self.sistema), \
+                mock.patch.object(arena.plataforma_do_sistema, "preparar_recursos", return_value=0):
+            arena.preparar_o_ps2_do_android(arena.config_padrao(), {"arquivo": "x.chd"})
+        with open(self.caminho, encoding="utf-8") as arquivo:
+            texto = arquivo.read()
+        self.assertIn("EmuCore/GS/texture_preloading = 1", texto)
+        self.assertIn("EmuCore/GS/GSBackThreadMode = 0", texto)
+
+
+class RemendoDoNucleo(unittest.TestCase):
+    """Os remendos sao texto escrito a mao: confere o formato (um erro de conta de linhas so apareceria no
+    GitHub, depois de baixar o ARMSX2 inteiro). Os dois se aplicam em ordem alfabetica: primeiro os jogadores, e o
+    da sobreposicao (feito sobre o resultado do primeiro) depois."""
+
+    PASTA = os.path.join(RAIZ, "ferramentas", "remendos")
+    CAMINHO = os.path.join(PASTA, "armsx2-libretro-jogadores.patch")
+    CAMINHO_DA_SOBREPOSICAO = os.path.join(PASTA, "armsx2-libretro-sobreposicao-do-arena.patch")
 
     def setUp(self):
         with open(self.CAMINHO, "rb") as arquivo:
             self.bruto = arquivo.read()
         self.texto = self.bruto.decode("utf-8")
+        with open(self.CAMINHO_DA_SOBREPOSICAO, "rb") as arquivo:
+            self.bruto2 = arquivo.read()
+        self.texto2 = self.bruto2.decode("utf-8")
+
+    def remendos(self):
+        return [(self.bruto, self.texto), (self.bruto2, self.texto2)]
 
     def test_so_tem_fim_de_linha_do_unix_e_mexe_so_no_nucleo_libretro(self):
-        self.assertNotIn(b"\r", self.bruto)
-        arquivos = re.findall(r"^(?:---|\+\+\+) (\S+)", self.texto, re.M)
-        self.assertEqual(arquivos, ["a/pcsx2-libretro/Main.cpp", "b/pcsx2-libretro/Main.cpp"])
+        for bruto, texto in self.remendos():
+            self.assertNotIn(b"\r", bruto)
+            arquivos = re.findall(r"^(?:---|\+\+\+) (\S+)", texto, re.M)
+            self.assertEqual(arquivos, ["a/pcsx2-libretro/Main.cpp", "b/pcsx2-libretro/Main.cpp"])
 
     def test_a_conta_de_linhas_de_cada_trecho_fecha(self):
-        trechos = re.split(r"^(?=@@ )", self.texto, flags=re.M)[1:]
-        self.assertGreaterEqual(len(trechos), 4)
-        for trecho in trechos:
-            cabeca, *linhas = trecho.split("\n")
-            if linhas and linhas[-1] == "":
-                linhas.pop()
-            achado = re.match(r"@@ -\d+(?:,(\d+))? \+\d+(?:,(\d+))? @@", cabeca)
-            self.assertTrue(achado, cabeca)
-            velho = int(achado.group(1) or 1)
-            novo = int(achado.group(2) or 1)
-            self.assertEqual(sum(1 for l in linhas if l[:1] in (" ", "-")), velho, cabeca)
-            self.assertEqual(sum(1 for l in linhas if l[:1] in (" ", "+")), novo, cabeca)
+        for bruto, texto in self.remendos():
+            trechos = re.split(r"^(?=@@ )", texto, flags=re.M)[1:]
+            self.assertGreaterEqual(len(trechos), 1)
+            for trecho in trechos:
+                cabeca, *linhas = trecho.split("\n")
+                if linhas and linhas[-1] == "":
+                    linhas.pop()
+                achado = re.match(r"@@ -\d+(?:,(\d+))? \+\d+(?:,(\d+))? @@", cabeca)
+                self.assertTrue(achado, cabeca)
+                velho = int(achado.group(1) or 1)
+                novo = int(achado.group(2) or 1)
+                self.assertEqual(sum(1 for l in linhas if l[:1] in (" ", "-")), velho, cabeca)
+                self.assertEqual(sum(1 for l in linhas if l[:1] in (" ", "+")), novo, cabeca)
+        self.assertGreaterEqual(len(re.findall(r"^@@ ", self.texto, re.M)), 4)
 
-    def test_faz_o_que_o_pedido_diz(self):
+    def test_o_remendo_dos_jogadores_faz_o_que_o_pedido_diz(self):
         self.assertIn('"Pad2", "Type", "DualShock2"', self.texto)                  # o jogador 2 ligado no PS2
         self.assertIn("MultitapPort0_Enabled", self.texto)                          # o multitap da porta 1
         self.assertIn("input_state_cb(jogador, RETRO_DEVICE_JOYPAD", self.texto)    # uma porta do libretro por jogador
         self.assertNotIn("+				pad->Set(m.ds2, input_state_cb(0,", self.texto)
         self.assertIn("+	bool support_no_game = true;", self.texto)                 # abrir sem jogo: o menu da BIOS
+
+    def test_o_remendo_da_sobreposicao_le_o_arquivo_que_o_arena_escreve(self):
+        # o mesmo nome, a mesma secao e o mesmo formato (Secao/Chave) de graficos.gravar_ajustes_do_armsx2
+        self.assertIn('"arena-overrides.ini"', self.texto2)
+        self.assertIn('GetKeyValueList("Overrides")', self.texto2)
+        self.assertIn("rfind('/')", self.texto2)
+        self.assertEqual(os.path.basename(graficos.arquivo_de_ajustes_do_armsx2("x")), "arena-overrides.ini")
+        # entra DEPOIS dos ajustes proprios do nucleo e ANTES de salvar o .ini
+        self.assertIn('+	// ARENA: os ajustes do servidor do ARENA, por cima do .ini do nucleo', self.texto2)
+        self.assertIn(" 	Error save_error;", self.texto2)
+
+    def test_a_ordem_alfabetica_poe_os_jogadores_primeiro(self):
+        nomes = sorted(n for n in os.listdir(self.PASTA) if n.endswith(".patch"))
+        self.assertEqual(nomes, ["armsx2-libretro-jogadores.patch", "armsx2-libretro-sobreposicao-do-arena.patch"])
 
     def test_o_fluxo_do_github_confere_e_aplica_o_remendo_antes_de_compilar(self):
         with open(os.path.join(RAIZ, ".github", "workflows", "nucleo-ps2-android.yml"), encoding="utf-8") as arquivo:

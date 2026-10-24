@@ -1,0 +1,33 @@
+--- a/pcsx2-libretro/Main.cpp
++++ b/pcsx2-libretro/Main.cpp
+@@ -253,6 +253,30 @@
+ 		// Audio goes out through retro_run pulling the stream ring; the Null
+ 		// backend keeps SPU2 mixing into the ring with no device thread.
+ 		s_base_settings->SetStringValue("SPU2/Output", "Backend", "Null");
++	}
++
++	// ARENA: os ajustes do servidor do ARENA, por cima do .ini do nucleo, a cada abertura (inclusive a primeira, quando
++	// o .ini ainda nem existe). O arquivo system/pcsx2/inis/arena-overrides.ini tem uma secao [Overrides] com linhas
++	// "Secao/Chave = valor", por exemplo "EmuCore/GS/texture_preloading = 1": a ultima barra separa a secao da chave.
++	{
++		const std::string arena_path = Path::Combine(EmuFolders::Settings, "arena-overrides.ini");
++		if (FileSystem::FileExists(arena_path.c_str()))
++		{
++			INISettingsInterface arena_ini(arena_path);
++			if (arena_ini.Load())
++			{
++				auto lock = Host::GetSettingsLock();
++				for (const auto& [arena_chave, arena_valor] : arena_ini.GetKeyValueList("Overrides"))
++				{
++					const std::string::size_type barra = arena_chave.rfind('/');
++					if (barra == std::string::npos || barra == 0 || barra + 1 >= arena_chave.size())
++						continue;
++					const std::string arena_secao = arena_chave.substr(0, barra);
++					s_base_settings->SetStringValue(arena_secao.c_str(), arena_chave.c_str() + barra + 1,
++						arena_valor.c_str());
++				}
++			}
++		}
+ 	}
+ 
+ 	Error save_error;

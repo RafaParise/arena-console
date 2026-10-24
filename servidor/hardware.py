@@ -1043,6 +1043,8 @@ def resumo(pasta_raiz):
         "driver_video": driver_video(),
         "runtime_ok": runtime_visual_c(),
         "android": NO_ANDROID,
+        # No Android: o aparelho tem Vulkan de verdade (o app pergunta ao sistema).
+        "vulkan": bool(do_app("VULKAN")),
         "removivel": info_disco["removivel"],
         # Perfil: define quais plataformas aparecem na lista.
         "perfil_maquina": ("completo"
@@ -1085,13 +1087,20 @@ def capacidade(info=None, pasta_raiz=None):
     # 0..10 vira 1..5
     nota = max(1, min(5, round(pontos / 2.0)))
 
-    # Android: celular tem 8 nucleos e 8 GB e nem por isso e' um PC de nota
-    # 4 -- os nucleos sao pequenos. Ali vale tambem a velocidade MEDIDA de um
-    # nucleo (velocidade_de_um_nucleo, comparada ao notebook-alvo): abaixo da
-    # do alvo, a nota para no 2; ate uma vez e meia, no 3.
+    # Android: celular tem 8 nucleos e nem por isso e' um PC de nota 4 -- os
+    # nucleos sao pequenos, e a conta de nucleos (acima) nao serve. Ali a
+    # nota sai de duas coisas: a velocidade MEDIDA de um nucleo
+    # (velocidade_de_um_nucleo, em vezes o notebook-alvo: abaixo de 1, nota 2;
+    # ate 1,5, nota 3; ate 2,2, nota 4; acima, 5) e a memoria (menos de 3 GB,
+    # nota 2; de 4,5 GB, 3; de 6,5 GB, 4). Vale a menor. Pedido do Rafael,
+    # 24/10/2026: "permita o ARENA atingir o auge dos telefones" -- o celular
+    # de ponta chega ao 5, o de entrada (o Galaxy A12) continua no 2.
     if info.get("android"):
         relativa = (info.get("velocidade") or {}).get("relativa_ao_alvo") or 0
-        nota = min(nota, 2 if relativa < 1.0 else 3 if relativa < 1.5 else 4)
+        por_velocidade = 2 if relativa < 1.0 else 3 if relativa < 1.5 else 4 if relativa < 2.2 else 5
+        ram_do_aparelho = info.get("ram_total_gb") or 0
+        por_memoria = 2 if ram_do_aparelho < 3.0 else 3 if ram_do_aparelho < 4.5 else 4 if ram_do_aparelho < 6.5 else 5
+        nota = min(por_velocidade, por_memoria)
 
     # Nota separada para o que depende da PLACA DE VIDEO: resolucao
     # interna, filtro de textura, anti-serrilhado (teto_da_placa).
@@ -1124,16 +1133,69 @@ _DEDICADAS_FRACAS = re.compile(
     r"|quadro\s+nvs", re.I)
 
 
+def nota_da_placa_de_celular(nome):
+    """Nota de 1 a 5 de uma placa de video de celular ou tablet, pelo nome que o OpenGL ES do aparelho diz
+    ("Adreno (TM) 740", "Mali-G78 MC14", "PowerVR Rogue GE8320"); None se nao conhece.
+
+    ESTIMATIVA por familia e geracao, nao medida: so o Galaxy A12 (PowerVR GE8320, nota 2) foi testado de verdade.
+    A escada sobe pelo que o aparelho aguenta e o "Desempenho que aprende" e o ajuste do proprio emulador
+    abaixam se o jogo ficar abaixo de 60 quadros. 5 = topo de linha (Adreno 730 ou mais, Immortalis, Xclipse);
+    4 = de cima (Adreno 640 a 699 e 710-725, Mali-G68/G77/G78/G710); 3 = intermediaria (Adreno 618-630,
+    Mali-G57/G610/G72/G76); 2 = de entrada (Adreno 610-616, Mali-G31/G51/G52, PowerVR GE); 1 = muito antiga."""
+    n = (nome or "").lower()
+    if not n:
+        return None
+    if "immortalis" in n or "xclipse" in n:
+        return 5
+    m = re.search(r"adreno[^0-9]*(\d{3})", n)
+    if m:
+        v = int(m.group(1))
+        if v >= 730:
+            return 5
+        if v >= 710:
+            return 4
+        if v == 702 or v == 705:
+            return 3
+        if v >= 640:
+            return 4
+        if v >= 618:
+            return 3
+        if v >= 610:
+            return 2
+        if v >= 540:
+            return 3
+        return 2 if v >= 500 else 1
+    m = re.search(r"mali[- ]?g(\d{2,3})", n)
+    if m:
+        v = int(m.group(1))
+        if v >= 715:
+            return 5
+        if v in (68, 77, 78, 615) or v >= 710:
+            return 4
+        if v in (57, 72, 76, 510, 610):
+            return 3
+        return 2
+    if re.search(r"mali[- ]?t", n):
+        return 1
+    if "powervr" in n:
+        return 3 if re.search(r"\bg[mx]9\d{3}|bxm|bxs", n) else 2
+    return None
+
+
 def teto_da_placa(gpu, processador=""):
     """Ate que nota da placa (1 a 5) esta placa de video vai.
 
     - integrada comum: 3, por melhor que seja o processador (a memoria e' a
       do sistema, dividida com ele);
+    - celular e tablet (Android): o que a tabela de nota_da_placa_de_celular
+      diz, ate o 5; placa que a tabela nao conhece fica no 3;
     - Ryzen de mesa com Vega (G/GE) e Ryzen 8000G: 4 (medido, acima);
     - dedicada antiga e fraca: 2;
     - outra dedicada: 5 (vale a nota da maquina).
     """
     nome = (gpu or {}).get("nome", "") or ""
+    if NO_ANDROID:
+        return nota_da_placa_de_celular(nome) or 3
     if (gpu or {}).get("integrada", True):
         return 4 if _APU_DE_MESA.search(processador or "") else 3
     return 2 if _DEDICADAS_FRACAS.search(nome) else 5

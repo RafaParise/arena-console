@@ -481,6 +481,7 @@
   ],
   "excecoes": {
     "mupen64plus_next": {
+      "nao_no_android": true,
       "_leia": "O gliden64 e mais rapido, mas desenha errado o HUD (a caixa de itens) de alguns jogos - Mario Kart 64 e o caso classico. O parallel-rdp e fiel e resolve, ao custo de placa de video.",
       "por_nota": [
         {
@@ -492,6 +493,11 @@
         }
       ]
     }
+  },
+  "ini_armsx2": {
+    "_leia": "O que o ARENA grava no armsx2-libretro.ini do PS2 do Android (graficos.aplicar_ini_do_armsx2), alem das opcoes do nucleo: {secao: {chave: valor}}. 'sempre' vale em todo jogo; depois o bloco do motor de video (vulkan, opengl, software); depois modesto, abaixo_leve e abaixo_minimo. Nomes conferidos em pcsx2/Pcsx2Config.cpp do ARMSX2. Toda chave que o ARENA gerencia fica em 'sempre' com o valor padrao dele (o nucleo guarda no .ini o que recebeu: chave tirada daqui nao voltaria sozinha ao normal). texture_preloading: 0 nenhuma, 1 parcial, 2 completa (o padrao do nucleo). A completa faz o PS2 calcular e guardar a imagem inteira de cada quadro de FILME: no Galaxy A12 (PowerVR GE8320, OpenGL) o video de abertura do Mortal Kombat Armageddon rodava a 5-9 fps com ela e a ~54 com a parcial (medido em 24/10/2026, mesma cena, mesmos outros ajustes). GSBackThreadMode liga a thread de fundo do vídeo (so existe no Vulkan: nos outros o nucleo desliga sozinho).",
+    "sempre": {"EmuCore/GS": {"texture_preloading": "1", "GSBackThreadMode": "0"}},
+    "vulkan": {"EmuCore/GS": {"GSBackThreadMode": "1"}}
   },
   "tela_4k": {
     "_leia": "Tela de 4K (2.000 linhas ou mais, em pixels de verdade) E placa de video dedicada (nota da placa 4 ou 5): os consoles de 3D leves desenham perto da resolucao da tela, em vez de parar em 1440p. Os pesados (PS2, GameCube, Wii, PS3, Xbox 360) ficam no que a placa aguenta: 4K neles derruba placa media. Valores conferidos no proprio nucleo (o SwanStation diz '9x (for 4K)'). PSP em 6x e N64 em 2x, nao no maximo: estabilidade antes de nitidez.",

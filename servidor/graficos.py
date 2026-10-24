@@ -495,6 +495,9 @@ def opcoes_finais_do_nucleo(nome_curto, nota, nota_gpu=None, modesto=False, altu
         # Excecoes conhecidas por nucleo: defeito que a nota de hardware nao
         # preve, porque e' conhecimento do emulador, nao da maquina.
         excecao = dados.get("excecoes", {}).get(nome_curto, {})
+        # No Android o video e' o OpenGL ES, e o plugin que pede Vulkan (o parallel-rdp do N64) nao abre.
+        if excecao.get("nao_no_android") and plataforma_do_sistema.ANDROID:
+            excecao = {}
         for bloco in sorted(excecao.get("por_nota", []), key=lambda b: b.get("nota_minima", 0)):
             if alvo >= bloco.get("nota_minima", 0):
                 opcoes.update(bloco.get("opcoes", {}))
@@ -1113,6 +1116,128 @@ def limpar_ajustes_dos_nucleos(valor):
 def ajustes_finos_do_nucleo(ajustes, nome_curto):
     """As opcoes do ajuste fino da pessoa para UM nucleo (limpar_ajustes_dos_nucleos); {} se nao ha."""
     return dict(limpar_ajustes_dos_nucleos(ajustes).get(nome_curto, {}))
+
+
+_SECAO_DE_INI = re.compile(r"^[A-Za-z0-9_/]{1,60}$")
+_CHAVE_DE_INI = re.compile(r"^[A-Za-z0-9_./\-]{1,80}$")
+_VALOR_DE_INI = re.compile(r"^[A-Za-z0-9_ ./+\-]{0,80}$")
+
+
+def limpar_ajustes_ini(valor):
+    """Ajuste fino direto no arquivo de configuracao de um emulador (config.json -> ajustes_ini_dos_nucleos):
+    {"armsx2": {"EmuCore/GS": {"texture_preloading": "1"}}}. Para o que o nucleo nao mostra como opcao.
+
+    Passa so nome de nucleo, secao e chave com cara de .ini e valor simples de uma linha (letras, numeros e
+    . / _ - + espaco); booleano vira "true"/"false". O resto e' descartado em silencio."""
+    limpo = {}
+    if not isinstance(valor, dict):
+        return limpo
+    for nucleo, secoes in list(valor.items())[:20]:
+        if not isinstance(nucleo, str) or not _NOME_DE_NUCLEO.match(nucleo) or not isinstance(secoes, dict):
+            continue
+        aceitas = {}
+        for secao, chaves in list(secoes.items())[:20]:
+            if not isinstance(secao, str) or not _SECAO_DE_INI.match(secao) or not isinstance(chaves, dict):
+                continue
+            for chave, conteudo in list(chaves.items())[:60]:
+                if isinstance(conteudo, bool):
+                    conteudo = "true" if conteudo else "false"
+                elif isinstance(conteudo, (int, float)):
+                    conteudo = str(conteudo)
+                if (isinstance(chave, str) and _CHAVE_DE_INI.match(chave) and isinstance(conteudo, str)
+                        and _VALOR_DE_INI.match(conteudo)):
+                    aceitas.setdefault(secao, {})[chave] = conteudo
+        if aceitas:
+            limpo[nucleo] = aceitas
+    return limpo
+
+
+def arquivo_ini_do_armsx2(pasta_sistema):
+    """O arquivo de configuracao do PS2 do Android: system/pcsx2/inis/armsx2-libretro.ini."""
+    return os.path.join(pasta_sistema, "pcsx2", "inis", "armsx2-libretro.ini")
+
+
+def ini_padrao_do_armsx2(motor_do_nucleo, nota_gpu=None, modesto=False, abaixo=""):
+    """O que o ARENA decide, no .ini do PS2 do Android, alem das opcoes do nucleo (graficos.json -> ini_armsx2):
+    'sempre', depois o bloco do motor de video ("vulkan"/"opengl"/"software") e, por cima, o modo modesto e os
+    niveis abaixo do original. Devolve {secao: {chave: valor}}."""
+    regra = carregar_graficos().get("ini_armsx2", {})
+    blocos = [regra.get("sempre", {}), regra.get((motor_do_nucleo or "").lower(), {})]
+    if modesto:
+        blocos.append(regra.get("modesto", {}))
+    for nivel in niveis_abaixo_ate(abaixo):
+        blocos.append(regra.get("abaixo_" + nivel, {}))
+    resultado = {}
+    for bloco in blocos:
+        for secao, chaves in bloco.items():
+            if isinstance(chaves, dict) and not secao.startswith("_"):
+                resultado.setdefault(secao, {}).update(
+                    {k: str(v) for k, v in chaves.items() if not k.startswith("_")})
+    return resultado
+
+
+def arquivo_de_ajustes_do_armsx2(pasta_sistema):
+    """O arquivo que o nucleo remendado do ARENA le a cada abertura: system/pcsx2/inis/arena-overrides.ini
+    (ferramentas/remendos/armsx2-libretro-sobreposicao-do-arena.patch)."""
+    return os.path.join(pasta_sistema, "pcsx2", "inis", "arena-overrides.ini")
+
+
+def gravar_ajustes_do_armsx2(pasta_sistema, ajustes):
+    """Escreve 'ajustes' ({secao: {chave: valor}}) no arquivo que o nucleo remendado le a cada abertura, uma secao
+    [Overrides] com linhas "Secao/Chave = valor". Diferente de aplicar_ini_do_armsx2, vale ja na PRIMEIRA abertura
+    (o .ini do nucleo ainda nem existe) e nao mexe no .ini dele. So grava se algo mudou. Devolve True se gravou."""
+    linhas = ["# Gerado pelo ARENA a cada jogo de PS2 (graficos.json -> ini_armsx2 e Ajustes). O nucleo le por cima do",
+              "# armsx2-libretro.ini ao abrir. Para mudar, use o ARENA: este arquivo e reescrito.",
+              "[Overrides]"]
+    for secao in sorted(ajustes or {}):
+        for chave in sorted(ajustes[secao]):
+            linhas.append("%s/%s = %s" % (secao, chave, ajustes[secao][chave]))
+    texto = "\n".join(linhas) + "\n"
+    caminho = arquivo_de_ajustes_do_armsx2(pasta_sistema)
+    try:
+        with open(caminho, encoding="utf-8") as arquivo:
+            if arquivo.read() == texto:
+                return False
+    except OSError:
+        pass
+    try:
+        gravar_atomico(caminho, texto)
+    except OSError:
+        return False
+    return True
+
+
+def aplicar_ini_do_armsx2(pasta_sistema, ajustes):
+    """Poe 'ajustes' ({secao: {chave: valor}}) no .ini do PS2 do Android, antes do jogo abrir, mantendo o resto.
+
+    So mexe no arquivo que o proprio nucleo ja criou (na primeira abertura ele grava o completo, com os
+    padroes dele; um arquivo feito aqui, mais curto, faria o nucleo pular os padroes, como o do memory card).
+    Antes disso, nada a fazer: vale a partir da segunda abertura. So grava se algo mudou. Devolve a lista
+    de "Secao/chave = valor" que mudou."""
+    caminho = arquivo_ini_do_armsx2(pasta_sistema)
+    if not ajustes or not os.path.isfile(caminho):
+        return []
+    try:
+        with open(caminho, encoding="utf-8-sig") as arquivo:
+            original = arquivo.read()
+    except OSError:
+        return []
+    texto = original
+    mudou = []
+    for secao, chaves in ajustes.items():
+        trocar = {}
+        for chave, valor in chaves.items():
+            if _valor_ini(texto, secao, chave) != str(valor):
+                trocar[chave] = str(valor)
+                mudou.append("%s/%s = %s" % (secao, chave, valor))
+        if trocar:
+            texto = _trocar_chaves_ini(texto, secao, trocar)
+    if mudou:
+        try:
+            gravar_atomico(caminho, texto)
+        except OSError:
+            return []
+    return mudou
 
 
 def preparar_portatil_pcsx2(caminho_executavel):
@@ -1741,7 +1866,9 @@ def controles_pcsx2(jogadores, controles_xinput):
 # (D3D::GetPreferredRenderer, conferido no codigo-fonte em 01/10/2026) --
 # suspeito dos graficos piscando no Celeron (Intel UHD, driver de 2021):
 # a escolha fica na tela do ARENA para testar em um clique.
-MOTORES_PCSX2 = {"automatico": "-1", "d3d11": "3", "d3d12": "15", "vulkan": "14"}
+# "opengl" so vale no celular (o PS2 do Android, nucleo ARMSX2): no PC, o PCSX2 tambem aceita o 12, mas a tela de
+# la nao oferece.
+MOTORES_PCSX2 = {"automatico": "-1", "d3d11": "3", "d3d12": "15", "vulkan": "14", "opengl": "12"}
 
 
 # Os valores-padrao do PCSX2 para o que ele mesmo avisa que "pode quebrar a

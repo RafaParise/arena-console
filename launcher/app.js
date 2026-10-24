@@ -2932,10 +2932,36 @@ function capturar(linha, valor, botaoDefinir, jogador, botao) {
 // A de agora, as que o aparelho tem e as permissoes (servidor/ponte_android.py).
 // Trocar de pasta abre o servidor de novo; a tela volta sozinha.
 
+// No celular, o PS2 e' o nucleo ARMSX2 do proprio ARENA e os motores sao outros (nao ha DirectX): o seletor ganha
+// os do aparelho. A mesma chave da configuracao (motor_ps2) vale nos dois.
+function motorDoPs2NoCelular() {
+  const lista = $("#listaMotorPs2");
+  if (!lista) return;
+  const opcoes = [
+    ["automatico", "Automático (o ARENA escolhe pelo aparelho)"],
+    ["opengl", "OpenGL (o mais compatível)"],
+    ["vulkan", "Vulkan (mais rápido em aparelho que o suporta bem)"],
+  ];
+  lista.replaceChildren(...opcoes.map(([valor, texto]) => {
+    const opcao = document.createElement("option");
+    opcao.value = valor;
+    opcao.textContent = texto;
+    return opcao;
+  }));
+  const atual = (estado.config && estado.config.motor_ps2) || "automatico";
+  lista.value = opcoes.some(([valor]) => valor === atual) ? atual : "automatico";
+  const ajuda = lista.closest(".opcao")?.querySelector(".opcao-ajuda");
+  if (ajuda) {
+    ajuda.textContent = "Deixe no automático: o ARENA escolhe pelo seu aparelho. Se o PS2 piscar, distorcer " +
+      "ou fechar, escolha OpenGL. O Vulkan divide o vídeo em duas threads e costuma render mais nos aparelhos novos.";
+  }
+}
+
 function mostrarAndroid(android) {
   const bloco = $("#blocoAndroid");
   if (!bloco) return;
   bloco.hidden = false;
+  motorDoPs2NoCelular();
   $("#estadoAndroidPasta").textContent = android.pasta
     ? "Usando a pasta " + android.pasta + (android.so_leitura
       ? ". O Android só deixa ler nela: os jogos e as BIOS vêm de lá; os saves ficam no aparelho."

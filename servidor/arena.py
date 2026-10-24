@@ -1244,6 +1244,8 @@ def config_padrao():
         # Ajuste fino por emulador (graficos.limpar_ajustes_dos_nucleos): as opcoes do nucleo que a pessoa
         # quer diferentes do que o ARENA escolhe, {"armsx2": {"armsx2_upscale": "2x"}}.
         "ajustes_dos_nucleos": {},
+        # O mesmo, direto no .ini do emulador (graficos.limpar_ajustes_ini): {"armsx2": {"EmuCore/GS": {...}}}.
+        "ajustes_ini_dos_nucleos": {},
         # "automatico" (decide pela nota da maquina), "leve" ou "bonito".
         # Vale para os emuladores externos (PCSX2, RPCS3, Xenia).
         "preset_grafico_externo": "automatico",
@@ -1407,6 +1409,7 @@ def ler_config_do_disco():
     if salvo.get("abaixo_do_original") in graficos.NIVEIS_ABAIXO:
         config["abaixo_do_original"] = salvo["abaixo_do_original"]
     config["ajustes_dos_nucleos"] = graficos.limpar_ajustes_dos_nucleos(salvo.get("ajustes_dos_nucleos"))
+    config["ajustes_ini_dos_nucleos"] = graficos.limpar_ajustes_ini(salvo.get("ajustes_ini_dos_nucleos"))
     config["rpcn_ativo"] = bool(salvo.get("rpcn_ativo"))
     if salvo.get("escala_da_tela") in graficos.ESCALAS:
         config["escala_da_tela"] = salvo["escala_da_tela"]
@@ -2750,6 +2753,37 @@ def preparar_lossless(jogo, config):
             "executavel": achado["executavel"]}
 
 
+def preparar_o_ps2_do_android(config, jogo=None, sem_jogo=False):
+    """Tudo o que o PS2 do Android (o nucleo ARMSX2, dentro do app) precisa antes de abrir, num lugar so:
+    os arquivos de apoio de dentro do APK (o nucleo nem liga sem eles), as BIOS na pasta do nucleo, o motor de
+    video e a BIOS da regiao do jogo, o ajuste fino da pessoa e o .ini (graficos.json -> ini_armsx2).
+    'sem_jogo': o menu da BIOS do PS2 (idioma, data e hora, memory card), sem passar pelo disco: a abertura
+    do PS2 fica ligada. Devolve as opcoes do nucleo."""
+    plataforma_do_sistema.preparar_recursos(PASTA_SISTEMA)
+    levadas = graficos.preparar_bios_do_nucleo_ps2(PASTA_SISTEMA)
+    if levadas:
+        print("[ARENA] BIOS do PS2 levadas para a pasta do nucleo: %s." % ", ".join(levadas))
+    opcoes = graficos.opcoes_do_armsx2(config.get("motor_ps2", "automatico"), (jogo or {}).get("arquivo"),
+                                       PASTA_SISTEMA)
+    # O que a pessoa pediu para este emulador manda em tudo (config.json -> ajustes_dos_nucleos).
+    opcoes.update(graficos.ajustes_finos_do_nucleo(config.get("ajustes_dos_nucleos"), "armsx2"))
+    if sem_jogo:
+        opcoes["armsx2_fast_boot"] = "disabled"
+    # O .ini do nucleo (o que ele nao mostra como opcao): o padrao do ARENA e, por cima, o da pessoa.
+    ini = graficos.ini_padrao_do_armsx2(opcoes.get("armsx2_renderer"), CAPACIDADE.get("nota_gpu"),
+                                        grafico_original(config), nivel_abaixo(config))
+    for secao, chaves in graficos.limpar_ajustes_ini(config.get("ajustes_ini_dos_nucleos")).get("armsx2", {}).items():
+        ini.setdefault(secao, {}).update(chaves)
+    # Dois jeitos, para qualquer nucleo: o arquivo de ajustes que o nucleo remendado do ARENA le a cada abertura
+    # (vale ja na primeira) e, se o .ini do nucleo ja existe, a troca direta nele (vale para um nucleo sem o remendo,
+    # colado a mao na pasta emuladores).
+    graficos.gravar_ajustes_do_armsx2(PASTA_SISTEMA, ini)
+    mudou = graficos.aplicar_ini_do_armsx2(PASTA_SISTEMA, ini)
+    if mudou:
+        print("[ARENA] PS2 (.ini do nucleo): %s." % "; ".join(mudou))
+    return opcoes
+
+
 def executar_jogo(jogo, apelido, config, custo=None, partida=None):
     """Abre o RetroArch, espera fechar e grava a sessao.
 
@@ -2789,10 +2823,9 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         extras_core.update(jogo.get("opcoes_livre") or {})
         extras_core.update(graficos.opcoes_de_memory_card(
             PASTA_SAVES, jogo["plataforma"]))
-        # PS2 pelo nucleo do ARMSX2 (o do Android): o motor de video e a BIOS da regiao do jogo.
+        # PS2 pelo nucleo do ARMSX2 (o do Android): arquivos de apoio, BIOS, motor de video, ajuste fino e .ini.
         if nome_core == "armsx2" and jogo.get("jeito") != "livre":
-            extras_core.update(graficos.opcoes_do_armsx2(
-                config.get("motor_ps2", "automatico"), jogo.get("arquivo"), PASTA_SISTEMA))
+            extras_core.update(preparar_o_ps2_do_android(config, jogo))
         # O ajuste fino que a pessoa pediu para este emulador manda em tudo (config.json -> ajustes_dos_nucleos).
         extras_core.update(graficos.ajustes_finos_do_nucleo(config.get("ajustes_dos_nucleos"), nome_core))
         # Avisa o console de que o controle tem analogico. Sem isto, no
@@ -3023,7 +3056,6 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         # PS2 pelo nucleo do RetroArch (o caminho do Android; no computador abre pelo PCSX2 de fora):
         # o nucleo procura a BIOS em system\pcsx2\bios, e o jeito livre (Play!) nao precisa de nenhuma.
         if jogo.get("plataforma") == "ps2" and jogo.get("jeito") != "livre":
-            plataforma_do_sistema.preparar_recursos(PASTA_SISTEMA)    # o resources do nucleo, de dentro do APK
             levadas = graficos.preparar_bios_do_nucleo_ps2(PASTA_SISTEMA)
             if levadas:
                 print("[ARENA] BIOS do PS2 levadas para a pasta do nucleo: %s." % ", ".join(levadas))
@@ -5297,6 +5329,19 @@ class Manipulador(BaseHTTPRequestHandler):
             return self.responder_json({"ok": True, "arquivo": os.path.basename(arquivo),
                                         "total": len(linhas), "linhas": linhas[-quantas:]})
 
+        if caminho == "/api/android/ini-ps2":
+            # O .ini do PS2 do Android (so leitura): o que o nucleo guardou e o que o ARENA ajustou. Ajuda a
+            # entender o PS2 de um aparelho; nao tem dado pessoal.
+            if not plataforma_do_sistema.ANDROID:
+                return self.erro("Isto é só do ARENA do Android. No computador, abra a pasta emuladores do ARENA: "
+                                 "o PCSX2 fica lá.", 404)
+            try:
+                with open(graficos.arquivo_ini_do_armsx2(PASTA_SISTEMA), encoding="utf-8-sig") as arquivo:
+                    linhas = arquivo.read().splitlines()
+            except OSError:
+                return self.responder_json({"ok": True, "existe": False, "linhas": []})
+            return self.responder_json({"ok": True, "existe": True, "total": len(linhas), "linhas": linhas[:1500]})
+
         if caminho == "/api/armazenamento":
             # A memoria do aparelho e o cartao SD, as pastas de jogos do cartao e a escolha de
             # jogar direto ou pelo interno (Ajustes -> Maquina -> Armazenamento, so no Android).
@@ -6214,6 +6259,9 @@ class Manipulador(BaseHTTPRequestHandler):
                     config.get("bios", {}).get(plataforma_id)))
                 extras.update(graficos.opcoes_de_memory_card(
                     PASTA_SAVES, plataforma_id))
+                # O PS2 do Android (o nucleo ARMSX2): sem disco, o menu da BIOS (idioma, data e hora, memory card).
+                if nome_curto_do_core(plataforma["core"]) == "armsx2":
+                    extras.update(preparar_o_ps2_do_android(config, None, sem_jogo=True))
                 try:
                     graficos.gravar_opcoes_dos_nucleos(
                         CAPACIDADE["nota"], extras, CAPACIDADE.get("nota_gpu"))
@@ -6800,6 +6848,9 @@ class Manipulador(BaseHTTPRequestHandler):
                     if opcao["tipo"] == "lista" and valor not in opcao.get("opcoes", []):
                         continue
                     config["avancado"][chave] = valor
+
+            if isinstance(dados.get("ajustes_ini_dos_nucleos"), dict):
+                config["ajustes_ini_dos_nucleos"] = graficos.limpar_ajustes_ini(dados["ajustes_ini_dos_nucleos"])
 
             if isinstance(dados.get("ajustes_dos_nucleos"), dict):
                 # O ajuste fino por emulador inteiro de uma vez ({} limpa): a tela manda o que quer que fique.
