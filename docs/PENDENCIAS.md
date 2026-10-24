@@ -210,7 +210,8 @@ novos **PocketStation** (núcleo Pokket) e **VMU** (núcleo VeMUlator). Detalhes
 Falta (nesta ordem):
 1. ~~**DreamPotato**~~ **Feito em 24/10** (`servidor\companheiros.py`: abre junto com o jogo e fecha com ele; o zip dele traz a BIOS
    do VMU da Sega e por isso só fica em `emuladores\DreamPotato`, fora do pacote). Falta testar com um jogo de Dreamcast no PC.
-2. **PokketSX** como emulador de fora do PS1 (Windows): o jogo de PS1 conversa com o PocketStation ao vivo.
+2. **PokketSX** como emulador de fora do PS1 (Windows): baixado e abrindo em `emuladores\PokketSX` (24/10). Falta o ARENA abrir o
+   jogo de PS1 por ele, com a BIOS do PocketStation e o cartão no lugar.
 3. **Cartão único** do PocketStation entre o PS1, o PS2 e o Pokket, com cópia de segurança.
 4. Pokket e VeMUlator já abrem no PC e no celular (BIOS: o `kernel.bin` do Rafael); falta testar com minijogos de verdade e no
    Chromebook; o APK já leva os dois núcleos (marcas em `ferramentas\android_nucleos.json`).

@@ -102,7 +102,7 @@ uma pistola de luz só mira em jogo de pistola. Por isso cada acessório do cat�
   **Seus saves antigos** continuam no cartão de 8 MB (`Mcd001.ps2`); para trazê-los: em Acessórios → PlayStation 2 ponha
   a entrada 2 em "Cartão do PS2 de 8 MB", abra a BIOS (Browser), copie os saves da entrada 2 para a 1 e volte a
   entrada 2 para o PocketStation.
-- **Ligado ao jogo ao vivo** [Certo, ainda não integrado]: só o **PokketSX** (GPLv3; fork do DuckStation de antes de
+- **Ligado ao jogo ao vivo** [Certo; instalado em `emuladores\PokketSX`, ainda sem botão no ARENA]: só o **PokketSX** (GPLv3; fork do DuckStation de antes de
   a licença dele fechar; só Windows x64). Na aba de cartões de memória tem uma caixinha por cartão para pôr o
   PocketStation no lugar dele, e na aba BIOS um campo para a BIOS do PocketStation. É o único jeito conhecido de o
   jogo de PS1 conversar com o PocketStation (baixar o minijogo do jogo, ver os saves na telinha). Não vai para
@@ -138,7 +138,9 @@ opções nessa leitura; os tipos de controle por porta deles (como Zapper e Powe
 ## Pendências desta frente
 
 1. ~~DreamPotato~~ **Feito** (programa companheiro); falta testar com um jogo de Dreamcast de verdade no PC do Rafael.
-2. **PokketSX** como emulador de fora do PS1 no Windows.
+2. **PokketSX** como emulador de fora do PS1 no Windows: já baixado e abrindo em `emuladores\PokketSX` (modo portátil, sem o
+   atualizador, Discord desligado; zip sha256 `ce7cdb2b...f74c`). Falta o ARENA abrir um jogo de PS1 por ele (escrever o
+   settings.ini com a BIOS do PocketStation e o cartão no lugar).
 3. **Cartão único** entre o PS1, o PS2 e o Pokket (hoje o PS2 cria o `PocketStation.mcr`; o Pokket abre o cartão
    que você escolher e grava num `.srm`; falta o ARENA copiar de um para o outro com cópia de segurança).
 4. Testar o Pokket (precisa do `pocketstation.bin` do Rafael) e o VeMUlator (precisa de um `.vms`) no celular.
