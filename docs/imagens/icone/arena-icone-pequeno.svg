@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><defs>
+    <linearGradient id="fundo" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#241f4a"/><stop offset="1" stop-color="#0d0c17"/></linearGradient>
+    <radialGradient id="brilho" cx="50%" cy="46%" r="52%"><stop offset="0" stop-color="#ff6f9c" stop-opacity=".42"/><stop offset="0.6" stop-color="#5a46ff" stop-opacity=".16"/><stop offset="1" stop-color="#5a46ff" stop-opacity="0"/></radialGradient>
+    <linearGradient id="corpo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbf9ff"/><stop offset="0.55" stop-color="#d8d3ee"/><stop offset="1" stop-color="#a59fc9"/></linearGradient>
+    <linearGradient id="gripe" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#2a2552" stop-opacity=".38"/></linearGradient>
+    <radialGradient id="capa" cx="38%" cy="30%" r="75%"><stop offset="0" stop-color="#6a6597"/><stop offset="1" stop-color="#25213f"/></radialGradient>
+    <radialGradient id="capa-clara" cx="38%" cy="30%" r="75%"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#a9a6c4"/></radialGradient>
+    <radialGradient id="capa-amarela" cx="38%" cy="30%" r="75%"><stop offset="0" stop-color="#fff0a0"/><stop offset="1" stop-color="#f0a500"/></radialGradient>
+    <radialGradient id="verde" cx="38%" cy="30%" r="80%"><stop offset="0" stop-color="#8dffbf"/><stop offset="1" stop-color="#14b45a"/></radialGradient>
+    <radialGradient id="vermelho" cx="38%" cy="30%" r="80%"><stop offset="0" stop-color="#ffa3b5"/><stop offset="1" stop-color="#e0214a"/></radialGradient>
+    <radialGradient id="azul" cx="38%" cy="30%" r="80%"><stop offset="0" stop-color="#a6c0ff"/><stop offset="1" stop-color="#2f56e8"/></radialGradient>
+    <radialGradient id="ambar" cx="38%" cy="30%" r="80%"><stop offset="0" stop-color="#ffe7a1"/><stop offset="1" stop-color="#f09a00"/></radialGradient>
+    <radialGradient id="joia" cx="40%" cy="30%" r="80%"><stop offset="0" stop-color="#ffd0df"/><stop offset="0.5" stop-color="#ff6f9c"/><stop offset="1" stop-color="#c2185b"/></radialGradient>
+    <filter id="sombra" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="10" stdDeviation="9" flood-color="#000" flood-opacity=".55"/></filter>
+<clipPath id="recorte"><rect width="512" height="512" rx="112"/></clipPath></defs><g clip-path="url(#recorte)"><rect width="512" height="512" fill="url(#fundo)"/><rect width="512" height="512" fill="url(#brilho)"/></g><g transform="translate(23.27,6.00) scale(1.1636)">
+    <path d="M40,140 C40,98 72,66 118,66 L282,66 C328,66 360,98 360,140 C360,200 372,262 366,312 C360,352 334,372 304,372 C278,372 262,352 262,322 L262,282 C262,262 250,252 236,252 L236,330 C236,348 222,358 200,358 C178,358 164,348 164,330 L164,252 C150,252 138,262 138,282 L138,322 C138,352 122,372 96,372 C66,372 40,352 34,312 C28,262 40,200 40,140 Z" fill="url(#corpo)" stroke="#1d1a33" stroke-width="16" stroke-linejoin="round"/>
+    <path d="M40,140 C40,98 72,66 118,66 L282,66 C328,66 360,98 360,140 C360,200 372,262 366,312 C360,352 334,372 304,372 C278,372 262,352 262,322 L262,282 C262,262 250,252 236,252 L236,330 C236,348 222,358 200,358 C178,358 164,348 164,330 L164,252 C150,252 138,262 138,282 L138,322 C138,352 122,372 96,372 C66,372 40,352 34,312 C28,262 40,200 40,140 Z" fill="url(#corpo)"/>
+    <path d="M40,140 C40,98 72,66 118,66 L282,66 C328,66 360,98 360,140 C360,200 372,262 366,312 C360,352 334,372 304,372 C278,372 262,352 262,322 L262,282 C262,262 250,252 236,252 L236,330 C236,348 222,358 200,358 C178,358 164,348 164,330 L164,252 C150,252 138,262 138,282 L138,322 C138,352 122,372 96,372 C66,372 40,352 34,312 C28,262 40,200 40,140 Z" fill="url(#gripe)"/>
+    <g id="direcional" transform="translate(92,136)" fill="#2b2748" stroke="#14122a" stroke-width="5">
+      <rect x="-37" y="-14" width="74" height="28" rx="8"/><rect x="-14" y="-37" width="28" height="74" rx="8"/>
+    </g>
+    <circle id="analogico-esquerdo" cx="112" cy="226" r="27" fill="#2b2748" stroke="#14122a" stroke-width="6"/>
+    <circle cx="112" cy="226" r="12" fill="#6a6597"/>
+    <circle id="analogico-do-meio" cx="200" cy="300" r="27" fill="#f1effa" stroke="#14122a" stroke-width="6"/>
+    <circle cx="200" cy="300" r="10" fill="none" stroke="#6f6a96" stroke-width="5"/>
+    <circle id="joia-do-arena" cx="200" cy="148" r="33" fill="url(#joia)" stroke="#7d0e3a" stroke-width="6"/>
+    <g id="botoes-xyab" stroke="#14122a" stroke-width="5">
+      <circle cx="296" cy="104" r="20" fill="url(#ambar)"/>
+      <circle cx="257" cy="143" r="20" fill="url(#azul)"/>
+      <circle cx="335" cy="143" r="20" fill="url(#vermelho)"/>
+      <circle cx="296" cy="188" r="26" fill="url(#verde)"/>
+    </g>
+    <circle id="analogico-direito" cx="306" cy="270" r="26" fill="url(#capa-amarela)" stroke="#14122a" stroke-width="6"/>
+</g></svg>

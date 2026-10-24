@@ -331,6 +331,13 @@ No computador fraco, prefira o Edge ou o Chrome: a tela funciona igual nos
 três, mas o Firefox gasta umas 2,5 vezes mais memória (os números estão em
 `docs\NAVEGADORES.md`).
 
+**Atalho com o ícone do ARENA (Windows):** dois cliques em
+**`CRIAR-ATALHO.bat`** põem o atalho `ARENA` na área de trabalho, com o
+**supercontrole**, o ícone oficial (veja `docs\ICONE.md`). O atalho guarda o
+caminho desta pasta: se você mudar a pasta de lugar, ou se o pen drive ganhar
+outra letra, rode o `CRIAR-ATALHO.bat` de novo. A janela do ARENA já mostra o
+supercontrole na barra de tarefas.
+
 **Se aparecer `[ERRO] O Python nao foi encontrado`:** volte ao passo 2.
 
 ---

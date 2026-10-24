@@ -1250,8 +1250,12 @@ def config_padrao():
         # Formato da imagem (graficos.FORMATOS, pedido de 22/10/2026):
         # "automatico" estica o 4:3 dos consoles de TV ate a borda da tela
         # larga (ate 16:9); "esticar", todo jogo; "console", a proporcao do
-        # console (graficos.proporcao_da_partida).
-        "formato_da_imagem": "automatico",
+        # console (graficos.proporcao_da_partida). No Android o padrao e'
+        # TELA CHEIA, sempre (pedido de 23/10/2026: "lembre-se sempre tela
+        # cheia, a nao ser que va nas configuracoes e manualmente decida uma
+        # resolucao ou escala menor"): o celular deitado e' mais largo que
+        # 16:9, e o automatico deixava faixa dos lados.
+        "formato_da_imagem": "esticar" if plataforma_do_sistema.ANDROID else "automatico",
         # Botoes na tela do Android (plataforma.BOTOES_NA_TELA, pedido de
         # 22/10/2026): "automatico" some com um controle de verdade ligado.
         "botoes_na_tela": "automatico",

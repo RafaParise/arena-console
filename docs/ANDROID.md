@@ -160,6 +160,11 @@ anterior.
   celular (`docs\WEB.md`). (O Galaxy A12 **não** é de 32 bits: a lista do
   aparelho mostra `arm64-v8a`. A recusa "não é compatível com seu
   smartphone" vinha do APK `x86_64`, que é o do emulador do computador.)
+- **Tela cheia, sempre** (pedido de 23/10/2026): no Android o **Formato da imagem** abre em
+  "Esticar até a borda" (`arena.config_padrao`), sem o limite de 16:9 do
+  Automático, que deixava faixa dos lados no celular deitado. Resolução ou escala
+  menor só por ajuste manual em Ajustes; o "desempenho que aprende" só mexe na
+  qualidade interna do jogo, nunca no tamanho da imagem na tela.
 - **A nota do aparelho** para pela velocidade medida de um núcleo: celular
   tem 8 núcleos e 8 GB, mas os núcleos são pequenos.
 - **Hardware do celular, até os miliamperes da bateria** (pedido de

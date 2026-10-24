@@ -4,6 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ARENA</title>
+<!-- O icone oficial, o supercontrole (ferramentas\gerar_icone.py, docs\ICONE.md): o SVG simples
+     para a aba e a janela, o PNG, o .ico do Windows (o da barra de tarefas) e o do iPhone/iPad. -->
+<link rel="icon" href="arena-icone-pequeno.svg" type="image/svg+xml">
+<link rel="icon" href="arena-icone-64.png" sizes="64x64" type="image/png">
+<link rel="icon" href="arena.ico" sizes="16x16 24x24 32x32 48x48 64x64 128x128 256x256">
+<link rel="apple-touch-icon" href="arena-icone-192.png">
 <link rel="stylesheet" href="estilo.css">
 </head>
 <body>
@@ -18,6 +24,7 @@
 <!-- ===================== BARRA DE ESTADO DA MAQUINA ===================== -->
 <header class="painel-topo">
   <div class="marca">
+    <img class="marca-icone" src="arena-icone-64.png" width="34" height="34" alt="">
     <span class="marca-nome">ARENA</span>
     <span class="marca-sub">central retrô da turma <b id="versao"></b></span>
     <button class="botao botao--mini" id="btnVerAnimacao" type="button" aria-label="Visualizar animação"

@@ -60,14 +60,12 @@ import json
 import os
 import re
 import shutil
-import struct
 import subprocess
 import sys
 import tempfile
 import time
 import urllib.request
 import zipfile
-import zlib
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(RAIZ, "testes"))
@@ -228,47 +226,34 @@ def nucleos_do_android(abi, atualizar):
 
 
 # ---------------------------------------------------------------------------
-# O icone (o monstrinho da capa do ARENA)
+# O icone (o supercontrole, ferramentas\gerar_icone.py, docs\ICONE.md)
 # ---------------------------------------------------------------------------
 
-def gravar_png(caminho, largura, altura, pontos):
-    cru = bytearray()
-    for y in range(altura):
-        cru.append(0)
-        for r, g, b in pontos[y * largura:(y + 1) * largura]:
-            cru += bytes((r, g, b))
-
-    def bloco(tipo, dados):
-        return struct.pack(">I", len(dados)) + tipo + dados + struct.pack(">I", zlib.crc32(tipo + dados) & 0xFFFFFFFF)
-
-    with open(caminho, "wb") as arquivo:
-        arquivo.write(b"\x89PNG\r\n\x1a\n" + bloco(b"IHDR", struct.pack(">IIBBBBB", largura, altura, 8, 2, 0, 0, 0))
-                      + bloco(b"IDAT", zlib.compress(bytes(cru), 9)) + bloco(b"IEND", b""))
+# O fundo do icone adaptavel: o indigo do fundo do icone. A frente (o controle, o brilho e a
+# sombra, sem fundo) vem do PNG; o Android recorta o formato que o aparelho usa.
+COR_DO_FUNDO_DO_ICONE = "#1a1735"
+TAMANHOS_DO_ICONE = (("mipmap-mdpi", 48, 108), ("mipmap-hdpi", 72, 162), ("mipmap-xhdpi", 96, 216),
+                     ("mipmap-xxhdpi", 144, 324), ("mipmap-xxxhdpi", 192, 432))
 
 
 def gerar_icones(res):
-    """O icone do ARENA: o monstrinho da capa (docs\\imagens\\arena-capa.png),
-    num quadrado do ceu estrelado dela, ampliado sem borrar (pixel art)."""
-    from gravar_fundo_gif import ler_png
-    with open(os.path.join(RAIZ, "docs", "imagens", "arena-capa.png"), "rb") as arquivo:
-        largura, _altura, pontos = ler_png(arquivo.read())
-    x0, y0, lado = 84, 280, 112                     # o monstrinho fica em x 88-191, y 296-375
-    recorte = [pontos[(y0 + y) * largura + x0 + x][:3] for y in range(lado) for x in range(lado)]
-
-    def ampliar(tamanho):
-        return [recorte[(y * lado // tamanho) * lado + (x * lado // tamanho)] for y in range(tamanho)
-                for x in range(tamanho)]
-    # O icone comum (48 a 192) e a frente do icone adaptavel (108 a 432).
-    for pasta, comum, frente in (("mipmap-mdpi", 48, 108), ("mipmap-hdpi", 72, 162), ("mipmap-xhdpi", 96, 216),
-                                 ("mipmap-xxhdpi", 144, 324), ("mipmap-xxxhdpi", 192, 432)):
-        gravar_png(os.path.join(res, pasta, "ic_launcher.png"), comum, comum, ampliar(comum))
-        gravar_png(os.path.join(res, pasta, "ic_launcher_foreground.png"), frente, frente, ampliar(frente))
-    fundo = recorte[0]
+    """O icone do ARENA: o supercontrole. Copia os PNG que o ferramentas\\gerar_icone.py
+    deixou em docs\\imagens\\icone\\android (o comum, de 48 a 192, e a frente do icone
+    adaptavel, de 108 a 432) e poe a cor do fundo do adaptavel. Falta algum? Rode o
+    gerar_icone.py (precisa do Edge ou do Chrome)."""
+    origem = os.path.join(RAIZ, "docs", "imagens", "icone", "android")
+    for pasta, _comum, _frente in TAMANHOS_DO_ICONE:
+        for nome in ("ic_launcher.png", "ic_launcher_foreground.png"):
+            de = os.path.join(origem, pasta, nome)
+            if not os.path.isfile(de):
+                raise SystemExit("Falta %s: rode servidor\\python\\python.exe ferramentas\\gerar_icone.py" % de)
+            os.makedirs(os.path.join(res, pasta), exist_ok=True)
+            shutil.copyfile(de, os.path.join(res, pasta, nome))
     cores = os.path.join(res, "values", "colors.xml")
     with open(cores, encoding="utf-8") as arquivo:
         texto = arquivo.read()
     texto = re.sub(r'(<color name="ic_launcher_background">)[^<]*(</color>)',
-                   r"\g<1>#%02x%02x%02x\g<2>" % fundo, texto)
+                   r"\g<1>%s\g<2>" % COR_DO_FUNDO_DO_ICONE, texto)
     with open(cores, "w", encoding="utf-8") as arquivo:
         arquivo.write(texto)
 

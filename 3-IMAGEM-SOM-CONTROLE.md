@@ -1282,8 +1282,8 @@ TV desenhavam para a TV quadradona (4:3); a tela de hoje é larga (16:9 ou
 
 | Escolha | O que faz |
 |---|---|
-| **Automático** (recomendado) | Os consoles de TV e os computadores antigos (do Atari ao PS2, GameCube e Wii) esticam até a borda. Os portáteis de tela quadrada (Game Boy, Game Gear, Neo Geo Pocket), o fliperama, o WonderSwan e o Vectrex (que têm jogo em pé) e o PSP ficam no formato deles. No celular deitado (tela mais larga que 16:9), estica só até 16:9 |
-| **Esticar até a borda** | Todo jogo enche a tela inteira; o desenho fica mais largo que o original |
+| **Automático** (o padrão no computador) | Os consoles de TV e os computadores antigos (do Atari ao PS2, GameCube e Wii) esticam até a borda. Os portáteis de tela quadrada (Game Boy, Game Gear, Neo Geo Pocket), o fliperama, o WonderSwan e o Vectrex (que têm jogo em pé) e o PSP ficam no formato deles. No celular deitado (tela mais larga que 16:9), estica só até 16:9 |
+| **Esticar até a borda** (o padrão no Android) | Todo jogo enche a tela inteira; o desenho fica mais largo que o original. No celular o ARENA abre sempre assim: tela cheia, e só diminui se você mesmo escolher outra coisa nos Ajustes |
 | **Do console (sem esticar)** | O formato da TV da época, com faixas pretas dos lados |
 
 Vale nos núcleos do RetroArch (Windows, Linux, Android e navegador), no PS2

@@ -147,8 +147,22 @@ class ArquivoDaPartida(unittest.TestCase):
 
 class Configuracao(unittest.TestCase):
     def test_padrao_e_lista(self):
-        self.assertEqual(arena.config_padrao()["formato_da_imagem"], "automatico")
+        with mock.patch.object(arena.plataforma_do_sistema, "ANDROID", False):
+            self.assertEqual(arena.config_padrao()["formato_da_imagem"], "automatico")
         self.assertEqual(graficos.FORMATOS[0], "automatico")
+
+    def test_no_android_o_padrao_e_tela_cheia_de_verdade(self):
+        # Pedido de 23/10/2026: "sempre tela cheia, a nao ser que va nas configuracoes".
+        with mock.patch.object(arena.plataforma_do_sistema, "ANDROID", True):
+            padrao = arena.config_padrao()["formato_da_imagem"]
+        self.assertEqual(padrao, "esticar")
+        # no celular deitado (20:9), a partida vai ate a borda, sem o limite de 16:9
+        for plataforma in ("snes", "gba", "arcade", "psp", "ps1"):
+            self.assertEqual(graficos.proporcao_da_partida(plataforma, padrao, CELULAR)["aspect_ratio_index"],
+                             graficos.PROPORCAO_TELA_CHEIA, plataforma)
+        # e quem escolhe outro nos Ajustes continua tendo o que escolheu
+        self.assertEqual(graficos.proporcao_da_partida("snes", "console", CELULAR)["aspect_ratio_index"],
+                         graficos.PROPORCAO_DO_NUCLEO)
 
 
 class EmuladoresDeFora(unittest.TestCase):

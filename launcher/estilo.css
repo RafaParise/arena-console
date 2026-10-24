@@ -194,6 +194,8 @@ code {
 }
 
 .marca { display: flex; align-items: baseline; gap: 0.5rem; }
+/* O supercontrole, o icone oficial: centrado na linha (o resto da marca alinha pelo texto). */
+.marca-icone { align-self: center; width: 34px; height: 34px; border-radius: 9px; flex-shrink: 0; }
 
 .marca-nome {
   font-family: var(--fonte-titulo);

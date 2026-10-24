@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><defs>
+    <linearGradient id="fundo" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#241f4a"/><stop offset="1" stop-color="#0d0c17"/></linearGradient>
+    <radialGradient id="brilho" cx="50%" cy="46%" r="52%"><stop offset="0" stop-color="#ff6f9c" stop-opacity=".42"/><stop offset="0.6" stop-color="#5a46ff" stop-opacity=".16"/><stop offset="1" stop-color="#5a46ff" stop-opacity="0"/></radialGradient>
+    <linearGradient id="corpo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbf9ff"/><stop offset="0.55" stop-color="#d8d3ee"/><stop offset="1" stop-color="#a59fc9"/></linearGradient>
+    <linearGradient id="gripe" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#2a2552" stop-opacity=".38"/></linearGradient>
+    <radialGradient id="capa" cx="38%" cy="30%" r="75%"><stop offset="0" stop-color="#6a6597"/><stop offset="1" stop-color="#25213f"/></radialGradient>
+    <radialGradient id="capa-clara" cx="38%" cy="30%" r="75%"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#a9a6c4"/></radialGradient>
+    <radialGradient id="capa-amarela" cx="38%" cy="30%" r="75%"><stop offset="0" stop-color="#fff0a0"/><stop offset="1" stop-color="#f0a500"/></radialGradient>
+    <radialGradient id="verde" cx="38%" cy="30%" r="80%"><stop offset="0" stop-color="#8dffbf"/><stop offset="1" stop-color="#14b45a"/></radialGradient>
+    <radialGradient id="vermelho" cx="38%" cy="30%" r="80%"><stop offset="0" stop-color="#ffa3b5"/><stop offset="1" stop-color="#e0214a"/></radialGradient>
+    <radialGradient id="azul" cx="38%" cy="30%" r="80%"><stop offset="0" stop-color="#a6c0ff"/><stop offset="1" stop-color="#2f56e8"/></radialGradient>
+    <radialGradient id="ambar" cx="38%" cy="30%" r="80%"><stop offset="0" stop-color="#ffe7a1"/><stop offset="1" stop-color="#f09a00"/></radialGradient>
+    <radialGradient id="joia" cx="40%" cy="30%" r="80%"><stop offset="0" stop-color="#ffd0df"/><stop offset="0.5" stop-color="#ff6f9c"/><stop offset="1" stop-color="#c2185b"/></radialGradient>
+    <filter id="sombra" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="10" stdDeviation="9" flood-color="#000" flood-opacity=".55"/></filter>
+<clipPath id="recorte"><rect width="512" height="512" rx="112"/></clipPath></defs><g transform="translate(17.86,17.91) scale(1.1907)">
+    <g filter="url(#sombra)">
+      <rect id="gatilho-esquerdo" x="62" y="44" width="92" height="34" rx="16" fill="#4a4575" stroke="#1d1a33" stroke-width="7"/>
+      <rect id="gatilho-direito" x="246" y="44" width="92" height="34" rx="16" fill="#4a4575" stroke="#1d1a33" stroke-width="7"/>
+      <rect id="z-gamecube" x="168" y="38" width="64" height="30" rx="14" fill="#8a63ff" stroke="#1d1a33" stroke-width="7"/>
+      <path id="corpo-de-tres-pontas" d="M40,140 C40,98 72,66 118,66 L282,66 C328,66 360,98 360,140 C360,200 372,262 366,312 C360,352 334,372 304,372 C278,372 262,352 262,322 L262,282 C262,262 250,252 236,252 L236,330 C236,348 222,358 200,358 C178,358 164,348 164,330 L164,252 C150,252 138,262 138,282 L138,322 C138,352 122,372 96,372 C66,372 40,352 34,312 C28,262 40,200 40,140 Z" fill="url(#corpo)" stroke="#1d1a33" stroke-width="9" stroke-linejoin="round"/>
+    </g>
+    <path d="M40,140 C40,98 72,66 118,66 L282,66 C328,66 360,98 360,140 C360,200 372,262 366,312 C360,352 334,372 304,372 C278,372 262,352 262,322 L262,282 C262,262 250,252 236,252 L236,330 C236,348 222,358 200,358 C178,358 164,348 164,330 L164,252 C150,252 138,262 138,282 L138,322 C138,352 122,372 96,372 C66,372 40,352 34,312 C28,262 40,200 40,140 Z" fill="url(#corpo)"/>
+    <path d="M40,140 C40,98 72,66 118,66 L282,66 C328,66 360,98 360,140 C360,200 372,262 366,312 C360,352 334,372 304,372 C278,372 262,352 262,322 L262,282 C262,262 250,252 236,252 L236,330 C236,348 222,358 200,358 C178,358 164,348 164,330 L164,252 C150,252 138,262 138,282 L138,322 C138,352 122,372 96,372 C66,372 40,352 34,312 C28,262 40,200 40,140 Z" fill="url(#gripe)"/>
+    <path d="M70,110 C86,84 108,78 130,78 L270,78 C292,78 314,84 330,110 C300,96 270,92 200,92 C130,92 100,96 70,110 Z" fill="#fff" opacity=".7"/>
+    <g id="direcional" transform="translate(92,136)">
+      <rect x="-33" y="-12" width="66" height="24" rx="7" fill="#2b2748" stroke="#14122a" stroke-width="4"/>
+      <rect x="-12" y="-33" width="24" height="66" rx="7" fill="#2b2748" stroke="#14122a" stroke-width="4"/>
+      <rect x="-30" y="-9" width="60" height="18" rx="5" fill="#3d3866"/>
+      <rect x="-9" y="-30" width="18" height="60" rx="5" fill="#3d3866"/>
+      <circle r="6" fill="#241f3f"/>
+    </g>
+    <g id="analogico-esquerdo" transform="translate(112,222)">
+      <circle r="31" fill="#1b1830" stroke="#0e0c1c" stroke-width="4"/>
+      <circle r="23" fill="url(#capa)" stroke="#0e0c1c" stroke-width="3"/>
+      <circle cx="-6" cy="-7" r="8" fill="#fff" opacity=".18"/>
+    </g>
+    <g id="analogico-do-meio" transform="translate(200,298)">
+      <circle r="31" fill="#1b1830" stroke="#0e0c1c" stroke-width="4"/>
+      <circle r="22" fill="url(#capa-clara)" stroke="#0e0c1c" stroke-width="3"/>
+      <circle r="9" fill="none" stroke="#6f6a96" stroke-width="3"/>
+    </g>
+    <g id="joia-do-arena" transform="translate(200,146)">
+      <circle r="35" fill="#1b1830" stroke="#0e0c1c" stroke-width="4"/>
+      <circle r="28" fill="url(#joia)" stroke="#7d0e3a" stroke-width="3"/>
+      <path d="M-13,12 L0,-14 L13,12 M-8,4 L8,4" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <circle id="start-do-n64" cx="200" cy="205" r="10" fill="#ff3b4e" stroke="#7a0d1e" stroke-width="3"/>
+    <g id="botoes-xyab" stroke="#14122a" stroke-width="4">
+      <circle cx="292" cy="102" r="16" fill="url(#ambar)"/>
+      <circle cx="256" cy="138" r="16" fill="url(#azul)"/>
+      <circle cx="330" cy="138" r="16" fill="url(#vermelho)"/>
+      <circle cx="293" cy="176" r="22" fill="url(#verde)"/>
+    </g>
+    <rect id="botao-branco-do-duke" x="252" y="208" width="27" height="13" rx="6.5" fill="#f4f2ff" stroke="#14122a" stroke-width="3.5"/>
+    <rect id="botao-preto-do-duke" x="284" y="208" width="27" height="13" rx="6.5" fill="#1d1a33" stroke="#0a0916" stroke-width="3.5"/>
+    <g id="botoes-c-do-n64" fill="url(#ambar)" stroke="#14122a" stroke-width="3">
+      <circle cx="334" cy="194" r="6"/><circle cx="334" cy="216" r="6"/><circle cx="323" cy="205" r="6"/><circle cx="345" cy="205" r="6"/>
+    </g>
+    <g id="analogico-direito" transform="translate(305,262)">
+      <circle r="29" fill="#1b1830" stroke="#0e0c1c" stroke-width="4"/>
+      <circle r="21" fill="url(#capa-amarela)" stroke="#0e0c1c" stroke-width="3"/>
+      <circle cx="-5" cy="-6" r="7" fill="#fff" opacity=".35"/>
+    </g>
+</g></svg>

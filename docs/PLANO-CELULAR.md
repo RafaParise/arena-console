@@ -76,8 +76,11 @@ Rafael quiser trocar, é só dizer.
 | 7 | **Ícone: o supercontrole**, em todas as versões | Registrado | Independente; pode ser feito enquanto espera o celular; tem de estar pronto antes do Release |
 | 8 | **ETAPA 2**: captura de tela, uma por clique | A fazer | Segue o roteiro |
 | 9 | **ETAPA 3**: celular como controle do computador (Network RetroPad pelo servidor do ARENA) | A fazer | Segue o roteiro |
-| 10 | Controle de verdade no Android (o GameSir Nova Lite do Rafael é o de teste): tirar os botões da tela sozinho, mapeamento automático e à mão | A fazer | O controle já está pareando no A12 |
+| 10 | **Controles e teclado no Android**: a ordem de conexão define o jogador 1 a 8, a tela de toque é o próximo jogador depois dos controles, e o teclado (com fio ou Bluetooth) é reconhecido; botões da tela somem sozinhos, mapeamento automático e à mão (o GameSir Nova Lite do Rafael, dois deles, é o de teste) | A fazer; pedido das 21h50 registrado abaixo | Os dois controles já estão pareados no A12. A tela de toque como jogador 3 precisa de um remendo no RetroArch |
+| 10-A | **Controle na tela personalizável e pacotes de aparência** (mover e redimensionar peças, analógico esquerdo, direito ou nenhum, formas e cores de SNES, N64, PlayStation, Xbox, GameCube; estilos prontos dentro do APK) | Registrado (pedido das 22h30) | Usa o gerador de overlay do ARENA e o mesmo remendo do item 10 |
+| 10-B | **Tela cheia sempre** (resolução e escala menores só por ajuste manual) e **o Lossless Scaling adaptado ao Android** | Registrado (pedido das 22h40) | Mexe no padrão do formato da imagem no Android, no Vulkan do A12 e na escala |
 | 11 | Paridade com o computador, função por função (matriz abaixo) | A fazer | Fecha o que sobrar dos itens acima |
+| 12-A | **Instalar sem tropeço**: um APK só para celular com nome claro, página "Baixar" que escolhe o arquivo certo (ou a versão web), o ARENA instala o ARMSX2 com um toque e o assistente da primeira abertura configura o resto | Registrado (pedido das 22h30) | Junto do Release; o Android sempre mostra a tela "Instalar" |
 | 12 | Teste final no A12 e Release: juntar `auditoria-4` ao `main`, versão nova, `rodada_final.py`, pacotes e `gh-pages` | Por último | Só depois dos testes no Android (autorizado pelo Rafael) |
 
 ## Os pedidos novos da noite de 23/10/2026 (registrados com as palavras dele)
@@ -187,6 +190,184 @@ O que isso exige, já separado em regras (para quando for feito):
    da lista do ARENA.
 7. Mesma função no computador (paridade): lá o "Procurar jogos baixados" já
    existe; "procurar em outra unidade" fica como melhoria.
+
+### Controles e teclado no Android: a ordem dos jogadores (item 10)
+
+> "A ideia é que, assim como no PC, a ordem de conexão dos controles
+> determina que é player 1, 2, 3, 4 ou player 8, e, como no PC, se tem 2
+> controles, quem vai jogar na tela do celular é o player 3 e assim por
+> diante. O ARENA do Android deve também reconhecer teclados para telefones,
+> sejam com fio ou via Bluetooth, por gentileza."
+
+O que já existe (lido no código em 23/10/2026): o app conta os controles de
+jogo (`ArenaServico.java`, `InputDevice` com GAMEPAD ou JOYSTICK, sem os
+virtuais) e o servidor repassa (`ponte_android.controles()`), e o
+`controles.opcoes_do_retroarch` põe o **teclado como o jogador N+1** (com 3
+controles, o teclado é o 4, igual no PC). O teclado de verdade é achado pelo
+nome (`ponte_android.teclado_fisico()`, tipo alfabético, fora os que também
+são controle) e entregue ao RetroArch em `input_android_physical_keyboard`;
+sem isso, o RetroArch toma o teclado com setas por um controle.
+
+O que falta:
+
+1. **A tela de toque como o próximo jogador.** Lido no RetroArch 1.22.2
+   (`input/input_driver.c`): o toque do overlay é somado **sempre à porta 0 do
+   núcleo** (`if (port == 0)` no joypad, no teclado e no analógico), mesmo com
+   o remapeamento de usuários, e não existe opção para mudar (só
+   `input_overlay_lightgun_port`, da pistola, e `input_overlay_show_inputs_port`,
+   do desenho). Então "a tela é o jogador 3" pede um **remendo pequeno no
+   RetroArch**: uma opção nova `input_overlay_port` (padrão 0) em
+   `configuration.h`/`configuration.c` e a troca dos quatro `port == 0` do
+   overlay por `port == input_overlay_port`, no mesmo molde do
+   `android/retroarch/arena-args.patch`. O ARENA grava o número no arquivo da
+   partida (= quantos controles estão ligados, mais o teclado, se houver).
+   Com a tela escondida (modo Automático com controle ligado) nada muda;
+   com **Sempre**, a tela vira o jogador seguinte.
+2. **A ordem de conexão** vira o número do jogador (1 a 8): conferir no
+   aparelho, com os dois GameSir, em que ordem o Android numera e o RetroArch
+   atribui (`input_playerN_joypad_index`); controle que sai e volta entra por
+   último (o Android lhe dá um número novo).
+3. **Conferir o teclado de verdade** (USB-OTG e Bluetooth): reconhecido ao
+   abrir o jogo, no jogador N+1, com as teclas do ARENA (setas, Z, X, Enter,
+   F10) e o menu; e se ele chega **durante** o jogo.
+4. A mesma regra no **Jogar Junto** e no **celular como controle do PC** (o
+   jogador que vem do celular entra como o próximo).
+
+### Controles na tela personalizáveis e pacotes de aparência (item 10-A)
+
+> "A interface e a disposição dos botões na tela deve ser personalizável, ou
+> seja, poder mudar o lugar e a posição dos botões, adicionar analógico
+> esquerdo, direito ou nenhum dos dois, e colocar os botões no formato e cor
+> do Super Nintendo, Nintendo 64, enfim, poder personalizar os controles da
+> tela com ícones que se assemelham aos controles de outros consoles. Deve ter
+> todas as opções para todos os botões de todos os controles, por exemplo:
+> analógico direcional com o formato do analógico do Nintendo 64. Revise os
+> apps de referência que são cases de sucesso para ter ideias e exemplos de
+> como implementar isso para ficar simples e intuitivo como o ARENA é, e
+> descubra uma forma de deixar os pacotes de aparência de botões no jogo
+> totalmente configurados e prontos para usar, como tudo deve ser no ARENA: a
+> instalação deve ocorrer automaticamente, assim que baixa o APK, ou qualquer
+> que seja o formato mais compatível com todos os aparelhos Android antigos ou
+> atuais [...]. Que essa instalação faça o caminho que deu certo no telefone
+> para instalar, ou verifique alguma solução que seja baixar do GitHub,
+> clicar, instalar e configurar tudo sozinho."
+
+**O que os apps de sucesso fazem** (lido em 23/10/2026):
+
+- **Lemuroid e o RadialGamePad** (código aberto, `Swordfish90/RadialGamePad`,
+  README): a biblioteca "foi desenhada para personalização" e alimenta todos os
+  layouts do Lemuroid; cada controle é um **dial primário** no centro (cruz,
+  analógico ou botões) cercado de **dials secundários** (botão único, grupo de
+  botões, analógico), e a biblioteca dimensiona e posiciona tudo para
+  aproveitar o espaço. O Lemuroid deixa mudar tamanho e posição dos controles.
+- **PPSSPP** ("Edit touch control layout", ppsspp.org/docs/settings/controls):
+  cada botão se **arrasta e se redimensiona** na própria tela; o centro do
+  analógico pode seguir o dedo; a versão 1.20 passou a guardar um layout para
+  **retrato** e outro para **paisagem** (Android Authority).
+- **Dolphin no Android**: edita posição, tamanho e opacidade; relatos de
+  usuários pedem "reiniciar a posição" e dizem que algumas posições se perdem
+  (fórum do Dolphin): lição: sempre ter **Restaurar o padrão** e gravar
+  certo.
+- **Delta (iOS)**: a aparência é um **pacote** (`.deltaskin`, um zip com um
+  JSON do mapeamento e a arte por aparelho e orientação, fileinfo.com): abrir
+  o arquivo já instala. É o modelo de "pacote de aparência" para o ARENA.
+- **RetroArch** (o motor do ARENA): o controle na tela é um texto `.cfg` com
+  PNGs e áreas de toque normalizadas (`descN = "entrada,x,y,forma,w,h"`, forma
+  `radial` ou `rect`, `descN_overlay = img/arquivo.png`), com páginas
+  (`overlay_next`) e analógicos; a comunidade mantém **32 pastas de overlays
+  prontos** (`libretro/common-overlays`, CC-BY-4.0, atualizado em 15/10/2026),
+  entre elas `n64`, `snes`, `nes`, `psx`, `dual-shock`, `genesis`, `gameboy`,
+  `gba` e `arcade`.
+
+**Desenho proposto** (simples para o aluno, no jeito do ARENA):
+
+1. **O ARENA gera o controle na tela.** Um **modelo de layout** (JSON, em
+   `dados/`) mais um **pacote de aparência** (as imagens e um JSON que diz o
+   formato de cada peça) viram, a cada partida, o `.cfg` do RetroArch, para
+   retrato e paisagem, como o ARENA já faz com os botões SAIR e MENU
+   (`plataforma.controle_de_toque_do_arena`). Não depende de editar overlay à
+   mão nem de baixar nada.
+2. **As peças** (todas com todas as opções): direcional (cruz, quatro botões
+   separados, estilos NES, SNES, Mega Drive, N64), analógico **esquerdo,
+   direito ou nenhum** (formatos: N64 cinza com anel, GameCube amarelo,
+   PlayStation, Xbox, genérico), botões de rosto em formas e cores de cada
+   console (SNES: Y verde, X azul, B amarelo, A vermelho; N64: A azul, B verde,
+   quatro C amarelos, Z; PlayStation: ✕ ○ □ △; Xbox: A verde, B vermelho, X
+   azul, Y âmbar; GameCube: A verde grande), gatilhos e ombros, Start e
+   Select, e os do ARENA (Menu, Sair, avanço rápido).
+3. **Editar na tela, em três toques**: Ajustes → Controle na tela. Um desenho do
+   celular (deitado e de pé) onde se **arrasta** cada peça e se muda o tamanho;
+   chaves para os analógicos (esquerdo, direito, nenhum); **um toque** escolhe
+   o estilo de console (muda formas e cores de tudo junto) e depois dá para
+   ajustar peça por peça (formato, cor, tamanho, transparência); "canhoto"
+   (espelha); **Restaurar o padrão**. O estilo sugerido muda com o console do
+   jogo (SNES abre com o do SNES etc.), e o aluno pode fixar um só.
+4. **Pacotes de aparência prontos, dentro do APK**: as imagens e os modelos
+   vão em `assets/arena-aparencias/` e são extraídos sozinhos na primeira
+   abertura (o `android_inicio.tirar_do_apk` já faz isso com os overlays do
+   RetroArch). Arte **original do ARENA**, feita pelo mesmo caminho do ícone
+   (SVG → PNG), na mesma paleta; os overlays da comunidade (CC-BY) só entram
+   se forem creditados em `CREDITOS.md`.
+5. A ordem dos jogadores e a **tela como o próximo jogador** (item 10) usam o
+   mesmo gerador: o jogador da tela vira o `input_overlay_port` do remendo.
+
+### Instalar o ARENA no celular: o que dá e o que não dá (item 12-A)
+
+- **[Certo] O Android não deixa nenhum app instalar a si mesmo, nem em
+  silêncio.** O aluno sempre vê a tela do sistema ("Instalar") e, na primeira
+  vez, autoriza o navegador (ou o gerenciador de arquivos) a "instalar apps
+  desconhecidos". Isso vale para qualquer APK baixado do GitHub. O caminho mais
+  curto que existe: tocar no arquivo, **Permitir** (uma vez), **Instalar**.
+- **O erro do A12 foi o APK errado, não o jeito de instalar.** A mensagem
+  "Como o app não é compatível com seu smartphone" veio do APK `x86_64` (o do
+  emulador do computador); o `arm64` instala (provado pelo cabo, com a
+  Depuração USB). O que o aluno precisa é **um nome claro e um só arquivo**:
+  `ARENA-celular.apk` (arm64, o do celular) e o do emulador/PC separado.
+- **A página "Baixar"** (GitHub Pages, ao lado da versão web) **escolhe o
+  arquivo certo pelo aparelho** (arm64 → o APK; 32 bits ou Android anterior ao
+  7.0 → a **versão web**, que se instala pelo navegador, "Adicionar à tela
+  inicial", sem APK) e mostra o passo a passo em três telas.
+- **O ARENA instala o ARMSX2 (PS2) sozinho**: baixa do GitHub só o APK certo
+  para o processador do celular (o `legacy-armv8.0` para o Cortex-A53; os
+  `armv8.2` para os mais novos, escolhidos pelas instruções que o processador
+  declara) e abre o instalador do Android: um toque.
+- **Configurar tudo sozinho** = o assistente da primeira abertura: pasta do
+  ARENA, permissão de arquivos, cartão SD, estilo do controle na tela, tela
+  cheia, e nada para baixar.
+
+### Tela cheia sempre, e o Lossless Scaling adaptado ao Android (item 10-B)
+
+> "E lembre-se sempre tela cheia, a não ser que vá nas configurações e
+> manualmente decida uma resolução ou escala menor, por gentileza, usando
+> todas as estratégias, ideias e funcionamento do Lossless Scaling, mas
+> adaptado para o Android, sua arquitetura, hardware e possibilidades
+> atuais."
+
+- **Hoje** o padrão do formato da imagem é `automatico` (`arena.py`,
+  `formato_da_imagem`): o console estica até a borda, **mas com a tela mais
+  larga que 16:9 (o celular deitado, 20:9) estica só até o 16:9** e deixa
+  faixa dos lados. No Android o padrão passa a ser **tela cheia de verdade**
+  (`esticar`, `aspect_ratio_index` 24, sem escala inteira); a resolução ou
+  escala menor só vem de um ajuste **manual** em Ajustes. O que o "desempenho
+  que aprende" mexe é a qualidade interna do jogo, **nunca o tamanho da imagem
+  na tela**.
+- **Estratégias do Lossless Scaling e como ficam no Android** (a engenharia
+  reversa já feita para o computador, em `servidor/lossless.py`, e a escala do
+  ARENA):
+  1. *Escala espacial* (LS1, FSR, NIS, Anime4K, xBR, nítido): os `.slangp` do
+     ARENA rodam no **Vulkan**; o A12 tem Vulkan 1.1, então testar a
+     estabilidade e o custo ali; no OpenGL ES ficam o filtro bilinear ou de
+     ponto, a escala inteira e os shaders GLSL leves (sharp-bilinear).
+  2. *Fator de escala de renderização* (renderizar menor e subir para a tela
+     cheia): a resolução interna de cada núcleo (PS1, N64, PSP, Dreamcast, PS2)
+     e o modo modesto, **só a pedido do aluno**.
+  3. *Geração de quadros* (LSFG): o RetroArch não tem; no Android fica o que
+     existe de verdade: mistura de quadros (shader) para jogo de 30 em tela de
+     60 Hz ou mais, **Black Frame Insertion** em tela de 120 Hz,
+     sincronização com a taxa real da tela e `video_frame_delay`. O A12 tem
+     tela de 60 Hz fixa: lá não se aplica, e o painel diz isso.
+  4. *Modo automático*: escolher escala e filtro pelo aparelho e pelo
+     console, com o que o ARENA já mede (nota do aparelho e carga por thread).
 
 ### O ícone: o supercontrole (item 7)
 
