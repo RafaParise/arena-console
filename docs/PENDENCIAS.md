@@ -208,8 +208,8 @@ Ajustes → Emuladores → Acessórios dos consoles, o PocketStation na entrada 
 novos **PocketStation** (núcleo Pokket) e **VMU** (núcleo VeMUlator). Detalhes e fontes em `docs\ACESSORIOS.md`.
 
 Falta (nesta ordem):
-1. **DreamPotato** como emulador de fora do Dreamcast, ligado ao Flycast (VMU de verdade numa janela, com a memória
-   do jogo). O zip dele traz a BIOS do VMU da Sega: não pode ir no pacote, o professor baixa.
+1. ~~**DreamPotato**~~ **Feito em 24/10** (`servidor\companheiros.py`: abre junto com o jogo e fecha com ele; o zip dele traz a BIOS
+   do VMU da Sega e por isso só fica em `emuladores\DreamPotato`, fora do pacote). Falta testar com um jogo de Dreamcast no PC.
 2. **PokketSX** como emulador de fora do PS1 (Windows): o jogo de PS1 conversa com o PocketStation ao vivo.
 3. **Cartão único** do PocketStation entre o PS1, o PS2 e o Pokket, com cópia de segurança.
 4. Pokket e VeMUlator já abrem no PC e no celular (BIOS: o `kernel.bin` do Rafael); falta testar com minijogos de verdade e no

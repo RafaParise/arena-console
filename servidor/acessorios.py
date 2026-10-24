@@ -222,6 +222,26 @@ def cartoes_ps2(estado):
     return resultado
 
 
+def companheiros(estado, console_id):
+    """Os programas que precisam abrir JUNTO com o jogo deste console, pelo que a pessoa escolheu (servidor\\companheiros.py).
+    Um controle do catalogo diz, no campo "companheiros", qual valor dele chama qual programa: {"DreamPotato": "dreampotato"}.
+    So conta o que a pessoa mexeu (o padrao nunca abre programa nenhum)."""
+    estado = limpar_estado(estado)
+    achados = []
+    for grupo in carregar():
+        if console_id not in grupo["consoles"]:
+            continue
+        for acessorio in grupo["acessorios"]:
+            escolhas = estado.get(acessorio.get("id"), {})
+            for controle in acessorio.get("controles", []):
+                mapa = controle.get("companheiros")
+                if isinstance(mapa, dict) and controle.get("id") in escolhas:
+                    programa = mapa.get(str(escolhas[controle["id"]]))
+                    if programa and programa not in achados:
+                        achados.append(programa)
+    return achados
+
+
 def para_a_tela(estado, sistema, nomes_dos_consoles):
     """O que a tela desenha: uma lista de consoles, cada um com os seus acessorios e o valor de cada controle.
 

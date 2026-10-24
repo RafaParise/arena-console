@@ -65,13 +65,16 @@ uma pistola de luz só mira em jogo de pistola. Por isso cada acessório do cat�
   (emulação de alto nível do chip Sanyo LC86K87). Controles: direcional, A, B, Start = MODE, Select = SLEEP. Limites
   do próprio núcleo: sem save state, o som pode sair fora de sincronia e fechar o conteúdo pode travar.
   Fontes: docs.libretro.com/library/vemulator e wiki.batocera.org/systems:vemulator.
-- **Ligado ao jogo, um mudando o outro** [Certo, ainda não integrado]: o Flycast tem o encaixe **"DreamPotato"** e a
+- **Ligado ao jogo, um mudando o outro** [Certo, integrado no PC em 24/10/2026]: o Flycast tem o encaixe **"DreamPotato"** e a
   opção "DreamPotato VMU storage"; o **DreamPotato** (MIT, Rikki Gibson; Windows, Linux e macOS; em beta) é um VMU
   completo numa janela à parte que se liga ao Flycast por rede (TCP): a memória, a tela e os botões do VMU de lá
   passam a ser os do jogo. O README dele avisa que o Flycast 2.6 estável tem um defeito com ele e pede uma
   versão do ramo principal. **O zip do DreamPotato traz o `american_v1.05.bin`, a BIOS do VMU da Sega**
   (listei o zip): o ARENA **não pode** distribuí-lo; é um emulador de fora, que o professor baixa e põe em
-  `emuladores\DreamPotato`, como o PCSX2. A integração (achar, abrir junto, ligar as duas opções) é o próximo passo.
+  `emuladores\DreamPotato`, como o PCSX2. **Como usar:** Acessórios → Sega Dreamcast → "Controle 1: o que está encaixado nele" →
+  Encaixe A1 = DreamPotato, e ligue "VMU: memória compartilhada com o DreamPotato". O ARENA abre o DreamPotato junto com o jogo
+  e fecha com ele (`servidor\companheiros.py`; testado: abre, fica vivo e fecha). O do Rafael já está em `emuladores\DreamPotato`
+  (zip conferido pela marca SHA-256, 24/10/2026). Só Windows e Linux: não existe para Android.
 
 ### PocketStation (PlayStation 1)
 
@@ -134,8 +137,7 @@ opções nessa leitura; os tipos de controle por porta deles (como Zapper e Powe
 
 ## Pendências desta frente
 
-1. **DreamPotato** como emulador de fora do Dreamcast (achar em `emuladores\DreamPotato`, abrir junto do jogo,
-   ligar "Use Physical VMU Memory" e o encaixe "DreamPotato").
+1. ~~DreamPotato~~ **Feito** (programa companheiro); falta testar com um jogo de Dreamcast de verdade no PC do Rafael.
 2. **PokketSX** como emulador de fora do PS1 no Windows.
 3. **Cartão único** entre o PS1, o PS2 e o Pokket (hoje o PS2 cria o `PocketStation.mcr`; o Pokket abre o cartão
    que você escolher e grava num `.srm`; falta o ARENA copiar de um para o outro com cópia de segurança).

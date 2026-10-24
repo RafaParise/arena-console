@@ -86,6 +86,7 @@ import baixados  # noqa: E402  (os jogos baixados, levados para a prateleira -- 
 import motivo_do_erro  # noqa: E402  (por que o jogo nao abriu, pelo registro -- 02/10/2026)
 import desempenho  # noqa: E402  (o jogo pesado demais deixa o grafico mais leve -- auditoria 4)
 import bios        # noqa: E402  (nome, pasta e versao certa de cada BIOS -- 03/10/2026)
+import companheiros  # noqa: E402  (programas que abrem junto com o jogo: o DreamPotato -- 24/10/2026)
 import acessorios  # noqa: E402  (VMU, Rumble Pak, multitap, pistola de luz... ligar e desligar -- 24/10/2026)
 import arrumar     # noqa: E402  (o botao Arrumar: o arquivo do jogo no lugar certo -- 03/10/2026)
 import ponte_sem_acento  # noqa: E402  (nucleo que nao abre pasta com acento: o Hatari -- 14/10/2026)
@@ -3325,6 +3326,11 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
                 # aparece.
                 print("[ARENA] Lossless Scaling aberto junto com o jogo.")
                 time.sleep(2)
+            # Os programas companheiros que a pessoa pediu em Acessorios (hoje: o DreamPotato, o VMU de verdade do Dreamcast).
+            abertos = companheiros.abrir_todos(acessorios.companheiros(config.get("acessorios"), jogo["plataforma"]))
+            if abertos:
+                print("[ARENA] Aberto junto com o jogo: %s." % ", ".join(companheiros.PROGRAMAS[p]["nome"] for p in abertos))
+                time.sleep(1.5)
             aberto_em = time.time()
             # No Android, quem abre o RetroArch e' o app (plataforma.py).
             processo = plataforma_do_sistema.abrir_programa(comando, cwd=pasta_trabalho, **extras)
@@ -3386,6 +3392,8 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             # Volta tudo ao normal, abrindo o jogo ou nao.
             VIGIA["suspenso"] = False
             processos.fechar_caixa(caixa)
+            if companheiros.fechar_os_que_o_arena_abriu():
+                print("[ARENA] Programas companheiros fechados junto com o jogo.")
             if pelo_lossless and lossless.fechar_o_que_o_arena_abriu():
                 print("[ARENA] Lossless Scaling fechado junto com o jogo.")
             if acelerar:

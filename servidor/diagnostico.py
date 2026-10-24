@@ -65,7 +65,7 @@ PROGRAMA = [
     "servidor/jeitos_de_abrir.py", "servidor/biblioteca_livre.py", "servidor/lossless.py", "servidor/navegadores.py",
     "servidor/plataforma.py", "servidor/baixar.py", "servidor/portas.py", "servidor/ponte_android.py",
     "servidor/baixados.py", "servidor/desempenho.py", "servidor/adb_aparelho.py", "servidor/armazenamento.py",
-    "servidor/acessorios.py", "servidor/acessorios.json",
+    "servidor/acessorios.py", "servidor/acessorios.json", "servidor/companheiros.py",
     "servidor/toque/arena-menu.png", "servidor/toque/arena-sair.png",
     "servidor/filtros/pixel-nitido.slangp", "servidor/filtros/fsr.slangp",
     "servidor/filtros/catmull-rom.slangp", "servidor/filtros/rcas.slangp", "servidor/filtros/suave.slangp",
