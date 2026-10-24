@@ -1029,6 +1029,92 @@ def preparar_bios_do_nucleo_ps2(pasta_sistema):
     return copiadas
 
 
+_REGIOES_DO_JOGO = (
+    ("A", ("usa", "br", "brazil", "canada", "mexico", "latin america")),
+    ("E", ("europe", "germany", "france", "spain", "italy", "netherlands", "sweden", "denmark", "finland",
+           "norway", "russia", "australia", "uk", "portugal", "poland")),
+    ("J", ("japan", "korea", "asia", "china", "taiwan", "hong kong")),
+)
+
+
+def regiao_do_jogo_ps2(arquivo):
+    """'A' (EUA e Brasil), 'E' (Europa) ou 'J' (Japao e Asia) pelas marcas entre parenteses do NOME do arquivo
+    ("Mortal Kombat (USA).chd"); None se o nome nao diz."""
+    nome = os.path.basename(arquivo or "").lower()
+    for marca in re.findall(r"\(([^)]*)\)", nome):
+        palavras = [p.strip() for p in marca.split(",")]
+        for regiao, nomes in _REGIOES_DO_JOGO:
+            if any(p in nomes for p in palavras):
+                return regiao
+    return None
+
+
+def bios_do_ps2_para_o_jogo(arquivo_do_jogo, pasta_bios):
+    """O nome da BIOS de PS2 (na pasta bios do nucleo) da MESMA regiao do jogo, ou "auto" (o nucleo escolhe
+    a primeira que serve). A mesma BIOS toda vez deixa o idioma, a data e a hora do PS2 iguais de uma sessao
+    para a outra, e a regiao certa evita o jogo americano abrir a 50 Hz numa BIOS europeia."""
+    import bios as bios_do_arena
+    regiao = regiao_do_jogo_ps2(arquivo_do_jogo)
+    if not regiao:
+        return "auto"
+    try:
+        nomes = sorted(os.listdir(pasta_bios), key=str.lower)
+    except OSError:
+        return "auto"
+    for nome in nomes:
+        achado = bios_do_arena.playstation(os.path.join(pasta_bios, nome))
+        if achado and achado[0] == "ps2" and achado[1] == regiao:
+            return nome
+    return "auto"
+
+
+def opcoes_do_armsx2(motor, arquivo_do_jogo, pasta_sistema):
+    """O que o ARENA decide por aparelho e por jogo no nucleo do PS2 do Android (ARMSX2): o motor de video e a
+    BIOS. "automatico" e' OpenGL, como o proprio ARMSX2 faz no Android (so manda para o Vulkan a placa que uma regra
+    dele marca): o driver Vulkan do PowerVR do Galaxy A12 vem com 7 defeitos conhecidos e o jogo cai em
+    substitutos lentos (medido em 24/10/2026, com o registro do nucleo). "vulkan" fica para quem escolher."""
+    motor_do_nucleo = {"vulkan": "Vulkan", "software": "Software"}.get(motor, "OpenGL")
+    return {"armsx2_renderer": motor_do_nucleo,
+            "armsx2_bios": bios_do_ps2_para_o_jogo(arquivo_do_jogo, os.path.join(pasta_sistema, "pcsx2", "bios"))}
+
+
+_NOME_DE_NUCLEO = re.compile(r"^[a-z0-9_]{1,40}$")
+_CHAVE_DE_OPCAO = re.compile(r"^[A-Za-z0-9_.\-]{1,80}$")
+
+
+def limpar_ajustes_dos_nucleos(valor):
+    """Ajuste fino por emulador (config.json -> ajustes_dos_nucleos): {"armsx2": {"armsx2_upscale": "2x"}}.
+
+    Vale por cima de TUDO o que o ARENA escolhe sozinho (a escada da nota, o modo modesto, o abaixo do
+    original): e' a pessoa mandando. So passa nome de nucleo e chave de opcao com cara de opcao e valor em
+    texto simples, de uma linha e sem aspas, porque o valor vai para uma linha `chave = "valor"` do arquivo de
+    opcoes do RetroArch. Booleano vira "true"/"false"; o que nao serve e' descartado em silencio."""
+    limpo = {}
+    if not isinstance(valor, dict):
+        return limpo
+    for nucleo, opcoes in list(valor.items())[:40]:
+        if not isinstance(nucleo, str) or not _NOME_DE_NUCLEO.match(nucleo) or not isinstance(opcoes, dict):
+            continue
+        aceitas = {}
+        for chave, conteudo in list(opcoes.items())[:60]:
+            if isinstance(conteudo, bool):
+                conteudo = "true" if conteudo else "false"
+            elif isinstance(conteudo, (int, float)):
+                conteudo = str(conteudo)
+            if (not isinstance(chave, str) or not _CHAVE_DE_OPCAO.match(chave) or not isinstance(conteudo, str)
+                    or len(conteudo) > 80 or any(c in conteudo for c in '"\r\n\0')):
+                continue
+            aceitas[chave] = conteudo
+        if aceitas:
+            limpo[nucleo] = aceitas
+    return limpo
+
+
+def ajustes_finos_do_nucleo(ajustes, nome_curto):
+    """As opcoes do ajuste fino da pessoa para UM nucleo (limpar_ajustes_dos_nucleos); {} se nao ha."""
+    return dict(limpar_ajustes_dos_nucleos(ajustes).get(nome_curto, {}))
+
+
 def preparar_portatil_pcsx2(caminho_executavel):
     """Liga o modo portatil do PCSX2 e traz os memory cards de Documentos.
 

@@ -368,6 +368,56 @@ def preparar_nucleo(caminho):
     return os.path.isfile(caminho)
 
 
+PREFIXO_DOS_RECURSOS = "assets/arena-recursos/"
+
+
+def preparar_recursos(pasta_sistema):
+    """Poe para fora do APK, dentro da pasta system do RetroArch, os arquivos de apoio dos nucleos que o
+    ARENA compila (o resources do PS2: assets/arena-recursos/pcsx2/resources vira system/pcsx2/resources;
+    sem eles o nucleo nem liga). Uma vez por APK e por pasta: a marca fica dentro da propria pasta, e se
+    a pessoa apagar a pasta, ela volta. Devolve quantos arquivos escreveu."""
+    desta = marca_do_apk()
+    total = 0
+    with _TRAVA_DOS_NUCLEOS:
+        try:
+            with zipfile.ZipFile(APK) as apk:
+                pastas = {}
+                for item in apk.infolist():
+                    if item.is_dir() or not item.filename.startswith(PREFIXO_DOS_RECURSOS):
+                        continue
+                    partes = item.filename[len(PREFIXO_DOS_RECURSOS):].split("/")
+                    # A pasta de apoio e' o par de nomes do inicio (pcsx2/resources): a marca vai nela.
+                    pastas.setdefault("/".join(partes[:2]), []).append((item, partes))
+                for pasta, itens in sorted(pastas.items()):
+                    raiz = os.path.join(pasta_sistema, *pasta.split("/"))
+                    marca = os.path.join(raiz, ".arena")
+                    try:
+                        with open(marca, encoding="utf-8") as arquivo:
+                            if arquivo.read().strip() == desta:
+                                continue
+                    except OSError:
+                        pass
+                    for item, partes in itens:
+                        destino = os.path.join(pasta_sistema, *partes)
+                        if os.path.commonpath([os.path.abspath(destino), os.path.abspath(pasta_sistema)]) \
+                                != os.path.abspath(pasta_sistema):
+                            continue          # um nome com ".." nao sai da pasta system
+                        os.makedirs(os.path.dirname(destino), exist_ok=True)
+                        with apk.open(item) as de, open(destino + ".parcial", "wb") as para:
+                            while True:
+                                bloco = de.read(1 << 20)
+                                if not bloco:
+                                    break
+                                para.write(bloco)
+                        os.replace(destino + ".parcial", destino)
+                        total += 1
+                    with open(marca, "w", encoding="utf-8") as arquivo:
+                        arquivo.write(desta)
+        except (OSError, zipfile.BadZipFile) as falha:
+            print("[ARENA] Nao consegui tirar os arquivos de apoio do APK: %s" % falha)
+    return total
+
+
 # ---------------------------------------------------------------------------
 # A pasta do ARENA no aparelho
 # ---------------------------------------------------------------------------

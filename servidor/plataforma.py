@@ -199,6 +199,15 @@ def preparar_nucleo(caminho):
     return os.path.isfile(caminho)
 
 
+def preparar_recursos(pasta_sistema):
+    """Antes de abrir o jogo: no Android, os arquivos de apoio dos nucleos que o ARENA compila (o resources
+    do PS2) saem do APK para a pasta system (uma vez por APK). Quantos arquivos escreveu; 0 fora do Android."""
+    if ANDROID:
+        import ponte_android
+        return ponte_android.preparar_recursos(pasta_sistema)
+    return 0
+
+
 def executavel_do_retroarch(pasta_retroarch):
     """O programa do RetroArch deste sistema, dentro da pasta retroarch (no
     Android, a marca de que ele veio no APK)."""

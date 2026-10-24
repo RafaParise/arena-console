@@ -170,6 +170,78 @@ def ler_lista_dos_nucleos():
         return {}
 
 
+def marca_da_arvore(pasta):
+    """Uma marca SHA-256 para a pasta inteira: os caminhos e a marca de cada arquivo, em ordem."""
+    resumo = hashlib.sha256()
+    for atual, pastas, arquivos in os.walk(pasta):
+        pastas.sort()
+        for arquivo in sorted(arquivos):
+            caminho = os.path.join(atual, arquivo)
+            resumo.update(os.path.relpath(caminho, pasta).replace(os.sep, "/").encode("utf-8") + b"\0")
+            resumo.update(bytes.fromhex(marca(caminho)))
+    return resumo.hexdigest()
+
+
+def recursos_do_cache(nome, pasta):
+    """Onde ficam, no cache de quem monta, os arquivos de apoio de um nucleo compilado no GitHub."""
+    return os.path.join(pasta, nome + ".recursos")
+
+
+def nucleo_do_github(nome, ficha, pasta):
+    """O .so de um nucleo que o ARENA compila no GitHub Actions (e a pasta de apoio dele), ou None.
+
+    O PS2 do Android e' o ARMSX2 compilado para o Cortex-A53 (.github/workflows/nucleo-ps2-android.yml,
+    com os remendos de ferramentas/remendos): o nightly do libretro nao serve (ele usa instrucoes que o
+    A53 nao tem). O .so fica no cache de quem monta e vale pela marca SHA-256 do proprio .so
+    (sha256_so); a pasta resources, que o nucleo exige ao lado da BIOS, vale pela marca da pasta
+    (recursos.sha256). Sem eles no cache, procura o artefato (90 dias) nas ultimas compilacoes que deram
+    certo e so aceita o que tiver as marcas. Passou o prazo: rode o fluxo de novo no GitHub (Actions ->
+    Nucleo do PS2 -> Run workflow), baixe o resultado e atualize as marcas no android_nucleos.json."""
+    so = os.path.join(pasta, nome)
+    esperada = ficha.get("sha256_so", "")
+    recursos = ficha.get("recursos")
+    no_cache = recursos_do_cache(nome, pasta)
+
+    def em_ordem():
+        return (os.path.isfile(so) and marca(so) == esperada
+                and (not recursos or (os.path.isdir(no_cache) and marca_da_arvore(no_cache) == recursos["sha256"])))
+
+    if em_ordem():
+        return so
+    origem = ficha["construido_por"]
+    gh = shutil.which("gh")
+    if not gh:
+        print("  %s: falta o 'gh' (GitHub CLI) para baixar o nucleo que o ARENA compila; veja %s" % (
+            nome, origem["fluxo"]))
+        return None
+    lista = subprocess.run([gh, "run", "list", "--workflow", origem["fluxo"], "--status", "success", "--limit", "10",
+                            "--json", "databaseId", "--jq", ".[].databaseId"],
+                           capture_output=True, text=True, errors="replace", cwd=RAIZ)
+    for numero in lista.stdout.split():
+        destino = tempfile.mkdtemp(prefix="arena-nucleo-")
+        try:
+            feito = subprocess.run([gh, "run", "download", numero, "-n", origem["artefato"], "-D", destino],
+                                   capture_output=True, text=True, errors="replace", cwd=RAIZ)
+            achado = os.path.join(destino, nome)
+            if feito.returncode != 0 or not os.path.isfile(achado) or marca(achado) != esperada:
+                continue
+            if recursos:
+                apoio = os.path.join(destino, recursos["pasta"])
+                if not os.path.isdir(apoio) or marca_da_arvore(apoio) != recursos["sha256"]:
+                    continue
+                if os.path.isdir(no_cache):
+                    limpeza.apagar_pasta(no_cache)
+                shutil.copytree(apoio, no_cache)
+            shutil.copyfile(achado, so)
+            print("  %s: baixado do GitHub Actions (execucao %s)" % (nome, numero))
+            return so
+        finally:
+            limpeza.apagar_pasta(destino)
+    print("  %s: nenhuma compilacao do GitHub tem o .so com a marca %s... (passou dos 90 dias?). "
+          "Rode o fluxo %s de novo." % (nome, esperada[:12], origem["fluxo"]))
+    return None
+
+
 def nucleos_do_android(abi, atualizar):
     """{nome do .so: caminho no cache} dos nucleos desta ABI. Confere cada zip
     com a marca de ferramentas\\android_nucleos.json; com 'atualizar', baixa o
@@ -180,6 +252,15 @@ def nucleos_do_android(abi, atualizar):
     os.makedirs(pasta, exist_ok=True)
     saida, faltam = {}, []
     for nome in sorted(nucleos_do_arena()):
+        # Os que o proprio ARENA compila no GitHub (o PS2 do Android) nao tem zip do libretro: vale a
+        # marca do .so (nucleo_do_github).
+        if marcas.get(nome, {}).get("construido_por"):
+            so = nucleo_do_github(nome, marcas[nome], pasta)
+            if so:
+                saida[nome] = so
+            else:
+                faltam.append(nome)
+            continue
         zip_cache = os.path.join(pasta, nome + ".zip")
         conferida = marcas.get(nome, {}).get("sha256")
         if atualizar and (not os.path.isfile(zip_cache) or marca(zip_cache) != conferida):
@@ -346,6 +427,23 @@ def por_os_jogos_livres(assets):
     return postos
 
 
+def por_os_recursos_dos_nucleos(assets, abi):
+    """A pasta de apoio de cada nucleo que o ARENA compila (o resources do PS2) em assets/arena-recursos,
+    no caminho que ela tem dentro da pasta system: o servidor a poe la na primeira vez
+    (ponte_android.preparar_recursos). Devolve quantos arquivos foram."""
+    pasta = os.path.join(preparar_linux.CACHE, "android-nucleos", abi)
+    total = 0
+    for nome, ficha in sorted(ler_lista_dos_nucleos().get(abi, {}).items()):
+        recursos = ficha.get("recursos")
+        origem = recursos_do_cache(nome, pasta)
+        if not recursos or not os.path.isdir(origem) or marca_da_arvore(origem) != recursos["sha256"]:
+            continue
+        alvo = os.path.join(assets, "arena-recursos", *recursos["destino"].split("/"))
+        shutil.copytree(origem, alvo)
+        total += sum(len(arquivos) for _, _, arquivos in os.walk(alvo))
+    return total
+
+
 def por_as_bios_livres(assets):
     """As BIOS livres (servidor\\bios_livres) no lugar delas dentro da pasta
     system (o "destino" da lista.json): a ArenaActivity copia as que faltam.
@@ -390,6 +488,25 @@ REDE_DO_ARENA = '''<?xml version="1.0" encoding="utf-8"?>
 </network-security-config>
 '''
 
+# A tela do JOGO (o RetroArch) do ARENA, auditoria 4, 24/10/2026. Tres arquivos, um por familia do Android:
+#   base      fundo preto (nunca o branco do tema do sistema);
+#   Android 9 (v28)  a imagem ocupa tambem a area do recorte da camera ("tela cheia sempre": o furo da
+#                    camera deixava uma faixa preta no lado do jogo);
+#   Android 12 (v31) a tela de abertura que o sistema desenha (o icone num fundo CLARO, que piscava quando o
+#                    jogo abria) fica preta e sem icone.
+ESTILO_DO_JOGO = """<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="ArenaJogo" parent="@android:style/Theme.NoTitleBar.Fullscreen">
+        <item name="android:windowBackground">@android:color/black</item>
+%s
+    </style>
+</resources>
+"""
+ESTILO_V28 = '        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>'
+ESTILO_V31 = (ESTILO_V28 + """
+        <item name="android:windowSplashScreenBackground">@android:color/black</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@android:color/transparent</item>""")
+
 ATIVIDADE_DO_ARENA = '''        <activity android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode" android:exported="true" android:label="ARENA" android:launchMode="singleTask" android:name="io.github.rafaparise.arena.ArenaActivity" android:process=":tela" android:screenOrientation="fullUser" android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -429,6 +546,10 @@ def ajustar_manifesto(pasta, versao_nome, versao_codigo):
          'android:name="com.retroarch.browser.retroactivity.RetroActivityFuture"'),
         ('<activity android:exported="true" android:name="com.retroarch.browser.debug.CoreSideloadActivity"/>',
          '<activity android:exported="false" android:name="com.retroarch.browser.debug.CoreSideloadActivity"/>'),
+        ('android:name="com.retroarch.browser.retroactivity.RetroActivityFuture" '
+         'android:theme="@android:style/Theme.NoTitleBar.Fullscreen"',
+         'android:name="com.retroarch.browser.retroactivity.RetroActivityFuture" '
+         'android:theme="@style/ArenaJogo"'),
         ("    </application>", ATIVIDADE_DO_ARENA + SERVICO_DO_ARENA + "    </application>"),
         ('    <uses-permission android:name="android.permission.VIBRATE"/>\n',
          '    <uses-permission android:name="android.permission.VIBRATE"/>\n' + PERMISSOES_DO_SERVIDOR),
@@ -448,6 +569,10 @@ def ajustar_manifesto(pasta, versao_nome, versao_codigo):
     os.makedirs(os.path.join(pasta, "res", "xml"), exist_ok=True)
     with open(os.path.join(pasta, "res", "xml", "arena_rede.xml"), "w", encoding="utf-8") as arquivo:
         arquivo.write(REDE_DO_ARENA)
+    for familia, extras in (("values", ""), ("values-v28", ESTILO_V28), ("values-v31", ESTILO_V31)):
+        os.makedirs(os.path.join(pasta, "res", familia), exist_ok=True)
+        with open(os.path.join(pasta, "res", familia, "arena_estilos.xml"), "w", encoding="utf-8") as arquivo:
+            arquivo.write(ESTILO_DO_JOGO % extras)
     nomes = os.path.join(pasta, "res", "values", "strings.xml")
     with open(nomes, encoding="utf-8") as arquivo:
         texto = arquivo.read().replace('<string name="app_name">RetroArch</string>', '<string name="app_name">ARENA</string>')
@@ -538,9 +663,10 @@ def montar_apk(abi, teste, atualizar, trabalho):
     por_o_servidor(assets)
     livres = por_os_jogos_livres(assets)
     por_as_bios_livres(assets)
+    de_apoio = por_os_recursos_dos_nucleos(assets, abi)
     modulos = python_android.por_no_apk(pasta, abi)
-    print("  servidor do ARENA, Python %s (%d modulos nativos) e %d jogos livres" % (python_android.VERSAO, modulos,
-                                                                                    livres), flush=True)
+    print("  servidor do ARENA, Python %s (%d modulos nativos), %d jogos livres e %d arquivos de apoio dos "
+          "nucleos" % (python_android.VERSAO, modulos, livres, de_apoio), flush=True)
     destino_nucleos = os.path.join(assets, "arena-nucleos", abi)
     os.makedirs(destino_nucleos)
     for nome, caminho in nucleos.items():

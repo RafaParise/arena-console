@@ -895,6 +895,7 @@ window.ARENA_DADOS = {
  "config_padrao": {
   "abaixo_do_original": "",
   "ajuste_pelo_desempenho": true,
+  "ajustes_dos_nucleos": {},
   "apelido": "",
   "avancado": {
    "audio_enable": "true",

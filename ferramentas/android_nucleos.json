@@ -20,9 +20,18 @@
    "tamanho": 540000
   },
   "armsx2_libretro_android.so": {
-   "origem": "construido por .github/workflows/nucleo-ps2-android.yml (ARMSX2 commit 90126bdfea, ARMv8.0); SHA-256 do .so 04574ad0fe85447ef446a37a08d679e97aa43a5ec523409818ab2639964d95b8",
-   "sha256": "6491dc710b2e8d949d9e44405c6c1357bfb3fb8030ec54c67b1972419cf969f0",
-   "tamanho": 12646294
+   "construido_por": {
+    "artefato": "armsx2_libretro_android-arm64-v8.0",
+    "fluxo": "nucleo-ps2-android.yml"
+   },
+   "origem": "construido por .github/workflows/nucleo-ps2-android.yml (ARMSX2 commit 90126bdfea, ARMv8.0, com ferramentas/remendos/armsx2-libretro-jogadores.patch, sha256 a0ab72876ecb); execucao 40059908390 de 24/10/2026, 34 instrucoes LSE",
+   "recursos": {
+    "destino": "pcsx2/resources",
+    "pasta": "resources",
+    "sha256": "25f9e674f9ad68a66357309f9813fc604492b76948db004ced01273421604b3e"
+   },
+   "sha256_so": "fa3a2d5f373d416ac2c92e042a2b5a72a99536353aefbf35a10fd3dac5c7c5ea",
+   "tamanho": 33024288
   },
   "atari800_libretro_android.so": {
    "sha256": "aeeb02f655888ee537a2bed3f89d8c8ae4ea627fdb477d1ba52729b024de2a7f",

@@ -277,6 +277,48 @@
         }
       ]
     },
+    "armsx2": {
+      "_nome": "PlayStation 2 (ARMSX2, o nucleo do Android)",
+      "sempre": {
+        "armsx2_fast_boot": "enabled",
+        "armsx2_instant_vu1": "enabled",
+        "armsx2_mtvu": "enabled",
+        "armsx2_fxaa": "disabled",
+        "armsx2_show_fps": "disabled",
+        "armsx2_mipmapping": "enabled",
+        "armsx2_trilinear_filtering": "Automatic",
+        "armsx2_texture_filtering": "Bilinear (PS2)",
+        "armsx2_hw_download_mode": "Accurate",
+        "armsx2_blending_accuracy": "Basic",
+        "armsx2_upscale": "1x",
+        "armsx2_anisotropic_filtering": "0"
+      },
+      "por_nota": [
+        {
+          "nota_minima": 3,
+          "opcoes": {
+            "armsx2_upscale": "2x",
+            "armsx2_anisotropic_filtering": "4"
+          }
+        },
+        {
+          "nota_minima": 4,
+          "opcoes": {
+            "armsx2_upscale": "3x",
+            "armsx2_anisotropic_filtering": "8",
+            "armsx2_blending_accuracy": "Medium"
+          }
+        },
+        {
+          "nota_minima": 5,
+          "opcoes": {
+            "armsx2_upscale": "4x",
+            "armsx2_anisotropic_filtering": "16",
+            "armsx2_blending_accuracy": "High"
+          }
+        }
+      ]
+    },
     "dolphin": {
       "_nome": "GameCube e Wii",
       "sempre": {
@@ -434,6 +476,7 @@
     "flycast",
     "swanstation",
     "pcsx2",
+    "armsx2",
     "mednafen_saturn"
   ],
   "excecoes": {
@@ -519,6 +562,11 @@
       "pcsx2_anisotropic_filtering": "0",
       "pcsx2_texture_filtering": "Nearest"
     },
+    "armsx2": {
+      "armsx2_upscale": "1x",
+      "armsx2_anisotropic_filtering": "0",
+      "armsx2_texture_filtering": "Nearest"
+    },
     "genesis_plus_gx": {
       "genesis_plus_gx_blargg_ntsc_filter": "disabled"
     },
@@ -538,6 +586,10 @@
   "abaixo_do_original": {
     "_leia": "Pedido do Rafael (02/10/2026): modos ABAIXO do grafico original -- a imagem fica feia (bonecos de papelao), mas o jogo roda em maquina mais fraca. Entram por cima do bloco 'modesto' (o grafico original); 'minimo' entra por cima do 'leve'. Valores conferidos no codigo-fonte de cada nucleo (libretro_core_options.h) e as chaves dentro de cada .dll (testes/teste_chaves_graficos.py). Pulo de quadros 'auto': o nucleo deixa de DESENHAR um quadro quando a maquina atrasa -- o jogo e o som seguem na velocidade certa. SNES, NES e Game Boy nao tem pulo de quadros nesta versao (e sao leves). PS1 fica no original: o desenho por processador ja e' o mais leve, e trocar de nucleo esconderia os saves.",
     "leve": {
+      "armsx2": {
+        "armsx2_ee_cycle_rate": "75%",
+        "armsx2_ee_cycle_skip": "mild"
+      },
       "flycast": {
         "reicast_internal_resolution": "320x240",
         "reicast_auto_skip_frame": "some",
@@ -587,6 +639,12 @@
       }
     },
     "minimo": {
+      "armsx2": {
+        "armsx2_ee_cycle_rate": "60%",
+        "armsx2_ee_cycle_skip": "moderate",
+        "armsx2_blending_accuracy": "Minimum",
+        "armsx2_hw_download_mode": "Disable Readbacks"
+      },
       "flycast": {
         "reicast_auto_skip_frame": "more",
         "reicast_frame_skipping": "1",

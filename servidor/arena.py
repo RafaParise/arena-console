@@ -1241,6 +1241,9 @@ def config_padrao():
         # "minimo" -- imagem feia, roda em maquina mais fraca. Ligado, vale
         # como se o modo_modesto tambem estivesse (ver grafico_original).
         "abaixo_do_original": "",
+        # Ajuste fino por emulador (graficos.limpar_ajustes_dos_nucleos): as opcoes do nucleo que a pessoa
+        # quer diferentes do que o ARENA escolhe, {"armsx2": {"armsx2_upscale": "2x"}}.
+        "ajustes_dos_nucleos": {},
         # "automatico" (decide pela nota da maquina), "leve" ou "bonito".
         # Vale para os emuladores externos (PCSX2, RPCS3, Xenia).
         "preset_grafico_externo": "automatico",
@@ -1403,6 +1406,7 @@ def ler_config_do_disco():
     config["modo_modesto"] = bool(salvo.get("modo_modesto"))
     if salvo.get("abaixo_do_original") in graficos.NIVEIS_ABAIXO:
         config["abaixo_do_original"] = salvo["abaixo_do_original"]
+    config["ajustes_dos_nucleos"] = graficos.limpar_ajustes_dos_nucleos(salvo.get("ajustes_dos_nucleos"))
     config["rpcn_ativo"] = bool(salvo.get("rpcn_ativo"))
     if salvo.get("escala_da_tela") in graficos.ESCALAS:
         config["escala_da_tela"] = salvo["escala_da_tela"]
@@ -2785,6 +2789,12 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         extras_core.update(jogo.get("opcoes_livre") or {})
         extras_core.update(graficos.opcoes_de_memory_card(
             PASTA_SAVES, jogo["plataforma"]))
+        # PS2 pelo nucleo do ARMSX2 (o do Android): o motor de video e a BIOS da regiao do jogo.
+        if nome_core == "armsx2" and jogo.get("jeito") != "livre":
+            extras_core.update(graficos.opcoes_do_armsx2(
+                config.get("motor_ps2", "automatico"), jogo.get("arquivo"), PASTA_SISTEMA))
+        # O ajuste fino que a pessoa pediu para este emulador manda em tudo (config.json -> ajustes_dos_nucleos).
+        extras_core.update(graficos.ajustes_finos_do_nucleo(config.get("ajustes_dos_nucleos"), nome_core))
         # Avisa o console de que o controle tem analogico. Sem isto, no
         # PlayStation os dois analogicos ficam mudos.
         escolhas = config.get("perfil_controle", {}).get(jogo["plataforma"], {})
@@ -3013,6 +3023,7 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         # PS2 pelo nucleo do RetroArch (o caminho do Android; no computador abre pelo PCSX2 de fora):
         # o nucleo procura a BIOS em system\pcsx2\bios, e o jeito livre (Play!) nao precisa de nenhuma.
         if jogo.get("plataforma") == "ps2" and jogo.get("jeito") != "livre":
+            plataforma_do_sistema.preparar_recursos(PASTA_SISTEMA)    # o resources do nucleo, de dentro do APK
             levadas = graficos.preparar_bios_do_nucleo_ps2(PASTA_SISTEMA)
             if levadas:
                 print("[ARENA] BIOS do PS2 levadas para a pasta do nucleo: %s." % ", ".join(levadas))
@@ -6789,6 +6800,10 @@ class Manipulador(BaseHTTPRequestHandler):
                     if opcao["tipo"] == "lista" and valor not in opcao.get("opcoes", []):
                         continue
                     config["avancado"][chave] = valor
+
+            if isinstance(dados.get("ajustes_dos_nucleos"), dict):
+                # O ajuste fino por emulador inteiro de uma vez ({} limpa): a tela manda o que quer que fique.
+                config["ajustes_dos_nucleos"] = graficos.limpar_ajustes_dos_nucleos(dados["ajustes_dos_nucleos"])
 
             if isinstance(dados.get("bios"), dict):
                 validas = {p["id"] for p in carregar_catalogo()}
