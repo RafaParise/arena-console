@@ -5262,6 +5262,24 @@ class Manipulador(BaseHTTPRequestHandler):
                 return self.erro("Isto é só do ARENA do Android. No computador, veja Ajustes → Máquina → Celular ligado no cabo.", 404)
             return self.responder_json({"ok": True, "aparelho": ponte_android.aparelho()})
 
+        if caminho == "/api/android/registro":
+            # O registro do RetroArch da ultima partida (so no Android): quando o jogo abre
+            # mas a imagem sai errada ou ele fecha, e' ali que o nucleo explica. So leitura.
+            if not plataforma_do_sistema.ANDROID:
+                return self.erro("Isto é só do ARENA do Android. No computador, abra a pasta dados do ARENA: "
+                                 "o registro do RetroArch fica lá.", 404)
+            consulta = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+            try:
+                quantas = max(10, min(2000, int((consulta.get("linhas") or ["300"])[0])))
+            except ValueError:
+                quantas = 300
+            arquivo = motivo_do_erro.registro_da_partida(PASTA_DADOS, 0)
+            if not arquivo:
+                return self.responder_json({"ok": True, "arquivo": "", "linhas": [], "total": 0})
+            linhas = motivo_do_erro.ler(arquivo, limite=1024 * 1024).splitlines()
+            return self.responder_json({"ok": True, "arquivo": os.path.basename(arquivo),
+                                        "total": len(linhas), "linhas": linhas[-quantas:]})
+
         if caminho == "/api/armazenamento":
             # A memoria do aparelho e o cartao SD, as pastas de jogos do cartao e a escolha de
             # jogar direto ou pelo interno (Ajustes -> Maquina -> Armazenamento, so no Android).

@@ -127,9 +127,18 @@ def nucleos_deste_sistema(plataformas):
     if WINDOWS:
         return plataformas
     for p in plataformas:
+        # No Android o emulador roda DENTRO do app, como nucleo do RetroArch (nunca como app a
+        # parte; pedido do Rafael, 24/10/2026). O bloco "android" do console diz o que muda la
+        # (o PS2, que no computador abre pelo PCSX2 de fora, abre por um nucleo; o jeito livre
+        # tambem) e vale no lugar do resto.
+        if ANDROID and isinstance(p.get("android"), dict):
+            p.update(p["android"])
         for campo in CAMPOS_DE_NUCLEO:
             if p.get(campo):
                 p[campo] = arquivo_do_nucleo(p[campo])
+        # O jeito livre que traz o nucleo dele (o Play! do PS2) tambem vai para o nome deste sistema.
+        if isinstance(p.get("livre"), dict) and p["livre"].get("core"):
+            p["livre"] = dict(p["livre"], core=arquivo_do_nucleo(p["livre"]["core"]))
     return plataformas
 
 

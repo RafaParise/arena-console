@@ -1751,6 +1751,15 @@ window.ARENA_DADOS = {
    "tamanho_max_mb": 800
   },
   {
+   "android": {
+    "core": "pcsx2_libretro.dll",
+    "livre": {
+     "aviso": "Este PlayStation 2 liga pelo Play!, que imita a BIOS: alguns jogos não abrem ou travam. Se isso acontecer, ponha a BIOS do console na pasta BIOS (guia 2).",
+     "core": "play_libretro.dll",
+     "explica": "Liga sem a BIOS da Sony: o Play! imita o sistema do PlayStation 2 e é de código aberto. Abre menos jogos que o outro jeito, mas não precisa de arquivo nenhum da Sony.",
+     "nome": "Play! (livre, sem BIOS)"
+    }
+   },
    "apelidos": [
     "playstation 2",
     "playstation2",

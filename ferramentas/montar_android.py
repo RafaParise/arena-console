@@ -150,9 +150,14 @@ def nucleos_do_arena():
         plataformas = json.load(arquivo)["plataformas"]
     nomes = {}
     for p in plataformas:
-        for campo in ("core", "core_netplay"):
-            if p.get(campo):
-                base = os.path.splitext(p[campo])[0]
+        # O que o console usa no Android: o bloco "android" (o PS2 abre por um nucleo, e o
+        # jeito livre tem o nucleo dele) soma ao resto.
+        no_android = p.get("android") if isinstance(p.get("android"), dict) else {}
+        nucleos = [p.get("core"), p.get("core_netplay"), (p.get("livre") or {}).get("core"),
+                   no_android.get("core"), no_android.get("core_netplay"), (no_android.get("livre") or {}).get("core")]
+        for nucleo in nucleos:
+            if nucleo:
+                base = os.path.splitext(nucleo)[0]
                 nomes.setdefault((OUTRO_NOME.get(base, base)) + "_android.so", p["id"])
     return nomes
 

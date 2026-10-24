@@ -155,6 +155,10 @@
    "sha256": "d4530c0992cb157e57207f4b44e68548bce2ed8533d66c7decd950b873cf9c64",
    "tamanho": 604891
   },
+  "play_libretro_android.so": {
+   "sha256": "b720603d4b3dd4bd18764ab16d0ff07a1c067be978a562d5118193b9e540d2ef",
+   "tamanho": 1750248
+  },
   "pokemini_libretro_android.so": {
    "sha256": "609cc9ed54c893e1e164bdd38e1fb2f255199e2a5661707da9cb023dd978f0b7",
    "tamanho": 85574

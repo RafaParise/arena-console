@@ -47,6 +47,31 @@ class Nucleos(unittest.TestCase):
         with no_windows(True):
             self.assertEqual(plataforma.nucleos_deste_sistema(catalogo), catalogo)
 
+    def test_o_bloco_android_vale_so_no_android(self):
+        """O PS2 abre pelo PCSX2 de fora no computador; no Android, por um nucleo do RetroArch do app
+        (nunca por um app a parte), e o jeito livre dele (o Play!) tambem e' um nucleo."""
+        catalogo = [{"id": "ps2", "core": "pcsx2_libretro.dll",
+                     "android": {"core": "armsx2_libretro.dll",
+                                 "livre": {"nome": "Play!", "core": "play_libretro.dll"}}}]
+        with mock.patch.object(plataforma, "ANDROID", True), no_windows(False):
+            no_celular = plataforma.nucleos_deste_sistema([{**p, "android": dict(p["android"])} for p in catalogo])
+        self.assertEqual(no_celular[0]["core"], "armsx2_libretro_android.so")
+        self.assertEqual(no_celular[0]["livre"]["core"], "play_libretro_android.so")
+        with mock.patch.object(plataforma, "ANDROID", False), no_windows(False):
+            no_linux = plataforma.nucleos_deste_sistema([dict(p) for p in catalogo])
+        self.assertEqual(no_linux[0]["core"], "pcsx2_libretro.so")
+        self.assertNotIn("livre", no_linux[0])
+        with no_windows(True):
+            self.assertEqual(plataforma.nucleos_deste_sistema(catalogo), catalogo)
+
+    def test_o_ps2_do_catalogo_abre_por_nucleo_no_android(self):
+        import json
+        with open(os.path.join(PASTA_SERVIDOR, "consoles.json"), encoding="utf-8") as arquivo:
+            ps2 = next(p for p in json.load(arquivo)["plataformas"] if p["id"] == "ps2")
+        self.assertTrue(ps2["android"]["core"].endswith("_libretro.dll"))
+        self.assertTrue(ps2["android"]["livre"]["core"].endswith("_libretro.dll"))
+        self.assertIn("BIOS", ps2["android"]["livre"]["explica"])
+
     def test_nome_curto_nos_dois(self):
         for arquivo in ("swanstation_libretro.dll", "/arena/retroarch/cores/swanstation_libretro.so",
                         "SwanStation_Libretro.DLL"):

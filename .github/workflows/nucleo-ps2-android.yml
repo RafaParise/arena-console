@@ -1,0 +1,123 @@
+name: Nucleo do PS2 para Android (ARMSX2, ARMv8.0)
+
+# Por que existe (pedido do Rafael, 24/10/2026: "qualquer emulador deve rodar dentro do arena e nao
+# um aplicativo a parte"): no Android, o PS2 do ARENA roda como NUCLEO do RetroArch do proprio app,
+# nunca como app instalado a parte. O nucleo e' o do ARMSX2 (GPL-3.0, github.com/ARMSX2/ARMSX2).
+#
+# O nucleo pronto do buildbot do libretro e' compilado com -march=armv8.1-a: as instrucoes atomicas
+# LSE ficam soltas no codigo (524 ocorrencias) e o Cortex-A53 (Galaxy A12 e muitos outros) nao as tem:
+# o jogo fecha com SIGILL ao abrir (medido no A12 em 24/10/2026, `ldaddal` no endereco 0x126d720).
+# Aqui o MESMO codigo, na MESMA versao, com a MESMA receita do projeto (as dependencias pelo script
+# dele e o CMake do .gitlab-ci.yml dele), muda so a CPU: -march=armv8-a -moutline-atomics, como o APK
+# "legacy" do proprio ARMSX2. Roda no A53 e usa LSE nos aparelhos que tem.
+#
+# Nada aqui usa segredo. O resultado e' um arquivo (o artefato), que o ARENA confere pelo SHA-256 e
+# leva dentro do APK (ferramentas/montar_android.py). O codigo-fonte e' o do commit fixado abaixo.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [auditoria-4]
+    paths: [".github/workflows/nucleo-ps2-android.yml"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nucleo-ps2-android
+  cancel-in-progress: true
+
+env:
+  # O nightly de 23/10/2026 (o que traz o frontend libretro; o 2.8.4 estavel nao traz).
+  ARMSX2_COMMIT: 90126bdfea7a3ffb1fd288b2f7f0ae0b033af2d6
+  # O mesmo NDK que o proprio ARMSX2 fixa nas versoes dele.
+  NDK_VERSION: 29.0.14206865
+  API: "28"
+  # O alvo de CPU: o piso do ARMv8.0 (A53, A72, A73...) e as atomicas escolhidas na hora de rodar.
+  MARCHA: "-march=armv8-a -moutline-atomics"
+
+jobs:
+  construir:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 345
+    steps:
+      - name: Liberar espaco no disco
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/share/boost /opt/ghc /usr/local/.ghcup \
+            /opt/hostedtoolcache/CodeQL /usr/local/lib/node_modules
+          df -h / | tail -1
+
+      - name: Baixar o ARMSX2 (so este commit, com os submodulos)
+        run: |
+          git init armsx2
+          cd armsx2
+          git remote add origin https://github.com/ARMSX2/ARMSX2.git
+          git fetch --depth 1 origin "$ARMSX2_COMMIT"
+          git checkout --detach FETCH_HEAD
+          git submodule update --init --recursive --depth 1 --jobs 4
+          git log -1 --format='commit %H%n%s'
+
+      - name: Instalar o NDK
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "ndk;$NDK_VERSION" > /dev/null || true
+          test -f "$ANDROID_HOME/ndk/$NDK_VERSION/build/cmake/android.toolchain.cmake"
+          echo "ANDROID_NDK=$ANDROID_HOME/ndk/$NDK_VERSION" >> "$GITHUB_ENV"
+
+      - name: Compilar as dependencias (o script do proprio ARMSX2)
+        working-directory: armsx2
+        run: |
+          ANDROID_NDK="$ANDROID_NDK" ANDROID_ABI=arm64-v8a ANDROID_API="$API" \
+            .github/workflows/scripts/android/build-dependencies.sh "$PWD/.deps"
+          ls .deps/lib | head -40
+
+      - name: Configurar o nucleo (a receita do .gitlab-ci.yml, com o alvo de CPU)
+        working-directory: armsx2
+        run: |
+          cmake -G Ninja -B build/android-arm64-v8a \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK/build/cmake/android.toolchain.cmake" \
+            -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM="android-$API" -DANDROID_STL=c++_static \
+            -DCMAKE_PREFIX_PATH="$PWD/.deps" -DCMAKE_FIND_ROOT_PATH="$PWD/.deps" \
+            -DENABLE_LIBRETRO=ON -DENABLE_QT_UI=OFF -DENABLE_SDL_FRONTEND=OFF -DENABLE_GSRUNNER=OFF \
+            -DENABLE_TESTS=OFF -DENABLE_RECOMPILER_TEST_HOOKS=OFF -DENABLE_SETCAP=OFF -DUSE_BACKTRACE=OFF \
+            -DX11_API=OFF -DWAYLAND_API=OFF -DDISABLE_ADVANCE_SIMD=TRUE \
+            -DARMSX2_ANDROID_HOST_PAGE_SIZE=0x1000 -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON \
+            "-DCMAKE_C_FLAGS=$MARCHA" "-DCMAKE_CXX_FLAGS=$MARCHA"
+
+      - name: Compilar o nucleo
+        working-directory: armsx2
+        run: cmake --build build/android-arm64-v8a --target armsx2_libretro -- -j "$(nproc)"
+
+      - name: Conferir que nao sobrou atomica LSE solta no codigo
+        working-directory: armsx2
+        run: |
+          SO=$(find build/android-arm64-v8a -name 'armsx2_libretro.so' | head -1)
+          test -n "$SO"
+          BIN="$ANDROID_NDK/toolchains/llvm/prebuilt/linux-x86_64/bin"
+          "$BIN/llvm-strip" "$SO"
+          # Com -moutline-atomics so as funcoes auxiliares do compilador (umas dezenas, com teste de
+          # CPU antes) trazem LSE. O do buildbot (armv8.1-a) tinha 524 soltas: aqui isso e' defeito.
+          "$BIN/llvm-objdump" -d --mattr=+v8.5a,+lse "$SO" > /tmp/desmontado.txt
+          LSE=$(grep -cE '[[:space:]](ldadd|ldclr|ldset|ldeor|swp|cas|casp)[a-z]*[[:space:]]' /tmp/desmontado.txt || true)
+          echo "instrucoes LSE no codigo: $LSE"
+          test "$LSE" -lt 80
+          mkdir -p ../saida
+          cp "$SO" ../saida/armsx2_libretro_android.so
+          cd ../saida
+          sha256sum armsx2_libretro_android.so | tee armsx2_libretro_android.so.sha256
+          ls -l armsx2_libretro_android.so
+          "$BIN/llvm-readelf" -d armsx2_libretro_android.so | grep -E 'NEEDED|SONAME'
+          {
+            echo "Nucleo do PS2 (ARMSX2) para Android arm64, ARMv8.0 (Cortex-A53 e acima)."
+            echo "Codigo-fonte: https://github.com/ARMSX2/ARMSX2 no commit $ARMSX2_COMMIT (GPL-3.0)."
+            echo "Receita: .gitlab-ci.yml do ARMSX2 (nucleo libretro, Android) + $MARCHA."
+            echo "NDK $NDK_VERSION, API $API. Instrucoes LSE soltas no codigo: $LSE."
+          } > LEIA.txt
+
+      - name: Guardar o nucleo
+        uses: actions/upload-artifact@v4
+        with:
+          name: armsx2_libretro_android-arm64-v8.0
+          path: saida/
+          retention-days: 90
+          if-no-files-found: error

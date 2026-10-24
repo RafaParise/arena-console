@@ -83,7 +83,55 @@ Rafael quiser trocar, é só dizer.
 | 12-A | **Instalar sem tropeço**: um APK só para celular com nome claro, página "Baixar" que escolhe o arquivo certo (ou a versão web), o ARENA instala o ARMSX2 com um toque e o assistente da primeira abertura configura o resto | Registrado (pedido das 22h30) | Junto do Release; o Android sempre mostra a tela "Instalar" |
 | 12 | Teste final no A12 e Release: juntar `auditoria-4` ao `main`, versão nova, `rodada_final.py`, pacotes e `gh-pages` | Por último | Só depois dos testes no Android (autorizado pelo Rafael) |
 
-## Os pedidos novos da noite de 23/10/2026 (registrados com as palavras dele)
+## A regra mais nova (24/10/2026, 0h): o emulador roda DENTRO do ARENA
+
+> "assim como na versão de pc, qualquer emulador deve rodar dentro do arena e
+> não um aplicativo a parte, ele não deve aparecer instalado pois a idéia como
+> no computador o servidor offline manipular os arquivos, configurações,
+> ajustes finos que refletem diretamente nesses emuladores mas não baixar o
+> app novo assim como no arena deve ser copiar e colar a pasta no local certo,
+> pois se a pessoa quiser baixar um emulador a parte poderá usar ele isolado
+> do arena, além disso como no pc procure versões de bios e emuladores
+> gratuitos mas permita usar os convencionais também e deixe a opção de
+> escolher qual usar e continue testes por telefone para ser mais assertivo"
+
+**Isto troca o plano do PS2** (itens 3 e 5 abaixo): o ARMSX2 **como app
+instalado, aberto por intent, sai do plano** (foi o que testei até 23h40; ficou
+só como medida de comparação). O que vale agora:
+
+- **No Android, o emulador é um núcleo do RetroArch do próprio app do ARENA**
+  (um `.so`), do jeito que os outros 60 já são. Nada aparece instalado, e o
+  servidor do ARENA manda em tudo (opções do núcleo, BIOS, pastas, controles).
+- **Instalar = copiar e colar.** Os núcleos vêm no APK (`assets/arena-nucleos`)
+  e uma pasta `emuladores` visível em `/sdcard/ARENA` aceita um núcleo colado à
+  mão: o ARENA o leva para a pasta dos núcleos do app (o `/sdcard` do Android
+  não deixa executar código, por isso a cópia). Quem quiser outro emulador à
+  parte instala o app dele e usa isolado: os dois não se misturam.
+- **Livre e convencional, com escolha**, como no PC (`jeitos_de_abrir.py`): no
+  PS2, o convencional é o ARMSX2 ou o PCSX2 do libretro, com a BIOS de verdade, e
+  o livre é o **Play!** (código aberto, imita a BIOS, não pede arquivo da Sony).
+- **Os testes são no celular de verdade**, e foi o que mudou o plano.
+
+### O que o A12 respondeu sobre os núcleos de PS2 (medido em 24/10/2026)
+
+O buildbot oficial do libretro (`buildbot.libretro.com/nightly/android/latest/arm64-v8a`)
+tem hoje, para Android arm64, o `armsx2`, o `pcsx2`, o `play`, o `dolphin`, o `ppsspp`,
+o `flycast`, o `citra`, o `azahar`, o `melonds`, o `rpcs3`, o `xenia_edge`, o `cemu`, o
+`vita3k`... [Certo: o `.index-extended` da pasta, lido em 24/10/2026].
+
+- **`armsx2_libretro_android.so` (33 MB) não roda no A12**: `SIGILL (ILL_ILLOPC)`
+  no `ldaddal x9, x8, [x8]` (o contador de um `shared_ptr`), medido no aparelho
+  às 0h02. Motivo [Certo: `cmake/BuildParameters.cmake` do ARMSX2]: o padrão é
+  `-march=armv8.1-a`, com as atômicas LSE direto no código (524 ocorrências),
+  e o Cortex-A53 é ARMv8.0 (o comentário do próprio projeto cita "casal SIGILL
+  em um A53 de verdade"). O ARMSX2 só roda no A12 compilado com
+  `-march=armv8-a -moutline-atomics`, como o APK `legacy` dele. Em celular com
+  Cortex-A55 ou mais novo (quase todo de 2019 em diante), o do buildbot serve.
+- `pcsx2_libretro_android.so` (10 MB, do repositório `libretro/ps2`) e
+  `play_libretro_android.so` (5,5 MB) **não têm LSE no código** (só nas funções
+  auxiliares, com teste em tempo de execução): são candidatos ao A12.
+- O núcleo do ARMSX2 é Vulkan ou OpenGL e pede, em `system/pcsx2/`, a pasta
+  `bios` e a pasta `resources` (11 MB, a do mesmo ARMSX2).
 
 ### Cartão SD e armazenamento interno cheio (item 4)
 

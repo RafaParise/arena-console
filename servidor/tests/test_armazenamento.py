@@ -548,6 +548,23 @@ class RotasDoServidor(Base):
             self.assertEqual(self.pedir("/api/indexar", {})[0], 200)
         ligar.assert_called_once()
 
+    def test_o_registro_da_ultima_partida(self):
+        """So leitura, so no Android: o que o nucleo disse na ultima partida (as ultimas linhas)."""
+        estado, resposta = self.pedir("/api/android/registro")
+        self.assertEqual((estado, resposta["linhas"], resposta["arquivo"]), (200, [], ""))     # nenhuma partida ainda
+        os.makedirs(self.dados, exist_ok=True)
+        with open(os.path.join(self.dados, "retroarch__2026_10_24__00_06_14.log"), "w", encoding="utf-8") as f:
+            f.write("\n".join("[INFO] linha %d" % n for n in range(1, 501)) + "\n")
+        estado, resposta = self.pedir("/api/android/registro?linhas=50")
+        self.assertEqual(estado, 200)
+        self.assertEqual((resposta["total"], len(resposta["linhas"]), resposta["linhas"][-1]), (500, 50, "[INFO] linha 500"))
+        self.assertEqual(len(self.pedir("/api/android/registro?linhas=abc")[1]["linhas"]), 300)   # texto vira o padrao
+        self.assertEqual(len(self.pedir("/api/android/registro?linhas=99999")[1]["linhas"]), 500)  # no maximo 2000
+        self.assertEqual(self.pedir("/api/android/registro", cookie="")[0], 403)                  # sem o segredo da tela
+        import plataforma
+        with mock.patch.object(plataforma, "ANDROID", False):
+            self.assertEqual(self.pedir("/api/android/registro", cookie="")[0], 404)
+
 
 class OrigensDoIndexador(Base):
 
