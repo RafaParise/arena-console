@@ -504,6 +504,40 @@ class CartoesDoPs2(unittest.TestCase):
         self.assertIn("MemoryCards/Slot2_Filename = Mcd002.ps2", texto)
 
 
+class BiosSoDoPs2NaPlacaFraca(unittest.TestCase):
+    """A BIOS do PS2 sem jogo pesa na placa de video: na placa fraca ela abre pelo OpenGL (mais rapido ali)."""
+
+    def setUp(self):
+        self.pasta = tempfile.mkdtemp(prefix="arena_bios_so_ps2_")
+
+    def tearDown(self):
+        limpeza.apagar_pasta(self.pasta)
+
+    def abrir(self, config, nota_gpu, sem_jogo=True):
+        import arena
+        with mock.patch.object(arena, "PASTA_SISTEMA", self.pasta),                 mock.patch.object(arena.plataforma_do_sistema, "preparar_recursos", return_value=0),                 mock.patch.dict(arena.CAPACIDADE, {"nota_gpu": nota_gpu}):
+            return arena.preparar_o_ps2_do_android(config, None if sem_jogo else {"arquivo": "x.chd"}, sem_jogo=sem_jogo)
+
+    def test_placa_fraca_abre_a_bios_pelo_opengl(self):
+        import arena
+        self.assertEqual(self.abrir(arena.config_padrao(), 1)["armsx2_renderer"], "OpenGL")
+
+    def test_o_jogo_nao_muda(self):
+        import arena
+        com_jogo = self.abrir(arena.config_padrao(), 1, sem_jogo=False)["armsx2_renderer"]
+        sem_jogo = self.abrir(arena.config_padrao(), 5)["armsx2_renderer"]
+        self.assertEqual(com_jogo, sem_jogo)      # placa forte: a BIOS usa o mesmo motor do jogo
+
+    def test_quem_escolheu_o_motor_fica_com_o_dele(self):
+        import arena
+        config = arena.config_padrao()
+        config["ajustes_dos_nucleos"] = {"armsx2": {"armsx2_renderer": "Vulkan"}}
+        self.assertEqual(self.abrir(config, 1)["armsx2_renderer"], "Vulkan")
+        config = arena.config_padrao()
+        config["motor_ps2"] = "vulkan"
+        self.assertEqual(self.abrir(config, 1)["armsx2_renderer"], "Vulkan")
+
+
 class StatusDoPs2(unittest.TestCase):
     """arena-status.json: a velocidade de verdade, gravada pelo nucleo."""
 

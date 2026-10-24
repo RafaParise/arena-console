@@ -2794,6 +2794,13 @@ def preparar_o_ps2_do_android(config, jogo=None, sem_jogo=False, degrau=0):
     opcoes.update(graficos.ajustes_finos_do_nucleo(config.get("ajustes_dos_nucleos"), "armsx2"))
     if sem_jogo:
         opcoes["armsx2_fast_boot"] = "disabled"
+        # A tela da BIOS (as luzes e o prisma) pesa na PLACA de video, nao no processador, e numa placa fraca (o
+        # PowerVR do A12) o OpenGL anda a ~19% da velocidade contra ~13% do Vulkan (medido em 24/10/2026: mediana de
+        # 29 leituras de cada). Quem escolheu o motor, no Ajustes ou no ajuste fino, continua com o dele.
+        escolheu_o_motor = "armsx2_renderer" in graficos.ajustes_finos_do_nucleo(config.get("ajustes_dos_nucleos"), "armsx2")
+        placa_fraca = (CAPACIDADE.get("nota_gpu") if CAPACIDADE.get("nota_gpu") is not None else 5) <= 2
+        if config.get("motor_ps2", "automatico") == "automatico" and not escolheu_o_motor and placa_fraca:
+            opcoes["armsx2_renderer"] = "OpenGL"
     # O .ini do nucleo (o que ele nao mostra como opcao): o padrao do ARENA e, por cima, o da pessoa.
     ini = graficos.ini_padrao_do_armsx2(opcoes.get("armsx2_renderer"), CAPACIDADE.get("nota_gpu"),
                                         grafico_original(config), nivel_abaixo(config))
