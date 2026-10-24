@@ -1752,7 +1752,7 @@ window.ARENA_DADOS = {
     "motivo_escolha": "Liga o PocketStation de verdade na entrada 2 do cartão: o jogo conversa com ele e baixa o minijogo para o aparelho. Um jogador só; não mostra a telinha nem toca o som do PocketStation (para jogar o minijogo, abra o cartão no console PocketStation). Precisa da BIOS do PlayStation e da do PocketStation.",
     "nome": "PokketSX",
     "pasta": "PokketSX",
-    "selo_escolha": "com PocketStation",
+    "selo_escolha": "opcional",
     "site": "github.com/mentalfoundry/PokketSX",
     "so_windows": true,
     "titulo_escolha": "PokketSX (com PocketStation)"
