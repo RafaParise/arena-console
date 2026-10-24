@@ -216,7 +216,7 @@ async function carregarEstado() {
 
   $("#chaveRpcn").setAttribute("aria-pressed",
     dados.config.rpcn_ativo ? "true" : "false");
-  $("#chaveDesempenho").setAttribute("aria-pressed",
+  $("#chaveAjusteDesempenho").setAttribute("aria-pressed",
     dados.config.ajuste_pelo_desempenho === false ? "false" : "true");
   mostrarDesempenho(dados.desempenho || {});
 
@@ -5478,7 +5478,7 @@ function ligarEventos() {
     }
   });
 
-  $("#chaveDesempenho").addEventListener("click", async (evento) => {
+  $("#chaveAjusteDesempenho").addEventListener("click", async (evento) => {
     const botao = evento.currentTarget;
     const novo = botao.getAttribute("aria-pressed") !== "true";
     try {

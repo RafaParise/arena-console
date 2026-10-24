@@ -383,6 +383,7 @@ CREATE INDEX IF NOT EXISTS idx_sessao_envio  ON sessao(enviado);
 
 
 _ESQUEMA_CONFERIDO = {}
+_TRAVA_ESQUEMA = threading.Lock()
 
 
 @contextlib.contextmanager
@@ -404,8 +405,12 @@ def banco():
         # 'seq' e tabela 'contador'), por qualquer caminho que chegue aqui --
         # nao so pela abertura normal (preparar_banco).
         if _ESQUEMA_CONFERIDO.get(ARQUIVO_BANCO) is not True:
-            _ESQUEMA_CONFERIDO[ARQUIVO_BANCO] = True
-            aplicar_esquema(conexao)
+            # So marca como conferido DEPOIS de aplicar (se a migracao falhar, a proxima conexao tenta de novo) e
+            # com uma thread por vez (duas migracoes juntas brigariam pelo ALTER TABLE). Auditoria de 24/10/2026.
+            with _TRAVA_ESQUEMA:
+                if _ESQUEMA_CONFERIDO.get(ARQUIVO_BANCO) is not True:
+                    aplicar_esquema(conexao)
+                    _ESQUEMA_CONFERIDO[ARQUIVO_BANCO] = True
         yield conexao
         conexao.commit()
     except Exception:
@@ -483,9 +488,14 @@ def preparar_banco():
         # e cairia no mesmo erro.
         for sufixo in ("-wal", "-shm"):
             try:
-                os.remove(ARQUIVO_BANCO + sufixo)
+                # Guarda junto (mesmo nome + sufixo): o -wal pode ter recordes que ainda nao tinham ido para o
+                # arena.db. So apaga se nao der para guardar. Auditoria de 24/10/2026.
+                os.replace(ARQUIVO_BANCO + sufixo, quebrado + sufixo)
             except OSError:
-                pass
+                try:
+                    os.remove(ARQUIVO_BANCO + sufixo)
+                except OSError:
+                    pass
         with banco() as conexao:
             aplicar_esquema(conexao)
         print("[ARENA] Comecei um banco novo, vazio. Os recordes antigos "
@@ -1352,14 +1362,37 @@ def carregar_config():
     return json.loads(json.dumps(config))
 
 
+_CONFIG_QUEBRADA_GUARDADA = set()
+
+
+def guardar_config_quebrada():
+    """O config.json existe mas nao e' JSON (disco cheio no meio da gravacao, edicao a mao): antes de o ARENA gravar o
+    padrao por cima, fica uma copia do lado (uma vez por estado do arquivo). Nunca perde apelido, amigos e ajustes
+    sem deixar rastro. Auditoria de 24/10/2026."""
+    try:
+        estado = os.stat(ARQUIVO_CONFIG)
+        marca = (estado.st_mtime_ns, estado.st_size)
+        if marca in _CONFIG_QUEBRADA_GUARDADA:
+            return
+        _CONFIG_QUEBRADA_GUARDADA.add(marca)
+        copia = ARQUIVO_CONFIG + ".corrompido-" + time.strftime("%Y%m%d-%H%M%S")
+        shutil.copy2(ARQUIVO_CONFIG, copia)
+        print("[ARENA] O config.json esta quebrado; guardei uma copia em %s e uso o padrao." % copia)
+    except OSError:
+        pass
+
+
 def ler_config_do_disco():
     """Le config.json de verdade. Se nao existir ou estiver quebrado, usa o padrao."""
     config = config_padrao()
     try:
         with open(ARQUIVO_CONFIG, "r", encoding="utf-8") as arquivo:
             salvo = json.load(arquivo)
-    except (OSError, ValueError):
+    except OSError:
         salvo = {}
+    except ValueError:
+        salvo = {}
+        guardar_config_quebrada()
     if not isinstance(salvo, dict):
         salvo = {}     # [] ou "texto" no lugar de {...}: vale o padrao
 
@@ -1472,7 +1505,8 @@ def ler_config_do_disco():
     # que impede trinta pen drives copiados de terem o mesmo codigo - o
     # que quebraria a sincronizacao e a partida a dois de todo mundo.
     da_maquina = hardware.identidade_da_maquina()
-    guardado = salvo.get("dispositivo_id") or ""
+    guardado = salvo.get("dispositivo_id")
+    guardado = guardado[:40] if isinstance(guardado, str) else ""      # lista ou numero no arquivo: vale como vazio
 
     if salvo.get("codigo_proprio"):
         # Ja houve troca por codigo repetido: aquele codigo e definitivo.
@@ -4506,6 +4540,30 @@ def contar_pendentes():
     return placares + sessoes
 
 
+PONTOS_MAXIMOS = 99999999           # a mesma faixa do /api/placar (a pessoa digita; a rede nao muda a regra)
+SEGUNDOS_MAXIMOS_DA_SESSAO = 7 * 24 * 3600
+
+
+def pontos_validos(valor):
+    """Pontuacao de um recorde recebido da rede, na mesma faixa do /api/placar. Fora dela: ValueError (o registro
+    e' descartado, o resto do lote segue)."""
+    if isinstance(valor, bool):
+        raise ValueError("pontos")
+    pontos = int(valor)
+    if not 0 <= pontos <= PONTOS_MAXIMOS:
+        raise ValueError("pontos fora da faixa")
+    return pontos
+
+
+def segundos_validos(valor):
+    if isinstance(valor, bool):
+        raise ValueError("segundos")
+    segundos = int(valor)
+    if not 0 <= segundos <= SEGUNDOS_MAXIMOS_DA_SESSAO:
+        raise ValueError("segundos fora da faixa")
+    return segundos
+
+
 def gravar_recebidos(placares, sessoes):
     """Guarda registros vindos de outro ARENA.
 
@@ -4520,18 +4578,18 @@ def gravar_recebidos(placares, sessoes):
                 novos += inserir_placar(
                     conexao, str(p["uuid"])[:40], str(p["apelido"])[:24],
                     str(p["jogo_id"])[:400], str(p["jogo_titulo"])[:200],
-                    int(p["pontos"]), str(p["registrado_em"])[:40],
+                    pontos_validos(p["pontos"]), str(p["registrado_em"])[:40],
                     str(p["dispositivo"])[:40], enviado=1)
-            except (KeyError, TypeError, ValueError, sqlite3.Error):
+            except (KeyError, TypeError, ValueError, OverflowError, sqlite3.Error):
                 continue
         for s in sessoes:
             try:
                 novos += inserir_sessao_recebida(
                     conexao, str(s["uuid"])[:40], str(s["apelido"])[:24],
                     str(s["jogo_id"])[:400], str(s["jogo_titulo"])[:200],
-                    str(s["inicio"])[:40], int(s["segundos"]),
+                    str(s["inicio"])[:40], segundos_validos(s["segundos"]),
                     str(s["dispositivo"])[:40])
-            except (KeyError, TypeError, ValueError, sqlite3.Error):
+            except (KeyError, TypeError, ValueError, OverflowError, sqlite3.Error):
                 continue
     return novos
 
@@ -7363,7 +7421,7 @@ class Manipulador(BaseHTTPRequestHandler):
                 pontos = int(dados.get("pontos"))
             except (TypeError, ValueError):
                 return self.erro("Escreva a pontuação só com números, sem pontos nem letras.")
-            if not 0 <= pontos <= 99999999:
+            if not 0 <= pontos <= PONTOS_MAXIMOS:
                 return self.erro("Essa pontuação não vale: escreva um número de 0 a 99.999.999.")
 
             jogo = achar_jogo(dados.get("jogo_id"))

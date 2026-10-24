@@ -96,7 +96,10 @@ def auditar_tela():
             problemas.append("app.js: erro de sintaxe: " + feito.stderr.strip().splitlines()[-1][:160])
     else:
         avisos.append("sem node: app.js nao foi conferido por sintaxe")
-    ids_html = set(re.findall(r'\bid="([^"]+)"', html))
+    todos_os_ids = re.findall(r'\bid="([^"]+)"', html)
+    for ident in sorted({i for i in todos_os_ids if todos_os_ids.count(i) > 1}):
+        problemas.append("index.html tem o id %s repetido (o $('#id') acha so o primeiro)" % ident)
+    ids_html = set(todos_os_ids)
     ids_criados = set(re.findall(r'\bid="([^"$\{]+)"', js)) | set(re.findall(r'\.id\s*=\s*["\']([^"\']+)', js))
     procurados = set(re.findall(r'\$\("#([A-Za-z0-9_\-]+)"\)', js)) | \
         set(re.findall(r'getElementById\("([A-Za-z0-9_\-]+)"\)', js)) | \

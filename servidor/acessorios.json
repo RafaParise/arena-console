@@ -315,7 +315,7 @@
         {
           "id": "ps2_cartoes",
           "nome": "Cartões de memória do PS2",
-          "texto": "O PS2 tinha duas entradas de cartão. A entrada 1 pode ficar com o PocketStation (um cartão no formato do PlayStation 1, de 128 KB, que também tinha telinha e minijogos), como no ARENA do computador; a entrada 2 fica com um cartão do PS2 do tamanho que você escolher, o maior de todos para caber todos os saves. Atenção: jogo de PS2 não salva num cartão de PS1; salva no da entrada 2.",
+          "texto": "O PS2 tinha duas entradas de cartão. A entrada 1 pode ficar com o PocketStation (um cartão no formato do PlayStation 1, de 128 KB, que também tinha telinha e minijogos), como no ARENA do computador; a entrada 2 fica com um cartão do PS2 do tamanho que você escolher, o maior de todos para caber todos os saves. Atenção: jogo de PS2 não salva num cartão de PS1; salva no da entrada 2. Seus saves antigos continuam no cartão de PS2 de 8 MB (Mcd001.ps2), nada foi apagado: para trazê-los, ponha esse cartão na entrada 1, abra a BIOS (Browser) e copie os saves para a entrada 2; depois volte a entrada 1 para o PocketStation.",
           "controles": [
             {"id": "entrada1", "tipo": "escolha", "rotulo": "Entrada 1", "alvo": {"cartao_ps2": 1}, "padrao": "pocketstation",
              "escolhas": [["pocketstation", "PocketStation (cartão de PS1, 128 KB)"], ["8", "Cartão do PS2 de 8 MB (o da BIOS)"], ["16", "Cartão do PS2 de 16 MB"], ["32", "Cartão do PS2 de 32 MB"], ["64", "Cartão do PS2 de 64 MB"]]},
