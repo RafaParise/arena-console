@@ -610,6 +610,32 @@
       <button class="botao" id="btnAparelhoDeNovo" type="button">Ler de novo</button>
     </div>
 
+    <!-- So no Android (auditoria 4, 23/10/2026): a memoria do aparelho e o cartao
+         de memoria ao mesmo tempo (servidor\armazenamento.py). O cartao entra como
+         mais uma pasta de jogos: nada e' copiado, movido nem apagado. -->
+    <div id="blocoArmazenamento" data-so-android hidden>
+      <h3 class="grupo-titulo">Onde ficam os jogos</h3>
+      <div class="volumes" id="listaVolumes"></div>
+      <p class="explica" id="armazenamentoAviso" role="status" hidden></p>
+      <p class="explica">
+        O ARENA joga ao mesmo tempo os jogos da memória do aparelho e os do
+        cartão de memória. Com a memória cheia, deixe os jogos no cartão e
+        escolha aqui a pasta dele: o ARENA só lê, não copia nem apaga nada.
+        Sem o cartão no aparelho, os jogos dele somem da lista e voltam quando
+        você o encaixa de novo.
+      </p>
+      <h3 class="grupo-titulo">Pastas de jogos do cartão</h3>
+      <ul class="onde-lista" id="listaPastasDoCartao"></ul>
+      <p class="explica" id="armazenamentoBusca" role="status" hidden></p>
+      <ul class="onde-lista" id="listaCandidatasDoCartao"></ul>
+      <div class="controle-acoes">
+        <button class="botao" id="btnCartaoProcurar" type="button">Procurar jogos no cartão</button>
+        <button class="botao" id="btnMedirInterno" type="button">Medir a memória do aparelho</button>
+        <button class="botao" id="btnMedirCartao" type="button">Medir o cartão</button>
+      </div>
+      <p class="explica" id="armazenamentoVelocidade" role="status" hidden></p>
+    </div>
+
     <!-- So no computador (23/10/2026): o hardware de um celular ligado no cabo,
          lido pelo ADB oficial do Google (servidor\adb_aparelho.py). So leitura. -->
     <div id="blocoCelularNoCabo" data-fora-do-android data-so-windows>

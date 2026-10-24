@@ -1361,6 +1361,42 @@ input::placeholder { color: var(--texto-apagado); }
   font-weight: 600;
   color: var(--texto-fraco);
 }
+/* O armazenamento do Android (23/10/2026): a memoria e o cartao, cada um com a
+   barra do quanto ja esta usado (vermelha quando falta espaco). */
+.volumes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: .6rem;
+  margin: .4rem 0 .8rem;
+}
+.volume {
+  display: flex;
+  flex-direction: column;
+  gap: .2rem;
+  padding: .6rem .75rem;
+  border: 1px solid var(--borda);
+  border-radius: 10px;
+}
+.volume strong { font-size: var(--t-peq); }
+.volume-detalhe { font-size: var(--t-micro); color: var(--texto-apagado); }
+.volume-barra {
+  display: block;
+  height: .45rem;
+  margin-top: .15rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--borda);
+}
+.volume-barra > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--azul), #ff9d68);
+}
+.volume--cheio { border-color: #bd7184; }
+.volume--cheio .volume-barra > span { background: #ff8fa6; }
+#listaPastasDoCartao code, #listaCandidatasDoCartao code { font-size: var(--t-micro); overflow-wrap: anywhere; }
+#listaPastasDoCartao .botao, #listaCandidatasDoCartao .botao { align-self: flex-start; }
 #celularPainel .maquina { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
 #celularCaminhosLista code { font-size: var(--t-micro); overflow-wrap: anywhere; }
 #celularCaminhosLista .leu { color: var(--azul-claro); }

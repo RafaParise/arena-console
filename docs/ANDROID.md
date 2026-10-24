@@ -134,6 +134,25 @@ anterior.
   **Automático** (o controle desenhado some quando um controle de verdade é
   ligado), **Sempre** ou **Nunca** (só com controle; o menu abre com L3 +
   R3). A ajuda lembra: no menu, o direcional anda, o B confirma e o A volta.
+- **A memória do aparelho e o cartão SD ao mesmo tempo** (auditoria 4,
+  23/10/2026; `servidor/armazenamento.py`). Ajustes → Máquina → "Onde ficam os
+  jogos" mostra os dois lugares, com a barra do que já está usado, e avisa
+  quando a memória do aparelho está quase cheia. O cartão entra como mais uma
+  pasta de jogos: **Procurar jogos no cartão** acha a pasta que tem as pastas
+  de console dentro (PS1, Super Nintendo...) e **Jogar desta pasta** a põe na
+  lista (até 8 pastas). O ARENA só lê dela: não copia, não move e não apaga
+  nada, e **Tirar da lista** só desfaz o atalho. Sem o cartão no aparelho, os
+  jogos dele somem da lista e voltam quando ele é encaixado. Por baixo, a
+  pasta `jogos` do app é uma pasta de verdade com um atalho por origem
+  (`livres`, `turma`, `pessoais`, `cartao-<volume>`), porque o Android não
+  deixa criar atalho dentro do `/sdcard`; o caminho de cada jogo continua
+  relativo à raiz do ARENA, e tudo o que já funcionava (saves, capas, estados)
+  segue igual. **Medir** lê um pedaço de um jogo do cartão (nada é gravado
+  nele) e grava um arquivo pequeno na memória do aparelho, para comparar. No
+  A12 de teste, medido em 23/10/2026, o cartão leu 59 MB/s e a memória do
+  aparelho 106 MB/s: por isso o padrão é jogar direto do cartão. Copiar o
+  jogo para a memória do aparelho antes de abrir (como o Lemuroid faz) fica
+  como opção para cartão mais lento.
 - **"Aparelho", e não "computador"** (achado A7): no Android, a tela troca
   sozinha "computador" por "aparelho", também nos recados que chegam
   depois. O texto que fala do computador de propósito (a pasta copiada do

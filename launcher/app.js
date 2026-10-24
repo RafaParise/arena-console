@@ -320,6 +320,7 @@ async function carregarEstado() {
     for (const elemento of document.querySelectorAll("[data-so-android]")) elemento.hidden = false;
     falarDeAparelho();
     mostrarAparelho();
+    mostrarArmazenamento();
     mostrarAndroid(dados.android || {});
   }
   prepararTipoDeControle(dados.recursos || []);
@@ -1745,6 +1746,191 @@ function desenharLinhas(lista, linhas) {
     caixa.append(termo, dado);
     return caixa;
   }));
+}
+
+// O armazenamento do Android (servidor/armazenamento.py, 23/10/2026): a memoria do
+// aparelho e o cartao de memoria ao mesmo tempo. O que vem do aparelho (nome do
+// cartao, caminhos) e' dado de fora: entra por textContent, nunca como HTML.
+const VOLUME_CHEIO_PCT = 90;
+const VOLUME_CHEIO_MB = 1024;
+const volumeCheio = (v) => v.montado && (v.usado_pct >= VOLUME_CHEIO_PCT || v.livre_mb < VOLUME_CHEIO_MB);
+const cartaoNoAparelho = () => (estado.armazenamento?.volumes || []).find((v) => v.removivel && v.montado);
+
+async function mostrarArmazenamento() {
+  if (!$("#blocoArmazenamento")) return;
+  let dados;
+  try {
+    dados = await pedir("/api/armazenamento");
+  } catch (falha) {
+    return;
+  }
+  estado.armazenamento = dados;
+  const volumes = dados.volumes || [];
+  const extras = dados.extras || [];
+  desenharVolumes(volumes);
+  desenharPastasDoCartao(extras);
+
+  // Um recado so, o mais util agora.
+  const interno = volumes[0];
+  const cartao = cartaoNoAparelho();
+  let texto = "";
+  if (interno && volumeCheio(interno)) {
+    texto = `A memória do aparelho está quase cheia (${formatarMb(interno.livre_mb)} livres). ` +
+      (cartao ? "Deixe os jogos no cartão e escolha a pasta dele abaixo."
+        : "Encaixe um cartão de memória para guardar os jogos nele.");
+  } else if (cartao && !extras.length) {
+    texto = "Há um cartão de memória no aparelho. Clique em Procurar jogos no cartão para jogar o que está nele.";
+  }
+  $("#armazenamentoAviso").hidden = !texto;
+  $("#armazenamentoAviso").textContent = texto;
+  $("#btnCartaoProcurar").hidden = !cartao;
+  $("#btnMedirCartao").hidden = !cartao;
+}
+
+function desenharVolumes(volumes) {
+  $("#listaVolumes").replaceChildren(...volumes.map((v) => {
+    const caixa = document.createElement("div");
+    caixa.className = "volume" + (volumeCheio(v) ? " volume--cheio" : "");
+    const nome = document.createElement("strong");
+    nome.textContent = v.nome;
+    const detalhe = document.createElement("span");
+    detalhe.className = "volume-detalhe";
+    detalhe.textContent = v.montado
+      ? `${formatarMb(v.total_mb - v.livre_mb)} usados de ${formatarMb(v.total_mb)} · ${formatarMb(v.livre_mb)} livres`
+      : "Fora do aparelho agora: encaixe o cartão para ver os jogos dele.";
+    const barra = document.createElement("span");
+    barra.className = "volume-barra";
+    barra.setAttribute("role", "img");
+    barra.setAttribute("aria-label", `${Number(v.usado_pct) || 0}% usado`);
+    const cheio = document.createElement("span");
+    cheio.style.width = `${Math.min(100, Math.max(0, Number(v.usado_pct) || 0))}%`;
+    barra.append(cheio);
+    caixa.append(nome, detalhe, barra);
+    return caixa;
+  }));
+}
+
+function desenharPastasDoCartao(extras) {
+  const lista = $("#listaPastasDoCartao");
+  if (!extras.length) {
+    const vazio = document.createElement("li");
+    vazio.textContent = "Nenhuma pasta do cartão na lista ainda.";
+    lista.replaceChildren(vazio);
+    return;
+  }
+  lista.replaceChildren(...extras.map((e) => {
+    const item = document.createElement("li");
+    const nome = document.createElement("span");
+    nome.textContent = e.existe
+      ? `${e.nome}: ${e.consoles} pasta${e.consoles === 1 ? "" : "s"} de console`
+      : `${e.nome}: o cartão não está no aparelho agora (os jogos voltam quando ele for encaixado)`;
+    const lugar = document.createElement("code");
+    lugar.textContent = e.caminho;
+    const tirar = document.createElement("button");
+    tirar.className = "botao";
+    tirar.type = "button";
+    tirar.textContent = "Tirar da lista";
+    tirar.onclick = () => tirarPastaDoCartao(e.id);
+    item.append(nome, lugar, tirar);
+    return item;
+  }));
+}
+
+async function procurarJogosNoCartao() {
+  const botao = $("#btnCartaoProcurar");
+  const aviso = $("#armazenamentoBusca");
+  const lista = $("#listaCandidatasDoCartao");
+  const cartao = cartaoNoAparelho();
+  aviso.hidden = false;
+  if (!cartao) {
+    aviso.textContent = "Não achei nenhum cartão de memória no aparelho. Encaixe o cartão, feche o ARENA e abra de novo.";
+    lista.replaceChildren();
+    return;
+  }
+  botao.disabled = true;
+  botao.textContent = "Procurando...";
+  aviso.textContent = "Procurando a pasta de jogos no cartão (leva uns segundos; o ARENA só olha os nomes das pastas)...";
+  try {
+    const r = await pedir("/api/armazenamento/procurar", "POST", { volume: cartao.id });
+    const jaNaLista = new Set((estado.armazenamento?.extras || []).map((e) => e.caminho));
+    const novas = (r.candidatas || []).filter((c) => !jaNaLista.has(c.caminho));
+    lista.replaceChildren(...novas.map((c) => {
+      const item = document.createElement("li");
+      const nome = document.createElement("span");
+      nome.textContent = `${c.onde || "Cartão"}: ${c.consoles} pastas de console`;
+      const lugar = document.createElement("code");
+      lugar.textContent = c.caminho;
+      const usar = document.createElement("button");
+      usar.className = "botao botao--principal";
+      usar.type = "button";
+      usar.textContent = "Jogar desta pasta";
+      usar.onclick = () => usarPastaDoCartao(c);
+      item.append(nome, lugar, usar);
+      return item;
+    }));
+    aviso.textContent = novas.length
+      ? `Achei ${novas.length} pasta${novas.length === 1 ? "" : "s"} com jogos. Escolha a que você quer jogar:`
+      : "Não achei pasta nova com jogos no cartão. O ARENA procura pastas com nome de console (PS1, Super Nintendo, " +
+        "Dreamcast...): confira se seus jogos estão em pastas assim e procure de novo.";
+    if (r.completo === false) aviso.textContent += " A busca parou no tempo limite: se a sua pasta não apareceu, tente de novo.";
+  } catch (falha) {
+    aviso.textContent = falha.message;
+  } finally {
+    botao.disabled = false;
+    botao.textContent = "Procurar jogos no cartão";
+  }
+}
+
+async function usarPastaDoCartao(candidata) {
+  const primeira = !(estado.armazenamento?.extras || []).length;
+  const nome = primeira ? "Cartão de memória" : "Cartão: " + String(candidata.onde || "").split(" › ").pop();
+  try {
+    const r = await pedir("/api/armazenamento/usar", "POST", { caminho: candidata.caminho, nome });
+    $("#listaCandidatasDoCartao").replaceChildren();
+    $("#armazenamentoBusca").hidden = true;
+    await carregarCatalogo();
+    await mostrarArmazenamento();
+    recado(`Pasta do cartão na lista: o ARENA agora tem ${r.total} jogo(s) ao todo.`);
+  } catch (falha) {
+    recado(falha.message, true);
+  }
+}
+
+async function tirarPastaDoCartao(id) {
+  try {
+    await pedir("/api/armazenamento/tirar", "POST", { id });
+    await carregarCatalogo();
+    await mostrarArmazenamento();
+    recado("A pasta saiu da lista. Os jogos continuam no cartão, sem nenhuma mudança.");
+  } catch (falha) {
+    recado(falha.message, true);
+  }
+}
+
+async function medirVelocidade(qual) {
+  const saida = $("#armazenamentoVelocidade");
+  const botao = qual === "interno" ? $("#btnMedirInterno") : $("#btnMedirCartao");
+  const rotulo = botao.textContent;
+  const mbPorSegundo = (n) => (typeof n === "number" ? `${numeroBr(Math.round(n * 10) / 10)} MB/s` : "não deu para medir");
+  botao.disabled = true;
+  botao.textContent = "Medindo...";
+  saida.hidden = false;
+  saida.textContent = "Medindo (leva alguns segundos; nada é apagado)...";
+  try {
+    const cartao = cartaoNoAparelho();
+    const r = await pedir("/api/armazenamento/medir", "POST", { volume: qual === "interno" ? "interno" : (cartao ? cartao.id : "") });
+    estado.velocidades = Object.assign(estado.velocidades || {}, { [qual]: r });
+    const v = estado.velocidades;
+    const partes = [];
+    if (v.interno) partes.push(`Memória do aparelho: lê ${mbPorSegundo(v.interno.leitura_mb_s)} e grava ${mbPorSegundo(v.interno.gravacao_mb_s)}.`);
+    if (v.cartao) partes.push(`Cartão de memória: lê ${mbPorSegundo(v.cartao.leitura_mb_s)}.`);
+    saida.textContent = partes.join(" ");
+  } catch (falha) {
+    saida.textContent = falha.message;
+  } finally {
+    botao.disabled = false;
+    botao.textContent = rotulo;
+  }
 }
 
 // O celular ligado no cabo, lido pelo computador (ADB, so no computador; ETAPA 1
@@ -5093,6 +5279,9 @@ function ligarEventos() {
   });
 
   $("#btnAparelhoDeNovo").addEventListener("click", () => mostrarAparelho());
+  $("#btnCartaoProcurar").addEventListener("click", procurarJogosNoCartao);
+  $("#btnMedirInterno").addEventListener("click", () => medirVelocidade("interno"));
+  $("#btnMedirCartao").addEventListener("click", () => medirVelocidade("cartao"));
   $("#btnCelularProcurar").addEventListener("click", () => procurarCelularNoCabo());
   $("#listaCelularNoCabo").addEventListener("change", (evento) => procurarCelularNoCabo(evento.target.value));
 

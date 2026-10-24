@@ -586,6 +586,12 @@ saves do Windows. Precisa do Android 7 ou mais novo.
    - Alguns Android só deixam ler no cartão: o ARENA avisa, os jogos abrem
      de lá e os saves ficam no aparelho. O botão **Deixar gravar no
      cartão** abre a tela do Android que libera.
+   - **Memória cheia?** Deixe os jogos no cartão de memória e, em **Ajustes →
+     Máquina → Onde ficam os jogos**, clique em **Procurar jogos no cartão** e
+     em **Jogar desta pasta**. O ARENA joga ao mesmo tempo o que está na
+     memória do aparelho e o que está no cartão, só lê (não copia nem apaga
+     nada) e, se você tirar o cartão, os jogos dele somem da lista até você
+     encaixá-lo de novo.
 5. **Jogar.** Sem controle, o jogo mostra um controle desenhado na tela;
    com um controle ligado (pelo cabo OTG ou por Bluetooth), ele some. Para
    sair do jogo, o botão **voltar** do aparelho abre o menu do RetroArch:
