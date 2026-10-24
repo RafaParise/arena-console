@@ -70,6 +70,14 @@ class TestGraficos(unittest.TestCase):
             texto = f.read()
         self.assertIn("x = \"1\"", texto)
 
+    def test_extras_substituem_a_linha_da_escada_em_vez_de_repetir_a_chave(self):
+        with open(os.path.join(self.dir, "graficos.json"), "w", encoding="utf-8") as f:
+            f.write('{"nucleos": {"fbneo": {"sempre": {"x": "1", "y": "2"}}}}')
+        self.mod.gravar_opcoes_dos_nucleos(3, {"x": "9", "z": "7"})
+        with open(self.mod.ARQUIVO_OPCOES_CORE, encoding="utf-8") as f:
+            linhas = [l for l in f.read().splitlines() if l and not l.startswith("#")]
+        self.assertEqual(sorted(linhas), ['x = "9"', 'y = "2"', 'z = "7"'])      # x so uma vez, com o valor da pessoa
+
     def test_gravar_opcoes_mantem_o_que_o_aluno_mudou(self):
         # Revisao pos-auditoria: com global_core_options ligado, reescrever
         # o arquivo do zero apagaria o que o aluno mudou no menu. O que

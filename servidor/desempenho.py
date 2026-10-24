@@ -48,6 +48,11 @@ DESCARTAR_ANTES = 20.0     # segundos do comeco (abrir o jogo pesa mais)
 AMOSTRAS_MINIMAS = 15      # 30 s de jogo medido
 LIMITE_PCT = 95.0
 FRACAO_NO_LIMITE = 0.25
+# Quando o proprio emulador diz a velocidade (o PS2 do Android: o nucleo grava arena-status.json), vale ela, e nao a
+# ocupacao das threads: a thread do processador do PS2 fica em ~100% mesmo no jogo a 100% da velocidade (medido em
+# 24/10/2026). Abaixo de LIMITE_VELOCIDADE por cento do tempo real, o jogo anda mais devagar que o do console.
+LIMITE_VELOCIDADE = 90.0
+AMOSTRAS_MINIMAS_VELOCIDADE = 10      # 20 s de jogo medido (uma amostra a cada janela nova do emulador)
 DEGRAU_MAXIMO = 3
 PARTIDAS_PARA_SUBIR = 3
 
@@ -197,12 +202,16 @@ class Medidor(object):
     """Mede o emulador numa thread propria enquanto o jogo roda. parar()
     devolve a medida ({"amostras", "processador", "placa"}: as listas de %)."""
 
-    def __init__(self, pid, intervalo=INTERVALO, descartar_antes=DESCARTAR_ANTES, com_placa=True):
+    def __init__(self, pid, intervalo=INTERVALO, descartar_antes=DESCARTAR_ANTES, com_placa=True, velocidade=None):
         self.pid = int(pid or 0)
         self.com_placa = com_placa
         self.intervalo = intervalo
         self.descartar_antes = descartar_antes
         self.processador, self.placa = [], []
+        # 'velocidade': funcao que devolve o ultimo status do emulador ({"sequencia", "velocidade"}) ou None.
+        self._ler_velocidade = velocidade
+        self._ultima_sequencia = None
+        self.velocidade = []
         self._parar = threading.Event()
         self._thread = None
 
@@ -234,21 +243,51 @@ class Medidor(object):
                 self.processador.append(thread_mais_ocupada(antes, depois, agora - quando))
                 if placa:
                     self.placa.append(placa.ler(self.pid))
+                self._anotar_velocidade()
                 antes, quando = depois, agora
         finally:
             if placa:
                 placa.fechar()
+
+    def _anotar_velocidade(self):
+        """Uma amostra de velocidade por janela NOVA do emulador (a sequencia anda); erro de leitura nao derruba."""
+        if not self._ler_velocidade:
+            return
+        try:
+            status = self._ler_velocidade()
+        except Exception:      # noqa: BLE001 -- medir e' bonus
+            return
+        if status and status.get("sequencia") != self._ultima_sequencia:
+            self._ultima_sequencia = status.get("sequencia")
+            self.velocidade.append(float(status["velocidade"]))
 
     def parar(self):
         self._parar.set()
         if self._thread:
             self._thread.join(5)
         return {"amostras": len(self.processador), "processador": list(self.processador),
-                "placa": list(self.placa)}
+                "placa": list(self.placa), "mede_velocidade": bool(self._ler_velocidade),
+                "velocidade": list(self.velocidade)}
+
+
+def mediana(valores):
+    ordenados = sorted(valores)
+    meio = len(ordenados) // 2
+    if not ordenados:
+        return 0.0
+    return ordenados[meio] if len(ordenados) % 2 else (ordenados[meio - 1] + ordenados[meio]) / 2.0
 
 
 def ficou_no_limite(medida):
-    """True (pesado), False (folgado) ou None (jogo curto demais para saber)."""
+    """True (pesado), False (folgado) ou None (jogo curto demais para saber).
+
+    Com a velocidade do proprio emulador (medida["mede_velocidade"]) vale so ela: mais de uma quarta parte das
+    amostras abaixo de LIMITE_VELOCIDADE por cento e' pesado."""
+    if (medida or {}).get("mede_velocidade"):
+        velocidades = (medida or {}).get("velocidade") or []
+        if len(velocidades) < AMOSTRAS_MINIMAS_VELOCIDADE:
+            return None
+        return sum(1 for v in velocidades if v < LIMITE_VELOCIDADE) > FRACAO_NO_LIMITE * len(velocidades)
     amostras = int((medida or {}).get("amostras") or 0)
     if amostras < AMOSTRAS_MINIMAS:
         return None
@@ -300,7 +339,9 @@ def registrar(plataforma, medida, arquivo=None):
             console.update({"degrau": depois, "folgadas": folgadas, "quando": time.strftime("%Y-%m-%d %H:%M"),
                             "ultima": {"no_limite": resultado, "amostras": int((medida or {}).get("amostras") or 0),
                                        "processador_max": maximo((medida or {}).get("processador")),
-                                       "placa_max": maximo((medida or {}).get("placa"))}})
+                                       "placa_max": maximo((medida or {}).get("placa")),
+                                       "velocidade_mediana": (round(mediana(medida["velocidade"]), 1)
+                                                              if (medida or {}).get("velocidade") else None)}})
             dados[plataforma] = console
             _gravar(dados, arquivo)
     return antes, depois

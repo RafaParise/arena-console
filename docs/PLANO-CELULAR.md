@@ -133,6 +133,89 @@ o `flycast`, o `citra`, o `azahar`, o `melonds`, o `rpcs3`, o `xenia_edge`, o `c
 - O núcleo do ARMSX2 é Vulkan ou OpenGL e pede, em `system/pcsx2/`, a pasta
   `bios` e a pasta `resources` (11 MB, a do mesmo ARMSX2).
 
+### O vídeo lento do PS2 no A12 (medido em 24/10/2026, de manhã)
+
+> "o vídeo do jogo continua muito lento mas o som parece acompanhar"
+
+**Causa [Certo, medido]:** no vídeo de abertura do Mortal Kombat Armageddon o
+jogo ia a **5 a 9 quadros por segundo** (o resto do jogo, a 55 a 60). Uma só
+thread do vídeo (a "GS") ficava em 94% de um núcleo do processador, enquanto a
+thread do PS2 (EE) ficava em 15%: o gargalo era desenhar o filme, não emular. A
+causa era a **pré-carga de textura completa** (`texture_preloading = 2`, o
+padrão do núcleo), que a cada quadro do filme calcula e guarda a imagem
+inteira. Com a **parcial** (`= 1`) o mesmo filme roda a **~54 fps**.
+
+A mesma cena, o mesmo aparelho, só mudando o ajuste (o menor fps visto na
+rodada de 115 s; a rodada começa apertando START, com um evento de tecla):
+
+| Ajuste | menor fps | amostras abaixo de 40 |
+|---|---|---|
+| OpenGL, pré-carga completa (o padrão do núcleo) | **5,2** | 19 de 37 |
+| OpenGL, pré-carga parcial | 12,8 (depois ~54) | 3 de 36 |
+| OpenGL, sem pré-carga | 20,2 | 5 de 36 |
+| OpenGL, parcial, sem leitura de volta da imagem | 23,0 | 3 de 36 |
+| **Vulkan** (com a thread de vídeo dupla) | **51,8** | 0 de 36 |
+| **Vulkan** (sem a thread dupla) | **52,8** | 0 de 36 |
+| Renderizador por software (4 threads) | 57,7 | 0 de 37 |
+
+Como ler: o OpenGL só fica bom com a pré-carga parcial; o Vulkan segura o
+filme sem depender disso. O núcleo só divide o vídeo em duas threads no
+Vulkan (`GSBackThreadPolicy.h` do ARMSX2: a divisão "precisa do Vulkan" para o
+renderizador de hardware). O fps é o da camada do RetroArch no SurfaceFlinger
+(uma janela que alisa a curva): vale para comparar rodadas, não para dizer o
+quadro exato.
+
+**Correção importante (24/10, depois):** a tabela acima usa o fps da camada do
+Android, que **engana neste núcleo**: quando o PS2 não dá conta, ele repete a
+última imagem e o Android continua contando 50 a 60 quadros. O Mortal Kombat
+"a 50 fps" na luta andava, na verdade, a **~15 a 23% da velocidade** (o relógio
+do round contava 8 segundos em 45 s reais). A medida certa é o mostrador do
+próprio emulador (`OsdShowSpeed`, lido da tela), e o núcleo do ARENA agora
+também grava essa velocidade (`system/pcsx2/arena-status.json`, a cada 2 s). A
+linha do "renderizador por software" **não vale**: ele não liga neste núcleo
+(`Failed to initialize GS`, tela preta), e o ARENA não o oferece.
+
+**A velocidade de verdade no A12** (Mortal Kombat Armageddon, Vulkan, 1x,
+mostrador do emulador; abertura e carregamentos):
+
+| Processador do PS2 (EE) | Velocidade | EE por quadro (limite 16,7 ms) |
+|---|---|---|
+| sem ajuste (100%) | 70 a 73% | 22,7 ms |
+| 75% | 76 a 87% | ~20 ms |
+| 60% + salto de ciclos moderado | 83 a 93% | ~18 ms |
+| **50%, sem salto** | **93 a 99% no filme** | 15 a 17 ms |
+| regulador automático (`DynamicEECycleRate`, desce sozinho até 60%) | 80 a 93% | ~18 ms |
+
+O OpenGL e o Vulkan deram o **mesmo** nessas cenas (68-73% e 70-73%): ali o
+limite é o processador, não a placa. Mesmo com o EE a 50%, a **escolha de
+lutadores** caiu para **19 a 27%** (EE 30 a 88 ms por quadro) e a luta para
+~15 a 23%: **o A12 não dá conta do 3D do Mortal Kombat Armageddon**, por mais
+que se ajuste. É o aparelho, não o ARENA.
+
+**O que o ARENA faz com isso** (`graficos.passo_do_ee_do_ps2`): o salto de
+ciclos fica sempre desligado (o próprio ARMSX2 diz que ele quase sempre
+atrapalha, e o regulador automático só funciona sem ele); o ponto de partida do
+EE é **75% no aparelho fraco (nota 1 e 2)** e 100% nos outros; "abaixo do
+original" leve pede 60% e o mínimo 50%; cada degrau do "Desempenho que
+aprende" desce mais um passo; e o **regulador automático fica ligado** (desce
+até 2 passos sozinho durante o jogo e volta quando alivia). O "Desempenho que
+aprende" agora decide pela **velocidade lida do emulador** (abaixo de 90% em
+mais de uma quarta parte das medidas), porque a thread do EE fica em ~100% até
+com o jogo a 100% da velocidade.
+
+**O que o ARENA faz agora:**
+- `graficos.json → ini_armsx2` guarda o que o ARENA ajusta no `.ini` do núcleo
+  (`texture_preloading = 1` sempre; `GSBackThreadMode = 1` só com o Vulkan).
+- O núcleo ganhou um **segundo remendo**
+  (`ferramentas/remendos/armsx2-libretro-sobreposicao-do-arena.patch`): ele lê
+  `system/pcsx2/inis/arena-overrides.ini` a cada abertura, **inclusive a
+  primeira** (o `.ini` do próprio núcleo só existe depois da primeira vez).
+  Para um núcleo sem o remendo (colado à mão), o ARENA também troca direto no
+  `.ini` dele quando já existe.
+- O menu da BIOS do PS2 (idioma, data e hora, memory card) abre por **Ajustes →
+  Emuladores → Abrir só a BIOS**, escolhendo o PS2: no celular, sem disco, com a
+  abertura do PS2 ligada (`preparar_o_ps2_do_android`).
+
 ### Cartão SD e armazenamento interno cheio (item 4)
 
 > "O Arena no android deve ser capaz de armazenar jogos tanto na memória

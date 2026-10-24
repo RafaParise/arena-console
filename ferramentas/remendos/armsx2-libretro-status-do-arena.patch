@@ -1,0 +1,28 @@
+--- a/pcsx2-libretro/Main.cpp
++++ b/pcsx2-libretro/Main.cpp
+@@ -477,6 +477,25 @@
+ 
+ void Host::OnPerformanceMetricsUpdated()
+ {
++	// ARENA: a velocidade de verdade do PS2 e o custo de cada thread, uma linha de JSON a cada ~2 s em
++	// system/pcsx2/arena-status.json. Roda na thread do GS, quando uma janela de medidas acaba de fechar.
++	static std::chrono::steady_clock::time_point arena_ultimo;
++	const auto arena_agora = std::chrono::steady_clock::now();
++	if (arena_agora - arena_ultimo < std::chrono::seconds(2))
++		return;
++	PerformanceMetrics::WindowSnapshot arena_janela;
++	if (!PerformanceMetrics::TryGetWindowSnapshot(&arena_janela))
++		return;
++	arena_ultimo = arena_agora;
++	const std::string arena_texto = fmt::format(
++		"{{\"sequencia\":{},\"velocidade\":{:.1f},\"fps\":{:.1f},\"ee\":{:.1f},\"ee_ms\":{:.1f},\"gs\":{:.1f},"
++		"\"gs_ms\":{:.1f},\"gs_fundo\":{:.1f},\"gs_fundo_ms\":{:.1f},\"vu\":{:.1f},\"gpu\":{:.1f},"
++		"\"gpu_ms\":{:.1f},\"tem_gpu\":{}}}\n",
++		arena_janela.sequence, arena_janela.speed, PerformanceMetrics::GetFPS(), arena_janela.ee_usage,
++		arena_janela.ee_ms, arena_janela.gs_usage, arena_janela.gs_ms, arena_janela.gs_back_usage,
++		arena_janela.gs_back_ms, arena_janela.vu_usage, arena_janela.gpu_usage, arena_janela.gpu_ms,
++		arena_janela.has_gpu_timer ? "true" : "false");
++	FileSystem::WriteStringToFile(Path::Combine(EmuFolders::DataRoot, "arena-status.json").c_str(), arena_texto);
+ }
+ 
+ void Host::OnSaveStateLoading(const std::string_view filename)

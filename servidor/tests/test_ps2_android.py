@@ -129,7 +129,7 @@ class BiosDaRegiaoEMotor(unittest.TestCase):
 
     def test_o_motor_automatico_e_opengl_e_o_vulkan_so_se_pedirem(self):
         self.bios_de("scph39001.bin", "A")
-        for motor, nucleo in (("automatico", "OpenGL"), ("d3d11", "OpenGL"), ("vulkan", "Vulkan"), ("software", "Software")):
+        for motor, nucleo in (("automatico", "OpenGL"), ("d3d11", "OpenGL"), ("vulkan", "Vulkan"), ("software", "OpenGL")):
             opcoes = graficos.opcoes_do_armsx2(motor, "MK (USA).chd", self.sistema)
             self.assertEqual(opcoes, {"armsx2_renderer": nucleo, "armsx2_bios": "scph39001.bin"}, motor)
 
@@ -241,9 +241,18 @@ class NucleoCompiladoNoGithub(unittest.TestCase):
 
     def test_o_remendo_que_o_registro_cita_e_o_do_repositorio(self):
         import hashlib
-        with open(os.path.join(RAIZ, "ferramentas", "remendos", "armsx2-libretro-jogadores.patch"), "rb") as arquivo:
-            marca = hashlib.sha256(arquivo.read()).hexdigest()
-        self.assertIn(marca[:12], self.ficha["origem"])         # o .so fixado foi compilado COM este remendo
+        pasta = os.path.join(RAIZ, "ferramentas", "remendos")
+        remendos = sorted(n for n in os.listdir(pasta) if n.endswith(".patch"))
+        self.assertEqual(len(remendos), 3)
+        pendentes = set(self.ficha.get("remendos_pendentes", []))     # no repositorio, ainda fora do .so fixado
+        self.assertLessEqual(pendentes, set(remendos))
+        for nome in remendos:                                   # o .so fixado foi compilado COM todos os remendos
+            with open(os.path.join(pasta, nome), "rb") as arquivo:
+                marca = hashlib.sha256(arquivo.read()).hexdigest()
+            if nome in pendentes:
+                self.assertNotIn(marca[:12], self.ficha["origem"], nome)
+            else:
+                self.assertIn(marca[:12], self.ficha["origem"], nome)
 
     def test_a_marca_da_pasta_muda_com_o_nome_e_com_o_conteudo(self):
         pasta = tempfile.mkdtemp(prefix="arena_arvore_")
@@ -371,6 +380,81 @@ class IniDoPs2(unittest.TestCase):
         self.assertEqual(graficos._valor_ini(self.ler(), "EmuCore", "AutoTune"), "true")
 
 
+class EeDoPs2PelaNota(unittest.TestCase):
+    """A desaceleracao do processador do PS2 (EE) vem da nota do aparelho, do nivel abaixo do original e do degrau."""
+
+    def test_o_passo_pela_nota(self):
+        self.assertEqual([graficos.passo_do_ee_do_ps2(n) for n in (1, 2, 3, 4, 5)], [1, 1, 0, 0, 0])
+
+    def test_abaixo_do_original_e_o_degrau_empurram_para_baixo(self):
+        self.assertEqual(graficos.passo_do_ee_do_ps2(5, "leve"), 2)
+        self.assertEqual(graficos.passo_do_ee_do_ps2(5, "minimo"), 3)
+        self.assertEqual(graficos.passo_do_ee_do_ps2(3, "leve"), 2)
+        self.assertEqual(graficos.passo_do_ee_do_ps2(1, "leve"), 2)           # nunca mais fiel do que a nota pede
+        self.assertEqual([graficos.passo_do_ee_do_ps2(4, degrau=d) for d in (0, 1, 2, 3, 4)], [0, 1, 2, 3, 3])
+        self.assertEqual(graficos.passo_do_ee_do_ps2(2, degrau=3), 3)         # teto: o ultimo passo
+        self.assertEqual(graficos.passo_do_ee_do_ps2(2, degrau=-5), 1)
+
+    def test_as_opcoes_do_nucleo_levam_a_taxa_e_o_salto(self):
+        opcoes = graficos.opcoes_do_armsx2("automatico", "x.chd", "/nao/existe", nota=2)
+        self.assertEqual((opcoes["armsx2_ee_cycle_rate"], opcoes["armsx2_ee_cycle_skip"]), ("75%", "disabled"))
+        opcoes = graficos.opcoes_do_armsx2("automatico", "x.chd", "/nao/existe", nota=2, degrau=2)
+        self.assertEqual((opcoes["armsx2_ee_cycle_rate"], opcoes["armsx2_ee_cycle_skip"]), ("50%", "disabled"))
+        opcoes = graficos.opcoes_do_armsx2("automatico", "x.chd", "/nao/existe", nota=5)
+        self.assertEqual((opcoes["armsx2_ee_cycle_rate"], opcoes["armsx2_ee_cycle_skip"]), ("100%", "disabled"))
+        self.assertNotIn("armsx2_ee_cycle_rate", graficos.opcoes_do_armsx2("automatico", "x.chd", "/nao/existe"))
+
+    def test_so_o_vulkan_pedido_vai_para_o_vulkan(self):
+        for motor, esperado in (("automatico", "OpenGL"), ("opengl", "OpenGL"), ("vulkan", "Vulkan"),
+                                ("d3d11", "OpenGL")):
+            self.assertEqual(graficos.opcoes_do_armsx2(motor, "x.chd", "/nao/existe")["armsx2_renderer"], esperado)
+
+    def test_o_renderizador_por_software_nao_e_oferecido(self):
+        # no A12 o "Software" nao liga (o registro diz "Failed to initialize GS" e a tela fica preta)
+        self.assertEqual(graficos.opcoes_do_armsx2("software", "x.chd", "/nao/existe")["armsx2_renderer"], "OpenGL")
+
+    def test_a_escada_do_json_nao_tem_mais_o_ee_do_abaixo_do_original(self):
+        # o EE sai do codigo (passo_do_ee_do_ps2): duas fontes para a mesma opcao se contradiriam
+        dados = graficos.carregar_graficos()["abaixo_do_original"]
+        for nivel in ("leve", "minimo"):
+            self.assertNotIn("armsx2_ee_cycle_rate", dados[nivel].get("armsx2", {}))
+            self.assertNotIn("armsx2_ee_cycle_skip", dados[nivel].get("armsx2", {}))
+
+
+class StatusDoPs2(unittest.TestCase):
+    """arena-status.json: a velocidade de verdade, gravada pelo nucleo."""
+
+    def setUp(self):
+        self.pasta = tempfile.mkdtemp(prefix="arena_status_ps2_")
+        self.caminho = graficos.arquivo_de_status_do_armsx2(self.pasta)
+        os.makedirs(os.path.dirname(self.caminho))
+
+    def tearDown(self):
+        limpeza.apagar_pasta(self.pasta)
+
+    def escrever(self, texto):
+        with open(self.caminho, "w", encoding="utf-8") as arquivo:
+            arquivo.write(texto)
+
+    def test_le_a_linha_que_o_nucleo_grava(self):
+        linha = json.dumps({chave: 1 for chave in graficos.CHAVES_DO_STATUS_DO_ARMSX2}).replace(
+            '"velocidade": 1', '"velocidade": 73.4')
+        self.escrever(linha + "\n")
+        status = graficos.ler_status_do_armsx2(self.pasta)
+        self.assertEqual(status["velocidade"], 73.4)
+
+    def test_arquivo_ausente_ou_pela_metade_ou_sem_velocidade_devolve_none(self):
+        self.assertIsNone(graficos.ler_status_do_armsx2(os.path.join(self.pasta, "outra")))
+        self.escrever('{"sequencia": 3, "velocid')
+        self.assertIsNone(graficos.ler_status_do_armsx2(self.pasta))
+        self.escrever('{"sequencia": 3}')
+        self.assertIsNone(graficos.ler_status_do_armsx2(self.pasta))
+        self.escrever('{"velocidade": true}')
+        self.assertIsNone(graficos.ler_status_do_armsx2(self.pasta))
+        self.escrever("[1, 2]")
+        self.assertIsNone(graficos.ler_status_do_armsx2(self.pasta))
+
+
 class PreparoDoPs2NoAndroid(unittest.TestCase):
     """arena.preparar_o_ps2_do_android: o que o ARENA faz antes de abrir o PS2 (jogo ou menu da BIOS)."""
 
@@ -403,9 +487,19 @@ class PreparoDoPs2NoAndroid(unittest.TestCase):
             return arquivo.read()
 
     def test_primeira_abertura_devolve_as_opcoes_e_ainda_nao_cria_o_ini(self):
-        opcoes = self.arena.preparar_o_ps2_do_android(self.arena.config_padrao(), {"arquivo": "jogos/x (USA).chd"})
-        self.assertEqual(opcoes, {"armsx2_renderer": "OpenGL", "armsx2_bios": "auto"})
+        with mock.patch.dict(self.arena.CAPACIDADE, {"nota": 2}):                  # o aparelho de entrada
+            opcoes = self.arena.preparar_o_ps2_do_android(self.arena.config_padrao(), {"arquivo": "jogos/x (USA).chd"})
+        self.assertEqual(opcoes, {"armsx2_renderer": "OpenGL", "armsx2_bios": "auto",
+                                  "armsx2_ee_cycle_rate": "75%", "armsx2_ee_cycle_skip": "disabled"})
         self.assertFalse(os.path.exists(self.ini))
+
+    def test_o_degrau_do_desempenho_que_aprende_desacelera_mais_o_ee(self):
+        with mock.patch.dict(self.arena.CAPACIDADE, {"nota": 2}):
+            opcoes = self.arena.preparar_o_ps2_do_android(self.arena.config_padrao(), {"arquivo": "x.chd"}, degrau=1)
+        self.assertEqual((opcoes["armsx2_ee_cycle_rate"], opcoes["armsx2_ee_cycle_skip"]), ("60%", "disabled"))
+        with mock.patch.dict(self.arena.CAPACIDADE, {"nota": 5}):
+            opcoes = self.arena.preparar_o_ps2_do_android(self.arena.config_padrao(), {"arquivo": "x.chd"})
+        self.assertEqual((opcoes["armsx2_ee_cycle_rate"], opcoes["armsx2_ee_cycle_skip"]), ("100%", "disabled"))
 
     def test_com_o_ini_do_nucleo_poe_a_pre_carga_parcial(self):
         self.com_ini()
@@ -491,6 +585,7 @@ class RemendoDoNucleo(unittest.TestCase):
     PASTA = os.path.join(RAIZ, "ferramentas", "remendos")
     CAMINHO = os.path.join(PASTA, "armsx2-libretro-jogadores.patch")
     CAMINHO_DA_SOBREPOSICAO = os.path.join(PASTA, "armsx2-libretro-sobreposicao-do-arena.patch")
+    CAMINHO_DO_STATUS = os.path.join(PASTA, "armsx2-libretro-status-do-arena.patch")
 
     def setUp(self):
         with open(self.CAMINHO, "rb") as arquivo:
@@ -499,9 +594,12 @@ class RemendoDoNucleo(unittest.TestCase):
         with open(self.CAMINHO_DA_SOBREPOSICAO, "rb") as arquivo:
             self.bruto2 = arquivo.read()
         self.texto2 = self.bruto2.decode("utf-8")
+        with open(self.CAMINHO_DO_STATUS, "rb") as arquivo:
+            self.bruto3 = arquivo.read()
+        self.texto3 = self.bruto3.decode("utf-8")
 
     def remendos(self):
-        return [(self.bruto, self.texto), (self.bruto2, self.texto2)]
+        return [(self.bruto, self.texto), (self.bruto2, self.texto2), (self.bruto3, self.texto3)]
 
     def test_so_tem_fim_de_linha_do_unix_e_mexe_so_no_nucleo_libretro(self):
         for bruto, texto in self.remendos():
@@ -542,9 +640,18 @@ class RemendoDoNucleo(unittest.TestCase):
         self.assertIn('+	// ARENA: os ajustes do servidor do ARENA, por cima do .ini do nucleo', self.texto2)
         self.assertIn(" 	Error save_error;", self.texto2)
 
+    def test_o_remendo_do_status_grava_o_que_o_arena_le(self):
+        # o nome do arquivo e as chaves sao os de graficos.ler_status_do_armsx2 (ARENA do Android)
+        self.assertIn('"arena-status.json"', self.texto3)
+        self.assertIn("Host::OnPerformanceMetricsUpdated", self.texto3)
+        self.assertIn("TryGetWindowSnapshot", self.texto3)
+        for chave in graficos.CHAVES_DO_STATUS_DO_ARMSX2:
+            self.assertIn('\\"%s\\":' % chave, self.texto3, chave)
+
     def test_a_ordem_alfabetica_poe_os_jogadores_primeiro(self):
         nomes = sorted(n for n in os.listdir(self.PASTA) if n.endswith(".patch"))
-        self.assertEqual(nomes, ["armsx2-libretro-jogadores.patch", "armsx2-libretro-sobreposicao-do-arena.patch"])
+        self.assertEqual(nomes, ["armsx2-libretro-jogadores.patch", "armsx2-libretro-sobreposicao-do-arena.patch",
+                                 "armsx2-libretro-status-do-arena.patch"])
 
     def test_o_fluxo_do_github_confere_e_aplica_o_remendo_antes_de_compilar(self):
         with open(os.path.join(RAIZ, ".github", "workflows", "nucleo-ps2-android.yml"), encoding="utf-8") as arquivo:

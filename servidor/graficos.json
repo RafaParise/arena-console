@@ -495,8 +495,8 @@
     }
   },
   "ini_armsx2": {
-    "_leia": "O que o ARENA grava no armsx2-libretro.ini do PS2 do Android (graficos.aplicar_ini_do_armsx2), alem das opcoes do nucleo: {secao: {chave: valor}}. 'sempre' vale em todo jogo; depois o bloco do motor de video (vulkan, opengl, software); depois modesto, abaixo_leve e abaixo_minimo. Nomes conferidos em pcsx2/Pcsx2Config.cpp do ARMSX2. Toda chave que o ARENA gerencia fica em 'sempre' com o valor padrao dele (o nucleo guarda no .ini o que recebeu: chave tirada daqui nao voltaria sozinha ao normal). texture_preloading: 0 nenhuma, 1 parcial, 2 completa (o padrao do nucleo). A completa faz o PS2 calcular e guardar a imagem inteira de cada quadro de FILME: no Galaxy A12 (PowerVR GE8320, OpenGL) o video de abertura do Mortal Kombat Armageddon rodava a 5-9 fps com ela e a ~54 com a parcial (medido em 24/10/2026, mesma cena, mesmos outros ajustes). GSBackThreadMode liga a thread de fundo do vídeo (so existe no Vulkan: nos outros o nucleo desliga sozinho).",
-    "sempre": {"EmuCore/GS": {"texture_preloading": "1", "GSBackThreadMode": "0"}},
+    "_leia": "O que o ARENA grava no armsx2-libretro.ini do PS2 do Android (graficos.aplicar_ini_do_armsx2), alem das opcoes do nucleo: {secao: {chave: valor}}. 'sempre' vale em todo jogo; depois o bloco do motor de video (vulkan, opengl, software); depois modesto, abaixo_leve e abaixo_minimo. Nomes conferidos em pcsx2/Pcsx2Config.cpp do ARMSX2. Toda chave que o ARENA gerencia fica em 'sempre' com o valor padrao dele (o nucleo guarda no .ini o que recebeu: chave tirada daqui nao voltaria sozinha ao normal). texture_preloading: 0 nenhuma, 1 parcial, 2 completa (o padrao do nucleo). A completa faz o PS2 calcular e guardar a imagem inteira de cada quadro de FILME: no Galaxy A12 (PowerVR GE8320, OpenGL) o video de abertura do Mortal Kombat Armageddon rodava a 5-9 fps com ela e a ~54 com a parcial (medido em 24/10/2026, mesma cena, mesmos outros ajustes). DynamicEECycleRate liga o regulador automatico da taxa de ciclos do EE (baixa ate 2 passos sozinho quando o jogo atrasa e sobe quando alivia; so funciona com o salto de ciclos desligado). GSBackThreadMode liga a thread de fundo do vídeo (so existe no Vulkan: nos outros o nucleo desliga sozinho).",
+    "sempre": {"EmuCore/GS": {"texture_preloading": "1", "GSBackThreadMode": "0"}, "EmuCore/Speedhacks": {"DynamicEECycleRate": "true"}},
     "vulkan": {"EmuCore/GS": {"GSBackThreadMode": "1"}}
   },
   "tela_4k": {
@@ -592,10 +592,6 @@
   "abaixo_do_original": {
     "_leia": "Pedido do Rafael (02/10/2026): modos ABAIXO do grafico original -- a imagem fica feia (bonecos de papelao), mas o jogo roda em maquina mais fraca. Entram por cima do bloco 'modesto' (o grafico original); 'minimo' entra por cima do 'leve'. Valores conferidos no codigo-fonte de cada nucleo (libretro_core_options.h) e as chaves dentro de cada .dll (testes/teste_chaves_graficos.py). Pulo de quadros 'auto': o nucleo deixa de DESENHAR um quadro quando a maquina atrasa -- o jogo e o som seguem na velocidade certa. SNES, NES e Game Boy nao tem pulo de quadros nesta versao (e sao leves). PS1 fica no original: o desenho por processador ja e' o mais leve, e trocar de nucleo esconderia os saves.",
     "leve": {
-      "armsx2": {
-        "armsx2_ee_cycle_rate": "75%",
-        "armsx2_ee_cycle_skip": "mild"
-      },
       "flycast": {
         "reicast_internal_resolution": "320x240",
         "reicast_auto_skip_frame": "some",
@@ -646,8 +642,6 @@
     },
     "minimo": {
       "armsx2": {
-        "armsx2_ee_cycle_rate": "60%",
-        "armsx2_ee_cycle_skip": "moderate",
         "armsx2_blending_accuracy": "Minimum",
         "armsx2_hw_download_mode": "Disable Readbacks"
       },

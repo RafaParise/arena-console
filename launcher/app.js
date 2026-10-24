@@ -2112,14 +2112,21 @@ function mostrarDesempenho(porConsole) {
   const lista = $("#listaDesempenho");
   if (!lista) return;
   const nomes = new Map((estado.plataformas || []).map((p) => [p.id, p.nome]));
-  const itens = Object.entries(porConsole || {}).filter(([, d]) => d && d.degrau > 0)
+  const velocidade = (d) => (d && d.ultima && d.ultima.velocidade_mediana) || 0;
+  const itens = Object.entries(porConsole || {}).filter(([, d]) => d && (d.degrau > 0 || velocidade(d) > 0))
     .map(([id, d]) => {
       const item = document.createElement("li");
       const nome = document.createElement("span");
       nome.textContent = nomes.get(id) || id;
       const texto = document.createElement("code");
-      texto.textContent = d.degrau + (d.degrau === 1 ? " degrau mais leve" : " degraus mais leve") +
-        (d.quando ? " (desde " + String(d.quando).slice(0, 10).split("-").reverse().join("/") + ")" : "");
+      const partes = [];
+      if (d.degrau > 0) {
+        partes.push(d.degrau + (d.degrau === 1 ? " degrau mais leve" : " degraus mais leve") +
+          (d.quando ? " (desde " + String(d.quando).slice(0, 10).split("-").reverse().join("/") + ")" : ""));
+      }
+      // O PS2 do celular diz a velocidade de verdade (% do tempo real) na ultima partida.
+      if (velocidade(d) > 0) partes.push("última partida: " + Math.round(velocidade(d)) + "% da velocidade");
+      texto.textContent = partes.join("; ");
       item.append(nome, texto);
       return item;
     });

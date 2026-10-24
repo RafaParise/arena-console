@@ -2663,6 +2663,10 @@ def anotar_desempenho(jogo, medida, config):
     cima do motivo de um jogo que nao abriu). Nunca derruba nada."""
     try:
         antes, depois = desempenho.registrar(jogo.get("plataforma"), medida)
+        velocidades = (medida or {}).get("velocidade") or []
+        if velocidades:
+            print("[ARENA] Desempenho: %s rodou a %d%% da velocidade do console (mediana de %d medidas)."
+                  % (jogo.get("titulo", "o jogo"), round(desempenho.mediana(velocidades)), len(velocidades)))
         if depois > antes and config.get("ajuste_pelo_desempenho", True):
             texto = ("ficou pesado para esta maquina. Na proxima vez, o ARENA deixa o grafico deste "
                      "console mais leve (Ajustes -> Maquina desfaz).")
@@ -2753,18 +2757,20 @@ def preparar_lossless(jogo, config):
             "executavel": achado["executavel"]}
 
 
-def preparar_o_ps2_do_android(config, jogo=None, sem_jogo=False):
+def preparar_o_ps2_do_android(config, jogo=None, sem_jogo=False, degrau=0):
     """Tudo o que o PS2 do Android (o nucleo ARMSX2, dentro do app) precisa antes de abrir, num lugar so:
     os arquivos de apoio de dentro do APK (o nucleo nem liga sem eles), as BIOS na pasta do nucleo, o motor de
     video e a BIOS da regiao do jogo, o ajuste fino da pessoa e o .ini (graficos.json -> ini_armsx2).
     'sem_jogo': o menu da BIOS do PS2 (idioma, data e hora, memory card), sem passar pelo disco: a abertura
-    do PS2 fica ligada. Devolve as opcoes do nucleo."""
+    do PS2 fica ligada. 'degrau': o que o "Desempenho que aprende" desceu para este console (cada degrau, mais uma
+    desaceleracao do EE: graficos.PASSOS_DO_EE_DO_PS2). Devolve as opcoes do nucleo."""
     plataforma_do_sistema.preparar_recursos(PASTA_SISTEMA)
     levadas = graficos.preparar_bios_do_nucleo_ps2(PASTA_SISTEMA)
     if levadas:
         print("[ARENA] BIOS do PS2 levadas para a pasta do nucleo: %s." % ", ".join(levadas))
     opcoes = graficos.opcoes_do_armsx2(config.get("motor_ps2", "automatico"), (jogo or {}).get("arquivo"),
-                                       PASTA_SISTEMA)
+                                       PASTA_SISTEMA, nota=CAPACIDADE["nota"], abaixo=nivel_abaixo(config),
+                                       degrau=degrau)
     # O que a pessoa pediu para este emulador manda em tudo (config.json -> ajustes_dos_nucleos).
     opcoes.update(graficos.ajustes_finos_do_nucleo(config.get("ajustes_dos_nucleos"), "armsx2"))
     if sem_jogo:
@@ -2794,7 +2800,10 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
     # Desempenho que aprende: o console que ficou no limite antes joga um
     # degrau mais leve, so no Automatico (servidor/desempenho.py).
     degrau = desempenho.degrau(jogo.get("plataforma")) if config.get("ajuste_pelo_desempenho", True) else 0
+    config_do_aluno = config
     config = desempenho.config_da_partida(config, jogo.get("plataforma"))
+    # O degrau so vale no Automatico: com perfil ou nivel escolhido a mao, config_da_partida devolve o mesmo objeto.
+    degrau_que_vale = degrau if config is not config_do_aluno else 0
     if degrau:
         print("[ARENA] Desempenho: %s joga %d degrau(s) mais leve (ficou no limite antes)."
               % (jogo.get("plataforma"), degrau))
@@ -2825,7 +2834,7 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             PASTA_SAVES, jogo["plataforma"]))
         # PS2 pelo nucleo do ARMSX2 (o do Android): arquivos de apoio, BIOS, motor de video, ajuste fino e .ini.
         if nome_core == "armsx2" and jogo.get("jeito") != "livre":
-            extras_core.update(preparar_o_ps2_do_android(config, jogo))
+            extras_core.update(preparar_o_ps2_do_android(config, jogo, degrau=degrau_que_vale))
         # O ajuste fino que a pessoa pediu para este emulador manda em tudo (config.json -> ajustes_dos_nucleos).
         extras_core.update(graficos.ajustes_finos_do_nucleo(config.get("ajustes_dos_nucleos"), nome_core))
         # Avisa o console de que o controle tem analogico. Sem isto, no
@@ -3252,7 +3261,12 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
                 caixa = processos.caixa_que_fecha_os_filhos(processo.pid)
             if acelerar and processos.tirar_da_economia_de_energia(processo.pid):
                 print("[ARENA] Emulador fora da economia de energia do Windows.")
-            medidor = desempenho.Medidor(getattr(processo, "pid", 0)).comecar()
+            # O PS2 do Android (nucleo ARMSX2) diz a velocidade de verdade: o ARENA aprende com ela.
+            leitor_de_velocidade = None
+            if nome_curto_do_core(jogo.get("core", "")) == "armsx2" and jogo.get("jeito") != "livre":
+                def leitor_de_velocidade():
+                    return graficos.ler_status_do_armsx2(PASTA_SISTEMA)
+            medidor = desempenho.Medidor(getattr(processo, "pid", 0), velocidade=leitor_de_velocidade).comecar()
             codigo = processo.wait()
             medida = medidor.parar()
             processos.fechar_caixa(caixa)

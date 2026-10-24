@@ -448,9 +448,16 @@ def gravar_opcoes_dos_nucleos(nota, extras=None, nota_gpu=None, modesto=False, a
         for chave in sorted(opcoes):
             linhas.append('%s = "%s"' % (chave, opcoes[chave]))
 
-    # BIOS escolhida e memory card entram por cima.
+    # BIOS escolhida, memory card e o ajuste fino da pessoa entram por cima: a linha deles SUBSTITUI a da escada
+    # quando e' a mesma chave (duas linhas da mesma chave deixariam o RetroArch escolher qual vale).
+    posicao = {l.split(" = ", 1)[0]: i for i, l in enumerate(linhas) if not l.startswith("#") and " = " in l}
     for chave in sorted(extras or {}):
-        linhas.append('%s = "%s"' % (chave, extras[chave]))
+        linha = '%s = "%s"' % (chave, extras[chave])
+        if chave in posicao:
+            linhas[posicao[chave]] = linha
+        else:
+            posicao[chave] = len(linhas)
+            linhas.append(linha)
 
     # O resto e' do aluno: opcao que ele mudou no menu do RetroArch e que o
     # ARENA nao ajusta. Antes este arquivo era reescrito do zero -- nao fazia
@@ -1071,14 +1078,65 @@ def bios_do_ps2_para_o_jogo(arquivo_do_jogo, pasta_bios):
     return "auto"
 
 
-def opcoes_do_armsx2(motor, arquivo_do_jogo, pasta_sistema):
-    """O que o ARENA decide por aparelho e por jogo no nucleo do PS2 do Android (ARMSX2): o motor de video e a
-    BIOS. "automatico" e' OpenGL, como o proprio ARMSX2 faz no Android (so manda para o Vulkan a placa que uma regra
-    dele marca): o driver Vulkan do PowerVR do Galaxy A12 vem com 7 defeitos conhecidos e o jogo cai em
-    substitutos lentos (medido em 24/10/2026, com o registro do nucleo). "vulkan" fica para quem escolher."""
-    motor_do_nucleo = {"vulkan": "Vulkan", "software": "Software"}.get(motor, "OpenGL")
-    return {"armsx2_renderer": motor_do_nucleo,
-            "armsx2_bios": bios_do_ps2_para_o_jogo(arquivo_do_jogo, os.path.join(pasta_sistema, "pcsx2", "bios"))}
+# A "desaceleracao" do processador do PS2 (o EE) que o ARENA escolhe, do mais fiel ao mais leve: (taxa de ciclos,
+# salto de ciclos). O salto fica sempre desligado: o proprio ARMSX2 diz que ele "quase sempre atrapalha", e o regulador
+# automatico (DynamicEECycleRate, que baixa a taxa sozinho quando o jogo atrasa e sobe quando alivia) so funciona sem
+# ele. Medido no Galaxy A12 (24/10/2026, mostrador do emulador, abertura do Mortal Kombat Armageddon; velocidade em
+# % do tempo real): sem desaceleracao 70-73% (o EE gastava 22,7 ms por quadro, o limite e' 16,7); 75%, 76-87%;
+# 60% com salto moderado, 83-93%; 50% sem salto, 93-99% no filme; o regulador sozinho (desce ate 60%), 80-93%.
+PASSOS_DO_EE_DO_PS2 = (("100%", "disabled"), ("75%", "disabled"), ("60%", "disabled"), ("50%", "disabled"))
+
+
+def passo_do_ee_do_ps2(nota, abaixo="", degrau=0):
+    """Que passo de PASSOS_DO_EE_DO_PS2 (0 a 3) e' o ponto de partida: o aparelho fraco (nota 1 e 2) comeca no 1
+    (75%) e o resto no 0; "abaixo do original" leve pede ao menos o 2 e o minimo o 3; e cada degrau que o "Desempenho
+    que aprende" desceu (o jogo ficou abaixo da velocidade) sobe mais um passo. O regulador automatico ainda pode
+    baixar ate 2 passos sozinho, durante o jogo (e nunca passa do 50%)."""
+    passo = 1 if nota <= 2 else 0
+    if abaixo == "leve":
+        passo = max(passo, 2)
+    elif abaixo == "minimo":
+        passo = 3
+    return max(0, min(3, passo + max(0, int(degrau or 0))))
+
+
+def opcoes_do_armsx2(motor, arquivo_do_jogo, pasta_sistema, nota=None, abaixo="", degrau=0):
+    """O que o ARENA decide por aparelho e por jogo no nucleo do PS2 do Android (ARMSX2): o motor de video, a BIOS e,
+    com a nota do aparelho, a desaceleracao do EE. "automatico" e' OpenGL, como o proprio ARMSX2 faz no Android (so
+    manda para o Vulkan a placa que uma regra dele marca): o driver Vulkan do PowerVR do Galaxy A12 vem com 7
+    defeitos conhecidos. "vulkan" e "opengl" ficam para quem escolher."""
+    motor_do_nucleo = {"vulkan": "Vulkan"}.get(motor, "OpenGL")
+    opcoes = {"armsx2_renderer": motor_do_nucleo,
+              "armsx2_bios": bios_do_ps2_para_o_jogo(arquivo_do_jogo, os.path.join(pasta_sistema, "pcsx2", "bios"))}
+    if nota is not None:
+        taxa, salto = PASSOS_DO_EE_DO_PS2[passo_do_ee_do_ps2(nota, abaixo, degrau)]
+        opcoes["armsx2_ee_cycle_rate"] = taxa
+        opcoes["armsx2_ee_cycle_skip"] = salto
+    return opcoes
+
+
+# O que o nucleo remendado grava em system/pcsx2/arena-status.json, uma linha de JSON a cada ~2 s
+# (ferramentas/remendos/armsx2-libretro-status-do-arena.patch): a velocidade de VERDADE do PS2 (em % do tempo real; o
+# fps que o Android mede engana, porque o nucleo repete a ultima imagem quando nao da conta) e o custo de cada thread.
+CHAVES_DO_STATUS_DO_ARMSX2 = ("sequencia", "velocidade", "fps", "ee", "ee_ms", "gs", "gs_ms", "gs_fundo",
+                              "gs_fundo_ms", "vu", "gpu", "gpu_ms", "tem_gpu")
+
+
+def arquivo_de_status_do_armsx2(pasta_sistema):
+    return os.path.join(pasta_sistema, "pcsx2", "arena-status.json")
+
+
+def ler_status_do_armsx2(pasta_sistema):
+    """O ultimo status que o nucleo gravou, ou None (sem arquivo, linha pela metade ou sem velocidade)."""
+    try:
+        with open(arquivo_de_status_do_armsx2(pasta_sistema), encoding="utf-8") as arquivo:
+            dados = json.loads(arquivo.read())
+    except (OSError, ValueError):
+        return None
+    velocidade = dados.get("velocidade") if isinstance(dados, dict) else None
+    if isinstance(velocidade, bool) or not isinstance(velocidade, (int, float)):
+        return None
+    return dados
 
 
 _NOME_DE_NUCLEO = re.compile(r"^[a-z0-9_]{1,40}$")

@@ -110,12 +110,16 @@ class Ladeira(unittest.TestCase):
         modesto = graficos.opcoes_finais_do_nucleo("armsx2", 5, 5, modesto=True)
         self.assertEqual(modesto["armsx2_upscale"], "1x")                             # modo batata: o console original
         minimo = graficos.opcoes_finais_do_nucleo("armsx2", 5, 5, abaixo="minimo")
-        self.assertEqual(minimo["armsx2_ee_cycle_skip"], "moderate")                  # abaixo do original
+        self.assertEqual(minimo["armsx2_blending_accuracy"], "Minimum")               # abaixo do original (o EE vem
+        self.assertEqual(minimo["armsx2_hw_download_mode"], "Disable Readbacks")      # do passo_do_ee_do_ps2)
 
     def test_o_padrao_do_ini_do_ps2_tem_a_pre_carga_parcial(self):
         # medido no A12: com a completa, o filme de abertura ia a 5-9 quadros; com a parcial, a ~54
         self.assertEqual(graficos.ini_padrao_do_armsx2("OpenGL")["EmuCore/GS"]["texture_preloading"], "1")
         self.assertEqual(graficos.ini_padrao_do_armsx2("Vulkan")["EmuCore/GS"]["texture_preloading"], "1")
+        # o regulador automatico do EE (so funciona com o salto de ciclos desligado, que o ARENA nunca liga)
+        self.assertEqual(graficos.ini_padrao_do_armsx2("OpenGL")["EmuCore/Speedhacks"]["DynamicEECycleRate"], "true")
+        self.assertTrue(all(salto == "disabled" for _taxa, salto in graficos.PASSOS_DO_EE_DO_PS2))
 
 
 if __name__ == "__main__":

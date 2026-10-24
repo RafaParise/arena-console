@@ -64,6 +64,62 @@ class Medida(unittest.TestCase):
         self.assertGreater(max(resultado["processador"]), 50.0, resultado)
 
 
+def medida_de_velocidade(velocidades, **extras):
+    """Uma partida do PS2 do Android: o emulador diz a velocidade (o EE em ~100% nao quer dizer nada)."""
+    resposta = {"amostras": 20, "processador": [100.0] * 20, "placa": [], "mede_velocidade": True,
+                "velocidade": list(velocidades)}
+    resposta.update(extras)
+    return resposta
+
+
+class VelocidadeDoEmulador(unittest.TestCase):
+    """Quando o proprio emulador diz a velocidade, vale ela, e nao a ocupacao das threads."""
+
+    def test_velocidade_baixa_e_pesado_mesmo_com_thread_folgada(self):
+        self.assertTrue(desempenho.ficou_no_limite(medida_de_velocidade([73.0] * 20)))
+        # uma quarta parte ou menos abaixo de 90%: ainda e' folgado
+        self.assertFalse(desempenho.ficou_no_limite(medida_de_velocidade([100.0] * 15 + [80.0] * 5)))
+        self.assertTrue(desempenho.ficou_no_limite(medida_de_velocidade([100.0] * 14 + [80.0] * 6)))
+
+    def test_thread_em_100_com_o_jogo_a_100_nao_e_pesado(self):
+        # o caso medido no A12: EE 99-100% e Speed 100% (a thread do EE fica cheia mesmo no jogo certo)
+        self.assertFalse(desempenho.ficou_no_limite(medida_de_velocidade([100.0] * 20)))
+
+    def test_poucas_amostras_nao_decidem(self):
+        self.assertIsNone(desempenho.ficou_no_limite(medida_de_velocidade([60.0] * 5)))
+
+    def test_sem_leitor_vale_a_regra_das_threads(self):
+        self.assertTrue(desempenho.ficou_no_limite(medida([99.0] * 20)))      # sem "mede_velocidade"
+
+    def test_o_medidor_junta_uma_amostra_por_janela_nova(self):
+        leituras = iter([{"sequencia": 1, "velocidade": 70.0}, {"sequencia": 1, "velocidade": 70.0},
+                         {"sequencia": 2, "velocidade": 95.5}, None, {"sequencia": 3, "velocidade": 100.0}])
+        medidor = desempenho.Medidor(0, velocidade=lambda: next(leituras))
+        for _ in range(5):
+            medidor._anotar_velocidade()
+        self.assertEqual(medidor.velocidade, [70.0, 95.5, 100.0])
+        self.assertTrue(medidor.parar()["mede_velocidade"])
+
+    def test_erro_do_leitor_nao_derruba_o_medidor(self):
+        def quebra():
+            raise OSError("arquivo sumiu")
+        medidor = desempenho.Medidor(0, velocidade=quebra)
+        medidor._anotar_velocidade()
+        self.assertEqual(medidor.velocidade, [])
+
+    def test_a_velocidade_da_partida_fica_guardada_e_o_degrau_sobe(self):
+        pasta = tempfile.mkdtemp(prefix="arena_desempenho_")
+        try:
+            arquivo = os.path.join(pasta, "desempenho.json")
+            self.assertEqual(desempenho.registrar("ps2", medida_de_velocidade([73.0] * 20), arquivo), (0, 1))
+            guardado = desempenho.ler(arquivo)["ps2"]
+            self.assertEqual(guardado["ultima"]["velocidade_mediana"], 73.0)
+            self.assertEqual(desempenho.mediana([70.0, 100.0, 90.0, 80.0]), 85.0)
+            self.assertEqual(desempenho.mediana([]), 0.0)
+        finally:
+            limpeza.apagar_pasta(pasta)
+
+
 class Degraus(unittest.TestCase):
     def setUp(self):
         self.pasta = tempfile.mkdtemp(prefix="arena_teste_desempenho_")
