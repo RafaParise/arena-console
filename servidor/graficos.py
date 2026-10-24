@@ -1238,6 +1238,62 @@ def ini_padrao_do_armsx2(motor_do_nucleo, nota_gpu=None, modesto=False, abaixo="
     return resultado
 
 
+# Os memory cards do PS2 do Android (pedido do Rafael, 24/10/2026: "o primeiro slot seja o da BIOS e o slot 2 seja o
+# memory card com o maximo de espaco que tiver, para comportar todo e qualquer save, local no cartao"). O PCSX2
+# aceita cartoes de 8, 16, 32 e 64 MB; o de 8 MB e' o padrao do console e o mais compativel, e o de 64 e' o maximo.
+TAMANHOS_DE_CARTAO_PS2 = (8, 16, 32, 64)
+CARTOES_DO_PS2_PADRAO = {"slot1_mb": 8, "slot2_mb": 64}
+
+
+def limpar_cartoes_ps2(valor):
+    """{"slot1_mb": 8, "slot2_mb": 64} com so os tamanhos que existem; o que nao serve volta ao padrao."""
+    limpo = dict(CARTOES_DO_PS2_PADRAO)
+    if isinstance(valor, dict):
+        for chave in limpo:
+            tamanho = valor.get(chave)
+            if isinstance(tamanho, int) and not isinstance(tamanho, bool) and tamanho in TAMANHOS_DE_CARTAO_PS2:
+                limpo[chave] = tamanho
+    return limpo
+
+
+def nome_do_cartao_ps2(slot, megabytes):
+    """Mcd001.ps2 / Mcd002.ps2 (o de 8 MB, como o proprio PCSX2 nomeia) ou Mcd002-64MB.ps2."""
+    return "Mcd00%d.ps2" % slot if megabytes == 8 else "Mcd00%d-%dMB.ps2" % (slot, megabytes)
+
+
+def preparar_cartoes_do_ps2(pasta_sistema, cartoes=None):
+    """Garante os dois arquivos de cartao em system/pcsx2/memcards (so cria o que FALTA; nunca troca nem apaga um
+    cartao que ja existe) e devolve o que o .ini do nucleo precisa: {"MemoryCards": {...}}.
+
+    Um cartao novo e' um arquivo todo 0xFF do tamanho certo (528 bytes por pagina de 512), exatamente como o PCSX2 cria
+    o dele: o console pede para formatar (a BIOS no Browser, ou o jogo) na primeira vez, como num PS2 de verdade."""
+    escolha = limpar_cartoes_ps2(cartoes)
+    pasta = os.path.join(pasta_sistema, "pcsx2", "memcards")
+    nomes = {}
+    for slot in (1, 2):
+        megabytes = escolha["slot%d_mb" % slot]
+        nome = nome_do_cartao_ps2(slot, megabytes)
+        nomes[slot] = nome
+        caminho = os.path.join(pasta, nome)
+        if os.path.exists(caminho):
+            continue
+        tamanho = megabytes * 1024 * 1024 // 512 * 528
+        try:
+            os.makedirs(pasta, exist_ok=True)
+            temporario = "%s.%d.tmp" % (caminho, threading.get_ident())
+            bloco = b"\xff" * (1 << 20)
+            with open(temporario, "wb") as arquivo:
+                restante = tamanho
+                while restante > 0:
+                    arquivo.write(bloco[:min(len(bloco), restante)])
+                    restante -= len(bloco)
+            os.replace(temporario, caminho)
+        except OSError as falha:
+            print("[ARENA] Nao consegui criar o cartao %s do PS2: %s" % (nome, falha))
+    return {"MemoryCards": {"Slot1_Enable": "true", "Slot1_Filename": nomes[1],
+                            "Slot2_Enable": "true", "Slot2_Filename": nomes[2]}}
+
+
 def arquivo_de_ajustes_do_armsx2(pasta_sistema):
     """O arquivo que o nucleo remendado do ARENA le a cada abertura: system/pcsx2/inis/arena-overrides.ini
     (ferramentas/remendos/armsx2-libretro-sobreposicao-do-arena.patch)."""

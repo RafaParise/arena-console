@@ -430,6 +430,66 @@ class EeDoPs2PelaNota(unittest.TestCase):
             self.assertNotIn("armsx2_ee_cycle_skip", dados[nivel].get("armsx2", {}))
 
 
+class CartoesDoPs2(unittest.TestCase):
+    """Slot 1 padrao (8 MB, o da BIOS) e slot 2 o maior que o PCSX2 aceita (64 MB), na pasta do ARENA."""
+
+    def setUp(self):
+        self.pasta = tempfile.mkdtemp(prefix="arena_cartoes_ps2_")
+        self.memcards = os.path.join(self.pasta, "pcsx2", "memcards")
+
+    def tearDown(self):
+        limpeza.apagar_pasta(self.pasta)
+
+    def test_os_tamanhos_e_os_nomes(self):
+        self.assertEqual(graficos.limpar_cartoes_ps2(None), {"slot1_mb": 8, "slot2_mb": 64})
+        self.assertEqual(graficos.limpar_cartoes_ps2({"slot1_mb": 64, "slot2_mb": 7}), {"slot1_mb": 64, "slot2_mb": 64})
+        self.assertEqual(graficos.limpar_cartoes_ps2({"slot1_mb": True, "slot2_mb": "32"}), {"slot1_mb": 8, "slot2_mb": 64})
+        self.assertEqual(graficos.nome_do_cartao_ps2(1, 8), "Mcd001.ps2")
+        self.assertEqual(graficos.nome_do_cartao_ps2(2, 64), "Mcd002-64MB.ps2")
+
+    def test_cria_o_que_falta_com_o_tamanho_do_pcsx2(self):
+        ini = graficos.preparar_cartoes_do_ps2(self.pasta)
+        self.assertEqual(ini, {"MemoryCards": {"Slot1_Enable": "true", "Slot1_Filename": "Mcd001.ps2",
+                                               "Slot2_Enable": "true", "Slot2_Filename": "Mcd002-64MB.ps2"}})
+        self.assertEqual(os.path.getsize(os.path.join(self.memcards, "Mcd001.ps2")), 8650752)          # 8 MB
+        self.assertEqual(os.path.getsize(os.path.join(self.memcards, "Mcd002-64MB.ps2")), 69206016)    # 64 MB
+        with open(os.path.join(self.memcards, "Mcd002-64MB.ps2"), "rb") as arquivo:
+            self.assertEqual(arquivo.read(1 << 16), b"\xff" * (1 << 16))                               # como o PCSX2
+
+    def test_cartao_que_ja_existe_nunca_e_trocado(self):
+        os.makedirs(self.memcards)
+        guardado = os.path.join(self.memcards, "Mcd001.ps2")
+        with open(guardado, "wb") as arquivo:
+            arquivo.write(b"Sony PS2 Memory Card Format meus saves")
+        graficos.preparar_cartoes_do_ps2(self.pasta)
+        with open(guardado, "rb") as arquivo:
+            self.assertEqual(arquivo.read(), b"Sony PS2 Memory Card Format meus saves")
+        self.assertEqual(sorted(os.listdir(self.memcards)), ["Mcd001.ps2", "Mcd002-64MB.ps2"])      # sem sobra de .tmp
+
+    def test_o_preparo_do_ps2_poe_os_cartoes_no_arquivo_de_ajustes(self):
+        import arena
+        with mock.patch.object(arena, "PASTA_SISTEMA", self.pasta), \
+                mock.patch.object(arena.plataforma_do_sistema, "preparar_recursos", return_value=0):
+            arena.preparar_o_ps2_do_android(arena.config_padrao(), {"arquivo": "x.chd"})
+        with open(graficos.arquivo_de_ajustes_do_armsx2(self.pasta), encoding="utf-8") as arquivo:
+            texto = arquivo.read()
+        self.assertIn("MemoryCards/Slot1_Filename = Mcd001.ps2", texto)
+        self.assertIn("MemoryCards/Slot2_Filename = Mcd002-64MB.ps2", texto)
+        self.assertIn("EmuCore/WarnAboutUnsafeSettings = false", texto)
+
+    def test_a_escolha_da_pessoa_vale(self):
+        import arena
+        config = arena.config_padrao()
+        config["cartoes_ps2"] = {"slot1_mb": 64, "slot2_mb": 8}
+        with mock.patch.object(arena, "PASTA_SISTEMA", self.pasta), \
+                mock.patch.object(arena.plataforma_do_sistema, "preparar_recursos", return_value=0):
+            arena.preparar_o_ps2_do_android(config, {"arquivo": "x.chd"})
+        with open(graficos.arquivo_de_ajustes_do_armsx2(self.pasta), encoding="utf-8") as arquivo:
+            texto = arquivo.read()
+        self.assertIn("MemoryCards/Slot1_Filename = Mcd001-64MB.ps2", texto)
+        self.assertIn("MemoryCards/Slot2_Filename = Mcd002.ps2", texto)
+
+
 class StatusDoPs2(unittest.TestCase):
     """arena-status.json: a velocidade de verdade, gravada pelo nucleo."""
 

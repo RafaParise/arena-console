@@ -1246,6 +1246,9 @@ def config_padrao():
         "ajustes_dos_nucleos": {},
         # O mesmo, direto no .ini do emulador (graficos.limpar_ajustes_ini): {"armsx2": {"EmuCore/GS": {...}}}.
         "ajustes_ini_dos_nucleos": {},
+        # Os memory cards do PS2 do celular, em MB (graficos.limpar_cartoes_ps2): o 1 e' o padrao do console (o da
+        # BIOS) e o 2, o maior que o PCSX2 aceita, para comportar todo save.
+        "cartoes_ps2": dict(graficos.CARTOES_DO_PS2_PADRAO),
         # "automatico" (decide pela nota da maquina), "leve" ou "bonito".
         # Vale para os emuladores externos (PCSX2, RPCS3, Xenia).
         "preset_grafico_externo": "automatico",
@@ -1410,6 +1413,7 @@ def ler_config_do_disco():
         config["abaixo_do_original"] = salvo["abaixo_do_original"]
     config["ajustes_dos_nucleos"] = graficos.limpar_ajustes_dos_nucleos(salvo.get("ajustes_dos_nucleos"))
     config["ajustes_ini_dos_nucleos"] = graficos.limpar_ajustes_ini(salvo.get("ajustes_ini_dos_nucleos"))
+    config["cartoes_ps2"] = graficos.limpar_cartoes_ps2(salvo.get("cartoes_ps2"))
     config["rpcn_ativo"] = bool(salvo.get("rpcn_ativo"))
     if salvo.get("escala_da_tela") in graficos.ESCALAS:
         config["escala_da_tela"] = salvo["escala_da_tela"]
@@ -2788,6 +2792,9 @@ def preparar_o_ps2_do_android(config, jogo=None, sem_jogo=False, degrau=0):
     # O .ini do nucleo (o que ele nao mostra como opcao): o padrao do ARENA e, por cima, o da pessoa.
     ini = graficos.ini_padrao_do_armsx2(opcoes.get("armsx2_renderer"), CAPACIDADE.get("nota_gpu"),
                                         grafico_original(config), nivel_abaixo(config))
+    # Os memory cards: o 1 (8 MB, o da BIOS) e o 2 (64 MB, o maximo) em system/pcsx2/memcards, dentro da pasta do ARENA.
+    for secao, chaves in graficos.preparar_cartoes_do_ps2(PASTA_SISTEMA, config.get("cartoes_ps2")).items():
+        ini.setdefault(secao, {}).update(chaves)
     for secao, chaves in graficos.limpar_ajustes_ini(config.get("ajustes_ini_dos_nucleos")).get("armsx2", {}).items():
         ini.setdefault(secao, {}).update(chaves)
     # Dois jeitos, para qualquer nucleo: o arquivo de ajustes que o nucleo remendado do ARENA le a cada abertura
@@ -6875,6 +6882,8 @@ class Manipulador(BaseHTTPRequestHandler):
 
             if isinstance(dados.get("ajustes_ini_dos_nucleos"), dict):
                 config["ajustes_ini_dos_nucleos"] = graficos.limpar_ajustes_ini(dados["ajustes_ini_dos_nucleos"])
+            if isinstance(dados.get("cartoes_ps2"), dict):
+                config["cartoes_ps2"] = graficos.limpar_cartoes_ps2(dados["cartoes_ps2"])
 
             if isinstance(dados.get("ajustes_dos_nucleos"), dict):
                 # O ajuste fino por emulador inteiro de uma vez ({} limpa): a tela manda o que quer que fique.

@@ -923,6 +923,10 @@ window.ARENA_DADOS = {
   },
   "bios": {},
   "botoes_na_tela": "automatico",
+  "cartoes_ps2": {
+   "slot1_mb": 8,
+   "slot2_mb": 64
+  },
   "codigo_proprio": false,
   "dispositivo_id": "",
   "escala_da_tela": "automatico",
