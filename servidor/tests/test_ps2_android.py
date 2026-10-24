@@ -431,7 +431,9 @@ class EeDoPs2PelaNota(unittest.TestCase):
 
 
 class CartoesDoPs2(unittest.TestCase):
-    """Slot 1 padrao (8 MB, o da BIOS) e slot 2 o maior que o PCSX2 aceita (64 MB), na pasta do ARENA."""
+    """Os cartoes na pasta do ARENA: o nome segue a ORDEM de uso por tamanho (o 1o de 64 MB e' Mcd001-64MB.ps2 em qualquer
+    entrada, para o cartao poder mudar de entrada sem perder o save); o padrao do ARENA e' 64 MB na entrada 1 e o
+    PocketStation (cartao de PS1) na 2, como no ARENA do computador (decisao do Rafael, 24/10/2026)."""
 
     def setUp(self):
         self.pasta = tempfile.mkdtemp(prefix="arena_cartoes_ps2_")
@@ -445,15 +447,16 @@ class CartoesDoPs2(unittest.TestCase):
         self.assertEqual(graficos.limpar_cartoes_ps2({"slot1_mb": 64, "slot2_mb": 7}), {"slot1_mb": 64, "slot2_mb": 64})
         self.assertEqual(graficos.limpar_cartoes_ps2({"slot1_mb": True, "slot2_mb": "32"}), {"slot1_mb": 8, "slot2_mb": 64})
         self.assertEqual(graficos.nome_do_cartao_ps2(1, 8), "Mcd001.ps2")
+        self.assertEqual(graficos.nome_do_cartao_ps2(1, 64), "Mcd001-64MB.ps2")
         self.assertEqual(graficos.nome_do_cartao_ps2(2, 64), "Mcd002-64MB.ps2")
 
     def test_cria_o_que_falta_com_o_tamanho_do_pcsx2(self):
         ini = graficos.preparar_cartoes_do_ps2(self.pasta)
         self.assertEqual(ini, {"MemoryCards": {"Slot1_Enable": "true", "Slot1_Filename": "Mcd001.ps2",
-                                               "Slot2_Enable": "true", "Slot2_Filename": "Mcd002-64MB.ps2"}})
+                                               "Slot2_Enable": "true", "Slot2_Filename": "Mcd001-64MB.ps2"}})
         self.assertEqual(os.path.getsize(os.path.join(self.memcards, "Mcd001.ps2")), 8650752)          # 8 MB
-        self.assertEqual(os.path.getsize(os.path.join(self.memcards, "Mcd002-64MB.ps2")), 69206016)    # 64 MB
-        with open(os.path.join(self.memcards, "Mcd002-64MB.ps2"), "rb") as arquivo:
+        self.assertEqual(os.path.getsize(os.path.join(self.memcards, "Mcd001-64MB.ps2")), 69206016)    # 64 MB
+        with open(os.path.join(self.memcards, "Mcd001-64MB.ps2"), "rb") as arquivo:
             self.assertEqual(arquivo.read(1 << 16), b"\xff" * (1 << 16))                               # como o PCSX2
 
     def test_cartao_que_ja_existe_nunca_e_trocado(self):
@@ -464,7 +467,19 @@ class CartoesDoPs2(unittest.TestCase):
         graficos.preparar_cartoes_do_ps2(self.pasta)
         with open(guardado, "rb") as arquivo:
             self.assertEqual(arquivo.read(), b"Sony PS2 Memory Card Format meus saves")
-        self.assertEqual(sorted(os.listdir(self.memcards)), ["Mcd001.ps2", "Mcd002-64MB.ps2"])      # sem sobra de .tmp
+        self.assertEqual(sorted(os.listdir(self.memcards)), ["Mcd001-64MB.ps2", "Mcd001.ps2"])      # sem sobra de .tmp
+
+    def test_o_mesmo_cartao_muda_de_entrada_sem_perder_o_save(self):
+        graficos.preparar_cartoes_do_ps2(self.pasta, {"slot1_mb": 64, "slot2_mb": 8})
+        ini = graficos.preparar_cartoes_do_ps2(self.pasta, {"slot1_mb": 8, "slot2_mb": 64})
+        self.assertEqual(ini["MemoryCards"]["Slot1_Filename"], "Mcd001.ps2")
+        self.assertEqual(ini["MemoryCards"]["Slot2_Filename"], "Mcd001-64MB.ps2")
+        self.assertEqual(sorted(os.listdir(self.memcards)), ["Mcd001-64MB.ps2", "Mcd001.ps2"])       # nenhum cartao novo
+
+    def test_dois_cartoes_do_mesmo_tamanho_ganham_nomes_diferentes(self):
+        ini = graficos.preparar_cartoes_do_ps2(self.pasta, {"slot1_mb": 8, "slot2_mb": 8})
+        self.assertEqual((ini["MemoryCards"]["Slot1_Filename"], ini["MemoryCards"]["Slot2_Filename"]),
+                         ("Mcd001.ps2", "Mcd002.ps2"))
 
     def test_o_preparo_do_ps2_poe_os_cartoes_no_arquivo_de_ajustes(self):
         import arena
@@ -473,13 +488,14 @@ class CartoesDoPs2(unittest.TestCase):
             arena.preparar_o_ps2_do_android(arena.config_padrao(), {"arquivo": "x.chd"})
         with open(graficos.arquivo_de_ajustes_do_armsx2(self.pasta), encoding="utf-8") as arquivo:
             texto = arquivo.read()
-        # O padrao (pedido do Rafael, 24/10/2026): o PocketStation na entrada 1 e o maior cartao do PS2 na 2.
-        self.assertIn("MemoryCards/Slot1_Filename = PocketStation.mcr", texto)
-        self.assertIn("MemoryCards/Slot2_Filename = Mcd002-64MB.ps2", texto)
+        # O padrao (decisao do Rafael, 24/10/2026): o maior cartao do PS2 na entrada 1 e o PocketStation na 2.
+        self.assertIn("MemoryCards/Slot1_Filename = Mcd001-64MB.ps2", texto)
+        self.assertIn("MemoryCards/Slot2_Filename = PocketStation.mcr", texto)
         self.assertIn("EmuCore/WarnAboutUnsafeSettings = false", texto)
         self.assertEqual(os.path.getsize(os.path.join(self.memcards, "PocketStation.mcr")), 131072)
+        self.assertEqual(os.path.getsize(os.path.join(self.memcards, "Mcd001-64MB.ps2")), 69206016)
 
-    def test_a_pessoa_troca_a_entrada_1_pelo_cartao_do_ps2(self):
+    def test_a_pessoa_troca_o_pocketstation_pelo_cartao_do_ps2(self):
         import arena
         config = arena.config_padrao()
         config["acessorios"] = {"ps2_cartoes": {"entrada1": "8", "entrada2": "32"}}
@@ -489,9 +505,9 @@ class CartoesDoPs2(unittest.TestCase):
         with open(graficos.arquivo_de_ajustes_do_armsx2(self.pasta), encoding="utf-8") as arquivo:
             texto = arquivo.read()
         self.assertIn("MemoryCards/Slot1_Filename = Mcd001.ps2", texto)
-        self.assertIn("MemoryCards/Slot2_Filename = Mcd002-32MB.ps2", texto)
+        self.assertIn("MemoryCards/Slot2_Filename = Mcd001-32MB.ps2", texto)
 
-    def test_a_escolha_da_pessoa_vale(self):
+    def test_a_escolha_antiga_do_config_continua_valendo(self):
         import arena
         config = arena.config_padrao()
         config["cartoes_ps2"] = {"slot1_mb": 64, "slot2_mb": 8}
@@ -501,7 +517,7 @@ class CartoesDoPs2(unittest.TestCase):
         with open(graficos.arquivo_de_ajustes_do_armsx2(self.pasta), encoding="utf-8") as arquivo:
             texto = arquivo.read()
         self.assertIn("MemoryCards/Slot1_Filename = Mcd001-64MB.ps2", texto)
-        self.assertIn("MemoryCards/Slot2_Filename = Mcd002.ps2", texto)
+        self.assertIn("MemoryCards/Slot2_Filename = Mcd001.ps2", texto)
 
 
 class BiosSoDoPs2NaPlacaFraca(unittest.TestCase):

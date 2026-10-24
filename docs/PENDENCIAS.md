@@ -226,14 +226,13 @@ Falta (nesta ordem):
 - **Acessórios (24/10/2026), o que só você faz:**
   1. Olhar no celular: Ajustes → Emuladores → Acessórios dos consoles (ligar a telinha do VMU num jogo de Dreamcast,
      conferir o canto e o tamanho) e **abrir a BIOS do PS2** para ver "PocketStation/1" (já conferi por foto).
-  2. Dizer se mantém o **PocketStation como entrada 1 do PS2** (jogo de PS2 que só salva na entrada 1 não salvaria;
-     a troca está na mesma tela) e se o **PC** também deve usar o cartão de PS1 na entrada 1 (hoje não: é dado seu).
-  3. Autorizar (ou não) a integração do **DreamPotato** e do **PokketSX**: baixar de lá a BIOS do VMU (Sega) é escolha
-     sua; o ARENA não pode distribuir.
+  2. ~~Decidir o cartão do PS2~~ **Decidido em 24/10:** entrada 1 = cartão de 64 MB, entrada 2 = PocketStation (como no PC).
+  3. ~~Autorizar o DreamPotato e o PokketSX~~ **Autorizado em 24/10** (a BIOS do VMU da Sega que vem no zip do DreamPotato
+     fica só na máquina dele, em `emuladores\DreamPotato`, nunca no pacote).
   4. Testar com **controle de verdade** o Saturn e o PS1 no SwanStation (o tipo 517 que o ARENA manda pode ser
      "Arcade Racer" e "Analog Joystick").
-  5. O **PocketStation já abre** com o `kernel.bin` que você achou; para ver minijogos faltam arquivos de jogo
-     (`.mcd`, `.mcs`, `.pss`), que só você tem (de seus jogos de PS1 originais).
+  5. ~~Jogos de PocketStation~~ **Feito:** os 110 do conjunto TOSEC que você pôs no cartão SD foram descompactados e
+     posicionados no PC e no celular (`jogos\pessoais\PocketStation`).
   6. Rede do Dreamcast (adaptador de banda larga): fica desligada; ligar só com a rede liberada pelo professor.
 
 - **O teste no Chromebook da escola** (item 12, `docs/CHROMEBOOK.md`, "O

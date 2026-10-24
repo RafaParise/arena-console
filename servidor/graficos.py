@@ -1251,15 +1251,16 @@ TAMANHO_DO_CARTAO_PS1 = 128 * 1024
 
 def limpar_cartoes_ps2(valor):
     """{"slot1_mb": 8, "slot2_mb": 64} com so os tamanhos que existem; o que nao serve volta ao padrao.
-    "slot1_tipo" ("ps1" ou "ps2") so aparece se vier valido: sem ele a entrada 1 e' um cartao do PS2."""
+    "slot1_tipo" e "slot2_tipo" ("ps1" ou "ps2") so aparecem se vierem validos: sem eles a entrada e' um cartao do PS2."""
     limpo = dict(CARTOES_DO_PS2_PADRAO)
     if isinstance(valor, dict):
         for chave in list(limpo):
             tamanho = valor.get(chave)
             if isinstance(tamanho, int) and not isinstance(tamanho, bool) and tamanho in TAMANHOS_DE_CARTAO_PS2:
                 limpo[chave] = tamanho
-        if valor.get("slot1_tipo") in ("ps1", "ps2"):
-            limpo["slot1_tipo"] = valor["slot1_tipo"]
+        for entrada in ("slot1_tipo", "slot2_tipo"):
+            if valor.get(entrada) in ("ps1", "ps2"):
+                limpo[entrada] = valor[entrada]
     return limpo
 
 
@@ -1292,7 +1293,8 @@ def cartao_ps1_vazio():
 
 
 def nome_do_cartao_ps2(slot, megabytes):
-    """Mcd001.ps2 / Mcd002.ps2 (o de 8 MB, como o proprio PCSX2 nomeia) ou Mcd002-64MB.ps2."""
+    """Mcd001.ps2 / Mcd002.ps2 (o de 8 MB, como o proprio PCSX2 nomeia) ou Mcd001-64MB.ps2. 'slot' e' a ORDEM do cartao
+    daquele tamanho (1 ou 2), nao a entrada do console."""
     return "Mcd00%d.ps2" % slot if megabytes == 8 else "Mcd00%d-%dMB.ps2" % (slot, megabytes)
 
 
@@ -1305,10 +1307,20 @@ def preparar_cartoes_do_ps2(pasta_sistema, cartoes=None):
     escolha = limpar_cartoes_ps2(cartoes)
     pasta = os.path.join(pasta_sistema, "pcsx2", "memcards")
     nomes = {}
+    por_tamanho = {}          # quantos cartoes de PS2 de cada tamanho ja ganharam nome: 1o = Mcd001-..., 2o = Mcd002-...
+    ja_tem_pocketstation = False
     for slot in (1, 2):
         megabytes = escolha["slot%d_mb" % slot]
-        e_pocketstation = slot == 1 and escolha.get("slot1_tipo") == "ps1"
-        nome = NOME_DO_CARTAO_POCKETSTATION if e_pocketstation else nome_do_cartao_ps2(slot, megabytes)
+        e_pocketstation = escolha.get("slot%d_tipo" % slot) == "ps1"
+        if e_pocketstation:
+            # Dois PocketStation: o segundo ganha outro arquivo (o mesmo arquivo nao abre em duas entradas).
+            nome = "PocketStation-2.mcr" if ja_tem_pocketstation else NOME_DO_CARTAO_POCKETSTATION
+            ja_tem_pocketstation = True
+        else:
+            # O nome segue a ORDEM de uso por tamanho, nao a entrada: o cartao de 64 MB e' o mesmo arquivo na entrada 1
+            # ou na 2, e da para copiar saves de um cartao para outro pela BIOS.
+            por_tamanho[megabytes] = por_tamanho.get(megabytes, 0) + 1
+            nome = nome_do_cartao_ps2(por_tamanho[megabytes], megabytes)
         nomes[slot] = nome
         caminho = os.path.join(pasta, nome)
         if os.path.exists(caminho):

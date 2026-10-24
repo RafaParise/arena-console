@@ -158,16 +158,22 @@ class EscolhaDaPessoa(unittest.TestCase):
 
 
 class CartoesDoPs2PeloAcessorio(unittest.TestCase):
-    def test_sem_escolha_vale_o_pocketstation_na_entrada_1_e_o_maior_na_2(self):
-        self.assertEqual(acessorios.cartoes_ps2({}), {"slot1_tipo": "ps1", "slot1_mb": 8, "slot2_mb": 64})
+    def test_sem_escolha_vale_o_maior_cartao_na_entrada_1_e_o_pocketstation_na_2(self):
+        # Decisao do Rafael (24/10/2026): igual ao ARENA do computador.
+        esperado = {"slot1_tipo": "ps2", "slot1_mb": 64, "slot2_tipo": "ps1", "slot2_mb": 8}
+        self.assertEqual(acessorios.cartoes_ps2({}), esperado)
 
-    def test_a_pessoa_escolhe_um_cartao_de_ps2_na_entrada_1(self):
+    def test_a_pessoa_troca_os_cartoes(self):
         estado = {"ps2_cartoes": {"entrada1": "8", "entrada2": "32"}}
-        self.assertEqual(acessorios.cartoes_ps2(estado), {"slot1_tipo": "ps2", "slot1_mb": 8, "slot2_mb": 32})
+        self.assertEqual(acessorios.cartoes_ps2(estado), {"slot1_tipo": "ps2", "slot1_mb": 8, "slot2_tipo": "ps2", "slot2_mb": 32})
+
+    def test_o_pocketstation_pode_ir_na_entrada_1(self):
+        estado = {"ps2_cartoes": {"entrada1": "pocketstation", "entrada2": "64"}}
+        self.assertEqual(acessorios.cartoes_ps2(estado), {"slot1_tipo": "ps1", "slot1_mb": 64, "slot2_tipo": "ps2", "slot2_mb": 64})
 
     def test_valor_estranho_volta_ao_padrao(self):
         estado = {"ps2_cartoes": {"entrada1": "1000", "entrada2": "abc"}}
-        self.assertEqual(acessorios.cartoes_ps2(estado), {"slot1_tipo": "ps1", "slot1_mb": 8, "slot2_mb": 64})
+        self.assertEqual(acessorios.cartoes_ps2(estado), acessorios.cartoes_ps2({}))
 
 
 class ParaATela(unittest.TestCase):
@@ -261,21 +267,32 @@ class CartaoDoPocketStation(unittest.TestCase):
         self.assertEqual(quadro(16)[:4], b"\xff\xff\xff\xff")               # lista de setores ruins vazia
         self.assertEqual(cartao[56 * 128:], b"\xff" * (131072 - 56 * 128))  # os 15 blocos de dados em branco
 
-    def test_a_entrada_1_pode_ser_o_pocketstation(self):
+    def test_a_entrada_2_e_o_pocketstation_e_dois_pocketstation_ganham_arquivos_diferentes(self):
+        import tempfile as _tempfile
+        import limpeza as _limpeza
+        pasta = _tempfile.mkdtemp(prefix="arena_dois_pocketstation_")
+        try:
+            ini = graficos.preparar_cartoes_do_ps2(pasta, {"slot1_tipo": "ps1", "slot2_tipo": "ps1"})
+            self.assertEqual((ini["MemoryCards"]["Slot1_Filename"], ini["MemoryCards"]["Slot2_Filename"]),
+                             ("PocketStation.mcr", "PocketStation-2.mcr"))
+        finally:
+            _limpeza.apagar_pasta(pasta)
+
+    def test_a_entrada_pode_ser_o_pocketstation(self):
         import tempfile
         import limpeza
         pasta = tempfile.mkdtemp(prefix="arena_pocketstation_")
         try:
-            ini = graficos.preparar_cartoes_do_ps2(pasta, {"slot1_tipo": "ps1", "slot2_mb": 64})
+            ini = graficos.preparar_cartoes_do_ps2(pasta, {"slot1_mb": 64, "slot2_tipo": "ps1"})
             memcards = os.path.join(pasta, "pcsx2", "memcards")
-            self.assertEqual(ini["MemoryCards"]["Slot1_Filename"], "PocketStation.mcr")
-            self.assertEqual(ini["MemoryCards"]["Slot2_Filename"], "Mcd002-64MB.ps2")
+            self.assertEqual(ini["MemoryCards"]["Slot1_Filename"], "Mcd001-64MB.ps2")
+            self.assertEqual(ini["MemoryCards"]["Slot2_Filename"], "PocketStation.mcr")
             self.assertEqual(os.path.getsize(os.path.join(memcards, "PocketStation.mcr")), 131072)
             # Um cartao que a pessoa ja usou nunca e' trocado.
             with open(os.path.join(memcards, "PocketStation.mcr"), "r+b") as arquivo:
                 arquivo.seek(60 * 128)
                 arquivo.write(b"MEU SAVE")
-            graficos.preparar_cartoes_do_ps2(pasta, {"slot1_tipo": "ps1"})
+            graficos.preparar_cartoes_do_ps2(pasta, {"slot2_tipo": "ps1"})
             with open(os.path.join(memcards, "PocketStation.mcr"), "rb") as arquivo:
                 arquivo.seek(60 * 128)
                 self.assertEqual(arquivo.read(8), b"MEU SAVE")

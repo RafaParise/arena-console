@@ -2,29 +2,161 @@
   "_leia": "Catalogo de ACESSORIOS dos consoles (VMU, Rumble Pak, multitap, pistola de luz, cartuchos de expansao...). Cada grupo diz para quais consoles do ARENA e para qual nucleo libretro vale. Cada acessorio tem 'controles': uma chave (liga/desliga) ou uma escolha. O que a pessoa escolhe vai para config.json -> acessorios e, a cada jogo, vira (1) uma opcao do nucleo, (2) o tipo de controle de uma porta (input_libretro_device_pN, que o ARENA grava no .rmp da partida) ou (3) o cartao do PS2. Toda chave e todo valor daqui foram perguntados ao proprio nucleo (ferramentas/levantar_opcoes_dos_nucleos.py) e sao conferidos por ferramentas/conferir_acessorios.py. Valor vazio ('') quer dizer 'deixa como o emulador escolhe': nada e gravado. 'jogadores': N repete o acessorio para os jogadores 1..N, trocando {n} (numero) e {letra} (A, B, C, D) nos textos e nas chaves. 'so_alguns_jogos': o acessorio so faz efeito nos jogos feitos para ele.",
   "grupos": [
     {
-      "consoles": ["dreamcast"],
+      "consoles": [
+        "dreamcast"
+      ],
       "nucleo": "flycast",
       "acessorios": [
         {
-          "id": "dc_vmu_tela_{n}", "jogadores": 4, "so_alguns_jogos": true,
+          "id": "dc_vmu_tela_{n}",
+          "jogadores": 4,
+          "so_alguns_jogos": true,
           "nome": "VMU do jogador {n}: a telinha por cima do jogo",
           "texto": "O VMU (Visual Memory Unit) é o cartão de memória do Dreamcast que tinha uma telinha de cristal líquido (48×32 pontos) e botões. Alguns jogos desenham nela: as jogadas escolhidas num jogo de futebol, artes e provocações num jogo de luta, as cartas do Sonic Shuffle. Ligado, o ARENA mostra essa telinha por cima da imagem do jogo, no canto e no tamanho que você escolher.",
           "controles": [
-            {"id": "tela", "tipo": "chave", "rotulo": "Mostrar a telinha do VMU", "alvo": {"opcao": "reicast_vmu{n}_screen_display"}, "ligado": "enabled", "desligado": "disabled", "padrao": false},
-            {"id": "lugar", "tipo": "escolha", "rotulo": "Onde fica", "alvo": {"opcao": "reicast_vmu{n}_screen_position"}, "padrao": "",
-             "escolhas": [["", "Como o emulador escolhe"], ["Upper Left", "Em cima, à esquerda"], ["Upper Right", "Em cima, à direita"], ["Lower Left", "Embaixo, à esquerda"], ["Lower Right", "Embaixo, à direita"]]},
-            {"id": "tamanho", "tipo": "escolha", "rotulo": "Tamanho", "alvo": {"opcao": "reicast_vmu{n}_screen_size_mult"}, "padrao": "1x",
-             "escolhas": [["1x", "1× (pequena)"], ["2x", "2×"], ["3x", "3×"], ["4x", "4×"], ["5x", "5× (grande)"]]},
-            {"id": "opacidade", "tipo": "escolha", "rotulo": "Transparência", "alvo": {"opcao": "reicast_vmu{n}_screen_opacity"}, "padrao": "100%",
-             "escolhas": [["100%", "Sólida"], ["90%", "90%"], ["80%", "80%"], ["70%", "70%"], ["60%", "60%"], ["50%", "50%"], ["40%", "40%"], ["30%", "30%"], ["20%", "20%"], ["10%", "10% (quase some)"]]}
+            {
+              "id": "tela",
+              "tipo": "chave",
+              "rotulo": "Mostrar a telinha do VMU",
+              "alvo": {
+                "opcao": "reicast_vmu{n}_screen_display"
+              },
+              "ligado": "enabled",
+              "desligado": "disabled",
+              "padrao": false
+            },
+            {
+              "id": "lugar",
+              "tipo": "escolha",
+              "rotulo": "Onde fica",
+              "alvo": {
+                "opcao": "reicast_vmu{n}_screen_position"
+              },
+              "padrao": "",
+              "escolhas": [
+                [
+                  "",
+                  "Como o emulador escolhe"
+                ],
+                [
+                  "Upper Left",
+                  "Em cima, à esquerda"
+                ],
+                [
+                  "Upper Right",
+                  "Em cima, à direita"
+                ],
+                [
+                  "Lower Left",
+                  "Embaixo, à esquerda"
+                ],
+                [
+                  "Lower Right",
+                  "Embaixo, à direita"
+                ]
+              ]
+            },
+            {
+              "id": "tamanho",
+              "tipo": "escolha",
+              "rotulo": "Tamanho",
+              "alvo": {
+                "opcao": "reicast_vmu{n}_screen_size_mult"
+              },
+              "padrao": "1x",
+              "escolhas": [
+                [
+                  "1x",
+                  "1× (pequena)"
+                ],
+                [
+                  "2x",
+                  "2×"
+                ],
+                [
+                  "3x",
+                  "3×"
+                ],
+                [
+                  "4x",
+                  "4×"
+                ],
+                [
+                  "5x",
+                  "5× (grande)"
+                ]
+              ]
+            },
+            {
+              "id": "opacidade",
+              "tipo": "escolha",
+              "rotulo": "Transparência",
+              "alvo": {
+                "opcao": "reicast_vmu{n}_screen_opacity"
+              },
+              "padrao": "100%",
+              "escolhas": [
+                [
+                  "100%",
+                  "Sólida"
+                ],
+                [
+                  "90%",
+                  "90%"
+                ],
+                [
+                  "80%",
+                  "80%"
+                ],
+                [
+                  "70%",
+                  "70%"
+                ],
+                [
+                  "60%",
+                  "60%"
+                ],
+                [
+                  "50%",
+                  "50%"
+                ],
+                [
+                  "40%",
+                  "40%"
+                ],
+                [
+                  "30%",
+                  "30%"
+                ],
+                [
+                  "20%",
+                  "20%"
+                ],
+                [
+                  "10%",
+                  "10% (quase some)"
+                ]
+              ]
+            }
           ]
         },
         {
-          "id": "dc_vmu_som", "so_alguns_jogos": true,
+          "id": "dc_vmu_som",
+          "so_alguns_jogos": true,
           "nome": "VMU: os bipes do VMU",
           "texto": "Os jogos fazem o VMU apitar (um aviso, um som de carta). Ligado, você ouve esses sons junto com o som do jogo.",
           "controles": [
-            {"id": "som", "tipo": "chave", "rotulo": "Tocar o som do VMU", "alvo": {"opcao": "reicast_vmu_sound"}, "ligado": "enabled", "desligado": "disabled", "padrao": false}
+            {
+              "id": "som",
+              "tipo": "chave",
+              "rotulo": "Tocar o som do VMU",
+              "alvo": {
+                "opcao": "reicast_vmu_sound"
+              },
+              "ligado": "enabled",
+              "desligado": "disabled",
+              "padrao": false
+            }
           ]
         },
         {
@@ -32,60 +164,286 @@
           "nome": "VMU: o cartão de memória",
           "texto": "Escolha se cada jogo tem o seu próprio VMU (os saves de um jogo não se misturam com os de outro) ou se todos os jogos dividem os mesmos VMUs, como no console de verdade quando se troca o jogo e o VMU fica no controle.",
           "controles": [
-            {"id": "memoria", "tipo": "escolha", "rotulo": "Quem usa cada VMU", "alvo": {"opcao": "reicast_per_content_vmus"}, "padrao": "",
-             "escolhas": [["", "Como o emulador escolhe"], ["disabled", "Todos os jogos dividem os mesmos VMUs"], ["VMU A1", "Cada jogo tem o seu VMU do jogador 1"], ["All VMUs", "Cada jogo tem os seus 4 VMUs"]]}
+            {
+              "id": "memoria",
+              "tipo": "escolha",
+              "rotulo": "Quem usa cada VMU",
+              "alvo": {
+                "opcao": "reicast_per_content_vmus"
+              },
+              "padrao": "",
+              "escolhas": [
+                [
+                  "",
+                  "Como o emulador escolhe"
+                ],
+                [
+                  "disabled",
+                  "Todos os jogos dividem os mesmos VMUs"
+                ],
+                [
+                  "VMU A1",
+                  "Cada jogo tem o seu VMU do jogador 1"
+                ],
+                [
+                  "All VMUs",
+                  "Cada jogo tem os seus 4 VMUs"
+                ]
+              ]
+            }
           ]
         },
         {
-          "id": "dc_encaixes_{n}", "jogadores": 4,
+          "id": "dc_encaixes_{n}",
+          "jogadores": 4,
           "nome": "Controle {n}: o que está encaixado nele",
           "texto": "O controle do Dreamcast tinha dois encaixes na parte de cima (A1/A2, B1/B2...). Em geral ia um VMU no primeiro e um Jump Pack (a vibração) no segundo. O 'DreamPotato' liga o jogo a um VMU de verdade, num programa à parte (veja docs/ACESSORIOS.md).",
           "controles": [
-            {"id": "encaixe1", "tipo": "escolha", "rotulo": "Encaixe {letra}1", "alvo": {"opcao": "reicast_device_port{n}_slot1"}, "padrao": "",
-             "escolhas": [["", "Como o emulador escolhe"], ["VMU", "VMU (cartão de memória com telinha)"], ["Purupuru", "Jump Pack (vibração)"], ["DreamPotato", "DreamPotato (VMU em outro programa)"], ["None", "Vazio"]]},
-            {"id": "encaixe2", "tipo": "escolha", "rotulo": "Encaixe {letra}2", "alvo": {"opcao": "reicast_device_port{n}_slot2"}, "padrao": "",
-             "escolhas": [["", "Como o emulador escolhe"], ["VMU", "VMU (cartão de memória com telinha)"], ["Purupuru", "Jump Pack (vibração)"], ["None", "Vazio"]]}
+            {
+              "id": "encaixe1",
+              "tipo": "escolha",
+              "rotulo": "Encaixe {letra}1",
+              "alvo": {
+                "opcao": "reicast_device_port{n}_slot1"
+              },
+              "padrao": "",
+              "escolhas": [
+                [
+                  "",
+                  "Como o emulador escolhe"
+                ],
+                [
+                  "VMU",
+                  "VMU (cartão de memória com telinha)"
+                ],
+                [
+                  "Purupuru",
+                  "Jump Pack (vibração)"
+                ],
+                [
+                  "DreamPotato",
+                  "DreamPotato (VMU em outro programa)"
+                ],
+                [
+                  "None",
+                  "Vazio"
+                ]
+              ]
+            },
+            {
+              "id": "encaixe2",
+              "tipo": "escolha",
+              "rotulo": "Encaixe {letra}2",
+              "alvo": {
+                "opcao": "reicast_device_port{n}_slot2"
+              },
+              "padrao": "",
+              "escolhas": [
+                [
+                  "",
+                  "Como o emulador escolhe"
+                ],
+                [
+                  "VMU",
+                  "VMU (cartão de memória com telinha)"
+                ],
+                [
+                  "Purupuru",
+                  "Jump Pack (vibração)"
+                ],
+                [
+                  "None",
+                  "Vazio"
+                ]
+              ]
+            }
           ]
         },
         {
-          "id": "dc_controle_{n}", "jogadores": 4, "so_alguns_jogos": true,
+          "id": "dc_controle_{n}",
+          "jogadores": 4,
+          "so_alguns_jogos": true,
           "nome": "Controle {n}: o tipo de controle espetado",
           "texto": "O Dreamcast teve controles e brinquedos especiais: volante, arcade stick, pistola de luz, maracas do Samba de Amigo, vara de pescar, controle do trem (Densha de Go!), teclado e mouse. Só os jogos feitos para cada um respondem a ele.",
           "controles": [
-            {"id": "tipo", "tipo": "escolha", "rotulo": "Tipo de controle", "alvo": {"porta": "{n}"}, "padrao": "",
-             "escolhas": [["", "Como o ARENA escolhe"], ["1", "Controle comum"], ["1025", "Arcade Stick"], ["2049", "Volante (Race Controller)"], ["4", "Pistola de luz"], ["1281", "Maracas (Samba de Amigo)"], ["1537", "Vara de pescar"], ["1793", "Pop'n Music"], ["2305", "Densha de Go! (trem)"], ["3", "Teclado"], ["2", "Mouse"], ["513", "Twin Stick"], ["769", "Twin Stick do Saturn"], ["2561", "Controle completo (Full Controller)"], ["6", "Ponteiro (toque ou mouse na tela)"]]}
+            {
+              "id": "tipo",
+              "tipo": "escolha",
+              "rotulo": "Tipo de controle",
+              "alvo": {
+                "porta": "{n}"
+              },
+              "padrao": "",
+              "escolhas": [
+                [
+                  "",
+                  "Como o ARENA escolhe"
+                ],
+                [
+                  "1",
+                  "Controle comum"
+                ],
+                [
+                  "1025",
+                  "Arcade Stick"
+                ],
+                [
+                  "2049",
+                  "Volante (Race Controller)"
+                ],
+                [
+                  "4",
+                  "Pistola de luz"
+                ],
+                [
+                  "1281",
+                  "Maracas (Samba de Amigo)"
+                ],
+                [
+                  "1537",
+                  "Vara de pescar"
+                ],
+                [
+                  "1793",
+                  "Pop'n Music"
+                ],
+                [
+                  "2305",
+                  "Densha de Go! (trem)"
+                ],
+                [
+                  "3",
+                  "Teclado"
+                ],
+                [
+                  "2",
+                  "Mouse"
+                ],
+                [
+                  "513",
+                  "Twin Stick"
+                ],
+                [
+                  "769",
+                  "Twin Stick do Saturn"
+                ],
+                [
+                  "2561",
+                  "Controle completo (Full Controller)"
+                ],
+                [
+                  "6",
+                  "Ponteiro (toque ou mouse na tela)"
+                ]
+              ]
+            }
           ]
         },
         {
-          "id": "dc_mira_{n}", "jogadores": 2, "so_alguns_jogos": true,
+          "id": "dc_mira_{n}",
+          "jogadores": 2,
+          "so_alguns_jogos": true,
           "nome": "Pistola de luz {n}: mira na tela",
           "texto": "Mostra uma mira colorida onde a pistola de luz está apontando, para quem joga com mouse ou com o toque na tela.",
           "controles": [
-            {"id": "mira", "tipo": "escolha", "rotulo": "Cor da mira", "alvo": {"opcao": "reicast_lightgun{n}_crosshair"}, "padrao": "disabled",
-             "escolhas": [["disabled", "Sem mira"], ["White", "Branca"], ["Red", "Vermelha"], ["Green", "Verde"], ["Blue", "Azul"]]}
+            {
+              "id": "mira",
+              "tipo": "escolha",
+              "rotulo": "Cor da mira",
+              "alvo": {
+                "opcao": "reicast_lightgun{n}_crosshair"
+              },
+              "padrao": "disabled",
+              "escolhas": [
+                [
+                  "disabled",
+                  "Sem mira"
+                ],
+                [
+                  "White",
+                  "Branca"
+                ],
+                [
+                  "Red",
+                  "Vermelha"
+                ],
+                [
+                  "Green",
+                  "Verde"
+                ],
+                [
+                  "Blue",
+                  "Azul"
+                ]
+              ]
+            }
           ]
         },
         {
-          "id": "dc_banda_larga", "so_alguns_jogos": true,
+          "id": "dc_banda_larga",
+          "so_alguns_jogos": true,
           "nome": "Adaptador de banda larga (rede)",
           "texto": "O Dreamcast podia jogar pela internet com o Broadband Adapter. Ligado, o emulador finge ter esse adaptador. Fica DESLIGADO por padrão, porque coloca o jogo na rede: na escola, só ligue com a rede liberada pelo professor.",
           "controles": [
-            {"id": "rede", "tipo": "chave", "rotulo": "Ligar o adaptador de banda larga", "alvo": {"opcao": "reicast_emulate_bba"}, "ligado": "enabled", "desligado": "disabled", "padrao": false}
+            {
+              "id": "rede",
+              "tipo": "chave",
+              "rotulo": "Ligar o adaptador de banda larga",
+              "alvo": {
+                "opcao": "reicast_emulate_bba"
+              },
+              "ligado": "enabled",
+              "desligado": "disabled",
+              "padrao": false
+            }
           ]
         }
       ]
     },
     {
-      "consoles": ["n64"],
+      "consoles": [
+        "n64"
+      ],
       "nucleo": "mupen64plus_next",
       "acessorios": [
         {
-          "id": "n64_acessorio_{n}", "jogadores": 4, "so_alguns_jogos": true,
+          "id": "n64_acessorio_{n}",
+          "jogadores": 4,
+          "so_alguns_jogos": true,
           "nome": "Controle {n}: o acessório do encaixe",
           "texto": "O controle do Nintendo 64 tinha um encaixe embaixo. Dava para espetar o Controller Pak (um cartão de memória, onde alguns jogos guardam o progresso), o Rumble Pak (a vibração) ou o Transfer Pak (que lia um cartucho de Game Boy). Só dá para ter um por vez, e só os jogos feitos para ele reagem: nem todo jogo vibra, nem todo jogo usa o Controller Pak.",
           "controles": [
-            {"id": "pak", "tipo": "escolha", "rotulo": "No encaixe do controle {n}", "alvo": {"opcao": "mupen64plus-pak{n}"}, "padrao": "",
-             "escolhas": [["", "Como o emulador escolhe"], ["none", "Nada"], ["memory", "Controller Pak (cartão de memória)"], ["rumble", "Rumble Pak (vibração)"], ["transfer", "Transfer Pak (Game Boy)"]]}
+            {
+              "id": "pak",
+              "tipo": "escolha",
+              "rotulo": "No encaixe do controle {n}",
+              "alvo": {
+                "opcao": "mupen64plus-pak{n}"
+              },
+              "padrao": "",
+              "escolhas": [
+                [
+                  "",
+                  "Como o emulador escolhe"
+                ],
+                [
+                  "none",
+                  "Nada"
+                ],
+                [
+                  "memory",
+                  "Controller Pak (cartão de memória)"
+                ],
+                [
+                  "rumble",
+                  "Rumble Pak (vibração)"
+                ],
+                [
+                  "transfer",
+                  "Transfer Pak (Game Boy)"
+                ]
+              ]
+            }
           ]
         },
         {
@@ -93,117 +451,531 @@
           "nome": "Expansion Pak (4 MB de memória extra)",
           "texto": "O Expansion Pak dobrava a memória do Nintendo 64. Alguns jogos pedem (Donkey Kong 64, Zelda: Majora's Mask), outros ficam mais bonitos com ele. Deixe ligado; desligar serve para ver como era sem ele.",
           "controles": [
-            {"id": "memoria", "tipo": "chave", "rotulo": "Usar o Expansion Pak", "alvo": {"opcao": "mupen64plus-ForceDisableExtraMem"}, "ligado": "False", "desligado": "True", "padrao": true}
+            {
+              "id": "memoria",
+              "tipo": "chave",
+              "rotulo": "Usar o Expansion Pak",
+              "alvo": {
+                "opcao": "mupen64plus-ForceDisableExtraMem"
+              },
+              "ligado": "False",
+              "desligado": "True",
+              "padrao": true
+            }
           ]
         }
       ]
     },
     {
-      "consoles": ["nes"],
+      "consoles": [
+        "nes"
+      ],
       "nucleo": "fceumm",
       "acessorios": [
         {
-          "id": "nes_porta1", "so_alguns_jogos": true,
+          "id": "nes_porta1",
+          "so_alguns_jogos": true,
           "nome": "Porta 1: o que está espetado",
           "texto": "O Nintendinho tinha duas portas de controle. O Zapper é a pistola de luz (Duck Hunt, Hogan's Alley): só os jogos feitos para ela respondem.",
           "controles": [
-            {"id": "tipo", "tipo": "escolha", "rotulo": "Porta 1", "alvo": {"porta": 1}, "padrao": "",
-             "escolhas": [["", "Como o ARENA escolhe"], ["513", "Controle"], ["258", "Zapper (pistola de luz)"]]}
+            {
+              "id": "tipo",
+              "tipo": "escolha",
+              "rotulo": "Porta 1",
+              "alvo": {
+                "porta": 1
+              },
+              "padrao": "",
+              "escolhas": [
+                [
+                  "",
+                  "Como o ARENA escolhe"
+                ],
+                [
+                  "513",
+                  "Controle"
+                ],
+                [
+                  "258",
+                  "Zapper (pistola de luz)"
+                ]
+              ]
+            }
           ]
         },
         {
-          "id": "nes_porta2", "so_alguns_jogos": true,
+          "id": "nes_porta2",
+          "so_alguns_jogos": true,
           "nome": "Porta 2: o que está espetado",
           "texto": "Na porta 2 também iam o Zapper, o controle de roda do Arkanoid e o Power Pad (o tapete de esteira de Track & Field/Dance Aerobics).",
           "controles": [
-            {"id": "tipo", "tipo": "escolha", "rotulo": "Porta 2", "alvo": {"porta": 2}, "padrao": "",
-             "escolhas": [["", "Como o ARENA escolhe"], ["513", "Controle"], ["258", "Zapper (pistola de luz)"], ["514", "Arkanoid (controle de roda)"], ["259", "Power Pad (tapete), lado A"], ["515", "Power Pad (tapete), lado B"]]}
+            {
+              "id": "tipo",
+              "tipo": "escolha",
+              "rotulo": "Porta 2",
+              "alvo": {
+                "porta": 2
+              },
+              "padrao": "",
+              "escolhas": [
+                [
+                  "",
+                  "Como o ARENA escolhe"
+                ],
+                [
+                  "513",
+                  "Controle"
+                ],
+                [
+                  "258",
+                  "Zapper (pistola de luz)"
+                ],
+                [
+                  "514",
+                  "Arkanoid (controle de roda)"
+                ],
+                [
+                  "259",
+                  "Power Pad (tapete), lado A"
+                ],
+                [
+                  "515",
+                  "Power Pad (tapete), lado B"
+                ]
+              ]
+            }
           ]
         },
         {
-          "id": "nes_expansao", "so_alguns_jogos": true,
+          "id": "nes_expansao",
+          "so_alguns_jogos": true,
           "nome": "Porta de expansão do Famicom",
           "texto": "O Famicom japonês tinha uma porta de expansão na frente. Nela iam o adaptador de 4 jogadores, o Hyper Shot (pistolas de luz da Konami e da Bandai), o Arkanoid, a mesa de desenho Oeka Kids e o Family Trainer (tapete).",
           "controles": [
-            {"id": "tipo", "tipo": "escolha", "rotulo": "Porta de expansão", "alvo": {"porta": 5}, "padrao": "",
-             "escolhas": [["", "Como o ARENA escolhe"], ["769", "Adaptador de 4 jogadores (Four Score)"], ["1025", "Hyper Shot (Konami)"], ["1282", "Hyper Shot (Bandai)"], ["770", "Arkanoid (Famicom)"], ["1026", "Oeka Kids (mesa de desenho)"], ["771", "Family Trainer, lado A (tapete)"], ["1027", "Family Trainer, lado B (tapete)"]]}
+            {
+              "id": "tipo",
+              "tipo": "escolha",
+              "rotulo": "Porta de expansão",
+              "alvo": {
+                "porta": 5
+              },
+              "padrao": "",
+              "escolhas": [
+                [
+                  "",
+                  "Como o ARENA escolhe"
+                ],
+                [
+                  "769",
+                  "Adaptador de 4 jogadores (Four Score)"
+                ],
+                [
+                  "1025",
+                  "Hyper Shot (Konami)"
+                ],
+                [
+                  "1282",
+                  "Hyper Shot (Bandai)"
+                ],
+                [
+                  "770",
+                  "Arkanoid (Famicom)"
+                ],
+                [
+                  "1026",
+                  "Oeka Kids (mesa de desenho)"
+                ],
+                [
+                  "771",
+                  "Family Trainer, lado A (tapete)"
+                ],
+                [
+                  "1027",
+                  "Family Trainer, lado B (tapete)"
+                ]
+              ]
+            }
           ]
         }
       ]
     },
     {
-      "consoles": ["snes"],
+      "consoles": [
+        "snes"
+      ],
       "nucleo": "snes9x",
       "acessorios": [
         {
-          "id": "snes_porta1", "so_alguns_jogos": true,
+          "id": "snes_porta1",
+          "so_alguns_jogos": true,
           "nome": "Porta 1: o que está espetado",
           "texto": "O Super Nintendo tinha duas portas. O mouse era para jogos como Mario Paint; o Multitap (Super Multitap) dava 5 controles numa porta, para jogos como Super Bomberman.",
           "controles": [
-            {"id": "tipo", "tipo": "escolha", "rotulo": "Porta 1", "alvo": {"porta": 1}, "padrao": "",
-             "escolhas": [["", "Como o ARENA escolhe"], ["1", "Controle"], ["2", "Mouse do Super Nintendo"], ["257", "Multitap (até 5 controles)"]]}
+            {
+              "id": "tipo",
+              "tipo": "escolha",
+              "rotulo": "Porta 1",
+              "alvo": {
+                "porta": 1
+              },
+              "padrao": "",
+              "escolhas": [
+                [
+                  "",
+                  "Como o ARENA escolhe"
+                ],
+                [
+                  "1",
+                  "Controle"
+                ],
+                [
+                  "2",
+                  "Mouse do Super Nintendo"
+                ],
+                [
+                  "257",
+                  "Multitap (até 5 controles)"
+                ]
+              ]
+            }
           ]
         },
         {
-          "id": "snes_porta2", "so_alguns_jogos": true,
+          "id": "snes_porta2",
+          "so_alguns_jogos": true,
           "nome": "Porta 2: o que está espetado",
           "texto": "Na porta 2 iam também as armas de luz: o Super Scope (a bazuca, de jogos como Battle Clash e Yoshi's Safari), o Justifier (Lethal Enforcers) e o M.A.C.S. (um rifle de treino).",
           "controles": [
-            {"id": "tipo", "tipo": "escolha", "rotulo": "Porta 2", "alvo": {"porta": 2}, "padrao": "",
-             "escolhas": [["", "Como o ARENA escolhe"], ["1", "Controle"], ["2", "Mouse do Super Nintendo"], ["257", "Multitap (até 5 controles)"], ["260", "Super Scope (bazuca de luz)"], ["516", "Justifier (pistola)"], ["1028", "M.A.C.S. (rifle)"]]}
+            {
+              "id": "tipo",
+              "tipo": "escolha",
+              "rotulo": "Porta 2",
+              "alvo": {
+                "porta": 2
+              },
+              "padrao": "",
+              "escolhas": [
+                [
+                  "",
+                  "Como o ARENA escolhe"
+                ],
+                [
+                  "1",
+                  "Controle"
+                ],
+                [
+                  "2",
+                  "Mouse do Super Nintendo"
+                ],
+                [
+                  "257",
+                  "Multitap (até 5 controles)"
+                ],
+                [
+                  "260",
+                  "Super Scope (bazuca de luz)"
+                ],
+                [
+                  "516",
+                  "Justifier (pistola)"
+                ],
+                [
+                  "1028",
+                  "M.A.C.S. (rifle)"
+                ]
+              ]
+            }
           ]
         },
         {
-          "id": "snes_mira", "so_alguns_jogos": true,
+          "id": "snes_mira",
+          "so_alguns_jogos": true,
           "nome": "Armas de luz: como mirar",
           "texto": "Com mouse ou pistola de luz de verdade, escolha 'Mouse/pistola'. No celular ou no tablet, escolha 'Toque na tela' e aponte com o dedo.",
           "controles": [
-            {"id": "mirar", "tipo": "escolha", "rotulo": "Mirar com", "alvo": {"opcao": "snes9x_lightgun_mode"}, "padrao": "Lightgun",
-             "escolhas": [["Lightgun", "Mouse ou pistola"], ["Touchscreen", "Toque na tela"]]}
+            {
+              "id": "mirar",
+              "tipo": "escolha",
+              "rotulo": "Mirar com",
+              "alvo": {
+                "opcao": "snes9x_lightgun_mode"
+              },
+              "padrao": "Lightgun",
+              "escolhas": [
+                [
+                  "Lightgun",
+                  "Mouse ou pistola"
+                ],
+                [
+                  "Touchscreen",
+                  "Toque na tela"
+                ]
+              ]
+            }
           ]
         }
       ]
     },
     {
-      "consoles": ["megadrive", "segacd"],
+      "consoles": [
+        "megadrive",
+        "segacd"
+      ],
       "nucleo": "genesis_plus_gx",
       "acessorios": [
         {
-          "id": "md_porta1", "so_alguns_jogos": true,
+          "id": "md_porta1",
+          "so_alguns_jogos": true,
           "nome": "Porta 1: o que está espetado",
           "texto": "O Mega Drive tinha o controle de 3 botões, o de 6 (Street Fighter II), o mouse, o Team Player e o 4-Way Play (mais jogadores) e, com a base do Master System, a Light Phaser e o Paddle.",
           "controles": [
-            {"id": "tipo", "tipo": "escolha", "rotulo": "Porta 1", "alvo": {"porta": 1}, "padrao": "",
-             "escolhas": [["", "Como o ARENA escolhe"], ["257", "Controle de 3 botões"], ["513", "Controle de 6 botões"], ["2", "Mega Mouse"], ["773", "XE-1AP (controle analógico)"], ["1537", "3 botões + Team Player (4 em 1 porta)"], ["1793", "6 botões + Team Player (4 em 1 porta)"], ["1025", "3 botões + 4-Way Play"], ["1281", "6 botões + 4-Way Play"], ["260", "Master System: Light Phaser (pistola)"], ["261", "Master System: Paddle"], ["517", "Master System: Sports Pad"], ["262", "Master System: Graphic Board"], ["769", "Master System: controle de 2 botões"], ["2049", "Master System: Master Tap"]]}
+            {
+              "id": "tipo",
+              "tipo": "escolha",
+              "rotulo": "Porta 1",
+              "alvo": {
+                "porta": 1
+              },
+              "padrao": "",
+              "escolhas": [
+                [
+                  "",
+                  "Como o ARENA escolhe"
+                ],
+                [
+                  "257",
+                  "Controle de 3 botões"
+                ],
+                [
+                  "513",
+                  "Controle de 6 botões"
+                ],
+                [
+                  "2",
+                  "Mega Mouse"
+                ],
+                [
+                  "773",
+                  "XE-1AP (controle analógico)"
+                ],
+                [
+                  "1537",
+                  "3 botões + Team Player (4 em 1 porta)"
+                ],
+                [
+                  "1793",
+                  "6 botões + Team Player (4 em 1 porta)"
+                ],
+                [
+                  "1025",
+                  "3 botões + 4-Way Play"
+                ],
+                [
+                  "1281",
+                  "6 botões + 4-Way Play"
+                ],
+                [
+                  "260",
+                  "Master System: Light Phaser (pistola)"
+                ],
+                [
+                  "261",
+                  "Master System: Paddle"
+                ],
+                [
+                  "517",
+                  "Master System: Sports Pad"
+                ],
+                [
+                  "262",
+                  "Master System: Graphic Board"
+                ],
+                [
+                  "769",
+                  "Master System: controle de 2 botões"
+                ],
+                [
+                  "2049",
+                  "Master System: Master Tap"
+                ]
+              ]
+            }
           ]
         },
         {
-          "id": "md_porta2", "so_alguns_jogos": true,
+          "id": "md_porta2",
+          "so_alguns_jogos": true,
           "nome": "Porta 2: o que está espetado",
           "texto": "Na porta 2 também iam as pistolas: o Menacer (a bazuca) e o Justifier (duas pistolas, de Lethal Enforcers).",
           "controles": [
-            {"id": "tipo", "tipo": "escolha", "rotulo": "Porta 2", "alvo": {"porta": 2}, "padrao": "",
-             "escolhas": [["", "Como o ARENA escolhe"], ["257", "Controle de 3 botões"], ["513", "Controle de 6 botões"], ["2", "Mega Mouse"], ["773", "XE-1AP (controle analógico)"], ["516", "Menacer (bazuca de luz)"], ["772", "Justifiers (2 pistolas)"], ["1537", "3 botões + Team Player (4 em 1 porta)"], ["1793", "6 botões + Team Player (4 em 1 porta)"], ["260", "Master System: Light Phaser (pistola)"], ["261", "Master System: Paddle"], ["517", "Master System: Sports Pad"]]}
+            {
+              "id": "tipo",
+              "tipo": "escolha",
+              "rotulo": "Porta 2",
+              "alvo": {
+                "porta": 2
+              },
+              "padrao": "",
+              "escolhas": [
+                [
+                  "",
+                  "Como o ARENA escolhe"
+                ],
+                [
+                  "257",
+                  "Controle de 3 botões"
+                ],
+                [
+                  "513",
+                  "Controle de 6 botões"
+                ],
+                [
+                  "2",
+                  "Mega Mouse"
+                ],
+                [
+                  "773",
+                  "XE-1AP (controle analógico)"
+                ],
+                [
+                  "516",
+                  "Menacer (bazuca de luz)"
+                ],
+                [
+                  "772",
+                  "Justifiers (2 pistolas)"
+                ],
+                [
+                  "1537",
+                  "3 botões + Team Player (4 em 1 porta)"
+                ],
+                [
+                  "1793",
+                  "6 botões + Team Player (4 em 1 porta)"
+                ],
+                [
+                  "260",
+                  "Master System: Light Phaser (pistola)"
+                ],
+                [
+                  "261",
+                  "Master System: Paddle"
+                ],
+                [
+                  "517",
+                  "Master System: Sports Pad"
+                ]
+              ]
+            }
           ]
         },
         {
-          "id": "md_lock_on", "so_alguns_jogos": true,
+          "id": "md_lock_on",
+          "so_alguns_jogos": true,
           "nome": "Cartucho encaixado em cima (Lock-On)",
           "texto": "O Sonic & Knuckles tinha um encaixe em cima onde se espetava outro cartucho (Sonic 2, Sonic 3). Também havia o Game Genie e o Action Replay (códigos de trapaça). O emulador pede os arquivos do acessório na pasta BIOS; sem eles, o jogo abre do mesmo jeito, sem o acessório.",
           "controles": [
-            {"id": "encaixe", "tipo": "escolha", "rotulo": "Cartucho de cima", "alvo": {"opcao": "genesis_plus_gx_lock_on"}, "padrao": "disabled",
-             "escolhas": [["disabled", "Nenhum"], ["game genie", "Game Genie"], ["action replay (pro)", "Action Replay Pro"], ["sonic & knuckles", "Sonic & Knuckles (Lock-On)"]]}
+            {
+              "id": "encaixe",
+              "tipo": "escolha",
+              "rotulo": "Cartucho de cima",
+              "alvo": {
+                "opcao": "genesis_plus_gx_lock_on"
+              },
+              "padrao": "disabled",
+              "escolhas": [
+                [
+                  "disabled",
+                  "Nenhum"
+                ],
+                [
+                  "game genie",
+                  "Game Genie"
+                ],
+                [
+                  "action replay (pro)",
+                  "Action Replay Pro"
+                ],
+                [
+                  "sonic & knuckles",
+                  "Sonic & Knuckles (Lock-On)"
+                ]
+              ]
+            }
           ]
         },
         {
-          "id": "md_cd", "so_alguns_jogos": true,
+          "id": "md_cd",
+          "so_alguns_jogos": true,
           "nome": "Sega CD / Mega CD (o leitor de CD)",
           "texto": "O Sega CD era um leitor de CD que se encaixava embaixo do Mega Drive. 'Automático' liga quando o jogo é de CD. Precisa da BIOS do Sega CD na pasta BIOS.",
           "controles": [
-            {"id": "complemento", "tipo": "escolha", "rotulo": "Complemento de CD", "alvo": {"opcao": "genesis_plus_gx_add_on"}, "padrao": "auto",
-             "escolhas": [["auto", "Automático"], ["sega/mega cd", "Sega CD / Mega CD"], ["megasd", "MegaSD"], ["none", "Nenhum"]]},
-            {"id": "cartao", "tipo": "escolha", "rotulo": "Cartão de memória do Sega CD", "alvo": {"opcao": "genesis_plus_gx_cart_size"}, "padrao": "4meg",
-             "escolhas": [["disabled", "Sem cartão"], ["128k", "128 KB"], ["256k", "256 KB"], ["512k", "512 KB"], ["1meg", "1 MB"], ["2meg", "2 MB"], ["4meg", "4 MB (o maior)"]]}
+            {
+              "id": "complemento",
+              "tipo": "escolha",
+              "rotulo": "Complemento de CD",
+              "alvo": {
+                "opcao": "genesis_plus_gx_add_on"
+              },
+              "padrao": "auto",
+              "escolhas": [
+                [
+                  "auto",
+                  "Automático"
+                ],
+                [
+                  "sega/mega cd",
+                  "Sega CD / Mega CD"
+                ],
+                [
+                  "megasd",
+                  "MegaSD"
+                ],
+                [
+                  "none",
+                  "Nenhum"
+                ]
+              ]
+            },
+            {
+              "id": "cartao",
+              "tipo": "escolha",
+              "rotulo": "Cartão de memória do Sega CD",
+              "alvo": {
+                "opcao": "genesis_plus_gx_cart_size"
+              },
+              "padrao": "4meg",
+              "escolhas": [
+                [
+                  "disabled",
+                  "Sem cartão"
+                ],
+                [
+                  "128k",
+                  "128 KB"
+                ],
+                [
+                  "256k",
+                  "256 KB"
+                ],
+                [
+                  "512k",
+                  "512 KB"
+                ],
+                [
+                  "1meg",
+                  "1 MB"
+                ],
+                [
+                  "2meg",
+                  "2 MB"
+                ],
+                [
+                  "4meg",
+                  "4 MB (o maior)"
+                ]
+              ]
+            }
           ]
         },
         {
@@ -211,24 +983,75 @@
           "nome": "Master System: o módulo de som FM",
           "texto": "O Master System japonês tinha um módulo opcional de som FM (YM2413), que deixava a música dos jogos mais rica.",
           "controles": [
-            {"id": "fm", "tipo": "escolha", "rotulo": "Módulo FM", "alvo": {"opcao": "genesis_plus_gx_ym2413"}, "padrao": "auto",
-             "escolhas": [["auto", "Automático"], ["enabled", "Ligado"], ["disabled", "Desligado"]]}
+            {
+              "id": "fm",
+              "tipo": "escolha",
+              "rotulo": "Módulo FM",
+              "alvo": {
+                "opcao": "genesis_plus_gx_ym2413"
+              },
+              "padrao": "auto",
+              "escolhas": [
+                [
+                  "auto",
+                  "Automático"
+                ],
+                [
+                  "enabled",
+                  "Ligado"
+                ],
+                [
+                  "disabled",
+                  "Desligado"
+                ]
+              ]
+            }
           ]
         },
         {
-          "id": "md_mira", "so_alguns_jogos": true,
+          "id": "md_mira",
+          "so_alguns_jogos": true,
           "nome": "Pistolas de luz: como mirar",
           "texto": "Com mouse ou pistola de verdade, escolha 'Mouse/pistola'. No celular ou no tablet, escolha 'Toque na tela'.",
           "controles": [
-            {"id": "mirar", "tipo": "escolha", "rotulo": "Mirar com", "alvo": {"opcao": "genesis_plus_gx_gun_input"}, "padrao": "lightgun",
-             "escolhas": [["lightgun", "Mouse ou pistola"], ["touchscreen", "Toque na tela"]]},
-            {"id": "cursor", "tipo": "chave", "rotulo": "Mostrar a mira", "alvo": {"opcao": "genesis_plus_gx_gun_cursor"}, "ligado": "enabled", "desligado": "disabled", "padrao": false}
+            {
+              "id": "mirar",
+              "tipo": "escolha",
+              "rotulo": "Mirar com",
+              "alvo": {
+                "opcao": "genesis_plus_gx_gun_input"
+              },
+              "padrao": "lightgun",
+              "escolhas": [
+                [
+                  "lightgun",
+                  "Mouse ou pistola"
+                ],
+                [
+                  "touchscreen",
+                  "Toque na tela"
+                ]
+              ]
+            },
+            {
+              "id": "cursor",
+              "tipo": "chave",
+              "rotulo": "Mostrar a mira",
+              "alvo": {
+                "opcao": "genesis_plus_gx_gun_cursor"
+              },
+              "ligado": "enabled",
+              "desligado": "disabled",
+              "padrao": false
+            }
           ]
         }
       ]
     },
     {
-      "consoles": ["sega32x"],
+      "consoles": [
+        "sega32x"
+      ],
       "nucleo": "picodrive",
       "acessorios": [
         {
@@ -236,8 +1059,37 @@
           "nome": "Porta 1: o controle",
           "texto": "O Sega 32X é uma peça que se encaixava no Mega Drive e rodava jogos próprios, em cartuchos de 32X (ele não melhora os jogos comuns do Mega Drive). Aqui você escolhe o controle espetado.",
           "controles": [
-            {"id": "tipo", "tipo": "escolha", "rotulo": "Porta 1", "alvo": {"opcao": "picodrive_input1"}, "padrao": "3 button pad",
-             "escolhas": [["3 button pad", "Controle de 3 botões"], ["6 button pad", "Controle de 6 botões"], ["team player", "Team Player (4 em 1 porta)"], ["4way play", "4-Way Play"], ["None", "Vazio"]]}
+            {
+              "id": "tipo",
+              "tipo": "escolha",
+              "rotulo": "Porta 1",
+              "alvo": {
+                "opcao": "picodrive_input1"
+              },
+              "padrao": "3 button pad",
+              "escolhas": [
+                [
+                  "3 button pad",
+                  "Controle de 3 botões"
+                ],
+                [
+                  "6 button pad",
+                  "Controle de 6 botões"
+                ],
+                [
+                  "team player",
+                  "Team Player (4 em 1 porta)"
+                ],
+                [
+                  "4way play",
+                  "4-Way Play"
+                ],
+                [
+                  "None",
+                  "Vazio"
+                ]
+              ]
+            }
           ]
         },
         {
@@ -245,339 +1097,1326 @@
           "nome": "Porta 2: o controle",
           "texto": "O controle da segunda porta.",
           "controles": [
-            {"id": "tipo", "tipo": "escolha", "rotulo": "Porta 2", "alvo": {"opcao": "picodrive_input2"}, "padrao": "3 button pad",
-             "escolhas": [["3 button pad", "Controle de 3 botões"], ["6 button pad", "Controle de 6 botões"], ["None", "Vazio"]]}
+            {
+              "id": "tipo",
+              "tipo": "escolha",
+              "rotulo": "Porta 2",
+              "alvo": {
+                "opcao": "picodrive_input2"
+              },
+              "padrao": "3 button pad",
+              "escolhas": [
+                [
+                  "3 button pad",
+                  "Controle de 3 botões"
+                ],
+                [
+                  "6 button pad",
+                  "Controle de 6 botões"
+                ],
+                [
+                  "None",
+                  "Vazio"
+                ]
+              ]
+            }
           ]
         },
         {
-          "id": "x32_ramcart", "so_alguns_jogos": true,
+          "id": "x32_ramcart",
+          "so_alguns_jogos": true,
           "nome": "Sega CD: cartucho de RAM",
           "texto": "O cartucho de RAM do Sega CD guardava os saves dos jogos de CD.",
           "controles": [
-            {"id": "ram", "tipo": "chave", "rotulo": "Usar o cartucho de RAM", "alvo": {"opcao": "picodrive_ramcart"}, "ligado": "enabled", "desligado": "disabled", "padrao": false}
+            {
+              "id": "ram",
+              "tipo": "chave",
+              "rotulo": "Usar o cartucho de RAM",
+              "alvo": {
+                "opcao": "picodrive_ramcart"
+              },
+              "ligado": "enabled",
+              "desligado": "disabled",
+              "padrao": false
+            }
           ]
         }
       ]
     },
     {
-      "consoles": ["saturn"],
+      "consoles": [
+        "saturn"
+      ],
       "nucleo": "mednafen_saturn",
       "acessorios": [
         {
-          "id": "sat_cartucho", "so_alguns_jogos": true,
+          "id": "sat_cartucho",
+          "so_alguns_jogos": true,
           "nome": "Cartucho de expansão (encaixe de cima)",
           "texto": "O Saturn tinha um encaixe para cartuchos: a memória de backup extra (para guardar mais saves) e a RAM extra de 1 MB ou 4 MB, que jogos de luta como X-Men vs. Street Fighter e Marvel Super Heroes pediam. 'Detectar' escolhe sozinho pelo jogo.",
           "controles": [
-            {"id": "cartucho", "tipo": "escolha", "rotulo": "Cartucho", "alvo": {"opcao": "beetle_saturn_cart"}, "padrao": "Auto Detect",
-             "escolhas": [["Auto Detect", "Detectar pelo jogo"], ["None", "Nenhum"], ["Backup Memory", "Memória de backup (saves)"], ["Extended RAM (1MB)", "RAM extra de 1 MB"], ["Extended RAM (4MB)", "RAM extra de 4 MB"]]}
+            {
+              "id": "cartucho",
+              "tipo": "escolha",
+              "rotulo": "Cartucho",
+              "alvo": {
+                "opcao": "beetle_saturn_cart"
+              },
+              "padrao": "Auto Detect",
+              "escolhas": [
+                [
+                  "Auto Detect",
+                  "Detectar pelo jogo"
+                ],
+                [
+                  "None",
+                  "Nenhum"
+                ],
+                [
+                  "Backup Memory",
+                  "Memória de backup (saves)"
+                ],
+                [
+                  "Extended RAM (1MB)",
+                  "RAM extra de 1 MB"
+                ],
+                [
+                  "Extended RAM (4MB)",
+                  "RAM extra de 4 MB"
+                ]
+              ]
+            }
           ]
         },
         {
-          "id": "sat_multitap", "so_alguns_jogos": true,
+          "id": "sat_multitap",
+          "so_alguns_jogos": true,
           "nome": "Adaptador de 6 jogadores",
           "texto": "O adaptador multitap do Saturn dava até 6 controles em uma porta (7 jogadores com os dois, em jogos como Saturn Bomberman).",
           "controles": [
-            {"id": "porta1", "tipo": "chave", "rotulo": "Adaptador na porta 1", "alvo": {"opcao": "beetle_saturn_multitap_port1"}, "ligado": "enabled", "desligado": "disabled", "padrao": false},
-            {"id": "porta2", "tipo": "chave", "rotulo": "Adaptador na porta 2", "alvo": {"opcao": "beetle_saturn_multitap_port2"}, "ligado": "enabled", "desligado": "disabled", "padrao": false}
+            {
+              "id": "porta1",
+              "tipo": "chave",
+              "rotulo": "Adaptador na porta 1",
+              "alvo": {
+                "opcao": "beetle_saturn_multitap_port1"
+              },
+              "ligado": "enabled",
+              "desligado": "disabled",
+              "padrao": false
+            },
+            {
+              "id": "porta2",
+              "tipo": "chave",
+              "rotulo": "Adaptador na porta 2",
+              "alvo": {
+                "opcao": "beetle_saturn_multitap_port2"
+              },
+              "ligado": "enabled",
+              "desligado": "disabled",
+              "padrao": false
+            }
           ]
         },
         {
-          "id": "sat_porta_{n}", "jogadores": 2, "so_alguns_jogos": true,
+          "id": "sat_porta_{n}",
+          "jogadores": 2,
+          "so_alguns_jogos": true,
           "nome": "Porta {n}: o tipo de controle espetado",
           "texto": "O Saturn teve o Controle 3D (analógico, de NiGHTS), pistolas (Virtua Gun, Stunner), o volante Arcade Racer, o mouse, os Mission Sticks (manches de Panzer Dragoon/Black Fire) e o teclado.",
           "controles": [
-            {"id": "tipo", "tipo": "escolha", "rotulo": "Porta {n}", "alvo": {"porta": "{n}"}, "padrao": "",
-             "escolhas": [["", "Como o ARENA escolhe"], ["1", "Controle comum"], ["261", "Controle 3D (analógico)"], ["260", "Virtua Gun (pistola)"], ["516", "Stunner (pistola)"], ["258", "Mouse"], ["517", "Arcade Racer (volante)"], ["773", "Mission Stick (manche)"], ["1029", "Dois Mission Sticks"], ["1285", "Twin-Stick"], ["259", "Teclado"]]}
+            {
+              "id": "tipo",
+              "tipo": "escolha",
+              "rotulo": "Porta {n}",
+              "alvo": {
+                "porta": "{n}"
+              },
+              "padrao": "",
+              "escolhas": [
+                [
+                  "",
+                  "Como o ARENA escolhe"
+                ],
+                [
+                  "1",
+                  "Controle comum"
+                ],
+                [
+                  "261",
+                  "Controle 3D (analógico)"
+                ],
+                [
+                  "260",
+                  "Virtua Gun (pistola)"
+                ],
+                [
+                  "516",
+                  "Stunner (pistola)"
+                ],
+                [
+                  "258",
+                  "Mouse"
+                ],
+                [
+                  "517",
+                  "Arcade Racer (volante)"
+                ],
+                [
+                  "773",
+                  "Mission Stick (manche)"
+                ],
+                [
+                  "1029",
+                  "Dois Mission Sticks"
+                ],
+                [
+                  "1285",
+                  "Twin-Stick"
+                ],
+                [
+                  "259",
+                  "Teclado"
+                ]
+              ]
+            }
           ]
         }
       ]
     },
     {
-      "consoles": ["ps1"],
+      "consoles": [
+        "ps1"
+      ],
       "nucleo": "swanstation",
       "acessorios": [
         {
-          "id": "ps1_controle_{n}", "jogadores": 2, "so_alguns_jogos": true,
+          "id": "ps1_controle_{n}",
+          "jogadores": 2,
+          "so_alguns_jogos": true,
           "nome": "Porta {n}: o tipo de controle espetado",
           "texto": "O PlayStation teve o controle digital, o DualShock (analógico, com vibração), o Analog Joystick (manche), o NeGcon (controle de corrida de Ridge Racer), a pistola GunCon (Time Crisis) e o mouse. Só os jogos feitos para cada um respondem a ele. Para o PocketStation, veja o console PocketStation.",
           "controles": [
-            {"id": "tipo", "tipo": "escolha", "rotulo": "Porta {n}", "alvo": {"porta": "{n}"}, "padrao": "",
-             "escolhas": [["", "Como o ARENA escolhe"], ["1", "Controle digital"], ["261", "DualShock (analógico e vibração)"], ["517", "Analog Joystick (manche)"], ["773", "NeGcon (controle de corrida)"], ["1029", "NeGcon com vibração"], ["260", "GunCon (pistola de luz)"], ["258", "Mouse do PlayStation"]]}
+            {
+              "id": "tipo",
+              "tipo": "escolha",
+              "rotulo": "Porta {n}",
+              "alvo": {
+                "porta": "{n}"
+              },
+              "padrao": "",
+              "escolhas": [
+                [
+                  "",
+                  "Como o ARENA escolhe"
+                ],
+                [
+                  "1",
+                  "Controle digital"
+                ],
+                [
+                  "261",
+                  "DualShock (analógico e vibração)"
+                ],
+                [
+                  "517",
+                  "Analog Joystick (manche)"
+                ],
+                [
+                  "773",
+                  "NeGcon (controle de corrida)"
+                ],
+                [
+                  "1029",
+                  "NeGcon com vibração"
+                ],
+                [
+                  "260",
+                  "GunCon (pistola de luz)"
+                ],
+                [
+                  "258",
+                  "Mouse do PlayStation"
+                ]
+              ]
+            }
           ]
         }
       ]
     },
     {
-      "consoles": ["ps2"],
+      "consoles": [
+        "ps2"
+      ],
       "nucleo": "armsx2",
-      "plataformas": ["android"],
+      "plataformas": [
+        "android"
+      ],
       "acessorios": [
         {
           "id": "ps2_cartoes",
           "nome": "Cartões de memória do PS2",
-          "texto": "O PS2 tinha duas entradas de cartão. A entrada 1 pode ficar com o PocketStation (um cartão no formato do PlayStation 1, de 128 KB, que também tinha telinha e minijogos), como no ARENA do computador; a entrada 2 fica com um cartão do PS2 do tamanho que você escolher, o maior de todos para caber todos os saves. Atenção: jogo de PS2 não salva num cartão de PS1; salva no da entrada 2. Seus saves antigos continuam no cartão de PS2 de 8 MB (Mcd001.ps2), nada foi apagado: para trazê-los, ponha esse cartão na entrada 1, abra a BIOS (Browser) e copie os saves para a entrada 2; depois volte a entrada 1 para o PocketStation.",
+          "texto": "O PS2 tinha duas entradas de cartão. Aqui, como no ARENA do computador: a entrada 1 leva o cartão do PS2 com o máximo de memória (64 MB, cabe todo save) e a entrada 2 leva o PocketStation (um cartão no formato do PlayStation 1, de 128 KB, que também tinha telinha e minijogos; a BIOS do PS2 mostra \"PocketStation\"). Jogo de PS2 não salva num cartão de PS1: salva no da entrada 1. Seus saves antigos continuam no cartão de PS2 de 8 MB (Mcd001.ps2), nada foi apagado: para trazê-los, ponha esse cartão de 8 MB na entrada 2, abra a BIOS (Browser), copie os saves para a entrada 1 e depois volte a entrada 2 para o PocketStation.",
           "controles": [
-            {"id": "entrada1", "tipo": "escolha", "rotulo": "Entrada 1", "alvo": {"cartao_ps2": 1}, "padrao": "pocketstation",
-             "escolhas": [["pocketstation", "PocketStation (cartão de PS1, 128 KB)"], ["8", "Cartão do PS2 de 8 MB (o da BIOS)"], ["16", "Cartão do PS2 de 16 MB"], ["32", "Cartão do PS2 de 32 MB"], ["64", "Cartão do PS2 de 64 MB"]]},
-            {"id": "entrada2", "tipo": "escolha", "rotulo": "Entrada 2", "alvo": {"cartao_ps2": 2}, "padrao": "64",
-             "escolhas": [["8", "Cartão do PS2 de 8 MB"], ["16", "Cartão do PS2 de 16 MB"], ["32", "Cartão do PS2 de 32 MB"], ["64", "Cartão do PS2 de 64 MB (o maior)"]]}
+            {
+              "id": "entrada1",
+              "tipo": "escolha",
+              "rotulo": "Entrada 1",
+              "alvo": {
+                "cartao_ps2": 1
+              },
+              "padrao": "64",
+              "escolhas": [
+                [
+                  "pocketstation",
+                  "PocketStation (cartão de PS1, 128 KB)"
+                ],
+                [
+                  "8",
+                  "Cartão do PS2 de 8 MB"
+                ],
+                [
+                  "16",
+                  "Cartão do PS2 de 16 MB"
+                ],
+                [
+                  "32",
+                  "Cartão do PS2 de 32 MB"
+                ],
+                [
+                  "64",
+                  "Cartão do PS2 de 64 MB (o maior)"
+                ]
+              ]
+            },
+            {
+              "id": "entrada2",
+              "tipo": "escolha",
+              "rotulo": "Entrada 2",
+              "alvo": {
+                "cartao_ps2": 2
+              },
+              "padrao": "pocketstation",
+              "escolhas": [
+                [
+                  "pocketstation",
+                  "PocketStation (cartão de PS1, 128 KB)"
+                ],
+                [
+                  "8",
+                  "Cartão do PS2 de 8 MB"
+                ],
+                [
+                  "16",
+                  "Cartão do PS2 de 16 MB"
+                ],
+                [
+                  "32",
+                  "Cartão do PS2 de 32 MB"
+                ],
+                [
+                  "64",
+                  "Cartão do PS2 de 64 MB (o maior)"
+                ]
+              ]
+            }
           ]
         }
       ]
     },
     {
-      "consoles": ["gba"],
+      "consoles": [
+        "gba"
+      ],
       "nucleo": "mgba",
       "acessorios": [
         {
-          "id": "gba_solar", "so_alguns_jogos": true,
+          "id": "gba_solar",
+          "so_alguns_jogos": true,
           "nome": "Sensor de luz do cartucho (Boktai)",
           "texto": "Os cartuchos de Boktai tinham um sensor de luz solar: o jogo reagia ao sol de verdade. Aqui você escolhe a quantidade de luz (0 é escuro, 10 é sol forte). Só o Boktai usa.",
           "controles": [
-            {"id": "luz", "tipo": "escolha", "rotulo": "Luz do sol", "alvo": {"opcao": "mgba_solar_sensor_level"}, "padrao": "0",
-             "escolhas": [["0", "0 (escuro)"], ["1", "1"], ["2", "2"], ["3", "3"], ["4", "4"], ["5", "5"], ["6", "6"], ["7", "7"], ["8", "8"], ["9", "9"], ["10", "10 (sol forte)"], ["sensor", "Usar o sensor de luz do aparelho"]]}
+            {
+              "id": "luz",
+              "tipo": "escolha",
+              "rotulo": "Luz do sol",
+              "alvo": {
+                "opcao": "mgba_solar_sensor_level"
+              },
+              "padrao": "0",
+              "escolhas": [
+                [
+                  "0",
+                  "0 (escuro)"
+                ],
+                [
+                  "1",
+                  "1"
+                ],
+                [
+                  "2",
+                  "2"
+                ],
+                [
+                  "3",
+                  "3"
+                ],
+                [
+                  "4",
+                  "4"
+                ],
+                [
+                  "5",
+                  "5"
+                ],
+                [
+                  "6",
+                  "6"
+                ],
+                [
+                  "7",
+                  "7"
+                ],
+                [
+                  "8",
+                  "8"
+                ],
+                [
+                  "9",
+                  "9"
+                ],
+                [
+                  "10",
+                  "10 (sol forte)"
+                ],
+                [
+                  "sensor",
+                  "Usar o sensor de luz do aparelho"
+                ]
+              ]
+            }
           ]
         },
         {
-          "id": "gba_player", "so_alguns_jogos": true,
+          "id": "gba_player",
+          "so_alguns_jogos": true,
           "nome": "Game Boy Player (vibração de GameCube)",
           "texto": "O Game Boy Player era uma peça do GameCube que rodava cartuchos de Game Boy na TV e fazia o controle do GameCube vibrar em alguns jogos.",
           "controles": [
-            {"id": "gbp", "tipo": "chave", "rotulo": "Vibração do Game Boy Player", "alvo": {"opcao": "mgba_force_gbp"}, "ligado": "ON", "desligado": "OFF", "padrao": false}
+            {
+              "id": "gbp",
+              "tipo": "chave",
+              "rotulo": "Vibração do Game Boy Player",
+              "alvo": {
+                "opcao": "mgba_force_gbp"
+              },
+              "ligado": "ON",
+              "desligado": "OFF",
+              "padrao": false
+            }
           ]
         },
         {
-          "id": "gba_sgb", "so_alguns_jogos": true,
+          "id": "gba_sgb",
+          "so_alguns_jogos": true,
           "nome": "Super Game Boy (moldura e modelo)",
           "texto": "O Super Game Boy era um cartucho do Super Nintendo que rodava jogos de Game Boy com cores e uma moldura em volta da tela.",
           "controles": [
-            {"id": "moldura", "tipo": "chave", "rotulo": "Usar as molduras do Super Game Boy", "alvo": {"opcao": "mgba_sgb_borders"}, "ligado": "ON", "desligado": "OFF", "padrao": true},
-            {"id": "modelo", "tipo": "escolha", "rotulo": "Modelo de Game Boy dos jogos de Game Boy", "alvo": {"opcao": "mgba_gb_model"}, "padrao": "Autodetect",
-             "escolhas": [["Autodetect", "Detectar pelo jogo"], ["Game Boy", "Game Boy"], ["Super Game Boy", "Super Game Boy"], ["Game Boy Color", "Game Boy Color"], ["Super Game Boy Color", "Super Game Boy Color"], ["Game Boy Advance", "Game Boy Advance"]]}
+            {
+              "id": "moldura",
+              "tipo": "chave",
+              "rotulo": "Usar as molduras do Super Game Boy",
+              "alvo": {
+                "opcao": "mgba_sgb_borders"
+              },
+              "ligado": "ON",
+              "desligado": "OFF",
+              "padrao": true
+            },
+            {
+              "id": "modelo",
+              "tipo": "escolha",
+              "rotulo": "Modelo de Game Boy dos jogos de Game Boy",
+              "alvo": {
+                "opcao": "mgba_gb_model"
+              },
+              "padrao": "Autodetect",
+              "escolhas": [
+                [
+                  "Autodetect",
+                  "Detectar pelo jogo"
+                ],
+                [
+                  "Game Boy",
+                  "Game Boy"
+                ],
+                [
+                  "Super Game Boy",
+                  "Super Game Boy"
+                ],
+                [
+                  "Game Boy Color",
+                  "Game Boy Color"
+                ],
+                [
+                  "Super Game Boy Color",
+                  "Super Game Boy Color"
+                ],
+                [
+                  "Game Boy Advance",
+                  "Game Boy Advance"
+                ]
+              ]
+            }
           ]
         }
       ]
     },
     {
-      "consoles": ["gameboy"],
+      "consoles": [
+        "gameboy"
+      ],
       "nucleo": "gambatte",
       "acessorios": [
         {
-          "id": "gb_vibracao", "so_alguns_jogos": true,
+          "id": "gb_vibracao",
+          "so_alguns_jogos": true,
           "nome": "Cartucho com vibração",
           "texto": "Alguns cartuchos de Game Boy Color tinham motor de vibração dentro (Pokémon Pinball, Perfect Dark). A força vai de 0 (desligada) a 10.",
           "controles": [
-            {"id": "forca", "tipo": "escolha", "rotulo": "Força da vibração", "alvo": {"opcao": "gambatte_rumble_level"}, "padrao": "10",
-             "escolhas": [["0", "Desligada"], ["2", "Fraca"], ["5", "Média"], ["8", "Forte"], ["10", "Máxima"]]}
+            {
+              "id": "forca",
+              "tipo": "escolha",
+              "rotulo": "Força da vibração",
+              "alvo": {
+                "opcao": "gambatte_rumble_level"
+              },
+              "padrao": "10",
+              "escolhas": [
+                [
+                  "0",
+                  "Desligada"
+                ],
+                [
+                  "2",
+                  "Fraca"
+                ],
+                [
+                  "5",
+                  "Média"
+                ],
+                [
+                  "8",
+                  "Forte"
+                ],
+                [
+                  "10",
+                  "Máxima"
+                ]
+              ]
+            }
           ]
         }
       ]
     },
     {
-      "consoles": ["pokemini"],
+      "consoles": [
+        "pokemini"
+      ],
       "nucleo": "pokemini",
       "acessorios": [
         {
-          "id": "pm_vibracao", "so_alguns_jogos": true,
+          "id": "pm_vibracao",
+          "so_alguns_jogos": true,
           "nome": "Vibração do Pokémon mini",
           "texto": "O Pokémon mini tinha um motorzinho de vibração dentro do aparelho. A força vai de 0 (desligada) a 10.",
           "controles": [
-            {"id": "forca", "tipo": "escolha", "rotulo": "Força da vibração", "alvo": {"opcao": "pokemini_rumble_lv"}, "padrao": "10",
-             "escolhas": [["0", "Desligada"], ["2", "Fraca"], ["5", "Média"], ["8", "Forte"], ["10", "Máxima"]]}
+            {
+              "id": "forca",
+              "tipo": "escolha",
+              "rotulo": "Força da vibração",
+              "alvo": {
+                "opcao": "pokemini_rumble_lv"
+              },
+              "padrao": "10",
+              "escolhas": [
+                [
+                  "0",
+                  "Desligada"
+                ],
+                [
+                  "2",
+                  "Fraca"
+                ],
+                [
+                  "5",
+                  "Média"
+                ],
+                [
+                  "8",
+                  "Forte"
+                ],
+                [
+                  "10",
+                  "Máxima"
+                ]
+              ]
+            }
           ]
         }
       ]
     },
     {
-      "consoles": ["nds"],
+      "consoles": [
+        "nds"
+      ],
       "nucleo": "melonds",
       "acessorios": [
         {
-          "id": "nds_microfone", "so_alguns_jogos": true,
+          "id": "nds_microfone",
+          "so_alguns_jogos": true,
           "nome": "Microfone do Nintendo DS",
           "texto": "O DS tinha um microfone embutido: jogos como Nintendogs e Kirby pedem para soprar ou falar. Aqui o emulador finge o som que entra nele.",
           "controles": [
-            {"id": "som", "tipo": "escolha", "rotulo": "Som do microfone", "alvo": {"opcao": "melonds_mic_input"}, "padrao": "Blow Noise",
-             "escolhas": [["Blow Noise", "Sopro"], ["White Noise", "Ruído"]]}
+            {
+              "id": "som",
+              "tipo": "escolha",
+              "rotulo": "Som do microfone",
+              "alvo": {
+                "opcao": "melonds_mic_input"
+              },
+              "padrao": "Blow Noise",
+              "escolhas": [
+                [
+                  "Blow Noise",
+                  "Sopro"
+                ],
+                [
+                  "White Noise",
+                  "Ruído"
+                ]
+              ]
+            }
           ]
         }
       ]
     },
     {
-      "consoles": ["sg1000"],
+      "consoles": [
+        "sg1000"
+      ],
       "nucleo": "gearsystem",
       "acessorios": [
         {
-          "id": "sms_porta1", "so_alguns_jogos": true,
+          "id": "sms_porta1",
+          "so_alguns_jogos": true,
           "nome": "Porta 1: o que está espetado",
           "texto": "O Master System tinha a pistola Light Phaser (Safari Hunt, Operation Wolf), o Paddle (Galactic Protector), o Sports Pad e os óculos 3D.",
           "controles": [
-            {"id": "tipo", "tipo": "escolha", "rotulo": "Porta 1", "alvo": {"porta": 1}, "padrao": "",
-             "escolhas": [["", "Como o ARENA escolhe"], ["257", "Controle"], ["260", "Light Phaser (pistola)"], ["258", "Paddle"], ["517", "Sports Pad"], ["0", "Vazio"]]},
-            {"id": "oculos", "tipo": "escolha", "rotulo": "Óculos 3D", "alvo": {"opcao": "gearsystem_glasses"}, "padrao": "Both Eyes / OFF",
-             "escolhas": [["Both Eyes / OFF", "Desligados"], ["Left Eye", "Olho esquerdo"], ["Right Eye", "Olho direito"]]}
+            {
+              "id": "tipo",
+              "tipo": "escolha",
+              "rotulo": "Porta 1",
+              "alvo": {
+                "porta": 1
+              },
+              "padrao": "",
+              "escolhas": [
+                [
+                  "",
+                  "Como o ARENA escolhe"
+                ],
+                [
+                  "257",
+                  "Controle"
+                ],
+                [
+                  "260",
+                  "Light Phaser (pistola)"
+                ],
+                [
+                  "258",
+                  "Paddle"
+                ],
+                [
+                  "517",
+                  "Sports Pad"
+                ],
+                [
+                  "0",
+                  "Vazio"
+                ]
+              ]
+            },
+            {
+              "id": "oculos",
+              "tipo": "escolha",
+              "rotulo": "Óculos 3D",
+              "alvo": {
+                "opcao": "gearsystem_glasses"
+              },
+              "padrao": "Both Eyes / OFF",
+              "escolhas": [
+                [
+                  "Both Eyes / OFF",
+                  "Desligados"
+                ],
+                [
+                  "Left Eye",
+                  "Olho esquerdo"
+                ],
+                [
+                  "Right Eye",
+                  "Olho direito"
+                ]
+              ]
+            }
           ]
         }
       ]
     },
     {
-      "consoles": ["pcengine"],
+      "consoles": [
+        "pcengine"
+      ],
       "nucleo": "mednafen_pce",
       "acessorios": [
         {
-          "id": "pce_multitap", "so_alguns_jogos": true,
+          "id": "pce_multitap",
+          "so_alguns_jogos": true,
           "nome": "TurboTap (5 controles) e Arcade Card",
           "texto": "O TurboTap do PC Engine dava 5 controles (Bomberman, Dungeon Explorer). O Arcade Card era um cartão de memória extra para jogos de CD, como os de luta da SNK.",
           "controles": [
-            {"id": "tap", "tipo": "chave", "rotulo": "Usar o TurboTap", "alvo": {"opcao": "pce_multitap"}, "ligado": "enabled", "desligado": "disabled", "padrao": true},
-            {"id": "arcade", "tipo": "chave", "rotulo": "Usar o Arcade Card", "alvo": {"opcao": "pce_arcadecard"}, "ligado": "enabled", "desligado": "disabled", "padrao": true}
+            {
+              "id": "tap",
+              "tipo": "chave",
+              "rotulo": "Usar o TurboTap",
+              "alvo": {
+                "opcao": "pce_multitap"
+              },
+              "ligado": "enabled",
+              "desligado": "disabled",
+              "padrao": true
+            },
+            {
+              "id": "arcade",
+              "tipo": "chave",
+              "rotulo": "Usar o Arcade Card",
+              "alvo": {
+                "opcao": "pce_arcadecard"
+              },
+              "ligado": "enabled",
+              "desligado": "disabled",
+              "padrao": true
+            }
           ]
         }
       ]
     },
     {
-      "consoles": ["threedo"],
+      "consoles": [
+        "threedo"
+      ],
       "nucleo": "opera",
       "acessorios": [
         {
-          "id": "tdo_controle_{n}", "jogadores": 2, "so_alguns_jogos": true,
+          "id": "tdo_controle_{n}",
+          "jogadores": 2,
+          "so_alguns_jogos": true,
           "nome": "Controle {n}: o tipo espetado",
           "texto": "O 3DO teve o controle comum, o Flightstick (manche), o mouse, pistolas de luz e o Orbatak (trackball de fliperama). Os controles se ligavam em cadeia, um no outro.",
           "controles": [
-            {"id": "tipo", "tipo": "escolha", "rotulo": "Controle {n}", "alvo": {"porta": "{n}"}, "padrao": "",
-             "escolhas": [["", "Como o ARENA escolhe"], ["1", "Controle comum"], ["257", "Flightstick (manche)"], ["2", "Mouse"], ["4", "Pistola de luz"], ["260", "Pistola de fliperama"], ["513", "Orbatak (trackball)"]]}
+            {
+              "id": "tipo",
+              "tipo": "escolha",
+              "rotulo": "Controle {n}",
+              "alvo": {
+                "porta": "{n}"
+              },
+              "padrao": "",
+              "escolhas": [
+                [
+                  "",
+                  "Como o ARENA escolhe"
+                ],
+                [
+                  "1",
+                  "Controle comum"
+                ],
+                [
+                  "257",
+                  "Flightstick (manche)"
+                ],
+                [
+                  "2",
+                  "Mouse"
+                ],
+                [
+                  "4",
+                  "Pistola de luz"
+                ],
+                [
+                  "260",
+                  "Pistola de fliperama"
+                ],
+                [
+                  "513",
+                  "Orbatak (trackball)"
+                ]
+              ]
+            }
           ]
         }
       ]
     },
     {
-      "consoles": ["amiga"],
+      "consoles": [
+        "amiga"
+      ],
       "nucleo": "puae",
       "acessorios": [
         {
-          "id": "amiga_porta_{n}", "jogadores": 2, "so_alguns_jogos": true,
+          "id": "amiga_porta_{n}",
+          "jogadores": 2,
+          "so_alguns_jogos": true,
           "nome": "Porta {n}: o que está espetado",
           "texto": "O Amiga tinha duas portas para joystick ou mouse. Também iam o controle do CD32, o joystick analógico, a pistola Trojan Phazer e a caneta de luz.",
           "controles": [
-            {"id": "tipo", "tipo": "escolha", "rotulo": "Porta {n}", "alvo": {"porta": "{n}"}, "padrao": "",
-             "escolhas": [["", "Como o ARENA escolhe"], ["257", "Controle (RetroPad)"], ["517", "Controle do CD32"], ["261", "Joystick"], ["773", "Joystick analógico"], ["513", "Arcadia"], ["260", "Trojan Phazer (pistola de luz)"], ["516", "Caneta de luz"], ["259", "Teclado"], ["0", "Vazio"]]}
+            {
+              "id": "tipo",
+              "tipo": "escolha",
+              "rotulo": "Porta {n}",
+              "alvo": {
+                "porta": "{n}"
+              },
+              "padrao": "",
+              "escolhas": [
+                [
+                  "",
+                  "Como o ARENA escolhe"
+                ],
+                [
+                  "257",
+                  "Controle (RetroPad)"
+                ],
+                [
+                  "517",
+                  "Controle do CD32"
+                ],
+                [
+                  "261",
+                  "Joystick"
+                ],
+                [
+                  "773",
+                  "Joystick analógico"
+                ],
+                [
+                  "513",
+                  "Arcadia"
+                ],
+                [
+                  "260",
+                  "Trojan Phazer (pistola de luz)"
+                ],
+                [
+                  "516",
+                  "Caneta de luz"
+                ],
+                [
+                  "259",
+                  "Teclado"
+                ],
+                [
+                  "0",
+                  "Vazio"
+                ]
+              ]
+            }
           ]
         }
       ]
     },
     {
-      "consoles": ["c64"],
+      "consoles": [
+        "c64"
+      ],
       "nucleo": "vice_x64",
       "acessorios": [
         {
-          "id": "c64_expansoes", "so_alguns_jogos": true,
+          "id": "c64_expansoes",
+          "so_alguns_jogos": true,
           "nome": "Expansões do Commodore 64",
           "texto": "A REU (RAM Expansion Unit) aumentava a memória do C64 de 64 KB até 16 MB. A impressora e o adaptador de joysticks da porta do usuário (4 jogadores) também eram acessórios.",
           "controles": [
-            {"id": "reu", "tipo": "escolha", "rotulo": "REU (memória extra)", "alvo": {"opcao": "vice_ram_expansion_unit"}, "padrao": "none",
-             "escolhas": [["none", "Sem REU"], ["128kB", "128 KB"], ["512kB", "512 KB"], ["2048kB", "2 MB"], ["8192kB", "8 MB"], ["16384kB", "16 MB"]]},
-            {"id": "impressora", "tipo": "chave", "rotulo": "Impressora ligada", "alvo": {"opcao": "vice_printer"}, "ligado": "enabled", "desligado": "disabled", "padrao": false},
-            {"id": "adaptador", "tipo": "escolha", "rotulo": "Adaptador de joysticks (porta do usuário)", "alvo": {"opcao": "vice_userport_joytype"}, "padrao": "disabled",
-             "escolhas": [["disabled", "Sem adaptador"], ["CGA", "CGA"], ["HIT", "HIT"], ["Kingsoft", "Kingsoft"], ["Starbyte", "Starbyte"], ["Synergy", "Synergy"], ["Hummer", "Hummer"], ["OEM", "OEM"], ["PET", "PET"]]}
+            {
+              "id": "reu",
+              "tipo": "escolha",
+              "rotulo": "REU (memória extra)",
+              "alvo": {
+                "opcao": "vice_ram_expansion_unit"
+              },
+              "padrao": "none",
+              "escolhas": [
+                [
+                  "none",
+                  "Sem REU"
+                ],
+                [
+                  "128kB",
+                  "128 KB"
+                ],
+                [
+                  "512kB",
+                  "512 KB"
+                ],
+                [
+                  "2048kB",
+                  "2 MB"
+                ],
+                [
+                  "8192kB",
+                  "8 MB"
+                ],
+                [
+                  "16384kB",
+                  "16 MB"
+                ]
+              ]
+            },
+            {
+              "id": "impressora",
+              "tipo": "chave",
+              "rotulo": "Impressora ligada",
+              "alvo": {
+                "opcao": "vice_printer"
+              },
+              "ligado": "enabled",
+              "desligado": "disabled",
+              "padrao": false
+            },
+            {
+              "id": "adaptador",
+              "tipo": "escolha",
+              "rotulo": "Adaptador de joysticks (porta do usuário)",
+              "alvo": {
+                "opcao": "vice_userport_joytype"
+              },
+              "padrao": "disabled",
+              "escolhas": [
+                [
+                  "disabled",
+                  "Sem adaptador"
+                ],
+                [
+                  "CGA",
+                  "CGA"
+                ],
+                [
+                  "HIT",
+                  "HIT"
+                ],
+                [
+                  "Kingsoft",
+                  "Kingsoft"
+                ],
+                [
+                  "Starbyte",
+                  "Starbyte"
+                ],
+                [
+                  "Synergy",
+                  "Synergy"
+                ],
+                [
+                  "Hummer",
+                  "Hummer"
+                ],
+                [
+                  "OEM",
+                  "OEM"
+                ],
+                [
+                  "PET",
+                  "PET"
+                ]
+              ]
+            }
           ]
         }
       ]
     },
     {
-      "consoles": ["atari800"],
+      "consoles": [
+        "atari800"
+      ],
       "nucleo": "atari800",
       "acessorios": [
         {
-          "id": "a800_expansoes", "so_alguns_jogos": true,
+          "id": "a800_expansoes",
+          "so_alguns_jogos": true,
           "nome": "Expansões do Atari 8 bits",
           "texto": "Memórias extras (Axlon e Mosaic), a impressora e os paddles (controles de rosca) eram acessórios do Atari 800/XL/XE.",
           "controles": [
-            {"id": "axlon", "tipo": "escolha", "rotulo": "Memória Axlon", "alvo": {"opcao": "atari800_axlon"}, "padrao": "disabled",
-             "escolhas": [["disabled", "Sem"], ["128 KB", "128 KB"], ["512 KB", "512 KB"], ["1 MB", "1 MB"], ["4 MB", "4 MB"]]},
-            {"id": "mosaic", "tipo": "escolha", "rotulo": "Memória Mosaic", "alvo": {"opcao": "atari800_mosaic"}, "padrao": "disabled",
-             "escolhas": [["disabled", "Sem"], ["16 KB", "16 KB"], ["80 KB", "80 KB"], ["144 KB", "144 KB"]]},
-            {"id": "impressora", "tipo": "chave", "rotulo": "Impressora (P:)", "alvo": {"opcao": "atari800_pdevice"}, "ligado": "enabled", "desligado": "disabled", "padrao": true},
-            {"id": "paddle", "tipo": "chave", "rotulo": "Paddles no lugar do joystick", "alvo": {"opcao": "paddle_active"}, "ligado": "enabled", "desligado": "disabled", "padrao": false}
+            {
+              "id": "axlon",
+              "tipo": "escolha",
+              "rotulo": "Memória Axlon",
+              "alvo": {
+                "opcao": "atari800_axlon"
+              },
+              "padrao": "disabled",
+              "escolhas": [
+                [
+                  "disabled",
+                  "Sem"
+                ],
+                [
+                  "128 KB",
+                  "128 KB"
+                ],
+                [
+                  "512 KB",
+                  "512 KB"
+                ],
+                [
+                  "1 MB",
+                  "1 MB"
+                ],
+                [
+                  "4 MB",
+                  "4 MB"
+                ]
+              ]
+            },
+            {
+              "id": "mosaic",
+              "tipo": "escolha",
+              "rotulo": "Memória Mosaic",
+              "alvo": {
+                "opcao": "atari800_mosaic"
+              },
+              "padrao": "disabled",
+              "escolhas": [
+                [
+                  "disabled",
+                  "Sem"
+                ],
+                [
+                  "16 KB",
+                  "16 KB"
+                ],
+                [
+                  "80 KB",
+                  "80 KB"
+                ],
+                [
+                  "144 KB",
+                  "144 KB"
+                ]
+              ]
+            },
+            {
+              "id": "impressora",
+              "tipo": "chave",
+              "rotulo": "Impressora (P:)",
+              "alvo": {
+                "opcao": "atari800_pdevice"
+              },
+              "ligado": "enabled",
+              "desligado": "disabled",
+              "padrao": true
+            },
+            {
+              "id": "paddle",
+              "tipo": "chave",
+              "rotulo": "Paddles no lugar do joystick",
+              "alvo": {
+                "opcao": "paddle_active"
+              },
+              "ligado": "enabled",
+              "desligado": "disabled",
+              "padrao": false
+            }
           ]
         }
       ]
     },
     {
-      "consoles": ["apple2"],
+      "consoles": [
+        "apple2"
+      ],
       "nucleo": "applewin",
       "acessorios": [
         {
-          "id": "apple2_placas", "so_alguns_jogos": true,
+          "id": "apple2_placas",
+          "so_alguns_jogos": true,
           "nome": "Placas de expansão do Apple II",
           "texto": "O Apple II tinha 8 encaixes para placas: som Mockingboard, mouse, placa Z80 para rodar CP/M, disco rígido e outras.",
           "controles": [
-            {"id": "slot4", "tipo": "escolha", "rotulo": "Encaixe 4", "alvo": {"opcao": "applewin_slot4"}, "padrao": "Mockingboard C",
-             "escolhas": [["Empty", "Vazio"], ["Mockingboard C", "Mockingboard C (som)"], ["Mouse Card", "Placa de mouse"], ["Phasor", "Phasor (som)"]]},
-            {"id": "slot5", "tipo": "escolha", "rotulo": "Encaixe 5", "alvo": {"opcao": "applewin_slot5"}, "padrao": "Empty",
-             "escolhas": [["Empty", "Vazio"], ["Z80 SoftCard", "Z80 SoftCard (CP/M)"], ["Mockingboard C", "Mockingboard C (som)"], ["Phasor", "Phasor (som)"], ["SAM", "SAM (voz)"]]}
+            {
+              "id": "slot4",
+              "tipo": "escolha",
+              "rotulo": "Encaixe 4",
+              "alvo": {
+                "opcao": "applewin_slot4"
+              },
+              "padrao": "Mockingboard C",
+              "escolhas": [
+                [
+                  "Empty",
+                  "Vazio"
+                ],
+                [
+                  "Mockingboard C",
+                  "Mockingboard C (som)"
+                ],
+                [
+                  "Mouse Card",
+                  "Placa de mouse"
+                ],
+                [
+                  "Phasor",
+                  "Phasor (som)"
+                ]
+              ]
+            },
+            {
+              "id": "slot5",
+              "tipo": "escolha",
+              "rotulo": "Encaixe 5",
+              "alvo": {
+                "opcao": "applewin_slot5"
+              },
+              "padrao": "Empty",
+              "escolhas": [
+                [
+                  "Empty",
+                  "Vazio"
+                ],
+                [
+                  "Z80 SoftCard",
+                  "Z80 SoftCard (CP/M)"
+                ],
+                [
+                  "Mockingboard C",
+                  "Mockingboard C (som)"
+                ],
+                [
+                  "Phasor",
+                  "Phasor (som)"
+                ],
+                [
+                  "SAM",
+                  "SAM (voz)"
+                ]
+              ]
+            }
           ]
         }
       ]
     },
     {
-      "consoles": ["msx"],
+      "consoles": [
+        "msx"
+      ],
       "nucleo": "bluemsx",
       "acessorios": [
         {
-          "id": "msx_som", "so_alguns_jogos": true,
+          "id": "msx_som",
+          "so_alguns_jogos": true,
           "nome": "Cartucho de som extra (SCC)",
           "texto": "O MSX aceitava cartuchos que melhoravam o som, como o SCC da Konami (Nemesis 2, Salamander).",
           "controles": [
-            {"id": "cartucho", "tipo": "escolha", "rotulo": "Cartucho de som", "alvo": {"opcao": "bluemsx_additional_cart"}, "padrao": "",
-             "escolhas": [["", "Como o emulador escolhe"], ["disabled", "Nenhum"], ["scc", "SCC"], ["sccexpanded", "SCC expandido"], ["sccplus", "SCC+"], ["snatcher", "Snatcher"], ["sdsnatcher", "SD Snatcher"]]}
+            {
+              "id": "cartucho",
+              "tipo": "escolha",
+              "rotulo": "Cartucho de som",
+              "alvo": {
+                "opcao": "bluemsx_additional_cart"
+              },
+              "padrao": "",
+              "escolhas": [
+                [
+                  "",
+                  "Como o emulador escolhe"
+                ],
+                [
+                  "disabled",
+                  "Nenhum"
+                ],
+                [
+                  "scc",
+                  "SCC"
+                ],
+                [
+                  "sccexpanded",
+                  "SCC expandido"
+                ],
+                [
+                  "sccplus",
+                  "SCC+"
+                ],
+                [
+                  "snatcher",
+                  "Snatcher"
+                ],
+                [
+                  "sdsnatcher",
+                  "SD Snatcher"
+                ]
+              ]
+            }
           ]
         }
       ]
     },
     {
-      "consoles": ["amstrad"],
+      "consoles": [
+        "amstrad"
+      ],
       "nucleo": "cap32",
       "acessorios": [
         {
-          "id": "cpc_pistola", "so_alguns_jogos": true,
+          "id": "cpc_pistola",
+          "so_alguns_jogos": true,
           "nome": "Pistola de luz do Amstrad CPC",
           "texto": "O CPC tinha a pistola Trojan Phazer e a Gunstick (Operation Wolf, Robocop).",
           "controles": [
-            {"id": "pistola", "tipo": "escolha", "rotulo": "Pistola", "alvo": {"opcao": "cap32_lightgun_input"}, "padrao": "disabled",
-             "escolhas": [["disabled", "Sem pistola"], ["phaser", "Phaser"], ["gunstick", "Gunstick"]]},
-            {"id": "mira", "tipo": "chave", "rotulo": "Mostrar a mira", "alvo": {"opcao": "cap32_lightgun_show"}, "ligado": "enabled", "desligado": "disabled", "padrao": false}
+            {
+              "id": "pistola",
+              "tipo": "escolha",
+              "rotulo": "Pistola",
+              "alvo": {
+                "opcao": "cap32_lightgun_input"
+              },
+              "padrao": "disabled",
+              "escolhas": [
+                [
+                  "disabled",
+                  "Sem pistola"
+                ],
+                [
+                  "phaser",
+                  "Phaser"
+                ],
+                [
+                  "gunstick",
+                  "Gunstick"
+                ]
+              ]
+            },
+            {
+              "id": "mira",
+              "tipo": "chave",
+              "rotulo": "Mostrar a mira",
+              "alvo": {
+                "opcao": "cap32_lightgun_show"
+              },
+              "ligado": "enabled",
+              "desligado": "disabled",
+              "padrao": false
+            }
           ]
         }
       ]
     },
     {
-      "consoles": ["arcade"],
+      "consoles": [
+        "arcade"
+      ],
       "nucleo": "mame",
       "acessorios": [
         {
-          "id": "mame_armas", "so_alguns_jogos": true,
+          "id": "mame_armas",
+          "so_alguns_jogos": true,
           "nome": "Pistolas de luz e mouse dos fliperamas",
           "texto": "Muitos fliperamas tinham pistola de luz (Time Crisis, Lethal Enforcers) ou trackball. 'Pistola' usa o mouse; 'Toque na tela' é para o celular.",
           "controles": [
-            {"id": "pistola", "tipo": "escolha", "rotulo": "Pistola de luz", "alvo": {"opcao": "mame_lightgun_mode"}, "padrao": "none",
-             "escolhas": [["none", "Desligada"], ["lightgun", "Pistola (mouse)"], ["touchscreen", "Toque na tela"]]},
-            {"id": "mouse", "tipo": "chave", "rotulo": "Mouse (trackball)", "alvo": {"opcao": "mame_mouse_enable"}, "ligado": "enabled", "desligado": "disabled", "padrao": true}
+            {
+              "id": "pistola",
+              "tipo": "escolha",
+              "rotulo": "Pistola de luz",
+              "alvo": {
+                "opcao": "mame_lightgun_mode"
+              },
+              "padrao": "none",
+              "escolhas": [
+                [
+                  "none",
+                  "Desligada"
+                ],
+                [
+                  "lightgun",
+                  "Pistola (mouse)"
+                ],
+                [
+                  "touchscreen",
+                  "Toque na tela"
+                ]
+              ]
+            },
+            {
+              "id": "mouse",
+              "tipo": "chave",
+              "rotulo": "Mouse (trackball)",
+              "alvo": {
+                "opcao": "mame_mouse_enable"
+              },
+              "ligado": "enabled",
+              "desligado": "disabled",
+              "padrao": true
+            }
           ]
         }
       ]
     },
     {
-      "consoles": ["cdi"],
+      "consoles": [
+        "cdi"
+      ],
       "nucleo": "same_cdi",
       "acessorios": [
         {
-          "id": "cdi_armas", "so_alguns_jogos": true,
+          "id": "cdi_armas",
+          "so_alguns_jogos": true,
           "nome": "Pistola de luz e mouse do CD-i",
           "texto": "O Philips CD-i tinha mouse, trackball e a pistola de luz (Mad Dog McCree).",
           "controles": [
-            {"id": "pistola", "tipo": "escolha", "rotulo": "Pistola de luz", "alvo": {"opcao": "same_cdi_lightgun_mode"}, "padrao": "none",
-             "escolhas": [["none", "Desligada"], ["lightgun", "Pistola (mouse)"], ["touchscreen", "Toque na tela"]]},
-            {"id": "mouse", "tipo": "chave", "rotulo": "Mouse dentro do jogo", "alvo": {"opcao": "same_cdi_mouse_enable"}, "ligado": "enabled", "desligado": "disabled", "padrao": false}
+            {
+              "id": "pistola",
+              "tipo": "escolha",
+              "rotulo": "Pistola de luz",
+              "alvo": {
+                "opcao": "same_cdi_lightgun_mode"
+              },
+              "padrao": "none",
+              "escolhas": [
+                [
+                  "none",
+                  "Desligada"
+                ],
+                [
+                  "lightgun",
+                  "Pistola (mouse)"
+                ],
+                [
+                  "touchscreen",
+                  "Toque na tela"
+                ]
+              ]
+            },
+            {
+              "id": "mouse",
+              "tipo": "chave",
+              "rotulo": "Mouse dentro do jogo",
+              "alvo": {
+                "opcao": "same_cdi_mouse_enable"
+              },
+              "ligado": "enabled",
+              "desligado": "disabled",
+              "padrao": false
+            }
           ]
         }
       ]

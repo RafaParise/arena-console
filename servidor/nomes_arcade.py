@@ -26,6 +26,18 @@ import threading
 PASTA_SERVIDOR = os.path.dirname(os.path.abspath(__file__))
 RAIZ = os.path.dirname(PASTA_SERVIDOR)
 PASTA_RDB = os.path.join(RAIZ, "retroarch", "database", "rdb")
+# No celular nao ha retroarch\database (o APK deixa o banco de fora: pesa MB): os dois bancos que dao nome ao fliperama
+# (FBNeo e MAME, ~76 KB) vao ao lado do servidor (ferramentas\montar_android.py), e e' la que se procura se faltar.
+PASTA_RDB_DO_SERVIDOR = os.path.join(PASTA_SERVIDOR, "bancos_de_nomes")
+
+
+def caminho_do_banco(nome_rdb):
+    """O .rdb de verdade: o do RetroArch desta pasta, ou o que vem junto do servidor."""
+    principal = os.path.join(PASTA_RDB, nome_rdb)
+    if os.path.isfile(principal):
+        return principal
+    return os.path.join(PASTA_RDB_DO_SERVIDOR, nome_rdb)
+
 
 # Banco de cada nucleo. O primeiro da lista e' o do emulador do console; o
 # segundo serve de reserva (muito jogo de Neo Geo esta nos dois).
@@ -99,7 +111,7 @@ def _ler_texto(dados, i):
 
 
 def _carregar(nome_rdb):
-    caminho = os.path.join(PASTA_RDB, nome_rdb)
+    caminho = caminho_do_banco(nome_rdb)
     try:
         estado = os.stat(caminho)
     except OSError:
@@ -223,7 +235,7 @@ def nome_pela_marca(nome_rdb, marca):
     quando o nome nao achou a capa). A mesma conta do _procurar_em: entre o
     "name" e o "crc" so pode haver campos inteiros do MESMO registro."""
     try:
-        with open(os.path.join(PASTA_RDB, nome_rdb), "rb") as arquivo:
+        with open(caminho_do_banco(nome_rdb), "rb") as arquivo:
             dados = arquivo.read()
     except OSError:
         return None

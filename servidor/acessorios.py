@@ -201,23 +201,24 @@ def opcoes_de_porta(estado, console_id, nome_nucleo):
 
 
 def cartoes_ps2(estado):
-    """Os cartoes do PS2 pedidos: {"slot1_tipo": "ps1" ou "ps2", "slot1_mb": 8, "slot2_mb": 64}.
-    Sem escolha nenhuma vale o padrao do catalogo (PocketStation na entrada 1, o maior cartao na 2)."""
+    """Os cartoes do PS2 pedidos: {"slot1_tipo": "ps1" ou "ps2", "slot1_mb": 64, "slot2_tipo": ..., "slot2_mb": ...}.
+    Sem escolha nenhuma vale o padrao do catalogo: o maior cartao do PS2 (64 MB) na entrada 1 e o PocketStation na 2,
+    como no ARENA do computador (decisao do Rafael, 24/10/2026)."""
     estado = limpar_estado(estado)
+    resultado = {"slot1_tipo": "ps2", "slot1_mb": 64, "slot2_tipo": "ps1", "slot2_mb": 8}
     acessorio = todos_os_acessorios().get("ps2_cartoes")
-    resultado = {"slot1_tipo": "ps1", "slot1_mb": 8, "slot2_mb": 64}
     if acessorio is None:
         return resultado
     controles = _controles(acessorio)
     escolhas = estado.get("ps2_cartoes", {})
-    um = str(valor_efetivo(controles.get("entrada1", {"id": "entrada1", "padrao": "pocketstation"}), escolhas))
-    dois = str(valor_efetivo(controles.get("entrada2", {"id": "entrada2", "padrao": "64"}), escolhas))
-    if um == "pocketstation":
-        resultado["slot1_tipo"] = "ps1"
-    elif um.isdigit():
-        resultado["slot1_tipo"], resultado["slot1_mb"] = "ps2", int(um)
-    if dois.isdigit():
-        resultado["slot2_mb"] = int(dois)
+    padroes = {1: "64", 2: "pocketstation"}
+    for entrada in (1, 2):
+        controle = controles.get("entrada%d" % entrada, {"id": "entrada%d" % entrada, "padrao": padroes[entrada]})
+        valor = str(valor_efetivo(controle, escolhas))
+        if valor == "pocketstation":
+            resultado["slot%d_tipo" % entrada] = "ps1"
+        elif valor.isdigit():
+            resultado["slot%d_tipo" % entrada], resultado["slot%d_mb" % entrada] = "ps2", int(valor)
     return resultado
 
 

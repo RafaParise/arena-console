@@ -31,7 +31,7 @@ Cada chave, cada valor e cada tipo de controle foi **perguntado ao próprio núc
 | Sega 32X | `picodrive` | controles das duas portas, cartucho de RAM do Sega CD |
 | Sega Saturn | `mednafen_saturn` | cartucho (memória de backup, RAM de 1 MB ou 4 MB), adaptador de 6 jogadores, Controle 3D, Virtua Gun, Stunner, Mouse, Arcade Racer, Mission Stick, Twin-Stick, teclado |
 | PlayStation | `swanstation` | digital, DualShock, Analog Joystick, NeGcon, GunCon, mouse |
-| PlayStation 2 (Android) | `armsx2` | entrada 1: **PocketStation** (cartão de PS1) ou cartão de PS2; entrada 2: cartão de PS2 de 8 a 64 MB |
+| PlayStation 2 (Android) | `armsx2` | entrada 1: cartão de PS2 (padrão 64 MB, o maior); entrada 2: **PocketStation** (cartão de PS1, padrão) ou cartão de PS2 de 8 a 64 MB |
 | Game Boy Advance | `mgba` | sensor solar (Boktai), vibração do Game Boy Player, molduras e modelo do Super Game Boy |
 | Game Boy / Color | `gambatte` | vibração dos cartuchos que têm motor |
 | Pokémon mini | `pokemini` | vibração |
@@ -87,15 +87,18 @@ uma pistola de luz só mira em jogo de pistola. Por isso cada acessório do cat�
   celular [Certo: testado em 24/10/2026]. Pôr em `BIOS\PocketStation` (o ARENA reconhece pelo tamanho; copiado
   como `pocketstation.bin`). No Windows com acento no caminho ("Pedagógicos") o ARENA usa a ponte sem acento. O `.srm` que ele grava é um `.mcd`
   byte a byte, o mesmo formato do cartão de PS1.
-- **No PS2** [Certo]: a entrada 1 do PS2 (no celular) agora é um **cartão no formato do PS1 (128 KB)**, o mesmo
-  formato que o Pokket lê, criado pelo ARENA (`PocketStation.mcr`, formatado e vazio, nunca trocado se já existir).
-  **Confirmado no celular (24/10/2026, foto da tela):** com esse cartão na entrada 1, o Browser da BIOS do PS2
-  mostra **"PocketStation/1"** com o desenho do aparelho, e a entrada 2 como cartão de PS2: é o nome que a própria
-  BIOS dá a um cartão no formato do PS1.
+- **No PS2** [Certo]: no celular, **a entrada 1 é o cartão de PS2 de 64 MB (o maior que o PCSX2 aceita; cabe todo save) e a
+  entrada 2 é o PocketStation**, um cartão no formato do PS1 (128 KB), o mesmo formato que o Pokket lê, criado pelo ARENA
+  (`PocketStation.mcr`, formatado e vazio, nunca trocado se já existir). É a mesma divisão do ARENA do computador
+  (decisão do Rafael, 24/10/2026). **Confirmado no celular (foto da tela):** com um cartão de PS1 numa entrada, o
+  Browser da BIOS do PS2 mostra **"PocketStation/<entrada>"** com o desenho do aparelho; é o nome que a própria BIOS dá
+  a um cartão no formato do PS1.
   **Atenção, premissa a corrigir:** o PocketStation não "roda" dentro da BIOS do PS2. Nem o PCSX2 nem o ARMSX2
   emulam o aparelho; o que existe é o cartão no formato certo. E **jogo de PS2 não salva em cartão de PS1**: ele salva
-  na entrada 2 (cartão de PS2 de 64 MB). Jogos de PS2 que só olham a entrada 1 não salvariam; para esses, escolha
-  "Cartão do PS2 de 8 MB" na entrada 1 (Acessórios → PlayStation 2).
+  na entrada 1. Os cartões são o mesmo arquivo em qualquer entrada (o nome segue o tamanho: `Mcd001-64MB.ps2`).
+  **Seus saves antigos** continuam no cartão de 8 MB (`Mcd001.ps2`); para trazê-los: em Acessórios → PlayStation 2 ponha
+  a entrada 2 em "Cartão do PS2 de 8 MB", abra a BIOS (Browser), copie os saves da entrada 2 para a 1 e volte a
+  entrada 2 para o PocketStation.
 - **Ligado ao jogo ao vivo** [Certo, ainda não integrado]: só o **PokketSX** (GPLv3; fork do DuckStation de antes de
   a licença dele fechar; só Windows x64). Na aba de cartões de memória tem uma caixinha por cartão para pôr o
   PocketStation no lugar dele, e na aba BIOS um campo para a BIOS do PocketStation. É o único jeito conhecido de o
@@ -104,8 +107,9 @@ uma pistola de luz só mira em jogo de pistola. Por isso cada acessório do cat�
 
 ## Premissas corrigidas
 
-- **"No ARENA do PC o PocketStation já está na entrada 1."** Não [Certo]. No PC, a entrada 1 é um cartão de PS2 de
-  64 MB (`Memory Card Slot 1.ps2`) e a entrada 2 é um cartão de PS1 de 128 KB (`Memory Card Slot 2.mcr`), vazio. O
+- **"No ARENA do PC o PocketStation já está na entrada 1."** Não [Certo]: no PC ele está na **2**. A entrada 1 é um cartão de PS2 de
+  64 MB (`Memory Card Slot 1.ps2`) e a entrada 2 é um cartão de PS1 de 128 KB (`Memory Card Slot 2.mcr`), vazio. O celular agora
+  segue a mesma divisão (decisão de 24/10/2026). O
   `pcsx2-qt.exe` 2.8.2 não tem a palavra "PocketStation" (busca de texto), mas as BIOS do PS2 que o ARENA usa
   (30004R V6 e SCPH-70004 V12) têm o texto "PocketSt…", e no celular o Browser da BIOS escreve "PocketStation" para
   um cartão de PS1: o nome que você viu vem da BIOS do console, que chama assim o cartão de PS1 que estiver na

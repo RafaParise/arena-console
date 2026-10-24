@@ -388,6 +388,14 @@ def por_o_servidor(assets):
     destino = os.path.join(assets, "arena")
     shutil.copytree(os.path.join(RAIZ, "servidor"), os.path.join(destino, "servidor"),
                     ignore=shutil.ignore_patterns(*FORA_DO_SERVIDOR))
+    # Os dois bancos pequenos que dao o nome de verdade aos jogos de fliperama (Samsho2 -> Samurai Shodown II):
+    # sem eles o celular mostra o nome do arquivo (servidor\nomes_arcade.py procura nesta pasta).
+    bancos = os.path.join(destino, "servidor", "bancos_de_nomes")
+    for nome in ("FBNeo - Arcade Games.rdb", "MAME.rdb"):
+        origem = os.path.join(RAIZ, "retroarch", "database", "rdb", nome)
+        if os.path.isfile(origem):
+            os.makedirs(bancos, exist_ok=True)
+            shutil.copyfile(origem, os.path.join(bancos, nome))
     for nome in DA_RAIZ_NO_APK:
         if os.path.isfile(os.path.join(RAIZ, nome)):
             shutil.copyfile(os.path.join(RAIZ, nome), os.path.join(destino, nome))

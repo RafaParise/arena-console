@@ -2839,13 +2839,13 @@ def preparar_o_ps2_do_android(config, jogo=None, sem_jogo=False, degrau=0):
     # O .ini do nucleo (o que ele nao mostra como opcao): o padrao do ARENA e, por cima, o da pessoa.
     ini = graficos.ini_padrao_do_armsx2(opcoes.get("armsx2_renderer"), CAPACIDADE.get("nota_gpu"),
                                         grafico_original(config), nivel_abaixo(config))
-    # Os memory cards em system/pcsx2/memcards, dentro da pasta do ARENA: por padrao o PocketStation na entrada 1 (pedido
-    # do Rafael, 24/10/2026) e o maior cartao do PS2 (64 MB) na 2. A escolha vem de Acessorios; quem ja tinha mexido nos
+    # Os memory cards em system/pcsx2/memcards, dentro da pasta do ARENA: por padrao o maior cartao do PS2 (64 MB) na
+    # entrada 1 e o PocketStation na 2 (decisao do Rafael, 24/10/2026: igual ao ARENA do computador). A escolha vem de Acessorios; quem ja tinha mexido nos
     # tamanhos pelo config.json antigo (cartoes_ps2) continua valendo.
     cartoes = acessorios.cartoes_ps2(config.get("acessorios"))
     antigo = graficos.limpar_cartoes_ps2(config.get("cartoes_ps2"))
     if antigo != graficos.limpar_cartoes_ps2(None):
-        cartoes = dict(antigo, slot1_tipo=antigo.get("slot1_tipo", "ps2"))
+        cartoes = dict(antigo, slot1_tipo=antigo.get("slot1_tipo", "ps2"), slot2_tipo=antigo.get("slot2_tipo", "ps2"))
     for secao, chaves in graficos.preparar_cartoes_do_ps2(PASTA_SISTEMA, cartoes).items():
         ini.setdefault(secao, {}).update(chaves)
     for secao, chaves in graficos.limpar_ajustes_ini(config.get("ajustes_ini_dos_nucleos")).get("armsx2", {}).items():
@@ -4548,19 +4548,19 @@ def pontos_validos(valor):
     """Pontuacao de um recorde recebido da rede, na mesma faixa do /api/placar. Fora dela: ValueError (o registro
     e' descartado, o resto do lote segue)."""
     if isinstance(valor, bool):
-        raise ValueError("pontos")
+        raise ValueError("Pontuação inválida: escreva um número inteiro de 0 a 99.999.999.")
     pontos = int(valor)
     if not 0 <= pontos <= PONTOS_MAXIMOS:
-        raise ValueError("pontos fora da faixa")
+        raise ValueError("Pontuação fora da faixa: escreva um número de 0 a 99.999.999.")
     return pontos
 
 
 def segundos_validos(valor):
     if isinstance(valor, bool):
-        raise ValueError("segundos")
+        raise ValueError("Tempo de sessão inválido: use um valor de 0 a 604800 segundos.")
     segundos = int(valor)
     if not 0 <= segundos <= SEGUNDOS_MAXIMOS_DA_SESSAO:
-        raise ValueError("segundos fora da faixa")
+        raise ValueError("Tempo de sessão fora da faixa: use um valor de 0 a 604800 segundos.")
     return segundos
 
 
