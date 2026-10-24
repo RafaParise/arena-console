@@ -1352,6 +1352,17 @@ input::placeholder { color: var(--texto-apagado); }
   overflow-wrap: anywhere;
 }
 
+/* O celular ligado no cabo (23/10/2026): o servidor monta o painel em grupos. */
+.celular-grupo {
+  margin: 0.9rem 0 0.4rem;
+  font-size: var(--t-peq);
+  font-weight: 600;
+  color: var(--texto-fraco);
+}
+#celularPainel .maquina { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+#celularCaminhosLista code { font-size: var(--t-micro); overflow-wrap: anywhere; }
+#celularCaminhosLista .leu { color: var(--azul-claro); }
+
 /* ========================= GAVETA DO JOGO ========================= */
 
 .jogo-nome {

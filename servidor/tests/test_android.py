@@ -493,6 +493,64 @@ class PastaDoArena(unittest.TestCase):
         self.assertFalse(ponte_android.parece_arena(os.path.join(self.pasta, "cartao", "Fotos")))
 
 
+class PastaVisivel(unittest.TestCase):
+    """A pasta do ARENA que o aluno ve (auditoria 4, 23/10/2026). Pedido do
+    Rafael: "nao mostra onde colocar e o endereco para colocar o jogo nao
+    direciona para parte certa do diretorio": sem pasta do ARENA no aparelho,
+    os jogos iam para uma pasta do proprio app, que o gerenciador de arquivos
+    e o computador pelo cabo nao enxergam."""
+
+    def setUp(self):
+        self.pasta = tempfile.mkdtemp(prefix="arena_android_visivel_")
+        self.memoria = os.path.join(self.pasta, "emulated", "0")
+        self.cartao = os.path.join(self.pasta, "1A2B-3C4D")
+        os.makedirs(self.memoria)
+        os.makedirs(self.cartao)
+        self.lembradas = []
+        self.trocas = [mock.patch.object(ponte_android, "RAIZES", [self.memoria, self.cartao]),
+                       mock.patch.object(ponte_android, "lembrar_pasta", self.lembradas.append)]
+        for troca in self.trocas:
+            troca.start()
+
+    def tearDown(self):
+        for troca in reversed(self.trocas):
+            troca.stop()
+        limpeza.apagar_pasta(self.pasta)
+
+    def test_sem_pasta_do_arena_cria_na_memoria_do_aparelho(self):
+        criada = android_inicio.criar_a_pasta_do_arena()
+        self.assertEqual(criada, os.path.join(self.memoria, "ARENA"))
+        self.assertEqual(self.lembradas, [criada])
+        self.assertTrue(ponte_android.parece_arena(criada), "o app reconhece a pasta criada")
+        self.assertTrue(os.path.isdir(os.path.join(criada, "jogos", "pessoais", "Super Nintendo")))
+        self.assertTrue(os.path.isdir(os.path.join(criada, "BIOS")))
+        self.assertFalse(os.path.exists(os.path.join(criada, "jogos", "pessoais", "PS2")),
+                         "PS2 e' emulador de computador")
+        with open(os.path.join(criada, "LEIA.txt"), encoding="utf-8") as arquivo:
+            self.assertIn("Armazenamento", arquivo.read())
+
+    def test_com_uma_pasta_do_arena_no_aparelho_nao_cria_outra(self):
+        for parte in ("jogos", "retroarch"):
+            os.makedirs(os.path.join(self.cartao, "ARENA", parte))
+        self.assertEqual(android_inicio.criar_a_pasta_do_arena(), "")
+        self.assertFalse(os.path.exists(os.path.join(self.memoria, "ARENA")))
+        self.assertEqual(self.lembradas, [])
+
+    def test_sem_a_permissao_de_arquivos_nao_cria(self):
+        with mock.patch.object(android_inicio, "da_para_gravar", return_value=False):
+            self.assertEqual(android_inicio.criar_a_pasta_do_arena(), "")
+        self.assertEqual(self.lembradas, [])
+
+    def test_o_caminho_com_o_nome_que_o_aluno_ve(self):
+        seta = " › "
+        self.assertEqual(ponte_android.nome_do_lugar(os.path.join(self.memoria, "ARENA", "jogos", "pessoais", "NES")),
+                         seta.join(["Armazenamento interno", "ARENA", "jogos", "pessoais", "NES"]))
+        self.assertEqual(ponte_android.nome_do_lugar(os.path.join(self.cartao, "ARENA")),
+                         seta.join(["Cartão de memória", "ARENA"]))
+        self.assertIsNone(ponte_android.nome_do_lugar(os.path.join(self.pasta, "app", "arena", "jogos")),
+                          "a pasta do proprio app: nem o celular nem o computador a mostram")
+
+
 class Segredo(unittest.TestCase):
     """No Android, qualquer app do aparelho alcanca o 127.0.0.1: so a tela do
     ARENA tem o segredo (o cookie que o app poe no WebView)."""

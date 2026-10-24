@@ -129,3 +129,8 @@ BIOS/
 launcher/navegador/nucleos/*
 !launcher/navegador/nucleos/LEIA.txt
 launcher/navegador/livres.js
+
+# O ADB oficial do Google (Platform Tools): o aluno descompacta aqui para o ARENA
+# ler o celular ligado no cabo (servidor/adb_aparelho.py). E' do Google: nem no git,
+# nem no pacote.
+/platform-tools/

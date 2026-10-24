@@ -155,11 +155,51 @@ anterior.
   houver, copia para `/sdcard/ARENA` as BIOS, os saves e os jogos dos
   consoles que o celular roda (mostra o tamanho e pergunta antes) e abre o
   ARENA. A configuração de imagem do computador não vai: o celular escolhe
-  pela nota dele e pelo desempenho que aprende. **Celular de 32 bits** (o
-  Galaxy A12, o mais provável): o APK ainda não serve, e a ferramenta abre a
-  versão web no navegador do celular (`docs\WEB.md`).
+  pela nota dele e pelo desempenho que aprende. **Celular de 32 bits:** o
+  APK ainda não serve, e a ferramenta abre a versão web no navegador do
+  celular (`docs\WEB.md`). (O Galaxy A12 **não** é de 32 bits: a lista do
+  aparelho mostra `arm64-v8a`. A recusa "não é compatível com seu
+  smartphone" vinha do APK `x86_64`, que é o do emulador do computador.)
 - **A nota do aparelho** para pela velocidade medida de um núcleo: celular
   tem 8 núcleos e 8 GB, mas os núcleos são pequenos.
+- **Hardware do celular, até os miliamperes da bateria** (pedido de
+  23/10/2026), de dois lugares, os dois só de leitura:
+  - **No app** (Ajustes → Máquina → Este celular): o `ArenaServico.java`
+    (`aparelho()`) lê o `BatteryManager` (nível, voltagem, temperatura,
+    saúde, o contador de carga em µAh) e o perfil de energia do Android (a
+    capacidade de fábrica, por reflexão em `PowerProfile`), mais o
+    processador (com a velocidade máxima de cada núcleo), a placa de vídeo,
+    o Vulkan, a memória, o armazenamento e a tela. O servidor repassa em
+    `/api/android/aparelho` (`ponte_android.aparelho()`).
+  - **Do computador, pelo cabo** (ETAPA 1 do roteiro de 23/10/2026,
+    `docs\PLANO-CELULAR.md`): `servidor\adb_aparelho.py` e a rota
+    `POST /api/celular/procurar`, no painel Ajustes → Máquina → Celular
+    ligado no cabo. Usa o ADB oficial do Google (`platform-tools`, que o
+    ARENA procura em `ARENA_ADB`, na pasta `platform-tools` do ARENA, no SDK
+    de testes, no `ANDROID_HOME` e no PATH, nessa ordem; ele **não** vai no
+    pacote nem no git). Um único `adb shell` lê tudo (o roteiro vai pela
+    entrada do comando), cada pedaço é lido sozinho (o que falha vai em
+    `falhas`, o resto aparece), só entram as propriedades da lista
+    (`PROPRIEDADES`: nunca o `getprop` inteiro, que tem número de série e
+    IMEI) e nada vai para arquivo. Rodando sozinho, mostra o painel no
+    terminal: `servidor\python\python.exe servidor\adb_aparelho.py`. O
+    servidor do ADB só é desligado no fim se foi o painel que o ligou.
+  - **O que o Galaxy A12 entregou** (medido em 23/10/2026, Android 12): todo
+    arquivo de `/sys/class/power_supply/battery/*` dá "Permission denied"
+    para o shell do ADB (sem root), então o `charge_full_design` aparece como
+    "indisponível neste aparelho". O que vale: `dumpsys battery` (28%, 3.711
+    mV, 33,7 °C, boa, 1.405 mAh de carga) e `dumpsys batterystats` (5.000
+    mAh de capacidade do perfil de energia). A conta carga ÷ nível dá uns
+    5.000 a 5.200 mAh (oscila com o nível inteiro) e o índice `ASOC` da
+    Samsung diz 86%: duas fontes que não concordam, e o painel mostra as duas
+    com o nome. O ASOC é só um indicador aproximado: a Samsung o atualiza
+    depois de várias cargas completas, e some se o limite de carga estiver em
+    85% (fontes: fóruns da comunidade Samsung e da /e/ Foundation, lidos em
+    23/10/2026; a documentação oficial da Samsung não foi consultada).
+  - Do A12 também saem: 8 × Cortex-A53 (4 a 2,3 GHz e 4 a 1,8 GHz, pelo
+    código de núcleo que o kernel Linux define), PowerVR Rogue GE8320, OpenGL
+    ES 3.2, **Vulkan 1.1**, 3,7 GB de RAM, tela 720 × 1600 a 60 Hz, **sem
+    giroscópio** (só acelerômetro), com USB-OTG e Bluetooth.
 
 ## Os testes
 

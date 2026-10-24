@@ -319,6 +319,7 @@ async function carregarEstado() {
     for (const elemento of document.querySelectorAll("[data-fora-do-android]")) elemento.hidden = true;
     for (const elemento of document.querySelectorAll("[data-so-android]")) elemento.hidden = false;
     falarDeAparelho();
+    mostrarAparelho();
     mostrarAndroid(dados.android || {});
   }
   prepararTipoDeControle(dados.recursos || []);
@@ -1680,6 +1681,136 @@ const EXPLICA_FORMATO_IMAGEM = {
   console: "A imagem fica no formato do console, como na TV da época: na tela larga, com " +
     "faixas pretas dos lados.",
 };
+
+// O hardware completo do celular (Ajustes -> Maquina, so no Android; pedido
+// do Rafael de 23/10/2026: "mostrar o hardware completo do android para o
+// aluno saber tudo do celular dele, ate os miliamperes da bateria").
+const SAUDE_DA_BATERIA = { 2: "boa", 3: "esquentando demais", 4: "gasta (já não segura carga)",
+  5: "voltagem alta demais", 6: "com defeito", 7: "fria demais" };
+
+async function mostrarAparelho() {
+  const lista = $("#listaAparelho");
+  if (!lista) return;
+  let a = {};
+  try {
+    a = ((await pedir("/api/android/aparelho")) || {}).aparelho || {};
+  } catch (falha) {
+    return;
+  }
+  const linhas = [];
+  const linha = (rotulo, valor) => { if (valor !== undefined && valor !== null && valor !== "") linhas.push([rotulo, valor]); };
+  const mb = (valor) => valor >= 1024 ? numeroBr(Math.round(valor / 102.4) / 10) + " GB" : valor + " MB";
+  linha("Aparelho", [a.fabricante, a.modelo].filter(Boolean).join(" ") + (a.nome ? ` (“${a.nome}”)` : ""));
+  linha("Android", a.android ? `${a.android}` + (a.seguranca ? ` · atualização de segurança de ${String(a.seguranca).split("-").reverse().join("/")}` : "") : "");
+  const mhz = (a.nucleos_mhz || []).filter((f) => f > 0);
+  const grupos = {};
+  for (const f of mhz) grupos[f] = (grupos[f] || 0) + 1;
+  const frequencias = Object.entries(grupos).sort((x, y) => y[0] - x[0])
+    .map(([f, n]) => `${n} × ${numeroBr(Math.round(f / 100) / 10)} GHz`).join(" + ");
+  linha("Processador", (a.processador || "") + (a.nucleos ? ` · ${a.nucleos} núcleos` : "") + (frequencias ? ` (${frequencias})` : ""));
+  linha("Placa de vídeo", (a.placa_de_video || "") + (a.vulkan !== undefined ? (a.vulkan ? " · tem Vulkan" : " · sem Vulkan") : ""));
+  linha("Arquitetura", (a.arquiteturas || []).join(", "));
+  if (a.memoria_total_mb) linha("Memória RAM", `${mb(a.memoria_total_mb)} (${mb(a.memoria_livre_mb)} livres agora)`);
+  if (a.armazenamento_total_mb) linha("Armazenamento", `${mb(a.armazenamento_total_mb)} (${mb(a.armazenamento_livre_mb)} livres)`);
+  if (a.tela) linha("Tela", `${a.tela.replace("x", " × ")} pontos` + (a.tela_polegadas ? ` · ${numeroBr(a.tela_polegadas)} polegadas` : "") + (a.tela_hz ? ` · ${a.tela_hz} Hz` : ""));
+  if (a.tem_bateria) {
+    linha("Bateria", `${a.bateria_pct}%` + (a.na_tomada ? " · carregando" : " · na bateria") + (a.economia ? " · economia de bateria ligada" : ""));
+    if (a.bateria_capacidade_mah) {
+      let capacidade = `${numeroBr(a.bateria_capacidade_mah)} mAh de fábrica`;
+      if (a.bateria_carga_mah && a.bateria_pct > 5) {
+        const agora = Math.round(a.bateria_carga_mah / (a.bateria_pct / 100));
+        capacidade += ` · agora segura uns ${numeroBr(agora)} mAh (${Math.round(100 * agora / a.bateria_capacidade_mah)}%)`;
+      }
+      linha("Capacidade da bateria", capacidade);
+    } else if (a.bateria_carga_mah) {
+      linha("Carga agora", `${numeroBr(a.bateria_carga_mah)} mAh`);
+    }
+    linha("Saúde da bateria", SAUDE_DA_BATERIA[a.bateria_saude] || (a.bateria_saude ? "desconhecida" : ""));
+    if (a.bateria_temperatura_c !== undefined) linha("Temperatura da bateria", `${numeroBr(a.bateria_temperatura_c)} °C`);
+    if (a.bateria_voltagem_mv) linha("Voltagem", `${numeroBr(a.bateria_voltagem_mv / 1000)} V`);
+    linha("Tipo da bateria", a.bateria_tecnologia);
+  }
+  desenharLinhas(lista, linhas);
+}
+
+// As linhas "rotulo / valor" de uma lista .maquina. O texto entra por
+// textContent: o que vem do celular e' dado de fora, nunca HTML.
+function desenharLinhas(lista, linhas) {
+  lista.replaceChildren(...linhas.map(([rotulo, valor]) => {
+    const caixa = document.createElement("div");
+    const termo = document.createElement("dt");
+    termo.textContent = rotulo;
+    const dado = document.createElement("dd");
+    dado.textContent = valor;
+    caixa.append(termo, dado);
+    return caixa;
+  }));
+}
+
+// O celular ligado no cabo, lido pelo computador (ADB, so no computador; ETAPA 1
+// do roteiro de 23/10/2026). So quando o aluno toca no botao: procurar liga um
+// programa de fora (o adb) por alguns segundos. O servidor devolve o painel
+// pronto, em grupos (servidor\adb_aparelho.py); aqui so se desenha.
+async function procurarCelularNoCabo(serial = null) {
+  const botao = $("#btnCelularProcurar");
+  const aviso = $("#celularAviso");
+  const painel = $("#celularPainel");
+  const escolha = $("#celularEscolha");
+  botao.disabled = true;
+  botao.textContent = "Procurando...";
+  aviso.hidden = false;
+  aviso.textContent = "Procurando o celular no cabo e lendo o hardware (leva uns segundos)...";
+  try {
+    const r = await pedir("/api/celular/procurar", "POST", serial ? { serial } : {});
+    const falhas = (r.leitura && r.leitura.falhas) || [];
+    const recados = [r.como_baixar, r.erro, r.dica, falhas.length ? `Não deu para ler: ${falhas.join("; ")}.` : ""]
+      .filter(Boolean);
+    aviso.textContent = recados.join(" ");
+    aviso.hidden = recados.length === 0;
+
+    // Varios celulares no cabo: o aluno escolhe qual ler.
+    const lista = $("#listaCelularNoCabo");
+    escolha.hidden = (r.aparelhos || []).length < 2;
+    lista.replaceChildren(...(r.aparelhos || []).map((a) => {
+      const opcao = document.createElement("option");
+      opcao.value = a.serial;
+      opcao.textContent = `${a.modelo || "Celular"} (${a.serial_curto})` + (a.pronto ? "" : ` — ${a.estado}`);
+      opcao.selected = a.serial === r.escolhido;
+      return opcao;
+    }));
+
+    painel.replaceChildren(...(r.painel || []).flatMap((grupo) => {
+      const titulo = document.createElement("p");
+      titulo.className = "celular-grupo";
+      titulo.textContent = grupo.titulo;
+      const dl = document.createElement("dl");
+      dl.className = "maquina";
+      desenharLinhas(dl, grupo.linhas);
+      return [titulo, dl];
+    }));
+
+    // Os arquivos da bateria que o ARENA tentou ler e o que cada um respondeu.
+    const caminhos = r.caminhos || [];
+    $("#celularCaminhos").hidden = caminhos.length === 0;
+    $("#celularCaminhosResumo").textContent = r.resumo_dos_caminhos || "";
+    $("#celularCaminhosLista").replaceChildren(...caminhos.map((c) => {
+      const item = document.createElement("li");
+      const caminho = document.createElement("code");
+      caminho.textContent = c.caminho;
+      const resultado = document.createElement("span");
+      resultado.textContent = c.resultado;
+      if (c.ok) resultado.className = "leu";
+      item.append(caminho, resultado);
+      return item;
+    }));
+  } catch (falha) {
+    aviso.hidden = false;
+    aviso.textContent = falha.message;
+  } finally {
+    botao.disabled = false;
+    botao.textContent = "Procurar celular no cabo";
+  }
+}
 
 // No Android, a tela fala de "aparelho", e nao de "computador" (achado A7
 // da auditoria 4: o aluno lia "o seu computador" no celular). Vale para o
@@ -4114,7 +4245,16 @@ function desenharComoColocar() {
       recado(falha.message, true);
     }
   });
-  linha("Pasta", codigo(console.pasta), " ", abrir);
+  // No Android, a pasta com o nome que o aluno ve no gerenciador de arquivos
+  // do celular e no computador pelo cabo (auditoria 4, 23/10/2026).
+  const noAparelho = estado.sistemaDoComputador === "android" && console.pasta_no_aparelho;
+  linha("Pasta", codigo(noAparelho || console.pasta), " ", abrir);
+  if (noAparelho && /^Armazenamento interno|^Cartão de memória/.test(noAparelho)) {
+    // "No PC" (e nao "no computador"): no Android, a tela troca "computador"
+    // por "aparelho" (falarDeAparelho), e aqui e' mesmo o computador. O
+    // <code> fica de fora da troca.
+    linha("No PC, pelo cabo USB", codigo("Este Computador › (o celular) › " + noAparelho));
+  }
   linha("Arquivos que servem", console.formatos.join("  ") || "—");
   linha("Como guardar", console.como);
   linha(console.zip_titulo, console.zip_texto);
@@ -4951,6 +5091,10 @@ function ligarEventos() {
       recado(falha.message, true);
     }
   });
+
+  $("#btnAparelhoDeNovo").addEventListener("click", () => mostrarAparelho());
+  $("#btnCelularProcurar").addEventListener("click", () => procurarCelularNoCabo());
+  $("#listaCelularNoCabo").addEventListener("change", (evento) => procurarCelularNoCabo(evento.target.value));
 
   $("#btnDesempenhoZerar").addEventListener("click", async () => {
     try {

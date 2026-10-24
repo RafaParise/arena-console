@@ -95,6 +95,7 @@ import jeitos_de_abrir  # noqa: E402  (o original ou o livre: a tela pergunta --
 import plataforma as plataforma_do_sistema  # noqa: E402
 import portas  # noqa: E402  (as faixas que o Windows reserva a cada reinicio -- 18/10/2026)
 import ponte_android  # noqa: E402  (no Android, o que o servidor pede ao app -- item 14, 18/10/2026)
+import adb_aparelho  # noqa: E402  (o celular ligado no cabo, visto pelo computador -- 23/10/2026)
 
 PASTA_LAUNCHER = os.path.join(RAIZ, "launcher")
 PASTA_DADOS = os.path.join(RAIZ, "dados")
@@ -5233,6 +5234,13 @@ class Manipulador(BaseHTTPRequestHandler):
                 "android": dict(ponte_android.ESTADO) if plataforma_do_sistema.ANDROID else None,
             })
 
+        if caminho == "/api/android/aparelho":
+            # O hardware completo do celular (Ajustes -> Maquina, so no
+            # Android; pedido de 23/10/2026): so leitura, so deste aparelho.
+            if not plataforma_do_sistema.ANDROID:
+                return self.erro("Isto é só do ARENA do Android. No computador, veja Ajustes → Máquina → Celular ligado no cabo.", 404)
+            return self.responder_json({"ok": True, "aparelho": ponte_android.aparelho()})
+
         if caminho == "/api/android/pastas":
             # As pastas do ARENA deste aparelho (Ajustes -> Maquina, so no Android).
             if not plataforma_do_sistema.ANDROID:
@@ -5311,10 +5319,17 @@ class Manipulador(BaseHTTPRequestHandler):
             # O formato do disco do ARENA: no FAT32 nao cabe arquivo maior que
             # 4 GB, e a tela avisa nos consoles de jogo grande ANTES de alguem
             # copiar (auditoria 3, Fase 6; antes so o VERIFICAR.bat dizia).
+            consoles = como_colocar.guia(carregar_catalogo(), PASTA_SISTEMA, PASTA_JOGOS, falta)
+            # No Android, cada pasta com o nome que a pessoa ve no celular e no
+            # computador pelo cabo (Armazenamento interno > ARENA > ...).
+            if plataforma_do_sistema.ANDROID:
+                for console in consoles:
+                    console["pasta_no_aparelho"] = caminho_para_mostrar(
+                        os.path.join(PASTA_JOGOS, *console["pasta"].split("\\")[1:]))
             return self.responder_json({
                 "ok": True, "pasta_bios": bios.NOME_DA_PASTA,
                 "formato_do_disco": hardware.sistema_de_arquivos(RAIZ) or "",
-                "consoles": como_colocar.guia(carregar_catalogo(), PASTA_SISTEMA, PASTA_JOGOS, falta)})
+                "consoles": consoles})
 
         # As BIOS de cada console, como estao agora (Ajustes -> Emuladores ->
         # BIOS dos consoles): ativa, de outra versao ou falta, e onde fica a
@@ -5546,6 +5561,20 @@ class Manipulador(BaseHTTPRequestHandler):
             return self.erro_interno(falha)
 
     def api_post(self, caminho, dados):
+
+        # ---- o celular ligado no cabo, visto pelo computador (23/10/2026) ----
+        # Le o hardware do celular pelo ADB oficial do Google: so LEITURA, nada
+        # se grava. Fica de fora do ROTAS_REDE_EXTERNA (so este computador
+        # manda) e nao existe no Android, que e' o proprio celular. E' POST
+        # porque liga um programa de fora (o adb) por alguns segundos.
+        if caminho == "/api/celular/procurar":
+            if plataforma_do_sistema.ANDROID:
+                return self.erro("Isto é do ARENA do computador, para ler o celular ligado no cabo. Neste "
+                                 "aparelho, veja Ajustes → Máquina → Este celular.", 404)
+            serial = dados.get("serial")
+            if serial is not None and not isinstance(serial, str):
+                return self.erro("Celular inválido. Clique em Procurar celular no cabo de novo.")
+            return self.responder_json(dict(adb_aparelho.procurar(serial), ok=True))
 
         # ---- Android: a pasta do ARENA no aparelho e a permissao (item 14) --
         if caminho in ("/api/android/pasta", "/api/android/permissao"):
@@ -7382,8 +7411,12 @@ def ha_internet_agora():
 def caminho_para_mostrar(caminho):
     """O caminho que a tela mostra. No Android, as pastas de quem usa sao
     atalhos (servidor\\android_inicio.py): vale o lugar de verdade, o da
-    pasta do ARENA no cartao ou na memoria do aparelho."""
-    return os.path.realpath(caminho) if plataforma_do_sistema.ANDROID else caminho
+    pasta do ARENA no cartao ou na memoria do aparelho, com o nome que a
+    pessoa ve no celular e no computador pelo cabo ("Armazenamento interno >
+    ARENA > jogos", auditoria 4, 23/10/2026)."""
+    if not plataforma_do_sistema.ANDROID:
+        return caminho
+    return ponte_android.nome_do_lugar(caminho) or os.path.realpath(caminho)
 
 
 def abrir_janela(endereco):

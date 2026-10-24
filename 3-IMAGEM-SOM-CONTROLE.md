@@ -415,6 +415,40 @@ Aparece também a **confirmação em milissegundos**, separada da velocidade.
 Confirmação alta com velocidade alta é normal: é o disco avisando que
 gravou, não lentidão.
 
+### Conhecer o hardware de um celular (até os miliamperes da bateria)
+
+Duas maneiras, e as duas só **leem**: não instalam nada e não mudam nada no
+celular.
+
+- **No ARENA do Android:** **Ajustes → Máquina → Este celular**. Mostra o
+  modelo, o Android, o processador (com os núcleos e a velocidade de cada
+  um), a placa de vídeo, a memória, o armazenamento, a tela e a bateria:
+  porcentagem, miliamperes de agora, capacidade de fábrica, saúde,
+  temperatura e voltagem.
+- **No ARENA do computador, com o celular ligado no cabo:** **Ajustes →
+  Máquina → Celular ligado no cabo → Procurar celular no cabo**. Precisa da
+  Depuração USB ligada no celular (Configurações → Sobre o telefone →
+  Informações do software, toque 7 vezes em "Número da versão"; depois
+  Opções do desenvolvedor → Depuração USB) e do **ADB**, a ferramenta oficial
+  do Google, que **não vem junto com o ARENA**: baixe o "SDK Platform-Tools"
+  em developer.android.com/tools/releases/platform-tools, descompacte e deixe
+  a pasta `platform-tools` dentro da pasta do ARENA. No celular, toque em
+  **Permitir** na pergunta "Permitir depuração USB?". Se o servidor do ADB
+  não estava ligado, o ARENA o liga só para ler e desliga em seguida (assim
+  o pen drive sai limpo).
+
+**Se um dia você trocar a bateria,** olhe a **Capacidade de fábrica**: é o
+número em mAh que a bateria nova precisa ter. O ARENA diz de onde veio cada
+número, e escreve **"indisponível neste aparelho"** no que o Android não
+entrega, em vez de inventar. Na prática: o arquivo `charge_full_design` (a
+capacidade de projeto) quase nunca pode ser lido sem acesso de administrador
+(root), então a de fábrica vem do perfil de energia do próprio Android. A
+linha **Conta: carga ÷ nível** é só uma pista de desgaste (o nível é um
+número inteiro e alguns aparelhos usam a capacidade de fábrica como base do
+contador); com a bateria mais cheia a conta fica mais justa. O **índice de
+saúde da Samsung** (ASOC) é aproximado: ela só o atualiza depois de várias
+cargas completas.
+
 ### Tela 4K
 
 Com **placa de vídeo dedicada** e uma tela (ou TV) de **4K**, o ARENA sobe

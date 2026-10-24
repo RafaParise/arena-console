@@ -266,6 +266,19 @@ def energia():
         return {}
 
 
+def aparelho():
+    """O hardware do aparelho (o app pergunta ao Android, ArenaServico.java,
+    aparelho()): bateria (porcentagem, mAh de fabrica e de agora, saude,
+    temperatura, voltagem), processador, placa, memoria, armazenamento, tela
+    e Android. So leitura. {} se o app nao responder."""
+    try:
+        resposta = perguntar({"pedido": "aparelho"}, limite=4.0)
+    except OSError:
+        return {}
+    resposta.pop("id", None)
+    return resposta
+
+
 def abrir_pasta(caminho):
     """Abre a pasta no gerenciador de arquivos do aparelho. False se o
     aparelho nao tem um que abra pasta (quem chamou mostra o caminho)."""
@@ -405,6 +418,26 @@ def pastas_do_arena():
                                 "onde": "memoria do aparelho" if raiz == (RAIZES[0] if RAIZES else "")
                                 else "cartao ou pen drive"})
     return achadas
+
+
+def lembrar_pasta(caminho):
+    """Guarda no app a pasta do ARENA que o servidor criou, sem reabrir
+    (servidor/android_inicio.py, criar_a_pasta_do_arena)."""
+    avisar({"pedido": "lembrar_pasta", "caminho": caminho or ""})
+
+
+def nome_do_lugar(caminho):
+    """O caminho como a pessoa ve no gerenciador de arquivos do celular e no
+    computador pelo cabo: "Armazenamento interno > ARENA > jogos", ou
+    "Cartao de memoria > ..."; None fora da memoria e dos cartoes (a pasta
+    do proprio app, que nenhum dos dois mostra)."""
+    real = os.path.realpath(caminho)
+    for indice, raiz in enumerate(RAIZES):
+        raiz = os.path.realpath(raiz)
+        if real == raiz or real.startswith(raiz + os.sep):
+            partes = [p for p in os.path.relpath(real, raiz).split(os.sep) if p and p != "."]
+            return " \u203a ".join(["Armazenamento interno" if indice == 0 else "Cart\u00e3o de mem\u00f3ria"] + partes)
+    return None
 
 
 def escolher_pasta(caminho):

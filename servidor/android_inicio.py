@@ -33,6 +33,7 @@ O que o app conta ao abrir (variaveis do ambiente):
   ARENA_ANDROID_RAIZES   a memoria do aparelho e cada cartao ou pen drive
                          (uma por linha), onde procurar a pasta do ARENA
 """
+import json
 import os
 import runpy
 import shutil
@@ -134,6 +135,58 @@ def ligar(atalho, alvo):
             print("[ARENA] %s ja tinha arquivos: ficou como %s." % (atalho, guardada))
     # O target_is_directory so vale no Windows (os testes rodam la).
     os.symlink(alvo, atalho, target_is_directory=True)
+
+
+# Sem pasta do ARENA no aparelho (a primeira vez, sem copiar nada do pen
+# drive), o ARENA cria a dele na memoria do aparelho: Armazenamento interno >
+# ARENA. Pedido do Rafael (23/10/2026): "nao mostra onde colocar e o
+# endereco para colocar o jogo nao direciona para parte certa do diretorio".
+# Antes, os jogos iam para uma pasta do proprio app, que o gerenciador de
+# arquivos do celular e o computador pelo cabo nao enxergam.
+NOME_DA_PASTA = "ARENA"
+LEIA_DA_PASTA = """Esta e' a pasta do ARENA neste aparelho.
+
+Os jogos: cada um na pasta do console dele, em jogos > pessoais (por exemplo,
+jogos > pessoais > Super Nintendo). As BIOS: na pasta BIOS.
+
+No computador, pelo cabo USB: Este Computador > (o celular) > Armazenamento
+interno > ARENA > jogos > pessoais. No ARENA: Como colocar jogos mostra a
+pasta de cada console, e Procurar jogos baixados acha os que estao em
+Download e pergunta antes de trazer.
+"""
+
+
+def criar_a_pasta_do_arena():
+    """Cria <memoria do aparelho>/ARENA (jogos/pessoais com a pasta de cada
+    console, BIOS e retroarch, que faz o app reconhecer a pasta) e a guarda
+    no app como a escolhida. Devolve o caminho, ou "" se o Android ainda nao
+    deixa gravar la (sem a permissao de arquivos) ou se o aparelho ja tem uma
+    pasta do ARENA (a pessoa escolhe em Ajustes -> Maquina)."""
+    raizes = ponte_android.RAIZES
+    if not raizes or ponte_android.pastas_do_arena() or not da_para_gravar(raizes[0]):
+        return ""
+    pasta = os.path.join(raizes[0], NOME_DA_PASTA)
+    try:
+        with open(os.path.join(AQUI, "consoles.json"), encoding="utf-8") as arquivo:
+            plataformas = json.load(arquivo).get("plataformas", [])
+    except (OSError, ValueError):
+        plataformas = []
+    # Os consoles do RetroArch (os de fora, PS2, GameCube, Wii, PS3 e Xbox
+    # 360, sao programas de computador).
+    consoles = [p["pasta"] for p in plataformas if p.get("pasta") and not p.get("externo")]
+    try:
+        for relativo in ["BIOS", "retroarch"] + ["jogos/pessoais/" + c for c in consoles]:
+            os.makedirs(os.path.join(pasta, *relativo.split("/")), exist_ok=True)
+        leia = os.path.join(pasta, "LEIA.txt")
+        if not os.path.exists(leia):
+            with open(leia, "w", encoding="utf-8") as arquivo:
+                arquivo.write(LEIA_DA_PASTA)
+    except OSError as falha:
+        print("[ARENA] Nao consegui criar a pasta do ARENA na memoria do aparelho: %s" % falha)
+        return ""
+    ponte_android.lembrar_pasta(pasta)
+    print("[ARENA] Pasta do ARENA criada na memoria do aparelho: %s" % pasta)
+    return pasta
 
 
 def montar_as_pastas(escolhida, privada):
@@ -261,7 +314,7 @@ def preparar_o_cfg(escolhida):
 
 
 def preparar():
-    escolhida = os.environ.get("ARENA_PASTA", "").strip()
+    escolhida = os.environ.get("ARENA_PASTA", "").strip() or criar_a_pasta_do_arena()
     privada = os.environ.get("ARENA_ANDROID_DADOS") or os.path.join(os.path.dirname(RAIZ), "arena-dados")
     for pasta in ("cores", "cache", "autoconfig"):
         os.makedirs(caminho("retroarch", pasta), exist_ok=True)

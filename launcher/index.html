@@ -588,6 +588,47 @@
       <div><dt>Internet</dt><dd id="hwInternet">—</dd></div>
     </dl>
 
+    <!-- So no Android (auditoria 4, 23/10/2026): tudo do celular, ate os
+         miliamperes da bateria (ArenaServico.java, aparelho()). -->
+    <div id="blocoAparelho" data-so-android hidden>
+      <h3 class="grupo-titulo">Este celular</h3>
+      <dl class="maquina" id="listaAparelho"></dl>
+      <p class="explica">
+        Tudo é lido do próprio Android, só para você conhecer o seu aparelho:
+        nada aqui muda nada. A capacidade "de agora" da bateria é uma conta
+        (a carga de agora dividida pela porcentagem): bateria velha segura
+        menos que a de fábrica. Se um dia trocar a bateria, a de fábrica é a
+        que a nova precisa ter.
+      </p>
+      <button class="botao" id="btnAparelhoDeNovo" type="button">Ler de novo</button>
+    </div>
+
+    <!-- So no computador (23/10/2026): o hardware de um celular ligado no cabo,
+         lido pelo ADB oficial do Google (servidor\adb_aparelho.py). So leitura. -->
+    <div id="blocoCelularNoCabo" data-fora-do-android data-so-windows>
+      <h3 class="grupo-titulo">Celular ligado no cabo</h3>
+      <p class="explica">
+        Ligue um celular Android neste computador pelo cabo USB e veja o
+        hardware dele, até os miliamperes da bateria: serve para conhecer o seu
+        aparelho e, se um dia você trocar a bateria, saber a capacidade que a
+        nova precisa ter. O ARENA só lê: nada é instalado nem muda no celular, e
+        nada fica guardado. Precisa do ADB (a ferramenta do Google) e da
+        Depuração USB ligada no celular.
+      </p>
+      <div class="opcao" id="celularEscolha" hidden>
+        <span class="opcao-rotulo">Celular</span>
+        <select class="opcao-controle" id="listaCelularNoCabo" aria-label="Celular ligado no cabo"></select>
+      </div>
+      <p class="explica" id="celularAviso" role="status" hidden></p>
+      <div id="celularPainel"></div>
+      <details class="detalhe-avancado" id="celularCaminhos" hidden>
+        <summary class="grupo-titulo">Arquivos da bateria que o ARENA tentou ler</summary>
+        <p class="explica" id="celularCaminhosResumo"></p>
+        <ul class="onde-lista" id="celularCaminhosLista"></ul>
+      </details>
+      <button class="botao" id="btnCelularProcurar" type="button">Procurar celular no cabo</button>
+    </div>
+
     <div id="blocoRuntime" hidden data-so-windows>
       <h3 class="grupo-titulo">Bibliotecas gráficas ausentes</h3>
       <p class="explica">Necessário para abrir os jogos.</p>

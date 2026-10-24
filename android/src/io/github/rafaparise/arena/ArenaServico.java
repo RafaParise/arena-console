@@ -437,11 +437,17 @@ public class ArenaServico extends Service {
                 responder(numero, "nome", tecladoFisico());
             } else if (tipo.equals("energia")) {
                 responder(energia().put("id", numero));
+            } else if (tipo.equals("aparelho")) {
+                responder(aparelho().put("id", numero));
             } else if (tipo.equals("abrir_pasta")) {
                 responder(numero, "ok", abrirAPasta(pedido.optString("caminho")));
             } else if (tipo.equals("escolher_pasta")) {
                 guardado.edit().putString("pasta", pedido.optString("caminho")).apply();
                 reabrir();
+            } else if (tipo.equals("lembrar_pasta")) {
+                // A pasta que o proprio servidor criou na primeira vez
+                // (servidor/android_inicio.py): fica guardada, sem reabrir.
+                guardado.edit().putString("pasta", pedido.optString("caminho")).apply();
             } else if (tipo.equals("permissao")) {
                 ArenaActivity quem = tela.get();
                 if (quem != null) quem.pedirPermissao(pedido.optBoolean("todos_os_arquivos"));
@@ -576,6 +582,105 @@ public class ArenaServico extends Service {
         saida.put("na_tomada", tomada != 0);
         saida.put("economia", poder != null && poder.isPowerSaveMode());
         return saida;
+    }
+
+    /** O hardware do aparelho, para o aluno conhecer o celular dele (Ajustes
+     *  -> Maquina; pedido do Rafael de 23/10/2026: "mostrar o hardware completo
+     *  do android para o aluno saber tudo do celular dele, ate os miliamperes
+     *  da bateria [...] e se um dia trocar a bateria poder saber a capacidade
+     *  dele"). So leitura: nada aqui muda o aparelho. */
+    JSONObject aparelho() throws JSONException {
+        JSONObject saida = energia();
+        Intent bateria = registerReceiver(null, new android.content.IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        if (bateria != null) {
+            saida.put("bateria_saude", bateria.getIntExtra(android.os.BatteryManager.EXTRA_HEALTH, 0));
+            int temperatura = bateria.getIntExtra(android.os.BatteryManager.EXTRA_TEMPERATURE, Integer.MIN_VALUE);
+            if (temperatura != Integer.MIN_VALUE) saida.put("bateria_temperatura_c", temperatura / 10.0);
+            int voltagem = bateria.getIntExtra(android.os.BatteryManager.EXTRA_VOLTAGE, -1);
+            if (voltagem > 0) saida.put("bateria_voltagem_mv", voltagem);
+            saida.put("bateria_tecnologia", bateria.getStringExtra(android.os.BatteryManager.EXTRA_TECHNOLOGY));
+        }
+        android.os.BatteryManager gerente = (android.os.BatteryManager) getSystemService(Context.BATTERY_SERVICE);
+        if (gerente != null) {
+            // A carga de agora, em microampere-hora (o Android 5 em diante).
+            int carga = gerente.getIntProperty(android.os.BatteryManager.BATTERY_PROPERTY_CHARGE_COUNTER);
+            if (carga > 0 && carga != Integer.MIN_VALUE) saida.put("bateria_carga_mah", carga / 1000);
+        }
+        double deFabrica = capacidadeDeFabrica();
+        if (deFabrica > 0) saida.put("bateria_capacidade_mah", Math.round(deFabrica));
+        ActivityManager.MemoryInfo memoria = new ActivityManager.MemoryInfo();
+        ActivityManager atividades = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        if (atividades != null) {
+            atividades.getMemoryInfo(memoria);
+            saida.put("memoria_total_mb", memoria.totalMem / 1048576L);
+            saida.put("memoria_livre_mb", memoria.availMem / 1048576L);
+        }
+        try {
+            android.os.StatFs disco = new android.os.StatFs(Environment.getExternalStorageDirectory().getPath());
+            saida.put("armazenamento_total_mb", disco.getTotalBytes() / 1048576L);
+            saida.put("armazenamento_livre_mb", disco.getAvailableBytes() / 1048576L);
+        } catch (RuntimeException falha) {
+            Log.w(TAG, "armazenamento: " + falha);
+        }
+        DisplayMetrics medidas = new DisplayMetrics();
+        WindowManager janelas = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+        janelas.getDefaultDisplay().getRealMetrics(medidas);
+        saida.put("tela", medidas.widthPixels + "x" + medidas.heightPixels);
+        saida.put("tela_dpi", medidas.densityDpi);
+        if (medidas.xdpi > 0 && medidas.ydpi > 0) {
+            double polegadas = Math.hypot(medidas.widthPixels / medidas.xdpi, medidas.heightPixels / medidas.ydpi);
+            saida.put("tela_polegadas", Math.round(polegadas * 10) / 10.0);
+        }
+        saida.put("tela_hz", Math.round(janelas.getDefaultDisplay().getRefreshRate()));
+        saida.put("processador", processador());
+        saida.put("nucleos", Runtime.getRuntime().availableProcessors());
+        JSONArray frequencias = new JSONArray();
+        for (int i = 0; i < Runtime.getRuntime().availableProcessors(); i++) {
+            String maxima = lerLinha("/sys/devices/system/cpu/cpu" + i + "/cpufreq/cpuinfo_max_freq").trim();
+            long mhz = 0;
+            try {
+                mhz = maxima.isEmpty() ? 0 : Long.parseLong(maxima) / 1000;
+            } catch (NumberFormatException falha) {
+                mhz = 0;
+            }
+            frequencias.put(mhz);
+        }
+        saida.put("nucleos_mhz", frequencias);
+        saida.put("placa_de_video", placaDeVideo());
+        saida.put("vulkan", getPackageManager().hasSystemFeature(PackageManager.FEATURE_VULKAN_HARDWARE_VERSION));
+        saida.put("arquiteturas", new JSONArray(java.util.Arrays.asList(Build.SUPPORTED_ABIS)));
+        saida.put("fabricante", Build.MANUFACTURER);
+        saida.put("modelo", Build.MODEL);
+        String nome = Settings.Global.getString(getContentResolver(), "device_name");
+        saida.put("nome", nome == null ? "" : nome);
+        saida.put("android", Build.VERSION.RELEASE);
+        saida.put("android_sdk", Build.VERSION.SDK_INT);
+        if (Build.VERSION.SDK_INT >= 23) saida.put("seguranca", Build.VERSION.SECURITY_PATCH);
+        return saida;
+    }
+
+    /** A capacidade de fabrica da bateria, em mAh (a do power_profile.xml do
+     *  aparelho, a mesma que o Android usa na tela de bateria), ou 0. */
+    double capacidadeDeFabrica() {
+        try {
+            Class<?> perfil = Class.forName("com.android.internal.os.PowerProfile");
+            Object objeto = perfil.getConstructor(Context.class).newInstance(this);
+            Object capacidade = perfil.getMethod("getBatteryCapacity").invoke(objeto);
+            return capacidade instanceof Double ? (Double) capacidade : 0;
+        } catch (ReflectiveOperationException | RuntimeException falha) {
+            Log.w(TAG, "capacidade da bateria: " + falha);
+            return 0;
+        }
+    }
+
+    static String lerLinha(String caminho) {
+        try (BufferedReader leitor = new BufferedReader(new InputStreamReader(
+                new java.io.FileInputStream(caminho), StandardCharsets.UTF_8))) {
+            String linha = leitor.readLine();
+            return linha == null ? "" : linha;
+        } catch (IOException | RuntimeException falha) {
+            return "";
+        }
     }
 
     int contarControles() {

@@ -1,0 +1,219 @@
+# O celular e o ARENA: roteiro revisado (23/10/2026)
+
+Pedido do Rafael (23/10/2026), em três partes que aqui viram um plano só:
+
+1. o ARENA do Android mostrar o hardware completo do aparelho ao aluno, "até
+   os miliamperes da bateria", para ele saber a capacidade de uma bateria
+   nova se um dia trocar a dele;
+2. tudo o que a versão do computador faz, no Android, adaptado ao celular
+   (controles na tela ou controle de verdade, Bluetooth ou por USB-C,
+   configurado sozinho ou à mão);
+3. o celular como controle do ARENA do computador, "direto nos servidores
+   locais, para ambos se comunicarem".
+
+E um roteiro de três etapas (painel de hardware pelo ADB, captura de tela,
+celular como controle), que ele pediu para avaliar e aprovar antes de seguir.
+
+## Veredito sobre o roteiro: aprovado, com mudanças
+
+Nada no roteiro é problema em si: ADB oficial do Google, sensores e
+WebSocket padrão e uma ponte de controle são engenharia comum. As mudanças
+existem porque o ARENA tem regras que o roteiro não conhecia
+(`CLAUDE.md`: só biblioteca padrão, sem administrador, roda do pen drive,
+offline, alunos menores de idade).
+
+| # | O roteiro dizia | Vira | Por quê |
+|---|---|---|---|
+| 1 | Electron ou Tauri no computador, Node.js na rede | **Python puro**: o próprio servidor do ARENA (`servidor\`) e a tela HTML/JS dele | O ARENA não instala nada, não usa `pip` e roda do pen drive num Celeron de 7,7 GB. Node e Electron são instalação e peso a mais, sem ganho |
+| 2 | Gamepad virtual com o **ViGEmBus** | **Network RetroPad** do RetroArch: o servidor do ARENA manda o botão por UDP para o `127.0.0.1` | O ViGEmBus é driver de kernel (a instalação pede administrador, e o ARENA não mexe em driver) e o autor o **aposentou**: o README oficial diz "THIS PROJECT HAS BEEN RETIRED" [Certo: github.com/nefarius/ViGEmBus, lido em 23/10/2026]. O Network RetroPad já vem no RetroArch 1.22.2 que o ARENA usa, e foi provado aqui: START e A mandados por UDP tiraram o Thwaite (NES) da tela de título |
+| 3 | Servidor WebSocket em Node | Uma rota WebSocket no servidor do ARENA (RFC 6455 na biblioteca padrão), com mensagens binárias de poucos bytes | Mesma latência, nenhuma instalação |
+| 4 | Giroscópio lido pelo navegador do celular | Giroscópio **só dentro do app ARENA do Android**; no navegador comum, por `http://<IP do PC>`, só os botões | `DeviceOrientationEvent` exige contexto seguro [Certo: MDN, selo "Secure context"]. Dentro do app, a tela vem de `127.0.0.1`, que conta como seguro. Por `http://192.168...` não |
+| 5 | Captura de tela com botão "atualizar" | **Uma imagem por clique**, sem atualizar sozinha e sem gravar em disco | Regra do projeto: nada de gravação de vídeo nem de transmissão, por causa dos alunos menores. Uma atualização em laço seria transmissão |
+| 6 | "Instale o Platform Tools" | O `adb` vem do site do Google e **não vai no pacote**; o ARENA o procura em 4 lugares e, se não achar, explica onde baixar | O pacote do ARENA leva só o que é do ARENA ou de licença livre |
+| 7 | (não dizia) | **Segurança do controle remoto**: desligado por padrão; liga num clique no computador; código de 4 dígitos mostrado na tela do PC; só rede local; limite de eventos por segundo; o RetroArch só escuta a porta enquanto o jogo roda | Sem isso, qualquer colega da sala mandaria botão para o jogo do outro |
+| 8 | (pedido anterior) engenharia reversa do DroidJoy | **Fora.** O roteiro novo já proíbe, e não é preciso: o protocolo do RetroArch é documentado | Apps do gênero entram só como pesquisa de recursos e de layout (o que as lojas descrevem), sem descompilar nada |
+
+Os emuladores de fora (PCSX2, Dolphin, RPCS3, Xenia) não leem o Network
+RetroPad. Para eles, o celular como controle fica para uma fase seguinte, por
+teclas (sem driver). Isso é dito na tela, não escondido.
+
+## O que o A12 respondeu (SM-A125M, Android 12, medido em 23/10/2026)
+
+O roteiro previu que `charge_full_design` quase nunca aparece sem root, e foi
+isso: no Galaxy A12 **todos** os arquivos de `/sys/class/power_supply/battery/`
+dão "Permission denied" para o shell do ADB. O que o aparelho dá de verdade:
+
+| Dado | De onde | Valor no A12 |
+|---|---|---|
+| Nível, voltagem, temperatura, saúde, fonte de energia | `dumpsys battery` | 28%, 3711 mV, 33,7 °C, boa, USB |
+| Carga agora (µAh) | `dumpsys battery` ("Charge counter") | 1405000 µAh (1405 mAh) |
+| Capacidade de fábrica | `dumpsys batterystats` ("Capacity", perfil de energia do Android) | 5000 mAh |
+| Capacidade "aprendida" pelo Android | `dumpsys batterystats` | 5000 mAh (igual à de fábrica) |
+| Índice de saúde da Samsung (ASOC) | `dumpsys battery` ("mSavedBatteryAsoc") | 86% |
+| Capacidade de projeto (`charge_full_design`) | `/sys/class/power_supply/*/` | **indisponível neste aparelho** (sem permissão) |
+
+Duas fontes que **não concordam**: a conta "carga ÷ porcentagem" dá uns
+5.018 mAh (100% da fábrica), e o ASOC da Samsung diz 86%. O painel mostra as
+duas, cada uma com o nome da fonte, e não escolhe por você: a conta é uma
+pista, não uma medida, porque o contador de carga de alguns fabricantes é
+calculado em cima da capacidade de fábrica e não mostra o desgaste.
+
+## A ordem do trabalho (decidida em 23/10/2026, às 21h40)
+
+Os pedidos da noite chegaram em sequência e se apoiam uns nos outros, então a
+ordem abaixo segue o que depende de quê, e não a ordem em que chegaram. Se o
+Rafael quiser trocar, é só dizer.
+
+| # | O quê | Estado | Por que nesse lugar |
+|---|---|---|---|
+| 0 | Pasta `ARENA` visível no Android e a gaveta "Como colocar" com o caminho certo (no celular e no PC, pelo cabo) | Feito; falta olhar no A12 | |
+| 1 | Hardware completo no app (Ajustes → Máquina → Este celular) | Feito; falta olhar no A12 | |
+| 2 | **ETAPA 1**: painel do celular ligado no cabo, no ARENA do computador (`servidor\adb_aparelho.py`) | **Feita**: testada ao vivo no A12, 54 testes novos, bateria inteira verde; falta o commit | |
+| 3 | **PS2 no A12: os testes com o ARMSX2** | Em andamento (ver "PS2" abaixo) | Decide quanto vale tunar o 5 |
+| 4 | **Armazenamento: interno e cartão SD** (volumes, jogos no cartão, cache no interno, mover entre os dois) | **Próximo** | É a base do 5, do 6 e do 11: sem volume não há "jogos do cartão" nem "mover" |
+| 5 | **PS2 no ARENA do Android pelo ARMSX2** (o console PS2 aparece no celular; o ARENA abre o jogo com o caminho do arquivo) | Depende do 3 | Precisa do 4: os jogos de PS2 estão no cartão |
+| 6 | **ROMs em qualquer lugar do celular** → "fora da pasta certa" → um toque move | Registrado (pedido das 21h37) | Precisa do 4 (volumes, permissão) e do 5 (o PS2 existe no celular); estende o "Procurar jogos baixados" |
+| 7 | **Ícone: o supercontrole**, em todas as versões | Registrado | Independente; pode ser feito enquanto espera o celular; tem de estar pronto antes do Release |
+| 8 | **ETAPA 2**: captura de tela, uma por clique | A fazer | Segue o roteiro |
+| 9 | **ETAPA 3**: celular como controle do computador (Network RetroPad pelo servidor do ARENA) | A fazer | Segue o roteiro |
+| 10 | Controle de verdade no Android (o GameSir Nova Lite do Rafael é o de teste): tirar os botões da tela sozinho, mapeamento automático e à mão | A fazer | O controle já está pareando no A12 |
+| 11 | Paridade com o computador, função por função (matriz abaixo) | A fazer | Fecha o que sobrar dos itens acima |
+| 12 | Teste final no A12 e Release: juntar `auditoria-4` ao `main`, versão nova, `rodada_final.py`, pacotes e `gh-pages` | Por último | Só depois dos testes no Android (autorizado pelo Rafael) |
+
+## Os pedidos novos da noite de 23/10/2026 (registrados com as palavras dele)
+
+### Cartão SD e armazenamento interno cheio (item 4)
+
+> "O Arena no android deve ser capaz de armazenar jogos tanto na memória
+> interna como no [cartão SD] (corrigi: não é ssd e sim sd), e ele deve ser
+> capaz de gerenciar isso perfeitamente para telefones que quase sempre estão
+> com armazenamento interno cheio, então busque em programas e apps do gênero
+> que são case de sucesso implementações que permitam eu ter o arena
+> instalado no armazenamento interno e poder jogar jogos salvos no cartão sd
+> utilizando o processamento da memória de armazenamento interna onde tem
+> mais capacidade de leitura e escrita"
+
+- **Pesquisa feita** (código aberto, lido em 23/10/2026): o **Lemuroid**
+  (`Swordfish90/Lemuroid`, arquivos `StorageAccessFrameworkProvider.kt`,
+  `CacheCleaner.kt` e `GameCacheUtils.kt`) deixa a pasta de jogos onde a
+  pessoa quiser, inclusive o cartão, e na hora de jogar **copia o jogo para o
+  cache interno do app** (reaproveita se já está lá), com **limite de cache
+  escolhido** (de 64 MB a 10 GB, padrão 1% do interno) e limpeza **LRU pelo
+  último acesso**. É o modelo para o ARENA.
+- **Medido no A12** (leitura sequencial de 256 MB, primeira leitura): cartão
+  **59 MB/s**, interno **106 MB/s**. Para jogo de CD/DVD isso quer dizer que o
+  cartão dá conta de jogar direto; o que pesa é o processador.
+- **Desenho:** o programa, o banco, os saves, os estados, as BIOS e os
+  atalhos ficam no interno (já ficam); o cartão vira uma **origem de jogos
+  extra** (`indexador.ORIGENS`) ligada por atalho dentro de `jogos\`; jogo
+  grande de disco pode ser copiado para o cache interno ao jogar (limite e
+  limpeza LRU); o painel mostra o espaço e a velocidade de cada volume; mover
+  jogo entre volumes **copia, confere e só então apaga o original**, e só com
+  o toque do aluno.
+
+### Os jogos do PC no cartão
+
+> "Todos os jogos que tem no pc tem no cartão sd no meu celular nesse caminho
+> para você por favor já implementá-los no arena no meu celular para os
+> testes reais com o aparelho: Este Computador\Samsung A12 De Rafa
+> Parise\Rafa SDXC\Projetos\Criador De Apps Pedagógicos\arena-console/jogos/pessoais"
+
+Conferido em 23/10/2026: o cartão (exFAT, 477 GB, 58 GB livres) tem a pasta
+`jogos\pessoais` com **35 pastas de console e 115 GB**, mas **faltam** as que
+o PC tem de PSP (7,8 GB), PS3, Sega CD, Sega Saturn, Super Nintendo, Wii,
+Xbox 360 e Sega 32X. Dos que o celular roda, estão lá Dreamcast (6,7 GB), PS1
+(2,9 GB), Nintendo 64, Neo Geo, Mega Drive, fliperama, Commodore 64, Atari
+2600, Amiga e ColecoVision, e de PS2 há 37 jogos (cerca de 100 GB).
+
+### PS2 no A12 (itens 3 e 5)
+
+> "por favor faça o possível para implementar o ps2 nesse telefone, pois já
+> vi celulares menos capazes rodando o videogame mas sozinho eu nunca consegui
+> fazer um emulador de ps2 funcionar o oficial pelo menos"
+
+- Não existe PCSX2 **oficial** para Android; o que roda em celular são
+  projetos à parte. O aberto e ativo hoje é o **ARMSX2** (GPL-3.0,
+  `ARMSX2/ARMSX2`, versão 2.8.4 de 17/10/2026, nightly de 23/10).
+- Os requisitos oficiais [Certo: armsx2.net/docs/system-requirements, lido em
+  23/10/2026]: mínimo Android 8.0 e 64 bits; recomendado SoC potente, GPU
+  Vulkan atual, **6 GB de RAM ou mais** e refrigeração. O A12 cumpre o mínimo
+  e fica bem abaixo do recomendado (3,7 GB, 8 × Cortex-A53, PowerVR GE8320).
+- O A12 é ARMv8.0: três dos quatro APKs da 2.8.4 são ARMv8.2 e **não rodam**
+  no Cortex-A53. O certo é o `ARMSX2-2.8.4-legacy-armv8.0-sdk26.apk`
+  (SHA-256 `62db5395...dd8c4f`, conferido com o publicado pelo GitHub).
+- Como o ARENA abre um jogo: intent explícita para
+  `com.armsx2/com.armsx2.MainActivity` com o caminho em texto no extra
+  `path` (o próprio ARMSX2 aceita; código lido em
+  `MainActivityRuntime.kt`, `extractLaunchUri`). A BIOS vai em
+  `Android/data/com.armsx2/files/bios`, e o assistente do app pede a pasta da
+  BIOS pelo seletor do Android.
+- O ARMSX2 tem recursos de rede (Remote play, Discord, RetroAchievements) que
+  o ARENA **não liga e não oferece**, por causa da regra de não transmitir.
+- Resultados dos testes: ver a seção "O PS2 no A12, medido" mais abaixo.
+
+### ROMs em qualquer lugar do celular (item 6)
+
+> "o ARENA deve achar roms baixadas em qualquer lugar do telefone para poder
+> de dentro do arena mover esses jogos para a pasta ps2, ou seja a rom vai
+> ser reconhecida pelo arena na parte de ps2 porém vai ter o aviso que não
+> está na pasta certa e com um toque ele vai se precisar pedir permissão para
+> mover o arquivo para pasta certa, apenas registre isso e decida a ordem de
+> implementar"
+
+O que isso exige, já separado em regras (para quando for feito):
+
+1. **Procurar no aparelho todo** (interno, cartão e pen drive de OTG), e não
+   só em `Download` como o "Procurar jogos baixados" faz hoje
+   (`servidor\baixados.py`). Só olha **arquivo com extensão de jogo** (as do
+   `consoles.json`); nunca abre foto, vídeo, áudio nem documento. Fica de fora
+   `Android\`, pasta oculta, `DCIM`, `Pictures`, `Movies`, `Music` e a pasta
+   do próprio ARENA. Tem barra de progresso, limite de tempo e botão Parar.
+2. **Reconhecer o console pelo conteúdo**, e não só pela extensão
+   (`servidor\identificador.py`: o `.iso` pode ser de PS1, PS2, PSP ou
+   GameCube; o `.bin` e o `.chd` também).
+3. O jogo aparece **na seção do console certo** (por exemplo, PS2) com o
+   selo **"fora da pasta certa"** e de onde ele veio; dá para jogá-lo de onde
+   está, e o aviso só some quando ele é levado para a pasta do console.
+4. **Um toque em "Levar para a pasta certa"**: se o Android pedir permissão
+   (Acesso a todos os arquivos), explica para quê antes e abre a tela do
+   sistema. No mesmo volume é só renomear. Entre volumes, **copia com
+   progresso, confere o tamanho e só então tira o original**. Cria a pasta do
+   console se faltar. **Nunca sobrescreve**: se já existe um arquivo com o
+   mesmo nome, pergunta. Nunca apaga sem o toque do aluno.
+5. Jogo de vários arquivos (`.cue` com `.bin`, `.gdi` com as trilhas, `.m3u`
+   com os discos) é levado **junto**, como no `arrumar.py`.
+6. **Privacidade** (alunos menores): a busca só lê nome e os primeiros bytes
+   de arquivo com extensão de jogo; nada sai do aparelho; nada é guardado além
+   da lista do ARENA.
+7. Mesma função no computador (paridade): lá o "Procurar jogos baixados" já
+   existe; "procurar em outra unidade" fica como melhoria.
+
+### O ícone: o supercontrole (item 7)
+
+> "o ícone do arena deve ser um controle que é uma junção de todos os
+> controles e formatos já existentes, ou seja, um controle fundido com todos
+> que existem de uma forma harmônica. Por exemplo, um controle daquele Xbox
+> Duke com 3 pernas para ter aquele analógico do Nintendo 64 com analógicos
+> direcionais apenas como o do PS2, ou seja, dois direcionais esquerdos como
+> cada um fica no controle e apenas um direito. O padrão de quatro botões de
+> ambos os controles continua, mas adicione aqueles botões especiais do
+> Nintendo 64 e GameCube além daqueles do próprio controle Duke do Xbox 360
+> que serve como base. Então um supercontrole que mistura todos os existentes
+> como ícone oficial do ARENA em todas as suas versões."
+
+Em todas as versões: Windows (atalho e `.ico`), tela do ARENA (favicon e
+cabeçalho), Android (ícone do app, redondo e adaptativo), Chromebook e site
+(PWA: `manifest` e ícones maskable), Linux (`ARENA.desktop`) e as imagens do
+`README`. O desenho tem de funcionar de 16 a 512 pixels: versão completa para
+tamanho grande e versão simplificada (silhueta de três pontas, quatro botões
+coloridos e um analógico) para tamanho pequeno.
+
+## Paridade com o computador
+
+O levantamento por área ainda **não foi feito**. A primeira tentativa (cinco
+leitores em paralelo mais um crítico, às 20h) gastou uns 800 mil tokens e os
+seis caíram no limite da sessão sem entregar nada. Refazer sem agentes
+paralelos: busca curta nas 77 rotas `/api/...` de `servidor\arena.py`, nas 11
+abas de `launcher\index.html` e nos atributos `data-fora-do-android` /
+`data-so-android` / `data-so-windows`, anotando cada função como igual,
+adaptada, faltando ou sem sentido no celular.
