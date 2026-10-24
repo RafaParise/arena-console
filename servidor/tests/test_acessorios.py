@@ -288,6 +288,13 @@ class CartaoDoPocketStation(unittest.TestCase):
         self.assertNotIn("slot1_tipo", graficos.limpar_cartoes_ps2({"slot1_tipo": "xx"}))
 
 
+class PocketStationNoWindows(unittest.TestCase):
+    def test_o_pokket_vai_pela_ponte_sem_acento(self):
+        # O Pokket abre o pocketstation.bin em ANSI: com "Pedagógicos" no caminho o conteudo falhava (24/10/2026).
+        import ponte_sem_acento
+        self.assertEqual(ponte_sem_acento.NUCLEOS["pokket_libretro.dll"], ["pocketstation.bin"])
+
+
 class ConfigDoArena(unittest.TestCase):
     def test_a_configuracao_padrao_tem_a_chave_dos_acessorios(self):
         import arena

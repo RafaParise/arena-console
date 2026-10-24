@@ -66,6 +66,9 @@ NUCLEOS = {
     # does not exist in the system dir" e nem abria o Java. A metade Java
     # dele mora na system e abre com a system como pasta de trabalho.
     "freej2me_libretro.dll": ["freej2me-lr.jar"],
+    # PocketStation (24/10/2026): o Pokket abre o pocketstation.bin com fopen em ANSI; com acento na pasta, o
+    # conteudo "falha ao carregar" (provado: com a system em C:/pasta-sem-acento ele roda com o mesmo BIOS).
+    "pokket_libretro.dll": ["pocketstation.bin"],
 }
 PREFIXO = "ARENA-sem-acento-"
 # No Windows, todo nucleo da lista vai pela ponte (ver o topo).

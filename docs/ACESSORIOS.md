@@ -82,8 +82,10 @@ uma pistola de luz só mira em jogo de pistola. Por isso cada acessório do cat�
 - **Fora do jogo** [Certo]: novo console **PocketStation** no ARENA, pelo núcleo **Pokket** (núcleo MIT, programas
   GPLv3, mentalfoundry): abre o cartão inteiro (`.mcd`, `.mcr`, `.gme`) ou um minijogo só (`.mcs`, `.pss`),
   mostra o relógio e o menu do aparelho, roda os minijogos e tem até a ligação por infravermelho entre dois
-  PocketStation. **Precisa do `pocketstation.bin` (16 KB) do SEU aparelho**: é firmware da Sony e não pode ir no
-  ARENA. Pôr em `BIOS\PocketStation`; o ARENA reconhece pelo tamanho. O `.srm` que ele grava é um `.mcd`
+  PocketStation. **Precisa da BIOS do PocketStation (16 KB)**, firmware da Sony que não pode ir no ARENA. O `kernel.bin` de
+  16 KB que o Rafael já tinha na pasta BIOS **é** uma BIOS de PocketStation: abre o relógio no Pokket, no PC e no
+  celular [Certo: testado em 24/10/2026]. Pôr em `BIOS\PocketStation` (o ARENA reconhece pelo tamanho; copiado
+  como `pocketstation.bin`). No Windows com acento no caminho ("Pedagógicos") o ARENA usa a ponte sem acento. O `.srm` que ele grava é um `.mcd`
   byte a byte, o mesmo formato do cartão de PS1.
 - **No PS2** [Certo]: a entrada 1 do PS2 (no celular) agora é um **cartão no formato do PS1 (128 KB)**, o mesmo
   formato que o Pokket lê, criado pelo ARENA (`PocketStation.mcr`, formatado e vazio, nunca trocado se já existir).

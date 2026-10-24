@@ -212,7 +212,7 @@ Falta (nesta ordem):
    do jogo). O zip dele traz a BIOS do VMU da Sega: não pode ir no pacote, o professor baixa.
 2. **PokketSX** como emulador de fora do PS1 (Windows): o jogo de PS1 conversa com o PocketStation ao vivo.
 3. **Cartão único** do PocketStation entre o PS1, o PS2 e o Pokket, com cópia de segurança.
-4. Testar o Pokket (precisa do `pocketstation.bin` do Rafael) e o VeMUlator (precisa de um `.vms`) no celular e no
+4. Pokket e VeMUlator já abrem no PC e no celular (BIOS: o `kernel.bin` do Rafael); falta testar com minijogos de verdade e no
    Chromebook; o APK já leva os dois núcleos (marcas em `ferramentas\android_nucleos.json`).
 5. Ler as opções dos núcleos que só as declaram depois de abrir um jogo (fceumm, fbneo, dolphin, mame2003).
 6. **Conferir com controle real:** o ARENA manda o tipo `517` ao Saturn e ao PS1 (SwanStation); nesses núcleos `517` é
