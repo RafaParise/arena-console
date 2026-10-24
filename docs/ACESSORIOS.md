@@ -87,6 +87,9 @@ uma pistola de luz só mira em jogo de pistola. Por isso cada acessório do cat�
   byte a byte, o mesmo formato do cartão de PS1.
 - **No PS2** [Certo]: a entrada 1 do PS2 (no celular) agora é um **cartão no formato do PS1 (128 KB)**, o mesmo
   formato que o Pokket lê, criado pelo ARENA (`PocketStation.mcr`, formatado e vazio, nunca trocado se já existir).
+  **Confirmado no celular (24/10/2026, foto da tela):** com esse cartão na entrada 1, o Browser da BIOS do PS2
+  mostra **"PocketStation/1"** com o desenho do aparelho, e a entrada 2 como cartão de PS2: é o nome que a própria
+  BIOS dá a um cartão no formato do PS1.
   **Atenção, premissa a corrigir:** o PocketStation não "roda" dentro da BIOS do PS2. Nem o PCSX2 nem o ARMSX2
   emulam o aparelho; o que existe é o cartão no formato certo. E **jogo de PS2 não salva em cartão de PS1**: ele salva
   na entrada 2 (cartão de PS2 de 64 MB). Jogos de PS2 que só olham a entrada 1 não salvariam; para esses, escolha
@@ -102,8 +105,9 @@ uma pistola de luz só mira em jogo de pistola. Por isso cada acessório do cat�
 - **"No ARENA do PC o PocketStation já está na entrada 1."** Não [Certo]. No PC, a entrada 1 é um cartão de PS2 de
   64 MB (`Memory Card Slot 1.ps2`) e a entrada 2 é um cartão de PS1 de 128 KB (`Memory Card Slot 2.mcr`), vazio. O
   `pcsx2-qt.exe` 2.8.2 não tem a palavra "PocketStation" (busca de texto), mas as BIOS do PS2 que o ARENA usa
-  (30004R V6 e SCPH-70004 V12) têm o texto "PocketSt…": o nome que você viu na tela pode ter vindo da própria BIOS do
-  console. O PC não foi mudado (dado seu).
+  (30004R V6 e SCPH-70004 V12) têm o texto "PocketSt…", e no celular o Browser da BIOS escreve "PocketStation" para
+  um cartão de PS1: o nome que você viu vem da BIOS do console, que chama assim o cartão de PS1 que estiver na
+  entrada. No PC esse cartão é o da entrada 2. O PC não foi mudado (dado seu).
 - **"O 32X melhora os gráficos dos jogos do Mega Drive."** Não [Provável]: o 32X é uma peça que roda os **seus
   próprios** jogos (cartuchos de 32X); os jogos comuns do Mega Drive ficam iguais. O ARENA tem o console **Sega 32X**
   (PicoDrive) para esses jogos.
