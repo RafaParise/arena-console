@@ -201,6 +201,26 @@ reserva a cada reinício (Hyper-V, WSL, Docker). O `VERIFICAR.bat`, o
 `PARTIDA.bat` e a janela preta conferem as portas do ARENA contra elas
 (`servidor\portas.py`, sem administrador) e explicam o que fazer (guia 5).
 
+## Acessórios dos consoles (pedido de 24/10/2026)
+
+Feito: o catálogo `servidor\acessorios.json` (63 acessórios, 25 consoles, chaves conferidas nos núcleos), a tela
+Ajustes → Emuladores → Acessórios dos consoles, o PocketStation na entrada 1 do PS2 (cartão de PS1) e os consoles
+novos **PocketStation** (núcleo Pokket) e **VMU** (núcleo VeMUlator). Detalhes e fontes em `docs\ACESSORIOS.md`.
+
+Falta (nesta ordem):
+1. **DreamPotato** como emulador de fora do Dreamcast, ligado ao Flycast (VMU de verdade numa janela, com a memória
+   do jogo). O zip dele traz a BIOS do VMU da Sega: não pode ir no pacote, o professor baixa.
+2. **PokketSX** como emulador de fora do PS1 (Windows): o jogo de PS1 conversa com o PocketStation ao vivo.
+3. **Cartão único** do PocketStation entre o PS1, o PS2 e o Pokket, com cópia de segurança.
+4. Testar o Pokket (precisa do `pocketstation.bin` do Rafael) e o VeMUlator (precisa de um `.vms`) no celular e no
+   Chromebook; o APK já leva os dois núcleos (marcas em `ferramentas\android_nucleos.json`).
+5. Ler as opções dos núcleos que só as declaram depois de abrir um jogo (fceumm, fbneo, dolphin, mame2003).
+6. **Conferir com controle real:** o ARENA manda o tipo `517` ao Saturn e ao PS1 (SwanStation); nesses núcleos `517` é
+   "Arcade Racer" e "Analog Joystick", e o controle analógico é `261`. Se for defeito, o conserto é de uma linha em
+   `servidor\perfis_controle.json`. Não mexi sem teste.
+7. Mais acessórios: Game Boy Camera e Printer, e-Reader, cabo link (hoje só por rede no Gambatte), Wii Balance Board,
+   EyeToy, Kinect... a lista com o motivo de cada um está no fim de `docs\ACESSORIOS.md`.
+
 ## Depende do Rafael
 
 - **O teste no Chromebook da escola** (item 12, `docs/CHROMEBOOK.md`, "O

@@ -202,6 +202,12 @@ CONSOLES = {
     "lynx": {"tipo": "cartucho", "bios": ("opcional", ["lynxboot.img"], "Opcional: lynxboot.img.")},
     "supervision": {"tipo": "cartucho", "exemplo": "Nome do Jogo.sv"},
     "pokemini": {"tipo": "cartucho", "bios": ("opcional", ["bios.min"], "Opcional: bios.min.")},
+    "pocketstation": {"tipo": "cartucho", "exemplo": "Meu Cartao.mcd",
+                      "bios": ("todas", ["pocketstation.bin"], "pocketstation.bin, tirado do seu PocketStation."),
+                      "dica": "Vale o cartão inteiro (.mcd, .mcr ou .gme, de 128 KB) ou um minijogo só (.mcs ou .pss). "
+                              "O cartão que o ARENA cria para o PS2 fica em retroarch\\system\\pcsx2\\memcards."},
+    "vmu": {"tipo": "cartucho", "exemplo": "Meu Minijogo.vms",
+            "dica": "Vale o minijogo (.vms), o save (.dci) ou o cartão inteiro (.bin, de 128 KB). Não precisa de BIOS."},
     "odyssey2": {"tipo": "cartucho", "bios": ("todas", ["o2rom.bin"], "o2rom.bin.")},
     "colecovision": {"tipo": "cartucho", "bios": ("todas", ["colecovision.rom"], "colecovision.rom.")},
     "intellivision": {"tipo": "cartucho", "bios": ("todas", ["exec.bin", "grom.bin"], "exec.bin e grom.bin.")},

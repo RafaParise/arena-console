@@ -50,7 +50,8 @@ projeto; a do RetroArch (o buildbot nao publica), pela do arquivo baixado em
 
 Uso:
     servidor\python\python.exe ferramentas\preparar_linux.py [--sem-externos] [--aceitar-applewin=<marca>]
-                                                              [--aceitar-bluemsx=<marca>]
+                                                              [--aceitar-bluemsx=<marca>] [--aceitar-pokket=<marca>]
+                                                              [--aceitar-vemulator=<marca>]
 """
 import hashlib
 import io
@@ -142,7 +143,26 @@ BLUEMSX = {
     "nome": "bluemsx_libretro.so", "opcao": "--aceitar-bluemsx", "console": "MSX",
     "conferido": "20/10/2026",
 }
-NUCLEOS_DO_NIGHTLY = [APPLEWIN, BLUEMSX]
+POKKET = {
+    "endereco": "https://buildbot.libretro.com/nightly/linux/x86_64/latest/pokket_libretro.so.zip",
+    "arquivo": os.path.join("linux-nucleos", "pokket_libretro.so.zip"),
+    # O nightly de 24/10/2026 (04:05 GMT): o emulador do PocketStation. A BIOS (pocketstation.bin) e' do aparelho
+    # de quem usa; nao vem no pacote.
+    "sha256": "1ace1a72f4a0637277222e05de55feefc8e298eb4a55033ad6fa954f3c806444",
+    "tamanho": 46257,
+    "nome": "pokket_libretro.so", "opcao": "--aceitar-pokket", "console": "PocketStation",
+    "conferido": "24/10/2026",
+}
+VEMULATOR = {
+    "endereco": "https://buildbot.libretro.com/nightly/linux/x86_64/latest/vemulator_libretro.so.zip",
+    "arquivo": os.path.join("linux-nucleos", "vemulator_libretro.so.zip"),
+    # O nightly de 24/10/2026 (06:53 GMT): o VMU do Dreamcast sozinho (emulacao de alto nivel, sem BIOS).
+    "sha256": "3e931c966cc4ba59926c313d1a511dc9b04703bf53b4f03b05f2a24382cdb19d",
+    "tamanho": 33097,
+    "nome": "vemulator_libretro.so", "opcao": "--aceitar-vemulator", "console": "VMU",
+    "conferido": "24/10/2026",
+}
+NUCLEOS_DO_NIGHTLY = [APPLEWIN, BLUEMSX, POKKET, VEMULATOR]
 # O Java do Java ME (o mesmo de ferramentas\preparar_java.py, 21.0.12.1+1).
 JDK_WINDOWS = {
     "endereco": ("https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.12.1%2B1/"

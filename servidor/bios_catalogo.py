@@ -207,6 +207,9 @@ CATALOGO = [
      "nivel": "melhor", "tamanho": 262144, "o_que": "o firmware do Nintendo DS"},
     {"id": "pokemini", "console": "pokemini", "pasta": "Pokemon mini", "sub": "", "destino": "bios.min",
      "nivel": "melhor", "tamanho": 4096, "o_que": "a BIOS do Pokémon mini"},
+    # O PocketStation: a BIOS e' firmware da Sony (16 KB, tirada do aparelho de verdade) e NAO vem com o ARENA.
+    {"id": "pocketstation", "console": "pocketstation", "pasta": "PocketStation", "sub": "", "destino": "pocketstation.bin",
+     "nivel": "precisa", "tamanho": 16384, "o_que": "a BIOS do PocketStation (16 KB, tirada do seu aparelho)"},
 ]
 
 NIVEIS = ("precisa", "alguns", "melhor")

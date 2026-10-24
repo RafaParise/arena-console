@@ -1539,6 +1539,51 @@
       "pasta": "Tamagotchi"
     },
     {
+      "id": "pocketstation",
+      "nome": "PocketStation",
+      "descricao": "O acessorio do PlayStation 1 (so no Japao, 1999): um memory card com telinha, botoes e minijogos. Roda os minijogos e mostra os saves do cartao. Precisa do pocketstation.bin do SEU aparelho (a Sony nao libera).",
+      "core": "pokket_libretro.dll",
+      "extensoes": [
+        ".mcd",
+        ".mcr",
+        ".mcs",
+        ".pss",
+        ".gme",
+        ".bin"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 1,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "pocketstation",
+        "pocket station",
+        "ps1 pocketstation"
+      ],
+      "pasta": "PocketStation"
+    },
+    {
+      "id": "vmu",
+      "nome": "VMU (Dreamcast)",
+      "descricao": "O cartao de memoria do Dreamcast, sozinho: telinha, botoes, relogio e os minijogos do VMU. Nao precisa de BIOS.",
+      "core": "vemulator_libretro.dll",
+      "extensoes": [
+        ".vms",
+        ".dci",
+        ".bin"
+      ],
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "vmu",
+        "visual memory unit",
+        "dreamcast vmu"
+      ],
+      "pasta": "VMU"
+    },
+    {
       "id": "j2me",
       "nome": "Java ME (celular antigo)",
       "descricao": "Jogos de celular Java de antes do smartphone (Nokia e outros). O Java que o emulador usa ja vem no ARENA.",

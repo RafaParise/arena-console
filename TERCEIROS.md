@@ -62,7 +62,7 @@ O que mudou em relação ao que o projeto publica:
 - `C-BIOS/configs/blueMSX/MSX - C-BIOS/config.ini`: Os caminhos das ROMs com barra (/) no lugar da barra invertida do pacote: no Linux e no Android, o blueMSX não acha a ROM pelo caminho com \ e não liga esta máquina (21/10/2026). O MSX2 do mesmo pacote já vinha com /.
 - `C-BIOS/configs/blueMSX/MSX2+ - C-BIOS/config.ini`: Os caminhos das ROMs com barra (/) no lugar da barra invertida do pacote: no Linux e no Android, o blueMSX não acha a ROM pelo caminho com \ e liga o MSX2 no lugar do MSX2+ (21/10/2026). O MSX2 do mesmo pacote já vinha com /.
 
-## Núcleos do RetroArch (63)
+## Núcleos do RetroArch (65)
 
 Cada núcleo é o emulador de um console. A licença vem do arquivo `.info`
 do próprio núcleo (`retroarch\info`). Os de licença **não comercial**
@@ -113,6 +113,7 @@ que a lista depois da tabela aponta.
 | Sony - PlayStation (PCSX ReARMed) | `pcsx_rearmed_libretro.dll` | r24 | GPLv2 |
 | Sega - MS/GG/MD/CD/32X (PicoDrive) | `picodrive_libretro.dll` | 1.99 | MAME |
 | Nintendo - Pokemon Mini (PokeMini) | `pokemini_libretro.dll` | v0.60 | GPLv3 |
+| Sony - PocketStation (Pokket) | `pokket_libretro.dll` | v1.14 | GPLv3 |
 | Watara - Supervision (Potator) | `potator_libretro.dll` | 1.0.5 | Public Domain |
 | Sony - PlayStation Portable (PPSSPP) | `ppsspp_libretro.dll` | Git | GPLv2 |
 | Atari - 7800 (ProSystem) | `prosystem_libretro.dll` | 1.3e | GPLv2 |
@@ -128,6 +129,7 @@ que a lista depois da tabela aponta.
 | MicroW8 | `uw8_libretro.dll` | 0.2.2 | The Unlicense |
 | Uzebox (Uzem) | `uzem_libretro.dll` | — | MIT |
 | GCE - Vectrex (vecx) | `vecx_libretro.dll` | SVN | GPLv3 |
+| VeMUlator | `vemulator_libretro.dll` | 0.1 | GPL v3 |
 | Commodore - C128 (VICE x128) | `vice_x128_libretro.dll` | 3.9 | GPLv2 |
 | Commodore - C64 (VICE x64, fast) | `vice_x64_libretro.dll` | 3.9 | GPLv2 |
 | Commodore - PET (VICE xpet) | `vice_xpet_libretro.dll` | 3.9 | GPLv2 |
@@ -290,7 +292,7 @@ diga que é modificada e onde está o código dela.
 | Python 3.13.16 para Android: o CPython compilado pelo Chaquopy (os pacotes "target" do Maven Central), sem mudança, com o OpenSSL, o SQLite, o libffi, o bzip2 e o xz dele | PSF License (o Python); MIT (o Chaquopy); Apache-2.0 (o OpenSSL); domínio público (o SQLite); MIT (o libffi); bzip2 e xz, as deles | https://github.com/chaquo/chaquopy e https://www.python.org/downloads/source/ |
 | O lançador do Python (`lib/<abi>/libarenapython.so`): escrito pelo ARENA (`android/python/lancador.c`) | GPL-3.0 (a do ARENA) | https://github.com/RafaParise/arena-console |
 
-### Núcleos do RetroArch no APK do Android (62)
+### Núcleos do RetroArch no APK do Android (66)
 
 Os mesmos núcleos, na versão para Android que o libretro publica (o
 "nightly", com a marca SHA-256 de cada um em
@@ -303,6 +305,7 @@ mesmo código-fonte (<https://github.com/libretro>).
 | Atari - 5200 (a5200) | `a5200_libretro_android.so` | GPLv2 |
 | Apple II (AppleWin) | `applewin_libretro_android.so` | GPLv2 |
 | Arduboy (Ardens) | `ardens_libretro_android.so` | MIT |
+| armsx2_libretro_android.so | `armsx2_libretro_android.so` | ver o projeto |
 | Atari - 400/800/600XL/800XL/130XE/5200 (Atari800) | `atari800_libretro_android.so` | GPLv2 |
 | MSX/SVI/ColecoVision/SG-1000 (blueMSX) | `bluemsx_libretro_android.so` | GPLv2 |
 | Amstrad - CPC/GX4000 (Caprice32) | `cap32_libretro_android.so` | GPLv2 |
@@ -337,7 +340,9 @@ mesmo código-fonte (<https://github.com/libretro>).
 | Sony - PlayStation 2 (LRPS2) | `pcsx2_libretro_android.so` | GPL |
 | Sony - PlayStation (PCSX ReARMed) | `pcsx_rearmed_libretro_android.so` | GPLv2 |
 | Sega - MS/GG/MD/CD/32X (PicoDrive) | `picodrive_libretro_android.so` | MAME |
+| Sony - PlayStation 2 (Play!) | `play_libretro_android.so` | MIT |
 | Nintendo - Pokemon Mini (PokeMini) | `pokemini_libretro_android.so` | GPLv3 |
+| Sony - PocketStation (Pokket) | `pokket_libretro_android.so` | GPLv3 |
 | Watara - Supervision (Potator) | `potator_libretro_android.so` | Public Domain |
 | Sony - PlayStation Portable (PPSSPP) | `ppsspp_libretro_android.so` | GPLv2 |
 | Atari - 7800 (ProSystem) | `prosystem_libretro_android.so` | GPLv2 |
@@ -353,6 +358,7 @@ mesmo código-fonte (<https://github.com/libretro>).
 | MicroW8 | `uw8_libretro_android.so` | The Unlicense |
 | Uzebox (Uzem) | `uzem_libretro_android.so` | MIT |
 | GCE - Vectrex (vecx) | `vecx_libretro_android.so` | GPLv3 |
+| VeMUlator | `vemulator_libretro_android.so` | GPL v3 |
 | Commodore - C128 (VICE x128) | `vice_x128_libretro_android.so` | GPLv2 |
 | Commodore - C64 (VICE x64, fast) | `vice_x64_libretro_android.so` | GPLv2 |
 | Commodore - PET (VICE xpet) | `vice_xpet_libretro_android.so` | GPLv2 |

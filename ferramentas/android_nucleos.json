@@ -177,6 +177,10 @@
    "sha256": "609cc9ed54c893e1e164bdd38e1fb2f255199e2a5661707da9cb023dd978f0b7",
    "tamanho": 85574
   },
+  "pokket_libretro_android.so": {
+   "sha256": "f8cff00c5d9cf1c6a3b9fc369a3e67838f46b2a8ef0c6c3d35d083731a7da5ee",
+   "tamanho": 41312
+  },
   "potator_libretro_android.so": {
    "sha256": "96a31049210b35a7cd041422c1d775c1b5720380c85a5b03b4f6785ac8b07351",
    "tamanho": 17960
@@ -236,6 +240,10 @@
   "vecx_libretro_android.so": {
    "sha256": "a7aabdd0db1222052674acd1d46dc5a65a919b5e3f311afca1225fc11c40c2c8",
    "tamanho": 39653
+  },
+  "vemulator_libretro_android.so": {
+   "sha256": "90e56397c92372dfac1daf2d243c4b6a2f2209ff5913be3a90b614fdb502190e",
+   "tamanho": 89684
   },
   "vice_x128_libretro_android.so": {
    "sha256": "238c9039d1c224668be327163a3da91cfff372d068acce9855f8e122e2017357",
@@ -428,6 +436,10 @@
    "sha256": "c107da7a3cfc8a929258eac4862d053ad8b65ec449855caf1daa6e3580379ba6",
    "tamanho": 86999
   },
+  "pokket_libretro_android.so": {
+   "sha256": "e3e1e03fecad0b6cdca26e6eb94b4e50e65211a1c5a2e0ab625e0ced2fb763d3",
+   "tamanho": 42353
+  },
   "potator_libretro_android.so": {
    "sha256": "846fca7eab67d5403189ac387daba811dd09498565eed2114994e5570f0789ad",
    "tamanho": 18069
@@ -487,6 +499,10 @@
   "vecx_libretro_android.so": {
    "sha256": "6e06876605b10ca9130031d4962c877151eb251839f7b394e1d66d50af0ebc34",
    "tamanho": 41081
+  },
+  "vemulator_libretro_android.so": {
+   "sha256": "853de7b5003d3c77c7241bdfd30d0f4eb4b1a72a7105c6fec3bb706a71b34ee9",
+   "tamanho": 90372
   },
   "vice_x128_libretro_android.so": {
    "sha256": "175e61c19886f489f2fc2078e47cc61398be20288fbe49ef91223cffd3636331",

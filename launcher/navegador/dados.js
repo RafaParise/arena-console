@@ -2494,6 +2494,51 @@ window.ARENA_DADOS = {
   },
   {
    "apelidos": [
+    "pocketstation",
+    "pocket station",
+    "ps1 pocketstation"
+   ],
+   "arquivos_sistema": 1,
+   "core": "pokket_libretro.dll",
+   "custo": 1,
+   "descricao": "O acessorio do PlayStation 1 (so no Japao, 1999): um memory card com telinha, botoes e minijogos. Roda os minijogos e mostra os saves do cartao. Precisa do pocketstation.bin do SEU aparelho (a Sony nao libera).",
+   "extensoes": [
+    ".mcd",
+    ".mcr",
+    ".mcs",
+    ".pss",
+    ".gme",
+    ".bin"
+   ],
+   "id": "pocketstation",
+   "nome": "PocketStation",
+   "pasta": "PocketStation",
+   "pede_placar": false,
+   "peso": "leve"
+  },
+  {
+   "apelidos": [
+    "vmu",
+    "visual memory unit",
+    "dreamcast vmu"
+   ],
+   "arquivos_sistema": 0,
+   "core": "vemulator_libretro.dll",
+   "custo": 1,
+   "descricao": "O cartao de memoria do Dreamcast, sozinho: telinha, botoes, relogio e os minijogos do VMU. Nao precisa de BIOS.",
+   "extensoes": [
+    ".vms",
+    ".dci",
+    ".bin"
+   ],
+   "id": "vmu",
+   "nome": "VMU (Dreamcast)",
+   "pasta": "VMU",
+   "pede_placar": false,
+   "peso": "leve"
+  },
+  {
+   "apelidos": [
     "j2me",
     "java me",
     "javame",
