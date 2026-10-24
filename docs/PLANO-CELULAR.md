@@ -216,6 +216,44 @@ com o jogo a 100% da velocidade.
   Emuladores → Abrir só a BIOS**, escolhendo o PS2: no celular, sem disco, com a
   abertura do PS2 ligada (`preparar_o_ps2_do_android`).
 
+**O que o Rafael sentiu (24/10, manhã):** o jogador 2 passou a ser reconhecido
+(dois cursores independentes na escolha de lutadores; "o controle moveu o
+jogador certo"); o vídeo e o jogo "melhoraram, mas ainda lentos e travando
+muito" no vídeo de abertura e na luta. Combina com os números: o A12 só chega
+perto dos 100% em trechos do filme, e a luta fica entre 15 e 27%.
+
+**Decisões desta rodada (todas com teste):**
+- **Automático = Vulkan quando o aparelho tem Vulkan de verdade**, senão OpenGL
+  (`graficos.opcoes_do_armsx2(..., vulkan=)`); quem escolhe na mão manda.
+- **EE**: partida em 75% no aparelho fraco, sem salto de ciclos, regulador
+  automático ligado; o degrau do "Desempenho que aprende" (agora pela
+  velocidade lida do emulador) desce mais um passo por partida lenta.
+- **Pré-carga de textura parcial** sempre; **thread dupla do vídeo** só no
+  Vulkan.
+- A linha de ajuste fino da pessoa **substitui** a da escada (antes saía duas
+  vezes a mesma chave no arquivo de opções do RetroArch).
+- Nota do celular pela velocidade medida e pela memória (até o 5) e placa pela
+  tabela `hardware.nota_da_placa_de_celular` (estimativa; só o A12 foi medido).
+
+**Falta, em ordem:**
+1. Instalar o APK final no A12 e rodar `levantamento_ps2.py` (a velocidade real
+   de cada um dos 37 jogos de PS2, sem apertar tecla): dirá quais jogos o A12
+   aguenta.
+2. Aprendizado e selo **por jogo** (hoje o "Desempenho que aprende" é por
+   console, e no PS2 a diferença entre jogos é enorme).
+3. Testar o menu da BIOS do PS2 (Ajustes → Emuladores → Abrir só a BIOS), o
+   `arena-overrides.ini` na primeira abertura, a piscada clara, retrato e
+   paisagem.
+4. Aviso de calor: o processador do A12 cai de 2,3 para 1,88 GHz perto de
+   45-47 °C (sensor AP); dizer ao aluno (tirar a capinha e o carregador).
+5. Autoconfig do GameSir Nova Lite (13623/4161; hoje cai no "padrão alternativo").
+6. Pesquisa de outras otimizações (Game Mode, ADPF, taxa de atualização, escala
+   estilo Lossless Scaling), **uma frente por vez e com busca curta**.
+
+**Armadilhas de teste** (também na memória do assistente): comando injetado por
+`adb input` cria um controle "Virtual" que toma o jogador 1; e o fps do Android
+engana (medir pelo mostrador de velocidade ou por `arena-status.json`).
+
 ### Cartão SD e armazenamento interno cheio (item 4)
 
 > "O Arena no android deve ser capaz de armazenar jogos tanto na memória
