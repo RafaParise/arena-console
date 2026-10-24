@@ -2770,7 +2770,7 @@ def preparar_o_ps2_do_android(config, jogo=None, sem_jogo=False, degrau=0):
         print("[ARENA] BIOS do PS2 levadas para a pasta do nucleo: %s." % ", ".join(levadas))
     opcoes = graficos.opcoes_do_armsx2(config.get("motor_ps2", "automatico"), (jogo or {}).get("arquivo"),
                                        PASTA_SISTEMA, nota=CAPACIDADE["nota"], abaixo=nivel_abaixo(config),
-                                       degrau=degrau)
+                                       degrau=degrau, vulkan=bool(MAQUINA.get("vulkan")))
     # O que a pessoa pediu para este emulador manda em tudo (config.json -> ajustes_dos_nucleos).
     opcoes.update(graficos.ajustes_finos_do_nucleo(config.get("ajustes_dos_nucleos"), "armsx2"))
     if sem_jogo:

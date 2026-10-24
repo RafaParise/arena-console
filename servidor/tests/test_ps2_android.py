@@ -409,6 +409,15 @@ class EeDoPs2PelaNota(unittest.TestCase):
                                 ("d3d11", "OpenGL")):
             self.assertEqual(graficos.opcoes_do_armsx2(motor, "x.chd", "/nao/existe")["armsx2_renderer"], esperado)
 
+    def test_o_automatico_vai_para_o_vulkan_so_se_o_aparelho_tem(self):
+        com = graficos.opcoes_do_armsx2("automatico", "x.chd", "/nao/existe", vulkan=True)
+        self.assertEqual(com["armsx2_renderer"], "Vulkan")
+        self.assertEqual(graficos.opcoes_do_armsx2("automatico", "x.chd", "/nao/existe", vulkan=False)["armsx2_renderer"],
+                         "OpenGL")
+        # quem escolheu o OpenGL na mao fica no OpenGL, mesmo num aparelho com Vulkan
+        self.assertEqual(graficos.opcoes_do_armsx2("opengl", "x.chd", "/nao/existe", vulkan=True)["armsx2_renderer"],
+                         "OpenGL")
+
     def test_o_renderizador_por_software_nao_e_oferecido(self):
         # no A12 o "Software" nao liga (o registro diz "Failed to initialize GS" e a tela fica preta)
         self.assertEqual(graficos.opcoes_do_armsx2("software", "x.chd", "/nao/existe")["armsx2_renderer"], "OpenGL")
@@ -492,6 +501,17 @@ class PreparoDoPs2NoAndroid(unittest.TestCase):
         self.assertEqual(opcoes, {"armsx2_renderer": "OpenGL", "armsx2_bios": "auto",
                                   "armsx2_ee_cycle_rate": "75%", "armsx2_ee_cycle_skip": "disabled"})
         self.assertFalse(os.path.exists(self.ini))
+
+    def test_o_automatico_com_vulkan_liga_a_thread_de_fundo_do_video(self):
+        self.com_ini()
+        with mock.patch.dict(self.arena.MAQUINA, {"vulkan": True}):
+            opcoes = self.arena.preparar_o_ps2_do_android(self.arena.config_padrao(), {"arquivo": "x.chd"})
+        self.assertEqual(opcoes["armsx2_renderer"], "Vulkan")
+        self.assertEqual(graficos._valor_ini(self.ler_ini(), "EmuCore/GS", "GSBackThreadMode"), "1")
+        with mock.patch.dict(self.arena.MAQUINA, {"vulkan": False}):
+            opcoes = self.arena.preparar_o_ps2_do_android(self.arena.config_padrao(), {"arquivo": "x.chd"})
+        self.assertEqual(opcoes["armsx2_renderer"], "OpenGL")
+        self.assertEqual(graficos._valor_ini(self.ler_ini(), "EmuCore/GS", "GSBackThreadMode"), "0")
 
     def test_o_degrau_do_desempenho_que_aprende_desacelera_mais_o_ee(self):
         with mock.patch.dict(self.arena.CAPACIDADE, {"nota": 2}):

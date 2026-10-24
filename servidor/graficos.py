@@ -1100,12 +1100,16 @@ def passo_do_ee_do_ps2(nota, abaixo="", degrau=0):
     return max(0, min(3, passo + max(0, int(degrau or 0))))
 
 
-def opcoes_do_armsx2(motor, arquivo_do_jogo, pasta_sistema, nota=None, abaixo="", degrau=0):
+def opcoes_do_armsx2(motor, arquivo_do_jogo, pasta_sistema, nota=None, abaixo="", degrau=0, vulkan=False):
     """O que o ARENA decide por aparelho e por jogo no nucleo do PS2 do Android (ARMSX2): o motor de video, a BIOS e,
-    com a nota do aparelho, a desaceleracao do EE. "automatico" e' OpenGL, como o proprio ARMSX2 faz no Android (so
-    manda para o Vulkan a placa que uma regra dele marca): o driver Vulkan do PowerVR do Galaxy A12 vem com 7
-    defeitos conhecidos. "vulkan" e "opengl" ficam para quem escolher."""
-    motor_do_nucleo = {"vulkan": "Vulkan"}.get(motor, "OpenGL")
+    com a nota do aparelho, a desaceleracao do EE. "automatico" e' o Vulkan quando o aparelho tem Vulkan de verdade
+    ('vulkan'): o nucleo divide o video em duas threads so nele (GSBackThreadPolicy.h do ARMSX2), e no Galaxy A12 (o
+    PowerVR GE8320, que o proprio ARMSX2 evita) ele rodou o filme de abertura e a luta sem defeito de imagem
+    (24/10/2026). Sem Vulkan, OpenGL. "vulkan" e "opengl" ficam para quem escolher na mao (Ajustes -> Emuladores)."""
+    if motor == "vulkan" or (vulkan and motor in (None, "", "automatico")):
+        motor_do_nucleo = "Vulkan"
+    else:
+        motor_do_nucleo = "OpenGL"
     opcoes = {"armsx2_renderer": motor_do_nucleo,
               "armsx2_bios": bios_do_ps2_para_o_jogo(arquivo_do_jogo, os.path.join(pasta_sistema, "pcsx2", "bios"))}
     if nota is not None:
