@@ -46,6 +46,7 @@ RAIZ = os.path.dirname(AQUI)
 if AQUI not in sys.path:
     sys.path.insert(0, AQUI)
 
+import armazenamento  # noqa: E402
 import ponte_android  # noqa: E402
 import plataforma  # noqa: E402
 
@@ -201,6 +202,8 @@ def montar_as_pastas(escolhida, privada):
         print("[ARENA] O Android nao deixa gravar em %s: os jogos e as BIOS vem de la; os saves e os "
               "recordes ficam no app." % escolhida)
     for relativo, onde in PASTAS_DE_QUEM_USA:
+        if relativo == "jogos":
+            continue                  # e' uma pasta de verdade, com um atalho por origem (montar_os_jogos)
         alvo = None
         if escolhida and (onde == LER or (onde == GRAVAR and gravar)):
             alvo = os.path.join(escolhida, *relativo.split("/"))
@@ -213,8 +216,51 @@ def montar_as_pastas(escolhida, privada):
             alvo = os.path.join(privada, *relativo.split("/"))
             os.makedirs(alvo, exist_ok=True)
         ligar(caminho(relativo), alvo)
+    montar_os_jogos(escolhida, privada)
     ponte_android.ESTADO.update({"pasta": escolhida, "so_leitura": bool(escolhida) and not gravar})
     return bool(escolhida) and not gravar
+
+
+# As origens de jogos que a lista sempre procura (indexador.ORIGENS): cada uma e' uma pasta dentro de
+# jogos da pasta do ARENA escolhida (ou do app, sem pasta escolhida).
+ORIGENS_DOS_JOGOS = ("livres", "turma", "pessoais")
+MARCA_DOS_LIVRES = ".arena-livres"
+
+
+def montar_os_jogos(escolhida, privada):
+    """RAIZ/jogos: uma pasta de VERDADE, no app, com um atalho para cada origem de jogos (livres,
+    turma, pessoais) e um para cada pasta de jogos do cartao (armazenamento.py). Ate 22/10/2026 era um
+    atalho so, para a pasta jogos inteira, e nele nao cabia mais nada: um atalho dentro da memoria do
+    aparelho nao se cria (pedido do Rafael de 23/10/2026: jogos no cartao e na memoria ao mesmo tempo).
+    Nunca apaga nada: tira so o atalho antigo; os jogos ficam onde estavam."""
+    atalho = caminho("jogos")
+    antigo = ""
+    if os.path.islink(atalho):
+        antigo = os.readlink(atalho)
+        os.remove(atalho)                          # so o atalho: a pasta dele continua la
+    elif os.path.lexists(atalho) and not os.path.isdir(atalho):
+        os.replace(atalho, "%s.antes-%s" % (atalho, time.strftime("%Y%m%d-%H%M%S")))
+    os.makedirs(atalho, exist_ok=True)
+    base = os.path.join(escolhida, "jogos") if escolhida else os.path.join(privada, "jogos")
+    for origem in ORIGENS_DOS_JOGOS:
+        alvo = os.path.join(base, origem)
+        try:
+            os.makedirs(alvo, exist_ok=True)
+        except OSError:                            # a pasta escolhida nao deixa criar: essa origem fica no app
+            alvo = os.path.join(privada, "jogos", origem)
+            os.makedirs(alvo, exist_ok=True)
+        ligar(os.path.join(atalho, origem), alvo)
+    # A marca de que os jogos livres do APK ja vieram: dentro da origem (que e' do app e sobrevive a
+    # atualizacao), e nao mais solta em jogos. A de antes, se havia, vem junto.
+    if antigo and os.path.isfile(os.path.join(antigo, MARCA_DOS_LIVRES)):
+        marca = os.path.join(atalho, "livres", MARCA_DOS_LIVRES)
+        if not os.path.exists(marca):
+            with open(marca, "w", encoding="utf-8") as arquivo:
+                arquivo.write("Os jogos livres do APK ja vieram (servidor/android_inicio.py).\n")
+    # os jogos que moram no cartao (a lista que a pessoa fez em Ajustes > Maquina > Armazenamento)
+    for identificador, situacao in armazenamento.ligar_extras(atalho).items():
+        if situacao not in ("ligado", "ja_estava"):
+            print("[ARENA] Pasta de jogos do cartao %s: %s." % (identificador, situacao))
 
 
 def tirar_do_apk(apk):
@@ -260,7 +306,7 @@ def por_os_jogos_livres(apk, escolhida):
     teste no emulador de 21/10/2026): a primeira abertura ja tem jogo. Uma
     vez so: o que a pessoa apagar nao volta. Na pasta escolhida, nunca (ela
     e' de quem usa)."""
-    marca = caminho("jogos", ".arena-livres")
+    marca = caminho("jogos", "livres", MARCA_DOS_LIVRES)
     if escolhida or os.path.exists(marca):
         return 0
     postos = 0

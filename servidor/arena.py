@@ -96,6 +96,7 @@ import plataforma as plataforma_do_sistema  # noqa: E402
 import portas  # noqa: E402  (as faixas que o Windows reserva a cada reinicio -- 18/10/2026)
 import ponte_android  # noqa: E402  (no Android, o que o servidor pede ao app -- item 14, 18/10/2026)
 import adb_aparelho  # noqa: E402  (o celular ligado no cabo, visto pelo computador -- 23/10/2026)
+import armazenamento  # noqa: E402  (a memoria do celular e o cartao SD, juntos -- 23/10/2026)
 
 PASTA_LAUNCHER = os.path.join(RAIZ, "launcher")
 PASTA_DADOS = os.path.join(RAIZ, "dados")
@@ -2327,6 +2328,22 @@ def limpar_caches():
         _cache["plataformas"] = (0.0, None)
         _cache["manifesto"] = (0.0, None)
         _cache["resposta"] = (0.0, None)
+
+
+def ligar_o_cartao():
+    """As pastas de jogos do cartao SD (servidor\\armazenamento.py) viram origens da lista, ao lado de
+    "Meus jogos": refaz os atalhos dentro de jogos\\ e poe o nome de cada uma no indexador. So no
+    Android. Cartao que saiu do aparelho some da lista (e volta quando for encaixado e a lista
+    for atualizada). Devolve o que aconteceu com cada pasta."""
+    for origem in [o for o in indexador.ORIGENS if o.startswith(armazenamento.PREFIXO)]:
+        indexador.ORIGENS.pop(origem, None)
+    if not plataforma_do_sistema.ANDROID:
+        return {}
+    situacao = armazenamento.ligar_extras(PASTA_JOGOS)
+    for identificador, nome in armazenamento.rotulos_das_origens().items():
+        if situacao.get(identificador) in ("ligado", "ja_estava"):
+            indexador.ORIGENS[identificador] = nome
+    return situacao
 
 
 # Capas para todos os jogos sem capa (botao "Buscar capas que faltam",
@@ -5245,6 +5262,14 @@ class Manipulador(BaseHTTPRequestHandler):
                 return self.erro("Isto é só do ARENA do Android. No computador, veja Ajustes → Máquina → Celular ligado no cabo.", 404)
             return self.responder_json({"ok": True, "aparelho": ponte_android.aparelho()})
 
+        if caminho == "/api/armazenamento":
+            # A memoria do aparelho e o cartao SD, as pastas de jogos do cartao e a escolha de
+            # jogar direto ou pelo interno (Ajustes -> Maquina -> Armazenamento, so no Android).
+            if not plataforma_do_sistema.ANDROID:
+                return self.erro("Isto é só do ARENA do Android. No computador, ponha os jogos na pasta jogos do "
+                                 "ARENA (Como colocar jogos mostra onde).", 404)
+            return self.responder_json(dict(armazenamento.estado(), ok=True))
+
         if caminho == "/api/android/pastas":
             # As pastas do ARENA deste aparelho (Ajustes -> Maquina, so no Android).
             if not plataforma_do_sistema.ANDROID:
@@ -5564,6 +5589,70 @@ class Manipulador(BaseHTTPRequestHandler):
         except Exception as falha:
             return self.erro_interno(falha)
 
+    def api_armazenamento(self, caminho, dados):
+        """As rotas POST do armazenamento (so no Android)."""
+        if caminho == "/api/armazenamento/procurar":
+            volume = next((v for v in armazenamento.volumes() if v["id"] == str(dados.get("volume", ""))), None)
+            if not volume or not volume["montado"]:
+                return self.erro("Escolha um dos volumes da lista. Se o cartão não aparece, encaixe-o e abra o "
+                                 "ARENA de novo.")
+            return self.responder_json(dict(armazenamento.procurar_pastas_de_jogos(volume["caminho"]), ok=True))
+
+        if caminho == "/api/armazenamento/usar":
+            # As pastas de jogos do proprio ARENA (livres, turma, pessoais) nao entram de novo pelo cartao.
+            proprias = [os.path.join(PASTA_JOGOS, o) for o in indexador.ORIGENS
+                        if not o.startswith(armazenamento.PREFIXO)]
+            nome = str(dados.get("nome") or "").strip()[:40] or None
+            _novos, erro = armazenamento.adicionar(str(dados.get("caminho") or ""), nome=nome, proprias=proprias)
+            if erro:
+                return self.erro(erro)
+            return self.responder_json(self.depois_de_mexer_no_cartao())
+
+        if caminho == "/api/armazenamento/tirar":
+            _novos, erro = armazenamento.remover(str(dados.get("id") or ""))
+            if erro:
+                return self.erro(erro + " Atualize a tela e veja a lista de novo.")
+            return self.responder_json(self.depois_de_mexer_no_cartao())
+
+        if caminho == "/api/armazenamento/ajustar":
+            _novos, erro = armazenamento.definir_jogo_do_cartao(dados.get("jogar_do_cartao"),
+                                                                dados.get("limite_do_cache_mb"))
+            if erro:
+                return self.erro(erro)
+            return self.responder_json(dict(armazenamento.estado(), ok=True))
+
+        if caminho == "/api/armazenamento/medir":
+            identificador = str(dados.get("volume") or "")
+            if identificador == "interno":
+                # a pasta do app (dados\\), no interno: a velocidade que o cache de jogo teria
+                try:
+                    medida = armazenamento.medir_gravacao_e_leitura(PASTA_DADOS)
+                except OSError as falha:
+                    return self.erro(traduzir_erro_do_sistema(falha, "medir o armazenamento"))
+                return self.responder_json(dict(medida, ok=True, volume="interno"))
+            do_volume = [e for e in armazenamento.estado()["extras"] if e["volume"] == identificador and e["existe"]]
+            if not do_volume:
+                return self.erro("Ponha primeiro a pasta de jogos desse cartão na lista: é de um jogo dela que o "
+                                 "ARENA lê um pedaço para medir (nada é gravado no cartão).")
+            arquivo = armazenamento.maior_arquivo(do_volume[0]["caminho"], minimo_mb=64)
+            if not arquivo:
+                return self.erro("Não achei nenhum jogo grande (64 MB ou mais) nessa pasta para ler. Ponha na lista "
+                                 "a pasta que tem os jogos de disco (PS1, Dreamcast, PS2...).")
+            try:
+                velocidade = armazenamento.medir_leitura(arquivo)
+            except OSError as falha:
+                return self.erro(traduzir_erro_do_sistema(falha, "ler o jogo do cartão"))
+            return self.responder_json({"ok": True, "volume": identificador, "leitura_mb_s": velocidade})
+
+        return self.erro("Rota não encontrada.", 404)
+
+    def depois_de_mexer_no_cartao(self):
+        """A pasta do cartao entrou ou saiu da lista: refaz os atalhos, a lista de jogos e devolve o estado."""
+        situacao = ligar_o_cartao()
+        limpar_caches()
+        total = manifesto(forcar=True)["total"]
+        return dict(armazenamento.estado(), ok=True, total=total, situacao=situacao)
+
     def api_post(self, caminho, dados):
 
         # ---- o celular ligado no cabo, visto pelo computador (23/10/2026) ----
@@ -5579,6 +5668,15 @@ class Manipulador(BaseHTTPRequestHandler):
             if serial is not None and not isinstance(serial, str):
                 return self.erro("Celular inválido. Clique em Procurar celular no cabo de novo.")
             return self.responder_json(dict(adb_aparelho.procurar(serial), ok=True))
+
+        # ---- o armazenamento do celular: memoria e cartao SD (23/10/2026) ----
+        # So o Android (o cartao e' do celular), so deste aparelho. Nunca apaga nem move jogo: tirar
+        # uma pasta da lista so desfaz o atalho (servidor\armazenamento.py).
+        if caminho.startswith("/api/armazenamento/"):
+            if not plataforma_do_sistema.ANDROID:
+                return self.erro("Isto é só do ARENA do Android. No computador, ponha os jogos na pasta jogos do "
+                                 "ARENA (Como colocar jogos mostra onde).", 404)
+            return self.api_armazenamento(caminho, dados)
 
         # ---- Android: a pasta do ARENA no aparelho e a permissao (item 14) --
         if caminho in ("/api/android/pasta", "/api/android/permissao"):
@@ -6628,6 +6726,7 @@ class Manipulador(BaseHTTPRequestHandler):
             return self.responder_json({"ok": True, "copiadas": copiadas})
 
         if caminho == "/api/indexar":
+            ligar_o_cartao()          # cartao encaixado ou tirado desde a ultima vez
             limpar_caches()
             total = manifesto(forcar=True)["total"]
             # Com acervo grande, cada releitura deixa listas antigas para
@@ -7646,6 +7745,12 @@ def principal():
     instalados = graficos.instalar_configuracoes_que_faltam()
     if instalados:
         print("  Primeira vez: configuracao padrao de %d programa(s)" % len(instalados))
+
+    # Android: as pastas de jogos do cartao SD entram na lista (armazenamento.py).
+    if plataforma_do_sistema.ANDROID:
+        cartao = ligar_o_cartao()
+        if cartao:
+            print("  Cartao:   %s" % ", ".join("%s (%s)" % par for par in sorted(cartao.items())))
 
     # Pen drive muda de letra, pasta muda de lugar - conserta sozinho antes
     # de mais nada, senao o RetroArch abre com caminho de uma pasta que

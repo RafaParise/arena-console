@@ -25,6 +25,7 @@ if PASTA_SERVIDOR not in sys.path:
     sys.path.insert(0, PASTA_SERVIDOR)
 
 import android_inicio  # noqa: E402
+import armazenamento  # noqa: E402
 import hardware  # noqa: E402
 import plataforma  # noqa: E402
 import ponte_android  # noqa: E402
@@ -377,15 +378,63 @@ class PastaDoArena(unittest.TestCase):
     def test_os_atalhos_vao_para_a_pasta_escolhida(self):
         self.assertFalse(android_inicio.montar_as_pastas(self.escolhida, self.privada))
         for relativo, onde in android_inicio.PASTAS_DE_QUEM_USA:
+            if relativo == "jogos":
+                continue              # pasta de verdade, com um atalho por origem (teste proprio, abaixo)
             self.assertTrue(os.path.islink(os.path.join(self.raiz, *relativo.split("/"))), relativo)
             base = self.privada if onde == android_inicio.APP else self.escolhida
             self.assertEqual(self.alvo(relativo), os.path.realpath(os.path.join(base, *relativo.split("/"))),
                              relativo)
         self.assertEqual(ponte_android.ESTADO["pasta"], self.escolhida)
         # Um jogo posto pela pasta do app aparece na pasta escolhida.
-        with open(os.path.join(self.raiz, "jogos", "x.nes"), "wb") as arquivo:
+        with open(os.path.join(self.raiz, "jogos", "pessoais", "x.nes"), "wb") as arquivo:
             arquivo.write(b"NES")
-        self.assertTrue(os.path.isfile(os.path.join(self.escolhida, "jogos", "x.nes")))
+        self.assertTrue(os.path.isfile(os.path.join(self.escolhida, "jogos", "pessoais", "x.nes")))
+
+    def test_jogos_e_uma_pasta_de_verdade_com_um_atalho_por_origem(self):
+        android_inicio.montar_as_pastas(self.escolhida, self.privada)
+        jogos = os.path.join(self.raiz, "jogos")
+        self.assertTrue(os.path.isdir(jogos))
+        self.assertFalse(os.path.islink(jogos))
+        for origem in ("livres", "turma", "pessoais"):
+            self.assertTrue(os.path.islink(os.path.join(jogos, origem)), origem)
+            self.assertEqual(self.alvo("jogos/" + origem),
+                             os.path.realpath(os.path.join(self.escolhida, "jogos", origem)), origem)
+
+    def test_o_atalho_antigo_da_pasta_jogos_vira_pasta_sem_perder_jogo(self):
+        # As versoes ate 22/10/2026 faziam de RAIZ/jogos um atalho para <escolhida>/jogos.
+        jogo = os.path.join(self.escolhida, "jogos", "pessoais", "PS1", "Crash.chd")
+        os.makedirs(os.path.dirname(jogo))
+        with open(jogo, "wb") as arquivo:
+            arquivo.write(b"jogo")
+        os.symlink(os.path.join(self.escolhida, "jogos"), os.path.join(self.raiz, "jogos"), target_is_directory=True)
+        android_inicio.montar_as_pastas(self.escolhida, self.privada)
+        self.assertFalse(os.path.islink(os.path.join(self.raiz, "jogos")))
+        self.assertTrue(os.path.isfile(os.path.join(self.raiz, "jogos", "pessoais", "PS1", "Crash.chd")))
+        self.assertTrue(os.path.isfile(jogo))                          # o jogo nao saiu do lugar
+
+    def test_a_marca_dos_livres_do_atalho_antigo_vai_junto(self):
+        antiga = os.path.join(self.privada, "jogos")
+        os.makedirs(antiga)
+        with open(os.path.join(antiga, ".arena-livres"), "w", encoding="utf-8") as arquivo:
+            arquivo.write("ja vieram")
+        os.symlink(antiga, os.path.join(self.raiz, "jogos"), target_is_directory=True)
+        android_inicio.montar_as_pastas("", self.privada)
+        self.assertTrue(os.path.isfile(os.path.join(self.raiz, "jogos", "livres", ".arena-livres")))
+
+    def test_o_cartao_entra_como_mais_uma_origem(self):
+        do_cartao = os.path.join(self.pasta, "1234-5678", "jogos")
+        os.makedirs(os.path.join(do_cartao, "PS1"))
+        extra = {"id": "cartao-1234-5678", "nome": "Cartão SD", "caminho": do_cartao}
+        padrao = {"jogos_extras": [extra], "jogar_do_cartao": "direto", "limite_do_cache_mb": 2048}
+        with mock.patch.object(armazenamento, "ler", return_value=padrao):
+            android_inicio.montar_as_pastas(self.escolhida, self.privada)
+        self.assertEqual(self.alvo("jogos/cartao-1234-5678"), os.path.realpath(do_cartao))
+        self.assertEqual(os.listdir(os.path.join(self.raiz, "jogos", "cartao-1234-5678")), ["PS1"])
+        # sem a pasta na lista, o atalho some e o jogo fica no cartao
+        with mock.patch.object(armazenamento, "ler", return_value=dict(padrao, jogos_extras=[])):
+            android_inicio.montar_as_pastas(self.escolhida, self.privada)
+        self.assertFalse(os.path.lexists(os.path.join(self.raiz, "jogos", "cartao-1234-5678")))
+        self.assertTrue(os.path.isdir(os.path.join(do_cartao, "PS1")))
 
     def test_o_que_o_servidor_grava_fica_no_app(self):
         """O arquivo da partida, a configuracao, os recordes, as listas com o
@@ -408,7 +457,7 @@ class PastaDoArena(unittest.TestCase):
     def test_pasta_so_de_ler(self):
         with mock.patch.object(android_inicio, "da_para_gravar", return_value=False):
             self.assertTrue(android_inicio.montar_as_pastas(self.escolhida, self.privada))
-        self.assertEqual(self.alvo("jogos"), os.path.realpath(os.path.join(self.escolhida, "jogos")))
+        self.assertEqual(self.alvo("jogos/pessoais"), os.path.realpath(os.path.join(self.escolhida, "jogos", "pessoais")))
         self.assertEqual(self.alvo("retroarch/saves"),
                          os.path.realpath(os.path.join(self.privada, "retroarch", "saves")))
         self.assertTrue(ponte_android.ESTADO["so_leitura"])
@@ -427,7 +476,7 @@ class PastaDoArena(unittest.TestCase):
     def test_trocar_de_pasta_so_troca_o_atalho(self):
         android_inicio.montar_as_pastas(self.escolhida, self.privada)
         android_inicio.montar_as_pastas("", self.privada)
-        self.assertEqual(self.alvo("jogos"), os.path.realpath(os.path.join(self.privada, "jogos")))
+        self.assertEqual(self.alvo("jogos/pessoais"), os.path.realpath(os.path.join(self.privada, "jogos", "pessoais")))
         self.assertTrue(os.path.isdir(os.path.join(self.escolhida, "jogos")))   # a escolhida continua la
 
     def test_recursos_do_retroarch_saem_do_apk_uma_vez(self):
@@ -503,7 +552,7 @@ class PastaVisivel(unittest.TestCase):
     def setUp(self):
         self.pasta = tempfile.mkdtemp(prefix="arena_android_visivel_")
         self.memoria = os.path.join(self.pasta, "emulated", "0")
-        self.cartao = os.path.join(self.pasta, "1A2B-3C4D")
+        self.cartao = os.path.join(self.pasta, "1234-5678")
         os.makedirs(self.memoria)
         os.makedirs(self.cartao)
         self.lembradas = []

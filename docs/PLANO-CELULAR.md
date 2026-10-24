@@ -118,8 +118,8 @@ Rafael quiser trocar, é só dizer.
 
 > "Todos os jogos que tem no pc tem no cartão sd no meu celular nesse caminho
 > para você por favor já implementá-los no arena no meu celular para os
-> testes reais com o aparelho: Este Computador\Samsung A12 De Rafa
-> Parise\Rafa SDXC\Projetos\Criador De Apps Pedagógicos\arena-console/jogos/pessoais"
+> testes reais com o aparelho: Este Computador\[o celular]\[o cartão
+> SD]\Projetos\Criador De Apps Pedagógicos\arena-console/jogos/pessoais"
 
 Conferido em 23/10/2026: o cartão (exFAT, 477 GB, 58 GB livres) tem a pasta
 `jogos\pessoais` com **35 pastas de console e 115 GB**, mas **faltam** as que
