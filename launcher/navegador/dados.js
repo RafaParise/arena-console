@@ -1737,6 +1737,26 @@ window.ARENA_DADOS = {
     ".chd",
     ".iso"
    ],
+   "externo_extra": {
+    "argumentos": [
+     "-portable",
+     "-batch",
+     "-fullscreen",
+     "--",
+     "{jogo}"
+    ],
+    "executaveis": [
+     "pokketsx-qt-x64-Release-MSVC.exe"
+    ],
+    "motivo": "Opcional, só no Windows. Liga o PocketStation de verdade no lugar do cartão de memória, para os jogos de PlayStation que conversam com ele.",
+    "motivo_escolha": "Liga o PocketStation de verdade na entrada 2 do cartão: o jogo conversa com ele e baixa o minijogo para o aparelho. Um jogador só; não mostra a telinha nem toca o som do PocketStation (para jogar o minijogo, abra o cartão no console PocketStation). Precisa da BIOS do PlayStation e da do PocketStation.",
+    "nome": "PokketSX",
+    "pasta": "PokketSX",
+    "selo_escolha": "com PocketStation",
+    "site": "github.com/mentalfoundry/PokketSX",
+    "so_windows": true,
+    "titulo_escolha": "PokketSX (com PocketStation)"
+   },
    "id": "ps1",
    "jogadores_por_jogo": {
     "Crash Team Racing": 4

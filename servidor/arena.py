@@ -87,6 +87,7 @@ import motivo_do_erro  # noqa: E402  (por que o jogo nao abriu, pelo registro --
 import desempenho  # noqa: E402  (o jogo pesado demais deixa o grafico mais leve -- auditoria 4)
 import bios        # noqa: E402  (nome, pasta e versao certa de cada BIOS -- 03/10/2026)
 import companheiros  # noqa: E402  (programas que abrem junto com o jogo: o DreamPotato -- 24/10/2026)
+import pokketsx  # noqa: E402  (o PS1 com o PocketStation de verdade, so Windows -- 24/10/2026)
 import acessorios  # noqa: E402  (VMU, Rumble Pak, multitap, pistola de luz... ligar e desligar -- 24/10/2026)
 import arrumar     # noqa: E402  (o botao Arrumar: o arquivo do jogo no lugar certo -- 03/10/2026)
 import ponte_sem_acento  # noqa: E402  (nucleo que nao abre pasta com acento: o Hatari -- 14/10/2026)
@@ -2211,6 +2212,8 @@ def avaliar_plataformas(forcar=False):
         core_ok = plataforma["core"].lower() in cores
         precisa_sistema = plataforma["arquivos_sistema"] > 0
         caminho_externo, dados_externo = graficos.achar_externo(plataforma)
+        # O emulador de fora A MAIS (o PokketSX do PS1): so entra na lista dos jeitos de abrir.
+        caminho_extra, dados_extra = graficos.achar_externo_extra(plataforma)
 
         # Maquina fraca NAO impede mais de jogar. Antes, console pesado
         # sumia da lista em PC fraco - o aluno nem sabia que existia. Agora
@@ -2304,7 +2307,8 @@ def avaliar_plataformas(forcar=False):
             # escolher qual usar quando ha mais de um).
             "jeitos": [{"id": j["id"], "titulo": j["titulo"]} for j in jeitos_de_abrir.jeitos(
                 plataforma, PASTA_CORES, PASTA_SISTEMA,
-                dados_externo["nome"] if caminho_externo else None)],
+                dados_externo["nome"] if caminho_externo else None,
+                dados_extra["nome"] if caminho_extra else None)],
         })
 
     with TRAVA_CACHE:
@@ -3090,6 +3094,17 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             if graficos.escrever_config_rpcn(jogo["externo"]["caminho"], ligado=rpcn):
                 print("[ARENA] RPCN %s." % ("ligado (precisa de conta ja criada "
                                             "pela tela do RPCS3)" if rpcn else "desligado"))
+
+        # PokketSX (PS1 com o PocketStation de verdade): as BIOS, o cartao da entrada 2 e o settings.ini, para abrir
+        # sem o assistente dele (servidor\pokketsx.py).
+        elif jogo["externo"]["dados"]["nome"] == "PokketSX":
+            preparado = pokketsx.preparar(jogo["externo"]["caminho"], PASTA_SISTEMA)
+            if preparado["erro"]:
+                print("[ARENA] Nao consegui deixar o PokketSX pronto: %s" % preparado["erro"])
+            if preparado["bios"]:
+                print("[ARENA] BIOS levadas para o PokketSX: %s" % ", ".join(preparado["bios"]))
+            if preparado["cartao"]:
+                print("[ARENA] Cartao novo do PocketStation criado: %s" % preparado["cartao"])
 
         print("[ARENA] Abrindo pelo %s" % jogo["externo"]["dados"]["nome"])
     else:
@@ -7118,6 +7133,9 @@ class Manipulador(BaseHTTPRequestHandler):
             # Emulador de fora tem prioridade. Se ele existe, o RetroArch
             # nem precisa estar instalado para esta plataforma.
             caminho_externo, dados_externo = graficos.achar_externo(plataforma)
+            # O emulador de fora A MAIS (consoles.json -> externo_extra: o PokketSX do PS1) so abre se a pessoa o
+            # escolher. Sem escolha, e no Jogar Junto, o console segue pelo RetroArch.
+            caminho_extra, dados_extra = graficos.achar_externo_extra(plataforma)
 
             # Os jeitos de abrir este console (servidor\jeitos_de_abrir.py):
             # o emulador de fora, o original (a BIOS de verdade) e o livre
@@ -7129,10 +7147,12 @@ class Manipulador(BaseHTTPRequestHandler):
             bios.instalar_livres(PASTA_SISTEMA)
             lista_jeitos = jeitos_de_abrir.jeitos(
                 plataforma, PASTA_CORES, PASTA_SISTEMA,
-                dados_externo["nome"] if caminho_externo else None)
-            jeito = jeitos_de_abrir.escolher(
-                lista_jeitos, dados.get("jeito"),
-                carregar_config().get("jeito_de_abrir", {}).get(plataforma["id"]))
+                dados_externo["nome"] if caminho_externo else None,
+                dados_extra["nome"] if caminho_extra else None)
+            lembrado = jeitos_de_abrir.lembrado_que_vale(
+                carregar_config().get("jeito_de_abrir", {}).get(plataforma["id"]),
+                bool(dados.get("partida")), bool(caminho_extra))
+            jeito = jeitos_de_abrir.escolher(lista_jeitos, dados.get("jeito"), lembrado)
             if jeito is None and len(lista_jeitos) > 1 and not dados.get("partida"):
                 return self.responder_json({"ok": True, "escolher_jeito": True,
                                             "console": plataforma["nome"],
@@ -7144,6 +7164,8 @@ class Manipulador(BaseHTTPRequestHandler):
                 salvar_config(lembrar)
             if jeito in ("original", "livre"):
                 caminho_externo = None       # a pessoa escolheu o RetroArch
+            if caminho_extra and jeito == "externo":
+                caminho_externo, dados_externo = caminho_extra, dados_extra   # escolheu o emulador a mais
             livre = (plataforma.get("livre") or {}) if jeito == "livre" else {}
             core_do_jeito = livre.get("core") or plataforma["core"]
 
@@ -7415,6 +7437,11 @@ class Manipulador(BaseHTTPRequestHandler):
                     "ARENA já configurou, sem precisar de driver nenhum. Abra "
                     "o menu de rede DENTRO do jogo pra hospedar ou entrar "
                     "numa partida.")
+            elif caminho_externo and dados_externo["nome"] == "PokketSX":
+                resposta["aviso"] = (
+                    "O PocketStation está na entrada 2 do cartão. O PokketSX não mostra a telinha dele: o jogo "
+                    "baixa o minijogo para o cartão e, depois, o console PocketStation do ARENA abre esse cartão. "
+                    "F10 fecha o jogo.")
             # Aviso fixo do console (ex.: fliperama precisa de ficha antes do
             # Start), vindo do consoles.json -> aviso_ao_abrir.
             if plataforma.get("aviso_ao_abrir"):

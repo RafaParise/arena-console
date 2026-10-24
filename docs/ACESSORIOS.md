@@ -102,11 +102,32 @@ uma pistola de luz só mira em jogo de pistola. Por isso cada acessório do cat�
   **Seus saves antigos** continuam no cartão de 8 MB (`Mcd001.ps2`); para trazê-los: em Acessórios → PlayStation 2 ponha
   a entrada 2 em "Cartão do PS2 de 8 MB", abra a BIOS (Browser), copie os saves da entrada 2 para a 1 e volte a
   entrada 2 para o PocketStation.
-- **Ligado ao jogo ao vivo** [Certo; instalado em `emuladores\PokketSX`, ainda sem botão no ARENA]: só o **PokketSX** (GPLv3; fork do DuckStation de antes de
-  a licença dele fechar; só Windows x64). Na aba de cartões de memória tem uma caixinha por cartão para pôr o
-  PocketStation no lugar dele, e na aba BIOS um campo para a BIOS do PocketStation. É o único jeito conhecido de o
-  jogo de PS1 conversar com o PocketStation (baixar o minijogo do jogo, ver os saves na telinha). Não vai para
-  Android, Linux nem Chromebook (sem versão para eles). Próximo passo: tratá-lo como emulador de fora do PS1.
+- **Ligado ao jogo ao vivo** [Certo; feito em 24/10/2026, só Windows]: só o **PokketSX** (GPLv3; fork do DuckStation de
+  antes de a licença dele fechar; só Windows x64). Cada entrada de cartão tem uma caixinha para pôr o PocketStation no
+  lugar do cartão comum, e o jogo de PS1 conversa com ele pelo protocolo do cartão: é assim que o jogo baixa o minijogo
+  para o aparelho. É o único jeito conhecido de o jogo de PS1 falar com o PocketStation. Não vai para Android, Linux nem
+  Chromebook (sem versão para eles).
+  **Premissa a corrigir:** o PokketSX **não mostra a telinha, não toca o som e não liga os botões** do PocketStation.
+  O núcleo dele tem essas funções (tela de 32×32, áudio de 8 kHz, cinco botões), mas nada da janela as usa: o aparelho
+  roda "por dentro" do cartão [Provável: lido no código-fonte do PokketSX em 24/10/2026, por busca de texto em `src\`;
+  não li os `.c` do núcleo]. O que o jogo faz com o PocketStation fica no cartão; para **ver** e **jogar** o minijogo na
+  telinha, o cartão tem que abrir no console **PocketStation** do ARENA (núcleo Pokket).
+  **Como usar:** abra um jogo de PlayStation e, na pergunta "Como ligar o PlayStation?", escolha **PokketSX (com
+  PocketStation)** (marque "lembrar" se quiser; Ajustes → Emuladores troca depois). Ele só aparece na pergunta se
+  `emuladores\PokketSX` existir; o PlayStation segue sendo do RetroArch (Jogar Junto, vários discos e o resto não mudam;
+  no Jogar Junto a escolha lembrada do PokketSX não vale). **O que o ARENA faz sozinho** (`servidor\pokketsx.py`): leva
+  a BIOS do PlayStation e a do PocketStation para `emuladores\PokketSX\bios`, cria o cartão
+  `emuladores\PokketSX\memcards\PocketStation.mcd` (128 KB, formatado, nunca trocado) na **entrada 2** (a 1 fica com o
+  cartão comum de cada jogo; a mesma divisão do PS2), grava o `settings.ini` sem o assistente de configuração, sem
+  confirmar ao fechar, sem atualizador nem Discord, e abre em tela cheia com `-batch` (o programa fecha junto com o
+  jogo). **F10 fecha o jogo.** Um jogador só.
+  **Testado em 24/10/2026** [Certo]: abre o Crash Bandicoot e o Legacy of Kain pela rota `/api/jogar` de uma cópia do
+  ARENA numa pasta com acento (`testes\teste_pokketsx_pelo_arena.py`: 5 passos, tudo certo); o registro do próprio
+  PokketSX diz `Memory Card Slot 2: PocketStation started from ...\bios\pocketstation.bin`. O `kernel.bin` do Rafael tem
+  MD5 `3bcdcef3...d11c8`, diferente do dump "conhecido" que o PokketSX prefere (`d3dc54ef...e5ae`): ele só avisa e usa
+  assim mesmo (qualquer arquivo de 16 KB serve). **Não testado:** o jogo conversando de fato com o PocketStation (nenhum
+  jogo de PS1 desta pasta usa o PocketStation: precisa de um dos ~87 compatíveis, como o Final Fantasy VIII) e o
+  controle de verdade (os nomes dos botões SDL foram escritos pelo código do PokketSX; o teste com controle fica para o fim).
 
 ## Premissas corrigidas
 
@@ -138,11 +159,14 @@ opções nessa leitura; os tipos de controle por porta deles (como Zapper e Powe
 ## Pendências desta frente
 
 1. ~~DreamPotato~~ **Feito** (programa companheiro); falta testar com um jogo de Dreamcast de verdade no PC do Rafael.
-2. **PokketSX** como emulador de fora do PS1 no Windows: já baixado e abrindo em `emuladores\PokketSX` (modo portátil, sem o
-   atualizador, Discord desligado; zip sha256 `ce7cdb2b...f74c`). Falta o ARENA abrir um jogo de PS1 por ele (escrever o
-   settings.ini com a BIOS do PocketStation e o cartão no lugar).
-3. **Cartão único** entre o PS1, o PS2 e o Pokket (hoje o PS2 cria o `PocketStation.mcr`; o Pokket abre o cartão
-   que você escolher e grava num `.srm`; falta o ARENA copiar de um para o outro com cópia de segurança).
+2. ~~**PokketSX** como emulador de fora do PS1~~ **Feito em 24/10** (um jeito a mais de abrir o PS1; ver acima). Falta
+   testar com um jogo que use o PocketStation e com controle de verdade. (Instalado em `emuladores\PokketSX`: modo portátil,
+   sem o atualizador, Discord desligado; zip sha256 `ce7cdb2b...f74c`.)
+3. **Cartão único** entre o PS1, o PS2 e o Pokket (hoje o PS2 cria o `PocketStation.mcr`, o PokketSX usa
+   `emuladores\PokketSX\memcards\PocketStation.mcd` e o Pokket abre o cartão que você escolher e grava num `.srm`;
+   falta o ARENA copiar de um para o outro com cópia de segurança). **É o elo que falta para o que você faz num lado
+   aparecer no outro**: hoje, para ver na telinha o minijogo que o PokketSX baixou, copie o `PocketStation.mcd` para
+   `jogos\pessoais\PocketStation` e abra no console PocketStation.
 4. Testar o Pokket (precisa do `pocketstation.bin` do Rafael) e o VeMUlator (precisa de um `.vms`) no celular.
 5. Os núcleos que declaram as opções tarde (lista acima): ler as opções abrindo um jogo.
 6. Conferir os códigos de controle que o ARENA manda ao Saturn e ao PS1: o `517` aparece nos núcleos como

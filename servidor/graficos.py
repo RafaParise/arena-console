@@ -746,7 +746,16 @@ def achar_externo(plataforma):
     return caminho, externo
 
 
-def achar_externo_detalhado(plataforma):
+def achar_externo_extra(plataforma):
+    """Como achar_externo(), para o emulador de fora A MAIS do console (consoles.json -> externo_extra): um jeito
+    de abrir que so vale quando a pessoa o escolhe (o PokketSX do PS1). O console continua sendo do RetroArch, entao
+    as outras contas (estado, BIOS, varios discos, Jogar Junto) nem o enxergam. Devolve (caminho, dados) ou
+    (None, dados)."""
+    caminho, _, extra = achar_externo_detalhado(plataforma, "externo_extra")
+    return caminho, extra
+
+
+def achar_externo_detalhado(plataforma, chave="externo"):
     """Como achar_externo(), mas tambem avisa se so achou um .zip/.7z.
 
     Erro comum: baixar o emulador e largar o arquivo compactado dentro da
@@ -756,7 +765,7 @@ def achar_externo_detalhado(plataforma):
     Devolve (caminho do executavel ou None, caminho do compactado achado
     ou None, dados do cadastro).
     """
-    externo = plataforma.get("externo")
+    externo = plataforma.get(chave)
     if not externo:
         return None, None, None
     if plataforma_do_sistema.ANDROID:
@@ -841,6 +850,9 @@ def falta_para_o_externo(nome_externo, caminho_executavel):
                 "ainda não está aqui. Peça ao professor: o arquivo vai na pasta BIOS\\PS2 do "
                 "ARENA (Ajustes → Emuladores → BIOS dos consoles), e o ARENA leva para o "
                 "PCSX2 sozinho.")
+    if nome_externo == "PokketSX" and caminho_executavel:
+        import pokketsx
+        return pokketsx.falta(caminho_executavel)
     if nome_externo == "RPCS3" and caminho_executavel:
         firmware = os.path.join(os.path.dirname(caminho_executavel),
                                 "dev_flash", "sys", "external", "liblv2.sprx")
@@ -856,21 +868,27 @@ def situacao_dos_externos(plataformas):
     """Diz, para a tela, quais emuladores de fora estao instalados."""
     saida = []
     for plataforma in plataformas:
-        externo = plataforma.get("externo")
-        if not externo:
-            continue
-        caminho, compactado, _ = achar_externo_detalhado(plataforma)
-        saida.append({
-            "plataforma": plataforma["nome"],
-            "id": plataforma["id"],
-            "nome": externo["nome"],
-            "pasta": os.path.join("emuladores", externo["pasta"]),
-            "site": externo.get("site", ""),
-            "motivo": externo.get("motivo", ""),
-            "instalado": bool(caminho),
-            "compactado_pendente": os.path.basename(compactado) if compactado else "",
-            "falta": falta_para_o_externo(externo["nome"], caminho),
-        })
+        # "externo_extra": um jeito a mais de abrir o console; so aparece onde o programa existe (o PokketSX e' do
+        # Windows: no Linux e no celular a linha nem entra).
+        for chave in ("externo", "externo_extra"):
+            externo = plataforma.get(chave)
+            if not externo:
+                continue
+            if chave == "externo_extra" and externo.get("so_windows") and not NO_WINDOWS:
+                continue
+            caminho, compactado, _ = achar_externo_detalhado(plataforma, chave)
+            saida.append({
+                "plataforma": plataforma["nome"],
+                "id": plataforma["id"],
+                "nome": externo["nome"],
+                "pasta": os.path.join("emuladores", externo["pasta"]),
+                "site": externo.get("site", ""),
+                "motivo": externo.get("motivo", ""),
+                "extra": chave == "externo_extra",
+                "instalado": bool(caminho),
+                "compactado_pendente": os.path.basename(compactado) if compactado else "",
+                "falta": falta_para_o_externo(externo["nome"], caminho),
+            })
     return saida
 
 

@@ -813,6 +813,18 @@ Metal 2, Metal Slug X e Vigilante 8). Quem jogou sem BIOS na versão de
 pelo SwanStation, o ARENA leva uma cópia do cartão de memória (o original
 fica onde estava).
 
+**PlayStation com o PocketStation (só Windows, opcional).** O PocketStation era um cartão de memória da Sony, só
+vendido no Japão, com telinha, botões e minijogos que o jogo "baixava" para ele. Se a pasta `emuladores\PokketSX`
+existir (o PokketSX é um emulador de PlayStation de código aberto que sabe imitar o aparelho), a pergunta do PlayStation
+ganha uma terceira opção, **PokketSX (com PocketStation)**. O ARENA leva sozinho a BIOS do PlayStation e a do
+PocketStation (`pocketstation.bin`, 16 KB, tirada do seu aparelho; vai na pasta `BIOS\PocketStation`), põe o
+PocketStation na **entrada 2** do cartão e deixa o cartão comum de cada jogo na entrada 1. **F10 fecha o jogo.** Um
+jogador só, e o Jogar Junto segue pelo RetroArch. **Atenção:** o PokketSX não mostra a telinha do PocketStation nem toca o
+som dele: o minijogo que o jogo baixa fica guardado no cartão
+(`emuladores\PokketSX\memcards\PocketStation.mcd`). Para ver e jogar o minijogo na telinha, copie esse cartão para
+`jogos\pessoais\PocketStation` e abra no console **PocketStation** do ARENA. Detalhes e o que ainda falta testar:
+`docs\ACESSORIOS.md`.
+
 **Dreamcast: a mesma escolha.** Com a `dc_boot.bin` na pasta, o primeiro
 jogo de Dreamcast pergunta: **BIOS original** (a do console, com o logo de
 abertura) ou **BIOS imitada (Flycast)**, a que o próprio emulador, de código

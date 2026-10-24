@@ -3142,6 +3142,9 @@ function desenharExternos(lista) {
     nota.className = "controle-nota";
     if (item.instalado && item.falta) {
       nota.textContent = `instalado, mas falta uma coisa: ${item.falta}`;
+    } else if (item.instalado && item.extra) {
+      nota.textContent =
+        "instalado. É um jeito a mais de abrir o jogo: aparece na pergunta \"Como ligar o console?\".";
     } else if (item.instalado) {
       nota.textContent = "instalado. O ARENA está usando ele.";
     } else if (item.compactado_pendente) {
@@ -3155,7 +3158,7 @@ function desenharExternos(lista) {
     const selo = document.createElement("span");
     selo.className = "controle-tipo";
     selo.textContent = item.instalado
-      ? (item.falta ? "incompleto" : "em uso")
+      ? (item.falta ? "incompleto" : (item.extra ? "opcional" : "em uso"))
       : (item.compactado_pendente ? "falta extrair" : "não instalado");
     if (!item.instalado || item.falta) selo.style.opacity = "0.55";
 

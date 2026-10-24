@@ -20,6 +20,11 @@ Um console pode ter ate tres jeitos de abrir:
 
 Com um jeito so, o ARENA abre por ele. Com dois ou mais, a tela pergunta
 qual usar e pode lembrar a resposta (config.json -> jeito_de_abrir).
+
+Alguns consoles ainda tem um emulador de fora A MAIS (consoles.json ->
+externo_extra: o PokketSX do PlayStation, que liga o PocketStation de
+verdade). Ele entra na lista como o jeito "externo", por ultimo, e so abre
+quando a pessoa o escolhe: o console segue sendo do RetroArch.
 """
 import os
 
@@ -80,10 +85,11 @@ def _original_pronto(plataforma, pasta_cores, pasta_sistema, externo):
     return bios.tem_a_bios(plataforma["id"], pasta_sistema)
 
 
-def jeitos(plataforma, pasta_cores, pasta_sistema, externo=None):
+def jeitos(plataforma, pasta_cores, pasta_sistema, externo=None, extra=None):
     """Os jeitos de abrir que existem agora, o recomendado primeiro. Cada um:
     {"id", "titulo", "explica", "selo"}. 'externo' e' o nome do emulador de
-    fora achado na pasta emuladores (ou None)."""
+    fora achado na pasta emuladores (ou None); 'extra', o do emulador de
+    fora A MAIS do console (externo_extra), tambem achado na pasta."""
     lista = []
     dados_externo = plataforma.get("externo") or {}
     if externo:
@@ -114,6 +120,15 @@ def jeitos(plataforma, pasta_cores, pasta_sistema, externo=None):
             "explica": livre.get("explica", ""),
             "selo": "já vem no ARENA",
         })
+    if extra and not externo:
+        # Por ultimo: o recomendado e' o de sempre. Usa o mesmo id "externo" (nenhum console tem os dois).
+        dados_extra = plataforma.get("externo_extra") or {}
+        lista.append({
+            "id": "externo",
+            "titulo": dados_extra.get("titulo_escolha") or "%s (programa próprio)" % extra,
+            "explica": dados_extra.get("motivo_escolha") or "Abre no %s, o programa feito para isto." % extra,
+            "selo": dados_extra.get("selo_escolha", ""),
+        })
     return lista
 
 
@@ -129,3 +144,12 @@ def escolher(lista, pedido=None, lembrado=None):
     if len(ids) == 1:
         return ids[0]
     return None
+
+
+def lembrado_que_vale(lembrado, partida, tem_extra):
+    """A escolha lembrada, ou None se ela nao vale agora. O emulador de fora A MAIS (consoles.json -> externo_extra)
+    nao vale no Jogar Junto: partida a dois e' coisa do RetroArch, e quem lembrou o PokketSX nao deve levar um erro
+    ao pedir uma partida."""
+    if partida and tem_extra and lembrado == "externo":
+        return None
+    return lembrado

@@ -12,7 +12,7 @@ toda rota `/api/...` (86) e toda aba existe onde o servidor roda; o que muda é 
 | Android arm64 | Java ME, PS3, Xbox 360 | o núcleo do Java ME não existe para Android; PS3 e Xbox 360 só por emulador de fora (não cabe no celular) |
 | Android x86_64 (Chromebook com o APK) | os mesmos + PS2 | o ARMSX2 é só de arm64; falta compilar a biblioteca do RetroArch para x86_64 (`ferramentas\compilar_retroarch_android.py --abi x86_64`) |
 | Navegador (Chromebook sem instalar) | 33 consoles | só os núcleos que o RetroArch do navegador (Emscripten) traz; sem servidor, então sem **Acessórios** (escondidos), sem emuladores de fora e sem BIOS pela tela |
-| Só Windows | Lossless Scaling, prioridade e energia do processo, placa pelo `ctypes` | dependem do Windows (no Android e no Linux o servidor usa o que o sistema oferece) |
+| Só Windows | Lossless Scaling, prioridade e energia do processo, placa pelo `ctypes`, **PokketSX** (PS1 com o PocketStation de verdade, um jeito a mais na pergunta "Como ligar o PlayStation?") | dependem do Windows (no Android e no Linux o servidor usa o que o sistema oferece) |
 
 ## Consoles por versão
 
