@@ -87,6 +87,7 @@ import motivo_do_erro  # noqa: E402  (por que o jogo nao abriu, pelo registro --
 import desempenho  # noqa: E402  (o jogo pesado demais deixa o grafico mais leve -- auditoria 4)
 import bios        # noqa: E402  (nome, pasta e versao certa de cada BIOS -- 03/10/2026)
 import companheiros  # noqa: E402  (programas que abrem junto com o jogo: o DreamPotato -- 24/10/2026)
+import controle_remoto  # noqa: E402  (o celular como controle, pelo Wi-Fi: Network RetroPad -- 25/10/2026)
 import pokketsx  # noqa: E402  (o PS1 com o PocketStation de verdade, so Windows -- 24/10/2026)
 import acessorios  # noqa: E402  (VMU, Rumble Pak, multitap, pistola de luz... ligar e desligar -- 24/10/2026)
 import arrumar     # noqa: E402  (o botao Arrumar: o arquivo do jogo no lugar certo -- 03/10/2026)
@@ -3152,6 +3153,23 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         # tudo, ate da partida a dois, porque e' defeito do nucleo.
         opcoes_do_console = plataforma_jogo.get("opcoes_retroarch", {})
         opcoes_jogo.update(opcoes_do_console)
+        # O celular como controle (servidor\controle_remoto.py): com ele ligado em Ajustes -> Controles, o RetroArch
+        # abre o Network RetroPad dos jogadores 1 a 4, numa porta sorteada para esta partida. So no RetroArch e fora
+        # do Jogar Junto (o netplay cuida dos controles dele). O RetroArch so le o Network RetroPad dos jogadores
+        # abaixo de input_max_users, por isso o numero sobe para 4 (so nesta partida: o resto volta no fim).
+        chaves_do_remoto = []
+        if not partida:
+            remoto = CONTROLE_REMOTO.preparar_partida()
+            if remoto:
+                try:
+                    atual = int(opcoes_jogo.get("input_max_users") or jogadores_controle or 2)
+                except (TypeError, ValueError):
+                    atual = 2
+                opcoes_jogo.update(remoto)
+                opcoes_jogo["input_max_users"] = str(max(controle_remoto.JOGADORES, atual))
+                chaves_do_remoto = list(remoto) + ["input_max_users"]
+                print("[ARENA] Celular como controle: o RetroArch escuta o Network RetroPad na porta-base %s." %
+                      remoto["network_remote_base_port"])
         # As BIOS livres (e a metade Java do Java ME) no lugar ANTES de abrir.
         # A arrumacao das BIOS roda em segundo plano ao abrir o ARENA e pode
         # nao ter terminado: achado de 15/10/2026, o primeiro jogo de Java ME
@@ -3214,7 +3232,7 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         # livre tambem: senao o proximo jogo, de outro console, procuraria a
         # BIOS la. E o que o console pediu (o video sem thread do Java ME)
         # fica so nele.
-        so_desta_partida += chaves_da_ponte + chaves_do_livre + list(opcoes_do_console)
+        so_desta_partida += chaves_da_ponte + chaves_do_livre + list(opcoes_do_console) + chaves_do_remoto
         if jogadores_ligacao > 2:
             for n in range(3, jogadores_controle + 1):
                 so_desta_partida += ["input_libretro_device_p%d" % n,
@@ -5131,6 +5149,10 @@ def dentro_da_pasta(caminho, pasta):
 # Quando o ARENA trocou o proprio codigo de aparelho por pedido de fora (no maximo uma vez por hora: REDE-02).
 _TROCA_DE_CODIGO = {"em": 0.0}
 
+# O celular como controle (servidor\controle_remoto.py). Nasce desligado e so abre porta na rede quando o professor
+# liga em Ajustes -> Controles; nao fica guardado: o ARENA sempre abre com ele desligado.
+CONTROLE_REMOTO = controle_remoto.ControleRemoto()
+
 ROTAS_REDE_EXTERNA = frozenset((
     "/api/colegas",         # GET - quem esta online, pra tela de amigos
     "/api/ranking",         # GET - placar compartilhado
@@ -5558,6 +5580,13 @@ class Manipulador(BaseHTTPRequestHandler):
             return self.responder_json(marca)
 
         # ---- acervo de jogos livres ---------------------------------------
+        if caminho == "/api/controle-remoto":
+            # O celular como controle: ligado ou nao, o endereco, o codigo e quem esta conectado. So deste computador
+            # (nao esta em ROTAS_REDE_EXTERNA): quem ve o codigo e' quem esta na frente da tela.
+            if plataforma_do_sistema.ANDROID:
+                return self.erro("O celular como controle é ligado no computador: abra o ARENA nele, em Ajustes → Controles.", 404)
+            return self.responder_json(dict(CONTROLE_REMOTO.estado(), ok=True))
+
         if caminho == "/api/baixados":
             # Os jogos que a pessoa baixou (servidor\baixados.py): so a lista,
             # com o console sugerido. Nada sai do lugar sem o "Levar para o
@@ -6484,6 +6513,24 @@ class Manipulador(BaseHTTPRequestHandler):
             plataforma = dados.get("plataforma")
             desempenho.zerar(str(plataforma) if plataforma else None)
             return self.responder_json({"ok": True, "desempenho": desempenho.ler()})
+
+        if caminho in ("/api/controle-remoto/ligar", "/api/controle-remoto/desligar"):
+            # So deste computador (nao esta em ROTAS_REDE_EXTERNA): quem liga o controle pelo celular e' o professor,
+            # na frente da tela, e nunca o proprio celular (docs\PLANO-CELULAR.md, seguranca do controle remoto).
+            if plataforma_do_sistema.ANDROID:
+                return self.erro("O celular como controle é ligado no computador: abra o ARENA nele, em Ajustes → Controles.", 404)
+            if caminho.endswith("/ligar"):
+                try:
+                    estado_do_controle = CONTROLE_REMOTO.ligar()
+                except OSError as falha:
+                    return self.erro(str(falha), 500)
+                print("[ARENA] Celular como controle ligado: %s (codigo %s)." % (
+                    ", ".join(estado_do_controle.get("enderecos", [])) or "sem rede", estado_do_controle.get("codigo")))
+            else:
+                CONTROLE_REMOTO.desligar()
+                estado_do_controle = CONTROLE_REMOTO.estado()
+                print("[ARENA] Celular como controle desligado.")
+            return self.responder_json(dict(estado_do_controle, ok=True))
 
         if caminho == "/api/baixados/levar":
             try:

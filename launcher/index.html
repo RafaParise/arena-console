@@ -803,6 +803,35 @@
       <ul class="controles" id="listaControles"></ul>
     </div>
 
+    <div data-fora-do-android data-so-windows id="blocoControleRemoto">
+      <h3 class="grupo-titulo">Celular como controle (Wi-Fi)</h3>
+      <p class="explica">
+        Usa o celular de quem joga como controle do jogo que está aberto neste computador. Fica desligado até você
+        ligar aqui, e só vale para jogos que abrem pelo RetroArch (PS2, GameCube, Wii, PS3 e Xbox 360 abrem em
+        programas à parte e não leem o celular).
+      </p>
+      <div class="opcao">
+        <span class="opcao-rotulo">Ligar o celular como controle</span>
+        <button class="chave opcao-controle" id="chaveControleRemoto"
+                aria-pressed="false" aria-label="Ligar o celular como controle"></button>
+        <span class="opcao-ajuda">O celular e o computador precisam estar na mesma rede Wi-Fi.</span>
+      </div>
+      <div id="controleRemotoDados" hidden>
+        <p class="explica">No navegador do celular, abra um destes endereços e digite o código:</p>
+        <ul class="controles" id="controleRemotoEnderecos"></ul>
+        <p class="explica">Código:
+          <strong class="codigo-grande" id="controleRemotoCodigo" aria-live="polite">----</strong></p>
+        <ul class="controles" id="controleRemotoConectados"></ul>
+        <p class="explica" id="controleRemotoNota">
+          O código só vale enquanto estiver ligado e muda a cada vez que liga. Quem digita o código errado várias
+          vezes fica bloqueado por 2 minutos. Se a página não abrir no celular, o Windows pode estar barrando a
+          conexão: na primeira vez ele pergunta se o ARENA pode usar a rede (escolha permitir); em computador da
+          escola, peça ao professor responsável pela rede. Abra o jogo <b>depois</b> de ligar: o RetroArch só
+          escuta o celular nos jogos abertos com isto ligado.
+        </p>
+      </div>
+    </div>
+
     <div>
       <h3 class="grupo-titulo">Mapear as teclas e os botões</h3>
       <p class="explica">Escolha um botão e pressione a tecla ou botão desejado.</p>

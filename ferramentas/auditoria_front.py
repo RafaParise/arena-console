@@ -197,6 +197,12 @@ def estados(nav):
                 lista.append(("%s:%s" % (g["id"], aba), ligar + "; document.querySelector('#%s [data-aba=\"%s\"]').click(); true" % (g["id"], aba), desligar))
         else:
             lista.append((g["id"], ligar, desligar))
+    # O bloco do celular como controle, LIGADO (o codigo grande, os enderecos e quem esta conectado: so aparecem ligado)
+    lista.append(("controle_remoto_ligado",
+                  "abrirGaveta('gavetaAjustes'); document.querySelector('#gavetaAjustes [data-aba=\"controles\"]').click(); "
+                  "desenharControleRemoto({ligado: true, codigo: '1234', enderecos: ['http://192.168.0.5:8780/'], "
+                  "conectados: [{jogador: 2, apelido: 'Ana', ip: '192.168.0.9', ha_s: 12}]}); true",
+                  "document.querySelector('#gavetaAjustes').hidden = true; true"))
     modais = nav.avaliar("JSON.stringify([...document.querySelectorAll('.modal')].map(m => m.id))")
     for m in json.loads(modais):
         lista.append((m, "document.querySelector('#%s').hidden = false; true" % m, "document.querySelector('#%s').hidden = true; true" % m))

@@ -79,8 +79,30 @@ def adb_texto(*argumentos, segundos=120):
     return adb(*argumentos, segundos=segundos).stdout.decode("utf-8", "replace")
 
 
+SERIE_DO_EMULADOR = "emulator-5554"
+
+
+def so_o_emulador():
+    """Prende TODO comando do adb deste teste ao emulador (a variavel ANDROID_SERIAL).
+
+    Achado de 25/10/2026: a rodada final rodou o teste de estresse no CELULAR do professor, porque ele estava
+    ligado no adb e o emulador nao: o adb manda pedido sem '-s' para o unico aparelho que houver. Este teste
+    desinstala o ARENA (apaga os dados do app), instala o APK x86_64, pede adb root, liga o Monkey, gira a tela e
+    desliga Wi-Fi e dados: so cabe num aparelho virtual. Com o celular ligado, o adb passou a recusar ("more than
+    one device") e, so por isso, a desinstalacao nao rodou nele."""
+    os.environ["ANDROID_SERIAL"] = SERIE_DO_EMULADOR
+
+
+def conferir_que_e_emulador():
+    """Para tudo se o aparelho que responde nao for um emulador (propriedade ro.kernel.qemu do Android virtual)."""
+    qemu = adb_texto("shell", "getprop", "ro.kernel.qemu").strip()
+    if qemu != "1":
+        raise SystemExit("O aparelho %s nao e' um emulador (ro.kernel.qemu=%r). Este teste so roda no aparelho virtual."
+                         % (os.environ.get("ANDROID_SERIAL", "?"), qemu))
+
+
 def ligado():
-    return "emulator-" in adb_texto("devices")
+    return SERIE_DO_EMULADOR in adb_texto("devices")
 
 
 def ligar_emulador():
@@ -88,7 +110,8 @@ def ligar_emulador():
     if ligado():
         return None, 0.0
     inicio = time.monotonic()
-    processo = subprocess.Popen([EMULADOR, "-avd", sdk.NOME_DO_AVD, "-no-window", "-no-audio", "-no-snapshot",
+    processo = subprocess.Popen([EMULADOR, "-avd", sdk.NOME_DO_AVD, "-port", SERIE_DO_EMULADOR.split("-")[1],
+                                 "-no-window", "-no-audio", "-no-snapshot",
                                  "-no-boot-anim", "-gpu", "swiftshader_indirect"], env=sdk.ambiente(),
                                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     fim = time.monotonic() + 420
@@ -394,6 +417,7 @@ def pedido_de_fora():
 
 
 def principal():
+    so_o_emulador()
     apk = sys.argv[sys.argv.index("--apk") + 1] if "--apk" in sys.argv else None
     if not apk:
         pasta = os.path.join(sdk.BASE, "apk")
@@ -404,6 +428,7 @@ def principal():
     resultado = {"quando": time.strftime("%Y-%m-%d %H:%M:%S"), "apk": os.path.basename(apk)}
     falhas = []
     processo, ligou = ligar_emulador()
+    conferir_que_e_emulador()
     resultado["emulador_ligou_s"] = round(ligou, 1)
     resultado["android"] = adb_texto("shell", "getprop", "ro.build.version.release").strip()
     # O adb como root uma vez so, antes de tudo (as teclas pelo teclado de PC

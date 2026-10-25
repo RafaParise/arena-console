@@ -69,7 +69,10 @@ professor da rede estadual de SP.
 - Portas: 8777 (servidor), 55435 (partida a dois, no RetroArch) e 55436
   UDP (descoberta de colegas). Só as rotas de `ROTAS_REDE_EXTERNA` aceitam
   pedido de fora do computador, e todo POST exige
-  `Content-Type: application/json`.
+  `Content-Type: application/json`. A 8780 (tela do celular como controle,
+  `servidor\controle_remoto.py`) só abre com a chave ligada em Ajustes e só
+  atende rede local; o RetroArch escuta o UDP dele (porta sorteada a cada
+  jogo) só enquanto o jogo roda.
 - Testes:
   - `servidor\tests\run.py` (ou `RODAR_TESTES.bat`) antes de todo commit.
   - O `testes\teste_*.py` da área que você mexeu.

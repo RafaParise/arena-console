@@ -75,7 +75,7 @@ Rafael quiser trocar, é só dizer.
 | 6 | **ROMs em qualquer lugar do celular** → "fora da pasta certa" → um toque move | Registrado (pedido das 21h37) | Precisa do 4 (volumes, permissão) e do 5 (o PS2 existe no celular); estende o "Procurar jogos baixados" |
 | 7 | **Ícone: o supercontrole**, em todas as versões | Registrado | Independente; pode ser feito enquanto espera o celular; tem de estar pronto antes do Release |
 | 8 | **ETAPA 2**: captura de tela, uma por clique | A fazer | Segue o roteiro |
-| 9 | **ETAPA 3**: celular como controle do computador (Network RetroPad pelo servidor do ARENA) | A fazer | Segue o roteiro |
+| 9 | **ETAPA 3**: celular como controle do computador (Network RetroPad pelo servidor do ARENA) | **Wi-Fi feito em 25/10/2026** (ver "Etapa 3: o celular como controle" abaixo); dados móveis (túnel) a seguir | Segue o roteiro |
 | 10 | **Controles e teclado no Android**: a ordem de conexão define o jogador 1 a 8, a tela de toque é o próximo jogador depois dos controles, e o teclado (com fio ou Bluetooth) é reconhecido; botões da tela somem sozinhos, mapeamento automático e à mão (o GameSir Nova Lite do Rafael, dois deles, é o de teste) | A fazer; pedido das 21h50 registrado abaixo | Os dois controles já estão pareados no A12. A tela de toque como jogador 3 precisa de um remendo no RetroArch |
 | 10-A | **Controle na tela personalizável e pacotes de aparência** (mover e redimensionar peças, analógico esquerdo, direito ou nenhum, formas e cores de SNES, N64, PlayStation, Xbox, GameCube; estilos prontos dentro do APK) | Registrado (pedido das 22h30) | Usa o gerador de overlay do ARENA e o mesmo remendo do item 10 |
 | 10-B | **Tela cheia sempre** (resolução e escala menores só por ajuste manual) e **o Lossless Scaling adaptado ao Android** | Registrado (pedido das 22h40) | Mexe no padrão do formato da imagem no Android, no Vulkan do A12 e na escala |
@@ -557,6 +557,46 @@ cabeçalho), Android (ícone do app, redondo e adaptativo), Chromebook e site
 `README`. O desenho tem de funcionar de 16 a 512 pixels: versão completa para
 tamanho grande e versão simplificada (silhueta de três pontas, quatro botões
 coloridos e um analógico) para tamanho pequeno.
+
+## Etapa 3: o celular como controle do computador (Wi-Fi feito em 25/10/2026)
+
+O que existe: `servidor\controle_remoto.py` (a porta 8780 e o WebSocket, só com a chave ligada em Ajustes → Controles),
+a tela do controle em `launcher\controle\` (HTML, CSS e JS sem biblioteca, servidos pela porta 8780 e por mais nada) e o
+encaixe em `arena.executar_jogo`. Guia para quem usa: `3-IMAGEM-SOM-CONTROLE.md`, "O celular como controle".
+
+**Como o botão chega ao jogo.** Celular → WebSocket (RFC 6455 na biblioteca padrão, 11 bytes por estado: 16 botões e 4 eixos) →
+`EnviadorRetroPad` → datagrama UDP de 20 bytes (`struct remote_message`) para o `127.0.0.1` → o Network RetroPad do RetroArch.
+Lido no código do RetroArch 1.22.2 (`input/input_driver.c`) e **provado com o A12 de verdade** (25/10/2026, pelo cabo com
+`adb reverse`, e o Chrome do celular tocando A, direita, X e L2: cada toque chegou ao computador como "apertado" e "solto"):
+
+- **Um datagrama por jogador por quadro de vídeo.** O RetroArch faz `recvfrom` uma vez por jogador em cada `input_poll`, e cada
+  datagrama muda um controle só. Mandar tudo de uma vez enche a fila e o atraso cresce; por isso o `EnviadorRetroPad` guarda só o
+  que mudou, junta mudanças repetidas do mesmo controle e solta no máximo 1 datagrama por jogador a cada 1/60 s.
+- **Sem dado novo, o RetroArch mantém o último estado.** Botão apertado com o celular sumindo ficaria preso. Sem estado novo por
+  1,5 s, ao fechar a conexão e ao desligar, o ARENA solta tudo e manda o zero de cada um dos 20 controles (uma varredura de 20
+  quadros). Com o celular ligado e parado, repete um controle a cada 12 quadros (conserta datagrama perdido).
+- **Se uma só das portas do Network RetroPad estiver ocupada, o RetroArch desiste de todo o controle remoto** (`input_remote_new`
+  libera tudo e devolve NULL). Por isso `porta_base_livre()` sorteia (50000 a 59000) e testa as 4 portas antes de cada jogo.
+- **O RetroArch escuta o UDP em todas as placas de rede** (`socket_init` sem endereço): não dá para limitar ao `127.0.0.1`. Fica
+  dito na tela e no guia; a porta muda a cada jogo e só os 4 jogadores do celular são ligados.
+- **Só lê os jogadores abaixo de `input_max_users`:** o ARENA sobe o número para 4 só na partida (e devolve o `retroarch.cfg` no fim).
+- Os emuladores de fora (PCSX2, Dolphin, RPCS3, Xenia) não leem o Network RetroPad, e o Jogar Junto (netplay) não o usa.
+
+**Segurança** (a lista da linha 7 da tabela do roteiro): desligado por padrão e sem guardar no `config.json`; liga só pelo clique
+no computador; só rede local (`rede_privada`); código de 4 números conferido com `hmac.compare_digest`, bloqueio do endereço por
+2 minutos depois de 5 erros em 1 minuto, código novo depois de 20 erros no total; `Origin` de outro site recusado (um site aberto
+no celular não manda botão); só a página do controle na porta (nenhuma rota da API do ARENA); limite de 150 quadros por segundo,
+4 KB por quadro, 24 conexões abertas e 4 celulares; cabeçalhos `nosniff`, `no-store`, `Referrer-Policy` e CSP que só deixa o
+próprio servidor. A pergunta do firewall do Windows (e o fato de o computador da escola não deixar o aluno responder) está no guia.
+
+**Testado:** `servidor\tests\test_controle_remoto.py` (58 testes: o exemplo da RFC 6455, quadros de todo tamanho e quebrados, o
+datagrama de 20 bytes, o um-por-quadro, a junção de mudanças, a zona do analógico, a varredura de zero, o código e o bloqueio,
+a origem, a porta que só serve a página, o sem sinal, o fechar solta tudo, as rotas) e o A12 de verdade. Pendente com a máquina
+livre: o teste de ponta a ponta com um RetroArch de verdade (`testes\teste_controle_remoto_retroarch.py`) e a latência pelo Wi-Fi
+(o firewall do Windows barrou a 8780 neste computador: a rede está como "Pública"; o teste pelo cabo não depende disso).
+
+**O que fica para depois:** o giroscópio (só dentro do app, por exigir contexto seguro), dados móveis (túnel) e a tela como
+controle dentro do app do Android.
 
 ## Paridade com o computador
 

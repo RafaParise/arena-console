@@ -146,7 +146,9 @@ def principal():
     toques = int(argumento("toques", "3000"))
     saida = argumento("saida", os.path.join(os.environ.get("TEMP", "."), "teste_android_estresse.json"))
     resultado = {"quando": time.strftime("%Y-%m-%d %H:%M:%S"), "toques": toques}
+    base.so_o_emulador()      # o Monkey, a rotacao e o "sem rede" nunca vao para o celular do professor (25/10/2026)
     processo, ligou = base.ligar_emulador()
+    base.conferir_que_e_emulador()
     resultado["emulador_ligou_s"] = round(ligou, 1)
     base.adb("root", segundos=60)
     time.sleep(3)

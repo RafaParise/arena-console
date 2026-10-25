@@ -2447,6 +2447,71 @@ function montarAbaControles() {
   estado.controlesMontados = true;
   prepararBotoes(estado.consolesBotoes || []);
   prepararMapa(estado.consolesBotoes || []);
+  atualizarControleRemoto();
+}
+
+// O celular como controle (servidor\controle_remoto.py): a chave liga e desliga; ligado, mostra o endereco, o codigo e
+// quem esta conectado, e se atualiza de 3 em 3 segundos enquanto a aba esta aberta.
+let esperaDoControleRemoto = null;
+
+function desenharControleRemoto(dados) {
+  const ligado = !!dados.ligado;
+  $("#chaveControleRemoto").setAttribute("aria-pressed", ligado ? "true" : "false");
+  $("#controleRemotoDados").hidden = !ligado;
+  if (!ligado) return;
+  $("#controleRemotoCodigo").textContent = dados.codigo || "----";
+  const enderecos = document.createDocumentFragment();
+  for (const endereco of dados.enderecos || []) {
+    const item = document.createElement("li");
+    item.className = "controle";
+    const nome = document.createElement("span");
+    nome.className = "controle-nome";
+    nome.textContent = endereco;
+    item.append(nome);
+    enderecos.append(item);
+  }
+  if (!(dados.enderecos || []).length) {
+    const item = document.createElement("li");
+    item.className = "controle";
+    item.textContent = "Não achei o endereço deste computador na rede. Conecte o computador ao Wi-Fi.";
+    enderecos.append(item);
+  }
+  $("#controleRemotoEnderecos").replaceChildren(enderecos);
+  const conectados = document.createDocumentFragment();
+  for (const c of dados.conectados || []) {
+    const item = document.createElement("li");
+    item.className = "controle";
+    const nome = document.createElement("span");
+    nome.className = "controle-nome";
+    nome.textContent = `Jogador ${c.jogador}${c.apelido ? ` — ${c.apelido}` : ""}`;
+    const nota = document.createElement("span");
+    nota.className = "controle-nota";
+    nota.textContent = `celular ${c.ip}, conectado há ${c.ha_s} s`;
+    item.append(nome, nota);
+    conectados.append(item);
+  }
+  if (!(dados.conectados || []).length) {
+    const item = document.createElement("li");
+    item.className = "controle";
+    item.textContent = "Nenhum celular conectado ainda.";
+    conectados.append(item);
+  }
+  $("#controleRemotoConectados").replaceChildren(conectados);
+}
+
+async function atualizarControleRemoto() {
+  clearTimeout(esperaDoControleRemoto);
+  esperaDoControleRemoto = null;
+  try {
+    const dados = await pedir("/api/controle-remoto");
+    desenharControleRemoto(dados);
+    // enquanto ligado e com a aba a vista, olha de novo daqui a pouco (ha quem conecte ou saia)
+    if (dados.ligado && !$("#gavetaAjustes").hidden && !$("#blocoControleRemoto").closest(".aba-conteudo").hidden) {
+      esperaDoControleRemoto = setTimeout(atualizarControleRemoto, 3000);
+    }
+  } catch (falha) {
+    // sem a rota (versao antiga do servidor) ou no Android: o bloco fica como esta
+  }
 }
 
 function prepararMapa(consoles) {
@@ -4990,10 +5055,31 @@ function abrirGaveta(id) {
 const FOCAVEIS = 'button:not([disabled]), [href], input:not([disabled]):not([type="hidden"]), ' +
   'select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
+// Com uma janela (.modal) aberta, ou com uma gaveta (.gaveta) que cobre a tela inteira (o celular), o resto da tela nao
+// pode ser alcancado pelo Tab nem pelo leitor de tela (TalkBack, NVDA): fica "inert". Medido em 25/10/2026 no A12
+// (ferramentas\auditoria_celular.py): o fundo continuava exposto atras de TODAS as gavetas e janelas. Numa tela larga a
+// gaveta e' um painel do lado e a biblioteca segue usavel com o mouse, entao la nada muda. O recado, o aviso e a faixa de
+// "sem servidor" ficam fora do fundo de proposito: precisam ser lidos com a janela aberta.
+const FUNDO_DA_TELA = "header.painel-topo, main.corpo, #faixaTeclas";
+
+function isolarOFundo() {
+  const abertos = (seletor) => [...document.querySelectorAll(seletor)].filter((el) => !el.hidden);
+  const janela = abertos(".modal").pop();
+  const gaveta = abertos(".gaveta").pop();
+  const cobreATela = (el) => el.getBoundingClientRect().width >= window.innerWidth - 2;
+  const topo = janela || (gaveta && cobreATela(gaveta) ? gaveta : null);
+  for (const el of document.querySelectorAll(FUNDO_DA_TELA)) el.inert = !!topo;
+  // as outras janelas e gavetas abertas (uma janela por cima de uma gaveta) ficam atras da de cima
+  for (const el of document.querySelectorAll(".modal, .gaveta")) el.inert = !!topo && !el.hidden && el !== topo;
+}
+
 function ligarFocoDasJanelas() {
   const voltarPara = new Map();
   const visivel = (el) => el.offsetParent !== null || el.getClientRects().length > 0;
+  window.addEventListener("resize", isolarOFundo);
   new MutationObserver((mudancas) => {
+    // primeiro o isolamento: devolver o foco a quem abriu a janela so funciona depois de o fundo deixar de ser inert
+    isolarOFundo();
     for (const { target: painel } of mudancas) {
       if (!painel.matches(".modal, .gaveta")) continue;   // botoes e avisos nao
       if (!painel.hidden && !voltarPara.has(painel)) {
@@ -5577,6 +5663,21 @@ function ligarEventos() {
       recado(novo
         ? "Teclado preso no jogo. Para soltar e abrir o menu, aperte F9."
         : "Teclado solto. O Esc abre o menu normalmente.");
+    } catch (falha) {
+      recado(falha.message, true);
+    }
+  });
+
+  $("#chaveControleRemoto").addEventListener("click", async (evento) => {
+    const botao = evento.currentTarget;
+    const novo = botao.getAttribute("aria-pressed") !== "true";
+    try {
+      const dados = await pedir(novo ? "/api/controle-remoto/ligar" : "/api/controle-remoto/desligar", {});
+      desenharControleRemoto(dados);
+      recado(novo
+        ? "Celular como controle ligado. Abra o jogo agora e use o código na tela do celular."
+        : "Celular como controle desligado.");
+      if (novo) atualizarControleRemoto();
     } catch (falha) {
       recado(falha.message, true);
     }

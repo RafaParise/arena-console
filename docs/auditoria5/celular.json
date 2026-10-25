@@ -1,0 +1,1842 @@
+{
+ "feito_em": "2026-10-25 19:18",
+ "aparelho": {
+  "modelo": "SM-A125M",
+  "android": "12",
+  "abis": "arm64-v8a,armeabi-v7a,armeabi"
+ },
+ "pacote": {
+  "versionName": "2026.10.22",
+  "versionCode": "20261022",
+  "targetSdk": "28",
+  "minSdk": "24",
+  "depuravel": false,
+  "allowBackup": false,
+  "permissoes_pedidas": [
+   "android.permission.ACCESS_MEDIA_LOCATION",
+   "android.permission.CHANGE_WIFI_MULTICAST_STATE",
+   "android.permission.FOREGROUND_SERVICE",
+   "android.permission.INTERNET",
+   "android.permission.MANAGE_EXTERNAL_STORAGE",
+   "android.permission.READ_EXTERNAL_STORAGE",
+   "android.permission.VIBRATE",
+   "android.permission.WRITE_EXTERNAL_STORAGE"
+  ],
+  "permissoes_concedidas": [
+   "android.permission.ACCESS_MEDIA_LOCATION",
+   "android.permission.CHANGE_WIFI_MULTICAST_STATE",
+   "android.permission.FOREGROUND_SERVICE",
+   "android.permission.INTERNET",
+   "android.permission.READ_EXTERNAL_STORAGE",
+   "android.permission.VIBRATE",
+   "android.permission.WRITE_EXTERNAL_STORAGE"
+  ],
+  "uid": "10337"
+ },
+ "exportados_no_manifesto": [
+  {
+   "tipo": "provider",
+   "nome": "com.retroarch.browser.provider.RetroDocumentsProvider",
+   "exportado": true,
+   "filtro": true,
+   "permissao": "android.permission.MANAGE_DOCUMENTS"
+  },
+  {
+   "tipo": "activity",
+   "nome": "io.github.rafaparise.arena.ArenaActivity",
+   "exportado": true,
+   "filtro": true
+  }
+ ],
+ "manifesto_application": {
+  "allowBackup": "false",
+  "extractNativeLibs": "true",
+  "networkSecurityConfig": "@0x7f070000",
+  "requestLegacyExternalStorage": "true"
+ },
+ "bateria_antes": {
+  "nivel": 63,
+  "temperatura_c": 30.2
+ },
+ "abertura_a_frio": {
+  "tempos_ms": [
+   856,
+   825,
+   768,
+   781,
+   795
+  ],
+  "mediana_ms": 795
+ },
+ "soquetes": {
+  "tcp": [
+   {
+    "porta": 8777,
+    "so_do_aparelho": true,
+    "endereco": "0100007F"
+   }
+  ],
+  "udp": []
+ },
+ "memoria": {
+  "pss_mb": {
+   "io.github.rafaparise.arena:tela": 129.0
+  }
+ },
+ "ciclo_de_vida": {
+  "home_e_volta": true,
+  "girar_e_voltar": true,
+  "pouca_memoria": true
+ },
+ "bateria_depois": {
+  "nivel": 62,
+  "temperatura_c": 30.2
+ },
+ "pasta_do_arena": {
+  "livre_mb": 6775,
+  "pasta_no_armazenamento": "/sdcard/ARENA",
+  "itens": [
+   "BIOS",
+   "BIOS-PS2-teste",
+   "jogos",
+   "retroarch"
+  ]
+ },
+ "falhas_no_log": [
+  "10-25 19:16:52.942 E/AndroidRuntime(29548): FATAL EXCEPTION: main",
+  "10-25 19:16:56.988 E/AndroidRuntime(29799): FATAL EXCEPTION: main",
+  "10-25 19:17:04.149 E/AndroidRuntime(30019): FATAL EXCEPTION: main"
+ ],
+ "camada_da_tela": {
+  "telas": [
+   {
+    "estouro_horizontal_px": 0,
+    "sem_nome_acessivel": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_menor_que_24px": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_entre_24_e_44px": {
+     "total": 248,
+     "amostra": [
+      "button#btnVerAnimacao 43x33",
+      "button#btnPerfil 87x31",
+      "button#btnAmigos 68x31",
+      "button#btnRecordes 78x31",
+      "button#btnConquistas 90x31",
+      "button#btnAcervo 81x31"
+     ]
+    },
+    "contraste": {
+     "medidos": 219,
+     "nao_medido": {
+      "fundo_com_imagem": 1069,
+      "fundo_translucido": 0,
+      "cor_estranha": 0
+     },
+     "falhas": 0,
+     "piores": []
+    },
+    "texto_menor_que_12px": {
+     "total": 0,
+     "amostra": []
+    },
+    "id_repetido": [],
+    "imagem_sem_alt": [],
+    "tabindex_positivo": [],
+    "titulos": {
+     "h1": 1,
+     "pulos": 0
+    },
+    "zoom_bloqueado": false,
+    "lang": "pt-BR",
+    "regras_reduzir_movimento": 1,
+    "canvas_visiveis": 1,
+    "axe": [],
+    "tela": "inicio"
+   },
+   {
+    "estouro_horizontal_px": 0,
+    "sem_nome_acessivel": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_menor_que_24px": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_entre_24_e_44px": {
+     "total": 248,
+     "amostra": [
+      "button#btnVerAnimacao 43x33",
+      "button#btnPerfil 87x31",
+      "button#btnAmigos 68x31",
+      "button#btnRecordes 78x31",
+      "button#btnConquistas 90x31",
+      "button#btnAcervo 81x31"
+     ]
+    },
+    "contraste": {
+     "medidos": 219,
+     "nao_medido": {
+      "fundo_com_imagem": 1069,
+      "fundo_translucido": 0,
+      "cor_estranha": 0
+     },
+     "falhas": 0,
+     "piores": []
+    },
+    "texto_menor_que_12px": {
+     "total": 0,
+     "amostra": []
+    },
+    "id_repetido": [],
+    "imagem_sem_alt": [],
+    "tabindex_positivo": [],
+    "titulos": {
+     "h1": 1,
+     "pulos": 0
+    },
+    "zoom_bloqueado": false,
+    "lang": "pt-BR",
+    "regras_reduzir_movimento": 1,
+    "canvas_visiveis": 1,
+    "axe": [],
+    "tela": "detalhes_do_jogo"
+   },
+   {
+    "tela": "detalhes_do_jogo",
+    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_detalhes_do_jogo.png'"
+   },
+   {
+    "estouro_horizontal_px": 0,
+    "sem_nome_acessivel": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_menor_que_24px": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_entre_24_e_44px": {
+     "total": 255,
+     "amostra": [
+      "button#btnVerAnimacao 43x33",
+      "button#btnPerfil 87x31",
+      "button#btnAmigos 68x31",
+      "button#btnRecordes 78x31",
+      "button#btnConquistas 90x31",
+      "button#btnAcervo 81x31"
+     ]
+    },
+    "contraste": {
+     "medidos": 240,
+     "nao_medido": {
+      "fundo_com_imagem": 1071,
+      "fundo_translucido": 0,
+      "cor_estranha": 0
+     },
+     "falhas": 0,
+     "piores": []
+    },
+    "texto_menor_que_12px": {
+     "total": 0,
+     "amostra": []
+    },
+    "id_repetido": [],
+    "imagem_sem_alt": [],
+    "tabindex_positivo": [],
+    "titulos": {
+     "h1": 1,
+     "pulos": 0
+    },
+    "zoom_bloqueado": false,
+    "lang": "pt-BR",
+    "regras_reduzir_movimento": 1,
+    "canvas_visiveis": 1,
+    "axe": [],
+    "tela": "gavetaPerfil:perfil"
+   },
+   {
+    "tela": "gavetaPerfil:perfil",
+    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaPerfil_perfil.png'"
+   },
+   {
+    "estouro_horizontal_px": 0,
+    "sem_nome_acessivel": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_menor_que_24px": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_entre_24_e_44px": {
+     "total": 256,
+     "amostra": [
+      "button#btnVerAnimacao 43x33",
+      "button#btnPerfil 87x31",
+      "button#btnAmigos 68x31",
+      "button#btnRecordes 78x31",
+      "button#btnConquistas 90x31",
+      "button#btnAcervo 81x31"
+     ]
+    },
+    "contraste": {
+     "medidos": 254,
+     "nao_medido": {
+      "fundo_com_imagem": 1072,
+      "fundo_translucido": 0,
+      "cor_estranha": 0
+     },
+     "falhas": 0,
+     "piores": []
+    },
+    "texto_menor_que_12px": {
+     "total": 0,
+     "amostra": []
+    },
+    "id_repetido": [],
+    "imagem_sem_alt": [],
+    "tabindex_positivo": [],
+    "titulos": {
+     "h1": 1,
+     "pulos": 0
+    },
+    "zoom_bloqueado": false,
+    "lang": "pt-BR",
+    "regras_reduzir_movimento": 1,
+    "canvas_visiveis": 1,
+    "axe": [],
+    "tela": "gavetaPerfil:rede"
+   },
+   {
+    "tela": "gavetaPerfil:rede",
+    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaPerfil_rede.png'"
+   },
+   {
+    "estouro_horizontal_px": 0,
+    "sem_nome_acessivel": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_menor_que_24px": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_entre_24_e_44px": {
+     "total": 250,
+     "amostra": [
+      "button#btnVerAnimacao 43x33",
+      "button#btnPerfil 87x31",
+      "button#btnAmigos 68x31",
+      "button#btnRecordes 78x31",
+      "button#btnConquistas 90x31",
+      "button#btnAcervo 81x31"
+     ]
+    },
+    "contraste": {
+     "medidos": 225,
+     "nao_medido": {
+      "fundo_com_imagem": 1069,
+      "fundo_translucido": 0,
+      "cor_estranha": 0
+     },
+     "falhas": 0,
+     "piores": []
+    },
+    "texto_menor_que_12px": {
+     "total": 0,
+     "amostra": []
+    },
+    "id_repetido": [],
+    "imagem_sem_alt": [],
+    "tabindex_positivo": [],
+    "titulos": {
+     "h1": 1,
+     "pulos": 0
+    },
+    "zoom_bloqueado": false,
+    "lang": "pt-BR",
+    "regras_reduzir_movimento": 1,
+    "canvas_visiveis": 1,
+    "axe": [],
+    "tela": "gavetaBaixados"
+   },
+   {
+    "tela": "gavetaBaixados",
+    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaBaixados.png'"
+   },
+   {
+    "estouro_horizontal_px": 0,
+    "sem_nome_acessivel": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_menor_que_24px": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_entre_24_e_44px": {
+     "total": 250,
+     "amostra": [
+      "button#btnVerAnimacao 43x33",
+      "button#btnPerfil 87x31",
+      "button#btnAmigos 68x31",
+      "button#btnRecordes 78x31",
+      "button#btnConquistas 90x31",
+      "button#btnAcervo 81x31"
+     ]
+    },
+    "contraste": {
+     "medidos": 231,
+     "nao_medido": {
+      "fundo_com_imagem": 1069,
+      "fundo_translucido": 0,
+      "cor_estranha": 0
+     },
+     "falhas": 0,
+     "piores": []
+    },
+    "texto_menor_que_12px": {
+     "total": 0,
+     "amostra": []
+    },
+    "id_repetido": [],
+    "imagem_sem_alt": [],
+    "tabindex_positivo": [],
+    "titulos": {
+     "h1": 1,
+     "pulos": 0
+    },
+    "zoom_bloqueado": false,
+    "lang": "pt-BR",
+    "regras_reduzir_movimento": 1,
+    "canvas_visiveis": 1,
+    "axe": [],
+    "tela": "gavetaComoColocar"
+   },
+   {
+    "tela": "gavetaComoColocar",
+    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaComoColocar.png'"
+   },
+   {
+    "estouro_horizontal_px": 0,
+    "sem_nome_acessivel": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_menor_que_24px": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_entre_24_e_44px": {
+     "total": 251,
+     "amostra": [
+      "button#btnVerAnimacao 43x33",
+      "button#btnPerfil 87x31",
+      "button#btnAmigos 68x31",
+      "button#btnRecordes 78x31",
+      "button#btnConquistas 90x31",
+      "button#btnAcervo 81x31"
+     ]
+    },
+    "contraste": {
+     "medidos": 230,
+     "nao_medido": {
+      "fundo_com_imagem": 1069,
+      "fundo_translucido": 0,
+      "cor_estranha": 0
+     },
+     "falhas": 0,
+     "piores": []
+    },
+    "texto_menor_que_12px": {
+     "total": 0,
+     "amostra": []
+    },
+    "id_repetido": [],
+    "imagem_sem_alt": [],
+    "tabindex_positivo": [],
+    "titulos": {
+     "h1": 1,
+     "pulos": 0
+    },
+    "zoom_bloqueado": false,
+    "lang": "pt-BR",
+    "regras_reduzir_movimento": 1,
+    "canvas_visiveis": 1,
+    "axe": [],
+    "tela": "gavetaAcervo"
+   },
+   {
+    "tela": "gavetaAcervo",
+    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaAcervo.png'"
+   },
+   {
+    "estouro_horizontal_px": 0,
+    "sem_nome_acessivel": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_menor_que_24px": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_entre_24_e_44px": {
+     "total": 260,
+     "amostra": [
+      "button#btnVerAnimacao 43x33",
+      "button#btnPerfil 87x31",
+      "button#btnAmigos 68x31",
+      "button#btnRecordes 78x31",
+      "button#btnConquistas 90x31",
+      "button#btnAcervo 81x31"
+     ]
+    },
+    "contraste": {
+     "medidos": 260,
+     "nao_medido": {
+      "fundo_com_imagem": 1069,
+      "fundo_translucido": 0,
+      "cor_estranha": 0
+     },
+     "falhas": 0,
+     "piores": []
+    },
+    "texto_menor_que_12px": {
+     "total": 0,
+     "amostra": []
+    },
+    "id_repetido": [],
+    "imagem_sem_alt": [],
+    "tabindex_positivo": [],
+    "titulos": {
+     "h1": 1,
+     "pulos": 0
+    },
+    "zoom_bloqueado": false,
+    "lang": "pt-BR",
+    "regras_reduzir_movimento": 1,
+    "canvas_visiveis": 1,
+    "axe": [],
+    "tela": "gavetaAjustes:simples"
+   },
+   {
+    "tela": "gavetaAjustes:simples",
+    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaAjustes_simples.png'"
+   },
+   {
+    "estouro_horizontal_px": 0,
+    "sem_nome_acessivel": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_menor_que_24px": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_entre_24_e_44px": {
+     "total": 335,
+     "amostra": [
+      "button#btnVerAnimacao 43x33",
+      "button#btnPerfil 87x31",
+      "button#btnAmigos 68x31",
+      "button#btnRecordes 78x31",
+      "button#btnConquistas 90x31",
+      "button#btnAcervo 81x31"
+     ]
+    },
+    "contraste": {
+     "medidos": 368,
+     "nao_medido": {
+      "fundo_com_imagem": 1069,
+      "fundo_translucido": 0,
+      "cor_estranha": 0
+     },
+     "falhas": 0,
+     "piores": []
+    },
+    "texto_menor_que_12px": {
+     "total": 0,
+     "amostra": []
+    },
+    "id_repetido": [],
+    "imagem_sem_alt": [],
+    "tabindex_positivo": [],
+    "titulos": {
+     "h1": 1,
+     "pulos": 0
+    },
+    "zoom_bloqueado": false,
+    "lang": "pt-BR",
+    "regras_reduzir_movimento": 1,
+    "canvas_visiveis": 1,
+    "axe": [],
+    "tela": "gavetaAjustes:avancado"
+   },
+   {
+    "tela": "gavetaAjustes:avancado",
+    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaAjustes_avancado.png'"
+   },
+   {
+    "estouro_horizontal_px": 0,
+    "sem_nome_acessivel": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_menor_que_24px": {
+     "total": 4,
+     "amostra": [
+      "button#btnCartaoProcurar 151x24",
+      "button#btnCartaoEscolher 161x24",
+      "button#btnMedirInterno 176x24",
+      "button#btnMedirCartao 97x24"
+     ]
+    },
+    "alvo_entre_24_e_44px": {
+     "total": 264,
+     "amostra": [
+      "button#btnVerAnimacao 43x33",
+      "button#btnPerfil 87x31",
+      "button#btnAmigos 68x31",
+      "button#btnRecordes 78x31",
+      "button#btnConquistas 90x31",
+      "button#btnAcervo 81x31"
+     ]
+    },
+    "contraste": {
+     "medidos": 328,
+     "nao_medido": {
+      "fundo_com_imagem": 1069,
+      "fundo_translucido": 0,
+      "cor_estranha": 0
+     },
+     "falhas": 0,
+     "piores": []
+    },
+    "texto_menor_que_12px": {
+     "total": 0,
+     "amostra": []
+    },
+    "id_repetido": [],
+    "imagem_sem_alt": [],
+    "tabindex_positivo": [],
+    "titulos": {
+     "h1": 1,
+     "pulos": 0
+    },
+    "zoom_bloqueado": false,
+    "lang": "pt-BR",
+    "regras_reduzir_movimento": 1,
+    "canvas_visiveis": 1,
+    "axe": [],
+    "tela": "gavetaAjustes:maquina"
+   },
+   {
+    "tela": "gavetaAjustes:maquina",
+    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaAjustes_maquina.png'"
+   },
+   {
+    "estouro_horizontal_px": 0,
+    "sem_nome_acessivel": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_menor_que_24px": {
+     "total": 16,
+     "amostra": [
+      "ul#listaMapa > li.mapa-linha > button.botao.mapa-definir 58x23",
+      "ul#listaMapa > li.mapa-linha > button.botao.mapa-definir 58x23",
+      "ul#listaMapa > li.mapa-linha > button.botao.mapa-definir 58x23",
+      "ul#listaMapa > li.mapa-linha > button.botao.mapa-definir 58x23",
+      "ul#listaMapa > li.mapa-linha > button.botao.mapa-definir 58x23",
+      "ul#listaMapa > li.mapa-linha > button.botao.mapa-definir 58x23",
+      "ul#listaMapa > li.mapa-linha > button.botao.mapa-definir 58x23",
+      "ul#listaMapa > li.mapa-linha > button.botao.mapa-definir 58x23",
+      "ul#listaMapa > li.mapa-linha > button.botao.mapa-definir 58x23",
+      "ul#listaMapa > li.mapa-linha > button.botao.mapa-definir 58x23",
+      "ul#listaMapa > li.mapa-linha > button.botao.mapa-definir 58x23",
+      "ul#listaMapa > li.mapa-linha > button.botao.mapa-definir 58x23"
+     ]
+    },
+    "alvo_entre_24_e_44px": {
+     "total": 266,
+     "amostra": [
+      "button#btnVerAnimacao 43x33",
+      "button#btnPerfil 87x31",
+      "button#btnAmigos 68x31",
+      "button#btnRecordes 78x31",
+      "button#btnConquistas 90x31",
+      "button#btnAcervo 81x31"
+     ]
+    },
+    "contraste": {
+     "medidos": 375,
+     "nao_medido": {
+      "fundo_com_imagem": 1069,
+      "fundo_translucido": 0,
+      "cor_estranha": 0
+     },
+     "falhas": 0,
+     "piores": []
+    },
+    "texto_menor_que_12px": {
+     "total": 0,
+     "amostra": []
+    },
+    "id_repetido": [],
+    "imagem_sem_alt": [],
+    "tabindex_positivo": [],
+    "titulos": {
+     "h1": 1,
+     "pulos": 0
+    },
+    "zoom_bloqueado": false,
+    "lang": "pt-BR",
+    "regras_reduzir_movimento": 1,
+    "canvas_visiveis": 1,
+    "axe": [],
+    "tela": "gavetaAjustes:controles"
+   },
+   {
+    "tela": "gavetaAjustes:controles",
+    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaAjustes_controles.png'"
+   },
+   {
+    "estouro_horizontal_px": 0,
+    "sem_nome_acessivel": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_menor_que_24px": {
+     "total": 34,
+     "amostra": [
+      "button#btnBiosPasta 116x24",
+      "button#btnBiosConferir 62x24",
+      "li.controle.bios-console > div.controle-acoes > button.botao 142x24",
+      "li.controle.bios-console > div.controle-acoes > button.botao 142x24",
+      "li.controle.bios-console > div.controle-acoes > button.botao 142x24",
+      "li.controle.bios-console > div.controle-acoes > button.botao 166x24",
+      "li.controle.bios-console > div.controle-acoes > button.botao 185x24",
+      "li.controle.bios-console > div.controle-acoes > button.botao 179x24",
+      "li.controle.bios-console > div.controle-acoes > button.botao 167x24",
+      "li.controle.bios-console > div.controle-acoes > button.botao 275x24",
+      "li.controle.bios-console > div.controle-acoes > button.botao 286x24",
+      "li.controle.bios-console > div.controle-acoes > button.botao 273x24"
+     ]
+    },
+    "alvo_entre_24_e_44px": {
+     "total": 297,
+     "amostra": [
+      "button#btnVerAnimacao 43x33",
+      "button#btnPerfil 87x31",
+      "button#btnAmigos 68x31",
+      "button#btnRecordes 78x31",
+      "button#btnConquistas 90x31",
+      "button#btnAcervo 81x31"
+     ]
+    },
+    "contraste": {
+     "medidos": 551,
+     "nao_medido": {
+      "fundo_com_imagem": 1069,
+      "fundo_translucido": 0,
+      "cor_estranha": 0
+     },
+     "falhas": 15,
+     "piores": [
+      {
+       "razao": 1.93,
+       "minimo": 4.5,
+       "tam": 12,
+       "seletor": "li.controle.bios-console > ul.bios-itens > li.bios-ok",
+       "texto": "EUA: ✔ Ativa — versão 2.2, de 04/12/1995",
+       "cor": "rgb(46, 213, 115)",
+       "fundo": "rgb(255,255,255)"
+      },
+      {
+       "razao": 1.93,
+       "minimo": 4.5,
+       "tam": 12,
+       "seletor": "li.controle.bios-console > ul.bios-itens > li.bios-ok",
+       "texto": "EUA: ✔ Ativa — v01.60, de 07/02/2002 (ta",
+       "cor": "rgb(46, 213, 115)",
+       "fundo": "rgb(255,255,255)"
+      },
+      {
+       "razao": 1.93,
+       "minimo": 4.5,
+       "tam": 12,
+       "seletor": "li.controle.bios-console > ul.bios-itens > li.bios-ok",
+       "texto": "Europa: ✔ Ativa — v01.60, de 04/10/2001 ",
+       "cor": "rgb(46, 213, 115)",
+       "fundo": "rgb(255,255,255)"
+      },
+      {
+       "razao": 1.93,
+       "minimo": 4.5,
+       "tam": 12,
+       "seletor": "li.controle.bios-console > ul.bios-itens > li.bios-ok",
+       "texto": "Japão: ✔ Ativa — v01.00, de 17/01/2000 (",
+       "cor": "rgb(46, 213, 115)",
+       "fundo": "rgb(255,255,255)"
+      },
+      {
+       "razao": 1.93,
+       "minimo": 4.5,
+       "tam": 12,
+       "seletor": "li.controle.bios-console > ul.bios-itens > li.bios-ok",
+       "texto": "EUA: ✔ Ativa — versão conferida",
+       "cor": "rgb(46, 213, 115)",
+       "fundo": "rgb(255,255,255)"
+      },
+      {
+       "razao": 1.93,
+       "minimo": 4.5,
+       "tam": 12,
+       "seletor": "li.controle.bios-console > ul.bios-itens > li.bios-ok",
+       "texto": "Europa: ✔ Ativa — versão conferida",
+       "cor": "rgb(46, 213, 115)",
+       "fundo": "rgb(255,255,255)"
+      },
+      {
+       "razao": 1.93,
+       "minimo": 4.5,
+       "tam": 12,
+       "seletor": "li.controle.bios-console > ul.bios-itens > li.bios-ok",
+       "texto": "Japão: ✔ Ativa — versão conferida",
+       "cor": "rgb(46, 213, 115)",
+       "fundo": "rgb(255,255,255)"
+      },
+      {
+       "razao": 1.93,
+       "minimo": 4.5,
+       "tam": 12,
+       "seletor": "li.controle.bios-console > ul.bios-itens > li.bios-ok",
+       "texto": "EUA e Europa: ✔ Ativa — versão conferida",
+       "cor": "rgb(46, 213, 115)",
+       "fundo": "rgb(255,255,255)"
+      },
+      {
+       "razao": 1.93,
+       "minimo": 4.5,
+       "tam": 12,
+       "seletor": "li.controle.bios-console > ul.bios-itens > li.bios-ok",
+       "texto": "Japão: ✔ Ativa — versão conferida",
+       "cor": "rgb(46, 213, 115)",
+       "fundo": "rgb(255,255,255)"
+      },
+      {
+       "razao": 1.93,
+       "minimo": 4.5,
+       "tam": 12,
+       "seletor": "li.controle.bios-console > ul.bios-itens > li.bios-ok",
+       "texto": "✔ Ativa — versão conferida",
+       "cor": "rgb(46, 213, 115)",
+       "fundo": "rgb(255,255,255)"
+      }
+     ]
+    },
+    "texto_menor_que_12px": {
+     "total": 0,
+     "amostra": []
+    },
+    "id_repetido": [],
+    "imagem_sem_alt": [],
+    "tabindex_positivo": [],
+    "titulos": {
+     "h1": 1,
+     "pulos": 0
+    },
+    "zoom_bloqueado": false,
+    "lang": "pt-BR",
+    "regras_reduzir_movimento": 1,
+    "canvas_visiveis": 1,
+    "axe": [],
+    "tela": "gavetaAjustes:emuladores"
+   },
+   {
+    "tela": "gavetaAjustes:emuladores",
+    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaAjustes_emuladores.png'"
+   },
+   {
+    "estouro_horizontal_px": 0,
+    "sem_nome_acessivel": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_menor_que_24px": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_entre_24_e_44px": {
+     "total": 249,
+     "amostra": [
+      "button#btnVerAnimacao 43x33",
+      "button#btnPerfil 87x31",
+      "button#btnAmigos 68x31",
+      "button#btnRecordes 78x31",
+      "button#btnConquistas 90x31",
+      "button#btnAcervo 81x31"
+     ]
+    },
+    "contraste": {
+     "medidos": 222,
+     "nao_medido": {
+      "fundo_com_imagem": 1069,
+      "fundo_translucido": 0,
+      "cor_estranha": 0
+     },
+     "falhas": 0,
+     "piores": []
+    },
+    "texto_menor_que_12px": {
+     "total": 0,
+     "amostra": []
+    },
+    "id_repetido": [],
+    "imagem_sem_alt": [],
+    "tabindex_positivo": [],
+    "titulos": {
+     "h1": 1,
+     "pulos": 0
+    },
+    "zoom_bloqueado": false,
+    "lang": "pt-BR",
+    "regras_reduzir_movimento": 1,
+    "canvas_visiveis": 1,
+    "axe": [],
+    "tela": "gavetaConquistas"
+   },
+   {
+    "tela": "gavetaConquistas",
+    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaConquistas.png'"
+   },
+   {
+    "estouro_horizontal_px": 0,
+    "sem_nome_acessivel": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_menor_que_24px": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_entre_24_e_44px": {
+     "total": 251,
+     "amostra": [
+      "button#btnVerAnimacao 43x33",
+      "button#btnPerfil 87x31",
+      "button#btnAmigos 68x31",
+      "button#btnRecordes 78x31",
+      "button#btnConquistas 90x31",
+      "button#btnAcervo 81x31"
+     ]
+    },
+    "contraste": {
+     "medidos": 223,
+     "nao_medido": {
+      "fundo_com_imagem": 1069,
+      "fundo_translucido": 0,
+      "cor_estranha": 0
+     },
+     "falhas": 0,
+     "piores": []
+    },
+    "texto_menor_que_12px": {
+     "total": 0,
+     "amostra": []
+    },
+    "id_repetido": [],
+    "imagem_sem_alt": [],
+    "tabindex_positivo": [],
+    "titulos": {
+     "h1": 1,
+     "pulos": 0
+    },
+    "zoom_bloqueado": false,
+    "lang": "pt-BR",
+    "regras_reduzir_movimento": 1,
+    "canvas_visiveis": 1,
+    "axe": [],
+    "tela": "gavetaRecordes:pontos"
+   },
+   {
+    "tela": "gavetaRecordes:pontos",
+    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaRecordes_pontos.png'"
+   },
+   {
+    "estouro_horizontal_px": 0,
+    "sem_nome_acessivel": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_menor_que_24px": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_entre_24_e_44px": {
+     "total": 251,
+     "amostra": [
+      "button#btnVerAnimacao 43x33",
+      "button#btnPerfil 87x31",
+      "button#btnAmigos 68x31",
+      "button#btnRecordes 78x31",
+      "button#btnConquistas 90x31",
+      "button#btnAcervo 81x31"
+     ]
+    },
+    "contraste": {
+     "medidos": 223,
+     "nao_medido": {
+      "fundo_com_imagem": 1069,
+      "fundo_translucido": 0,
+      "cor_estranha": 0
+     },
+     "falhas": 0,
+     "piores": []
+    },
+    "texto_menor_que_12px": {
+     "total": 0,
+     "amostra": []
+    },
+    "id_repetido": [],
+    "imagem_sem_alt": [],
+    "tabindex_positivo": [],
+    "titulos": {
+     "h1": 1,
+     "pulos": 0
+    },
+    "zoom_bloqueado": false,
+    "lang": "pt-BR",
+    "regras_reduzir_movimento": 1,
+    "canvas_visiveis": 1,
+    "axe": [],
+    "tela": "gavetaRecordes:tempo"
+   },
+   {
+    "tela": "gavetaRecordes:tempo",
+    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaRecordes_tempo.png'"
+   },
+   {
+    "estouro_horizontal_px": 0,
+    "sem_nome_acessivel": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_menor_que_24px": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_entre_24_e_44px": {
+     "total": 252,
+     "amostra": [
+      "button#btnVerAnimacao 43x33",
+      "button#btnPerfil 87x31",
+      "button#btnAmigos 68x31",
+      "button#btnRecordes 78x31",
+      "button#btnConquistas 90x31",
+      "button#btnAcervo 81x31"
+     ]
+    },
+    "contraste": {
+     "medidos": 228,
+     "nao_medido": {
+      "fundo_com_imagem": 1069,
+      "fundo_translucido": 0,
+      "cor_estranha": 0
+     },
+     "falhas": 0,
+     "piores": []
+    },
+    "texto_menor_que_12px": {
+     "total": 0,
+     "amostra": []
+    },
+    "id_repetido": [],
+    "imagem_sem_alt": [],
+    "tabindex_positivo": [],
+    "titulos": {
+     "h1": 1,
+     "pulos": 0
+    },
+    "zoom_bloqueado": false,
+    "lang": "pt-BR",
+    "regras_reduzir_movimento": 1,
+    "canvas_visiveis": 1,
+    "axe": [],
+    "tela": "gavetaJogo:estados"
+   },
+   {
+    "tela": "gavetaJogo:estados",
+    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaJogo_estados.png'"
+   },
+   {
+    "estouro_horizontal_px": 0,
+    "sem_nome_acessivel": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_menor_que_24px": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_entre_24_e_44px": {
+     "total": 253,
+     "amostra": [
+      "button#btnVerAnimacao 43x33",
+      "button#btnPerfil 87x31",
+      "button#btnAmigos 68x31",
+      "button#btnRecordes 78x31",
+      "button#btnConquistas 90x31",
+      "button#btnAcervo 81x31"
+     ]
+    },
+    "contraste": {
+     "medidos": 228,
+     "nao_medido": {
+      "fundo_com_imagem": 1069,
+      "fundo_translucido": 0,
+      "cor_estranha": 0
+     },
+     "falhas": 0,
+     "piores": []
+    },
+    "texto_menor_que_12px": {
+     "total": 0,
+     "amostra": []
+    },
+    "id_repetido": [],
+    "imagem_sem_alt": [],
+    "tabindex_positivo": [],
+    "titulos": {
+     "h1": 1,
+     "pulos": 0
+    },
+    "zoom_bloqueado": false,
+    "lang": "pt-BR",
+    "regras_reduzir_movimento": 1,
+    "canvas_visiveis": 1,
+    "axe": [],
+    "tela": "gavetaJogo:cheats"
+   },
+   {
+    "tela": "gavetaJogo:cheats",
+    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaJogo_cheats.png'"
+   },
+   {
+    "estouro_horizontal_px": 0,
+    "sem_nome_acessivel": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_menor_que_24px": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_entre_24_e_44px": {
+     "total": 250,
+     "amostra": [
+      "button#btnVerAnimacao 43x33",
+      "button#btnPerfil 87x31",
+      "button#btnAmigos 68x31",
+      "button#btnRecordes 78x31",
+      "button#btnConquistas 90x31",
+      "button#btnAcervo 81x31"
+     ]
+    },
+    "contraste": {
+     "medidos": 223,
+     "nao_medido": {
+      "fundo_com_imagem": 1069,
+      "fundo_translucido": 0,
+      "cor_estranha": 0
+     },
+     "falhas": 0,
+     "piores": []
+    },
+    "texto_menor_que_12px": {
+     "total": 0,
+     "amostra": []
+    },
+    "id_repetido": [],
+    "imagem_sem_alt": [],
+    "tabindex_positivo": [],
+    "titulos": {
+     "h1": 1,
+     "pulos": 0
+    },
+    "zoom_bloqueado": false,
+    "lang": "pt-BR",
+    "regras_reduzir_movimento": 1,
+    "canvas_visiveis": 1,
+    "axe": [],
+    "tela": "modalJuntoLocal"
+   },
+   {
+    "tela": "modalJuntoLocal",
+    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_modalJuntoLocal.png'"
+   },
+   {
+    "estouro_horizontal_px": 0,
+    "sem_nome_acessivel": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_menor_que_24px": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_entre_24_e_44px": {
+     "total": 251,
+     "amostra": [
+      "button#btnVerAnimacao 43x33",
+      "button#btnPerfil 87x31",
+      "button#btnAmigos 68x31",
+      "button#btnRecordes 78x31",
+      "button#btnConquistas 90x31",
+      "button#btnAcervo 81x31"
+     ]
+    },
+    "contraste": {
+     "medidos": 230,
+     "nao_medido": {
+      "fundo_com_imagem": 1069,
+      "fundo_translucido": 0,
+      "cor_estranha": 0
+     },
+     "falhas": 0,
+     "piores": []
+    },
+    "texto_menor_que_12px": {
+     "total": 0,
+     "amostra": []
+    },
+    "id_repetido": [],
+    "imagem_sem_alt": [],
+    "tabindex_positivo": [],
+    "titulos": {
+     "h1": 1,
+     "pulos": 0
+    },
+    "zoom_bloqueado": false,
+    "lang": "pt-BR",
+    "regras_reduzir_movimento": 1,
+    "canvas_visiveis": 1,
+    "axe": [],
+    "tela": "modalPartida"
+   },
+   {
+    "tela": "modalPartida",
+    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_modalPartida.png'"
+   },
+   {
+    "estouro_horizontal_px": 0,
+    "sem_nome_acessivel": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_menor_que_24px": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_entre_24_e_44px": {
+     "total": 250,
+     "amostra": [
+      "button#btnVerAnimacao 43x33",
+      "button#btnPerfil 87x31",
+      "button#btnAmigos 68x31",
+      "button#btnRecordes 78x31",
+      "button#btnConquistas 90x31",
+      "button#btnAcervo 81x31"
+     ]
+    },
+    "contraste": {
+     "medidos": 226,
+     "nao_medido": {
+      "fundo_com_imagem": 1069,
+      "fundo_translucido": 0,
+      "cor_estranha": 0
+     },
+     "falhas": 0,
+     "piores": []
+    },
+    "texto_menor_que_12px": {
+     "total": 0,
+     "amostra": []
+    },
+    "id_repetido": [],
+    "imagem_sem_alt": [],
+    "tabindex_positivo": [],
+    "titulos": {
+     "h1": 1,
+     "pulos": 0
+    },
+    "zoom_bloqueado": false,
+    "lang": "pt-BR",
+    "regras_reduzir_movimento": 1,
+    "canvas_visiveis": 1,
+    "axe": [],
+    "tela": "modalEsperaPartida"
+   },
+   {
+    "tela": "modalEsperaPartida",
+    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_modalEsperaPartida.png'"
+   },
+   {
+    "estouro_horizontal_px": 0,
+    "sem_nome_acessivel": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_menor_que_24px": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_entre_24_e_44px": {
+     "total": 250,
+     "amostra": [
+      "button#btnVerAnimacao 43x33",
+      "button#btnPerfil 87x31",
+      "button#btnAmigos 68x31",
+      "button#btnRecordes 78x31",
+      "button#btnConquistas 90x31",
+      "button#btnAcervo 81x31"
+     ]
+    },
+    "contraste": {
+     "medidos": 222,
+     "nao_medido": {
+      "fundo_com_imagem": 1069,
+      "fundo_translucido": 0,
+      "cor_estranha": 0
+     },
+     "falhas": 0,
+     "piores": []
+    },
+    "texto_menor_que_12px": {
+     "total": 0,
+     "amostra": []
+    },
+    "id_repetido": [],
+    "imagem_sem_alt": [],
+    "tabindex_positivo": [],
+    "titulos": {
+     "h1": 1,
+     "pulos": 0
+    },
+    "zoom_bloqueado": false,
+    "lang": "pt-BR",
+    "regras_reduzir_movimento": 1,
+    "canvas_visiveis": 1,
+    "axe": [],
+    "tela": "modalJeito"
+   },
+   {
+    "tela": "modalJeito",
+    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_modalJeito.png'"
+   },
+   {
+    "estouro_horizontal_px": 0,
+    "sem_nome_acessivel": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_menor_que_24px": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_entre_24_e_44px": {
+     "total": 251,
+     "amostra": [
+      "button#btnVerAnimacao 43x33",
+      "button#btnPerfil 87x31",
+      "button#btnAmigos 68x31",
+      "button#btnRecordes 78x31",
+      "button#btnConquistas 90x31",
+      "button#btnAcervo 81x31"
+     ]
+    },
+    "contraste": {
+     "medidos": 224,
+     "nao_medido": {
+      "fundo_com_imagem": 1069,
+      "fundo_translucido": 0,
+      "cor_estranha": 0
+     },
+     "falhas": 0,
+     "piores": []
+    },
+    "texto_menor_que_12px": {
+     "total": 0,
+     "amostra": []
+    },
+    "id_repetido": [],
+    "imagem_sem_alt": [],
+    "tabindex_positivo": [],
+    "titulos": {
+     "h1": 1,
+     "pulos": 0
+    },
+    "zoom_bloqueado": false,
+    "lang": "pt-BR",
+    "regras_reduzir_movimento": 1,
+    "canvas_visiveis": 1,
+    "axe": [],
+    "tela": "modalPlacar"
+   },
+   {
+    "tela": "modalPlacar",
+    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_modalPlacar.png'"
+   },
+   {
+    "estouro_horizontal_px": 0,
+    "sem_nome_acessivel": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_menor_que_24px": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_entre_24_e_44px": {
+     "total": 259,
+     "amostra": [
+      "button#btnVerAnimacao 43x33",
+      "button#btnPerfil 87x31",
+      "button#btnAmigos 68x31",
+      "button#btnRecordes 78x31",
+      "button#btnConquistas 90x31",
+      "button#btnAcervo 81x31"
+     ]
+    },
+    "contraste": {
+     "medidos": 233,
+     "nao_medido": {
+      "fundo_com_imagem": 1069,
+      "fundo_translucido": 0,
+      "cor_estranha": 0
+     },
+     "falhas": 0,
+     "piores": []
+    },
+    "texto_menor_que_12px": {
+     "total": 0,
+     "amostra": []
+    },
+    "id_repetido": [],
+    "imagem_sem_alt": [],
+    "tabindex_positivo": [],
+    "titulos": {
+     "h1": 1,
+     "pulos": 0
+    },
+    "zoom_bloqueado": false,
+    "lang": "pt-BR",
+    "regras_reduzir_movimento": 1,
+    "canvas_visiveis": 1,
+    "axe": [],
+    "tela": "modalAcervo"
+   },
+   {
+    "tela": "modalAcervo",
+    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_modalAcervo.png'"
+   },
+   {
+    "estouro_horizontal_px": 0,
+    "sem_nome_acessivel": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_menor_que_24px": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_entre_24_e_44px": {
+     "total": 251,
+     "amostra": [
+      "button#btnVerAnimacao 43x33",
+      "button#btnPerfil 87x31",
+      "button#btnAmigos 68x31",
+      "button#btnRecordes 78x31",
+      "button#btnConquistas 90x31",
+      "button#btnAcervo 81x31"
+     ]
+    },
+    "contraste": {
+     "medidos": 224,
+     "nao_medido": {
+      "fundo_com_imagem": 1069,
+      "fundo_translucido": 0,
+      "cor_estranha": 0
+     },
+     "falhas": 0,
+     "piores": []
+    },
+    "texto_menor_que_12px": {
+     "total": 0,
+     "amostra": []
+    },
+    "id_repetido": [],
+    "imagem_sem_alt": [],
+    "tabindex_positivo": [],
+    "titulos": {
+     "h1": 1,
+     "pulos": 0
+    },
+    "zoom_bloqueado": false,
+    "lang": "pt-BR",
+    "regras_reduzir_movimento": 1,
+    "canvas_visiveis": 1,
+    "axe": [],
+    "tela": "modalConsole"
+   },
+   {
+    "tela": "modalConsole",
+    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_modalConsole.png'"
+   },
+   {
+    "estouro_horizontal_px": 0,
+    "sem_nome_acessivel": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_menor_que_24px": {
+     "total": 0,
+     "amostra": []
+    },
+    "alvo_entre_24_e_44px": {
+     "total": 250,
+     "amostra": [
+      "button#btnVerAnimacao 43x33",
+      "button#btnPerfil 87x31",
+      "button#btnAmigos 68x31",
+      "button#btnRecordes 78x31",
+      "button#btnConquistas 90x31",
+      "button#btnAcervo 81x31"
+     ]
+    },
+    "contraste": {
+     "medidos": 223,
+     "nao_medido": {
+      "fundo_com_imagem": 1069,
+      "fundo_translucido": 0,
+      "cor_estranha": 0
+     },
+     "falhas": 0,
+     "piores": []
+    },
+    "texto_menor_que_12px": {
+     "total": 0,
+     "amostra": []
+    },
+    "id_repetido": [],
+    "imagem_sem_alt": [],
+    "tabindex_positivo": [],
+    "titulos": {
+     "h1": 1,
+     "pulos": 0
+    },
+    "zoom_bloqueado": false,
+    "lang": "pt-BR",
+    "regras_reduzir_movimento": 1,
+    "canvas_visiveis": 1,
+    "axe": [],
+    "tela": "modalApelido"
+   },
+   {
+    "tela": "modalApelido",
+    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_modalApelido.png'"
+   }
+  ],
+  "rotas": [
+   {
+    "rota": "/api/acervo",
+    "status": 200,
+    "json_valido": true,
+    "erro": null
+   },
+   {
+    "rota": "/api/android/aparelho",
+    "status": 200,
+    "json_valido": true,
+    "erro": null
+   },
+   {
+    "rota": "/api/android/ini-ps2",
+    "status": 200,
+    "json_valido": true,
+    "erro": null
+   },
+   {
+    "rota": "/api/android/pastas",
+    "status": 200,
+    "json_valido": true,
+    "erro": null
+   },
+   {
+    "rota": "/api/android/registro",
+    "status": 200,
+    "json_valido": true,
+    "erro": null
+   },
+   {
+    "rota": "/api/armazenamento",
+    "status": 200,
+    "json_valido": true,
+    "erro": null
+   },
+   {
+    "rota": "/api/arrumar/progresso",
+    "status": 404,
+    "json_valido": true,
+    "erro": null
+   },
+   {
+    "rota": "/api/baixados",
+    "status": 200,
+    "json_valido": true,
+    "erro": null
+   },
+   {
+    "rota": "/api/barreiras",
+    "status": 200,
+    "json_valido": true,
+    "erro": null
+   },
+   {
+    "rota": "/api/bios",
+    "status": 200,
+    "json_valido": true,
+    "erro": null
+   },
+   {
+    "rota": "/api/botoes",
+    "status": 200,
+    "json_valido": true,
+    "erro": null
+   },
+   {
+    "rota": "/api/capa",
+    "status": 404,
+    "json_valido": true,
+    "erro": null
+   },
+   {
+    "rota": "/api/capas/progresso",
+    "status": 200,
+    "json_valido": true,
+    "erro": null
+   },
+   {
+    "rota": "/api/catalogo",
+    "status": 200,
+    "json_valido": true,
+    "erro": null
+   },
+   {
+    "rota": "/api/colegas",
+    "status": 200,
+    "json_valido": true,
+    "erro": null
+   },
+   {
+    "rota": "/api/como-colocar",
+    "status": 200,
+    "json_valido": true,
+    "erro": null
+   },
+   {
+    "rota": "/api/conquistas",
+    "status": 200,
+    "json_valido": true,
+    "erro": null
+   },
+   {
+    "rota": "/api/estado",
+    "status": 200,
+    "json_valido": true,
+    "erro": null
+   },
+   {
+    "rota": "/api/jogo",
+    "status": 404,
+    "json_valido": true,
+    "erro": null
+   },
+   {
+    "rota": "/api/jogo/impressao",
+    "status": 404,
+    "json_valido": true,
+    "erro": null
+   },
+   {
+    "rota": "/api/mapeamento",
+    "status": 200,
+    "json_valido": true,
+    "erro": null
+   },
+   {
+    "rota": "/api/partida/estado",
+    "status": 200,
+    "json_valido": true,
+    "erro": null
+   },
+   {
+    "rota": "/api/perfil/foto",
+    "status": 404,
+    "json_valido": true,
+    "erro": null
+   },
+   {
+    "rota": "/api/perfis-controle",
+    "status": 200,
+    "json_valido": true,
+    "erro": null
+   },
+   {
+    "rota": "/api/ranking",
+    "status": 200,
+    "json_valido": true,
+    "erro": null
+   }
+  ],
+  "viewport": {
+   "w": 829,
+   "h": 384,
+   "dpr": 1.875,
+   "tema": "claro"
+  },
+  "rotas_fora_da_varredura": [
+   "/api/armazenamento/ajustar",
+   "/api/armazenamento/listar",
+   "/api/armazenamento/medir",
+   "/api/armazenamento/procurar",
+   "/api/armazenamento/tirar",
+   "/api/armazenamento/usar",
+   "/api/biblioteca-livre",
+   "/api/biblioteca-online",
+   "/api/partida/procurar"
+  ],
+  "estado_android": {
+   "pasta": "/storage/emulated/0/ARENA",
+   "so_leitura": false,
+   "permissao": true
+  },
+  "plataforma": null,
+  "janelas_isolam_o_fundo": [
+   {
+    "id": "gavetaBaixados",
+    "papel": null,
+    "aria_modal": null,
+    "fundo_exposto": [
+     "header",
+     "main"
+    ]
+   },
+   {
+    "id": "gavetaComoColocar",
+    "papel": null,
+    "aria_modal": null,
+    "fundo_exposto": [
+     "header",
+     "main"
+    ]
+   },
+   {
+    "id": "gavetaAcervo",
+    "papel": null,
+    "aria_modal": null,
+    "fundo_exposto": [
+     "header",
+     "main"
+    ]
+   },
+   {
+    "id": "gavetaConquistas",
+    "papel": null,
+    "aria_modal": null,
+    "fundo_exposto": [
+     "header",
+     "main"
+    ]
+   },
+   {
+    "id": "modalJuntoLocal",
+    "papel": null,
+    "aria_modal": null,
+    "fundo_exposto": [
+     "header",
+     "main"
+    ]
+   },
+   {
+    "id": "modalPartida",
+    "papel": null,
+    "aria_modal": null,
+    "fundo_exposto": [
+     "header",
+     "main"
+    ]
+   },
+   {
+    "id": "modalEsperaPartida",
+    "papel": null,
+    "aria_modal": null,
+    "fundo_exposto": [
+     "header",
+     "main"
+    ]
+   },
+   {
+    "id": "modalJeito",
+    "papel": null,
+    "aria_modal": null,
+    "fundo_exposto": [
+     "header",
+     "main"
+    ]
+   },
+   {
+    "id": "modalPlacar",
+    "papel": null,
+    "aria_modal": null,
+    "fundo_exposto": [
+     "header",
+     "main"
+    ]
+   },
+   {
+    "id": "modalAcervo",
+    "papel": null,
+    "aria_modal": null,
+    "fundo_exposto": [
+     "header",
+     "main"
+    ]
+   },
+   {
+    "id": "modalConsole",
+    "papel": null,
+    "aria_modal": null,
+    "fundo_exposto": [
+     "header",
+     "main"
+    ]
+   },
+   {
+    "id": "modalApelido",
+    "papel": null,
+    "aria_modal": null,
+    "fundo_exposto": [
+     "header",
+     "main"
+    ]
+   }
+  ]
+ }
+}

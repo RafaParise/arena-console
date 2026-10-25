@@ -1574,6 +1574,22 @@ input::placeholder { color: var(--texto-apagado); }
   letter-spacing: 0.12em;
 }
 
+/* O celular como controle (Ajustes -> Controles): o codigo de 4 numeros que se digita no celular. */
+.codigo-grande {
+  display: inline-block;
+  padding: 0.2rem 0.8rem;
+  margin-left: 0.4rem;
+  background: var(--fundo);
+  border: 1px solid var(--borda-forte);
+  border-radius: var(--raio);
+  color: var(--destaque-texto);
+  font-family: var(--fonte-numero);
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 0.35em;
+}
+#controleRemotoEnderecos .controle-nome { font-family: var(--fonte-numero); user-select: all; }
+
 .perfil-box {
   display: flex;
   align-items: center;

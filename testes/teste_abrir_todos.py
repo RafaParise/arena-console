@@ -29,6 +29,7 @@ import teste_matriz_multitap as base  # noqa: E402
 
 RAIZ = base.RAIZ
 indexador = base.arena.indexador
+MAXIMO_POR_CONSOLE = 8      # sem filtro de console: uma amostra por console (ver o laco)
 
 
 def porta_ocupada(porta=55435):
@@ -48,6 +49,7 @@ def main():
     fotos = os.path.join(trabalho, "fotos")
     os.makedirs(fotos)
     saida = []
+    contados = {}
     for n, jogo in enumerate(sorted(jogos, key=lambda j: (j["plataforma_nome"], j["titulo"]))):
         plataforma = plataformas.get(jogo["plataforma"], {})
         if filtro and filtro not in jogo["plataforma_nome"].lower():
@@ -58,6 +60,11 @@ def main():
             item["situacao"] = "emulador de fora (%s): testar com o professor" % plataforma["externo"]["nome"]
             saida.append(item)
             print("%-45s %s" % (jogo["titulo"][:45], item["situacao"]))
+            continue
+        # Console com muitos jogos do mesmo tipo (os 110 minijogos do PocketStation, os fliperamas): uma amostra
+        # (os MAXIMO_POR_CONSOLE primeiros por titulo). Com o nome do console no argumento, abre todos.
+        contados[jogo["plataforma"]] = contados.get(jogo["plataforma"], 0) + 1
+        if not filtro and contados[jogo["plataforma"]] > MAXIMO_POR_CONSOLE:
             continue
         nucleo = plataforma.get("core", "").replace("_libretro.dll", "")
         if not os.path.isfile(os.path.join(RAIZ, "retroarch", "cores", nucleo + "_libretro.dll")):

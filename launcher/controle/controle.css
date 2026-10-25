@@ -1,0 +1,152 @@
+/* A tela do celular como controle (servidor\controle_remoto.py serve estes tres arquivos na porta 8780).
+   Pensada deitada: o celular nas duas maos, polegares nos botoes. Sem fontes nem imagens de fora. */
+:root {
+  --fundo: #14110f;
+  --painel: #221d18;
+  --tecla: #2e2720;
+  --tecla-borda: #7a6648;
+  --texto: #f3e7d3;
+  --apagado: #b8a98f;
+  --destaque: #ffb22e;
+  --erro: #ff8a80;
+  --u: min(11vh, 7.5vw);          /* a "unidade" do desenho: tudo e' multiplo dela */
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body {
+  margin: 0; height: 100%; background: var(--fundo); color: var(--texto);
+  font: 16px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  overscroll-behavior: none; -webkit-user-select: none; user-select: none;
+}
+[hidden] { display: none !important; }
+h1 { font-size: 1.6rem; margin: 0 0 .4rem; letter-spacing: .08em; }
+h1 span { color: var(--destaque); font-weight: 400; }
+
+/* ---------- entrar ---------- */
+.entrada { max-width: 30rem; margin: 0 auto; padding: max(1rem, env(safe-area-inset-top)) 1rem 2rem; overflow-y: auto; height: 100%; }
+/* celular deitado: o texto de um lado e o formulario do outro, para nao precisar rolar */
+@media (orientation: landscape) and (max-height: 560px) {
+  .entrada { max-width: 60rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0 2rem; align-content: start; padding-bottom: 1rem; }
+  h1 { font-size: 1.3rem; }
+  .jogadores span { padding: .4rem 0; }
+  .grande { min-height: 2.6rem; padding: .55rem 1rem; }
+  #codigo { font-size: 1.6rem; padding: .5rem; }
+}
+.explica { color: var(--apagado); margin: 0 0 1.2rem; }
+form { display: grid; gap: .6rem; }
+label { font-size: .95rem; color: var(--apagado); }
+input[type=text], input:not([type]), input[inputmode=numeric] {
+  width: 100%; font: inherit; font-size: 1.15rem; padding: .75rem .8rem; color: var(--texto);
+  background: var(--painel); border: 2px solid var(--tecla-borda); border-radius: .6rem;
+  -webkit-user-select: text; user-select: text;
+}
+#codigo { font-size: 2rem; letter-spacing: .5em; text-align: center; font-variant-numeric: tabular-nums; }
+input:focus-visible, button:focus-visible { outline: 3px solid var(--destaque); outline-offset: 2px; }
+fieldset { border: 0; padding: 0; margin: .4rem 0; }
+legend { color: var(--apagado); font-size: .95rem; margin-bottom: .3rem; padding: 0; }
+.jogadores { display: grid; grid-template-columns: repeat(4, 1fr); gap: .5rem; }
+.jogadores legend { grid-column: 1 / -1; }
+.jogadores label { position: relative; }
+.jogadores input { position: absolute; opacity: 0; inset: 0; width: 100%; height: 100%; margin: 0; }
+.jogadores span {
+  display: block; text-align: center; padding: .7rem 0; font-size: 1.3rem; font-weight: 700; color: var(--texto);
+  background: var(--painel); border: 2px solid var(--tecla-borda); border-radius: .6rem;
+}
+.jogadores input:checked + span { background: var(--destaque); color: #1b1408; border-color: var(--destaque); }
+.jogadores input:focus-visible + span { outline: 3px solid var(--destaque); outline-offset: 2px; }
+button { font: inherit; color: var(--texto); }
+.grande {
+  font-size: 1.15rem; font-weight: 700; padding: .85rem 1rem; border-radius: .7rem; border: 2px solid var(--destaque);
+  background: var(--destaque); color: #1b1408; min-height: 3rem;
+}
+.grande.perigo { background: transparent; color: var(--erro); border-color: var(--erro); }
+.aviso { min-height: 1.5em; color: var(--erro); font-weight: 600; }
+.aviso.bom { color: #9be28e; }
+.rodape { color: var(--apagado); font-size: .85rem; }
+
+/* ---------- o controle ---------- */
+.controle { position: fixed; inset: 0; touch-action: none; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+.controle * { touch-action: none; }
+.faixa-de-cima { position: absolute; top: max(4px, env(safe-area-inset-top)); left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 1rem; font-size: .8rem; color: var(--apagado); pointer-events: none; }
+.faixa-de-cima button { pointer-events: auto; }
+.pequeno { background: var(--painel); border: 1px solid var(--tecla-borda); border-radius: .5rem; padding: .35rem .7rem; font-size: .85rem; min-height: 2.2rem; }
+.conexao.perdida { color: var(--erro); font-weight: 700; }
+.tecla {
+  position: absolute; display: grid; place-items: center; font-weight: 700; color: var(--texto);
+  background: var(--tecla); border: 2px solid var(--tecla-borda); border-radius: .8rem;
+  -webkit-touch-callout: none; padding: 0;
+}
+.tecla.ativa, .seta.ativa { background: var(--destaque); color: #1b1408; border-color: var(--destaque); }
+.ombro, .gat { width: calc(var(--u) * 1.7); height: calc(var(--u) * 0.9); font-size: .95rem; }
+.gat.esq, .ombro.esq { left: 3vw; }
+.gat.dir, .ombro.dir { right: 3vw; }
+.gat { top: calc(var(--u) * 0.9); }
+.ombro { top: calc(var(--u) * 1.95); }
+.redonda { width: calc(var(--u) * 1.5); height: calc(var(--u) * 1.5); border-radius: 50%; font-size: 1.25rem; }
+.comprida { position: static; width: calc(var(--u) * 2); height: calc(var(--u) * 0.8); font-size: .85rem; }
+.pequena { width: calc(var(--u) * 1.1); height: calc(var(--u) * 0.8); font-size: .8rem; display: none; }
+.centro { position: absolute; bottom: calc(var(--u) * 0.6); left: 50%; transform: translateX(-50%); display: flex; gap: calc(var(--u) * 0.6); }
+
+/* direcional em cruz */
+.cruz { position: absolute; left: 4vw; bottom: calc(var(--u) * 0.7); width: calc(var(--u) * 4.2); height: calc(var(--u) * 4.2); }
+.seta {
+  position: absolute; width: calc(var(--u) * 1.4); height: calc(var(--u) * 1.4); display: grid; place-items: center;
+  background: var(--tecla); border: 2px solid var(--tecla-borda); border-radius: .6rem; font-size: 1.1rem; color: var(--texto);
+}
+.seta.cima { top: 0; left: 50%; transform: translateX(-50%); }
+.seta.baixo { bottom: 0; left: 50%; transform: translateX(-50%); }
+.seta.esquerda { left: 0; top: 50%; transform: translateY(-50%); }
+.seta.direita { right: 0; top: 50%; transform: translateY(-50%); }
+
+/* analogicos */
+.stick {
+  position: absolute; display: none; width: calc(var(--u) * 4); height: calc(var(--u) * 4); border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%, #3a3128 0%, #231d17 70%); border: 2px solid var(--tecla-borda);
+}
+.stick.esq { left: 4vw; bottom: calc(var(--u) * 0.7); }
+.stick.dir { right: 4vw; bottom: calc(var(--u) * 0.7); }
+.stick .bolinha {
+  position: absolute; left: 50%; top: 50%; width: calc(var(--u) * 1.7); height: calc(var(--u) * 1.7); margin: calc(var(--u) * -0.85) 0 0 calc(var(--u) * -0.85);
+  border-radius: 50%; background: #6b5a45; border: 2px solid var(--destaque); will-change: transform;
+}
+.stick.ativa .bolinha { background: var(--destaque); }
+
+/* botoes de acao em losango */
+.acoes { position: absolute; right: 4vw; bottom: calc(var(--u) * 0.7); width: calc(var(--u) * 4.4); height: calc(var(--u) * 4.4); }
+.acoes .redonda { position: absolute; }
+.acoes .cima { top: 0; left: 50%; margin-left: calc(var(--u) * -0.75); }
+.acoes .baixo { bottom: 0; left: 50%; margin-left: calc(var(--u) * -0.75); }
+.acoes .esquerda { left: 0; top: 50%; margin-top: calc(var(--u) * -0.75); }
+.acoes .direita { right: 0; top: 50%; margin-top: calc(var(--u) * -0.75); }
+
+/* modos */
+body[data-modo=direcional] .stick { display: none; }
+body[data-modo=analogico] .cruz, body[data-modo=dois] .cruz { display: none; }
+body[data-modo=analogico] .stick.esq, body[data-modo=dois] .stick.esq { display: block; }
+body[data-modo=analogico] .pequena.l3, body[data-modo=dois] .pequena { display: grid; }
+body[data-modo=dois] .stick.dir { display: block; }
+body[data-modo=dois] .stick { width: calc(var(--u) * 3.4); height: calc(var(--u) * 3.4); }
+body[data-modo=dois] .acoes { bottom: auto; top: calc(var(--u) * 3.1); width: calc(var(--u) * 3.6); height: calc(var(--u) * 3.6); right: 2vw; }
+body[data-modo=dois] .redonda { width: calc(var(--u) * 1.2); height: calc(var(--u) * 1.2); font-size: 1rem; }
+body[data-modo=dois] .acoes .cima { margin-left: calc(var(--u) * -0.6); }
+body[data-modo=dois] .acoes .baixo { margin-left: calc(var(--u) * -0.6); }
+body[data-modo=dois] .acoes .esquerda { margin-top: calc(var(--u) * -0.6); }
+body[data-modo=dois] .acoes .direita { margin-top: calc(var(--u) * -0.6); }
+.pequena.l3 { left: calc(4vw + var(--u) * 4.2); bottom: calc(var(--u) * 0.7); }
+.pequena.r3 { right: calc(4vw + var(--u) * 3.6); bottom: calc(var(--u) * 0.7); }
+body[data-modo=analogico] .pequena.r3 { display: none; }
+
+/* de pe, o controle nao cabe: pede para deitar */
+@media (orientation: portrait) {
+  .controle::before {
+    content: "Gire o celular para jogar"; position: absolute; inset: 0; z-index: 5; display: grid; place-items: center;
+    background: var(--fundo); color: var(--texto); font-size: 1.3rem; text-align: center; padding: 2rem;
+  }
+}
+
+/* ---------- menu ---------- */
+.menu { position: fixed; inset: 0; z-index: 10; background: rgba(0, 0, 0, .75); display: grid; place-items: center; padding: 1rem; overflow-y: auto; }
+.menu-caixa { width: min(30rem, 100%); background: var(--painel); border: 2px solid var(--tecla-borda); border-radius: 1rem; padding: 1rem 1.2rem; max-height: 100%; overflow-y: auto; }
+.menu-caixa h2 { margin: 0 0 .5rem; font-size: 1.2rem; }
+.menu-caixa fieldset label, .menu-caixa .linha { display: flex; align-items: center; gap: .6rem; padding: .5rem 0; font-size: 1.05rem; color: var(--texto); }
+.menu-caixa input[type=radio], .menu-caixa input[type=checkbox] { width: 1.5rem; height: 1.5rem; accent-color: var(--destaque); }
+.menu-acoes { display: grid; gap: .6rem; margin: .8rem 0; }

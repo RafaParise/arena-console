@@ -181,6 +181,36 @@ def main():
                 nav.avaliar("document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape'})); 1")
                 time.sleep(0.5)
                 foco[nome + ": volta"] = nav.avaliar("document.activeElement && document.activeElement.id === 'btnAjustes'")
+            # 10. Janela aberta: o fundo sai do Tab e do leitor de tela (inert). Janela sempre; gaveta so quando cobre a
+            # tela (o celular): numa tela larga ela e' um painel do lado e a biblioteca segue usavel. Achado de 25/10/2026,
+            # medido no A12: o fundo ficava exposto atras de todas as gavetas e janelas.
+            lido = ("JSON.stringify({fundo: [...document.querySelectorAll('header.painel-topo, main.corpo')].map(e => e.inert), "
+                    "aberta: [...document.querySelectorAll('.modal:not([hidden]), .gaveta:not([hidden])')].map(e => e.id + ':' + e.inert)})")
+            isolamento = {}
+            nav.abrir("http://127.0.0.1:%d/" % porta, largura=1366, altura=768, espera=3)
+            # a janela do apelido (primeiro acesso) abre sozinha numa copia nova e nao conta nesta medida
+            nav.avaliar("document.querySelector('#modalApelido').hidden = true; abrirGaveta(''); 1")
+            time.sleep(0.2)
+            isolamento["larga, sem janela"] = json.loads(nav.avaliar(lido))
+            nav.avaliar("document.querySelector('#modalPartida').hidden = false; 1")
+            time.sleep(0.2)
+            isolamento["larga, com janela"] = json.loads(nav.avaliar(lido))
+            nav.avaliar("document.querySelector('#modalPartida').hidden = true; abrirGaveta('gavetaAjustes'); 1")
+            time.sleep(0.2)
+            isolamento["larga, com gaveta do lado"] = json.loads(nav.avaliar(lido))
+            nav.avaliar("document.querySelector('#modalPartida').hidden = false; 1")
+            time.sleep(0.2)
+            isolamento["larga, janela por cima da gaveta"] = json.loads(nav.avaliar(lido))
+            nav.avaliar("document.querySelector('#modalPartida').hidden = true; abrirGaveta(''); 1")
+            time.sleep(0.2)
+            isolamento["larga, tudo fechado de novo"] = json.loads(nav.avaliar(lido))
+            nav.abrir("http://127.0.0.1:%d/" % porta, largura=412, altura=800, espera=3)
+            nav.avaliar("document.querySelector('#modalApelido').hidden = true; abrirGaveta('gavetaAjustes'); 1")
+            time.sleep(0.2)
+            isolamento["celular, com gaveta"] = json.loads(nav.avaliar(lido))
+            nav.avaliar("document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape'})); 1")
+            time.sleep(0.3)
+            isolamento["celular, depois do Esc"] = json.loads(nav.avaliar(lido))
         destino = os.path.join(os.path.dirname(AQUI), "docs", "auditoria3", "acessibilidade.json")
         with open(destino, "w", encoding="utf-8") as f:
             json.dump(resultados, f, ensure_ascii=False, indent=1)
@@ -212,6 +242,20 @@ def main():
                 juntar("escondidoAparece")[:10])
         sem_foco = [k for k, v in foco.items() if v is not True]
         confere("o foco entra na janela que abre e volta para quem abriu (Esc)", not sem_foco, sem_foco)
+        esperado = {
+            "larga, sem janela": ([False, False], []),
+            "larga, com janela": ([True, True], ["modalPartida:false"]),
+            "larga, com gaveta do lado": ([False, False], ["gavetaAjustes:false"]),
+            "larga, janela por cima da gaveta": ([True, True], ["gavetaAjustes:true", "modalPartida:false"]),
+            "larga, tudo fechado de novo": ([False, False], []),
+            "celular, com gaveta": ([True, True], ["gavetaAjustes:false"]),
+            "celular, depois do Esc": ([False, False], []),
+        }
+        erradas = ["%s: veio %s, esperava %s" % (nome, isolamento.get(nome), esperado[nome]) for nome in esperado
+                   if (isolamento.get(nome, {}).get("fundo"), sorted(isolamento.get(nome, {}).get("aberta", [])))
+                   != (esperado[nome][0], sorted(esperado[nome][1]))]
+        confere("janela aberta tira o fundo do Tab e do leitor de tela (inert); gaveta so no celular", not erradas,
+                "; ".join(erradas))
     finally:
         if processo:
             servidor_de_teste.derrubar(processo)
