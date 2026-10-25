@@ -517,7 +517,7 @@ def assinatura_das_pastas():
         partes.append("consoles|%d" % os.path.getmtime(ARQUIVO_CONSOLES))
     except OSError:
         pass
-    for origem in ORIGENS:
+    for origem in list(ORIGENS):
         caminho = os.path.join(PASTA_JOGOS, origem)
         if not os.path.isdir(caminho):
             continue
@@ -1137,7 +1137,7 @@ def indexar(forcar=False):
     regras = jogadores.ler(arquivo_de_jogadores())
     jogos = []
     try:
-        for origem in ORIGENS:
+        for origem in list(ORIGENS):
             jogos.extend(
                 varrer_pasta(os.path.join(PASTA_JOGOS, origem), origem,
                              por_extensao, por_id, manuais, regras)

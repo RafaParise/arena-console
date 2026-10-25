@@ -26,7 +26,7 @@ PASTA_SERVIDOR = os.path.dirname(os.path.abspath(__file__))
 ARQUIVO = os.path.join(PASTA_SERVIDOR, "acessorios.json")
 
 LETRAS = "ABCDEFGH"
-_ID = re.compile(r"^[a-z0-9_]{1,60}$")
+_ID = re.compile(r"^[a-z0-9_]{1,60}\Z")
 _TRAVA = threading.Lock()
 _CACHE = {"marca": None, "grupos": []}
 

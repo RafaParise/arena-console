@@ -93,3 +93,18 @@ toda rota `/api/...` (86) e toda aba existe onde o servidor roda; o que muda é 
 - **Cartão PocketStation na entrada 1 do PS2**: só no celular (ARMSX2). No PC o PCSX2 de fora segue com os cartões do
   Rafael (dado dele; opção a pedir).
 - **BIOS-só do PS2 pelo OpenGL na placa fraca**: só no celular.
+
+## Funções por versão (medido em 25/10/2026, `ferramentas\paridade_de_funcoes.py`)
+
+- A tela chama **79 rotas** `/api/` e o servidor atende **todas** (nenhuma rota órfã). Como o servidor e a tela são os
+  mesmos no Windows, no Linux, no Android e no Chromebook com o APK, as funções existem em todos eles; o que muda é o que
+  cada sistema tem por baixo (a tabela de consoles acima, e "Só Windows").
+- A **versão web** (Chromebook sem instalar, sem servidor) atende 29 dessas rotas; as outras 50 e poucas (amigos,
+  acervo, armazenamento do Android, BIOS pela tela, capas, cheats, importar/exportar...) pertencem a funções que a tela
+  **esconde** ali (38 elementos marcados `data-so-windows`); os testes `testes\teste_chromebook.py` e
+  `testes\teste_versao_web.py` conferem que nada escondido é chamado.
+- Chamadas do Windows no servidor (PowerShell, `ctypes.windll`, `taskkill`...): 11 arquivos; todos têm guarda de
+  sistema, menos `servidor\partida.py` (o diagnóstico da partida, `PARTIDA.bat`), que roda `powershell.exe` dentro de
+  um `try` e devolve "não deu para descobrir" se o comando não existe: sem efeito fora do Windows.
+- **PokketSX** (PS1 com o PocketStation) é só Windows e **DreamPotato** só Windows e Linux (`so_windows` e a lista de
+  companheiros); no Android e no Chromebook as duas linhas nem aparecem em Ajustes → Emuladores.

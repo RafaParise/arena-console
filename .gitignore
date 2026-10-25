@@ -134,3 +134,11 @@ launcher/navegador/livres.js
 # ler o celular ligado no cabo (servidor/adb_aparelho.py). E' do Google: nem no git,
 # nem no pacote.
 /platform-tools/
+
+# Arquivos soltos na raiz que nao sao do ARENA (conversas, troca de recordes, copias de memoria do assistente): nunca vao
+# para o repositorio publico (auditoria 5, SUP-02).
+/ARENA-troca.json
+/Conversa ARENA.txt
+/$HOME/
+/Script do claude code*.txt
+/claude-legacy-project-memory-*.md

@@ -1161,8 +1161,8 @@ def ler_status_do_armsx2(pasta_sistema):
     return dados
 
 
-_NOME_DE_NUCLEO = re.compile(r"^[a-z0-9_]{1,40}$")
-_CHAVE_DE_OPCAO = re.compile(r"^[A-Za-z0-9_.\-]{1,80}$")
+_NOME_DE_NUCLEO = re.compile(r"^[a-z0-9_]{1,40}\Z")
+_CHAVE_DE_OPCAO = re.compile(r"^[A-Za-z0-9_.\-]{1,80}\Z")
 
 
 def limpar_ajustes_dos_nucleos(valor):
@@ -1198,9 +1198,9 @@ def ajustes_finos_do_nucleo(ajustes, nome_curto):
     return dict(limpar_ajustes_dos_nucleos(ajustes).get(nome_curto, {}))
 
 
-_SECAO_DE_INI = re.compile(r"^[A-Za-z0-9_/]{1,60}$")
-_CHAVE_DE_INI = re.compile(r"^[A-Za-z0-9_./\-]{1,80}$")
-_VALOR_DE_INI = re.compile(r"^[A-Za-z0-9_ ./+\-]{0,80}$")
+_SECAO_DE_INI = re.compile(r"^[A-Za-z0-9_/]{1,60}\Z")
+_CHAVE_DE_INI = re.compile(r"^[A-Za-z0-9_./\-]{1,80}\Z")
+_VALOR_DE_INI = re.compile(r"^[A-Za-z0-9_ ./+\-]{0,80}\Z")
 
 
 def limpar_ajustes_ini(valor):
@@ -1343,6 +1343,7 @@ def preparar_cartoes_do_ps2(pasta_sistema, cartoes=None):
         caminho = os.path.join(pasta, nome)
         if os.path.exists(caminho):
             continue
+        temporario = None
         try:
             os.makedirs(pasta, exist_ok=True)
             temporario = "%s.%d.tmp" % (caminho, threading.get_ident())
@@ -1360,6 +1361,11 @@ def preparar_cartoes_do_ps2(pasta_sistema, cartoes=None):
             os.replace(temporario, caminho)
         except OSError as falha:
             print("[ARENA] Nao consegui criar o cartao %s do PS2: %s" % (nome, falha))
+            if temporario:
+                try:
+                    os.remove(temporario)        # o pedaco que ja foi gravado comeria o espaco que faltou (auditoria 5, DAD-01)
+                except OSError:
+                    pass
     return {"MemoryCards": {"Slot1_Enable": "true", "Slot1_Filename": nomes[1],
                             "Slot2_Enable": "true", "Slot2_Filename": nomes[2]}}
 

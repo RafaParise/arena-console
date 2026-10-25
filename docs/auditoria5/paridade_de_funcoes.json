@@ -1,0 +1,189 @@
+{
+ "rotas_da_tela": 79,
+ "rotas_do_servidor": 89,
+ "a_tela_chama_e_o_servidor_nao_tem": [],
+ "a_tela_chama_e_o_navegador_nao_atende": [
+  "/api/acervo/instalar",
+  "/api/acervo/remover",
+  "/api/acervo/salvar",
+  "/api/amigo/adicionar",
+  "/api/amigo/codigo",
+  "/api/amigo/remover",
+  "/api/amigo/testar",
+  "/api/android/aparelho",
+  "/api/android/pasta",
+  "/api/android/pastas",
+  "/api/android/permissao",
+  "/api/armazenamento",
+  "/api/armazenamento/listar",
+  "/api/armazenamento/medir",
+  "/api/armazenamento/procurar",
+  "/api/armazenamento/tirar",
+  "/api/armazenamento/usar",
+  "/api/backup",
+  "/api/baixados",
+  "/api/baixados/levar",
+  "/api/barreiras/fechar",
+  "/api/biblioteca-livre/instalar",
+  "/api/biblioteca-online/instalar",
+  "/api/bios/abrir",
+  "/api/bios/conferir",
+  "/api/bios/pasta",
+  "/api/capa/atualizar",
+  "/api/capa/enviar",
+  "/api/capas/buscar-faltando",
+  "/api/capas/parar",
+  "/api/celular/procurar",
+  "/api/cheat/adicionar",
+  "/api/cheat/alterar",
+  "/api/desempenho/zerar",
+  "/api/exportar",
+  "/api/importar",
+  "/api/jogo/arrumar",
+  "/api/jogo/console",
+  "/api/jogo/mover",
+  "/api/mala",
+  "/api/mapeamento/definir",
+  "/api/mapeamento/limpar",
+  "/api/mapeamento/padrao",
+  "/api/pacote/mostrar",
+  "/api/partida/cancelar",
+  "/api/partida/comecar",
+  "/api/partida/testar",
+  "/api/pasta/abrir",
+  "/api/pastas/criar",
+  "/api/perfil-controle",
+  "/api/perfil/novo",
+  "/api/reparar-runtime",
+  "/api/sincronizar"
+ ],
+ "elementos_so_windows_na_tela": [
+  "button btnAmigos",
+  "button btnAcervo",
+  "button btnSincronizar",
+  "div faixaTeclas",
+  "button btnComoColocar",
+  "button btnBaixados",
+  "button btnCriarPastas",
+  "button btnBuscarCapas",
+  "div (sem id)",
+  "button btnMultiplayerSelecionado",
+  "button btnEscolherConsole",
+  "button btnAtualizarCapa",
+  "label lblEnviarCapa",
+  "button rede",
+  "div (sem id)",
+  "button avancado",
+  "button controles",
+  "button emuladores",
+  "p (sem id)",
+  "div listaPerfis",
+  "div (sem id)",
+  "p explicaEscalaTela",
+  "div (sem id)",
+  "div (sem id)",
+  "div (sem id)",
+  "div (sem id)",
+  "div blocoCelularNoCabo",
+  "div blocoRuntime",
+  "div (sem id)",
+  "div (sem id)",
+  "div (sem id)",
+  "div (sem id)",
+  "div (sem id)",
+  "div (sem id)",
+  "div (sem id)",
+  "div (sem id)",
+  "button cheats",
+  "div (sem id)"
+ ],
+ "regra_que_esconde_so_windows": [],
+ "arquivos_do_servidor_com_chamada_do_windows": [
+  {
+   "arquivo": "servidor/adb_aparelho.py",
+   "chamadas": [
+    "CREATE_NO_WINDOW"
+   ],
+   "tem_guarda_de_sistema": true
+  },
+  {
+   "arquivo": "servidor/arena.py",
+   "chamadas": [
+    "CREATE_NO_WINDOW",
+    "powershell"
+   ],
+   "tem_guarda_de_sistema": true
+  },
+  {
+   "arquivo": "servidor/barreiras.py",
+   "chamadas": [
+    "CREATE_NO_WINDOW",
+    "powershell",
+    "taskkill"
+   ],
+   "tem_guarda_de_sistema": true
+  },
+  {
+   "arquivo": "servidor/controles.py",
+   "chamadas": [
+    "ctypes.windll"
+   ],
+   "tem_guarda_de_sistema": true
+  },
+  {
+   "arquivo": "servidor/graficos.py",
+   "chamadas": [
+    "ctypes.windll",
+    "powershell"
+   ],
+   "tem_guarda_de_sistema": true
+  },
+  {
+   "arquivo": "servidor/hardware.py",
+   "chamadas": [
+    "CREATE_NO_WINDOW",
+    "ctypes.windll",
+    "winreg",
+    "wmic"
+   ],
+   "tem_guarda_de_sistema": true
+  },
+  {
+   "arquivo": "servidor/lossless.py",
+   "chamadas": [
+    "CREATE_NO_WINDOW",
+    "taskkill",
+    "winreg"
+   ],
+   "tem_guarda_de_sistema": true
+  },
+  {
+   "arquivo": "servidor/navegadores.py",
+   "chamadas": [
+    "winreg"
+   ],
+   "tem_guarda_de_sistema": true
+  },
+  {
+   "arquivo": "servidor/partida.py",
+   "chamadas": [
+    "powershell"
+   ],
+   "tem_guarda_de_sistema": false
+  },
+  {
+   "arquivo": "servidor/plataforma.py",
+   "chamadas": [
+    "os.startfile"
+   ],
+   "tem_guarda_de_sistema": true
+  },
+  {
+   "arquivo": "servidor/portas.py",
+   "chamadas": [
+    "CREATE_NO_WINDOW"
+   ],
+   "tem_guarda_de_sistema": true
+  }
+ ]
+}

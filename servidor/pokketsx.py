@@ -26,6 +26,7 @@ Este modulo deixa o PokketSX pronto para abrir um jogo sem perguntar nada:
 """
 import os
 import shutil
+import threading
 import time
 
 import bios as bios_do_arena
@@ -140,7 +141,7 @@ def levar_as_bios(caminho_executavel, pasta_sistema):
 def _gravar_bytes(caminho, dados):
     """Grava sem deixar o arquivo pela metade (um temporario, depois a troca)."""
     os.makedirs(os.path.dirname(caminho), exist_ok=True)
-    temporario = caminho + ".tmp"
+    temporario = "%s.%d.tmp" % (caminho, threading.get_ident())   # um por thread: duas gravacoes juntas nao se misturam
     with open(temporario, "wb") as arquivo:
         arquivo.write(dados)
         arquivo.flush()

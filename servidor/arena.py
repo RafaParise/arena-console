@@ -3349,7 +3349,12 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
                 print("[ARENA] Lossless Scaling aberto junto com o jogo.")
                 time.sleep(2)
             # Os programas companheiros que a pessoa pediu em Acessorios (hoje: o DreamPotato, o VMU de verdade do Dreamcast).
-            abertos = companheiros.abrir_todos(acessorios.companheiros(config.get("acessorios"), jogo["plataforma"]))
+            pedidos = acessorios.companheiros(config.get("acessorios"), jogo["plataforma"])
+            abertos = companheiros.abrir_todos(pedidos)
+            for pedido in pedidos:
+                if pedido not in abertos and companheiros.achar(pedido) is None:
+                    print("[ARENA] %s foi pedido em Acessorios, mas nao esta em emuladores\\%s (ou nao ha versao para este sistema): "
+                          "o jogo abre sem ele." % (companheiros.PROGRAMAS[pedido]["nome"], companheiros.PROGRAMAS[pedido]["pasta"]))
             if abertos:
                 print("[ARENA] Aberto junto com o jogo: %s." % ", ".join(companheiros.PROGRAMAS[p]["nome"] for p in abertos))
                 time.sleep(1.5)
@@ -5123,6 +5128,9 @@ def dentro_da_pasta(caminho, pasta):
 # /api/amigo/codigo grava na lista de amigos) e passava a receber, na
 # sincronizacao, os recordes e as sessoes dele; e o /api/amigo/testar fazia
 # este computador procurar qualquer endereco a pedido de fora.
+# Quando o ARENA trocou o proprio codigo de aparelho por pedido de fora (no maximo uma vez por hora: REDE-02).
+_TROCA_DE_CODIGO = {"em": 0.0}
+
 ROTAS_REDE_EXTERNA = frozenset((
     "/api/colegas",         # GET - quem esta online, pra tela de amigos
     "/api/ranking",         # GET - placar compartilhado
@@ -5837,7 +5845,7 @@ class Manipulador(BaseHTTPRequestHandler):
 
         if caminho == "/api/armazenamento/usar":
             # As pastas de jogos do proprio ARENA (livres, turma, pessoais) nao entram de novo pelo cartao.
-            proprias = [os.path.join(PASTA_JOGOS, o) for o in indexador.ORIGENS
+            proprias = [os.path.join(PASTA_JOGOS, o) for o in list(indexador.ORIGENS)
                         if not o.startswith(armazenamento.PREFIXO)]
             nome = str(dados.get("nome") or "").strip()[:40] or None
             _novos, erro = armazenamento.adicionar(str(dados.get("caminho") or ""), nome=nome, proprias=proprias)
@@ -5966,6 +5974,14 @@ class Manipulador(BaseHTTPRequestHandler):
                 meus = {e["ip"] for e in enderecos_locais()} | {"127.0.0.1"}
 
                 if origem not in meus:
+                    # No maximo uma troca por hora: o codigo e' anunciado em claro na rede, e sem este limite qualquer
+                    # colega o faria mudar a cada segundo (auditoria 5, REDE-02). O caso real (dois PCs da mesma
+                    # imagem de laboratorio) se resolve na primeira troca.
+                    if time.time() - _TROCA_DE_CODIGO["em"] < 3600:
+                        return self.erro(
+                            "O código de aparelho está repetido, mas o meu já foi trocado há pouco. "
+                            "Tente de novo daqui a uma hora.", 409)
+                    _TROCA_DE_CODIGO["em"] = time.time()
                     config = carregar_config()
                     novo = uuid.uuid4().hex[:12]
                     print("[ARENA] Codigo repetido com %s. Troquei o nosso "
@@ -6261,6 +6277,10 @@ class Manipulador(BaseHTTPRequestHandler):
             porta_dele = partes.port or PORTA
             if not endereco:
                 return self.erro(ENDERECO_ESTRANHO if bruto else "Informe o endereço do colega.")
+            if not self.pedido_e_local():
+                # Pedido de fora (rede liberada): so se testa QUEM PEDIU, na porta de sempre. Com o endereco do corpo, qualquer
+                # colega faria este computador varrer portas da rede da escola (auditoria 5, REDE-01).
+                endereco, porta_dele = self.client_address[0], PORTA
 
             resultado = {"endereco": endereco, "arena": False,
                          "partida": False, "arquivo": None}

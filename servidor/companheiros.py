@@ -83,8 +83,8 @@ def fechar_os_que_o_arena_abriu(espera=6.0):
                 if processo.poll() is None:
                     processo.kill()
                     processo.wait(5)
-            except OSError:
-                pass
+            except (OSError, subprocess.TimeoutExpired):
+                pass                     # um que nao fecha nao impede de fechar os outros
         fechados.append(programa)
     return fechados
 
