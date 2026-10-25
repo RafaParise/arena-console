@@ -216,7 +216,7 @@ professor da rede estadual de SP.
   Respostas diretas. Quando algo não for possível, diga na hora, com o
   motivo técnico. Diagnóstico por eliminação.
 - **Economize tokens:**
-  - Não leia arquivo grande inteiro (o `arena.py` tem cerca de 6.700
+  - Não leia arquivo grande inteiro (o `arena.py` tem cerca de 8.200
     linhas): use a busca e leia só o trecho.
   - Não use agentes nem workflows sem pedido.
   - Use comandos curtos. Operação de vários passos vira um script `.py` em

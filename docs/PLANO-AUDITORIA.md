@@ -711,10 +711,9 @@ Após implementar tudo que solicitei e tudo estiver funcionando em todas as vers
 
 - [x] Antes: o que falta e o que só o Rafael faz (resposta de 24/10; `docs\PENDENCIAS.md`)
 - [x] Implementação: PokketSX como jeito a mais do PS1 (`63347b5`) e cartão único do PocketStation (`094cfe6`)
-- [ ] Fase 1 — Paridade função por função (PC × Linux × Android × Chromebook)
-- [ ] Fase 2 — Auditoria por domínio (front-end, back-end, banco e modelagem, lógica e linguagem, redes e segurança,
-  processos) e revisão do código novo desde a auditoria 4
-- [ ] Fase 3 — Consertos, bateria e matriz de paridade de novo
+- [x] Fase 1 — Paridade função por função (PC × Linux × Android × Chromebook): por script (`ferramentas\paridade_de_funcoes.py`); os 5 revisores da primeira tentativa morreram no limite da sessão sem resultado
+- [x] Fase 2 — Auditoria por domínio: front-end medido (10 problemas, 0 agora), redes/back-end/código novo por 3 revisores com teto, banco e processos por leitura minha; 5 achados conferidos e consertados
+- [x] Fase 3 — Consertos (`2994d04`, `d83cf42`), bateria 987 (a que falha, só com a máquina carregada) e matriz de paridade
 - [ ] Fase 4 — APKs (arm64 e x86_64, com a biblioteca do RetroArch x86_64 de 25/10) montados e instalados no celular
-- [ ] Fase 5 — Relatório (`docs\RELATORIO-AUDITORIA-5.md`)
+- [x] Fase 5 — Relatório (`docs\RELATORIO-AUDITORIA-5.md`)
 - [ ] Por último: a rodada final, os testes com os controles do Rafael e as etapas manuais
