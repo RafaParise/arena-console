@@ -41,13 +41,14 @@
   --espera-texto:   #3742fa;   /* o azul ja passa no fundo claro (6,3:1) */
   --bloqueado:      #9c8871;
   --erro:           #ff4757;   /* vermelho SNES Street Fighter */
+  --erro-texto:     #c4162a;   /* o mesmo vermelho, escuro, para TEXTO no tema claro (5,9:1 no branco) */
 
   /* ---- Tipografia (so fontes que ja vem no Windows) ---- */
   --fonte-titulo:   "Courier New", "Cascadia Mono", monospace;
   --fonte-texto:    "Segoe UI", system-ui, sans-serif;
   --fonte-numero:   "Consolas", "Cascadia Mono", monospace;
 
-  --t-micro:        0.72rem;
+  --t-micro:        0.75rem;
   --t-peq:          0.82rem;
   --t-base:         0.94rem;
   --t-med:          1.15rem;
@@ -63,6 +64,7 @@
 }
 
 body[data-tema="escuro"] {
+  --erro-texto: #ff6b78;
   --fundo: #0b0d17;
   --painel: #161a2d;
   --painel-alto: #1e2440;
@@ -198,6 +200,8 @@ code {
 .marca-icone { align-self: center; width: 34px; height: 34px; border-radius: 9px; flex-shrink: 0; }
 
 .marca-nome {
+  margin: 0;                   /* e' um h1 (um titulo principal por pagina) */
+  line-height: inherit;
   font-family: var(--fonte-titulo);
   font-size: var(--t-grande);
   font-weight: 600;
@@ -850,7 +854,7 @@ input::placeholder { color: var(--texto-apagado); }
   margin-top: 4px;
   padding: 2px 8px;
   border-radius: 10px;
-  font-size: 0.72rem;          /* era 0,66rem (10,6 px): letra minima da tela, 11 px */
+  font-size: 0.75rem;          /* era 0,66rem (10,6 px): letra minima da tela, 12 px */
   font-weight: 600;
   letter-spacing: 0.02em;
 }
@@ -1112,18 +1116,18 @@ input::placeholder { color: var(--texto-apagado); }
 .chave {
   position: relative;
   width: 40px;
-  height: 22px;
+  height: 24px;               /* era 22: a WCAG 2.2 pede alvo de pelo menos 24 x 24 */
   background: var(--borda-forte);
   border: 0;
-  border-radius: 11px;
+  border-radius: 12px;
   cursor: pointer;
   transition: background var(--transicao);
 }
 .chave::after {
   content: "";
   position: absolute;
-  top: 3px;
-  left: 3px;
+  top: 4px;
+  left: 4px;
   width: 16px;
   height: 16px;
   border-radius: 50%;
@@ -1317,7 +1321,7 @@ input::placeholder { color: var(--texto-apagado); }
   background: var(--espera);
   color: #ffffff;              /* no azul: 6,3:1 (o marrom de antes dava 2,9:1) */
   font-family: var(--fonte-numero);
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 700;
   text-align: center;
   line-height: 18px;
@@ -1539,7 +1543,7 @@ input::placeholder { color: var(--texto-apagado); }
   margin-top: 3px;
   padding: 1px 7px;
   border-radius: 10px;
-  font-size: 0.72rem;          /* era 0,66rem (10,6 px): letra minima da tela, 11 px */
+  font-size: 0.75rem;          /* era 0,66rem (10,6 px): letra minima da tela, 12 px */
   font-weight: 600;
   letter-spacing: 0.02em;
 }
@@ -1708,7 +1712,7 @@ input::placeholder { color: var(--texto-apagado); }
   background: var(--azul-escuro);
   color: var(--destaque-texto);
   font-family: var(--fonte-numero);
-  font-size: 0.72rem;          /* era 0,62rem (9,9 px) */
+  font-size: 0.75rem;          /* era 0,62rem (9,9 px) */
 }
 
 /* ============ ABA AVANCADA: recursos com explicacao e exemplo ============ */
@@ -1724,7 +1728,7 @@ input::placeholder { color: var(--texto-apagado); }
 .custo {
   padding: 0 5px;
   border-radius: 8px;
-  font-size: 0.72rem;          /* era 0,6rem (9,6 px): letra minima da tela, 11 px */
+  font-size: 0.75rem;          /* era 0,6rem (9,6 px): letra minima da tela, 12 px */
   font-weight: 600;
   vertical-align: 1px;
 }
@@ -1740,7 +1744,8 @@ input::placeholder { color: var(--texto-apagado); }
   cursor: pointer;
   font-family: var(--fonte-texto);
   font-size: var(--t-micro);
-  padding: 2px 0;
+  min-height: 24px;            /* alvo minimo da WCAG 2.2 */
+  padding: 4px 0;
   text-decoration: underline;
 }
 .opcao-exemplo-botao[hidden] { display: none; }
@@ -1928,7 +1933,7 @@ input::placeholder { color: var(--texto-apagado); }
 .como-colocar dd { margin: 0; overflow-wrap: anywhere; }
 .como-colocar code { font-size: 0.92em; }
 .como-colocar .bios-ok, .lista-bios .bios-ok { color: var(--ok, #2ed573); }
-.como-colocar .bios-falta, .lista-bios .bios-falta { color: var(--erro); }
+.como-colocar .bios-falta, .lista-bios .bios-falta { color: var(--erro-texto); }
 .como-colocar .bios-outra, .lista-bios .bios-outra { color: var(--aviso, #e0a030); }
 .lista-bios .bios-nada { color: var(--texto-apagado); }
 
@@ -1939,7 +1944,11 @@ input::placeholder { color: var(--texto-apagado); }
 .bios-itens li { overflow-wrap: anywhere; }
 .controle-tipo.selo-ok { background: #1e5b3c; color: #b9f5d2; }
 .controle-tipo.selo-falta { background: #6b2430; color: #ffd0d8; }
-.controle-tipo.selo-neutro { background: var(--borda); color: var(--texto-fraco); }
+.controle-tipo.selo-neutro { background: var(--borda); color: var(--texto); }   /* texto-fraco dava 4,06:1 */
+
+/* caixas de marcar com 24 px (alvo minimo da WCAG 2.2) */
+input[type="checkbox"] { width: 1.5rem; height: 1.5rem; flex-shrink: 0; }
+.controle-tipo.selo-apagado { background: transparent; border: 1px solid var(--borda-forte); color: var(--texto-fraco); }
 .como-colocar ul { margin: 0.2rem 0 0 1.1rem; padding: 0; }
 @media (max-width: 560px) {
   .como-colocar dl { grid-template-columns: 1fr; }

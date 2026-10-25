@@ -633,9 +633,9 @@ function linhaDoJogo(jogo) {
   item.dataset.jogo = jogo.id;
   item.classList.toggle("jogo--selecionado", estado.jogoSelecionado?.id === jogo.id);
   // Sem isto, quem usa só o teclado não consegue abrir o painel de detalhes.
+  // (Sem role="button": o item tem botoes dentro, e botao dentro de botao quebra o leitor de tela; axe 25/10.)
   item.tabIndex = 0;
-  item.setAttribute("role", "button");
-  item.setAttribute("aria-label", `Ver detalhes de ${jogo.titulo}`);
+  item.title = `Ver detalhes de ${jogo.titulo}`;
   item.addEventListener("keydown", (evento) => {
     if (evento.target !== item) return;
     if (evento.key === "Enter" || evento.key === " ") {
@@ -3160,7 +3160,7 @@ function desenharExternos(lista) {
     selo.textContent = item.instalado
       ? (item.falta ? "incompleto" : (item.extra ? "opcional" : "em uso"))
       : (item.compactado_pendente ? "falta extrair" : "não instalado");
-    if (!item.instalado || item.falta) selo.style.opacity = "0.55";
+    if (!item.instalado || item.falta) selo.classList.add("selo-apagado");   // era opacity 0.55: o texto perdia contraste
 
     linha.append(titulo, nota, selo);
     lote.append(linha);

@@ -1,0 +1,412 @@
+{
+ "modulos_maiores": [
+  {
+   "arquivo": "servidor/arena.py",
+   "linhas": 8192
+  },
+  {
+   "arquivo": "servidor/graficos.py",
+   "linhas": 3457
+  },
+  {
+   "arquivo": "servidor/bios.py",
+   "linhas": 1754
+  },
+  {
+   "arquivo": "servidor/hardware.py",
+   "linhas": 1202
+  },
+  {
+   "arquivo": "servidor/indexador.py",
+   "linhas": 1200
+  },
+  {
+   "arquivo": "ferramentas/medir_arena.py",
+   "linhas": 1091
+  },
+  {
+   "arquivo": "ferramentas/montar_versao_alunos.py",
+   "linhas": 1062
+  },
+  {
+   "arquivo": "servidor/barreiras.py",
+   "linhas": 1046
+  },
+  {
+   "arquivo": "ferramentas/coletar_maquina.py",
+   "linhas": 959
+  },
+  {
+   "arquivo": "servidor/adb_aparelho.py",
+   "linhas": 881
+  },
+  {
+   "arquivo": "servidor/plataforma.py",
+   "linhas": 781
+  },
+  {
+   "arquivo": "ferramentas/montar_android.py",
+   "linhas": 726
+  },
+  {
+   "arquivo": "servidor/diagnostico.py",
+   "linhas": 653
+  },
+  {
+   "arquivo": "servidor/capas_online.py",
+   "linhas": 633
+  },
+  {
+   "arquivo": "servidor/controles.py",
+   "linhas": 605
+  }
+ ],
+ "total_de_linhas_do_servidor": 29320,
+ "funcoes_mais_longas": [
+  {
+   "arquivo": "servidor/arena.py",
+   "funcao": "api_post",
+   "linha": 5893,
+   "linhas": 1591,
+   "complexidade": 441
+  },
+  {
+   "arquivo": "servidor/arena.py",
+   "funcao": "executar_jogo",
+   "linha": 2868,
+   "linhas": 588,
+   "complexidade": 140
+  },
+  {
+   "arquivo": "servidor/arena.py",
+   "funcao": "api_get",
+   "linha": 5345,
+   "linhas": 436,
+   "complexidade": 88
+  },
+  {
+   "arquivo": "servidor/indexador.py",
+   "funcao": "varrer_pasta",
+   "linha": 776,
+   "linhas": 290,
+   "complexidade": 62
+  },
+  {
+   "arquivo": "servidor/barreiras.py",
+   "funcao": "avaliar",
+   "linha": 339,
+   "linhas": 253,
+   "complexidade": 102
+  },
+  {
+   "arquivo": "servidor/arena.py",
+   "funcao": "principal",
+   "linha": 7958,
+   "linhas": 230,
+   "complexidade": 42
+  },
+  {
+   "arquivo": "ferramentas/montar_versao_alunos.py",
+   "funcao": "montar",
+   "linha": 417,
+   "linhas": 221,
+   "complexidade": 76
+  },
+  {
+   "arquivo": "servidor/arena.py",
+   "funcao": "gravar_override",
+   "linha": 1930,
+   "linhas": 202,
+   "complexidade": 33
+  },
+  {
+   "arquivo": "ferramentas/lista_de_terceiros.py",
+   "funcao": "montar",
+   "linha": 204,
+   "linhas": 188,
+   "complexidade": 35
+  },
+  {
+   "arquivo": "servidor/graficos.py",
+   "funcao": "escrever_config_pcsx2",
+   "linha": 2081,
+   "linhas": 185,
+   "complexidade": 36
+  },
+  {
+   "arquivo": "ferramentas/medir_arena.py",
+   "funcao": "medir_servidor",
+   "linha": 305,
+   "linhas": 179,
+   "complexidade": 36
+  },
+  {
+   "arquivo": "ferramentas/conferir_antes_de_publicar.py",
+   "funcao": "principal",
+   "linha": 243,
+   "linhas": 175,
+   "complexidade": 64
+  },
+  {
+   "arquivo": "ferramentas/gravar_fundo_gif.py",
+   "funcao": "principal",
+   "linha": 221,
+   "linhas": 164,
+   "complexidade": 41
+  },
+  {
+   "arquivo": "ferramentas/coletar_maquina.py",
+   "funcao": "escrever_resumo",
+   "linha": 754,
+   "linhas": 162,
+   "complexidade": 66
+  },
+  {
+   "arquivo": "servidor/arena.py",
+   "funcao": "ler_config_do_disco",
+   "linha": 1387,
+   "linhas": 138,
+   "complexidade": 49
+  },
+  {
+   "arquivo": "servidor/motivo_do_erro.py",
+   "funcao": "analisar",
+   "linha": 212,
+   "linhas": 135,
+   "complexidade": 72
+  },
+  {
+   "arquivo": "ferramentas/medir_arena.py",
+   "funcao": "escrever_resumo",
+   "linha": 892,
+   "linhas": 131,
+   "complexidade": 39
+  },
+  {
+   "arquivo": "ferramentas/medir_arena.py",
+   "funcao": "medir_jogo",
+   "linha": 573,
+   "linhas": 126,
+   "complexidade": 29
+  },
+  {
+   "arquivo": "servidor/arena.py",
+   "funcao": "avaliar_plataformas",
+   "linha": 2193,
+   "linhas": 124,
+   "complexidade": 28
+  },
+  {
+   "arquivo": "ferramentas/montar_versao_alunos.py",
+   "funcao": "conferir",
+   "linha": 739,
+   "linhas": 115,
+   "complexidade": 45
+  }
+ ],
+ "funcoes_mais_complexas": [
+  {
+   "arquivo": "servidor/arena.py",
+   "funcao": "api_post",
+   "linha": 5893,
+   "linhas": 1591,
+   "complexidade": 441
+  },
+  {
+   "arquivo": "servidor/arena.py",
+   "funcao": "executar_jogo",
+   "linha": 2868,
+   "linhas": 588,
+   "complexidade": 140
+  },
+  {
+   "arquivo": "servidor/barreiras.py",
+   "funcao": "avaliar",
+   "linha": 339,
+   "linhas": 253,
+   "complexidade": 102
+  },
+  {
+   "arquivo": "servidor/arena.py",
+   "funcao": "api_get",
+   "linha": 5345,
+   "linhas": 436,
+   "complexidade": 88
+  },
+  {
+   "arquivo": "ferramentas/montar_versao_alunos.py",
+   "funcao": "montar",
+   "linha": 417,
+   "linhas": 221,
+   "complexidade": 76
+  },
+  {
+   "arquivo": "servidor/motivo_do_erro.py",
+   "funcao": "analisar",
+   "linha": 212,
+   "linhas": 135,
+   "complexidade": 72
+  },
+  {
+   "arquivo": "ferramentas/coletar_maquina.py",
+   "funcao": "escrever_resumo",
+   "linha": 754,
+   "linhas": 162,
+   "complexidade": 66
+  },
+  {
+   "arquivo": "ferramentas/conferir_antes_de_publicar.py",
+   "funcao": "principal",
+   "linha": 243,
+   "linhas": 175,
+   "complexidade": 64
+  },
+  {
+   "arquivo": "servidor/indexador.py",
+   "funcao": "varrer_pasta",
+   "linha": 776,
+   "linhas": 290,
+   "complexidade": 62
+  },
+  {
+   "arquivo": "servidor/adb_aparelho.py",
+   "funcao": "linhas_do_painel",
+   "linha": 662,
+   "linhas": 102,
+   "complexidade": 56
+  },
+  {
+   "arquivo": "servidor/arena.py",
+   "funcao": "ler_config_do_disco",
+   "linha": 1387,
+   "linhas": 138,
+   "complexidade": 49
+  },
+  {
+   "arquivo": "servidor/barreiras.py",
+   "funcao": "avaliar_linux",
+   "linha": 819,
+   "linhas": 104,
+   "complexidade": 47
+  },
+  {
+   "arquivo": "servidor/bios.py",
+   "funcao": "_candidatos",
+   "linha": 1162,
+   "linhas": 111,
+   "complexidade": 45
+  },
+  {
+   "arquivo": "ferramentas/montar_versao_alunos.py",
+   "funcao": "conferir",
+   "linha": 739,
+   "linhas": 115,
+   "complexidade": 45
+  },
+  {
+   "arquivo": "servidor/arena.py",
+   "funcao": "principal",
+   "linha": 7958,
+   "linhas": 230,
+   "complexidade": 42
+  },
+  {
+   "arquivo": "servidor/capas_online.py",
+   "funcao": "buscar_e_baixar",
+   "linha": 527,
+   "linhas": 106,
+   "complexidade": 42
+  },
+  {
+   "arquivo": "ferramentas/gravar_fundo_gif.py",
+   "funcao": "principal",
+   "linha": 221,
+   "linhas": 164,
+   "complexidade": 41
+  },
+  {
+   "arquivo": "ferramentas/medir_arena.py",
+   "funcao": "escrever_resumo",
+   "linha": 892,
+   "linhas": 131,
+   "complexidade": 39
+  },
+  {
+   "arquivo": "ferramentas/metricas_de_codigo.py",
+   "funcao": "main",
+   "linha": 56,
+   "linhas": 94,
+   "complexidade": 39
+  },
+  {
+   "arquivo": "servidor/graficos.py",
+   "funcao": "escrever_config_pcsx2",
+   "linha": 2081,
+   "linhas": 185,
+   "complexidade": 36
+  }
+ ],
+ "funcoes_acima_de_150_linhas": 14,
+ "funcoes_com_complexidade_acima_de_30": 30,
+ "codigo_morto_provavel": [],
+ "modulos_do_servidor_sem_teste_que_os_cite": [],
+ "excecoes_engolidas": [
+  {
+   "arquivo": "servidor/arena.py",
+   "linha": 2633,
+   "tipo": "except Exception: pass"
+  },
+  {
+   "arquivo": "servidor/arena.py",
+   "linha": 6308,
+   "tipo": "except Exception: pass"
+  },
+  {
+   "arquivo": "servidor/arrumar.py",
+   "linha": 509,
+   "tipo": "except Exception: pass"
+  },
+  {
+   "arquivo": "servidor/hardware.py",
+   "linha": 517,
+   "tipo": "except Exception: pass"
+  },
+  {
+   "arquivo": "servidor/hardware.py",
+   "linha": 665,
+   "tipo": "except Exception: pass"
+  },
+  {
+   "arquivo": "servidor/hardware.py",
+   "linha": 678,
+   "tipo": "except Exception: pass"
+  },
+  {
+   "arquivo": "servidor/hardware.py",
+   "linha": 483,
+   "tipo": "except Exception: pass"
+  },
+  {
+   "arquivo": "ferramentas/coletar_maquina.py",
+   "linha": 118,
+   "tipo": "except Exception: pass"
+  },
+  {
+   "arquivo": "ferramentas/medir_arena.py",
+   "linha": 480,
+   "tipo": "except Exception: pass"
+  }
+ ],
+ "pendencias_no_codigo": [
+  {
+   "arquivo": "servidor/indexador.py",
+   "linha": 476,
+   "texto": "# TODO arquivo .iso, .chd e .cue virava Sega CD - inclusive jogo de"
+  },
+  {
+   "arquivo": "ferramentas/metricas_de_codigo.py",
+   "linha": 102,
+   "texto": "if re.search(r\"#.*\\b(TODO|FIXME|XXX|HACK)\\b\", linha):"
+  }
+ ]
+}

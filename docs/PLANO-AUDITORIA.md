@@ -668,3 +668,53 @@ Gradle nem biblioteca nova); ferramentas e testes em Python puro.
   Linux pela bateria no WSL (ver relatório)
 - [x] Fase 8 — Relatório (`docs\RELATORIO-AUDITORIA-4.md`) com as ações
   manuais no fim; juntar ao `main` e a versão nova esperam o Rafael
+
+
+## Auditoria 5 (24/10/2026 e 25/10/2026) — pedido do Rafael, sem resumir
+
+Os pedidos estão abaixo inteiros, sem resumir, entre as linhas de `====`.
+
+==========================================================================
+
+Após implementar tudo que solicitei e tudo estiver funcionando em todas as versões, por favor revise minuciosamente todas as funções e recursos que existe no arena de pc e garanta que nenhum ficou de fora de todas as versões, só então faça uma auditoria completa, utilize de todas as ferramentas, skills, plugins e pesquise as melhroes formas, ordem, estratégias e metodos mais sofisticados para garantir que não haverá problemas, bugs, fmções que funcionavam e agora não funcionam por exemplo, auditoria, de front edn, back end, modelagem e banco de dados, lógica e a linguagem da programação, redes e segurança da informação e todas as técnicas de processos de desenvolvimento de software e metodologias ágeis para otimizar a ordem e economizar tokens aplicando tudo que foi implementado no claude para distribuir a carga, trabalho, eficiênte e sem deixar nada para trás e além disso, antes de iniciar a auditoria deve revisar tudo que está pendente e eu precisaria fazer, só o que não tem como você fazer por favor. e eu tentei achar o pcketstaton.bin mas tudo que achei está nessa pasta Este Computador\Samsung A12 De Rafa Parise\Armazenamento interno\ARENA\BIOS e nesse caminho: C:\Projetos\Criador De Apps Pedagógicos\arena-console\BIOS siga da rodem que achar melhor
+
+==========================================================================
+
+**Mensagens seguintes, de 24/10 e 25/10/2026, sem resumir:**
+
+> 1 - DEIXE ISSO PARA O FINAL DO PROJEOT, DEPOIS DA AUDITORIA IMPLEMENTAÇÃO E TUDO - 2 - QUERO SIM POR FAVOR - 3 - DEIXO PARA DEPOIS, ALÉM DISSO QUE MAIS FALTA FAZER, SÓ ME RESPONDA POR FAVOR
+
+> faça tudo sozinho até o final por favor
+
+> Continuar por favor, telefone em depuração e com os gamesir t4 nova lite preto p1 e roxo p2, gamesir g7 he conectado como player 1 no pc para testes
+
+> mas testes e etapas manuais dexei sempre por ultimo por favor ]
+
+**Leitura adotada:**
+
+- A ordem é a do Rafael: **(1)** terminar de implementar (o PokketSX como jeito a mais do PS1 e o cartão único do
+  PocketStation, feitos); **(2)** rever função por função do ARENA do PC e conferir que existe, adaptada ou explicada,
+  no Android, no Linux e no Chromebook; **(3)** só então a auditoria completa; **(4)** consertar, montar os APKs e
+  instalar no celular; **(5)** **por último**, os testes que dependem dele (os controles GameSir ligados no PC e no
+  celular, o Saturn e o PS1 com controle de verdade, o Chromebook da escola) e as etapas manuais. Nada disso passa
+  na frente do resto, mesmo com os controles já ligados.
+- "Distribuir a carga e economizar tokens": **medir antes de pedir opinião** (a bateria, a auditoria estática, o
+  axe-core, o contraste calculado, as fotos em quatro tamanhos), e só então revisores em paralelo, cada um com o seu
+  arquivo de saída (lição de 24/10: três agentes no mesmo arquivo perderam os achados) e cada achado de gravidade
+  alta ou média conferido por um cético que tenta refutar. O que o limite da sessão cortar volta pelo `resume`.
+- Os domínios pedidos: front-end, back-end, modelagem e banco de dados, lógica e linguagem, redes e segurança, e
+  processos de desenvolvimento (SDLC e métodos ágeis). A auditoria de segurança do ramo, recomendada ao fim da
+  auditoria 4, entra aqui. Princípio: "função que funcionava e agora não funciona" se pega com a bateria, a matriz
+  de paridade e a rodada final; as três rodam de novo no fim.
+
+### Progresso da auditoria 5
+
+- [x] Antes: o que falta e o que só o Rafael faz (resposta de 24/10; `docs\PENDENCIAS.md`)
+- [x] Implementação: PokketSX como jeito a mais do PS1 (`63347b5`) e cartão único do PocketStation (`094cfe6`)
+- [ ] Fase 1 — Paridade função por função (PC × Linux × Android × Chromebook)
+- [ ] Fase 2 — Auditoria por domínio (front-end, back-end, banco e modelagem, lógica e linguagem, redes e segurança,
+  processos) e revisão do código novo desde a auditoria 4
+- [ ] Fase 3 — Consertos, bateria e matriz de paridade de novo
+- [ ] Fase 4 — APKs (arm64 e x86_64, com a biblioteca do RetroArch x86_64 de 25/10) montados e instalados no celular
+- [ ] Fase 5 — Relatório (`docs\RELATORIO-AUDITORIA-5.md`)
+- [ ] Por último: a rodada final, os testes com os controles do Rafael e as etapas manuais

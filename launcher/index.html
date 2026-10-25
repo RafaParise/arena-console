@@ -14,8 +14,8 @@
 </head>
 <body>
 
-<canvas id="galaxyCanvas"></canvas>
-<canvas id="fieldCanvas"></canvas>
+<canvas id="galaxyCanvas" aria-hidden="true"></canvas>
+<canvas id="fieldCanvas" aria-hidden="true"></canvas>
 
 <!-- Só aparece no "Visualizar animação": a tela some e fica só o fundo. -->
 <button class="botao" id="btnVoltarAnimacao" type="button" hidden
@@ -25,7 +25,7 @@
 <header class="painel-topo">
   <div class="marca">
     <img class="marca-icone" src="arena-icone-64.png" width="34" height="34" alt="">
-    <span class="marca-nome">ARENA</span>
+    <h1 class="marca-nome">ARENA</h1>
     <span class="marca-sub">central retrô da turma <b id="versao"></b></span>
     <button class="botao botao--mini" id="btnVerAnimacao" type="button" aria-label="Visualizar animação"
             title="Visualizar animação: esconde a tela inteira e deixa só o fundo animado (Esc volta)"><span
