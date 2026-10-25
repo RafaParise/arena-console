@@ -214,8 +214,8 @@ Falta (nesta ordem):
    "Como ligar o PlayStation?" (`servidor\pokketsx.py`; o ARENA leva as BIOS, cria o cartão na entrada 2 e escreve o
    `settings.ini`). **Não mostra a telinha do PocketStation** (só o Pokket mostra). Falta testar com um jogo que use o
    PocketStation e com controle de verdade.
-3. **Cartão único** do PocketStation entre o PS1 (PokketSX), o PS2 e o Pokket, com cópia de segurança: é o elo para o que se
-   faz num lado aparecer no outro (hoje é manual: copiar o `PocketStation.mcd` para `jogos\pessoais\PocketStation`).
+3. ~~**Cartão único** do PocketStation entre o PS1 (PokketSX) e o Pokket~~ **Feito em 25/10**: um arquivo só
+   (`retroarch\saves\Pokket\Meu PocketStation.srm`), com cópia de segurança. O PS2 fica de fora (não emula o aparelho).
 4. Pokket e VeMUlator já abrem no PC e no celular (BIOS: o `kernel.bin` do Rafael); falta testar com minijogos de verdade e no
    Chromebook; o APK já leva os dois núcleos (marcas em `ferramentas\android_nucleos.json`).
 5. Ler as opções dos núcleos que só as declaram depois de abrir um jogo (fceumm, fbneo, dolphin, mame2003).

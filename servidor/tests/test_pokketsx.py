@@ -281,12 +281,114 @@ class Config(Pasta):
         self.assertTrue(feito["config"])
         self.assertTrue(os.path.isfile(os.path.join(self.pasta, "portable.txt")))
         de_novo = pokketsx.preparar(self.exe, self.sistema)
-        self.assertEqual((de_novo["bios"], de_novo["cartao"], de_novo["config"]), ([], "", False))
+        self.assertEqual((de_novo["bios"], de_novo["cartao"], de_novo["config"]), ([], [], False))
 
     def test_erro_de_disco_volta_como_texto_e_nao_derruba(self):
         with mock.patch.object(pokketsx, "levar_as_bios", side_effect=PermissionError("somente leitura")):
             feito = pokketsx.preparar(self.exe, self.sistema)
         self.assertIn("somente leitura", feito["erro"])
+
+
+class CartaoUnico(Pasta):
+    """O cartao do PocketStation e' UM arquivo so: o save do "Meu PocketStation" no console PocketStation (Pokket) e a
+    entrada 2 do PokketSX. Nao ha copia entre os dois."""
+
+    def setUp(self):
+        super().setUp()
+        self.saves = os.path.join(self.base, "retroarch", "saves")
+        self.jogos = os.path.join(self.base, "jogos")
+        self.unico = os.path.join(self.saves, "Pokket", "Meu PocketStation.srm")
+        self.conteudo = os.path.join(self.jogos, "pessoais", "PocketStation", "Meu PocketStation.mcd")
+
+    def lido(self, caminho):
+        with open(caminho, "rb") as arquivo:
+            return arquivo.read()
+
+    def test_o_caminho_e_o_save_que_o_retroarch_guarda_do_conteudo(self):
+        """sort_savefiles_enable: retroarch\\saves\\<nome do nucleo>\\<nome do jogo>.srm. O nome do nucleo e' o do .info."""
+        with open(os.path.join(RAIZ, "retroarch", "info", "pokket_libretro.info"), encoding="utf-8") as arquivo:
+            nome_do_nucleo = next(l.split('"')[1] for l in arquivo if l.startswith("corename"))
+        self.assertEqual(pokketsx.PASTA_DO_POKKET, nome_do_nucleo)
+        self.assertEqual(pokketsx.caminho_do_cartao_unico(self.saves), self.unico)
+
+    def test_reconhece_o_jogo_pelo_nome(self):
+        self.assertTrue(pokketsx.e_o_cartao_unico(self.conteudo))
+        self.assertFalse(pokketsx.e_o_cartao_unico(os.path.join(self.jogos, "Aliens (1999).gme")))
+        self.assertFalse(pokketsx.e_o_cartao_unico(os.path.join(self.jogos, "Meu PocketStation 2.mcd")))
+
+    def test_o_pokketsx_recebe_o_caminho_relativo_a_pasta_memcards(self):
+        """Ele junta Card2Path com a pasta memcards e resolve os ".."; relativo para andar de pen drive."""
+        relativo = pokketsx.caminho_do_cartao_para_o_pokketsx(self.exe, self.saves)
+        self.assertEqual(relativo, os.path.join("..", "..", "..", "retroarch", "saves", "Pokket", "Meu PocketStation.srm"))
+        self.assertEqual(os.path.normpath(os.path.join(self.pasta, "memcards", relativo)), self.unico)
+
+    def test_em_outro_disco_fica_o_cartao_de_dentro_da_pasta_dele(self):
+        with mock.patch.object(pokketsx.os.path, "relpath", side_effect=ValueError("outro disco")):
+            self.assertEqual(pokketsx.caminho_do_cartao_para_o_pokketsx(self.exe, self.saves), pokketsx.NOME_DO_CARTAO)
+
+    def test_nasce_vazio_formatado_e_o_jogo_do_console_tambem(self):
+        criados = pokketsx.garantir_o_cartao_unico(self.exe, self.saves, self.jogos)
+        self.assertEqual(criados, [self.unico, self.conteudo])
+        for arquivo in criados:
+            conteudo = self.lido(arquivo)
+            self.assertEqual((len(conteudo), conteudo[:2]), (131072, b"MC"))
+
+    def test_nunca_troca_o_que_ja_existe(self):
+        pokketsx.garantir_o_cartao_unico(self.exe, self.saves, self.jogos)
+        with open(self.unico, "wb") as arquivo:
+            arquivo.write(b"MC" + b"saves da pessoa" * 8)
+        self.assertEqual(pokketsx.garantir_o_cartao_unico(self.exe, self.saves, self.jogos), [])
+        self.assertTrue(self.lido(self.unico).startswith(b"MCsaves da pessoa"))
+
+    def test_o_cartao_antigo_so_do_pokketsx_com_coisa_dentro_vira_o_unico(self):
+        """Quem ja tinha minijogos no memcards\\PocketStation.mcd nao perde nada."""
+        os.makedirs(os.path.join(self.pasta, "memcards"))
+        antigo = os.path.join(self.pasta, "memcards", pokketsx.NOME_DO_CARTAO)
+        com_coisa = bytearray(pokketsx.graficos.cartao_ps1_vazio())
+        com_coisa[8192:8200] = b"MINIJOGO"
+        with open(antigo, "wb") as arquivo:
+            arquivo.write(bytes(com_coisa))
+        pokketsx.garantir_o_cartao_unico(self.exe, self.saves, self.jogos)
+        self.assertEqual(self.lido(self.unico), bytes(com_coisa))
+        self.assertEqual(self.lido(antigo), bytes(com_coisa))               # o antigo fica como estava
+
+    def test_copia_de_seguranca_so_quando_mudou_e_guarda_as_mais_novas(self):
+        self.assertEqual(pokketsx.copia_de_seguranca(self.saves), "")       # sem cartao: nada a guardar
+        pokketsx.garantir_o_cartao_unico(self.exe, self.saves, self.jogos)
+        primeira = pokketsx.copia_de_seguranca(self.saves)
+        self.assertTrue(os.path.isfile(primeira))
+        self.assertEqual(pokketsx.copia_de_seguranca(self.saves), "")       # igual a ultima: nao repete
+        copias = os.path.join(self.saves, "Pokket", "copias")
+        for numero in range(8):
+            with open(self.unico, "wb") as arquivo:
+                arquivo.write(b"MC" + bytes([numero]) * 100)
+            # os nomes levam a hora: forca nomes diferentes (e mais novos que a primeira copia) sem esperar
+            with mock.patch.object(pokketsx.time, "strftime", return_value="29991231-23590%d" % numero):
+                self.assertTrue(pokketsx.copia_de_seguranca(self.saves))
+        guardadas = sorted(os.listdir(copias))
+        self.assertEqual(len(guardadas), pokketsx.COPIAS_GUARDADAS)
+        self.assertEqual(guardadas[-1], "Meu PocketStation-29991231-235907.srm")      # a mais nova ficou
+        self.assertNotIn(os.path.basename(primeira), guardadas)                         # a mais velha saiu
+
+    def test_preparar_usa_o_unico_e_a_copia_so_vem_a_partir_da_segunda_vez(self):
+        self.dar_as_bios()
+        primeira = pokketsx.preparar(self.exe, self.sistema, self.saves, self.jogos)
+        self.assertEqual(primeira["erro"], "")
+        self.assertEqual(primeira["cartao"], [self.unico, self.conteudo])
+        self.assertEqual(primeira["copia"], "")                              # acabou de nascer: nada a guardar
+        self.assertIn("Card2Path = " + os.path.join("..", "..", "..", "retroarch", "saves", "Pokket", "Meu PocketStation.srm"),
+                      self.ini().splitlines())
+        self.assertFalse(os.path.exists(os.path.join(self.pasta, "memcards", pokketsx.NOME_DO_CARTAO)))
+        with open(self.unico, "wb") as arquivo:                              # o Pokket mexeu no cartao
+            arquivo.write(b"MC" + b"minijogo novo" * 10)
+        segunda = pokketsx.preparar(self.exe, self.sistema, self.saves, self.jogos)
+        self.assertEqual((segunda["cartao"], segunda["config"]), ([], False))
+        self.assertTrue(os.path.isfile(segunda["copia"]))                    # a copia guarda o que havia antes do PokketSX
+
+    def test_sem_saves_e_jogos_o_cartao_segue_dentro_da_pasta_do_pokketsx(self):
+        feito = pokketsx.preparar(self.exe, self.sistema)
+        self.assertEqual(feito["cartao"], [os.path.join(self.pasta, "memcards", pokketsx.NOME_DO_CARTAO)])
+        self.assertIn("Card2Path = PocketStation.mcd", self.ini().splitlines())
 
 
 if __name__ == "__main__":

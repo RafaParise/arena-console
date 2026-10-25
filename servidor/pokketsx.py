@@ -17,17 +17,24 @@ SwanStation) continua pelo RetroArch.
 
 Este modulo deixa o PokketSX pronto para abrir um jogo sem perguntar nada:
   - as BIOS no lugar (a do PlayStation e a do PocketStation, levadas da pasta BIOS do ARENA);
-  - o cartao do PocketStation na entrada 2 (um arquivo so, memcards\PocketStation.mcd; a entrada 1 fica com o cartao
-    comum de cada jogo), a mesma divisao que o ARENA faz no PS2;
+  - o cartao do PocketStation na entrada 2 e a entrada 1 com o cartao comum de cada jogo (a mesma divisao que o ARENA
+    faz no PS2). O cartao do PocketStation e' UM ARQUIVO SO, o mesmo que o console PocketStation do ARENA (nucleo
+    Pokket) usa: retroarch\saves\Pokket\Meu PocketStation.srm. O que o jogo baixa para o aparelho (PokketSX) aparece
+    na telinha (Pokket) e o contrario, sem copiar nada entre os dois, e com copia de seguranca antes de cada uso;
   - o settings.ini sem o assistente de configuracao, sem pedir confirmacao ao fechar, sem atualizador nem Discord,
     com o F10 fechando o jogo (como no resto do ARENA) e o controle de verdade ligado.
 """
 import os
+import shutil
+import time
 
 import bios as bios_do_arena
 import graficos
 
-NOME_DO_CARTAO = "PocketStation.mcd"
+NOME_DO_CARTAO = "PocketStation.mcd"          # o cartao de dentro da pasta do PokketSX (so se nao houver o unico)
+NOME_DO_CARTAO_UNICO = "Meu PocketStation"    # o "jogo" do console PocketStation e o save dele (.srm)
+PASTA_DO_POKKET = "Pokket"                    # retroarch\saves\<nome do nucleo> (sort_savefiles_enable = true)
+COPIAS_GUARDADAS = 5
 NOME_DA_BIOS_POCKETSTATION = "pocketstation.bin"
 TAMANHO_DA_BIOS_PS1 = 524288          # 512 KB: a BIOS do PlayStation 1
 TAMANHO_DA_BIOS_POCKETSTATION = 16384  # 16 KB: o firmware do aparelho
@@ -116,7 +123,6 @@ def falta(caminho_executavel, pasta_sistema=None):
 def levar_as_bios(caminho_executavel, pasta_sistema):
     """Copia as BIOS do ARENA para a pasta bios\\ do PokketSX, que as acha sozinho pelo tamanho. So copia o que falta
     (se a pessoa ja pos a dela la, nada muda). Devolve os nomes copiados."""
-    import shutil
     destino = _pasta_de_bios(caminho_executavel)
     ps1, poc = _bios_do_arena(pasta_sistema)
     copiadas = []
@@ -131,16 +137,108 @@ def levar_as_bios(caminho_executavel, pasta_sistema):
     return copiadas
 
 
+def _gravar_bytes(caminho, dados):
+    """Grava sem deixar o arquivo pela metade (um temporario, depois a troca)."""
+    os.makedirs(os.path.dirname(caminho), exist_ok=True)
+    temporario = caminho + ".tmp"
+    with open(temporario, "wb") as arquivo:
+        arquivo.write(dados)
+        arquivo.flush()
+        os.fsync(arquivo.fileno())
+    os.replace(temporario, caminho)
+
+
 def garantir_o_cartao(caminho_executavel):
-    """O cartao do PocketStation (128 KB, o formato do cartao do PS1, o mesmo que o Pokket abre). Se ainda nao existe,
-    nasce formatado e vazio; nunca se troca um que ja exista. Devolve o caminho se criou, senao ""."""
+    """O cartao do PocketStation de dentro da pasta do PokketSX (128 KB, o formato do cartao do PS1). Se ainda nao
+    existe, nasce formatado e vazio; nunca se troca um que ja exista. Devolve o caminho se criou, senao ""."""
     cartao = os.path.join(os.path.dirname(caminho_executavel), "memcards", NOME_DO_CARTAO)
     if os.path.exists(cartao):
         return ""
-    os.makedirs(os.path.dirname(cartao), exist_ok=True)
-    with open(cartao, "wb") as arquivo:
-        arquivo.write(graficos.cartao_ps1_vazio())
+    _gravar_bytes(cartao, graficos.cartao_ps1_vazio())
     return cartao
+
+
+# ---------------------------------------------------------------------------
+# O cartao unico: o mesmo arquivo no PokketSX (entrada 2) e no console PocketStation (Pokket)
+# ---------------------------------------------------------------------------
+
+def caminho_do_cartao_unico(pasta_saves):
+    """retroarch\\saves\\Pokket\\Meu PocketStation.srm: o save que o RetroArch guarda do conteudo "Meu PocketStation"
+    (a pasta leva o nome do nucleo, Pokket). Um .srm do Pokket e' o cartao inteiro, byte a byte (128 KB)."""
+    return os.path.join(pasta_saves, PASTA_DO_POKKET, NOME_DO_CARTAO_UNICO + ".srm")
+
+
+def conteudo_do_cartao_unico(pasta_jogos):
+    """O "jogo" que aparece no console PocketStation do ARENA: um cartao vazio, so para o Pokket ter o que abrir (o que
+    vale e' o .srm dele, que o RetroArch poe por cima assim que existe)."""
+    return os.path.join(pasta_jogos, "pessoais", "PocketStation", NOME_DO_CARTAO_UNICO + ".mcd")
+
+
+def e_o_cartao_unico(caminho_do_jogo):
+    """Este jogo do console PocketStation e' o "Meu PocketStation"?"""
+    return os.path.splitext(os.path.basename(caminho_do_jogo))[0] == NOME_DO_CARTAO_UNICO
+
+
+def caminho_do_cartao_para_o_pokketsx(caminho_executavel, pasta_saves):
+    """O que vai em Card2Path: o caminho do cartao unico RELATIVO a pasta memcards do PokketSX (ele junta os dois e
+    resolve os ".."; o caminho absoluto sairia do pen drive). Em outro disco nao ha caminho relativo: fica o
+    cartao de dentro da pasta dele."""
+    try:
+        return os.path.relpath(caminho_do_cartao_unico(pasta_saves),
+                               os.path.join(os.path.dirname(caminho_executavel), "memcards"))
+    except ValueError:
+        return NOME_DO_CARTAO
+
+
+def garantir_o_cartao_unico(caminho_executavel, pasta_saves, pasta_jogos):
+    """Deixa os dois lados com o que abrir: o save (o cartao) e o "jogo" do console PocketStation. Nunca troca o que ja
+    existe. Se havia um cartao so do PokketSX (memcards\\PocketStation.mcd) com coisa dentro, ele vira o unico: nada
+    se perde. Devolve os caminhos criados."""
+    criados = []
+    vazio = graficos.cartao_ps1_vazio()
+    cartao = caminho_do_cartao_unico(pasta_saves)
+    if not os.path.exists(cartao):
+        dados = vazio
+        antigo = os.path.join(os.path.dirname(caminho_executavel), "memcards", NOME_DO_CARTAO)
+        try:
+            if os.path.getsize(antigo) == len(vazio):
+                with open(antigo, "rb") as arquivo:
+                    dados = arquivo.read()
+        except OSError:
+            pass
+        _gravar_bytes(cartao, dados)
+        criados.append(cartao)
+    conteudo = conteudo_do_cartao_unico(pasta_jogos)
+    if not os.path.exists(conteudo):
+        _gravar_bytes(conteudo, vazio)
+        criados.append(conteudo)
+    return criados
+
+
+def copia_de_seguranca(pasta_saves, quantas=COPIAS_GUARDADAS):
+    """Guarda uma copia do cartao unico em saves\\Pokket\\copias antes de um programa mexer nele (o PokketSX ou o Pokket).
+    So copia se o cartao mudou desde a ultima copia, e guarda as 'quantas' mais novas. Devolve o caminho da copia ou ""."""
+    cartao = caminho_do_cartao_unico(pasta_saves)
+    pasta = os.path.join(os.path.dirname(cartao), "copias")
+    try:
+        with open(cartao, "rb") as arquivo:
+            atual = arquivo.read()
+        antigas = sorted(n for n in os.listdir(pasta) if n.startswith(NOME_DO_CARTAO_UNICO) and n.endswith(".srm")) \
+            if os.path.isdir(pasta) else []
+        if antigas:
+            with open(os.path.join(pasta, antigas[-1]), "rb") as arquivo:
+                if arquivo.read() == atual:
+                    return ""
+        copia = os.path.join(pasta, "%s-%s.srm" % (NOME_DO_CARTAO_UNICO, time.strftime("%Y%m%d-%H%M%S")))
+        _gravar_bytes(copia, atual)
+        for velha in sorted(antigas + [os.path.basename(copia)])[:-quantas]:
+            try:
+                os.remove(os.path.join(pasta, velha))
+            except OSError:
+                pass
+        return copia
+    except OSError:
+        return ""
 
 
 # ---------------------------------------------------------------------------
@@ -184,7 +282,7 @@ def _com_o_controle(texto):
     return "\n".join(linhas) + "\n"
 
 
-def montar_config(texto, com_pocketstation=True):
+def montar_config(texto, com_pocketstation=True, cartao=NOME_DO_CARTAO):
     """O settings.ini que o ARENA quer, a partir do que ja existe (ou do texto vazio). O que a pessoa mexeu e o ARENA
     nao governa (qualidade da imagem, som...) fica como estava."""
     texto = graficos._trocar_chaves_ini(texto, "Main", {
@@ -197,7 +295,7 @@ def montar_config(texto, com_pocketstation=True):
     })
     texto = graficos._trocar_chaves_ini(texto, "AutoUpdater", {"CheckAtStartup": "false"})
     texto = graficos._trocar_chaves_ini(texto, "BIOS", {"SearchDirectory": "bios"})
-    cartoes = {"Card1PocketStation": "false", "Card2Type": "Shared", "Card2Path": NOME_DO_CARTAO,
+    cartoes = {"Card1PocketStation": "false", "Card2Type": "Shared", "Card2Path": cartao,
                "Card2PocketStation": "true" if com_pocketstation else "false"}
     if com_pocketstation:
         cartoes["PocketStationBiosPath"] = NOME_DA_BIOS_POCKETSTATION
@@ -209,30 +307,42 @@ def montar_config(texto, com_pocketstation=True):
     return _com_o_controle(texto)
 
 
-def escrever_config(caminho_executavel):
-    """Grava o settings.ini do PokketSX (do lado do .exe: o modo portatil). True se mudou alguma coisa."""
+def escrever_config(caminho_executavel, cartao=NOME_DO_CARTAO):
+    """Grava o settings.ini do PokketSX (do lado do .exe: o modo portatil). True se mudou alguma coisa. 'cartao' e' o
+    Card2Path: o cartao do PocketStation, relativo a pasta memcards dele."""
     arquivo = os.path.join(os.path.dirname(caminho_executavel), "settings.ini")
     antes = _ler(arquivo)
     com_pocketstation = bool(_por_tamanho(_pasta_de_bios(caminho_executavel), TAMANHO_DA_BIOS_POCKETSTATION))
-    depois = montar_config(antes, com_pocketstation)
+    depois = montar_config(antes, com_pocketstation, cartao)
     if depois.splitlines() == antes.splitlines():
         return False
     graficos.gravar_atomico(arquivo, depois)
     return True
 
 
-def preparar(caminho_executavel, pasta_sistema):
-    """Deixa o PokketSX pronto para abrir um jogo agora: modo portatil, as BIOS, o cartao e o settings.ini.
-    Devolve {"bios": [nomes copiados], "cartao": caminho criado ou "", "config": True se gravou, "erro": texto}."""
-    resultado = {"bios": [], "cartao": "", "config": False, "erro": ""}
+def preparar(caminho_executavel, pasta_sistema, pasta_saves=None, pasta_jogos=None):
+    """Deixa o PokketSX pronto para abrir um jogo agora: modo portatil, as BIOS, o cartao e o settings.ini. Com
+    'pasta_saves' e 'pasta_jogos' o cartao do PocketStation e' o UNICO (o mesmo do console PocketStation), com uma copia
+    de seguranca antes. Devolve {"bios": [nomes copiados], "cartao": [caminhos criados], "copia": caminho ou "",
+    "config": True se gravou, "erro": texto}."""
+    resultado = {"bios": [], "cartao": [], "copia": "", "config": False, "erro": ""}
     try:
         portatil = os.path.join(os.path.dirname(caminho_executavel), "portable.txt")
         if not os.path.exists(portatil):
             with open(portatil, "w", encoding="utf-8"):
                 pass
         resultado["bios"] = levar_as_bios(caminho_executavel, pasta_sistema)
-        resultado["cartao"] = garantir_o_cartao(caminho_executavel)
-        resultado["config"] = escrever_config(caminho_executavel)
+        cartao = NOME_DO_CARTAO
+        if pasta_saves and pasta_jogos:
+            cartao = caminho_do_cartao_para_o_pokketsx(caminho_executavel, pasta_saves)
+        if cartao == NOME_DO_CARTAO:
+            criado = garantir_o_cartao(caminho_executavel)
+            resultado["cartao"] = [criado] if criado else []
+        else:
+            resultado["cartao"] = garantir_o_cartao_unico(caminho_executavel, pasta_saves, pasta_jogos)
+            if caminho_do_cartao_unico(pasta_saves) not in resultado["cartao"]:     # o recem-criado nao tem o que guardar
+                resultado["copia"] = copia_de_seguranca(pasta_saves)
+        resultado["config"] = escrever_config(caminho_executavel, cartao)
     except OSError as falha:
         resultado["erro"] = str(falha)
     return resultado

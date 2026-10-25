@@ -111,16 +111,29 @@ uma pistola de luz só mira em jogo de pistola. Por isso cada acessório do cat�
   O núcleo dele tem essas funções (tela de 32×32, áudio de 8 kHz, cinco botões), mas nada da janela as usa: o aparelho
   roda "por dentro" do cartão [Provável: lido no código-fonte do PokketSX em 24/10/2026, por busca de texto em `src\`;
   não li os `.c` do núcleo]. O que o jogo faz com o PocketStation fica no cartão; para **ver** e **jogar** o minijogo na
-  telinha, o cartão tem que abrir no console **PocketStation** do ARENA (núcleo Pokket).
+  telinha, o cartão tem que abrir no console **PocketStation** do ARENA (núcleo Pokket): ver "Cartão único", abaixo.
   **Como usar:** abra um jogo de PlayStation e, na pergunta "Como ligar o PlayStation?", escolha **PokketSX (com
   PocketStation)** (marque "lembrar" se quiser; Ajustes → Emuladores troca depois). Ele só aparece na pergunta se
   `emuladores\PokketSX` existir; o PlayStation segue sendo do RetroArch (Jogar Junto, vários discos e o resto não mudam;
   no Jogar Junto a escolha lembrada do PokketSX não vale). **O que o ARENA faz sozinho** (`servidor\pokketsx.py`): leva
-  a BIOS do PlayStation e a do PocketStation para `emuladores\PokketSX\bios`, cria o cartão
-  `emuladores\PokketSX\memcards\PocketStation.mcd` (128 KB, formatado, nunca trocado) na **entrada 2** (a 1 fica com o
-  cartão comum de cada jogo; a mesma divisão do PS2), grava o `settings.ini` sem o assistente de configuração, sem
+  a BIOS do PlayStation e a do PocketStation para `emuladores\PokketSX\bios`, põe o cartão
+  do PocketStation (128 KB, formatado, nunca trocado) na **entrada 2** (a 1 fica com o cartão comum de cada jogo; a mesma
+  divisão do PS2; o cartão é o "cartão único", abaixo), grava o `settings.ini` sem o assistente de configuração, sem
   confirmar ao fechar, sem atualizador nem Discord, e abre em tela cheia com `-batch` (o programa fecha junto com o
   jogo). **F10 fecha o jogo.** Um jogador só.
+  **Cartão único** [Certo, feito e testado em 25/10/2026]: o cartão da entrada 2 do PokketSX e o do console PocketStation
+  (Pokket) são **o mesmo arquivo**, `retroarch\saves\Pokket\Meu PocketStation.srm`: o PokketSX recebe o caminho relativo
+  no `Card2Path` (`..\..\..\retroarch\saves\Pokket\Meu PocketStation.srm`, que ele junta à pasta `memcards` dele),
+  e o Pokket usa o `.srm` como o cartão inteiro (ele o lê no começo e o grava de volta no fim). **Não há cópia entre os
+  dois**, então nada fica dessincronizado: o minijogo que o jogo de PS1 baixa no PokketSX aparece no menu do
+  PocketStation do Pokket, e o que se faz no Pokket vale na próxima vez que o PokketSX abrir. O ARENA cria o cartão
+  vazio e o "jogo" **Meu PocketStation** (`jogos\pessoais\PocketStation\Meu PocketStation.mcd`, um cartão vazio só para
+  o console PocketStation ter o que abrir) na primeira vez que se escolhe o PokketSX, e **guarda uma cópia de segurança**
+  em `retroarch\saves\Pokket\copias` (as 5 mais novas, só quando o cartão mudou) antes de o PokketSX ou o Pokket abrirem
+  esse cartão. Quem já tinha um `memcards\PocketStation.mcd` com coisa dentro não perde nada: ele vira o cartão único
+  na primeira vez. Os outros jogos do console PocketStation (os 110 `.gme`) seguem cada um com o seu cartão.
+  **O PS2 fica de fora de propósito:** o PCSX2 e o ARMSX2 não emulam o aparelho, só deixam um cartão no formato do PS1 na
+  entrada (o `PocketStation.mcr`); não há "dentro" que valha para o PS2.
   **Testado em 24/10/2026** [Certo]: abre o Crash Bandicoot e o Legacy of Kain pela rota `/api/jogar` de uma cópia do
   ARENA numa pasta com acento (`testes\teste_pokketsx_pelo_arena.py`: 5 passos, tudo certo); o registro do próprio
   PokketSX diz `Memory Card Slot 2: PocketStation started from ...\bios\pocketstation.bin`. O `kernel.bin` do Rafael tem
@@ -162,11 +175,8 @@ opções nessa leitura; os tipos de controle por porta deles (como Zapper e Powe
 2. ~~**PokketSX** como emulador de fora do PS1~~ **Feito em 24/10** (um jeito a mais de abrir o PS1; ver acima). Falta
    testar com um jogo que use o PocketStation e com controle de verdade. (Instalado em `emuladores\PokketSX`: modo portátil,
    sem o atualizador, Discord desligado; zip sha256 `ce7cdb2b...f74c`.)
-3. **Cartão único** entre o PS1, o PS2 e o Pokket (hoje o PS2 cria o `PocketStation.mcr`, o PokketSX usa
-   `emuladores\PokketSX\memcards\PocketStation.mcd` e o Pokket abre o cartão que você escolher e grava num `.srm`;
-   falta o ARENA copiar de um para o outro com cópia de segurança). **É o elo que falta para o que você faz num lado
-   aparecer no outro**: hoje, para ver na telinha o minijogo que o PokketSX baixou, copie o `PocketStation.mcd` para
-   `jogos\pessoais\PocketStation` e abra no console PocketStation.
+3. ~~**Cartão único** entre o PokketSX e o Pokket~~ **Feito em 25/10** (um arquivo só, com cópia de segurança; ver acima). O PS2
+   fica de fora de propósito (não emula o aparelho).
 4. Testar o Pokket (precisa do `pocketstation.bin` do Rafael) e o VeMUlator (precisa de um `.vms`) no celular.
 5. Os núcleos que declaram as opções tarde (lista acima): ler as opções abrindo um jogo.
 6. Conferir os códigos de controle que o ARENA manda ao Saturn e ao PS1: o `517` aparece nos núcleos como

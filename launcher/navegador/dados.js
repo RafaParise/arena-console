@@ -1749,7 +1749,7 @@ window.ARENA_DADOS = {
      "pokketsx-qt-x64-Release-MSVC.exe"
     ],
     "motivo": "Opcional, só no Windows. Liga o PocketStation de verdade no lugar do cartão de memória, para os jogos de PlayStation que conversam com ele.",
-    "motivo_escolha": "Liga o PocketStation de verdade na entrada 2 do cartão: o jogo conversa com ele e baixa o minijogo para o aparelho. Um jogador só; não mostra a telinha nem toca o som do PocketStation (para jogar o minijogo, abra o cartão no console PocketStation). Precisa da BIOS do PlayStation e da do PocketStation.",
+    "motivo_escolha": "Liga o PocketStation de verdade na entrada 2 do cartão: o jogo conversa com ele e baixa o minijogo para o aparelho. Um jogador só; não mostra a telinha nem toca o som do PocketStation (para ver e jogar o minijogo, abra o \"Meu PocketStation\" no console PocketStation: o cartão é o mesmo). Precisa da BIOS do PlayStation e da do PocketStation.",
     "nome": "PokketSX",
     "pasta": "PokketSX",
     "selo_escolha": "opcional",

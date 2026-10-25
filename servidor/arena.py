@@ -3098,13 +3098,15 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         # PokketSX (PS1 com o PocketStation de verdade): as BIOS, o cartao da entrada 2 e o settings.ini, para abrir
         # sem o assistente dele (servidor\pokketsx.py).
         elif jogo["externo"]["dados"]["nome"] == "PokketSX":
-            preparado = pokketsx.preparar(jogo["externo"]["caminho"], PASTA_SISTEMA)
+            preparado = pokketsx.preparar(jogo["externo"]["caminho"], PASTA_SISTEMA, PASTA_SAVES, PASTA_JOGOS)
             if preparado["erro"]:
                 print("[ARENA] Nao consegui deixar o PokketSX pronto: %s" % preparado["erro"])
             if preparado["bios"]:
                 print("[ARENA] BIOS levadas para o PokketSX: %s" % ", ".join(preparado["bios"]))
             if preparado["cartao"]:
-                print("[ARENA] Cartao novo do PocketStation criado: %s" % preparado["cartao"])
+                print("[ARENA] Cartao do PocketStation criado: %s" % ", ".join(preparado["cartao"]))
+            if preparado["copia"]:
+                print("[ARENA] Copia de seguranca do cartao do PocketStation: %s" % preparado["copia"])
 
         print("[ARENA] Abrindo pelo %s" % jogo["externo"]["dados"]["nome"])
     else:
@@ -3129,6 +3131,11 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
                     print("[ARENA] Codigos de cheat deste jogo levados para a pasta que o RetroArch le.")
             except OSError as falha:
                 print("[ARENA] Nao consegui levar os codigos de cheat para a pasta certa: %s" % falha)
+        # O cartao unico do PocketStation e' o mesmo do PokketSX (servidor\pokketsx.py): uma copia antes de o Pokket mexer.
+        if jogo.get("plataforma") == "pocketstation" and pokketsx.e_o_cartao_unico(caminho_jogo):
+            copia_do_cartao = pokketsx.copia_de_seguranca(PASTA_SAVES)
+            if copia_do_cartao:
+                print("[ARENA] Copia de seguranca do cartao do PocketStation: %s" % copia_do_cartao)
         extra = dict(partida["opcoes"]) if partida else None
         # Mais de 2 jogadores (graficos.jogadores_do_jogo, calculado no
         # /api/jogar). Entra POR ULTIMO, depois das opcoes de controle:
@@ -7440,8 +7447,8 @@ class Manipulador(BaseHTTPRequestHandler):
             elif caminho_externo and dados_externo["nome"] == "PokketSX":
                 resposta["aviso"] = (
                     "O PocketStation está na entrada 2 do cartão. O PokketSX não mostra a telinha dele: o jogo "
-                    "baixa o minijogo para o cartão e, depois, o console PocketStation do ARENA abre esse cartão. "
-                    "F10 fecha o jogo.")
+                    "baixa o minijogo para o cartão; depois, abra o \"Meu PocketStation\" no console PocketStation "
+                    "do ARENA (o cartão é o mesmo). F10 fecha o jogo.")
             # Aviso fixo do console (ex.: fliperama precisa de ficha antes do
             # Start), vindo do consoles.json -> aviso_ao_abrir.
             if plataforma.get("aviso_ao_abrir"):

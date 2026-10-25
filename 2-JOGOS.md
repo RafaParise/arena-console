@@ -820,10 +820,11 @@ ganha uma terceira opção, **PokketSX (com PocketStation)**. O ARENA leva sozin
 PocketStation (`pocketstation.bin`, 16 KB, tirada do seu aparelho; vai na pasta `BIOS\PocketStation`), põe o
 PocketStation na **entrada 2** do cartão e deixa o cartão comum de cada jogo na entrada 1. **F10 fecha o jogo.** Um
 jogador só, e o Jogar Junto segue pelo RetroArch. **Atenção:** o PokketSX não mostra a telinha do PocketStation nem toca o
-som dele: o minijogo que o jogo baixa fica guardado no cartão
-(`emuladores\PokketSX\memcards\PocketStation.mcd`). Para ver e jogar o minijogo na telinha, copie esse cartão para
-`jogos\pessoais\PocketStation` e abra no console **PocketStation** do ARENA. Detalhes e o que ainda falta testar:
-`docs\ACESSORIOS.md`.
+som dele: o minijogo que o jogo baixa fica guardado no cartão. Esse cartão é o mesmo do console
+**PocketStation** do ARENA: depois de jogar, abra o "jogo" **Meu PocketStation** (em PocketStation, na lista de jogos) e o
+minijogo aparece no menu do aparelho, na telinha. É um arquivo só (`retroarch\saves\Pokket\Meu PocketStation.srm`), então
+o que se faz num lado vale no outro, e o ARENA guarda cópias de segurança em `retroarch\saves\Pokket\copias`. Detalhes
+e o que ainda falta testar: `docs\ACESSORIOS.md`.
 
 **Dreamcast: a mesma escolha.** Com a `dc_boot.bin` na pasta, o primeiro
 jogo de Dreamcast pergunta: **BIOS original** (a do console, com o logo de
