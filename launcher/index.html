@@ -859,6 +859,14 @@
         <p class="explica">Código:
           <strong class="codigo-grande" id="controleRemotoCodigo" aria-live="polite">----</strong></p>
         <ul class="controles" id="controleRemotoConectados"></ul>
+        <div class="opcao" id="controleRemotoGamepad">
+          <span class="opcao-rotulo">Gamepad Xbox virtual (para qualquer jogo)</span>
+          <button class="chave opcao-controle" id="chaveGamepadVirtual" aria-pressed="false" aria-label="Gamepad Xbox virtual"></button>
+          <span class="opcao-ajuda">O celular vira um controle Xbox 360 de verdade para o Windows, como o DroidJoy. Exceção à
+            regra "sem driver": precisa do driver ViGEmBus (instalado com administrador, o ARENA nunca instala) e vale só para
+            quem entrar depois de ligar. Ligado, o celular deixa de usar o caminho do RetroArch.</span>
+          <span class="opcao-ajuda" id="gamepadVirtualAviso" role="status"></span>
+        </div>
         <div class="opcao" id="controleRemotoCabo">
           <span class="opcao-rotulo">Pelo cabo USB (menor atraso)</span>
           <select class="opcao-controle" id="controleRemotoCaboLista" aria-label="Celular no cabo" hidden></select>

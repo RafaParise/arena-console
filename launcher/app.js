@@ -5776,6 +5776,17 @@ function ligarEventos() {
     }
   });
 
+  $("#chaveGamepadVirtual").addEventListener("click", async (evento) => {
+    const ligar = evento.currentTarget.getAttribute("aria-pressed") !== "true";
+    try {
+      const r = await pedir("/api/controle-remoto/gamepad", { ligar });
+      $("#gamepadVirtualAviso").textContent = r.erro || "";
+      evento.currentTarget.setAttribute("aria-pressed", r.gamepad_virtual ? "true" : "false");
+    } catch (falha) {
+      $("#gamepadVirtualAviso").textContent = falha.message;
+    }
+  });
+
   $("#btnControleRemotoUsb").addEventListener("click", async () => {
     const botao = $("#btnControleRemotoUsb");
     const lista = $("#controleRemotoCaboLista");

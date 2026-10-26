@@ -59,6 +59,7 @@ import urllib.parse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 import controle_usb
+import gamepad_virtual
 
 PASTA_SERVIDOR = os.path.dirname(os.path.abspath(__file__))
 RAIZ = os.path.dirname(PASTA_SERVIDOR)
@@ -601,6 +602,7 @@ class ControleRemoto:
         self._acertos = {}             # ip -> instante em que entrou com o codigo certo (passa pelo teto duro)
         self._trocas_do_codigo = 0     # quantas vezes o codigo mudou sozinho (alguem errou demais): o professor ve
         self._cabos = {}               # serial do celular -> porta que o cabo (adb reverse) leva ate aqui
+        self._gamepad = None           # GamepadVirtual quando o professor liga o gamepad XInput (excecao: precisa do ViGEmBus)
         self._liberados = set(JOGADORES_LIBERADOS_PADRAO)      # os jogadores que o celular pode ser (o professor muda)
         self._hosts_extras = set()     # outros nomes que valem como Host (o endereco do tunel, quando houver)
 
@@ -645,6 +647,9 @@ class ControleRemoto:
             self._clientes.clear()
             cabos, self._cabos = list(self._cabos.items()), {}
         controle_usb.soltar(cabos)          # o celular deixa de alcancar a porta deste computador pelo cabo
+        pad, self._gamepad = self._gamepad, None
+        if pad is not None:
+            pad.fechar()
         for jogador, dados in clientes:
             self.enviador.zerar(jogador)
             self.enviador.ativar(jogador, False)
@@ -667,10 +672,26 @@ class ControleRemoto:
         enderecos = ["http://%s:%d/" % (ip, self.porta) for ip in self._enderecos()]
         return {"ligado": True, "codigo": self.codigo, "porta_da_pagina": self.porta, "enderecos": enderecos,
                 "jogadores_liberados": sorted(self._liberados), "trocas_do_codigo": self._trocas_do_codigo,
+                "gamepad_virtual": self._gamepad is not None,
                 "cabos": [("…" + s[-4:]) if len(s) > 6 else s for s in self._cabos],
                 "conectados": [{"jogador": n, "ip": d["ip"], "apelido": d["apelido"], "ha_s": round(time.monotonic() - d["desde"]),
                                 "rtt_ms": d.get("rtt_ms"), "pelo_cabo": d["ip"].startswith("127.")}
                                for n, d in sorted(self._clientes.items())]}
+
+    # -- o gamepad XInput virtual (excecao autorizada: gamepad_virtual.py) ---------------------------
+    def gamepad_virtual(self, ligar):
+        """Liga ou desliga. (ok, motivo). Ligado, o celular vira um Xbox 360 de verdade para o Windows e NAO manda mais pelo
+        Network RetroPad (o jogo veria o controle duas vezes). Vale para quem entrar depois."""
+        if not ligar:
+            pad, self._gamepad = self._gamepad, None
+            if pad:
+                pad.fechar()
+            return True, ""
+        pad = gamepad_virtual.GamepadVirtual()
+        ok, motivo = pad.disponivel()
+        if ok:
+            self._gamepad = pad
+        return ok, motivo
 
     # -- o cabo USB -------------------------------------------------------------------------------
     def ligar_pelo_cabo(self, serial=None, jogador=None):
@@ -711,7 +732,7 @@ class ControleRemoto:
         """Chamado quando um jogo vai abrir: sorteia a porta-base do Network RetroPad e devolve as chaves do RetroArch,
         so dos jogadores liberados que o jogo tem (um jogo de 2 abre so o jogador 2 de um celular). Sem o controle remoto
         ligado, ou sem nenhum jogador a abrir, devolve {} e o jogo abre como sempre."""
-        if not self.ligado:
+        if not self.ligado or self._gamepad is not None:
             return {}
         ativos = [n for n in self.jogadores() if n <= max(2, int(jogadores_do_jogo or JOGADORES))]
         if not ativos:
@@ -919,7 +940,14 @@ class ControleRemoto:
                         estado = decodificar_estado(dados)
                         if estado is None:
                             raise ErroDeProtocolo(1003, "estado invalido")
-                        self.enviador.definir(jogador, *estado)
+                        pad = self._gamepad
+                        if pad is not None:
+                            try:
+                                pad.atualizar(jogador, *estado)
+                            except OSError:
+                                self._gamepad = None          # o driver sumiu: volta ao Network RetroPad
+                        else:
+                            self.enviador.definir(jogador, *estado)
                         ultimo_estado = agora
                         sem_sinal = False
                     elif opcode == OP_TEXTO:
@@ -973,5 +1001,8 @@ class ControleRemoto:
             if dono:
                 del self._clientes[jogador]
         if dono:
+            pad = self._gamepad
+            if pad is not None:
+                pad.remover(jogador)
             self.enviador.zerar(jogador)          # solta tudo e manda o zero de cada controle
             self.enviador.ativar(jogador, False)

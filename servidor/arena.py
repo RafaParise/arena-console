@@ -6561,6 +6561,12 @@ class Manipulador(BaseHTTPRequestHandler):
             CONTROLE_REMOTO.liberar_jogadores(lista)
             return self.responder_json(dict(CONTROLE_REMOTO.estado(), ok=True))
 
+        if caminho == "/api/controle-remoto/gamepad":
+            if plataforma_do_sistema.ANDROID:
+                return self.erro("Isto é só do computador: abra o ARENA nele e use Ajustes → Controles.", 404)
+            ok, motivo = CONTROLE_REMOTO.gamepad_virtual(bool(dados.get("ligar")))
+            return self.responder_json(dict(CONTROLE_REMOTO.estado(), ok=ok, erro=motivo or None))
+
         if caminho == "/api/controle-remoto/usb":
             # O cabo USB (servidor\controle_usb.py): `adb reverse` e abre a pagina no celular. So deste computador.
             if plataforma_do_sistema.ANDROID:
