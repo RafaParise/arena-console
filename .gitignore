@@ -142,3 +142,6 @@ launcher/navegador/livres.js
 /$HOME/
 /Script do claude code*.txt
 /claude-legacy-project-memory-*.md
+
+# O ViGEmClient.dll (gamepad Xbox virtual, opcional) nao vai ao repositorio publico: ferramentasaixar_vigem_client.py
+servidor/vigem/*.dll

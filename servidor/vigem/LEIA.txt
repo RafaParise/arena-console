@@ -1,4 +1,5 @@
-ViGEmClient.dll: a biblioteca do projeto ViGEm (https://github.com/nefarius/ViGEmClient, licenca MIT), pegada do pacote
-vgamepad 0.1.0 (MIT, Yann Bouteiller) em 26/10/2026. Serve so ao gamepad Xbox virtual do celular (servidor\gamepad_virtual.py),
-que e' OPCIONAL: precisa do driver ViGEmBus, que o ARENA nunca instala (winget install ViGEm.ViGEmBus, com administrador).
-Sem o driver, esta DLL nao faz nada e o resto do ARENA segue igual.
+O ViGEmClient.dll NAO vai no repositorio (publico, sem binario). Para ter o gamepad Xbox virtual do celular (OPCIONAL):
+  1. servidor\python\python.exe ferramentas\baixar_vigem_client.py   (pega a DLL MIT do pacote vgamepad 0.1.0 e confere a marca)
+  2. winget install ViGEm.ViGEmBus   (o DRIVER, com administrador: o ARENA nunca o instala; o autor o aposentou em 2023)
+Sem os dois, a chave "Gamepad Xbox virtual" diz o que falta e o resto do ARENA segue igual. Codigo: servidor\gamepad_virtual.py.
+Licencas: ViGEmClient (MIT, nefarius) e vgamepad (MIT, Yann Bouteiller).
