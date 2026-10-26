@@ -335,7 +335,7 @@ sem cabo e sem instalar nada no celular: tudo roda no navegador dele.
 
 1. No computador: **Ajustes → Controles → Celular como controle (Wi-Fi)** e
    ligue a chave. O ARENA mostra um endereço (como `http://192.168.0.5:8780/`)
-   e um **código de 4 números**. Ele sempre abre desligado, e o código muda a
+   e um **código de 6 números**. Ele sempre abre desligado, e o código muda a
    cada vez que liga.
 2. **Abra o jogo depois de ligar.** O RetroArch só escuta o celular nos jogos
    abertos com a chave ligada.

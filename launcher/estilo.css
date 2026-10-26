@@ -1589,6 +1589,7 @@ input::placeholder { color: var(--texto-apagado); }
   letter-spacing: 0.35em;
 }
 #controleRemotoEnderecos .controle-nome { font-family: var(--fonte-numero); user-select: all; }
+.jogador-liberado { display: inline-flex; align-items: center; gap: 0.35rem; margin-right: 1rem; min-height: 1.5rem; }
 
 .perfil-box {
   display: flex;

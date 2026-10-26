@@ -2457,6 +2457,9 @@ let esperaDoControleRemoto = null;
 function desenharControleRemoto(dados) {
   const ligado = !!dados.ligado;
   $("#chaveControleRemoto").setAttribute("aria-pressed", ligado ? "true" : "false");
+  for (const caixa of document.querySelectorAll("#controleRemotoJogadores input[data-jogador]")) {
+    caixa.checked = (dados.jogadores_liberados || []).includes(Number(caixa.dataset.jogador));
+  }
   $("#controleRemotoDados").hidden = !ligado;
   if (!ligado) return;
   $("#controleRemotoCodigo").textContent = dados.codigo || "----";
@@ -5663,6 +5666,19 @@ function ligarEventos() {
       recado(novo
         ? "Teclado preso no jogo. Para soltar e abrir o menu, aperte F9."
         : "Teclado solto. O Esc abre o menu normalmente.");
+    } catch (falha) {
+      recado(falha.message, true);
+    }
+  });
+
+  $("#controleRemotoJogadores").addEventListener("change", async () => {
+    const marcados = [...document.querySelectorAll("#controleRemotoJogadores input[data-jogador]:checked")]
+      .map((caixa) => Number(caixa.dataset.jogador));
+    try {
+      desenharControleRemoto(await pedir("/api/controle-remoto/jogadores", { jogadores: marcados }));
+      recado(marcados.length
+        ? `O celular pode ser o jogador ${marcados.join(", ")}. Vale no próximo jogo que você abrir.`
+        : "Nenhum jogador liberado: o celular não vai conseguir controlar o jogo. Marque pelo menos um.");
     } catch (falha) {
       recado(falha.message, true);
     }

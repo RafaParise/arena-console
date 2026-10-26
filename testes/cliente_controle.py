@@ -16,11 +16,13 @@ class RecusouAConexao(Exception):
 
 
 class ClienteDeControle:
-    def __init__(self, endereco="127.0.0.1", porta=8780, origem="auto", caminho="/ws", chave=None, segundos=5.0):
+    def __init__(self, endereco="127.0.0.1", porta=8780, origem="auto", caminho="/ws", chave=None, segundos=5.0,
+                 host_falso=None):
         self.s = socket.create_connection((endereco, porta), timeout=segundos)
         self.s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         self.buffer = bytearray()
-        self.host = "%s:%d" % (endereco, porta)
+        # host_falso: o nome que um site mal intencionado poria no Host depois de fazer o nome dele apontar para ca
+        self.host = host_falso or "%s:%d" % (endereco, porta)
         chave = chave or base64.b64encode(os.urandom(16)).decode()
         cabecas = ["GET %s HTTP/1.1" % caminho, "Host: %s" % self.host, "Upgrade: websocket", "Connection: Upgrade",
                    "Sec-WebSocket-Key: %s" % chave, "Sec-WebSocket-Version: 13"]

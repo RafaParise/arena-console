@@ -3159,17 +3159,21 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         # abaixo de input_max_users, por isso o numero sobe para 4 (so nesta partida: o resto volta no fim).
         chaves_do_remoto = []
         if not partida:
-            remoto = CONTROLE_REMOTO.preparar_partida()
+            # So os jogadores que o professor liberou E que o jogo tem: cada um e' uma porta UDP aberta, sem senha
+            # (e' do RetroArch), em todas as placas de rede, enquanto o jogo roda.
+            remoto = CONTROLE_REMOTO.preparar_partida(jogadores_pedidos(plataforma_jogo, jogo))
             if remoto:
                 try:
                     atual = int(opcoes_jogo.get("input_max_users") or jogadores_controle or 2)
                 except (TypeError, ValueError):
                     atual = 2
+                abertos = [n for n in range(1, controle_remoto.JOGADORES + 1)
+                           if remoto.get("network_remote_enable_user_p%d" % n) == "true"]
                 opcoes_jogo.update(remoto)
-                opcoes_jogo["input_max_users"] = str(max(controle_remoto.JOGADORES, atual))
+                opcoes_jogo["input_max_users"] = str(max(max(abertos), atual))
                 chaves_do_remoto = list(remoto) + ["input_max_users"]
-                print("[ARENA] Celular como controle: o RetroArch escuta o Network RetroPad na porta-base %s." %
-                      remoto["network_remote_base_port"])
+                print("[ARENA] Celular como controle: o RetroArch escuta o Network RetroPad dos jogadores %s (porta-base %s)." %
+                      (", ".join(str(n) for n in abertos), remoto["network_remote_base_port"]))
         # As BIOS livres (e a metade Java do Java ME) no lugar ANTES de abrir.
         # A arrumacao das BIOS roda em segundo plano ao abrir o ARENA e pode
         # nao ter terminado: achado de 15/10/2026, o primeiro jogo de Java ME
@@ -6513,6 +6517,16 @@ class Manipulador(BaseHTTPRequestHandler):
             plataforma = dados.get("plataforma")
             desempenho.zerar(str(plataforma) if plataforma else None)
             return self.responder_json({"ok": True, "desempenho": desempenho.ler()})
+
+        if caminho == "/api/controle-remoto/jogadores":
+            # Quais jogadores (1 a 4) o celular pode ser: vale no proximo jogo que abrir. So deste computador.
+            if plataforma_do_sistema.ANDROID:
+                return self.erro("O celular como controle é ligado no computador: abra o ARENA nele, em Ajustes → Controles.", 404)
+            lista = dados.get("jogadores")
+            if not isinstance(lista, list):
+                return self.erro("Marque os jogadores que o celular pode ser (de 1 a 4).")
+            CONTROLE_REMOTO.liberar_jogadores(lista)
+            return self.responder_json(dict(CONTROLE_REMOTO.estado(), ok=True))
 
         if caminho in ("/api/controle-remoto/ligar", "/api/controle-remoto/desligar"):
             # So deste computador (nao esta em ROTAS_REDE_EXTERNA): quem liga o controle pelo celular e' o professor,

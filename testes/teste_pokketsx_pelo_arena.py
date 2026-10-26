@@ -69,9 +69,14 @@ def main():
         return c.processos(NOME_DO_PROGRAMA, pasta_do_pokketsx)
 
     def fechar_o_pokketsx():
-        for pid in abertos():
-            subprocess.run(["taskkill", "/PID", str(pid)], capture_output=True)
-        if not c.esperar(lambda: not abertos(), 20):
+        # Como o aluno: clica no X e, se a janela ainda nao respondeu (o PokketSX leva uns segundos para ficar pronto,
+        # e na rodada final de 25/10 o primeiro "fechar" se perdeu), clica de novo.
+        fim = time.monotonic() + 45
+        while abertos() and time.monotonic() < fim:
+            for pid in abertos():
+                subprocess.run(["taskkill", "/PID", str(pid)], capture_output=True)
+            c.esperar(lambda: not abertos(), 6)
+        if abertos():
             for pid in abertos():
                 subprocess.run(["taskkill", "/F", "/PID", str(pid)], capture_output=True)
             return False

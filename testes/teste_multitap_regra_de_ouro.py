@@ -96,6 +96,12 @@ TIRADAS_NA_AUDITORIA_3 = {"quick_menu_show_cheevos", "notification_show_recordin
                           "menu_show_legacy_thumbnail_updater"}
 # Novas de proposito (o atalho de repetir/parar a gravacao da partida, sem tecla).
 NOVAS_NA_AUDITORIA_3 = {"input_play_replay", "input_halt_replay"}
+# O "formato da imagem" (esticar, 4:3...: docs\ESCALA-DA-TELA.md, 16 e 17/10/2026) grava a proporcao da tela no
+# arquivo da partida; nao existia na versao de antes e vale para o jogo inteiro, de proposito.
+DO_FORMATO_DA_IMAGEM = {"aspect_ratio_index", "video_aspect_ratio_auto"}
+# Consoles que nao existiam na versao de antes (o PocketStation do Pokket e o VMU do VeMUlator, 24/10/2026): os jogos
+# deles nao tem com o que comparar, e nao ha o que a regra de ouro proteger.
+CONSOLES_NOVOS_DE_PROPOSITO = {"pocketstation", "vmu"}
 # Valor que mudou de proposito junto com o nome: o tema pedia o 27 e nunca
 # valeu (fica o 4, o que os alunos sempre viram); "Importar conteudo" escondido
 # era "false" no nome velho e e' "0" no novo.
@@ -134,6 +140,7 @@ def sem_mudanca_de_proposito(chaves_override):
     return {c: v for c, v in com_nomes_certos(chaves_override).items()
             if c != "input_remapping_directory"
             and c not in NOVAS_NA_AUDITORIA_3
+            and c not in DO_FORMATO_DA_IMAGEM
             and not re.match(teclado, c)
             and not (v == "nul" and re.match(r"^input_player\d+_\w+_(btn|axis)$", c))}
 
@@ -305,7 +312,7 @@ def principal():
                 # Titulo que mudou DE PROPOSITO depois da versao de antes
                 # (25/09/2026: "disc.gdi" passou a ter o nome da pasta, "Disc"
                 # -> "Capcom Vs SNK 2..."). Sem par, nao da para comparar.
-                if caso.split(" | ")[0] in TITULOS_NOVOS_DE_PROPOSITO:
+                if caso.split(" | ")[0] in TITULOS_NOVOS_DE_PROPOSITO or b.get("plataforma") in CONSOLES_NOVOS_DE_PROPOSITO:
                     continue
                 falhas.append("%s: nao existe na versao de antes" % caso)
                 continue

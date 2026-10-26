@@ -14,6 +14,7 @@
   const BATIDA_MS = 250;            // com a tela parada, manda o estado de novo (o computador solta tudo se ficar 1,5 s sem ouvir)
   const ESPERAS = [500, 1000, 2000, 4000];
   const ZONA_MORTA_DO_ANALOGICO = 0.12;
+  let DIGITOS = 6;                  // quantos numeros tem o codigo (o computador diz em /jogadores)
 
   let botoes = 0;
   const eixos = [0, 0, 0, 0];
@@ -62,6 +63,8 @@
         mensagem(textoDoErro(m), false);
       } else if (m.t === "sem_sinal") {
         sujo = true;                          // o computador soltou os botoes: manda o que esta apertado de novo
+      } else if (m.t === "q") {
+        medirIdaEVolta(m.n);
       }
     };
     este.onclose = () => {
@@ -77,8 +80,12 @@
   function textoDoErro(m) {
     if (m.motivo === "codigo") return "Código errado. Confira o número que está na tela do computador. Tentativas que restam: " + (m.restam ?? "?") + ".";
     if (m.motivo === "bloqueado") return "Muitas tentativas erradas. Espere 2 minutos e tente de novo.";
+    if (m.motivo === "muitas") return "Muita gente tentando entrar ao mesmo tempo. Espere uns 10 segundos e toque em Conectar de novo.";
     if (m.motivo === "ocupado") return "Esse jogador já está sendo usado por outro celular. Escolha outro número.";
-    if (m.motivo === "jogador") return "Escolha o número do jogador, de 1 a 4.";
+    if (m.motivo === "jogador") {
+      const liberados = (m.jogadores || []).join(", ");
+      return "Esse jogador não foi liberado para o celular" + (liberados ? ". Escolha " + liberados + "." : ": peça ao professor para liberar.");
+    }
     return "O computador recusou a conexão.";
   }
 
@@ -98,6 +105,40 @@
     if (!ws || ws.readyState !== 1 || $("#controle").hidden) return;
     if (sujo || performance.now() - ultimoEnvio > BATIDA_MS) enviar();
   }, 16);
+
+  // Menor latencia: o estado sai NA HORA em que o dedo muda (e nao no proximo tique de 16 ms). O intervalo acima fica
+  // so para o "ainda estou aqui" e para o que ficou preso; um intervalo minimo de 4 ms evita enxurrada com varios dedos.
+  function enviarJa() {
+    if (!ws || ws.readyState !== 1 || $("#controle").hidden) return;
+    if (performance.now() - ultimoEnvio >= 4) enviar();
+  }
+
+  // A ida e volta ate o computador, medida aqui (so este lado tem o relogio): um "ping" a cada 2 s, suavizado com os
+  // ultimos 5, mostrado no alto e mandado ao computador (que mostra na lista de celulares).
+  const idas = new Map();
+  const ultimas = [];
+  let numeroDoPing = 0;
+  setInterval(() => {
+    if (!ws || ws.readyState !== 1 || $("#controle").hidden) return;
+    numeroDoPing += 1;
+    idas.set(numeroDoPing, performance.now());
+    for (const antigo of [...idas.keys()]) if (antigo < numeroDoPing - 5) idas.delete(antigo);
+    ws.send(JSON.stringify({ t: "p", n: numeroDoPing }));
+  }, 2000);
+
+  function medirIdaEVolta(n) {
+    const saida = idas.get(n);
+    if (saida === undefined) return;
+    idas.delete(n);
+    ultimas.push(performance.now() - saida);
+    if (ultimas.length > 5) ultimas.shift();
+    const ordenadas = [...ultimas].sort((a, b) => a - b);
+    const mediana = ordenadas[Math.floor(ordenadas.length / 2)];
+    const rotulo = $("#rtt");
+    rotulo.textContent = Math.round(mediana) + " ms";
+    rotulo.className = "rtt " + (mediana < 25 ? "rapida" : mediana < 60 ? "media" : "lenta");
+    if (ws && ws.readyState === 1) ws.send(JSON.stringify({ t: "rtt", ms: Math.round(mediana) }));
+  }
 
   // ---------- os dedos ----------
   function alvoDe(x, y) {
@@ -177,6 +218,7 @@
       botoes = novoBotoes;
       for (let i = 0; i < 4; i += 1) eixos[i] = novosEixos[i];
       sujo = true;
+      enviarJa();
     }
   }
 
@@ -256,7 +298,7 @@
 
   function iniciar() {
     const params = new URLSearchParams(location.search);
-    $("#codigo").value = (params.get("c") || "").replace(/\D/g, "").slice(0, 4);
+    $("#codigo").value = (params.get("c") || "").replace(/\D/g, "").slice(0, DIGITOS);
     const jogador = params.get("j") || guardar.ler("arena_ctl_jogador", "2");
     for (const radio of document.querySelectorAll("input[name=jogador]")) radio.checked = radio.value === jogador;
     $("#apelido").value = params.get("a") || guardar.ler("arena_ctl_apelido", "");
@@ -267,7 +309,7 @@
     $("#formulario").addEventListener("submit", (e) => {
       e.preventDefault();
       const codigo = $("#codigo").value.replace(/\D/g, "");
-      if (codigo.length !== 4) { mensagem("O código tem 4 números.", false); return; }
+      if (codigo.length !== DIGITOS) { mensagem("O código tem " + DIGITOS + " números.", false); return; }
       const escolhido = document.querySelector("input[name=jogador]:checked");
       dados = { codigo, jogador: Number(escolhido ? escolhido.value : 2), apelido: $("#apelido").value.trim().slice(0, 20) };
       guardar.gravar("arena_ctl_jogador", String(dados.jogador));
@@ -311,7 +353,33 @@
     // para os testes: o que o controle acha que esta apertado
     window.__controle = { estado: () => ({ botoes, eixos: eixos.slice() }), conectado: () => !!ws && ws.readyState === 1 };
 
-    if (/^\d{4}$/.test($("#codigo").value)) $("#conectar").focus(); else $("#codigo").focus();
+    if (new RegExp("^\\d{" + DIGITOS + "}$").test($("#codigo").value)) $("#conectar").focus(); else $("#codigo").focus();
+    liberados();
+  }
+
+  // O computador diz quais jogadores o professor liberou para o celular (e quantos numeros tem o codigo).
+  function liberados() {
+    fetch("/jogadores", { cache: "no-store" }).then((r) => r.json()).then((d) => {
+      if (d.digitos) {
+        DIGITOS = d.digitos;
+        $("#codigo").maxLength = DIGITOS;
+        $("#codigo").placeholder = "0".repeat(DIGITOS);
+        $("#digitosDoCodigo").textContent = String(DIGITOS);
+      }
+      const lista = d.jogadores || [];
+      let marcado = document.querySelector("input[name=jogador]:checked");
+      for (const radio of document.querySelectorAll("input[name=jogador]")) {
+        const livre = lista.includes(Number(radio.value));
+        radio.disabled = !livre;
+        radio.closest("label").style.opacity = livre ? "" : "0.35";
+      }
+      if (marcado && marcado.disabled) {
+        marcado.checked = false;
+        const primeiro = [...document.querySelectorAll("input[name=jogador]")].find((r) => !r.disabled);
+        if (primeiro) primeiro.checked = true;
+      }
+      if (!lista.length) mensagem("O professor ainda não liberou nenhum jogador para o celular.", false);
+    }).catch(() => { /* sem a lista: o computador confere do mesmo jeito na hora de conectar */ });
   }
 
   iniciar();

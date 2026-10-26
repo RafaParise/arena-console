@@ -280,6 +280,7 @@ No fliperama do MAME, a BIOS vai na pasta dos próprios jogos.
 | PlayStation 2 | `PS2` | `.iso` `.chd` | **não** | Uma BIOS de PS2 (um arquivo .bin de 4 MB) em retroarch\system |
 | PlayStation 3 | `PS3` | `.iso` `.pkg` | **não** | O firmware oficial do PS3 (PS3UPDAT.PUP), instalado UMA vez pelo próprio RPCS3 |
 | PlayStation Portable | `PSP` | `.cso` `.iso` `.chd` | **não** | não precisa |
+| PocketStation | `PocketStation` | `.mcd` `.mcr` `.mcs` `.pss` `.gme` `.bin` | pode | `pocketstation.bin`, tirado do seu PocketStation |
 | Pokemon mini | `Pokemon mini` | `.min` | pode | não precisa |
 | ScummVM | `ScummVM` | `.scummvm` `.svm` | **não** | não precisa |
 | Sega 32X | `Sega 32X` | `.32x` | pode | não precisa |
@@ -295,6 +296,7 @@ No fliperama do MAME, a BIOS vai na pasta dos próprios jogos.
 | Vectrex | `Vectrex` | `.vec` | pode | não precisa |
 | Vircon32 | `Vircon32` | `.v32` | pode | não precisa (a BIOS livre vem no emulador) |
 | Virtual Boy | `Virtual Boy` | `.vb` `.vboy` | pode | não precisa |
+| VMU (Dreamcast) | `VMU` | `.vms` `.dci` `.bin` | pode | não precisa |
 | WASM-4 | `WASM-4` | `.wasm` | pode | não precisa |
 | Watara Supervision | `Watara Supervision` | `.sv` | pode | não precisa |
 | WonderSwan | `WonderSwan` | `.ws` `.wsc` | pode | não precisa |

@@ -245,14 +245,25 @@ class QuemPodeEntrar(unittest.TestCase):
         for fora in ("8.8.8.8", "172.32.0.1", "200.10.20.30", "2606:4700:4700::1111", "abc", ""):
             self.assertFalse(cr.rede_privada(fora), fora)
 
-    def test_origem(self):
-        self.assertTrue(cr.origem_confiavel("http://192.168.0.5:8780", "192.168.0.5:8780"))
-        self.assertTrue(cr.origem_confiavel(None, "192.168.0.5:8780"))        # sem Origin: nao e' navegador
-        self.assertFalse(cr.origem_confiavel("http://site-do-mal.example", "192.168.0.5:8780"))
-        self.assertFalse(cr.origem_confiavel("http://192.168.0.5:9999", "192.168.0.5:8780"))
-        self.assertFalse(cr.origem_confiavel("null", "192.168.0.5:8780"))
+    def test_origem_e_host(self):
+        meus = {"192.168.0.5:8780", "127.0.0.1:8780"}
+        self.assertTrue(cr.origem_confiavel("http://192.168.0.5:8780", "192.168.0.5:8780", meus))
+        self.assertTrue(cr.origem_confiavel(None, "192.168.0.5:8780", meus))      # sem Origin: nao e' navegador
+        self.assertFalse(cr.origem_confiavel("http://site-do-mal.example", "192.168.0.5:8780", meus))
+        self.assertFalse(cr.origem_confiavel("http://192.168.0.5:9999", "192.168.0.5:8780", meus))
+        self.assertFalse(cr.origem_confiavel("null", "192.168.0.5:8780", meus))
+        self.assertFalse(cr.origem_confiavel("ftp://192.168.0.5:8780", "192.168.0.5:8780", meus))
 
-    def test_codigo_de_4_digitos(self):
+    def test_dns_rebinding_o_nome_do_site_nao_esta_na_lista(self):
+        # O site mal intencionado faz "evil.example" apontar para o IP do computador: o navegador manda Origin e Host
+        # IGUAIS (os dois com o nome do site). So comparar um com o outro deixaria passar; a lista fechada nao.
+        meus = {"192.168.0.5:8780", "127.0.0.1:8780"}
+        self.assertFalse(cr.origem_confiavel("http://evil.example:8780", "evil.example:8780", meus))
+        self.assertFalse(cr.origem_confiavel(None, "evil.example:8780", meus))
+        self.assertFalse(cr.origem_confiavel(None, "", meus))
+        self.assertFalse(cr.origem_confiavel(None, None, meus))
+
+    def test_codigo_com_os_digitos_pedidos(self):
         for _ in range(50):
             codigo = cr.codigo_novo()
             self.assertEqual(len(codigo), cr.DIGITOS_DO_CODIGO)
@@ -264,6 +275,12 @@ class QuemPodeEntrar(unittest.TestCase):
         self.assertEqual(chaves["network_remote_base_port"], "55400")
         self.assertEqual([n for n in chaves if n.startswith("network_remote_enable_user_p")],
                          ["network_remote_enable_user_p%d" % i for i in range(1, cr.JOGADORES + 1)])
+        self.assertTrue(all(chaves["network_remote_enable_user_p%d" % i] == "true" for i in range(1, cr.JOGADORES + 1)))
+
+    def test_so_os_jogadores_pedidos_abrem_no_retroarch(self):
+        chaves = cr.opcoes_do_retroarch(55400, [2, 4])
+        self.assertEqual([chaves["network_remote_enable_user_p%d" % i] for i in range(1, 5)],
+                         ["false", "true", "false", "true"])
 
     def test_porta_base_livre_deixa_as_quatro_portas_soltas(self):
         import socket as sk
@@ -313,7 +330,7 @@ class OServicoPorDentro(unittest.TestCase):
     # -- a pagina ---------------------------------------------------------------------------------
     def test_ligado_mostra_o_endereco_e_o_codigo(self):
         self.assertTrue(self.estado["ligado"])
-        self.assertEqual(len(self.codigo), 4)
+        self.assertEqual(len(self.codigo), cr.DIGITOS_DO_CODIGO)
         self.assertEqual(self.estado["enderecos"], ["http://127.0.0.1:%d/" % self.porta])
 
     def test_so_a_pagina_do_controle(self):
@@ -377,13 +394,42 @@ class OServicoPorDentro(unittest.TestCase):
         self.assertTrue(self.controle.conferir_o_codigo("10.0.0.10", self.codigo, agora=1100.0)[0])
 
     def test_muitos_erros_no_total_trocam_o_codigo(self):
+        passo = cr.JANELA_GLOBAL_S + 1                         # devagar o bastante para nao esbarrar no limite global
         for i in range(cr.ERROS_ANTES_DE_TROCAR_O_CODIGO - 1):
-            self.controle.conferir_o_codigo("10.1.%d.1" % i, "nada", agora=2000.0 + i)       # cada um de um endereco
+            self.controle.conferir_o_codigo("10.1.%d.1" % i, "nada", agora=2000.0 + i * passo)    # cada um de um endereco
         self.assertEqual(self.controle._erros_no_total, cr.ERROS_ANTES_DE_TROCAR_O_CODIGO - 1)
-        with mock.patch.object(cr, "codigo_novo", return_value="4242"):
-            self.controle.conferir_o_codigo("10.1.99.1", "nada", agora=2100.0)
-        self.assertEqual(self.controle.codigo, "4242")                    # o codigo que o tentador tinha nao vale mais
+        with mock.patch.object(cr, "codigo_novo", return_value="424242"):
+            self.controle.conferir_o_codigo("10.1.99.1", "nada", agora=2000.0 + 30 * passo)
+        self.assertEqual(self.controle.codigo, "424242")                  # o codigo que o tentador tinha nao vale mais
         self.assertEqual(self.controle._erros_no_total, 0)
+
+    def test_limite_global_vale_para_todos_os_enderecos_juntos(self):
+        # O atacante troca de endereco a cada tentativa: o bloqueio por endereco nunca dispara, o global sim.
+        resultados = [self.controle.conferir_o_codigo("10.2.%d.1" % i, "nada", agora=3000.0 + i * 0.1)[1]
+                      for i in range(cr.TENTATIVAS_POR_JANELA + 5)]
+        self.assertEqual(resultados[:cr.TENTATIVAS_POR_JANELA], ["codigo"] * cr.TENTATIVAS_POR_JANELA)
+        self.assertEqual(set(resultados[cr.TENTATIVAS_POR_JANELA:]), {"muitas"})
+        # passada a janela, volta a aceitar (e o codigo CERTO entra, sem nenhum castigo para quem nao errou)
+        self.assertEqual(self.controle.conferir_o_codigo("10.3.0.1", self.codigo, agora=3000.0 + cr.JANELA_GLOBAL_S + 5)[:2],
+                         (True, ""))
+
+    def test_conferir_o_codigo_e_atomico_com_varias_conexoes_ao_mesmo_tempo(self):
+        # 60 conexoes ao mesmo tempo, cada uma com um endereco: so TENTATIVAS_POR_JANELA chegam a comparar o codigo.
+        saidas, trava = [], threading.Lock()
+        porta_de_largada = threading.Barrier(60)
+
+        def tentar(i):
+            porta_de_largada.wait()
+            r = self.controle.conferir_o_codigo("10.4.%d.1" % i, "nada", agora=4000.0)[1]
+            with trava:
+                saidas.append(r)
+        fios = [threading.Thread(target=tentar, args=(i,)) for i in range(60)]
+        for f in fios:
+            f.start()
+        for f in fios:
+            f.join(10)
+        self.assertEqual(saidas.count("codigo"), cr.TENTATIVAS_POR_JANELA)
+        self.assertEqual(saidas.count("muitas"), 60 - cr.TENTATIVAS_POR_JANELA)
 
     def test_jogador_que_nao_existe(self):
         _c, resposta = self.entrar(jogador=9)
@@ -414,7 +460,7 @@ class OServicoPorDentro(unittest.TestCase):
         self.assertTrue(esperar(lambda: any(v[3] == 8 and v[4] == 0 for v in self.udp_lido())))
 
     def test_analogico(self):
-        c, _ = self.entrar(jogador=1)
+        c, _ = self.entrar(jogador=3)
         c.enviar_binario(cc.estado(lx=20000, ry=-15000))
         self.assertTrue(esperar(lambda: any(v[1] == 5 and v[2] == 0 and v[3] == 0 and v[4] == 20000 for v in self.udp_lido())))
         self.assertTrue(esperar(lambda: any(v[1] == 5 and v[2] == 1 and v[3] == 1 and v[4] == (-15000) & 0xFFFF for v in self.udp_lido())))
@@ -473,13 +519,68 @@ class OServicoPorDentro(unittest.TestCase):
         with self.assertRaises(OSError):
             cc.ClienteDeControle(porta=self.porta, segundos=1.0)
 
-    def test_preparar_partida_sorteia_a_base_e_liga_os_4_jogadores(self):
-        chaves = self.controle.preparar_partida()
+    def test_preparar_partida_sorteia_a_base_e_abre_so_os_liberados(self):
+        chaves = self.controle.preparar_partida()                               # um jogo de 4 jogadores
         self.assertEqual(chaves["network_remote_enable"], "true")
         self.assertEqual(int(chaves["network_remote_base_port"]), self.enviador.porta_base)
-        self.assertEqual(sum(1 for n in chaves if n.startswith("network_remote_enable_user_p")), cr.JOGADORES)
+        self.assertEqual([chaves["network_remote_enable_user_p%d" % i] for i in range(1, 5)],
+                         ["false", "true", "true", "true"])                     # de fabrica: 2, 3 e 4 (o 1 e' o teclado)
         self.controle.desligar()
         self.assertEqual(self.controle.preparar_partida(), {})                  # desligado: o jogo abre como sempre
+
+    def test_jogo_de_2_jogadores_abre_so_o_jogador_2(self):
+        chaves = self.controle.preparar_partida(2)
+        self.assertEqual([chaves["network_remote_enable_user_p%d" % i] for i in range(1, 5)],
+                         ["false", "true", "false", "false"])
+
+    def test_sem_jogador_liberado_que_o_jogo_tenha_nada_abre(self):
+        self.controle.liberar_jogadores([3, 4])
+        self.assertEqual(self.controle.preparar_partida(2), {})                 # o jogo so tem 1 e 2
+        self.assertEqual(self.controle.preparar_partida(4)["network_remote_enable_user_p3"], "true")
+        self.controle.liberar_jogadores([])
+        self.assertEqual(self.controle.preparar_partida(4), {})
+
+    def test_o_professor_libera_o_jogador_1(self):
+        self.controle.liberar_jogadores([1])
+        chaves = self.controle.preparar_partida(1)                              # um jogo de 1 jogador, vale 1 e 2
+        self.assertEqual(chaves["network_remote_enable_user_p1"], "true")
+        self.assertEqual(self.controle.jogadores(), [1])
+
+    def test_liberar_jogadores_ignora_lixo(self):
+        # Vale de 1 a 8 (cr.JOGADORES); 0 e 9 estao fora, e texto que nao e' numero, None e fracao sao descartados.
+        self.assertEqual(self.controle.liberar_jogadores([0, 1, "2", "x", 5, 9, None, 3.5]), [1, 2, 5])
+        self.assertEqual(self.controle.liberar_jogadores(range(0, cr.JOGADORES + 2)), list(range(1, cr.JOGADORES + 1)))
+
+    def test_jogador_nao_liberado_nao_entra(self):
+        self.controle.liberar_jogadores([3])
+        _c, resposta = self.entrar(jogador=2)
+        self.assertIn(b'"jogador"', resposta[1])
+        self.assertIn(b'"jogadores": [3]', resposta[1])
+        _c, resposta = self.entrar(jogador=3)
+        self.assertIn(b'"ok"', resposta[1])
+
+    def test_a_pagina_pergunta_quais_jogadores_estao_liberados(self):
+        import http.client
+        import json as j
+        self.controle.liberar_jogadores([2, 4])
+        conexao = http.client.HTTPConnection("127.0.0.1", self.porta, timeout=5)
+        conexao.request("GET", "/jogadores")
+        resposta = conexao.getresponse()
+        corpo = j.loads(resposta.read())
+        conexao.close()
+        self.assertEqual((resposta.status, corpo), (200, {"jogadores": [2, 4], "digitos": cr.DIGITOS_DO_CODIGO}))
+
+    def test_host_de_site_que_apontou_para_o_computador_e_recusado(self):
+        # DNS rebinding: o nome do site aponta para este computador; Host e Origin chegam iguais, com o nome do site.
+        with self.assertRaises(cc.RecusouAConexao) as dentro:
+            cc.ClienteDeControle(porta=self.porta, origem="http://evil.example:%d" % self.porta,
+                                 host_falso="evil.example:%d" % self.porta)
+        self.assertIn("403", str(dentro.exception))
+        import http.client
+        conexao = http.client.HTTPConnection("127.0.0.1", self.porta, timeout=5)
+        conexao.request("GET", "/", headers={"Host": "evil.example:%d" % self.porta})
+        self.assertEqual(conexao.getresponse().status, 403)                      # nem a pagina
+        conexao.close()
 
     def test_ligar_duas_vezes_nao_troca_o_codigo(self):
         de_novo = self.controle.ligar()
@@ -553,7 +654,8 @@ class AsRotasDoArena(unittest.TestCase):
     def test_liga_mostra_o_codigo_e_desliga(self):
         _, ligado = self.pedir("/api/controle-remoto/ligar", post=True)
         self.assertTrue(ligado["ok"] and ligado["ligado"])
-        self.assertEqual(len(ligado["codigo"]), 4)
+        self.assertEqual(len(ligado["codigo"]), cr.DIGITOS_DO_CODIGO)
+        self.assertEqual(ligado["jogadores_liberados"], [2, 3, 4])
         self.assertTrue(ligado["enderecos"][0].startswith("http://127.0.0.1:"))
         _, olhando = self.pedir("/api/controle-remoto")
         self.assertEqual(olhando["codigo"], ligado["codigo"])
@@ -562,8 +664,21 @@ class AsRotasDoArena(unittest.TestCase):
         self.assertNotIn("codigo", desligado)             # desligado, o codigo nao fica a mostra
 
     def test_a_rota_nao_esta_aberta_a_rede(self):
-        for rota in ("/api/controle-remoto", "/api/controle-remoto/ligar", "/api/controle-remoto/desligar"):
+        for rota in ("/api/controle-remoto", "/api/controle-remoto/ligar", "/api/controle-remoto/desligar",
+                     "/api/controle-remoto/jogadores"):
             self.assertNotIn(rota, self.arena.ROTAS_REDE_EXTERNA)
+
+    def test_o_professor_escolhe_os_jogadores_do_celular(self):
+        falso = FalsoManipulador()
+        self.arena.Manipulador.api_post(falso, "/api/controle-remoto/jogadores", {"jogadores": [1, 3]})
+        tipo, corpo = falso.respostas[-1]
+        self.assertEqual((tipo, corpo["ok"], corpo["jogadores_liberados"]), ("json", True, [1, 3]))
+        self.assertEqual(self.servico.jogadores(), [1, 3])
+        # desligado tambem guarda a escolha (o professor marca antes de ligar)
+        self.assertEqual(self.pedir("/api/controle-remoto")[1]["jogadores_liberados"], [1, 3])
+        falso = FalsoManipulador()
+        self.arena.Manipulador.api_post(falso, "/api/controle-remoto/jogadores", {"jogadores": "todos"})
+        self.assertEqual(falso.respostas[-1][0], "erro")
 
     def test_no_android_nao_liga(self):
         with mock.patch.object(self.arena.plataforma_do_sistema, "ANDROID", True):

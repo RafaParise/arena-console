@@ -6,7 +6,7 @@
     "com_simulador": false,
     "conectou": true,
     "entrou_em_s": 0.8,
-    "ping_ms": 28,
+    "ping_ms": 13,
     "caiu_depois_de_entrar": false,
     "os_dois_abertos_no_fim": true
   },
@@ -16,13 +16,13 @@
     "perda_pct": 0,
     "com_simulador": true,
     "conectou": true,
-    "entrou_em_s": 1.1,
+    "entrou_em_s": 1.0,
     "ping_ms": 128,
     "caiu_depois_de_entrar": false,
     "os_dois_abertos_no_fim": true,
     "pedacos_no_simulador": {
-      "cliente->host": 856,
-      "host->cliente": 867
+      "cliente->host": 858,
+      "host->cliente": 871
     },
     "passou_pelo_simulador": true
   },
@@ -38,7 +38,7 @@
     "os_dois_abertos_no_fim": true,
     "pedacos_no_simulador": {
       "cliente->host": 839,
-      "host->cliente": 861
+      "host->cliente": 860
     },
     "passou_pelo_simulador": true
   },
@@ -49,12 +49,12 @@
     "com_simulador": true,
     "conectou": true,
     "entrou_em_s": 1.8,
-    "ping_ms": 429,
+    "ping_ms": 426,
     "caiu_depois_de_entrar": false,
     "os_dois_abertos_no_fim": true,
     "pedacos_no_simulador": {
-      "cliente->host": 801,
-      "host->cliente": 839
+      "cliente->host": 802,
+      "host->cliente": 842
     },
     "passou_pelo_simulador": true
   },
@@ -65,13 +65,13 @@
     "com_simulador": true,
     "conectou": true,
     "entrou_em_s": 1.0,
-    "ping_ms": 128,
+    "ping_ms": 111,
     "caiu_depois_de_entrar": false,
     "os_dois_abertos_no_fim": true,
     "pedacos_no_simulador": {
-      "cliente->host": 857,
-      "host->cliente": 870,
-      "perdidos": 13
+      "cliente->host": 858,
+      "host->cliente": 871,
+      "perdidos": 24
     },
     "passou_pelo_simulador": true
   },
@@ -82,13 +82,13 @@
     "com_simulador": true,
     "conectou": true,
     "entrou_em_s": 1.0,
-    "ping_ms": 128,
+    "ping_ms": 111,
     "caiu_depois_de_entrar": false,
     "os_dois_abertos_no_fim": true,
     "pedacos_no_simulador": {
-      "cliente->host": 855,
-      "host->cliente": 866,
-      "perdidos": 86
+      "cliente->host": 858,
+      "host->cliente": 871,
+      "perdidos": 79
     },
     "passou_pelo_simulador": true
   }

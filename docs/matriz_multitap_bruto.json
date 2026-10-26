@@ -5,7 +5,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 97479,
-      "segundos": 10.8,
+      "segundos": 10.7,
       "travou": false,
       "erros": []
     },
@@ -14,14 +14,7 @@
       "convidado_diz": "Você se juntou como jogador 2",
       "recusa_do_nucleo": "",
       "hospedeiro_vivo": true,
-      "erros": [
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
-      ]
+      "erros": []
     }
   },
   {
@@ -30,7 +23,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 235564,
-      "segundos": 10.9,
+      "segundos": 10.8,
       "travou": false,
       "erros": []
     },
@@ -39,14 +32,7 @@
       "convidado_diz": "Você se juntou como jogador 2",
       "recusa_do_nucleo": "",
       "hospedeiro_vivo": true,
-      "erros": [
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
-      ]
+      "erros": []
     }
   },
   {
@@ -55,7 +41,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 336143,
-      "segundos": 10.8,
+      "segundos": 10.7,
       "travou": false,
       "erros": [
         "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented."
@@ -67,12 +53,7 @@
       "recusa_do_nucleo": "",
       "hospedeiro_vivo": true,
       "erros": [
-        "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
+        "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented."
       ]
     }
   },
@@ -82,7 +63,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 40997,
-      "segundos": 10.8,
+      "segundos": 11.2,
       "travou": false,
       "erros": []
     },
@@ -91,14 +72,7 @@
       "convidado_diz": "Você se juntou como jogador 2",
       "recusa_do_nucleo": "",
       "hospedeiro_vivo": true,
-      "erros": [
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
-      ]
+      "erros": []
     }
   },
   {
@@ -107,7 +81,7 @@
     "abre": {
       "abre_e_mostra_imagem": false,
       "foto_bytes": 1796,
-      "segundos": 10.8,
+      "segundos": 10.7,
       "travou": false,
       "erros": []
     },
@@ -116,14 +90,7 @@
       "convidado_diz": "Você se juntou como jogador 2",
       "recusa_do_nucleo": "",
       "hospedeiro_vivo": true,
-      "erros": [
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
-      ]
+      "erros": []
     }
   },
   {
@@ -162,14 +129,7 @@
       "convidado_diz": "Você se juntou como jogador 2",
       "recusa_do_nucleo": "",
       "hospedeiro_vivo": true,
-      "erros": [
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
-      ]
+      "erros": []
     }
   },
   {
@@ -178,7 +138,7 @@
     "abre": {
       "abre_e_mostra_imagem": false,
       "foto_bytes": 1848,
-      "segundos": 10.8,
+      "segundos": 10.9,
       "travou": false,
       "erros": []
     },
@@ -187,14 +147,7 @@
       "convidado_diz": "Você se juntou como jogador 2",
       "recusa_do_nucleo": "",
       "hospedeiro_vivo": true,
-      "erros": [
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
-      ]
+      "erros": []
     }
   },
   {
@@ -203,7 +156,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 58602,
-      "segundos": 13.0,
+      "segundos": 11.2,
       "travou": false,
       "erros": [
         "[libretro INFO] [BOOT] USA region not supported. Using Europe instead"
@@ -226,7 +179,7 @@
     "jogo": "Killzone - Liberation (USA) (En,Fr,De,Es,It,Nl,Pl,Ru).iso",
     "abre": {
       "abre_e_mostra_imagem": true,
-      "foto_bytes": 6601,
+      "foto_bytes": 6595,
       "segundos": 11.1,
       "travou": false,
       "erros": [
@@ -250,7 +203,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 28984,
-      "segundos": 11.4,
+      "segundos": 11.9,
       "travou": false,
       "erros": []
     },
@@ -259,14 +212,7 @@
       "convidado_diz": "Você se juntou como jogador 2",
       "recusa_do_nucleo": "",
       "hospedeiro_vivo": true,
-      "erros": [
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket.",
-        "[ERROR] [Discovery] Failed to initialize netplay advertisement socket."
-      ]
+      "erros": []
     }
   }
 ]

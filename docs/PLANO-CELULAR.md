@@ -30,7 +30,7 @@ offline, alunos menores de idade).
 | 4 | Giroscópio lido pelo navegador do celular | Giroscópio **só dentro do app ARENA do Android**; no navegador comum, por `http://<IP do PC>`, só os botões | `DeviceOrientationEvent` exige contexto seguro [Certo: MDN, selo "Secure context"]. Dentro do app, a tela vem de `127.0.0.1`, que conta como seguro. Por `http://192.168...` não |
 | 5 | Captura de tela com botão "atualizar" | **Uma imagem por clique**, sem atualizar sozinha e sem gravar em disco | Regra do projeto: nada de gravação de vídeo nem de transmissão, por causa dos alunos menores. Uma atualização em laço seria transmissão |
 | 6 | "Instale o Platform Tools" | O `adb` vem do site do Google e **não vai no pacote**; o ARENA o procura em 4 lugares e, se não achar, explica onde baixar | O pacote do ARENA leva só o que é do ARENA ou de licença livre |
-| 7 | (não dizia) | **Segurança do controle remoto**: desligado por padrão; liga num clique no computador; código de 4 dígitos mostrado na tela do PC; só rede local; limite de eventos por segundo; o RetroArch só escuta a porta enquanto o jogo roda | Sem isso, qualquer colega da sala mandaria botão para o jogo do outro |
+| 7 | (não dizia) | **Segurança do controle remoto**: desligado por padrão; liga num clique no computador; código mostrado na tela do PC (4 dígitos no roteiro; 6 depois da revisão de segurança de 25/10/2026); só rede local; limite de eventos por segundo; o RetroArch só escuta a porta enquanto o jogo roda | Sem isso, qualquer colega da sala mandaria botão para o jogo do outro |
 | 8 | (pedido anterior) engenharia reversa do DroidJoy | **Fora.** O roteiro novo já proíbe, e não é preciso: o protocolo do RetroArch é documentado | Apps do gênero entram só como pesquisa de recursos e de layout (o que as lojas descrevem), sem descompilar nada |
 
 Os emuladores de fora (PCSX2, Dolphin, RPCS3, Xenia) não leem o Network
@@ -583,7 +583,7 @@ Lido no código do RetroArch 1.22.2 (`input/input_driver.c`) e **provado com o A
 - Os emuladores de fora (PCSX2, Dolphin, RPCS3, Xenia) não leem o Network RetroPad, e o Jogar Junto (netplay) não o usa.
 
 **Segurança** (a lista da linha 7 da tabela do roteiro): desligado por padrão e sem guardar no `config.json`; liga só pelo clique
-no computador; só rede local (`rede_privada`); código de 4 números conferido com `hmac.compare_digest`, bloqueio do endereço por
+no computador; só rede local (`rede_privada`); código de 6 números conferido com `hmac.compare_digest`, bloqueio do endereço por
 2 minutos depois de 5 erros em 1 minuto, código novo depois de 20 erros no total; `Origin` de outro site recusado (um site aberto
 no celular não manda botão); só a página do controle na porta (nenhuma rota da API do ARENA); limite de 150 quadros por segundo,
 4 KB por quadro, 24 conexões abertas e 4 celulares; cabeçalhos `nosniff`, `no-store`, `Referrer-Policy` e CSP que só deixa o

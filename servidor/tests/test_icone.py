@@ -286,7 +286,8 @@ class AtalhoDoWindows(unittest.TestCase):
         import subprocess
         feito = subprocess.run(["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File",
                                 caminho("ferramentas", "criar_atalho.ps1"), os.path.join(tempfile.gettempdir(), "nao_existe_arena_xyz")],
-                               capture_output=True, text=True, timeout=60, creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+                               capture_output=True, text=True, errors="replace",       # o "Pedagógicos" do caminho vem na página do console, não em UTF-8 (com python -X utf8, sem isto, o stderr vinha None)
+                               timeout=60, creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
         self.assertNotEqual(feito.returncode, 0)
         self.assertIn("nao existe", feito.stderr)
 

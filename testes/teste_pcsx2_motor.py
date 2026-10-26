@@ -105,12 +105,18 @@ def main():
         finally:
             arena.ARQUIVO_CONFIG = original
 
-        # A tela oferece exatamente os motores que o servidor aceita.
+        # A tela do computador oferece os motores que o servidor aceita, menos o OpenGL: ele so vale no celular (o PS2 do
+        # Android, nucleo ARMSX2), onde o app.js troca a lista por automatico, OpenGL e Vulkan (motorDoPs2NoCelular).
         html = open(os.path.join(RAIZ, "launcher", "index.html"), encoding="utf-8").read()
         bloco = html.split('id="listaMotorPs2"', 1)[-1].split("</select>", 1)[0]
         oferecidos = {parte.split('"', 1)[0] for parte in bloco.split('value="')[1:]}
-        confere("a tela oferece os mesmos motores que o servidor aceita",
-                oferecidos == set(graficos.MOTORES_PCSX2), str(oferecidos))
+        confere("a tela do computador oferece os motores do servidor (menos o OpenGL, so do celular)",
+                oferecidos == set(graficos.MOTORES_PCSX2) - {"opengl"}, str(oferecidos))
+        app = open(os.path.join(RAIZ, "launcher", "app.js"), encoding="utf-8").read()
+        celular = app.split("function motorDoPs2NoCelular", 1)[-1].split("function mostrarAndroid", 1)[0]
+        no_celular = {parte.split('"', 1)[0] for parte in celular.split('["')[1:]}
+        confere("a tela do celular oferece automatico, OpenGL e Vulkan, e o servidor aceita os tres",
+                no_celular == {"automatico", "opengl", "vulkan"} and no_celular <= set(graficos.MOTORES_PCSX2), str(no_celular))
     finally:
         shutil.rmtree(pasta, ignore_errors=True)
 

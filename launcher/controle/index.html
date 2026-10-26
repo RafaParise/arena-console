@@ -14,19 +14,23 @@
 <main id="entrada" class="entrada">
   <section class="entrada-texto">
     <h1>ARENA <span>controle</span></h1>
-    <p class="explica">Use este celular como controle do jogo que está aberto no computador. Olhe o <b>código de 4 números</b> que o ARENA mostra no computador (Ajustes → Controles → Celular como controle).</p>
+    <p class="explica">Use este celular como controle do jogo que está aberto no computador. Olhe o <b>código de <span id="digitosDoCodigo">6</span> números</b> que o ARENA mostra no computador (Ajustes → Controles → Celular como controle).</p>
     <p class="rodape">Só funciona na mesma rede Wi-Fi do computador. Nada é gravado: nem vídeo, nem foto, nem som.</p>
   </section>
   <section class="entrada-form">
   <form id="formulario" autocomplete="off">
     <label for="codigo">Código do computador</label>
-    <input id="codigo" name="codigo" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="0000" autocomplete="one-time-code" required>
+    <input id="codigo" name="codigo" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="000000" autocomplete="one-time-code" required>
     <fieldset class="jogadores">
       <legend>Qual jogador você é?</legend>
       <label><input type="radio" name="jogador" value="1"><span>1</span></label>
       <label><input type="radio" name="jogador" value="2" checked><span>2</span></label>
       <label><input type="radio" name="jogador" value="3"><span>3</span></label>
       <label><input type="radio" name="jogador" value="4"><span>4</span></label>
+      <label><input type="radio" name="jogador" value="5"><span>5</span></label>
+      <label><input type="radio" name="jogador" value="6"><span>6</span></label>
+      <label><input type="radio" name="jogador" value="7"><span>7</span></label>
+      <label><input type="radio" name="jogador" value="8"><span>8</span></label>
     </fieldset>
     <label for="apelido">Seu apelido (aparece no computador)</label>
     <input id="apelido" name="apelido" maxlength="20" placeholder="opcional">
@@ -41,6 +45,7 @@
   <div class="faixa-de-cima">
     <button class="pequeno" id="botaoMenu" type="button" aria-label="Abrir o menu do controle">☰ Menu</button>
     <span id="estadoDaConexao" class="conexao" role="status" aria-live="polite">Conectado</span>
+    <span id="rtt" class="rtt" title="Tempo de ida e volta até o computador: quanto menor, mais rápido responde"></span>
     <span id="rotuloDoJogador" class="jogador">Jogador 2</span>
   </div>
 

@@ -816,6 +816,24 @@
                 aria-pressed="false" aria-label="Ligar o celular como controle"></button>
         <span class="opcao-ajuda">O celular e o computador precisam estar na mesma rede Wi-Fi.</span>
       </div>
+      <div class="opcao" id="controleRemotoJogadores">
+        <span class="opcao-rotulo">Jogadores que o celular pode ser</span>
+        <span class="opcao-controle" role="group" aria-label="Jogadores que o celular pode ser">
+          <label class="jogador-liberado"><input type="checkbox" data-jogador="1" aria-label="Jogador 1"> 1</label>
+          <label class="jogador-liberado"><input type="checkbox" data-jogador="2" aria-label="Jogador 2"> 2</label>
+          <label class="jogador-liberado"><input type="checkbox" data-jogador="3" aria-label="Jogador 3"> 3</label>
+          <label class="jogador-liberado"><input type="checkbox" data-jogador="4" aria-label="Jogador 4"> 4</label>
+          <label class="jogador-liberado"><input type="checkbox" data-jogador="5" aria-label="Jogador 5"> 5</label>
+          <label class="jogador-liberado"><input type="checkbox" data-jogador="6" aria-label="Jogador 6"> 6</label>
+          <label class="jogador-liberado"><input type="checkbox" data-jogador="7" aria-label="Jogador 7"> 7</label>
+          <label class="jogador-liberado"><input type="checkbox" data-jogador="8" aria-label="Jogador 8"> 8</label>
+        </span>
+        <span class="opcao-ajuda">
+          Cada jogador liberado é uma porta que o RetroArch deixa aberta na rede enquanto o jogo roda (sem senha: é do
+          próprio RetroArch). Libere só os que vai usar: um jogo de 2 jogadores abre só o jogador 2. Vale no próximo
+          jogo que você abrir.
+        </span>
+      </div>
       <div id="controleRemotoDados" hidden>
         <p class="explica">No navegador do celular, abra um destes endereços e digite o código:</p>
         <ul class="controles" id="controleRemotoEnderecos"></ul>

@@ -6,7 +6,7 @@ Como funciona, em quatro passos:
   1. O professor liga "Celular como controle" nos Ajustes. So entao este modulo abre uma porta (8780) na rede local,
      com a tela do controle e um WebSocket. Desligado e' o padrao, e o ARENA sempre abre desligado.
   2. O aluno abre o endereco que a tela mostra (http://192.168.x.x:8780/) no navegador do celular e digita o codigo de
-     4 digitos que aparece no computador.
+     6 numeros que aparece no computador.
   3. A tela do controle manda o estado dos botoes (11 bytes) a cada mudanca e a cada 250 ms (o "ainda estou aqui").
   4. Este modulo traduz o estado para o Network RetroPad do RetroArch: datagramas UDP de 20 bytes para o 127.0.0.1
      (so este computador), um por quadro de video. O RetroArch so escuta enquanto o jogo roda.
@@ -21,16 +21,26 @@ por 1,5 s (ou ao fechar a conexao), tudo e' solto, e uma varredura manda o zero 
 Seguranca (docs\\PLANO-CELULAR.md, linha 7 da tabela):
   * desligado por padrao e so liga pelo clique do professor no computador (nunca pelo celular);
   * so aceita conexao de rede local (10.x, 172.16-31.x, 192.168.x, 169.254.x e o proprio computador);
-  * so 4 digitos de codigo, conferidos sem pressa (hmac.compare_digest), com bloqueio do endereco depois de 5 erros
-    em 1 minuto e codigo novo depois de 20 erros no total;
+  * codigo de 6 numeros, conferido com hmac.compare_digest NA MESMA TRAVA em que a tentativa e' contada (varias conexoes
+    de uma vez nao passam do limite), bloqueio do endereco depois de 5 erros em 1 minuto, no maximo 10 tentativas a cada
+    10 s de TODOS os enderecos juntos (trocar de endereco a cada tentativa nao ajuda) e codigo novo depois de 20 erros;
   * a pagina so e' do controle: nenhuma rota da API do ARENA fica na porta aberta;
-  * o WebSocket de outra origem (um site aberto no celular) e' recusado;
+  * so responde a quem chamou o computador por um endereco DELE (lista fechada de IP:porta): um site que fez o nome dele
+    apontar para o computador (DNS rebinding) chega com outro Host e e' recusado; a Origin tambem tem que ser a desse Host;
+  * o professor escolhe quais jogadores (1 a 4) o celular pode ser, e so esses abrem no RetroArch;
   * limite de quadros por segundo e de tamanho; no maximo 4 celulares ao mesmo tempo.
 
 O que nao da: os emuladores de fora (PCSX2, Dolphin, RPCS3, Xenia) nao leem o Network RetroPad. E o RetroArch escuta o
 UDP em TODAS as placas de rede enquanto o jogo roda (nao da para pedir so o 127.0.0.1): com o firewall do Windows
-fechado para a rede publica isso nao chega a ninguem, mas na rede da escola vale o aviso na tela. Por isso a porta-base
-muda a cada jogo (sorteada) e so os 4 jogadores do controle remoto sao ligados.
+fechado para a rede publica isso nao chega a ninguem, mas na rede da escola vale o aviso na tela.
+
+O que isso quer dizer, sem enfeite (revisao de seguranca de 25/10/2026): enquanto um jogo do RetroArch esta aberto com
+o controle remoto ligado, QUALQUER computador da mesma rede que ache a porta UDP (sorteada entre 50000 e 59000 so para
+nao esbarrar em outra; varrer 9 mil portas e' rapido) pode mandar botoes para os jogadores liberados. Nao ha senha: o
+Network RetroPad e' do RetroArch e nao tem. O estrago e' o de uma brincadeira (apertar botao no jogo do colega), e e' o
+mesmo da porta do Jogar Junto. O que o ARENA faz: desligado de fabrica, so abre os jogadores liberados pelo professor e
+que o jogo tem, so enquanto o jogo roda. O conserto de verdade (escutar so o 127.0.0.1) exige mexer no RetroArch, que o
+ARENA leva sem alteracao no Windows; fica anotado em docs\\PLANO-CELULAR.md.
 """
 import base64
 import hashlib
@@ -54,7 +64,7 @@ PASTA_DA_PAGINA = os.path.join(RAIZ, "launcher", "controle")
 
 PORTA_DA_PAGINA = 8780
 PORTA_BASE_PADRAO = 55400                 # o padrao do RetroArch (network_remote_base_port)
-JOGADORES = 4
+JOGADORES = 8                               # o Network RetroPad do RetroArch vai ate 16; 8 cobre os consoles com 2 multitaps
 TAMANHO_MAXIMO_DO_QUADRO = 4096           # nada do controle passa de 200 bytes
 QUADROS_POR_SEGUNDO_MAXIMO = 150          # o celular manda uns 60 por segundo
 SEGUNDOS_SEM_SINAL = 1.5                  # sem estado novo: solta tudo
@@ -63,7 +73,10 @@ SEGUNDOS_PARA_O_CODIGO = 8.0              # tempo para o celular dizer "oi" depo
 INTERVALO_DO_ENVIO = 1.0 / 60.0           # um quadro de video
 RESSINCRONIZAR_A_CADA = 12                # quadros: com a fila vazia, repete o estado de um controle (conserta perda)
 ZONA_DO_ANALOGICO = 256                   # mudanca menor que isso (de 32767) nao vira datagrama
-DIGITOS_DO_CODIGO = 4
+DIGITOS_DO_CODIGO = 6                     # 4 caiam em 10 mil tentativas; 6, em 1 milhao (revisao de seguranca de 25/10/2026)
+TENTATIVAS_POR_JANELA = 10                # tentativas de codigo de TODOS os enderecos juntos...
+JANELA_GLOBAL_S = 10.0                    # ...a cada 10 s: com enderecos trocados, o bloqueio por endereco nao basta
+JOGADORES_LIBERADOS_PADRAO = (2, 3, 4)    # o 1 costuma ser o teclado ou o controle de verdade
 ERROS_ANTES_DO_BLOQUEIO = 5
 JANELA_DOS_ERROS_S = 60.0
 BLOQUEIO_S = 120.0
@@ -371,16 +384,21 @@ def rede_privada(endereco):
     return ip.is_loopback or ip.is_private or ip.is_link_local
 
 
-def origem_confiavel(origem, host):
-    """A pagina que abriu o WebSocket veio DESTE mesmo servidor? (Um site qualquer aberto no celular nao pode mandar
-    botao para o jogo.) Sem Origin nao e' navegador: o codigo continua valendo."""
+def origem_confiavel(origem, host, permitidos):
+    """O pedido veio da tela DESTE servidor? 'permitidos' e' a lista fechada dos enderecos que o computador tem de
+    verdade (IP:porta). Comparar a Origin so com o Host nao basta: num "DNS rebinding" um site qualquer faz o nome dele
+    apontar para o IP do computador, e a Origin e o Host chegam IGUAIS, com o nome do site. Um nome fora da lista nao
+    entra. Sem Origin nao e' navegador (so o codigo vale)."""
+    host = (host or "").strip().lower()
+    if host not in permitidos:
+        return False
     if not origem:
         return True
     try:
-        quem = urllib.parse.urlparse(origem).netloc.lower()
+        partes = urllib.parse.urlsplit(origem)
     except ValueError:
         return False
-    return bool(host) and quem == host.strip().lower()
+    return partes.scheme in ("http", "https") and partes.netloc.lower() == host
 
 
 def codigo_novo():
@@ -407,12 +425,15 @@ def porta_base_livre(tentativas=30):
     return PORTA_BASE_PADRAO
 
 
-def opcoes_do_retroarch(porta_base):
-    """As chaves do arquivo da partida (--appendconfig) que ligam o Network RetroPad dos 4 jogadores. O RetroArch so
-    abre os soquetes dos jogadores abaixo de input_max_users: quem junta isto com o resto sobe o input_max_users."""
+def opcoes_do_retroarch(porta_base, jogadores=None):
+    """As chaves do arquivo da partida (--appendconfig) que ligam o Network RetroPad dos 'jogadores' (so esses: cada um
+    e' uma porta UDP aberta em todas as placas de rede enquanto o jogo roda, sem senha: e' do proprio RetroArch).
+    O RetroArch so abre os soquetes dos jogadores abaixo de input_max_users: quem junta isto com o resto sobe o
+    input_max_users para pelo menos o maior destes."""
+    jogadores = sorted(set(jogadores if jogadores is not None else range(1, JOGADORES + 1)))
     chaves = {"network_remote_enable": "true", "network_remote_base_port": str(int(porta_base))}
     for n in range(1, JOGADORES + 1):
-        chaves["network_remote_enable_user_p%d" % n] = "true"
+        chaves["network_remote_enable_user_p%d" % n] = "true" if n in jogadores else "false"
     return chaves
 
 
@@ -509,8 +530,16 @@ class _Manipulador(BaseHTTPRequestHandler):
     def do_GET(self):
         caminho = urllib.parse.urlparse(self.path).path
         controle = self.server.controle
+        # So responde a quem chamou o computador por um endereco DELE (o IP da rede ou 127.0.0.1): um nome de site que
+        # passou a apontar para ca (DNS rebinding) traz outro Host e nao entra.
+        if not controle.host_confiavel(self.headers.get("Host")):
+            return self._responder(403, "Pedido recusado: use o endereço que o ARENA mostra no computador.".encode("utf-8"))
         if caminho == "/ws":
             return self._abrir_websocket()
+        if caminho == "/jogadores":
+            # quais jogadores o professor liberou para o celular (sem segredo nenhum): a tela do celular so oferece estes
+            corpo = json.dumps({"jogadores": controle.jogadores(), "digitos": DIGITOS_DO_CODIGO}).encode("utf-8")
+            return self._responder(200, corpo, "application/json; charset=utf-8")
         arquivo = _ROTAS_DA_PAGINA.get(caminho)
         if not arquivo:
             return self._responder(404, "Não achei esta página. O controle está em /".encode("utf-8"))
@@ -533,7 +562,7 @@ class _Manipulador(BaseHTTPRequestHandler):
         if (cab.get("Upgrade", "").lower() != "websocket" or "upgrade" not in cab.get("Connection", "").lower()
                 or cab.get("Sec-WebSocket-Version") != "13" or not chave_valida(chave)):
             return self._responder(400, b"Isto e' um WebSocket.")
-        if not origem_confiavel(cab.get("Origin"), cab.get("Host")):
+        if not origem_confiavel(cab.get("Origin"), cab.get("Host"), controle.hosts_confiaveis()):
             return self._responder(403, "Pedido recusado: ele não veio da tela do controle.".encode("utf-8"))
         self.send_response(101, "Switching Protocols")
         self.send_header("Upgrade", "websocket")
@@ -563,6 +592,9 @@ class ControleRemoto:
         self._erros = {}               # ip -> [instantes dos erros de codigo]
         self._bloqueios = {}           # ip -> instante em que o bloqueio acaba
         self._erros_no_total = 0
+        self._tentativas = []          # instantes das ultimas tentativas de codigo, de qualquer endereco
+        self._liberados = set(JOGADORES_LIBERADOS_PADRAO)      # os jogadores que o celular pode ser (o professor muda)
+        self._hosts_extras = set()     # outros nomes que valem como Host (o endereco do tunel, quando houver)
 
     # -- liga e desliga ---------------------------------------------------------------------------
     def ligar(self):
@@ -588,6 +620,7 @@ class ControleRemoto:
             self._erros.clear()
             self._bloqueios.clear()
             self._erros_no_total = 0
+            self._tentativas = []
             self.ligado = True
             return self._estado_sem_trava()
 
@@ -617,19 +650,53 @@ class ControleRemoto:
 
     def _estado_sem_trava(self):
         if not self.ligado:
-            return {"ligado": False, "porta_da_pagina": self.porta_pedida}
+            return {"ligado": False, "porta_da_pagina": self.porta_pedida, "jogadores_liberados": sorted(self._liberados)}
         enderecos = ["http://%s:%d/" % (ip, self.porta) for ip in self._enderecos()]
         return {"ligado": True, "codigo": self.codigo, "porta_da_pagina": self.porta, "enderecos": enderecos,
-                "conectados": [{"jogador": n, "ip": d["ip"], "apelido": d["apelido"], "ha_s": round(time.monotonic() - d["desde"])}
+                "jogadores_liberados": sorted(self._liberados),
+                "conectados": [{"jogador": n, "ip": d["ip"], "apelido": d["apelido"], "ha_s": round(time.monotonic() - d["desde"]),
+                                "rtt_ms": d.get("rtt_ms"), "pelo_cabo": d["ip"].startswith("127.")}
                                for n, d in sorted(self._clientes.items())]}
 
-    def preparar_partida(self):
-        """Chamado quando um jogo vai abrir: sorteia a porta-base do Network RetroPad e devolve as chaves do RetroArch.
-        Sem o controle remoto ligado devolve {} (o jogo abre como sempre)."""
+    # -- que jogadores o celular pode ser ---------------------------------------------------------
+    def jogadores(self):
+        with self._trava:
+            return sorted(self._liberados)
+
+    def liberar_jogadores(self, numeros):
+        """O professor escolhe (de 1 a 4) quais jogadores o celular pode ser. Vale no PROXIMO jogo que abrir: cada jogador
+        liberado e' uma porta UDP aberta no RetroArch enquanto o jogo roda (sem senha: e' do proprio RetroArch), entao
+        so se abre o que se vai usar."""
+        novos = {int(n) for n in numeros if str(n).isdigit() and 1 <= int(n) <= JOGADORES}
+        with self._trava:
+            self._liberados = novos
+        return sorted(novos)
+
+    def preparar_partida(self, jogadores_do_jogo=JOGADORES):
+        """Chamado quando um jogo vai abrir: sorteia a porta-base do Network RetroPad e devolve as chaves do RetroArch,
+        so dos jogadores liberados que o jogo tem (um jogo de 2 abre so o jogador 2 de um celular). Sem o controle remoto
+        ligado, ou sem nenhum jogador a abrir, devolve {} e o jogo abre como sempre."""
         if not self.ligado:
             return {}
+        ativos = [n for n in self.jogadores() if n <= max(2, int(jogadores_do_jogo or JOGADORES))]
+        if not ativos:
+            return {}
         self.enviador.porta_base = porta_base_livre()
-        return opcoes_do_retroarch(self.enviador.porta_base)
+        return opcoes_do_retroarch(self.enviador.porta_base, ativos)
+
+    # -- que nomes valem como Host ----------------------------------------------------------------
+    def hosts_confiaveis(self):
+        """Os 'IP:porta' deste computador (o da rede, o do proprio computador, o nome dele) e os nomes extras (o tunel)."""
+        nomes = {"127.0.0.1", "localhost", "[::1]", socket.gethostname().lower()}
+        nomes.update(self._enderecos())
+        nomes.add(socket.gethostname().lower() + ".local")
+        porta = self.porta
+        permitidos = {"%s:%d" % (n.lower(), porta) for n in nomes if porta}
+        permitidos.update(h.lower() for h in self._hosts_extras)
+        return permitidos
+
+    def host_confiavel(self, host):
+        return (host or "").strip().lower() in self.hosts_confiaveis()
 
     # -- quem pode entrar -------------------------------------------------------------------------
     def _bloqueado(self, ip, agora):
@@ -640,27 +707,34 @@ class ControleRemoto:
         return False
 
     def _anotar_erro(self, ip, agora):
-        with self._trava:
-            recentes = [t for t in self._erros.get(ip, []) if agora - t < JANELA_DOS_ERROS_S] + [agora]
-            self._erros[ip] = recentes
-            if len(recentes) >= ERROS_ANTES_DO_BLOQUEIO:
-                self._bloqueios[ip] = agora + BLOQUEIO_S
-            self._erros_no_total += 1
-            if self._erros_no_total >= ERROS_ANTES_DE_TROCAR_O_CODIGO:
-                self.codigo = codigo_novo()          # alguem esta tentando todos: o codigo que ele tem nao vale mais
-                self._erros_no_total = 0
-            return max(0, ERROS_ANTES_DO_BLOQUEIO - len(recentes))
+        """Conta o erro (chamar com a trava na mao)."""
+        recentes = [t for t in self._erros.get(ip, []) if agora - t < JANELA_DOS_ERROS_S] + [agora]
+        self._erros[ip] = recentes
+        if len(recentes) >= ERROS_ANTES_DO_BLOQUEIO:
+            self._bloqueios[ip] = agora + BLOQUEIO_S
+        self._erros_no_total += 1
+        if self._erros_no_total >= ERROS_ANTES_DE_TROCAR_O_CODIGO:
+            self.codigo = codigo_novo()          # alguem esta tentando todos: o codigo que ele tem nao vale mais
+            self._erros_no_total = 0
+        return max(0, ERROS_ANTES_DO_BLOQUEIO - len(recentes))
 
     def conferir_o_codigo(self, ip, codigo, agora=None):
-        """(ok, motivo, restam). O bloqueio vale para o endereco inteiro, com o codigo certo ou errado."""
+        """(ok, motivo, restam). Tudo na mesma trava: a tentativa e' contada ANTES de o codigo ser comparado, e o limite
+        vale para todos os enderecos juntos (um endereco trocado a cada tentativa nao escapa do bloqueio por endereco).
+        O bloqueio vale para o endereco inteiro, com o codigo certo ou errado."""
         agora = time.monotonic() if agora is None else agora
         with self._trava:
             if self._bloqueado(ip, agora):
                 return False, "bloqueado", 0
+            self._tentativas = [t for t in self._tentativas if agora - t < JANELA_GLOBAL_S]
+            if len(self._tentativas) >= TENTATIVAS_POR_JANELA:
+                return False, "muitas", 0
+            self._tentativas.append(agora)
             certo = self.codigo
-        if certo and isinstance(codigo, str) and hmac.compare_digest(codigo.encode("utf-8"), certo.encode("utf-8")):
-            return True, "", ERROS_ANTES_DO_BLOQUEIO
-        return False, "codigo", self._anotar_erro(ip, agora)
+            if (certo and isinstance(codigo, str)
+                    and hmac.compare_digest(codigo.encode("utf-8"), certo.encode("utf-8"))):
+                return True, "", ERROS_ANTES_DO_BLOQUEIO
+            return False, "codigo", self._anotar_erro(ip, agora)
 
     # -- a conversa com um celular ----------------------------------------------------------------
     def atender(self, soquete, ip):
@@ -734,8 +808,8 @@ class ControleRemoto:
             jogador = int(oi.get("jogador", 0))
         except (TypeError, ValueError):
             jogador = 0
-        if not 1 <= jogador <= JOGADORES:
-            self._enviar_texto(soquete, {"t": "erro", "motivo": "jogador"})
+        if not 1 <= jogador <= JOGADORES or jogador not in self.jogadores():
+            self._enviar_texto(soquete, {"t": "erro", "motivo": "jogador", "jogadores": self.jogadores()})
             self._fechar(soquete, 1008, "jogador")
             return None
         apelido = str(oi.get("apelido", ""))[:20]
@@ -797,9 +871,15 @@ class ControleRemoto:
                             mensagem = json.loads(dados.decode("utf-8"))
                         except (ValueError, UnicodeDecodeError):
                             raise ErroDeProtocolo(1007, "mensagem ilegivel") from None
-                        if isinstance(mensagem, dict) and mensagem.get("t") == "tchau":
+                        tipo = mensagem.get("t") if isinstance(mensagem, dict) else None
+                        if tipo == "tchau":
                             self._fechar(soquete, 1000, "tchau")
                             return
+                        if tipo == "p":
+                            # "ping" da tela do celular: ela mede sozinha a ida e volta (a latencia que importa)
+                            self._enviar_texto(soquete, {"t": "q", "n": mensagem.get("n")})
+                        elif tipo == "rtt":
+                            self._anotar_rtt(jogador, soquete, mensagem.get("ms"))
                 pedaco = soquete.recv(4096)
                 if not pedaco:
                     return
@@ -816,6 +896,19 @@ class ControleRemoto:
                 if agora - ultimo_dado > SEGUNDOS_PARA_DESISTIR:
                     self._fechar(soquete, 1001, "parado")
                     return
+
+    def _anotar_rtt(self, jogador, soquete, ms):
+        """A ida e volta, em milissegundos, que a tela do celular mediu: aparece na lista de celulares do computador."""
+        try:
+            ms = float(ms)
+        except (TypeError, ValueError):
+            return
+        if not 0 <= ms < 10000:
+            return
+        with self._trava:
+            dados = self._clientes.get(jogador)
+            if dados is not None and dados["soquete"] is soquete:
+                dados["rtt_ms"] = round(ms)
 
     def _soltar_o_jogador(self, jogador, soquete):
         with self._trava:
