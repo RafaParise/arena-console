@@ -176,7 +176,7 @@ Passar de 1.5 costuma deixar o movimento nervoso.
 
 #### Abrir menu pelo controle
 
-Sem teclado por perto? Deixe no **2** e aperte **Start + Select juntos**.
+Sem teclado por perto? Deixe no **2** e aperte **os dois analógicos juntos** (L3 + R3). Sem analógico que aperta, use o **4** (Start + Select juntos).
 
 ---
 

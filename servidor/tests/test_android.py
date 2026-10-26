@@ -721,6 +721,34 @@ class RotasDoAndroid(unittest.TestCase):
             self.assertEqual(self.pedir("/api/android/pastas")[0], 404)
 
 
+class OQueOCelularNaoTem(unittest.TestCase):
+    """O ARENA do celular nao sugere o que so existe no computador (pedido do Rafael, 25/10/2026: "tudo que o ARENA PC
+    faz, o Android faz"; o que ele nao faz, nao aparece)."""
+
+    def test_os_consoles_sem_versao_para_o_celular(self):
+        import arena
+        falso = [{"id": "ps3", "estado": "falta_externo"}, {"id": "javame", "estado": "sem_core"},
+                 {"id": "snes", "estado": "pronta"}, {"id": "ps1", "estado": "falta_sistema"}]
+        with no_android(), mock.patch.object(arena, "avaliar_plataformas", return_value=falso):
+            self.assertEqual(arena.consoles_sem_versao_neste_aparelho(), {"ps3", "javame"})
+        with mock.patch.object(plataforma, "ANDROID", False),                 mock.patch.object(arena, "avaliar_plataformas", return_value=falso):
+            self.assertEqual(arena.consoles_sem_versao_neste_aparelho(), set())          # no computador, todos existem
+
+    def test_a_lista_de_controles_do_celular_nao_fala_de_driver_nem_de_windows(self):
+        import graficos
+        self.assertGreaterEqual(len(graficos.CONTROLES_DO_ANDROID), 5)
+        for nome, selo, nota in graficos.CONTROLES_DO_ANDROID:
+            self.assertNotRegex(" ".join((nome, selo, nota)), r"(?i)xinput|dinput|windows|steam|driver|scp")
+
+    def test_como_fechar_o_jogo_no_celular_nao_e_f10(self):
+        import arena
+        self.assertEqual(arena.como_fechar_o_jogo(), "F10")                      # no computador
+        with no_android():
+            self.assertNotIn("F10", arena.como_fechar_o_jogo())
+            self.assertIn("SAIR", arena.como_fechar_o_jogo())
+            self.assertNotIn("F10", arena.mensagem_cheat_com_jogo_aberto())
+
+
 class Lentidao(unittest.TestCase):
     """O que deixa o jogo lento, no aparelho (servidor\\barreiras.py): a memoria
     pelo /proc, a bateria e a economia de bateria pelo app."""
@@ -756,6 +784,28 @@ class Lentidao(unittest.TestCase):
             self.assertEqual(fatos["bateria_pct"], 12)
             rapidos = sorted(b["id"] for b in barreiras.avaliar_rapido(fatos))
         self.assertEqual(rapidos, ["bateria", "economia_bateria", "memoria"])
+
+    def test_o_aparelho_esquentando_avisa(self):
+        import barreiras
+        base = {"sistema": "android", "memoria_total_mb": 3700, "memoria_livre_mb": 2500, "memoria_em_uso_pct": 40,
+                "tem_bateria": True, "bateria_pct": 80, "na_tomada": True, "economia_de_bateria": False}
+        self.assertEqual(barreiras.avaliar_android(dict(base, termico=0)), [])
+        self.assertEqual(barreiras.avaliar_android(dict(base, termico=1)), [])
+        quente = barreiras.avaliar_android(dict(base, termico=2))
+        self.assertEqual([(b["id"], b["gravidade"]) for b in quente], [("calor", "media")])
+        muito = barreiras.avaliar_android(dict(base, termico=3))
+        self.assertEqual([(b["id"], b["gravidade"]) for b in muito], [("calor", "alta")])
+        # so o calor forte entra no aviso rapido de antes do jogo
+        self.assertEqual([b["id"] for b in barreiras.avaliar_rapido(dict(base, termico=3))], ["calor"])
+        self.assertEqual(barreiras.avaliar_rapido(dict(base, termico=2)), [])
+
+    def test_o_calor_vem_do_app(self):
+        import barreiras
+        ponte_android.CANAL = AppDeMentira(respostas={"energia": {"tem_bateria": True, "bateria_pct": 80,
+                                                                  "na_tomada": True, "economia": False, "termico": 3}})
+        with mock.patch.object(barreiras, "_ler_linux", side_effect=lambda c: self.MEMINFO if "meminfo" in c else ""):
+            fatos = barreiras.coletar_fatos_android(rapido=True)
+        self.assertEqual(fatos["termico"], 3)
 
     def test_sem_o_app_so_a_memoria(self):
         import barreiras

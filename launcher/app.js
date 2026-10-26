@@ -118,6 +118,12 @@ async function pedir(rota, metodo = "GET", corpo = null) {
   return dados;
 }
 
+// No celular nao ha F10, F2, Esc nem teclado: onde o texto manda apertar uma tecla, o celular tem outro jeito (o botao
+// MENU ou SAIR do controle de toque, ou os dois analogicos apertados no controle de verdade). Pedido do Rafael, 25/10/2026.
+function noCelular() {
+  return estado.sistemaDoComputador === "android";
+}
+
 // O jeito de abrir o ARENA de novo: no computador, pelo ARENA.bat (a janela
 // preta e' o servidor); no Android, pelo icone (item 14).
 function comoAbrirDeNovo() {
@@ -320,7 +326,7 @@ async function carregarEstado() {
     for (const elemento of document.querySelectorAll("[data-fora-do-android]")) elemento.hidden = true;
     for (const elemento of document.querySelectorAll("[data-so-android]")) elemento.hidden = false;
     falarDeAparelho();
-    mostrarAparelho();
+    mostrarAparelho();          // so le se a aba Maquina estiver a vista; senao espera o aluno abrir
     mostrarArmazenamento();
     mostrarAndroid(dados.android || {});
   }
@@ -769,7 +775,7 @@ function desenharDetalhes() {
   // precisa saber como trocar de disco sem sair do jogo.
   const discos = Array.isArray(jogo.discos) ? jogo.discos.length : 0;
   $("#detalhesDescricao").textContent = discos > 1
-    ? `Jogo de ${discos} discos. Quando ele pedir o próximo, aperte Esc e use ` +
+    ? `Jogo de ${discos} discos. Quando ele pedir o próximo, ${noCelular() ? "toque em MENU" : "aperte Esc"} e use ` +
       "Controle de disco: ejetar, escolher o disco e inserir — sem sair do jogo."
     : (plataforma.descricao || "Jogo da biblioteca do ARENA.");
   $("#detalhesPlataforma").textContent = jogo.plataforma_nome;
@@ -1684,55 +1690,114 @@ const EXPLICA_FORMATO_IMAGEM = {
     "faixas pretas dos lados.",
 };
 
-// O hardware completo do celular (Ajustes -> Maquina, so no Android; pedido
-// do Rafael de 23/10/2026: "mostrar o hardware completo do android para o
-// aluno saber tudo do celular dele, ate os miliamperes da bateria").
-const SAUDE_DA_BATERIA = { 2: "boa", 3: "esquentando demais", 4: "gasta (já não segura carga)",
-  5: "voltagem alta demais", 6: "com defeito", 7: "fria demais" };
+// O painel "Este celular" (Ajustes -> Maquina, so no Android). Pedidos do Rafael: 23/10/2026 ("mostrar o hardware
+// completo do android para o aluno saber tudo do celular dele, ate os miliamperes da bateria") e 25/10/2026 ("em vez
+// de apenas remover, unifique [...] em menos campos, mas agora completos e revisados, para ver sempre a saude da
+// bateria, miliamperes, quanto de energia esta gastando no momento, temperatura, memoria RAM em tempo real").
+//
+// O servidor monta os grupos (servidor\painel_do_aparelho.py) e a tela so desenha. Enquanto o aluno olha (a gaveta de
+// Ajustes aberta, na aba Maquina ou na Controles), a tela pergunta de novo a cada poucos segundos e troca so o texto e
+// a barrinha de cada linha: nada de refazer a tela inteira. Com a aba escondida ou o app em segundo plano, nao pergunta.
+const SEGUNDOS_DO_AO_VIVO = 2500;
+let esperaDoAparelho = null;
+let desenhoDoAparelho = { assinatura: "", linhas: new Map() };
 
-async function mostrarAparelho() {
-  const lista = $("#listaAparelho");
-  if (!lista) return;
-  let a = {};
+function aparelhoAVista() {
+  const gaveta = $("#gavetaAjustes");
+  if (!gaveta || gaveta.hidden || document.hidden) return false;
+  return ["maquina", "controles"].some((aba) => {
+    const painel = gaveta.querySelector(`.aba-conteudo[data-painel="${aba}"]`);
+    return painel && !painel.hidden;
+  });
+}
+
+async function mostrarAparelho({ forcar = false } = {}) {
+  clearTimeout(esperaDoAparelho);
+  esperaDoAparelho = null;
+  if (!$("#painelAparelho") || (!forcar && !aparelhoAVista())) return;
+  let resposta;
   try {
-    a = ((await pedir("/api/android/aparelho")) || {}).aparelho || {};
+    resposta = await pedir("/api/android/aparelho");
   } catch (falha) {
+    // Sem resposta agora (o servidor reabrindo, por exemplo): tenta de novo no proximo ciclo, se ainda estiver a vista.
+    if (aparelhoAVista()) esperaDoAparelho = setTimeout(mostrarAparelho, SEGUNDOS_DO_AO_VIVO);
     return;
   }
-  const linhas = [];
-  const linha = (rotulo, valor) => { if (valor !== undefined && valor !== null && valor !== "") linhas.push([rotulo, valor]); };
-  const mb = (valor) => valor >= 1024 ? numeroBr(Math.round(valor / 102.4) / 10) + " GB" : valor + " MB";
-  linha("Aparelho", [a.fabricante, a.modelo].filter(Boolean).join(" ") + (a.nome ? ` (“${a.nome}”)` : ""));
-  linha("Android", a.android ? `${a.android}` + (a.seguranca ? ` · atualização de segurança de ${String(a.seguranca).split("-").reverse().join("/")}` : "") : "");
-  const mhz = (a.nucleos_mhz || []).filter((f) => f > 0);
-  const grupos = {};
-  for (const f of mhz) grupos[f] = (grupos[f] || 0) + 1;
-  const frequencias = Object.entries(grupos).sort((x, y) => y[0] - x[0])
-    .map(([f, n]) => `${n} × ${numeroBr(Math.round(f / 100) / 10)} GHz`).join(" + ");
-  linha("Processador", (a.processador || "") + (a.nucleos ? ` · ${a.nucleos} núcleos` : "") + (frequencias ? ` (${frequencias})` : ""));
-  linha("Placa de vídeo", (a.placa_de_video || "") + (a.vulkan !== undefined ? (a.vulkan ? " · tem Vulkan" : " · sem Vulkan") : ""));
-  linha("Arquitetura", (a.arquiteturas || []).join(", "));
-  if (a.memoria_total_mb) linha("Memória RAM", `${mb(a.memoria_total_mb)} (${mb(a.memoria_livre_mb)} livres agora)`);
-  if (a.armazenamento_total_mb) linha("Armazenamento", `${mb(a.armazenamento_total_mb)} (${mb(a.armazenamento_livre_mb)} livres)`);
-  if (a.tela) linha("Tela", `${a.tela.replace("x", " × ")} pontos` + (a.tela_polegadas ? ` · ${numeroBr(a.tela_polegadas)} polegadas` : "") + (a.tela_hz ? ` · ${a.tela_hz} Hz` : ""));
-  if (a.tem_bateria) {
-    linha("Bateria", `${a.bateria_pct}%` + (a.na_tomada ? " · carregando" : " · na bateria") + (a.economia ? " · economia de bateria ligada" : ""));
-    if (a.bateria_capacidade_mah) {
-      let capacidade = `${numeroBr(a.bateria_capacidade_mah)} mAh de fábrica`;
-      if (a.bateria_carga_mah && a.bateria_pct > 5) {
-        const agora = Math.round(a.bateria_carga_mah / (a.bateria_pct / 100));
-        capacidade += ` · agora segura uns ${numeroBr(agora)} mAh (${Math.round(100 * agora / a.bateria_capacidade_mah)}%)`;
+  desenharPainelDoAparelho($("#painelAparelho"), resposta.painel || []);
+  desenharControlesLigados((resposta.aparelho || {}).controles);
+  if (aparelhoAVista()) esperaDoAparelho = setTimeout(mostrarAparelho, SEGUNDOS_DO_AO_VIVO);
+}
+
+function desenharPainelDoAparelho(painel, grupos) {
+  const assinatura = grupos.map((g) => g.titulo + ":" + g.linhas.map((l) => l[0]).join("|")).join("||");
+  if (assinatura !== desenhoDoAparelho.assinatura) {
+    // O conjunto de linhas mudou (o celular entrou na tomada e apareceu "Falta para encher"): refaz o painel.
+    const linhas = new Map();
+    painel.replaceChildren(...grupos.flatMap((grupo) => {
+      const titulo = document.createElement("h4");
+      titulo.className = "celular-grupo";
+      titulo.textContent = grupo.titulo;
+      const lista = document.createElement("dl");
+      lista.className = "maquina";
+      for (const [rotulo, , barra] of grupo.linhas) {
+        const caixa = document.createElement("div");
+        const termo = document.createElement("dt");
+        termo.textContent = rotulo;
+        const dado = document.createElement("dd");
+        caixa.append(termo, dado);
+        let faixa = null;
+        if (barra) {
+          faixa = document.createElement("span");
+          faixa.className = "aparelho-barra";
+          faixa.setAttribute("role", "img");
+          faixa.append(document.createElement("span"));
+          caixa.append(faixa);
+        }
+        linhas.set(grupo.titulo + ":" + rotulo, { dado, faixa });
+        lista.append(caixa);
       }
-      linha("Capacidade da bateria", capacidade);
-    } else if (a.bateria_carga_mah) {
-      linha("Carga agora", `${numeroBr(a.bateria_carga_mah)} mAh`);
-    }
-    linha("Saúde da bateria", SAUDE_DA_BATERIA[a.bateria_saude] || (a.bateria_saude ? "desconhecida" : ""));
-    if (a.bateria_temperatura_c !== undefined) linha("Temperatura da bateria", `${numeroBr(a.bateria_temperatura_c)} °C`);
-    if (a.bateria_voltagem_mv) linha("Voltagem", `${numeroBr(a.bateria_voltagem_mv / 1000)} V`);
-    linha("Tipo da bateria", a.bateria_tecnologia);
+      return [titulo, lista];
+    }));
+    desenhoDoAparelho = { assinatura, linhas };
   }
-  desenharLinhas(lista, linhas);
+  // O texto entra por textContent: o que vem do celular e' dado de fora, nunca HTML.
+  for (const grupo of grupos) {
+    for (const [rotulo, valor, barra] of grupo.linhas) {
+      const celula = desenhoDoAparelho.linhas.get(grupo.titulo + ":" + rotulo);
+      if (!celula) continue;
+      if (celula.dado.textContent !== valor) celula.dado.textContent = valor;
+      if (celula.faixa && barra) {
+        celula.faixa.className = "aparelho-barra aparelho-barra--" + (barra.nivel || "ok");
+        celula.faixa.setAttribute("aria-label", `${barra.pct}%`);
+        celula.faixa.firstChild.style.width = `${barra.pct}%`;
+      }
+    }
+  }
+}
+
+// Os controles ligados agora, na aba Controles (a lista vem do Android, na ordem em que viram jogadores).
+function desenharControlesLigados(controles) {
+  const lista = $("#listaControlesLigados");
+  if (!lista || !Array.isArray(controles)) return;
+  const itens = controles.map((c) => {
+    const item = document.createElement("li");
+    item.className = "controle";
+    const nome = document.createElement("span");
+    nome.className = "controle-nome";
+    nome.textContent = String(c.nome || "");
+    const nota = document.createElement("span");
+    nota.className = "controle-nota";
+    nota.textContent = c.teclado ? "teclado" : `jogador ${c.jogador}`;
+    item.append(nome, nota);
+    return item;
+  });
+  if (!itens.length) {
+    const vazio = document.createElement("li");
+    vazio.className = "controle";
+    vazio.textContent = "Nenhum controle ligado agora: o controle de toque aparece na tela do jogo.";
+    itens.push(vazio);
+  }
+  lista.replaceChildren(...itens);
 }
 
 // As linhas "rotulo / valor" de uma lista .maquina. O texto entra por
@@ -2045,12 +2110,25 @@ async function procurarCelularNoCabo(serial = null) {
 // da auditoria 4: o aluno lia "o seu computador" no celular). Vale para o
 // texto que ja esta na tela e para o que chega depois (recados, cartoes); o
 // que fala do computador de proposito leva data-manter-computador.
-const COMPUTADOR = /\b([Cc])omputador(es)?\b/g;
+// Pedido do Rafael (25/10/2026): o mesmo vale para "PC" e "monitor" (que no celular e' a tela), que vinham das
+// explicacoes das opcoes do RetroArch (servidor/recursos.json) e dos perfis ("Para PC fraco").
+const TROCAS_DO_CELULAR = [
+  [/\b([Cc])omputador(es)?\b/g, function (_tudo, letra, plural) {
+    return (letra === "C" ? "A" : "a") + "parelho" + (plural ? "s" : "");
+  }],
+  // Os nomes de console (PC Engine, PC-FX) ficam como estao.
+  [/\bPC\b(?![ -]?(?:Engine|FX))/g, "aparelho"],
+  // O artigo muda junto: "o monitor" vira "a tela", "do monitor" vira "da tela".
+  [/\b([Oo]) monitor\b/g, function (_tudo, letra) { return (letra === "O" ? "A" : "a") + " tela"; }],
+  [/\b([Uu])m monitor\b/g, function (_tudo, letra) { return letra + "ma tela"; }],
+  [/\b([DdNn])o monitor\b/g, function (_tudo, letra) { return letra + "a tela"; }],
+  [/\b([Aa])o monitor\b/g, function (_tudo, letra) { return (letra === "A" ? "À" : "à") + " tela"; }],
+  [/\b([Mm])onitor\b/g, function (_tudo, letra) { return (letra === "M" ? "T" : "t") + "ela"; }],
+];
+const PRECISA_TROCAR = /omputador|\bPC\b|onitor/;
 
 function trocarComputador(texto) {
-  return texto.replace(COMPUTADOR, function (_tudo, letra, plural) {
-    return (letra === "C" ? "A" : "a") + "parelho" + (plural ? "s" : "");
-  });
+  return TROCAS_DO_CELULAR.reduce(function (atual, regra) { return atual.replace(regra[0], regra[1]); }, texto);
 }
 
 function falarDeAparelho(raiz) {
@@ -2058,8 +2136,8 @@ function falarDeAparelho(raiz) {
   const elemento = comeco && (comeco.nodeType === Node.ELEMENT_NODE ? comeco : comeco.parentElement);
   if (!comeco || (elemento && elemento.closest("[data-manter-computador]"))) return;
   if (comeco.nodeType === Node.TEXT_NODE) {
-    if (COMPUTADOR.test(comeco.nodeValue)) comeco.nodeValue = trocarComputador(comeco.nodeValue);
-    COMPUTADOR.lastIndex = 0;
+    const trocado = trocarComputador(comeco.nodeValue);
+    if (trocado !== comeco.nodeValue) comeco.nodeValue = trocado;
     return;
   }
   const andarilho = document.createTreeWalker(comeco, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT, {
@@ -2070,11 +2148,11 @@ function falarDeAparelho(raiz) {
         }
         for (const atributo of ["title", "aria-label", "placeholder"]) {
           const valor = no.getAttribute(atributo);
-          if (valor && /omputador/.test(valor)) no.setAttribute(atributo, trocarComputador(valor));
+          if (valor && PRECISA_TROCAR.test(valor)) no.setAttribute(atributo, trocarComputador(valor));
         }
         return NodeFilter.FILTER_SKIP;
       }
-      return /omputador/.test(no.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+      return PRECISA_TROCAR.test(no.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
     },
   });
   const textos = [];
@@ -5056,6 +5134,7 @@ function abrirGaveta(id) {
   for (const gaveta of document.querySelectorAll(".gaveta")) {
     gaveta.hidden = gaveta.id !== id;
   }
+  if (id === "gavetaAjustes" && noCelular()) mostrarAparelho();          // Maquina ja era a aba aberta: volta a ler
 }
 
 // Teclado: a janela (.modal) ou gaveta (.gaveta) que aparece leva o foco
@@ -5592,7 +5671,11 @@ function ligarEventos() {
     }
   });
 
-  $("#btnAparelhoDeNovo").addEventListener("click", () => mostrarAparelho());
+  $("#btnAparelhoDeNovo").addEventListener("click", () => mostrarAparelho({ forcar: true }));
+  // O app voltou para a frente (depois de um jogo, por exemplo): se a aba Maquina estava aberta, volta a ler.
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && noCelular()) mostrarAparelho();
+  });
   $("#btnCartaoProcurar").addEventListener("click", procurarJogosNoCartao);
   $("#btnCartaoEscolher").addEventListener("click", () => navegarNoCartao());
   $("#btnNavegadorSubir").addEventListener("click", () => {
@@ -5737,7 +5820,7 @@ function ligarEventos() {
       botao.setAttribute("aria-pressed", novo ? "true" : "false");
       if (novo) $("#chaveDesempenho").setAttribute("aria-pressed", "true");
       recado(novo
-        ? "Ultra desempenho ligado. Para sair de um jogo, use F10."
+        ? `Ultra desempenho ligado. Para sair de um jogo, ${noCelular() ? "toque duas vezes em SAIR" : "use F10"}.`
         : "Ultra desempenho desligado.");
     } catch (falha) {
       recado(falha.message, true);
@@ -5960,6 +6043,7 @@ function ligarEventos() {
       for (const painel of gaveta.querySelectorAll(".aba-conteudo")) {
         painel.hidden = painel.dataset.painel !== aba.dataset.aba;
       }
+      if (noCelular()) mostrarAparelho();          // a aba Maquina (ou Controles) acabou de aparecer: le e segue lendo
     });
   }
 

@@ -388,8 +388,12 @@ firewall sozinho.
 
 ### Abrir o menu sem teclado
 
-Aperte **Start + Select juntos**. Dá para trocar a combinação em *Ajustes →
-Avançado → Controle → Abrir menu pelo controle*.
+Aperte **os dois analógicos juntos** (L3 + R3: cada analógico se aperta para
+baixo, como um botão). Esse é o jeito que o ARENA deixa ligado (o número 2 em
+*Ajustes → Avançado → Controle → Abrir menu pelo controle*; conferido no código
+do RetroArch 1.22.2). Se o seu controle não tem analógico que aperta, troque
+para 4 (Start + Select juntos), sabendo que alguns jogos usam esses dois botões
+juntos. No celular, o botão MENU do controle de toque abre o mesmo menu.
 
 ---
 
@@ -426,7 +430,7 @@ Tudo dentro da pasta do ARENA. Copiou a pasta, levou a configuração junto.
 | O analógico anda sozinho | Ajustes → Avançado → Folga do analógico para 0.2 |
 | O analógico não chega ao máximo | Ajustes → Avançado → Sensibilidade para 1.2 |
 | Só um controle funciona | Ajustes → Avançado → Quantos jogadores para 2 |
-| Não consigo abrir o menu sem teclado | Aperte Start + Select juntos |
+| Não consigo abrir o menu sem teclado | Aperte os dois analógicos juntos (L3 + R3). Sem analógico que aperta, troque para 4 (Start + Select) em Ajustes → Avançado |
 | Funciona no meu PC mas não no do colega | Cada máquina reconhece na primeira vez. Plugue e reabra o ARENA lá |
 
 Ajuste fino de resposta do controle: **documento 6**, grupo *Resposta do
@@ -1092,7 +1096,7 @@ diferente.
 |---|---|
 | **Leitura do controle** | `2` (tardia) dá o menor atraso. É o padrão do ARENA |
 | **Quantos jogadores** | Quantos controles o jogo aceita ao mesmo tempo |
-| **Abrir menu pelo controle** | `2` abre o menu com Start e Select juntos |
+| **Abrir menu pelo controle** | `2` abre o menu com os dois analógicos apertados (L3 + R3); `4`, com Start e Select juntos |
 | **Velocidade do turbo** | Menor = dispara mais rápido |
 
 #### Dois jogadores

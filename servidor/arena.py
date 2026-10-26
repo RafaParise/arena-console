@@ -97,6 +97,7 @@ import jeitos_de_abrir  # noqa: E402  (o original ou o livre: a tela pergunta --
 # Windows ou Linux: os nomes que mudam de um para o outro (item 13, 17/10/2026).
 # "plataforma_do_sistema" porque "plataforma" ja e' o console, aqui dentro.
 import plataforma as plataforma_do_sistema  # noqa: E402
+import painel_do_aparelho  # noqa: E402
 import portas  # noqa: E402  (as faixas que o Windows reserva a cada reinicio -- 18/10/2026)
 import ponte_android  # noqa: E402  (no Android, o que o servidor pede ao app -- item 14, 18/10/2026)
 import adb_aparelho  # noqa: E402  (o celular ligado no cabo, visto pelo computador -- 23/10/2026)
@@ -204,13 +205,23 @@ def gravar_texto_atomico(caminho, texto):
 # Guarda contra abrir dois jogos ao mesmo tempo. Sem isso, um duplo clique
 # apressado sobe duas janelas do RetroArch disputando o mesmo controle.
 JOGO_EM_ANDAMENTO = {"ativo": False, "titulo": "", "id": ""}
+# Como se fecha o jogo: o F10 do teclado, no computador; no celular nao ha F10, e o jeito e' o botao SAIR do controle de
+# toque (servidor\plataforma.py, BOTOES_DO_TOQUE), tocado duas vezes. A tela nao pode mandar o aluno apertar tecla que ele
+# nao tem (pedido do Rafael, 25/10/2026).
+def como_fechar_o_jogo():
+    return "botão SAIR, duas vezes" if plataforma_do_sistema.ANDROID else "F10"
+
+
 # Os codigos do jogo aberto nao mudam pela tela: ao fechar o jogo, o
 # RetroArch grava por cima do .cht a lista que ele carregou (registro dele:
 # "Save game-specific cheatfile"), e a mudanca feita no meio se perderia.
-MENSAGEM_CHEAT_COM_JOGO_ABERTO = (
-    "Este jogo está aberto agora. Feche o jogo (F10) antes de mudar os códigos dele: quando o jogo "
-    "fecha, o RetroArch grava por cima a lista de códigos que ele tem aberta, e a sua mudança se "
-    "perderia.")
+def mensagem_cheat_com_jogo_aberto():
+    return ("Este jogo está aberto agora. Feche o jogo (" + como_fechar_o_jogo() + ") antes de mudar os códigos dele: "
+            "quando o jogo fecha, o RetroArch grava por cima a lista de códigos que ele tem aberta, e a sua mudança "
+            "se perderia.")
+
+
+MENSAGEM_CHEAT_COM_JOGO_ABERTO = mensagem_cheat_com_jogo_aberto()           # o texto de agora (os testes leem esta)
 
 # A partida que ESTE computador esta hospedando agora (ou None). E' o que
 # faz o amigo ver "Fulano - partida aberta: Super Bomberman 4" na lista de
@@ -2315,6 +2326,15 @@ def avaliar_plataformas(forcar=False):
     with TRAVA_CACHE:
         _cache["plataformas"] = (time.time(), resultado)
     return resultado
+
+
+def consoles_sem_versao_neste_aparelho():
+    """So no Android: os ids dos consoles que nao tem versao nele (o PS3, o Xbox 360 e o Java ME; no x86_64, tambem o
+    PS2). A tela nao mostra BIOS, firmware nem emulador de fora de console que o celular nao abre (pedido do Rafael,
+    25/10/2026: "tudo que o ARENA PC faz, o Android faz"; o que ele nao faz, nao sugere). No computador, vazio."""
+    if not plataforma_do_sistema.ANDROID:
+        return set()
+    return {p["id"] for p in avaliar_plataformas() if p.get("estado") in ("falta_externo", "sem_core")}
 
 
 def montar_catalogo():
@@ -5382,6 +5402,7 @@ class Manipulador(BaseHTTPRequestHandler):
             # So na resposta (carregar_config devolve uma copia): o codigo
             # curto de cada amigo, para a tela mostrar.
             config["servidores"] = amigos_para_a_tela(config.get("servidores"))
+            sem_versao = consoles_sem_versao_neste_aparelho()           # so no Android; no computador, vazio
             return self.responder_json({
                 "maquina": MAQUINA,
                 "retroarch_presente": os.path.isfile(EXECUTAVEL_RETROARCH),
@@ -5413,12 +5434,14 @@ class Manipulador(BaseHTTPRequestHandler):
                 "vigia_suspenso": VIGIA["suspenso"],
                 "fechamentos": ler_fechamentos(),
                 "repasses": graficos.repasses_disponiveis(),
-                "controles": graficos.CONTROLES_CONHECIDOS,
+                "controles": (graficos.CONTROLES_DO_ANDROID if plataforma_do_sistema.ANDROID
+                              else graficos.CONTROLES_CONHECIDOS),
                 "consoles_botoes": [
                     {"id": p["id"], "nome": p["nome"]}
                     for p in carregar_catalogo()
                     if p["id"] in graficos.consoles_com_botoes()],
-                "externos": graficos.situacao_dos_externos(carregar_catalogo()),
+                # No Android nao ha emulador de fora: os nucleos vem dentro do APK (a aba nem mostra o bloco).
+                "externos": [] if plataforma_do_sistema.ANDROID else graficos.situacao_dos_externos(carregar_catalogo()),
                 # O Lossless Scaling de quem comprou: achado, versao, licenca
                 # da Steam (servidor\lossless.py). A tela so mostra o bloco
                 # dele se ele estiver nesta maquina.
@@ -5450,7 +5473,7 @@ class Manipulador(BaseHTTPRequestHandler):
                          nome_curto_do_core(p.get("core", "")),
                          [b["arquivo"] for b in graficos.bios_disponiveis(PASTA_SISTEMA)])}
                     for p in carregar_catalogo()
-                    if p["arquivos_sistema"] > 0],
+                    if p["arquivos_sistema"] > 0 and p["id"] not in sem_versao],
                 "shader": os.path.basename(
                     graficos.filtro_de_tela("snes")) or None,
                 "porta_partida": graficos.PORTA_PARTIDA,
@@ -5489,7 +5512,15 @@ class Manipulador(BaseHTTPRequestHandler):
             # Android; pedido de 23/10/2026): so leitura, so deste aparelho.
             if not plataforma_do_sistema.ANDROID:
                 return self.erro("Isto é só do ARENA do Android. No computador, veja Ajustes → Máquina → Celular ligado no cabo.", 404)
-            return self.responder_json({"ok": True, "aparelho": ponte_android.aparelho()})
+            dados = ponte_android.aparelho()
+            # O painel "Este celular" vem pronto daqui (servidor\painel_do_aparelho.py): a tela so desenha. A tela
+            # pergunta de novo a cada poucos segundos enquanto o aluno olha (RAM, bateria e calor ao vivo).
+            velocidade = (MAQUINA.get("velocidade") or {}).get("relativa_ao_alvo")
+            extras = {"motor": opcoes_efetivas(carregar_config()).get("video_driver") or MAQUINA.get("driver_video"),
+                      "velocidade_relativa": velocidade if isinstance(velocidade, (int, float)) else None,
+                      "gravacao_mbs": (MAQUINA.get("disco") or {}).get("escrita_mbs"),
+                      "internet": bool(VIGIA["internet"]), "economico": bool(ECONOMICO)}
+            return self.responder_json({"ok": True, "aparelho": dados, "painel": painel_do_aparelho.painel(dados, extras)})
 
         if caminho == "/api/android/registro":
             # O registro do RetroArch da ultima partida (so no Android): quando o jogo abre
@@ -5640,6 +5671,8 @@ class Manipulador(BaseHTTPRequestHandler):
 
         if caminho == "/api/bios":
             itens = bios.situacao(RAIZ)
+            ausentes = consoles_sem_versao_neste_aparelho()          # so no Android: PS3, Xbox 360, Java ME...
+            itens = [i for i in itens if i["console"] not in ausentes]
             return self.responder_json({"ok": True, "pasta": bios.NOME_DA_PASTA, "itens": itens,
                                         "resumo": bios.resumo(itens), "sem_bios": bios.consoles_sem_bios()})
 
@@ -6773,7 +6806,7 @@ class Manipulador(BaseHTTPRequestHandler):
                 return self.erro("Jogo não encontrado. Ele pode ter sido movido ou apagado. "
                                  "Clique em Atualizar lista e tente de novo.", 404)
             if jogo_aberto_agora(jogo):
-                return self.erro(MENSAGEM_CHEAT_COM_JOGO_ABERTO, 409)
+                return self.erro(mensagem_cheat_com_jogo_aberto(), 409)
             lista, erro = cheats.adicionar_cheat(
                 jogo, str(dados.get("descricao", ""))[:120],
                 str(dados.get("codigo", "")), bool(dados.get("ligado")), nucleo_das_pastas(jogo))
@@ -6792,7 +6825,7 @@ class Manipulador(BaseHTTPRequestHandler):
                 return self.erro("Esse código não está mais na lista de cheats. "
                                  "Reabra o painel do jogo e tente de novo.")
             if jogo_aberto_agora(jogo):
-                return self.erro(MENSAGEM_CHEAT_COM_JOGO_ABERTO, 409)
+                return self.erro(mensagem_cheat_com_jogo_aberto(), 409)
             lista, erro = cheats.alterar_cheat(
                 jogo, indice, dados.get("ligado"), bool(dados.get("apagar")), nucleo_das_pastas(jogo))
             if erro:
@@ -7313,8 +7346,8 @@ class Manipulador(BaseHTTPRequestHandler):
             with TRAVA_JOGO:
                 if JOGO_EM_ANDAMENTO["ativo"]:
                     return self.erro(
-                        "Já existe um jogo aberto (%s). Feche com F10 antes "
-                        "de abrir outro." % JOGO_EM_ANDAMENTO["titulo"], 409)
+                        "Já existe um jogo aberto (%s). Feche-o (%s) antes "
+                        "de abrir outro." % (JOGO_EM_ANDAMENTO["titulo"], como_fechar_o_jogo()), 409)
                 JOGO_EM_ANDAMENTO["ativo"] = True
                 JOGO_EM_ANDAMENTO["titulo"] = jogo["titulo"]
                 # O id: a gaveta "Saves e cheats" nao deixa mudar os codigos

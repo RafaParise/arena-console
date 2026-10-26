@@ -612,7 +612,7 @@ def diagnosticar(disco_mecanico=None):
 
 # O que a checagem rapida (na hora de jogar) pode acusar: so o grave e o
 # que da para medir num instante, sem PowerShell.
-IDS_RAPIDOS = ("memoria", "bateria", "economia_bateria")
+IDS_RAPIDOS = ("memoria", "bateria", "economia_bateria", "calor")
 
 
 def avaliar_do_sistema(fatos):
@@ -952,6 +952,8 @@ def coletar_fatos_android(rapido=False):
         fatos["bateria_pct"] = energia.get("bateria_pct")
         fatos["na_tomada"] = bool(energia.get("na_tomada"))
         fatos["economia_de_bateria"] = bool(energia.get("economia"))
+        if isinstance(energia.get("termico"), int):          # o calor, como o proprio Android o ve (Android 10 em diante)
+            fatos["termico"] = energia["termico"]
     if rapido:
         return fatos
     try:
@@ -995,6 +997,14 @@ def avaliar_android(fatos):
                             "Ela corta o desempenho de propósito.",
                             "Desligue a Economia de bateria nas configurações rápidas (puxe a barra de cima da "
                             "tela).", ACOES_ALUNO))
+    termico = fatos.get("termico")
+    if isinstance(termico, int) and termico >= 2:
+        # PowerManager.THERMAL_STATUS_MODERATE (2) e SEVERE (3) ou mais: o Android esta se defendendo do calor.
+        barreiras.append(_b("calor", "alta" if termico >= 3 else "media", "Aparelho esquentando",
+                            "O Android diz que o aparelho está %s." % ("muito quente" if termico >= 3 else "quente"),
+                            "Quando esquenta, o Android segura o processador para esfriar, e o jogo perde velocidade.",
+                            "Tire a capa, deixe o aparelho fora do sol e longe de cama e sofá, e dê um tempo antes de jogar "
+                            "de novo.", ACOES_ALUNO))
     livre_gb = fatos.get("disco_livre_gb")
     if isinstance(livre_gb, (int, float)) and livre_gb < 1:
         barreiras.append(_b("disco_cheio", "alta", "Pouco espaço onde fica a pasta do ARENA",

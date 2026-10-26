@@ -74,11 +74,17 @@
      entao fica aqui, grande, onde o aluno ve ao abrir e a cada Alt+Tab. -->
 <div class="faixa-teclas" id="faixaTeclas" role="status" hidden data-so-windows>
   <span class="faixa-teclas-titulo">No jogo:</span>
-  <span class="faixa-tecla"><kbd>F2</kbd> salva</span>
-  <span class="faixa-tecla"><kbd>F4</kbd> volta ao save</span>
-  <span class="faixa-tecla" id="faixaTeclaF9" hidden><kbd>F9</kbd> destrava o teclado</span>
-  <span class="faixa-tecla"><kbd>F10</kbd> fecha o jogo</span>
-  <span class="faixa-tecla"><kbd>Esc</kbd> abre o menu</span>
+  <span class="faixa-tecla" data-fora-do-android><kbd>F2</kbd> salva</span>
+  <span class="faixa-tecla" data-fora-do-android><kbd>F4</kbd> volta ao save</span>
+  <span class="faixa-tecla" id="faixaTeclaF9" hidden data-fora-do-android><kbd>F9</kbd> destrava o teclado</span>
+  <span class="faixa-tecla" data-fora-do-android><kbd>F10</kbd> fecha o jogo</span>
+  <span class="faixa-tecla" data-fora-do-android><kbd>Esc</kbd> abre o menu</span>
+  <!-- No celular nao ha F2, F10 nem Esc: o controle de toque tem os botoes MENU (salvar, carregar, cheats, sair
+       para o ARENA) e SAIR (toque duas vezes), e o controle de verdade abre o menu com os dois analogicos
+       apertados (servidor\plataforma.py, BOTOES_DO_TOQUE; EXPLICA_BOTOES_NA_TELA no app.js). -->
+  <span class="faixa-tecla" data-so-android hidden><kbd>MENU</kbd> abre o menu (salvar, carregar)</span>
+  <span class="faixa-tecla" data-so-android hidden><kbd>SAIR</kbd> fecha o jogo (toque duas vezes)</span>
+  <span class="faixa-tecla" data-so-android hidden><kbd>L3 + R3</kbd> abre o menu pelo controle</span>
 </div>
 
 <main class="corpo">
@@ -300,17 +306,18 @@
         </span>
       </div>
       <p class="explica">
-        Vale na hora: <b>não precisa fechar o ARENA</b>. Na primeira vez, o
+        Vale na hora: <b>não precisa fechar o ARENA</b>.
+        <span data-fora-do-android>Na primeira vez, o
         Windows pode perguntar se o Python (o programa que faz o ARENA
         funcionar) pode usar a rede. Quem pergunta é o firewall, o porteiro do
         Windows. Clique em <b>Permitir acesso</b>. Se pedir senha de
-        administrador, chame o professor ou o TI.
+        administrador, chame o professor ou o TI.</span>
       </p>
 
       <h3 class="grupo-titulo">Meus endereços</h3>
       <p class="explica">
         Passe <b>um destes</b> para o colega. O marcado como adaptador
-        virtual não serve: é uma rede de mentira que o Windows cria. O
+        virtual não serve: é uma rede de mentira que o sistema cria. O
         marcado como VPN só serve se o colega estiver na mesma VPN.
       </p>
       <ul class="onde-lista" id="listaEnderecos"></ul>
@@ -580,7 +587,9 @@
       <input id="campoGuardarJogo" type="file" multiple hidden>
     </div>
 
-    <dl class="maquina">
+    <!-- No celular, o painel "Este celular" (abaixo) traz tudo isto, e mais: sem o processador, a memoria e o disco
+         duas vezes (pedido do Rafael, 25/10/2026). -->
+    <dl class="maquina" data-fora-do-android>
       <div><dt>Processador</dt><dd id="hwCpu">—</dd></div>
       <div><dt>Núcleos</dt><dd id="hwNucleos">—</dd></div>
       <div><dt>Memória RAM</dt><dd id="hwRam">—</dd></div>
@@ -599,13 +608,15 @@
          miliamperes da bateria (ArenaServico.java, aparelho()). -->
     <div id="blocoAparelho" data-so-android hidden>
       <h3 class="grupo-titulo">Este celular</h3>
-      <dl class="maquina" id="listaAparelho"></dl>
+      <div id="painelAparelho" class="painel-aparelho"></div>
       <p class="explica">
         Tudo é lido do próprio Android, só para você conhecer o seu aparelho:
-        nada aqui muda nada. A capacidade "de agora" da bateria é uma conta
-        (a carga de agora dividida pela porcentagem): bateria velha segura
-        menos que a de fábrica. Se um dia trocar a bateria, a de fábrica é a
-        que a nova precisa ter.
+        nada aqui muda nada. A memória, a bateria (quantos miliamperes entram
+        ou saem agora), o calor, o Wi-Fi e os controles se atualizam sozinhos
+        enquanto esta aba está aberta. O que o aparelho não informa não
+        aparece, em vez de ser inventado. A capacidade "de agora" da bateria é
+        uma conta (a carga de agora dividida pela porcentagem): só uma pista.
+        Se um dia trocar a bateria, a de fábrica é a que a nova precisa ter.
       </p>
       <button class="botao" id="btnAparelhoDeNovo" type="button">Ler de novo</button>
     </div>
@@ -699,11 +710,17 @@
 
     <div data-so-windows>
       <h3 class="grupo-titulo">O que está deixando este computador lento</h3>
-      <p class="explica">
+      <p class="explica" data-fora-do-android>
         O ARENA procura o que pesa no Windows: programas que abrem sozinhos,
         programas de fábrica, atualização rodando, dois antivírus, bateria,
         pouca memória, disco cheio e outros. Leva uns 5 segundos. Ele só
         olha: nada no Windows muda sem você clicar.
+      </p>
+      <p class="explica" data-so-android hidden>
+        O ARENA procura o que pesa no aparelho: economia de bateria ligada,
+        bateria fraca, aparelho esquentando, pouca memória livre, pouco espaço
+        e aparelho ligado há muito tempo. Leva uns segundos. Ele só olha:
+        nada no Android muda sem você tocar.
       </p>
       <button class="botao botao--principal" id="btnBarreiras" type="button">Verificar agora</button>
       <p class="explica" id="barreirasEstado" role="status"></p>
@@ -732,8 +749,9 @@
 
     <div data-so-windows>
       <h3 class="grupo-titulo">Modo desempenho</h3>
-      <p class="explica">Dá prioridade ao jogo enquanto ele estiver aberto.</p>
-      <div class="opcao">
+      <!-- A prioridade do processo e a energia do jogo sao do Windows (servidor\processos.py): no celular o Android decide. -->
+      <p class="explica" data-fora-do-android>Dá prioridade ao jogo enquanto ele estiver aberto.</p>
+      <div class="opcao" data-fora-do-android>
         <span class="opcao-rotulo">Dar prioridade ao jogo</span>
         <button class="chave opcao-controle" id="chaveDesempenho"
                 aria-pressed="false" aria-label="Modo desempenho"></button>
@@ -743,9 +761,10 @@
         <span class="opcao-rotulo">Ultra desempenho</span>
         <button class="chave opcao-controle" id="chaveUltra"
                 aria-pressed="false" aria-label="Ultra desempenho"></button>
-        <span class="opcao-ajuda">Máximo desempenho, com menos recursos para o Arena. Não altera o Windows.</span>
+        <span class="opcao-ajuda" data-fora-do-android>Máximo desempenho, com menos recursos para o Arena. Não altera o Windows.</span>
+        <span class="opcao-ajuda" data-so-android hidden>Máximo desempenho: sem efeitos de imagem e com o ARENA quieto (não vigia a rede) enquanto o jogo roda. Não altera o Android.</span>
       </div>
-      <div class="opcao">
+      <div class="opcao" data-fora-do-android>
         <span class="opcao-rotulo">Travar Alt+Tab e tecla Windows</span>
         <button class="chave opcao-controle" id="chaveTravar"
                 aria-pressed="false" aria-label="Travar teclas do sistema"></button>
@@ -851,7 +870,26 @@
       </div>
     </div>
 
-    <div>
+    <!-- So no celular: os controles ligados agora (a lista vem do Android) e como mudar um botao. O mapeamento por
+         jogador, abaixo, e' o do computador (numeracao do XInput e do udev): no celular, quem troca botao e' o menu do
+         proprio jogo. -->
+    <div data-so-android hidden id="blocoControlesDoCelular">
+      <h3 class="grupo-titulo">Controles ligados agora</h3>
+      <ul class="controles" id="listaControlesLigados"></ul>
+      <p class="explica">
+        Os jogadores entram na ordem em que os controles foram ligados: o primeiro é o jogador 1. Sem controle de
+        verdade, o controle de toque aparece na tela do jogo e some sozinho quando você liga um controle (dá para
+        mudar isso em Ajustes → Simples).
+      </p>
+      <h3 class="grupo-titulo">Mudar os botões</h3>
+      <p class="explica">
+        O Android reconhece cada controle sozinho. Se algum botão vier trocado, abra o menu do jogo (toque em MENU, ou
+        aperte os dois analógicos juntos no controle de verdade) e procure Controles da porta 1 em Configurações →
+        Entrada.
+      </p>
+    </div>
+
+    <div data-fora-do-android>
       <h3 class="grupo-titulo">Mapear as teclas e os botões</h3>
       <p class="explica">Escolha um botão e pressione a tecla ou botão desejado.</p>
 
@@ -949,7 +987,7 @@
     </div>
 
     <!-- Assistente para controles genéricos -->
-    <div class="wizard-generico" id="wizardGenerico" hidden>
+    <div class="wizard-generico" id="wizardGenerico" hidden data-fora-do-android>
       <div class="wizard-cabecalho">
         <h3 class="wizard-titulo" id="wizardTitulo">Configurando controle genérico</h3>
         <p class="wizard-instrucao" id="wizardInstrucao">Pressione cada botão quando o ARENA pedir.</p>
@@ -985,9 +1023,12 @@
 
   <!-- Aba emuladores -->
   <div class="aba-conteudo" data-painel="emuladores" hidden>
-    <p class="explica">Emuladores externos opcionais.</p>
-    <ul class="controles" id="listaExternos"></ul>
-    <p class="explica">Coloque cada emulador na pasta <code>emuladores</code>.</p>
+    <!-- No celular os emuladores vem dentro do app (um nucleo do RetroArch para cada console): nao ha o que baixar. -->
+    <p class="explica" data-fora-do-android>Emuladores externos opcionais.</p>
+    <ul class="controles" id="listaExternos" data-fora-do-android></ul>
+    <p class="explica" data-fora-do-android>Coloque cada emulador na pasta <code>emuladores</code>.</p>
+    <p class="explica" data-so-android hidden>No celular, os emuladores já vêm dentro do ARENA: cada console abre
+      pelo seu próprio núcleo, sem nada para baixar. Abaixo, a BIOS de cada console e o jeito de ligar os que têm mais de um.</p>
 
     <div id="blocoLossless" hidden>
       <h3 class="grupo-titulo">Lossless Scaling (de quem comprou)</h3>
@@ -1075,7 +1116,7 @@
         cabo de rede que o resto do Jogar Junto usa.
       </p>
       <p class="explica" id="statusRedePs2">Verificando…</p>
-      <p class="explica" id="explicaDriverPs2" hidden>
+      <p class="explica" id="explicaDriverPs2" hidden data-fora-do-android>
         Hospedar (e entrar) precisa de um driver de rede opcional
         (Npcap). Instalar pede a senha de administrador do Windows — o
         ARENA nunca pede isso sozinho, mas se você quiser tentar
@@ -1210,7 +1251,8 @@
       </span>
     </div>
 
-    <p class="explica">10 slots de save state. F2 salva e F4 carrega.</p>
+    <p class="explica" data-fora-do-android>10 slots de save state. F2 salva e F4 carrega.</p>
+    <p class="explica" data-so-android hidden>10 slots de save state. Dentro do jogo, toque em MENU para salvar e carregar; aqui você vê quando cada um foi salvo e pode apagar.</p>
     <div class="espacos" id="listaEspacos"></div>
     <p class="explica" id="temSave">—</p>
   </div>
@@ -1218,8 +1260,10 @@
   <!-- Cheats -->
   <div class="aba-conteudo" data-painel="cheats" hidden>
     <h3 class="jogo-nome" id="jogoNomeCheats">—</h3>
-    <p class="explica">Cadastre os códigos com o jogo fechado. Dentro do jogo, ligue e desligue
+    <p class="explica" data-fora-do-android>Cadastre os códigos com o jogo fechado. Dentro do jogo, ligue e desligue
       cada um pelo menu: Esc → Cheats.</p>
+    <p class="explica" data-so-android hidden>Cadastre os códigos com o jogo fechado. Dentro do jogo, ligue e desligue
+      cada um pelo menu: toque em MENU → Cheats.</p>
     <ul class="cheats-lista" id="listaCheats"></ul>
 
     <div class="cheat-form">
@@ -1290,8 +1334,8 @@
       </select>
       <span class="opcao-ajuda" id="dicaSemPartida" hidden>
         Não apareceu? Quem abre a partida precisa ligar “Aceitar conexões da rede”
-        (botão Amigos, no alto) e os dois precisam estar na mesma rede. Se mesmo
-        assim não aparecer, rode o PARTIDA.bat nos dois computadores.
+        (botão Amigos, no alto) e os dois precisam estar na mesma rede.<span data-fora-do-android> Se mesmo
+        assim não aparecer, rode o PARTIDA.bat nos dois computadores.</span>
       </span>
     </label>
 
@@ -1359,7 +1403,8 @@
       <span>Quantos pontos você fez?</span>
       <input id="campoPontos" type="number" min="0" step="1" inputmode="numeric">
     </label>
-    <p class="explica">F8 tira uma foto como comprovante.</p>
+    <p class="explica" data-fora-do-android>F8 tira uma foto como comprovante.</p>
+    <p class="explica" data-so-android hidden>Tire uma foto da tela do celular como comprovante (os botões de ligar e de baixar o volume, juntos).</p>
     <div class="modal-acoes">
       <button class="botao" data-fechar="modalPlacar" type="button">Cancelar</button>
       <button class="botao botao--principal" id="btnSalvarPontos" type="button">Salvar</button>

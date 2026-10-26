@@ -256,7 +256,7 @@
       "tipo": "bool",
       "custo": "nada",
       "explica": "Aquelas mensagens que aparecem no canto quando você salva.",
-      "exemplo": "Aquele 'Estado salvo no espaço 3' que aparece no canto. Desligue se ele atrapalha a foto da tela (F8)."
+      "exemplo": "Aquele 'Estado salvo no espaço 3' que aparece no canto. Desligue se ele atrapalha a foto da tela."
     },
     {
       "chave": "fps_show",
@@ -428,8 +428,8 @@
         "6"
       ],
       "custo": "nada",
-      "explica": "Sem teclado por perto? Deixe no 2 e aperte Start + Select juntos.",
-      "exemplo": "Serve para quando o teclado está longe ou você está jogando na TV. Com 2, Start e Select juntos abrem o menu, sem levantar do sofá."
+      "explica": "Sem teclado por perto? Deixe no 2 e aperte os dois analógicos juntos (L3 + R3).",
+      "exemplo": "Serve para quando o teclado está longe ou você está jogando na TV. O número escolhe o jeito: 0 desliga; 1 = para baixo + Y + L1 + R1; 2 = L3 + R3 (apertar os dois analógicos, como se fossem botões); 3 = L1 + R1 + Start + Select; 4 = Start + Select; 5 = L3 + R1; 6 = L1 + R1. Se o seu controle não tem analógico que aperta, use 4 (mas alguns jogos usam Start e Select juntos)."
     },
     {
       "chave": "input_turbo_period",
@@ -563,8 +563,8 @@
       "nome": "Mostrar cheats no menu",
       "tipo": "bool",
       "custo": "nada",
-      "explica": "Deixa a lista de códigos aparecer quando você aperta Esc.",
-      "exemplo": "Se você não usa código nenhum, desligue e o menu do Esc fica com um item a menos para procurar."
+      "explica": "Deixa a lista de códigos aparecer no menu do jogo.",
+      "exemplo": "Se você não usa código nenhum, desligue e o menu do jogo fica com um item a menos para procurar."
     },
     {
       "chave": "apply_cheats_after_load",
@@ -587,7 +587,7 @@
       ],
       "custo": "baixo",
       "explica": "rgui é o mais leve e feio. ozone é bonito e leve. xmb é o mais bonito e mais pesado.",
-      "exemplo": "Só muda a aparência do menu do Esc, nada do jogo. rgui é texto puro e abre na hora; xmb tem ícone grande e demora um pouquinho."
+      "exemplo": "Só muda a aparência do menu do jogo, nada do jogo. rgui é texto puro e abre na hora; xmb tem ícone grande e demora um pouquinho."
     },
     {
       "chave": "pause_nonactive",

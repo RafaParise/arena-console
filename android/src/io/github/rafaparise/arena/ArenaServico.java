@@ -581,6 +581,9 @@ public class ArenaServico extends Service {
         saida.put("bateria_pct", nivel >= 0 && escala > 0 ? nivel * 100 / escala : JSONObject.NULL);
         saida.put("na_tomada", tomada != 0);
         saida.put("economia", poder != null && poder.isPowerSaveMode());
+        // O calor do aparelho, como o proprio Android o ve: 0 normal, 1 leve, 2 moderado, 3 forte (ele segura o
+        // processador), 4 ou mais, critico. So no Android 10 em diante.
+        if (poder != null && Build.VERSION.SDK_INT >= 29) saida.put("termico", poder.getCurrentThermalStatus());
         return saida;
     }
 
@@ -588,40 +591,29 @@ public class ArenaServico extends Service {
      *  -> Maquina; pedido do Rafael de 23/10/2026: "mostrar o hardware completo
      *  do android para o aluno saber tudo do celular dele, ate os miliamperes
      *  da bateria [...] e se um dia trocar a bateria poder saber a capacidade
-     *  dele"). So leitura: nada aqui muda o aparelho. */
-    JSONObject aparelho() throws JSONException {
-        JSONObject saida = energia();
-        Intent bateria = registerReceiver(null, new android.content.IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-        if (bateria != null) {
-            saida.put("bateria_saude", bateria.getIntExtra(android.os.BatteryManager.EXTRA_HEALTH, 0));
-            int temperatura = bateria.getIntExtra(android.os.BatteryManager.EXTRA_TEMPERATURE, Integer.MIN_VALUE);
-            if (temperatura != Integer.MIN_VALUE) saida.put("bateria_temperatura_c", temperatura / 10.0);
-            int voltagem = bateria.getIntExtra(android.os.BatteryManager.EXTRA_VOLTAGE, -1);
-            if (voltagem > 0) saida.put("bateria_voltagem_mv", voltagem);
-            saida.put("bateria_tecnologia", bateria.getStringExtra(android.os.BatteryManager.EXTRA_TECHNOLOGY));
+     *  dele"; e de 25/10/2026: "saude da bateria, miliamperes, quanto de energia
+     *  esta gastando no momento, temperatura, memoria RAM em tempo real").
+     *  So leitura: nada aqui muda o aparelho. O que nao muda (modelo, placa,
+     *  sensores, capacidade de fabrica) e' lido uma vez e guardado; o que muda
+     *  (bateria, memoria, calor, Wi-Fi, controles) e' lido a cada pedido: a tela
+     *  pergunta de novo a cada poucos segundos enquanto o aluno olha. */
+    JSONObject estatico = null;
+
+    synchronized JSONObject aparelho() throws JSONException {
+        if (estatico == null) estatico = aparelhoQueNaoMuda();
+        JSONObject saida = new JSONObject(estatico.toString());
+        JSONObject vivo = aoVivo();
+        for (java.util.Iterator<String> chaves = vivo.keys(); chaves.hasNext();) {
+            String chave = chaves.next();
+            saida.put(chave, vivo.get(chave));
         }
-        android.os.BatteryManager gerente = (android.os.BatteryManager) getSystemService(Context.BATTERY_SERVICE);
-        if (gerente != null) {
-            // A carga de agora, em microampere-hora (o Android 5 em diante).
-            int carga = gerente.getIntProperty(android.os.BatteryManager.BATTERY_PROPERTY_CHARGE_COUNTER);
-            if (carga > 0 && carga != Integer.MIN_VALUE) saida.put("bateria_carga_mah", carga / 1000);
-        }
+        return saida;
+    }
+
+    JSONObject aparelhoQueNaoMuda() throws JSONException {
+        JSONObject saida = new JSONObject();
         double deFabrica = capacidadeDeFabrica();
         if (deFabrica > 0) saida.put("bateria_capacidade_mah", Math.round(deFabrica));
-        ActivityManager.MemoryInfo memoria = new ActivityManager.MemoryInfo();
-        ActivityManager atividades = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        if (atividades != null) {
-            atividades.getMemoryInfo(memoria);
-            saida.put("memoria_total_mb", memoria.totalMem / 1048576L);
-            saida.put("memoria_livre_mb", memoria.availMem / 1048576L);
-        }
-        try {
-            android.os.StatFs disco = new android.os.StatFs(Environment.getExternalStorageDirectory().getPath());
-            saida.put("armazenamento_total_mb", disco.getTotalBytes() / 1048576L);
-            saida.put("armazenamento_livre_mb", disco.getAvailableBytes() / 1048576L);
-        } catch (RuntimeException falha) {
-            Log.w(TAG, "armazenamento: " + falha);
-        }
         DisplayMetrics medidas = new DisplayMetrics();
         WindowManager janelas = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
         janelas.getDefaultDisplay().getRealMetrics(medidas);
@@ -632,22 +624,43 @@ public class ArenaServico extends Service {
             saida.put("tela_polegadas", Math.round(polegadas * 10) / 10.0);
         }
         saida.put("tela_hz", Math.round(janelas.getDefaultDisplay().getRefreshRate()));
+        try {
+            // Os modos de atualizacao que a tela aceita (60, 90, 120 Hz...), sem repetir.
+            java.util.TreeSet<Long> modos = new java.util.TreeSet<Long>();
+            for (android.view.Display.Mode modo : janelas.getDefaultDisplay().getSupportedModes()) {
+                modos.add(Math.round((double) modo.getRefreshRate()));
+            }
+            JSONArray lista = new JSONArray();
+            for (Long hz : modos) lista.put(hz);
+            saida.put("tela_modos_hz", lista);
+        } catch (RuntimeException falha) {
+            Log.w(TAG, "modos da tela: " + falha);
+        }
         saida.put("processador", processador());
+        saida.put("hardware", Build.HARDWARE);
+        saida.put("placa", Build.BOARD);
         saida.put("nucleos", Runtime.getRuntime().availableProcessors());
         JSONArray frequencias = new JSONArray();
         for (int i = 0; i < Runtime.getRuntime().availableProcessors(); i++) {
-            String maxima = lerLinha("/sys/devices/system/cpu/cpu" + i + "/cpufreq/cpuinfo_max_freq").trim();
-            long mhz = 0;
-            try {
-                mhz = maxima.isEmpty() ? 0 : Long.parseLong(maxima) / 1000;
-            } catch (NumberFormatException falha) {
-                mhz = 0;
-            }
-            frequencias.put(mhz);
+            frequencias.put(mhzDe("/sys/devices/system/cpu/cpu" + i + "/cpufreq/cpuinfo_max_freq"));
         }
         saida.put("nucleos_mhz", frequencias);
         saida.put("placa_de_video", placaDeVideo());
         saida.put("vulkan", getPackageManager().hasSystemFeature(PackageManager.FEATURE_VULKAN_HARDWARE_VERSION));
+        try {
+            for (android.content.pm.FeatureInfo recurso : getPackageManager().getSystemAvailableFeatures()) {
+                if ("android.hardware.vulkan.version".equals(recurso.name)) {
+                    int v = recurso.version;
+                    saida.put("vulkan_versao", ((v >> 22) & 0x7f) + "." + ((v >> 12) & 0x3ff));
+                }
+            }
+            ActivityManager atividades = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+            if (atividades != null) {
+                saida.put("opengl_es", atividades.getDeviceConfigurationInfo().getGlEsVersion());
+            }
+        } catch (RuntimeException falha) {
+            Log.w(TAG, "vulkan e opengl: " + falha);
+        }
         saida.put("arquiteturas", new JSONArray(java.util.Arrays.asList(Build.SUPPORTED_ABIS)));
         saida.put("fabricante", Build.MANUFACTURER);
         saida.put("modelo", Build.MODEL);
@@ -656,7 +669,185 @@ public class ArenaServico extends Service {
         saida.put("android", Build.VERSION.RELEASE);
         saida.put("android_sdk", Build.VERSION.SDK_INT);
         if (Build.VERSION.SDK_INT >= 23) saida.put("seguranca", Build.VERSION.SECURITY_PATCH);
+        saida.put("versao_do_sistema", Build.DISPLAY);
+        String nucleo = System.getProperty("os.version");
+        if (nucleo != null) saida.put("kernel", nucleo);
+        // O que o aparelho tem para jogar com controle (e para o celular virar controle).
+        PackageManager pacotes = getPackageManager();
+        JSONObject recursos = new JSONObject();
+        recursos.put("usb_host", pacotes.hasSystemFeature("android.hardware.usb.host"));
+        recursos.put("bluetooth", pacotes.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH));
+        recursos.put("bluetooth_le", pacotes.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE));
+        recursos.put("giroscopio", pacotes.hasSystemFeature(PackageManager.FEATURE_SENSOR_GYROSCOPE));
+        recursos.put("acelerometro", pacotes.hasSystemFeature(PackageManager.FEATURE_SENSOR_ACCELEROMETER));
+        recursos.put("multitoque", pacotes.hasSystemFeature(PackageManager.FEATURE_TOUCHSCREEN_MULTITOUCH_DISTINCT));
+        android.os.Vibrator vibrador = (android.os.Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        recursos.put("vibracao", vibrador != null && vibrador.hasVibrator());
+        saida.put("recursos", recursos);
         return saida;
+    }
+
+    /** O que muda enquanto o aluno olha. Cada leitura que o aparelho nao da
+     *  simplesmente fica de fora: nada aqui e' inventado. */
+    JSONObject aoVivo() throws JSONException {
+        JSONObject saida = energia();
+        Intent bateria = registerReceiver(null, new android.content.IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        if (bateria != null) {
+            saida.put("bateria_estado", bateria.getIntExtra(android.os.BatteryManager.EXTRA_STATUS, 0));
+            saida.put("tomada", bateria.getIntExtra(android.os.BatteryManager.EXTRA_PLUGGED, 0));
+            saida.put("bateria_saude", bateria.getIntExtra(android.os.BatteryManager.EXTRA_HEALTH, 0));
+            int temperatura = bateria.getIntExtra(android.os.BatteryManager.EXTRA_TEMPERATURE, Integer.MIN_VALUE);
+            if (temperatura != Integer.MIN_VALUE) saida.put("bateria_temperatura_c", temperatura / 10.0);
+            int voltagem = bateria.getIntExtra(android.os.BatteryManager.EXTRA_VOLTAGE, -1);
+            if (voltagem > 0) saida.put("bateria_voltagem_mv", voltagem);
+            String tecnologia = bateria.getStringExtra(android.os.BatteryManager.EXTRA_TECHNOLOGY);
+            if (tecnologia != null) saida.put("bateria_tecnologia", tecnologia);
+            if (Build.VERSION.SDK_INT >= 34) {
+                int ciclos = bateria.getIntExtra(android.os.BatteryManager.EXTRA_CYCLE_COUNT, -1);
+                if (ciclos >= 0) saida.put("bateria_ciclos", ciclos);
+            }
+        }
+        android.os.BatteryManager gerente = (android.os.BatteryManager) getSystemService(Context.BATTERY_SERVICE);
+        if (gerente != null) {
+            // Corrente em microampere: o Android diz positivo para carregando e negativo para gastando, mas cada
+            // fabricante faz do seu jeito. A tela usa o ESTADO (carregando ou nao), e nao o sinal.
+            long corrente = gerente.getLongProperty(android.os.BatteryManager.BATTERY_PROPERTY_CURRENT_NOW);
+            if (corrente != Long.MIN_VALUE) saida.put("corrente_ua", corrente);
+            long media = gerente.getLongProperty(android.os.BatteryManager.BATTERY_PROPERTY_CURRENT_AVERAGE);
+            if (media != Long.MIN_VALUE) saida.put("corrente_media_ua", media);
+            // A carga de agora, em microampere-hora (o Android 5 em diante).
+            int carga = gerente.getIntProperty(android.os.BatteryManager.BATTERY_PROPERTY_CHARGE_COUNTER);
+            if (carga > 0 && carga != Integer.MIN_VALUE) saida.put("bateria_carga_mah", carga / 1000);
+            if (Build.VERSION.SDK_INT >= 28) {
+                long faltam = gerente.computeChargeTimeRemaining();
+                if (faltam > 0) saida.put("falta_para_encher_s", faltam / 1000);
+            }
+            if (Build.VERSION.SDK_INT >= 34) {
+                int saudePct = gerente.getIntProperty(10);          // BATTERY_PROPERTY_STATE_OF_HEALTH (a constante nao vem no android.jar publico)
+                if (saudePct > 0 && saudePct != Integer.MIN_VALUE) saida.put("bateria_saude_pct", saudePct);
+            }
+        }
+        ActivityManager.MemoryInfo memoria = new ActivityManager.MemoryInfo();
+        ActivityManager atividades = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        if (atividades != null) {
+            atividades.getMemoryInfo(memoria);
+            saida.put("memoria_total_mb", memoria.totalMem / 1048576L);
+            saida.put("memoria_livre_mb", memoria.availMem / 1048576L);
+            saida.put("memoria_baixa", memoria.lowMemory);
+            saida.put("memoria_limite_mb", memoria.threshold / 1048576L);
+        }
+        long[] troca = memoriaVirtual();
+        if (troca != null && troca[0] > 0) {
+            saida.put("troca_total_mb", troca[0] / 1024);
+            saida.put("troca_livre_mb", troca[1] / 1024);
+        }
+        try {
+            android.os.StatFs disco = new android.os.StatFs(Environment.getExternalStorageDirectory().getPath());
+            saida.put("armazenamento_total_mb", disco.getTotalBytes() / 1048576L);
+            saida.put("armazenamento_livre_mb", disco.getAvailableBytes() / 1048576L);
+        } catch (RuntimeException falha) {
+            Log.w(TAG, "armazenamento: " + falha);
+        }
+        JSONArray agora = new JSONArray();
+        for (int i = 0; i < Runtime.getRuntime().availableProcessors(); i++) {
+            agora.put(mhzDe("/sys/devices/system/cpu/cpu" + i + "/cpufreq/scaling_cur_freq"));
+        }
+        saida.put("nucleos_agora_mhz", agora);
+        android.os.PowerManager poder = (android.os.PowerManager) getSystemService(Context.POWER_SERVICE);
+        if (poder != null && Build.VERSION.SDK_INT >= 30) {
+            // A margem para esquentar: 1,0 = ja no limite em 10 s. NaN = o aparelho nao diz.
+            float margem = poder.getThermalHeadroom(10);
+            if (!Float.isNaN(margem)) saida.put("margem_termica", Math.round(margem * 100) / 100.0);
+        }
+        saida.put("ligado_ha_s", android.os.SystemClock.elapsedRealtime() / 1000L);
+        try {
+            WifiManager wifi = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+            if (wifi != null) saida.put("wifi_ligado", wifi.isWifiEnabled());
+            if (wifi != null && wifi.isWifiEnabled()) {
+                android.net.wifi.WifiInfo info = wifi.getConnectionInfo();
+                if (info != null && info.getRssi() > -127 && info.getLinkSpeed() > 0) {
+                    JSONObject w = new JSONObject();
+                    w.put("sinal_dbm", info.getRssi());
+                    w.put("velocidade_mbps", info.getLinkSpeed());
+                    w.put("frequencia_mhz", info.getFrequency());
+                    saida.put("wifi", w);
+                }
+            }
+        } catch (RuntimeException falha) {
+            Log.w(TAG, "wifi: " + falha);
+        }
+        saida.put("controles", controlesLigados());
+        return saida;
+    }
+
+    /** Os controles de jogo e o teclado de verdade ligados agora, na ordem em
+     *  que o RetroArch os poe nos jogadores (o primeiro ligado e' o jogador 1:
+     *  o RetroArch do ARENA registra por numero de aparelho, do menor para o
+     *  maior; ver docs/PLANO-CELULAR.md). */
+    JSONArray controlesLigados() {
+        JSONArray lista = new JSONArray();
+        try {
+            int[] ids = InputDevice.getDeviceIds();
+            java.util.Arrays.sort(ids);
+            int jogador = 0;
+            for (int id : ids) {
+                InputDevice d = InputDevice.getDevice(id);
+                if (d == null || d.isVirtual()) continue;
+                int fontes = d.getSources();
+                boolean controle = (fontes & InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD
+                        || (fontes & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK;
+                if (!controle) continue;
+                jogador++;
+                lista.put(new JSONObject().put("nome", String.valueOf(d.getName())).put("jogador", jogador));
+            }
+            // Os teclados de letras de verdade (com fio ou Bluetooth). O "Consumer Control" de um controle e' teclado,
+            // mas nao de letras: fica de fora.
+            for (int id : ids) {
+                InputDevice d = InputDevice.getDevice(id);
+                if (d == null || d.isVirtual()) continue;
+                int fontes = d.getSources();
+                boolean controle = (fontes & InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD
+                        || (fontes & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK;
+                if (!controle && d.getKeyboardType() == InputDevice.KEYBOARD_TYPE_ALPHABETIC
+                        && (fontes & InputDevice.SOURCE_KEYBOARD) == InputDevice.SOURCE_KEYBOARD) {
+                    lista.put(new JSONObject().put("nome", String.valueOf(d.getName())).put("teclado", true));
+                }
+            }
+        } catch (JSONException | RuntimeException falha) {
+            Log.w(TAG, "controles: " + falha);
+        }
+        return lista;
+    }
+
+    /** {total, livre} da memoria virtual (o zRAM do Android), em kB, ou null. */
+    static long[] memoriaVirtual() {
+        long total = -1, livre = -1;
+        try (BufferedReader leitor = new BufferedReader(new InputStreamReader(
+                new java.io.FileInputStream("/proc/meminfo"), StandardCharsets.UTF_8))) {
+            String linha;
+            while ((linha = leitor.readLine()) != null) {
+                if (linha.startsWith("SwapTotal:")) total = kbDe(linha);
+                else if (linha.startsWith("SwapFree:")) livre = kbDe(linha);
+            }
+        } catch (IOException | RuntimeException falha) {
+            return null;
+        }
+        return total >= 0 && livre >= 0 ? new long[]{total, livre} : null;
+    }
+
+    static long kbDe(String linha) {
+        String[] partes = linha.trim().split("\\s+");
+        return partes.length >= 2 ? Long.parseLong(partes[1]) : -1;
+    }
+
+    /** A frequencia de um arquivo do cpufreq (em kHz) em MHz; 0 se nao deu para ler (nucleo desligado). */
+    static long mhzDe(String caminho) {
+        String texto = lerLinha(caminho).trim();
+        try {
+            return texto.isEmpty() ? 0 : Long.parseLong(texto) / 1000;
+        } catch (NumberFormatException falha) {
+            return 0;
+        }
     }
 
     /** A capacidade de fabrica da bateria, em mAh (a do power_profile.xml do

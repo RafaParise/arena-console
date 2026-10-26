@@ -1805,6 +1805,27 @@ CONTROLES_CONHECIDOS = [
     ("Teclado", "-", "Sempre funciona como jogador 1, mesmo com controle plugado."),
 ]
 
+# O mesmo, para o ARENA do Android (Ajustes -> Controles). No celular nao ha "xinput" nem "dinput": quem le o controle
+# e' o Android, e o selo diz como ele liga (pedido do Rafael, 25/10/2026: "tudo que o arena pc faz, o android faz",
+# e o que o computador diz e nao vale no celular, o celular nao diz).
+CONTROLES_DO_ANDROID = [
+    ("Xbox 360, One e Series", "Bluetooth ou cabo",
+     "Pareie no Bluetooth do Android (ou ligue no cabo, com adaptador OTG): funciona sem instalar nada."),
+    ("PlayStation 4 e 5", "Bluetooth ou cabo",
+     "Pareie no Bluetooth do Android ou ligue no cabo OTG."),
+    ("Nintendo Switch Pro e Joy-Con", "Bluetooth",
+     "Pareie no Bluetooth do Android. O Joy-Con avulso funciona como um controle pequeno."),
+    ("GameSir, 8BitDo e parecidos", "Bluetooth ou cabo",
+     "Se o controle tem chave de modo, deixe no modo Android (ou Xbox) antes de parear."),
+    ("Genéricos e arcade stick USB", "cabo OTG",
+     "Quase todos funcionam ligados no cabo, com adaptador OTG (USB-C ou micro USB)."),
+    ("Teclado e mouse", "-",
+     "Por cabo OTG ou Bluetooth. O teclado joga como jogador 1; no jogo, o menu abre com o botão MENU ou com os dois "
+     "analógicos apertados."),
+    ("Controle de toque, na tela", "-",
+     "Sem controle de verdade, o jogo mostra os botões na tela e eles somem sozinhos quando você liga um controle."),
+]
+
 
 
 

@@ -482,8 +482,10 @@ SERVICO_DO_ARENA = '''        <service android:exported="false" android:name="io
 # O que o servidor pede ao Android alem do RetroArch: ficar aberto durante o
 # jogo (o aviso na barra), receber os avisos da rede do Jogar Junto (o Wi-Fi
 # joga fora os de grupo sem a trava) e, no Android 11 em diante, gravar no
-# cartao e no pen drive (o "Acesso a todos os arquivos", que a pessoa liga).
+# cartao e no pen drive (o "Acesso a todos os arquivos", que a pessoa liga). O ACCESS_WIFI_STATE (sem pergunta ao
+# aluno: e' das permissoes "normais") deixa o painel Ajustes -> Maquina mostrar o sinal e a velocidade do Wi-Fi.
 PERMISSOES_DO_SERVIDOR = '''    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE"/>
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
 '''
