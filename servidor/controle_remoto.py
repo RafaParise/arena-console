@@ -27,8 +27,8 @@ Seguranca (docs\\PLANO-CELULAR.md, linha 7 da tabela):
   * a pagina so e' do controle: nenhuma rota da API do ARENA fica na porta aberta;
   * so responde a quem chamou o computador por um endereco DELE (lista fechada de IP:porta): um site que fez o nome dele
     apontar para o computador (DNS rebinding) chega com outro Host e e' recusado; a Origin tambem tem que ser a desse Host;
-  * o professor escolhe quais jogadores (1 a 4) o celular pode ser, e so esses abrem no RetroArch;
-  * limite de quadros por segundo e de tamanho; no maximo 4 celulares ao mesmo tempo.
+  * o professor escolhe quais jogadores (1 a 8) o celular pode ser, e so esses abrem no RetroArch;
+  * limite de quadros por segundo e de tamanho; no maximo 8 celulares ao mesmo tempo (um por jogador).
 
 O que nao da: os emuladores de fora (PCSX2, Dolphin, RPCS3, Xenia) nao leem o Network RetroPad. E o RetroArch escuta o
 UDP em TODAS as placas de rede enquanto o jogo roda (nao da para pedir so o 127.0.0.1): com o firewall do Windows
@@ -57,6 +57,8 @@ import threading
 import time
 import urllib.parse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+import controle_usb
 
 PASTA_SERVIDOR = os.path.dirname(os.path.abspath(__file__))
 RAIZ = os.path.dirname(PASTA_SERVIDOR)
@@ -598,6 +600,7 @@ class ControleRemoto:
         self._falhas = []              # instantes dos ultimos codigos errados, de qualquer endereco
         self._acertos = {}             # ip -> instante em que entrou com o codigo certo (passa pelo teto duro)
         self._trocas_do_codigo = 0     # quantas vezes o codigo mudou sozinho (alguem errou demais): o professor ve
+        self._cabos = {}               # serial do celular -> porta que o cabo (adb reverse) leva ate aqui
         self._liberados = set(JOGADORES_LIBERADOS_PADRAO)      # os jogadores que o celular pode ser (o professor muda)
         self._hosts_extras = set()     # outros nomes que valem como Host (o endereco do tunel, quando houver)
 
@@ -628,6 +631,7 @@ class ControleRemoto:
             self._falhas = []
             self._acertos = {}
             self._trocas_do_codigo = 0
+            self._cabos = {}
             self.ligado = True
             return self._estado_sem_trava()
 
@@ -639,6 +643,8 @@ class ControleRemoto:
             servidor, self._servidor = self._servidor, None
             clientes = list(self._clientes.items())
             self._clientes.clear()
+            cabos, self._cabos = list(self._cabos.items()), {}
+        controle_usb.soltar(cabos)          # o celular deixa de alcancar a porta deste computador pelo cabo
         for jogador, dados in clientes:
             self.enviador.zerar(jogador)
             self.enviador.ativar(jogador, False)
@@ -661,9 +667,25 @@ class ControleRemoto:
         enderecos = ["http://%s:%d/" % (ip, self.porta) for ip in self._enderecos()]
         return {"ligado": True, "codigo": self.codigo, "porta_da_pagina": self.porta, "enderecos": enderecos,
                 "jogadores_liberados": sorted(self._liberados), "trocas_do_codigo": self._trocas_do_codigo,
+                "cabos": [("…" + s[-4:]) if len(s) > 6 else s for s in self._cabos],
                 "conectados": [{"jogador": n, "ip": d["ip"], "apelido": d["apelido"], "ha_s": round(time.monotonic() - d["desde"]),
                                 "rtt_ms": d.get("rtt_ms"), "pelo_cabo": d["ip"].startswith("127.")}
                                for n, d in sorted(self._clientes.items())]}
+
+    # -- o cabo USB -------------------------------------------------------------------------------
+    def ligar_pelo_cabo(self, serial=None, jogador=None):
+        """Liga o cabo (adb reverse) a porta do controle e abre a pagina no celular, com o codigo. Devolve o que o
+        professor precisa ver (controle_usb.abrir_no_celular). Nunca levanta."""
+        with self._trava:
+            ligado, porta, codigo = self.ligado, self.porta, self.codigo
+        if not ligado:
+            return {"ok": False, "erro": "Ligue o celular como controle antes de usar o cabo.", "aparelhos": []}
+        resposta = controle_usb.abrir_no_celular(porta, codigo, serial, jogador)
+        if resposta.get("ok") and resposta.get("escolhido"):
+            with self._trava:
+                if self.ligado:
+                    self._cabos[resposta["escolhido"]] = porta
+        return resposta
 
     # -- que jogadores o celular pode ser ---------------------------------------------------------
     def jogadores(self):

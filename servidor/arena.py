@@ -6557,9 +6557,19 @@ class Manipulador(BaseHTTPRequestHandler):
                 return self.erro("O celular como controle é ligado no computador: abra o ARENA nele, em Ajustes → Controles.", 404)
             lista = dados.get("jogadores")
             if not isinstance(lista, list):
-                return self.erro("Marque os jogadores que o celular pode ser (de 1 a 4).")
+                return self.erro("Marque os jogadores que o celular pode ser (de 1 a 8).")
             CONTROLE_REMOTO.liberar_jogadores(lista)
             return self.responder_json(dict(CONTROLE_REMOTO.estado(), ok=True))
+
+        if caminho == "/api/controle-remoto/usb":
+            # O cabo USB (servidor\controle_usb.py): `adb reverse` e abre a pagina no celular. So deste computador.
+            if plataforma_do_sistema.ANDROID:
+                return self.erro("O celular como controle é ligado no computador: abra o ARENA nele, em Ajustes → Controles.", 404)
+            serial = dados.get("serial")
+            jogador = dados.get("jogador")
+            resposta = CONTROLE_REMOTO.ligar_pelo_cabo(serial if isinstance(serial, str) else None,
+                                                       jogador if isinstance(jogador, int) else None)
+            return self.responder_json(dict(resposta, estado=CONTROLE_REMOTO.estado()))
 
         if caminho in ("/api/controle-remoto/ligar", "/api/controle-remoto/desligar"):
             # So deste computador (nao esta em ROTAS_REDE_EXTERNA): quem liga o controle pelo celular e' o professor,

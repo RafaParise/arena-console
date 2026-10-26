@@ -5776,6 +5776,31 @@ function ligarEventos() {
     }
   });
 
+  $("#btnControleRemotoUsb").addEventListener("click", async () => {
+    const botao = $("#btnControleRemotoUsb");
+    const lista = $("#controleRemotoCaboLista");
+    const aviso = $("#controleRemotoCaboAviso");
+    botao.disabled = true;
+    aviso.textContent = "Procurando o celular no cabo…";
+    try {
+      const r = await pedir("/api/controle-remoto/usb", { serial: lista.hidden ? undefined : lista.value });
+      const aparelhos = r.aparelhos || [];
+      lista.hidden = aparelhos.filter((a) => a.pronto).length < 2;
+      lista.replaceChildren(...aparelhos.map((a) => {
+        const opcao = document.createElement("option");
+        opcao.value = a.serial;
+        opcao.textContent = `${a.modelo || "Celular"} (${a.serial_curto})`;
+        return opcao;
+      }));
+      aviso.textContent = r.ok ? "Aberto no celular. " + (r.dica || "") : [r.como_baixar, r.erro, r.dica].filter(Boolean).join(" ");
+      desenharControleRemoto(r.estado || (await pedir("/api/controle-remoto")));
+    } catch (falha) {
+      aviso.textContent = falha.message;
+    } finally {
+      botao.disabled = false;
+    }
+  });
+
   $("#chaveControleRemoto").addEventListener("click", async (evento) => {
     const botao = evento.currentTarget;
     const novo = botao.getAttribute("aria-pressed") !== "true";

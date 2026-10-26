@@ -13,8 +13,50 @@
 
   const BATIDA_MS = 250;            // com a tela parada, manda o estado de novo (o computador solta tudo se ficar 1,5 s sem ouvir)
   const ESPERAS = [500, 1000, 2000, 4000];
-  const ZONA_MORTA_DO_ANALOGICO = 0.12;
   let DIGITOS = 6;                  // quantos numeros tem o codigo (o computador diz em /jogadores)
+
+  // Os ajustes de cada um (guardados so neste celular) e os 3 perfis, como no GameSir Nexus. Padrao = o de sempre.
+  const AJUSTES_PADRAO = { modo: "direcional", zona: 12, curva: "linear", diagonal: 38, escala: 100, canhoto: false,
+                           inclinar: false, inverterInclinacao: false };
+  let ajustes = Object.assign({}, AJUSTES_PADRAO);
+  const inclinacao = { eixo: 0, zero: 0, angulo: 0 };          // o volante: o eixo de agora e a posicao "reta"
+
+  // ==== contas puras (testadas em servidor/tests/test_contas_do_controle.py, com o Node.js) ====
+  // Zona morta e curva do analogico (o que o GameSir Nexus chama de "dead zone" e curva de resposta). (nx, ny) e' a
+  // posicao do dedo de -1 a 1; a zona morta e' o tanto de curso que nao vale nada (de 0 a 0,4); depois dela o curso
+  // volta a comecar do zero, para o personagem nao "pular" do parado para o andando.
+  function aplicarZonaECurva(nx, ny, zona, curva) {
+    const forca = Math.hypot(nx, ny);
+    if (forca === 0 || forca <= zona) return [0, 0];
+    let f = Math.min(1, (forca - zona) / (1 - zona));
+    if (curva === "suave") f = f * f;                  // fino no comeco: bom para mirar
+    else if (curva === "rapida") f = Math.sqrt(f);     // forte no comeco: bom para correr
+    return [nx / forca * f, ny / forca * f];
+  }
+
+  // O direcional em cruz: a direcao vem do ANGULO do dedo em relacao ao centro, com zona morta no meio. 'limite' e' o
+  // quanto de cada lado o dedo precisa ter (cosseno) para contar: menor = as diagonais saem mais facil (o "ajuste das
+  // diagonais" do Nexus). Dois lados juntos (diagonal) quando o dedo esta perto de 45 graus.
+  function bitsDoDirecional(dx, dy, largura, limite) {
+    const dist = Math.hypot(dx, dy);
+    if (dist < largura * 0.14) return 0;
+    const ax = dx / dist;
+    const ay = dy / dist;
+    let bits = 0;
+    if (ay < -limite) bits |= 1 << 4;     // cima
+    if (ay > limite) bits |= 1 << 5;      // baixo
+    if (ax < -limite) bits |= 1 << 6;     // esquerda
+    if (ax > limite) bits |= 1 << 7;      // direita
+    return bits;
+  }
+
+  // Inclinar o celular deitado para virar (volante): 'angulo' e' o quanto ele esta girado em graus (de -90 a 90, 0 =
+  // reto); 'maximo' e' o giro que vale o curso inteiro. Devolve o eixo de -32767 a 32767, ja com zona morta e curva.
+  function eixoDaInclinacao(angulo, maximo, zona, curva, inverter) {
+    const n = Math.max(-1, Math.min(1, angulo / maximo)) * (inverter ? -1 : 1);
+    return Math.round(aplicarZonaECurva(n, 0, zona, curva)[0] * 32767);
+  }
+  // ==== fim das contas puras ====
 
   let botoes = 0;
   const eixos = [0, 0, 0, 0];
@@ -24,6 +66,7 @@
   let tentativa = 0;
   let desistiu = false;
   let dados = { codigo: "", jogador: 2, apelido: "" };
+  let pelaCabo = false;             // a pagina veio por 127.0.0.1: o cabo USB (menor atraso, e o navegador libera o sensor)
   const dedos = new Map();          // id do dedo -> {tipo, elemento, ...}
 
   // ---------- falar com o computador ----------
@@ -55,7 +98,7 @@
       if (m.t === "ok") {
         tentativa = 0;
         mostrarControle();
-        estadoDaConexao("Conectado", false);
+        estadoDaConexao(pelaCabo ? "Conectado pelo cabo" : "Conectado", false);
         sujo = true;
       } else if (m.t === "erro") {
         desistiu = true;
@@ -148,22 +191,9 @@
     return el.closest("#cruz") || el.closest(".stick") || el.closest(".tecla[data-b]");
   }
 
-  // O direcional em cruz: a direcao vem do ANGULO do dedo em relacao ao centro, com zona morta no meio.
-  // Dois lados juntos (diagonal) quando o dedo esta perto de 45 graus.
   function direcoes(elemento, x, y) {
     const r = elemento.getBoundingClientRect();
-    const dx = x - (r.left + r.width / 2);
-    const dy = y - (r.top + r.height / 2);
-    const dist = Math.hypot(dx, dy);
-    if (dist < r.width * 0.14) return 0;
-    const ax = dx / dist;
-    const ay = dy / dist;
-    let bits = 0;
-    if (ay < -0.38) bits |= 1 << 4;     // cima
-    if (ay > 0.38) bits |= 1 << 5;      // baixo
-    if (ax < -0.38) bits |= 1 << 6;     // esquerda
-    if (ax > 0.38) bits |= 1 << 7;      // direita
-    return bits;
+    return bitsDoDirecional(x - (r.left + r.width / 2), y - (r.top + r.height / 2), r.width, ajustes.diagonal / 100);
   }
 
   // O analogico: o dedo puxa a bolinha ate a borda; o eixo vai de -32767 a 32767 (cima e esquerda negativos).
@@ -192,17 +222,14 @@
         novoBotoes |= dedo.bits;
         acesas.add(dedo.elemento);
       } else if (dedo.tipo === "stick") {
-        const nx = dedo.dx / dedo.raio;
-        const ny = dedo.dy / dedo.raio;
-        const forca = Math.hypot(nx, ny);
         const i = Number(dedo.elemento.dataset.eixos);
-        if (forca > ZONA_MORTA_DO_ANALOGICO) {
-          novosEixos[i] = Math.round(nx * 32767);
-          novosEixos[i + 1] = Math.round(ny * 32767);
-        }
+        const [vx, vy] = aplicarZonaECurva(dedo.dx / dedo.raio, dedo.dy / dedo.raio, ajustes.zona / 100, ajustes.curva);
+        novosEixos[i] = Math.round(vx * 32767);
+        novosEixos[i + 1] = Math.round(vy * 32767);
         acesas.add(dedo.elemento);
       }
     }
+    if (ajustes.inclinar && novosEixos[0] === 0) novosEixos[0] = inclinacao.eixo;
     // o desenho: tecla acesa enquanto ha dedo nela; setas acesas pelo bit; bolinha acompanha o dedo
     for (const el of document.querySelectorAll("#controle [data-b]")) {
       const bit = Number(el.dataset.b);
@@ -267,6 +294,80 @@
     sujo = true;
   }
 
+  // ---------- ajustes e perfis ----------
+  // O que vem do armazenamento do navegador e' dado de fora: so entra o que a pagina conhece, dentro dos limites.
+  function limparAjustes(bruto) {
+    const a = Object.assign({}, AJUSTES_PADRAO);
+    if (!bruto || typeof bruto !== "object") return a;
+    const numero = (v, minimo, maximo, padrao) => {
+      const n = Number(v);
+      return Number.isFinite(n) ? Math.max(minimo, Math.min(maximo, Math.round(n))) : padrao;
+    };
+    if (["direcional", "analogico", "dois"].includes(bruto.modo)) a.modo = bruto.modo;
+    a.zona = numero(bruto.zona, 0, 40, a.zona);
+    if (["linear", "suave", "rapida"].includes(bruto.curva)) a.curva = bruto.curva;
+    a.diagonal = numero(bruto.diagonal, 25, 55, a.diagonal);
+    a.escala = numero(bruto.escala, 80, 130, a.escala);
+    a.canhoto = bruto.canhoto === true;
+    a.inclinar = bruto.inclinar === true;
+    a.inverterInclinacao = bruto.inverterInclinacao === true;
+    return a;
+  }
+
+  function lerPerfis() {
+    try {
+      const perfis = JSON.parse(guardar.ler("arena_ctl_perfis", "{}"));
+      return perfis && typeof perfis === "object" ? perfis : {};
+    } catch (e) { return {}; }
+  }
+
+  let perfilAtual = "1";
+
+  function aplicarAjustes() {
+    document.body.dataset.modo = ajustes.modo;
+    document.body.classList.toggle("canhoto", ajustes.canhoto);
+    document.documentElement.style.setProperty("--escala", String(ajustes.escala / 100));
+    for (const radio of document.querySelectorAll("input[name=modo]")) radio.checked = radio.value === ajustes.modo;
+    $("#zona").value = String(ajustes.zona);
+    $("#zonaValor").textContent = ajustes.zona + "%";
+    $("#curva").value = ajustes.curva;
+    $("#diagonal").value = String(ajustes.diagonal);
+    $("#diagonalValor").textContent = ajustes.diagonal < 34 ? "fácil" : ajustes.diagonal > 44 ? "difícil" : "normal";
+    $("#escala").value = String(ajustes.escala);
+    $("#escalaValor").textContent = ajustes.escala + "%";
+    $("#canhoto").checked = ajustes.canhoto;
+    $("#inclinar").checked = ajustes.inclinar;
+    $("#inverterInclinacao").checked = ajustes.inverterInclinacao;
+    ligarInclinacao();
+    guardar.gravar("arena_ctl_ajustes", JSON.stringify(ajustes));
+    soltarTudo();
+  }
+
+  // O volante: so quando o navegador deixa ler o sensor. Pelo Wi-Fi (http de rede) o Chrome nao deixa; pelo cabo USB, o
+  // endereco 127.0.0.1 e' "contexto seguro" e deixa. Mede o giro do celular deitado pela gravidade (o acelerometro: o
+  // giroscopio nem todo celular tem).
+  let ouvindoMovimento = false;
+  let calibrar = true;
+  function ligarInclinacao() {
+    const possivel = window.isSecureContext && "DeviceMotionEvent" in window;
+    $("#linhaInclinar").hidden = !possivel;
+    const ligar = possivel && ajustes.inclinar;
+    if (ligar && !ouvindoMovimento) { window.addEventListener("devicemotion", aoMover); ouvindoMovimento = true; calibrar = true; }
+    if (!ligar && ouvindoMovimento) { window.removeEventListener("devicemotion", aoMover); ouvindoMovimento = false; }
+    if (!ligar) inclinacao.eixo = 0;
+  }
+
+  function aoMover(e) {
+    const g = e.accelerationIncludingGravity;
+    if (!g || typeof g.x !== "number" || typeof g.y !== "number") return;
+    const lado = screen.orientation ? screen.orientation.angle : (typeof window.orientation === "number" ? (window.orientation + 360) % 360 : 90);
+    const sinal = lado === 270 ? -1 : 1;             // deitado para a esquerda (90) ou para a direita (270)
+    inclinacao.angulo = Math.atan2(sinal * g.y, sinal * g.x) * 180 / Math.PI;
+    if (calibrar) { inclinacao.zero = inclinacao.angulo; calibrar = false; }
+    const eixo = $("#menu").hidden ? eixoDaInclinacao(inclinacao.angulo - inclinacao.zero, 40, ajustes.zona / 100, ajustes.curva, ajustes.inverterInclinacao) : 0;
+    if (Math.abs(eixo - inclinacao.eixo) >= 256 || (eixo === 0) !== (inclinacao.eixo === 0)) { inclinacao.eixo = eixo; recalcular(); }
+  }
+
   // ---------- telas ----------
   function mostrarControle() {
     $("#entrada").hidden = true;
@@ -282,10 +383,8 @@
   }
 
   function aplicarModo(modo) {
-    document.body.dataset.modo = modo;
-    guardar.gravar("arena_ctl_modo", modo);
-    for (const radio of document.querySelectorAll("input[name=modo]")) radio.checked = radio.value === modo;
-    soltarTudo();
+    ajustes.modo = modo;
+    aplicarAjustes();
   }
 
   function pedirTelaCheia() {
@@ -297,14 +396,24 @@
   }
 
   function iniciar() {
-    const params = new URLSearchParams(location.search);
+    // O ARENA abre esta pagina no celular pelo cabo USB (servidor/controle_usb.py) com o codigo depois do "#": o navegador
+    // nao o manda a servidor nenhum. Lido, sai do endereco (nem fica na barra nem no historico).
+    const params = new URLSearchParams(location.hash.replace(/^#/, "") || location.search);
+    const veioPeloEndereco = /^\d{4,12}$/.test(params.get("c") || "");
+    if (location.hash || location.search) { try { history.replaceState(null, "", location.pathname); } catch (e) { /* segue */ } }
+    pelaCabo = ["127.0.0.1", "localhost", "[::1]"].includes(location.hostname);
     $("#codigo").value = (params.get("c") || "").replace(/\D/g, "").slice(0, DIGITOS);
     const jogador = params.get("j") || guardar.ler("arena_ctl_jogador", "2");
     for (const radio of document.querySelectorAll("input[name=jogador]")) radio.checked = radio.value === jogador;
     $("#apelido").value = params.get("a") || guardar.ler("arena_ctl_apelido", "");
     $("#vibrar").checked = guardar.ler("arena_ctl_vibrar", "1") === "1";
     $("#telaCheia").checked = guardar.ler("arena_ctl_tela_cheia", "1") === "1";
-    aplicarModo(guardar.ler("arena_ctl_modo", "direcional"));
+    perfilAtual = ["1", "2", "3"].includes(guardar.ler("arena_ctl_perfil", "1")) ? guardar.ler("arena_ctl_perfil", "1") : "1";
+    let salvo = null;
+    try { salvo = JSON.parse(guardar.ler("arena_ctl_ajustes", "null")); } catch (e) { salvo = null; }
+    ajustes = limparAjustes(salvo || { modo: guardar.ler("arena_ctl_modo", "direcional") });
+    $("#perfil").value = perfilAtual;
+    aplicarAjustes();
 
     $("#formulario").addEventListener("submit", (e) => {
       e.preventDefault();
@@ -330,7 +439,34 @@
     document.addEventListener("touchmove", (e) => { if (!$("#controle").hidden) e.preventDefault(); }, { passive: false });
     document.addEventListener("gesturestart", (e) => e.preventDefault());
 
-    $("#botaoMenu").addEventListener("click", () => { $("#menu").hidden = false; soltarTudo(); });
+    const mudar = (campo, valor) => { ajustes[campo] = valor; aplicarAjustes(); };
+    $("#zona").addEventListener("input", (e) => mudar("zona", Number(e.target.value)));
+    $("#curva").addEventListener("change", (e) => mudar("curva", e.target.value));
+    $("#diagonal").addEventListener("input", (e) => mudar("diagonal", Number(e.target.value)));
+    $("#escala").addEventListener("input", (e) => mudar("escala", Number(e.target.value)));
+    $("#canhoto").addEventListener("change", (e) => mudar("canhoto", e.target.checked));
+    $("#inclinar").addEventListener("change", (e) => mudar("inclinar", e.target.checked));
+    $("#inverterInclinacao").addEventListener("change", (e) => mudar("inverterInclinacao", e.target.checked));
+    $("#calibrar").addEventListener("click", () => { calibrar = true; });
+    $("#perfil").addEventListener("change", (e) => {
+      perfilAtual = e.target.value;
+      guardar.gravar("arena_ctl_perfil", perfilAtual);
+      ajustes = limparAjustes(lerPerfis()[perfilAtual]);
+      aplicarAjustes();
+      $("#avisoDoMenu").textContent = "Perfil " + perfilAtual + (lerPerfis()[perfilAtual] ? " aberto." : " ainda está vazio: está com os ajustes de fábrica.");
+    });
+    $("#guardarPerfil").addEventListener("click", () => {
+      const perfis = lerPerfis();
+      perfis[perfilAtual] = ajustes;
+      guardar.gravar("arena_ctl_perfis", JSON.stringify(perfis));
+      $("#avisoDoMenu").textContent = "Ajustes guardados no perfil " + perfilAtual + ".";
+    });
+    $("#ajustesDeFabrica").addEventListener("click", () => {
+      ajustes = Object.assign({}, AJUSTES_PADRAO);
+      aplicarAjustes();
+      $("#avisoDoMenu").textContent = "Ajustes de fábrica (guarde num perfil se quiser ficar com eles).";
+    });
+    $("#botaoMenu").addEventListener("click", () => { $("#menu").hidden = false; soltarTudo(); inclinacao.eixo = 0; });
     $("#fecharMenu").addEventListener("click", () => { $("#menu").hidden = true; });
     for (const radio of document.querySelectorAll("input[name=modo]")) radio.addEventListener("change", () => aplicarModo(radio.value));
     $("#vibrar").addEventListener("change", (e) => guardar.gravar("arena_ctl_vibrar", e.target.checked ? "1" : "0"));
@@ -351,15 +487,18 @@
     window.addEventListener("pagehide", () => { if (ws && ws.readyState === 1) ws.send(JSON.stringify({ t: "tchau" })); });
 
     // para os testes: o que o controle acha que esta apertado
-    window.__controle = { estado: () => ({ botoes, eixos: eixos.slice() }), conectado: () => !!ws && ws.readyState === 1 };
+    window.__controle = { estado: () => ({ botoes, eixos: eixos.slice() }), conectado: () => !!ws && ws.readyState === 1,
+                          ajustes: () => Object.assign({}, ajustes), pelaCabo: () => pelaCabo };
 
     if (new RegExp("^\\d{" + DIGITOS + "}$").test($("#codigo").value)) $("#conectar").focus(); else $("#codigo").focus();
-    liberados();
+    const pronto = liberados();
+    // Veio do cabo USB com o codigo no endereco: o professor ja escolheu esta tela, entao conecta sem pedir mais um toque.
+    if (veioPeloEndereco) pronto.then(() => { if (!$("#entrada").hidden && !ws) $("#conectar").click(); });
   }
 
   // O computador diz quais jogadores o professor liberou para o celular (e quantos numeros tem o codigo).
   function liberados() {
-    fetch("/jogadores", { cache: "no-store" }).then((r) => r.json()).then((d) => {
+    return fetch("/jogadores", { cache: "no-store" }).then((r) => r.json()).then((d) => {
       if (d.digitos) {
         DIGITOS = d.digitos;
         $("#codigo").maxLength = DIGITOS;

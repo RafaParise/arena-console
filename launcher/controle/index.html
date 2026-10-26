@@ -94,6 +94,32 @@
       <label><input type="radio" name="modo" value="analogico"> Analógico esquerdo</label>
       <label><input type="radio" name="modo" value="dois"> Dois analógicos</label>
     </fieldset>
+    <fieldset>
+      <legend>Perfil (como no GameSir Nexus: 3 jogos de ajustes)</legend>
+      <div class="linha">
+        <label for="perfil">Perfil</label>
+        <select id="perfil" aria-label="Perfil de ajustes">
+          <option value="1">Perfil 1</option><option value="2">Perfil 2</option><option value="3">Perfil 3</option>
+        </select>
+        <button type="button" id="guardarPerfil" class="pequeno">Guardar aqui</button>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>Ajustes do toque</legend>
+      <label class="linha"><span>Zona morta do analógico</span><input type="range" id="zona" min="0" max="40" step="1"><output id="zonaValor" for="zona"></output></label>
+      <label class="linha"><span>Curva do analógico</span>
+        <select id="curva"><option value="linear">Linear</option><option value="suave">Suave (fina no começo)</option><option value="rapida">Rápida (forte no começo)</option></select></label>
+      <label class="linha"><span>Diagonais do direcional</span><input type="range" id="diagonal" min="25" max="55" step="1"><output id="diagonalValor" for="diagonal"></output></label>
+      <label class="linha"><span>Tamanho dos botões</span><input type="range" id="escala" min="80" max="130" step="5"><output id="escalaValor" for="escala"></output></label>
+      <label class="linha"><input type="checkbox" id="canhoto"> Controle para canhotos (lados trocados)</label>
+      <div id="linhaInclinar" hidden>
+        <label class="linha"><input type="checkbox" id="inclinar"> Inclinar o celular para virar (volante)</label>
+        <label class="linha"><input type="checkbox" id="inverterInclinacao"> Inverter o lado da inclinação</label>
+        <button type="button" id="calibrar" class="pequeno">Zerar a inclinação (segure reto e toque)</button>
+      </div>
+      <button type="button" id="ajustesDeFabrica" class="pequeno">Voltar aos ajustes de fábrica</button>
+      <p class="rodape" id="avisoDoMenu" role="status" aria-live="polite"></p>
+    </fieldset>
     <label class="linha"><input type="checkbox" id="vibrar" checked> Vibrar ao tocar</label>
     <label class="linha"><input type="checkbox" id="telaCheia"> Tela cheia</label>
     <div class="menu-acoes">

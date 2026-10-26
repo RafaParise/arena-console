@@ -355,6 +355,24 @@ como controle (Wi-Fi)* ele marca quais jogadores o celular pode ser (por
 padrão, 2, 3 e 4) e vê quem está conectado, de qual endereço e com que tempo de
 resposta.
 
+**Pelo cabo USB (menor atraso).** Com o celular ligado no computador pelo cabo e a
+Depuração USB ligada, o botão **Abrir o controle no celular do cabo** (no mesmo
+bloco) faz o ARENA ligar o cabo à porta do controle (`adb reverse`) e abrir a
+página no navegador do celular, **já conectada** (o código vai depois do `#` do
+endereço, que o navegador não manda a servidor nenhum). Medido no Galaxy A12:
+**4 a 6 ms** de ida e volta, sem oscilar; o ping pelo Wi-Fi do mesmo celular deu
+média de 561 ms e máxima de 1321 ms (o celular economiza o rádio com a tela
+parada: o ping exagera, mas mostra a oscilação). Pelo cabo o endereço é
+`127.0.0.1`, que o navegador trata como "seguro": só assim a página libera o
+**volante** (inclinar o celular). Precisa do ADB do Google (veja *Celular ligado
+no cabo*, em Máquina).
+
+No menu do controle (botão *Menu*): zona morta e curva do analógico, ajuste das
+diagonais do direcional, tamanho dos botões, controle para canhotos, volante
+(pelo cabo) e **3 perfis** que ficam guardados no celular, no estilo do GameSir
+Nexus (que guarda 3 perfis, zona morta e ajuste de diagonais) e do DroidJoy
+(layouts ajustáveis e sensor de movimento).
+
 O que o ARENA faz para ser seguro numa sala de aula:
 
 - Só aceita celular da **rede local**; ninguém de fora entra.

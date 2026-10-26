@@ -604,6 +604,17 @@ a origem, a porta que só serve a página, o sem sinal, o fechar solta tudo, as 
 livre: o teste de ponta a ponta com um RetroArch de verdade (`testes\teste_controle_remoto_retroarch.py`) e a latência pelo Wi-Fi
 (o firewall do Windows barrou a 8780 neste computador: a rede está como "Pública"; o teste pelo cabo não depende disso).
 
+**Cabo USB e inspiração (25/10/2026).** `servidor\controle_usb.py`: `adb reverse tcp:P tcp:P` + `am start` da página com
+`#c=CODIGO&j=N`; a pagina le o codigo do `#`, tira do endereco e conecta sozinha. Medido no A12: RTT 4 a 6 ms (21 amostras);
+ping Wi-Fi 561 ms em media (maximo 1321 ms). Os 127.0.0.1 do cabo contam como um endereco so no bloqueio por erros. A pagina
+ganhou zona morta, curva, diagonais, tamanho, canhoto, volante (so em contexto seguro, isto e, pelo cabo) e 3 perfis, no
+estilo do GameSir Nexus (3 perfis, zona morta, ajuste de diagonais; gamesir.com/pages/gamesir-nexus) e do DroidJoy (layouts
+ajustaveis, giroscopio; servidor Windows com driver ScpVbus para XInput; github.com/grill2010/DroidJoy_Server/wiki). O
+DroidJoy apresenta o celular como gamepad de verdade ao Windows **por um driver de kernel**: o ARENA nao instala driver nem
+pede administrador, entao o equivalente dele sem driver e' o Network RetroPad (jogos do ARENA) e, a fazer, o modo teclado por
+SendInput (so com o professor liberando, lista de teclas segura). Um gamepad XInput virtual para qualquer jogo exigiria o
+ViGEmBus (driver): fica de fora ate o Rafael decidir.
+
 **O que fica para depois:** o giroscópio (só dentro do app, por exigir contexto seguro), dados móveis (túnel) e a tela como
 controle dentro do app do Android.
 

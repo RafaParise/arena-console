@@ -859,6 +859,15 @@
         <p class="explica">Código:
           <strong class="codigo-grande" id="controleRemotoCodigo" aria-live="polite">----</strong></p>
         <ul class="controles" id="controleRemotoConectados"></ul>
+        <div class="opcao" id="controleRemotoCabo">
+          <span class="opcao-rotulo">Pelo cabo USB (menor atraso)</span>
+          <select class="opcao-controle" id="controleRemotoCaboLista" aria-label="Celular no cabo" hidden></select>
+          <button class="botao opcao-controle" id="btnControleRemotoUsb" type="button">Abrir o controle no celular do cabo</button>
+          <span class="opcao-ajuda">Ligue o celular neste computador pelo cabo USB (com a Depuração USB ligada). O ARENA abre o
+            controle nele já conectado, sem Wi-Fi e sem o firewall do Windows no meio: o tempo de resposta cai para uns 5 ms e
+            não oscila, e o celular carrega. Usa o ADB do Google; só abre uma página, nada é instalado no celular.</span>
+          <span class="opcao-ajuda" id="controleRemotoCaboAviso" role="status"></span>
+        </div>
         <p class="explica" id="controleRemotoTroca" role="status" hidden></p>
         <p class="explica" id="controleRemotoNota">
           O código só vale enquanto estiver ligado e muda a cada vez que liga. Quem digita o código errado várias

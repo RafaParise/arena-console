@@ -9,7 +9,8 @@
   --apagado: #b8a98f;
   --destaque: #ffb22e;
   --erro: #ff8a80;
-  --u: min(11vh, 7.5vw);          /* a "unidade" do desenho: tudo e' multiplo dela */
+  --escala: 1;                    /* o ajuste "Tamanho dos botoes" (menu) */
+  --u: calc(min(11vh, 7.5vw) * var(--escala));          /* a "unidade" do desenho: tudo e' multiplo dela */
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body {
@@ -154,3 +155,20 @@ body[data-modo=analogico] .pequena.r3 { display: none; }
 .menu-caixa fieldset label, .menu-caixa .linha { display: flex; align-items: center; gap: .6rem; padding: .5rem 0; font-size: 1.05rem; color: var(--texto); }
 .menu-caixa input[type=radio], .menu-caixa input[type=checkbox] { width: 1.5rem; height: 1.5rem; accent-color: var(--destaque); }
 .menu-acoes { display: grid; gap: .6rem; margin: .8rem 0; }
+.menu-caixa fieldset { margin: .4rem 0 .8rem; }
+.menu-caixa .linha > span { flex: 1; }
+.menu-caixa input[type=range] { flex: 1.2; accent-color: var(--destaque); min-width: 6rem; }
+.menu-caixa output { min-width: 3.2em; text-align: right; color: var(--apagado); font-variant-numeric: tabular-nums; }
+.menu-caixa select { font: inherit; color: var(--texto); background: var(--fundo); border: 2px solid var(--tecla-borda); border-radius: .5rem; padding: .35rem .5rem; }
+.menu-caixa .pequeno { margin: .3rem 0; color: var(--texto); }
+
+/* para canhotos: cada lado vai para o outro (depois das regras dos modos, de proposito: valem mais por virem por ultimo) */
+body.canhoto .cruz { left: auto; right: 4vw; }
+body.canhoto .acoes { right: auto; left: 4vw; }
+body.canhoto .stick.esq { left: auto; right: 4vw; }
+body.canhoto .stick.dir { right: auto; left: 4vw; }
+body.canhoto .gat.esq, body.canhoto .ombro.esq { left: auto; right: 3vw; }
+body.canhoto .gat.dir, body.canhoto .ombro.dir { right: auto; left: 3vw; }
+body.canhoto .pequena.l3 { left: auto; right: calc(4vw + var(--u) * 4.2); }
+body.canhoto .pequena.r3 { right: auto; left: calc(4vw + var(--u) * 3.6); }
+body[data-modo=dois].canhoto .acoes { right: auto; left: 2vw; }

@@ -64,7 +64,7 @@ PROGRAMA = [
     "servidor/como_colocar.py", "servidor/ponte_sem_acento.py", "servidor/java_do_arena.py",
     "servidor/jeitos_de_abrir.py", "servidor/biblioteca_livre.py", "servidor/lossless.py", "servidor/navegadores.py",
     "servidor/plataforma.py", "servidor/baixar.py", "servidor/portas.py", "servidor/ponte_android.py",
-    "servidor/baixados.py", "servidor/desempenho.py", "servidor/adb_aparelho.py", "servidor/painel_do_aparelho.py",
+    "servidor/controle_usb.py", "servidor/baixados.py", "servidor/desempenho.py", "servidor/adb_aparelho.py", "servidor/painel_do_aparelho.py",
     "servidor/armazenamento.py",
     "servidor/acessorios.py", "servidor/acessorios.json", "servidor/companheiros.py", "servidor/pokketsx.py", "servidor/controle_remoto.py",
     "servidor/toque/arena-menu.png", "servidor/toque/arena-sair.png",
