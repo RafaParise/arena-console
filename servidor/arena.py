@@ -7466,13 +7466,14 @@ class Manipulador(BaseHTTPRequestHandler):
                     posicao = int(dados.get("jogador") or 2)
                 except (TypeError, ValueError):
                     posicao = 2
+                proximo_livre = str(dados.get("jogador")).lower() in ("auto", "0", "livre")
                 posicao = max(2, min(posicao, jogadores_max))
                 partida = {
                     "opcoes": graficos.opcoes_de_partida(
                         apelido, hospedar, assistir=assistir,
                         pela_internet=pela_internet,
                         repasse=str(dados.get("repasse", "saopaulo")),
-                        jogador=posicao),
+                        jogador=posicao, proximo_livre=proximo_livre),
                     "argumentos": graficos.argumentos_de_partida(hospedar, endereco),
                     "hospedar": hospedar,
                     "assistir": assistir,

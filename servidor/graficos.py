@@ -3205,7 +3205,7 @@ NETPLAY_CONEXOES_PADRAO = 3     # o mesmo padrao do RetroArch (netplay_max_conne
 
 def opcoes_de_partida(apelido, hospedar, atraso=0, assistir=False,
                       pela_internet=False, repasse=REPASSE_PADRAO, jogador=None,
-                      multitap=False):
+                      multitap=False, proximo_livre=False):
     """Opcoes do RetroArch para hospedar, entrar ou assistir uma partida.
 
     Assistir e o mesmo caminho de entrar numa partida, so que sem pegar
@@ -3258,8 +3258,10 @@ def opcoes_de_partida(apelido, hospedar, atraso=0, assistir=False,
         # Espectador nao pede controle nenhum: so olha. Todo mundo comeca
         # desligado, e so a posicao escolhida liga - senao o RetroArch
         # pode herdar "true" de uma partida anterior gravada no override.
+        # proximo_livre (quem entra sem escolher o numero): nenhum pedido, e o RetroArch de quem hospeda poe o
+        # convidado no primeiro lugar vago (celular, computador, Linux: qualquer um, na ordem de chegada).
         opcoes["netplay_request_device_p%d" % n] = (
-            "true" if (not assistir and n == posicao) else "false")
+            "true" if (not assistir and not (proximo_livre and not hospedar) and n == posicao) else "false")
 
     if multitap:
         # Liga o adaptador na porta 2 do console (nao na 1 - e assim que o

@@ -3938,7 +3938,7 @@ async function comecarPartida() {
     }
   }
   if (estado.papelDaPartida === "entrar" && !$("#campoJogadorPartida").hidden) {
-    corpo.jogador = Number($("#listaJogadorPartida").value) || 2;
+    corpo.jogador = $("#listaJogadorPartida").value === "auto" ? "auto" : (Number($("#listaJogadorPartida").value) || 2);
   }
 
   try {
@@ -5925,6 +5925,10 @@ function ligarEventos() {
       $("#campoJogadorPartida").hidden = !mostrarJogador;
       if (mostrarJogador) {
         const opcoes = document.createDocumentFragment();
+        const livre = document.createElement("option");
+        livre.value = "auto";
+        livre.textContent = "O próximo lugar livre";
+        opcoes.append(livre);
         for (let n = 2; n <= maximo; n++) {
           const item = document.createElement("option");
           item.value = String(n);

@@ -81,7 +81,7 @@ def main():
         jogo_id = jogos[0]["id"]
 
         def comando_do_pc(hospedar):
-            opcoes = graficos.opcoes_de_partida(apelido="PC", hospedar=hospedar, jogador=1 if hospedar else 2, multitap=False, atraso=ATRASO)
+            opcoes = graficos.opcoes_de_partida(apelido="PC", hospedar=hospedar, jogador=1 if hospedar else 2, multitap=False, atraso=ATRASO, proximo_livre="--auto" in sys.argv)
             argumentos = graficos.argumentos_de_partida(hospedar, endereco=ip_celular, porta=PORTA)
             cfg = os.path.join(pasta, "override.cfg")
             n5.montar_override(cfg, pasta, arena, graficos, opcoes)
@@ -100,7 +100,7 @@ def main():
         resultado["resposta_do_celular"] = {k: resposta.get(k) for k in ("ok", "erro", "aviso", "papel")} if isinstance(resposta, dict) else str(resposta)
         print("celular:", resultado["resposta_do_celular"], flush=True)
         if not pc_hospeda:
-            time.sleep(10)                                   # o RetroArch do celular precisa abrir e escutar
+            time.sleep(16)                                   # o RetroArch do celular precisa abrir e escutar
             pc = abrir_pc(False)
         fim = time.monotonic() + 40
         entrou = None
