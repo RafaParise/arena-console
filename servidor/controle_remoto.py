@@ -683,8 +683,14 @@ class ControleRemoto:
         resposta = controle_usb.abrir_no_celular(porta, codigo, serial, jogador)
         if resposta.get("ok") and resposta.get("escolhido"):
             with self._trava:
-                if self.ligado:
+                # O controle pode ter sido desligado (ou ligado de novo, com outro codigo) enquanto o adb trabalhava:
+                # o cabo que sobrou nao fica para tras, e' desfeito na hora (achado da revisao de seguranca).
+                valido = self.ligado and self.codigo == codigo and self.porta == porta
+                if valido:
                     self._cabos[resposta["escolhido"]] = porta
+            if not valido:
+                controle_usb.soltar([(resposta["escolhido"], porta)])
+                return {"ok": False, "erro": "O controle foi desligado enquanto o cabo era ligado. Ligue de novo.", "aparelhos": []}
         return resposta
 
     # -- que jogadores o celular pode ser ---------------------------------------------------------
