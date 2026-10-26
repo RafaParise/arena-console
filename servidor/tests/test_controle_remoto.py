@@ -433,6 +433,22 @@ class OServicoPorDentro(unittest.TestCase):
         self.assertEqual(self.controle.conferir_o_codigo("10.8.0.1", "424242", agora=depois)[:2], (True, ""))
         self.assertGreaterEqual(self.controle.estado()["trocas_do_codigo"], 1)
 
+    def test_o_celular_que_entrou_ha_pouco_passa_pelo_teto_duro(self):
+        # O celular do professor entrou, o Wi-Fi piscou, e bem nessa hora alguem despeja erros: ele volta a entrar
+        # (com o codigo certo); um celular novo espera a janela passar.
+        self.assertEqual(self.controle.conferir_o_codigo("10.9.0.1", self.codigo, agora=7000.0)[:2], (True, ""))
+        antigo = self.codigo
+        with mock.patch.object(cr, "codigo_novo", return_value=antigo):               # o codigo nao muda no meio do teste
+            for i in range(cr.TENTATIVAS_LIMITE_DURO):
+                self.controle.conferir_o_codigo("10.10.%d.1" % i, "nada", agora=7001.0 + i * 0.1)
+            self.assertEqual(self.controle.conferir_o_codigo("10.9.0.2", antigo, agora=7005.0)[:2], (False, "muitas"))
+            self.assertEqual(self.controle.conferir_o_codigo("10.9.0.1", antigo, agora=7005.0)[:2], (True, ""))
+            # ...mas so enquanto vale a memoria do acerto
+            for i in range(cr.TENTATIVAS_LIMITE_DURO):
+                self.controle.conferir_o_codigo("10.11.%d.1" % i, "nada", agora=7000.0 + cr.MEMORIA_DE_ACERTO_S + 5 + i * 0.1)
+            self.assertEqual(self.controle.conferir_o_codigo("10.9.0.1", antigo,
+                                                             agora=7000.0 + cr.MEMORIA_DE_ACERTO_S + 9)[:2], (False, "muitas"))
+
     def test_o_codigo_que_o_atacante_tinha_nao_vale_depois_do_despejo(self):
         antigo = self.codigo
         with mock.patch.object(cr, "codigo_novo", return_value="424242"):

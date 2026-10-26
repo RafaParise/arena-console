@@ -78,6 +78,7 @@ TENTATIVAS_POR_JANELA = 10                # codigos ERRADOS de TODOS os endereco
 JANELA_GLOBAL_S = 10.0                    # ...a cada 10 s: passou disso, quem ja errou espera (quem ainda nao errou entra)
 TENTATIVAS_LIMITE_DURO = 30               # e com 30 erros em 10 s (de varios enderecos novos) espera todo mundo, ate os que nao
                                           # erraram: no maximo uns 3 palpites por segundo, venha de quantos enderecos vier
+MEMORIA_DE_ACERTO_S = 600.0               # ...menos o celular que entrou com o codigo certo ha menos de 10 min (o Wi-Fi piscou)
 JOGADORES_LIBERADOS_PADRAO = (2, 3, 4)    # o 1 costuma ser o teclado ou o controle de verdade
 ERROS_ANTES_DO_BLOQUEIO = 5
 JANELA_DOS_ERROS_S = 60.0
@@ -595,6 +596,7 @@ class ControleRemoto:
         self._bloqueios = {}           # ip -> instante em que o bloqueio acaba
         self._erros_no_total = 0
         self._falhas = []              # instantes dos ultimos codigos errados, de qualquer endereco
+        self._acertos = {}             # ip -> instante em que entrou com o codigo certo (passa pelo teto duro)
         self._trocas_do_codigo = 0     # quantas vezes o codigo mudou sozinho (alguem errou demais): o professor ve
         self._liberados = set(JOGADORES_LIBERADOS_PADRAO)      # os jogadores que o celular pode ser (o professor muda)
         self._hosts_extras = set()     # outros nomes que valem como Host (o endereco do tunel, quando houver)
@@ -624,6 +626,7 @@ class ControleRemoto:
             self._bloqueios.clear()
             self._erros_no_total = 0
             self._falhas = []
+            self._acertos = {}
             self._trocas_do_codigo = 0
             self.ligado = True
             return self._estado_sem_trava()
@@ -734,9 +737,12 @@ class ControleRemoto:
         25/10/2026 puxaram cada uma para um lado):
           - TENTATIVAS_POR_JANELA: so quem ja errou espera. Quem despeja erros nao tranca a porta de todos (contando
             tambem os acertos, dois enderecos com 5 erros cada trancavam o celular do professor);
-          - TENTATIVAS_LIMITE_DURO: espera todo mundo, ate quem nao errou. E' o teto de palpites por segundo de quem usa
-            muitos enderecos (o IPv6 deixa criar quantos quiser); o preco e' trancar por, no maximo, 10 s a cada rajada
-            de 30 erros, e o professor ve o aviso.
+          - TENTATIVAS_LIMITE_DURO: espera todo mundo, ate quem nao errou, MENOS o endereco que entrou com o codigo
+            certo ha pouco (MEMORIA_DE_ACERTO_S). E' o teto de palpites por segundo de quem usa muitos enderecos (o
+            IPv6 deixa criar quantos quiser). RISCO QUE FICA, de proposito: um celular NOVO, ou que nao entrou nos
+            ultimos 10 min, espera ate 10 s durante uma rajada de 30 erros (para fazer isso, quem ataca precisa de
+            6 enderecos ou mais, cada um bloqueado por 2 min depois de 5 erros), e o professor ve o aviso. A saida
+            de verdade para esse resto seria o professor aprovar cada celular; nao se fez para nao pesar na aula.
         Alem dos limites, o codigo troca a cada ERROS_ANTES_DE_TROCAR_O_CODIGO erros, venha de onde vier: cada codigo
         sofre no maximo uns 20 palpites, de 1 milhao de possibilidades."""
         agora = time.monotonic() if agora is None else agora
@@ -744,12 +750,16 @@ class ControleRemoto:
             if self._bloqueado(ip, agora):
                 return False, "bloqueado", 0
             self._falhas = [t for t in self._falhas if agora - t < JANELA_GLOBAL_S]
-            if len(self._falhas) >= TENTATIVAS_LIMITE_DURO or (
+            ultimo_acerto = self._acertos.get(ip)
+            conhecido = ultimo_acerto is not None and agora - ultimo_acerto < MEMORIA_DE_ACERTO_S
+            if (len(self._falhas) >= TENTATIVAS_LIMITE_DURO and not conhecido) or (
                     len(self._falhas) >= TENTATIVAS_POR_JANELA and self._ja_errou(ip, agora)):
                 return False, "muitas", 0
             certo = self.codigo
             if (certo and isinstance(codigo, str)
                     and hmac.compare_digest(codigo.encode("utf-8"), certo.encode("utf-8"))):
+                self._acertos = {a: t for a, t in self._acertos.items() if agora - t < MEMORIA_DE_ACERTO_S}
+                self._acertos[ip] = agora
                 return True, "", ERROS_ANTES_DO_BLOQUEIO
             self._falhas.append(agora)
             return False, "codigo", self._anotar_erro(ip, agora)
