@@ -420,6 +420,19 @@ class OServicoPorDentro(unittest.TestCase):
         self.assertEqual(self.controle.conferir_o_codigo("10.2.0.1", self.codigo, agora=3000.0 + cr.JANELA_GLOBAL_S + 5)[:2],
                          (True, ""))
 
+    def test_teto_duro_segura_ate_quem_nao_errou(self):
+        # Muitos enderecos novos, um erro de cada: sem teto, ninguem os segurava (segunda revisao de seguranca). Com
+        # TENTATIVAS_LIMITE_DURO erros em uma janela, espera todo mundo, ate com o codigo certo (sem dar pista).
+        with mock.patch.object(cr, "codigo_novo", return_value="424242"):
+            for i in range(cr.TENTATIVAS_LIMITE_DURO):
+                self.controle.conferir_o_codigo("10.7.%d.1" % i, "nada", agora=6000.0 + i * 0.1)
+        self.assertEqual(self.controle.conferir_o_codigo("10.8.0.1", "424242", agora=6004.0)[:2], (False, "muitas"))
+        self.assertEqual(self.controle.conferir_o_codigo("10.8.0.1", "nada", agora=6004.0)[:2], (False, "muitas"))
+        # passada a janela, a porta abre de novo: a rajada prendeu todo mundo por, no maximo, JANELA_GLOBAL_S
+        depois = 6000.0 + cr.JANELA_GLOBAL_S + 5
+        self.assertEqual(self.controle.conferir_o_codigo("10.8.0.1", "424242", agora=depois)[:2], (True, ""))
+        self.assertGreaterEqual(self.controle.estado()["trocas_do_codigo"], 1)
+
     def test_o_codigo_que_o_atacante_tinha_nao_vale_depois_do_despejo(self):
         antigo = self.codigo
         with mock.patch.object(cr, "codigo_novo", return_value="424242"):

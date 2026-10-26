@@ -362,7 +362,8 @@ O que o ARENA faz para ser seguro numa sala de aula:
   depois de 20 erros no total o código troca sozinho (o ARENA avisa o
   professor, no computador, que isso aconteceu). Se chegarem muitos erros de
   uma vez, só quem já errou espera uns 10 segundos: o celular que ainda não
-  errou continua entrando.
+  errou continua entrando (só uma rajada de 30 erros em 10 segundos segura todo
+  mundo, por no máximo 10 segundos).
 - A porta só existe enquanto a chave estiver ligada; a página do celular não
   mostra nem dá acesso a nenhuma outra parte do ARENA.
 - Se o celular apagar a tela, perder o Wi-Fi ou for fechado, os botões **se

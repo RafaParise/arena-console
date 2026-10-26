@@ -586,15 +586,16 @@ Lido no código do RetroArch 1.22.2 (`input/input_driver.c`) e **provado com o A
 
 **Segurança** (a lista da linha 7 da tabela do roteiro): desligado por padrão e sem guardar no `config.json`; liga só pelo clique
 no computador; só rede local (`rede_privada`); código de 6 números conferido com `hmac.compare_digest`, bloqueio do endereço por
-2 minutos depois de 5 erros em 1 minuto, código novo depois de 20 erros no total (e o professor vê o aviso); o limite de 10 erros em
-10 s de todos os endereços juntos **só segura quem já errou** (achado da revisão de segurança de 25/10/2026: contando todas as
-tentativas, quem despejasse erros trancava a porta de todos os celulares); `Host` e `Origin` de outro site recusados (um site aberto
+2 minutos depois de 5 erros em 1 minuto, código novo depois de 20 erros no total (e o professor vê o aviso); os limites de todos os endereços juntos contam **só os erros**, em duas faixas (duas revisões de segurança de 25/10/2026,
+cada uma para um lado): 10 erros em 10 s seguram **só quem já errou** (contando também os acertos, dois endereços com 5 erros
+cada trancavam o celular do professor) e 30 erros em 10 s seguram **todo mundo** por até 10 s, para quem usa muitos endereços
+(o IPv6 deixa criar quantos quiser): no máximo uns 3 palpites por segundo, e cada código sofre uns 20 antes de trocar; `Host` e `Origin` de outro site recusados (um site aberto
 no celular, ou um nome que aponte para este computador, não manda botão); só a página do controle na porta (nenhuma rota da API
 do ARENA); limite de 150 quadros por segundo, 4 KB por quadro, 24 conexões abertas e 8 celulares; cabeçalhos `nosniff`,
 `no-store`, `Referrer-Policy` e CSP que só deixa o próprio servidor. A pergunta do firewall do Windows (e o fato de o computador da
 escola não deixar o aluno responder) está no guia.
 
-**Testado:** `servidor\tests\test_controle_remoto.py` (71 testes: o exemplo da RFC 6455, quadros de todo tamanho e quebrados, o
+**Testado:** `servidor\tests\test_controle_remoto.py` (72 testes: o exemplo da RFC 6455, quadros de todo tamanho e quebrados, o
 datagrama de 20 bytes, o um-por-quadro, a junção de mudanças, a zona do analógico, a varredura de zero, o código e o bloqueio,
 a origem, a porta que só serve a página, o sem sinal, o fechar solta tudo, as rotas) e o A12 de verdade. Pendente com a máquina
 livre: o teste de ponta a ponta com um RetroArch de verdade (`testes\teste_controle_remoto_retroarch.py`) e a latência pelo Wi-Fi

@@ -76,6 +76,8 @@ ZONA_DO_ANALOGICO = 256                   # mudanca menor que isso (de 32767) na
 DIGITOS_DO_CODIGO = 6                     # 4 caiam em 10 mil tentativas; 6, em 1 milhao (revisao de seguranca de 25/10/2026)
 TENTATIVAS_POR_JANELA = 10                # codigos ERRADOS de TODOS os enderecos juntos...
 JANELA_GLOBAL_S = 10.0                    # ...a cada 10 s: passou disso, quem ja errou espera (quem ainda nao errou entra)
+TENTATIVAS_LIMITE_DURO = 30               # e com 30 erros em 10 s (de varios enderecos novos) espera todo mundo, ate os que nao
+                                          # erraram: no maximo uns 3 palpites por segundo, venha de quantos enderecos vier
 JOGADORES_LIBERADOS_PADRAO = (2, 3, 4)    # o 1 costuma ser o teclado ou o controle de verdade
 ERROS_ANTES_DO_BLOQUEIO = 5
 JANELA_DOS_ERROS_S = 60.0
@@ -726,17 +728,24 @@ class ControleRemoto:
 
     def conferir_o_codigo(self, ip, codigo, agora=None):
         """(ok, motivo, restam). Tudo na mesma trava: conferir e anotar o erro nao se separam, mesmo com 60 conexoes ao
-        mesmo tempo. O bloqueio vale para o endereco inteiro (com o codigo certo ou errado). O limite de todos os
-        enderecos juntos conta so os ERROS e so segura quem ja errou: um endereco trocado a cada tentativa nao escapa
-        dele, mas quem despeja erros nao tranca a porta para os outros celulares (achado da revisao de seguranca de
-        25/10/2026). O que protege o codigo de quem tenta todos e' trocar o codigo a cada
-        ERROS_ANTES_DE_TROCAR_O_CODIGO erros, venha de onde vier."""
+        mesmo tempo. O bloqueio vale para o endereco inteiro (com o codigo certo ou errado).
+
+        Os limites de todos os enderecos juntos contam so os ERROS, em duas faixas (duas revisoes de seguranca de
+        25/10/2026 puxaram cada uma para um lado):
+          - TENTATIVAS_POR_JANELA: so quem ja errou espera. Quem despeja erros nao tranca a porta de todos (contando
+            tambem os acertos, dois enderecos com 5 erros cada trancavam o celular do professor);
+          - TENTATIVAS_LIMITE_DURO: espera todo mundo, ate quem nao errou. E' o teto de palpites por segundo de quem usa
+            muitos enderecos (o IPv6 deixa criar quantos quiser); o preco e' trancar por, no maximo, 10 s a cada rajada
+            de 30 erros, e o professor ve o aviso.
+        Alem dos limites, o codigo troca a cada ERROS_ANTES_DE_TROCAR_O_CODIGO erros, venha de onde vier: cada codigo
+        sofre no maximo uns 20 palpites, de 1 milhao de possibilidades."""
         agora = time.monotonic() if agora is None else agora
         with self._trava:
             if self._bloqueado(ip, agora):
                 return False, "bloqueado", 0
             self._falhas = [t for t in self._falhas if agora - t < JANELA_GLOBAL_S]
-            if len(self._falhas) >= TENTATIVAS_POR_JANELA and self._ja_errou(ip, agora):
+            if len(self._falhas) >= TENTATIVAS_LIMITE_DURO or (
+                    len(self._falhas) >= TENTATIVAS_POR_JANELA and self._ja_errou(ip, agora)):
                 return False, "muitas", 0
             certo = self.codigo
             if (certo and isinstance(codigo, str)
