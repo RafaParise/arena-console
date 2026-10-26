@@ -209,7 +209,7 @@
    },
    {
     "tela": "detalhes_do_jogo",
-    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_detalhes_do_jogo.png'"
+    "erro": "[Errno 2] No such file or directory: '%USERPROFILE%/AppData/Local/Temp/arena_fotos_celular\\\\celular_detalhes_do_jogo.png'"
    },
    {
     "estouro_horizontal_px": 0,
@@ -262,7 +262,7 @@
    },
    {
     "tela": "gavetaPerfil:perfil",
-    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaPerfil_perfil.png'"
+    "erro": "[Errno 2] No such file or directory: '%USERPROFILE%/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaPerfil_perfil.png'"
    },
    {
     "estouro_horizontal_px": 0,
@@ -315,7 +315,7 @@
    },
    {
     "tela": "gavetaPerfil:rede",
-    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaPerfil_rede.png'"
+    "erro": "[Errno 2] No such file or directory: '%USERPROFILE%/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaPerfil_rede.png'"
    },
    {
     "estouro_horizontal_px": 0,
@@ -368,7 +368,7 @@
    },
    {
     "tela": "gavetaBaixados",
-    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaBaixados.png'"
+    "erro": "[Errno 2] No such file or directory: '%USERPROFILE%/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaBaixados.png'"
    },
    {
     "estouro_horizontal_px": 0,
@@ -421,7 +421,7 @@
    },
    {
     "tela": "gavetaComoColocar",
-    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaComoColocar.png'"
+    "erro": "[Errno 2] No such file or directory: '%USERPROFILE%/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaComoColocar.png'"
    },
    {
     "estouro_horizontal_px": 0,
@@ -474,7 +474,7 @@
    },
    {
     "tela": "gavetaAcervo",
-    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaAcervo.png'"
+    "erro": "[Errno 2] No such file or directory: '%USERPROFILE%/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaAcervo.png'"
    },
    {
     "estouro_horizontal_px": 0,
@@ -527,7 +527,7 @@
    },
    {
     "tela": "gavetaAjustes:simples",
-    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaAjustes_simples.png'"
+    "erro": "[Errno 2] No such file or directory: '%USERPROFILE%/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaAjustes_simples.png'"
    },
    {
     "estouro_horizontal_px": 0,
@@ -580,7 +580,7 @@
    },
    {
     "tela": "gavetaAjustes:avancado",
-    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaAjustes_avancado.png'"
+    "erro": "[Errno 2] No such file or directory: '%USERPROFILE%/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaAjustes_avancado.png'"
    },
    {
     "estouro_horizontal_px": 0,
@@ -638,7 +638,7 @@
    },
    {
     "tela": "gavetaAjustes:maquina",
-    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaAjustes_maquina.png'"
+    "erro": "[Errno 2] No such file or directory: '%USERPROFILE%/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaAjustes_maquina.png'"
    },
    {
     "estouro_horizontal_px": 0,
@@ -704,7 +704,7 @@
    },
    {
     "tela": "gavetaAjustes:controles",
-    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaAjustes_controles.png'"
+    "erro": "[Errno 2] No such file or directory: '%USERPROFILE%/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaAjustes_controles.png'"
    },
    {
     "estouro_horizontal_px": 0,
@@ -861,7 +861,7 @@
    },
    {
     "tela": "gavetaAjustes:emuladores",
-    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaAjustes_emuladores.png'"
+    "erro": "[Errno 2] No such file or directory: '%USERPROFILE%/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaAjustes_emuladores.png'"
    },
    {
     "estouro_horizontal_px": 0,
@@ -914,7 +914,7 @@
    },
    {
     "tela": "gavetaConquistas",
-    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaConquistas.png'"
+    "erro": "[Errno 2] No such file or directory: '%USERPROFILE%/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaConquistas.png'"
    },
    {
     "estouro_horizontal_px": 0,
@@ -967,7 +967,7 @@
    },
    {
     "tela": "gavetaRecordes:pontos",
-    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaRecordes_pontos.png'"
+    "erro": "[Errno 2] No such file or directory: '%USERPROFILE%/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaRecordes_pontos.png'"
    },
    {
     "estouro_horizontal_px": 0,
@@ -1020,7 +1020,7 @@
    },
    {
     "tela": "gavetaRecordes:tempo",
-    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaRecordes_tempo.png'"
+    "erro": "[Errno 2] No such file or directory: '%USERPROFILE%/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaRecordes_tempo.png'"
    },
    {
     "estouro_horizontal_px": 0,
@@ -1073,7 +1073,7 @@
    },
    {
     "tela": "gavetaJogo:estados",
-    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaJogo_estados.png'"
+    "erro": "[Errno 2] No such file or directory: '%USERPROFILE%/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaJogo_estados.png'"
    },
    {
     "estouro_horizontal_px": 0,
@@ -1126,7 +1126,7 @@
    },
    {
     "tela": "gavetaJogo:cheats",
-    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaJogo_cheats.png'"
+    "erro": "[Errno 2] No such file or directory: '%USERPROFILE%/AppData/Local/Temp/arena_fotos_celular\\\\celular_gavetaJogo_cheats.png'"
    },
    {
     "estouro_horizontal_px": 0,
@@ -1179,7 +1179,7 @@
    },
    {
     "tela": "modalJuntoLocal",
-    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_modalJuntoLocal.png'"
+    "erro": "[Errno 2] No such file or directory: '%USERPROFILE%/AppData/Local/Temp/arena_fotos_celular\\\\celular_modalJuntoLocal.png'"
    },
    {
     "estouro_horizontal_px": 0,
@@ -1232,7 +1232,7 @@
    },
    {
     "tela": "modalPartida",
-    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_modalPartida.png'"
+    "erro": "[Errno 2] No such file or directory: '%USERPROFILE%/AppData/Local/Temp/arena_fotos_celular\\\\celular_modalPartida.png'"
    },
    {
     "estouro_horizontal_px": 0,
@@ -1285,7 +1285,7 @@
    },
    {
     "tela": "modalEsperaPartida",
-    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_modalEsperaPartida.png'"
+    "erro": "[Errno 2] No such file or directory: '%USERPROFILE%/AppData/Local/Temp/arena_fotos_celular\\\\celular_modalEsperaPartida.png'"
    },
    {
     "estouro_horizontal_px": 0,
@@ -1338,7 +1338,7 @@
    },
    {
     "tela": "modalJeito",
-    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_modalJeito.png'"
+    "erro": "[Errno 2] No such file or directory: '%USERPROFILE%/AppData/Local/Temp/arena_fotos_celular\\\\celular_modalJeito.png'"
    },
    {
     "estouro_horizontal_px": 0,
@@ -1391,7 +1391,7 @@
    },
    {
     "tela": "modalPlacar",
-    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_modalPlacar.png'"
+    "erro": "[Errno 2] No such file or directory: '%USERPROFILE%/AppData/Local/Temp/arena_fotos_celular\\\\celular_modalPlacar.png'"
    },
    {
     "estouro_horizontal_px": 0,
@@ -1444,7 +1444,7 @@
    },
    {
     "tela": "modalAcervo",
-    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_modalAcervo.png'"
+    "erro": "[Errno 2] No such file or directory: '%USERPROFILE%/AppData/Local/Temp/arena_fotos_celular\\\\celular_modalAcervo.png'"
    },
    {
     "estouro_horizontal_px": 0,
@@ -1497,7 +1497,7 @@
    },
    {
     "tela": "modalConsole",
-    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_modalConsole.png'"
+    "erro": "[Errno 2] No such file or directory: '%USERPROFILE%/AppData/Local/Temp/arena_fotos_celular\\\\celular_modalConsole.png'"
    },
    {
     "estouro_horizontal_px": 0,
@@ -1550,7 +1550,7 @@
    },
    {
     "tela": "modalApelido",
-    "erro": "[Errno 2] No such file or directory: 'C:/Users/passo/AppData/Local/Temp/arena_fotos_celular\\\\celular_modalApelido.png'"
+    "erro": "[Errno 2] No such file or directory: '%USERPROFILE%/AppData/Local/Temp/arena_fotos_celular\\\\celular_modalApelido.png'"
    }
   ],
   "rotas": [

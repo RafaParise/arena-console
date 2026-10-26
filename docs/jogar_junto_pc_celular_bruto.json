@@ -1,24 +1,28 @@
 {
-  "hospeda": "pc",
+  "hospeda": "celular",
   "ip_celular": "192.168.18.4",
   "ip_pc": "192.168.18.17",
   "resposta_do_celular": {
     "ok": true,
     "erro": null,
     "aviso": null,
-    "papel": "jogador 2"
+    "papel": "jogador 1"
   },
-  "caiu_depois_de_s": null,
+  "caiu_depois_de_s": 6.0,
   "pc_vivo_depois": true,
   "pc_netplay": [
-    "[INFO] [Netplay] Você se juntou como jogador 1"
+    "[WARN] [Netplay] ATENÇÃO: Um par da Netplay está executando uma versão diferente do núcleo. Se ocorrerem problemas, use a mesma versão.",
+    "[INFO] [Netplay] Conectado a: \"RafaParise\"",
+    "[INFO] [Netplay] Você se juntou como jogador 2 (ping: 565 ms)",
+    "[INFO] [Netplay] Desconectado da Netplay"
   ],
   "celular_netplay": [
-    "[Override] Redirecionando arquivo dados da memória do jogo em \"/data/user/0/io.github.rafaparise.arena/files/arena/retroarch/saves/Snes9x/.netplay/Super Bomberman 4 (Japan) [T-En by Svambo v1.0].srm\".",
-    "[Environ] GET_SAVE_DIRECTORY: \"/data/user/0/io.github.rafaparise.arena/files/arena/retroarch/saves/Snes9x/.netplay\".",
-    "[Netplay] Failed to connect to host 192.168.18.17 on port 55435.",
-    "[Netplay] Failed to set up netplay sockets.",
-    "[Netplay] Falha em inicializar a Netplay."
+    "[Netplay] Você se juntou como jogador 1",
+    "[Netplay] ATENÇÃO: Um par da Netplay está executando uma versão diferente do núcleo. Se ocorrerem problemas, use a mesma versão.",
+    "[Netplay] Vaga de conexão 0",
+    "[Netplay] Conexão recebida de: \"PC\"",
+    "[Netplay] PC se juntou como o jogador 2 (ping: 447 ms)",
+    "[Netplay] \"PC\" desconectou"
   ],
   "celular_registro_campos": [
     "arquivo",
@@ -27,12 +31,6 @@
     "total"
   ],
   "celular_registro_cauda": [
-    "[GLSL] Found GLSL fragment shader.",
-    "[GLSL] Shader log: Success.",
-    ".",
-    "[GLSL] Linking GLSL program.",
-    "[GLSL] Found GLSL vertex shader.",
-    "[GLSL] Shader log: Success.",
     ".",
     "[GLSL] Found GLSL fragment shader.",
     "[GLSL] Shader log: Success.",
@@ -56,12 +54,18 @@
     "[Playlist] Carregando arquivo de histórico: \"/data/user/0/io.github.rafaparise.arena/files/arena/dados/builtin/content_history.lpl\".",
     "[Playlist] Carregando arquivo de histórico: \"/data/user/0/io.github.rafaparise.arena/files/arena/dados/builtin/content_image_history.lpl\".",
     "[Playlist] Carregando arquivo de histórico: \"/data/user/0/io.github.rafaparise.arena/files/arena/dados/builtin/content_music_history.lpl\".",
-    "[Environ] SET_GEOMETRY."
+    "[Environ] SET_GEOMETRY.",
+    "[Content] CRC32: 0x4c58462d.",
+    "[Netplay] ATENÇÃO: Um par da Netplay está executando uma versão diferente do núcleo. Se ocorrerem problemas, use a mesma versão.",
+    "[Netplay] Vaga de conexão 0",
+    "[Netplay] Conexão recebida de: \"PC\"",
+    "[Netplay] PC se juntou como o jogador 2 (ping: 447 ms)",
+    "[Netplay] \"PC\" desconectou"
   ],
   "celular_jogo_em_andamento": {
     "ativo": true,
     "titulo": "Super Bomberman 4",
     "id": "jogos/pessoais/super nintendo/super bomberman 4 (japan) [t-en by svambo v1.0].sfc"
   },
-  "entrou_em_s": 0.1
+  "entrou_em_s": 25.1
 }

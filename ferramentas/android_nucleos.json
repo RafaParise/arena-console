@@ -278,7 +278,7 @@
    "tamanho": 58523
   }
  },
- "conferido_em": "2026-10-18",
+ "conferido_em": "2026-10-26",
  "x86_64": {
   "81_libretro_android.so": {
    "sha256": "dfec37c1e0b8bc2221e0d30b7c1bb71e3b479618a7fe2a9647d4ad88ecdad204",
@@ -432,13 +432,17 @@
    "sha256": "19be969ea49a1de8679bf93dd69db5e79e4bd404b14aa5703b8d90165e0fbd83",
    "tamanho": 620568
   },
+  "play_libretro_android.so": {
+   "sha256": "0512807dc1066b08c054aea986a70948c2fd74254ad77ef577878a064b910488",
+   "tamanho": 1961524
+  },
   "pokemini_libretro_android.so": {
    "sha256": "c107da7a3cfc8a929258eac4862d053ad8b65ec449855caf1daa6e3580379ba6",
    "tamanho": 86999
   },
   "pokket_libretro_android.so": {
-   "sha256": "e3e1e03fecad0b6cdca26e6eb94b4e50e65211a1c5a2e0ab625e0ced2fb763d3",
-   "tamanho": 42353
+   "sha256": "5936a65f4f3f1c631dfc3fe57d7d99bad858650e63cf38841a8f1ec4b3e8083d",
+   "tamanho": 42351
   },
   "potator_libretro_android.so": {
    "sha256": "846fca7eab67d5403189ac387daba811dd09498565eed2114994e5570f0789ad",
@@ -501,7 +505,7 @@
    "tamanho": 41081
   },
   "vemulator_libretro_android.so": {
-   "sha256": "853de7b5003d3c77c7241bdfd30d0f4eb4b1a72a7105c6fec3bb706a71b34ee9",
+   "sha256": "36ae5b916e5aabe052a1bb77fa8426b4166906fbbe5306f285a34e9ad06f01b9",
    "tamanho": 90372
   },
   "vice_x128_libretro_android.so": {
