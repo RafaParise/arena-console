@@ -340,20 +340,29 @@ sem cabo e sem instalar nada no celular: tudo roda no navegador dele.
 2. **Abra o jogo depois de ligar.** O RetroArch só escuta o celular nos jogos
    abertos com a chave ligada.
 3. No celular (na **mesma rede Wi-Fi** do computador), abra o endereço no
-   navegador, digite o código, escolha o número do jogador (1 a 4) e toque em
+   navegador, digite o código, escolha o número do jogador (de 1 a 8) e toque em
    **Conectar**. Deite o celular: a tela vira um controle com direcional (ou
    um ou dois analógicos, pelo botão *Menu*), A, B, X, Y, L1, L2, R1, R2,
-   Select e Start. O celular vibra ao tocar (dá para desligar no *Menu*).
+   Select e Start. O celular vibra ao tocar (dá para desligar no *Menu*) e
+   mostra, no alto, em quantos milissegundos o computador responde (verde é
+   rápido, vermelho é lento).
 
-Dá para ter até **4 celulares** ao mesmo tempo, um em cada jogador. O celular
-entra como o jogador que você escolheu: se o jogador 1 já é um controle de
-verdade, escolha 2 ou mais no celular.
+Dá para ter até **8 celulares** ao mesmo tempo, um em cada jogador (os consoles
+com multitap e os jogos de 5 ou mais jogadores). O celular entra como o jogador
+que você escolheu: se o jogador 1 já é um controle de verdade, escolha 2 ou
+mais no celular. **Quem manda** é o professor: em *Ajustes → Controles → Celular
+como controle (Wi-Fi)* ele marca quais jogadores o celular pode ser (por
+padrão, 2, 3 e 4) e vê quem está conectado, de qual endereço e com que tempo de
+resposta.
 
 O que o ARENA faz para ser seguro numa sala de aula:
 
 - Só aceita celular da **rede local**; ninguém de fora entra.
 - Quem erra o código **5 vezes em 1 minuto** fica bloqueado por 2 minutos, e
-  depois de 20 erros no total o código troca sozinho.
+  depois de 20 erros no total o código troca sozinho (o ARENA avisa o
+  professor, no computador, que isso aconteceu). Se chegarem muitos erros de
+  uma vez, só quem já errou espera uns 10 segundos: o celular que ainda não
+  errou continua entrando.
 - A porta só existe enquanto a chave estiver ligada; a página do celular não
   mostra nem dá acesso a nenhuma outra parte do ARENA.
 - Se o celular apagar a tela, perder o Wi-Fi ou for fechado, os botões **se
@@ -366,8 +375,8 @@ O que não dá: PS2, GameCube, Wii, PS3 e Xbox 360 abrem em programas à parte
 RetroArch está aberto com a chave ligada, ele escuta a porta do celular em
 **todas** as placas de rede do computador (o RetroArch não deixa escolher só a
 do próprio computador). Por isso o ARENA sorteia uma porta nova a cada jogo e
-só liga os 4 jogadores do celular. Em rede de escola, deixe ligado só durante a
-aula.
+só liga os jogadores que o professor liberou e que o jogo tem. Em rede de
+escola, deixe ligado só durante a aula.
 
 **Se a página não abrir no celular:** quase sempre é o firewall do Windows. Na
 primeira vez, o Windows pergunta se o programa pode usar a rede: escolha

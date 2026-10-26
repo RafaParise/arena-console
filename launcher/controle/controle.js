@@ -80,7 +80,7 @@
   function textoDoErro(m) {
     if (m.motivo === "codigo") return "Código errado. Confira o número que está na tela do computador. Tentativas que restam: " + (m.restam ?? "?") + ".";
     if (m.motivo === "bloqueado") return "Muitas tentativas erradas. Espere 2 minutos e tente de novo.";
-    if (m.motivo === "muitas") return "Muita gente tentando entrar ao mesmo tempo. Espere uns 10 segundos e toque em Conectar de novo.";
+    if (m.motivo === "muitas") return "Muitos códigos errados ao mesmo tempo. Espere uns 10 segundos, olhe o código na tela do computador e toque em Conectar de novo.";
     if (m.motivo === "ocupado") return "Esse jogador já está sendo usado por outro celular. Escolha outro número.";
     if (m.motivo === "jogador") {
       const liberados = (m.jogadores || []).join(", ");

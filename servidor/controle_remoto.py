@@ -74,8 +74,8 @@ INTERVALO_DO_ENVIO = 1.0 / 60.0           # um quadro de video
 RESSINCRONIZAR_A_CADA = 12                # quadros: com a fila vazia, repete o estado de um controle (conserta perda)
 ZONA_DO_ANALOGICO = 256                   # mudanca menor que isso (de 32767) nao vira datagrama
 DIGITOS_DO_CODIGO = 6                     # 4 caiam em 10 mil tentativas; 6, em 1 milhao (revisao de seguranca de 25/10/2026)
-TENTATIVAS_POR_JANELA = 10                # tentativas de codigo de TODOS os enderecos juntos...
-JANELA_GLOBAL_S = 10.0                    # ...a cada 10 s: com enderecos trocados, o bloqueio por endereco nao basta
+TENTATIVAS_POR_JANELA = 10                # codigos ERRADOS de TODOS os enderecos juntos...
+JANELA_GLOBAL_S = 10.0                    # ...a cada 10 s: passou disso, quem ja errou espera (quem ainda nao errou entra)
 JOGADORES_LIBERADOS_PADRAO = (2, 3, 4)    # o 1 costuma ser o teclado ou o controle de verdade
 ERROS_ANTES_DO_BLOQUEIO = 5
 JANELA_DOS_ERROS_S = 60.0
@@ -592,7 +592,8 @@ class ControleRemoto:
         self._erros = {}               # ip -> [instantes dos erros de codigo]
         self._bloqueios = {}           # ip -> instante em que o bloqueio acaba
         self._erros_no_total = 0
-        self._tentativas = []          # instantes das ultimas tentativas de codigo, de qualquer endereco
+        self._falhas = []              # instantes dos ultimos codigos errados, de qualquer endereco
+        self._trocas_do_codigo = 0     # quantas vezes o codigo mudou sozinho (alguem errou demais): o professor ve
         self._liberados = set(JOGADORES_LIBERADOS_PADRAO)      # os jogadores que o celular pode ser (o professor muda)
         self._hosts_extras = set()     # outros nomes que valem como Host (o endereco do tunel, quando houver)
 
@@ -620,7 +621,8 @@ class ControleRemoto:
             self._erros.clear()
             self._bloqueios.clear()
             self._erros_no_total = 0
-            self._tentativas = []
+            self._falhas = []
+            self._trocas_do_codigo = 0
             self.ligado = True
             return self._estado_sem_trava()
 
@@ -653,7 +655,7 @@ class ControleRemoto:
             return {"ligado": False, "porta_da_pagina": self.porta_pedida, "jogadores_liberados": sorted(self._liberados)}
         enderecos = ["http://%s:%d/" % (ip, self.porta) for ip in self._enderecos()]
         return {"ligado": True, "codigo": self.codigo, "porta_da_pagina": self.porta, "enderecos": enderecos,
-                "jogadores_liberados": sorted(self._liberados),
+                "jogadores_liberados": sorted(self._liberados), "trocas_do_codigo": self._trocas_do_codigo,
                 "conectados": [{"jogador": n, "ip": d["ip"], "apelido": d["apelido"], "ha_s": round(time.monotonic() - d["desde"]),
                                 "rtt_ms": d.get("rtt_ms"), "pelo_cabo": d["ip"].startswith("127.")}
                                for n, d in sorted(self._clientes.items())]}
@@ -664,7 +666,7 @@ class ControleRemoto:
             return sorted(self._liberados)
 
     def liberar_jogadores(self, numeros):
-        """O professor escolhe (de 1 a 4) quais jogadores o celular pode ser. Vale no PROXIMO jogo que abrir: cada jogador
+        """O professor escolhe (de 1 a 8) quais jogadores o celular pode ser. Vale no PROXIMO jogo que abrir: cada jogador
         liberado e' uma porta UDP aberta no RetroArch enquanto o jogo roda (sem senha: e' do proprio RetroArch), entao
         so se abre o que se vai usar."""
         novos = {int(n) for n in numeros if str(n).isdigit() and 1 <= int(n) <= JOGADORES}
@@ -716,24 +718,31 @@ class ControleRemoto:
         if self._erros_no_total >= ERROS_ANTES_DE_TROCAR_O_CODIGO:
             self.codigo = codigo_novo()          # alguem esta tentando todos: o codigo que ele tem nao vale mais
             self._erros_no_total = 0
+            self._trocas_do_codigo += 1
         return max(0, ERROS_ANTES_DO_BLOQUEIO - len(recentes))
 
+    def _ja_errou(self, ip, agora):
+        return any(agora - t < JANELA_DOS_ERROS_S for t in self._erros.get(ip, ()))
+
     def conferir_o_codigo(self, ip, codigo, agora=None):
-        """(ok, motivo, restam). Tudo na mesma trava: a tentativa e' contada ANTES de o codigo ser comparado, e o limite
-        vale para todos os enderecos juntos (um endereco trocado a cada tentativa nao escapa do bloqueio por endereco).
-        O bloqueio vale para o endereco inteiro, com o codigo certo ou errado."""
+        """(ok, motivo, restam). Tudo na mesma trava: conferir e anotar o erro nao se separam, mesmo com 60 conexoes ao
+        mesmo tempo. O bloqueio vale para o endereco inteiro (com o codigo certo ou errado). O limite de todos os
+        enderecos juntos conta so os ERROS e so segura quem ja errou: um endereco trocado a cada tentativa nao escapa
+        dele, mas quem despeja erros nao tranca a porta para os outros celulares (achado da revisao de seguranca de
+        25/10/2026). O que protege o codigo de quem tenta todos e' trocar o codigo a cada
+        ERROS_ANTES_DE_TROCAR_O_CODIGO erros, venha de onde vier."""
         agora = time.monotonic() if agora is None else agora
         with self._trava:
             if self._bloqueado(ip, agora):
                 return False, "bloqueado", 0
-            self._tentativas = [t for t in self._tentativas if agora - t < JANELA_GLOBAL_S]
-            if len(self._tentativas) >= TENTATIVAS_POR_JANELA:
+            self._falhas = [t for t in self._falhas if agora - t < JANELA_GLOBAL_S]
+            if len(self._falhas) >= TENTATIVAS_POR_JANELA and self._ja_errou(ip, agora):
                 return False, "muitas", 0
-            self._tentativas.append(agora)
             certo = self.codigo
             if (certo and isinstance(codigo, str)
                     and hmac.compare_digest(codigo.encode("utf-8"), certo.encode("utf-8"))):
                 return True, "", ERROS_ANTES_DO_BLOQUEIO
+            self._falhas.append(agora)
             return False, "codigo", self._anotar_erro(ip, agora)
 
     # -- a conversa com um celular ----------------------------------------------------------------

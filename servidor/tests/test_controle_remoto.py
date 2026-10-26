@@ -403,33 +403,50 @@ class OServicoPorDentro(unittest.TestCase):
         self.assertEqual(self.controle.codigo, "424242")                  # o codigo que o tentador tinha nao vale mais
         self.assertEqual(self.controle._erros_no_total, 0)
 
-    def test_limite_global_vale_para_todos_os_enderecos_juntos(self):
-        # O atacante troca de endereco a cada tentativa: o bloqueio por endereco nunca dispara, o global sim.
-        resultados = [self.controle.conferir_o_codigo("10.2.%d.1" % i, "nada", agora=3000.0 + i * 0.1)[1]
-                      for i in range(cr.TENTATIVAS_POR_JANELA + 5)]
-        self.assertEqual(resultados[:cr.TENTATIVAS_POR_JANELA], ["codigo"] * cr.TENTATIVAS_POR_JANELA)
-        self.assertEqual(set(resultados[cr.TENTATIVAS_POR_JANELA:]), {"muitas"})
-        # passada a janela, volta a aceitar (e o codigo CERTO entra, sem nenhum castigo para quem nao errou)
-        self.assertEqual(self.controle.conferir_o_codigo("10.3.0.1", self.codigo, agora=3000.0 + cr.JANELA_GLOBAL_S + 5)[:2],
+    def test_limite_global_segura_so_quem_ja_errou(self):
+        # O atacante troca de endereco a cada tentativa: o bloqueio por endereco nunca dispara.
+        for i in range(cr.TENTATIVAS_POR_JANELA):
+            r = self.controle.conferir_o_codigo("10.2.%d.1" % i, "nada", agora=3000.0 + i * 0.1)
+            self.assertEqual(r[1], "codigo")
+        # Passou do limite: quem ja errou espera a janela passar...
+        self.assertEqual(self.controle.conferir_o_codigo("10.2.0.1", "nada", agora=3002.0)[:2], (False, "muitas"))
+        self.assertEqual(self.controle.conferir_o_codigo("10.2.0.1", self.codigo, agora=3002.0)[:2], (False, "muitas"))
+        # ...mas o celular que ainda nao errou entra com o codigo certo, mesmo no meio do despejo (achado da revisao de
+        # seguranca: o limite global antigo contava TODAS as tentativas e deixava um atacante trancar a porta de todos).
+        self.assertEqual(self.controle.conferir_o_codigo("10.3.0.1", self.codigo, agora=3002.0)[:2], (True, ""))
+        # O despejo continua custando um erro por endereco novo: o codigo troca a cada ERROS_ANTES_DE_TROCAR_O_CODIGO.
+        self.assertEqual(self.controle.conferir_o_codigo("10.3.0.2", "nada", agora=3002.0)[:2], (False, "codigo"))
+        # Passada a janela, quem errou volta a poder tentar.
+        self.assertEqual(self.controle.conferir_o_codigo("10.2.0.1", self.codigo, agora=3000.0 + cr.JANELA_GLOBAL_S + 5)[:2],
                          (True, ""))
 
+    def test_o_codigo_que_o_atacante_tinha_nao_vale_depois_do_despejo(self):
+        antigo = self.codigo
+        with mock.patch.object(cr, "codigo_novo", return_value="424242"):
+            for i in range(cr.ERROS_ANTES_DE_TROCAR_O_CODIGO):
+                self.controle.conferir_o_codigo("10.5.%d.1" % i, "nada", agora=5000.0 + i * 0.1)
+        self.assertEqual(self.controle.estado()["trocas_do_codigo"], 1)         # o professor ve que algo errou demais
+        self.assertEqual(self.controle.conferir_o_codigo("10.6.0.1", antigo, agora=5010.0)[:2], (False, "codigo"))
+        self.assertEqual(self.controle.conferir_o_codigo("10.6.0.2", "424242", agora=5010.0)[:2], (True, ""))
+
     def test_conferir_o_codigo_e_atomico_com_varias_conexoes_ao_mesmo_tempo(self):
-        # 60 conexoes ao mesmo tempo, cada uma com um endereco: so TENTATIVAS_POR_JANELA chegam a comparar o codigo.
+        # 60 conexoes ao mesmo tempo, TODAS do mesmo endereco: so ERROS_ANTES_DO_BLOQUEIO chegam a comparar o codigo,
+        # as outras ja encontram o endereco bloqueado (conferir e anotar o erro nao se separam).
         saidas, trava = [], threading.Lock()
         porta_de_largada = threading.Barrier(60)
 
-        def tentar(i):
+        def tentar():
             porta_de_largada.wait()
-            r = self.controle.conferir_o_codigo("10.4.%d.1" % i, "nada", agora=4000.0)[1]
+            r = self.controle.conferir_o_codigo("10.4.0.1", "nada", agora=4000.0)[1]
             with trava:
                 saidas.append(r)
-        fios = [threading.Thread(target=tentar, args=(i,)) for i in range(60)]
+        fios = [threading.Thread(target=tentar) for _ in range(60)]
         for f in fios:
             f.start()
         for f in fios:
             f.join(10)
-        self.assertEqual(saidas.count("codigo"), cr.TENTATIVAS_POR_JANELA)
-        self.assertEqual(saidas.count("muitas"), 60 - cr.TENTATIVAS_POR_JANELA)
+        self.assertEqual(saidas.count("codigo"), cr.ERROS_ANTES_DO_BLOQUEIO)
+        self.assertEqual(saidas.count("bloqueado"), 60 - cr.ERROS_ANTES_DO_BLOQUEIO)
 
     def test_jogador_que_nao_existe(self):
         _c, resposta = self.entrar(jogador=9)

@@ -578,18 +578,23 @@ Lido no código do RetroArch 1.22.2 (`input/input_driver.c`) e **provado com o A
 - **Se uma só das portas do Network RetroPad estiver ocupada, o RetroArch desiste de todo o controle remoto** (`input_remote_new`
   libera tudo e devolve NULL). Por isso `porta_base_livre()` sorteia (50000 a 59000) e testa as 4 portas antes de cada jogo.
 - **O RetroArch escuta o UDP em todas as placas de rede** (`socket_init` sem endereço): não dá para limitar ao `127.0.0.1`. Fica
-  dito na tela e no guia; a porta muda a cada jogo e só os 4 jogadores do celular são ligados.
-- **Só lê os jogadores abaixo de `input_max_users`:** o ARENA sobe o número para 4 só na partida (e devolve o `retroarch.cfg` no fim).
+  dito na tela e no guia; a porta muda a cada jogo e só os jogadores que o professor liberou (padrão 2, 3 e 4) e que o jogo tem
+  são ligados. Ideia para fechar de vez: um remendo no RetroArch que prenda o `bind` ao `127.0.0.1` (o APK do Android já é
+  compilado pelo ARENA); no Windows, só com um RetroArch compilado por nós.
+- **Só lê os jogadores abaixo de `input_max_users`:** o ARENA sobe o número até o maior jogador liberado, só na partida (e devolve o `retroarch.cfg` no fim).
 - Os emuladores de fora (PCSX2, Dolphin, RPCS3, Xenia) não leem o Network RetroPad, e o Jogar Junto (netplay) não o usa.
 
 **Segurança** (a lista da linha 7 da tabela do roteiro): desligado por padrão e sem guardar no `config.json`; liga só pelo clique
 no computador; só rede local (`rede_privada`); código de 6 números conferido com `hmac.compare_digest`, bloqueio do endereço por
-2 minutos depois de 5 erros em 1 minuto, código novo depois de 20 erros no total; `Origin` de outro site recusado (um site aberto
-no celular não manda botão); só a página do controle na porta (nenhuma rota da API do ARENA); limite de 150 quadros por segundo,
-4 KB por quadro, 24 conexões abertas e 4 celulares; cabeçalhos `nosniff`, `no-store`, `Referrer-Policy` e CSP que só deixa o
-próprio servidor. A pergunta do firewall do Windows (e o fato de o computador da escola não deixar o aluno responder) está no guia.
+2 minutos depois de 5 erros em 1 minuto, código novo depois de 20 erros no total (e o professor vê o aviso); o limite de 10 erros em
+10 s de todos os endereços juntos **só segura quem já errou** (achado da revisão de segurança de 25/10/2026: contando todas as
+tentativas, quem despejasse erros trancava a porta de todos os celulares); `Host` e `Origin` de outro site recusados (um site aberto
+no celular, ou um nome que aponte para este computador, não manda botão); só a página do controle na porta (nenhuma rota da API
+do ARENA); limite de 150 quadros por segundo, 4 KB por quadro, 24 conexões abertas e 8 celulares; cabeçalhos `nosniff`,
+`no-store`, `Referrer-Policy` e CSP que só deixa o próprio servidor. A pergunta do firewall do Windows (e o fato de o computador da
+escola não deixar o aluno responder) está no guia.
 
-**Testado:** `servidor\tests\test_controle_remoto.py` (58 testes: o exemplo da RFC 6455, quadros de todo tamanho e quebrados, o
+**Testado:** `servidor\tests\test_controle_remoto.py` (71 testes: o exemplo da RFC 6455, quadros de todo tamanho e quebrados, o
 datagrama de 20 bytes, o um-por-quadro, a junção de mudanças, a zona do analógico, a varredura de zero, o código e o bloqueio,
 a origem, a porta que só serve a página, o sem sinal, o fechar solta tudo, as rotas) e o A12 de verdade. Pendente com a máquina
 livre: o teste de ponta a ponta com um RetroArch de verdade (`testes\teste_controle_remoto_retroarch.py`) e a latência pelo Wi-Fi

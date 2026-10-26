@@ -2489,7 +2489,8 @@ function desenharControleRemoto(dados) {
     nome.textContent = `Jogador ${c.jogador}${c.apelido ? ` — ${c.apelido}` : ""}`;
     const nota = document.createElement("span");
     nota.className = "controle-nota";
-    nota.textContent = `celular ${c.ip}, conectado há ${c.ha_s} s`;
+    nota.textContent = `celular ${c.ip}${c.pelo_cabo ? " (pelo cabo USB)" : ""}, conectado há ${c.ha_s} s` +
+      (typeof c.rtt_ms === "number" ? ` · resposta em ${numeroBr(c.rtt_ms)} ms` : "");
     item.append(nome, nota);
     conectados.append(item);
   }
@@ -2500,6 +2501,14 @@ function desenharControleRemoto(dados) {
     conectados.append(item);
   }
   $("#controleRemotoConectados").replaceChildren(conectados);
+  // Quem erra o codigo demais faz o codigo mudar sozinho (servidor\controle_remoto.py): o professor fica sabendo.
+  const trocas = Number(dados.trocas_do_codigo) || 0;
+  const troca = $("#controleRemotoTroca");
+  troca.hidden = !trocas;
+  if (trocas) {
+    troca.textContent = `Atenção: o código já mudou ${trocas} ${trocas === 1 ? "vez" : "vezes"} sozinho, porque erraram o ` +
+      "código muitas vezes. Se não foi engano de quem está na sala, vale ver quem está tentando. O código novo já aparece acima.";
+  }
 }
 
 async function atualizarControleRemoto() {
