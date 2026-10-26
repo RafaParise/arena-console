@@ -622,6 +622,42 @@ volta pelo XInput. O modo teclado/mouse (SendInput) ficou de fora: o gamepad vir
 **O que fica para depois:** o giroscópio (só dentro do app, por exigir contexto seguro), dados móveis (túnel) e a tela como
 controle dentro do app do Android.
 
+## Jogar Junto entre versões (celular, computador, Linux, Chromebook): a ordem e o que foi medido (26/10/2026)
+
+Pedido do Rafael: jogar do celular como jogador 2 numa partida hospedada no computador, ou ao contrário, entrando no
+próximo lugar livre, até 8 jogadores onde o console aceita, em todas as versões.
+
+**O que o RetroArch exige** (lido no código do 1.22.2): o **nome do núcleo** igual nos dois lados (se for outro, recusa); versão
+do núcleo e CRC do jogo diferentes só avisam ("Um par da Netplay está executando uma versão diferente do núcleo"). O PC (snes9x
+1.63 890b5d4) e o celular (1.63 fae2fea) são builds diferentes do mesmo núcleo: **entram e jogam**, só com o aviso.
+
+**Medido (`testes\teste_jogar_junto_pc_celular.py`, Super Bomberman 4, A12 e o computador do Rafael):**
+
+| Caminho | Entrou | Aguentou | Ping do netplay |
+|---|---|---|---|
+| celular hospeda, PC entra, **Wi-Fi** (celular 2,4 GHz, PC 5 GHz) | em 0,6 a 30 s | **caiu em 5 a 19 s** | 94 a 4239 ms |
+| PC hospeda, celular entra, **Wi-Fi** | em 0,1 a 0,6 s | **caiu em 12 s** | 94 a 161 ms |
+| celular hospeda, PC entra, **cabo USB** (`adb forward tcp:55435`) | em 11 s | **de pé depois de 45 s** | 23 a 34 ms |
+| celular hospeda, PC entra, **Wi-Fi com o modo de baixa latência** (APK novo) | em 12 a 13 s (1 de 4 tentativas não conectou) | **de pé depois de 45 s** (3 de 3 conectadas) | 44 a 116 ms |
+| PC hospeda, celular entra, Wi-Fi com o modo de baixa latência | (o teste só passou a contar a entrada do jogador 2 depois) | **sem queda em 45 s** (2 de 2) | — |
+
+Conclusão: **o jogo entre versões funciona** (a diferença de build do núcleo não derrubou nada: pelo cabo a mesma partida
+ficou de pé). O que derruba é o **Wi-Fi do celular**, que poupa o rádio e deixa o ping de 5 ms a mais de 1 s. Duas respostas:
+1. o app do Android segura o Wi-Fi em **modo de baixa latência** enquanto o jogo é em rede (`ArenaServico.wifiRapido`, só com o
+   app na frente e a tela ligada; permissão `WAKE_LOCK`);
+2. quem quer partida firme liga o celular no cabo e a porta da partida (55435) passa por `adb forward` (celular hospeda) ou
+   `adb reverse` (PC hospeda), com o endereço `127.0.0.1`: é o mesmo truque do controle pelo cabo.
+
+**Ordem de implementação (a melhor, decidida por risco e valor):**
+1. (feito) o teste que prova PC↔celular nos dois sentidos, para ter número antes de mexer;
+2. (feito) Wi-Fi de baixa latência no celular durante a partida;
+3. o botão "Partida pelo cabo" no Jogar Junto, reaproveitando `controle_usb.py` (forward/reverse da 55435);
+4. o próximo lugar livre: quem entra sem escolher fica com o menor jogador vago que o console aceita (hoje a tela pede o número);
+5. até 8 jogadores: consoles com multitap (Saturn 10, SNES 5, PS1 8) já passam pelo `jogadores_max`; testar com o celular como um deles;
+6. **Linux** usa o mesmo servidor e o mesmo RetroArch (núcleo `.so`): vale o mesmo, falta só rodar o teste num Linux;
+7. **Chromebook**: o RetroArch do navegador (wasm) **não tem netplay** (nenhuma ocorrência no wasm do libretro): quem quer
+   jogar junto pelo Chromebook usa o APK no ChromeOS (precisa do x86_64) ou usa o Chromebook/celular só como controle.
+
 ## Paridade com o computador
 
 O levantamento por área ainda **não foi feito**. A primeira tentativa (cinco

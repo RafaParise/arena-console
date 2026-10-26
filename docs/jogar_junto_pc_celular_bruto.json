@@ -1,24 +1,67 @@
 {
-  "hospeda": "celular",
+  "hospeda": "pc",
   "ip_celular": "192.168.18.4",
   "ip_pc": "192.168.18.17",
   "resposta_do_celular": {
     "ok": true,
     "erro": null,
     "aviso": null,
-    "papel": "jogador 1"
+    "papel": "jogador 2"
   },
+  "caiu_depois_de_s": null,
   "pc_vivo_depois": true,
   "pc_netplay": [
-    "[WARN] [Netplay] ATENÇÃO: Um par da Netplay está executando uma versão diferente do núcleo. Se ocorrerem problemas, use a mesma versão.",
-    "[INFO] [Netplay] Conectado a: \"RafaParise\"",
-    "[INFO] [Netplay] Você se juntou como jogador 2 (ping: 2911 ms)"
+    "[INFO] [Netplay] Você se juntou como jogador 1"
   ],
-  "celular_netplay": [],
+  "celular_netplay": [
+    "[Override] Redirecionando arquivo dados da memória do jogo em \"/data/user/0/io.github.rafaparise.arena/files/arena/retroarch/saves/Snes9x/.netplay/Super Bomberman 4 (Japan) [T-En by Svambo v1.0].srm\".",
+    "[Environ] GET_SAVE_DIRECTORY: \"/data/user/0/io.github.rafaparise.arena/files/arena/retroarch/saves/Snes9x/.netplay\".",
+    "[Netplay] Failed to connect to host 192.168.18.17 on port 55435.",
+    "[Netplay] Failed to set up netplay sockets.",
+    "[Netplay] Falha em inicializar a Netplay."
+  ],
+  "celular_registro_campos": [
+    "arquivo",
+    "linhas",
+    "ok",
+    "total"
+  ],
+  "celular_registro_cauda": [
+    "[GLSL] Found GLSL fragment shader.",
+    "[GLSL] Shader log: Success.",
+    ".",
+    "[GLSL] Linking GLSL program.",
+    "[GLSL] Found GLSL vertex shader.",
+    "[GLSL] Shader log: Success.",
+    ".",
+    "[GLSL] Found GLSL fragment shader.",
+    "[GLSL] Shader log: Success.",
+    "WARNING: 0:15: Calls to any function that may require a gradient calculation inside a conditional block may return undefined results",
+    "1 compilation warnings.",
+    "",
+    ".",
+    "[GLSL] Linking GLSL program.",
+    "[GL] Using 4 textures.",
+    "[GL] Loaded 1 program(s).",
+    "[Input] Found joypad driver: \"android\".",
+    "[Video] Found display server: \"android\".",
+    "[Audio] Set audio input rate to: 32040.00 Hz.",
+    "[Video] Game FPS > Monitor FPS. Cannot rely on VSync.",
+    "[OpenSL] Requested audio latency: 64 ms.",
+    "[OpenSL] Setting audio latency: Block size = 2048, Blocks = 6, Total = 12288...",
+    "[Audio] Started synchronous audio driver.",
+    "[Display] Found display driver: \"gl\".",
+    "[Environ] SET_SUBSYSTEM_INFO.",
+    "[Playlist] Carregando o arquivo de favoritos: \"/data/user/0/io.github.rafaparise.arena/files/arena/dados/builtin/content_favorites.lpl\".",
+    "[Playlist] Carregando arquivo de histórico: \"/data/user/0/io.github.rafaparise.arena/files/arena/dados/builtin/content_history.lpl\".",
+    "[Playlist] Carregando arquivo de histórico: \"/data/user/0/io.github.rafaparise.arena/files/arena/dados/builtin/content_image_history.lpl\".",
+    "[Playlist] Carregando arquivo de histórico: \"/data/user/0/io.github.rafaparise.arena/files/arena/dados/builtin/content_music_history.lpl\".",
+    "[Environ] SET_GEOMETRY."
+  ],
   "celular_jogo_em_andamento": {
     "ativo": true,
     "titulo": "Super Bomberman 4",
     "id": "jogos/pessoais/super nintendo/super bomberman 4 (japan) [t-en by svambo v1.0].sfc"
   },
-  "entrou_em_s": 22.2
+  "entrou_em_s": 0.1
 }

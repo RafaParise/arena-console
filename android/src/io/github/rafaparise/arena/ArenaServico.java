@@ -482,7 +482,46 @@ public class ArenaServico extends Service {
         if (pid > 0) android.os.Process.killProcess(pid);
     }
 
+    /** O Wi-Fi em modo de baixa latencia enquanto o jogo e' em rede (Jogar Junto). Sem ele, o celular poupa o radio do
+     *  Wi-Fi e o ping vai de 5 ms a mais de 1 s (medido no A12 em 26/10/2026: a partida com o computador caia em 5 a 20 s;
+     *  pelo cabo USB, com 23 ms, nao caia). O modo vale so com o app na frente e a tela ligada (Android 10 em diante; antes,
+     *  o modo de alto desempenho). */
+    WifiManager.WifiLock wifiRapido;
+
+    void wifiRapido(boolean ligar) {
+        try {
+            if (ligar && wifiRapido == null) {
+                WifiManager wifi = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                if (wifi == null) return;
+                int modo = Build.VERSION.SDK_INT >= 29 ? WifiManager.WIFI_MODE_FULL_LOW_LATENCY : WifiManager.WIFI_MODE_FULL_HIGH_PERF;
+                wifiRapido = wifi.createWifiLock(modo, "ARENA-jogo-em-rede");
+                wifiRapido.setReferenceCounted(false);
+                wifiRapido.acquire();
+            } else if (!ligar && wifiRapido != null) {
+                if (wifiRapido.isHeld()) wifiRapido.release();
+                wifiRapido = null;
+            }
+        } catch (RuntimeException falha) {
+            Log.w(TAG, "wifi de baixa latencia: " + falha);
+            wifiRapido = null;
+        }
+    }
+
     void jogar(final int numero, JSONArray argumentos) throws JSONException {
+        boolean emRede = false;
+        for (int i = 0; i < argumentos.length(); i++) {
+            String parte = argumentos.optString(i);
+            if (parte.equals("--host") || parte.equals("--connect")) emRede = true;
+        }
+        wifiRapido(emRede);
+        try {
+            jogarDeVerdade(numero, argumentos);
+        } finally {
+            wifiRapido(false);
+        }
+    }
+
+    void jogarDeVerdade(final int numero, JSONArray argumentos) throws JSONException {
         // Um RetroArch que ficou aberto (a pessoa saiu do jogo pelo botao de
         // inicio do aparelho) nao abriria o jogo novo: fecha antes.
         if (processoDoRetroArch() > 0) {

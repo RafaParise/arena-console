@@ -486,6 +486,7 @@ SERVICO_DO_ARENA = '''        <service android:exported="false" android:name="io
 # aluno: e' das permissoes "normais") deixa o painel Ajustes -> Maquina mostrar o sinal e a velocidade do Wi-Fi.
 PERMISSOES_DO_SERVIDOR = '''    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE"/>
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
 '''

@@ -26,6 +26,7 @@ import celular_mao  # noqa: E402
 import teste_netplay_5_jogadores as n5  # noqa: E402  (montar_override, carregar_modulos e as constantes do jogo)
 
 TITULO = "Super Bomberman 4"
+ATRASO = int(next((x.split("=")[1] for x in sys.argv if x.startswith("--atraso=")), "0"))      # quadros de folga do lado do PC
 PORTA = n5.PORTA_PARTIDA
 
 
@@ -57,8 +58,16 @@ def log_do_pc(pasta):
 
 def main():
     pc_hospeda = "--pc-hospeda" in sys.argv
+    pelo_cabo = "--cabo" in sys.argv        # a partida (TCP) vai pelo cabo USB (adb forward/reverse) em vez do Wi-Fi
     celular = celular_mao.Celular()
     ip_celular, ip_pc = ip_do_celular(celular), ip_do_computador()
+    if pelo_cabo:
+        if pc_hospeda:
+            celular.texto("reverse", "tcp:%d" % PORTA, "tcp:%d" % PORTA)          # o 127.0.0.1 do celular chega no PC
+            ip_pc = "127.0.0.1"
+        else:
+            celular.texto("forward", "tcp:%d" % PORTA, "tcp:%d" % PORTA)          # o 127.0.0.1 do PC chega no celular
+            ip_celular = "127.0.0.1"
     print("celular %s, computador %s; hospeda: %s" % (ip_celular, ip_pc, "o computador" if pc_hospeda else "o celular"), flush=True)
     arena, graficos = n5.carregar_modulos()
     pagina = ca.abrir(segundos=120)
@@ -72,7 +81,7 @@ def main():
         jogo_id = jogos[0]["id"]
 
         def comando_do_pc(hospedar):
-            opcoes = graficos.opcoes_de_partida(apelido="PC", hospedar=hospedar, jogador=1 if hospedar else 2, multitap=False)
+            opcoes = graficos.opcoes_de_partida(apelido="PC", hospedar=hospedar, jogador=1 if hospedar else 2, multitap=False, atraso=ATRASO)
             argumentos = graficos.argumentos_de_partida(hospedar, endereco=ip_celular, porta=PORTA)
             cfg = os.path.join(pasta, "override.cfg")
             n5.montar_override(cfg, pasta, arena, graficos, opcoes)
@@ -97,16 +106,27 @@ def main():
         entrou = None
         while time.monotonic() < fim and entrou is None:
             texto = log_do_pc(pasta).lower()
-            if "[netplay]" in texto and ("se juntou" in texto or "joined" in texto or "connected" in texto):
+            # o PC hospedando tambem escreve "Voce se juntou como jogador 1": so vale a linha do OUTRO lado (jogador 2)
+            if "[netplay]" in texto and ("juntou como o jogador 2" in texto or "juntou como jogador 2" in texto):
                 entrou = round(time.monotonic() - t0, 1)
             time.sleep(1)
-        time.sleep(15)
+        # quanto tempo a partida aguenta? olha o log do computador a cada segundo, por ate 45 s depois da entrada
+        caiu = None
+        if entrou is not None:
+            inicio = time.monotonic()
+            while time.monotonic() - inicio < 45 and caiu is None:
+                if "desconect" in log_do_pc(pasta).lower() or "disconnect" in log_do_pc(pasta).lower():
+                    caiu = round(time.monotonic() - inicio, 1)
+                time.sleep(1)
+        resultado["caiu_depois_de_s"] = caiu            # None = ainda de pe depois de 45 s
         resultado["pc_vivo_depois"] = pc.poll() is None
         linhas = [l.strip() for l in log_do_pc(pasta).splitlines() if "[netplay]" in l.lower()]
         resultado["pc_netplay"] = linhas[-25:]
         registro = ca.pedir(pagina, "/api/android/registro")
-        texto_celular = registro.get("texto", "") if isinstance(registro, dict) else ""
+        texto_celular = chr(10).join(str(l) for l in registro.get("linhas", [])) if isinstance(registro, dict) else ""
         resultado["celular_netplay"] = [l.strip() for l in texto_celular.splitlines() if "netplay" in l.lower()][-25:]
+        resultado["celular_registro_campos"] = sorted(registro) if isinstance(registro, dict) else None
+        resultado["celular_registro_cauda"] = [l.strip() for l in texto_celular.splitlines()][-30:]
         estado = ca.pedir(pagina, "/api/estado")
         resultado["celular_jogo_em_andamento"] = (estado or {}).get("jogo_em_andamento")
         resultado["entrou_em_s"] = entrou
@@ -118,6 +138,9 @@ def main():
         if pc is not None and pc.poll() is None:
             pc.kill()
         pagina.fechar()
+        if pelo_cabo:
+            celular.texto("forward", "--remove", "tcp:%d" % PORTA)
+            celular.texto("reverse", "--remove", "tcp:%d" % PORTA)
         # fecha o jogo do celular: o RetroArch dele e' o processo do app; abrir o ARENA de novo o traz de volta
         celular.shell("am force-stop io.github.rafaparise.arena")
         time.sleep(2)
