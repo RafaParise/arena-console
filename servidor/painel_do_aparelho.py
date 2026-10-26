@@ -114,8 +114,13 @@ def painel(d, extras=None):
     ])
 
     # ------------------------------------------------------------------ processador e video
-    maximas = [m for m in d.get("nucleos_mhz") or [] if isinstance(m, (int, float)) and m > 0]
-    agora = [a for a in d.get("nucleos_agora_mhz") or [] if isinstance(a, (int, float)) and a > 0]
+    todas_as_maximas = d.get("nucleos_mhz") or []
+    todas_agora = d.get("nucleos_agora_mhz") or []
+    maximas = [m for m in todas_as_maximas if isinstance(m, (int, float)) and m > 0]
+    agora = [a for a in todas_agora if isinstance(a, (int, float)) and a > 0]
+    # cada nucleo contra o maximo DELE (mesmo indice): o Android desliga os que nao precisa
+    pares = [(a, m) for a, m in zip(todas_agora, todas_as_maximas)
+             if isinstance(a, (int, float)) and isinstance(m, (int, float)) and a > 0 and m > 0]
     grupos_de_nucleos = {}
     for m in maximas:
         grupos_de_nucleos[m] = grupos_de_nucleos.get(m, 0) + 1
@@ -126,9 +131,8 @@ def painel(d, extras=None):
     elif d.get("nucleos"):
         nucleos = "%d núcleos" % d["nucleos"]
     velocidade = None
-    if agora and maximas:
-        # So conta os nucleos ligados agora (o Android desliga os que nao precisa); o 100% e' cada um no maximo dele.
-        pct_nucleos = 100.0 * sum(agora) / sum(sorted(maximas, reverse=True)[:len(agora)])
+    if pares:
+        pct_nucleos = 100.0 * sum(a for a, _ in pares) / sum(m for _, m in pares)
         velocidade = ("%s GHz no mais rápido · núcleos ligados a %d%% do máximo" % (br(max(agora) / 1000.0, 1), round(pct_nucleos)),
                       min(100.0, pct_nucleos))
     arquiteturas = d.get("arquiteturas") or []
@@ -153,8 +157,8 @@ def painel(d, extras=None):
     if total and livre is not None:
         usada = max(0, total - livre)
         pct = 100.0 * usada / total
-        sufoco = bool(d.get("memoria_baixa")) or livre < 300
-        nivel = "ruim" if sufoco else ("atencao" if livre < 700 or pct >= 85 else "ok")
+        sufoco = bool(d.get("memoria_baixa"))                   # a frase so quando o proprio Android diz que esta com pouca
+        nivel = "ruim" if sufoco or livre < 300 else ("atencao" if livre < 700 or pct >= 85 else "ok")
         memoria = linha("Memória RAM", "%s: %s em uso · %s livres" % (tamanho(total), tamanho(usada), tamanho(livre))
                         + (" · o Android está com pouca memória" if sufoco else ""), pct, nivel)
     troca_total, troca_livre = _numero(d, "troca_total_mb"), _numero(d, "troca_livre_mb")
@@ -184,7 +188,8 @@ def painel(d, extras=None):
             linhas.append(linha("Nível", "%d%% · %s" % (pct, estado), pct, "ruim" if fraca else ("atencao" if pct < 30 and not d.get("na_tomada") else "ok")))
         ma = milis(_numero(d, "corrente_ua"))
         volts = (_numero(d, "bateria_voltagem_mv") or 0) / 1000.0
-        if d.get("bateria_estado") in (CHEIA, SEM_CARREGAR):
+        tomada_ligada = bool(d.get("tomada")) or bool(d.get("na_tomada"))
+        if d.get("bateria_estado") == CHEIA or (d.get("bateria_estado") == SEM_CARREGAR and tomada_ligada):
             # Na tomada sem carregar, o aparelho vive da energia da tomada: a corrente da bateria e' perto de zero, e
             # o numero (de uns poucos uA ou mA) nao se deixa ler com certeza.
             linhas.append(linha("Corrente na bateria", "quase nenhuma: a energia vem da tomada, não da bateria"))

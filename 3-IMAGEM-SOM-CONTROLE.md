@@ -367,6 +367,13 @@ parada: o ping exagera, mas mostra a oscilação). Pelo cabo o endereço é
 **volante** (inclinar o celular). Precisa do ADB do Google (veja *Celular ligado
 no cabo*, em Máquina).
 
+**Gamepad Xbox virtual (opcional, para qualquer jogo do Windows).** Em *Ajustes → Controles → Celular como controle*, a chave
+*Gamepad Xbox virtual* faz o celular aparecer para o Windows como um controle Xbox 360 de verdade (como o DroidJoy). É uma
+**exceção à regra "sem driver"** do ARENA: precisa do driver ViGEmBus, que o ARENA nunca instala (um administrador instala,
+com `winget install ViGEm.ViGEmBus`), e ele não recebe mais atualização. Vale só para quem entrar *depois* de ligar a chave,
+para os jogadores 1 a 4, e o celular deixa de falar com o RetroArch pelo outro caminho. Sem o driver, a chave diz que ele
+não está instalado e nada muda.
+
 No menu do controle (botão *Menu*): zona morta e curva do analógico, ajuste das
 diagonais do direcional, tamanho dos botões, controle para canhotos, volante
 (pelo cabo) e **3 perfis** que ficam guardados no celular, no estilo do GameSir

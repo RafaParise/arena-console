@@ -17,10 +17,10 @@ NODE = shutil.which("node")
 def trocar(textos):
     with open(os.path.join(RAIZ, "launcher", "app.js"), encoding="utf-8") as arquivo:
         fonte = arquivo.read()
-    achou = re.search(r"const TROCAS_DO_CELULAR = \[.*?\nfunction trocarComputador\(texto\) \{\n.*?\n\}\n", fonte, re.S)
+    achou = re.search(r"const TROCAS_DO_CELULAR = \[.*?\nfunction trocarComputador\(texto, tambemPcEMonitor\) \{\n.*?\n\}\n", fonte, re.S)
     if not achou:
         raise AssertionError("a tabela TROCAS_DO_CELULAR sumiu do app.js")
-    programa = achou.group(0) + "\nconsole.log(JSON.stringify(%s.map(trocarComputador)));" % json.dumps(textos, ensure_ascii=False)
+    programa = achou.group(0) + "\nconsole.log(JSON.stringify(%s.map((t) => trocarComputador(t, true))));" % json.dumps(textos, ensure_ascii=False)
     saida = subprocess.run([NODE, "-e", programa], capture_output=True, timeout=30)
     if saida.returncode:
         raise AssertionError(saida.stderr.decode("utf-8", "replace"))

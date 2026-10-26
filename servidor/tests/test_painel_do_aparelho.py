@@ -100,6 +100,10 @@ class ABateria(unittest.TestCase):
             self.assertNotIn("Gastando agora", tudo)
             self.assertNotIn("Entrando na bateria agora", tudo)
 
+    def test_sem_tomada_o_estado_4_mostra_a_corrente_medida(self):
+        leitura = dict(LEITURA, bateria_estado=4, tomada=0, na_tomada=False)
+        self.assertIn("Gastando agora", linhas_de(p.painel(leitura, EXTRAS)))
+
     def test_a_conta_da_capacidade_diz_que_e_so_pista(self):
         tudo = linhas_de(p.painel(LEITURA, EXTRAS))
         self.assertIn("só uma pista", tudo["Conta: carga ÷ nível"])
@@ -142,6 +146,12 @@ class AMemoria(unittest.TestCase):
         self.assertEqual(self.nivel_da_ram(600), "atencao")
         self.assertEqual(self.nivel_da_ram(200), "ruim")
         self.assertEqual(self.nivel_da_ram(2000, memoria_baixa=True), "ruim")
+
+    def test_pouca_memoria_so_na_frase_quando_o_android_diz(self):
+        linha = next(l for g in p.painel(dict(LEITURA, memoria_livre_mb=200, memoria_baixa=False), EXTRAS) for l in g["linhas"]
+                     if l[0] == "Memória RAM")
+        self.assertNotIn("pouca memória", linha[1])
+        self.assertEqual(linha[2]["nivel"], "ruim")                       # a cor avisa; a frase espera o Android dizer
 
     def test_a_barra_mostra_o_quanto_esta_em_uso(self):
         linha = next(l for g in p.painel(LEITURA, EXTRAS) for l in g["linhas"] if l[0] == "Memória RAM")
@@ -200,6 +210,10 @@ class OResto(unittest.TestCase):
         linha = next(l for g in p.painel(LEITURA, EXTRAS) for l in g["linhas"] if l[0] == "Velocidade agora")
         self.assertEqual(linha[1], "1,2 GHz no mais rápido · núcleos ligados a 51% do máximo")
         self.assertEqual(linha[2]["pct"], 51)
+        # nucleos desligados (frequencia 0): cada um conta contra o maximo DELE, nao contra os maiores da lista
+        desligados = dict(LEITURA, nucleos_agora_mhz=[0, 0, 0, 0, 900, 900, 900, 900])
+        linha = next(l for g in p.painel(desligados, EXTRAS) for l in g["linhas"] if l[0] == "Velocidade agora")
+        self.assertEqual(linha[2]["pct"], 50)                             # 3600 / 7200: os de 1,8 GHz no maximo
 
 
 if __name__ == "__main__":

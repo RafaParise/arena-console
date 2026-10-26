@@ -646,7 +646,7 @@ class ControleRemoto:
             clientes = list(self._clientes.items())
             self._clientes.clear()
             cabos, self._cabos = list(self._cabos.items()), {}
-        controle_usb.soltar(cabos)          # o celular deixa de alcancar a porta deste computador pelo cabo
+        controle_usb.soltar(cabos, ultimo=True)          # o celular deixa de alcancar a porta deste computador pelo cabo
         pad, self._gamepad = self._gamepad, None
         if pad is not None:
             pad.fechar()
@@ -682,15 +682,23 @@ class ControleRemoto:
     def gamepad_virtual(self, ligar):
         """Liga ou desliga. (ok, motivo). Ligado, o celular vira um Xbox 360 de verdade para o Windows e NAO manda mais pelo
         Network RetroPad (o jogo veria o controle duas vezes). Vale para quem entrar depois."""
+        with self._trava:
+            if not ligar:
+                pad, self._gamepad = self._gamepad, None
+            elif self._gamepad is not None:
+                return True, ""                     # ja ligado (clique duplo): nao cria outro e deixa o primeiro sem fechar
+            else:
+                pad = None
         if not ligar:
-            pad, self._gamepad = self._gamepad, None
             if pad:
                 pad.fechar()
             return True, ""
-        pad = gamepad_virtual.GamepadVirtual()
-        ok, motivo = pad.disponivel()
+        novo = gamepad_virtual.GamepadVirtual()
+        ok, motivo = novo.disponivel()
         if ok:
-            self._gamepad = pad
+            with self._trava:
+                if self._gamepad is None:
+                    self._gamepad = novo
         return ok, motivo
 
     # -- o cabo USB -------------------------------------------------------------------------------
@@ -706,12 +714,18 @@ class ControleRemoto:
             with self._trava:
                 # O controle pode ter sido desligado (ou ligado de novo, com outro codigo) enquanto o adb trabalhava:
                 # o cabo que sobrou nao fica para tras, e' desfeito na hora (achado da revisao de seguranca).
-                valido = self.ligado and self.codigo == codigo and self.porta == porta
+                valido = self.ligado and self.porta == porta
+                codigo_mudou = valido and self.codigo != codigo
                 if valido:
                     self._cabos[resposta["escolhido"]] = porta
+                ficaram = bool(self._cabos)
             if not valido:
-                controle_usb.soltar([(resposta["escolhido"], porta)])
+                controle_usb.soltar([(resposta["escolhido"], porta)], ultimo=not ficaram)
                 return {"ok": False, "erro": "O controle foi desligado enquanto o cabo era ligado. Ligue de novo.", "aparelhos": []}
+            if codigo_mudou:
+                # O cabo fica (a porta e' a mesma), mas a pagina que abriu no celular tem o codigo velho.
+                return {"ok": False, "erro": "O código do controle mudou (erros seguidos de código) no meio do caminho. Clique de novo para "
+                                             "abrir com o código novo.", "aparelhos": resposta.get("aparelhos", [])}
         return resposta
 
     # -- que jogadores o celular pode ser ---------------------------------------------------------
@@ -941,7 +955,9 @@ class ControleRemoto:
                         if estado is None:
                             raise ErroDeProtocolo(1003, "estado invalido")
                         pad = self._gamepad
-                        if pad is not None:
+                        if pad is not None and jogador > gamepad_virtual.MAXIMO_DE_GAMEPADS:
+                            pass                                  # o XInput so enxerga 4: do 5 em diante nao ha o que mandar
+                        elif pad is not None:
                             try:
                                 pad.atualizar(jogador, *estado)
                             except OSError:
@@ -975,6 +991,12 @@ class ControleRemoto:
                 agora = time.monotonic()
                 if not sem_sinal and agora - ultimo_estado > SEGUNDOS_SEM_SINAL:
                     self.enviador.zerar(jogador)             # a tela do celular parou (apagou, trocou de app): solta tudo
+                    pad = self._gamepad
+                    if pad is not None:
+                        try:
+                            pad.soltar(jogador)                  # e o Xbox virtual tambem (achado da revisao: ficava apertado)
+                        except OSError:
+                            pass
                     sem_sinal = True
                     try:
                         self._enviar_texto(soquete, {"t": "sem_sinal"})

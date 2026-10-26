@@ -16,6 +16,7 @@ import os
 import sys
 import threading
 
+MAXIMO_DE_GAMEPADS = 4          # o XInput do Windows enxerga 4 gamepads, nao mais
 DLL = os.path.join(os.path.dirname(os.path.abspath(__file__)), "vigem", "ViGEmClient.dll")
 
 # RetroPad (bit) -> botao do XUSB_REPORT
@@ -95,6 +96,8 @@ class GamepadVirtual:
 
     def atualizar(self, jogador, botoes, eixos):
         """Cria o gamepad do jogador na primeira vez e manda o estado. Depois de fechar(), nao faz nada (nao religa o driver)."""
+        if jogador > MAXIMO_DE_GAMEPADS:
+            return
         with self._trava:
             if not self._fechado:
                 self._atualizar(jogador, botoes, eixos)
@@ -108,7 +111,8 @@ class GamepadVirtual:
                 self._lib.vigem_target_free(alvo)
                 raise OSError("O Windows não deixou criar o gamepad virtual.")
             self._alvos[jogador] = alvo
-        self._lib.vigem_target_x360_update(self._cliente, alvo, converter(botoes, eixos))
+        if self._lib.vigem_target_x360_update(self._cliente, alvo, converter(botoes, eixos)) != 0x20000000:
+            raise OSError("O driver ViGEmBus não aceitou o estado do gamepad.")
 
     def soltar(self, jogador):
         with self._trava:

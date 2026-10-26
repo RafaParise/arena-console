@@ -1246,7 +1246,7 @@ function mostrarAlertaMaquina(alertas) {
 // vez so, quando o aluno volta para esta janela.
 
 function mostrarFaixaTeclas() {
-  $("#faixaTeclaF9").hidden = !estado.config.travar_teclas;
+  $("#faixaTeclaF9").hidden = noCelular() || !estado.config.travar_teclas;
   $("#faixaTeclas").hidden = false;
 }
 
@@ -2127,8 +2127,16 @@ const TROCAS_DO_CELULAR = [
 ];
 const PRECISA_TROCAR = /omputador|\bPC\b|onitor/;
 
-function trocarComputador(texto) {
-  return TROCAS_DO_CELULAR.reduce(function (atual, regra) { return atual.replace(regra[0], regra[1]); }, texto);
+function trocarComputador(texto, tambemPcEMonitor) {
+  // A regra do "computador" vale em toda a tela (e' a de sempre); "PC" e "monitor" so nos textos de ajuda das abas
+  // (explicam, opcoes), nunca em nome de jogo, de controle ou do aparelho (revisao de 26/10/2026).
+  const regras = tambemPcEMonitor ? TROCAS_DO_CELULAR : TROCAS_DO_CELULAR.slice(0, 1);
+  return regras.reduce(function (atual, regra) { return atual.replace(regra[0], regra[1]); }, texto);
+}
+
+function textoDeAjuda(no) {
+  const pai = no.nodeType === Node.ELEMENT_NODE ? no : no.parentElement;
+  return !!pai && !!pai.closest(".aba-conteudo, .explica, .opcao") && !pai.closest("#painelAparelho, #listaControlesLigados, .cartao");
 }
 
 function falarDeAparelho(raiz) {
@@ -2136,7 +2144,7 @@ function falarDeAparelho(raiz) {
   const elemento = comeco && (comeco.nodeType === Node.ELEMENT_NODE ? comeco : comeco.parentElement);
   if (!comeco || (elemento && elemento.closest("[data-manter-computador]"))) return;
   if (comeco.nodeType === Node.TEXT_NODE) {
-    const trocado = trocarComputador(comeco.nodeValue);
+    const trocado = trocarComputador(comeco.nodeValue, textoDeAjuda(comeco));
     if (trocado !== comeco.nodeValue) comeco.nodeValue = trocado;
     return;
   }
@@ -2157,7 +2165,7 @@ function falarDeAparelho(raiz) {
   });
   const textos = [];
   while (andarilho.nextNode()) textos.push(andarilho.currentNode);
-  for (const no of textos) no.nodeValue = trocarComputador(no.nodeValue);
+  for (const no of textos) no.nodeValue = trocarComputador(no.nodeValue, textoDeAjuda(no));
   if (!raiz && !falarDeAparelho.vigia && window.MutationObserver) {
     falarDeAparelho.vigia = new MutationObserver(function (mudancas) {
       for (const mudanca of mudancas) {

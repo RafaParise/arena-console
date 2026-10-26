@@ -28,6 +28,7 @@ import re
 import adb_aparelho as adb
 
 PADRAO_DO_CODIGO = re.compile(r"^[0-9]{4,12}$")
+_ligamos_o_servidor = False        # o servidor do adb (que guarda o `adb reverse`) foi ligado por este programa?
 
 
 def _lista(adb_caminho):
@@ -52,7 +53,12 @@ def abrir_no_celular(porta, codigo, serial=None, jogador=None):
         return resposta
     resposta["adb"] = origem
     try:
-        with adb.sessao(caminho):
+        global _ligamos_o_servidor
+        with adb.TRAVA_ADB:
+            # Sem adb.sessao(): ele derruba o servidor do adb ao sair, e o `adb reverse` vive nesse servidor (achado da
+            # revisao de 26/10/2026). Quem derruba, depois do cabo, e' soltar(), se foi o ARENA que o ligou.
+            if not adb.servidor_do_adb_de_pe():
+                _ligamos_o_servidor = True
             aparelhos = _lista(caminho)
             resposta["aparelhos"] = aparelhos
             prontos = [a for a in aparelhos if a["pronto"]]
@@ -98,18 +104,27 @@ def abrir_no_celular(porta, codigo, serial=None, jogador=None):
     return resposta
 
 
-def soltar(ligados):
+def soltar(ligados, ultimo=True):
     """Desfaz o cabo de cada (serial, porta) de 'ligados': o celular deixa de alcancar a porta deste computador. Tudo
-    sem levantar: se o celular ja saiu do cabo, nao ha o que desfazer."""
+    sem levantar: se o celular ja saiu do cabo, nao ha o que desfazer. 'ultimo': nao sobrou cabo nenhum; se foi o ARENA
+    que ligou o servidor do adb, ele o desliga (o ADB no pen drive nao pode ficar segurando a pasta)."""
+    global _ligamos_o_servidor
     caminho, _origem = adb.achar_adb()
-    if not caminho or not ligados:
+    if not caminho:
         return
     try:
-        with adb.sessao(caminho):
-            for serial, porta in ligados:
+        with adb.TRAVA_ADB:
+            for serial, porta in ligados or ():
                 try:
                     adb.executar(caminho, ["-s", serial, "reverse", "--remove", "tcp:%d" % porta], tempo=adb.TEMPO_DO_ADB)
                 except (OSError, TimeoutError):
                     pass
+            if ultimo and _ligamos_o_servidor and adb.servidor_do_adb_de_pe():
+                try:
+                    adb.executar(caminho, ["kill-server"], tempo=adb.TEMPO_DO_ADB)
+                except (OSError, TimeoutError):
+                    pass
+            if ultimo:
+                _ligamos_o_servidor = False
     except (OSError, TimeoutError):
         pass

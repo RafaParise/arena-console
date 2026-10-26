@@ -600,7 +600,8 @@ public class ArenaServico extends Service {
     JSONObject estatico = null;
 
     synchronized JSONObject aparelho() throws JSONException {
-        if (estatico == null) estatico = aparelhoQueNaoMuda();
+        // Nucleo desligado na hora da leitura da frequencia maxima grava 0: enquanto houver zero, le de novo.
+        if (estatico == null || temZero(estatico.optJSONArray("nucleos_mhz"))) estatico = aparelhoQueNaoMuda();
         JSONObject saida = new JSONObject(estatico.toString());
         JSONObject vivo = aoVivo();
         for (java.util.Iterator<String> chaves = vivo.keys(); chaves.hasNext();) {
@@ -608,6 +609,12 @@ public class ArenaServico extends Service {
             saida.put(chave, vivo.get(chave));
         }
         return saida;
+    }
+
+    static boolean temZero(JSONArray lista) {
+        if (lista == null) return false;
+        for (int i = 0; i < lista.length(); i++) if (lista.optLong(i) <= 0) return true;
+        return false;
     }
 
     JSONObject aparelhoQueNaoMuda() throws JSONException {

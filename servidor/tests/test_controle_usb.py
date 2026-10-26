@@ -33,7 +33,7 @@ class AdbDeMentira:
 def com_adb(falso):
     with mock.patch.object(adb, "achar_adb", return_value=("adb-falso", "teste")), \
             mock.patch.object(adb, "executar", side_effect=falso.executar), \
-            mock.patch.object(adb, "sessao", side_effect=lambda _c: contextlib.nullcontext()):
+            mock.patch.object(adb, "servidor_do_adb_de_pe", return_value=True):
         yield
 
 

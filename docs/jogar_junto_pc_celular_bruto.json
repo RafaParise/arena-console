@@ -1,0 +1,24 @@
+{
+  "hospeda": "celular",
+  "ip_celular": "192.168.18.4",
+  "ip_pc": "192.168.18.17",
+  "resposta_do_celular": {
+    "ok": true,
+    "erro": null,
+    "aviso": null,
+    "papel": "jogador 1"
+  },
+  "pc_vivo_depois": true,
+  "pc_netplay": [
+    "[WARN] [Netplay] ATENÇÃO: Um par da Netplay está executando uma versão diferente do núcleo. Se ocorrerem problemas, use a mesma versão.",
+    "[INFO] [Netplay] Conectado a: \"RafaParise\"",
+    "[INFO] [Netplay] Você se juntou como jogador 2 (ping: 2911 ms)"
+  ],
+  "celular_netplay": [],
+  "celular_jogo_em_andamento": {
+    "ativo": true,
+    "titulo": "Super Bomberman 4",
+    "id": "jogos/pessoais/super nintendo/super bomberman 4 (japan) [t-en by svambo v1.0].sfc"
+  },
+  "entrou_em_s": 22.2
+}

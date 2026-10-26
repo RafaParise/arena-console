@@ -66,6 +66,7 @@
   let tentativa = 0;
   let desistiu = false;
   let dados = { codigo: "", jogador: 2, apelido: "" };
+  let jogadorPedido = "";           // o jogador que veio no endereco (o cabo USB): a conexao automatica so vale para ele
   let pelaCabo = false;             // a pagina veio por 127.0.0.1: o cabo USB (menor atraso, e o navegador libera o sensor)
   const dedos = new Map();          // id do dedo -> {tipo, elemento, ...}
 
@@ -403,6 +404,7 @@
     if (location.hash || location.search) { try { history.replaceState(null, "", location.pathname); } catch (e) { /* segue */ } }
     pelaCabo = ["127.0.0.1", "localhost", "[::1]"].includes(location.hostname);
     $("#codigo").value = (params.get("c") || "").replace(/\D/g, "").slice(0, DIGITOS);
+    jogadorPedido = params.get("j") || "";
     const jogador = params.get("j") || guardar.ler("arena_ctl_jogador", "2");
     for (const radio of document.querySelectorAll("input[name=jogador]")) radio.checked = radio.value === jogador;
     $("#apelido").value = params.get("a") || guardar.ler("arena_ctl_apelido", "");
@@ -493,7 +495,13 @@
     if (new RegExp("^\\d{" + DIGITOS + "}$").test($("#codigo").value)) $("#conectar").focus(); else $("#codigo").focus();
     const pronto = liberados();
     // Veio do cabo USB com o codigo no endereco: o professor ja escolheu esta tela, entao conecta sem pedir mais um toque.
-    if (veioPeloEndereco) pronto.then(() => { if (!$("#entrada").hidden && !ws) $("#conectar").click(); });
+    if (veioPeloEndereco) {
+      pronto.then(() => {
+        const escolhido = document.querySelector("input[name=jogador]:checked");
+        // So conecta sozinha se o jogador que o professor pediu (j) continua liberado; senao deixa a escolha na tela.
+        if (!$("#entrada").hidden && !ws && escolhido && !escolhido.disabled && escolhido.value === jogadorPedido) $("#conectar").click();
+      });
+    }
   }
 
   // O computador diz quais jogadores o professor liberou para o celular (e quantos numeros tem o codigo).

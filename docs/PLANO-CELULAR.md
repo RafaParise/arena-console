@@ -613,7 +613,11 @@ ajustaveis, giroscopio; servidor Windows com driver ScpVbus para XInput; github.
 DroidJoy apresenta o celular como gamepad de verdade ao Windows **por um driver de kernel**: o ARENA nao instala driver nem
 pede administrador, entao o equivalente dele sem driver e' o Network RetroPad (jogos do ARENA) e, a fazer, o modo teclado por
 SendInput (so com o professor liberando, lista de teclas segura). Um gamepad XInput virtual para qualquer jogo exigiria o
-ViGEmBus (driver): fica de fora ate o Rafael decidir.
+ViGEmBus (driver): **o Rafael autorizou em 26/10/2026 e esta feito, como EXCECAO opcional** (`servidor\gamepad_virtual.py`,
+ctypes sobre o ViGEmClient.dll, MIT, em `servidor\vigem\`): so liga com o professor marcando, o ARENA nunca instala o driver
+(`winget install ViGEm.ViGEmBus`, administrador; o autor aposentou o ViGEmBus em 2023), vale para os jogadores 1 a 4 (o XInput
+so enxerga 4) e, ligado, o celular deixa de usar o Network RetroPad. Testado com o driver de verdade, lendo o gamepad de
+volta pelo XInput. O modo teclado/mouse (SendInput) ficou de fora: o gamepad virtual cobre quase todo jogo.
 
 **O que fica para depois:** o giroscópio (só dentro do app, por exigir contexto seguro), dados móveis (túnel) e a tela como
 controle dentro do app do Android.
