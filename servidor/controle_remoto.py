@@ -945,7 +945,10 @@ class ControleRemoto:
                             try:
                                 pad.atualizar(jogador, *estado)
                             except OSError:
-                                self._gamepad = None          # o driver sumiu: volta ao Network RetroPad
+                                with self._trava:
+                                    if self._gamepad is pad:
+                                        self._gamepad = None      # o driver sumiu: volta ao Network RetroPad
+                                pad.fechar()
                         else:
                             self.enviador.definir(jogador, *estado)
                         ultimo_estado = agora

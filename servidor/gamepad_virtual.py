@@ -14,6 +14,7 @@ escolhe correr. Nao vale para a maquina da escola sem administrador.
 import ctypes
 import os
 import sys
+import threading
 
 DLL = os.path.join(os.path.dirname(os.path.abspath(__file__)), "vigem", "ViGEmClient.dll")
 
@@ -48,6 +49,8 @@ class GamepadVirtual:
         self._lib = None
         self._cliente = None
         self._alvos = {}
+        self._trava = threading.Lock()   # cada jogador roda numa linha de execucao: o fechar nao pode cruzar com o atualizar
+        self._fechado = False
 
     def disponivel(self):
         """(ok, motivo): o driver e a DLL estao ai?"""
@@ -91,7 +94,12 @@ class GamepadVirtual:
         self._lib, self._cliente = lib, cliente
 
     def atualizar(self, jogador, botoes, eixos):
-        """Cria o gamepad do jogador na primeira vez e manda o estado."""
+        """Cria o gamepad do jogador na primeira vez e manda o estado. Depois de fechar(), nao faz nada (nao religa o driver)."""
+        with self._trava:
+            if not self._fechado:
+                self._atualizar(jogador, botoes, eixos)
+
+    def _atualizar(self, jogador, botoes, eixos):
         self._ligar()
         alvo = self._alvos.get(jogador)
         if alvo is None:
@@ -103,19 +111,26 @@ class GamepadVirtual:
         self._lib.vigem_target_x360_update(self._cliente, alvo, converter(botoes, eixos))
 
     def soltar(self, jogador):
-        if jogador in self._alvos:
-            self.atualizar(jogador, 0, [0, 0, 0, 0])
+        with self._trava:
+            if jogador in self._alvos and not self._fechado:
+                self._atualizar(jogador, 0, [0, 0, 0, 0])
 
     def remover(self, jogador):
+        with self._trava:
+            self._remover(jogador)
+
+    def _remover(self, jogador):
         alvo = self._alvos.pop(jogador, None)
         if alvo is not None and self._cliente:
             self._lib.vigem_target_remove(self._cliente, alvo)
             self._lib.vigem_target_free(alvo)
 
     def fechar(self):
-        for jogador in list(self._alvos):
-            self.remover(jogador)
-        if self._cliente:
-            self._lib.vigem_disconnect(self._cliente)
-            self._lib.vigem_free(self._cliente)
-            self._cliente = None
+        with self._trava:
+            self._fechado = True
+            for jogador in list(self._alvos):
+                self._remover(jogador)
+            if self._cliente:
+                self._lib.vigem_disconnect(self._cliente)
+                self._lib.vigem_free(self._cliente)
+                self._cliente = None
