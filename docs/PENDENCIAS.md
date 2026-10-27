@@ -225,6 +225,53 @@ Falta (nesta ordem):
 7. Mais acessórios: Game Boy Camera e Printer, e-Reader, cabo link (hoje só por rede no Gambatte), Wii Balance Board,
    EyeToy, Kinect... a lista com o motivo de cada um está no fim de `docs\ACESSORIOS.md`.
 
+## Rodada de 25 e 26/10/2026: o que foi feito e o que falta
+
+**Feito**
+
+- **O celular como controle do jogo do computador** (`servidor\controle_remoto.py`): pelo Wi-Fi, até 8 jogadores, o professor escolhe
+  quais jogadores o celular pode ser, a tela mostra o tempo de resposta, e o código tem três faixas de limite de erros e aviso ao
+  professor (o risco que sobra está escrito em `docs\PLANO-CELULAR.md`).
+- **Pelo cabo USB** (`servidor\controle_usb.py`): um botão abre o controle no celular já conectado; medido no A12, **4 a 6 ms** (o
+  Wi-Fi do mesmo celular oscila de 94 ms a mais de 1 s). Ajustes na tela do celular no estilo do GameSir Nexus e do DroidJoy: zona
+  morta, curva, diagonais, tamanho, canhoto, volante e 3 perfis.
+- **Gamepad Xbox 360 virtual** (`servidor\gamepad_virtual.py`), **opcional e autorizado por você em 26/10**: o celular vira um controle
+  de verdade para qualquer jogo do Windows. Exige o driver ViGEmBus (já instalado neste computador pelo `winget`); a DLL vem de
+  `ferramentas\baixar_vigem_client.py` (o repositório público não leva binário). Vale para os jogadores 1 a 4.
+- **Painel "Este celular" do Android**, um só e ao vivo: corrente da bateria em mA e potência em W, temperatura, calor segundo o
+  Android, saúde e capacidade, RAM e memória virtual em tempo real, núcleos do processador, Wi-Fi e controles ligados. Sem o que era
+  repetido; sem o que o aparelho não informa.
+- **Nenhuma tecla de PC no Android** (F2, F4, F9, F10, Esc, Alt+Tab, "monitor", driver, Xenia): a faixa do jogo mostra MENU, SAIR e
+  L3 + R3; `servidor\tests\test_textos_do_android.py` impede a volta.
+- **Combo do menu pelo controle corrigido**: o valor `2` é **L3 + R3** (os guias diziam Start + Select, que é o `4`).
+- **Jogar Junto entre celular e computador**, testado nos dois sentidos (Super Bomberman 4): com o Wi-Fi do app em modo de baixa
+  latência e com "o próximo lugar livre"; plano e medidas em `docs\PLANO-CELULAR.md`.
+- **Revisão independente** (4 revisores, um cético por achado): 14 achados confirmados e corrigidos.
+- **Testes refeitos** da rodada final: regra de ouro do multitap, PokketSX, capas, como colocar jogos, motor do PS2. Bateria do
+  servidor: 1130 testes OK; auditoria de acessibilidade da tela: 0 problemas.
+- **Publicação**: os APKs 2026.10.26 estão no mesmo release do 2026.10.22 (a página "Latest"), e a `main` recebeu tudo (avanço
+  simples, sem apagar nada).
+
+**O que falta**
+
+- **Controles de verdade** (você): GameSir T4 Nova Lite no celular e G7 HE no computador. Todos os testes desta rodada usaram
+  controles virtuais (`testes\controle_virtual_android.py`).
+- **Pacote novo do Windows**: o código do computador (controle pelo cabo, gamepad virtual, ajustes) está na `main`, mas o zip e a
+  atualização do Windows continuam os da 2026.10.22.
+- **Botão "Partida pelo cabo" no Jogar Junto**: hoje o cabo só está no script `testes\teste_jogar_junto_pc_celular.py --cabo`.
+- **Jogar Junto**: com 8 jogadores e o celular como um deles; num Linux de verdade; Wi-Fi do roteador (o celular está em 2,4 GHz e o
+  computador em 5 GHz, e a partida ainda caiu uma vez em 6 s: o cabo é o jeito firme).
+- **Chromebook**: o navegador não tem jogo em rede; o APK x86_64 no ChromeOS não foi testado num Chromebook de verdade; o teste do
+  Chromebook da escola segue na lista abaixo.
+- **Testes não refeitos**: `teste_matriz_consoles`, `teste_navegadores` (24 de 30) e `teste_android` (precisa do emulador).
+- **Volante**: o A12 não tem giroscópio, então o volante usa o acelerômetro e o sinal da inclinação não foi conferido girando o
+  celular de verdade.
+- **Não feitos, de propósito ou por prioridade**: modo teclado/mouse por SendInput (o gamepad virtual cobre quase todo jogo), aprovação
+  de cada celular pelo professor (a saída de verdade do limite de tentativas), modo de dados móveis com servidor-ponte, e a opção
+  de Android de 32 bits.
+- **Limpezas no celular**: apagar `/sdcard/ARENA/BIOS-PS2-teste` e, se você quiser, desinstalar o `com.armsx2`; o APK de teste foi
+  trocado pelo de produção.
+
 ## Depende do Rafael
 
 - **Acessórios (24/10/2026), o que só você faz:**

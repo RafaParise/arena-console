@@ -60,6 +60,14 @@ Ele nasceu nas aulas do curso técnico de **Desenvolvimento de Sistemas**
 | 🐧 **Também no Linux** | O mesmo pen drive abre no Linux (`sh ARENA.sh`), sem instalar nada e sem administrador: o mesmo ARENA, os 66 consoles e o mesmo save do Windows ([`docs/LINUX.md`](docs/LINUX.md)) |
 | 📱 **Também no Android** | O app do ARENA (o APK nos *Releases*): o mesmo servidor e a mesma tela, o Jogar Junto, os jogos e os saves da pasta do ARENA copiada para o aparelho ou no pen drive pelo cabo OTG ([`docs/ANDROID.md`](docs/ANDROID.md)) |
 
+## Novidades de 26/10/2026
+
+Acrescentado à versão 2026.10.22 (o que já existia continua valendo): o **app do Android 2026.10.26** (mesma página de download,
+[releases/latest](https://github.com/RafaParise/arena-console/releases/latest)), com o painel "Este celular" ao vivo e sem dica
+de teclado de PC; o **celular como controle** do jogo do computador (Wi-Fi, **cabo USB** de 4 a 6 ms, até 8 jogadores, ajustes e
+perfis) e, como opção que exige driver, o celular como **gamepad Xbox 360 virtual**; e o **Jogar Junto entre celular e computador**.
+O que foi feito e o que ainda falta: [docs/PENDENCIAS.md](docs/PENDENCIAS.md); guia do controle: [3-IMAGEM-SOM-CONTROLE.md](3-IMAGEM-SOM-CONTROLE.md).
+
 ## Baixar e usar
 
 1. Baixe o arquivo **`ARENA-2026.10.22.zip`** (uns 1.065 MB; descompactado, 2,6 GB) na página

@@ -266,3 +266,19 @@ livres do APK, e o de ZX81 abre, com imagem, e fecha pelo F10.
 Android mostra o aviso "Tela cheia: para sair, deslize de cima para baixo"
 e espera um toque em "Entendi"; até lá, o aviso fica na frente do jogo e
 pega as teclas. O aluno toca uma vez e ele não volta.
+
+## Atualização de 26/10/2026 (2026.10.26)
+
+APKs `ARENA-2026.10.26-arm64-v8a.apk` e `ARENA-2026.10.26-x86_64.apk`, **na página do release 2026.10.22** (a "Latest"); instalam por
+cima da versão que está no celular (mesma assinatura, `versionCode` 20261026). O que entrou:
+
+- **Ajustes → Máquina** é um painel só, ao vivo (`servidor\painel_do_aparelho.py`, lido pelo `ArenaServico.aparelho()`): corrente em mA
+  e potência em W, temperatura, calor segundo o Android (`PowerManager`), saúde e capacidade, RAM e memória virtual, núcleos, Wi-Fi
+  (permissão `ACCESS_WIFI_STATE`) e controles ligados na ordem dos jogadores. Só aparece o que o aparelho informa.
+- A tela não manda apertar tecla de PC (F2, F4, F9, F10, Esc): MENU, SAIR e **L3 + R3**. As abas Controles e Emuladores não falam de
+  driver, Windows, Xenia nem PS3.
+- Durante o jogo em rede, o app segura o **Wi-Fi em modo de baixa latência** (`WifiLock`, permissão `WAKE_LOCK`).
+- Aviso de **calor** nas barreiras e antes do jogo.
+- Jogar Junto com o computador testado nos dois sentidos; no celular, "o próximo lugar livre".
+
+Medidas e o que falta: `docs\PLANO-CELULAR.md` e `docs\PENDENCIAS.md`.
