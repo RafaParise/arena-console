@@ -36,6 +36,7 @@ fogao; outra pessoa passa os recados para o mural quando der.
 """
 import atexit
 import faulthandler
+import signal
 import os
 import queue
 import sys
@@ -71,10 +72,36 @@ def ligar_registro_de_queda(pasta_logs, versao=""):
                       % (versao, datetime.now().strftime("%d/%m/%Y %H:%M:%S")))
         arquivo.flush()
         faulthandler.enable(file=arquivo, all_threads=True)
+        # Fora do Windows (Linux, Android): `kill -USR1 <pid>` escreve aqui onde cada thread esta, sem derrubar o
+        # servidor. E' assim que se acha um ARENA parado (07/11/2026: o servidor do celular parava ao abrir).
+        if hasattr(faulthandler, "register") and hasattr(signal, "SIGUSR1"):
+            faulthandler.register(signal.SIGUSR1, file=arquivo, all_threads=True, chain=False)
         _registro_aberto[:] = [arquivo]
         return caminho
     except OSError:
         return None
+
+
+# Abertura demorada (07/11/2026): no celular, o servidor ficou minutos parado ao abrir, lendo o cartao SD devagar, e
+# nada dizia onde. Se a abertura passar deste tempo, o faulthandler escreve no registro de queda onde cada thread esta
+# (de novo a cada intervalo, ate a abertura acabar). Nao precisa de sinal nem derruba nada: e' uma thread do proprio
+# Python que escreve.
+ABERTURA_DEMORADA_S = 60
+
+
+def vigiar_abertura(segundos=ABERTURA_DEMORADA_S):
+    if _registro_aberto:
+        try:
+            faulthandler.dump_traceback_later(segundos, repeat=True, file=_registro_aberto[0])
+        except (OSError, ValueError, RuntimeError):
+            pass
+
+
+def abertura_terminou():
+    try:
+        faulthandler.cancel_dump_traceback_later()
+    except (OSError, ValueError, RuntimeError):
+        pass
 
 
 def desligar_edicao_rapida():

@@ -222,11 +222,14 @@ class Motores(unittest.TestCase):
             with open(arena, encoding="utf-8") as arquivo:
                 texto = arquivo.read()
             for numero in (0, 1):
-                self.assertIn("overlay%d_descs = 3" % numero, texto)
+                self.assertIn("overlay%d_descs = 5" % numero, texto)
                 self.assertIn('overlay%d_desc1 = "menu_toggle,' % numero, texto)
-                self.assertIn('overlay%d_desc2 = "exit_emulator,' % numero, texto)
-                self.assertIn('overlay%d_desc2_overlay = "img/arena-sair.png"' % numero, texto)
-            for imagem in ("arena-menu.png", "arena-sair.png"):
+                # SALVAR e CARREGAR (07/11/2026): o estado no celular sem o F2/F4 do computador
+                self.assertIn('overlay%d_desc2 = "save_state,' % numero, texto)
+                self.assertIn('overlay%d_desc3 = "load_state,' % numero, texto)
+                self.assertIn('overlay%d_desc4 = "exit_emulator,' % numero, texto)
+                self.assertIn('overlay%d_desc4_overlay = "img/arena-sair.png"' % numero, texto)
+            for imagem in ("arena-menu.png", "arena-salvar.png", "arena-carregar.png", "arena-sair.png"):
                 self.assertTrue(os.path.isfile(os.path.join(os.path.dirname(origem), "img", imagem)))
             # O de sempre fica intacto (o RetroArch do Android pode usa-lo).
             with open(origem, encoding="utf-8") as arquivo:

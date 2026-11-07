@@ -555,11 +555,19 @@ def motor_de_som_do_linux():
 # escrito. O SAIR pede confirmacao (o quit_press_twice do ARENA: "aperte de
 # novo para sair"), como o F10.
 PASTA_DO_TOQUE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "toque")
+# SALVAR e CARREGAR (pedido do Rafael, 07/11/2026: "os savestates nao funcionam"): no celular o estado so se salvava
+# pelo menu do jogo; o F2 e o F4 do computador nao existem ali. Os dois botoes usam o espaco atual (state_slot) e
+# guardam a foto de onde parou (savestate_thumbnail_enable).
+IMAGENS_DO_TOQUE = ("arena-menu.png", "arena-salvar.png", "arena-carregar.png", "arena-sair.png")
 BOTOES_DO_TOQUE = {
     # nome do desenho -> [(comando, x, y, metade da largura, metade da altura, imagem)]
-    "portrait": [("menu_toggle", 0.30, 0.47, 0.13, 0.024, "arena-menu.png"),
-                 ("exit_emulator", 0.70, 0.47, 0.13, 0.024, "arena-sair.png")],
+    "portrait": [("menu_toggle", 0.14, 0.47, 0.11, 0.022, "arena-menu.png"),
+                 ("save_state", 0.38, 0.47, 0.11, 0.022, "arena-salvar.png"),
+                 ("load_state", 0.62, 0.47, 0.11, 0.022, "arena-carregar.png"),
+                 ("exit_emulator", 0.86, 0.47, 0.11, 0.022, "arena-sair.png")],
     "landscape": [("menu_toggle", 0.15, 0.08, 0.06, 0.05, "arena-menu.png"),
+                  ("save_state", 0.36, 0.08, 0.06, 0.05, "arena-salvar.png"),
+                  ("load_state", 0.64, 0.08, 0.06, 0.05, "arena-carregar.png"),
                   ("exit_emulator", 0.85, 0.08, 0.06, 0.05, "arena-sair.png")],
 }
 
@@ -590,7 +598,7 @@ def controle_de_toque_do_arena(origem):
         if not extras:
             return None
         os.makedirs(os.path.join(pasta, "img"), exist_ok=True)
-        for imagem in ("arena-menu.png", "arena-sair.png"):
+        for imagem in IMAGENS_DO_TOQUE:
             with open(os.path.join(PASTA_DO_TOQUE, imagem), "rb") as arquivo:
                 dados = arquivo.read()
             alvo = os.path.join(pasta, "img", imagem)
@@ -614,7 +622,8 @@ def controle_de_toque_do_arena(origem):
 BOTOES_NA_TELA = ("automatico", "sempre", "nunca")
 
 
-def ajustes_do_android(opcoes, pasta_retroarch, filtro, teclado="", botoes="automatico"):
+def ajustes_do_android(opcoes, pasta_retroarch, filtro, teclado="", botoes="automatico", vibrar_celular=False,
+                       vibrar_ao_tocar=False):
     """O arquivo da partida no Android: ganha a tela de toque (o controle
     desenhado na tela, que some quando um controle de verdade e' ligado) e
     uma folga no som (o celular barato estala com menos de 64 ms; o padrao
@@ -641,6 +650,11 @@ def ajustes_do_android(opcoes, pasta_retroarch, filtro, teclado="", botoes="auto
         opcoes["input_overlay_hide_in_menu"] = "false"
     if teclado:
         opcoes["input_android_physical_keyboard"] = teclado
+    # O celular vibra como o controle (pedido do Rafael, 07/11/2026): o tremor que o jogo manda ao jogador 1 vai para o
+    # motor do proprio aparelho ("enable_device_vibration" do RetroArch do Android). E, a parte, um toque curto a cada
+    # botao da tela apertado ("vibrate_on_keypress"), como o celular faz no teclado.
+    opcoes["enable_device_vibration"] = "true" if vibrar_celular else "false"
+    opcoes["vibrate_on_keypress"] = "true" if vibrar_ao_tocar else "false"
     # O menu do jogo aceita toque (auditoria 4, 22/10/2026): o celular sem
     # teclado so saia do jogo fechando o app. Com o "Fechar" voltando ao
     # ARENA (graficos.VALORES_OBRIGATORIOS), sair e' o botao SAIR do controle

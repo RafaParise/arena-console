@@ -528,7 +528,7 @@ ATIVIDADE_DO_ARENA = '''        <activity android:configChanges="keyboard|keyboa
 '''
 
 
-def ajustar_manifesto(pasta, versao_nome, versao_codigo):
+def ajustar_manifesto(pasta, versao_nome, versao_codigo, teste=False):
     caminho = os.path.join(pasta, "AndroidManifest.xml")
     with open(caminho, encoding="utf-8") as arquivo:
         texto = arquivo.read()
@@ -575,6 +575,11 @@ def ajustar_manifesto(pasta, versao_nome, versao_codigo):
         if texto.count(velho) != 1:
             raise SystemExit("O AndroidManifest.xml do RetroArch mudou (nao achei %r). Nada foi montado." % velho[:60])
         texto = texto.replace(velho, novo)
+    if teste:
+        # So o APK de teste (07/11/2026): "depuravel" deixa o `adb shell run-as` ler os arquivos internos do app (o banco,
+        # a configuracao, o registro do servidor) quando ele trava no celular. O APK de verdade nunca sai assim.
+        texto = re.sub(r'\s+android:debuggable="[^"]*"', "", texto)
+        texto = texto.replace("<application ", '<application android:debuggable="true" ', 1)
     with open(caminho, "w", encoding="utf-8") as arquivo:
         arquivo.write(texto)
     os.makedirs(os.path.join(pasta, "res", "xml"), exist_ok=True)
@@ -659,7 +664,7 @@ def montar_apk(abi, teste, atualizar, trabalho):
     rodar([java(), "-jar", preparar_linux.baixado(APKTOOL), "d", "-s", "-f", "-o", pasta,
            preparar_linux.baixado(RETROARCH_APK)])
     versao, codigo = versao_do_arena()
-    ajustar_manifesto(pasta, "%s (RetroArch 1.22.2)" % versao.replace(" ", "_"), codigo)
+    ajustar_manifesto(pasta, "%s (RetroArch 1.22.2)" % versao.replace(" ", "_"), codigo, teste)
     for parte in FORA_DO_APK:
         if os.path.isdir(os.path.join(pasta, parte)):
             limpeza.apagar_pasta(os.path.join(pasta, parte))

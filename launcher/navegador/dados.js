@@ -85,7 +85,7 @@ window.ARENA_DADOS = {
   "savestate_auto_load": "false",
   "savestate_auto_save": "false",
   "savestate_max_keep": "0",
-  "savestate_thumbnail_enable": "false",
+  "savestate_thumbnail_enable": "true",
   "settings_show_accessibility": "false",
   "settings_show_achievements": "false",
   "settings_show_ai_service": "false",
@@ -915,7 +915,7 @@ window.ARENA_DADOS = {
    "rewind_buffer_size": "20",
    "run_ahead_frames": "1",
    "run_ahead_secondary_instance": "false",
-   "savestate_thumbnail_enable": "false",
+   "savestate_thumbnail_enable": "true",
    "slowmotion_ratio": "3.0",
    "video_driver": "automatico",
    "video_fullscreen": "true",
@@ -952,7 +952,9 @@ window.ARENA_DADOS = {
   "tema": "claro",
   "tipo_controle": "xbox360",
   "travar_teclas": false,
-  "ultra_desempenho": false
+  "ultra_desempenho": false,
+  "vibrar_ao_tocar": false,
+  "vibrar_o_celular": false
  },
  "consoles": [
   {

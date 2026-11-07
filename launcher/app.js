@@ -216,6 +216,8 @@ async function carregarEstado() {
   $("#listaEscalaTela").value = dados.config.escala_da_tela || "automatico";
   $("#listaFormatoImagem").value = dados.config.formato_da_imagem || "automatico";
   $("#listaBotoesNaTela").value = dados.config.botoes_na_tela || "automatico";
+  $("#chaveVibrarCelular").setAttribute("aria-pressed", dados.config.vibrar_o_celular ? "true" : "false");
+  $("#chaveVibrarAoTocar").setAttribute("aria-pressed", dados.config.vibrar_ao_tocar ? "true" : "false");
   explicarEscalaTela();
   explicarFormatoImagem();
   explicarBotoesNaTela();
@@ -5728,6 +5730,25 @@ function ligarEventos() {
       recado(falha.message, true);
     }
   });
+
+  // O celular vibra como o controle (07/11/2026): chaves gerais, valem em todo console no proximo jogo.
+  for (const [id, chave, ligado, desligado] of [
+    ["#chaveVibrarCelular", "vibrar_o_celular", "Pronto: o celular vibra junto com o jogo. Vale no próximo jogo.",
+      "Desligado: só o controle vibra."],
+    ["#chaveVibrarAoTocar", "vibrar_ao_tocar", "Pronto: cada botão da tela dá um toque. Vale no próximo jogo.",
+      "Desligado: os botões da tela não vibram."]]) {
+    $(id).addEventListener("click", async (evento) => {
+      const botao = evento.currentTarget;
+      const novo = botao.getAttribute("aria-pressed") !== "true";
+      try {
+        await salvarConfig({ [chave]: novo });
+        botao.setAttribute("aria-pressed", novo ? "true" : "false");
+        recado(novo ? ligado : desligado);
+      } catch (falha) {
+        recado(falha.message, true);
+      }
+    });
+  }
 
   $("#chaveAjusteDesempenho").addEventListener("click", async (evento) => {
     const botao = evento.currentTarget;

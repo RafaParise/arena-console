@@ -864,7 +864,10 @@ BASE_COMUM = {
     "video_black_frame_insertion": "0",
     "savestate_auto_save": "false",
     "savestate_auto_load": "false",
-    "savestate_thumbnail_enable": "false",
+    # A foto de onde parou (pedido do Rafael, 07/11/2026: "salvar fotos de onde parou como o RetroArch faz"):
+    # o RetroArch guarda uma imagem ao lado de cada estado, e o menu e a gaveta Saves a mostram. So custa
+    # na hora de salvar (alguns KB), nunca durante o jogo.
+    "savestate_thumbnail_enable": "true",
     "content_show_favorites": "false",
     "content_show_history": "false",
     "check_firmware_before_loading": "false",
@@ -1245,7 +1248,10 @@ AVANCADO_PADRAO = {
     "rewind_buffer_size": "20",
     "run_ahead_frames": "1",
     "run_ahead_secondary_instance": "false",
-    "savestate_thumbnail_enable": "false",
+    # A foto de onde parou (pedido do Rafael, 07/11/2026: "salvar fotos de onde parou como o RetroArch faz"):
+    # o RetroArch guarda uma imagem ao lado de cada estado, e o menu e a gaveta Saves a mostram. So custa
+    # na hora de salvar (alguns KB), nunca durante o jogo.
+    "savestate_thumbnail_enable": "true",
     # DESLIGADO de proposito. Ligado, o RetroArch pausa o jogo sempre que
     # a janela perde o foco - e em varias maquinas de escola a janela do
     # emulador nunca ganha o foco de verdade, porque o navegador do ARENA
@@ -1312,6 +1318,9 @@ def config_padrao():
         # Botoes na tela do Android (plataforma.BOTOES_NA_TELA, pedido de
         # 22/10/2026): "automatico" some com um controle de verdade ligado.
         "botoes_na_tela": "automatico",
+        # O celular vibra como o controle e a cada toque nos botoes da tela (07/11/2026). So valem no Android.
+        "vibrar_o_celular": False,
+        "vibrar_ao_tocar": False,
         # Desempenho que aprende (servidor/desempenho.py, pedido de
         # 22/10/2026): o console que ficou no limite ganha um degrau mais
         # leve na proxima partida, so no Automatico.
@@ -1489,6 +1498,9 @@ def ler_config_do_disco():
         config["formato_da_imagem"] = salvo["formato_da_imagem"]
     if salvo.get("botoes_na_tela") in plataforma_do_sistema.BOTOES_NA_TELA:
         config["botoes_na_tela"] = salvo["botoes_na_tela"]
+    for chave in ("vibrar_o_celular", "vibrar_ao_tocar"):
+        if chave in salvo:
+            config[chave] = bool(salvo[chave])
     if "ajuste_pelo_desempenho" in salvo:
         config["ajuste_pelo_desempenho"] = bool(salvo["ajuste_pelo_desempenho"])
     if salvo.get("navegador") in NAVEGADORES_ACEITOS:
@@ -1885,7 +1897,10 @@ ULTRA_DESEMPENHO = {
     "fps_show": "false",
     "rewind_enable": "false",
     "run_ahead_enabled": "false",
-    "savestate_thumbnail_enable": "false",
+    # A foto de onde parou (pedido do Rafael, 07/11/2026: "salvar fotos de onde parou como o RetroArch faz"):
+    # o RetroArch guarda uma imagem ao lado de cada estado, e o menu e a gaveta Saves a mostram. So custa
+    # na hora de salvar (alguns KB), nunca durante o jogo.
+    "savestate_thumbnail_enable": "true",
     "savestate_auto_save": "false",
     "check_firmware_before_loading": "false",
 
@@ -2143,7 +2158,9 @@ def gravar_override(config, custo=None, extras=None, em_partida=False,
         import ponte_android
         filtro = plataforma_do_sistema.ajustes_do_android(opcoes, PASTA_RETROARCH, filtro,
                                                           teclado=ponte_android.teclado_fisico(),
-                                                          botoes=config.get("botoes_na_tela", "automatico"))
+                                                          botoes=config.get("botoes_na_tela", "automatico"),
+                                                          vibrar_celular=bool(config.get("vibrar_o_celular")),
+                                                          vibrar_ao_tocar=bool(config.get("vibrar_ao_tocar")))
 
     linhas = ["# Gerado pelo ARENA. Nao edite a mao: sera reescrito."]
     # Nenhum valor pode quebrar a linha nem fechar as aspas antes da hora:
@@ -5273,7 +5290,7 @@ class Manipulador(BaseHTTPRequestHandler):
             # Host do proprio tunel (um site no navegador do aparelho que fizesse DNS rebinding nao passa).
             if caminho in ROTAS_DA_PORTA_DOS_COLEGAS and self.host_confiavel():
                 return True
-            self.erro("Esta porta só recebe o aviso da partida pelo cabo.", 403)
+            self.erro("Esta porta só recebe o aviso da partida pelo cabo. Abra o ARENA pela tela dele, no endereço de sempre.", 403)
             return False
         if self.pedido_e_local():
             # Pedido deste computador: so aceita se veio da nossa tela, e nao
@@ -7221,6 +7238,9 @@ class Manipulador(BaseHTTPRequestHandler):
                 config["formato_da_imagem"] = dados["formato_da_imagem"]
             if dados.get("botoes_na_tela") in plataforma_do_sistema.BOTOES_NA_TELA:
                 config["botoes_na_tela"] = dados["botoes_na_tela"]
+            for chave in ("vibrar_o_celular", "vibrar_ao_tocar"):
+                if chave in dados:
+                    config[chave] = bool(dados[chave])
             if "ajuste_pelo_desempenho" in dados:
                 config["ajuste_pelo_desempenho"] = bool(dados["ajuste_pelo_desempenho"])
             if dados.get("navegador") in NAVEGADORES_ACEITOS:
@@ -8188,6 +8208,7 @@ def principal():
     # Janela preta: registro da queda, Edicao Rapida desligada e recados que
     # nunca travam o servidor (servidor\janela_preta.py, achado de 02/10/2026).
     janela_preta.preparar(os.path.join(PASTA_DADOS, "logs"), VERSAO)
+    janela_preta.vigiar_abertura()       # abertura com mais de 60 s: o registro de queda diz onde parou
     print("=" * 62)
     print("  ARENA %s - servidor local" % VERSAO)
     print("=" * 62)
@@ -8375,6 +8396,7 @@ def principal():
         # (auditoria 3, Fase 2: a abertura ficou 1 s mais curta).
         threading.Thread(target=abrir_janela, args=(local,), daemon=True).start()
 
+    janela_preta.abertura_terminou()
     try:
         with TRAVA_REDE:
             SERVIDOR_ATUAL["servidor"] = servidor

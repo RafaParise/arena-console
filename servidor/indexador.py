@@ -618,18 +618,62 @@ def capas_do_jogo(caminho_absoluto, pasta_atual, titulo, nome_banco=None, sozinh
     if nome_banco:
         nomes.append(re.sub(r'[&*/:`<>?\\|"]', "_", nome_banco))
     miniaturas = os.path.join(RAIZ, "retroarch", "thumbnails")
-    if os.path.isdir(miniaturas):
-        # .jpg tambem: a capa oficial do Xbox 360 vem assim (02/10/2026).
-        for sistema in os.listdir(miniaturas):
-            arte = next((os.path.join(miniaturas, sistema, "Named_Boxarts", n + extensao)
-                         for n in nomes for extensao in (".png", ".jpg")
-                         if os.path.isfile(os.path.join(miniaturas, sistema, "Named_Boxarts", n + extensao))),
-                        None)
-            if arte:
-                achados.append(arte)
-                break
+    # .jpg tambem: a capa oficial do Xbox 360 vem assim (02/10/2026). A lista das capas baixadas vem da memoria
+    # (miniaturas_baixadas): perguntar ao disco, jogo por jogo, se cada nome existe travava o celular na abertura.
+    for sistema, arquivos in miniaturas_baixadas(miniaturas):
+        arte = next((os.path.join(miniaturas, sistema, "Named_Boxarts", arquivos[_chave_do_arquivo(n + extensao)])
+                     for n in nomes for extensao in (".png", ".jpg")
+                     if _chave_do_arquivo(n + extensao) in arquivos), None)
+        if arte:
+            achados.append(arte)
+            break
 
     return [os.path.relpath(a, RAIZ).replace("\\", "/") for a in achados[:3]]
+
+
+# As capas baixadas (retroarch/thumbnails/<sistema>/Named_Boxarts), lidas UMA vez por varredura (07/11/2026).
+# Antes, para cada jogo, o ARENA listava as ~30 pastas e perguntava ao disco se existia cada nome possivel (ate ~170
+# perguntas por jogo). No Windows isso e' instantaneo; no Android cada pergunta passa pelo servico de armazenamento do
+# aparelho, e com ~6 mil arquivos no cartao SD a abertura ficava MINUTOS parada em "Abrindo o ARENA" (visto no A12).
+_MINIATURAS = {"pasta": None, "lista": None}
+
+
+def _chave_do_arquivo(nome):
+    # O Windows nao diferencia maiusculas no nome do arquivo (o isfile de antes achava "mario.png" para "Mario.png");
+    # o Linux e o Android diferenciam.
+    return nome.casefold() if os.name == "nt" else nome
+
+
+def esquecer_miniaturas():
+    """A proxima busca de capa le de novo as pastas (comeco de cada varredura; capa nova baixada)."""
+    _MINIATURAS["pasta"] = _MINIATURAS["lista"] = None
+
+
+def miniaturas_baixadas(miniaturas):
+    """[(sistema, {chave do nome: nome do arquivo})], na ordem do os.listdir, como a busca de antes. Cada pasta de
+    capas e' lida uma vez so (os.scandir: o tipo do arquivo vem junto, sem perguntar de novo ao disco)."""
+    if _MINIATURAS["pasta"] == miniaturas and _MINIATURAS["lista"] is not None:
+        return _MINIATURAS["lista"]
+    lista = []
+    try:
+        sistemas = os.listdir(miniaturas)
+    except OSError:
+        sistemas = []
+    for sistema in sistemas:
+        arquivos = {}
+        try:
+            with os.scandir(os.path.join(miniaturas, sistema, "Named_Boxarts")) as itens:
+                for item in itens:
+                    try:
+                        if item.is_file():
+                            arquivos.setdefault(_chave_do_arquivo(item.name), item.name)
+                    except OSError:
+                        continue
+        except OSError:
+            pass
+        lista.append((sistema, arquivos))
+    _MINIATURAS["pasta"], _MINIATURAS["lista"] = miniaturas, lista
+    return lista
 
 
 RE_NOME_DO_GAMEBASE = re.compile(r"^Name:[ \t]*(\S.*?)\s*$", re.M)
@@ -1121,6 +1165,7 @@ def indexar(forcar=False):
     Com forcar=False, reaproveita o catalogo salvo se nada mudou nas pastas.
     """
     assinatura = assinatura_das_pastas()
+    esquecer_miniaturas()          # capas baixadas desde a ultima varredura entram
 
     if not forcar:
         salvo = ler_manifesto_salvo()
