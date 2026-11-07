@@ -19,7 +19,7 @@
   const AJUSTES_PADRAO = { modo: "direcional", zona: 12, curva: "linear", diagonal: 38, escala: 100, canhoto: false,
                            inclinar: false, inverterInclinacao: false };
   let ajustes = Object.assign({}, AJUSTES_PADRAO);
-  const inclinacao = { eixo: 0, zero: 0, angulo: 0 };          // o volante: o eixo de agora e a posicao "reta"
+  const inclinacao = { eixo: 0, zero: 0, angulo: 0, suave: null };          // o volante: o eixo de agora e a posicao "reta"
 
   // ==== contas puras (testadas em servidor/tests/test_contas_do_controle.py, com o Node.js) ====
   // Zona morta e curva do analogico (o que o GameSir Nexus chama de "dead zone" e curva de resposta). (nx, ny) e' a
@@ -55,6 +55,19 @@
   function eixoDaInclinacao(angulo, maximo, zona, curva, inverter) {
     const n = Math.max(-1, Math.min(1, angulo / maximo)) * (inverter ? -1 : 1);
     return Math.round(aplicarZonaECurva(n, 0, zona, curva)[0] * 32767);
+  }
+  // O giro do celular deitado (em graus; 0 = reto, positivo = horario) a partir da gravidade que o acelerometro mede
+  // (gx, gy: o plano da tela). 'lado' e' o angulo da tela (90 = deitado para a esquerda, 270 = para a direita). Celular
+  // quase de bruços na mesa (pouca gravidade no plano da tela) nao tem "giro": devolve null em vez de um numero que pula.
+  function giroDoCelular(gx, gy, lado) {
+    if (Math.hypot(gx, gy) < 3) return null;
+    const sinal = lado === 270 ? -1 : 1;
+    return Math.atan2(sinal * gy, sinal * gx) * 180 / Math.PI;
+  }
+
+  // Suaviza o tremor da mao: 'fator' perto de 1 segue o celular depressa, perto de 0 amortece (0,35 e' um meio-termo).
+  function suavizar(anterior, novo, fator) {
+    return anterior === null || anterior === undefined ? novo : anterior + (novo - anterior) * fator;
   }
   // ==== fim das contas puras ====
 
@@ -362,8 +375,14 @@
     const g = e.accelerationIncludingGravity;
     if (!g || typeof g.x !== "number" || typeof g.y !== "number") return;
     const lado = screen.orientation ? screen.orientation.angle : (typeof window.orientation === "number" ? (window.orientation + 360) % 360 : 90);
-    const sinal = lado === 270 ? -1 : 1;             // deitado para a esquerda (90) ou para a direita (270)
-    inclinacao.angulo = Math.atan2(sinal * g.y, sinal * g.x) * 180 / Math.PI;
+    const giro = giroDoCelular(g.x, g.y, lado);                  // null: o celular esta deitado na mesa, sem giro que valha
+    if (giro === null) {
+      if (inclinacao.eixo !== 0) { inclinacao.eixo = 0; recalcular(); }
+      return;
+    }
+    // Celular com giroscopio: o Chrome ja mistura os sensores no mesmo evento; o acelerometro basta e serve em todo celular.
+    inclinacao.angulo = suavizar(inclinacao.suave, giro, 0.35);
+    inclinacao.suave = inclinacao.angulo;
     if (calibrar) { inclinacao.zero = inclinacao.angulo; calibrar = false; }
     const eixo = $("#menu").hidden ? eixoDaInclinacao(inclinacao.angulo - inclinacao.zero, 40, ajustes.zona / 100, ajustes.curva, ajustes.inverterInclinacao) : 0;
     if (Math.abs(eixo - inclinacao.eixo) >= 256 || (eixo === 0) !== (inclinacao.eixo === 0)) { inclinacao.eixo = eixo; recalcular(); }

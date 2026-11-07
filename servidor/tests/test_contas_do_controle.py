@@ -112,5 +112,34 @@ class OVolante(unittest.TestCase):
         self.assertGreater(self.eixo(10, zona=0.1), 0)
 
 
+@unittest.skipUnless(NODE, "sem o Node.js nesta maquina")
+class OGiroDoCelular(unittest.TestCase):
+    G = 9.81
+
+    def giro(self, graus, lado=90):
+        x, y = self.G * math.cos(math.radians(graus)), self.G * math.sin(math.radians(graus))
+        if lado == 270:
+            x, y = -x, -y
+        return rodar("giroDoCelular(%s, %s, %s)" % (x, y, lado))
+
+    def test_reto_e_zero_nos_dois_lados(self):
+        for lado in (90, 270):
+            self.assertAlmostEqual(self.giro(0, lado), 0, places=5)
+
+    def test_girar_no_sentido_horario_e_positivo_nos_dois_lados(self):
+        for lado in (90, 270):
+            self.assertAlmostEqual(self.giro(25, lado), 25, places=5)
+            self.assertAlmostEqual(self.giro(-40, lado), -40, places=5)
+
+    def test_celular_deitado_na_mesa_nao_tem_giro(self):
+        self.assertIsNone(rodar("giroDoCelular(0.3, -0.4, 90)"))          # so a gravidade da tela para cima: z = 9,8
+        self.assertIsNone(rodar("giroDoCelular(2, 2, 270)"))              # 2,8 m/s2 no plano: ainda quase deitado
+
+    def test_suavizar(self):
+        self.assertEqual(rodar("suavizar(null, 30, 0.35)"), 30)           # a primeira leitura vale inteira
+        self.assertAlmostEqual(rodar("suavizar(0, 20, 0.35)"), 7)
+        self.assertEqual(rodar("suavizar(10, 10, 0.35)"), 10)
+
+
 if __name__ == "__main__":
     unittest.main()
