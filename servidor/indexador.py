@@ -218,13 +218,14 @@ def aviso_da_bios_neo_geo(pasta, nucleo):
     do jogo e so por esse nome (provado em 02/10/2026: com neogeo.mame.zip ao
     lado, "000-lo.lo NOT FOUND"; renomeado para neogeo.zip, achou). O FBNeo
     tambem acha em retroarch\\system. None se esta tudo certo."""
-    try:
-        nomes = os.listdir(pasta)
-    except OSError:
+    # A pasta e a do sistema, lidas uma vez por varredura (_nomes_da_pasta): antes, cada jogo de Neo Geo listava a
+    # pasta inteira de novo, e no cartao do celular isso somava minutos (07/11/2026).
+    if not os.path.isdir(pasta):
         return None
+    nomes = list(_nomes_da_pasta(pasta).values())
     if any(n.lower() == "neogeo.zip" for n in nomes):
         return None
-    if nucleo == "fbneo" and os.path.isfile(os.path.join(RAIZ, "retroarch", "system", "neogeo.zip")):
+    if nucleo == "fbneo" and _chave_do_arquivo("neogeo.zip") in _nomes_da_pasta(os.path.join(RAIZ, "retroarch", "system")):
         return None
     errado = next((n for n in sorted(nomes) if re.match(r"^neogeo[ ._-].+\.(zip|7z)$", n, re.I)), None)
     if errado:
@@ -572,7 +573,7 @@ CAPAS_DA_PASTA = ("cover", "folder", "boxart", "capa", "front")
 
 
 def capas_do_jogo(caminho_absoluto, pasta_atual, titulo, nome_banco=None, sozinho_na_pasta=False,
-                  outros_titulos=()):
+                  outros_titulos=(), arquivos_da_pasta=None):
     """Procura a arte do jogo em quatro lugares, do mais especifico ao geral.
 
     1. Um arquivo com o MESMO nome do jogo, na mesma pasta:
@@ -584,15 +585,23 @@ def capas_do_jogo(caminho_absoluto, pasta_atual, titulo, nome_banco=None, sozinh
     4. As miniaturas que o proprio RetroArch baixa, se existirem.
 
     Devolve caminhos que a tela pede ao servidor, nunca ao disco direto.
+
+    'arquivos_da_pasta': os nomes que o os.walk ja leu de pasta_atual (a varredura passa). Com eles, a busca nao
+    pergunta ao disco arquivo por arquivo: no Android cada pergunta passa pelo servico de armazenamento, e com milhares
+    de jogos no cartao a abertura levava minutos (07/11/2026).
     """
     base = os.path.splitext(os.path.basename(caminho_absoluto))[0]
     achados = []
 
     for onde in (pasta_atual, os.path.join(pasta_atual, PASTA_CAPAS)):
+        if onde == pasta_atual and arquivos_da_pasta is not None:
+            nomes_aqui = _nomes_em_memoria(onde, arquivos_da_pasta)
+        else:
+            nomes_aqui = _nomes_da_pasta(onde)
         for extensao in CAPAS_EXTENSOES:
-            candidato = os.path.join(onde, base + extensao)
-            if os.path.isfile(candidato):
-                achados.append(candidato)
+            nome = nomes_aqui.get(_chave_do_arquivo(base + extensao))
+            if nome:
+                achados.append(os.path.join(onde, nome))
     if sozinho_na_pasta and not achados:
         try:
             nomes = {nome.casefold(): nome for nome in os.listdir(pasta_atual)}
@@ -647,6 +656,42 @@ def _chave_do_arquivo(nome):
 def esquecer_miniaturas():
     """A proxima busca de capa le de novo as pastas (comeco de cada varredura; capa nova baixada)."""
     _MINIATURAS["pasta"] = _MINIATURAS["lista"] = None
+    _PASTAS_LIDAS.clear()
+
+
+# As pastas ja lidas nesta varredura (a subpasta "capas" de cada pasta de jogos): {pasta: {chave: nome}}.
+_PASTAS_LIDAS = {}
+_EM_MEMORIA = {}
+
+
+def _nomes_em_memoria(pasta, arquivos):
+    """{chave do nome: nome} dos arquivos que o os.walk ja leu (guardado por pasta: varios jogos na mesma pasta)."""
+    guardado = _EM_MEMORIA.get(pasta)
+    if guardado is None or guardado[0] is not arquivos:
+        guardado = (arquivos, {_chave_do_arquivo(n): n for n in arquivos})
+        _EM_MEMORIA.clear()                 # so a pasta da vez: a varredura anda pasta por pasta
+        _EM_MEMORIA[pasta] = guardado
+    return guardado[1]
+
+
+def _nomes_da_pasta(pasta):
+    """{chave do nome: nome} dos arquivos de uma pasta, lida uma vez so por varredura ({} se ela nao existe)."""
+    if pasta not in _PASTAS_LIDAS:
+        nomes = {}
+        try:
+            with os.scandir(pasta) as itens:
+                for item in itens:
+                    try:
+                        if item.is_file():
+                            nomes.setdefault(_chave_do_arquivo(item.name), item.name)
+                    except OSError:
+                        continue
+        except OSError:
+            pass
+        if len(_PASTAS_LIDAS) > 4096:       # nao cresce sem fim numa colecao enorme
+            _PASTAS_LIDAS.clear()
+        _PASTAS_LIDAS[pasta] = nomes
+    return _PASTAS_LIDAS[pasta]
 
 
 def miniaturas_baixadas(miniaturas):
@@ -704,7 +749,28 @@ def sozinho_na_pasta(pasta_atual, caminho_pasta, nome_arquivo, arquivos):
     if os.path.normcase(os.path.abspath(pasta_atual)) == os.path.normcase(os.path.abspath(caminho_pasta)):
         return False
     extensao = os.path.splitext(nome_arquivo)[1].lower()
-    return sum(1 for nome in arquivos if nome.lower().endswith(extensao)) == 1
+    if not extensao:
+        return len(arquivos) == 1
+    return _quantos_com_extensao(arquivos).get(extensao, 0) == 1
+
+
+# Quantos arquivos de cada extensao a pasta tem, contados UMA vez por pasta (07/11/2026): antes, cada jogo contava a
+# pasta inteira de novo; na pasta do Super Nintendo do cartao (milhares de jogos) isso era milhoes de contas e a
+# abertura do celular passava de um minuto so aqui.
+_CONTAGEM = {"lista": None, "por_extensao": {}}
+
+
+def _quantos_com_extensao(arquivos):
+    if _CONTAGEM["lista"] is not arquivos:
+        por_extensao = {}
+        for nome in arquivos:
+            minusculo = nome.lower()
+            # a mesma regra do endswith de antes: "x.tar.gz" conta para ".gz" (o splitext tambem da ".gz")
+            ponto = minusculo.rfind(".")
+            if ponto >= 0:
+                por_extensao[minusculo[ponto:]] = por_extensao.get(minusculo[ponto:], 0) + 1
+        _CONTAGEM["lista"], _CONTAGEM["por_extensao"] = arquivos, por_extensao
+    return _CONTAGEM["por_extensao"]
 
 
 def ler_manuais():
@@ -1093,7 +1159,7 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None,
                                        sozinho_na_pasta=sozinho_na_pasta(pasta_atual, caminho_pasta,
                                                                          nome_arquivo, arquivos),
                                        outros_titulos=(titulo_do_arquivo,) if titulo_do_arquivo != titulo
-                                       else ()),
+                                       else (), arquivos_da_pasta=arquivos),
                 # Fliperama: o nome curto do arquivo e o nome completo do
                 # banco (a busca de capa usa o completo).
                 "romset": romset,
