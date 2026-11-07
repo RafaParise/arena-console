@@ -308,9 +308,11 @@ Falta (nesta ordem):
 - **APK e pacote do Windows novos e a página do release**: só depois do teste acima.
 - Da rodada anterior: 8 jogadores e Linux de verdade, `teste_matriz_consoles`, `teste_navegadores`, `teste_android`, modo de dados
   móveis, controles de verdade.
-- **Pedidos antigos sem sinal de feito** (achados na revisão de todos os pedidos, 07/11): tela do celular na TV e orientação em pé e
-  deitado escolhida pelo aluno (24/10); Deadly Alliance lento (24/10); o modo claro piscando ao abrir o jogo (24/10); o pedido do
-  Donkey Kong com a Dixie e o bebê (21/10). Ficam para a próxima rodada, nesta ordem.
+- **Pedidos antigos conferidos na revisão de todos os pedidos (07/11)**: o clarão do tema claro ao abrir o jogo (24/10) já
+  estava resolvido (a856884: fundo preto na tela do jogo e abertura do Android 12 preta e sem ícone), e a turma do Donkey Kong com
+  a Dixie e o bebê (21/10) já está no fundo animado. Faltam, e dependem do celular: **em pé e deitado do jeito que o aluno quiser,
+  com a tela espelhada na TV** (Smart View/Miracast; 24/10) e o **Deadly Alliance lento no A12** (24/10; o PS2 pede mais do que o
+  processador dele dá, então a meta é medir e achar o melhor ajuste, sem prometer velocidade cheia).
 
 ## Depende do Rafael
 
