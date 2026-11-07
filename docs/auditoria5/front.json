@@ -1,6 +1,6 @@
 {
  "axe": "4.10.2",
- "feito_em": "2026-10-26 20:37",
+ "feito_em": "2026-11-07 11:17",
  "telas": [
   {
    "estouro_horizontal_px": 0,
@@ -177,7 +177,7 @@
     ]
    },
    "contraste": {
-    "medidos": 56,
+    "medidos": 58,
     "nao_medido": {
      "fundo_com_imagem": 14,
      "fundo_translucido": 0,
@@ -982,7 +982,7 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
-    "total": 9,
+    "total": 10,
     "amostra": [
      "button#btnVerAnimacao 42x33",
      "input#campoBusca 336x35",
@@ -993,7 +993,7 @@
     ]
    },
    "contraste": {
-    "medidos": 29,
+    "medidos": 30,
     "nao_medido": {
      "fundo_com_imagem": 11,
      "fundo_translucido": 0,
@@ -1503,7 +1503,7 @@
     ]
    },
    "contraste": {
-    "medidos": 64,
+    "medidos": 66,
     "nao_medido": {
      "fundo_com_imagem": 6,
      "fundo_translucido": 0,
@@ -2308,7 +2308,7 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
-    "total": 9,
+    "total": 10,
     "amostra": [
      "button#btnVerAnimacao 42x33",
      "input#campoBusca 336x35",
@@ -2319,7 +2319,7 @@
     ]
    },
    "contraste": {
-    "medidos": 34,
+    "medidos": 35,
     "nao_medido": {
      "fundo_com_imagem": 6,
      "fundo_translucido": 0,
@@ -2829,7 +2829,7 @@
     ]
    },
    "contraste": {
-    "medidos": 62,
+    "medidos": 64,
     "nao_medido": {
      "fundo_com_imagem": 167,
      "fundo_translucido": 0,
@@ -3634,7 +3634,7 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
-    "total": 96,
+    "total": 97,
     "amostra": [
      "button#btnVerAnimacao 42x33",
      "button#btnPerfil 54x33",
@@ -3645,7 +3645,7 @@
     ]
    },
    "contraste": {
-    "medidos": 35,
+    "medidos": 36,
     "nao_medido": {
      "fundo_com_imagem": 164,
      "fundo_translucido": 0,
@@ -4155,7 +4155,7 @@
     ]
    },
    "contraste": {
-    "medidos": 212,
+    "medidos": 214,
     "nao_medido": {
      "fundo_com_imagem": 17,
      "fundo_translucido": 0,
@@ -4960,7 +4960,7 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
-    "total": 96,
+    "total": 97,
     "amostra": [
      "button#btnVerAnimacao 42x33",
      "button#btnPerfil 54x33",
@@ -4971,7 +4971,7 @@
     ]
    },
    "contraste": {
-    "medidos": 182,
+    "medidos": 183,
     "nao_medido": {
      "fundo_com_imagem": 17,
      "fundo_translucido": 0,

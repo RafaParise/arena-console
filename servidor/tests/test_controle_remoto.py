@@ -726,6 +726,21 @@ class AsRotasDoArena(unittest.TestCase):
         self.arena.Manipulador.api_post(falso, "/api/controle-remoto/jogadores", {"jogadores": "todos"})
         self.assertEqual(falso.respostas[-1][0], "erro")
 
+    def test_a_partida_pelo_cabo_responde_ligado_sem_derrubar_a_tela(self):
+        self.assertNotIn("/api/partida/cabo", self.arena.ROTAS_REDE_EXTERNA)        # so de quem esta na frente da tela
+        resposta = {"ok": False, "dica": "Há 2 celulares no cabo. Escolha em qual jogar.", "aparelhos": [1, 2],
+                    "erro": None, "endereco": None}
+        with mock.patch.object(self.arena.controle_usb, "ligar_partida", return_value=resposta) as ligar:
+            falso = FalsoManipulador()
+            self.arena.Manipulador.api_post(falso, "/api/partida/cabo", {"papel": "hospedar", "serial": 7})
+        ligar.assert_called_once_with("hospedar", None)             # serial que nao e' texto nem chega ao adb
+        tipo, corpo = falso.respostas[-1]
+        self.assertEqual((tipo, corpo["ok"], corpo["ligado"], corpo["aparelhos"]), ("json", True, False, [1, 2]))
+        with mock.patch.object(self.arena.plataforma_do_sistema, "ANDROID", True):
+            falso = FalsoManipulador()
+            self.arena.Manipulador.api_post(falso, "/api/partida/cabo", {"papel": "hospedar"})
+        self.assertEqual(falso.respostas[-1][0], "erro")
+
     def test_no_android_nao_liga(self):
         with mock.patch.object(self.arena.plataforma_do_sistema, "ANDROID", True):
             for rota, post in (("/api/controle-remoto", False), ("/api/controle-remoto/ligar", True)):

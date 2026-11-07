@@ -114,5 +114,137 @@ class ODesligar(unittest.TestCase):
         self.assertIn("Ligue", r["erro"])
 
 
+class APartidaPeloCabo(unittest.TestCase):
+    """Jogar Junto pelo cabo (controle_usb.ligar_partida): a partida do RetroArch e o "cheguei" vao dentro do cabo."""
+
+    def setUp(self):
+        usb._partida = None
+        usb._controle_ligado = False
+        usb._ligamos_o_servidor = False
+
+    tearDown = setUp
+
+    def test_quem_abre_a_partida_faz_reverse_das_duas_portas(self):
+        falso = AdbDeMentira(LISTA_UM)
+        with com_adb(falso):
+            r = usb.ligar_partida("hospedar")
+        self.assertTrue(r["ok"], r)
+        self.assertEqual(r["endereco"], "127.0.0.1:18777")
+        ligacoes = [c for c in falso.chamadas if "reverse" in c]
+        self.assertEqual(ligacoes, [["-s", "ABC12345", "reverse", "tcp:55435", "tcp:55435"],
+                                    ["-s", "ABC12345", "reverse", "tcp:18777", "tcp:8777"]])
+        self.assertEqual(usb.partida_ligada(), ("ABC12345", "reverse"))
+
+    def test_quem_entra_na_partida_do_celular_faz_forward(self):
+        falso = AdbDeMentira(LISTA_UM)
+        with com_adb(falso):
+            for papel in ("entrar", "assistir"):
+                self.assertTrue(usb.ligar_partida(papel)["ok"])
+        ligacoes = [c for c in falso.chamadas if "forward" in c and "--remove" not in c]
+        self.assertEqual(ligacoes[0], ["-s", "ABC12345", "forward", "tcp:55435", "tcp:55435"])
+        self.assertEqual(ligacoes[1], ["-s", "ABC12345", "forward", "tcp:18777", "tcp:8777"])
+        # a segunda partida trocou a primeira: as duas portas da primeira foram tiradas antes
+        remocoes = [c for c in falso.chamadas if "--remove" in c]
+        self.assertEqual(remocoes, [["-s", "ABC12345", "forward", "--remove", "tcp:55435"],
+                                    ["-s", "ABC12345", "forward", "--remove", "tcp:18777"]])
+
+    def test_soltar_tira_as_duas_portas_e_so_uma_vez(self):
+        falso = AdbDeMentira(LISTA_UM)
+        with com_adb(falso):
+            usb.ligar_partida("hospedar")
+            usb.soltar_partida()
+            usb.soltar_partida()
+        remocoes = [c for c in falso.chamadas if "--remove" in c]
+        self.assertEqual(remocoes, [["-s", "ABC12345", "reverse", "--remove", "tcp:55435"],
+                                    ["-s", "ABC12345", "reverse", "--remove", "tcp:18777"]])
+        self.assertIsNone(usb.partida_ligada())
+
+    def test_porta_ocupada_desfaz_a_metade_e_explica(self):
+        class PortaOcupada(AdbDeMentira):
+            def executar(self, caminho, argumentos, entrada=None, tempo=15):
+                if "tcp:18777" in argumentos and "--remove" not in argumentos:
+                    self.chamadas.append(list(argumentos))
+                    return 1, "error: cannot bind listener: Address already in use"
+                return AdbDeMentira.executar(self, caminho, argumentos, entrada, tempo)
+        falso = PortaOcupada(LISTA_UM)
+        with com_adb(falso):
+            r = usb.ligar_partida("entrar")
+        self.assertFalse(r["ok"])
+        self.assertIn("ocupada", r["erro"])
+        self.assertIn(["-s", "ABC12345", "forward", "--remove", "tcp:55435"], falso.chamadas)     # a primeira saiu
+        self.assertIsNone(usb.partida_ligada())
+
+    def test_papel_ou_serial_estranho_nem_chama_o_adb(self):
+        falso = AdbDeMentira(LISTA_UM)
+        with com_adb(falso):
+            self.assertFalse(usb.ligar_partida("apagar")["ok"])
+            self.assertFalse(usb.ligar_partida("hospedar", serial="a b; c")["ok"])
+        self.assertEqual(falso.chamadas, [])
+
+    def test_dois_celulares_pedem_a_escolha(self):
+        falso = AdbDeMentira(LISTA_DOIS)
+        with com_adb(falso):
+            r = usb.ligar_partida("hospedar")
+        self.assertFalse(r["ok"])
+        self.assertIn("2 celulares", r["dica"])
+        self.assertFalse(any("reverse" in c for c in falso.chamadas))
+
+    def test_o_servidor_do_adb_fica_de_pe_enquanto_a_partida_usa(self):
+        falso = AdbDeMentira(LISTA_UM)
+        with mock.patch.object(adb, "achar_adb", return_value=("adb-falso", "teste")), \
+                mock.patch.object(adb, "executar", side_effect=falso.executar), \
+                mock.patch.object(adb, "servidor_do_adb_de_pe", side_effect=[False, True, True, True, True]):
+            usb.ligar_partida("hospedar")                       # o ARENA ligou o servidor do adb
+            self.assertTrue(usb._ligamos_o_servidor)
+            usb.soltar([("ABC12345", 8780)], ultimo=True)      # o controle saiu, mas a partida segue no cabo
+            self.assertNotIn(["kill-server"], falso.chamadas)
+            usb.soltar_partida()                                 # agora ninguem usa: desliga
+        self.assertIn(["kill-server"], falso.chamadas)
+        self.assertFalse(usb._ligamos_o_servidor)
+
+
+class APortaViva(unittest.TestCase):
+    """arena.porta_viva: pelo cabo, quem atende e' o adb, mesmo com a partida do outro lado fechada."""
+
+    @classmethod
+    def setUpClass(cls):
+        import socket
+        import threading
+        cls.socket, cls.threading = socket, threading
+
+    def servidor(self, fecha_na_hora):
+        escuta = self.socket.socket()
+        escuta.bind(("127.0.0.1", 0))
+        escuta.listen(1)
+        aceitas = []
+
+        def atender():
+            conexao, _ = escuta.accept()
+            if fecha_na_hora:
+                conexao.close()
+            else:
+                aceitas.append(conexao)          # fica calado, como o RetroArch esperando o cabecalho
+        self.threading.Thread(target=atender, daemon=True).start()
+        self.addCleanup(lambda: [c.close() for c in aceitas])
+        self.addCleanup(escuta.close)
+        return escuta.getsockname()[1]
+
+    def test_partida_escutando_vale(self):
+        import arena
+        self.assertTrue(arena.porta_viva("127.0.0.1", self.servidor(False), espera=0.3))
+
+    def test_adb_que_atende_e_fecha_nao_vale(self):
+        import arena
+        self.assertFalse(arena.porta_viva("127.0.0.1", self.servidor(True), espera=1.0))
+
+    def test_porta_fechada_nao_vale(self):
+        import arena
+        sobra = self.socket.socket()
+        sobra.bind(("127.0.0.1", 0))
+        porta = sobra.getsockname()[1]
+        sobra.close()
+        self.assertFalse(arena.porta_viva("127.0.0.1", porta))
+
+
 if __name__ == "__main__":
     unittest.main()

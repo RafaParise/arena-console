@@ -88,6 +88,7 @@ import desempenho  # noqa: E402  (o jogo pesado demais deixa o grafico mais leve
 import bios        # noqa: E402  (nome, pasta e versao certa de cada BIOS -- 03/10/2026)
 import companheiros  # noqa: E402  (programas que abrem junto com o jogo: o DreamPotato -- 24/10/2026)
 import controle_remoto  # noqa: E402  (o celular como controle, pelo Wi-Fi: Network RetroPad -- 25/10/2026)
+import controle_usb  # noqa: E402  (o cabo USB: celular-controle e Jogar Junto pelo cabo -- 26/10/2026)
 import pokketsx  # noqa: E402  (o PS1 com o PocketStation de verdade, so Windows -- 24/10/2026)
 import acessorios  # noqa: E402  (VMU, Rumble Pak, multitap, pistola de luz... ligar e desligar -- 24/10/2026)
 import arrumar     # noqa: E402  (o botao Arrumar: o arquivo do jogo no lugar certo -- 03/10/2026)
@@ -289,6 +290,7 @@ def cancelar_partida_pendente(vez=None):
         PARTIDA_ABERTA["partida"] = None
         JOGO_EM_ANDAMENTO["ativo"] = False
         JOGO_EM_ANDAMENTO["titulo"] = ""
+    threading.Thread(target=controle_usb.soltar_partida, daemon=True).start()     # a partida pelo cabo, se havia
     return True
 
 
@@ -301,6 +303,21 @@ def estado_da_partida():
                 "convidado": PARTIDA_PENDENTE["convidado"],
                 "jogo": aberta.get("jogo", ""),
                 "aberto": bool(JOGO_EM_ANDAMENTO["ativo"]) and not esperando}
+
+
+def porta_viva(ip, porta, espera=0.7):
+    """A partida do outro lado ja escuta? Pelo cabo USB (adb forward/reverse) quem atende a conexao e' o adb, mesmo com
+    a porta do outro lado fechada: ai ele fecha logo em seguida (a leitura volta vazia). O RetroArch de verdade espera
+    o cabecalho de quem entra e fica calado (a leitura so passa do tempo). Achado de 07/11/2026, partida pelo cabo."""
+    try:
+        with socket.create_connection((ip, porta), timeout=1.0) as conexao:
+            conexao.settimeout(espera)
+            try:
+                return conexao.recv(1) != b""
+            except socket.timeout:
+                return True
+    except (OSError, ValueError):
+        return False
 
 
 def chegar_na_partida(anfitriao, apelido, porta=None, limite=25.0):
@@ -325,10 +342,7 @@ def chegar_na_partida(anfitriao, apelido, porta=None, limite=25.0):
         return False
     fim = time.monotonic() + limite
     while time.monotonic() < fim:
-        try:
-            with socket.create_connection((ip, porta), timeout=1.0):
-                pass
-        except (OSError, ValueError):
+        if not porta_viva(ip, porta):
             time.sleep(0.5)
             continue
         # A porta abriu: o RetroArch dele ja carregou o jogo. Um respiro e vai.
@@ -3500,6 +3514,8 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             JOGO_EM_ANDAMENTO["ativo"] = False
             JOGO_EM_ANDAMENTO["titulo"] = ""
             PARTIDA_ABERTA["partida"] = None
+        if partida:
+            controle_usb.soltar_partida()       # a partida pelo cabo (adb forward/reverse), se havia
 
 
 # ---------------------------------------------------------------------------
@@ -6567,6 +6583,18 @@ class Manipulador(BaseHTTPRequestHandler):
             ok, motivo = CONTROLE_REMOTO.gamepad_virtual(bool(dados.get("ligar")))
             return self.responder_json(dict(CONTROLE_REMOTO.estado(), ok=ok, erro=motivo or None))
 
+        if caminho == "/api/partida/cabo":
+            # Jogar Junto pelo cabo USB com o celular ligado neste computador (controle_usb.ligar_partida). So daqui.
+            if plataforma_do_sistema.ANDROID:
+                return self.erro("A partida pelo cabo é ligada no computador: lá, em Jogar junto, clique em Ligar pelo "
+                                 "cabo USB. Aqui, escolha “Computador ligado pelo cabo USB” na lista.", 404)
+            serial = dados.get("serial")
+            resposta = controle_usb.ligar_partida(str(dados.get("papel", "")),
+                                                  serial if isinstance(serial, str) else None)
+            # "ok" e' o do pedido (a tela trata ok=false como erro e perderia a lista de celulares e a dica);
+            # "ligado" diz se o cabo ficou pronto.
+            return self.responder_json(dict(resposta, ok=True, ligado=resposta["ok"]))
+
         if caminho == "/api/controle-remoto/usb":
             # O cabo USB (servidor\controle_usb.py): `adb reverse` e abre a pagina no celular. So deste computador.
             if plataforma_do_sistema.ANDROID:
@@ -6575,7 +6603,10 @@ class Manipulador(BaseHTTPRequestHandler):
             jogador = dados.get("jogador")
             resposta = CONTROLE_REMOTO.ligar_pelo_cabo(serial if isinstance(serial, str) else None,
                                                        jogador if isinstance(jogador, int) else None)
-            return self.responder_json(dict(resposta, estado=CONTROLE_REMOTO.estado()))
+            # Como em /api/partida/cabo: com ok=false a tela levantava erro e nunca mostrava a escolha entre 2 celulares
+            # nem o "como baixar o ADB" (achado de 07/11/2026).
+            return self.responder_json(dict(resposta, ok=True, ligado=bool(resposta.get("ok")),
+                                            estado=CONTROLE_REMOTO.estado()))
 
         if caminho in ("/api/controle-remoto/ligar", "/api/controle-remoto/desligar"):
             # So deste computador (nao esta em ROTAS_REDE_EXTERNA): quem liga o controle pelo celular e' o professor,
@@ -7445,6 +7476,11 @@ class Manipulador(BaseHTTPRequestHandler):
                 hospedar = (modo == "hospedar")
                 assistir = (modo == "assistir")
                 endereco = ""
+                ligada = controle_usb.partida_ligada()
+                if hospedar and ligada and ligada[1] == "forward":
+                    # O cabo foi ligado para ENTRAR na partida do celular: o `adb forward` segura a porta 55435 deste
+                    # computador e a partida aberta aqui nao escutaria. Desfaz antes.
+                    controle_usb.soltar_partida()
                 if not hospedar:
                     bruto = str(dados.get("endereco", "") or "").strip()
                     endereco = normalizar_url(bruto)

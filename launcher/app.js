@@ -3885,10 +3885,15 @@ function abrirJuntoLocal(jogo) {
   $("#modalJuntoLocal").hidden = false;
 }
 
+const TEXTO_DO_CABO_DA_PARTIDA = "Com o celular ligado neste computador pelo cabo (Depuração USB), a partida não " +
+  "depende do Wi-Fi. Escolha antes se você abre a partida ou entra na do celular.";
+
 function abrirPartida(jogo) {
   estado.jogoDaPartida = jogo;
   estado.papelDaPartida = "hospedar";
   estado.partidaEscolhida = "";
+  estado.partidaPeloCabo = false;
+  $("#dicaPartidaCabo").textContent = TEXTO_DO_CABO_DA_PARTIDA;
   $("#partidaJogo").textContent = jogo.titulo;
   $("#campoAmigoPartida").hidden = true;
   $("#campoJogadorPartida").hidden = true;
@@ -4090,6 +4095,15 @@ function desenharAmigos(online) {
 // Lista de "Entrar na partida do amigo": só quem está com partida ABERTA
 // agora. Vem de /api/partida/procurar, que junta a descoberta da rede (UDP)
 // com uma pergunta direta a cada amigo salvo (o mesmo caminho dos recordes).
+// Jogar Junto pelo cabo USB (servidor\controle_usb.py, ligar_partida): o ARENA do outro lado aparece no 127.0.0.1:18777
+// e a partida do RetroArch no 127.0.0.1:55435, dentro do cabo. No celular a opcao esta sempre na lista (quem liga o cabo
+// e' o computador); no computador, so depois do botao "Ligar pelo cabo USB" com o papel de entrar.
+const PARTIDA_PELO_CABO = "127.0.0.1:18777";
+
+function partidaPeloCaboNaLista() {
+  return noCelular() || Boolean(estado.partidaPeloCabo);
+}
+
 function preencherAmigosPartida() {
   const lista = $("#listaAmigosPartida");
   if (!lista) return;
@@ -4106,7 +4120,8 @@ function preencherAmigosPartida() {
 
   // A lista se atualiza a cada 4 s: só redesenha se algo mudou. Redesenhar
   // sem mudança fecha a lista aberta no meio da escolha do aluno.
-  const assinatura = JSON.stringify([estado.procurandoPartidas,
+  const comCabo = partidaPeloCaboNaLista();
+  const assinatura = JSON.stringify([estado.procurandoPartidas, comCabo,
     [...unicos.values()].map((c) => [c.url, c.apelido, c.jogo_partida, c.jogo_id_partida,
       c.esperando_partida]),
     estado.jogoDaPartida ? estado.jogoDaPartida.id : ""]);
@@ -4119,6 +4134,14 @@ function preencherAmigosPartida() {
   // chamar o professor.
   const dica = $("#dicaSemPartida");
   if (dica) dica.hidden = Boolean(unicos.size) || Boolean(estado.procurandoPartidas);
+  const opcaoDoCabo = () => {
+    const opcao = document.createElement("option");
+    opcao.value = PARTIDA_PELO_CABO;
+    opcao.textContent = noCelular()
+      ? "Computador ligado neste celular pelo cabo USB"
+      : "Celular ligado neste computador pelo cabo USB";
+    return opcao;
+  };
   if (!unicos.size) {
     const opcao = document.createElement("option");
     opcao.value = "";
@@ -4126,15 +4149,20 @@ function preencherAmigosPartida() {
       ? "Procurando partidas abertas…"
       : "Nenhuma partida aberta ainda — o amigo clica em “Eu abro a partida”";
     lista.append(opcao);
+    if (comCabo) {
+      lista.append(opcaoDoCabo());
+      if (escolhida === PARTIDA_PELO_CABO) lista.value = escolhida;
+    }
     return;
   }
 
   // Com mais de uma partida aberta, o aluno escolhe: nenhuma vem marcada,
-  // senão um clique apressado em Começar entraria na partida errada.
-  if (unicos.size > 1) {
+  // senão um clique apressado em Começar entraria na partida errada. O cabo
+  // conta como mais uma: nunca vem marcado sem o aluno (ou o botão) escolher.
+  if (unicos.size > 1 || comCabo) {
     const escolha = document.createElement("option");
     escolha.value = "";
-    escolha.textContent = `Escolha a partida (${unicos.size} abertas)`;
+    escolha.textContent = unicos.size > 1 ? `Escolha a partida (${unicos.size} abertas)` : "Escolha a partida";
     lista.append(escolha);
   }
 
@@ -4154,8 +4182,42 @@ function preencherAmigosPartida() {
     opcao.textContent = `${nome}${jogo}${colega.esperando_partida ? " · esperando você" : ""}`;
     lista.append(opcao);
   }
+  if (comCabo) lista.append(opcaoDoCabo());
   // Mantém a escolha do aluno quando a lista se atualiza sozinha.
-  if (escolhida && unicos.has(escolhida)) lista.value = escolhida;
+  if (escolhida && (unicos.has(escolhida) || (comCabo && escolhida === PARTIDA_PELO_CABO))) lista.value = escolhida;
+}
+
+// O botão "Ligar pelo cabo USB" do Jogar Junto (só no computador).
+async function ligarPartidaPeloCabo() {
+  const botao = $("#btnPartidaCabo");
+  const dica = $("#dicaPartidaCabo");
+  const papel = estado.papelDaPartida;
+  botao.disabled = true;
+  dica.textContent = "Procurando o celular no cabo…";
+  try {
+    const r = await pedir("/api/partida/cabo", "POST", { papel });
+    if (!r.ligado) {
+      dica.textContent = [r.como_baixar, r.erro, r.dica].filter(Boolean).join(" ") || "Não deu para ligar o cabo.";
+      return;
+    }
+    const aviso = r.dica ? " " + r.dica : "";
+    if (papel === "hospedar") {
+      estado.partidaPeloCabo = false;
+      dica.textContent = "Cabo ligado. Clique em Começar aqui. No celular, toque em “Entrar na partida do amigo” e " +
+        "escolha “Computador ligado neste celular pelo cabo USB”." + aviso;
+    } else {
+      estado.partidaPeloCabo = true;
+      estado.partidaEscolhida = r.endereco || PARTIDA_PELO_CABO;
+      preencherAmigosPartida();
+      $("#listaAmigosPartida").value = estado.partidaEscolhida;
+      dica.textContent = "Cabo ligado e escolhido na lista. No celular, a partida precisa estar aberta (“Eu abro a " +
+        "partida”); depois clique em Começar." + aviso;
+    }
+  } catch (falha) {
+    dica.textContent = falha.message;
+  } finally {
+    botao.disabled = false;
+  }
 }
 
 async function procurarPartidas(janelaAberta = false) {
@@ -5489,6 +5551,7 @@ function ligarEventos() {
   $("#btnAddCheat").addEventListener("click", adicionarCheat);
   $("#btnExportar").addEventListener("click", exportarPacote);
   $("#btnAbrirPartida").addEventListener("click", comecarPartida);
+  $("#btnPartidaCabo").addEventListener("click", ligarPartidaPeloCabo);
 
   $("#btnTestarPartida").addEventListener("click", async (evento) => {
     const endereco = $("#listaAmigosPartida").value;
@@ -5775,7 +5838,7 @@ function ligarEventos() {
     const marcados = [...document.querySelectorAll("#controleRemotoJogadores input[data-jogador]:checked")]
       .map((caixa) => Number(caixa.dataset.jogador));
     try {
-      desenharControleRemoto(await pedir("/api/controle-remoto/jogadores", { jogadores: marcados }));
+      desenharControleRemoto(await pedir("/api/controle-remoto/jogadores", "POST", { jogadores: marcados }));
       recado(marcados.length
         ? `O celular pode ser o jogador ${marcados.join(", ")}. Vale no próximo jogo que você abrir.`
         : "Nenhum jogador liberado: o celular não vai conseguir controlar o jogo. Marque pelo menos um.");
@@ -5787,7 +5850,7 @@ function ligarEventos() {
   $("#chaveGamepadVirtual").addEventListener("click", async (evento) => {
     const ligar = evento.currentTarget.getAttribute("aria-pressed") !== "true";
     try {
-      const r = await pedir("/api/controle-remoto/gamepad", { ligar });
+      const r = await pedir("/api/controle-remoto/gamepad", "POST", { ligar });
       $("#gamepadVirtualAviso").textContent = r.erro || "";
       evento.currentTarget.setAttribute("aria-pressed", r.gamepad_virtual ? "true" : "false");
     } catch (falha) {
@@ -5802,7 +5865,7 @@ function ligarEventos() {
     botao.disabled = true;
     aviso.textContent = "Procurando o celular no cabo…";
     try {
-      const r = await pedir("/api/controle-remoto/usb", { serial: lista.hidden ? undefined : lista.value });
+      const r = await pedir("/api/controle-remoto/usb", "POST", { serial: lista.hidden ? undefined : lista.value });
       const aparelhos = r.aparelhos || [];
       lista.hidden = aparelhos.filter((a) => a.pronto).length < 2;
       lista.replaceChildren(...aparelhos.map((a) => {
@@ -5811,7 +5874,7 @@ function ligarEventos() {
         opcao.textContent = `${a.modelo || "Celular"} (${a.serial_curto})`;
         return opcao;
       }));
-      aviso.textContent = r.ok ? "Aberto no celular. " + (r.dica || "") : [r.como_baixar, r.erro, r.dica].filter(Boolean).join(" ");
+      aviso.textContent = r.ligado ? "Aberto no celular. " + (r.dica || "") : [r.como_baixar, r.erro, r.dica].filter(Boolean).join(" ");
       desenharControleRemoto(r.estado || (await pedir("/api/controle-remoto")));
     } catch (falha) {
       aviso.textContent = falha.message;
@@ -5824,7 +5887,7 @@ function ligarEventos() {
     const botao = evento.currentTarget;
     const novo = botao.getAttribute("aria-pressed") !== "true";
     try {
-      const dados = await pedir(novo ? "/api/controle-remoto/ligar" : "/api/controle-remoto/desligar", {});
+      const dados = await pedir(novo ? "/api/controle-remoto/ligar" : "/api/controle-remoto/desligar", "POST", {});
       desenharControleRemoto(dados);
       recado(novo
         ? "Celular como controle ligado. Abra o jogo agora e use o código na tela do celular."
@@ -5904,6 +5967,12 @@ function ligarEventos() {
     .addEventListener("click", (evento) => {
       const botao = evento.target.closest(".perfil");
       if (!botao) return;
+      if (botao.dataset.papel !== estado.papelDaPartida) {
+        // O cabo de quem abre (reverse) e o de quem entra (forward) sao ao contrario: trocou o papel, liga de novo.
+        estado.partidaPeloCabo = false;
+        if (estado.partidaEscolhida === PARTIDA_PELO_CABO) estado.partidaEscolhida = "";
+        $("#dicaPartidaCabo").textContent = TEXTO_DO_CABO_DA_PARTIDA;
+      }
       estado.papelDaPartida = botao.dataset.papel;
       for (const b of document.querySelectorAll("#modalPartida .perfil")) {
         b.classList.toggle("ativo", b === botao);
