@@ -4292,6 +4292,146 @@ function preencherAmigosPartida() {
   if (escolhida && (unicos.has(escolhida) || (comCabo && escolhida === PARTIDA_PELO_CABO))) lista.value = escolhida;
 }
 
+// ---- Arrumar os botões da tela (07/11/2026, servidor\\toque_consoles.py) ----
+// A tela do celular em miniatura: cada botão do desenho do console, no lugar de fábrica ou onde o aluno pôs. As
+// posições vão de 0 a 1 (a mesma conta do .cfg do RetroArch); o tamanho segue a mesma regra de toque_consoles.py.
+const TOQUE_ASPECTO = { deitado: 2, em_pe: 0.5 };
+const TOQUE_ENCOLHER_EM_PE = 0.7;
+
+async function abrirArrumarToque() {
+  let dados;
+  try {
+    dados = await pedir("/api/toque");
+  } catch (falha) {
+    recado(falha.message, true);
+    return;
+  }
+  estado.toque = { dados, ajustes: JSON.parse(JSON.stringify(dados.ajustes || {})) };
+  const lista = $("#listaToqueDesenho");
+  lista.replaceChildren(...Object.entries(dados.desenhos).map(([nome, d]) => {
+    const opcao = document.createElement("option");
+    opcao.value = nome;
+    opcao.textContent = d.nome;
+    return opcao;
+  }));
+  // Começa no console do jogo que estava escolhido, se ele tiver desenho.
+  const doJogo = dados.console_do_desenho[estado.jogoSelecionado?.plataforma || ""];
+  if (doJogo && dados.desenhos[doJogo]) lista.value = doJogo;
+  $("#chaveToquePorConsole").setAttribute("aria-pressed", dados.por_console ? "true" : "false");
+  $("#toqueAviso").textContent = "";
+  carregarDesenhoNaTela();
+  $("#modalToque").hidden = false;
+}
+
+function ajusteDoDesenho() {
+  const nome = $("#listaToqueDesenho").value;
+  estado.toque.ajustes[nome] = estado.toque.ajustes[nome] || {};
+  return estado.toque.ajustes[nome];
+}
+
+function carregarDesenhoNaTela() {
+  const ajuste = ajusteDoDesenho();
+  $("#listaToqueAnalogicos").value = ajuste.analogicos || "do_console";
+  $("#faixaToqueTamanho").value = String(Math.round((ajuste.tamanho || 1) * 100));
+  desenharPalcoToque();
+}
+
+function desenharPalcoToque() {
+  const nome = $("#listaToqueDesenho").value;
+  const desenho = estado.toque.dados.desenhos[nome];
+  const orientacao = $("#listaToqueOrientacao").value;
+  const ajuste = ajusteDoDesenho();
+  const analogicos = $("#listaToqueAnalogicos").value;
+  const escala = Number($("#faixaToqueTamanho").value) / 100;
+  const palco = $("#palcoToque");
+  palco.classList.toggle("toque-palco--em-pe", orientacao === "em_pe");
+  const largura = palco.clientWidth || 320;
+  const mudadas = ajuste[orientacao] || {};
+  palco.replaceChildren(...desenho.pecas.filter((p) => {
+    if (p.forma === "analogico" && analogicos === "nenhum") return false;
+    return !(p.extra && analogicos !== "dois");
+  }).map((p) => {
+    const [x, y] = mudadas[p.id] || desenho.fabrica[orientacao][p.id];
+    const peca = document.createElement("div");
+    peca.className = `toque-peca toque-peca--${p.forma}`;
+    peca.tabIndex = 0;
+    peca.setAttribute("role", "button");
+    peca.setAttribute("aria-label", `Botão ${p.rotulo || p.id}: arraste para mudar de lugar`);
+    peca.textContent = p.rotulo;
+    peca.style.background = p.cor;
+    // largura e altura na tela, como no .cfg: deitado, metade da largura = rw / 2; em pé, rw * 0,7
+    const W = largura;
+    const H = largura / TOQUE_ASPECTO[orientacao];
+    const larguraPx = orientacao === "deitado" ? p.rw * escala * W : 2 * p.rw * escala * TOQUE_ENCOLHER_EM_PE * W;
+    const alturaPx = orientacao === "deitado" ? 2 * p.rh * escala * H
+      : 2 * p.rh * escala * TOQUE_ENCOLHER_EM_PE * 0.5 * H;
+    peca.style.width = `${Math.max(14, larguraPx)}px`;
+    peca.style.height = `${Math.max(14, alturaPx)}px`;
+    peca.style.left = `${x * 100}%`;
+    peca.style.top = `${y * 100}%`;
+    arrastarPecaDoToque(peca, p.id);
+    return peca;
+  }));
+}
+
+function arrastarPecaDoToque(peca, ident) {
+  const mover = (evento) => {
+    const caixa = $("#palcoToque").getBoundingClientRect();
+    const x = Math.min(0.98, Math.max(0.02, (evento.clientX - caixa.left) / caixa.width));
+    const y = Math.min(0.98, Math.max(0.02, (evento.clientY - caixa.top) / caixa.height));
+    peca.style.left = `${x * 100}%`;
+    peca.style.top = `${y * 100}%`;
+    const orientacao = $("#listaToqueOrientacao").value;
+    const ajuste = ajusteDoDesenho();
+    ajuste[orientacao] = ajuste[orientacao] || {};
+    ajuste[orientacao][ident] = [Math.round(x * 10000) / 10000, Math.round(y * 10000) / 10000];
+  };
+  peca.addEventListener("pointerdown", (evento) => {
+    evento.preventDefault();
+    peca.setPointerCapture(evento.pointerId);
+    peca.classList.add("toque-peca--arrastando");
+    peca.onpointermove = mover;
+  });
+  const soltar = () => {
+    peca.classList.remove("toque-peca--arrastando");
+    peca.onpointermove = null;
+  };
+  peca.addEventListener("pointerup", soltar);
+  peca.addEventListener("pointercancel", soltar);
+  // Sem dedo nem mouse: as setas do teclado andam 1% por vez.
+  peca.addEventListener("keydown", (evento) => {
+    const passo = { ArrowLeft: [-0.01, 0], ArrowRight: [0.01, 0], ArrowUp: [0, -0.01], ArrowDown: [0, 0.01] }[evento.key];
+    if (!passo) return;
+    evento.preventDefault();
+    const caixa = $("#palcoToque").getBoundingClientRect();
+    const atual = peca.getBoundingClientRect();
+    mover({ clientX: atual.left + atual.width / 2 + passo[0] * caixa.width,
+      clientY: atual.top + atual.height / 2 + passo[1] * caixa.height });
+  });
+}
+
+async function salvarArrumarToque(deFabrica = false) {
+  const nome = $("#listaToqueDesenho").value;
+  const ajuste = ajusteDoDesenho();
+  ajuste.analogicos = $("#listaToqueAnalogicos").value;
+  ajuste.tamanho = Number($("#faixaToqueTamanho").value) / 100;
+  try {
+    const r = await pedir("/api/toque", "POST", deFabrica ? { desenho: nome, de_fabrica: true }
+      : { desenho: nome, ajustes: ajuste,
+        por_console: $("#chaveToquePorConsole").getAttribute("aria-pressed") === "true" });
+    estado.toque.ajustes = JSON.parse(JSON.stringify(r.toque.desenhos || {}));
+    if (deFabrica) {
+      carregarDesenhoNaTela();
+      $("#toqueAviso").textContent = "O " + estado.toque.dados.desenhos[nome].nome + " voltou ao de fábrica.";
+    } else {
+      $("#modalToque").hidden = true;
+      recado("Pronto. Os botões novos aparecem no próximo jogo.");
+    }
+  } catch (falha) {
+    $("#toqueAviso").textContent = falha.message;
+  }
+}
+
 // O botão "Ligar pelo cabo USB" do Jogar Junto (só no computador).
 async function ligarPartidaPeloCabo() {
   const botao = $("#btnPartidaCabo");
@@ -5868,6 +6008,17 @@ function ligarEventos() {
 
   $("#btnAparelhoDeNovo").addEventListener("click", () => mostrarAparelho({ forcar: true }));
   $("#btnCriarPastaNoCartao").addEventListener("click", criarPastaNoCartao);
+  $("#btnArrumarToque").addEventListener("click", abrirArrumarToque);
+  $("#listaToqueDesenho").addEventListener("change", carregarDesenhoNaTela);
+  $("#listaToqueOrientacao").addEventListener("change", desenharPalcoToque);
+  $("#listaToqueAnalogicos").addEventListener("change", desenharPalcoToque);
+  $("#faixaToqueTamanho").addEventListener("input", desenharPalcoToque);
+  $("#btnToqueSalvar").addEventListener("click", () => salvarArrumarToque(false));
+  $("#btnToqueFabrica").addEventListener("click", () => salvarArrumarToque(true));
+  $("#chaveToquePorConsole").addEventListener("click", (evento) => {
+    const botao = evento.currentTarget;
+    botao.setAttribute("aria-pressed", botao.getAttribute("aria-pressed") === "true" ? "false" : "true");
+  });
   $("#btnJogosNaMemoria").addEventListener("click", listarJogosNaMemoria);
   $("#btnLevarParaCartao").addEventListener("click", levarMarcadosParaCartao);
   $("#btnFecharLevarParaCartao").addEventListener("click", () => { $("#blocoLevarParaCartao").hidden = true; });

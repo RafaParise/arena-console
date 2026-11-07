@@ -623,7 +623,7 @@ BOTOES_NA_TELA = ("automatico", "sempre", "nunca")
 
 
 def ajustes_do_android(opcoes, pasta_retroarch, filtro, teclado="", botoes="automatico", vibrar_celular=False,
-                       vibrar_ao_tocar=False):
+                       vibrar_ao_tocar=False, console=None, toque=None):
     """O arquivo da partida no Android: ganha a tela de toque (o controle
     desenhado na tela, que some quando um controle de verdade e' ligado) e
     uma folga no som (o celular barato estala com menos de 64 ms; o padrao
@@ -633,12 +633,26 @@ def ajustes_do_android(opcoes, pasta_retroarch, filtro, teclado="", botoes="auto
     RetroArch toma o teclado com setas por um controle e as teclas do ARENA
     (F10, Esc, F2...) nao funcionam. Devolve o filtro que vale ("" sem
     nenhum)."""
-    toque = os.path.join(pasta_retroarch, "overlays", "gamepads", "neo-retropad", "neo-retropad.cfg")
+    toque_de_sempre = os.path.join(pasta_retroarch, "overlays", "gamepads", "neo-retropad", "neo-retropad.cfg")
     if botoes == "nunca":
         opcoes["input_overlay_enable"] = "false"
-    elif os.path.isfile(toque):
+    elif os.path.isfile(toque_de_sempre):
         opcoes["input_overlay_enable"] = "true"
-        opcoes["input_overlay"] = controle_de_toque_do_arena(toque) or toque
+        # O controle com a cara do console (toque_consoles.py, 07/11/2026), com o que o aluno arrumou; console sem
+        # desenho proprio, ou com a chave "por console" desligada, segue com o neo-retropad de sempre.
+        proprio = None
+        ajustes_do_toque = toque if isinstance(toque, dict) else {}
+        if ajustes_do_toque.get("por_console", True):
+            import toque_consoles
+            desenho = toque_consoles.desenho_do_console(console)
+            if desenho:
+                proprio = toque_consoles.gravar_controle(desenho, pasta_retroarch,
+                                                        (ajustes_do_toque.get("desenhos") or {}).get(desenho))
+        if proprio:
+            opcoes["input_overlay"] = proprio
+            opcoes["input_overlay_auto_scale"] = "true"      # o desenho e' feito para 2:1; o RetroArch acerta a tela
+        else:
+            opcoes["input_overlay"] = controle_de_toque_do_arena(toque_de_sempre) or toque_de_sempre
         opcoes["input_overlay_hide_when_gamepad_connected"] = "false" if botoes == "sempre" else "true"
         # De pe, o desenho de pe (com o menu no meio); deitado, o deitado.
         # Sem isto, o de pe usava o deitado esticado (achado da auditoria 4).

@@ -1,0 +1,487 @@
+# -*- coding: utf-8 -*-
+r"""
+ARENA - o controle de toque com a cara de cada console (Android).
+
+Pedido do Rafael (07/11/2026): "os layouts e formas dos botoes e desenhos devem acompanhar os consoles, o GameCube por
+exemplo [...] os botoes devem ter o mesmo formato e posicao como no controle, mas tambem deve ser possivel mexer na
+posicao dos botoes e precisa ter os dois analogicos para os consoles que tinham o recurso, mas mesmo para os consoles
+que nao tem deve ter o recurso ativo, pois no Dreamcast por exemplo nao tem o direito, mas depois alguns jogos foram
+adaptados para esse recurso".
+
+COMO FUNCIONA: cada desenho (DESENHOS) diz onde fica cada botao com o celular DEITADO (x e y de 0 a 1 na tela; o
+tamanho em fracao da altura, para o redondo continuar redondo). O desenho EM PE sai do deitado (a_partir_do_deitado):
+os controles vao para a metade de baixo, com o jogo em cima. O ARENA grava o .cfg de "overlay" do RetroArch a cada
+jogo (gerar_cfg), com as posicoes que o aluno mudou na tela "Arrumar os botoes" por cima das de fabrica.
+
+QUE BOTAO MANDA O QUE: o toque manda um botao do RetroPad (o controle padrao do RetroArch) e o nucleo o traduz para o
+console. O mapa de cada nucleo foi LIDO dele mesmo (07/11/2026: o RetroArch registra o SET_INPUT_DESCRIPTORS ao abrir
+um jogo; o do Dolphin, no codigo dele, Source/Core/DolphinLibretro/Input.cpp). Exemplos: no Mega Drive o A e' o "y",
+o B e' o "b" e o C e' o "a"; no Nintendo 64 o A e' o "b", o B e' o "y" e os botoes C sao o analogico direito; no
+GameCube o Z e' o "r" e os gatilhos L e R sao o "l2" e o "r2".
+
+ANALOGICOS: "do_console" (os que o controle tinha), "dois" (os dois sempre, para os jogos adaptados) ou "nenhum".
+
+So biblioteca padrao. As imagens (servidor\toque\consoles\*.png) saem de ferramentas\gerar_toque_consoles.py.
+"""
+import os
+
+PASTA_DAS_IMAGENS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "toque", "consoles")
+PASTA_DOS_BOTOES_DO_ARENA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "toque")
+ASPECTO_DEITADO = 2.0          # largura / altura do desenho deitado (o RetroArch ajusta a tela de verdade: auto_scale)
+ASPECTO_EM_PE = 0.5
+ANALOGICOS = ("do_console", "dois", "nenhum")
+
+# As imagens: nome -> (forma, cor, texto, cor do texto). As cores lembram os controles de verdade.
+CINZA, CINZA_CLARO, PRETO = "#5a5f66", "#9aa0a6", "#2b2d31"
+IMAGENS = {
+    "seta_cima": ("seta", CINZA, "cima", ""), "seta_baixo": ("seta", CINZA, "baixo", ""),
+    "seta_esq": ("seta", CINZA, "esquerda", ""), "seta_dir": ("seta", CINZA, "direita", ""),
+    "base_analogico": ("base", CINZA, "", ""), "pino": ("pino", CINZA_CLARO, "", ""),
+    "pino_c": ("pino", "#e8c22e", "C", PRETO),
+    "start": ("pilula", CINZA, "START", "#ffffff"), "select": ("pilula", CINZA, "SELECT", "#ffffff"),
+    "mode": ("pilula", CINZA, "MODE", "#ffffff"), "coin": ("pilula", CINZA, "COIN", "#ffffff"),
+    "run": ("pilula", CINZA, "RUN", "#ffffff"),
+    "start_vermelho": ("circulo", "#c83a3a", "S", "#ffffff"), "start_redondo": ("circulo", CINZA, "S", "#ffffff"),
+    "l": ("pilula", CINZA, "L", "#ffffff"), "r": ("pilula", CINZA, "R", "#ffffff"),
+    "l1": ("pilula", CINZA, "L1", "#ffffff"), "r1": ("pilula", CINZA, "R1", "#ffffff"),
+    "l2": ("pilula", CINZA, "L2", "#ffffff"), "r2": ("pilula", CINZA, "R2", "#ffffff"),
+    "l3": ("circulo", CINZA, "L3", "#ffffff"), "r3": ("circulo", CINZA, "R3", "#ffffff"),
+    "z_n64": ("pilula", "#6b6f78", "Z", "#ffffff"), "z_gc": ("pilula", "#6a4bb5", "Z", "#ffffff"),
+    # Super Nintendo (o colorido do Super Famicom)
+    "snes_a": ("circulo", "#d03a3a", "A", "#ffffff"), "snes_b": ("circulo", "#e8c02e", "B", PRETO),
+    "snes_x": ("circulo", "#3a5bd0", "X", "#ffffff"), "snes_y": ("circulo", "#3aa050", "Y", "#ffffff"),
+    # NES, Game Boy, PC Engine
+    "nes_a": ("circulo", "#c42d2d", "A", "#ffffff"), "nes_b": ("circulo", "#c42d2d", "B", "#ffffff"),
+    "gb_a": ("circulo", "#a23b6b", "A", "#ffffff"), "gb_b": ("circulo", "#a23b6b", "B", "#ffffff"),
+    "pce_1": ("circulo", PRETO, "I", "#ffffff"), "pce_2": ("circulo", PRETO, "II", "#ffffff"),
+    # Nintendo 64
+    "n64_a": ("circulo", "#2f5fc4", "A", "#ffffff"), "n64_b": ("circulo", "#2f9a48", "B", "#ffffff"),
+    # GameCube: A grande verde, B pequeno vermelho, X e Y em feijao, gatilhos cinza
+    "gc_a": ("circulo", "#2fa356", "A", "#ffffff"), "gc_b": ("circulo", "#d03a3a", "B", "#ffffff"),
+    "gc_x": ("feijao_vertical", "#b9bdc4", "X", PRETO), "gc_y": ("feijao_deitado", "#b9bdc4", "Y", PRETO),
+    "gc_l": ("pilula", "#8c9098", "L", "#ffffff"), "gc_r": ("pilula", "#8c9098", "R", "#ffffff"),
+    # Mega Drive, Saturn e fliperama
+    "md_a": ("circulo", PRETO, "A", "#ffffff"), "md_b": ("circulo", PRETO, "B", "#ffffff"),
+    "md_c": ("circulo", PRETO, "C", "#ffffff"), "md_x": ("circulo", "#44474d", "X", "#ffffff"),
+    "md_y": ("circulo", "#44474d", "Y", "#ffffff"), "md_z": ("circulo", "#44474d", "Z", "#ffffff"),
+    "sat_a": ("circulo", "#3c3f46", "A", "#ffffff"), "sat_b": ("circulo", "#3c3f46", "B", "#ffffff"),
+    "sat_c": ("circulo", "#3c3f46", "C", "#ffffff"), "sat_x": ("circulo", "#585c64", "X", "#ffffff"),
+    "sat_y": ("circulo", "#585c64", "Y", "#ffffff"), "sat_z": ("circulo", "#585c64", "Z", "#ffffff"),
+    "arc_1": ("circulo", "#d03a3a", "1", "#ffffff"), "arc_2": ("circulo", "#e8c02e", "2", PRETO),
+    "arc_3": ("circulo", "#3aa050", "3", "#ffffff"), "arc_4": ("circulo", "#3a5bd0", "4", "#ffffff"),
+    "arc_5": ("circulo", "#e07a2e", "5", "#ffffff"), "arc_6": ("circulo", "#8a4bc2", "6", "#ffffff"),
+    # Neo Geo: A vermelho, B amarelo, C verde, D azul
+    "neo_a": ("circulo", "#d03a3a", "A", "#ffffff"), "neo_b": ("circulo", "#e8c02e", "B", PRETO),
+    "neo_c": ("circulo", "#3aa050", "C", "#ffffff"), "neo_d": ("circulo", "#3a5bd0", "D", "#ffffff"),
+    # Dreamcast: A vermelho, B azul, X amarelo, Y verde
+    "dc_a": ("circulo", "#d03a3a", "A", "#ffffff"), "dc_b": ("circulo", "#3a5bd0", "B", "#ffffff"),
+    "dc_x": ("circulo", "#e8c02e", "X", PRETO), "dc_y": ("circulo", "#3aa050", "Y", "#ffffff"),
+    # PlayStation: os simbolos nas cores de sempre
+    "ps_triangulo": ("simbolo", "#2fae7a", "triangulo", ""), "ps_circulo": ("simbolo", "#e0464d", "circulo", ""),
+    "ps_x": ("simbolo", "#5b8fe0", "x", ""), "ps_quadrado": ("simbolo", "#d77fbd", "quadrado", ""),
+    # Nintendo DS
+    "nds_a": ("circulo", "#b9bdc4", "A", PRETO), "nds_b": ("circulo", "#b9bdc4", "B", PRETO),
+    "nds_x": ("circulo", "#b9bdc4", "X", PRETO), "nds_y": ("circulo", "#b9bdc4", "Y", PRETO),
+}
+
+
+# ---------------------------------------------------------------------------
+# Pecas (posicoes no desenho DEITADO; tamanhos em fracao da altura)
+# ---------------------------------------------------------------------------
+
+def botao(ident, comando, x, y, raio, imagem):
+    return {"id": ident, "comando": comando, "x": x, "y": y, "forma": "radial", "rw": raio, "rh": raio, "imagem": imagem}
+
+
+def pilula(ident, comando, x, y, largura, altura, imagem):
+    return {"id": ident, "comando": comando, "x": x, "y": y, "forma": "rect", "rw": largura, "rh": altura,
+            "imagem": imagem}
+
+
+def direcional(x, y, braco=0.10, ident="direcional"):
+    """As quatro setas e as quatro diagonais (sem imagem), como o neo-retropad. Mexe junto: um "id" so."""
+    d = braco
+    return {"id": ident, "grupo": "direcional", "x": x, "y": y, "braco": d}
+
+
+def analogico(ident, comando, x, y, raio=0.12, pino="pino"):
+    return {"id": ident, "comando": comando, "x": x, "y": y, "forma": "analogico", "rw": raio, "rh": raio,
+            "imagem": "base_analogico", "pino": pino}
+
+
+def losango(x, y, cima, direita, baixo, esquerda, raio=0.075, distancia=0.115):
+    """Quatro botoes em cruz (Super Nintendo, PlayStation, Dreamcast...): (id, comando, imagem) de cada lado."""
+    dx = distancia / ASPECTO_DEITADO
+    return [botao(cima[0], cima[1], x, y - distancia, raio, cima[2]),
+            botao(direita[0], direita[1], x + dx, y, raio, direita[2]),
+            botao(baixo[0], baixo[1], x, y + distancia, raio, baixo[2]),
+            botao(esquerda[0], esquerda[1], x - dx, y, raio, esquerda[2])]
+
+
+def start_select(start="start", select="select", com_select=True, x=0.5, y=0.93):
+    pecas = [pilula("start", "start", x + 0.06, y, 0.10, 0.045, start)]
+    if com_select:
+        pecas.append(pilula("select", "select", x - 0.06, y, 0.10, 0.045, select))
+    return pecas
+
+
+def ombros(l="l", r="r", l_img="l", r_img="r", y=0.25, largura=0.14, altura=0.065):
+    return [pilula("l", l, 0.09, y, largura, altura, l_img), pilula("r", r, 0.91, y, largura, altura, r_img)]
+
+
+# Onde entram os analogicos que o console nao tinha ("dois"): perto do meio, embaixo, sem cobrir os outros.
+ANALOGICO_ESQ_EXTRA = (0.30, 0.80)
+ANALOGICO_DIR_EXTRA = (0.70, 0.80)
+
+DESENHOS = {
+    "snes": {"nome": "Super Nintendo", "pecas": [
+        direcional(0.13, 0.60),
+        *losango(0.87, 0.60, ("x", "x", "snes_x"), ("a", "a", "snes_a"), ("b", "b", "snes_b"), ("y", "y", "snes_y")),
+        *ombros(), *start_select()]},
+    "nes": {"nome": "NES", "pecas": [
+        direcional(0.13, 0.62),
+        botao("b", "b", 0.80, 0.66, 0.08, "nes_b"), botao("a", "a", 0.915, 0.66, 0.08, "nes_a"),
+        *start_select()]},
+    "gameboy": {"nome": "Game Boy", "pecas": [
+        direcional(0.13, 0.62),
+        botao("b", "b", 0.81, 0.70, 0.08, "gb_b"), botao("a", "a", 0.915, 0.57, 0.08, "gb_a"),
+        *start_select()]},
+    "gba": {"nome": "Game Boy Advance", "pecas": [
+        direcional(0.13, 0.62),
+        botao("b", "b", 0.81, 0.70, 0.08, "gb_b"), botao("a", "a", 0.915, 0.57, 0.08, "gb_a"),
+        *ombros(), *start_select()]},
+    "pcengine": {"nome": "PC Engine", "pecas": [
+        direcional(0.13, 0.62),
+        botao("ii", "b", 0.80, 0.66, 0.08, "pce_2"), botao("i", "a", 0.915, 0.66, 0.08, "pce_1"),
+        *start_select(start="run")]},
+    "n64": {"nome": "Nintendo 64", "analogicos": ("esq", "dir"), "pecas": [
+        analogico("analogico_esq", "analog_left", 0.13, 0.55),
+        direcional(0.10, 0.86, braco=0.06),
+        botao("a", "b", 0.85, 0.72, 0.085, "n64_a"), botao("b", "y", 0.765, 0.60, 0.07, "n64_b"),
+        # os botoes C sao o analogico direito no Mupen64Plus-Next (C Buttons X/Y)
+        analogico("analogico_dir", "analog_right", 0.925, 0.43, raio=0.09, pino="pino_c"),
+        *ombros(), pilula("z", "l2", 0.09, 0.37, 0.14, 0.065, "z_n64"),
+        botao("start", "start", 0.50, 0.90, 0.055, "start_vermelho")]},
+    "gamecube": {"nome": "GameCube", "analogicos": ("esq", "dir"), "pecas": [
+        analogico("analogico_esq", "analog_left", 0.13, 0.52),
+        direcional(0.10, 0.86, braco=0.055),
+        botao("a", "a", 0.86, 0.62, 0.10, "gc_a"),
+        botao("b", "b", 0.765, 0.76, 0.055, "gc_b"),
+        pilula("x", "x", 0.945, 0.57, 0.055, 0.14, "gc_x"),
+        pilula("y", "y", 0.85, 0.45, 0.12, 0.055, "gc_y"),
+        analogico("analogico_dir", "analog_right", 0.80, 0.895, raio=0.075, pino="pino_c"),
+        pilula("l", "l2", 0.09, 0.25, 0.14, 0.07, "gc_l"), pilula("r", "r2", 0.91, 0.22, 0.14, 0.07, "gc_r"),
+        pilula("z", "r", 0.94, 0.335, 0.10, 0.05, "z_gc"),
+        botao("start", "start", 0.50, 0.90, 0.05, "start_redondo")]},
+    "megadrive": {"nome": "Mega Drive", "pecas": [
+        direcional(0.13, 0.62),
+        botao("a", "y", 0.735, 0.72, 0.072, "md_a"), botao("b", "b", 0.83, 0.70, 0.072, "md_b"),
+        botao("c", "a", 0.925, 0.68, 0.072, "md_c"),
+        botao("x", "l", 0.725, 0.53, 0.06, "md_x"), botao("y", "x", 0.815, 0.51, 0.06, "md_y"),
+        botao("z", "r", 0.905, 0.49, 0.06, "md_z"),
+        *start_select(select="mode")]},
+    "saturn": {"nome": "Sega Saturn", "pecas": [
+        direcional(0.13, 0.62),
+        botao("a", "b", 0.735, 0.72, 0.072, "sat_a"), botao("b", "a", 0.83, 0.70, 0.072, "sat_b"),
+        botao("c", "r", 0.925, 0.68, 0.072, "sat_c"),
+        botao("x", "y", 0.725, 0.53, 0.06, "sat_x"), botao("y", "x", 0.815, 0.51, 0.06, "sat_y"),
+        botao("z", "l", 0.905, 0.49, 0.06, "sat_z"),
+        *ombros(l="l2", r="r2"), *start_select(com_select=False)]},
+    "dreamcast": {"nome": "Dreamcast", "analogicos": ("esq",), "pecas": [
+        analogico("analogico_esq", "analog_left", 0.13, 0.52),
+        direcional(0.10, 0.86, braco=0.06),
+        *losango(0.87, 0.60, ("y", "x", "dc_y"), ("b", "a", "dc_b"), ("a", "b", "dc_a"), ("x", "y", "dc_x")),
+        *ombros(l="l2", r="r2"), botao("start", "start", 0.50, 0.90, 0.05, "start_redondo")]},
+    "playstation": {"nome": "PlayStation", "analogicos": ("esq", "dir"), "pecas": [
+        direcional(0.12, 0.50, braco=0.075),
+        *losango(0.88, 0.50, ("triangulo", "x", "ps_triangulo"), ("circulo", "a", "ps_circulo"),
+                 ("xis", "b", "ps_x"), ("quadrado", "y", "ps_quadrado"), raio=0.07, distancia=0.105),
+        analogico("analogico_esq", "analog_left", 0.30, 0.80, raio=0.11),
+        analogico("analogico_dir", "analog_right", 0.70, 0.80, raio=0.11),
+        botao("l3", "l3", 0.41, 0.70, 0.045, "l3"), botao("r3", "r3", 0.59, 0.70, 0.045, "r3"),
+        pilula("l1", "l", 0.09, 0.26, 0.14, 0.06, "l1"), pilula("r1", "r", 0.91, 0.26, 0.14, 0.06, "r1"),
+        pilula("l2", "l2", 0.09, 0.15, 0.14, 0.06, "l2"), pilula("r2", "r2", 0.91, 0.15, 0.14, 0.06, "r2"),
+        *start_select(y=0.93)]},
+    "psp": {"nome": "PSP", "analogicos": ("esq",), "pecas": [
+        direcional(0.12, 0.52, braco=0.075),
+        *losango(0.88, 0.55, ("triangulo", "x", "ps_triangulo"), ("circulo", "a", "ps_circulo"),
+                 ("xis", "b", "ps_x"), ("quadrado", "y", "ps_quadrado"), raio=0.07, distancia=0.105),
+        analogico("analogico_esq", "analog_left", 0.13, 0.86, raio=0.08),
+        *ombros(), *start_select()]},
+    "neogeo": {"nome": "Neo Geo", "pecas": [
+        direcional(0.13, 0.62),
+        botao("a", "b", 0.71, 0.74, 0.07, "neo_a"), botao("b", "a", 0.795, 0.64, 0.07, "neo_b"),
+        botao("c", "y", 0.88, 0.60, 0.07, "neo_c"), botao("d", "x", 0.955, 0.64, 0.07, "neo_d"),
+        *start_select(select="coin")]},
+    "fliperama": {"nome": "Fliperama", "pecas": [
+        direcional(0.13, 0.62),
+        botao("1", "b", 0.725, 0.74, 0.07, "arc_1"), botao("2", "a", 0.82, 0.74, 0.07, "arc_2"),
+        botao("3", "r", 0.915, 0.74, 0.07, "arc_3"),
+        botao("4", "y", 0.74, 0.55, 0.07, "arc_4"), botao("5", "x", 0.835, 0.55, 0.07, "arc_5"),
+        botao("6", "l", 0.93, 0.55, 0.07, "arc_6"),
+        *start_select(select="coin")]},
+    "nds": {"nome": "Nintendo DS", "pecas": [
+        direcional(0.10, 0.62),
+        *losango(0.90, 0.60, ("x", "x", "nds_x"), ("a", "a", "nds_a"), ("b", "b", "nds_b"), ("y", "y", "nds_y"),
+                 raio=0.065, distancia=0.10),
+        *ombros(), *start_select()]},
+}
+
+# Console -> desenho. O que nao esta aqui segue com o controle de toque de sempre (neo-retropad).
+DESENHO_DO_CONSOLE = {
+    "snes": "snes", "nes": "nes", "gameboy": "gameboy", "gba": "gba", "pcengine": "pcengine", "pcfx": "pcengine",
+    "n64": "n64", "gamecube": "gamecube", "megadrive": "megadrive", "sega32x": "megadrive", "segacd": "megadrive",
+    "sg1000": "nes", "saturn": "saturn", "dreamcast": "dreamcast", "ps1": "playstation", "ps2": "playstation",
+    "psp": "psp", "neogeo": "neogeo", "arcade": "fliperama", "nds": "nds", "ngp": "nes", "wonderswan": "gameboy",
+    "virtualboy": "snes", "lynx": "nes",
+}
+
+# Os botoes do ARENA (menu, salvar, carregar, sair) no alto, no meio: os cantos ficam para L e R.
+BOTOES_DO_ARENA = [
+    # (comando, x deitado, y deitado, x em pe, y em pe, imagem)
+    ("menu_toggle", 0.26, 0.075, 0.14, 0.47, "arena-menu.png"),
+    ("save_state", 0.42, 0.075, 0.38, 0.47, "arena-salvar.png"),
+    ("load_state", 0.58, 0.075, 0.62, 0.47, "arena-carregar.png"),
+    ("exit_emulator", 0.74, 0.075, 0.86, 0.47, "arena-sair.png"),
+]
+
+
+def desenho_do_console(plataforma):
+    return DESENHO_DO_CONSOLE.get(str(plataforma or ""))
+
+
+# ---------------------------------------------------------------------------
+# Deitado -> em pe
+# ---------------------------------------------------------------------------
+
+ENCOLHER_EM_PE = 0.70          # o tamanho das pecas em pe (a tela em pe e' mais estreita)
+AFASTAR_EM_PE = 0.65           # a distancia de cada peca ate a borda dela, em pe
+
+
+def a_partir_do_deitado(x, y):
+    """A posicao em pe (0 a 1) de uma peca, a partir da deitada: o lado esquerdo continua preso a borda esquerda, o
+    direito a direita, o meio no meio, e tudo desce para a metade de baixo da tela (o jogo fica em cima)."""
+    unidades = x * ASPECTO_DEITADO                      # de 0 a 2 alturas da tela deitada
+    if x < 0.4:
+        px = unidades * AFASTAR_EM_PE
+    elif x > 0.6:
+        px = 1 - (ASPECTO_DEITADO - unidades) * AFASTAR_EM_PE
+    else:
+        px = 0.5 + (unidades - 1) * 1.6                 # o meio (start, select): perto do centro, sem amontoar
+    py = (0.97 + y * 1.0) / 2                           # a tela em pe tem 2 larguras de altura
+    return round(min(max(px, 0.02), 0.98), 4), round(min(max(py, 0.5), 0.98), 4)
+
+
+def posicoes_de_fabrica(nome, analogicos="do_console"):
+    """{"deitado": {id: [x, y]}, "em_pe": {id: [x, y]}} das pecas do desenho (o que a tela de arrumar mostra)."""
+    saida = {"deitado": {}, "em_pe": {}}
+    for peca in pecas_do_desenho(nome, analogicos):
+        saida["deitado"][peca["id"]] = [peca["x"], peca["y"]]
+        saida["em_pe"][peca["id"]] = list(a_partir_do_deitado(peca["x"], peca["y"]))
+    return saida
+
+
+def pecas_do_desenho(nome, analogicos="do_console"):
+    """As pecas do desenho com os analogicos pedidos: os do console, os dois sempre ou nenhum."""
+    desenho = DESENHOS[nome]
+    pecas = [dict(p) for p in desenho["pecas"]]
+    if analogicos == "nenhum":
+        return [p for p in pecas if p.get("forma") != "analogico"]
+    if analogicos == "dois":
+        ids = {p["id"] for p in pecas}
+        if "analogico_esq" not in ids:
+            pecas.append(analogico("analogico_esq", "analog_left", *ANALOGICO_ESQ_EXTRA, raio=0.10))
+        if "analogico_dir" not in ids:
+            pecas.append(analogico("analogico_dir", "analog_right", *ANALOGICO_DIR_EXTRA, raio=0.10))
+    return pecas
+
+
+def resumo_para_a_tela(analogicos="do_console"):
+    """O que a tela "Arrumar os botoes" precisa: cada desenho com as pecas (id, rotulo, forma, tamanho, cor) e as
+    posicoes de fabrica deitado e em pe."""
+    saida = {}
+    for nome, desenho in DESENHOS.items():
+        pecas = []
+        do_console = {p["id"] for p in pecas_do_desenho(nome, "do_console")}
+        for peca in pecas_do_desenho(nome, analogicos):
+            if peca.get("grupo") == "direcional":
+                pecas.append({"id": peca["id"], "rotulo": "✚", "forma": "direcional", "rw": peca["braco"] * 1.9,
+                              "rh": peca["braco"] * 1.9, "cor": CINZA, "extra": False})
+                continue
+            imagem = IMAGENS.get(peca["imagem"], ("circulo", CINZA, "", ""))
+            rotulo = imagem[2] if imagem[0] not in ("simbolo", "seta", "base") else \
+                {"triangulo": "△", "circulo": "○", "x": "✕", "quadrado": "□"}.get(imagem[2], "")
+            if peca.get("forma") == "analogico":
+                rotulo = "C" if peca.get("pino") == "pino_c" else ("L" if peca["comando"] == "analog_left" else "R")
+            pecas.append({"id": peca["id"], "rotulo": rotulo, "forma": peca["forma"], "rw": peca["rw"],
+                          "rh": peca["rh"], "cor": imagem[1], "extra": peca["id"] not in do_console})
+        saida[nome] = {"nome": desenho["nome"], "pecas": pecas, "fabrica": posicoes_de_fabrica(nome, analogicos)}
+    return saida
+
+
+# ---------------------------------------------------------------------------
+# O .cfg do RetroArch
+# ---------------------------------------------------------------------------
+
+def _tamanho(peca, em_pe, escala):
+    """(metade da largura, metade da altura) normalizadas na tela."""
+    rw, rh = peca["rw"] * escala, peca["rh"] * escala
+    if em_pe:
+        return rw * ENCOLHER_EM_PE, rh * ENCOLHER_EM_PE * ASPECTO_EM_PE
+    return rw / ASPECTO_DEITADO, rh
+
+
+def _linhas_da_peca(o, n, peca, x, y, em_pe, escala):
+    """As linhas desc de uma peca no overlay 'o', a partir do numero 'n'. Devolve (linhas, quantas descs)."""
+    linhas = []
+    if peca.get("grupo") == "direcional":
+        braco = peca["braco"] * escala
+        fx = (ENCOLHER_EM_PE if em_pe else 1 / ASPECTO_DEITADO)
+        fy = (ENCOLHER_EM_PE * ASPECTO_EM_PE if em_pe else 1.0)
+        dx, dy = braco * fx, braco * fy
+        meio_w, meio_h = braco * 0.55 * fx, braco * 0.55 * fy
+        setas = [("up", x, y - dy, "seta_cima"), ("down", x, y + dy, "seta_baixo"),
+                 ("left", x - dx, y, "seta_esq"), ("right", x + dx, y, "seta_dir")]
+        for comando, sx, sy, imagem in setas:
+            linhas.append('overlay%d_desc%d = "%s,%.5f,%.5f,rect,%.5f,%.5f"' % (o, n, comando, sx, sy, meio_w, meio_h))
+            linhas.append('overlay%d_desc%d_overlay = "img/%s.png"' % (o, n, imagem))
+            n += 1
+        for comando, sx, sy in (("up|left", x - dx, y - dy), ("up|right", x + dx, y - dy),
+                                ("down|left", x - dx, y + dy), ("down|right", x + dx, y + dy)):
+            linhas.append('overlay%d_desc%d = "%s,%.5f,%.5f,rect,%.5f,%.5f"' % (o, n, comando, sx, sy, meio_w, meio_h))
+            n += 1
+        return linhas, 8
+    w, h = _tamanho(peca, em_pe, escala)
+    if peca.get("forma") == "analogico":
+        linhas.append('overlay%d_desc%d = "%s,%.5f,%.5f,radial,%.5f,%.5f"' % (o, n, peca["comando"], x, y, w, h))
+        linhas.append('overlay%d_desc%d_overlay = "img/base_analogico.png"' % (o, n))
+        linhas.append("overlay%d_desc%d_saturate_pct = 1000000.0" % (o, n))
+        n += 1
+        linhas.append('overlay%d_desc%d = "%s,%.5f,%.5f,radial,%.5f,%.5f"' % (o, n, peca["comando"], x, y,
+                                                                              w * 0.55, h * 0.55))
+        linhas.append('overlay%d_desc%d_overlay = "img/%s.png"' % (o, n, peca.get("pino", "pino")))
+        linhas.append("overlay%d_desc%d_movable = true" % (o, n))
+        linhas.append("overlay%d_desc%d_reach_x = 1.75" % (o, n))
+        linhas.append("overlay%d_desc%d_reach_y = 1.75" % (o, n))
+        return linhas, 2
+    linhas.append('overlay%d_desc%d = "%s,%.5f,%.5f,%s,%.5f,%.5f"' % (o, n, peca["comando"], x, y,
+                                                                      "rect" if peca["forma"] == "rect" else "radial",
+                                                                      w, h))
+    linhas.append('overlay%d_desc%d_overlay = "img/%s.png"' % (o, n, peca["imagem"]))
+    return linhas, 1
+
+
+def _numero(valor, padrao, minimo, maximo):
+    try:
+        numero = float(valor)
+    except (TypeError, ValueError):
+        return padrao
+    return min(max(numero, minimo), maximo) if numero == numero else padrao
+
+
+def gerar_cfg(nome, ajustes=None, botoes_do_arena=True):
+    """O texto do .cfg de overlay do desenho 'nome', com os ajustes do aluno:
+    {"analogicos": "do_console"|"dois"|"nenhum", "tamanho": 0.7..1.4, "deitado": {id: [x, y]}, "em_pe": {...}}."""
+    ajustes = ajustes if isinstance(ajustes, dict) else {}
+    analogicos = ajustes.get("analogicos") if ajustes.get("analogicos") in ANALOGICOS else "do_console"
+    escala = _numero(ajustes.get("tamanho"), 1.0, 0.6, 1.5)
+    pecas = pecas_do_desenho(nome, analogicos)
+    saida = ["# Gerado pelo ARENA (servidor/toque_consoles.py): o controle de toque do %s." % DESENHOS[nome]["nome"],
+             "overlays = 2"]
+    for o, (rotulo, em_pe) in enumerate((("landscape", False), ("portrait", True))):
+        chave = "em_pe" if em_pe else "deitado"
+        mudadas = ajustes.get(chave) if isinstance(ajustes.get(chave), dict) else {}
+        linhas, n = [], 0
+        for peca in pecas:
+            if em_pe:
+                x, y = a_partir_do_deitado(peca["x"], peca["y"])
+            else:
+                x, y = peca["x"], peca["y"]
+            posicao = mudadas.get(peca["id"])
+            if isinstance(posicao, (list, tuple)) and len(posicao) == 2:
+                x, y = _numero(posicao[0], x, 0.0, 1.0), _numero(posicao[1], y, 0.0, 1.0)
+            novas, quantas = _linhas_da_peca(o, n, peca, x, y, em_pe, escala)
+            linhas += novas
+            n += quantas
+        if botoes_do_arena:
+            for comando, xd, yd, xp, yp, imagem in BOTOES_DO_ARENA:
+                x, y = (xp, yp) if em_pe else (xd, yd)
+                w, h = (0.11, 0.022) if em_pe else (0.065, 0.05)
+                linhas.append('overlay%d_desc%d = "%s,%.5f,%.5f,rect,%.5f,%.5f"' % (o, n, comando, x, y, w, h))
+                linhas.append('overlay%d_desc%d_overlay = "img/%s"' % (o, n, imagem))
+                n += 1
+        saida += ["", 'overlay%d_name = "%s"' % (o, rotulo), "overlay%d_full_screen = true" % o,
+                  "overlay%d_normalized = true" % o,
+                  "overlay%d_aspect_ratio = %.4f" % (o, ASPECTO_EM_PE if em_pe else ASPECTO_DEITADO),
+                  "overlay%d_range_mod = 1.5" % o, "overlay%d_alpha_mod = 2.0" % o, "overlay%d_descs = %d" % (o, n)]
+        saida += linhas
+    return "\n".join(saida) + "\n"
+
+
+def imagens_usadas(nome, analogicos="dois"):
+    """Os nomes de arquivo das imagens que o desenho usa (para copiar ao lado do .cfg)."""
+    usadas = {"seta_cima.png", "seta_baixo.png", "seta_esq.png", "seta_dir.png", "base_analogico.png"}
+    for peca in pecas_do_desenho(nome, analogicos):
+        if peca.get("imagem"):
+            usadas.add(peca["imagem"] + ".png")
+        if peca.get("pino"):
+            usadas.add(peca["pino"] + ".png")
+    return sorted(usadas)
+
+
+def gravar_controle(nome, pasta_retroarch, ajustes=None):
+    """Grava overlays/arena/<nome>.cfg (com as imagens em overlays/arena/img) e devolve o caminho, ou None se nao
+    deu (o jogo segue com o controle de toque de sempre)."""
+    if nome not in DESENHOS:
+        return None
+    pasta = os.path.join(pasta_retroarch, "overlays", "arena")
+    img = os.path.join(pasta, "img")
+    try:
+        os.makedirs(img, exist_ok=True)
+        copiar = [(os.path.join(PASTA_DAS_IMAGENS, n), os.path.join(img, n)) for n in imagens_usadas(nome)]
+        copiar += [(os.path.join(PASTA_DOS_BOTOES_DO_ARENA, b[5]), os.path.join(img, b[5])) for b in BOTOES_DO_ARENA]
+        for origem, destino in copiar:
+            with open(origem, "rb") as arquivo:
+                dados = arquivo.read()
+            if not os.path.isfile(destino) or os.path.getsize(destino) != len(dados):
+                with open(destino, "wb") as arquivo:
+                    arquivo.write(dados)
+        destino = os.path.join(pasta, nome + ".cfg")
+        temporario = destino + ".%d.tmp" % os.getpid()
+        with open(temporario, "w", encoding="utf-8", newline="\n") as arquivo:
+            arquivo.write(gerar_cfg(nome, ajustes))
+        os.replace(temporario, destino)
+        return destino
+    except OSError:
+        return None
+
+
+def limpar_ajustes(dados):
+    """Os ajustes vindos da tela, so com o que vale: {desenho: {analogicos, tamanho, deitado, em_pe}}."""
+    saida = {}
+    if not isinstance(dados, dict):
+        return saida
+    for nome, ajuste in dados.items():
+        if nome not in DESENHOS or not isinstance(ajuste, dict):
+            continue
+        ids = {p["id"] for p in pecas_do_desenho(nome, "dois")}
+        limpo = {}
+        if ajuste.get("analogicos") in ANALOGICOS:
+            limpo["analogicos"] = ajuste["analogicos"]
+        if "tamanho" in ajuste:
+            limpo["tamanho"] = round(_numero(ajuste.get("tamanho"), 1.0, 0.6, 1.5), 2)
+        for chave in ("deitado", "em_pe"):
+            posicoes = ajuste.get(chave)
+            if not isinstance(posicoes, dict):
+                continue
+            boas = {}
+            for ident, par in posicoes.items():
+                if ident in ids and isinstance(par, (list, tuple)) and len(par) == 2:
+                    x, y = _numero(par[0], None, 0.0, 1.0), _numero(par[1], None, 0.0, 1.0)
+                    if x is not None and y is not None:
+                        boas[ident] = [round(x, 4), round(y, 4)]
+            if boas:
+                limpo[chave] = boas
+        if limpo:
+            saida[nome] = limpo
+    return saida

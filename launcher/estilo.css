@@ -1998,3 +1998,27 @@ input[type="checkbox"] { width: 1.5rem; height: 1.5rem; flex-shrink: 0; }
 /* ARENA no navegador (o Chromebook, launcher\navegador): o que so existe no
    Windows some da tela. No Windows, o html nunca tem data-navegador. */
 html[data-navegador="true"] [data-so-windows] { display: none !important; }
+
+/* Arrumar os botoes da tela (07/11/2026): a tela do celular em miniatura, com os botoes que se arrastam. */
+.toque-escolhas { display: flex; flex-wrap: wrap; gap: .5rem 1rem; }
+.toque-escolhas .campo { min-width: 9rem; }
+.toque-palco {
+  position: relative; width: 100%; aspect-ratio: 2 / 1; margin: .5rem 0;
+  background: linear-gradient(90deg, #22252b 0 20%, #3d4f6b 20% 80%, #22252b 80%);
+  border-radius: 12px; overflow: hidden; touch-action: none; user-select: none;
+}
+.toque-palco--em-pe {
+  width: min(100%, 15rem); aspect-ratio: 1 / 2; margin-inline: auto;
+  background: linear-gradient(180deg, #3d4f6b 0 37%, #22252b 37%);
+}
+.toque-peca {
+  position: absolute; transform: translate(-50%, -50%); display: grid; place-items: center;
+  border: 2px solid rgba(255, 255, 255, .55); color: #fff; font-weight: 700; font-size: .8rem;
+  cursor: grab; touch-action: none; box-sizing: border-box;
+}
+.toque-peca--radial { border-radius: 50%; }
+.toque-peca--rect { border-radius: 999px; }
+.toque-peca--analogico { border-radius: 50%; background: rgba(90, 95, 102, .45) !important; }
+.toque-peca--direcional { border-radius: 8px; font-size: 1.2rem; }
+.toque-peca:focus-visible { outline: 3px solid var(--foco, #ffd166); outline-offset: 2px; }
+.toque-peca--arrastando { cursor: grabbing; filter: brightness(1.2); }

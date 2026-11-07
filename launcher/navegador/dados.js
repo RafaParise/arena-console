@@ -951,6 +951,10 @@ window.ARENA_DADOS = {
   "servidores": [],
   "tema": "claro",
   "tipo_controle": "xbox360",
+  "toque": {
+   "desenhos": {},
+   "por_console": true
+  },
   "travar_teclas": false,
   "ultra_desempenho": false,
   "vibrar_ao_tocar": false,

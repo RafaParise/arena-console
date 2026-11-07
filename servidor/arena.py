@@ -1323,6 +1323,8 @@ def config_padrao():
         # O celular vibra como o controle e a cada toque nos botoes da tela (07/11/2026). So valem no Android.
         "vibrar_o_celular": False,
         "vibrar_ao_tocar": False,
+        # O controle de toque com a cara de cada console e o que o aluno arrumou (servidor/toque_consoles.py).
+        "toque": {"por_console": True, "desenhos": {}},
         # Desempenho que aprende (servidor/desempenho.py, pedido de
         # 22/10/2026): o console que ficou no limite ganha um degrau mais
         # leve na proxima partida, so no Automatico.
@@ -1503,6 +1505,10 @@ def ler_config_do_disco():
     for chave in ("vibrar_o_celular", "vibrar_ao_tocar"):
         if chave in salvo:
             config[chave] = bool(salvo[chave])
+    if isinstance(salvo.get("toque"), dict):
+        import toque_consoles
+        config["toque"] = {"por_console": salvo["toque"].get("por_console", True) is not False,
+                           "desenhos": toque_consoles.limpar_ajustes(salvo["toque"].get("desenhos"))}
     if "ajuste_pelo_desempenho" in salvo:
         config["ajuste_pelo_desempenho"] = bool(salvo["ajuste_pelo_desempenho"])
     if salvo.get("navegador") in NAVEGADORES_ACEITOS:
@@ -2162,7 +2168,8 @@ def gravar_override(config, custo=None, extras=None, em_partida=False,
                                                           teclado=ponte_android.teclado_fisico(),
                                                           botoes=config.get("botoes_na_tela", "automatico"),
                                                           vibrar_celular=bool(config.get("vibrar_o_celular")),
-                                                          vibrar_ao_tocar=bool(config.get("vibrar_ao_tocar")))
+                                                          vibrar_ao_tocar=bool(config.get("vibrar_ao_tocar")),
+                                                          console=plataforma, toque=config.get("toque"))
 
     linhas = ["# Gerado pelo ARENA. Nao edite a mao: sera reescrito."]
     # Nenhum valor pode quebrar a linha nem fechar as aspas antes da hora:
@@ -5601,6 +5608,15 @@ class Manipulador(BaseHTTPRequestHandler):
                 return self.responder_json({"ok": True, "existe": False, "linhas": []})
             return self.responder_json({"ok": True, "existe": True, "total": len(linhas), "linhas": linhas[:1500]})
 
+        if caminho == "/api/toque":
+            # Os desenhos do controle de toque de cada console e o que o aluno ja arrumou (tela "Arrumar os botoes").
+            import toque_consoles
+            toque = carregar_config().get("toque") or {}
+            return self.responder_json({"ok": True, "desenhos": toque_consoles.resumo_para_a_tela("dois"),
+                                        "console_do_desenho": toque_consoles.DESENHO_DO_CONSOLE,
+                                        "por_console": toque.get("por_console", True) is not False,
+                                        "ajustes": toque.get("desenhos") or {}})
+
         if caminho == "/api/armazenamento":
             # A memoria do aparelho e o cartao SD, as pastas de jogos do cartao e a escolha de
             # jogar direto ou pelo interno (Ajustes -> Maquina -> Armazenamento, so no Android).
@@ -6693,6 +6709,28 @@ class Manipulador(BaseHTTPRequestHandler):
             # "ok" e' o do pedido (a tela trata ok=false como erro e perderia a lista de celulares e a dica);
             # "ligado" diz se o cabo ficou pronto.
             return self.responder_json(dict(resposta, ok=True, ligado=resposta["ok"]))
+
+        if caminho == "/api/toque":
+            # A tela "Arrumar os botoes" (07/11/2026): grava o que o aluno mudou num desenho (ou volta ao de fabrica).
+            import toque_consoles
+            config = carregar_config()
+            atual = config.get("toque") if isinstance(config.get("toque"), dict) else {}
+            desenhos = dict(atual.get("desenhos") or {})
+            nome = str(dados.get("desenho", ""))
+            if nome:
+                if nome not in toque_consoles.DESENHOS:
+                    return self.erro("Escolha um dos consoles da lista.")
+                if dados.get("de_fabrica"):
+                    desenhos.pop(nome, None)
+                else:
+                    limpo = toque_consoles.limpar_ajustes({nome: dados.get("ajustes")})
+                    desenhos[nome] = limpo.get(nome, {})
+            por_console = atual.get("por_console", True) is not False
+            if "por_console" in dados:
+                por_console = bool(dados["por_console"])
+            config["toque"] = {"por_console": por_console, "desenhos": toque_consoles.limpar_ajustes(desenhos)}
+            salvar_config(config)
+            return self.responder_json({"ok": True, "toque": config["toque"]})
 
         if caminho == "/api/controle-remoto/usb":
             # O cabo USB (servidor\controle_usb.py): `adb reverse` e abre a pagina no celular. So deste computador.

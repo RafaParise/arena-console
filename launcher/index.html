@@ -499,6 +499,9 @@
       </select>
     </div>
     <p class="explica" id="explicaBotoesNaTela" data-so-android hidden></p>
+    <div class="controle-acoes" data-so-android hidden>
+      <button class="botao" id="btnArrumarToque" type="button">Arrumar os botões da tela</button>
+    </div>
 
     <div class="opcao">
       <span class="opcao-rotulo">Fundo animado</span>
@@ -1341,6 +1344,45 @@
     <div class="modal-acoes">
       <button class="botao" data-fechar="modalJuntoLocal" type="button">Fechar</button>
       <button class="botao botao--principal" id="btnAbrirJuntoLocal" type="button">Abrir o jogo</button>
+    </div>
+  </div>
+</div>
+
+<!-- Arrumar os botoes da tela (07/11/2026, servidor\toque_consoles.py): o controle de toque com a cara de cada
+     console; o aluno arrasta cada botao, escolhe os analogicos e o tamanho. Vale no proximo jogo. -->
+<div class="modal" id="modalToque" hidden>
+  <div class="modal-caixa modal-caixa--largo" role="dialog" aria-modal="true" aria-labelledby="tituloToque">
+    <h2 id="tituloToque">Arrumar os botões da tela</h2>
+    <div class="opcao">
+      <span class="opcao-rotulo">Com a cara de cada console</span>
+      <button class="chave opcao-controle" id="chaveToquePorConsole" aria-pressed="true"
+              aria-label="Controle de toque com a cara de cada console"></button>
+      <span class="opcao-ajuda">Desligado, todo console usa o controle de toque genérico.</span>
+    </div>
+    <div class="toque-escolhas">
+      <label class="campo"><span>Console</span><select id="listaToqueDesenho"></select></label>
+      <label class="campo"><span>Celular</span>
+        <select id="listaToqueOrientacao">
+          <option value="deitado">Deitado</option>
+          <option value="em_pe">Em pé</option>
+        </select></label>
+      <label class="campo"><span>Analógicos</span>
+        <select id="listaToqueAnalogicos">
+          <option value="do_console">Os do console</option>
+          <option value="dois">Os dois, sempre</option>
+          <option value="nenhum">Nenhum</option>
+        </select></label>
+      <label class="campo"><span>Tamanho dos botões</span>
+        <input type="range" id="faixaToqueTamanho" min="60" max="150" step="5" value="100"></label>
+    </div>
+    <p class="explica">Arraste cada botão com o dedo para onde ficar melhor. "Os dois, sempre" põe os dois
+      analógicos mesmo em console que não tinha (há jogos adaptados que usam). Vale no próximo jogo.</p>
+    <div class="toque-palco" id="palcoToque" role="group" aria-label="A tela do celular com os botões"></div>
+    <p class="explica" id="toqueAviso" role="status" aria-live="polite"></p>
+    <div class="modal-acoes">
+      <button class="botao" id="btnToqueFabrica" type="button">Voltar ao de fábrica</button>
+      <button class="botao" data-fechar="modalToque" type="button">Cancelar</button>
+      <button class="botao botao--principal" id="btnToqueSalvar" type="button">Salvar</button>
     </div>
   </div>
 </div>
