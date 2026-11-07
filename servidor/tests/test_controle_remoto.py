@@ -741,6 +741,37 @@ class AsRotasDoArena(unittest.TestCase):
             self.arena.Manipulador.api_post(falso, "/api/partida/cabo", {"papel": "hospedar"})
         self.assertEqual(falso.respostas[-1][0], "erro")
 
+    def test_a_porta_dos_colegas_so_atende_as_rotas_da_rede(self):
+        import json as _json
+        import urllib.error
+        import urllib.request
+        arena = self.arena
+        porta_antiga = arena.PORTA_DOS_COLEGAS
+        arena.PORTA_DOS_COLEGAS = 0                       # porta livre qualquer
+        try:
+            self.assertTrue(arena.abrir_porta_dos_colegas())
+            porta = arena.PORTA_DOS_COLEGAS_ABERTA["servidor"].server_address[1]
+            base = "http://127.0.0.1:%d" % porta
+
+            def pedir(rota, corpo=None):
+                pedido = urllib.request.Request(base + rota, data=None if corpo is None else _json.dumps(corpo).encode(),
+                                                headers={"Content-Type": "application/json"})
+                try:
+                    with urllib.request.urlopen(pedido, timeout=5) as resposta:
+                        return resposta.status
+                except urllib.error.HTTPError as falha:
+                    return falha.code
+            # de 127.0.0.1, mas pela porta dos colegas: a rota de professor e' recusada
+            self.assertEqual(pedir("/api/controle-remoto"), 403)
+            self.assertEqual(pedir("/api/controle-remoto/ligar", {}), 403)
+            self.assertEqual(pedir("/api/partida/cabo", {"papel": "hospedar"}), 403)
+            # o "cheguei" (aberto a rede) passa: sem partida esperando, a resposta e' o 404 explicado
+            self.assertEqual(pedir("/api/partida/cheguei", {"apelido": "PC"}), 404)
+        finally:
+            arena.fechar_porta_dos_colegas()
+            arena.PORTA_DOS_COLEGAS = porta_antiga
+        self.assertIsNone(arena.PORTA_DOS_COLEGAS_ABERTA["servidor"])
+
     def test_no_android_nao_liga(self):
         with mock.patch.object(self.arena.plataforma_do_sistema, "ANDROID", True):
             for rota, post in (("/api/controle-remoto", False), ("/api/controle-remoto/ligar", True)):

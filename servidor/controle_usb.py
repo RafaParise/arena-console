@@ -32,9 +32,11 @@ _ligamos_o_servidor = False        # o servidor do adb (que guarda o `adb revers
 _controle_ligado = False           # ha celular-controle no cabo (abrir_no_celular), ainda nao solto
 
 # Jogar Junto pelo cabo (pedido do Rafael, 26/10/2026): a partida do RetroArch (TCP 55435) e o "cheguei" entre os dois
-# ARENA vao dentro do cabo. O 8777 de cada lado ja e' o proprio ARENA, entao o ARENA do OUTRO lado aparece no 18777.
+# ARENA vao dentro do cabo. O ARENA do OUTRO lado aparece no 18777 e o tunel chega na PORTA DOS COLEGAS dele (8778), que
+# so atende as rotas abertas a rede (arena.ServidorDosColegas). Nunca na 8777: o que chega pelo tunel vem de 127.0.0.1,
+# e na 8777 qualquer app do celular passaria por "este computador" (achado da revisao de seguranca de 07/11/2026).
 PORTA_DA_PARTIDA = 55435           # graficos.PORTA_PARTIDA
-PORTA_DO_ARENA = 8777
+PORTA_DO_ARENA = 8778              # arena.PORTA_DOS_COLEGAS
 PORTA_DO_OUTRO_ARENA = 18777
 ENDERECO_PELO_CABO = "127.0.0.1:%d" % PORTA_DO_OUTRO_ARENA
 _partida = None                    # (serial, "reverse" ou "forward") da partida pelo cabo ligada agora

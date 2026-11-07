@@ -132,7 +132,7 @@ class APartidaPeloCabo(unittest.TestCase):
         self.assertEqual(r["endereco"], "127.0.0.1:18777")
         ligacoes = [c for c in falso.chamadas if "reverse" in c]
         self.assertEqual(ligacoes, [["-s", "ABC12345", "reverse", "tcp:55435", "tcp:55435"],
-                                    ["-s", "ABC12345", "reverse", "tcp:18777", "tcp:8777"]])
+                                    ["-s", "ABC12345", "reverse", "tcp:18777", "tcp:8778"]])
         self.assertEqual(usb.partida_ligada(), ("ABC12345", "reverse"))
 
     def test_quem_entra_na_partida_do_celular_faz_forward(self):
@@ -142,7 +142,7 @@ class APartidaPeloCabo(unittest.TestCase):
                 self.assertTrue(usb.ligar_partida(papel)["ok"])
         ligacoes = [c for c in falso.chamadas if "forward" in c and "--remove" not in c]
         self.assertEqual(ligacoes[0], ["-s", "ABC12345", "forward", "tcp:55435", "tcp:55435"])
-        self.assertEqual(ligacoes[1], ["-s", "ABC12345", "forward", "tcp:18777", "tcp:8777"])
+        self.assertEqual(ligacoes[1], ["-s", "ABC12345", "forward", "tcp:18777", "tcp:8778"])
         # a segunda partida trocou a primeira: as duas portas da primeira foram tiradas antes
         remocoes = [c for c in falso.chamadas if "--remove" in c]
         self.assertEqual(remocoes, [["-s", "ABC12345", "forward", "--remove", "tcp:55435"],

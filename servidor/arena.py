@@ -291,6 +291,7 @@ def cancelar_partida_pendente(vez=None):
         JOGO_EM_ANDAMENTO["ativo"] = False
         JOGO_EM_ANDAMENTO["titulo"] = ""
     threading.Thread(target=controle_usb.soltar_partida, daemon=True).start()     # a partida pelo cabo, se havia
+    threading.Thread(target=fechar_porta_dos_colegas, daemon=True).start()
     return True
 
 
@@ -3516,6 +3517,7 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             PARTIDA_ABERTA["partida"] = None
         if partida:
             controle_usb.soltar_partida()       # a partida pelo cabo (adb forward/reverse), se havia
+            fechar_porta_dos_colegas()
 
 
 # ---------------------------------------------------------------------------
@@ -5227,6 +5229,10 @@ class Manipulador(BaseHTTPRequestHandler):
     def pedido_e_local(self):
         """O pedido veio deste MESMO computador (qualquer um dos enderecos
         dele), e nao de outra maquina na rede?"""
+        if getattr(self.server, "so_colegas", False):
+            # A porta dos colegas (Jogar Junto pelo cabo): chega de 127.0.0.1 pelo tunel do adb, mas quem esta do outro
+            # lado e' o OUTRO aparelho. Vale como pedido da rede: so as ROTAS_REDE_EXTERNA.
+            return False
         origem = self.client_address[0]
         # Todo endereco de loopback (127.0.0.0/8, ::1 e ::ffff:127.x) e' deste
         # aparelho. No Linux e no Android, qualquer programa liga o proprio
@@ -6589,8 +6595,13 @@ class Manipulador(BaseHTTPRequestHandler):
                 return self.erro("A partida pelo cabo é ligada no computador: lá, em Jogar junto, clique em Ligar pelo "
                                  "cabo USB. Aqui, escolha “Computador ligado pelo cabo USB” na lista.", 404)
             serial = dados.get("serial")
-            resposta = controle_usb.ligar_partida(str(dados.get("papel", "")),
-                                                  serial if isinstance(serial, str) else None)
+            papel = str(dados.get("papel", ""))
+            resposta = controle_usb.ligar_partida(papel, serial if isinstance(serial, str) else None)
+            if resposta["ok"] and papel == "hospedar" and not abrir_porta_dos_colegas():
+                controle_usb.soltar_partida()
+                resposta = dict(resposta, ok=False, endereco=None,
+                                erro="A porta %d deste computador está ocupada por outro programa. Feche o outro ARENA "
+                                     "e tente de novo." % PORTA_DOS_COLEGAS)
             # "ok" e' o do pedido (a tela trata ok=false como erro e perderia a lista de celulares e a dica);
             # "ligado" diz se o cabo ficou pronto.
             return self.responder_json(dict(resposta, ok=True, ligado=resposta["ok"]))
@@ -7554,6 +7565,8 @@ class Manipulador(BaseHTTPRequestHandler):
                     }
 
             argumentos = (jogo, apelido, config, plataforma.get("custo"), partida)
+            if modo == "hospedar" and partida and plataforma_do_sistema.ANDROID:
+                abrir_porta_dos_colegas()          # o computador pode entrar pelo cabo USB (adb forward ate o 8778)
             if esperar:
                 esperar_o_amigo(argumentos)
             else:
@@ -7664,6 +7677,47 @@ class Servidor(ThreadingHTTPServer):
     # o segundo ARENA roubaria a porta do primeiro em silencio. Por isso fica
     # desligado la, e ligado no Linux, onde o comportamento e o esperado.
     allow_reuse_address = not sys.platform.startswith("win")
+
+
+# A porta dos colegas pelo cabo USB (controle_usb.ligar_partida): o tunel do adb traz o ARENA do outro aparelho ate o
+# 127.0.0.1 deste. Aqui ele so alcanca as ROTAS_REDE_EXTERNA (o "cheguei" da partida), como um colega da rede. Escuta so
+# no 127.0.0.1 e so enquanto ha partida pelo cabo (ou partida aberta no celular, que nao sabe se vem cabo).
+PORTA_DOS_COLEGAS = 8778
+
+
+class ServidorDosColegas(Servidor):
+    so_colegas = True
+    request_queue_size = 8
+
+
+PORTA_DOS_COLEGAS_ABERTA = {"servidor": None}
+TRAVA_COLEGAS = threading.Lock()
+
+
+def abrir_porta_dos_colegas():
+    """Liga a porta dos colegas (127.0.0.1:8778). True se ficou (ou ja estava) aberta; nunca levanta."""
+    with TRAVA_COLEGAS:
+        if PORTA_DOS_COLEGAS_ABERTA["servidor"] is not None:
+            return True
+        try:
+            servidor = ServidorDosColegas(("127.0.0.1", PORTA_DOS_COLEGAS), Manipulador)
+        except OSError as falha:
+            print("[ARENA] Porta dos colegas pelo cabo (%d) ocupada: %s" % (PORTA_DOS_COLEGAS, falha))
+            return False
+        PORTA_DOS_COLEGAS_ABERTA["servidor"] = servidor
+        threading.Thread(target=servidor.serve_forever, daemon=True).start()
+        return True
+
+
+def fechar_porta_dos_colegas():
+    with TRAVA_COLEGAS:
+        servidor, PORTA_DOS_COLEGAS_ABERTA["servidor"] = PORTA_DOS_COLEGAS_ABERTA["servidor"], None
+    if servidor is not None:
+        try:
+            servidor.shutdown()
+            servidor.server_close()
+        except OSError:
+            pass
 
 
 # ---------------------------------------------------------------------------
