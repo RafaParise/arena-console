@@ -272,6 +272,46 @@ Falta (nesta ordem):
 - **Limpezas no celular**: apagar `/sdcard/ARENA/BIOS-PS2-teste` e, se você quiser, desinstalar o `com.armsx2`; o APK de teste foi
   trocado pelo de produção.
 
+## Rodada de 07/11/2026: o que foi feito e o que falta
+
+**Feito**
+
+- **A abertura do ARENA no celular parava minutos** em "Abrindo o ARENA…" com muitos jogos no cartão SD (no A12, 6.567 jogos): a
+  busca de capa perguntava ao armazenamento do Android, jogo por jogo, por centenas de nomes. Agora cada pasta é lida uma vez:
+  **de mais de 5 minutos (sem terminar) para 24 s**, varrendo do zero. Um vigia (`janela_preta.vigiar_abertura`) escreve no registro de
+  queda onde o servidor está se a abertura passar de 60 s.
+- **Savestate no celular**: o estado só se salvava pelo menu do jogo (F2 e F4 não existem no celular). O controle de toque ganhou
+  **SALVAR e CARREGAR**, e o estado passa a guardar **a foto de onde parou**. Testado no A12: estado e foto gravados, e carregados.
+- **Pasta de jogos do ARENA no cartão SD** (Ajustes → Máquina → Onde ficam os jogos): "Criar a pasta no cartão" faz `ARENA-jogos` com
+  uma pasta por console; os **jogos baixados** passam a ir para ela; e "Levar jogos da memória para o cartão" lista os jogos que estão
+  na memória do aparelho e leva os marcados (copia, confere e só depois apaga o original; o jogo vai inteiro, com as trilhas).
+  Testado no A12: pasta criada no cartão, 422 jogos achados na memória, um arquivo de teste levado e conferido.
+- **O celular vibra também**: chave que manda o tremor do jogo para o próprio celular, e "Vibrar ao tocar" nos botões da tela.
+- **Controle de toque com a cara de cada console**: 15 desenhos (Super Nintendo, NES, Game Boy, GBA, PC Engine, Nintendo 64,
+  GameCube, Mega Drive, Saturn, Dreamcast, PlayStation, PSP, Neo Geo, fliperama, Nintendo DS), deitado e em pé, com o formato e a
+  posição do controle de verdade. O botão que cada peça manda foi lido do próprio núcleo. **Os dois analógicos** podem ficar sempre
+  (para os jogos adaptados), só os do console ou nenhum. Em Ajustes → Imagem → **"Arrumar os botões da tela"** o aluno arrasta cada
+  botão, muda o tamanho e volta ao de fábrica.
+- **Jogar Junto pelo cabo USB**: botão "Ligar pelo cabo USB" no computador; no celular, a opção "Computador ligado neste celular pelo
+  cabo USB" na lista. A revisão de segurança automática achou e eu corrigi: o túnel chega numa porta só para o aviso da partida
+  (8778), nunca nas rotas do professor.
+- **Quatro botões do celular-controle que nunca funcionaram pela tela** (a chave, o cabo, o gamepad e os jogadores): mandavam o
+  pedido sem o método e o navegador recusava. Corrigidos, com teste que impede a volta.
+- **Ferramentas em qualquer projeto**: os plugins, MCP, kits, subagentes e permissões ficam no nível do usuário; `continuar-projeto`
+  passou a ser um comando geral.
+- Bateria do servidor: **1177 testes OK**; auditoria de acessibilidade da tela: **0 problemas** em 108 telas.
+
+**O que falta**
+
+- **Ver no celular** os controles de toque novos e a tela de arrumar (o celular saiu do cabo antes); sentir a vibração com o T4.
+- **Partida pelo cabo de verdade** entre o computador e o celular, nos dois sentidos, com o APK novo.
+- **APK e pacote do Windows novos e a página do release**: só depois do teste acima.
+- Da rodada anterior: 8 jogadores e Linux de verdade, `teste_matriz_consoles`, `teste_navegadores`, `teste_android`, modo de dados
+  móveis, controles de verdade.
+- **Pedidos antigos sem sinal de feito** (achados na revisão de todos os pedidos, 07/11): tela do celular na TV e orientação em pé e
+  deitado escolhida pelo aluno (24/10); Deadly Alliance lento (24/10); o modo claro piscando ao abrir o jogo (24/10); o pedido do
+  Donkey Kong com a Dixie e o bebê (21/10). Ficam para a próxima rodada, nesta ordem.
+
 ## Depende do Rafael
 
 - **Acessórios (24/10/2026), o que só você faz:**

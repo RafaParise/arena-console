@@ -282,3 +282,12 @@ cima da versão que está no celular (mesma assinatura, `versionCode` 20261026).
 - Jogar Junto com o computador testado nos dois sentidos; no celular, "o próximo lugar livre".
 
 Medidas e o que falta: `docs\PLANO-CELULAR.md` e `docs\PENDENCIAS.md`.
+
+## Atualização de 07/11/2026 (no código; o APK sai depois do teste no celular)
+
+- **Abertura**: com 6.567 jogos no cartão, o A12 ficava mais de 5 minutos em "Abrindo o ARENA…"; agora leva 24 s (varredura do zero).
+  A causa era a busca de capa perguntando ao armazenamento do Android, arquivo por arquivo (cada pergunta passa pelo FUSE).
+- **SALVAR e CARREGAR** no controle de toque, com a foto do estado; **pasta ARENA-jogos no cartão** e levar jogos da memória para ela;
+  **o celular vibra também**; **controle de toque com a cara de cada console** e a tela **Arrumar os botões da tela**.
+- **APK de teste depurável**: só o `--teste` sai com `android:debuggable`, para o `adb shell run-as` ler o banco, a configuração e os
+  registros do app quando ele trava. O APK de verdade continua fechado.

@@ -1295,3 +1295,13 @@ opção específica que só ele tem.
 
 
 ---
+
+## A pasta de jogos do ARENA no cartão de memória (celular, 07/11/2026)
+
+Em Ajustes → Máquina → Onde ficam os jogos:
+
+1. **Criar a pasta no cartão** faz a pasta `ARENA-jogos` no cartão, com uma pasta para cada console. Os jogos que você baixa e
+   leva para o ARENA passam a ir para ela, e não para a memória do aparelho.
+2. **Levar jogos da memória para o cartão** mostra os jogos que estão ocupando a memória do aparelho, com o tamanho. Marque os que
+   vão para o cartão e toque em **Levar os marcados**. O ARENA copia, confere e só depois apaga da memória; se faltar espaço ou der
+   erro, o jogo fica onde estava. Os saves continuam valendo. Não tire o cartão enquanto a mudança anda.

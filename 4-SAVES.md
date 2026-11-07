@@ -570,3 +570,9 @@ paciência.
 
 
 ---
+
+## Salvar de onde parou no celular (07/11/2026)
+
+No celular não há F2 nem F4. Use os botões **SALVAR** e **CARREGAR** no alto da tela do jogo: SALVAR guarda o ponto exato do jogo
+(e uma **foto** dele, que aparece no menu do jogo e na gaveta Saves), CARREGAR volta para lá. Com um controle ligado, o menu do jogo
+abre com **L3 + R3** (os dois analógicos apertados), e lá estão "Salvar estado" e "Carregar estado".

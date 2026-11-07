@@ -1703,3 +1703,17 @@ Se precisar cortar, corte de cima para baixo.
 
 
 ---
+
+## Controle de toque com a cara do console (celular, 07/11/2026)
+
+No celular, os botões da tela têm o formato e a posição do controle de cada console: o A grande e verde do GameCube, os botões C
+amarelos do Nintendo 64, o ABC/XYZ do Mega Drive, os símbolos do PlayStation e assim por diante. Em todos ficam, no alto, **MENU,
+SALVAR, CARREGAR e SAIR**.
+
+- **Mudar os botões de lugar**: Ajustes → Imagem → **Arrumar os botões da tela**. Escolha o console e se o celular fica deitado ou em
+  pé, e arraste cada botão com o dedo. "Tamanho dos botões" aumenta ou diminui todos. **Voltar ao de fábrica** desfaz.
+- **Analógicos**: "Os do console" (o PlayStation tem dois, o Dreamcast um, o Super Nintendo nenhum), **"Os dois, sempre"** (há jogos
+  adaptados que usam o segundo analógico, como os do Dreamcast) ou "Nenhum".
+- Desligando "Com a cara de cada console", todo console volta ao controle de toque genérico.
+- **Vibração**: logo abaixo da chave Vibração, **"O celular vibra também"** manda o tremor do jogo para o próprio celular, e
+  **"Vibrar ao tocar"** dá um toque curto a cada botão da tela.

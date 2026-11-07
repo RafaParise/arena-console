@@ -68,6 +68,15 @@ de teclado de PC; o **celular como controle** do jogo do computador (Wi-Fi, **ca
 perfis) e, como opção que exige driver, o celular como **gamepad Xbox 360 virtual**; e o **Jogar Junto entre celular e computador**.
 O que foi feito e o que ainda falta: [docs/PENDENCIAS.md](docs/PENDENCIAS.md); guia do controle: [3-IMAGEM-SOM-CONTROLE.md](3-IMAGEM-SOM-CONTROLE.md).
 
+## Novidades de 07/11/2026
+
+Acrescentado (no código; o APK novo sai depois do teste no celular): no Android, a **abertura que levava minutos com muitos jogos
+no cartão** agora leva segundos; **SALVAR e CARREGAR** no controle de toque, com a **foto de onde parou**; a **pasta de jogos do ARENA no
+cartão SD**, para onde vão os jogos baixados e os da memória do aparelho; o **celular vibra junto** com o jogo; e o **controle de
+toque com a cara de cada console** (GameCube, N64, PlayStation, Mega Drive...), com **dois analógicos** quando o aluno quiser e botões
+que ele **arrasta para onde preferir**. No computador, o **Jogar Junto pelo cabo USB** com o celular. Tudo o que foi feito e o que
+falta: [docs/PENDENCIAS.md](docs/PENDENCIAS.md).
+
 ## Baixar e usar
 
 1. Baixe o arquivo **`ARENA-2026.10.22.zip`** (uns 1.065 MB; descompactado, 2,6 GB) na página
