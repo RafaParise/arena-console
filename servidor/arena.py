@@ -5268,6 +5268,13 @@ class Manipulador(BaseHTTPRequestHandler):
     def checar_acesso_de_rede(self, caminho):
         """Barra rota sensivel vinda de fora deste computador. Devolve
         True se o pedido pode seguir, False se ja respondeu com erro."""
+        if getattr(self.server, "so_colegas", False):
+            # A porta dos colegas pelo cabo (revisao de seguranca de 07/11/2026): so o "cheguei" da partida, e so com o
+            # Host do proprio tunel (um site no navegador do aparelho que fizesse DNS rebinding nao passa).
+            if caminho in ROTAS_DA_PORTA_DOS_COLEGAS and self.host_confiavel():
+                return True
+            self.erro("Esta porta só recebe o aviso da partida pelo cabo.", 403)
+            return False
         if self.pedido_e_local():
             # Pedido deste computador: so aceita se veio da nossa tela, e nao
             # de um site que se disfarcou de 127.0.0.1 (DNS rebinding).
@@ -7683,6 +7690,7 @@ class Servidor(ThreadingHTTPServer):
 # 127.0.0.1 deste. Aqui ele so alcanca as ROTAS_REDE_EXTERNA (o "cheguei" da partida), como um colega da rede. Escuta so
 # no 127.0.0.1 e so enquanto ha partida pelo cabo (ou partida aberta no celular, que nao sabe se vem cabo).
 PORTA_DOS_COLEGAS = 8778
+ROTAS_DA_PORTA_DOS_COLEGAS = frozenset(("/api/partida/cheguei",))
 
 
 class ServidorDosColegas(Servidor):

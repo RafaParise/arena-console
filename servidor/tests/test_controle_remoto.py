@@ -767,6 +767,12 @@ class AsRotasDoArena(unittest.TestCase):
             self.assertEqual(pedir("/api/partida/cabo", {"papel": "hospedar"}), 403)
             # o "cheguei" (aberto a rede) passa: sem partida esperando, a resposta e' o 404 explicado
             self.assertEqual(pedir("/api/partida/cheguei", {"apelido": "PC"}), 404)
+            self.assertEqual(pedir("/api/ranking"), 403)                  # aberta a rede, mas nao a esta porta
+            pedido = urllib.request.Request(base + "/api/partida/cheguei", data=b"{}",
+                                            headers={"Content-Type": "application/json", "Host": "site.exemplo"})
+            with self.assertRaises(urllib.error.HTTPError) as falha:
+                urllib.request.urlopen(pedido, timeout=5)
+            self.assertEqual(falha.exception.code, 403)                     # DNS rebinding
         finally:
             arena.fechar_porta_dos_colegas()
             arena.PORTA_DOS_COLEGAS = porta_antiga
