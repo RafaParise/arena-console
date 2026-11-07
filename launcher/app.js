@@ -1854,6 +1854,109 @@ async function mostrarArmazenamento() {
   $("#btnCartaoProcurar").hidden = !cartao;
   $("#btnCartaoEscolher").hidden = !cartao;
   $("#btnMedirCartao").hidden = !cartao;
+  desenharPastaDoArena(dados, cartao);
+}
+
+// A pasta ARENA-jogos no cartao (07/11/2026, servidor\cartao_de_jogos.py): criar, levar os jogos da memoria para
+// ela e acompanhar a mudanca.
+function desenharPastaDoArena(dados, cartao) {
+  const texto = $("#pastaDoArenaNoCartao");
+  const criar = $("#btnCriarPastaNoCartao");
+  const levar = $("#btnJogosNaMemoria");
+  if (dados.pasta_do_arena) {
+    texto.textContent = `Os jogos que você baixar vão para ${dados.pasta_do_arena}. Ponha cada jogo na pasta do ` +
+      "console dele; o ARENA lê esta pasta sozinho.";
+  } else if (cartao) {
+    texto.textContent = "Crie uma pasta só do ARENA no cartão: ela já vem com uma pasta por console, os jogos " +
+      "baixados passam a ir para lá e você pode levar para ela os jogos que estão ocupando a memória do aparelho.";
+  } else {
+    texto.textContent = "Encaixe um cartão de memória para criar a pasta de jogos do ARENA nele.";
+  }
+  criar.hidden = !cartao || Boolean(dados.pasta_do_arena);
+  levar.hidden = !dados.pasta_do_arena;
+  desenharMudanca(dados.mudanca);
+}
+
+function desenharMudanca(mudanca) {
+  const aviso = $("#mudancaAndamento");
+  if (!mudanca || (!mudanca.rodando && !mudanca.terminou_em)) {
+    aviso.hidden = true;
+    return;
+  }
+  aviso.hidden = false;
+  const pct = mudanca.bytes_total ? Math.min(100, Math.round(100 * mudanca.bytes_feitos / mudanca.bytes_total)) : 0;
+  if (mudanca.rodando) {
+    aviso.textContent = `Levando para o cartão: ${mudanca.feitos} de ${mudanca.total} jogos (${pct}%). ` +
+      `Agora: ${mudanca.atual || "…"}. Pode usar o ARENA enquanto isso, mas não tire o cartão.`;
+    clearTimeout(estado.relogioMudanca);
+    estado.relogioMudanca = setTimeout(mostrarArmazenamento, 1500);
+  } else {
+    const erros = mudanca.erros || [];
+    aviso.textContent = `Pronto: ${mudanca.total - erros.length} de ${mudanca.total} jogos estão no cartão.` +
+      (erros.length ? " Ficaram na memória, sem perder nada: " + erros.slice(0, 5).join("; ") +
+        (erros.length > 5 ? ` e mais ${erros.length - 5}.` : ".") : "");
+  }
+}
+
+async function criarPastaNoCartao() {
+  const cartao = cartaoNoAparelho();
+  const botao = $("#btnCriarPastaNoCartao");
+  if (!cartao) { recado("Encaixe o cartão de memória e tente de novo.", true); return; }
+  botao.disabled = true;
+  try {
+    await pedir("/api/armazenamento/criar-pasta", "POST", { volume: cartao.id });
+    recado("Pasta criada no cartão. Os jogos baixados vão para ela.");
+    await mostrarArmazenamento();
+  } catch (falha) {
+    recado(falha.message, true);
+  } finally {
+    botao.disabled = false;
+  }
+}
+
+async function listarJogosNaMemoria() {
+  const lista = $("#listaJogosNaMemoria");
+  const resumo = $("#levarResumo");
+  $("#blocoLevarParaCartao").hidden = false;
+  resumo.textContent = "Procurando os jogos que estão na memória do aparelho…";
+  lista.replaceChildren();
+  let r;
+  try {
+    r = await pedir("/api/armazenamento/na-memoria", "POST", {});
+  } catch (falha) {
+    resumo.textContent = falha.message;
+    return;
+  }
+  const jogos = r.jogos || [];
+  if (!jogos.length) {
+    resumo.textContent = "Nenhum jogo de Meus jogos ou Da turma está na memória do aparelho: já está tudo no cartão.";
+    return;
+  }
+  resumo.textContent = `${jogos.length} jogo${jogos.length === 1 ? "" : "s"} na memória do aparelho, ` +
+    `${formatarMb(Math.round(r.bytes / 1048576))} no total. Marque os que vão para o cartão. O ARENA copia, confere ` +
+    "e só depois apaga da memória; os saves continuam valendo.";
+  lista.replaceChildren(...jogos.map((jogo) => {
+    const item = document.createElement("li");
+    const rotulo = document.createElement("label");
+    const marca = document.createElement("input");
+    marca.type = "checkbox";
+    marca.value = jogo.id;
+    rotulo.append(marca, ` ${jogo.titulo} (${jogo.console}, ${formatarMb(Math.max(1, Math.round(jogo.bytes / 1048576)))})`);
+    item.append(rotulo);
+    return item;
+  }));
+}
+
+async function levarMarcadosParaCartao() {
+  const marcados = [...document.querySelectorAll("#listaJogosNaMemoria input:checked")].map((m) => m.value);
+  if (!marcados.length) { recado("Marque pelo menos um jogo.", true); return; }
+  try {
+    const r = await pedir("/api/armazenamento/mover", "POST", { jogos: marcados });
+    $("#blocoLevarParaCartao").hidden = true;
+    desenharMudanca(r.mudanca);
+  } catch (falha) {
+    recado(falha.message, true);
+  }
 }
 
 function desenharVolumes(volumes) {
@@ -5764,6 +5867,15 @@ function ligarEventos() {
   });
 
   $("#btnAparelhoDeNovo").addEventListener("click", () => mostrarAparelho({ forcar: true }));
+  $("#btnCriarPastaNoCartao").addEventListener("click", criarPastaNoCartao);
+  $("#btnJogosNaMemoria").addEventListener("click", listarJogosNaMemoria);
+  $("#btnLevarParaCartao").addEventListener("click", levarMarcadosParaCartao);
+  $("#btnFecharLevarParaCartao").addEventListener("click", () => { $("#blocoLevarParaCartao").hidden = true; });
+  $("#btnMarcarTodosParaCartao").addEventListener("click", () => {
+    const marcas = [...document.querySelectorAll("#listaJogosNaMemoria input")];
+    const todas = marcas.every((m) => m.checked);
+    for (const m of marcas) m.checked = !todas;
+  });
   // O app voltou para a frente (depois de um jogo, por exemplo): se a aba Maquina estava aberta, volta a ler.
   document.addEventListener("visibilitychange", () => {
     if (!document.hidden && noCelular()) mostrarAparelho();

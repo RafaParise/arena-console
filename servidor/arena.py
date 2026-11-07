@@ -103,6 +103,8 @@ import portas  # noqa: E402  (as faixas que o Windows reserva a cada reinicio --
 import ponte_android  # noqa: E402  (no Android, o que o servidor pede ao app -- item 14, 18/10/2026)
 import adb_aparelho  # noqa: E402  (o celular ligado no cabo, visto pelo computador -- 23/10/2026)
 import armazenamento  # noqa: E402  (a memoria do celular e o cartao SD, juntos -- 23/10/2026)
+import cartao_de_jogos  # noqa: E402  (a pasta ARENA-jogos no cartao e levar os jogos para ela -- 07/11/2026)
+MUDANCA_PARA_O_CARTAO = cartao_de_jogos.Mudanca()
 
 PASTA_LAUNCHER = os.path.join(RAIZ, "launcher")
 PASTA_DADOS = os.path.join(RAIZ, "dados")
@@ -5605,7 +5607,9 @@ class Manipulador(BaseHTTPRequestHandler):
             if not plataforma_do_sistema.ANDROID:
                 return self.erro("Isto é só do ARENA do Android. No computador, ponha os jogos na pasta jogos do "
                                  "ARENA (Como colocar jogos mostra onde).", 404)
-            return self.responder_json(dict(armazenamento.estado(), ok=True))
+            return self.responder_json(dict(armazenamento.estado(), ok=True,
+                                            pasta_do_arena=cartao_de_jogos.pasta_no_cartao(),
+                                            mudanca=MUDANCA_PARA_O_CARTAO.estado()))
 
         if caminho == "/api/android/pastas":
             # As pastas do ARENA deste aparelho (Ajustes -> Maquina, so no Android).
@@ -5964,6 +5968,66 @@ class Manipulador(BaseHTTPRequestHandler):
             if erro:
                 return self.erro(erro)
             return self.responder_json(self.depois_de_mexer_no_cartao())
+
+        if caminho == "/api/armazenamento/criar-pasta":
+            # A pasta ARENA-jogos no cartao (07/11/2026): uma pasta por console, ja na lista e destino dos baixados.
+            volume = next((v for v in armazenamento.volumes() if v["id"] == str(dados.get("volume", ""))
+                           and v["removivel"] and v["montado"]), None)
+            if not volume:
+                return self.erro("Escolha o cartão de memória. Se ele não aparece, encaixe-o e abra o ARENA de novo.")
+            proprias = [os.path.join(PASTA_JOGOS, o) for o in list(indexador.ORIGENS)
+                        if not o.startswith(armazenamento.PREFIXO)]
+            try:
+                cartao_de_jogos.criar_no_cartao(volume["caminho"], cartao_de_jogos.pastas_dos_consoles(),
+                                                proprias=proprias)
+            except cartao_de_jogos.NaoPode as falha:
+                return self.erro(str(falha))
+            resposta = self.depois_de_mexer_no_cartao()
+            resposta["pasta_do_arena"] = cartao_de_jogos.pasta_no_cartao()
+            return self.responder_json(resposta)
+
+        if caminho == "/api/armazenamento/na-memoria":
+            # Os jogos de Meus jogos e Da turma que estao na memoria do aparelho (para levar ao cartao).
+            jogos = cartao_de_jogos.jogos_na_memoria(manifesto()["jogos"], RAIZ, PASTA_JOGOS)
+            return self.responder_json({"ok": True, "jogos": jogos, "pasta_do_arena": cartao_de_jogos.pasta_no_cartao(),
+                                        "bytes": sum(j["bytes"] for j in jogos)})
+
+        if caminho == "/api/armazenamento/mover":
+            destino = cartao_de_jogos.pasta_no_cartao()
+            if not destino:
+                return self.erro("Falta a pasta de jogos do ARENA no cartão: clique antes em Criar a pasta no cartão.")
+            with TRAVA_JOGO:
+                if JOGO_EM_ANDAMENTO["ativo"]:
+                    return self.erro("Feche o jogo aberto antes de levar jogos para o cartão.", 409)
+            pedidos = dados.get("jogos")
+            if not isinstance(pedidos, list) or not pedidos or len(pedidos) > 20000:
+                return self.erro("Marque os jogos que vão para o cartão.")
+            pedidos = {str(p) for p in pedidos}
+            itens = []
+            for jogo in manifesto()["jogos"]:
+                if jogo["id"] not in pedidos or jogo.get("origem") not in cartao_de_jogos.ORIGENS_DA_MEMORIA:
+                    continue
+                origem_real = os.path.join(PASTA_JOGOS, jogo["origem"])
+                caminho_do_jogo = os.path.join(RAIZ, jogo["arquivo"])
+                if not dentro_da_pasta(caminho_do_jogo, PASTA_JOGOS) or not os.path.isfile(caminho_do_jogo):
+                    continue
+                console = cartao_de_jogos._pasta_do_console(caminho_do_jogo, origem_real)
+                if not console:
+                    continue
+                pasta, nomes = cartao_de_jogos.arquivos_do_jogo(caminho_do_jogo, console)
+                itens.append({"titulo": jogo.get("titulo", ""), "caminho": caminho_do_jogo, "pasta_do_console": console,
+                              "destino_do_console": os.path.join(destino, os.path.basename(console)),
+                              "bytes": cartao_de_jogos._tamanho(pasta, nomes)})
+            if not itens:
+                return self.erro("Nenhum dos jogos marcados está na memória do aparelho. Atualize a lista e marque de novo.")
+
+            def depois():
+                ligar_o_cartao()
+                limpar_caches()
+                manifesto(forcar=True)
+            if not MUDANCA_PARA_O_CARTAO.comecar(itens, depois):
+                return self.erro("Já há jogos indo para o cartão. Espere terminar.", 409)
+            return self.responder_json({"ok": True, "mudanca": MUDANCA_PARA_O_CARTAO.estado()})
 
         if caminho == "/api/armazenamento/tirar":
             _novos, erro = armazenamento.remover(str(dados.get("id") or ""))
@@ -6663,8 +6727,10 @@ class Manipulador(BaseHTTPRequestHandler):
 
         if caminho == "/api/baixados/levar":
             try:
+                # No celular com a pasta ARENA-jogos no cartao, o jogo baixado vai para ela (07/11/2026).
+                no_cartao = cartao_de_jogos.pasta_no_cartao() if plataforma_do_sistema.ANDROID else None
                 destino = baixados.levar(dados.get("arquivo"), str(dados.get("console", "")),
-                                         carregar_catalogo(), PASTA_JOGOS)
+                                         carregar_catalogo(), PASTA_JOGOS, prateleira=no_cartao)
             except baixados.NaoPode as falha:
                 return self.erro(str(falha))
             except OSError as falha:

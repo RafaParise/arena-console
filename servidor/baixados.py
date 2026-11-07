@@ -150,9 +150,9 @@ class NaoPode(Exception):
     """O pedido nao pode ser feito; a mensagem diz o porque e o que fazer."""
 
 
-def levar(caminho, plataforma_id, plataformas, pasta_jogos, pastas=None):
-    """Move o arquivo baixado para jogos\\pessoais\\<console>. Devolve o
-    destino. So aceita arquivo de dentro das pastas de download e com a
+def levar(caminho, plataforma_id, plataformas, pasta_jogos, pastas=None, prateleira=None):
+    """Move o arquivo baixado para jogos\\pessoais\\<console> (ou para 'prateleira'\\<console>: a pasta ARENA-jogos
+    do cartao SD, no celular). Devolve o destino. So aceita arquivo de dentro das pastas de download e com a
     extensao do console escolhido."""
     real = os.path.realpath(str(caminho or ""))
     permitidas = pastas if pastas is not None else pastas_de_baixados()
@@ -167,7 +167,7 @@ def levar(caminho, plataforma_id, plataformas, pasta_jogos, pastas=None):
     extensao = os.path.splitext(real)[1].lower()
     if extensao not in [e.lower() for e in plataforma.get("extensoes", [])]:
         raise NaoPode("O %s não abre arquivo %s. Escolha outro console." % (plataforma["nome"], extensao))
-    prateleira = os.path.join(pasta_jogos, "pessoais", plataforma["pasta"])
+    prateleira = os.path.join(prateleira or os.path.join(pasta_jogos, "pessoais"), plataforma["pasta"])
     destino = os.path.join(prateleira, os.path.basename(real))
     if os.path.exists(destino):
         raise NaoPode("Já existe um jogo com esse nome no %s." % plataforma["nome"])

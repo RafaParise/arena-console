@@ -635,6 +635,22 @@
         Sem o cartão no aparelho, os jogos dele somem da lista e voltam quando
         você o encaixa de novo.
       </p>
+      <h3 class="grupo-titulo">Pasta de jogos do ARENA no cartão</h3>
+      <p class="explica" id="pastaDoArenaNoCartao" role="status"></p>
+      <div class="controle-acoes">
+        <button class="botao" id="btnCriarPastaNoCartao" type="button">Criar a pasta no cartão</button>
+        <button class="botao" id="btnJogosNaMemoria" type="button" hidden>Levar jogos da memória para o cartão</button>
+      </div>
+      <div id="blocoLevarParaCartao" hidden>
+        <p class="explica" id="levarResumo" role="status"></p>
+        <div class="controle-acoes">
+          <button class="botao" id="btnMarcarTodosParaCartao" type="button">Marcar todos</button>
+          <button class="botao botao--principal" id="btnLevarParaCartao" type="button">Levar os marcados</button>
+          <button class="botao" id="btnFecharLevarParaCartao" type="button">Fechar</button>
+        </div>
+        <ul class="onde-lista" id="listaJogosNaMemoria"></ul>
+      </div>
+      <p class="explica" id="mudancaAndamento" role="status" aria-live="polite" hidden></p>
       <h3 class="grupo-titulo">Pastas de jogos do cartão</h3>
       <ul class="onde-lista" id="listaPastasDoCartao"></ul>
       <p class="explica" id="armazenamentoBusca" role="status" hidden></p>
