@@ -16,7 +16,7 @@ instalar nada), numa tela de 1366x768 como a do notebook da escola:
     2. nenhum erro de JavaScript (erro, promessa recusada, console.error);
     3. nada vaza para os lados (sem barra de rolagem horizontal);
     4. Ajustes abre, e cada uma das 5 abas mostra o painel dela;
-    5. a Escala da tela tem as 5 escolhas, e trocar grava no servidor;
+    5. a Escala da tela tem as 7 escolhas, e trocar grava no servidor;
     6. a lista "Abrir a tela em" tem o padrao e os instalados;
     7. a busca filtra a lista de jogos;
     8. clicar num jogo mostra os detalhes dele;
@@ -118,8 +118,10 @@ ROTEIRO = r"""
 
   const busca = document.getElementById("campoBusca");
   const primeiro = document.querySelector("#listaJogos .jogo");
-  // O titulo do jogo: o mesmo que o leitor de tela le ("Ver detalhes de ...").
-  const nome = primeiro ? (primeiro.getAttribute("aria-label") || "").replace(/^Ver detalhes de /, "").trim() : "";
+  // O titulo do jogo, como aparece no cartao (07/11/2026: o "Ver detalhes de ..." saiu do cartao para o botao de
+  // dentro, e o teste passou a buscar por "", sem filtrar nada).
+  const tituloDoCartao = primeiro ? primeiro.querySelector(".jogo-titulo") : null;
+  const nome = tituloDoCartao ? tituloDoCartao.textContent.trim() : "";
   r.busca_por = nome.slice(0, 5);
   busca.value = r.busca_por;
   busca.dispatchEvent(new Event("input", { bubbles: true }));
@@ -277,8 +279,9 @@ def conferir(r):
         ("nada vaza para os lados", r.get("sem_rolagem_lateral") is True),
         ("Ajustes abre e as 5 abas mostram o painel", r.get("ajustes_abre") is True
          and len(abas) == 5 and all(abas.values())),
-        ("Escala da tela: 5 escolhas e a troca grava", r.get("escalas") ==
-         ["automatico", "pixel", "nitido", "suave", "original"] and r.get("escala_gravada") == "nitido"),
+        ("Escala da tela: 7 escolhas e a troca grava", r.get("escalas") ==
+         ["automatico", "pixel", "nitido", "suave", "anime4k", "inteiro", "original"]
+         and r.get("escala_gravada") == "nitido"),
         ("Abrir a tela em: o padrao e os instalados", (r.get("navegadores") or [""])[0] == "automatico"
          and len(r.get("navegadores") or []) >= 2),
         ("a busca filtra", 0 < r.get("cartoes_na_busca", 0) < r.get("cartoes", 0) or r.get("cartoes", 0) == 1),

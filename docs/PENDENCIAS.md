@@ -300,14 +300,17 @@ Falta (nesta ordem):
 - **Ferramentas em qualquer projeto**: os plugins, MCP, kits, subagentes e permissões ficam no nível do usuário; `continuar-projeto`
   passou a ser um comando geral.
 - Bateria do servidor: **1177 testes OK**; auditoria de acessibilidade da tela: **0 problemas** em 108 telas.
+- **`teste_navegadores` refeito: 30 de 30** (Edge, Chrome for Testing 157 e Firefox 159; tela pronta em 0,5 a 1,1 s, 32
+  quadros por segundo no fundo animado). Os 6 que falhavam eram do próprio teste: a Escala da tela ganhou duas escolhas
+  (anime4k e inteiro) e o nome do jogo saiu do cartão para o botão de dentro, e o teste buscava por um texto vazio.
 
 **O que falta**
 
 - **Ver no celular** os controles de toque novos e a tela de arrumar (o celular saiu do cabo antes); sentir a vibração com o T4.
 - **Partida pelo cabo de verdade** entre o computador e o celular, nos dois sentidos, com o APK novo.
 - **APK e pacote do Windows novos e a página do release**: só depois do teste acima.
-- Da rodada anterior: 8 jogadores e Linux de verdade, `teste_matriz_consoles`, `teste_navegadores`, `teste_android`, modo de dados
-  móveis, controles de verdade.
+- Da rodada anterior: 8 jogadores e Linux de verdade, `teste_matriz_consoles`, `teste_android`, modo de dados móveis, controles de
+  verdade.
 - **Pedidos antigos conferidos na revisão de todos os pedidos (07/11)**: o clarão do tema claro ao abrir o jogo (24/10) já
   estava resolvido (a856884: fundo preto na tela do jogo e abertura do Android 12 preta e sem ícone), e a turma do Donkey Kong com
   a Dixie e o bebê (21/10) já está no fundo animado. Faltam, e dependem do celular: **em pé e deitado do jeito que o aluno quiser,
