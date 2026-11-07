@@ -31,57 +31,101 @@ ASPECTO_DEITADO = 2.0          # largura / altura do desenho deitado (o RetroArc
 ASPECTO_EM_PE = 0.5
 ANALOGICOS = ("do_console", "dois", "nenhum")
 
-# As imagens: nome -> (forma, cor, texto, cor do texto). As cores lembram os controles de verdade.
+# As imagens: nome -> (forma, cor, texto, cor do texto). Pedido do Rafael (07/11/2026, depois do primeiro desenho):
+# "os icones de botoes do controle de cada console devem ter o mesmo desenho, formato e cor dos originais (...) p2 com
+# triangulo, cruz azul, bola vermelha e quadrado rosa". Por isso cada botao tem o volume do de verdade (sombra, brilho
+# e a letra gravada na cor do proprio botao), o direcional tem o formato de cada console (a cruz da Nintendo, o disco
+# da Sega, as quatro setas soltas do PlayStation, a alavanca do fliperama) e os C do Nintendo 64 sao os quatro botoes
+# amarelos. Formas: circulo, pilula, feijao_deitado, feijao_vertical (botoes); simbolo (PlayStation: botao preto com o
+# simbolo colorido); base_redonda e base_octogono (onde o analogico anda); pino (a ponta do analogico); botoes_c (N64);
+# dpad_cruz, dpad_sega, dpad_ps, dpad_alavanca (o fundo do direcional); marca e seta_ps (cada braco do direcional).
+# Cor do texto vazia = a letra gravada (a cor do botao, mais escura).
 CINZA, CINZA_CLARO, PRETO = "#5a5f66", "#9aa0a6", "#2b2d31"
 IMAGENS = {
-    "seta_cima": ("seta", CINZA, "cima", ""), "seta_baixo": ("seta", CINZA, "baixo", ""),
-    "seta_esq": ("seta", CINZA, "esquerda", ""), "seta_dir": ("seta", CINZA, "direita", ""),
-    "base_analogico": ("base", CINZA, "", ""), "pino": ("pino", CINZA_CLARO, "", ""),
-    "pino_c": ("pino", "#e8c22e", "C", PRETO),
-    "start": ("pilula", CINZA, "START", "#ffffff"), "select": ("pilula", CINZA, "SELECT", "#ffffff"),
-    "mode": ("pilula", CINZA, "MODE", "#ffffff"), "coin": ("pilula", CINZA, "COIN", "#ffffff"),
-    "run": ("pilula", CINZA, "RUN", "#ffffff"),
-    "start_vermelho": ("circulo", "#c83a3a", "S", "#ffffff"), "start_redondo": ("circulo", CINZA, "S", "#ffffff"),
-    "l": ("pilula", CINZA, "L", "#ffffff"), "r": ("pilula", CINZA, "R", "#ffffff"),
-    "l1": ("pilula", CINZA, "L1", "#ffffff"), "r1": ("pilula", CINZA, "R1", "#ffffff"),
-    "l2": ("pilula", CINZA, "L2", "#ffffff"), "r2": ("pilula", CINZA, "R2", "#ffffff"),
-    "l3": ("circulo", CINZA, "L3", "#ffffff"), "r3": ("circulo", CINZA, "R3", "#ffffff"),
-    "z_n64": ("pilula", "#6b6f78", "Z", "#ffffff"), "z_gc": ("pilula", "#6a4bb5", "Z", "#ffffff"),
-    # Super Nintendo (o colorido do Super Famicom)
-    "snes_a": ("circulo", "#d03a3a", "A", "#ffffff"), "snes_b": ("circulo", "#e8c02e", "B", PRETO),
-    "snes_x": ("circulo", "#3a5bd0", "X", "#ffffff"), "snes_y": ("circulo", "#3aa050", "Y", "#ffffff"),
-    # NES, Game Boy, PC Engine
-    "nes_a": ("circulo", "#c42d2d", "A", "#ffffff"), "nes_b": ("circulo", "#c42d2d", "B", "#ffffff"),
-    "gb_a": ("circulo", "#a23b6b", "A", "#ffffff"), "gb_b": ("circulo", "#a23b6b", "B", "#ffffff"),
-    "pce_1": ("circulo", PRETO, "I", "#ffffff"), "pce_2": ("circulo", PRETO, "II", "#ffffff"),
-    # Nintendo 64
-    "n64_a": ("circulo", "#2f5fc4", "A", "#ffffff"), "n64_b": ("circulo", "#2f9a48", "B", "#ffffff"),
-    # GameCube: A grande verde, B pequeno vermelho, X e Y em feijao, gatilhos cinza
-    "gc_a": ("circulo", "#2fa356", "A", "#ffffff"), "gc_b": ("circulo", "#d03a3a", "B", "#ffffff"),
-    "gc_x": ("feijao_vertical", "#b9bdc4", "X", PRETO), "gc_y": ("feijao_deitado", "#b9bdc4", "Y", PRETO),
-    "gc_l": ("pilula", "#8c9098", "L", "#ffffff"), "gc_r": ("pilula", "#8c9098", "R", "#ffffff"),
-    # Mega Drive, Saturn e fliperama
-    "md_a": ("circulo", PRETO, "A", "#ffffff"), "md_b": ("circulo", PRETO, "B", "#ffffff"),
-    "md_c": ("circulo", PRETO, "C", "#ffffff"), "md_x": ("circulo", "#44474d", "X", "#ffffff"),
-    "md_y": ("circulo", "#44474d", "Y", "#ffffff"), "md_z": ("circulo", "#44474d", "Z", "#ffffff"),
-    "sat_a": ("circulo", "#3c3f46", "A", "#ffffff"), "sat_b": ("circulo", "#3c3f46", "B", "#ffffff"),
-    "sat_c": ("circulo", "#3c3f46", "C", "#ffffff"), "sat_x": ("circulo", "#585c64", "X", "#ffffff"),
-    "sat_y": ("circulo", "#585c64", "Y", "#ffffff"), "sat_z": ("circulo", "#585c64", "Z", "#ffffff"),
-    "arc_1": ("circulo", "#d03a3a", "1", "#ffffff"), "arc_2": ("circulo", "#e8c02e", "2", PRETO),
-    "arc_3": ("circulo", "#3aa050", "3", "#ffffff"), "arc_4": ("circulo", "#3a5bd0", "4", "#ffffff"),
-    "arc_5": ("circulo", "#e07a2e", "5", "#ffffff"), "arc_6": ("circulo", "#8a4bc2", "6", "#ffffff"),
+    # o direcional de cada console: o fundo (sem botao) e os quatro bracos (cada um manda a sua direcao)
+    "dpad_cruz": ("dpad_cruz", "#2b2d31", "", ""),             # Nintendo: a cruz preta
+    "dpad_cruz_cinza": ("dpad_cruz", "#6b6f78", "", ""),       # Nintendo 64 e Dreamcast
+    "dpad_cruz_gc": ("dpad_cruz", "#a3a8b0", "", ""),          # GameCube: a cruz pequena cinza clara
+    "dpad_sega": ("dpad_sega", "#2b2d31", "", ""),             # Mega Drive e Saturn: o disco com a cruz
+    "dpad_ps": ("dpad_ps", "#1f2024", "", ""),                 # PlayStation e PSP: o buraco das quatro setas
+    "dpad_alavanca": ("dpad_alavanca", "#d03a3a", "", ""),     # fliperama: a bola vermelha
+    "dpad_alavanca_neo": ("dpad_alavanca", "#2b2d31", "", ""),  # Neo Geo: a bola preta
+    "marca_cima": ("marca", "#ffffff", "cima", ""), "marca_baixo": ("marca", "#ffffff", "baixo", ""),
+    "marca_esq": ("marca", "#ffffff", "esquerda", ""), "marca_dir": ("marca", "#ffffff", "direita", ""),
+    "seta_ps_cima": ("seta_ps", "#3a3c42", "cima", ""), "seta_ps_baixo": ("seta_ps", "#3a3c42", "baixo", ""),
+    "seta_ps_esq": ("seta_ps", "#3a3c42", "esquerda", ""), "seta_ps_dir": ("seta_ps", "#3a3c42", "direita", ""),
+    # os analogicos
+    "base_analogico": ("base_redonda", CINZA, "", ""), "pino": ("pino", CINZA_CLARO, "", ""),
+    "base_ps": ("base_redonda", "#1f2024", "", ""), "pino_ps": ("pino", "#2b2d31", "", ""),
+    "base_octogono": ("base_octogono", "#7d828a", "", ""),
+    "pino_n64": ("pino", "#8c9098", "", ""), "pino_gc": ("pino", "#9aa0a6", "", ""),
+    "pino_c": ("pino", "#f2c418", "C", ""),
+    "base_dc": ("base_redonda", "#c9ccd1", "", ""), "pino_dc": ("pino", "#d9dce0", "", ""),
+    "pino_psp": ("pino", "#b9bdc4", "", ""),
+    "botoes_c": ("botoes_c", "#f2c418", "", ""),
+    # start, select e os ombros
+    "start": ("pilula", PRETO, "START", "#d9dce0"), "select": ("pilula", PRETO, "SELECT", "#d9dce0"),
+    "start_cinza": ("pilula", "#8a8f99", "START", "#2b2d31"), "select_cinza": ("pilula", "#8a8f99", "SELECT", "#2b2d31"),
+    "mode": ("pilula", PRETO, "MODE", "#d9dce0"), "coin": ("pilula", PRETO, "COIN", "#d9dce0"),
+    "run": ("pilula", PRETO, "RUN", "#d9dce0"),
+    "start_vermelho": ("circulo", "#d0242c", "START", "#ffd9d9"), "start_redondo": ("circulo", "#b9bdc4", "START", "#3a3c42"),
+    "start_dc": ("circulo", "#c9ccd1", "START", "#3a3c42"),
+    "l": ("pilula", "#7d828a", "L", "#ffffff"), "r": ("pilula", "#7d828a", "R", "#ffffff"),
+    "l1": ("pilula", "#3a3c42", "L1", "#d9dce0"), "r1": ("pilula", "#3a3c42", "R1", "#d9dce0"),
+    "l2": ("pilula", "#3a3c42", "L2", "#d9dce0"), "r2": ("pilula", "#3a3c42", "R2", "#d9dce0"),
+    "l3": ("circulo", "#2b2d31", "L3", "#d9dce0"), "r3": ("circulo", "#2b2d31", "R3", "#d9dce0"),
+    "z_n64": ("pilula", "#6b6f78", "Z", "#ffffff"), "z_gc": ("pilula", "#5246b8", "Z", "#ffffff"),
+    # Super Nintendo (o colorido do Super Famicom e do Super Nintendo brasileiro)
+    "snes_a": ("circulo", "#d0242c", "A", ""), "snes_b": ("circulo", "#f0c419", "B", ""),
+    "snes_x": ("circulo", "#2a4fc8", "X", ""), "snes_y": ("circulo", "#239b48", "Y", ""),
+    # NES (vermelho), Game Boy (vinho), Game Boy Advance (lilas), PC Engine (preto)
+    "nes_a": ("circulo", "#c8202a", "A", ""), "nes_b": ("circulo", "#c8202a", "B", ""),
+    "gb_a": ("circulo", "#9c2259", "A", ""), "gb_b": ("circulo", "#9c2259", "B", ""),
+    "gba_a": ("circulo", "#b8b4cc", "A", ""), "gba_b": ("circulo", "#b8b4cc", "B", ""),
+    "pce_1": ("circulo", PRETO, "I", "#c9ccd1"), "pce_2": ("circulo", PRETO, "II", "#c9ccd1"),
+    # Nintendo 64: A azul grande, B verde
+    "n64_a": ("circulo", "#2851c8", "A", ""), "n64_b": ("circulo", "#1d8a3a", "B", ""),
+    # GameCube: A grande verde, B pequeno vermelho, X e Y em feijao cinza claro, gatilhos cinza
+    "gc_a": ("circulo", "#1fa35b", "A", ""), "gc_b": ("circulo", "#d0242c", "B", ""),
+    "gc_x": ("feijao_vertical", "#c4c8ce", "X", ""), "gc_y": ("feijao_deitado", "#c4c8ce", "Y", ""),
+    "gc_l": ("pilula", "#9aa0a6", "L", "#ffffff"), "gc_r": ("pilula", "#9aa0a6", "R", "#ffffff"),
+    # Mega Drive e Saturn (os pretos da Tec Toy) e o fliperama
+    "md_a": ("circulo", PRETO, "A", "#9aa0a6"), "md_b": ("circulo", PRETO, "B", "#9aa0a6"),
+    "md_c": ("circulo", PRETO, "C", "#9aa0a6"), "md_x": ("circulo", "#3a3c42", "X", "#9aa0a6"),
+    "md_y": ("circulo", "#3a3c42", "Y", "#9aa0a6"), "md_z": ("circulo", "#3a3c42", "Z", "#9aa0a6"),
+    "sat_a": ("circulo", "#3a3c42", "A", "#b9bdc4"), "sat_b": ("circulo", "#3a3c42", "B", "#b9bdc4"),
+    "sat_c": ("circulo", "#3a3c42", "C", "#b9bdc4"), "sat_x": ("circulo", "#4a4d54", "X", "#b9bdc4"),
+    "sat_y": ("circulo", "#4a4d54", "Y", "#b9bdc4"), "sat_z": ("circulo", "#4a4d54", "Z", "#b9bdc4"),
+    "arc_1": ("circulo", "#d0242c", "1", ""), "arc_2": ("circulo", "#f0c419", "2", ""),
+    "arc_3": ("circulo", "#239b48", "3", ""), "arc_4": ("circulo", "#2a4fc8", "4", ""),
+    "arc_5": ("circulo", "#e07a1e", "5", ""), "arc_6": ("circulo", "#7a3fc2", "6", ""),
     # Neo Geo: A vermelho, B amarelo, C verde, D azul
-    "neo_a": ("circulo", "#d03a3a", "A", "#ffffff"), "neo_b": ("circulo", "#e8c02e", "B", PRETO),
-    "neo_c": ("circulo", "#3aa050", "C", "#ffffff"), "neo_d": ("circulo", "#3a5bd0", "D", "#ffffff"),
+    "neo_a": ("circulo", "#d0242c", "A", ""), "neo_b": ("circulo", "#f0c419", "B", ""),
+    "neo_c": ("circulo", "#239b48", "C", ""), "neo_d": ("circulo", "#2a4fc8", "D", ""),
     # Dreamcast: A vermelho, B azul, X amarelo, Y verde
-    "dc_a": ("circulo", "#d03a3a", "A", "#ffffff"), "dc_b": ("circulo", "#3a5bd0", "B", "#ffffff"),
-    "dc_x": ("circulo", "#e8c02e", "X", PRETO), "dc_y": ("circulo", "#3aa050", "Y", "#ffffff"),
-    # PlayStation: os simbolos nas cores de sempre
-    "ps_triangulo": ("simbolo", "#2fae7a", "triangulo", ""), "ps_circulo": ("simbolo", "#e0464d", "circulo", ""),
-    "ps_x": ("simbolo", "#5b8fe0", "x", ""), "ps_quadrado": ("simbolo", "#d77fbd", "quadrado", ""),
-    # Nintendo DS
-    "nds_a": ("circulo", "#b9bdc4", "A", PRETO), "nds_b": ("circulo", "#b9bdc4", "B", PRETO),
-    "nds_x": ("circulo", "#b9bdc4", "X", PRETO), "nds_y": ("circulo", "#b9bdc4", "Y", PRETO),
+    "dc_a": ("circulo", "#d0242c", "A", ""), "dc_b": ("circulo", "#2a4fc8", "B", ""),
+    "dc_x": ("circulo", "#f0c419", "X", ""), "dc_y": ("circulo", "#239b48", "Y", ""),
+    # PlayStation: botao preto com o simbolo colorido (triangulo verde, bola vermelha, xis azul, quadrado rosa)
+    "ps_triangulo": ("simbolo", "#3ec7a0", "triangulo", ""), "ps_circulo": ("simbolo", "#f0484e", "circulo", ""),
+    "ps_x": ("simbolo", "#6f9be8", "x", ""), "ps_quadrado": ("simbolo", "#e77fc9", "quadrado", ""),
+    # Nintendo DS: botoes cinza claro com a letra
+    "nds_a": ("circulo", "#c4c8ce", "A", "#3a3c42"), "nds_b": ("circulo", "#c4c8ce", "B", "#3a3c42"),
+    "nds_x": ("circulo", "#c4c8ce", "X", "#3a3c42"), "nds_y": ("circulo", "#c4c8ce", "Y", "#3a3c42"),
+}
+
+# O direcional de cada estilo: (o fundo, desenhado atras e sem botao; os bracos cima, baixo, esquerda, direita).
+# O fundo vai de ponta a ponta (FUNDO_DO_DIRECIONAL bracos); cada braco e' um quadrado de 2 * MEIO_BRACO.
+MEIO_BRACO = 0.55
+FUNDO_DO_DIRECIONAL = 1.55
+_MARCAS = ("marca_cima", "marca_baixo", "marca_esq", "marca_dir")
+DIRECIONAIS = {
+    "cruz": ("dpad_cruz", _MARCAS),
+    "cruz_cinza": ("dpad_cruz_cinza", _MARCAS),
+    "cruz_gc": ("dpad_cruz_gc", _MARCAS),
+    "sega": ("dpad_sega", _MARCAS),
+    "ps": ("dpad_ps", ("seta_ps_cima", "seta_ps_baixo", "seta_ps_esq", "seta_ps_dir")),
+    "alavanca": ("dpad_alavanca", _MARCAS),
+    "alavanca_neo": ("dpad_alavanca_neo", _MARCAS),
 }
 
 
@@ -98,15 +142,21 @@ def pilula(ident, comando, x, y, largura, altura, imagem):
             "imagem": imagem}
 
 
-def direcional(x, y, braco=0.10, ident="direcional"):
-    """As quatro setas e as quatro diagonais (sem imagem), como o neo-retropad. Mexe junto: um "id" so."""
-    d = braco
-    return {"id": ident, "grupo": "direcional", "x": x, "y": y, "braco": d}
+def direcional(x, y, braco=0.10, ident="direcional", estilo="cruz"):
+    """O fundo com o formato do console (DIRECIONAIS), as quatro setas e as quatro diagonais. Mexe junto: um "id" so."""
+    return {"id": ident, "grupo": "direcional", "x": x, "y": y, "braco": braco, "estilo": estilo}
 
 
-def analogico(ident, comando, x, y, raio=0.12, pino="pino"):
+def analogico(ident, comando, x, y, raio=0.12, pino="pino", base="base_analogico"):
     return {"id": ident, "comando": comando, "x": x, "y": y, "forma": "analogico", "rw": raio, "rh": raio,
-            "imagem": "base_analogico", "pino": pino}
+            "imagem": base, "pino": pino}
+
+
+def botoes_c(x, y, raio=0.10):
+    """Os quatro botoes C amarelos do Nintendo 64. No Mupen64Plus-Next eles sao o analogico direito (C Buttons X/Y):
+    a area manda o analogico direito todo para o lado do C tocado (sem o pino que anda). Nao some com "nenhum"."""
+    return {"id": "botoes_c", "comando": "analog_right", "x": x, "y": y, "forma": "analogico", "rw": raio, "rh": raio,
+            "imagem": "botoes_c", "pino": None, "fixo": True}
 
 
 def losango(x, y, cima, direita, baixo, esquerda, raio=0.075, distancia=0.115):
@@ -135,93 +185,93 @@ ANALOGICO_DIR_EXTRA = (0.70, 0.80)
 
 DESENHOS = {
     "snes": {"nome": "Super Nintendo", "pecas": [
-        direcional(0.13, 0.60),
+        direcional(0.13, 0.60, estilo="cruz"),
         *losango(0.87, 0.60, ("x", "x", "snes_x"), ("a", "a", "snes_a"), ("b", "b", "snes_b"), ("y", "y", "snes_y")),
         *ombros(), *start_select()]},
     "nes": {"nome": "NES", "pecas": [
-        direcional(0.13, 0.62),
+        direcional(0.13, 0.62, estilo="cruz"),
         botao("b", "b", 0.80, 0.66, 0.08, "nes_b"), botao("a", "a", 0.915, 0.66, 0.08, "nes_a"),
         *start_select()]},
     "gameboy": {"nome": "Game Boy", "pecas": [
-        direcional(0.13, 0.62),
+        direcional(0.13, 0.62, estilo="cruz"),
         botao("b", "b", 0.81, 0.70, 0.08, "gb_b"), botao("a", "a", 0.915, 0.57, 0.08, "gb_a"),
-        *start_select()]},
+        *start_select(start="start_cinza", select="select_cinza")]},
     "gba": {"nome": "Game Boy Advance", "pecas": [
-        direcional(0.13, 0.62),
-        botao("b", "b", 0.81, 0.70, 0.08, "gb_b"), botao("a", "a", 0.915, 0.57, 0.08, "gb_a"),
+        direcional(0.13, 0.62, estilo="cruz"),
+        botao("b", "b", 0.81, 0.70, 0.08, "gba_b"), botao("a", "a", 0.915, 0.57, 0.08, "gba_a"),
         *ombros(), *start_select()]},
     "pcengine": {"nome": "PC Engine", "pecas": [
-        direcional(0.13, 0.62),
+        direcional(0.13, 0.62, estilo="cruz"),
         botao("ii", "b", 0.80, 0.66, 0.08, "pce_2"), botao("i", "a", 0.915, 0.66, 0.08, "pce_1"),
         *start_select(start="run")]},
     "n64": {"nome": "Nintendo 64", "analogicos": ("esq", "dir"), "pecas": [
-        analogico("analogico_esq", "analog_left", 0.13, 0.55),
-        direcional(0.10, 0.86, braco=0.06),
+        analogico("analogico_esq", "analog_left", 0.13, 0.55, pino="pino_n64", base="base_octogono"),
+        direcional(0.10, 0.86, braco=0.06, estilo="cruz_cinza"),
         botao("a", "b", 0.85, 0.72, 0.085, "n64_a"), botao("b", "y", 0.765, 0.60, 0.07, "n64_b"),
-        # os botoes C sao o analogico direito no Mupen64Plus-Next (C Buttons X/Y)
-        analogico("analogico_dir", "analog_right", 0.925, 0.43, raio=0.09, pino="pino_c"),
+        # os quatro botoes C amarelos: no Mupen64Plus-Next eles sao o analogico direito (C Buttons X/Y)
+        botoes_c(0.925, 0.43, raio=0.10),
         *ombros(), pilula("z", "l2", 0.09, 0.37, 0.14, 0.065, "z_n64"),
         botao("start", "start", 0.50, 0.90, 0.055, "start_vermelho")]},
     "gamecube": {"nome": "GameCube", "analogicos": ("esq", "dir"), "pecas": [
-        analogico("analogico_esq", "analog_left", 0.13, 0.52),
-        direcional(0.10, 0.86, braco=0.055),
+        analogico("analogico_esq", "analog_left", 0.13, 0.52, pino="pino_gc", base="base_octogono"),
+        direcional(0.10, 0.86, braco=0.055, estilo="cruz_gc"),
         botao("a", "a", 0.86, 0.62, 0.10, "gc_a"),
         botao("b", "b", 0.765, 0.76, 0.055, "gc_b"),
         pilula("x", "x", 0.945, 0.57, 0.055, 0.14, "gc_x"),
         pilula("y", "y", 0.85, 0.45, 0.12, 0.055, "gc_y"),
-        analogico("analogico_dir", "analog_right", 0.80, 0.895, raio=0.075, pino="pino_c"),
+        analogico("analogico_dir", "analog_right", 0.80, 0.895, raio=0.075, pino="pino_c", base="base_octogono"),
         pilula("l", "l2", 0.09, 0.25, 0.14, 0.07, "gc_l"), pilula("r", "r2", 0.91, 0.22, 0.14, 0.07, "gc_r"),
         pilula("z", "r", 0.94, 0.335, 0.10, 0.05, "z_gc"),
         botao("start", "start", 0.50, 0.90, 0.05, "start_redondo")]},
     "megadrive": {"nome": "Mega Drive", "pecas": [
-        direcional(0.13, 0.62),
+        direcional(0.13, 0.62, estilo="sega"),
         botao("a", "y", 0.735, 0.72, 0.072, "md_a"), botao("b", "b", 0.83, 0.70, 0.072, "md_b"),
         botao("c", "a", 0.925, 0.68, 0.072, "md_c"),
         botao("x", "l", 0.725, 0.53, 0.06, "md_x"), botao("y", "x", 0.815, 0.51, 0.06, "md_y"),
         botao("z", "r", 0.905, 0.49, 0.06, "md_z"),
         *start_select(select="mode")]},
     "saturn": {"nome": "Sega Saturn", "pecas": [
-        direcional(0.13, 0.62),
+        direcional(0.13, 0.62, estilo="sega"),
         botao("a", "b", 0.735, 0.72, 0.072, "sat_a"), botao("b", "a", 0.83, 0.70, 0.072, "sat_b"),
         botao("c", "r", 0.925, 0.68, 0.072, "sat_c"),
         botao("x", "y", 0.725, 0.53, 0.06, "sat_x"), botao("y", "x", 0.815, 0.51, 0.06, "sat_y"),
         botao("z", "l", 0.905, 0.49, 0.06, "sat_z"),
         *ombros(l="l2", r="r2"), *start_select(com_select=False)]},
     "dreamcast": {"nome": "Dreamcast", "analogicos": ("esq",), "pecas": [
-        analogico("analogico_esq", "analog_left", 0.13, 0.52),
-        direcional(0.10, 0.86, braco=0.06),
+        analogico("analogico_esq", "analog_left", 0.13, 0.52, pino="pino_dc", base="base_dc"),
+        direcional(0.10, 0.86, braco=0.06, estilo="cruz_cinza"),
         *losango(0.87, 0.60, ("y", "x", "dc_y"), ("b", "a", "dc_b"), ("a", "b", "dc_a"), ("x", "y", "dc_x")),
-        *ombros(l="l2", r="r2"), botao("start", "start", 0.50, 0.90, 0.05, "start_redondo")]},
+        *ombros(l="l2", r="r2"), botao("start", "start", 0.50, 0.90, 0.05, "start_dc")]},
     "playstation": {"nome": "PlayStation", "analogicos": ("esq", "dir"), "pecas": [
-        direcional(0.12, 0.50, braco=0.075),
+        direcional(0.12, 0.50, braco=0.075, estilo="ps"),
         *losango(0.88, 0.50, ("triangulo", "x", "ps_triangulo"), ("circulo", "a", "ps_circulo"),
                  ("xis", "b", "ps_x"), ("quadrado", "y", "ps_quadrado"), raio=0.07, distancia=0.105),
-        analogico("analogico_esq", "analog_left", 0.30, 0.80, raio=0.11),
-        analogico("analogico_dir", "analog_right", 0.70, 0.80, raio=0.11),
+        analogico("analogico_esq", "analog_left", 0.30, 0.80, raio=0.11, pino="pino_ps", base="base_ps"),
+        analogico("analogico_dir", "analog_right", 0.70, 0.80, raio=0.11, pino="pino_ps", base="base_ps"),
         botao("l3", "l3", 0.41, 0.70, 0.045, "l3"), botao("r3", "r3", 0.59, 0.70, 0.045, "r3"),
         pilula("l1", "l", 0.09, 0.26, 0.14, 0.06, "l1"), pilula("r1", "r", 0.91, 0.26, 0.14, 0.06, "r1"),
         pilula("l2", "l2", 0.09, 0.15, 0.14, 0.06, "l2"), pilula("r2", "r2", 0.91, 0.15, 0.14, 0.06, "r2"),
         *start_select(y=0.93)]},
     "psp": {"nome": "PSP", "analogicos": ("esq",), "pecas": [
-        direcional(0.12, 0.52, braco=0.075),
+        direcional(0.12, 0.52, braco=0.075, estilo="ps"),
         *losango(0.88, 0.55, ("triangulo", "x", "ps_triangulo"), ("circulo", "a", "ps_circulo"),
                  ("xis", "b", "ps_x"), ("quadrado", "y", "ps_quadrado"), raio=0.07, distancia=0.105),
-        analogico("analogico_esq", "analog_left", 0.13, 0.86, raio=0.08),
+        analogico("analogico_esq", "analog_left", 0.13, 0.86, raio=0.08, pino="pino_psp", base="base_ps"),
         *ombros(), *start_select()]},
     "neogeo": {"nome": "Neo Geo", "pecas": [
-        direcional(0.13, 0.62),
+        direcional(0.13, 0.62, braco=0.11, estilo="alavanca_neo"),
         botao("a", "b", 0.71, 0.74, 0.07, "neo_a"), botao("b", "a", 0.795, 0.64, 0.07, "neo_b"),
         botao("c", "y", 0.88, 0.60, 0.07, "neo_c"), botao("d", "x", 0.955, 0.64, 0.07, "neo_d"),
         *start_select(select="coin")]},
     "fliperama": {"nome": "Fliperama", "pecas": [
-        direcional(0.13, 0.62),
+        direcional(0.13, 0.62, braco=0.11, estilo="alavanca"),
         botao("1", "b", 0.725, 0.74, 0.07, "arc_1"), botao("2", "a", 0.82, 0.74, 0.07, "arc_2"),
         botao("3", "r", 0.915, 0.74, 0.07, "arc_3"),
         botao("4", "y", 0.74, 0.55, 0.07, "arc_4"), botao("5", "x", 0.835, 0.55, 0.07, "arc_5"),
         botao("6", "l", 0.93, 0.55, 0.07, "arc_6"),
         *start_select(select="coin")]},
     "nds": {"nome": "Nintendo DS", "pecas": [
-        direcional(0.10, 0.62),
+        direcional(0.10, 0.62, estilo="cruz"),
         *losango(0.90, 0.60, ("x", "x", "nds_x"), ("a", "a", "nds_a"), ("b", "b", "nds_b"), ("y", "y", "nds_y"),
                  raio=0.065, distancia=0.10),
         *ombros(), *start_select()]},
@@ -286,7 +336,7 @@ def pecas_do_desenho(nome, analogicos="do_console"):
     desenho = DESENHOS[nome]
     pecas = [dict(p) for p in desenho["pecas"]]
     if analogicos == "nenhum":
-        return [p for p in pecas if p.get("forma") != "analogico"]
+        return [p for p in pecas if p.get("forma") != "analogico" or p.get("fixo")]
     if analogicos == "dois":
         ids = {p["id"] for p in pecas}
         if "analogico_esq" not in ids:
@@ -305,16 +355,21 @@ def resumo_para_a_tela(analogicos="do_console"):
         do_console = {p["id"] for p in pecas_do_desenho(nome, "do_console")}
         for peca in pecas_do_desenho(nome, analogicos):
             if peca.get("grupo") == "direcional":
-                pecas.append({"id": peca["id"], "rotulo": "✚", "forma": "direcional", "rw": peca["braco"] * 1.9,
-                              "rh": peca["braco"] * 1.9, "cor": CINZA, "extra": False})
+                fundo = DIRECIONAIS[peca.get("estilo", "cruz")][0]
+                pecas.append({"id": peca["id"], "rotulo": "✚", "forma": "direcional",
+                              "rw": peca["braco"] * FUNDO_DO_DIRECIONAL, "rh": peca["braco"] * FUNDO_DO_DIRECIONAL,
+                              "cor": CINZA, "extra": False, "imagem": fundo + "_tela.png"})
                 continue
             imagem = IMAGENS.get(peca["imagem"], ("circulo", CINZA, "", ""))
             rotulo = imagem[2] if imagem[0] not in ("simbolo", "seta", "base") else \
                 {"triangulo": "△", "circulo": "○", "x": "✕", "quadrado": "□"}.get(imagem[2], "")
             if peca.get("forma") == "analogico":
-                rotulo = "C" if peca.get("pino") == "pino_c" else ("L" if peca["comando"] == "analog_left" else "R")
-            pecas.append({"id": peca["id"], "rotulo": rotulo, "forma": peca["forma"], "rw": peca["rw"],
-                          "rh": peca["rh"], "cor": imagem[1], "extra": peca["id"] not in do_console})
+                rotulo = "C" if peca.get("pino") in ("pino_c", None) else ("L" if peca["comando"] == "analog_left" else "R")
+            item = {"id": peca["id"], "rotulo": rotulo, "forma": peca["forma"], "rw": peca["rw"], "rh": peca["rh"],
+                    "cor": imagem[1], "extra": peca["id"] not in do_console, "imagem": peca["imagem"] + ".png"}
+            if peca.get("pino"):
+                item["pino"] = peca["pino"] + ".png"
+            pecas.append(item)
         saida[nome] = {"nome": desenho["nome"], "pecas": pecas, "fabrica": posicoes_de_fabrica(nome, analogicos)}
     return saida
 
@@ -339,9 +394,15 @@ def _linhas_da_peca(o, n, peca, x, y, em_pe, escala):
         fx = (ENCOLHER_EM_PE if em_pe else 1 / ASPECTO_DEITADO)
         fy = (ENCOLHER_EM_PE * ASPECTO_EM_PE if em_pe else 1.0)
         dx, dy = braco * fx, braco * fy
-        meio_w, meio_h = braco * 0.55 * fx, braco * 0.55 * fy
-        setas = [("up", x, y - dy, "seta_cima"), ("down", x, y + dy, "seta_baixo"),
-                 ("left", x - dx, y, "seta_esq"), ("right", x + dx, y, "seta_dir")]
+        meio_w, meio_h = braco * MEIO_BRACO * fx, braco * MEIO_BRACO * fy
+        fundo, bracos = DIRECIONAIS[peca.get("estilo", "cruz")]
+        # o fundo (a cruz, o disco...) vem primeiro, para ficar atras; "nul" = so a imagem, nao manda botao
+        linhas.append('overlay%d_desc%d = "nul,%.5f,%.5f,rect,%.5f,%.5f"' % (o, n, x, y, braco * FUNDO_DO_DIRECIONAL * fx,
+                                                                            braco * FUNDO_DO_DIRECIONAL * fy))
+        linhas.append('overlay%d_desc%d_overlay = "img/%s.png"' % (o, n, fundo))
+        n += 1
+        setas = [("up", x, y - dy, bracos[0]), ("down", x, y + dy, bracos[1]),
+                 ("left", x - dx, y, bracos[2]), ("right", x + dx, y, bracos[3])]
         for comando, sx, sy, imagem in setas:
             linhas.append('overlay%d_desc%d = "%s,%.5f,%.5f,rect,%.5f,%.5f"' % (o, n, comando, sx, sy, meio_w, meio_h))
             linhas.append('overlay%d_desc%d_overlay = "img/%s.png"' % (o, n, imagem))
@@ -350,13 +411,15 @@ def _linhas_da_peca(o, n, peca, x, y, em_pe, escala):
                                 ("down|left", x - dx, y + dy), ("down|right", x + dx, y + dy)):
             linhas.append('overlay%d_desc%d = "%s,%.5f,%.5f,rect,%.5f,%.5f"' % (o, n, comando, sx, sy, meio_w, meio_h))
             n += 1
-        return linhas, 8
+        return linhas, 9
     w, h = _tamanho(peca, em_pe, escala)
     if peca.get("forma") == "analogico":
         linhas.append('overlay%d_desc%d = "%s,%.5f,%.5f,radial,%.5f,%.5f"' % (o, n, peca["comando"], x, y, w, h))
-        linhas.append('overlay%d_desc%d_overlay = "img/base_analogico.png"' % (o, n))
+        linhas.append('overlay%d_desc%d_overlay = "img/%s.png"' % (o, n, peca.get("imagem") or "base_analogico"))
         linhas.append("overlay%d_desc%d_saturate_pct = 1000000.0" % (o, n))
         n += 1
+        if not peca.get("pino"):                     # os botoes C: a area inteira, sem o pino que anda
+            return linhas, 1
         linhas.append('overlay%d_desc%d = "%s,%.5f,%.5f,radial,%.5f,%.5f"' % (o, n, peca["comando"], x, y,
                                                                               w * 0.55, h * 0.55))
         linhas.append('overlay%d_desc%d_overlay = "img/%s.png"' % (o, n, peca.get("pino", "pino")))
@@ -420,8 +483,11 @@ def gerar_cfg(nome, ajustes=None, botoes_do_arena=True):
 
 def imagens_usadas(nome, analogicos="dois"):
     """Os nomes de arquivo das imagens que o desenho usa (para copiar ao lado do .cfg)."""
-    usadas = {"seta_cima.png", "seta_baixo.png", "seta_esq.png", "seta_dir.png", "base_analogico.png"}
+    usadas = set()
     for peca in pecas_do_desenho(nome, analogicos):
+        if peca.get("grupo") == "direcional":
+            fundo, bracos = DIRECIONAIS[peca.get("estilo", "cruz")]
+            usadas.update(i + ".png" for i in (fundo,) + tuple(bracos))
         if peca.get("imagem"):
             usadas.add(peca["imagem"] + ".png")
         if peca.get("pino"):
@@ -443,7 +509,12 @@ def gravar_controle(nome, pasta_retroarch, ajustes=None):
         for origem, destino in copiar:
             with open(origem, "rb") as arquivo:
                 dados = arquivo.read()
-            if not os.path.isfile(destino) or os.path.getsize(destino) != len(dados):
+            try:
+                with open(destino, "rb") as arquivo:
+                    igual = arquivo.read() == dados
+            except OSError:
+                igual = False
+            if not igual:                    # imagem nova do ARENA (o desenho mudou): troca a velha
                 with open(destino, "wb") as arquivo:
                     arquivo.write(dados)
         destino = os.path.join(pasta, nome + ".cfg")

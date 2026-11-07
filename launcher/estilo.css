@@ -2021,4 +2021,10 @@ html[data-navegador="true"] [data-so-windows] { display: none !important; }
 .toque-peca--analogico { border-radius: 50%; background: rgba(90, 95, 102, .45) !important; }
 .toque-peca--direcional { border-radius: 8px; font-size: 1.2rem; }
 .toque-peca:focus-visible { outline: 3px solid var(--foco, #ffd166); outline-offset: 2px; }
+/* com a imagem do botao (07/11/2026): sem a borda e o fundo de cor; o pino do analogico no meio, menor */
+.toque-peca--imagem {
+  border: 0; border-radius: 0; background-color: transparent !important;
+  background-repeat: no-repeat; background-position: center; background-size: 100% 100%;
+}
+.toque-peca--analogico.toque-peca--imagem { background-size: 55% 55%, 100% 100%; }
 .toque-peca--arrastando { cursor: grabbing; filter: brightness(1.2); }

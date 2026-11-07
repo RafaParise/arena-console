@@ -292,6 +292,12 @@ Falta (nesta ordem):
   posição do controle de verdade. O botão que cada peça manda foi lido do próprio núcleo. **Os dois analógicos** podem ficar sempre
   (para os jogos adaptados), só os do console ou nenhum. Em Ajustes → Imagem → **"Arrumar os botões da tela"** o aluno arrasta cada
   botão, muda o tamanho e volta ao de fábrica.
+- **Botões com o desenho, o formato e a cor dos originais** (pedido do Rafael, 07/11, à noite): volume de botão de verdade e letra
+  gravada; PlayStation com o triângulo verde, o xis azul, a bola vermelha e o quadrado rosa no botão preto, e as quatro setas soltas;
+  direcional de cada console (cruz da Nintendo, disco da Sega, alavanca do fliperama); os quatro C amarelos do Nintendo 64; feijões
+  do GameCube. A tela de arrumar mostra as mesmas imagens (rota `/toque/<nome>.png`). 108 imagens de
+  `ferramentas\gerar_toque_consoles.py`. Visto no A12 (APK de teste): Crash (PlayStation), Mario Kart 64 e Smash Melee
+  (GameCube) com os desenhos novos, e a tela de arrumar com as mesmas imagens.
 - **Jogar Junto pelo cabo USB**: botão "Ligar pelo cabo USB" no computador; no celular, a opção "Computador ligado neste celular pelo
   cabo USB" na lista. A revisão de segurança automática achou e eu corrigi: o túnel chega numa porta só para o aviso da partida
   (8778), nunca nas rotas do professor.

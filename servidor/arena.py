@@ -5436,6 +5436,27 @@ class Manipulador(BaseHTTPRequestHandler):
         if caminho in ("/", "/index.html"):
             caminho = "/index.html"
 
+        # As imagens do controle de toque de cada console (servidor/toque), para a tela "Arrumar os botoes" mostrar
+        # cada botao como ele e' no jogo. So nome simples de .png: nada de subir de pasta.
+        nome_png = caminho[len("/toque/"):] if caminho.startswith("/toque/") else ""
+        if nome_png:
+            import toque_consoles
+            simples = (nome_png.endswith(".png") and len(nome_png) <= 44
+                       and all(letra in "abcdefghijklmnopqrstuvwxyz0123456789_-" for letra in nome_png[:-4]))
+            for pasta in (toque_consoles.PASTA_DAS_IMAGENS, toque_consoles.PASTA_DOS_BOTOES_DO_ARENA):
+                if simples and os.path.isfile(os.path.join(pasta, nome_png)):
+                    caminho_png = os.path.join(pasta, nome_png)
+                    with open(caminho_png, "rb") as origem:
+                        conteudo = origem.read()
+                    self.send_response(200)
+                    self.send_header("Content-Type", "image/png")
+                    self.send_header("Content-Length", str(len(conteudo)))
+                    self.send_header("Cache-Control", "max-age=3600")
+                    self.end_headers()
+                    self.wfile.write(conteudo)
+                    return
+            return self.send_error(404, "Arquivo nao encontrado")
+
         arquivo = os.path.normpath(os.path.join(PASTA_LAUNCHER, caminho.lstrip("/")))
         if not dentro_da_pasta(arquivo, PASTA_LAUNCHER) or not os.path.isfile(arquivo):
             return self.send_error(404, "Arquivo nao encontrado")

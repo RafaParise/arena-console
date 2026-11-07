@@ -4357,8 +4357,14 @@ function desenharPalcoToque() {
     peca.tabIndex = 0;
     peca.setAttribute("role", "button");
     peca.setAttribute("aria-label", `Botão ${p.rotulo || p.id}: arraste para mudar de lugar`);
-    peca.textContent = p.rotulo;
-    peca.style.background = p.cor;
+    if (p.imagem) {
+      // a imagem de verdade do botao (servidor/toque); o analogico leva o pino por cima da base
+      peca.classList.add("toque-peca--imagem");
+      peca.style.backgroundImage = (p.pino ? `url("/toque/${p.pino}"), ` : "") + `url("/toque/${p.imagem}")`;
+    } else {
+      peca.textContent = p.rotulo;
+      peca.style.background = p.cor;
+    }
     // largura e altura na tela, como no .cfg: deitado, metade da largura = rw / 2; em pé, rw * 0,7
     const W = largura;
     const H = largura / TOQUE_ASPECTO[orientacao];

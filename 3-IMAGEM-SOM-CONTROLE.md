@@ -1715,5 +1715,11 @@ SALVAR, CARREGAR e SAIR**.
 - **Analógicos**: "Os do console" (o PlayStation tem dois, o Dreamcast um, o Super Nintendo nenhum), **"Os dois, sempre"** (há jogos
   adaptados que usam o segundo analógico, como os do Dreamcast) ou "Nenhum".
 - Desligando "Com a cara de cada console", todo console volta ao controle de toque genérico.
+- **Desenho, formato e cor dos originais**: cada botão tem o volume do de verdade (sombra, brilho e a letra gravada na cor dele). No
+  PlayStation, o botão preto com o **triângulo verde, o xis azul, a bola vermelha e o quadrado rosa**, e o direcional são as quatro
+  setas soltas. No Super Nintendo, A vermelho, B amarelo, X azul e Y verde, com a cruz preta. No Nintendo 64, os **quatro botões C
+  amarelos** e o analógico no encaixe de oito lados. No GameCube, o A verde grande, o B vermelho, o X e o Y em feijão e o C
+  amarelo. No Mega Drive e no Saturn, o disco da Sega. No Dreamcast, A vermelho, B azul, X amarelo e Y verde. No Neo Geo e no
+  fliperama, a alavanca com a bola. A tela "Arrumar os botões" mostra cada botão com essa mesma imagem.
 - **Vibração**: logo abaixo da chave Vibração, **"O celular vibra também"** manda o tremor do jogo para o próprio celular, e
   **"Vibrar ao tocar"** dá um toque curto a cada botão da tela.

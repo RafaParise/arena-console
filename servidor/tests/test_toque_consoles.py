@@ -37,7 +37,7 @@ class OMapaDeCadaNucleo(unittest.TestCase):
 
     def test_nintendo_64(self):
         c = comandos("n64")
-        self.assertEqual((c["a"], c["b"], c["z"], c["analogico_dir"]), ("b", "y", "l2", "analog_right"))
+        self.assertEqual((c["a"], c["b"], c["z"], c["botoes_c"]), ("b", "y", "l2", "analog_right"))
 
     def test_gamecube(self):
         c = comandos("gamecube")
@@ -91,6 +91,74 @@ class ODesenho(unittest.TestCase):
             for y in (0.0, 0.5, 1.0):
                 px, py = tc.a_partir_do_deitado(x, y)
                 self.assertTrue(0 <= px <= 1 and 0.5 <= py <= 1, (x, y, px, py))
+
+
+class ACaraDoOriginal(unittest.TestCase):
+    """Pedido do Rafael (07/11/2026): "o mesmo desenho, formato e cor dos originais (...) triangulo [verde], cruz azul,
+    bola vermelha e quadrado rosa"."""
+
+    @staticmethod
+    def matiz(cor):
+        import colorsys
+        r, g, b = (int(cor.lstrip("#")[i:i + 2], 16) / 255 for i in (0, 2, 4))
+        return colorsys.rgb_to_hsv(r, g, b)[0] * 360
+
+    def test_as_cores_do_playstation(self):
+        faixas = {"ps_triangulo": (140, 175), "ps_x": (205, 235), "ps_circulo": (345, 375), "ps_quadrado": (300, 340)}
+        for nome, (de, ate) in faixas.items():
+            forma, cor, simbolo, _ = tc.IMAGENS[nome]
+            m = self.matiz(cor)
+            m = m + 360 if m < 30 else m                            # o vermelho dá a volta no zero
+            self.assertEqual(forma, "simbolo")
+            self.assertTrue(de <= m <= ate, (nome, cor, m))
+
+    def test_as_cores_da_nintendo_e_da_sega(self):
+        self.assertEqual([tc.IMAGENS["snes_" + b][1] for b in "abxy"], ["#d0242c", "#f0c419", "#2a4fc8", "#239b48"])
+        self.assertEqual([tc.IMAGENS["dc_" + b][1] for b in "abxy"], ["#d0242c", "#2a4fc8", "#f0c419", "#239b48"])
+        self.assertEqual(tc.IMAGENS["gc_a"][1], "#1fa35b")              # o A verde grande do GameCube
+        self.assertEqual(tc.IMAGENS["gc_x"][0], "feijao_vertical")
+        self.assertEqual(tc.IMAGENS["botoes_c"][1], "#f2c418")          # os C amarelos do Nintendo 64
+
+    def test_o_direcional_de_cada_console(self):
+        estilo = {nome: next(p["estilo"] for p in d["pecas"] if p.get("grupo") == "direcional")
+                  for nome, d in tc.DESENHOS.items()}
+        self.assertEqual((estilo["playstation"], estilo["psp"]), ("ps", "ps"))              # as quatro setas soltas
+        self.assertEqual((estilo["megadrive"], estilo["saturn"]), ("sega", "sega"))         # o disco
+        self.assertEqual((estilo["fliperama"], estilo["neogeo"]), ("alavanca", "alavanca_neo"))
+        self.assertEqual(estilo["snes"], "cruz")
+        texto = tc.gerar_cfg("playstation")
+        fundo = re.search(r'^overlay0_desc(\d+) = "nul,', texto, re.M)
+        self.assertIsNotNone(fundo)                                    # o fundo vai sem botao
+        self.assertIn('overlay0_desc%s_overlay = "img/dpad_ps.png"' % fundo.group(1), texto)
+        self.assertIn('img/seta_ps_cima.png', texto)
+
+    def test_os_botoes_c_ficam_mesmo_sem_analogico(self):
+        pecas = {p["id"]: p for p in tc.pecas_do_desenho("n64", "nenhum")}
+        self.assertIn("botoes_c", pecas)
+        self.assertNotIn("analogico_esq", pecas)
+        texto = tc.gerar_cfg("n64")
+        self.assertIn("img/botoes_c.png", texto)
+        self.assertNotIn("pino_c.png", texto)                          # os C nao tem o pino que anda
+
+    def test_a_tela_de_arrumar_recebe_a_imagem_de_cada_peca(self):
+        for nome, desenho in tc.resumo_para_a_tela("dois").items():
+            for peca in desenho["pecas"]:
+                self.assertTrue(os.path.isfile(os.path.join(tc.PASTA_DAS_IMAGENS, peca["imagem"])), (nome, peca["id"]))
+                if peca.get("pino"):
+                    self.assertTrue(os.path.isfile(os.path.join(tc.PASTA_DAS_IMAGENS, peca["pino"])), (nome, peca))
+
+    def test_a_imagem_nova_troca_a_velha_mesmo_com_o_mesmo_tamanho(self):
+        pasta = tempfile.mkdtemp(prefix="arena_toque_img_")
+        self.addCleanup(limpeza.apagar_pasta, pasta)
+        self.assertTrue(tc.gravar_controle("snes", pasta))
+        alvo = os.path.join(pasta, "overlays", "arena", "img", "snes_a.png")
+        with open(alvo, "rb") as arquivo:
+            certo = arquivo.read()
+        with open(alvo, "wb") as arquivo:
+            arquivo.write(b"x" * len(certo))                          # a velha, do mesmo tamanho
+        tc.gravar_controle("snes", pasta)
+        with open(alvo, "rb") as arquivo:
+            self.assertEqual(arquivo.read(), certo)
 
 
 class OsAnalogicos(unittest.TestCase):
@@ -154,6 +222,42 @@ class NoJogo(unittest.TestCase):
             opcoes = {"video_driver": "gl"}
             plataforma.ajustes_do_android(opcoes, self.pasta, "", console=console, toque=toque)
             self.assertTrue(opcoes["input_overlay"].endswith("neo-retropad-arena.cfg"), console)
+
+
+class ARotaDasImagens(unittest.TestCase):
+    """GET /toque/<nome>.png: as imagens para a tela de arrumar; so nome simples, nada fora da pasta."""
+
+    @classmethod
+    def setUpClass(cls):
+        import threading
+        import arena
+        cls.servidor = arena.Servidor(("127.0.0.1", 0), arena.Manipulador)
+        cls.porta = cls.servidor.server_address[1]
+        threading.Thread(target=cls.servidor.serve_forever, daemon=True).start()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.servidor.shutdown()
+        cls.servidor.server_close()
+
+    def pedir(self, rota):
+        import http.client
+        conexao = http.client.HTTPConnection("127.0.0.1", self.porta, timeout=10)
+        conexao.request("GET", rota)
+        resposta = conexao.getresponse()
+        corpo = resposta.read()
+        conexao.close()
+        return resposta.status, resposta.getheader("Content-Type"), corpo
+
+    def test_entrega_a_imagem(self):
+        for nome in ("ps_x.png", "dpad_ps_tela.png", "arena-salvar.png"):
+            status, tipo, corpo = self.pedir("/toque/" + nome)
+            self.assertEqual((status, tipo, corpo[1:4]), (200, "image/png", b"PNG"), nome)
+
+    def test_recusa_o_que_nao_e_nome_simples(self):
+        for rota in ("/toque/../arena.py", "/toque/..%2Farena.py", "/toque/consoles/ps_x.png", "/toque/PS_X.png",
+                     "/toque/nao_existe.png", "/toque/toque_consoles.py"):
+            self.assertEqual(self.pedir(rota)[0], 404, rota)
 
 
 if __name__ == "__main__":
