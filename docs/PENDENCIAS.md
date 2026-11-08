@@ -418,10 +418,16 @@ pelo SurfaceFlinger, foto e saída pelo SAIR. Todos os que abriram saíram pelo 
 | `teste_matriz_consoles` (PocketStation) | a ponte sem acento acrescentava uma 2ª `system_directory`, e o RetroArch fica com a 1ª (com acento). Só no teste: no `/api/jogar` a ponte entra antes | a linha é trocada (3c436ef); abre, salva, carrega e fecha nos dois modos. A foto do modo modesto saiu branca 3 vezes na matriz, mas com a mesma configuração fora dela mostra o coração do 15 Puzzle (tela de 32×32 que pisca entre animações) |
 | `teste_multitap_regra_de_ouro` | as mudanças de propósito de 07/11 (foto do save, tipo de porta lido dos núcleos, PicoDrive no netplay) nunca foram ensinadas ao teste | 8179eff; **254 casos iguais, passou** |
 | `teste_partida_aparece` | oscilação de tempo do grito UDP | sozinho, **passou** inteiro |
-| `teste_pasta_system_pelo_arena` | 2 fotos da janela pretas: **tela bloqueada** (o resto, 15 conferências, certo) | repetir com a tela desbloqueada |
-| `teste_pokketsx_pelo_arena` | "fechou pela janela" aperta F10 na janela, e com a **tela bloqueada** nenhuma tecla chega | repetir com a tela desbloqueada (abre, mostra imagem, leva as BIOS e o cartão único certos) |
-| `teste_orcamentos_modo_alvo` | 1b (abertura do servidor) 3,36 e 3,97 s no modo alvo, teto 2,3. Com a **tela bloqueada** o Windows não diz a placa da tela principal e o ARENA cai no registro: "NVIDIA GeForce 210, placa 2/5" em vez da Radeon do 5600G. Fora do modo alvo, a mesma abertura leva 1,6 a 2,3 s | **medir de novo com a tela desbloqueada** antes da versão |
+| `teste_pasta_system_pelo_arena` | 2 fotos da janela pretas: **tela bloqueada** (o resto, 15 conferências, certo) | com a tela desbloqueada (08/11, 20h): **passou** |
+| `teste_pokketsx_pelo_arena` | "fechou pela janela" aperta F10 na janela, e com a **tela bloqueada** nenhuma tecla chega | com a tela desbloqueada: **passou** inteiro, inclusive o F10 |
+| `teste_orcamentos_modo_alvo` | 1b (abertura do servidor) 3,36 e 3,97 s no modo alvo, teto 2,3. Com a **tela bloqueada** o Windows não diz a placa da tela principal e o ARENA cai no registro: "NVIDIA GeForce 210, placa 2/5" em vez da Radeon do 5600G. Fora do modo alvo, a mesma abertura leva 1,6 a 2,3 s | com a tela desbloqueada estourou de novo (4,51 s): **não era a tela**. Causa achada e consertada (abaixo); agora **2,0 s, passou** |
 | `teste_jogar_junto_pc_celular` | precisa do celular no cabo | com o celular de volta |
+
+**Causa do 1b (consertada em 08/11):** com a rede liberada em Ajustes (o ARENA escuta em `0.0.0.0`), o `HTTPServer` do
+Python pergunta o nome do computador pela rede (`socket.getfqdn`) ao abrir a porta: **1,27 s** em toda abertura no PC do
+Rafael (numa rede de escola com DNS lento, pode ser mais). Em 22/10 a rede estava fechada, por isso não aparecia. O
+`Servidor` agora pula essa pergunta, como o `controle_remoto.py` já fazia: a porta abre em 0,43 s em vez de 1,3 a 1,7 s,
+e no modo alvo o 1b caiu de 4,51 para 2,0 s e o 1a de 3,33 para 1,37 s.
 
 **Achado para consertar depois (não é da versão de hoje):** com a tela bloqueada (ou sem monitor), `hardware.placa_da_tela_principal()`
 volta vazio e o ARENA usa a placa do registro, que guarda placas que já saíram do computador. Melhor seria preferir a placa

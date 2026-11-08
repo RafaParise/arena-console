@@ -26,6 +26,7 @@ import json
 import os
 import shutil
 import socket
+import socketserver
 import sqlite3
 import stat
 import subprocess
@@ -7941,6 +7942,16 @@ class Servidor(ThreadingHTTPServer):
     # o segundo ARENA roubaria a porta do primeiro em silencio. Por isso fica
     # desligado la, e ligado no Linux, onde o comportamento e o esperado.
     allow_reuse_address = not sys.platform.startswith("win")
+
+    def server_bind(self):
+        # O HTTPServer de fabrica pergunta o nome do computador pela rede
+        # (socket.getfqdn) ao abrir a porta. Com a rede liberada (0.0.0.0)
+        # isso levava 1,27 s em toda abertura do ARENA no PC do Rafael
+        # (08/11/2026), e numa rede de escola com DNS lento pode ser mais. O
+        # ARENA nao usa esse nome: fica o proprio endereco, como no
+        # controle_remoto.py.
+        socketserver.TCPServer.server_bind(self)
+        self.server_name, self.server_port = self.server_address[:2]
 
 
 # A porta dos colegas pelo cabo USB (controle_usb.ligar_partida): o tunel do adb traz o ARENA do outro aparelho ate o

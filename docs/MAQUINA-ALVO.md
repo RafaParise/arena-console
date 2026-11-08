@@ -314,6 +314,11 @@ núcleo é 2,3 vezes mais forte. Como ficou:
   papel de parede animado, outro teste) passa na frente. **Regra:** medir
   com o computador sem carga e, se o 1b estourar, repetir antes de procurar
   a causa no ARENA (`docs\PENDENCIAS.md`, item 18).
+- **O 1b de 08/11/2026 não era alarme falso:** 4,51 s com o computador
+  parado. Com a rede liberada (0.0.0.0), o `HTTPServer` do Python perguntava
+  o nome do computador pela rede (`socket.getfqdn`, 1,27 s) ao abrir a
+  porta. Consertado no `arena.Servidor.server_bind`: 2,0 s no modo alvo.
+  Medir o 1b também com a rede liberada.
 
 **O que mudou na régua do projeto:** ela deixou de depender só da coleta na
 escola — toda mudança agora pode ser medida aqui, com os limites do
