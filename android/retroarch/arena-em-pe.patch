@@ -1,0 +1,37 @@
+Remendo do ARENA para o RetroArch 1.22.2 do Android (GPLv3, como o RetroArch)
+
+O que muda: com a imagem em "tela cheia" (ASPECT_RATIO_FULL, o padrao do ARENA
+no Android), o celular EM PE esticava o jogo ate a altura da tela: a imagem
+ficava achatada e por baixo dos botoes de toque. Agora, so em pe, a imagem ocupa
+a largura toda na proporcao do proprio jogo e o ajuste de pe do RetroArch
+(video_viewport_bias_portrait_y, 0 = em cima) a poe no alto; os botoes ficam na
+metade de baixo. Deitado, nada muda.
+
+Base: a etiqueta v1.22.2 do libretro (commit 69a4f0ea1e8aaf442ae4858f2e7f2b31a1776576),
+https://github.com/libretro/RetroArch/archive/refs/tags/v1.22.2.tar.gz
+Modificado pelo ARENA em 07/11/2026. Quem aplica e compila:
+ferramentas/compilar_retroarch_android.py (depois do arena-controles.patch).
+
+--- a/gfx/video_driver.c
++++ b/gfx/video_driver.c
+@@ -2124,6 +2124,20 @@ void video_viewport_get_scaled_aspect2(struct video_viewport *vp,
+    {
+       vp_bias_x         = settings->floats.video_vp_bias_portrait_x;
+       vp_bias_y         = settings->floats.video_vp_bias_portrait_y;
++      /* ARENA: "tela cheia" vale para o celular deitado. Em pe, esticar o
++       * jogo ate a altura da tela deixava a imagem achatada e embaixo dos
++       * botoes: a imagem ocupa a largura toda, na proporcao do jogo, e o
++       * ajuste de pe (video_viewport_bias_portrait_y, 0 = em cima) a poe no
++       * alto, com os botoes de toque na metade de baixo. */
++      if (settings->uints.video_aspect_ratio_idx == ASPECT_RATIO_FULL)
++      {
++         const struct retro_game_geometry *geom = &video_st->av_info.geometry;
++         float do_jogo = geom->aspect_ratio;
++         if (do_jogo <= 0.0f && geom->base_width && geom->base_height)
++            do_jogo = (float)geom->base_width / (float)geom->base_height;
++         if (do_jogo > 0.0f)
++            desired_aspect = do_jogo;
++      }
+    }
+ #endif
+    if (!y_down)

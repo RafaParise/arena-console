@@ -11,7 +11,10 @@ sai do codigo oficial da mesma versao com os remendos de android\retroarch\
     tem como pedir partida em rede;
   - arena-controles.patch: os controles ja ligados entram na ordem em que foram
     CONECTADOS (o primeiro conectado e' o jogador 1); o oficial registra quem
-    apertar primeiro.
+    apertar primeiro;
+  - arena-em-pe.patch: com a "tela cheia", o celular EM PE mostra o jogo no
+    alto, na largura toda e na proporcao dele (o oficial esticava ate a altura
+    da tela, por baixo dos botoes); deitado, nada muda.
 
 Do codigo oficial ate a biblioteca:
   1. o codigo da etiqueta v1.22.2 do GitHub do libretro, conferido pela

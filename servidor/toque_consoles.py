@@ -466,6 +466,13 @@ def gerar_cfg(nome, ajustes=None, botoes_do_arena=True):
             novas, quantas = _linhas_da_peca(o, n, peca, x, y, em_pe, escala)
             linhas += novas
             n += quantas
+        # O RetroArch so troca sozinho para o desenho da outra orientacao (input_overlay_auto_rotate) se algum botao
+        # apontar para ele (next_target): sem isto, o celular em pe mostrava o desenho deitado, encolhido no meio
+        # (visto no A12 em 07/11/2026). O RetroArch so le o next_target de um botao "overlay_next" (task_overlay.c):
+        # ele fica FORA da tela (posicao negativa, que o RetroArch aceita), onde nenhum dedo alcanca.
+        linhas.append('overlay%d_desc%d = "overlay_next,-1.00000,-1.00000,rect,0.00500,0.00500"' % (o, n))
+        linhas.append('overlay%d_desc%d_next_target = "%s"' % (o, n, "landscape" if em_pe else "portrait"))
+        n += 1
         if botoes_do_arena:
             for comando, xd, yd, xp, yp, imagem in BOTOES_DO_ARENA:
                 x, y = (xp, yp) if em_pe else (xd, yd)

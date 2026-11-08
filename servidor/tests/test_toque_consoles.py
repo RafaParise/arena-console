@@ -14,7 +14,7 @@ import limpeza  # noqa: E402
 import plataforma  # noqa: E402
 import toque_consoles as tc  # noqa: E402
 
-RE_DESC = re.compile(r'^overlay(\d)_desc(\d+) = "([^,]+),([\d.]+),([\d.]+),(rect|radial),([\d.]+),([\d.]+)"$', re.M)
+RE_DESC = re.compile(r'^overlay(\d)_desc(\d+) = "([^,]+),(-?[\d.]+),(-?[\d.]+),(rect|radial),([\d.]+),([\d.]+)"$', re.M)
 
 
 def comandos(nome, ajustes=None):
@@ -78,11 +78,20 @@ class ODesenho(unittest.TestCase):
                 achados = [m for m in RE_DESC.finditer(texto) if m.group(1) == str(o)]
                 self.assertEqual(len(achados), declarado, nome)
                 self.assertEqual(sorted(int(m.group(2)) for m in achados), list(range(declarado)), nome)
-                for m in achados:
+                for m in [m for m in achados if m.group(3) != "overlay_next"]:      # o ponteiro fica fora da tela
                     x, y = float(m.group(4)), float(m.group(5))
                     self.assertTrue(0 <= x <= 1 and 0 <= y <= 1, (nome, m.group(0)))
             for botao in ("menu_toggle", "save_state", "load_state", "exit_emulator"):
                 self.assertEqual(texto.count('"%s,' % botao), 2, (nome, botao))     # deitado e em pe
+
+    def test_cada_desenho_aponta_para_o_da_outra_orientacao(self):
+        # sem o next_target o RetroArch nao troca para o desenho em pe (input_overlay_auto_rotate), visto no A12
+        for nome in tc.DESENHOS:
+            texto = tc.gerar_cfg(nome)
+            self.assertRegex(texto, r'(?m)^overlay0_desc\d+_next_target = "portrait"$', nome)
+            self.assertRegex(texto, r'(?m)^overlay1_desc\d+_next_target = "landscape"$', nome)
+            # o next_target so vale num botao overlay_next, e ele fica fora da tela (nenhum toque troca o desenho)
+            self.assertRegex(texto, r'(?m)^overlay0_desc\d+ = "overlay_next,-1\.00000,-1\.00000,', nome)
 
     def test_em_pe_vai_para_a_metade_de_baixo_e_cada_lado_na_sua_borda(self):
         self.assertLess(tc.a_partir_do_deitado(0.1, 0.6)[0], 0.5)

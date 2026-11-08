@@ -1721,5 +1721,8 @@ SALVAR, CARREGAR e SAIR**.
   amarelos** e o analógico no encaixe de oito lados. No GameCube, o A verde grande, o B vermelho, o X e o Y em feijão e o C
   amarelo. No Mega Drive e no Saturn, o disco da Sega. No Dreamcast, A vermelho, B azul, X amarelo e Y verde. No Neo Geo e no
   fliperama, a alavanca com a bola. A tela "Arrumar os botões" mostra cada botão com essa mesma imagem.
+- **Em pé ou deitado, como o aluno quiser**: deitado, o jogo ocupa a tela toda. Em pé, o jogo fica no alto, na largura toda e na
+  proporção dele, e os botões ficam na metade de baixo (cada console tem o seu desenho em pé). Basta girar o celular com a rotação
+  automática ligada.
 - **Vibração**: logo abaixo da chave Vibração, **"O celular vibra também"** manda o tremor do jogo para o próprio celular, e
   **"Vibrar ao tocar"** dá um toque curto a cada botão da tela.

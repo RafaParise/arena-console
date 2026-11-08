@@ -657,6 +657,10 @@ def ajustes_do_android(opcoes, pasta_retroarch, filtro, teclado="", botoes="auto
         # De pe, o desenho de pe (com o menu no meio); deitado, o deitado.
         # Sem isto, o de pe usava o deitado esticado (achado da auditoria 4).
         opcoes["input_overlay_auto_rotate"] = "true"
+        # Em pe, a imagem do jogo fica no alto, na largura toda (android/retroarch/arena-em-pe.patch), e os botoes na
+        # metade de baixo; deitado, a tela cheia de sempre.
+        opcoes["video_viewport_bias_portrait_x"] = "0.500000"
+        opcoes["video_viewport_bias_portrait_y"] = "0.000000"
         # O controle de toque continua na tela com o menu aberto: o aluno anda
         # no menu pelo direcional e confirma com o A, como num controle. O
         # toque direto no menu (RGUI) erra a linha com o celular de pe: o

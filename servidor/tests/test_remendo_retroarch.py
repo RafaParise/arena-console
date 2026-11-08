@@ -26,7 +26,7 @@ def ler(nome):
 
 
 class FormatoDosRemendos(unittest.TestCase):
-    NOMES = ["arena-args.patch", "arena-controles.patch"]
+    NOMES = ["arena-args.patch", "arena-controles.patch", "arena-em-pe.patch"]
 
     def test_os_remendos_sao_estes_e_nesta_ordem(self):
         self.assertEqual([os.path.basename(r) for r in compilador.remendos()], self.NOMES)
@@ -86,6 +86,32 @@ class RemendoDosControles(unittest.TestCase):
             codigo = arquivo.read()
         self.assertIn('b"[ARENA] Controles na ordem"', codigo)
         self.assertIn("[ARENA] Controles na ordem em que foram conectados", self.texto)
+
+
+class RemendoDoCelularEmPe(unittest.TestCase):
+    """Visto no A12 em 07/11/2026: com a "tela cheia", o celular em pe esticava o jogo ate a altura da tela, por baixo
+    dos botoes. O remendo vale so em pe e so na tela cheia: deitado, nada muda."""
+
+    def setUp(self):
+        self.texto = ler("arena-em-pe.patch")[1]
+
+    def test_mexe_so_no_calculo_da_imagem(self):
+        arquivos = re.findall(r"^(?:---|\+\+\+) (\S+)", self.texto, re.M)
+        self.assertEqual(arquivos, ["a/gfx/video_driver.c", "b/gfx/video_driver.c"])
+        self.assertIn("void video_viewport_get_scaled_aspect2(", self.texto)
+
+    def test_so_em_pe_e_so_na_tela_cheia(self):
+        novas = "\n".join(l[1:] for l in self.texto.splitlines() if l.startswith("+") and not l.startswith("+++"))
+        self.assertIn("video_aspect_ratio_idx == ASPECT_RATIO_FULL", novas)
+        contexto = self.texto[:self.texto.index("+      /* ARENA")]
+        # dentro do bloco "em pe" do proprio RetroArch (o if (vp_width < vp_height) que escolhe o ajuste de pe)
+        self.assertIn("vp_bias_y         = settings->floats.video_vp_bias_portrait_y;", contexto)
+        self.assertIn("desired_aspect = do_jogo;", novas)              # a proporcao do jogo, nao a da tela
+
+    def test_o_arena_poe_a_imagem_em_pe_no_alto(self):
+        with open(os.path.join(PASTA_SERVIDOR, "plataforma.py"), encoding="utf-8") as arquivo:
+            codigo = arquivo.read()
+        self.assertIn('opcoes["video_viewport_bias_portrait_y"] = "0.000000"', codigo)
 
 
 class MarcaDosRemendos(unittest.TestCase):
