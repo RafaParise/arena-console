@@ -366,6 +366,46 @@ Falta (nesta ordem):
   com a tela espelhada na TV** (Smart View/Miracast; 24/10) e o **Deadly Alliance lento no A12** (24/10; o PS2 pede mais do que o
   processador dele dá, então a meta é medir e achar o melhor ajuste, sem prometer velocidade cheia).
 
+## Android com o mesmo cuidado do PC (08/11/2026, de manhã)
+
+Pedido do Rafael: "a maioria tem celular do que pc, então merece um cuidado e carinho especial". O APK de teste 2026.11.08
+foi aberto **console por console no Galaxy A12** (`ferramentas\afinar_no_celular.py`; bruto em
+`docs\auditoria6\celular_SM_A125M.json`): um jogo de cada um dos 23 consoles com jogo no celular, quadros por segundo
+pelo SurfaceFlinger, foto e saída pelo SAIR. Todos os que abriram saíram pelo SAIR.
+
+| Console | Jogo | Quadros por segundo no A12 |
+|---|---|---|
+| NES, Super Nintendo, Mega Drive, Atari 2600, ColecoVision | Contra, 1997 New Year FD, Golden Axe, Combat, Slither | 60 (nenhum lento) |
+| Neo Geo | Metal Slug X | 59,3 |
+| PlayStation | CTR | **59,3** (depois do conserto abaixo) |
+| PS2 | Black | 58 no Android (o número do Android engana no PS2: conferir pelo mostrador do emulador) |
+| Saturn | Saturn Bomberman | **56** com o YabaSanshiro (era 21 com o Beetle Saturn) |
+| Amiga, C64, 32X, Sega CD | Alien Breed, International Karate, Chaotix, Sonic CD | ~50 (provavelmente região europeia, 50 Hz; não conferido) |
+| Nintendo 64 | Bomberman 64 | 48,8 |
+| PocketStation | 15 Puzzle | 31,9 (provavelmente o ritmo do próprio aparelho; não conferido) |
+| GameCube | F-Zero GX | 17 (limite do A12) |
+| Fliperama | Killer Instinct | 13,6 (dos mais pesados do MAME; limite do A12) |
+| Dreamcast | Armada | 11,5 com a BIOS original (limite do A12; falta medir com a BIOS imitada) |
+| Wii | Mario Kart Wii | 1,4 e o Android acusou "não responde" (limite do A12) |
+| PSP | Burnout Legends | abriu e saiu; a medida veio vazia (refazer com mais tempo de carga) |
+| Java ME, PS3, Xbox 360 | — | não têm versão para Android (o recado agora diz isso) |
+
+**Consertado nesta manhã** (commits e6c1088, 21c3a16, 271affd):
+- **PS1 levava 31,9 s de tela preta** antes do primeiro quadro: o SwanStation carregava o disco inteiro na memória (bom no
+  pen drive do PC, ruim no cartão SD de um celular de 4 GB). No Android ele lê direto do cartão: **2,5 s**, e o jogo a 59,3.
+- **Saturn pelo YabaSanshiro no celular**: 21 → 56 quadros. Com o tipo de controle dele (o 261 do Beetle não existe nele e
+  deixaria o jogador sem controle), o C e o Z no mesmo lugar do computador (troca pelo `.rmp` da partida) e o adaptador de 6.
+- **"Voltar ao jogo"**: o jogo que ficava aberto atrás do ARENA travava a abertura de outro (achado ao vivo no A12).
+- **Recado do console sem versão para Android** (Java ME, PS3, Xbox 360) em vez de "instale de novo".
+- A medida do celular (`afinar_no_celular.py`) achava a camada errada e tocava o SAIR no lugar antigo.
+
+**Falta, com o celular de volta**:
+- Instalar o APK de teste novo (com o Saturn, o PS1 e o Voltar ao jogo) e conferir: a **proporção da imagem do Saturn** no
+  YabaSanshiro (a foto pareceu esticada na largura), os **botões C e Z** na mão, o **Voltar ao jogo** (sair pelo botão de
+  início e tocar em outro jogo) e o recado do Java ME.
+- Medir de novo o PSP (com mais tempo de carga) e o Dreamcast com a BIOS imitada.
+- No fim, **instalar o APK de produção** (o A12 ficou com o de teste).
+
 ## Depende do Rafael
 
 - **Acessórios (24/10/2026), o que só você faz:**

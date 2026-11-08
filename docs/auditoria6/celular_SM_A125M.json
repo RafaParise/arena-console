@@ -1,0 +1,234 @@
+{
+ "modelo": "SM-A125M",
+ "quando": "2026-11-08 07:55",
+ "maquina": {
+  "cpu": "Mediatek MT6765V/CB",
+  "gpu": {
+   "nome": "PowerVR Rogue GE8320",
+   "integrada": true,
+   "conhecida": true
+  },
+  "instrucoes": {
+   "avx": null,
+   "avx2": null
+  },
+  "velocidade": {
+   "operacoes_por_segundo": 563844,
+   "relativa_ao_alvo": 0.18,
+   "referencia_provisoria": true
+  },
+  "nucleos": 8,
+  "ram_total_gb": 3.7,
+  "ram_livre_gb": 1.5,
+  "disco": {
+   "unidade": "/data/user/0",
+   "tipo": "fixo",
+   "removivel": false,
+   "classe": "rapido",
+   "escrita_mbs": 115.1,
+   "leitura_mbs": 432.6,
+   "confirmacao_ms": 45.4,
+   "livre_gb": 13.4,
+   "total_gb": 51.3,
+   "usado_pct": 74,
+   "descricao": "SSD (115 MB/s)",
+   "cabem_states": 11434
+  },
+  "sistema": "Android 12 (samsung SM-A125M) (aarch64, 64 bits)",
+  "driver_video": "gl",
+  "runtime_ok": true,
+  "android": true,
+  "vulkan": true,
+  "removivel": false,
+  "perfil_maquina": "leve"
+ },
+ "consoles": [
+  {
+   "jogo": "Alien Breed Disk1",
+   "plataforma": "amiga",
+   "abriu_s": 1.3,
+   "quadros_por_segundo": 50.1,
+   "quadros_lentos": 0.197,
+   "foto": "celular-amiga.png",
+   "saiu_por": "SAIR"
+  },
+  {
+   "jogo": "Killer Instinct",
+   "plataforma": "arcade",
+   "abriu_s": 3.0,
+   "quadros_por_segundo": 13.6,
+   "quadros_lentos": 0.857,
+   "foto": "celular-arcade.png",
+   "saiu_por": "SAIR"
+  },
+  {
+   "jogo": "Combat",
+   "plataforma": "atari2600",
+   "abriu_s": 2.9,
+   "quadros_por_segundo": 60.0,
+   "quadros_lentos": 0.0,
+   "foto": "celular-atari2600.png",
+   "saiu_por": "SAIR"
+  },
+  {
+   "jogo": "International Karate",
+   "plataforma": "c64",
+   "abriu_s": 2.9,
+   "quadros_por_segundo": 50.2,
+   "quadros_lentos": 0.195,
+   "foto": "celular-c64.png",
+   "saiu_por": "SAIR"
+  },
+  {
+   "jogo": "Slither",
+   "plataforma": "colecovision",
+   "abriu_s": 2.9,
+   "quadros_por_segundo": 59.9,
+   "quadros_lentos": 0.003,
+   "foto": "celular-colecovision.png",
+   "saiu_por": "SAIR"
+  },
+  {
+   "jogo": "Armada",
+   "plataforma": "dreamcast",
+   "erro": "o RetroArch nao ficou na frente"
+  },
+  {
+   "jogo": "F Zero GX",
+   "plataforma": "gamecube",
+   "abriu_s": 2.9,
+   "quadros_por_segundo": 17.2,
+   "quadros_lentos": 0.487,
+   "foto": "celular-gamecube.png",
+   "saiu_por": "SAIR"
+  },
+  {
+   "jogo": "God of War Betrayal J2ME EN V0195",
+   "plataforma": "j2me",
+   "erro": "{'ok': False, 'erro': 'Falta o núcleo deste console na pasta retroarch/cores. Rode o APK do ARENA (instale de novo) (guia 6).'}"
+  },
+  {
+   "jogo": "Golden Axe",
+   "plataforma": "megadrive",
+   "abriu_s": 1.3,
+   "quadros_por_segundo": 60.0,
+   "quadros_lentos": 0.0,
+   "foto": "celular-megadrive.png",
+   "saiu_por": "SAIR"
+  },
+  {
+   "jogo": "Bomberman 64",
+   "plataforma": "n64",
+   "abriu_s": 2.9,
+   "quadros_por_segundo": 48.8,
+   "quadros_lentos": 0.069,
+   "foto": "celular-n64.png",
+   "saiu_por": "SAIR"
+  },
+  {
+   "jogo": "Metal Slug X - Super Vehicle-001",
+   "plataforma": "neogeo",
+   "abriu_s": 4.0,
+   "quadros_por_segundo": 59.3,
+   "quadros_lentos": 0.013,
+   "foto": "celular-neogeo.png",
+   "saiu_por": "SAIR"
+  },
+  {
+   "jogo": "Contra",
+   "plataforma": "nes",
+   "abriu_s": 2.9,
+   "quadros_por_segundo": 60.0,
+   "quadros_lentos": 0.0,
+   "foto": "celular-nes.png",
+   "saiu_por": "SAIR"
+  },
+  {
+   "jogo": "15 Puzzle",
+   "plataforma": "pocketstation",
+   "abriu_s": 2.9,
+   "quadros_por_segundo": 31.9,
+   "quadros_lentos": 0.881,
+   "foto": "celular-pocketstation.png",
+   "saiu_por": "SAIR"
+  },
+  {
+   "jogo": "CTR Crash Team Racing",
+   "plataforma": "ps1",
+   "abriu_s": 3.0,
+   "foto": "celular-ps1.png",
+   "saiu_por": "SAIR"
+  },
+  {
+   "jogo": "Black",
+   "plataforma": "ps2",
+   "abriu_s": 5.5,
+   "quadros_por_segundo": 58.1,
+   "quadros_lentos": 0.021,
+   "foto": "celular-ps2.png",
+   "saiu_por": "SAIR"
+  },
+  {
+   "jogo": "Minecraft PlayStation 3 Edition",
+   "plataforma": "ps3",
+   "erro": "{'ok': False, 'erro': 'Falta o núcleo deste console na pasta retroarch/cores. Rode o APK do ARENA (instale de novo) (guia 6). Ou instale o RPCS3 na pasta emuladores.'}"
+  },
+  {
+   "jogo": "Burnout Legends",
+   "plataforma": "psp",
+   "abriu_s": 1.3,
+   "foto": "celular-psp.png",
+   "saiu_por": "SAIR"
+  },
+  {
+   "jogo": "Saturn Bomberman",
+   "plataforma": "saturn",
+   "abriu_s": 2.9,
+   "quadros_por_segundo": 21.3,
+   "quadros_lentos": 0.939,
+   "foto": "celular-saturn.png",
+   "saiu_por": "SAIR"
+  },
+  {
+   "jogo": "Knuckles' Chaotix",
+   "plataforma": "sega32x",
+   "abriu_s": 3.0,
+   "quadros_por_segundo": 49.1,
+   "quadros_lentos": 0.223,
+   "foto": "celular-sega32x.png",
+   "saiu_por": "SAIR"
+  },
+  {
+   "jogo": "Sonic CD",
+   "plataforma": "segacd",
+   "abriu_s": 2.9,
+   "quadros_por_segundo": 49.8,
+   "quadros_lentos": 0.205,
+   "foto": "celular-segacd.png",
+   "saiu_por": "SAIR"
+  },
+  {
+   "jogo": "1997 New Year FD",
+   "plataforma": "snes",
+   "abriu_s": 2.8,
+   "quadros_por_segundo": 60.0,
+   "quadros_lentos": 0.0,
+   "foto": "celular-snes.png",
+   "saiu_por": "SAIR"
+  },
+  {
+   "jogo": "Mario Kart Wii",
+   "plataforma": "wii",
+   "abriu_s": 3.1,
+   "quadros_por_segundo": 1.4,
+   "quadros_lentos": 0.775,
+   "foto": "celular-wii.png",
+   "saiu_por": "SAIR"
+  },
+  {
+   "jogo": "Halo 3",
+   "plataforma": "xbox360",
+   "erro": "{'ok': False, 'erro': 'Falta o núcleo deste console na pasta retroarch/cores. Rode o APK do ARENA (instale de novo) (guia 6). Ou instale o Xenia na pasta emuladores.'}"
+  }
+ ]
+}
