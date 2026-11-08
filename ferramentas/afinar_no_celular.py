@@ -18,7 +18,7 @@ para cada console que tem jogo na pasta do ARENA do aparelho:
   3. tira a foto da tela;
   4. sai como o aluno: dois toques no SAIR do controle de toque.
 O resultado vai para docs\auditoria4\celular_<modelo>.json.
-Uso: servidor\python\python.exe ferramentas\afinar_no_celular.py [--consoles=snes,ps1] [--segundos=30]
+Uso: servidor\python\python.exe ferramentas\afinar_no_celular.py [--consoles=snes,ps1] [--segundos=30] [--saida=arquivo.json]
 """
 import json
 import os
@@ -30,10 +30,19 @@ AQUI = os.path.dirname(os.path.abspath(__file__))
 RAIZ = os.path.dirname(AQUI)
 sys.path.insert(0, os.path.join(RAIZ, "testes"))
 import teste_android as base  # noqa: E402
+sys.path.insert(0, os.path.join(RAIZ, "servidor"))
+import toque_consoles  # noqa: E402
 
 PACOTE = base.PACOTE
-# O SAIR do controle de toque, deitado (servidor\plataforma.py, BOTOES_DO_TOQUE).
+# O SAIR do controle de toque, deitado: no de sempre (servidor\plataforma.py, BOTOES_DO_TOQUE) e nos desenhos de
+# cada console (servidor	oque_consoles.py, BOTOES_DO_ARENA; 08/11/2026: o teste tocava no lugar antigo).
 SAIR_DEITADO = (0.85, 0.08)
+SAIR_NO_DESENHO = next((x, y) for comando, x, y, _xp, _yp, _img in toque_consoles.BOTOES_DO_ARENA
+                       if comando == "exit_emulator")
+
+
+def lugar_do_sair(plataforma):
+    return SAIR_NO_DESENHO if toque_consoles.desenho_do_console(plataforma) else SAIR_DEITADO
 
 
 def argumento(nome, padrao):
@@ -51,10 +60,17 @@ def tamanho_da_tela():
 
 
 def camada_do_jogo():
-    """O nome da camada do RetroArch no SurfaceFlinger."""
-    for linha in base.adb_texto("shell", "dumpsys", "SurfaceFlinger", "--list").splitlines():
-        if "RetroActivityFuture" in linha and "SurfaceView" in linha and "Background" not in linha:
-            return linha.strip()
+    """O nome da camada do RetroArch no SurfaceFlinger: a SurfaceView (RetroArch antigo) ou, no RetroArch 1.22 do ARENA,
+    que desenha direto na janela (NativeActivity), a camada de quadros dela, a que termina em "$_<numero>#0"
+    (08/11/2026: sem isso a medida saia vazia em todos os consoles)."""
+    linhas = [linha.strip() for linha in base.adb_texto("shell", "dumpsys", "SurfaceFlinger", "--list").splitlines()
+              if "RetroActivityFuture" in linha and "Background" not in linha and "ActivityRecord" not in linha]
+    for linha in linhas:
+        if "SurfaceView" in linha:
+            return linha
+    for linha in linhas:
+        if re.search(r"RetroActivityFuture\$_\d+#\d+$", linha):
+            return linha
     return None
 
 
@@ -63,7 +79,8 @@ def quadros_por_segundo(camada):
     o tempo da tela) dos ultimos ~127 quadros da camada."""
     if not camada:
         return None, None
-    linhas = base.adb_texto("shell", "dumpsys", "SurfaceFlinger", "--latency", camada).splitlines()
+    # Entre aspas simples: o adb junta tudo numa linha do shell do celular, e o "$_123" do nome viraria variavel.
+    linhas = base.adb_texto("shell", "dumpsys", "SurfaceFlinger", "--latency", "'%s'" % camada).splitlines()
     if len(linhas) < 3:
         return None, None
     try:
@@ -86,9 +103,10 @@ def quadros_por_segundo(camada):
     return round(fps, 1), round(lentos, 3)
 
 
-def sair_tocando():
+def sair_tocando(plataforma=None):
     largura, altura = tamanho_da_tela()
-    x, y = int(SAIR_DEITADO[0] * largura), int(SAIR_DEITADO[1] * altura)
+    lugar = lugar_do_sair(plataforma)
+    x, y = int(lugar[0] * largura), int(lugar[1] * altura)
     for _ in range(2):
         base.adb("shell", "input", "tap", str(x), str(y))
         time.sleep(0.8)
@@ -109,6 +127,11 @@ def medir(pagina, jogo, segundos):
     r = {"jogo": jogo["titulo"], "plataforma": jogo["plataforma"]}
     antes = time.monotonic()
     resposta = pagina.pedir("/api/jogar", {"jogo_id": jogo["id"]})
+    if resposta and resposta.get("escolher_jeito") and resposta.get("jeitos"):
+        # Console com mais de um jeito de abrir (a BIOS original ou a imitada): a tela pergunta ao aluno; aqui vai o
+        # primeiro, o que a tela mostra em cima (08/11/2026: o Dreamcast parecia "nao abrir").
+        r["jeito"] = resposta["jeitos"][0]["id"]
+        resposta = pagina.pedir("/api/jogar", {"jogo_id": jogo["id"], "jeito": r["jeito"]})
     if not resposta or resposta.get("ok") is False or resposta.get("erro"):
         r["erro"] = str(resposta)[:200]
         return r
@@ -127,7 +150,7 @@ def medir(pagina, jogo, segundos):
         r["quadros_por_segundo"] = round(sum(m[0] for m in validas) / len(validas), 1)
         r["quadros_lentos"] = round(sum(m[1] for m in validas) / len(validas), 3)
     r["foto"] = os.path.basename(base.foto("celular-" + jogo["plataforma"])[0])
-    r["saiu_por"] = sair_tocando()
+    r["saiu_por"] = sair_tocando(jogo["plataforma"])
     base.esperar(lambda: not (pagina.pedir("/api/estado") or {}).get("jogo_em_andamento", {}).get("ativo"), 30)
     return r
 
@@ -160,7 +183,8 @@ def principal():
                 r.get("saiu_por"), r.get("erro", "")), flush=True)
     finally:
         pagina.fechar()
-    saida = os.path.join(RAIZ, "docs", "auditoria4", "celular_%s.json" % re.sub(r"\W+", "_", modelo))
+    saida = argumento("saida", "") or os.path.join(RAIZ, "docs", "auditoria4",
+                                                   "celular_%s.json" % re.sub(r"\W+", "_", modelo))
     with open(saida, "w", encoding="utf-8") as arquivo:
         json.dump(resultado, arquivo, ensure_ascii=False, indent=1)
     print("Resultado: %s" % saida)

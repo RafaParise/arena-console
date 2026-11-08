@@ -842,6 +842,22 @@ class Catalogo(unittest.TestCase):
             self.assertNotIn("emuladores", consoles[console]["motivo"], console)
 
 
+class OpcoesSoDoAndroid(unittest.TestCase):
+    """graficos.json -> no_android (08/11/2026): no celular o PS1 nao carrega o disco inteiro na memoria (no A12, 31,9 s
+    de tela preta no CTR; lendo do cartao, 2,5 s); no computador continua carregando."""
+
+    def test_ps1_le_do_cartao_no_celular_e_carrega_na_memoria_no_pc(self):
+        import graficos
+        for nota in (1, 3, 5):
+            for abaixo in ("", "leve", "minimo"):
+                with no_android():
+                    no_celular = graficos.opcoes_finais_do_nucleo("swanstation", nota, nota, abaixo=abaixo)
+                self.assertEqual(no_celular.get("swanstation_CDROM_LoadImageToRAM"), "false", (nota, abaixo))
+                with mock.patch.multiple(plataforma, ANDROID=False, WINDOWS=True, LINUX=False):
+                    no_pc = graficos.opcoes_finais_do_nucleo("swanstation", nota, nota, abaixo=abaixo)
+                self.assertEqual(no_pc.get("swanstation_CDROM_LoadImageToRAM"), "true", (nota, abaixo))
+
+
 class Hardware(unittest.TestCase):
     def test_o_que_o_app_conta(self):
         ambiente = {"ARENA_ANDROID_GPU": "Adreno (TM) 610", "ARENA_ANDROID_PROCESSADOR": "Qualcomm SM6125",

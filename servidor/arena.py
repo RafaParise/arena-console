@@ -7568,6 +7568,11 @@ class Manipulador(BaseHTTPRequestHandler):
                         "Não achei o %s na pasta retroarch. A pasta tem que se chamar retroarch (guia 1); rode o %s "
                         "para conferir." % (plataforma_do_sistema.NOME_DO_RETROARCH, plataforma_do_sistema.VERIFICAR))
                 if not plataforma_do_sistema.tem_nucleo(os.path.join(PASTA_CORES, core_do_jeito)):
+                    if plataforma_do_sistema.ANDROID:
+                        # O nucleo que nao veio no APK nao se instala de novo (o Java ME precisa do Java do
+                        # computador): o mesmo recado do cartao do console (08/11/2026, no A12).
+                        return self.erro("Este console não tem versão para Android: abra o jogo no computador, "
+                                         "com a mesma pasta do ARENA.")
                     sugestao = ""
                     if dados_externo:
                         sugestao = (" Ou instale o %s na pasta emuladores."

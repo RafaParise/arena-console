@@ -501,6 +501,14 @@
     "sempre": {"EmuCore/GS": {"texture_preloading": "1", "GSBackThreadMode": "0"}, "EmuCore/Speedhacks": {"DynamicEECycleRate": "true"}, "EmuCore": {"WarnAboutUnsafeSettings": "false"}},
     "vulkan": {"EmuCore/GS": {"GSBackThreadMode": "1"}}
   },
+  "no_android": {
+    "_leia": "Opcoes que so valem no Android, por cima de todas as outras (graficos.opcoes_finais_do_nucleo). PS1: o SwanStation NAO carrega o disco inteiro na memoria. No PC isso ajuda com o pen drive lento; no celular sao centenas de MB lidos do cartao SD antes do primeiro quadro, num aparelho com 4 GB: no Galaxy A12 o CTR levava 31,9 s de tela preta e com a leitura direta 2,5 s, a 59,3 fps no jogo (medido em 08/11/2026).",
+    "nucleos": {
+      "swanstation": {
+        "swanstation_CDROM_LoadImageToRAM": "false"
+      }
+    }
+  },
   "tela_4k": {
     "_leia": "Tela de 4K (2.000 linhas ou mais, em pixels de verdade) E placa de video dedicada (nota da placa 4 ou 5): os consoles de 3D leves desenham perto da resolucao da tela, em vez de parar em 1440p. Os pesados (PS2, GameCube, Wii, PS3, Xbox 360) ficam no que a placa aguenta: 4K neles derruba placa media. Valores conferidos no proprio nucleo (o SwanStation diz '9x (for 4K)'). PSP em 6x e N64 em 2x, nao no maximo: estabilidade antes de nitidez.",
     "altura_minima": 2000,

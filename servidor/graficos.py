@@ -512,6 +512,9 @@ def opcoes_finais_do_nucleo(nome_curto, nota, nota_gpu=None, modesto=False, altu
         # resolucao da tela (graficos.json -> tela_4k).
         if tela_4k_vale(nota_gpu, altura_tela):
             opcoes.update(dados.get("tela_4k", {}).get("nucleos", {}).get(nome_curto, {}))
+    # O que so vale no celular (graficos.json -> no_android), por cima de tudo, em qualquer nivel.
+    if plataforma_do_sistema.ANDROID:
+        opcoes.update(dados.get("no_android", {}).get("nucleos", {}).get(nome_curto, {}))
     return opcoes
 
 
