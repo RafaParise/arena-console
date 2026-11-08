@@ -140,7 +140,7 @@ ARQUIVO_OVERRIDE = os.path.join(PASTA_DADOS, "arena_override.cfg")
 # Serve para uma coisa so: acabar com a duvida de "sera que estou testando
 # a versao corrigida?". Quando algo nao bate com o esperado, o primeiro
 # passo e comparar este numero.
-VERSAO = "2026.10.26"   # Android: painel ao vivo, celular como controle (USB, gamepad virtual), Jogar Junto entre versoes
+VERSAO = "2026.11.08"   # controle de toque com a cara de cada console, em pe, dois toques, PS2 no A12, Lossless nos emuladores de fora, auditoria 6
 
 PORTA = 8777
 # Os testes que sobem uma copia do ARENA (testes\copia_do_arena.py) usam

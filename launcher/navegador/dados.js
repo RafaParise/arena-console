@@ -3302,5 +3302,5 @@ window.ARENA_DADOS = {
    2.0
   ]
  },
- "versao": "2026.10.26"
+ "versao": "2026.11.08"
 };
