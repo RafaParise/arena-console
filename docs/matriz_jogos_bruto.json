@@ -3,7 +3,7 @@
     "console": "Nintendo 64",
     "jogo": "Bomberman 64 (USA).n64",
     "abre_e_mostra_imagem": true,
-    "tamanho_captura_bytes": 454502,
+    "tamanho_captura_bytes": 56334,
     "salva_estado": true,
     "carrega_sem_travar": true
   },
@@ -11,7 +11,7 @@
     "console": "Mega Drive",
     "jogo": "Sonic The Hedgehog 3 (USA).md",
     "abre_e_mostra_imagem": true,
-    "tamanho_captura_bytes": 53677,
+    "tamanho_captura_bytes": 53520,
     "salva_estado": true,
     "carrega_sem_travar": true
   },
@@ -19,7 +19,7 @@
     "console": "Super Nintendo",
     "jogo": "Super Bomberman 4 (Japan) [T-En by Svambo v1.0].sfc",
     "abre_e_mostra_imagem": true,
-    "tamanho_captura_bytes": 50098,
+    "tamanho_captura_bytes": 50382,
     "salva_estado": true,
     "carrega_sem_travar": true
   },
@@ -27,7 +27,7 @@
     "console": "PlayStation",
     "jogo": "CTR - Crash Team Racing (USA).bin",
     "abre_e_mostra_imagem": true,
-    "tamanho_captura_bytes": 11139,
+    "tamanho_captura_bytes": 7105,
     "salva_estado": true,
     "carrega_sem_travar": true
   },
@@ -35,7 +35,7 @@
     "console": "Dreamcast",
     "jogo": "Marvel vs. Capcom 2 - New Age of Heroes (Europe).cue",
     "abre_e_mostra_imagem": true,
-    "tamanho_captura_bytes": 26165,
+    "tamanho_captura_bytes": 25900,
     "salva_estado": true,
     "carrega_sem_travar": true
   },
@@ -43,7 +43,7 @@
     "console": "Neo Geo",
     "jogo": "kof97.zip",
     "abre_e_mostra_imagem": true,
-    "tamanho_captura_bytes": 143790,
+    "tamanho_captura_bytes": 148934,
     "salva_estado": true,
     "carrega_sem_travar": true
   },
@@ -51,7 +51,7 @@
     "console": "PSP",
     "jogo": "Killzone - Liberation (USA) (En,Fr,De,Es,It,Nl,Pl,Ru).iso",
     "abre_e_mostra_imagem": true,
-    "tamanho_captura_bytes": 39062,
+    "tamanho_captura_bytes": 21744,
     "salva_estado": true,
     "carrega_sem_travar": true
   }

@@ -1,5 +1,5 @@
 {
- "quando": "2026-10-25 22:21:25",
+ "quando": "2026-11-08 14:29:14",
  "partes": [
   "A",
   "B",
@@ -19,12 +19,12 @@
    "jogo": "DIAFLW",
    "nucleo": "applewin_libretro.so",
    "imagem": true,
-   "detalhe": "1575x1080, 215 cores, a mais comum em 96%",
+   "detalhe": "1440x1080, 193 cores, a mais comum em 96%",
    "travou": false,
-   "segundos": 30.8,
+   "segundos": 30.9,
    "pela_ponte": false,
    "quadros": 1800,
-   "quadros_por_segundo": 58.4
+   "quadros_por_segundo": 58.3
   },
   {
    "parte": "B",
@@ -32,12 +32,12 @@
    "jogo": "DIAFLW",
    "nucleo": "applewin_libretro.so",
    "imagem": true,
-   "detalhe": "1575x1080, 215 cores, a mais comum em 96%",
+   "detalhe": "1440x1080, 193 cores, a mais comum em 96%",
    "travou": false,
-   "segundos": 30.5,
+   "segundos": 30.6,
    "pela_ponte": false,
    "quadros": 1800,
-   "quadros_por_segundo": 58.9
+   "quadros_por_segundo": 58.7
   },
   {
    "parte": "A",
@@ -45,9 +45,9 @@
    "jogo": "Evade",
    "nucleo": "ardens_libretro.so",
    "imagem": true,
-   "detalhe": "384x192, 14 cores, a mais comum em 97%",
+   "detalhe": "255x192, 183 cores, a mais comum em 97%",
    "travou": false,
-   "segundos": 15.2,
+   "segundos": 15.3,
    "pela_ponte": false,
    "quadros": 900,
    "quadros_por_segundo": 59.0
@@ -58,9 +58,9 @@
    "jogo": "Evade",
    "nucleo": "ardens_libretro.so",
    "imagem": true,
-   "detalhe": "384x192, 14 cores, a mais comum em 97%",
+   "detalhe": "255x192, 183 cores, a mais comum em 97%",
    "travou": false,
-   "segundos": 15.2,
+   "segundos": 15.3,
    "pela_ponte": false,
    "quadros": 900,
    "quadros_por_segundo": 59.0
@@ -71,9 +71,9 @@
    "jogo": "Rayoïd",
    "nucleo": "hatari_libretro.so",
    "imagem": true,
-   "detalhe": "1439x1079, 3412 cores, a mais comum em 60%",
+   "detalhe": "1439x1080, 3247 cores, a mais comum em 60%",
    "travou": false,
-   "segundos": 30.6,
+   "segundos": 30.5,
    "pela_ponte": false,
    "quadros": 1500,
    "quadros_por_segundo": 49.1
@@ -84,9 +84,9 @@
    "jogo": "Rayoïd",
    "nucleo": "hatari_libretro.so",
    "imagem": true,
-   "detalhe": "1439x1079, 3412 cores, a mais comum em 60%",
+   "detalhe": "1439x1080, 3247 cores, a mais comum em 60%",
    "travou": false,
-   "segundos": 30.4,
+   "segundos": 30.5,
    "pela_ponte": false,
    "quadros": 1500,
    "quadros_por_segundo": 49.3
@@ -97,7 +97,7 @@
    "jogo": "Slippery Slope",
    "nucleo": "jaxe_libretro.so",
    "imagem": true,
-   "detalhe": "384x192, 14 cores, a mais comum em 71%",
+   "detalhe": "255x192, 208 cores, a mais comum em 70%",
    "travou": false,
    "segundos": 10.2,
    "pela_ponte": false,
@@ -110,7 +110,7 @@
    "jogo": "Slippery Slope",
    "nucleo": "jaxe_libretro.so",
    "imagem": true,
-   "detalhe": "384x192, 14 cores, a mais comum em 71%",
+   "detalhe": "255x192, 208 cores, a mais comum em 70%",
    "travou": false,
    "segundos": 10.2,
    "pela_ponte": false,
@@ -128,7 +128,7 @@
    "segundos": 10.2,
    "pela_ponte": false,
    "quadros": 600,
-   "quadros_por_segundo": 58.9
+   "quadros_por_segundo": 58.6
   },
   {
    "parte": "B",
@@ -149,20 +149,7 @@
    "jogo": "NOBORUNOCA",
    "nucleo": "bluemsx_libretro.so",
    "imagem": true,
-   "detalhe": "816x720, 99 cores, a mais comum em 43%",
-   "travou": false,
-   "segundos": 15.3,
-   "pela_ponte": false,
-   "quadros": 900,
-   "quadros_por_segundo": 59.0
-  },
-  {
-   "parte": "B",
-   "console": "msx",
-   "jogo": "NOBORUNOCA",
-   "nucleo": "bluemsx_libretro.so",
-   "imagem": true,
-   "detalhe": "816x720, 99 cores, a mais comum em 43%",
+   "detalhe": "960x720, 1198 cores, a mais comum em 43%",
    "travou": false,
    "segundos": 15.2,
    "pela_ponte": false,
@@ -170,25 +157,25 @@
    "quadros_por_segundo": 59.0
   },
   {
+   "parte": "B",
+   "console": "msx",
+   "jogo": "NOBORUNOCA",
+   "nucleo": "bluemsx_libretro.so",
+   "imagem": true,
+   "detalhe": "960x720, 1198 cores, a mais comum em 43%",
+   "travou": false,
+   "segundos": 15.3,
+   "pela_ponte": false,
+   "quadros": 900,
+   "quadros_por_segundo": 59.0
+  },
+  {
    "parte": "A",
    "console": "plus4",
    "jogo": "Intervallo",
    "nucleo": "vice_xplus4_libretro.so",
    "imagem": true,
-   "detalhe": "1194x863, 899 cores, a mais comum em 49%",
-   "travou": false,
-   "segundos": 24.4,
-   "pela_ponte": false,
-   "quadros": 1200,
-   "quadros_por_segundo": 49.2
-  },
-  {
-   "parte": "B",
-   "console": "plus4",
-   "jogo": "Intervallo",
-   "nucleo": "vice_xplus4_libretro.so",
-   "imagem": true,
-   "detalhe": "1194x863, 899 cores, a mais comum em 49%",
+   "detalhe": "1152x864, 19 cores, a mais comum em 51%",
    "travou": false,
    "segundos": 24.3,
    "pela_ponte": false,
@@ -196,12 +183,25 @@
    "quadros_por_segundo": 49.3
   },
   {
+   "parte": "B",
+   "console": "plus4",
+   "jogo": "Intervallo",
+   "nucleo": "vice_xplus4_libretro.so",
+   "imagem": true,
+   "detalhe": "1152x864, 19 cores, a mais comum em 51%",
+   "travou": false,
+   "segundos": 24.3,
+   "pela_ponte": false,
+   "quadros": 1200,
+   "quadros_por_segundo": 49.4
+  },
+  {
    "parte": "A",
    "console": "vic20",
    "jogo": "Baguel",
    "nucleo": "vice_xvic_libretro.so",
    "imagem": true,
-   "detalhe": "1119x852, 394 cores, a mais comum em 53%",
+   "detalhe": "1137x852, 435 cores, a mais comum em 53%",
    "travou": false,
    "segundos": 30.2,
    "pela_ponte": false,
@@ -214,12 +214,12 @@
    "jogo": "Baguel",
    "nucleo": "vice_xvic_libretro.so",
    "imagem": true,
-   "detalhe": "1119x852, 394 cores, a mais comum em 53%",
+   "detalhe": "1137x852, 435 cores, a mais comum em 53%",
    "travou": false,
-   "segundos": 30.2,
+   "segundos": 30.3,
    "pela_ponte": false,
    "quadros": 1500,
-   "quadros_por_segundo": 49.6
+   "quadros_por_segundo": 49.5
   },
   {
    "parte": "A",
@@ -245,7 +245,7 @@
    "segundos": 30.2,
    "pela_ponte": false,
    "quadros": 1500,
-   "quadros_por_segundo": 49.6
+   "quadros_por_segundo": 49.7
   },
   {
    "parte": "A",
@@ -253,12 +253,12 @@
    "jogo": "Shooter",
    "nucleo": "freej2me_libretro.so",
    "imagem": true,
-   "detalhe": "540x720, 256 cores, a mais comum em 91%",
+   "detalhe": "960x720, 256 cores, a mais comum em 91%",
    "travou": false,
-   "segundos": 16.2,
+   "segundos": 16.4,
    "pela_ponte": false,
    "quadros": 900,
-   "quadros_por_segundo": 55.4
+   "quadros_por_segundo": 54.9
   },
   {
    "parte": "B",
@@ -266,7 +266,7 @@
    "jogo": "Shooter",
    "nucleo": "freej2me_libretro.so",
    "imagem": true,
-   "detalhe": "540x720, 256 cores, a mais comum em 91%",
+   "detalhe": "960x720, 256 cores, a mais comum em 91%",
    "travou": false,
    "segundos": 15.6,
    "pela_ponte": true,
@@ -284,7 +284,7 @@
    "segundos": 10.3,
    "pela_ponte": false,
    "quadros": 600,
-   "quadros_por_segundo": 58.1
+   "quadros_por_segundo": 58.3
   },
   {
    "parte": "B",
@@ -294,10 +294,10 @@
    "imagem": true,
    "detalhe": "960x720, 98 cores, a mais comum em 75%, (90, 40, 0)",
    "travou": false,
-   "segundos": 10.3,
+   "segundos": 10.2,
    "pela_ponte": false,
    "quadros": 600,
-   "quadros_por_segundo": 58.3
+   "quadros_por_segundo": 58.6
   },
   {
    "parte": "A",
@@ -305,20 +305,7 @@
    "jogo": "programa de teste (BASIC 4.0)",
    "nucleo": "vice_xpet_libretro.so",
    "imagem": true,
-   "detalhe": "1056x798, 10 cores, a mais comum em 63%, (101, 208, 69)",
-   "travou": false,
-   "segundos": 30.3,
-   "pela_ponte": false,
-   "quadros": 1500,
-   "quadros_por_segundo": 49.5
-  },
-  {
-   "parte": "B",
-   "console": "pet",
-   "jogo": "programa de teste (BASIC 4.0)",
-   "nucleo": "vice_xpet_libretro.so",
-   "imagem": true,
-   "detalhe": "1056x798, 10 cores, a mais comum em 63%, (101, 208, 69)",
+   "detalhe": "1065x798, 7 cores, a mais comum em 63%, (101, 208, 69)",
    "travou": false,
    "segundos": 30.2,
    "pela_ponte": false,
@@ -326,17 +313,30 @@
    "quadros_por_segundo": 49.6
   },
   {
+   "parte": "B",
+   "console": "pet",
+   "jogo": "programa de teste (BASIC 4.0)",
+   "nucleo": "vice_xpet_libretro.so",
+   "imagem": true,
+   "detalhe": "1065x798, 7 cores, a mais comum em 63%, (101, 208, 69)",
+   "travou": false,
+   "segundos": 30.3,
+   "pela_ponte": false,
+   "quadros": 1500,
+   "quadros_por_segundo": 49.5
+  },
+  {
    "parte": "A",
    "console": "c128",
    "jogo": "programa de teste (BASIC 7.0)",
    "nucleo": "vice_x128_libretro.so",
    "imagem": true,
-   "detalhe": "911x689, 918 cores, a mais comum em 56%, (122, 65, 50)",
+   "detalhe": "1152x864, 331 cores, a mais comum em 56%, (122, 65, 50)",
    "travou": false,
    "segundos": 30.5,
    "pela_ponte": false,
    "quadros": 1500,
-   "quadros_por_segundo": 49.2
+   "quadros_por_segundo": 49.1
   },
   {
    "parte": "B",
@@ -344,12 +344,12 @@
    "jogo": "programa de teste (BASIC 7.0)",
    "nucleo": "vice_x128_libretro.so",
    "imagem": true,
-   "detalhe": "911x689, 918 cores, a mais comum em 56%, (122, 65, 50)",
+   "detalhe": "1152x864, 331 cores, a mais comum em 56%, (122, 65, 50)",
    "travou": false,
    "segundos": 30.5,
    "pela_ponte": false,
    "quadros": 1500,
-   "quadros_por_segundo": 49.2
+   "quadros_por_segundo": 49.1
   },
   {
    "parte": "A",
@@ -357,12 +357,12 @@
    "jogo": "programa de teste",
    "nucleo": "potator_libretro.so",
    "imagem": true,
-   "detalhe": "480x480, 12 cores, a mais comum em 67%, (0, 0, 0)",
+   "detalhe": "639x480, 24 cores, a mais comum em 67%, (0, 0, 0)",
    "travou": false,
    "segundos": 5.2,
    "pela_ponte": false,
    "quadros": 300,
-   "quadros_por_segundo": 57.9
+   "quadros_por_segundo": 58.0
   },
   {
    "parte": "B",
@@ -370,7 +370,7 @@
    "jogo": "programa de teste",
    "nucleo": "potator_libretro.so",
    "imagem": true,
-   "detalhe": "480x480, 12 cores, a mais comum em 67%, (0, 0, 0)",
+   "detalhe": "639x480, 24 cores, a mais comum em 67%, (0, 0, 0)",
    "travou": false,
    "segundos": 5.2,
    "pela_ponte": false,
@@ -383,7 +383,7 @@
    "jogo": "programa de teste (cartucho do MO5)",
    "nucleo": "theodore_libretro.so",
    "imagem": true,
-   "detalhe": "1680x1080, 7 cores, a mais comum em 88%, (255, 0, 0)",
+   "detalhe": "1440x1080, 10 cores, a mais comum em 88%, (255, 0, 0)",
    "travou": false,
    "segundos": 12.2,
    "pela_ponte": false,
@@ -396,12 +396,12 @@
    "jogo": "programa de teste (cartucho do MO5)",
    "nucleo": "theodore_libretro.so",
    "imagem": true,
-   "detalhe": "1680x1080, 7 cores, a mais comum em 88%, (255, 0, 0)",
+   "detalhe": "1440x1080, 10 cores, a mais comum em 88%, (255, 0, 0)",
    "travou": false,
    "segundos": 12.2,
    "pela_ponte": false,
    "quadros": 600,
-   "quadros_por_segundo": 49.0
+   "quadros_por_segundo": 49.2
   },
   {
    "parte": "A",
@@ -409,12 +409,12 @@
    "jogo": "programa de teste (BIOS livre)",
    "nucleo": "vircon32_libretro.so",
    "imagem": true,
-   "detalhe": "1920x1080, 13952 cores, a mais comum em 72%, (255, 0, 0)",
+   "detalhe": "1440x1080, 13313 cores, a mais comum em 71%, (255, 0, 0)",
    "travou": false,
-   "segundos": 10.9,
+   "segundos": 10.8,
    "pela_ponte": false,
    "quadros": 600,
-   "quadros_por_segundo": 55.3
+   "quadros_por_segundo": 55.6
   },
   {
    "parte": "B",
@@ -422,22 +422,22 @@
    "jogo": "programa de teste (BIOS livre)",
    "nucleo": "vircon32_libretro.so",
    "imagem": true,
-   "detalhe": "1920x1080, 13952 cores, a mais comum em 72%, (255, 0, 0)",
+   "detalhe": "1440x1080, 13313 cores, a mais comum em 71%, (255, 0, 0)",
    "travou": false,
-   "segundos": 10.5,
+   "segundos": 10.6,
    "pela_ponte": false,
    "quadros": 600,
-   "quadros_por_segundo": 56.9
+   "quadros_por_segundo": 56.7
   }
  ],
- "servidor_abriu_s": 0.91,
+ "servidor_abriu_s": 0.61,
  "sistema_do_computador": "linux",
  "maquina": {
   "sistema": "Debian GNU/Linux 13 (trixie) (Linux 6.18.54.1) (x86_64, 64 bits)",
   "processador": null,
   "driver_video": "vulkan"
  },
- "servidor_memoria_mb": 51.4,
+ "servidor_memoria_mb": 55.2,
  "jogo_abriu_s": 8.5,
  "tela_do_jogo": {
   "largura": 1280,
@@ -445,7 +445,7 @@
   "cores": 2,
   "a_mais_comum": 0.783
  },
- "retroarch_memoria_mb": 144.6,
+ "retroarch_memoria_mb": 144.3,
  "sessoes_encerradas": 1,
  "arena_sh_abriu_s": 0.9,
  "arena_sh_cache": [
@@ -463,21 +463,21 @@
    "programa": "/home/aluno/.cache/arena/pcsx2-60119544/AppRun"
   },
   "RPCS3": {
-   "tirar_do_appimage_s": 0.9,
+   "tirar_do_appimage_s": 0.8,
    "abriu": true,
    "codigo": 0,
    "saida": "No AppImage path found, checking for executable\nFound exec path: /home/aluno/.cache/arena/rpcs3-94026641/usr/bin/rpcs3\n[TSC calibration] Available clock sources: 'tsc hyperv_clocksource_tsc_page hyper",
    "programa": "/home/aluno/.cache/arena/rpcs3-94026641/AppRun"
   },
   "Xenia": {
-   "tirar_do_appimage_s": 0.2,
+   "tirar_do_appimage_s": 0.1,
    "abriu": true,
    "codigo": null,
-   "saida": "i> 00000517 VulkanPresenter: Created 1280x720 swapchain with format 44, color space 0, presentation mode 0",
+   "saida": "i> 0000051D VulkanPresenter: Created 1280x720 swapchain with format 44, color space 0, presentation mode 0",
    "programa": "/home/aluno/.cache/arena/xenia-17832440/AppRun"
   }
  },
- "segundos": 665.8,
+ "segundos": 664.3,
  "falhas": [],
- "segundos_com_o_conteiner": 676.8
+ "segundos_com_o_conteiner": 700.4
 }

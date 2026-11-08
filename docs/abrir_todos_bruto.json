@@ -6,7 +6,7 @@
   "abrir": {
    "abre_e_mostra_imagem": false,
    "foto_bytes": 0,
-   "segundos": 0.6,
+   "segundos": 0.5,
    "travou": false,
    "erros": [
     "[ERROR] [Content] Falha ao carregar o conteúdo."
@@ -23,7 +23,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 16630,
-   "segundos": 11.9,
+   "segundos": 12.0,
    "travou": false,
    "erros": []
   },
@@ -42,8 +42,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 20746,
-   "segundos": 10.9,
+   "foto_bytes": 17201,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -62,8 +62,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 32045,
-   "segundos": 10.8,
+   "foto_bytes": 24508,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -82,8 +82,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 37634,
-   "segundos": 10.8,
+   "foto_bytes": 29416,
+   "segundos": 11.3,
    "travou": false,
    "erros": []
   },
@@ -102,8 +102,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 10171,
-   "segundos": 10.8,
+   "foto_bytes": 8973,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -122,8 +122,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 33301,
-   "segundos": 11.1,
+   "foto_bytes": 76999,
+   "segundos": 11.4,
    "travou": false,
    "erros": []
   },
@@ -142,8 +142,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 102489,
-   "segundos": 11.0,
+   "foto_bytes": 102636,
+   "segundos": 11.2,
    "travou": false,
    "erros": []
   },
@@ -162,8 +162,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 30701,
-   "segundos": 10.8,
+   "foto_bytes": 23175,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -183,7 +183,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 4841,
-   "segundos": 10.7,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -202,8 +202,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 4844,
-   "segundos": 10.8,
+   "foto_bytes": 4472,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
@@ -222,8 +222,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 15991,
-   "segundos": 10.7,
+   "foto_bytes": 10811,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
@@ -242,8 +242,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 8699,
-   "segundos": 10.7,
+   "foto_bytes": 7632,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
@@ -263,7 +263,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 2054,
-   "segundos": 10.7,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -283,7 +283,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 7273,
-   "segundos": 10.7,
+   "segundos": 11.3,
    "travou": false,
    "erros": []
   },
@@ -302,8 +302,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 31547,
-   "segundos": 13.0,
+   "foto_bytes": 30159,
+   "segundos": 13.6,
    "travou": false,
    "erros": []
   },
@@ -318,8 +318,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 34475,
-   "segundos": 13.0,
+   "foto_bytes": 33082,
+   "segundos": 13.2,
    "travou": false,
    "erros": []
   },
@@ -334,8 +334,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 96717,
-   "segundos": 13.0,
+   "foto_bytes": 91061,
+   "segundos": 13.3,
    "travou": false,
    "erros": []
   },
@@ -350,8 +350,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 4101,
-   "segundos": 12.8,
+   "foto_bytes": 4160,
+   "segundos": 13.1,
    "travou": false,
    "erros": []
   },
@@ -366,8 +366,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 67668,
-   "segundos": 12.8,
+   "foto_bytes": 68395,
+   "segundos": 13.0,
    "travou": false,
    "erros": []
   },
@@ -382,8 +382,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 77373,
-   "segundos": 12.8,
+   "foto_bytes": 59412,
+   "segundos": 13.0,
    "travou": false,
    "erros": []
   },
@@ -398,8 +398,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 31176,
-   "segundos": 12.9,
+   "foto_bytes": 35071,
+   "segundos": 13.0,
    "travou": false,
    "erros": []
   },
@@ -434,8 +434,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 11775,
-   "segundos": 10.7,
+   "foto_bytes": 26262,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
@@ -454,8 +454,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 105081,
-   "segundos": 10.7,
+   "foto_bytes": 191867,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
@@ -505,7 +505,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 2089,
-   "segundos": 10.7,
+   "segundos": 11.0,
    "travou": false,
    "erros": [
     "[ERROR] [Environ] SET_MESSAGE_EXT: FreeJ2ME system files not found!"
@@ -523,7 +523,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 2089,
-   "segundos": 10.8,
+   "segundos": 11.0,
    "travou": false,
    "erros": [
     "[ERROR] [Environ] SET_MESSAGE_EXT: FreeJ2ME system files not found!"
@@ -540,8 +540,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 11148,
-   "segundos": 10.9,
+   "foto_bytes": 40800,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
@@ -556,8 +556,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 457257,
-   "segundos": 11.0,
+   "foto_bytes": 459769,
+   "segundos": 11.3,
    "travou": false,
    "erros": []
   },
@@ -576,8 +576,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 420385,
-   "segundos": 10.8,
+   "foto_bytes": 415256,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -596,8 +596,8 @@
   "jogadores": 4,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 40997,
-   "segundos": 10.7,
+   "foto_bytes": 41254,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
@@ -616,8 +616,8 @@
   "jogadores": 4,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 256111,
-   "segundos": 40.8,
+   "foto_bytes": 255633,
+   "segundos": 41.0,
    "travou": false,
    "erros": [],
    "segunda_vez_com_40s": true
@@ -637,8 +637,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 212480,
-   "segundos": 10.8,
+   "foto_bytes": 210779,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -657,8 +657,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 464201,
-   "segundos": 10.8,
+   "foto_bytes": 463286,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -677,8 +677,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 152297,
-   "segundos": 10.7,
+   "foto_bytes": 151578,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
@@ -698,7 +698,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 8637,
-   "segundos": 10.6,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
@@ -717,8 +717,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 100256,
-   "segundos": 11.3,
+   "foto_bytes": 105657,
+   "segundos": 11.8,
    "travou": false,
    "erros": []
   },
@@ -737,8 +737,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 41479,
-   "segundos": 10.9,
+   "foto_bytes": 47792,
+   "segundos": 11.2,
    "travou": false,
    "erros": []
   },
@@ -757,8 +757,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 41479,
-   "segundos": 11.7,
+   "foto_bytes": 47792,
+   "segundos": 11.2,
    "travou": false,
    "erros": []
   },
@@ -777,8 +777,8 @@
   "jogadores": 4,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 169621,
-   "segundos": 10.9,
+   "foto_bytes": 187598,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -797,7 +797,7 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 28984,
+   "foto_bytes": 29667,
    "segundos": 11.3,
    "travou": false,
    "erros": []
@@ -817,8 +817,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 30273,
-   "segundos": 11.2,
+   "foto_bytes": 30514,
+   "segundos": 11.6,
    "travou": false,
    "erros": []
   },
@@ -837,8 +837,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 238369,
-   "segundos": 10.7,
+   "foto_bytes": 244013,
+   "segundos": 11.0,
    "travou": false,
    "erros": [
     "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented."
@@ -861,8 +861,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 336143,
-   "segundos": 10.7,
+   "foto_bytes": 342861,
+   "segundos": 11.3,
    "travou": false,
    "erros": [
     "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented."
@@ -885,8 +885,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 179186,
-   "segundos": 10.7,
+   "foto_bytes": 181503,
+   "segundos": 11.0,
    "travou": false,
    "erros": [
     "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented."
@@ -909,8 +909,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 351702,
-   "segundos": 10.7,
+   "foto_bytes": 360860,
+   "segundos": 10.9,
    "travou": false,
    "erros": [
     "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented."
@@ -934,7 +934,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 458042,
-   "segundos": 12.5,
+   "segundos": 15.1,
    "travou": false,
    "erros": []
   },
@@ -950,7 +950,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 682244,
-   "segundos": 14.3,
+   "segundos": 16.8,
    "travou": false,
    "erros": []
   },
@@ -966,7 +966,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 1400779,
-   "segundos": 11.7,
+   "segundos": 14.3,
    "travou": false,
    "erros": []
   },
@@ -982,7 +982,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 435421,
-   "segundos": 19.7,
+   "segundos": 15.4,
    "travou": false,
    "erros": []
   },
@@ -998,7 +998,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 590887,
-   "segundos": 13.4,
+   "segundos": 15.8,
    "travou": false,
    "erros": []
   },
@@ -1014,7 +1014,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 406434,
-   "segundos": 12.5,
+   "segundos": 14.8,
    "travou": false,
    "erros": []
   },
@@ -1030,7 +1030,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 251652,
-   "segundos": 11.7,
+   "segundos": 14.5,
    "travou": false,
    "erros": []
   },
@@ -1064,7 +1064,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 43950,
-   "segundos": 22.2,
+   "segundos": 25.1,
    "travou": false,
    "erros": []
   },
@@ -1084,7 +1084,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 43950,
-   "segundos": 22.2,
+   "segundos": 24.9,
    "travou": false,
    "erros": []
   },
@@ -1104,7 +1104,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 66502,
-   "segundos": 18.9,
+   "segundos": 21.7,
    "travou": false,
    "erros": []
   },
@@ -1124,7 +1124,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 43950,
-   "segundos": 25.2,
+   "segundos": 28.4,
    "travou": false,
    "erros": []
   },
@@ -1144,7 +1144,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 43950,
-   "segundos": 12.7,
+   "segundos": 15.5,
    "travou": false,
    "erros": []
   },
@@ -1164,7 +1164,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 43950,
-   "segundos": 23.6,
+   "segundos": 26.0,
    "travou": false,
    "erros": []
   },
@@ -1183,8 +1183,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 66297,
-   "segundos": 13.8,
+   "foto_bytes": 66502,
+   "segundos": 16.0,
    "travou": false,
    "erros": []
   },
@@ -1420,7 +1420,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 448271,
-   "segundos": 11.8,
+   "segundos": 14.8,
    "travou": false,
    "erros": []
   },
@@ -1436,7 +1436,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 93036,
-   "segundos": 11.0,
+   "segundos": 13.7,
    "travou": false,
    "erros": []
   },
@@ -1452,7 +1452,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 112903,
-   "segundos": 11.0,
+   "segundos": 13.7,
    "travou": false,
    "erros": []
   },
@@ -1468,7 +1468,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 6595,
-   "segundos": 11.0,
+   "segundos": 13.8,
    "travou": false,
    "erros": [
     "[libretro WARN] [sceDisplay] Video out requested, not supported: mode=0 size=512,272"
@@ -1486,7 +1486,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 19404,
-   "segundos": 11.5,
+   "segundos": 13.8,
    "travou": false,
    "erros": [
     "[libretro WARN] [sceDisplay] Video out requested, not supported: mode=0 size=512,272"
@@ -1503,8 +1503,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 1658881,
-   "segundos": 17.7,
+   "foto_bytes": 1537199,
+   "segundos": 20.1,
    "travou": false,
    "erros": []
   },
@@ -1519,8 +1519,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 430555,
-   "segundos": 11.2,
+   "foto_bytes": 430305,
+   "segundos": 13.8,
    "travou": false,
    "erros": []
   },
@@ -1536,7 +1536,7 @@
   "abrir": {
    "abre_e_mostra_imagem": false,
    "foto_bytes": 0,
-   "segundos": 0.1,
+   "segundos": 0.2,
    "travou": false,
    "erros": [
     "[ERROR] [Content] Falha ao carregar o conteúdo."
@@ -1634,7 +1634,7 @@
   "abrir": {
    "abre_e_mostra_imagem": false,
    "foto_bytes": 0,
-   "segundos": 0.2,
+   "segundos": 0.1,
    "travou": false,
    "erros": [
     "[ERROR] [Content] Falha ao carregar o conteúdo."
@@ -1648,7 +1648,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 47656,
-   "segundos": 12.7,
+   "segundos": 13.0,
    "travou": false,
    "erros": []
   },
@@ -1667,8 +1667,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 7570,
-   "segundos": 10.7,
+   "foto_bytes": 11583,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
@@ -1687,8 +1687,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 427566,
-   "segundos": 11.2,
+   "foto_bytes": 525721,
+   "segundos": 11.8,
    "travou": false,
    "erros": []
   },
@@ -1707,8 +1707,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 405363,
-   "segundos": 12.9,
+   "foto_bytes": 286742,
+   "segundos": 13.1,
    "travou": false,
    "erros": []
   },
@@ -1728,7 +1728,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 107003,
-   "segundos": 11.1,
+   "segundos": 15.8,
    "travou": false,
    "erros": []
   },
@@ -1744,7 +1744,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 58602,
-   "segundos": 11.2,
+   "segundos": 15.5,
    "travou": false,
    "erros": []
   },
@@ -1760,7 +1760,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 58602,
-   "segundos": 11.1,
+   "segundos": 15.5,
    "travou": false,
    "erros": [
     "[libretro INFO] [BOOT] USA region not supported. Using Europe instead"
@@ -1778,7 +1778,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 58602,
-   "segundos": 11.0,
+   "segundos": 15.7,
    "travou": false,
    "erros": []
   },
@@ -1794,7 +1794,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 58602,
-   "segundos": 11.7,
+   "segundos": 15.4,
    "travou": false,
    "erros": [
     "[libretro INFO] [BOOT] USA region not supported. Using Europe instead"
@@ -1812,7 +1812,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 58602,
-   "segundos": 18.9,
+   "segundos": 15.5,
    "travou": false,
    "erros": [
     "[libretro INFO] [BOOT] USA region not supported. Using Europe instead"
@@ -1829,8 +1829,8 @@
   "jogadores": 10,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 46473,
-   "segundos": 11.5,
+   "foto_bytes": 46284,
+   "segundos": 12.0,
    "travou": false,
    "erros": []
   },
@@ -1849,8 +1849,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 185997,
-   "segundos": 10.9,
+   "foto_bytes": 186647,
+   "segundos": 11.4,
    "travou": false,
    "erros": []
   },
@@ -1869,8 +1869,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 185997,
-   "segundos": 10.7,
+   "foto_bytes": 186647,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
@@ -1889,8 +1889,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 346224,
-   "segundos": 10.8,
+   "foto_bytes": 344006,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -1909,8 +1909,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 404304,
-   "segundos": 10.8,
+   "foto_bytes": 401369,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -1929,8 +1929,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 136698,
-   "segundos": 10.9,
+   "foto_bytes": 137070,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
@@ -1949,8 +1949,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 267243,
-   "segundos": 12.8,
+   "foto_bytes": 260650,
+   "segundos": 13.1,
    "travou": false,
    "erros": []
   },
@@ -1969,8 +1969,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 347705,
-   "segundos": 12.9,
+   "foto_bytes": 347734,
+   "segundos": 13.2,
    "travou": false,
    "erros": []
   },
@@ -1989,8 +1989,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 329805,
-   "segundos": 12.8,
+   "foto_bytes": 327956,
+   "segundos": 13.0,
    "travou": false,
    "erros": []
   },
@@ -2022,7 +2022,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 11185,
-   "segundos": 12.8,
+   "segundos": 13.1,
    "travou": false,
    "erros": [
     "[ERROR] [Disc] Failed to set initial disc index. Expected #1 \"\", Detected #1 \"\"."
@@ -2046,7 +2046,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 16258,
-   "segundos": 12.7,
+   "segundos": 13.0,
    "travou": false,
    "erros": []
   },

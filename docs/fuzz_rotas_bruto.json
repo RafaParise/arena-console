@@ -762,7 +762,7 @@
     "status": 200,
     "ok": true,
     "motivo": "ok",
-    "extra": "falhas=0/20"
+    "extra": "falhas=0/2"
   },
   {
     "rota": "/api/perfil-controle",

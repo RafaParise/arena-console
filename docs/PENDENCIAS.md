@@ -406,6 +406,27 @@ pelo SurfaceFlinger, foto e saída pelo SAIR. Todos os que abriram saíram pelo 
 - Medir de novo o PSP (com mais tempo de carga) e o Dreamcast com a BIOS imitada.
 - No fim, **instalar o APK de produção** (o A12 ficou com o de teste).
 
+## Rodada final de 08/11/2026 (PC, com o Rafael fora de casa e a tela bloqueada)
+
+**110 de 120** na rodada inteira (09:53 às 13:00). As 10 falhas, uma por uma:
+
+| Teste | Causa | Situação |
+|---|---|---|
+| `fuzz_rotas` | o celular cadastrado como amigo estava fora de casa: o sincronizar espera 8 s, o fuzz esperava 5 | prazo de 30 s (df057fd); **passou** |
+| `teste_abaixo_do_original` | o terminal de testes é administrador: o Edge sem janela só subia depois que o Python saía; o Edge 156 abre a página de sincronização da conta antes da nossa | `--do-not-de-elevate` e o alvo `about:blank` (df057fd); **passou** |
+| `teste_android_estresse` | começou 0,2 s depois do `emu kill` e pegou o emulador ainda desligando | espera o emulador sair da lista do adb (3c436ef); **passou** |
+| `teste_matriz_consoles` (PocketStation) | a ponte sem acento acrescentava uma 2ª `system_directory`, e o RetroArch fica com a 1ª (com acento). Só no teste: no `/api/jogar` a ponte entra antes | a linha é trocada (3c436ef); abre, salva, carrega e fecha nos dois modos. A foto do modo modesto saiu branca 3 vezes na matriz, mas com a mesma configuração fora dela mostra o coração do 15 Puzzle (tela de 32×32 que pisca entre animações) |
+| `teste_multitap_regra_de_ouro` | as mudanças de propósito de 07/11 (foto do save, tipo de porta lido dos núcleos, PicoDrive no netplay) nunca foram ensinadas ao teste | 8179eff; **254 casos iguais, passou** |
+| `teste_partida_aparece` | oscilação de tempo do grito UDP | sozinho, **passou** inteiro |
+| `teste_pasta_system_pelo_arena` | 2 fotos da janela pretas: **tela bloqueada** (o resto, 15 conferências, certo) | repetir com a tela desbloqueada |
+| `teste_pokketsx_pelo_arena` | "fechou pela janela" aperta F10 na janela, e com a **tela bloqueada** nenhuma tecla chega | repetir com a tela desbloqueada (abre, mostra imagem, leva as BIOS e o cartão único certos) |
+| `teste_orcamentos_modo_alvo` | 1b (abertura do servidor) 3,36 e 3,97 s no modo alvo, teto 2,3. Com a **tela bloqueada** o Windows não diz a placa da tela principal e o ARENA cai no registro: "NVIDIA GeForce 210, placa 2/5" em vez da Radeon do 5600G. Fora do modo alvo, a mesma abertura leva 1,6 a 2,3 s | **medir de novo com a tela desbloqueada** antes da versão |
+| `teste_jogar_junto_pc_celular` | precisa do celular no cabo | com o celular de volta |
+
+**Achado para consertar depois (não é da versão de hoje):** com a tela bloqueada (ou sem monitor), `hardware.placa_da_tela_principal()`
+volta vazio e o ARENA usa a placa do registro, que guarda placas que já saíram do computador. Melhor seria preferir a placa
+que o Windows diz estar funcionando (`Win32_VideoController` com `Status = OK`), sem deixar a abertura mais lenta.
+
 ## Depende do Rafael
 
 - **Acessórios (24/10/2026), o que só você faz:**

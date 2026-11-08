@@ -3,7 +3,7 @@
   "jogo": "Black (BR).iso",
   "nivel": "automatico",
   "comecou": true,
-  "segundos": 21.2,
+  "segundos": 21.1,
   "avisos": []
  },
  {
@@ -17,7 +17,7 @@
   "jogo": "BloodRayne 2 (USA).chd",
   "nivel": "automatico",
   "comecou": true,
-  "segundos": 21.1,
+  "segundos": 20.1,
   "avisos": []
  },
  {
@@ -101,7 +101,7 @@
   "jogo": "God of War (BR).chd",
   "nivel": "automatico",
   "comecou": true,
-  "segundos": 20.1,
+  "segundos": 19.1,
   "avisos": []
  },
  {
@@ -150,7 +150,7 @@
   "jogo": "Hitman 2 - Silent Assassin (BR).chd",
   "nivel": "automatico",
   "comecou": true,
-  "segundos": 21.1,
+  "segundos": 20.1,
   "avisos": []
  },
  {
@@ -234,7 +234,7 @@
   "jogo": "SOCOM - U.S. Navy SEALs - Combined Assault (USA).chd",
   "nivel": "automatico",
   "comecou": true,
-  "segundos": 20.1,
+  "segundos": 19.1,
   "avisos": []
  },
  {

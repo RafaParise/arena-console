@@ -4,7 +4,7 @@
     "jogo": "Super Bomberman 4 (Japan) [T-En by Svambo v1.0].sfc",
     "abre": {
       "abre_e_mostra_imagem": true,
-      "foto_bytes": 97479,
+      "foto_bytes": 97658,
       "segundos": 10.7,
       "travou": false,
       "erros": []
@@ -22,8 +22,8 @@
     "jogo": "Super Mario Kart (USA).sfc",
     "abre": {
       "abre_e_mostra_imagem": true,
-      "foto_bytes": 235564,
-      "segundos": 10.8,
+      "foto_bytes": 235493,
+      "segundos": 10.7,
       "travou": false,
       "erros": []
     },
@@ -40,7 +40,7 @@
     "jogo": "Contra (USA).nes",
     "abre": {
       "abre_e_mostra_imagem": true,
-      "foto_bytes": 336143,
+      "foto_bytes": 342861,
       "segundos": 10.7,
       "travou": false,
       "erros": [
@@ -62,8 +62,8 @@
     "jogo": "Mega Bomberman (USA).md",
     "abre": {
       "abre_e_mostra_imagem": true,
-      "foto_bytes": 40997,
-      "segundos": 11.2,
+      "foto_bytes": 41254,
+      "segundos": 10.7,
       "travou": false,
       "erros": []
     },
@@ -80,8 +80,8 @@
     "jogo": "Micro Machines 2 - Turbo Tournament (Europe).md",
     "abre": {
       "abre_e_mostra_imagem": false,
-      "foto_bytes": 1796,
-      "segundos": 10.7,
+      "foto_bytes": 1797,
+      "segundos": 10.6,
       "travou": false,
       "erros": []
     },
@@ -98,8 +98,8 @@
     "jogo": "GoldenEye 007 (USA).z64",
     "abre": {
       "abre_e_mostra_imagem": true,
-      "foto_bytes": 435421,
-      "segundos": 12.7,
+      "foto_bytes": 51646,
+      "segundos": 24.3,
       "travou": false,
       "erros": []
     },
@@ -119,8 +119,8 @@
     "jogo": "CTR - Crash Team Racing (USA).cue",
     "abre": {
       "abre_e_mostra_imagem": true,
-      "foto_bytes": 43950,
-      "segundos": 12.9,
+      "foto_bytes": 32824,
+      "segundos": 20.6,
       "travou": false,
       "erros": []
     },
@@ -137,8 +137,8 @@
     "jogo": "Saturn Bomberman (USA) (1S) (Track 01).bin",
     "abre": {
       "abre_e_mostra_imagem": false,
-      "foto_bytes": 1848,
-      "segundos": 10.9,
+      "foto_bytes": 1850,
+      "segundos": 10.7,
       "travou": false,
       "erros": []
     },
@@ -156,7 +156,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 58602,
-      "segundos": 11.2,
+      "segundos": 19.0,
       "travou": false,
       "erros": [
         "[libretro INFO] [BOOT] USA region not supported. Using Europe instead"
@@ -179,8 +179,8 @@
     "jogo": "Killzone - Liberation (USA) (En,Fr,De,Es,It,Nl,Pl,Ru).iso",
     "abre": {
       "abre_e_mostra_imagem": true,
-      "foto_bytes": 6595,
-      "segundos": 11.1,
+      "foto_bytes": 3940,
+      "segundos": 18.9,
       "travou": false,
       "erros": [
         "[libretro WARN] [sceDisplay] Video out requested, not supported: mode=0 size=512,272"
@@ -202,8 +202,8 @@
     "jogo": "kof97.zip",
     "abre": {
       "abre_e_mostra_imagem": true,
-      "foto_bytes": 28984,
-      "segundos": 11.9,
+      "foto_bytes": 29667,
+      "segundos": 11.3,
       "travou": false,
       "erros": []
     },
