@@ -258,12 +258,13 @@ Falta (nesta ordem):
   controles virtuais (`testes\controle_virtual_android.py`).
 - **Pacote novo do Windows**: o código do computador (controle pelo cabo, gamepad virtual, ajustes) está na `main`, mas o zip e a
   atualização do Windows continuam os da 2026.10.22.
-- **Botão "Partida pelo cabo" no Jogar Junto**: hoje o cabo só está no script `testes\teste_jogar_junto_pc_celular.py --cabo`.
+- ~~Botão "Partida pelo cabo" no Jogar Junto~~ **Feito** (`a12efa1`, testado nos dois sentidos em 07/11).
 - **Jogar Junto**: com 8 jogadores e o celular como um deles; num Linux de verdade; Wi-Fi do roteador (o celular está em 2,4 GHz e o
   computador em 5 GHz, e a partida ainda caiu uma vez em 6 s: o cabo é o jeito firme).
 - **Chromebook**: o navegador não tem jogo em rede; o APK x86_64 no ChromeOS não foi testado num Chromebook de verdade; o teste do
   Chromebook da escola segue na lista abaixo.
-- **Testes não refeitos**: `teste_matriz_consoles`, `teste_navegadores` (24 de 30) e `teste_android` (precisa do emulador).
+- **Testes**: `teste_navegadores` 30 de 30 (`7a98b86`); `teste_matriz_consoles` refeito na auditoria 6; `teste_android` precisa do
+  emulador do Android, que não está instalado neste computador.
 - **Volante**: o A12 não tem giroscópio, então o volante usa o acelerômetro e o sinal da inclinação não foi conferido girando o
   celular de verdade.
 - **Não feitos, de propósito ou por prioridade**: modo teclado/mouse por SendInput (o gamepad virtual cobre quase todo jogo), aprovação
@@ -323,8 +324,9 @@ Falta (nesta ordem):
   - **Tipo de controle errado em 3 consoles** (lido dos próprios núcleos): o ARENA mandava 517 para todos, que é o
     **volante (Arcade Racer) no Saturn**, o "Analog Joystick" no SwanStation do PlayStation e nada no Dreamcast. Agora: Saturn
     3D Control Pad, PlayStation DualShock (no SwanStation e no PCSX ReARMed), Dreamcast o controle comum; teclado do C64 e do
-    Amiga e mouse do PlayStation e do Saturn com o número certo. Falta conferir o do GameCube/Wii (o Dolphin não diz a lista
-    ao carregar) e o do PS2 no Android.
+    Amiga e mouse do PlayStation e do Saturn com o número certo. No GameCube/Wii e no PS2 do Android o ARENA não manda
+    tipo nenhum: vale o controle padrão de cada núcleo (o controle do GameCube; o DualShock 2), o mesmo que o Rafael usou no
+    Melee e no Bully no A12 (08/11).
   - **No celular, nenhum jogo passava de 2 jogadores** (nem o N64 de 4, nem o adaptador do Saturn, do PlayStation ou do Mega
     Drive): o mapa dos adaptadores procurava o núcleo pelo nome do Windows. Consertado.
   - No PC, a leitura dos adaptadores de rede morria com nome acentuado ("Conexão local") quando o ARENA roda com `-X utf8`.
