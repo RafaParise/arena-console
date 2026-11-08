@@ -301,8 +301,15 @@ def sessao(jogo, plataforma, modesto, pasta):
     if arena.ponte_sem_acento.precisa(plataforma["core"], arena.PASTA_SISTEMA, caminho_jogo):
         caminho_jogo, opcoes_ponte, devolver_ponte = arena.ponte_sem_acento.preparar(
             plataforma["core"], arena.PASTA_SISTEMA, caminho_jogo)
-        with open(override, "a", encoding="utf-8") as arquivo:
-            arquivo.write("".join('%s = "%s"\n' % item for item in opcoes_ponte.items()))
+        # TROCA a linha, nao acrescenta outra: o RetroArch fica com a PRIMEIRA chave repetida, e o
+        # gravar_override ja escreveu a system_directory de verdade (com acento). Achado de 08/11/2026: o
+        # PocketStation, o unico da ponte que tambem precisa da pasta system, "fechava sozinho" so aqui.
+        with open(override, encoding="utf-8") as arquivo:
+            linhas = [l for l in arquivo.read().splitlines()
+                      if not any(l.startswith(chave + " = ") for chave in opcoes_ponte)]
+        linhas += ['%s = "%s"' % item for item in opcoes_ponte.items()]
+        with open(override, "w", encoding="utf-8") as arquivo:
+            arquivo.write("\n".join(linhas) + "\n")
     try:
         return _sessao_aberta(jogo, plataforma, modesto, pasta, override, filtro, pastas, com_comandos,
                               caminho_jogo)

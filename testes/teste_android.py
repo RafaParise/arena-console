@@ -102,7 +102,9 @@ def conferir_que_e_emulador():
 
 
 def ligado():
-    return SERIE_DO_EMULADOR in adb_texto("devices")
+    """Ligado e pronto: a linha "emulator-5554<TAB>device". Achado de 08/11/2026: o teste de estresse comecou 0,2 s
+    depois do 'emu kill' deste, ainda viu o emulador na lista (desligando, "offline") e o getprop voltou vazio."""
+    return any(linha.split() == [SERIE_DO_EMULADOR, "device"] for linha in adb_texto("devices").splitlines())
 
 
 def ligar_emulador():
@@ -129,6 +131,10 @@ def desligar_emulador(processo):
             processo.wait(60)
         except subprocess.TimeoutExpired:
             processo.kill()
+    # Espera o emulador sair da lista do adb: o proximo teste nao pode pegar um aparelho que ainda esta desligando.
+    fim = time.monotonic() + 60
+    while time.monotonic() < fim and SERIE_DO_EMULADOR in adb_texto("devices", segundos=15):
+        time.sleep(1)
 
 
 def foto(nome):
