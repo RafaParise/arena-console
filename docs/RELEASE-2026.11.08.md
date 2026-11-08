@@ -24,6 +24,10 @@ Os arquivos que terminam em **`-ANTERIOR`** são das versões passadas, guardado
   cartão SD** e levar os jogos da memória para ela.
 - **PS2 no celular**: o Mortal Kombat Deadly Alliance voltou a carregar no Galaxy A12 (o nível mínimo deixava o processador
   do PS2 lento demais para o carregamento terminar).
+- **Android revisado console por console no Galaxy A12** (23 consoles, um jogo de cada, com os quadros por segundo medidos):
+  o **PlayStation** abre em 2,5 s em vez de 32 s de tela preta; o **Saturn** passou de 21 para 56 quadros por segundo (outro
+  emulador, o YabaSanshiro, com os botões no mesmo lugar do computador); o botão **"Voltar ao jogo"** traz de volta o jogo
+  que ficou aberto atrás do ARENA; Java ME, PS3 e Xbox 360 dizem que são só do computador.
 - **Jogar Junto computador × celular pelo cabo**, testado console por console; Mega Drive e Sega CD pelo PicoDrive.
 - **Lossless Scaling** (para quem comprou): geração de quadros também no PS2, GameCube/Wii, PS3 e Xbox 360 — medido: um
   jogo que roda a 30 passa a 60 na tela.
