@@ -1,0 +1,77 @@
+{
+ "revisor": "redes",
+ "arquivos_lidos": [
+  "servidor/controle_remoto.py (linhas 20-1033)",
+  "servidor/controle_usb.py (inteiro)",
+  "servidor/gamepad_virtual.py (inteiro)",
+  "servidor/arena.py (ROTAS_REDE_EXTERNA 5252-5260, pedido_e_local/host_confiavel/checar_acesso_de_rede 5283-5362, ler_corpo 5420-5450, do_GET e /toque/ 5453-5501, /api/controle-remoto 5733-5738, do_POST 5972-6005, rotas POST novas 6729-6813, porta dos colegas 7873-7915, diff filtrado de 6446757..HEAD)",
+  "servidor/adb_aparelho.py (PADRAO_DE_SERIAL linha 150 e executar linha 190-194, so por busca)",
+  "servidor/janela_preta.py (55-94, para saber se o print do codigo vai para arquivo: nao vai)",
+  "android/src/io/github/rafaparise/arena/ArenaServico.java (diff 6446757..HEAD, sem comentarios)",
+  "launcher/app.js (2648-2694, como a tela mostra o apelido vindo do celular)"
+ ],
+ "achados": [
+  {
+   "id": "REDE6-01",
+   "gravidade": "media",
+   "arquivo": "servidor/controle_remoto.py",
+   "linha": 495,
+   "titulo": "Qualquer colega da rede, sem o codigo, ocupa as 24 vagas da porta 8780 e nenhum celular novo consegue entrar",
+   "cenario": "Com o controle ligado, um aluno roda um script na mesma Wi-Fi que abre 24 conexoes TCP para 192.168.x.x:8780. O teto CONEXOES_MAXIMAS e' global, sem limite por endereco. Cada conexao fica presa indefinidamente de dois jeitos que nao pedem o codigo: (a) HTTP/1.1 com keep-alive mandando 'GET /jogadores' a cada 9 s (o timeout de 10 s da classe e' por leitura, nao por conexao); ou (b) mandando 1 byte do cabecalho a cada 9 s (slowloris). A 25a conexao cai em verify_request -> False e o TCP fecha: o celular do colega (ou o do professor que caiu do Wi-Fi) nunca mais entra enquanto o script roda. O bloqueio por erros de codigo nao entra em jogo, porque o atacante nunca manda codigo.",
+   "evidencia": "def verify_request(...): if not rede_privada(client_address[0]): return False / with self._trava_abertas: if self._abertas >= CONEXOES_MAXIMAS: return False  (linha 90: CONEXOES_MAXIMAS = 24; linha 518: timeout = 10; linha 517: protocol_version = \"HTTP/1.1\")",
+   "conserto_sugerido": "Contar as conexoes abertas por IP (dicionario ip -> quantas, na mesma _trava_abertas) e recusar a partir de 3 por endereco (o 127.0.0.1 do cabo pode ter um teto proprio, ex. 8). Nas rotas HTTP comuns (/, /controle.js, /controle.css, /jogadores) responder com 'Connection: close' (self.close_connection = True) para que so o WebSocket segure a conexao, e impor um prazo TOTAL para o cabecalho (ex. guardar o instante do accept e, no handle_one_request, fechar se passar de 10 s). Opcional: reservar as vagas dos jogadores ja autenticados fora do teto global.",
+   "situacao": "corrigido (4 conexoes por aparelho; o cabo no teto geral)"
+  },
+  {
+   "id": "REDE6-02",
+   "gravidade": "baixa",
+   "arquivo": "servidor/controle_remoto.py",
+   "linha": 945,
+   "titulo": "Celular autenticado pode inundar o servidor com ping e texto 'p' sem limite (o limite de quadros so vale para o binario)",
+   "cenario": "O codigo de 6 numeros aparece na tela do professor, entao qualquer aluno da sala o tem. Um aluno entra como jogador 3 e manda, em laco, quadros PING ou texto {\"t\":\"p\"} de ate 4096 bytes. O balde de fichas (QUADROS_POR_SEGUNDO_MAXIMO) so e' consultado no ramo OP_BINARIO; ping e texto sao respondidos sempre, e todo quadro passa antes pelo desmascaramento byte a byte em Python (linha 173, 4096 iteracoes por quadro) segurando o GIL. No Celeron N5100 da maquina-alvo isso disputa o GIL com as threads dos outros celulares e com a thread do UDP (60 Hz), e o controle dos colegas engasga. Os quadros binarios acima do limite tambem sao desmascarados antes de serem descartados.",
+   "evidencia": "if opcode == OP_PING:\n    soquete.sendall(montar_quadro(OP_PONG, dados))\nelif opcode == OP_BINARIO:\n    fichas = min(...)  # so aqui\n...\nif tipo == \"p\":\n    self._enviar_texto(soquete, {\"t\": \"q\", \"n\": mensagem.get(\"n\")})",
+   "conserto_sugerido": "Gastar uma ficha em TODO quadro (ping, texto e binario) antes de tratar, e fechar a conexao (1008) quando o cliente passar, por exemplo, de 3x o limite por 2 s seguidos, em vez de so descartar. Baixar TAMANHO_MAXIMO_DO_QUADRO depois do 'oi' para uns 256 bytes (o estado tem 11 e o maior texto legitimo e' pequeno). Para o desmascaramento, usar int.from_bytes/XOR em bloco (bytes(a ^ b ...) vetorizado com int) em vez do laco por byte.",
+   "situacao": "registrado (celular ja autenticado pelo codigo da tela do professor)"
+  },
+  {
+   "id": "REDE6-03",
+   "gravidade": "baixa",
+   "arquivo": "servidor/controle_remoto.py",
+   "linha": 909,
+   "titulo": "Pelo cabo USB todo celular (e todo programa local) e' o mesmo 127.0.0.1: um derruba o outro e o bloqueio de um tranca todos",
+   "cenario": "O adb reverse (controle_usb.py:101) faz o 127.0.0.1:8780 de QUALQUER app do celular chegar ao 127.0.0.1:8780 do computador. A identidade usada para 'o mesmo aparelho voltando', para o bloqueio por erros e para a memoria de acerto e' so o IP. Consequencias: (1) qualquer app do celular no cabo, sem o codigo, erra 5 vezes e bloqueia o 127.0.0.1 por 2 min (BLOQUEIO_S), entao o controle pelo cabo de todos os celulares nao reconecta; repetindo, fica fora a aula toda; (2) com dois celulares no cabo (a tela ja oferece escolher entre 2), quem tem o codigo e escolhe o mesmo jogador derruba o outro em vez de receber 'ocupado', porque atual['ip'] == ip; (3) depois que um celular do cabo acerta, o 127.0.0.1 fica 'conhecido' por 10 min e qualquer processo local passa pelo teto duro global de palpites.",
+   "evidencia": "atual = self._clientes.get(jogador)\nif atual and atual[\"ip\"] != ip:\n    ocupado = True\nelse:\n    ... if atual:  # o mesmo aparelho voltando (o Wi-Fi piscou): o ultimo que chega vence\n        atual[\"soquete\"].close()",
+   "conserto_sugerido": "Dar ao celular uma identidade que nao seja o IP: no 'ok' do servidor, mandar um token aleatorio (secrets.token_urlsafe) que a pagina guarda em sessionStorage e devolve no 'oi' ao reconectar; so quem traz o token do dono atual toma a vaga, o resto recebe 'ocupado'. Para o 127.0.0.1, nao aplicar o bloqueio por endereco (ou aplica-lo por token/conexao) e nao gravar o 127.0.0.1 em _acertos.",
+   "situacao": "registrado (pede token por celular no cabo: melhoria futura)"
+  },
+  {
+   "id": "REDE6-04",
+   "gravidade": "baixa",
+   "arquivo": "servidor/controle_remoto.py",
+   "linha": 663,
+   "titulo": "Condicao de corrida em desligar(): 'self.codigo = None' fora da trava apaga o codigo de um ligar() que entrou no meio",
+   "cenario": "O professor clica Desligar e, logo em seguida, Ligar (ou a tela repete o pedido); cada POST roda numa thread do ThreadingHTTPServer. desligar() solta a trava depois de ligado=False e passa ~segundos em controle_usb.soltar (adb) e servidor.shutdown(); nesse meio, ligar() pega a trava, abre o servidor novo (8781, porque o 8780 ainda nao fechou) e grava um codigo novo. Quando desligar() termina, executa self.codigo = None sem trava: o controle fica 'ligado' com codigo None, ninguem entra (conferir_o_codigo exige 'certo'), a tela mostra '----' e o cabo recusa (PADRAO_DO_CODIGO). Falha fechada (nao abre brecha), mas deixa o recurso inutil ate desligar e ligar de novo. O mesmo padrao vale para self._gamepad (linha 650), lido e trocado fora da trava.",
+   "evidencia": "def desligar(self):\n    with self._trava:\n        ... self.ligado = False\n    controle_usb.soltar(cabos, ultimo=True)\n    ...\n    servidor.shutdown(); servidor.server_close()\n    self.codigo = None",
+   "conserto_sugerido": "Mover 'self.codigo = None' e a troca de self._gamepad para dentro do primeiro 'with self._trava:' de desligar(), e serializar ligar/desligar com uma segunda trava (ex. self._trava_liga) que cubra a funcao inteira, para que um ligar() espere o desligar() terminar o shutdown.",
+   "situacao": "corrigido (codigo apagado dentro da trava)"
+  }
+ ],
+ "observacoes_positivas": [
+  "Rotas novas /api/controle-remoto*, /api/partida/cabo e /api/toque ficam fora de ROTAS_REDE_EXTERNA, passam por checar_acesso_de_rede (Host contra DNS rebinding, segredo do cookie no Android) e o POST exige application/json (arena.py:5975-5999).",
+  "Porta 8780: verify_request so aceita loopback/privada/link-local; a pagina nao expoe nenhuma rota da API; Host em lista fechada e Origin igual ao Host no WebSocket; CSP restrita; codigo de 6 digitos com secrets e hmac.compare_digest na mesma trava do contador.",
+  "Quadro WebSocket: mascara obrigatoria, sem fragmentacao, teto de 4096 bytes conferido antes de esperar o corpo (o buffer nao cresce sem limite); 8 s para o 'oi'.",
+  "controle_usb.py: adb chamado por lista de argumentos (sem shell=True); serial validado por regex que nao deixa comecar com '-'; o texto que vai ao 'am start' no shell do celular so tem porta inteira, codigo so com digitos e jogador inteiro.",
+  "Porta dos colegas pelo cabo (8778) escuta so em 127.0.0.1 e so atende /api/partida/cheguei com Host conferido.",
+  "/toque/<nome>.png aceita so [a-z0-9_-] e ate 44 letras: sem travessia de caminho.",
+  "O apelido vindo do celular e' mostrado com textContent (app.js:2680): sem XSS na tela do professor.",
+  "Gamepad virtual nao mapeia o botao Guide (0x0400), entao o celular nao abre a Xbox Game Bar (que tem gravacao de tela)."
+ ],
+ "nao_verificado": [
+  "launcher/controle/controle.js e index.html (a pagina do celular): como guarda e tira o codigo do '#', e se usa innerHTML com o que o servidor manda.",
+  "Network RetroPad (UDP 50000-59000 aberto em todas as placas enquanto o jogo roda, sem senha): ja documentado como risco aceito na revisao de 25/10/2026 (controle_remoto.py:33-43); nao reavaliado aqui.",
+  "Limite de palpites distribuido (varios IPs): documentado como risco aceito em conferir_o_codigo (linhas 799-810); nao recalculado.",
+  "O resto do diff de servidor/arena.py fora das rotas HTTP (cerca de 460 linhas: gravar_override, porta_viva, rotas /api/armazenamento/* do Android) foi lido so por busca, nao linha a linha.",
+  "android/retroarch/arena-toque.patch e arena-em-pe.patch (patches no RetroArch do Android) e testes/controle_virtual_android.py.",
+  "Nenhum teste foi rodado (so leitura): os cenarios acima sao por leitura do codigo, nao reproduzidos ao vivo."
+ ]
+}

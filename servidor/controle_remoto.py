@@ -88,6 +88,7 @@ JANELA_DOS_ERROS_S = 60.0
 BLOQUEIO_S = 120.0
 ERROS_ANTES_DE_TROCAR_O_CODIGO = 20
 CONEXOES_MAXIMAS = 24                     # abertas ao mesmo tempo (com ou sem codigo certo)
+CONEXOES_POR_APARELHO = 4                 # um celular usa a pagina e o WebSocket: 4 sobra (auditoria 6, REDE6-01)
 
 GUID_DO_WEBSOCKET = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"       # fixo, da RFC 6455
 TIPO_ESTADO = 1                           # primeiro byte do quadro binario "estado dos botoes"
@@ -484,6 +485,7 @@ class _ServidorDoControle(ThreadingHTTPServer):
     def __init__(self, endereco, controle):
         self.controle = controle
         self._abertas = 0
+        self._por_endereco = {}
         self._trava_abertas = threading.Lock()
         super().__init__(endereco, _Manipulador)
 
@@ -496,10 +498,16 @@ class _ServidorDoControle(ThreadingHTTPServer):
         # so a rede local; e um teto de conexoes abertas (uma pessoa mal intencionada nao esgota as linhas de execucao)
         if not rede_privada(client_address[0]):
             return False
+        # E um teto POR APARELHO (auditoria 6, REDE6-01): sem ele, um colega abria 24 conexoes e as segurava, e nenhum
+        # celular novo entrava. O 127.0.0.1 e' o cabo USB (todos os celulares do cabo chegam por ele): fica so no teto
+        # geral.
+        endereco = client_address[0]
+        teto = CONEXOES_MAXIMAS if endereco in ("127.0.0.1", "::1") else CONEXOES_POR_APARELHO
         with self._trava_abertas:
-            if self._abertas >= CONEXOES_MAXIMAS:
+            if self._abertas >= CONEXOES_MAXIMAS or self._por_endereco.get(endereco, 0) >= teto:
                 return False
             self._abertas += 1
+            self._por_endereco[endereco] = self._por_endereco.get(endereco, 0) + 1
         return True
 
     def process_request_thread(self, request, client_address):
@@ -508,6 +516,11 @@ class _ServidorDoControle(ThreadingHTTPServer):
         finally:
             with self._trava_abertas:
                 self._abertas = max(0, self._abertas - 1)
+                restantes = self._por_endereco.get(client_address[0], 0) - 1
+                if restantes > 0:
+                    self._por_endereco[client_address[0]] = restantes
+                else:
+                    self._por_endereco.pop(client_address[0], None)
 
     def handle_error(self, request, client_address):
         pass                    # cliente que some no meio nao enche a janela preta de erro
@@ -646,8 +659,11 @@ class ControleRemoto:
             clientes = list(self._clientes.items())
             self._clientes.clear()
             cabos, self._cabos = list(self._cabos.items()), {}
+            # Dentro da trava: um ligar() logo depois ganha codigo e gamepad proprios, que este desligar nao apaga mais
+            # (auditoria 6, REDE6-04: o controle ficava ligado sem codigo e ninguem entrava).
+            self.codigo = None
+            pad, self._gamepad = self._gamepad, None
         controle_usb.soltar(cabos, ultimo=True)          # o celular deixa de alcancar a porta deste computador pelo cabo
-        pad, self._gamepad = self._gamepad, None
         if pad is not None:
             pad.fechar()
         for jogador, dados in clientes:
@@ -660,7 +676,6 @@ class ControleRemoto:
         if servidor:
             servidor.shutdown()
             servidor.server_close()
-        self.codigo = None
 
     def estado(self):
         with self._trava:

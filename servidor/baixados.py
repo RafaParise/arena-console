@@ -172,5 +172,34 @@ def levar(caminho, plataforma_id, plataformas, pasta_jogos, pastas=None, pratele
     if os.path.exists(destino):
         raise NaoPode("Já existe um jogo com esse nome no %s." % plataforma["nome"])
     os.makedirs(prateleira, exist_ok=True)
-    shutil.move(real, destino)
+    try:
+        os.rename(real, destino)                  # mesmo disco: so troca de lugar, na hora
+        return destino
+    except OSError:
+        pass
+    # Outro disco (no celular: Download na memoria -> ARENA-jogos no cartao SD). Antes, o shutil.move copiava direto no
+    # nome final: com o cartao cheio ou retirado no meio, sobrava um jogo cortado com o nome certo, que nao abria e
+    # impedia a nova tentativa (auditoria 6, DAD6-05). Agora: copia com outro nome, confere o tamanho e so entao troca
+    # o nome e apaga o original.
+    parcial = destino + ".arena-parcial"
+    try:
+        shutil.copyfile(real, parcial)
+        with open(parcial, "rb+") as arquivo:
+            os.fsync(arquivo.fileno())
+        if os.path.getsize(parcial) != os.path.getsize(real):
+            raise NaoPode("A cópia não chegou inteira (o cartão está cheio ou saiu?). O arquivo ficou nos downloads.")
+        os.replace(parcial, destino)
+    except OSError as falha:
+        raise NaoPode("Não consegui levar o arquivo (%s). Ele ficou nos downloads."
+                      % (getattr(falha, "strerror", None) or falha))
+    finally:
+        if os.path.exists(parcial):
+            try:
+                os.remove(parcial)
+            except OSError:
+                pass
+    try:
+        os.remove(real)
+    except OSError:
+        pass                                      # o jogo ja esta no ARENA; o download sobra para o aluno apagar
     return destino

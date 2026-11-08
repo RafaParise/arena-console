@@ -2878,6 +2878,37 @@ def preparar_lossless(jogo, config):
             "executavel": achado["executavel"]}
 
 
+def trocar_id_dos_jogos(levados):
+    """Depois de levar jogos para o cartao: o id do jogo e' o caminho dele (indexador), e mudou. Troca o id antigo
+    pelo novo nos favoritos, nos recentes, no placar e no tempo de jogo, para o aluno nao perder nada (auditoria 6,
+    DAD6-04: o placar e o tempo de jogo sumiam da lista). 'levados': [(caminho antigo, caminho novo)]."""
+    trocas = {}
+    for antigo, novo in levados or ():
+        de = os.path.relpath(antigo, RAIZ).replace("\\", "/").lower()
+        para = os.path.relpath(novo, RAIZ).replace("\\", "/").lower()
+        if de != para:
+            trocas[de] = para
+    if not trocas:
+        return 0
+    try:
+        with TRAVA_BANCO, banco() as conexao:
+            for de, para in trocas.items():
+                for tabela in ("placar", "sessao"):
+                    conexao.execute("UPDATE %s SET jogo_id = ? WHERE jogo_id = ?" % tabela, (para, de))
+    except sqlite3.Error as falha:
+        print("[ARENA] Nao consegui trocar o id dos jogos levados no banco: %s" % falha)
+    config = carregar_config()
+    mudou = False
+    for chave in ("favoritos", "recentes"):
+        lista = config.get(chave) or []
+        nova = [trocas.get(str(item).lower(), item) for item in lista]
+        if nova != lista:
+            config[chave], mudou = nova, True
+    if mudou:
+        salvar_config(config)
+    return len(trocas)
+
+
 def preparar_lossless_de_fora(jogo, config, programa):
     """A geracao de quadros do Lossless Scaling num emulador de fora (PCSX2, Dolphin, RPCS3, Xenia), se o aluno
     ligou o Lossless Scaling E o "mais quadros". Ele ja desenha na tela cheia: o LS nao estica, so cria quadros
@@ -6079,14 +6110,14 @@ class Manipulador(BaseHTTPRequestHandler):
                 console = cartao_de_jogos._pasta_do_console(caminho_do_jogo, origem_real)
                 if not console:
                     continue
-                pasta, nomes = cartao_de_jogos.arquivos_do_jogo(caminho_do_jogo, console)
                 itens.append({"titulo": jogo.get("titulo", ""), "caminho": caminho_do_jogo, "pasta_do_console": console,
                               "destino_do_console": os.path.join(destino, os.path.basename(console)),
-                              "bytes": cartao_de_jogos._tamanho(pasta, nomes)})
+                              "bytes": cartao_de_jogos.bytes_do_jogo(caminho_do_jogo, console)})
             if not itens:
                 return self.erro("Nenhum dos jogos marcados está na memória do aparelho. Atualize a lista e marque de novo.")
 
             def depois():
+                trocar_id_dos_jogos(MUDANCA_PARA_O_CARTAO.levados())
                 ligar_o_cartao()
                 limpar_caches()
                 manifesto(forcar=True)
@@ -7474,6 +7505,9 @@ class Manipulador(BaseHTTPRequestHandler):
             })
 
         if caminho == "/api/jogar":
+            # Jogo indo para o cartao: os arquivos estao mudando de lugar (auditoria 6, DAD6-07).
+            if MUDANCA_PARA_O_CARTAO.rodando():
+                return self.erro("Espere terminar de levar os jogos para o cartão (Ajustes → Máquina).", 409)
             jogo = achar_jogo(dados.get("jogo_id"))
             if not jogo:
                 return self.erro("Jogo não está no catálogo. Clique em Atualizar lista.", 404)

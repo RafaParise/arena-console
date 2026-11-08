@@ -1,0 +1,82 @@
+{
+ "revisor": "dados",
+ "achados": [
+  {
+   "id": "DAD6-01",
+   "gravidade": "alta",
+   "arquivo": "servidor/cartao_de_jogos.py",
+   "titulo": "Arquivo de mesmo nome e tamanho no cartao contava como copia e o original (ate o save) era apagado",
+   "situacao": "corrigido (conteudo comparado byte a byte; samefile)"
+  },
+  {
+   "id": "DAD6-02",
+   "gravidade": "media",
+   "arquivo": "servidor/cartao_de_jogos.py",
+   "titulo": "Original apagado sem reconferir a copia; erro ao apagar engolido",
+   "situacao": "corrigido"
+  },
+  {
+   "id": "DAD6-03",
+   "gravidade": "media",
+   "arquivo": "servidor/cartao_de_jogos.py",
+   "titulo": "Trilhas com maiuscula diferente e as dos .cue de um .m3u ficavam para tras",
+   "situacao": "corrigido (casefold, corrente .m3u->.cue->trilhas, trilha faltando nao leva nada)"
+  },
+  {
+   "id": "DAD6-04",
+   "gravidade": "media",
+   "arquivo": "servidor/indexador.py",
+   "titulo": "Jogo levado ao cartao perdia favoritos, recentes, placar e tempo de jogo (o id e' o caminho)",
+   "situacao": "corrigido (arena.trocar_id_dos_jogos)"
+  },
+  {
+   "id": "DAD6-05",
+   "gravidade": "media",
+   "arquivo": "servidor/baixados.py",
+   "titulo": "shutil.move entre armazenamentos copiava direto no nome final",
+   "situacao": "corrigido (.arena-parcial, fsync, tamanho conferido)"
+  },
+  {
+   "id": "DAD6-06",
+   "gravidade": "media",
+   "arquivo": "servidor/cartao_de_jogos.py",
+   "titulo": "Jogo numa pasta com outros jogos levava a pasta inteira",
+   "situacao": "corrigido (so os arquivos do jogo)"
+  },
+  {
+   "id": "DAD6-07",
+   "gravidade": "baixa",
+   "arquivo": "servidor/arena.py",
+   "titulo": "Abrir jogo durante a mudanca para o cartao nao era recusado",
+   "situacao": "corrigido (409)"
+  },
+  {
+   "id": "DAD6-08",
+   "gravidade": "baixa",
+   "arquivo": "servidor/cartao_de_jogos.py",
+   "titulo": "Erro inesperado abortava o lote sem recado; .arena-parcial sobrava",
+   "situacao": "corrigido"
+  },
+  {
+   "id": "DAD6-09",
+   "gravidade": "media",
+   "arquivo": "servidor/arena.py",
+   "titulo": "/api/baixados procura na thread do pedido",
+   "situacao": "aceito (da auditoria 4; so com o botao do aluno, um nivel de subpasta, ate 300 arquivos)"
+  },
+  {
+   "id": "DAD6-10",
+   "gravidade": "baixa",
+   "arquivo": "servidor/lossless.py",
+   "titulo": "Copia de seguranca do Settings.xml nao atomica",
+   "situacao": "corrigido"
+  },
+  {
+   "id": "DAD6-11",
+   "gravidade": "baixa",
+   "arquivo": "servidor/janela_preta.py",
+   "titulo": "Arquivo do registro de queda aberto se o faulthandler falhar",
+   "situacao": "corrigido"
+  }
+ ]
+}

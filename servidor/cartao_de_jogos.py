@@ -127,35 +127,90 @@ def _citados(indice):
     return [os.path.basename(n.replace("\\", "/")) for n in nomes]
 
 
+class TrilhaFaltando(Exception):
+    """O .cue/.gdi/.m3u cita um arquivo que nao esta ao lado dele: levar so parte do jogo o quebraria."""
+
+
+def _do_jogo_na_pasta(caminho_do_jogo):
+    """Os nomes, na pasta do jogo, que formam o jogo: o mesmo nome (Crash.cue + Crash.bin, Zelda.sfc + Zelda.srm) e
+    tudo o que o .cue/.gdi/.m3u cita, seguindo a corrente (.m3u -> .cue -> trilhas). A trilha e' achada sem
+    diferenca de maiusculas (o .cue diz "Track 1.BIN" e o arquivo e' "Track 1.bin"; no Android isso importa).
+    Auditoria 6 (DAD6-03): antes, a trilha com maiuscula diferente e as trilhas dos .cue de um .m3u ficavam para
+    tras, e o jogo quebrava nos dois lugares. Levanta TrilhaFaltando se algo citado nao existe."""
+    pasta = os.path.dirname(caminho_do_jogo)
+    try:
+        vizinhos = [n for n in os.listdir(pasta) if os.path.isfile(os.path.join(pasta, n))]
+    except OSError:
+        vizinhos = []
+    pelo_nome = {}
+    for nome in vizinhos:
+        pelo_nome.setdefault(nome.casefold(), nome)
+    base = os.path.splitext(os.path.basename(caminho_do_jogo))[0].casefold()
+    juntos = {os.path.basename(caminho_do_jogo)}
+    juntos.update(n for n in vizinhos if os.path.splitext(n)[0].casefold() == base)
+    olhar = list(juntos)
+    while olhar:
+        nome = olhar.pop()
+        if os.path.splitext(nome)[1].lower() not in (".cue", ".gdi", ".m3u"):
+            continue
+        for citado in _citados(os.path.join(pasta, nome)):
+            achado = pelo_nome.get(citado.casefold())
+            if achado is None:
+                raise TrilhaFaltando(citado)
+            if achado not in juntos:
+                juntos.add(achado)
+                olhar.append(achado)
+    return juntos
+
+
 def arquivos_do_jogo(caminho_do_jogo, pasta_do_console):
     """(pasta_de_cima, [arquivos relativos a ela]) que formam o jogo. Jogo numa pasta so dele: a pasta inteira (a
-    pasta_de_cima e' a do console e os arquivos vem com o nome da pasta do jogo na frente)."""
+    pasta_de_cima e' a do console e os arquivos vem com o nome da pasta do jogo na frente). Pasta com OUTROS jogos
+    (PS1\\Coletanea\\A.cue e B.cue): so os arquivos deste jogo, com o caminho dentro da pasta (auditoria 6, DAD6-06:
+    marcar um levava a pasta inteira, com os outros jogos). Levanta TrilhaFaltando (ver _do_jogo_na_pasta)."""
     caminho_do_jogo = os.path.abspath(caminho_do_jogo)
     pasta_do_console = os.path.abspath(pasta_do_console)
     pasta = os.path.dirname(caminho_do_jogo)
-    if os.path.normcase(pasta) != os.path.normcase(pasta_do_console):
-        # numa pasta so dele: leva a primeira pasta abaixo da do console, inteira
-        relativo = os.path.relpath(caminho_do_jogo, pasta_do_console).replace("\\", "/").split("/")
-        topo = os.path.join(pasta_do_console, relativo[0])
-        lista = []
-        for atual, _subpastas, arquivos in os.walk(topo):
-            for nome in arquivos:
-                lista.append(os.path.relpath(os.path.join(atual, nome), pasta_do_console))
-        return pasta_do_console, sorted(lista)
-    base = os.path.splitext(os.path.basename(caminho_do_jogo))[0].casefold()
+    proprios = _do_jogo_na_pasta(caminho_do_jogo)
+    if os.path.normcase(pasta) == os.path.normcase(pasta_do_console):
+        return pasta, sorted(proprios)
+    relativo = os.path.relpath(caminho_do_jogo, pasta_do_console).replace("\\", "/").split("/")
+    topo = os.path.join(pasta_do_console, relativo[0])
+    extensao = os.path.splitext(caminho_do_jogo)[1].casefold()
+    lista, outro_jogo = [], False
+    for atual, _subpastas, arquivos in os.walk(topo):
+        for nome in arquivos:
+            caminho = os.path.join(atual, nome)
+            lista.append(os.path.relpath(caminho, pasta_do_console))
+            mesmo_lugar = os.path.normcase(atual) == os.path.normcase(pasta)
+            if os.path.splitext(nome)[1].casefold() == extensao and not (mesmo_lugar and nome in proprios):
+                outro_jogo = True               # outro arquivo do mesmo tipo do jogo: outro jogo na mesma pasta
+    if not outro_jogo:
+        return pasta_do_console, sorted(lista)   # a pasta e' so dele: vai inteira (com extras, capas, leia-me)
+    dentro = os.path.relpath(pasta, pasta_do_console)
+    return pasta_do_console, sorted(os.path.join(dentro, nome) for nome in proprios)
+
+
+def _iguais(um, outro):
+    """Os dois arquivos tem o mesmo conteudo (bloco por bloco)."""
+    if os.path.getsize(um) != os.path.getsize(outro):
+        return False
+    with open(um, "rb") as a, open(outro, "rb") as b:
+        while True:
+            x, y = a.read(BLOCO), b.read(BLOCO)
+            if x != y:
+                return False
+            if not x:
+                return True
+
+
+def bytes_do_jogo(caminho_do_jogo, pasta_do_console):
+    """O tamanho do jogo inteiro, ou 0 se ele cita um arquivo que falta (quem leva avisa o motivo)."""
     try:
-        vizinhos = os.listdir(pasta)
-    except OSError:
-        vizinhos = []
-    juntos = {os.path.basename(caminho_do_jogo)}
-    juntos.update(n for n in vizinhos if os.path.splitext(n)[0].casefold() == base
-                  and os.path.isfile(os.path.join(pasta, n)))
-    for nome in list(juntos):
-        if os.path.splitext(nome)[1].lower() in (".cue", ".gdi", ".m3u"):
-            for citado in _citados(os.path.join(pasta, nome)):
-                if citado in vizinhos:
-                    juntos.add(citado)
-    return pasta, sorted(juntos)
+        pasta, nomes = arquivos_do_jogo(caminho_do_jogo, pasta_do_console)
+    except TrilhaFaltando:
+        return 0
+    return _tamanho(pasta, nomes)
 
 
 def _tamanho(pasta, nomes):
@@ -186,9 +241,8 @@ def jogos_na_memoria(jogos, raiz, pasta_dos_jogos, raizes=None):
         console = _pasta_do_console(caminho, os.path.join(pasta_dos_jogos, jogo["origem"]))
         if not console:
             continue
-        pasta, nomes = arquivos_do_jogo(caminho, console)
         saida.append({"id": jogo["id"], "titulo": jogo.get("titulo", ""), "console": os.path.basename(console),
-                      "bytes": _tamanho(pasta, nomes)})
+                      "bytes": bytes_do_jogo(caminho, console)})
     return saida
 
 
@@ -231,28 +285,43 @@ def _copiar(origem, destino, progresso):
 
 def levar_jogo(caminho_do_jogo, pasta_do_console, destino_do_console, progresso=lambda n: None):
     """Leva o jogo (todos os arquivos dele) para destino_do_console. Devolve o novo caminho do arquivo do jogo.
-    Arquivo com o mesmo nome e o mesmo tamanho ja no destino conta como ja copiado (uma mudanca interrompida
-    continua); com outro tamanho, para sem mexer em nada."""
-    pasta, nomes = arquivos_do_jogo(caminho_do_jogo, pasta_do_console)
+    Arquivo que ja esta no destino so conta como ja copiado (uma mudanca interrompida continua) se for IGUAL ao
+    original, byte por byte; diferente, para sem mexer em nada. Auditoria 6 (DAD6-01): antes bastava o mesmo nome e o
+    mesmo tamanho, e um Zelda.srm de outro progresso no cartao fazia o do aluno ser apagado."""
+    try:
+        pasta, nomes = arquivos_do_jogo(caminho_do_jogo, pasta_do_console)
+    except TrilhaFaltando as falta:
+        raise NaoPode("O jogo cita o arquivo %s, que não está ao lado dele: nada foi levado." % falta)
     for nome in nomes:
-        alvo = os.path.join(destino_do_console, nome)
-        if os.path.exists(alvo) and os.path.getsize(alvo) != os.path.getsize(os.path.join(pasta, nome)):
+        original, alvo = os.path.join(pasta, nome), os.path.join(destino_do_console, nome)
+        if not os.path.exists(alvo):
+            continue
+        if os.path.samefile(original, alvo):
+            raise NaoPode("O arquivo %s já é o mesmo do cartão: nada foi levado." % nome)
+        if not _iguais(original, alvo):
             raise NaoPode("Já existe no cartão um arquivo %s diferente deste. Apague ou renomeie o de lá e tente de "
                           "novo." % nome)
-    copiados = []
     for nome in nomes:
         alvo = os.path.join(destino_do_console, nome)
         if not os.path.exists(alvo):
             _copiar(os.path.join(pasta, nome), alvo, progresso)
         else:
             progresso(os.path.getsize(alvo))
-        copiados.append(nome)
-    # tudo chegou e conferido: agora sim o original sai
+    # Tudo chegou: confere de novo cada copia (o cartao pode ter saido no meio) e so entao o original sai. Auditoria 6
+    # (DAD6-02): antes nada era reconferido e o erro ao apagar era engolido.
+    for nome in nomes:
+        alvo = os.path.join(destino_do_console, nome)
+        if not os.path.isfile(alvo) or os.path.getsize(alvo) != os.path.getsize(os.path.join(pasta, nome)):
+            raise NaoPode("A cópia de %s no cartão não confere (o cartão saiu?): o original ficou onde estava." % nome)
+    nao_apagados = []
     for nome in nomes:
         try:
             os.remove(os.path.join(pasta, nome))
         except OSError:
-            pass
+            nao_apagados.append(nome)
+    if nao_apagados:
+        raise NaoPode("O jogo chegou inteiro ao cartão, mas não consegui apagar da memória: %s. Ele aparece duas "
+                      "vezes até ser apagado à mão." % ", ".join(nao_apagados))
     # a pasta so do jogo que ficou vazia sai tambem (nunca a do console)
     if os.path.normcase(pasta) == os.path.normcase(os.path.abspath(pasta_do_console)):
         primeiras = {n.replace("\\", "/").split("/")[0] for n in nomes if "/" in n.replace("\\", "/")}
@@ -273,6 +342,17 @@ class Mudanca:
         self.trava = threading.Lock()
         self._estado = {"rodando": False, "total": 0, "feitos": 0, "bytes_total": 0, "bytes_feitos": 0,
                         "atual": "", "erros": [], "terminou_em": None}
+        self._levados = []
+
+    def levados(self):
+        """[(caminho antigo, caminho novo)] do arquivo de cada jogo levado na ultima mudanca: o ARENA troca o id do
+        jogo nos favoritos, nos recentes, no placar e no tempo de jogo (auditoria 6, DAD6-04)."""
+        with self.trava:
+            return list(self._levados)
+
+    def rodando(self):
+        with self.trava:
+            return bool(self._estado["rodando"])
 
     def estado(self):
         with self.trava:
@@ -287,6 +367,7 @@ class Mudanca:
             self._estado = {"rodando": True, "total": len(itens), "feitos": 0, "bytes_feitos": 0, "atual": "",
                             "bytes_total": sum(int(i.get("bytes") or 0) for i in itens), "erros": [],
                             "terminou_em": None}
+            self._levados = []
         threading.Thread(target=self._rodar, args=(itens, depois), daemon=True, name="arena-mudanca").start()
         return True
 
@@ -303,9 +384,18 @@ class Mudanca:
                     livre = _livre_mb(item["destino_do_console"])
                     if livre is not None and livre * 1048576 < int(item.get("bytes") or 0) + FOLGA_MB * 1048576:
                         raise NaoPode("O cartão não tem espaço para %s (%d MB livres)." % (item["titulo"], livre))
-                    levar_jogo(item["caminho"], item["pasta_do_console"], item["destino_do_console"], self._somar)
-                except (NaoPode, OSError) as falha:
-                    texto = str(falha) if isinstance(falha, NaoPode) else (getattr(falha, "strerror", None) or str(falha))
+                    _apagar_parciais(item["destino_do_console"])
+                    novo = levar_jogo(item["caminho"], item["pasta_do_console"], item["destino_do_console"],
+                                      self._somar)
+                    with self.trava:
+                        self._levados.append((item["caminho"], novo))
+                except Exception as falha:          # qualquer erro vira recado do item (auditoria 6, DAD6-08)
+                    if isinstance(falha, NaoPode):
+                        texto = str(falha)
+                    elif isinstance(falha, OSError):
+                        texto = getattr(falha, "strerror", None) or str(falha)
+                    else:
+                        texto = "erro inesperado (%s); o original ficou onde estava" % type(falha).__name__
                     with self.trava:
                         self._estado["erros"].append("%s: %s" % (item["titulo"], texto))
                 with self.trava:
@@ -317,6 +407,18 @@ class Mudanca:
             finally:
                 with self.trava:
                     self._estado.update(rodando=False, atual="", terminou_em=time.time())
+
+
+def _apagar_parciais(pasta):
+    """Tira os .arena-parcial que sobraram de uma mudanca cortada no meio (o app fechado a forca): ocupavam o cartao
+    sem aparecer em lista nenhuma (auditoria 6, DAD6-08). So na pasta do console de destino."""
+    for atual, _subpastas, arquivos in os.walk(pasta) if os.path.isdir(pasta) else ():
+        for nome in arquivos:
+            if nome.endswith(".arena-parcial"):
+                try:
+                    os.remove(os.path.join(atual, nome))
+                except OSError:
+                    pass
 
 
 def _livre_mb(pasta):

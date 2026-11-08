@@ -370,8 +370,21 @@ def gravar_perfil(trocas=None, arquivo=None):
             return True, "ja estava assim"
         copia = os.path.join(os.path.dirname(arquivo), COPIA_DE_ANTES)
         if not os.path.exists(copia):
-            with open(copia, "wb") as saida:
-                saida.write(bruto)
+            # Atomica, como o proprio Settings.xml: uma copia cortada no meio passaria por boa para sempre (auditoria
+            # 6, DAD6-10).
+            temporario_da_copia = "%s.%d.arena.tmp" % (copia, threading.get_ident())
+            try:
+                with open(temporario_da_copia, "wb") as saida:
+                    saida.write(bruto)
+                    saida.flush()
+                    os.fsync(saida.fileno())
+                os.replace(temporario_da_copia, copia)
+            finally:
+                if os.path.exists(temporario_da_copia):
+                    try:
+                        os.remove(temporario_da_copia)
+                    except OSError:
+                        pass
         temporario = "%s.%d.arena.tmp" % (arquivo, threading.get_ident())
         try:
             with open(temporario, "wb") as saida:

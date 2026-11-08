@@ -113,7 +113,9 @@ async function pedir(rota, metodo = "GET", corpo = null) {
   const dados = await resposta.json().catch(() => ({}));
 
   if (!resposta.ok || dados.ok === false) {
-    throw new Error(dados.erro || "O servidor não respondeu como esperado.");
+    const erro = new Error(dados.erro || "O servidor não respondeu como esperado.");
+    erro.status = resposta.status;          // quem chamou distingue "a rota nao existe" (404) de falha passageira
+    throw erro;
   }
   return dados;
 }
@@ -1830,6 +1832,11 @@ async function mostrarArmazenamento() {
   try {
     dados = await pedir("/api/armazenamento");
   } catch (falha) {
+    // Com jogos indo para o cartao, uma falha passageira nao pode congelar o "Levando para o cartao" (auditoria 6,
+    // FRT6-04): tenta de novo.
+    if (estado.armazenamento && estado.armazenamento.mudanca && estado.armazenamento.mudanca.rodando) {
+      setTimeout(mostrarArmazenamento, 3000);
+    }
     return;
   }
   estado.armazenamento = dados;
@@ -2713,7 +2720,12 @@ async function atualizarControleRemoto() {
       esperaDoControleRemoto = setTimeout(atualizarControleRemoto, 3000);
     }
   } catch (falha) {
-    // sem a rota (versao antiga do servidor) ou no Android: o bloco fica como esta
+    // sem a rota (versao antiga do servidor) ou no Android: o bloco fica como esta. Uma falha passageira (servidor
+    // ocupado) tenta de novo com a aba a vista, senao o codigo e a lista de celulares paravam (auditoria 6, FRT6-03).
+    if (falha && falha.status !== 404 && !$("#gavetaAjustes").hidden
+        && !$("#blocoControleRemoto").closest(".aba-conteudo").hidden) {
+      esperaDoControleRemoto = setTimeout(atualizarControleRemoto, 6000);
+    }
   }
 }
 
@@ -4323,10 +4335,25 @@ async function abrirArrumarToque() {
   $("#modalToque").hidden = false;
 }
 
-function ajusteDoDesenho() {
+// O ajuste do console aberto. Quem pede para MUDAR (mudando = true) marca o console como mexido: no Salvar, todos
+// os consoles mexidos vao ao servidor, nao so o que esta aberto (auditoria 6, FRT6-01: trocar de console antes de
+// salvar perdia, sem aviso, o que se tinha arrumado no outro).
+function ajusteDoDesenho(mudando = false) {
   const nome = $("#listaToqueDesenho").value;
   estado.toque.ajustes[nome] = estado.toque.ajustes[nome] || {};
+  if (mudando) {
+    estado.toque.mexidos = estado.toque.mexidos || new Set();
+    estado.toque.mexidos.add(nome);
+  }
   return estado.toque.ajustes[nome];
+}
+
+// Analogicos e tamanho entram no ajuste assim que mudam (antes, so ao salvar: trocar de console os perdia).
+function guardarOpcoesDoToque() {
+  const ajuste = ajusteDoDesenho(true);
+  ajuste.analogicos = $("#listaToqueAnalogicos").value;
+  ajuste.tamanho = Number($("#faixaToqueTamanho").value) / 100;
+  desenharPalcoToque();
 }
 
 function carregarDesenhoNaTela() {
@@ -4371,8 +4398,9 @@ function desenharPalcoToque() {
     const larguraPx = orientacao === "deitado" ? p.rw * escala * W : 2 * p.rw * escala * TOQUE_ENCOLHER_EM_PE * W;
     const alturaPx = orientacao === "deitado" ? 2 * p.rh * escala * H
       : 2 * p.rh * escala * TOQUE_ENCOLHER_EM_PE * 0.5 * H;
-    peca.style.width = `${Math.max(14, larguraPx)}px`;
-    peca.style.height = `${Math.max(14, alturaPx)}px`;
+    // Nunca menor que 24 x 24 px, o alvo minimo de toque (WCAG 2.2, 2.5.8; auditoria 6, FRT6-02).
+    peca.style.width = `${Math.max(24, larguraPx)}px`;
+    peca.style.height = `${Math.max(24, alturaPx)}px`;
     peca.style.left = `${x * 100}%`;
     peca.style.top = `${y * 100}%`;
     arrastarPecaDoToque(peca, p.id);
@@ -4388,7 +4416,7 @@ function arrastarPecaDoToque(peca, ident) {
     peca.style.left = `${x * 100}%`;
     peca.style.top = `${y * 100}%`;
     const orientacao = $("#listaToqueOrientacao").value;
-    const ajuste = ajusteDoDesenho();
+    const ajuste = ajusteDoDesenho(true);
     ajuste[orientacao] = ajuste[orientacao] || {};
     ajuste[orientacao][ident] = [Math.round(x * 10000) / 10000, Math.round(y * 10000) / 10000];
   };
@@ -4418,14 +4446,27 @@ function arrastarPecaDoToque(peca, ident) {
 
 async function salvarArrumarToque(deFabrica = false) {
   const nome = $("#listaToqueDesenho").value;
-  const ajuste = ajusteDoDesenho();
-  ajuste.analogicos = $("#listaToqueAnalogicos").value;
-  ajuste.tamanho = Number($("#faixaToqueTamanho").value) / 100;
+  const mexidos = estado.toque.mexidos || new Set();
+  if (!deFabrica) guardarOpcoesDoToque();
   try {
-    const r = await pedir("/api/toque", "POST", deFabrica ? { desenho: nome, de_fabrica: true }
-      : { desenho: nome, ajustes: ajuste,
-        por_console: $("#chaveToquePorConsole").getAttribute("aria-pressed") === "true" });
-    estado.toque.ajustes = JSON.parse(JSON.stringify(r.toque.desenhos || {}));
+    let r = null;
+    if (deFabrica) {
+      r = await pedir("/api/toque", "POST", { desenho: nome, de_fabrica: true });
+      mexidos.delete(nome);
+    } else {
+      // Cada console mexido vai num pedido (o servidor guarda um desenho por vez).
+      const porConsole = $("#chaveToquePorConsole").getAttribute("aria-pressed") === "true";
+      for (const mexido of [...mexidos]) {
+        r = await pedir("/api/toque", "POST", { desenho: mexido, ajustes: estado.toque.ajustes[mexido] || {},
+          por_console: porConsole });
+        mexidos.delete(mexido);
+      }
+    }
+    // O que voltou do servidor, mais o que ainda nao foi salvo nos outros consoles (o "de fabrica" de um nao apaga
+    // o que se arrumou nos outros).
+    const pendentes = {};
+    for (const outro of mexidos) pendentes[outro] = estado.toque.ajustes[outro];
+    if (r) estado.toque.ajustes = Object.assign(JSON.parse(JSON.stringify(r.toque.desenhos || {})), pendentes);
     if (deFabrica) {
       carregarDesenhoNaTela();
       $("#toqueAviso").textContent = "O " + estado.toque.dados.desenhos[nome].nome + " voltou ao de fábrica.";
@@ -6017,8 +6058,8 @@ function ligarEventos() {
   $("#btnArrumarToque").addEventListener("click", abrirArrumarToque);
   $("#listaToqueDesenho").addEventListener("change", carregarDesenhoNaTela);
   $("#listaToqueOrientacao").addEventListener("change", desenharPalcoToque);
-  $("#listaToqueAnalogicos").addEventListener("change", desenharPalcoToque);
-  $("#faixaToqueTamanho").addEventListener("input", desenharPalcoToque);
+  $("#listaToqueAnalogicos").addEventListener("change", guardarOpcoesDoToque);
+  $("#faixaToqueTamanho").addEventListener("input", guardarOpcoesDoToque);
   $("#btnToqueSalvar").addEventListener("click", () => salvarArrumarToque(false));
   $("#btnToqueFabrica").addEventListener("click", () => salvarArrumarToque(true));
   $("#chaveToquePorConsole").addEventListener("click", (evento) => {
@@ -6443,6 +6484,8 @@ function ligarEventos() {
       if (!aba) return;
       const gaveta = grupo.closest(".gaveta");
       if (aba.dataset.aba === "controles" && !estado.controlesMontados) montarAbaControles();
+      // Voltando a aba Controles: o codigo e os celulares conectados ao vivo de novo (auditoria 6, FRT6-03).
+      else if (aba.dataset.aba === "controles") atualizarControleRemoto();
       if (aba.dataset.aba === "emuladores") carregarBios();
       for (const outra of grupo.querySelectorAll(".aba")) {
         outra.classList.toggle("ativo", outra === aba);

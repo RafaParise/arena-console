@@ -254,6 +254,18 @@ class QuemPodeEntrar(unittest.TestCase):
         self.assertFalse(cr.origem_confiavel("null", "192.168.0.5:8780", meus))
         self.assertFalse(cr.origem_confiavel("ftp://192.168.0.5:8780", "192.168.0.5:8780", meus))
 
+    def test_um_colega_nao_segura_todas_as_vagas(self):
+        # Auditoria 6 (REDE6-01): o teto vale por aparelho; o cabo (127.0.0.1) so no teto geral.
+        servidor = cr._ServidorDoControle.__new__(cr._ServidorDoControle)
+        servidor._abertas, servidor._por_endereco, servidor._trava_abertas = 0, {}, threading.Lock()
+        colega = ("192.168.0.66", 50000)
+        aceitas = sum(servidor.verify_request(None, colega) for _ in range(cr.CONEXOES_MAXIMAS))
+        self.assertEqual(aceitas, cr.CONEXOES_POR_APARELHO)
+        self.assertTrue(servidor.verify_request(None, ("192.168.0.77", 50001)))      # o celular do outro entra
+        cabo = sum(servidor.verify_request(None, ("127.0.0.1", 1)) for _ in range(cr.CONEXOES_MAXIMAS))
+        self.assertEqual(servidor._abertas, cr.CONEXOES_MAXIMAS)                     # o cabo usa o resto
+        self.assertEqual(cabo, cr.CONEXOES_MAXIMAS - cr.CONEXOES_POR_APARELHO - 1)
+
     def test_dns_rebinding_o_nome_do_site_nao_esta_na_lista(self):
         # O site mal intencionado faz "evil.example" apontar para o IP do computador: o navegador manda Origin e Host
         # IGUAIS (os dois com o nome do site). So comparar um com o outro deixaria passar; a lista fechada nao.

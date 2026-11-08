@@ -68,10 +68,14 @@ def ligar_registro_de_queda(pasta_logs, versao=""):
         except OSError:
             pass
         arquivo = open(caminho, "a", encoding="utf-8", errors="replace")
-        arquivo.write("\n--- ARENA %s aberto em %s ---\n"
-                      % (versao, datetime.now().strftime("%d/%m/%Y %H:%M:%S")))
-        arquivo.flush()
-        faulthandler.enable(file=arquivo, all_threads=True)
+        try:
+            arquivo.write("\n--- ARENA %s aberto em %s ---\n"
+                          % (versao, datetime.now().strftime("%d/%m/%Y %H:%M:%S")))
+            arquivo.flush()
+            faulthandler.enable(file=arquivo, all_threads=True)
+        except (OSError, ValueError):
+            arquivo.close()                       # nao fica aberto a toa (auditoria 6, DAD6-11)
+            return None
         # Fora do Windows (Linux, Android): `kill -USR1 <pid>` escreve aqui onde cada thread esta, sem derrubar o
         # servidor. E' assim que se acha um ARENA parado (07/11/2026: o servidor do celular parava ao abrir).
         if hasattr(faulthandler, "register") and hasattr(signal, "SIGUSR1"):

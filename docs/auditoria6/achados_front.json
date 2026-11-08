@@ -1,0 +1,47 @@
+{
+ "revisor": "front",
+ "achados": [
+  {
+   "id": "FRT6-01",
+   "gravidade": "media",
+   "arquivo": "launcher/app.js",
+   "titulo": "Salvar so mandava o console aberto; as edicoes dos outros sumiam sem aviso",
+   "situacao": "corrigido"
+  },
+  {
+   "id": "FRT6-02",
+   "gravidade": "media",
+   "arquivo": "launcher/app.js",
+   "titulo": "Pecas do editor abaixo de 24x24 px no celular estreito",
+   "situacao": "corrigido"
+  },
+  {
+   "id": "FRT6-03",
+   "gravidade": "media",
+   "arquivo": "launcher/app.js",
+   "titulo": "Codigo e celulares conectados do controle remoto ficavam velhos ao voltar a aba",
+   "situacao": "corrigido"
+  },
+  {
+   "id": "FRT6-04",
+   "gravidade": "baixa",
+   "arquivo": "launcher/app.js",
+   "titulo": "Progresso 'Levando para o cartao' congelava com uma falha passageira",
+   "situacao": "corrigido"
+  },
+  {
+   "id": "FRT6-05",
+   "gravidade": "baixa",
+   "arquivo": "servidor/toque_consoles.py",
+   "titulo": "Conversao deitado->em pe descontinua: L3/R3 do PlayStation fora de ordem em pe",
+   "situacao": "registrado (so aparencia; o aluno arruma no editor)"
+  },
+  {
+   "id": "FRT6-06",
+   "gravidade": "baixa",
+   "arquivo": "launcher/app.js",
+   "titulo": "'Voltar ao de fabrica' grava na hora e o Cancelar nao desfaz",
+   "situacao": "aceito (o botao diz o que faz e mexe so no console aberto)"
+  }
+ ]
+}

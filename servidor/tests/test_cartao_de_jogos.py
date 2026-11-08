@@ -128,6 +128,88 @@ class LevarUmJogo(Base):
         self.assertTrue(os.path.isfile(os.path.join(console, "B.sfc")))     # o que deu erro fica
 
 
+class AchadosDaAuditoria6(Base):
+    """Os defeitos de dados achados na auditoria 6 (08/11/2026): nenhum pode apagar jogo ou save do aluno."""
+
+    def setUp(self):
+        super().setUp()
+        self.console = os.path.join(self.interno, "Super Nintendo")
+        self.destino = os.path.join(self.cartao, "ARENA-jogos", "Super Nintendo")
+
+    def test_save_de_mesmo_tamanho_mas_outro_progresso_nao_apaga_o_do_aluno(self):     # DAD6-01
+        escrever(os.path.join(self.console, "Zelda.sfc"), b"rom")
+        escrever(os.path.join(self.console, "Zelda.srm"), b"AAAA")                      # o progresso do aluno
+        escrever(os.path.join(self.destino, "Zelda.srm"), b"BBBB")                      # outro, do mesmo tamanho
+        with self.assertRaises(cj.NaoPode):
+            cj.levar_jogo(os.path.join(self.console, "Zelda.sfc"), self.console, self.destino)
+        with open(os.path.join(self.console, "Zelda.srm"), "rb") as arquivo:
+            self.assertEqual(arquivo.read(), b"AAAA")
+        self.assertTrue(os.path.exists(os.path.join(self.console, "Zelda.sfc")))
+
+    def test_copia_igual_ja_no_cartao_continua_a_mudanca(self):
+        escrever(os.path.join(self.console, "Zelda.sfc"), b"rom")
+        escrever(os.path.join(self.destino, "Zelda.sfc"), b"rom")                       # mudanca cortada no meio
+        cj.levar_jogo(os.path.join(self.console, "Zelda.sfc"), self.console, self.destino)
+        self.assertFalse(os.path.exists(os.path.join(self.console, "Zelda.sfc")))
+
+    def test_trilha_com_maiuscula_diferente_e_as_trilhas_do_m3u(self):                 # DAD6-03
+        ps1 = os.path.join(self.interno, "PS1")
+        escrever(os.path.join(ps1, "FF.m3u"), b"FF (Disc 1).cue\nFF (Disc 2).cue\n")
+        escrever(os.path.join(ps1, "FF (Disc 1).cue"), b'FILE "FF (Disc 1).BIN" BINARY\n')
+        escrever(os.path.join(ps1, "FF (Disc 2).cue"), b'FILE "FF (Disc 2).bin" BINARY\n')
+        escrever(os.path.join(ps1, "FF (Disc 1).bin"))
+        escrever(os.path.join(ps1, "FF (Disc 2).bin"))
+        _pasta, nomes = cj.arquivos_do_jogo(os.path.join(ps1, "FF.m3u"), ps1)
+        self.assertEqual(nomes, ["FF (Disc 1).bin", "FF (Disc 1).cue", "FF (Disc 2).bin", "FF (Disc 2).cue", "FF.m3u"])
+
+    def test_trilha_que_falta_nao_leva_nada(self):
+        ps1 = os.path.join(self.interno, "PS1")
+        escrever(os.path.join(ps1, "Crash.cue"), b'FILE "Crash (Track 9).bin" BINARY\n')
+        destino = os.path.join(self.cartao, "ARENA-jogos", "PS1")
+        with self.assertRaises(cj.NaoPode):
+            cj.levar_jogo(os.path.join(ps1, "Crash.cue"), ps1, destino)
+        self.assertTrue(os.path.exists(os.path.join(ps1, "Crash.cue")))
+        self.assertEqual(cj.bytes_do_jogo(os.path.join(ps1, "Crash.cue"), ps1), 0)
+
+    def test_pasta_com_outros_jogos_leva_so_o_marcado(self):                          # DAD6-06
+        ps1 = os.path.join(self.interno, "PS1")
+        for nome in ("A.cue", "A.bin", "B.cue", "B.bin"):
+            escrever(os.path.join(ps1, "Coletanea", nome), b'FILE "%s.bin" BINARY\n' % nome[0].encode()
+                     if nome.endswith(".cue") else b"x")
+        _pasta, nomes = cj.arquivos_do_jogo(os.path.join(ps1, "Coletanea", "A.cue"), ps1)
+        self.assertEqual(sorted(n.replace("\\", "/") for n in nomes), ["Coletanea/A.bin", "Coletanea/A.cue"])
+
+    def test_a_copia_que_sumiu_antes_de_apagar_deixa_o_original(self):              # DAD6-02
+        escrever(os.path.join(self.console, "Zelda.sfc"), b"rom")
+        original = cj._copiar
+
+        def copiar_e_perder(origem, destino, progresso):
+            original(origem, destino, progresso)
+            os.remove(destino)                                                          # o cartao "saiu"
+        with mock.patch.object(cj, "_copiar", copiar_e_perder):
+            with self.assertRaises(cj.NaoPode):
+                cj.levar_jogo(os.path.join(self.console, "Zelda.sfc"), self.console, self.destino)
+        self.assertTrue(os.path.exists(os.path.join(self.console, "Zelda.sfc")))
+
+    def test_a_mudanca_guarda_o_que_levou_e_sobrevive_a_erro_estranho(self):         # DAD6-04 e DAD6-08
+        escrever(os.path.join(self.console, "Zelda.sfc"), b"rom")
+        escrever(os.path.join(self.destino, "Velho.sfc.arena-parcial"), b"sobra")
+        mudanca, terminou = cj.Mudanca(), []
+        itens = [{"titulo": "Zelda", "caminho": os.path.join(self.console, "Zelda.sfc"),
+                  "pasta_do_console": self.console, "destino_do_console": self.destino, "bytes": 3},
+                 {"titulo": "Estranho", "caminho": None, "pasta_do_console": self.console,
+                  "destino_do_console": self.destino, "bytes": 0}]
+        self.assertTrue(mudanca.comecar(itens, lambda: terminou.append(True)))
+        limite = time.time() + 10
+        while mudanca.rodando() and time.time() < limite:
+            time.sleep(0.05)
+        self.assertEqual(mudanca.levados(), [(os.path.join(self.console, "Zelda.sfc"),
+                                              os.path.join(self.destino, "Zelda.sfc"))])
+        self.assertEqual(len(mudanca.estado()["erros"]), 1)
+        self.assertFalse(os.path.exists(os.path.join(self.destino, "Velho.sfc.arena-parcial")))
+        self.assertEqual(terminou, [True])
+
+
 class APastaNoCartao(Base):
     def test_criar_poe_as_pastas_dos_consoles_e_entra_na_lista(self):
         caminho = cj.criar_no_cartao(self.cartao, self.consoles, raizes=self.raizes)
