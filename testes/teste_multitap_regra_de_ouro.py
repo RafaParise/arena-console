@@ -111,6 +111,30 @@ VALOR_NOVO_DE_PROPOSITO = {("rgui_menu_color_theme", "27"): "4", ("content_show_
                            # caia para 30 quadros/s; o PS1 gastava 5x o processador).
                            ("rewind_enable", "true"): "false", ("run_ahead_enabled", "true"): "false"}
 
+# Mudancas de 07/11/2026, de proposito (achadas pela rodada final de 08/11, que reprovou 242 casos so por elas):
+#  - a foto de onde parou (savestate_thumbnail_enable, 326a430): vale para todo jogo e nao mexe em porta nem em
+#    jogadores; fica fora da comparacao, como o formato da imagem;
+#  - o tipo de controle lido de cada nucleo (32af42f): no SwanStation o 517 era o "Analog Joystick" e o DualShock
+#    e' o 261; no Flycast so existe o 1 (o 517 e o 513 eram de outro nucleo). A versao de antes passa por este mapa;
+#  - Mega Drive e Sega CD ganharam o nucleo so de netplay (PicoDrive, 32af42f), e todo nucleo de netplay desliga a
+#    checagem de dessincronia (netplay_check_frames = 0, a mesma regra do PS1 desde 22/09).
+FORA_DA_COMPARACAO_DESDE_07_11 = {"savestate_thumbnail_enable"}
+TIPO_DE_PORTA_NOVO = {"ps1": {"517": "261"}, "dreamcast": {"517": "1", "513": "1"}}
+NUCLEO_DE_NETPLAY_NOVO = {"megadrive", "segacd"}
+
+
+def com_mudancas_de_07_11(chaves_antes, plataforma, modo):
+    """A versao de antes, com as mudancas de 07/11/2026 (acima) aplicadas."""
+    traduzido = {c: v for c, v in chaves_antes.items() if c not in FORA_DA_COMPARACAO_DESDE_07_11}
+    # No Jogar Junto o PS1 vai pelo PCSX ReARMed (core_netplay), onde o 517 continua sendo o DualShock.
+    netplay_do_ps1 = plataforma == "ps1" and modo in ("hospedar", "entrar")
+    for chave, valor in list(traduzido.items()):
+        if chave.startswith("input_libretro_device_p") and not netplay_do_ps1:
+            traduzido[chave] = TIPO_DE_PORTA_NOVO.get(plataforma, {}).get(valor, valor)
+    if plataforma in NUCLEO_DE_NETPLAY_NOVO and modo in ("hospedar", "entrar") and "netplay_check_frames" in traduzido:
+        traduzido["netplay_check_frames"] = "0"
+    return traduzido
+
 
 def com_nomes_certos(chaves_override):
     """A versao de antes, falando a lingua de hoje (nomes certos e valores que
@@ -328,7 +352,9 @@ def principal():
                 # desde 15/10 abre pelo FreeJ2ME-Plus (fc788dd).
                 continue
             if not mais_de_dois:
-                ca, cb =sem_mudanca_de_proposito(chaves(a["override"])), sem_mudanca_de_proposito(chaves(b["override"]))
+                ca = com_mudancas_de_07_11(sem_mudanca_de_proposito(chaves(a["override"])), b.get("plataforma"), modo)
+                cb = {c: v for c, v in sem_mudanca_de_proposito(chaves(b["override"])).items()
+                      if c not in FORA_DA_COMPARACAO_DESDE_07_11}
                 if (cb.get("system_directory", "").endswith("\\OpenBIOS")
                         and ca.get("system_directory", "").endswith("\\system")):
                     # O PS1 sem a BIOS da Sony (as copias deste teste vem do git,
