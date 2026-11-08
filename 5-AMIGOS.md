@@ -738,6 +738,9 @@ PlayStation**.
   próprio núcleo), e o Jogar Junto começa justamente mandando um salvamento rápido do computador para o celular. É o
   mesmo caso do Mega Drive, mas no Saturn não há um emulador reserva que sirva sem perder: os da família Yabause
   aceitariam, porém acertam menos jogos e têm outra limitação no salvamento. Entre dois computadores, o Saturn funciona.
+  Desde 08/11/2026 o Saturn **do celular** roda no YabaSanshiro (da família Yabause): no Galaxy A12 o Beetle dava 21
+  quadros por segundo e o YabaSanshiro, 56. Os botões ficam no mesmo lugar que no computador, mas o save de um não
+  abre no outro (cada emulador guarda do seu jeito), e por isso o computador continua no Beetle.
 - Os dois lados precisam de versões próximas do ARENA: o aviso "versão diferente do núcleo" aparece e não atrapalha.
 
 ### PS2 em rede de verdade (system link)

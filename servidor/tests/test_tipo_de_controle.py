@@ -26,6 +26,22 @@ class OTipoDeCadaNucleo(unittest.TestCase):
         self.assertEqual(tipo("saturn", "mednafen_saturn", analogico=False), "1")      # Control Pad (513 nao existe)
         self.assertEqual(tipo("saturn", "mednafen_saturn", extra="mouse", jogador=2), "258")
 
+    def test_saturn_do_android_no_yabasanshiro(self):
+        # 08/11/2026, lido no libretro.c do YabaSanshiro: 1 = Saturn Pad, 5 = Saturn 3D Pad, sem mouse. O 261 do
+        # Beetle nao existe nele (o jogador ficaria sem controle).
+        self.assertEqual(tipo("saturn", "yabasanshiro"), "5")
+        self.assertEqual(tipo("saturn", "yabasanshiro", analogico=False), "1")
+        self.assertEqual(tipo("saturn", "yabasanshiro", extra="mouse", jogador=2), "5")
+
+    def test_c_e_z_do_saturn_no_mesmo_lugar_nos_dois_nucleos(self):
+        # O YabaSanshiro pede o C no L e o Z no R (o Beetle, no R e no L): o .rmp da partida troca, em cada jogador.
+        opcoes = controles.opcoes_do_console("saturn", jogadores=4, nucleo="yabasanshiro")
+        for jogador in range(1, 5):
+            self.assertEqual(opcoes["input_player%d_btn_l" % jogador], "11")
+            self.assertEqual(opcoes["input_player%d_btn_r" % jogador], "10")
+        beetle = controles.opcoes_do_console("saturn", jogadores=4, nucleo="mednafen_saturn")
+        self.assertFalse([c for c in beetle if "_btn_" in c])
+
     def test_playstation_dualshock_nos_dois_nucleos(self):
         self.assertEqual(tipo("ps1", "swanstation"), "261")                 # DualShock (517 = Analog Joystick)
         self.assertEqual(tipo("ps1", "pcsx_rearmed"), "517")                # DualShock no PCSX ReARMed (a partida)

@@ -216,6 +216,10 @@ def opcoes_do_console(console_id, jogadores=2, usar_analogico=True,
         opcoes["input_libretro_device_p%d" % jogador] = str(codigo)
         opcoes["input_player%d_analog_dpad_mode" % jogador] = (
             "1" if usar_analogico else "0")
+        # Botao que o nucleo pede noutro lugar (o C e o Z do Saturn no YabaSanshiro estao no L e no R ao contrario
+        # do Beetle Saturn): vai para o remapeamento da partida (.rmp), e o controle e o toque ficam iguais nos dois.
+        for botao, destino in sorted((console.get("remapear") or {}).items()):
+            opcoes["input_player%d_btn_%s" % (jogador, botao)] = str(destino)
 
     if dispositivo_extra == "mouse" and console.get("mouse"):
         opcoes["input_libretro_device_p2"] = str(console["mouse"])

@@ -54,5 +54,46 @@ class OIdDoJogoLevadoParaOCartao(unittest.TestCase):
         self.assertEqual(self.salvo, [])
 
 
+class OsBotoesTrocadosVaoNoRemapeamento(unittest.TestCase):
+    """08/11/2026: o Saturn do Android (YabaSanshiro) pede o C e o Z trocados; a troca vai no .rmp da partida, por cima
+    do remapeamento que o aluno salvou, sem perder o resto dele, e sai das opcoes do --appendconfig."""
+
+    def setUp(self):
+        self.pasta = tempfile.mkdtemp(prefix="arena_remap6_")
+        self.addCleanup(limpeza.apagar_pasta, self.pasta)
+        retroarch = os.path.join(self.pasta, "retroarch")
+        os.makedirs(os.path.join(retroarch, "info"))
+        with open(os.path.join(retroarch, "info", "yabasanshiro_libretro.info"), "w", encoding="utf-8") as arquivo:
+            arquivo.write('corename = "YabaSanshiro"\n')
+        os.makedirs(os.path.join(retroarch, "remaps", "YabaSanshiro"))
+        with open(os.path.join(retroarch, "remaps", "YabaSanshiro", "YabaSanshiro.rmp"), "w",
+                  encoding="utf-8") as arquivo:
+            arquivo.write('input_player1_btn_a = "8"\ninput_player1_btn_l = "4"\ninput_libretro_device_p1 = "1"\n')
+        for remendo in (mock.patch.object(arena, "PASTA_RETROARCH", retroarch),
+                        mock.patch.object(arena, "PASTA_REMAPS", os.path.join(retroarch, "remaps")),
+                        mock.patch.object(arena, "PASTA_REMAP_PARTIDA", os.path.join(self.pasta, "remap_partida"))):
+            remendo.start()
+            self.addCleanup(remendo.stop)
+
+    def test_troca_do_l_e_do_r_no_rmp(self):
+        opcoes = {"input_libretro_device_p1": "5", "input_player1_btn_l": "11", "input_player1_btn_r": "10",
+                  "input_player1_analog_dpad_mode": "1"}
+        pasta = arena.remapeamento_da_partida(opcoes, "yabasanshiro_libretro_android.so", "/jogos/Bomberman.chd")
+        with open(os.path.join(pasta, "YabaSanshiro", "Bomberman.rmp"), encoding="utf-8") as arquivo:
+            linhas = arquivo.read().splitlines()
+        self.assertIn('input_player1_btn_a = "8"', linhas)          # o que o aluno salvou fica
+        self.assertIn('input_player1_btn_l = "11"', linhas)         # a troca do nucleo vale mais
+        self.assertNotIn('input_player1_btn_l = "4"', linhas)
+        self.assertIn('input_player1_btn_r = "10"', linhas)
+        self.assertIn('input_libretro_device_p1 = "5"', linhas)
+        self.assertEqual(len([l for l in linhas if l.startswith("input_player1_btn_l")]), 1)
+
+    def test_o_que_e_do_rmp(self):
+        for chave in ("input_libretro_device_p3", "input_player1_btn_l", "input_player12_btn_r2"):
+            self.assertTrue(arena.chave_do_remapeamento(chave), chave)
+        for chave in ("input_player1_analog_dpad_mode", "input_player1_a", "input_player_btn_l", "video_driver"):
+            self.assertFalse(arena.chave_do_remapeamento(chave), chave)
+
+
 if __name__ == "__main__":
     unittest.main()

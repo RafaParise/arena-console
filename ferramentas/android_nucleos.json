@@ -276,6 +276,10 @@
   "wasm4_libretro_android.so": {
    "sha256": "e7cbd03ecd3a0ec7e59dc15e5e30a10c44768a728de9439e9bc19846aadd1a07",
    "tamanho": 58523
+  },
+  "yabasanshiro_libretro_android.so": {
+   "sha256": "3665395f5ab983390a352eef013b1d8f579fda002b8e87b5f4ecb72f200d53f1",
+   "tamanho": 523295
   }
  },
  "conferido_em": "2026-10-26",
@@ -539,6 +543,10 @@
   "wasm4_libretro_android.so": {
    "sha256": "3ea0adcdfc787f4f952470f47ffd8089cd106d5f73056702925d7215d8807869",
    "tamanho": 59437
+  },
+  "yabasanshiro_libretro_android.so": {
+   "sha256": "b6436e1afa842404493dd43b460429991b1e8fe97828424190c777045778e906",
+   "tamanho": 519784
   }
  }
 }

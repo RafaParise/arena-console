@@ -143,7 +143,7 @@ Código-fonte fora do libretro:
 
 - `freej2me_libretro.dll`: <https://github.com/TASEmulators/freej2me-plus/tree/8f87bf1497e7a9738a32d1909379376a1faca7dd>
 
-## Núcleos do RetroArch no Linux (63)
+## Núcleos do RetroArch no Linux (65)
 
 Os mesmos núcleos, na versão para Linux do mesmo RetroArch 1.22.2 (o
 `RetroArch_cores.7z` do libretro): ficam ao lado dos do Windows, em
@@ -192,6 +192,7 @@ código-fonte. Só a extensão muda: `.so` no lugar de `.dll`.
 | Sony - PlayStation (PCSX ReARMed) | `pcsx_rearmed_libretro.so` | GPLv2 |
 | Sega - MS/GG/MD/CD/32X (PicoDrive) | `picodrive_libretro.so` | MAME |
 | Nintendo - Pokemon Mini (PokeMini) | `pokemini_libretro.so` | GPLv3 |
+| Sony - PocketStation (Pokket) | `pokket_libretro.so` | GPLv3 |
 | Watara - Supervision (Potator) | `potator_libretro.so` | Public Domain |
 | Sony - PlayStation Portable (PPSSPP) | `ppsspp_libretro.so` | GPLv2 |
 | Atari - 7800 (ProSystem) | `prosystem_libretro.so` | GPLv2 |
@@ -207,6 +208,7 @@ código-fonte. Só a extensão muda: `.so` no lugar de `.dll`.
 | MicroW8 | `uw8_libretro.so` | The Unlicense |
 | Uzebox (Uzem) | `uzem_libretro.so` | MIT |
 | GCE - Vectrex (vecx) | `vecx_libretro.so` | GPLv3 |
+| VeMUlator | `vemulator_libretro.so` | GPL v3 |
 | Commodore - C128 (VICE x128) | `vice_x128_libretro.so` | GPLv2 |
 | Commodore - C64 (VICE x64, fast) | `vice_x64_libretro.so` | GPLv2 |
 | Commodore - PET (VICE xpet) | `vice_xpet_libretro.so` | GPLv2 |
@@ -292,7 +294,7 @@ diga que é modificada e onde está o código dela.
 | Python 3.13.16 para Android: o CPython compilado pelo Chaquopy (os pacotes "target" do Maven Central), sem mudança, com o OpenSSL, o SQLite, o libffi, o bzip2 e o xz dele | PSF License (o Python); MIT (o Chaquopy); Apache-2.0 (o OpenSSL); domínio público (o SQLite); MIT (o libffi); bzip2 e xz, as deles | https://github.com/chaquo/chaquopy e https://www.python.org/downloads/source/ |
 | O lançador do Python (`lib/<abi>/libarenapython.so`): escrito pelo ARENA (`android/python/lancador.c`) | GPL-3.0 (a do ARENA) | https://github.com/RafaParise/arena-console |
 
-### Núcleos do RetroArch no APK do Android (66)
+### Núcleos do RetroArch no APK do Android (67)
 
 Os mesmos núcleos, na versão para Android que o libretro publica (o
 "nightly", com a marca SHA-256 de cada um em
@@ -367,6 +369,7 @@ mesmo código-fonte (<https://github.com/libretro>).
 | Vircon32 | `vircon32_libretro_android.so` | 3-clause BSD |
 | Atari - Jaguar (Virtual Jaguar) | `virtualjaguar_libretro_android.so` | GPLv3 |
 | WASM-4 | `wasm4_libretro_android.so` | ISC |
+| Sega - Saturn (YabaSanshiro) | `yabasanshiro_libretro_android.so` | GPLv2 |
 
 ### Jogos livres que vêm no APK (8)
 

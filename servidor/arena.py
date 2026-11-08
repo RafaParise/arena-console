@@ -1930,6 +1930,15 @@ ULTRA_DESEMPENHO = {
 }
 
 
+def chave_do_remapeamento(chave):
+    """O que vai no .rmp da partida, e nao no --appendconfig: o tipo de cada porta e o botao que o nucleo pede noutro
+    lugar (input_playerN_btn_X = o numero do botao do RetroPad que ele aperta; controles.opcoes_do_console)."""
+    if chave.startswith("input_libretro_device_p"):
+        return True
+    jogador, separador, botao = chave[len("input_player"):].partition("_btn_")
+    return chave.startswith("input_player") and bool(separador) and jogador.isdigit() and botao.isalnum()
+
+
 def remapeamento_da_partida(opcoes, caminho_core, caminho_jogo):
     """Grava o tipo de cada porta (input_libretro_device_pN) num arquivo de
     remapeamento SO desta partida e devolve a pasta dele.
@@ -1940,7 +1949,7 @@ def remapeamento_da_partida(opcoes, caminho_core, caminho_jogo):
     com o arquivo da partida pedindo o Multitap (257). O arquivo de
     remapeamento (.rmp) e' onde o proprio RetroArch guarda o "Tipo de
     dispositivo" -- dele ele le sempre. Provado: com ele, 5 jogadores."""
-    tipos = {c: v for c, v in opcoes.items() if c.startswith("input_libretro_device_p")}
+    tipos = {c: v for c, v in opcoes.items() if chave_do_remapeamento(c)}
     if not tipos:
         return None
     nome_info = plataforma_do_sistema.nome_do_info(caminho_core)
@@ -1965,7 +1974,7 @@ def remapeamento_da_partida(opcoes, caminho_core, caminho_jogo):
         if os.path.isfile(candidato):
             with open(candidato, encoding="utf-8", errors="replace") as arquivo:
                 linhas = [l.rstrip("\n") for l in arquivo
-                          if not l.startswith("input_libretro_device_p")]
+                          if not l.startswith("input_libretro_device_p") and l.split("=", 1)[0].strip() not in tipos]
             break
     linhas += ['%s = "%s"' % (c, tipos[c]) for c in sorted(tipos)]
 
@@ -2086,6 +2095,8 @@ def gravar_override(config, custo=None, extras=None, em_partida=False,
             print("[ARENA] Nao consegui gravar o tipo de controle das portas: %s" % falha)
         if pasta_remap:
             opcoes["input_remapping_directory"] = pasta_remap
+            for chave in [c for c in opcoes if c.startswith("input_player") and chave_do_remapeamento(c)]:
+                del opcoes[chave]          # o botao trocado ja esta no .rmp
     opcoes["joypad_autoconfig_dir"] = (PASTA_PERFIS_CONTROLE
                                        if os.path.isdir(PASTA_PERFIS_CONTROLE)
                                        else PASTA_CONTROLES)
@@ -3057,6 +3068,8 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             for chave in ("input_libretro_device_p%d", "input_player%d_analog_dpad_mode"):
                 if chave % 1 in extras_controle:
                     extras_controle[chave % n] = extras_controle[chave % 1]
+            for chave in [c for c in list(extras_controle) if c.startswith("input_player1_btn_")]:
+                extras_controle[chave.replace("input_player1_", "input_player%d_" % n, 1)] = extras_controle[chave]
         graficos.gravar_opcoes_dos_nucleos(
             CAPACIDADE["nota"], extras_core, CAPACIDADE.get("nota_gpu"),
             modesto=grafico_original(config), abaixo=nivel_abaixo(config))

@@ -1665,6 +1665,10 @@ window.ARENA_DADOS = {
    "tamanho_max_mb": 800
   },
   {
+   "android": {
+    "_motivo": "No Galaxy A12 (08/11/2026) o Beetle Saturn rodava o Saturn Bomberman a 21 quadros por segundo e o YabaSanshiro, a 56. Ele usa a mesma BIOS (sega_101.bin ou mpr-17933.bin) e, sem ela, imita a BIOS.",
+    "core": "yabasanshiro_libretro.dll"
+   },
    "apelidos": [
     "saturn",
     "sega saturn",

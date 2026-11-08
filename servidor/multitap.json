@@ -106,6 +106,23 @@
       }
     },
 
+    "yabasanshiro_libretro.dll": {
+      "console": "saturn",
+      "jogadores_sem_adaptador": 2,
+      "jogar_junto": "nao_confirmado",
+      "adaptador": {
+        "tipo": "opcao_do_nucleo",
+        "nome_no_nucleo": "6Player Adaptor",
+        "chaves": {"yabasanshiro_multitap_port1": "enabled"},
+        "desligado": "disabled",
+        "jogadores": 7,
+        "valores_possiveis": {"enabled": 7},
+        "segundo_adaptador": {"chaves": {"yabasanshiro_multitap_port2": "enabled"}, "jogadores": 12},
+        "fonte": "yabause (ramo yabasanshiro) src/libretro/libretro.c linhas 104-105 (chaves, disabled|enabled), 79 e 161-175 (7 jogadores com um adaptador, 12 com os dois); o Saturn do Android desde 08/11/2026",
+        "observacao": "Igual ao Beetle Saturn: o Saturn Bomberman aceita 10 com as duas portas."
+      }
+    },
+
     "mednafen_saturn_libretro.dll": {
       "console": "saturn",
       "jogadores_sem_adaptador": 2,
