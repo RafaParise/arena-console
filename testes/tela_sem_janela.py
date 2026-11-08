@@ -53,6 +53,15 @@ def achar_navegador():
     return next((c for c in CANDIDATOS if c and os.path.isfile(c)), None)
 
 
+def roda_como_administrador():
+    """True quando este Python roda como administrador (so no Windows)."""
+    try:
+        import ctypes
+        return bool(ctypes.windll.shell32.IsUserAnAdmin())
+    except (AttributeError, OSError):
+        return False
+
+
 def porta_livre():
     s = socket.socket()
     s.bind(("127.0.0.1", 0))
@@ -160,6 +169,13 @@ class Navegador:
     def __enter__(self):
         comuns = ["--remote-debugging-port=%d" % self.porta, "--user-data-dir=" + self.perfil,
                   "--no-first-run", "--no-default-browser-check", "--disable-extensions"]
+        # 08/11/2026: teste rodado de um terminal de administrador. O Edge
+        # aberto por administrador se reabre sem o poder, pelo Explorer, e
+        # essa volta so acontecia depois que o Python saia: o teste esperava
+        # a pagina que nunca vinha ("nao respondeu"). O ARENA dos alunos nunca
+        # roda como administrador; so o teste precisa pular essa volta.
+        if roda_como_administrador():
+            comuns.append("--do-not-de-elevate")
         if self.janela:
             argumentos = comuns + ["--app=about:blank", "--window-size=%d,%d" % self.tamanho,
                                    "--disable-features=Translate,AutofillServerCommunication"]
@@ -172,7 +188,11 @@ class Navegador:
             try:
                 with urllib.request.urlopen("http://127.0.0.1:%d/json" % self.porta, timeout=2) as r:
                     alvos = json.loads(r.read())
-                alvo = next((a for a in alvos if a.get("type") == "page"), None)
+                # O Edge 156 abre, num perfil novo, a pagina de sincronizacao
+                # da conta (edge://sync-confirmation-dialog) ANTES da nossa:
+                # a primeira "page" da lista nem sempre e' a do teste.
+                paginas = [a for a in alvos if a.get("type") == "page"]
+                alvo = next((a for a in paginas if a.get("url") == "about:blank"), None)
                 if alvo:
                     break
             except OSError:

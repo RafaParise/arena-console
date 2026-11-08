@@ -68,7 +68,11 @@ ROTAS_LENTAS = {"/api/barreiras": 60}
 # capa passava dos 5 s, e o fuzz contava "conexao falhou"). Prazo maior, e a
 # repeticao rapida so 2 vezes: 20 buscas seguidas viravam 20 pedidos a quem
 # guarda as capas e os jogos (o banco de capas, o archive.org).
-ROTAS_DA_INTERNET = {"/api/capa/atualizar": 60, "/api/biblioteca-online": 30}
+# 08/11/2026: a /api/sincronizar fala com cada amigo cadastrado (a copia leva a
+# configuracao de verdade), e um amigo fora da rede (o celular que saiu de casa)
+# so desiste depois dos 8 s do falar_com. O fuzz contava "conexao falhou" 20 de 20.
+ROTAS_DA_INTERNET = {"/api/capa/atualizar": 60, "/api/biblioteca-online": 30,
+                     "/api/sincronizar": 30}
 
 
 # A linha do pedido que o http.server do Python aceita (BaseHTTPRequestHandler
