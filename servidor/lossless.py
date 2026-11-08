@@ -416,6 +416,26 @@ def trocas_para_o_jogo(desenho_2d, nota_gpu, mais_quadros=False, hz=60, esticar=
     return trocas
 
 
+def trocas_para_o_externo(programa, nota_gpu, hz=60):
+    """As trocas do perfil "ARENA" para um emulador de fora (PCSX2, Dolphin, RPCS3, Xenia).
+
+    Eles ja desenham na tela cheia sem borda, no tamanho da tela: o LS nao
+    estica nada (ScalingType Off) e serve so para a geracao de quadros (LSFG 3
+    no modo que segue a tela). A escala sozinha espera 8 s: o emulador abre
+    primeiro uma janela de carregamento e so depois a do jogo.
+
+    Medido no PC do Rafael em 08/11/2026 (Ryzen 5 5600G, Radeon integrada,
+    tela de 60 Hz; PresentMon 2.6, Bully no PCSX2): o PCSX2 entrega 60 quadros
+    por segundo mesmo quando o jogo desenha 30 (repete cada um), e com isso o
+    LS nao tinha o que gerar. Por isso, com o LS, o PCSX2 passa a entregar so
+    os quadros novos (graficos.escrever_config_pcsx2, so_quadros_novos)."""
+    return {"Path": programa, "ScalingType": "Off", "FrameGeneration": "LSFG3", "LSFG3Mode1": "ADAPTIVE",
+            "LSFG3Target": str(int(hz or 60)),
+            "LSFGSize": "BALANCED" if (nota_gpu or 0) >= 4 else "PERFORMANCE",
+            "LSFGFlowScale": "100" if (nota_gpu or 0) >= 4 else "75",
+            "AutoScaleDelay": "8"}
+
+
 # ---------------------------------------------------------------------------
 # A janela do RetroArch que o LS estica
 # ---------------------------------------------------------------------------

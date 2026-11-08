@@ -2878,6 +2878,30 @@ def preparar_lossless(jogo, config):
             "executavel": achado["executavel"]}
 
 
+def preparar_lossless_de_fora(jogo, config, programa):
+    """A geracao de quadros do Lossless Scaling num emulador de fora (PCSX2, Dolphin, RPCS3, Xenia), se o aluno
+    ligou o Lossless Scaling E o "mais quadros". Ele ja desenha na tela cheia: o LS nao estica, so cria quadros
+    (lossless.trocas_para_o_externo). Devolve None ou {"opcoes": {}, "executavel": o LosslessScaling.exe}."""
+    if not (config.get("lossless_scaling") and config.get("lossless_mais_quadros")):
+        return None
+    achado = lossless.achar(RAIZ)
+    if not achado or not achado["licenca"]:
+        print("[ARENA] Lossless Scaling ligado nos Ajustes, mas sem o programa instalado pela Steam desta conta: "
+              "o jogo abre sem ele.")
+        return None
+    trocas = lossless.trocas_para_o_externo(os.path.basename(programa), nota_da_placa_de_fora(),
+                                            lossless.frequencia_da_tela())
+    try:
+        gravou, motivo = lossless.gravar_perfil(trocas)
+    except (OSError, ValueError) as falha:
+        gravou, motivo = False, str(falha)
+    if not gravou:
+        print("[ARENA] Lossless Scaling: %s. O jogo abre sem ele." % motivo)
+        return None
+    print("[ARENA] %s com a geracao de quadros do Lossless Scaling." % jogo["externo"]["dados"]["nome"])
+    return {"opcoes": {}, "executavel": achado["executavel"]}
+
+
 def preparar_o_ps2_do_android(config, jogo=None, sem_jogo=False, degrau=0):
     """Tudo o que o PS2 do Android (o nucleo ARMSX2, dentro do app) precisa antes de abrir, num lugar so:
     os arquivos de apoio de dentro do APK (o nucleo nem liga sem eles), as BIOS na pasta do nucleo, o motor de
@@ -3036,6 +3060,8 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         comando = [plataforma_do_sistema.programa_que_roda(programa_externo, nome_externo)] + \
             argumentos_externo + comando[1:]
         pasta_trabalho = os.path.dirname(programa_externo)
+        # A geracao de quadros do Lossless Scaling tambem nos emuladores de fora (pedido de 07/11/2026).
+        pelo_lossless = None if partida else preparar_lossless_de_fora(jogo, config, programa_externo)
 
         # O PCSX2 tem tela propria, mas le a configuracao antes de abrir.
         # O ARENA escreve o controle ali: dois analogicos, direcional
@@ -3063,7 +3089,8 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
                 integrada=bool(MAQUINA["gpu"].get("integrada", True)),
                 motor=config.get("motor_ps2", "automatico"),
                 formato=graficos.formato_de_fora("ps2", config.get("formato_da_imagem", "automatico"),
-                                                 hardware.tamanho_da_tela()))
+                                                 hardware.tamanho_da_tela()),
+                so_quadros_novos=bool(pelo_lossless))
             if escrito:
                 print("[ARENA] Controle e qualidade do PCSX2 configurados "
                       "(%s jogadores)." % jogo.get("jogadores_max", 2))

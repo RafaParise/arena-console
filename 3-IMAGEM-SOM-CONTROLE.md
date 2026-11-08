@@ -1457,8 +1457,15 @@ Scaling**, dizendo onde o achou, a versão e se a licença vale. Ligando
 **Feche o Lossless Scaling antes de abrir o jogo**: com ele aberto, o ARENA
 não consegue ajustá-lo (o programa regrava a configuração ao fechar), e o
 jogo abre normal, com a escala do ARENA. Também não vale na partida a dois
-(o atraso pesa mais ali) nem nos emuladores de fora (PCSX2, Dolphin, RPCS3,
-Xenia), que já desenham grande sozinhos.
+(o atraso pesa mais ali).
+
+**Nos emuladores de fora (PCSX2, Dolphin, RPCS3, Xenia)**, que já desenham
+grande sozinhos, o Lossless Scaling não estica nada: ele entra só com
+**Mais quadros** ligado, para a geração de quadros (desde 08/11/2026). No
+PCSX2, o ARENA ainda acerta duas coisas para ela funcionar: o PCSX2 entrega
+só os quadros que o jogo desenhou de verdade (sem repetir) e nunca toma a
+tela só para ele (a tela cheia "exclusiva"), senão a imagem do Lossless
+Scaling fica por baixo.
 
 #### Mais quadros (a geração de quadros)
 
@@ -1485,6 +1492,22 @@ Ou seja: a escala do próprio ARENA dá o mesmo resultado pelo mesmo custo,
 sem o programa e sem o pequeno atraso de captura que ele acrescenta (ele
 "fotografa" a janela do jogo a cada quadro antes de esticar). O Lossless
 Scaling vale pelo jeito de esticar dele (o LS1) e pela geração de quadros.
+
+Medido em 08/11/2026 no mesmo computador (Ryzen 5 5600G, tela de 60 Hz),
+com o PresentMon (programa gratuito da Intel que conta os quadros que cada
+programa entrega à tela), no PCSX2:
+
+| Jogo | O PS2 desenha | A tela mostra, com Mais quadros |
+|---|---|---|
+| Black (roda a 30) | 30 quadros por segundo | **60**, sempre a cada 16,7 ms |
+| Bully (telas de abertura, a 60) | 60 | 60 (não há o que gerar) |
+
+Antes do ajuste (o PCSX2 repetindo quadros e na tela cheia exclusiva), o
+Lossless Scaling gerava 58 quadros, mas só 7 chegavam à tela.
+
+**Dica para este computador**: a tela aceita 75 Hz (hoje está em 60). Em
+Configurações do Windows → Tela → Avançado, escolhendo 75 Hz, a geração de
+quadros leva o jogo de 30 a 75 quadros, e o que já roda a 60 fica igual.
 
 Uma curiosidade: **a foto da tela (`F8` ou print) não mostra a imagem
 esticada pelo Lossless Scaling**. O programa marca a janela dele como "fora

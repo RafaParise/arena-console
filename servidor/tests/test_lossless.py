@@ -219,6 +219,64 @@ class Partida(unittest.TestCase):
         self.assertEqual((trocas["ScalingType"], trocas["FrameGeneration"]), ("LS1", "LSFG3"))
 
 
+class EmuladorDeFora(unittest.TestCase):
+    """arena.preparar_lossless_de_fora: a geracao de quadros nos emuladores de fora (PCSX2, Dolphin, RPCS3, Xenia).
+    Medido no PC do Rafael em 08/11/2026 (PresentMon): o Black desenha 30 quadros por segundo no PCSX2 e, pelo LS, a
+    tela mostra 60."""
+
+    tearDown = Partida.tearDown
+    config = Partida.config
+
+    def setUp(self):
+        Partida.setUp(self)
+        self.jogo = {"plataforma": "ps2", "externo": {"dados": {"nome": "PCSX2"}}}
+        self.programa = "C:\\ARENA\\emuladores\\PCSX2\\PCSX2\\pcsx2-qt.exe"
+
+    def test_so_com_as_duas_chaves(self):
+        for config in (self.config(lossless_scaling=False, lossless_mais_quadros=True), self.config()):
+            self.assertIsNone(self.arena.preparar_lossless_de_fora(self.jogo, config, self.programa))
+
+    def test_so_gera_quadros_e_so_para_este_emulador(self):
+        with mock.patch.object(lossless, "frequencia_da_tela", return_value=75):
+            pronto = self.arena.preparar_lossless_de_fora(self.jogo, self.config(lossless_mais_quadros=True),
+                                                          self.programa)
+        self.assertEqual(pronto, {"opcoes": {}, "executavel": self.achado["executavel"]})
+        trocas = lossless.gravar_perfil.call_args[0][0]
+        self.assertEqual(trocas["Path"], "pcsx2-qt.exe")
+        self.assertEqual(trocas["ScalingType"], "Off")                     # ele ja desenha na tela cheia
+        self.assertEqual((trocas["FrameGeneration"], trocas["LSFG3Mode1"], trocas["LSFG3Target"]),
+                         ("LSFG3", "ADAPTIVE", "75"))                      # ate a frequencia da tela
+        lossless.montar_perfil(trocas)                                     # so campos e valores que o LS aceita
+
+    def test_sem_licenca_ou_com_o_ls_aberto(self):
+        com = self.config(lossless_mais_quadros=True)
+        with mock.patch.object(lossless, "achar", return_value=dict(self.achado, licenca=False)):
+            self.assertIsNone(self.arena.preparar_lossless_de_fora(self.jogo, com, self.programa))
+        with mock.patch.object(lossless, "gravar_perfil", return_value=(False, "o Lossless Scaling esta aberto")):
+            self.assertIsNone(self.arena.preparar_lossless_de_fora(self.jogo, com, self.programa))
+
+
+class PcsxComOLossless(unittest.TestCase):
+    """Com a geracao de quadros do LS, o PCSX2 entrega so os quadros novos e nunca toma a tela (exclusiva)."""
+
+    def ler(self, **opcoes):
+        import graficos
+        pasta = tempfile.mkdtemp(prefix="arena_pcsx2_ls_")
+        self.addCleanup(limpeza.apagar_pasta, pasta)
+        exe = os.path.join(pasta, "pcsx2-qt.exe")
+        open(exe, "wb").close()
+        graficos.escrever_config_pcsx2(exe, nota=4, nota_gpu=3, **opcoes)
+        with open(os.path.join(pasta, "inis", "PCSX2.ini"), encoding="utf-8") as arquivo:
+            return arquivo.read()
+
+    def test_com_e_sem(self):
+        com, sem = self.ler(so_quadros_novos=True), self.ler()
+        self.assertIn("SkipDuplicateFrames = true", com)
+        self.assertIn("ExclusiveFullscreenControl = 0", com)
+        self.assertIn("SkipDuplicateFrames = false", sem)
+        self.assertIn("ExclusiveFullscreenControl = -1", sem)
+
+
 class Steam(unittest.TestCase):
     def test_bibliotecas_do_libraryfolders(self):
         pasta = tempfile.mkdtemp(prefix="arena_teste_steam_")

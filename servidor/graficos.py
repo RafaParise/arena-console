@@ -2111,8 +2111,12 @@ def escrever_config_pcsx2(caminho_executavel, ultra=False, nota=None,
                           nota_gpu=None, modesto=False, preset=None,
                           jogadores=2, controles_xinput=(0, 1),
                           cartoes=("Mcd001.ps2", "Mcd002.ps2"), integrada=None,
-                          motor="automatico", abaixo="", formato=None):
+                          motor="automatico", abaixo="", formato=None, so_quadros_novos=False):
     """Escreve o bloco de controle, teclas e qualidade grafica do PCSX2.
+
+    'so_quadros_novos': o jogo vai pela geracao de quadros do Lossless Scaling
+    (lossless.trocas_para_o_externo), e o PCSX2 entrega so os quadros que o
+    jogo desenhou de verdade, sem repetir.
 
     Preserva tudo o que ja estiver no arquivo fora desses blocos - em
     especial a BIOS, que o aluno configura uma vez pela tela do programa.
@@ -2229,8 +2233,13 @@ def escrever_config_pcsx2(caminho_executavel, ultra=False, nota=None,
         # "Minima" (0): "Blending Accuracy is below Basic, this may break
         # effects in some games". Fora do minimo, abaixo da basica nunca.
         linhas_gs.append("accurate_blending_unit = 1")
-    # Quadro repetido nao e' redesenhado (so no minimo; o padrao e' desligado).
-    linhas_gs.append("SkipDuplicateFrames = %s" % ("true" if abaixo == "minimo" else "false"))
+    # Quadro repetido nao e' redesenhado (no minimo e com a geracao de quadros do Lossless Scaling, que precisa ver
+    # o ritmo de verdade do jogo; o padrao e' desligado).
+    linhas_gs.append("SkipDuplicateFrames = %s" % ("true" if abaixo == "minimo" or so_quadros_novos else "false"))
+    # Tela cheia exclusiva (so no Vulkan): -1 o PCSX2 decide, 0 nunca. Com o Lossless Scaling, nunca: na exclusiva o
+    # PCSX2 toma a tela e a imagem do LS fica por baixo (medido em 08/11/2026 com o PresentMon, Radeon integrada: o LS
+    # gerava 58 quadros por segundo e so 7 chegavam a tela).
+    linhas_gs.append("ExclusiveFullscreenControl = %d" % (0 if so_quadros_novos else -1))
 
     if ultra:
         linhas_gs += ["VsyncEnable = true", "OsdShowSpeed = false"]
