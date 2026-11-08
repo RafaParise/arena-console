@@ -747,8 +747,12 @@ O que ficou aberto - vou responder na ordem - 1 - Antes o Deadly Alliance Assim 
 ### Progresso da auditoria 6
 
 - [x] Deadly Alliance: o EE do PS2 a 50% travava o carregamento; o mínimo do PS2 agora é 60% e a imagem do leve
-- [ ] Dois toques na tela mostram o controle de toque (remendo `arena-toque.patch`, conferir no A12)
-- [ ] Pendências das conversas anteriores
-- [ ] Ferramentas e Lossless Scaling
-- [ ] Auditoria por domínio (medidas, revisores com teto, céticos)
-- [ ] Consertos, rodada final, APKs de produção, pacote do Windows e release
+- [x] Dois toques na tela mostram o controle de toque (`3a8c455`, conferido no A12 com controle virtual)
+- [x] Pendências das conversas anteriores: Saturn PC × celular investigado (`b2a59b2`), cabo e navegadores já feitos,
+  tipo de controle do GameCube/Wii e do PS2 do Android (`98ca0db`)
+- [x] Ferramentas e Lossless Scaling: PresentMon 2.6 (Intel, gratuito, sem administrador) para medir quadros; Lossless
+  nos emuladores de fora (`5f03de9`); no A12 não dá (PowerVR, Android 12)
+- [x] Auditoria por domínio: medidas (estática 0, front 0 em 108 telas, navegadores 30/30) e 3 revisores com teto;
+  21 achados, 16 corrigidos (`95cea7b`); relatório em `docs\RELATORIO-AUDITORIA-6.md`
+- [x] Versão 2026.11.08 (`ec616a8`) e APKs de produção montados
+- [ ] Rodada final (a matriz de consoles parou por falta de memória: só a pedido), pacote do Windows e o release
