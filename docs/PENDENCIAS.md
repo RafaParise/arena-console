@@ -328,18 +328,20 @@ Falta (nesta ordem):
   - **No celular, nenhum jogo passava de 2 jogadores** (nem o N64 de 4, nem o adaptador do Saturn, do PlayStation ou do Mega
     Drive): o mapa dos adaptadores procurava o núcleo pelo nome do Windows. Consertado.
   - No PC, a leitura dos adaptadores de rede morria com nome acentuado ("Conexão local") quando o ARENA roda com `-X utf8`.
-  - **Deadly Alliance no A12**: não é lentidão. Medido pelo próprio emulador, a abertura roda a 100% (60 quadros, EE em 55%),
-    mas o jogo **fica preso na tela "LOADING"** (170 s a 60 quadros, sem avançar). Já descartados: o motor de vídeo (Vulkan e
-    OpenGL), o cartão da entrada 2 (desligado) e o regulador do EE (desligado). O Mortal Kombat Armageddon, no mesmo formato de
-    arquivo (CHD de CD, 5 GB), carrega normalmente. Próximo passo: conferir este CHD no PCSX2 do computador (ou outra cópia
-    do jogo) e as opções de precisão do EE/VU do ARMSX2.
+  - **Deadly Alliance no A12: consertado (07/11, de madrugada).** Achado por eliminação, mesmo jogo, mesmo celular: o nível
+    "mínimo" (em que o celular estava) punha o processador do PS2 (EE) a **50%**, e com ele o jogo fica para sempre no LOADING,
+    mesmo rodando a 100%; no nível normal e no leve (60%) ele carrega. O 50% saiu da escada do EE (o mais lento agora é 60%). No
+    mesmo teste, a mistura de cores "Minimum" e o "Disable Readbacks" do mínimo trocavam o logotipo e o texto dos menus por
+    manchas: no PS2 do celular o mínimo economiza só pelo EE. Resultado: carrega e roda a 100% (60 quadros) no mínimo.
+    O aviso "No space on memory card slot 2" é do PocketStation na entrada 2 (decisão de 24/10): basta apertar X uma vez.
+  - **Dois toques na tela mostram o controle de toque** (pedido do Bully, 07/11): com um controle de verdade ligado, o RetroArch
+    escondia os botões da tela e não havia como chegar ao SAIR. Remendo `android/retroarch/arena-toque.patch`.
   - **PS2 abrindo durante um giro de tela** (rotação automática ligada): uma vez em quatro, o PS2 abriu com o desenho em pé
     espremido na tela deitada. Girar o celular uma vez conserta na hora; girar com o jogo aberto funciona nos dois sentidos.
 
 **O que falta**
 
-- **Sentir a vibração com o T4** (controle de verdade, só você), o **Saturn no Jogar Junto** entre computador e celular e o
-  **Deadly Alliance preso no LOADING** (acima).
+- **Sentir a vibração com o T4** (controle de verdade, só você) e o **Saturn no Jogar Junto** entre computador e celular.
 - **Partida pelo cabo**: testada nos dois sentidos (o celular abriu o Super Nintendo e o computador entrou como jogador 2, ping
   14 ms). Falta só o Saturn.
 - **APK e pacote do Windows novos e a página do release**: só depois do teste acima.

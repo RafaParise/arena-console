@@ -1,0 +1,111 @@
+Remendo do ARENA para o RetroArch 1.22.2 do Android (GPLv3, como o RetroArch)
+
+O que muda: com um controle de verdade ligado, o RetroArch esconde o controle de toque inteiro
+(input_overlay_hide_when_gamepad_connected) e nao havia como chegar ao SAIR, ao MENU e ao SALVAR pela tela (achado do
+Rafael jogando Bully no Galaxy A12, 07/11/2026). Agora dois toques rapidos na tela (menos de 0,4 s) mostram o controle
+de toque; ele fica enquanto a tela e' tocada e some sozinho 10 s depois do ultimo toque. Sem controle ligado, nada muda.
+
+Base: a etiqueta v1.22.2 do libretro (commit 69a4f0ea1e8aaf442ae4858f2e7f2b31a1776576),
+https://github.com/libretro/RetroArch/archive/refs/tags/v1.22.2.tar.gz
+Modificado pelo ARENA em 07/11/2026. Quem aplica e compila:
+ferramentas/compilar_retroarch_android.py (depois do arena-em-pe.patch).
+
+diff --git a/input/drivers/android_input.c b/input/drivers/android_input.c
+--- a/input/drivers/android_input.c
++++ b/input/drivers/android_input.c
+@@ -725,12 +725,42 @@ static INLINE void android_mouse_calculate_deltas(android_input_t *android,
+    android->mouse_y = y;
+ }
+ 
++/* ARENA: com um controle de verdade ligado, o RetroArch esconde o controle de toque inteiro
++ * (input_overlay_hide_when_gamepad_connected) e nao havia como chegar ao SAIR, ao MENU e ao SALVAR pela tela (achado
++ * do Rafael no Bully, 07/11/2026). Dois toques rapidos na tela mostram o controle de toque; ele fica enquanto a tela e'
++ * tocada e some de novo 10 s depois do ultimo toque. Quem pergunta e' o runloop.c (arena_toque_a_vista). */
++#define ARENA_DOIS_TOQUES_US   400000
++#define ARENA_TOQUE_A_VISTA_US 10000000
++static retro_time_t arena_toque_ate     = 0;
++static retro_time_t arena_ultimo_toque  = 0;
++
++bool arena_toque_a_vista(void)
++{
++   return arena_toque_ate && cpu_features_get_time_usec() < arena_toque_ate;
++}
++
++static void arena_tocou_na_tela(void)
++{
++   retro_time_t agora = cpu_features_get_time_usec();
++   if (arena_toque_a_vista())
++      arena_toque_ate = agora + ARENA_TOQUE_A_VISTA_US;      /* usando os botoes da tela: continuam */
++   else if (arena_ultimo_toque && agora - arena_ultimo_toque < ARENA_DOIS_TOQUES_US)
++   {
++      arena_toque_ate = agora + ARENA_TOQUE_A_VISTA_US;      /* dois toques: aparecem */
++      RARCH_LOG("[ARENA] Dois toques na tela: o controle de toque aparece.\n");
++   }
++   arena_ultimo_toque = agora;
++}
++
+ static INLINE void android_input_poll_event_type_motion(
+       android_input_t *android, AInputEvent *event,
+       int port, int source)
+ {
+    int getaction     = AMotionEvent_getAction(event);
+    int action        = getaction  & AMOTION_EVENT_ACTION_MASK;
++   if (action == AMOTION_EVENT_ACTION_DOWN
++         && (source & AINPUT_SOURCE_TOUCHSCREEN) == AINPUT_SOURCE_TOUCHSCREEN)
++      arena_tocou_na_tela();
+    size_t motion_ptr = getaction >> AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT;
+    bool keyup        = (
+             action == AMOTION_EVENT_ACTION_UP
+diff --git a/input/input_driver.c b/input/input_driver.c
+--- a/input/input_driver.c
++++ b/input/input_driver.c
+@@ -5348,6 +5348,10 @@ void input_overlay_set_visibility(int overlay_idx,
+       ol->iface->set_alpha(ol->iface_data, overlay_idx, 0.0);
+ }
+ 
++#if defined(ANDROID)
++bool arena_toque_a_vista(void);   /* ARENA: input/drivers/android_input.c */
++#endif
++
+ static bool input_overlay_want_hidden(void)
+ {
+    settings_t *settings = config_get_ptr();
+@@ -5358,7 +5362,11 @@ static bool input_overlay_want_hidden(void)
+       hide = (menu_state_get_ptr()->flags & MENU_ST_FLAG_ALIVE) != 0;
+ #endif
+    if (settings->bools.input_overlay_hide_when_gamepad_connected)
+-      hide = hide || (input_config_get_device_name(0) != NULL);
++      hide = hide || (input_config_get_device_name(0) != NULL
++#if defined(ANDROID)
++            && !arena_toque_a_vista()   /* ARENA: dois toques na tela (input/drivers/android_input.c) */
++#endif
++            );
+ 
+    return hide;
+ }
+diff --git a/runloop.c b/runloop.c
+--- a/runloop.c
++++ b/runloop.c
+@@ -110,6 +110,10 @@
+ 
+ #include "runtime_file.h"
+ #include "runloop.h"
++
++#if defined(ANDROID)
++bool arena_toque_a_vista(void);   /* ARENA: input/drivers/android_input.c */
++#endif
+ #include "camera/camera_driver.h"
+ #include "location_driver.h"
+ #include "record/record_driver.h"
+@@ -5734,6 +5738,11 @@ static enum runloop_state_enum runloop_check_state(
+       {
+          static bool last_controller_connected = false;
+          bool controller_connected             = (input_config_get_device_name(0) != NULL);
++#if defined(ANDROID)
++         /* ARENA: dois toques na tela trazem o controle de toque de volta (input/drivers/android_input.c) */
++         if (controller_connected && arena_toque_a_vista())
++            controller_connected = false;
++#endif
+ 
+          if (controller_connected != last_controller_connected)
+          {

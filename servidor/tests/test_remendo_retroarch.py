@@ -26,7 +26,7 @@ def ler(nome):
 
 
 class FormatoDosRemendos(unittest.TestCase):
-    NOMES = ["arena-args.patch", "arena-controles.patch", "arena-em-pe.patch"]
+    NOMES = ["arena-args.patch", "arena-controles.patch", "arena-em-pe.patch", "arena-toque.patch"]
 
     def test_os_remendos_sao_estes_e_nesta_ordem(self):
         self.assertEqual([os.path.basename(r) for r in compilador.remendos()], self.NOMES)
@@ -112,6 +112,33 @@ class RemendoDoCelularEmPe(unittest.TestCase):
         with open(os.path.join(PASTA_SERVIDOR, "plataforma.py"), encoding="utf-8") as arquivo:
             codigo = arquivo.read()
         self.assertIn('opcoes["video_viewport_bias_portrait_y"] = "0.000000"', codigo)
+
+
+class RemendoDosDoisToques(unittest.TestCase):
+    """Achado do Rafael jogando Bully no A12 (07/11/2026): com um controle de verdade ligado, o RetroArch esconde o
+    controle de toque inteiro e nao havia como chegar ao SAIR pela tela. Dois toques rapidos o trazem de volta."""
+
+    def setUp(self):
+        self.texto = ler("arena-toque.patch")[1]
+        self.novas = "\n".join(l[1:] for l in self.texto.splitlines() if l.startswith("+") and not l.startswith("+++"))
+
+    def test_mexe_nos_tres_lugares_que_decidem(self):
+        arquivos = re.findall(r"^\+\+\+ b/(\S+)", self.texto, re.M)
+        # o toque (android_input.c), quem carrega o controle (input_driver.c) e quem o esconde (runloop.c): sem o
+        # input_driver.c o log dizia "aparece", mas o input_overlay_want_hidden() mantinha escondido
+        self.assertEqual(arquivos, ["input/drivers/android_input.c", "input/input_driver.c", "runloop.c"])
+
+    def test_dois_toques_em_menos_de_meio_segundo_e_some_sozinho(self):
+        self.assertIn("#define ARENA_DOIS_TOQUES_US   400000", self.novas)
+        self.assertIn("#define ARENA_TOQUE_A_VISTA_US 10000000", self.novas)
+        self.assertIn("AINPUT_SOURCE_TOUCHSCREEN", self.novas)       # so o dedo na tela, nunca o controle
+        self.assertIn("&& !arena_toque_a_vista()", self.novas)
+        self.assertIn("if (controller_connected && arena_toque_a_vista())", self.novas)
+
+    def test_so_no_android(self):
+        for trecho in ("input/input_driver.c", "runloop.c"):
+            parte = self.texto[self.texto.index("+++ b/" + trecho):]
+            self.assertIn("#if defined(ANDROID)", parte.split("diff --git")[0])
 
 
 class MarcaDosRemendos(unittest.TestCase):

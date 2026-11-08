@@ -1102,20 +1102,22 @@ def bios_do_ps2_para_o_jogo(arquivo_do_jogo, pasta_bios):
 # ele. Medido no Galaxy A12 (24/10/2026, mostrador do emulador, abertura do Mortal Kombat Armageddon; velocidade em
 # % do tempo real): sem desaceleracao 70-73% (o EE gastava 22,7 ms por quadro, o limite e' 16,7); 75%, 76-87%;
 # 60% com salto moderado, 83-93%; 50% sem salto, 93-99% no filme; o regulador sozinho (desce ate 60%), 80-93%.
-PASSOS_DO_EE_DO_PS2 = (("100%", "disabled"), ("75%", "disabled"), ("60%", "disabled"), ("50%", "disabled"))
+# O 50% SAIU da escada em 07/11/2026: com ele o Mortal Kombat Deadly Alliance ficava para sempre no LOADING (o jogo a
+# 100% da velocidade, mas o EE lento demais para o carregamento terminar). Achado por eliminacao no A12, mesmo jogo:
+# minimo com 50% travava com a leitura da placa "Accurate" e com a mistura "Basic"; com 60%, carregou.
+PASSOS_DO_EE_DO_PS2 = (("100%", "disabled"), ("75%", "disabled"), ("60%", "disabled"))
 
 
 def passo_do_ee_do_ps2(nota, abaixo="", degrau=0):
-    """Que passo de PASSOS_DO_EE_DO_PS2 (0 a 3) e' o ponto de partida: o aparelho fraco (nota 1 e 2) comeca no 1
-    (75%) e o resto no 0; "abaixo do original" leve pede ao menos o 2 e o minimo o 3; e cada degrau que o "Desempenho
-    que aprende" desceu (o jogo ficou abaixo da velocidade) sobe mais um passo. O regulador automatico ainda pode
-    baixar ate 2 passos sozinho, durante o jogo (e nunca passa do 50%)."""
+    """Que passo de PASSOS_DO_EE_DO_PS2 (0 a 2) e' o ponto de partida: o aparelho fraco (nota 1 e 2) comeca no 1
+    (75%) e o resto no 0; "abaixo do original" (leve ou minimo) pede o 2 (60%, o mais lento que nao trava jogo); e
+    cada degrau que o "Desempenho que aprende" desceu (o jogo ficou abaixo da velocidade) sobe mais um passo, ate o
+    ultimo. O regulador automatico ainda pode baixar a taxa sozinho durante o jogo, quando o jogo atrasa."""
+    ultimo = len(PASSOS_DO_EE_DO_PS2) - 1
     passo = 1 if nota <= 2 else 0
-    if abaixo == "leve":
-        passo = max(passo, 2)
-    elif abaixo == "minimo":
-        passo = 3
-    return max(0, min(3, passo + max(0, int(degrau or 0))))
+    if abaixo in ("leve", "minimo"):
+        passo = ultimo
+    return max(0, min(ultimo, passo + max(0, int(degrau or 0))))
 
 
 def opcoes_do_armsx2(motor, arquivo_do_jogo, pasta_sistema, nota=None, abaixo="", degrau=0, vulkan=False):

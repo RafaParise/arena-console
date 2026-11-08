@@ -388,18 +388,20 @@ class EeDoPs2PelaNota(unittest.TestCase):
 
     def test_abaixo_do_original_e_o_degrau_empurram_para_baixo(self):
         self.assertEqual(graficos.passo_do_ee_do_ps2(5, "leve"), 2)
-        self.assertEqual(graficos.passo_do_ee_do_ps2(5, "minimo"), 3)
+        self.assertEqual(graficos.passo_do_ee_do_ps2(5, "minimo"), 2)         # 50% travava o Deadly Alliance
         self.assertEqual(graficos.passo_do_ee_do_ps2(3, "leve"), 2)
         self.assertEqual(graficos.passo_do_ee_do_ps2(1, "leve"), 2)           # nunca mais fiel do que a nota pede
-        self.assertEqual([graficos.passo_do_ee_do_ps2(4, degrau=d) for d in (0, 1, 2, 3, 4)], [0, 1, 2, 3, 3])
-        self.assertEqual(graficos.passo_do_ee_do_ps2(2, degrau=3), 3)         # teto: o ultimo passo
+        self.assertEqual([graficos.passo_do_ee_do_ps2(4, degrau=d) for d in (0, 1, 2, 3, 4)], [0, 1, 2, 2, 2])
+        self.assertEqual(graficos.passo_do_ee_do_ps2(2, degrau=3), 2)         # teto: o ultimo passo (60%)
         self.assertEqual(graficos.passo_do_ee_do_ps2(2, degrau=-5), 1)
 
     def test_as_opcoes_do_nucleo_levam_a_taxa_e_o_salto(self):
         opcoes = graficos.opcoes_do_armsx2("automatico", "x.chd", "/nao/existe", nota=2)
         self.assertEqual((opcoes["armsx2_ee_cycle_rate"], opcoes["armsx2_ee_cycle_skip"]), ("75%", "disabled"))
         opcoes = graficos.opcoes_do_armsx2("automatico", "x.chd", "/nao/existe", nota=2, degrau=2)
-        self.assertEqual((opcoes["armsx2_ee_cycle_rate"], opcoes["armsx2_ee_cycle_skip"]), ("50%", "disabled"))
+        self.assertEqual((opcoes["armsx2_ee_cycle_rate"], opcoes["armsx2_ee_cycle_skip"]), ("60%", "disabled"))
+        # nunca abaixo de 60%: com 50% o Mortal Kombat Deadly Alliance ficava no LOADING (A12, 07/11/2026)
+        self.assertNotIn("50%", [taxa for taxa, _salto in graficos.PASSOS_DO_EE_DO_PS2])
         opcoes = graficos.opcoes_do_armsx2("automatico", "x.chd", "/nao/existe", nota=5)
         self.assertEqual((opcoes["armsx2_ee_cycle_rate"], opcoes["armsx2_ee_cycle_skip"]), ("100%", "disabled"))
         self.assertNotIn("armsx2_ee_cycle_rate", graficos.opcoes_do_armsx2("automatico", "x.chd", "/nao/existe"))

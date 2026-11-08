@@ -593,6 +593,11 @@ O que cada console faz nos dois níveis abaixo do original:
 | PlayStation | Igual ao original: o desenho pelo processador já é o mais leve | Igual |
 | Xbox 360 | Igual ao original: o emulador não desenha abaixo disso | Igual |
 
+No celular, o PS2 é outro emulador: **leve e mínimo põem o processador do PS2 a 60%** e a imagem fica a do leve. Mais baixo
+que isso estraga jogo: com o processador a 50%, o Mortal Kombat Deadly Alliance ficava para sempre no "LOADING", e a mistura de
+cores mínima e o desligar das leituras da placa trocavam o logotipo e o texto dos menus por manchas (medido no Galaxy A12 em
+07/11/2026). Com 60%, o mesmo jogo carregou e rodou a 100%.
+
 **Pular quadro** quer dizer: quando o computador atrasa, o emulador deixa de
 desenhar um quadro, mas o jogo e o som seguem na velocidade certa. Fica
 menos liso, não mais lento.
@@ -1724,5 +1729,8 @@ SALVAR, CARREGAR e SAIR**.
 - **Em pé ou deitado, como o aluno quiser**: deitado, o jogo ocupa a tela toda. Em pé, o jogo fica no alto, na largura toda e na
   proporção dele, e os botões ficam na metade de baixo (cada console tem o seu desenho em pé). Basta girar o celular com a rotação
   automática ligada.
+- **Com um controle de verdade ligado** (Bluetooth ou cabo), os botões da tela somem para não atrapalhar. Para chegar ao SAIR, ao
+  MENU ou ao SALVAR, **toque duas vezes rápido na tela**: os botões aparecem e ficam enquanto você toca neles, e somem sozinhos 10
+  segundos depois do último toque.
 - **Vibração**: logo abaixo da chave Vibração, **"O celular vibra também"** manda o tremor do jogo para o próprio celular, e
   **"Vibrar ao tocar"** dá um toque curto a cada botão da tela.

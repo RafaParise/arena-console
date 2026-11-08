@@ -717,3 +717,38 @@ Após implementar tudo que solicitei e tudo estiver funcionando em todas as vers
 - [ ] Fase 4 — APKs (arm64 e x86_64, com a biblioteca do RetroArch x86_64 de 25/10) montados e instalados no celular
 - [x] Fase 5 — Relatório (`docs\RELATORIO-AUDITORIA-5.md`)
 - [ ] Por último: a rodada final, os testes com os controles do Rafael e as etapas manuais
+
+## Auditoria 6 (07/11/2026, de madrugada) — pedido do Rafael, sem resumir
+
+Os pedidos estão abaixo inteiros, sem resumir, entre as linhas de `====`.
+
+==========================================================================
+
+O que ficou aberto - vou responder na ordem - 1 - Antes o Deadly Alliance Assim como o ArMAGGENDON ABRIA BEM LENTO MAS ABRIA e o jogo ia seguindo como dava, mas agora nem mesmo isso, no caso o jogo roda normal e muito bem no pc - Quando for montar os APKS por favor deixe bem claro escrito na parte de downloads o que é android, o que é chromebook e pc, linux e assim por diante, mas antes de lançar o novo release e melhor finalizar o trabalho que ficaram pendentes enttre outras conversas passadas com diversas solicitações, precisa ter um comando como dois toques na tela para os controles da tela aparecerem , pois agora jogando bully que até que rodou bem no a12 talvez a uns 42 ou 52 fps mais ou menos, não consigo sair do jogo pois o botão não aparece mais, tocou uma vez na tela os botões aparecem. Antes de publicar um novo release termine o que estava fazendo antes e o que faltava, instale as mais modernas e recentes ferramentas mecessárias para esse projeto para o pc, android, linux, eu preciso de ferramentas, skills, plugins ou algo do gênero, para melhor desempenho em maquinas antigas e fracas, técnicas novas de processamento e distribuição de carga, front end, back end, diversos tipos de auditoria seja no telefone conectado ou pc e diversos tipos de ferramentas para extrair as melhores ideias, para implementar no meu projto, por favor use essas novas ferramenteas e implementações para implementar o lossless scalling, meu app que comprei na steam com ajustes finos para meu pc e no meu samsung a12 também por favor para verificar se assim é possível rodar os jogos com maior desempenho e fluidez e se possível mais bonito. só após ter uma versão boa e estpavel com todos os recursos funcionando adequadamente ai sim podermos criar um release novo
+
+==========================================================================
+
+**Mensagem seguinte (07/11/2026, ~23:45), sem resumir:**
+
+> Eu vou dormir agora, mas deixo o telefone com a tela apagada mas em modo de depuração, esse modo não bloqueia a tela continua ativa, mas apaga para poupar energia, siga o projeto até  final sozinho, revise pois tem muita coisa a ser feita, tome as decisões sozinho sem perguntas, siga trabalhando pela madrugada e implemente tudo que pedi anteriormente para fazer aquela auditoria que fizemos outras duas vezes completa para poder lançar um release com todas as pendências amarradas
+
+**Leitura adotada:**
+
+- Ordem: **(1)** os consertos que o teste no A12 pediu (Deadly Alliance preso no LOADING; dois toques para o controle de toque
+  aparecer com controle de verdade ligado); **(2)** as pendências das conversas anteriores (`docs\PENDENCIAS.md`, "O que falta");
+  **(3)** ferramentas novas, gratuitas e sem `pip` no ARENA (o que roda no computador do Rafael para medir e auditar, nunca uma
+  dependência nova do ARENA) e o **Lossless Scaling** (programa pago do Rafael, na Steam: o ARENA não o distribui nem depende
+  dele; no máximo o reconhece e prepara, quando instalado); **(4)** a auditoria completa, do mesmo jeito da 5 (medir antes de
+  opinar, no máximo 3 revisores com teto e um cético por achado); **(5)** consertos, a rodada final e só então os APKs de
+  produção, o pacote do Windows e o release, com os downloads explicados por sistema (Android, Chromebook, Windows, Linux).
+- O release só sai se a bateria, a matriz e os testes no celular passarem; se algo grave ficar aberto, ele espera e o motivo
+  fica escrito aqui e no `docs\PENDENCIAS.md`.
+
+### Progresso da auditoria 6
+
+- [x] Deadly Alliance: o EE do PS2 a 50% travava o carregamento; o mínimo do PS2 agora é 60% e a imagem do leve
+- [ ] Dois toques na tela mostram o controle de toque (remendo `arena-toque.patch`, conferir no A12)
+- [ ] Pendências das conversas anteriores
+- [ ] Ferramentas e Lossless Scaling
+- [ ] Auditoria por domínio (medidas, revisores com teto, céticos)
+- [ ] Consertos, rodada final, APKs de produção, pacote do Windows e release

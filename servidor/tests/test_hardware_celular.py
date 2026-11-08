@@ -110,8 +110,10 @@ class Ladeira(unittest.TestCase):
         modesto = graficos.opcoes_finais_do_nucleo("armsx2", 5, 5, modesto=True)
         self.assertEqual(modesto["armsx2_upscale"], "1x")                             # modo batata: o console original
         minimo = graficos.opcoes_finais_do_nucleo("armsx2", 5, 5, abaixo="minimo")
-        self.assertEqual(minimo["armsx2_blending_accuracy"], "Minimum")               # abaixo do original (o EE vem
-        self.assertEqual(minimo["armsx2_hw_download_mode"], "Disable Readbacks")      # do passo_do_ee_do_ps2)
+        self.assertNotEqual(minimo["armsx2_blending_accuracy"], "Minimum")            # abaixo do original (o EE vem
+        self.assertEqual(minimo["armsx2_hw_download_mode"], "Accurate")               # do passo_do_ee_do_ps2)
+        # 07/11/2026, Mortal Kombat Deadly Alliance no A12: a mistura "Minimum" trocava o logotipo por manchas
+        # brancas e o "Disable Readbacks" apagava o texto dos menus; no PS2 o minimo economiza so pelo EE (60%)
 
     def test_o_padrao_do_ini_do_ps2_tem_a_pre_carga_parcial(self):
         # medido no A12: com a completa, o filme de abertura ia a 5-9 quadros; com a parcial, a ~54

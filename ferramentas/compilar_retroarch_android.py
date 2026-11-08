@@ -15,6 +15,10 @@ sai do codigo oficial da mesma versao com os remendos de android\retroarch\
   - arena-em-pe.patch: com a "tela cheia", o celular EM PE mostra o jogo no
     alto, na largura toda e na proporcao dele (o oficial esticava ate a altura
     da tela, por baixo dos botoes); deitado, nada muda.
+  - arena-toque.patch: com um controle de verdade ligado, o controle de toque
+    some (como no oficial), mas dois toques rapidos na tela o trazem de volta
+    por 10 s (para chegar ao SAIR, ao MENU e ao SALVAR); o oficial nao tinha
+    como mostra-lo sem desligar o controle.
 
 Do codigo oficial ate a biblioteca:
   1. o codigo da etiqueta v1.22.2 do GitHub do libretro, conferido pela

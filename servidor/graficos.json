@@ -643,10 +643,6 @@
       }
     },
     "minimo": {
-      "armsx2": {
-        "armsx2_blending_accuracy": "Minimum",
-        "armsx2_hw_download_mode": "Disable Readbacks"
-      },
       "flycast": {
         "reicast_auto_skip_frame": "more",
         "reicast_frame_skipping": "1",
