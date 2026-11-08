@@ -258,6 +258,12 @@ Falta (nesta ordem):
   controles virtuais (`testes\controle_virtual_android.py`).
 - **Pacote novo do Windows**: o código do computador (controle pelo cabo, gamepad virtual, ajustes) está na `main`, mas o zip e a
   atualização do Windows continuam os da 2026.10.22.
+- **Release 2026.11.08 — o que falta para publicar (08/11, madrugada):** a versão, a auditoria 6 e o APK de produção arm64
+  estão prontos (instalado no A12). O computador ficou sem memória duas vezes e o sistema parou a **matriz de consoles** e
+  a montagem do **APK x86_64**; pela regra, só rodam de novo com o seu pedido. Faltam: (1) a rodada final
+  (`ferramentas\rodada_final.py`); (2) o APK x86_64 (`montar_android.py --abi x86_64`); (3) o pacote do Windows
+  (`montar_versao_alunos.py --zip-completo` e `--zip-atualizacao`); (4) publicar pelo `SINCRONIZAR.bat` e acrescentar à
+  página do release o texto de `docs\RELEASE-2026.11.08.md` (com "Qual arquivo baixar" por sistema).
 - ~~Botão "Partida pelo cabo" no Jogar Junto~~ **Feito** (`a12efa1`, testado nos dois sentidos em 07/11).
 - **Jogar Junto**: com 8 jogadores e o celular como um deles; num Linux de verdade; Wi-Fi do roteador (o celular está em 2,4 GHz e o
   computador em 5 GHz, e a partida ainda caiu uma vez em 6 s: o cabo é o jeito firme).
