@@ -2992,7 +2992,8 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             jogadores=jogadores_controle,
             usar_analogico=escolhas.get("analogico_esq", True),
             vibracao=escolhas.get("vibracao", True),
-            dispositivo_extra=escolhas.get("extra"))
+            dispositivo_extra=escolhas.get("extra"),
+            nucleo=nome_core)
         # O acessorio escolhido para uma porta (pistola de luz na 2, mouse na 1...) vale mais que o tipo padrao do console.
         extras_controle.update(acessorios.opcoes_de_porta(config.get("acessorios"), jogo["plataforma"], nome_core))
         # opcoes_do_console cobre ate 4 portas; o 5o jogador em diante (PS1 e
@@ -7602,7 +7603,17 @@ class Manipulador(BaseHTTPRequestHandler):
                 aviso_sem_bios = plataforma.get("sem_bios_aviso", "")
 
             aviso_netplay = ""
-            if modo in ("hospedar", "entrar", "assistir") and plataforma.get("core_netplay"):
+            usar_core_netplay = bool(plataforma.get("core_netplay"))
+            if usar_core_netplay and plataforma.get("core_netplay_ate_2") and modo in ("hospedar", "entrar", "assistir"):
+                # Mega Drive e Sega CD (07/11/2026): o nucleo da partida (PicoDrive) e' o que joga entre computador e
+                # celular, mas o adaptador de 4 (Team Player, J-Cart) so esta ligado no nucleo normal. Jogo que usa o
+                # adaptador fica no normal (entre computadores). Os dois lados fazem a mesma conta: mesmo nucleo.
+                com_o_normal = graficos.jogadores_do_jogo(
+                    jogo["core"], jogadores_pedidos(plataforma, jogo),
+                    config.get("avancado", {}).get("input_max_users", 2),
+                    arquivo=os.path.join(RAIZ, jogo["arquivo"]))
+                usar_core_netplay = int(com_o_normal.get("jogadores") or 0) <= 2
+            if modo in ("hospedar", "entrar", "assistir") and usar_core_netplay:
                 core_netplay = os.path.join(PASTA_CORES, plataforma["core_netplay"])
                 if not plataforma_do_sistema.tem_nucleo(core_netplay):
                     with TRAVA_JOGO:
@@ -7955,15 +7966,19 @@ def atualizar_adaptadores():
     minutos); endereco que nao veio, pergunta no maximo 1 vez por minuto."""
     mapa = {}
     try:
-        comando = ("Get-NetIPAddress -AddressFamily IPv4 | ForEach-Object { "
+        # A saida em UTF-8 (o nome do adaptador tem acento: "Conexao de Rede..."). Sem isto, o PowerShell respondia
+        # na pagina de codigo do console, o ARENA (que roda com -X utf8) nao decodificava, a saida vinha vazia e a
+        # thread morria (visto no PC em 07/11/2026).
+        comando = ("[Console]::OutputEncoding = [Text.Encoding]::UTF8; "
+                   "Get-NetIPAddress -AddressFamily IPv4 | ForEach-Object { "
                    "$a = Get-NetAdapter -InterfaceIndex $_.InterfaceIndex "
                    "-ErrorAction SilentlyContinue; "
                    "'{0}|{1}|{2}' -f $_.IPAddress, $_.InterfaceAlias, $a.InterfaceDescription }")
         saida = subprocess.run(
             ["powershell.exe", "-NoProfile", "-NonInteractive", "-Command", comando],
-            capture_output=True, text=True, timeout=15,
+            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=15,
             creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0)).stdout
-        for linha in saida.splitlines():
+        for linha in (saida or "").splitlines():
             partes = linha.strip().split("|")
             if len(partes) == 3 and partes[0]:
                 mapa[partes[0]] = (partes[1] + " " + partes[2]).lower()

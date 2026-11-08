@@ -3308,6 +3308,24 @@ def carregar_mapa_multitap():
         return {}
 
 
+def info_do_nucleo_no_mapa(mapa, nucleo):
+    """O nucleo no mapa (multitap.json, que tem o nome do Windows), em qualquer sistema. Achado no A12 em 07/11/2026:
+    no Android o nucleo se chama 'mednafen_saturn_libretro_android.so' (e o do N64 muda de nome), o mapa nao o achava
+    e todo jogo do celular parava em 2 jogadores, sozinho ou no Jogar Junto."""
+    nucleos = mapa.get("nucleos", {})
+    base = os.path.basename(nucleo or "")
+    if base in nucleos:
+        return nucleos[base]
+    curto = plataforma_do_sistema.nome_curto_do_nucleo(base)
+    for do_pc, do_android in plataforma_do_sistema.NO_ANDROID_COM_OUTRO_NOME.items():
+        if curto == plataforma_do_sistema.nome_curto_do_nucleo(do_android + "_android.so"):
+            curto = plataforma_do_sistema.nome_curto_do_nucleo(do_pc + ".dll")
+    for chave, info in nucleos.items():
+        if curto and plataforma_do_sistema.nome_curto_do_nucleo(chave) == curto:
+            return info
+    return None
+
+
 def cabecalho_mega_drive(caminho):
     """Serie e acessorios que o cartucho de Mega Drive declara no proprio
     cabecalho (0x180 e 0x190). None se o arquivo nao e' um cartucho de Mega
@@ -3346,7 +3364,7 @@ def jogadores_do_jogo(nucleo, jogadores, jogadores_da_config=2, mapa=None, arqui
         return resultado
 
     mapa = carregar_mapa_multitap() if mapa is None else mapa
-    info = mapa.get("nucleos", {}).get(os.path.basename(nucleo or ""))
+    info = info_do_nucleo_no_mapa(mapa, nucleo)
     if not info:
         resultado["jogadores"] = 2
         resultado["motivo"] = ("Este console ainda não foi conferido para mais "

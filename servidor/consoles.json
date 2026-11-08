@@ -624,6 +624,9 @@
       "nome": "Mega Drive, Master System e Game Gear",
       "descricao": "Um nucleo cobre as tres.",
       "core": "genesis_plus_gx_libretro.dll",
+      "core_netplay": "picodrive_libretro.dll",
+      "core_netplay_ate_2": true,
+      "netplay_aviso": "Jogar Junto no Mega Drive e no Sega CD usa o PicoDrive em vez do Genesis Plus GX: o Genesis Plus GX não deixa jogar entre aparelhos diferentes (computador com celular, visto em 07/11/2026). Sozinho, continua o Genesis Plus GX.",
       "core_navegador": "genesis_plus_gx",
       "extensoes": [
         ".md",
@@ -677,6 +680,9 @@
       "nome": "Sega CD",
       "descricao": "Expansao em CD do Mega Drive.",
       "core": "genesis_plus_gx_libretro.dll",
+      "core_netplay": "picodrive_libretro.dll",
+      "core_netplay_ate_2": true,
+      "netplay_aviso": "Jogar Junto no Mega Drive e no Sega CD usa o PicoDrive em vez do Genesis Plus GX: o Genesis Plus GX não deixa jogar entre aparelhos diferentes (computador com celular, visto em 07/11/2026). Sozinho, continua o Genesis Plus GX.",
       "core_navegador": "genesis_plus_gx",
       "extensoes": [
         ".cue",

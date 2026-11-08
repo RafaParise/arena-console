@@ -193,13 +193,19 @@ def montar_perfil(tipo_id, console_id, usar_direcional=True,
 
 
 def opcoes_do_console(console_id, jogadores=2, usar_analogico=True,
-                      vibracao=True, dispositivo_extra=None):
+                      vibracao=True, dispositivo_extra=None, nucleo=None):
     """Diz ao emulador o que cada jogador esta usando.
 
     'dispositivo_extra' troca o jogador 2 por mouse ou teclado nos consoles
     que aceitavam - PlayStation 2, Dreamcast, MSX, ScummVM.
+
+    O numero de cada tipo e' do NUCLEO, nao do console: o 517 e' o DualShock
+    no PCSX ReARMed, o "Analog Joystick" no SwanStation e o volante (Arcade
+    Racer) no Beetle Saturn. 'nucleo' (o nome curto, como "pcsx_rearmed")
+    escolhe o "por_nucleo" do perfil (lido dos nucleos em 07/11/2026).
     """
     console = perfil_do_console(console_id)
+    console.update((console.get("por_nucleo") or {}).get(nucleo or "", {}))
     opcoes = {}
 
     codigo = console.get("dispositivo", 1)

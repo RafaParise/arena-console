@@ -72,12 +72,14 @@ CASOS = [
      {"input_max_users": "4", "netplay_max_connections": "3",
       "input_libretro_device_p3": "517", "input_libretro_device_p4": "517"},
      {"pcsx_rearmed_multitap": "port 1"}, 4, ""),
+    # SwanStation: 261 e' o DualShock (o 517 e' o "Analog Joystick"); na partida, o PCSX ReARMed, onde o 517 e' o
+    # DualShock (tipos lidos dos nucleos em 07/11/2026)
     ("CTR Crash Team Racing", "sozinho",
-     {"input_max_users": "4", "input_libretro_device_p3": "517", "input_libretro_device_p4": "517"},
+     {"input_max_users": "4", "input_libretro_device_p3": "261", "input_libretro_device_p4": "261"},
      {"swanstation_ControllerPorts_MultitapMode": "Port1Only"}, 4, ""),
     ("Saturn Bomberman", "hospedar",
      {"input_max_users": "10", "netplay_max_connections": "9",
-      "input_libretro_device_p5": "517", "input_libretro_device_p10": "517"},
+      "input_libretro_device_p5": "261", "input_libretro_device_p10": "261"},     # 3D Control Pad (517 = volante)
      {"beetle_saturn_multitap_port1": "enabled", "beetle_saturn_multitap_port2": "enabled"}, 10, ""),
     ("GoldenEye 007", "sozinho",
      {"input_max_users": "4", "input_libretro_device_p3": "1", "input_libretro_device_p4": "1"}, {}, 4, ""),

@@ -1593,6 +1593,8 @@ window.ARENA_DADOS = {
    "arquivos_sistema": 0,
    "core": "genesis_plus_gx_libretro.dll",
    "core_navegador": "genesis_plus_gx",
+   "core_netplay": "picodrive_libretro.dll",
+   "core_netplay_ate_2": true,
    "custo": 1,
    "descricao": "Um nucleo cobre as tres.",
    "extensoes": [
@@ -1608,6 +1610,7 @@ window.ARENA_DADOS = {
     "Micro Machines 2 Turbo Tournament": 4
    },
    "netplay": true,
+   "netplay_aviso": "Jogar Junto no Mega Drive e no Sega CD usa o PicoDrive em vez do Genesis Plus GX: o Genesis Plus GX não deixa jogar entre aparelhos diferentes (computador com celular, visto em 07/11/2026). Sozinho, continua o Genesis Plus GX.",
    "nome": "Mega Drive, Master System e Game Gear",
    "pasta": "Mega Drive",
    "pede_placar": false,
@@ -1644,6 +1647,8 @@ window.ARENA_DADOS = {
    "arquivos_sistema": 3,
    "core": "genesis_plus_gx_libretro.dll",
    "core_navegador": "genesis_plus_gx",
+   "core_netplay": "picodrive_libretro.dll",
+   "core_netplay_ate_2": true,
    "custo": 2,
    "descricao": "Expansao em CD do Mega Drive.",
    "extensoes": [
@@ -1652,6 +1657,7 @@ window.ARENA_DADOS = {
     ".iso"
    ],
    "id": "segacd",
+   "netplay_aviso": "Jogar Junto no Mega Drive e no Sega CD usa o PicoDrive em vez do Genesis Plus GX: o Genesis Plus GX não deixa jogar entre aparelhos diferentes (computador com celular, visto em 07/11/2026). Sozinho, continua o Genesis Plus GX.",
    "nome": "Sega CD",
    "pasta": "Sega CD",
    "pede_placar": false,

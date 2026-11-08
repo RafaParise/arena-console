@@ -310,10 +310,29 @@ Falta (nesta ordem):
   quadros por segundo no fundo animado). Os 6 que falhavam eram do próprio teste: a Escala da tela ganhou duas escolhas
   (anime4k e inteiro) e o nome do jogo saiu do cartão para o botão de dentro, e o teste buscava por um texto vazio.
 
+- **Teste no celular pelo cabo (07/11, à noite)**, com o APK de teste novo:
+  - **Celular em pé** consertado: o controle de cada console não trocava para o desenho em pé (faltava o botão
+    `overlay_next` que o RetroArch exige para girar) e o jogo era esticado até a altura da tela. Agora o jogo fica no alto, na
+    proporção dele (remendo `android/retroarch/arena-em-pe.patch`), e os botões embaixo; girando com o jogo aberto, troca sozinho.
+  - **SALVAR e CARREGAR** com a foto de onde parou: conferidos no Streets of Rage 2 (o estado e o `.png` gravados no celular).
+  - **Vibrar ao tocar**: o ARENA manda a vibração (50 ms por toque, no registro do Android), mas o celular estava em "Não
+    perturbe", que zera a vibração de toque de todos os apps. Com o modo normal, vibra.
+  - **Jogar Junto computador × celular pelo cabo**, console por console (tabela no guia 5): funcionam Super Nintendo, NES,
+    Mega Drive, Sega CD, 32X, fliperama, Neo Geo, Atari 2600, ColecoVision e PlayStation. Mega Drive e Sega CD passaram a usar
+    o PicoDrive na partida (o Genesis Plus GX recusa plataformas diferentes). **Saturn** ainda não conecta: falta investigar.
+  - **Tipo de controle errado em 3 consoles** (lido dos próprios núcleos): o ARENA mandava 517 para todos, que é o
+    **volante (Arcade Racer) no Saturn**, o "Analog Joystick" no SwanStation do PlayStation e nada no Dreamcast. Agora: Saturn
+    3D Control Pad, PlayStation DualShock (no SwanStation e no PCSX ReARMed), Dreamcast o controle comum; teclado do C64 e do
+    Amiga e mouse do PlayStation e do Saturn com o número certo. Falta conferir o do GameCube/Wii (o Dolphin não diz a lista
+    ao carregar) e o do PS2 no Android.
+  - **No celular, nenhum jogo passava de 2 jogadores** (nem o N64 de 4, nem o adaptador do Saturn, do PlayStation ou do Mega
+    Drive): o mapa dos adaptadores procurava o núcleo pelo nome do Windows. Consertado.
+  - No PC, a leitura dos adaptadores de rede morria com nome acentuado ("Conexão local") quando o ARENA roda com `-X utf8`.
+
 **O que falta**
 
-- **Ver no celular** os controles de toque novos e a tela de arrumar (o celular saiu do cabo antes); sentir a vibração com o T4.
-- **Partida pelo cabo de verdade** entre o computador e o celular, nos dois sentidos, com o APK novo.
+- **Sentir a vibração com o T4** (controle de verdade, só você) e o **Saturn no Jogar Junto** entre computador e celular.
+- **Partida pelo cabo**: o sentido computador abre e celular entra foi testado (acima); falta o celular abrir e o computador entrar.
 - **APK e pacote do Windows novos e a página do release**: só depois do teste acima.
 - Da rodada anterior: 8 jogadores e Linux de verdade, `teste_matriz_consoles`, `teste_android`, modo de dados móveis, controles de
   verdade.

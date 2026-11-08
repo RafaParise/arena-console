@@ -113,6 +113,24 @@ class TestJogadoresDoJogo(unittest.TestCase):
         self.assertEqual(r["cfg"], {})
 
 
+class TestNomeDoNucleoEmCadaSistema(unittest.TestCase):
+    """Achado no A12 (07/11/2026): o mapa tem o nome do Windows, e no Android o nucleo se chama '..._android.so' (o do
+    N64 e o do MAME mudam de nome). Sem achar, todo jogo do celular parava em 2 jogadores."""
+
+    def test_o_android_acha_o_mesmo_que_o_windows(self):
+        for windows, android in (("mednafen_saturn_libretro.dll", "mednafen_saturn_libretro_android.so"),
+                                 ("mupen64plus_next_libretro.dll", "mupen64plus_next_gles3_libretro_android.so"),
+                                 ("snes9x_libretro.dll", "snes9x_libretro_android.so"),
+                                 ("swanstation_libretro.dll", "swanstation_libretro.so")):
+            with self.subTest(android=android):
+                self.assertEqual(graficos.jogadores_do_jogo(android, 4), graficos.jogadores_do_jogo(windows, 4))
+                self.assertEqual(graficos.jogadores_do_jogo(android, 10)["jogadores"],
+                                 graficos.jogadores_do_jogo(windows, 10)["jogadores"])
+
+    def test_nucleo_de_fora_do_mapa_continua_em_2(self):
+        self.assertEqual(graficos.jogadores_do_jogo("nao_existe_libretro_android.so", 4)["jogadores"], 2)
+
+
 class TestMegaDrivePeloCartucho(unittest.TestCase):
     """Mega Drive: o adaptador depende do que o proprio cartucho declara."""
 

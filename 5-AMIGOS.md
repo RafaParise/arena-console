@@ -724,6 +724,18 @@ passar o mouse em cima.
 | Nintendo 64, Dreamcast, PSP | Não dá. O emulador de cada um não tem esse recurso |
 | PS2, PS3, Xbox 360 | Não dá pelo Jogar Junto normal — esses usam um programa à parte (PCSX2, RPCS3, Xenia), sem esse recurso em rede pronto do jeito do RetroArch. Alguns jogos de PS2 têm rede de um outro jeito — ver abaixo |
 
+### Computador com celular (testado em 07/11/2026)
+
+O computador abriu a partida e o celular entrou, pelo cabo USB, console por console. Entraram como jogador 2:
+**Super Nintendo, NES, Mega Drive, Sega CD, 32X, fliperama (FBNeo), Neo Geo, Atari 2600, ColecoVision e
+PlayStation**.
+
+- No **Mega Drive e no Sega CD**, o Jogar Junto usa o **PicoDrive** por baixo (o emulador de sempre, o Genesis Plus GX,
+  recusa jogar entre aparelhos diferentes). A exceção é o jogo de 4 com adaptador (Mega Bomberman, Micro Machines 2):
+  esse continua no emulador de sempre e funciona entre computadores, não com o celular.
+- **Saturn**: entre computador e celular ainda não conecta (os dois abrem, mas a ligação cai). Fica para investigar.
+- Os dois lados precisam de versões próximas do ARENA: o aviso "versão diferente do núcleo" aparece e não atrapalha.
+
 ### PS2 em rede de verdade (system link)
 
 Uns poucos jogos de PS2 (a lista cresce conforme forem testados — hoje só
