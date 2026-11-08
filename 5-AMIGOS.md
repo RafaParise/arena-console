@@ -733,7 +733,11 @@ PlayStation**.
 - No **Mega Drive e no Sega CD**, o Jogar Junto usa o **PicoDrive** por baixo (o emulador de sempre, o Genesis Plus GX,
   recusa jogar entre aparelhos diferentes). A exceção é o jogo de 4 com adaptador (Mega Bomberman, Micro Machines 2):
   esse continua no emulador de sempre e funciona entre computadores, não com o celular.
-- **Saturn**: entre computador e celular ainda não conecta (os dois abrem, mas a ligação cai). Fica para investigar.
+- **Saturn**: entre computador e celular **não conecta**, e o motivo é do próprio emulador. O Beetle Saturn avisa ao
+  RetroArch que o "salvamento rápido" dele só vale no mesmo tipo de aparelho (conferido em 08/11/2026, perguntando ao
+  próprio núcleo), e o Jogar Junto começa justamente mandando um salvamento rápido do computador para o celular. É o
+  mesmo caso do Mega Drive, mas no Saturn não há um emulador reserva que sirva sem perder: os da família Yabause
+  aceitariam, porém acertam menos jogos e têm outra limitação no salvamento. Entre dois computadores, o Saturn funciona.
 - Os dois lados precisam de versões próximas do ARENA: o aviso "versão diferente do núcleo" aparece e não atrapalha.
 
 ### PS2 em rede de verdade (system link)

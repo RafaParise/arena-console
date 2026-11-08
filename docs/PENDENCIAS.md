@@ -319,7 +319,7 @@ Falta (nesta ordem):
     perturbe", que zera a vibração de toque de todos os apps. Com o modo normal, vibra.
   - **Jogar Junto computador × celular pelo cabo**, console por console (tabela no guia 5): funcionam Super Nintendo, NES,
     Mega Drive, Sega CD, 32X, fliperama, Neo Geo, Atari 2600, ColecoVision e PlayStation. Mega Drive e Sega CD passaram a usar
-    o PicoDrive na partida (o Genesis Plus GX recusa plataformas diferentes). **Saturn** ainda não conecta: falta investigar.
+    o PicoDrive na partida (o Genesis Plus GX recusa plataformas diferentes). **Saturn** não conecta: o Beetle Saturn declara o estado "platform-dependent" (abaixo).
   - **Tipo de controle errado em 3 consoles** (lido dos próprios núcleos): o ARENA mandava 517 para todos, que é o
     **volante (Arcade Racer) no Saturn**, o "Analog Joystick" no SwanStation do PlayStation e nada no Dreamcast. Agora: Saturn
     3D Control Pad, PlayStation DualShock (no SwanStation e no PCSX ReARMed), Dreamcast o controle comum; teclado do C64 e do
@@ -341,7 +341,12 @@ Falta (nesta ordem):
 
 **O que falta**
 
-- **Sentir a vibração com o T4** (controle de verdade, só você) e o **Saturn no Jogar Junto** entre computador e celular.
+- **Sentir a vibração com o T4** (controle de verdade, só você).
+- **Saturn no Jogar Junto entre computador e celular: fechado como limitação (08/11).** O Beetle Saturn declara o estado
+  "PLATFORM_DEPENDENT" (lido do próprio núcleo, com `retro_load_game` fora do RetroArch), e o RetroArch recusa a partida
+  entre Windows x64 e Android arm64, como no Genesis Plus GX. Os núcleos Yabause, YabaSanshiro e Kronos declaram só
+  "SINGLE_SESSION" e existem para Android arm64 no buildbot: seria o caminho (`core_netplay` do Saturn), mas trocaria
+  também a partida entre computadores por um emulador menos compatível. Fica como melhoria futura, se o Rafael quiser.
 - **Partida pelo cabo**: testada nos dois sentidos (o celular abriu o Super Nintendo e o computador entrou como jogador 2, ping
   14 ms). Falta só o Saturn.
 - **APK e pacote do Windows novos e a página do release**: só depois do teste acima.
