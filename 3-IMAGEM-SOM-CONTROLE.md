@@ -1755,5 +1755,8 @@ SALVAR, CARREGAR e SAIR**.
 - **Com um controle de verdade ligado** (Bluetooth ou cabo), os botões da tela somem para não atrapalhar. Para chegar ao SAIR, ao
   MENU ou ao SALVAR, **toque duas vezes rápido na tela**: os botões aparecem e ficam enquanto você toca neles, e somem sozinhos 10
   segundos depois do último toque.
+- **Saiu do jogo pelo botão de início do celular?** O jogo continua aberto, atrás do ARENA. Ao tocar em Jogar noutro jogo, o
+  ARENA avisa e mostra o botão **Voltar ao jogo**: ele traz o jogo de volta, e aí é só sair pelo SAIR (duas vezes), sem perder
+  o que não foi salvo.
 - **Vibração**: logo abaixo da chave Vibração, **"O celular vibra também"** manda o tremor do jogo para o próprio celular, e
   **"Vibrar ao tocar"** dá um toque curto a cada botão da tela.

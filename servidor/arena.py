@@ -2904,8 +2904,8 @@ def trocar_id_dos_jogos(levados):
     try:
         with TRAVA_BANCO, banco() as conexao:
             for de, para in trocas.items():
-                for tabela in ("placar", "sessao"):
-                    conexao.execute("UPDATE %s SET jogo_id = ? WHERE jogo_id = ?" % tabela, (para, de))
+                conexao.execute("UPDATE placar SET jogo_id = ? WHERE jogo_id = ?", (para, de))
+                conexao.execute("UPDATE sessao SET jogo_id = ? WHERE jogo_id = ?", (para, de))
     except sqlite3.Error as falha:
         print("[ARENA] Nao consegui trocar o id dos jogos levados no banco: %s" % falha)
     config = carregar_config()
@@ -6208,6 +6208,20 @@ class Manipulador(BaseHTTPRequestHandler):
                                  "ARENA (Como colocar jogos mostra onde).", 404)
             return self.api_armazenamento(caminho, dados)
 
+        # ---- Android: traz de volta o jogo que ficou atras do ARENA (08/11/2026) --
+        if caminho == "/api/jogo/voltar":
+            if not plataforma_do_sistema.ANDROID:
+                return self.erro("Isto é só do ARENA do Android. No computador, o jogo aberto fica na barra de "
+                                 "tarefas: clique nele.", 404)
+            with TRAVA_JOGO:
+                aberto = bool(JOGO_EM_ANDAMENTO.get("ativo"))
+            if not aberto:
+                return self.responder_json({"ok": True, "fechado": True})
+            if ponte_android.voltar_ao_jogo():
+                return self.responder_json({"ok": True})
+            return self.erro("Não consegui trazer o jogo de volta. Abra os apps recentes do celular (o botão do "
+                             "quadrado ou das três barras), toque no jogo e saia pelo SAIR.")
+
         # ---- Android: a pasta do ARENA no aparelho e a permissao (item 14) --
         if caminho in ("/api/android/pasta", "/api/android/permissao"):
             if not plataforma_do_sistema.ANDROID:
@@ -7634,6 +7648,14 @@ class Manipulador(BaseHTTPRequestHandler):
             # aluno acaba com varios emuladores abertos disputando o mesmo
             # controle. Foi o que o teste de rajada mostrou.
             with TRAVA_JOGO:
+                if JOGO_EM_ANDAMENTO["ativo"] and plataforma_do_sistema.ANDROID:
+                    # No celular, quem toca em Jogar esta na tela do ARENA: o jogo aberto ficou ATRAS dela (o aluno
+                    # saiu pelo botao de inicio do aparelho) e nao se ve. A tela oferece trazer ele de volta
+                    # (/api/jogo/voltar) para sair pelo SAIR, sem perder o que nao foi salvo (08/11/2026, no A12).
+                    return self.responder_json({
+                        "ok": False, "voltar_ao_jogo": True, "titulo": JOGO_EM_ANDAMENTO["titulo"],
+                        "erro": "O jogo %s ainda está aberto, atrás do ARENA. Toque em Voltar ao jogo e saia dele "
+                                "pelo SAIR (duas vezes) antes de abrir outro." % JOGO_EM_ANDAMENTO["titulo"]}, 409)
                 if JOGO_EM_ANDAMENTO["ativo"]:
                     return self.erro(
                         "Já existe um jogo aberto (%s). Feche-o (%s) antes "

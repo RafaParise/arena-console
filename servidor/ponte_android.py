@@ -289,6 +289,16 @@ def abrir_pasta(caminho):
     return bool(resposta.get("ok"))
 
 
+def voltar_ao_jogo():
+    """Traz para a frente o jogo que ficou aberto atras do ARENA (o aluno saiu pelo botao de inicio do aparelho).
+    False se o app nao achou o jogo (ja fechou) ou nao respondeu."""
+    try:
+        resposta = perguntar({"pedido": "voltar_ao_jogo"}, limite=5.0)
+    except OSError:
+        return False
+    return bool(resposta.get("ok"))
+
+
 def tela_pronta(endereco):
     """O servidor ja escuta: o app pode mostrar a tela do ARENA."""
     try:

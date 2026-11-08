@@ -32,6 +32,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -431,6 +432,8 @@ public class ArenaServico extends Service {
                 jogar(numero, pedido.getJSONArray("argumentos"));
             } else if (tipo.equals("fechar_jogo")) {
                 fecharORetroArch();
+            } else if (tipo.equals("voltar_ao_jogo")) {
+                responder(numero, "ok", voltarAoJogo());
             } else if (tipo.equals("controles")) {
                 responder(numero, "quantos", contarControles());
             } else if (tipo.equals("teclado")) {
@@ -475,6 +478,28 @@ public class ArenaServico extends Service {
             if (getPackageName().equals(p.processName)) return p.pid;
         }
         return 0;
+    }
+
+    /** Traz para a frente o jogo que ficou aberto atras do ARENA (o aluno saiu pelo botao de inicio ou pelo de apps
+     *  recentes do aparelho). Sem isto, o ARENA recusava outro jogo ("ja existe um jogo aberto") e o aluno nao via
+     *  esse jogo para sair dele pelo SAIR (achado no A12 em 08/11/2026). Fechar a forca perderia o que nao foi salvo. */
+    boolean voltarAoJogo() {
+        ActivityManager gerente = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.AppTask tarefa : gerente.getAppTasks()) {
+            try {
+                ActivityManager.RecentTaskInfo info = tarefa.getTaskInfo();
+                ComponentName topo = info.topActivity;
+                ComponentName base = info.baseActivity;
+                if ((topo != null && RETROARCH.equals(topo.getClassName()))
+                        || (base != null && RETROARCH.equals(base.getClassName()))) {
+                    tarefa.moveToFront();
+                    return true;
+                }
+            } catch (RuntimeException falha) {
+                Log.w(TAG, "voltar ao jogo: " + falha);
+            }
+        }
+        return false;
     }
 
     void fecharORetroArch() {

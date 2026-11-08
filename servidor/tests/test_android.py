@@ -698,6 +698,24 @@ class RotasDoAndroid(unittest.TestCase):
         for endereco in ("192.168.0.10", "10.0.2.15", "::ffff:192.168.0.10", "", None, "nao-e-ip"):
             self.assertFalse(self.arena.endereco_de_loopback(endereco), endereco)
 
+    def test_voltar_ao_jogo_que_ficou_atras_do_arena(self):
+        # 08/11/2026, no A12: o jogo ficou aberto atras da tela do ARENA e o aluno nao tinha como sair dele.
+        cookie = "arena_segredo=segredo-da-tela"
+        self.assertEqual(self.pedir("/api/jogo/voltar", {})[0], 403)                 # outro app do aparelho, nao
+        antes = dict(self.arena.JOGO_EM_ANDAMENTO)
+        self.addCleanup(lambda: (self.arena.JOGO_EM_ANDAMENTO.clear(), self.arena.JOGO_EM_ANDAMENTO.update(antes)))
+        self.arena.JOGO_EM_ANDAMENTO.update(ativo=False)
+        with mock.patch.object(ponte_android, "voltar_ao_jogo", return_value=True) as voltar:
+            self.assertEqual(self.pedir("/api/jogo/voltar", {}, cookie=cookie), (200, {"ok": True, "fechado": True}))
+            voltar.assert_not_called()                                                # ja fechou: nada a trazer
+            self.arena.JOGO_EM_ANDAMENTO.update(ativo=True, titulo="CTR")
+            self.assertEqual(self.pedir("/api/jogo/voltar", {}, cookie=cookie), (200, {"ok": True}))
+            voltar.assert_called_once_with()
+        with mock.patch.object(ponte_android, "voltar_ao_jogo", return_value=False):
+            estado, resposta = self.pedir("/api/jogo/voltar", {}, cookie=cookie)
+        self.assertEqual(estado, 400)
+        self.assertIn("apps recentes", resposta["erro"])
+
     def test_a_tela_do_arena_entra(self):
         self.assertNotEqual(self.pedir("/api/ranking", cookie="arena_segredo=segredo-da-tela")[0], 403)
         estado, resposta = self.pedir("/api/android/pastas", cookie="arena_segredo=segredo-da-tela")

@@ -115,6 +115,7 @@ async function pedir(rota, metodo = "GET", corpo = null) {
   if (!resposta.ok || dados.ok === false) {
     const erro = new Error(dados.erro || "O servidor não respondeu como esperado.");
     erro.status = resposta.status;          // quem chamou distingue "a rota nao existe" (404) de falha passageira
+    erro.dados = dados;                     // e le o que mais o servidor mandou (o voltar_ao_jogo do celular)
     throw erro;
   }
   return dados;
@@ -187,11 +188,24 @@ function recado(texto, erro = false, duracaoMs = 4500) {
   temporizadorRecado = setTimeout(() => { caixa.hidden = true; }, duracaoMs);
 }
 
-function aviso(texto) {
+function aviso(texto, voltarAoJogo = false) {
   const caixa = $("#aviso");
+  $("#avisoVoltarAoJogo").hidden = !voltarAoJogo;
   if (!texto) { caixa.hidden = true; return; }
   $("#avisoTexto").textContent = texto;
   caixa.hidden = false;
+}
+
+// No celular, o jogo que ficou aberto atras do ARENA (o aluno saiu pelo botao de inicio do aparelho) volta para a
+// frente, para sair pelo SAIR sem perder o que nao foi salvo (08/11/2026, no Galaxy A12).
+async function voltarAoJogo() {
+  try {
+    const dados = await pedir("/api/jogo/voltar", "POST", {});
+    aviso("");
+    if (dados.fechado) recado("O jogo já tinha fechado. Toque em Jogar de novo.");
+  } catch (falha) {
+    aviso(falha.message);
+  }
 }
 
 // --------------------------------------------------------------------------
@@ -1051,6 +1065,11 @@ async function jogar(jogo, jeito = "", lembrar = false) {
     mostrarFaixaTeclas();
     mostrarAlertaMaquina(dados.alerta_maquina);
   } catch (falha) {
+    if (falha.dados && falha.dados.voltar_ao_jogo) {
+      aviso(falha.message, true);
+      $("#avisoVoltarAoJogo").focus();
+      return;
+    }
     recado(falha.message, true);
   }
 }
@@ -5601,6 +5620,8 @@ function ligarEventos() {
       desenharJogos();
     }, 130);
   });
+
+  $("#avisoVoltarAoJogo").addEventListener("click", voltarAoJogo);
 
   $("#btnMais").addEventListener("click", () => {
     estado.limite += PASSO_LIMITE;
