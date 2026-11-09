@@ -502,10 +502,13 @@
     "vulkan": {"EmuCore/GS": {"GSBackThreadMode": "1"}}
   },
   "no_android": {
-    "_leia": "Opcoes que so valem no Android, por cima de todas as outras (graficos.opcoes_finais_do_nucleo). PS1: o SwanStation NAO carrega o disco inteiro na memoria. No PC isso ajuda com o pen drive lento; no celular sao centenas de MB lidos do cartao SD antes do primeiro quadro, num aparelho com 4 GB: no Galaxy A12 o CTR levava 31,9 s de tela preta e com a leitura direta 2,5 s, a 59,3 fps no jogo (medido em 08/11/2026).",
+    "_leia": "Opcoes que so valem no Android, por cima de todas as outras (graficos.opcoes_finais_do_nucleo). PS1: o SwanStation NAO carrega o disco inteiro na memoria. No PC isso ajuda com o pen drive lento; no celular sao centenas de MB lidos do cartao SD antes do primeiro quadro, num aparelho com 4 GB: no Galaxy A12 o CTR levava 31,9 s de tela preta e com a leitura direta 2,5 s, a 59,3 fps no jogo (medido em 08/11/2026). PSP: o PPSSPP do Android cai (ponteiro nulo, em OpenGL e em Vulkan) 2 a 3 s depois de abrir com o 'pular efeitos de buffer' ligado, que os niveis abaixo do original ligam; no Galaxy A12 o Burnout Legends abriu e voltou para a lista toda vez, e com ele desligado chegou a tela de titulo (08/11/2026). No Windows o mesmo jogo com a opcao ligada abre (testes/teste_abaixo_do_original.py).",
     "nucleos": {
       "swanstation": {
         "swanstation_CDROM_LoadImageToRAM": "false"
+      },
+      "ppsspp": {
+        "ppsspp_skip_buffer_effects": "disabled"
       }
     }
   },

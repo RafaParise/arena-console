@@ -875,6 +875,19 @@ class OpcoesSoDoAndroid(unittest.TestCase):
                     no_pc = graficos.opcoes_finais_do_nucleo("swanstation", nota, nota, abaixo=abaixo)
                 self.assertEqual(no_pc.get("swanstation_CDROM_LoadImageToRAM"), "true", (nota, abaixo))
 
+    def test_psp_sem_pular_efeitos_no_celular(self):
+        """O PPSSPP do Android cai 2 a 3 s depois de abrir com o 'pular efeitos de buffer' (Galaxy A12, 08/11/2026);
+        no computador os niveis abaixo do original continuam ligando, porque la ele abre e alivia a maquina fraca."""
+        import graficos
+        for nota in (1, 3, 5):
+            for abaixo in ("", "leve", "minimo"):
+                with no_android():
+                    no_celular = graficos.opcoes_finais_do_nucleo("ppsspp", nota, nota, abaixo=abaixo)
+                self.assertEqual(no_celular.get("ppsspp_skip_buffer_effects"), "disabled", (nota, abaixo))
+        with mock.patch.multiple(plataforma, ANDROID=False, WINDOWS=True, LINUX=False):
+            no_pc = graficos.opcoes_finais_do_nucleo("ppsspp", 1, 1, abaixo="leve")
+        self.assertEqual(no_pc.get("ppsspp_skip_buffer_effects"), "enabled")
+
 
 class Hardware(unittest.TestCase):
     def test_o_que_o_app_conta(self):

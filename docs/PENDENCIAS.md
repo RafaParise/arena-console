@@ -429,6 +429,17 @@ Rafael (numa rede de escola com DNS lento, pode ser mais). Em 22/10 a rede estav
 `Servidor` agora pula essa pergunta, como o `controle_remoto.py` já fazia: a porta abre em 0,43 s em vez de 1,3 a 1,7 s,
 e no modo alvo o 1b caiu de 4,51 para 2,0 s e o 1a de 3,33 para 1,37 s.
 
+**No celular, 08/11 à noite (APK de teste com o conserto acima):**
+- **Saturn:** 56,1 quadros por segundo no Saturn Bomberman. A imagem "esticada" não é defeito: o `config.json` do A12
+  está com o Formato da imagem em **"esticar"** (até a borda, em todo console) desde antes das 8h34. No "automático" o
+  Saturn para em 16:9.
+- **PSP: caía 2 a 3 s depois de abrir, toda vez** (não era tempo de carga: o registro de queda do Android mostra ponteiro
+  nulo dentro do PPSSPP, igual em OpenGL e em Vulkan). Separado opção por opção pelo ajuste fino por emulador: a culpada
+  é o **"pular efeitos de buffer"** (`ppsspp_skip_buffer_effects`), que os níveis abaixo do original ligam. Com ela
+  desligada o Burnout Legends chega à tela de título. Consertado só no Android (`graficos.json → no_android`); no
+  Windows o mesmo jogo abre com ela ligada (`teste_abaixo_do_original`). A pasta de apoio do PPSSPP
+  (`system/PPSSPP`) também foi testada e não muda nada.
+
 **Achado para consertar depois (não é da versão de hoje):** com a tela bloqueada (ou sem monitor), `hardware.placa_da_tela_principal()`
 volta vazio e o ARENA usa a placa do registro, que guarda placas que já saíram do computador. Melhor seria preferir a placa
 que o Windows diz estar funcionando (`Win32_VideoController` com `Status = OK`), sem deixar a abertura mais lenta.
