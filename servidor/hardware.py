@@ -720,6 +720,58 @@ def placa_da_tela_principal():
         return ""
 
 
+def placas_presentes():
+    """Nomes das placas de video que estao NA MAQUINA agora (Windows), pela SetupAPI com DIGCF_PRESENT: sem
+    administrador e sem WMI (que levaria segundos na abertura). Serve quando a tela esta bloqueada ou sem monitor e o
+    placa_da_tela_principal volta vazio (09/11/2026): o registro sozinho guarda placas que ja sairam da maquina, e aqui
+    ela nao aparece. Placas de mentira (o adaptador basico da Microsoft, telas virtuais e remotas) ficam de fora."""
+    if not sys.platform.startswith("win"):
+        return []
+    try:
+        import ctypes
+        from ctypes import wintypes
+
+        class GUID(ctypes.Structure):
+            _fields_ = [("Data1", wintypes.DWORD), ("Data2", wintypes.WORD), ("Data3", wintypes.WORD),
+                        ("Data4", ctypes.c_ubyte * 8)]
+
+        class SP_DEVINFO_DATA(ctypes.Structure):
+            _fields_ = [("cbSize", wintypes.DWORD), ("ClassGuid", GUID), ("DevInst", wintypes.DWORD),
+                        ("Reserved", ctypes.c_void_p)]
+
+        setupapi = ctypes.WinDLL("setupapi")
+        setupapi.SetupDiGetClassDevsW.restype = ctypes.c_void_p
+        setupapi.SetupDiGetClassDevsW.argtypes = [ctypes.POINTER(GUID), wintypes.LPCWSTR, wintypes.HWND,
+                                                  wintypes.DWORD]
+        setupapi.SetupDiEnumDeviceInfo.argtypes = [ctypes.c_void_p, wintypes.DWORD, ctypes.POINTER(SP_DEVINFO_DATA)]
+        setupapi.SetupDiGetDeviceRegistryPropertyW.argtypes = [
+            ctypes.c_void_p, ctypes.POINTER(SP_DEVINFO_DATA), wintypes.DWORD, ctypes.POINTER(wintypes.DWORD),
+            ctypes.c_void_p, wintypes.DWORD, ctypes.POINTER(wintypes.DWORD)]
+        setupapi.SetupDiDestroyDeviceInfoList.argtypes = [ctypes.c_void_p]
+        # A classe "Adaptadores de video" do Windows: {4d36e968-e325-11ce-bfc1-08002be10318}
+        classe = GUID(0x4d36e968, 0xe325, 0x11ce, (ctypes.c_ubyte * 8)(0xbf, 0xc1, 0x08, 0x00, 0x2b, 0xe1, 0x03, 0x18))
+        DIGCF_PRESENT, SPDRP_DEVICEDESC, INVALIDO = 0x2, 0x0, ctypes.c_void_p(-1).value
+        lista = setupapi.SetupDiGetClassDevsW(ctypes.byref(classe), None, None, DIGCF_PRESENT)
+        if not lista or lista == INVALIDO:
+            return []
+        nomes = []
+        try:
+            for indice in range(16):
+                info = SP_DEVINFO_DATA()
+                info.cbSize = ctypes.sizeof(info)
+                if not setupapi.SetupDiEnumDeviceInfo(lista, indice, ctypes.byref(info)):
+                    break
+                texto = ctypes.create_unicode_buffer(256)
+                if setupapi.SetupDiGetDeviceRegistryPropertyW(lista, ctypes.byref(info), SPDRP_DEVICEDESC, None,
+                                                              texto, ctypes.sizeof(texto), None):
+                    nomes.append(texto.value)
+        finally:
+            setupapi.SetupDiDestroyDeviceInfoList(lista)
+        return [n for n in nomes if n and not any(p in n.lower() for p in ("basic", "virtual", "remote", "indirect"))]
+    except (AttributeError, OSError, ValueError):
+        return []
+
+
 FABRICANTES_PCI = {"0x1002": "AMD", "0x8086": "Intel", "0x10de": "NVIDIA", "0x1af4": "virtio (maquina virtual)",
                    "0x15ad": "VMware", "0x1234": "QEMU", "0x80ee": "VirtualBox"}
 
@@ -812,6 +864,10 @@ def placa_video():
         if nome and nome == do_sistema:
             integrada_pelo_sistema = integrada_do_sistema
     elif not nome:
+        # Tela bloqueada ou sem monitor: a placa que esta na maquina, nao a que o registro lembra (09/11/2026).
+        presentes = placas_presentes()
+        nome = presentes[0] if presentes else ""
+    if not nome and sys.platform.startswith("win") and not NO_ANDROID:
         try:
             import winreg
             base = (r"SYSTEM\CurrentControlSet\Control\Class"

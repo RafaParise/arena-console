@@ -72,7 +72,9 @@ de mexer** em servidor, threads, processos, vídeo ou RetroArch: cada item aqui 
 - `hardware.placa_da_tela_principal()` (`EnumDisplayDevicesW`) vem antes
   do registro do Windows, que guarda placas que já saíram do computador.
   Uma GeForce antiga fazia a Radeon integrada passar por dedicada e
-  quebrava o texto do PS1.
+  quebrava o texto do PS1. Sem tela principal (tela bloqueada, sem
+  monitor), vem `hardware.placas_presentes()` (SetupAPI com
+  `DIGCF_PRESENT`, 24 ms, sem WMI) antes do registro (09/11/2026).
 - A nota da placa é separada da nota geral (`hardware.teto_da_placa`):
   integrada não passa de 3, salvo o Ryzen de mesa com Vega (série G) e o
   8000G, que vão a 4 nos núcleos do RetroArch (medido em 17/10/2026). Nos

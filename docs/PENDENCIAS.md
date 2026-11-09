@@ -457,9 +457,10 @@ e no modo alvo o 1b caiu de 4,51 para 2,0 s e o 1a de 3,33 para 1,37 s.
 - **Botões C e Z do Saturn:** no desenho de toque estão no lugar do computador (foto da medição); conferir com o
   controle de verdade na mão fica com o Rafael, sem travar a versão.
 
-**Achado para consertar depois (não é da versão de hoje):** com a tela bloqueada (ou sem monitor), `hardware.placa_da_tela_principal()`
-volta vazio e o ARENA usa a placa do registro, que guarda placas que já saíram do computador. Melhor seria preferir a placa
-que o Windows diz estar funcionando (`Win32_VideoController` com `Status = OK`), sem deixar a abertura mais lenta.
+**Achado de 08/11, consertado em 09/11:** com a tela bloqueada (ou sem monitor), `hardware.placa_da_tela_principal()`
+volta vazio e o ARENA usava a placa do registro, que guarda placas que já saíram do computador (a GeForce 210 no lugar da
+Radeon). Agora vem antes `hardware.placas_presentes()`: as placas que estão na máquina, pela SetupAPI do Windows
+(`DIGCF_PRESENT`), em 24 ms e sem WMI; ela só roda quando a tela principal não responde. Com teste.
 
 ## Depende do Rafael
 

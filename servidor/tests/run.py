@@ -491,6 +491,22 @@ class TestHardware(unittest.TestCase):
         finally:
             hardware.placa_da_tela_principal = original
 
+    def test_tela_bloqueada_usa_a_placa_presente_e_nao_o_registro(self):
+        # Achado 08/11/2026: com a tela bloqueada o Windows nao diz a placa da tela principal, e o registro devolvia a
+        # GeForce 210 que ja saiu da maquina (placa 2/5 no lugar da Radeon do 5600G). A placa presente vem antes.
+        import hardware
+        if not sys.platform.startswith("win"):
+            self.skipTest("so no Windows")
+        tela, presentes = hardware.placa_da_tela_principal, hardware.placas_presentes
+        try:
+            hardware.placa_da_tela_principal = lambda: ""
+            hardware.placas_presentes = lambda: ["AMD Radeon(TM) Graphics"]
+            placa = hardware.placa_video()
+            self.assertEqual(placa["nome"], "AMD Radeon(TM) Graphics")
+            self.assertTrue(placa["integrada"])
+        finally:
+            hardware.placa_da_tela_principal, hardware.placas_presentes = tela, presentes
+
     def test_classificar(self):
         import arena
         # classificar() lê CAPACIDADE["nota"] global — mock temporário.
