@@ -324,6 +324,33 @@ class TestGraficos(unittest.TestCase):
             self.mod.PASTA_FILTROS = antes
 
 
+class ValoresQueONucleoAceita(unittest.TestCase):
+    """Valor fora da lista do nucleo e' ignorado em silencio (fica o padrao dele). Achado de 09/11/2026: o degrau da
+    nota 1 do Dreamcast mandava reicast_texupscale = "off", e o Flycast so aceita "1" (desligado), "2", "4" e "6"
+    (lido na tabela de opcoes dentro do flycast_libretro.dll)."""
+
+    ACEITOS = {"reicast_texupscale": {"1", "2", "4", "6"}}
+
+    def test_graficos_json_so_usa_valores_aceitos(self):
+        import json
+        with open(os.path.join(RAIZ, "graficos.json"), encoding="utf-8") as arquivo:
+            dados = json.load(arquivo)
+        achados = []
+
+        def andar(no, caminho):
+            if isinstance(no, dict):
+                for chave, valor in no.items():
+                    if chave in self.ACEITOS:
+                        achados.append(chave)
+                        self.assertIn(valor, self.ACEITOS[chave], "%s em %s" % (chave, caminho))
+                    andar(valor, caminho + "/" + chave)
+            elif isinstance(no, list):
+                for i, item in enumerate(no):
+                    andar(item, "%s[%d]" % (caminho, i))
+        andar(dados, "")
+        self.assertTrue(achados, "a chave sumiu do graficos.json: confira o teste")
+
+
 class TestAcervo(unittest.TestCase):
 
     def setUp(self):

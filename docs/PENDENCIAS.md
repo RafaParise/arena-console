@@ -440,8 +440,9 @@ e no modo alvo o 1b caiu de 4,51 para 2,0 s e o 1a de 3,33 para 1,37 s.
   Windows o mesmo jogo abre com ela ligada (`teste_abaixo_do_original`). A pasta de apoio do PPSSPP
   (`system/PPSSPP`) também foi testada e não muda nada.
 - **Dreamcast com a BIOS imitada** (o registro diz "using reios"): 8,1 quadros no Armada (11,5 com a original; limite
-  do A12). Achado menor para depois: o nível leve manda `reicast_texupscale = "1"` e o Flycast responde "Invalid value"
-  (ignora e fica no padrão, sem prejuízo).
+  do A12). O "Invalid value" do `reicast_texupscale` no celular é inofensivo: o Flycast do Android não tem essa opção
+  (recusa também a vizinha, que o ARENA nem manda). Conferindo isso (09/11), achei o degrau da nota 1 mandando `"off"`,
+  que o Flycast do PC não aceita (só `1` = desligado, `2`, `4`, `6`): trocado por `"1"`, com teste.
 - **Botão de início do aparelho com um jogo aberto: o servidor do ARENA caía e o Voltar ao jogo não achava o jogo**
   (o aluno ficava preso: o ARENA recusava outro jogo e o botão dizia "não consegui trazer o jogo de volta"). Causa: a
   tela do jogo e a do ARENA tinham a mesma afinidade de tarefa, e o Android 12 só mostra uma tarefa por afinidade:

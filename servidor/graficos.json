@@ -235,7 +235,7 @@
           "opcoes": {
             "reicast_internal_resolution": "640x480",
             "reicast_anisotropic_filtering": "off",
-            "reicast_texupscale": "off"
+            "reicast_texupscale": "1"
           }
         },
         {
