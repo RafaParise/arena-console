@@ -1,4 +1,4 @@
-<!-- Texto a ACRESCENTAR no topo da página do release Latest (a descrição só acrescenta). Falta: rodada final, APK x86_64 e pacote do Windows. -->
+<!-- Texto a ACRESCENTAR no topo da página do release Latest (a descrição só acrescenta). Rodada final, APKs e pacote do Windows prontos em 08/11/2026. -->
 
 ## ⬇️ Qual arquivo baixar (atualização de 2026.11.08)
 
@@ -33,10 +33,18 @@ Os arquivos que terminam em **`-ANTERIOR`** são das versões passadas, guardado
   jogo que roda a 30 passa a 60 na tela.
 - **Auditoria 6**: 21 achados de três revisores, 16 corrigidos (o mais grave: levar jogos para o cartão podia apagar um save
   de mesmo tamanho); 0 problemas de acessibilidade em 108 telas; 1213 testes OK.
+- **Rodada final de 08/11** (120 testes, cerca de 3 horas) e a conferência no Galaxy A12 acharam e consertaram:
+  - **o ARENA abre 1,3 s mais rápido** com a rede liberada (o Python perguntava o nome do computador à rede a cada
+    abertura);
+  - **PSP no celular**: o jogo abria e voltava para a lista; agora chega ao jogo;
+  - **celular, botão de início com um jogo aberto**: o ARENA perdia o jogo e o "Voltar ao jogo" não o achava mais;
+    agora volta, sai pelo SAIR e abre outro;
+  - **Jogar Junto entre computador e celular pelo Wi-Fi**, testado nos dois sentidos (entra em 5 a 17 s, sem cair).
+  1220 testes OK.
 
 ### O que ainda falta
 
-- **Rodada final completa** antes de cada versão (matriz de consoles e Linux de verdade) e os **controles de verdade**.
+- **Controles de verdade** (Saturn e PlayStation com o controle na mão) e o Linux num computador de verdade.
 - **Saturn no Jogar Junto entre computador e celular**: o emulador de Saturn não aceita (o salvamento dele só vale no mesmo
   tipo de aparelho); entre dois computadores funciona.
 - **Lossless Scaling no celular**: só em placa Adreno 7xx ou mais nova (o A12 não tem).
