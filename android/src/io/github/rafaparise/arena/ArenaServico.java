@@ -157,7 +157,15 @@ public class ArenaServico extends Service {
 
     @Override
     public void onTaskRemoved(Intent pedido) {
-        // A pessoa fechou o ARENA (tirou da tela dos apps abertos).
+        // A pessoa fechou o ARENA (tirou da tela dos apps abertos). Mas com um jogo aberto (o RetroArch fica numa
+        // tarefa propria), o Android do A12 tambem tira a tarefa da tela do ARENA quando o aluno aperta o botao de
+        // inicio: o servidor caia junto, o jogo ficava orfao atras e o "Voltar ao jogo" nao achava mais nada (achado
+        // no A12 em 08/11/2026). Com o jogo vivo, o servidor fica; a tela volta a ele quando o ARENA for aberto.
+        if (processoDoRetroArch() > 0) {
+            Log.i(TAG, "a tarefa da tela saiu com um jogo aberto: o servidor continua");
+            return;
+        }
+        Log.i(TAG, "a tarefa do ARENA saiu sem jogo aberto: fechando o servidor");
         encerrar();
         stopSelf();
     }

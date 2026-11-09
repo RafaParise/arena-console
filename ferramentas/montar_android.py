@@ -551,6 +551,11 @@ def ajustar_manifesto(pasta, versao_nome, versao_codigo, teste=False):
          'android:name="com.retroarch.browser.mainmenu.MainMenuActivity">',
          '<activity android:exported="false" android:launchMode="singleInstance" '
          'android:name="com.retroarch.browser.mainmenu.MainMenuActivity">'),
+        # A tela do jogo com afinidade de tarefa PROPRIA (08/11/2026): com a mesma do ARENA (o nome do pacote), o
+        # Android 12 so deixa uma tarefa dessa afinidade na lista de apps abertos e esconde a outra. Abrir o jogo
+        # escondia a tarefa do ARENA, e o botao de inicio do aparelho a destruia (o servidor caia junto); voltar ao
+        # ARENA escondia a do jogo, e o "Voltar ao jogo" nao a achava mais (getAppTasks). Visto no Galaxy A12.
+        # (O atributo entra na troca do tema, logo abaixo: esta aqui tem que continuar achando o texto original.)
         ('android:exported="true" android:launchMode="singleInstance" '
          'android:name="com.retroarch.browser.retroactivity.RetroActivityFuture"',
          'android:exported="false" android:launchMode="singleInstance" '
@@ -560,7 +565,7 @@ def ajustar_manifesto(pasta, versao_nome, versao_codigo, teste=False):
         ('android:name="com.retroarch.browser.retroactivity.RetroActivityFuture" '
          'android:theme="@android:style/Theme.NoTitleBar.Fullscreen"',
          'android:name="com.retroarch.browser.retroactivity.RetroActivityFuture" '
-         'android:theme="@style/ArenaJogo"'),
+         'android:taskAffinity="%s.jogo" android:theme="@style/ArenaJogo"' % PACOTE),
         ("    </application>", ATIVIDADE_DO_ARENA + SERVICO_DO_ARENA + "    </application>"),
         ('    <uses-permission android:name="android.permission.VIBRATE"/>\n',
          '    <uses-permission android:name="android.permission.VIBRATE"/>\n' + PERMISSOES_DO_SERVIDOR),
