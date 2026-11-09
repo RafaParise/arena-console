@@ -439,6 +439,22 @@ e no modo alvo o 1b caiu de 4,51 para 2,0 s e o 1a de 3,33 para 1,37 s.
   desligada o Burnout Legends chega à tela de título. Consertado só no Android (`graficos.json → no_android`); no
   Windows o mesmo jogo abre com ela ligada (`teste_abaixo_do_original`). A pasta de apoio do PPSSPP
   (`system/PPSSPP`) também foi testada e não muda nada.
+- **Dreamcast com a BIOS imitada** (o registro diz "using reios"): 8,1 quadros no Armada (11,5 com a original; limite
+  do A12). Achado menor para depois: o nível leve manda `reicast_texupscale = "1"` e o Flycast responde "Invalid value"
+  (ignora e fica no padrão, sem prejuízo).
+- **Botão de início do aparelho com um jogo aberto: o servidor do ARENA caía e o Voltar ao jogo não achava o jogo**
+  (o aluno ficava preso: o ARENA recusava outro jogo e o botão dizia "não consegui trazer o jogo de volta"). Causa: a
+  tela do jogo e a do ARENA tinham a mesma afinidade de tarefa, e o Android 12 só mostra uma tarefa por afinidade:
+  esconde a outra e, no botão de início, a destrói (o `onTaskRemoved` do serviço encerrava o servidor). Consertado com
+  afinidade própria para a tela do jogo e o serviço sem fechar o servidor com jogo aberto (c5c39ff). No A12, do zero:
+  Contra → início → ARENA → Voltar ao jogo → SAIR → Golden Axe → SAIR, os 10 passos certos.
+- **Recado do Java ME:** "Este console não tem versão para Android: abra o jogo no computador, com a mesma pasta do
+  ARENA." Certo.
+- **Jogar Junto entre PC e celular, Wi-Fi da casa:** o celular hospedando, o PC entrou em 17,1 s; o PC hospedando, o
+  celular entrou em 5,1 s. Nos dois, 45 s de partida sem cair. (O Super Bomberman 4 foi copiado ao celular só para o
+  teste e apagado depois.)
+- **Botões C e Z do Saturn:** no desenho de toque estão no lugar do computador (foto da medição); conferir com o
+  controle de verdade na mão fica com o Rafael, sem travar a versão.
 
 **Achado para consertar depois (não é da versão de hoje):** com a tela bloqueada (ou sem monitor), `hardware.placa_da_tela_principal()`
 volta vazio e o ARENA usa a placa do registro, que guarda placas que já saíram do computador. Melhor seria preferir a placa

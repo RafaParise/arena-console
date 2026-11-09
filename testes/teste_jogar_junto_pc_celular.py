@@ -122,12 +122,19 @@ def main():
         resultado["pc_vivo_depois"] = pc.poll() is None
         linhas = [l.strip() for l in log_do_pc(pasta).splitlines() if "[netplay]" in l.lower()]
         resultado["pc_netplay"] = linhas[-25:]
-        registro = ca.pedir(pagina, "/api/android/registro")
+        # A tela do ARENA fica ATRAS do jogo (o RetroArch tem tarefa propria desde 08/11/2026) e o Android pausa o
+        # WebView dela: o pedido pela tela pode nao voltar enquanto o jogo roda. O resultado da partida (o registro do
+        # computador) vale do mesmo jeito; o do celular fica so como complemento.
+        try:
+            registro = ca.pedir(pagina, "/api/android/registro")
+            estado = ca.pedir(pagina, "/api/estado")
+        except (OSError, TimeoutError) as falha:
+            registro, estado = {}, {}
+            resultado["celular_sem_resposta"] = "a tela do ARENA, atras do jogo, nao respondeu (%s)" % falha
         texto_celular = chr(10).join(str(l) for l in registro.get("linhas", [])) if isinstance(registro, dict) else ""
         resultado["celular_netplay"] = [l.strip() for l in texto_celular.splitlines() if "netplay" in l.lower()][-25:]
         resultado["celular_registro_campos"] = sorted(registro) if isinstance(registro, dict) else None
         resultado["celular_registro_cauda"] = [l.strip() for l in texto_celular.splitlines()][-30:]
-        estado = ca.pedir(pagina, "/api/estado")
         resultado["celular_jogo_em_andamento"] = (estado or {}).get("jogo_em_andamento")
         resultado["entrou_em_s"] = entrou
         print(json.dumps(resultado, ensure_ascii=False, indent=2), flush=True)
