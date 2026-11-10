@@ -477,8 +477,17 @@ def por_as_bios_livres(assets):
 # ---------------------------------------------------------------------------
 
 # O servidor do ARENA (ArenaServico.java), no mesmo processo da tela.
-SERVICO_DO_ARENA = '''        <service android:exported="false" android:name="io.github.rafaparise.arena.ArenaServico" android:process=":tela"/>
+# Do Android 14 em diante (versao-alvo 34+), o servico em primeiro plano diz o tipo; "specialUse" pede a explicacao na
+# propriedade (o ArenaServico chama o startForeground com o mesmo tipo).
+SERVICO_DO_ARENA = '''        <service android:exported="false" android:foregroundServiceType="specialUse" android:name="io.github.rafaparise.arena.ArenaServico" android:process=":tela">
+            <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="servidor local do ARENA enquanto o jogo esta aberto"/>
+        </service>
 '''
+# A versao do Android que o app diz conhecer (10/11/2026). O RetroArch oficial (fora da loja) vem com 28; o Google Play
+# Protect (e o instalador dos Xiaomi) avisa "app criado para uma versao mais antiga do Android" quando ela fica mais de 2
+# versoes abaixo da do celular (relato do aluno, num Poco X7 com Android 15). 35 = Android 15. O que muda com ela esta no
+# ArenaActivity/ArenaServico (acesso a todos os arquivos, notificacoes, tipo do servico) e em docs\PENDENCIAS.md.
+VERSAO_ALVO_DO_ANDROID = 35
 # O que o servidor pede ao Android alem do RetroArch: ficar aberto durante o
 # jogo (o aviso na barra), receber os avisos da rede do Jogar Junto (o Wi-Fi
 # joga fora os de grupo sem a trava) e, no Android 11 em diante, gravar no
@@ -489,6 +498,8 @@ PERMISSOES_DO_SERVIDOR = '''    <uses-permission android:name="android.permissio
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE"/>
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 '''
 # O WebView so fala sem HTTPS com o servidor do proprio aparelho.
 REDE_DO_ARENA = '''<?xml version="1.0" encoding="utf-8"?>
@@ -603,6 +614,7 @@ def ajustar_manifesto(pasta, versao_nome, versao_codigo, teste=False):
     with open(yml, encoding="utf-8") as arquivo:
         texto = arquivo.read()
     texto = re.sub(r"minSdkVersion: \S+", "minSdkVersion: 24", texto)
+    texto = re.sub(r"targetSdkVersion: \S+", "targetSdkVersion: %d" % VERSAO_ALVO_DO_ANDROID, texto)
     texto = re.sub(r"versionCode: \S+", "versionCode: %d" % versao_codigo, texto)
     texto = re.sub(r"versionName: \S+", "versionName: %s" % versao_nome, texto)
     with open(yml, "w", encoding="utf-8") as arquivo:

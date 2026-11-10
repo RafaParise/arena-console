@@ -101,6 +101,9 @@ public class ArenaActivity extends Activity {
     static final int PEDIDO_DE_PERMISSAO = 7;
     static final int PERMISSAO_DA_ABERTURA = 8;
     static final int TODOS_OS_ARQUIVOS = 9;
+    // Versao-alvo 35 (10/11/2026): no Android 11 em diante, ver as pastas do aparelho e' so com o "Acesso a todos os
+    // arquivos" (a tela de Ajustes do sistema). Na abertura, a volta dessa tela segue para o comecar().
+    static final int TODOS_OS_ARQUIVOS_DA_ABERTURA = 10;
     // O servidor do ARENA no aparelho (ArenaServico), como no computador.
     static final String SERVIDOR = "http://127.0.0.1:" + ArenaServico.PORTA + "/";
     // Enquanto o servidor abre (na primeira vez ele tira o programa do APK).
@@ -213,13 +216,16 @@ public class ArenaActivity extends Activity {
      *  livres, e a permissao fica em Ajustes -> Maquina. */
     void explicarAntesDePedir() {
         // O pedido de notificacoes so existe do Android 13 (API 33) em diante.
+        String arquivos = Build.VERSION.SDK_INT >= 30
+                ? "Ver os arquivos: o Android abre a tela \"Acesso a todos os arquivos\". Ligue a chave do ARENA "
+                  + "e volte (é para o ARENA achar a pasta dele e os jogos do celular)."
+                : "Ver os arquivos: é para o ARENA achar a pasta dele e os jogos do celular.";
         String perguntas = Build.VERSION.SDK_INT >= 33
                 ? "O Android vai fazer duas perguntas.\n\n"
-                  + "1. Ver os arquivos: é para o ARENA achar a pasta dele e os jogos do celular.\n"
-                  + "2. Mostrar notificações: é o aviso de que o ARENA está aberto, para o Android "
-                  + "não fechá-lo no meio do jogo.\n\n"
-                : "O Android vai perguntar se o ARENA pode ver os arquivos: é para achar a pasta "
-                  + "dele e os jogos do celular.\n\n";
+                  + "1. Mostrar notificações: é o aviso de que o ARENA está aberto, para o Android "
+                  + "não fechá-lo no meio do jogo.\n"
+                  + "2. " + arquivos + "\n\n"
+                : arquivos + "\n\n";
         new AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Dialog_Alert)
                 .setTitle("Antes de começar")
                 .setMessage(perguntas
@@ -229,8 +235,15 @@ public class ArenaActivity extends Activity {
                 .setPositiveButton("Continuar", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface janela, int qual) {
-                        requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
-                                Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSAO_DA_ABERTURA);
+                        if (Build.VERSION.SDK_INT >= 33) {
+                            // Primeiro as notificacoes (com a versao-alvo 33+, quem pede e' o app); na volta, os arquivos.
+                            requestPermissions(new String[]{"android.permission.POST_NOTIFICATIONS"}, PERMISSAO_DA_ABERTURA);
+                        } else if (Build.VERSION.SDK_INT >= 30) {
+                            abrirTodosOsArquivos(TODOS_OS_ARQUIVOS_DA_ABERTURA);
+                        } else {
+                            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
+                                    Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSAO_DA_ABERTURA);
+                        }
                     }
                 })
                 .show();
@@ -301,15 +314,9 @@ public class ArenaActivity extends Activity {
     void pedirPermissao(final boolean todosOsArquivos) {
         runOnUiThread(new Runnable() {
             public void run() {
-                if (todosOsArquivos && Build.VERSION.SDK_INT >= 30) {
-                    try {
-                        startActivityForResult(new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
-                                Uri.parse("package:" + getPackageName())), TODOS_OS_ARQUIVOS);
-                        return;
-                    } catch (RuntimeException falha) {
-                        Log.w(TAG, "sem a tela de todos os arquivos: " + falha);
-                    }
-                }
+                // Versao-alvo 35: no Android 11 em diante, o pedido comum de arquivos nao da mais acesso as pastas;
+                // e' sempre a tela "Acesso a todos os arquivos" (antes, so quando o pedido era o do cartao).
+                if (Build.VERSION.SDK_INT >= 30 && abrirTodosOsArquivos(TODOS_OS_ARQUIVOS)) return;
                 if (Build.VERSION.SDK_INT >= 23) {
                     requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
                             Manifest.permission.WRITE_EXTERNAL_STORAGE}, PEDIDO_DE_PERMISSAO);
@@ -318,10 +325,31 @@ public class ArenaActivity extends Activity {
         });
     }
 
+    /** A tela do sistema "Acesso a todos os arquivos" do ARENA (Android 11 em diante). False se o aparelho nao tem. */
+    boolean abrirTodosOsArquivos(int pedido) {
+        try {
+            startActivityForResult(new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
+                    Uri.parse("package:" + getPackageName())), pedido);
+            return true;
+        } catch (RuntimeException falha) {
+            Log.w(TAG, "sem a tela de todos os arquivos: " + falha);
+            if (pedido == TODOS_OS_ARQUIVOS_DA_ABERTURA) comecar();
+            return false;
+        }
+    }
+
     @Override
     protected void onActivityResult(int pedido, int resultado, Intent dados) {
         super.onActivityResult(pedido, resultado, dados);
-        if (pedido == TODOS_OS_ARQUIVOS && ArenaServico.atual != null) ArenaServico.atual.reabrir();
+        if (pedido == TODOS_OS_ARQUIVOS_DA_ABERTURA) {
+            comecar();
+        } else if (pedido == TODOS_OS_ARQUIVOS) {
+            if (modoNavegador) {
+                avisarAPagina("window.ARENA_ANDROID_PERMISSAO && window.ARENA_ANDROID_PERMISSAO(" + temPermissao() + ")");
+            } else if (ArenaServico.atual != null) {
+                ArenaServico.atual.reabrir();
+            }
+        }
     }
 
     @Override
@@ -383,7 +411,9 @@ public class ArenaActivity extends Activity {
     @Override
     public void onRequestPermissionsResult(int pedido, String[] permissoes, int[] respostas) {
         if (pedido == PERMISSAO_DA_ABERTURA) {
-            comecar();
+            // Android 13 em diante: acabou de responder as notificacoes; falta a tela dos arquivos.
+            if (Build.VERSION.SDK_INT >= 30 && !temPermissao()) abrirTodosOsArquivos(TODOS_OS_ARQUIVOS_DA_ABERTURA);
+            else comecar();
         } else if (pedido == PEDIDO_DE_PERMISSAO) {
             if (modoNavegador) {
                 avisarAPagina("window.ARENA_ANDROID_PERMISSAO && window.ARENA_ANDROID_PERMISSAO(" + temPermissao()
@@ -395,8 +425,14 @@ public class ArenaActivity extends Activity {
     }
 
     boolean temPermissao() {
-        return Build.VERSION.SDK_INT < 23
-                || checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+        return temPermissaoDeArquivos(this);
+    }
+
+    /** Ver as pastas do aparelho: no Android 11 em diante (versao-alvo 35), so o "Acesso a todos os arquivos". */
+    static boolean temPermissaoDeArquivos(android.content.Context contexto) {
+        if (Build.VERSION.SDK_INT >= 30) return Environment.isExternalStorageManager();
+        return Build.VERSION.SDK_INT < 23 || contexto.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED;
     }
 
     // ------------------------------------------------------------------
@@ -853,6 +889,7 @@ public class ArenaActivity extends Activity {
             if (!paginaDoArena()) return;
             runOnUiThread(new Runnable() {
                 public void run() {
+                    if (Build.VERSION.SDK_INT >= 30 && abrirTodosOsArquivos(TODOS_OS_ARQUIVOS)) return;
                     if (Build.VERSION.SDK_INT >= 23) {
                         requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
                                 Manifest.permission.WRITE_EXTERNAL_STORAGE}, PEDIDO_DE_PERMISSAO);

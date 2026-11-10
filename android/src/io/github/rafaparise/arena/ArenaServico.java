@@ -203,7 +203,13 @@ public class ArenaServico extends Service {
                 .setSmallIcon(getApplicationInfo().icon)
                 .setOngoing(true)
                 .setContentIntent(PendingIntent.getActivity(this, 0, abrir, tipo));
-        startForeground(AVISO, aviso.build());
+        if (Build.VERSION.SDK_INT >= 34) {
+            // Versao-alvo 35 (10/11/2026): do Android 14 em diante, o servico em primeiro plano diz o tipo (o mesmo do
+            // manifesto), senao o Android fecha o app. "specialUse": o servidor local do ARENA durante o jogo.
+            startForeground(AVISO, aviso.build(), android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
+        } else {
+            startForeground(AVISO, aviso.build());
+        }
     }
 
     // ------------------------------------------------------------------
@@ -1040,8 +1046,7 @@ public class ArenaServico extends Service {
         File certificados = certificados();
         if (certificados != null) a.put("SSL_CERT_FILE", certificados.getPath());
         a.put("ARENA_ANDROID_SEGREDO", segredo);
-        a.put("ARENA_ANDROID_PERMISSAO", Build.VERSION.SDK_INT < 23 || checkSelfPermission(
-                android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED ? "1" : "0");
+        a.put("ARENA_ANDROID_PERMISSAO", ArenaActivity.temPermissaoDeArquivos(this) ? "1" : "0");
         String pasta = guardado.getString("pasta", "");
         a.put("ARENA_PASTA", pasta);
         a.put("ARENA_ANDROID_DADOS", new File(getFilesDir(), "arena-dados").getPath());

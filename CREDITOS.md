@@ -62,6 +62,10 @@ bloqueado: esse app foi criado para uma versão mais antiga do Android"), e
 avisou o professor para orientar a turma enquanto isso não se resolve. O
 motivo está no APK: ele declara o Android 9 como versão-alvo, e o Play Protect
 avisa quando a versão-alvo está mais de duas versões abaixo da do celular.
+Ele também mandou os dados do celular onde o problema aparece (um Xiaomi
+Poco X7, com HyperOS 2 e Android 15, o mesmo Android do emulador de testes do
+ARENA) e contou que um colega só conseguiu instalar pelo APKMirror Installer.
+Com isso, a nova versão-alvo do app foi escolhida para esse Android (API 35).
 
 Os dois relatos viraram pendências registradas (`docs\PENDENCIAS.md`) e foram
 a base da revisão dos saves e dos cartões de memória e da troca da versão-alvo
