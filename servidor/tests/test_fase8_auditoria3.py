@@ -195,5 +195,33 @@ class TestProtegeDadosDeQuemJoga(unittest.TestCase):
             self.assertIn(esperado, protegidos)
 
 
+class TestLeiaDeCadaConsole(unittest.TestCase):
+    """Pesquisa de 10/11/2026 (ideia do ES-DE): cada jogos\\pessoais\\<console> da versao dos alunos vai com um LEIA.txt
+    que diz que arquivo serve ali, se pode ser .zip e se precisa de BIOS (do servidor\\como_colocar.py)."""
+
+    def test_todo_console_com_pasta_tem_o_seu_leia(self):
+        import json
+        with open(os.path.join(RAIZ, "servidor", "consoles.json"), encoding="utf-8") as arquivo:
+            plataformas = [p for p in json.load(arquivo)["plataformas"] if p.get("pasta")]
+        self.assertGreater(len(plataformas), 50)
+        for plataforma in plataformas:
+            texto = montador.leia_da_pasta_de_console(plataforma)
+            self.assertIn(plataforma["nome"], texto)
+            for extensao in plataforma["extensoes"]:
+                self.assertIn(extensao, texto)
+            self.assertIn("Atualizar lista", texto)        # o nome do botao da tela (launcher\index.html)
+            self.assertTrue(texto.endswith("\r\n"))         # Bloco de Notas antigo
+
+    def test_disco_nao_vai_em_zip_e_fliperama_e_o_zip(self):
+        ps1 = {"id": "ps1", "nome": "PlayStation", "extensoes": [".chd"]}
+        arcade = {"id": "arcade", "nome": "Arcade", "extensoes": [".zip"]}
+        self.assertIn("NÃO use .zip", montador.leia_da_pasta_de_console(ps1))
+        self.assertIn("NÃO descompacte", montador.leia_da_pasta_de_console(arcade))
+
+    def test_o_botao_citado_existe_na_tela(self):
+        with open(os.path.join(RAIZ, "launcher", "index.html"), encoding="utf-8") as arquivo:
+            self.assertIn(">Atualizar lista<", arquivo.read())
+
+
 if __name__ == "__main__":
     unittest.main()

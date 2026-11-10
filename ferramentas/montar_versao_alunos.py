@@ -301,6 +301,37 @@ def tamanho(pasta):
 
 # ---------------------------------------------------------------------------
 
+def leia_da_pasta_de_console(plataforma):
+    """O LEIA.txt de jogos\\pessoais\\<console> (pesquisa de 10/11/2026, ideia do ES-DE, que poe um systeminfo.txt em
+    cada pasta): qual console, que arquivos servem, se pode ser .zip e se precisa de BIOS. E' o que mais resolve o "pus
+    o jogo e nao apareceu". O texto vem do servidor\\como_colocar.py, o mesmo da tela "Como colocar os jogos"."""
+    pasta_servidor = os.path.join(RAIZ, "servidor")
+    if pasta_servidor not in sys.path:
+        sys.path.insert(0, pasta_servidor)
+    import como_colocar
+    info = como_colocar.CONSOLES.get(plataforma["id"], {})
+    tipo = info.get("tipo") or ("externo" if plataforma.get("externo") else "cartucho")
+    regras = como_colocar.TIPOS[tipo]
+    formatos = list(plataforma.get("extensoes") or [])
+    exemplo = info.get("exemplo") or "Nome do Jogo%s" % (formatos[0] if formatos else "")
+    linhas = ["%s: os jogos deste console vão nesta pasta." % plataforma.get("nome", plataforma["id"]),
+              "",
+              "Arquivos que servem: %s." % ", ".join(formatos),
+              regras["como"],
+              regras["regra_zip"],
+              "Exemplo: %s" % exemplo]
+    if info.get("bios"):
+        linhas += ["", "BIOS: %s Ponha na pasta BIOS do ARENA; a tela mostra o que falta em Ajustes > Emuladores > "
+                   "BIOS dos consoles." % info["bios"][2]]
+        if plataforma.get("livre"):
+            linhas.append("Sem ela, este console liga com a BIOS livre que já vem no ARENA (a %s)."
+                          % plataforma["livre"].get("pasta", "livre"))
+    if info.get("dica"):
+        linhas += ["", info["dica"]]
+    linhas += ["", "Depois de copiar, toque em Atualizar lista na tela do ARENA. Mais no guia 2-JOGOS.md."]
+    return "\r\n".join(linhas) + "\r\n"
+
+
 def nucleos_usados():
     dados = json.load(open(os.path.join(RAIZ, "servidor", "consoles.json"), encoding="utf-8"))
     usados = set()
@@ -445,8 +476,13 @@ def montar(destino, com_bios=False):
     for rel in ("dados", os.path.join("jogos", "pessoais"), os.path.join("jogos", "turma"),
                 os.path.join("jogos", "livres"), "backup"):
         copiar_leia(rel, destino)
+    plataformas_por_pasta = {p["pasta"]: p for p in json.load(open(
+        os.path.join(RAIZ, "servidor", "consoles.json"), encoding="utf-8"))["plataformas"] if p.get("pasta")}
     for pasta in sorted(set(pastas_de_console)):
         os.makedirs(os.path.join(destino, "jogos", "pessoais", pasta), exist_ok=True)
+        with open(os.path.join(destino, "jogos", "pessoais", pasta, "LEIA.txt"), "w", encoding="utf-8-sig",
+                  newline="") as leia:
+            leia.write(leia_da_pasta_de_console(plataformas_por_pasta[pasta]))
 
     # 3. RetroArch.
     os.makedirs(RA_D)
