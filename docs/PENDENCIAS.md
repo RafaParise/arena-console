@@ -507,11 +507,18 @@ calmo (depois de reiniciar o PC) antes de mexer no ARENA.
 2. ~~Item 7~~ **feito em 10/11, falta o teste na sala com 5 controles** (veja os limites conhecidos): mais de 4 controles do Xbox (o XInput do Windows só conta 4; plano: SDL2 automático com tradução de
    botões). Cinco controles de verdade só na sala.
 3. Revisar PENDÊNCIAS e guias atrás de algo prometido e não feito.
-4. Pesquisa dos melhores projetos parecidos (Lemuroid, Daijishō, ES-DE, Pegasus, RetroBat, Batocera, RetroArch) atrás
+4. ~~Pesquisa~~ **feita em 10/11** (`docs\PESQUISA-PROJETOS-PARECIDOS.md`; o LEIA em cada pasta de console já entrou no montador, `ab9eefb`; as outras ideias abaixo, em "Depende do Rafael" e no próprio documento). Pesquisa dos melhores projetos parecidos (Lemuroid, Daijishō, ES-DE, Pegasus, RetroBat, Batocera, RetroArch) atrás
    de recursos e otimizações para todo celular (meta realista: Android 7 ou mais novo, 64 bits, dos últimos 7 a 8 anos).
 5. Auditoria da tela e layout novo (abas, distribuição), o mesmo no PC, no celular e no Chromebook.
 
 ## Depende do Rafael
+
+- **Continuar de onde parou (ideia do Lemuroid, pesquisa de 10/11):** o jogo grava o estado sozinho ao sair e volta
+  nele ao abrir (`savestate_auto_save` e `savestate_auto_load`; o estado automático fica num espaço próprio e não
+  apaga os 10 do F2). Bom no celular do aluno; no computador dividido entre turmas, o aluno da tarde abriria no ponto
+  do aluno da manhã. Minha proposta: ligado por padrão só no Android, com a chave em Ajustes nos dois. **Você decide.**
+- **Modo de desempenho contínuo do Android:** ligar só depois de medir 30 minutos no A12 com e sem (teste longo, numa
+  madrugada com o celular na tomada).
 
 - **Acessórios (24/10/2026), o que só você faz:**
   1. ~~Olhar no celular a telinha do VMU num jogo de Dreamcast~~ **Conferido por foto em 09/11** (Capcom vs. SNK 2:
