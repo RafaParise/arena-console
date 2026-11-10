@@ -370,7 +370,7 @@ Falta (nesta ordem):
   estava resolvido (a856884: fundo preto na tela do jogo e abertura do Android 12 preta e sem ícone), e a turma do Donkey Kong com
   a Dixie e o bebê (21/10) já está no fundo animado. Faltam, e dependem do celular: **em pé e deitado do jeito que o aluno quiser,
   com a tela espelhada na TV** (Smart View/Miracast; 24/10) e o **Deadly Alliance lento no A12** (24/10; o PS2 pede mais do que o
-  processador dele dá, então a meta é medir e achar o melhor ajuste, sem prometer velocidade cheia).
+  processador dele dá, então a meta é medir e achar o melhor ajuste, sem prometer velocidade cheia). **Medido em 10/11 (APK 2026.11.09, Vulkan, 1x):** na luta, **42 a 47% da velocidade**, com o processador do PS2 (EE) em 100% e 35 a 44 ms por quadro (o limite é 16,7); a placa gasta só 4 ms. O ARENA já está no passo mais leve que não trava o jogo (EE a 60%); o salto de ciclos não ajuda ("maximum" deu o mesmo; "moderate", 28%). Menu principal 18 quadros, escolha de lutadores 56, tela do cartão 60. **Limite do aparelho, como o Armageddon em 24/10; fechado sem mudança.** O aviso "MEMORY CARD (PS2) FULL" no slot 2 é o PocketStation (cartão de PS1) que você escolheu para lá em 24/10; o jogo salva no slot 1. Para tirar o aviso, Ajustes → Emuladores → Acessórios dos consoles → Cartões de memória do PS2, Entrada 2 com um cartão de PS2.
 
 ## Android com o mesmo cuidado do PC (08/11/2026, de manhã)
 

@@ -192,6 +192,8 @@ lutadores** caiu para **19 a 27%** (EE 30 a 88 ms por quadro) e a luta para
 ~15 a 23%: **o A12 não dá conta do 3D do Mortal Kombat Armageddon**, por mais
 que se ajuste. É o aparelho, não o ARENA.
 
+**Mortal Kombat Deadly Alliance no A12 (10/11/2026, `arena-status.json` do núcleo):** na luta, 42 a 47% (EE 100%, 35 a 44 ms por quadro; GS 4 ms). Com o salto de ciclos "maximum", o mesmo (38 a 43%); com o "moderate", pior (28%, a thread de fundo do vídeo atrasando). Mesma conclusão: o processador do A12 não dá conta da luta em 3D.
+
 **O que o ARENA faz com isso** (`graficos.passo_do_ee_do_ps2`): o salto de
 ciclos fica sempre desligado (o próprio ARMSX2 diz que ele quase sempre
 atrapalha, e o regulador automático só funciona sem ele); o ponto de partida do
