@@ -521,6 +521,43 @@ calmo (depois de reiniciar o PC) antes de mexer no ARENA.
    de recursos e otimizações para todo celular (meta realista: Android 7 ou mais novo, 64 bits, dos últimos 7 a 8 anos).
 5. ~~Auditoria da tela~~ **feita em 10/11** (defeitos consertados em `78a469e`; a proposta de layout em `docs\PROPOSTA-LAYOUT.md`, à espera das suas respostas abaixo). Auditoria da tela e layout novo (abas, distribuição), o mesmo no PC, no celular e no Chromebook.
 
+## Relato do aluno HugoVHK (03/11/2026): o save do PS2 que trava
+
+Relatado com fotos pelo aluno da conta [HugoVHK](https://github.com/HugoVHK) (crédito em `CREDITOS.md`): no **Crash of
+the Titans** (PS2), a tela de salvar fica parada no logotipo, com as linhas da caixa de salvamento; o primeiro save
+gravou e o segundo não gravou mais. Ele também confirmou o PS2 funcionando no computador dele (God of War liso, com a
+BIOS do console dele).
+
+- **Ainda não reproduzido:** o jogo não está entre os do professor.
+- **Hipóteses, nenhuma conferida:**
+  1. O cartão da entrada 1 é de **64 MB** (o padrão do ARENA desde 24/10), e alguns jogos de PS2 não lidam com cartão
+     maior que 8 MB.
+  2. O save no cartão **misturado com estado salvo** (F2/F4): carregar um estado salvo **depois** de gravar no cartão
+     pode estragar o save. A dica é antiga nos fóruns do PCSX2:
+     https://forums.pcsx2.net/archive/index.php/thread-39979-2.html .
+     Pesa direto no "continuar de onde parou", que também carrega estado salvo.
+- **Como testar quando houver o jogo:** salvar duas vezes com o cartão de 64 MB e depois com um de 8 MB (Ajustes →
+  Emuladores → Acessórios dos consoles → Cartões de memória do PS2), sem usar o F2/F4 no meio.
+- Entra na revisão dos saves e dos cartões de memória pedida em 10/11 (o "continuar de onde parou").
+
+**Segundo relato do mesmo aluno (10/11/2026), com foto: o Play Protect bloqueia o app.** Ao instalar o APK, o Google
+Play Protect mostra "App de risco bloqueado: esse app foi criado para uma versão mais antiga do Android e não inclui
+as proteções de privacidade mais recentes", com o link pequeno **"Instalar assim mesmo"**.
+- **Causa, conferida no APK de 09/11 (apktool):** `targetSdkVersion: 28` (Android 9), herdado do RetroArch oficial que
+  o ARENA usa de base. O Play Protect avisa quando a versão-alvo fica **mais de 2 versões abaixo** da do celular [Certo,
+  guia do Google: https://developers.google.com/android/play-protect/warning-dev-guidance]. Então qualquer celular com
+  Android 12 ou mais novo mostra o aviso, o A12 inclusive.
+- **Enquanto não muda:** na tela do aviso, tocar em **"Instalar assim mesmo"** (dá para instalar; é aviso, não
+  proibição). **Não desligar o Play Protect** (o aluno contou que desligou): ele é o antivírus do Android e protege
+  contra app malicioso, mais ainda em celular que baixa arquivos de sites de fora. Quem desligou: Play Store → foto do
+  perfil → Play Protect → engrenagem → ligar "Verificar apps com o Play Protect" de novo.
+- **Conserto planejado:** subir a versão-alvo para **35** (Android 15), no `ferramentas\montar_android.py`, junto com o
+  que muda a partir da 29: acesso aos arquivos só com "Acesso a todos os arquivos" (o ARENA já pede), `android:exported`
+  em toda tela com filtro (31), `PendingIntent` com a marca de imutável (31), receptor registrado com
+  `RECEIVER_EXPORTED`/`NOT_EXPORTED` (34), tipo do serviço em primeiro plano (34) e a tela de ponta a ponta (35). O A12
+  é Android 12 e só mostra o que muda até a 31: o resto precisa do emulador do Android 15 (imagem grátis do SDK) antes
+  de ir para a turma.
+
 ## Depende do Rafael
 
 - **"Estamos em casas diferentes" (partida pela internet, pelo repasse do RetroArch), investigado em 10/11:** o

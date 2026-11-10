@@ -24,6 +24,14 @@
   &nbsp;·&nbsp; <a href="#perguntas-frequentes">Perguntas frequentes</a>
 </p>
 
+<!-- A soma dos downloads de TODAS as versoes (o GitHub conta por arquivo de cada versao e nao junta sozinho; o
+     shields.io soma tudo a cada visita, de graca e sem conta). Pedido do professor em 10/11/2026. -->
+<p align="center">
+  <a href="https://github.com/RafaParise/arena-console/releases"><img
+     src="https://img.shields.io/github/downloads/RafaParise/arena-console/total?label=downloads%20de%20todas%20as%20vers%C3%B5es&amp;color=d4a017"
+     alt="Downloads somando todas as versões do ARENA"></a>
+</p>
+
 ---
 
 ## O que é
@@ -349,6 +357,14 @@ baixar as capas dos jogos, a biblioteca do archive.org, o assistente de
 controle, a primeira bateria de testes e correções de bugs. O que é de cada
 um, e as versões antigas para baixar (`v0.9`, do professor, e `v1.0`, do
 aluno), estão em [`CREDITOS.md`](CREDITOS.md).
+
+O aluno da conta **[HugoVHK](https://github.com/HugoVHK)** testou o ARENA em
+casa (03/11/2026): achou o defeito do save do PS2 (a tela de salvar parada no
+*Crash of the Titans*, e o segundo save que não gravava) e mostrou o PS2
+rodando liso no computador dele. Depois avisou que o Google Play Protect
+bloqueia a instalação do app no celular ("criado para uma versão mais antiga
+do Android"). Os dois relatos foram a base da revisão dos saves e da troca da
+versão-alvo do app, em novembro de 2026 (detalhes em [`CREDITOS.md`](CREDITOS.md)).
 
 Os emuladores são obra das equipes do RetroArch/libretro, PCSX2, Dolphin,
 RPCS3 e Xenia — o ARENA só os organiza para a sala de aula.

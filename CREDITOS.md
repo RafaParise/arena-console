@@ -45,6 +45,29 @@ JSON com chaves e o grande demais; favoritos e recentes deixaram de repetir
 jogo; o Jogar Junto do PlayStation passou a avisar em vez de falhar (o
 núcleo da época não sincronizava as duas máquinas).
 
+## O aluno HugoVHK: o teste dos saves do PS2 (03/11/2026)
+
+O aluno da conta **[HugoVHK](https://github.com/HugoVHK)** testou o ARENA em
+casa e mandou ao professor, com fotos da tela:
+
+- **um defeito no save do PS2:** no *Crash of the Titans*, a tela de salvar
+  ficava parada (só o logotipo do jogo e as linhas da caixa de salvamento).
+  O primeiro save gravou, e o segundo não gravou mais;
+- **o PS2 funcionando no computador dele:** *God of War* rodando liso, com a
+  BIOS do console dele.
+
+Depois (10/11/2026), mandou outro achado, também com foto: **o Google Play
+Protect bloqueia a instalação do app do ARENA no celular** ("App de risco
+bloqueado: esse app foi criado para uma versão mais antiga do Android"), e
+avisou o professor para orientar a turma enquanto isso não se resolve. O
+motivo está no APK: ele declara o Android 9 como versão-alvo, e o Play Protect
+avisa quando a versão-alvo está mais de duas versões abaixo da do celular.
+
+Os dois relatos viraram pendências registradas (`docs\PENDENCIAS.md`) e foram
+a base da revisão dos saves e dos cartões de memória e da troca da versão-alvo
+do app, na atualização de novembro de 2026. É o tipo de teste que o ARENA mais precisa: um aluno jogando de
+verdade, numa máquina que não é a do professor, e contando o que travou.
+
 ## As versões para baixar
 
 Nos [Releases](https://github.com/RafaParise/arena-console/releases), da
