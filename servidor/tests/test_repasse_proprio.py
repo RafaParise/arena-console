@@ -217,16 +217,31 @@ class Pedacos(unittest.TestCase):
         self.assertNotIn(dados["codigo"], repasse.salas)
         self.assertNotIn(sala.sessao, repasse.por_sessao)
 
-    def test_tentativas_ao_acaso_de_muitos_enderecos_param(self):
+    def test_codigos_errados_param_so_a_vizinhanca(self):
+        # Quem troca de endereco dentro da mesma rede (/24) para; as outras redes continuam achando as salas delas.
         repasse = rp.Repasse()
         _status, dados = repasse.reservar("200.1.2.3")
         sala = repasse.salas[dados["codigo"]]
         sala.sessao = b"z" * 12
         errado = "%06d" % ((int(dados["codigo"]) + 1) % 1000000)
-        for n in range(rp.LIMITE_ERROS_GERAL[0]):
-            self.assertEqual(repasse.consultar("10.%d.%d.1" % (n // 250, n % 250), errado)[0], 404)
-        # Agora o repasse inteiro para de responder codigos por um minuto, ate o certo.
-        self.assertEqual(repasse.consultar("10.200.0.1", dados["codigo"])[0], 429)
+        for n in range(rp.LIMITE_ERROS_DA_VIZINHANCA[0]):
+            ip = "10.0.0.%d" % (n + 1)
+            self.assertEqual(repasse.consultar(ip, errado, rp.vizinhanca(ip))[0], 404)
+        self.assertEqual(repasse.consultar("10.0.0.250", dados["codigo"], rp.vizinhanca("10.0.0.250"))[0], 429)
+        self.assertEqual(repasse.consultar("10.0.1.5", dados["codigo"], rp.vizinhanca("10.0.1.5"))[0], 200)
+
+    def test_vizinhanca(self):
+        self.assertEqual(rp.vizinhanca("10.0.0.7"), "10.0.0.0/24")
+        self.assertEqual(rp.vizinhanca("::ffff:10.0.0.7"), "10.0.0.0/24")
+        self.assertEqual(rp.vizinhanca("2804:14c:1:2::1"), "2804:14c:1::/48")
+
+    def test_a_sala_e_so_do_endereco_exato(self):
+        # Revisao de seguranca: o /64 conta os limites, mas so o RetroArch do MESMO endereco pega a sala reservada.
+        repasse = rp.Repasse()
+        _status, dados = repasse.reservar(rp.chave_do_endereco("2804:14c:1:2::10"), "2804:14c:1:2::10")
+        sala = repasse.salas[dados["codigo"]]
+        self.assertEqual(sala.ip, "2804:14c:1:2::10")
+        self.assertEqual(sala.chave, "2804:14c:1:2::/64")
 
     def test_mesmo_ipv4_pelos_dois_jeitos(self):
         self.assertEqual(rp.chave_do_endereco("::ffff:200.1.2.3"), "200.1.2.3")

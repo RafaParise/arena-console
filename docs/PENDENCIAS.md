@@ -530,6 +530,14 @@ calmo (depois de reiniciar o PC) antes de mexer no ARENA.
   jogo e o país. Para a chave voltar, o ARENA teria de anunciar a sala nessa lista pública (dá para usar um apelido
   sorteado e senha na sala, para ninguém de fora entrar). Como expõe o que o aluno joga numa lista pública, **a
   decisão é sua**: anunciar (com apelido sorteado e senha) ou deixar a chave fora, como está.
+  **Decidido e feito em 10/11/2026 (tarde):** o Rafael pediu para montar, unido à infraestrutura do parise-sync, que
+  fica sempre ligada. Em vez da lista pública (que mostraria o apelido do aluno menor de idade), foi feito um **repasse
+  próprio** (`servidor\repasse_proprio.py`): fala o mesmo protocolo do repasse do RetroArch (conferido no
+  `netplay_frontend.c`) e, na mesma porta 55440, dá um código de 6 números por sala. Sem lista, sem nome, nada em disco.
+  A chave "Estamos em casas diferentes" voltou à tela quando o repasse está em Amigos → Partidas entre casas. Testes:
+  `servidor\tests\test_repasse_proprio.py` (22), `testes\teste_repasse_proprio_retroarch.py` (dois RetroArch pelo
+  túnel) e `testes\teste_repasse_proprio_pelo_arena.py` (o ARENA abre com código, entra pelo código e explica os
+  erros): todos passam. Falta: instalar no A12 da bancada e abrir a porta no FortiGate (`docs\REPASSE-PROPRIO.md`).
 
 - **Layout novo (`docs\PROPOSTA-LAYOUT.md`, 10/11):** (1) as 5 abas (Jogos, Amigos, Placar, Biblioteca, Ajustes) no
   lugar dos 8 botões do topo, ou manter como está? (2) no celular, abas embaixo ou em cima? (3) o tema claro/escuro

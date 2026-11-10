@@ -854,6 +854,23 @@ ligava o repasse da internet do RetroArch, mas, testado de verdade, o
 colega nunca entrava: o ARENA ainda não passa para ele o "código da sala"
 do repasse. Ela volta quando isso funcionar.
 
+**Voltou em 10/11/2026, pelo repasse da turma.** O professor deixa ligado um
+aparelho com o repasse do ARENA (`servidor\repasse_proprio.py`): é ele quem
+passa os dados de uma casa para a outra. Ninguém aparece em lista nenhuma
+da internet. Funciona assim:
+
+1. Uma vez só: botão **Amigos**, no alto → **Partidas entre casas** →
+   escreva o endereço que o professor passou → **Testar** → **Guardar**.
+2. Quem abre: **Jogar junto** → **Eu abro a partida** → ligue **Estamos em
+   casas diferentes** → **Começar**. No alto da tela aparece o **código da
+   sala**, com 6 números. Passe esse código ao amigo.
+3. Quem entra: **Jogar junto** → **Entrar na partida do amigo** → ligue **Estamos em casas
+   diferentes** → digite o código → **Começar**.
+
+O código só vale enquanto o jogo de quem abriu estiver aberto. Sem o
+endereço do repasse em Amigos, a chave nem aparece. Para quem monta o
+repasse (o professor): `docs\REPASSE-PROPRIO.md`.
+
 Se as máquinas da escola não se enxergam, é isolamento de cliente no
 roteador. As saídas estão na Parte A deste mesmo documento.
 

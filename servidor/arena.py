@@ -90,6 +90,7 @@ import bios        # noqa: E402  (nome, pasta e versao certa de cada BIOS -- 03/
 import companheiros  # noqa: E402  (programas que abrem junto com o jogo: o DreamPotato -- 24/10/2026)
 import controle_remoto  # noqa: E402  (o celular como controle, pelo Wi-Fi: Network RetroPad -- 25/10/2026)
 import controle_usb  # noqa: E402  (o cabo USB: celular-controle e Jogar Junto pelo cabo -- 26/10/2026)
+import repasse_proprio  # noqa: E402  (partida entre casas pelo repasse do professor, com codigo de sala -- 10/11/2026)
 import pokketsx  # noqa: E402  (o PS1 com o PocketStation de verdade, so Windows -- 24/10/2026)
 import acessorios  # noqa: E402  (VMU, Rumble Pak, multitap, pistola de luz... ligar e desligar -- 24/10/2026)
 import arrumar     # noqa: E402  (o botao Arrumar: o arquivo do jogo no lugar certo -- 03/10/2026)
@@ -1297,6 +1298,9 @@ def config_padrao():
         # Os acessorios de cada console que a pessoa ligou, desligou ou escolheu (acessorios.limpar_estado):
         # {"dc_vmu_tela_1": {"tela": true, "lugar": "Lower Right"}}. Controle que ela nunca mexeu nao entra.
         "acessorios": {},
+        # O repasse da turma (servidor\repasse_proprio.py, 10/11/2026): "host" ou "host:porta" do aparelho que o
+        # professor deixa ligado. Com ele, "Estamos em casas diferentes" funciona por um codigo de 6 numeros.
+        "repasse_proprio": "",
         # O mesmo, direto no .ini do emulador (graficos.limpar_ajustes_ini): {"armsx2": {"EmuCore/GS": {...}}}.
         "ajustes_ini_dos_nucleos": {},
         # Os memory cards do PS2 do celular, em MB (graficos.limpar_cartoes_ps2): o 1 e' o padrao do console (o da
@@ -1497,6 +1501,9 @@ def ler_config_do_disco():
     config["ajustes_ini_dos_nucleos"] = graficos.limpar_ajustes_ini(salvo.get("ajustes_ini_dos_nucleos"))
     config["cartoes_ps2"] = graficos.limpar_cartoes_ps2(salvo.get("cartoes_ps2"))
     config["rpcn_ativo"] = bool(salvo.get("rpcn_ativo"))
+    repasse_salvo = str(salvo.get("repasse_proprio") or "").strip()[:255]
+    if repasse_salvo and repasse_proprio.separar_endereco(repasse_salvo) is not None:
+        config["repasse_proprio"] = repasse_salvo
     if salvo.get("escala_da_tela") in graficos.ESCALAS:
         config["escala_da_tela"] = salvo["escala_da_tela"]
     if salvo.get("formato_da_imagem") in graficos.FORMATOS:
@@ -7428,6 +7435,20 @@ class Manipulador(BaseHTTPRequestHandler):
             gc.collect()
             return self.responder_json({"ok": True, "total": total})
 
+        if caminho == "/api/repasse/testar":
+            # O botao "Testar" de Ajustes: o repasse da turma responde daqui? (servidor\repasse_proprio.py)
+            endereco = str(dados.get("endereco") or carregar_config().get("repasse_proprio") or "").strip()[:255]
+            if not endereco:
+                return self.erro("Escreva o endereço do repasse primeiro.")
+            if repasse_proprio.separar_endereco(endereco) is None:
+                return self.erro("Endereço do repasse inválido. Use o nome ou o número que o professor passou "
+                                 "(exemplo: 200.100.50.25:55440).")
+            if repasse_proprio.saude(endereco):
+                return self.responder_json({"ok": True, "mensagem": "O repasse respondeu: as partidas entre casas "
+                                                                      "vão por ele."})
+            return self.responder_json({"ok": False, "mensagem": "O repasse não respondeu. Confira o endereço e se o "
+                                                                   "aparelho dele está ligado e com internet."})
+
         if caminho == "/api/config":
             config = carregar_config()
 
@@ -7507,6 +7528,12 @@ class Manipulador(BaseHTTPRequestHandler):
                 config["motor_ps2"] = dados["motor_ps2"]
             if dados.get("fundo_animado") in FUNDOS_ANIMADOS:
                 config["fundo_animado"] = dados["fundo_animado"]
+            if isinstance(dados.get("repasse_proprio"), str):
+                texto = dados["repasse_proprio"].strip()[:255]
+                if texto and repasse_proprio.separar_endereco(texto) is None:
+                    return self.erro("Endereço do repasse inválido. Use o nome ou o número, com a porta depois "
+                                     "de dois pontos se não for a 55440 (exemplo: 200.100.50.25:55440).")
+                config["repasse_proprio"] = texto
             if dados.get("tema") in ("claro", "escuro"):
                 config["tema"] = dados["tema"]
 
@@ -7801,7 +7828,8 @@ class Manipulador(BaseHTTPRequestHandler):
                     # O cabo foi ligado para ENTRAR na partida do celular: o `adb forward` segura a porta 55435 deste
                     # computador e a partida aberta aqui nao escutaria. Desfaz antes.
                     controle_usb.soltar_partida()
-                if not hospedar:
+                if not hospedar and not dados.get("pela_internet"):
+                    # (Pela internet, quem entra acha a sala pelo codigo de 6 numeros, no repasse: mais abaixo.)
                     bruto = str(dados.get("endereco", "") or "").strip()
                     endereco = normalizar_url(bruto)
                     endereco = urllib.parse.urlsplit(endereco).hostname or ""
@@ -7841,7 +7869,47 @@ class Manipulador(BaseHTTPRequestHandler):
                 # recusaria o ultimo colega. Com 1 ou 2, continua 3.
                 partida["opcoes"]["netplay_max_connections"] = str(
                     jogo["ligacao"]["max_conexoes"])
-                if not hospedar and not assistir:
+                if pela_internet:
+                    # Casas diferentes (10/11/2026): pelo repasse da turma (servidor\repasse_proprio.py), sem a lista
+                    # publica da internet. Quem abre ganha um codigo de 6 numeros; quem entra digita o codigo.
+                    repasse = str(config.get("repasse_proprio") or "").strip()
+                    falha_do_repasse = None
+                    if not repasse:
+                        falha_do_repasse = ("Para jogar com quem está em outra casa, o ARENA precisa do repasse da "
+                                            "turma: botão Amigos, no alto → Partidas entre casas. Peça o endereço "
+                                            "ao professor.")
+                    elif hospedar:
+                        codigo_sala, falha_do_repasse = repasse_proprio.reservar_sala(repasse)
+                        if codigo_sala:
+                            partida["opcoes"].update({
+                                "netplay_use_mitm_server": "true",
+                                "netplay_mitm_server": "custom",
+                                "netplay_custom_mitm_server": repasse_proprio.para_o_retroarch(repasse),
+                                "netplay_nat_traversal": "false",
+                                "netplay_public_announce": "false",
+                            })
+                            partida["codigo_sala"] = codigo_sala
+                    else:
+                        achado, falha_do_repasse = repasse_proprio.procurar_sala(repasse, dados.get("codigo_sala", ""))
+                        if achado:
+                            # O tunel fica na MESMA porta do endereco que o ARENA ja alcancou (a que o roteador do
+                            # professor abre), nao na que o repasse diz de si: assim nao ha desencontro de porta.
+                            sessao = achado[0]
+                            maquina_do_repasse, porta_do_repasse = repasse_proprio.separar_endereco(repasse)
+                            partida["opcoes"].update({
+                                # A porta vale pelo arquivo (o "--port" da linha de comando e' ignorado, 08/10/2026).
+                                "netplay_ip_port": str(porta_do_repasse),
+                                "netplay_use_mitm_server": "false",
+                                "netplay_nat_traversal": "false",
+                            })
+                            partida["argumentos"] = ["--connect", maquina_do_repasse, "--port", str(porta_do_repasse),
+                                                     "--mitm-session=" + sessao]
+                    if falha_do_repasse:
+                        with TRAVA_JOGO:
+                            JOGO_EM_ANDAMENTO["ativo"] = False
+                            JOGO_EM_ANDAMENTO["titulo"] = ""
+                        return self.erro(falha_do_repasse)
+                if not hospedar and not assistir and not pela_internet:
                     # Para avisar o ARENA de quem abriu ("cheguei") antes de
                     # conectar: se ele esperava, os dois comecam juntos.
                     partida["anfitriao"] = normalizar_url(str(dados.get("endereco", "") or ""))
@@ -7861,7 +7929,9 @@ class Manipulador(BaseHTTPRequestHandler):
             # Quem abre a partida pode esperar o amigo para comecarem juntos
             # (a tela pede "esperar"; ver PARTIDA_PENDENTE). Sem o pedido, o
             # jogo abre na hora, como sempre.
-            esperar = bool(modo == "hospedar" and partida and dados.get("esperar"))
+            # Pela internet nao ha espera: o amigo nao alcanca este ARENA para avisar "cheguei", e o codigo da sala
+            # so vale 90 s ate o RetroArch chegar ao repasse.
+            esperar = bool(modo == "hospedar" and partida and dados.get("esperar") and not dados.get("pela_internet"))
             if modo == "hospedar" and partida:
                 with TRAVA_JOGO:
                     PARTIDA_ABERTA["partida"] = {
@@ -7870,6 +7940,7 @@ class Manipulador(BaseHTTPRequestHandler):
                         "console": plataforma.get("nome", ""),
                         "jogadores": jogo["ligacao"]["jogadores"],
                         "pela_internet": bool(dados.get("pela_internet")),
+                        "codigo_sala": partida.get("codigo_sala", ""),
                         "esperando": esperar,
                     }
 
@@ -7894,6 +7965,8 @@ class Manipulador(BaseHTTPRequestHandler):
             if partida:
                 resposta["papel"] = partida["papel"]
                 resposta["porta"] = graficos.PORTA_PARTIDA
+                if partida.get("codigo_sala"):
+                    resposta["codigo_sala"] = partida["codigo_sala"]
             if esperar:
                 resposta["esperando"] = True
             if aviso_netplay or aviso_sem_bios:

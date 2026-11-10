@@ -40,9 +40,12 @@ RetroArch dele pede a sessao (RATS). Os dois saem do MESMO endereco de internet,
 pode haver uma reserva esperando por endereco (outra casa que divide a mesma internet espera alguns segundos), e um
 RetroArch que chega sem reserva e' recusado: o repasse nao serve de repasse aberto para estranhos.
 
-Risco aceito (revisao de seguranca de 10/11/2026): 6 numeros sao 1 milhao de codigos. Com 30 consultas por minuto por
-internet (o bloco /64 inteiro, no IPv6), no maximo 300 codigos errados por minuto no repasse todo e a sala fechando
-quando o jogo fecha, achar uma sala ao acaso levaria dias de tentativa. O pior caso e' um estranho entrar como jogador
+Risco aceito (revisoes de seguranca de 10/11/2026): 6 numeros sao 1 milhao de codigos. Com 30 consultas por minuto por
+internet (o bloco /64 inteiro, no IPv6), 60 codigos errados a cada 10 minutos por vizinhanca de rede (/24 do IPv4, /48
+do IPv6) e a sala fechando quando o jogo fecha, achar uma sala ao acaso de uma rede so levaria meses. Fica aceito o caso
+de muitas redes diferentes tentando juntas: um bloqueio geral contra isso foi descartado porque qualquer um poderia
+dispara-lo e travar todo mundo. A sala so e' do RetroArch que sai do MESMO endereco exato de quem reservou (o /64 conta
+os limites, nao a posse). O pior caso e' um estranho entrar como jogador
 numa partida: o RetroArch mostra na tela o apelido de quem entrou, e fechar o jogo fecha a sala. Nao ha conversa, voz,
 nem dado do aluno no repasse.
 
@@ -80,9 +83,10 @@ SILENCIO_MAXIMO = 300.0            # ligacao emendada sem nenhum byte por 5 min 
 INTERVALO_DO_PING = 30.0
 LIMITE_RESERVAS = (10, 600.0)      # ate 10 reservas a cada 10 min por endereco
 LIMITE_CONSULTAS = (30, 60.0)      # ate 30 consultas de codigo por minuto por endereco (6 numeros nao se adivinham)
-# Revisao de seguranca (10/11/2026): muitos enderecos juntos tentando codigos ao acaso. Passando de 300 consultas ERRADAS
-# por minuto no repasse inteiro, ninguem consulta por 1 minuto (quem ja esta jogando continua).
-LIMITE_ERROS_GERAL = (300, 60.0)
+# Revisao de seguranca (10/11/2026): codigos ERRADOS contam tambem pela vizinhanca de rede (o /24 do IPv4, o /48 do
+# IPv6), para quem troca de endereco dentro da mesma rede. Um bloqueio geral do repasse foi descartado: qualquer um
+# poderia dispara-lo de proposito e travar todo mundo.
+LIMITE_ERROS_DA_VIZINHANCA = (60, 600.0)
 MAX_SALAS_POR_ENDERECO = 2         # salas abertas (esperando ou jogando) de uma mesma internet
 VIDA_MAXIMA_DA_SALA = 6 * 3600.0   # uma sala nao fica aberta mais de 6 horas
 
@@ -111,6 +115,18 @@ def chave_do_endereco(ip):
     if endereco.version == 6:
         return str(ipaddress.ip_network("%s/64" % endereco, strict=False))
     return str(endereco)
+
+
+def vizinhanca(ip):
+    """A rede em volta de quem ligou: o /24 do IPv4 e o /48 do IPv6 (para contar codigos errados)."""
+    try:
+        endereco = ipaddress.ip_address(ip.split("%")[0])
+    except ValueError:
+        return ip
+    if endereco.version == 6 and endereco.ipv4_mapped:
+        endereco = endereco.ipv4_mapped
+    tamanho = 24 if endereco.version == 4 else 48
+    return str(ipaddress.ip_network("%s/%d" % (endereco, tamanho), strict=False))
 
 
 class Limitador:
@@ -143,9 +159,10 @@ class Limitador:
 
 
 class Sala:
-    def __init__(self, codigo, chave):
+    def __init__(self, codigo, chave, ip=None):
         self.codigo = codigo
-        self.chave = chave                 # endereco de quem reservou
+        self.chave = chave                 # a internet de quem reservou (o /64 no IPv6): conta os limites
+        self.ip = ip or chave              # o endereco EXATO de quem reservou: so o RetroArch dele pega a sala
         self.criada = time.monotonic()
         self.sessao = None                 # 12 bytes, quando o RetroArch do anfitriao chega
         self.controle = None               # o escritor do canal de controle
@@ -179,7 +196,7 @@ class Repasse:
         self.total = 0
         self.reservas = Limitador(*LIMITE_RESERVAS)
         self.consultas = Limitador(*LIMITE_CONSULTAS)
-        self.erros = Limitador(*LIMITE_ERROS_GERAL)
+        self.erros = Limitador(*LIMITE_ERROS_DA_VIZINHANCA)
 
     # --- Salas -----------------------------------------------------------------------------------------------
     def _limpar_reservas_vencidas(self):
@@ -194,7 +211,7 @@ class Repasse:
         self.reservas.limpar(agora)
         self.consultas.limpar(agora)
 
-    def reservar(self, chave):
+    def reservar(self, chave, ip=None):
         """(status HTTP, resposta) para o POST /sala."""
         self._limpar_reservas_vencidas()
         if any(s.chave == chave and s.sessao is None for s in self.salas.values()):
@@ -209,20 +226,20 @@ class Repasse:
             codigo = "%06d" % secrets.randbelow(1000000)
             if codigo not in self.salas:
                 break
-        self.salas[codigo] = Sala(codigo, chave)
+        self.salas[codigo] = Sala(codigo, chave, ip)
         return 200, {"codigo": codigo, "vale": int(RESERVA_VALE)}
 
-    def consultar(self, chave, codigo):
+    def consultar(self, chave, codigo, perto=None):
         """(status HTTP, resposta) para o GET /sala/<codigo>."""
         if not self.consultas.pode(chave):
             return 429, {"erro": "Muitas tentativas. Espere um minuto e confira o codigo."}
-        if self.erros.cheio(""):
-            # Codigos errados demais no repasse inteiro (gente tentando ao acaso de muitos enderecos): ninguem consulta
-            # por 1 minuto. Quem ja esta jogando nao e' afetado.
-            return 429, {"erro": "O repasse esta recebendo tentativas demais. Espere um minuto."}
+        perto = perto or chave
+        if self.erros.cheio(perto):
+            # Codigos errados demais vindos desta vizinhanca de rede: so ela espera.
+            return 429, {"erro": "Muitos codigos errados desta rede. Espere alguns minutos e confira o codigo."}
         sala = self.salas.get(codigo)
         if sala is None:
-            self.erros.pode("")                # conta o erro
+            self.erros.pode(perto)             # conta o erro
             return 404, {"erro": "Nao ha sala com esse codigo (confira os 6 numeros, ou a sala ja fechou)."}
         if sala.sessao is None:
             return 202, {"aberta": False, "erro": "A sala ainda esta abrindo. Tente de novo em alguns segundos."}
@@ -246,6 +263,9 @@ class Repasse:
     async def atender(self, leitor, escritor):
         par = escritor.get_extra_info("peername") or ("?", 0)
         chave = chave_do_endereco(par[0])
+        exato = str(par[0]).split("%")[0]
+        if exato.startswith("::ffff:"):
+            exato = exato[len("::ffff:"):]
         if self.total >= MAX_CONEXOES or self.conexoes.get(chave, 0) >= MAX_CONEXOES_POR_ENDERECO:
             await _fechar(escritor)
             return
@@ -259,7 +279,7 @@ class Repasse:
             elif comeco == SESSAO:
                 resto = await asyncio.wait_for(leitor.readexactly(TAMANHO_ID - 4), ESPERA_DO_COMECO)
                 if resto == bytes(12):
-                    await self._anfitriao(leitor, escritor, chave)
+                    await self._anfitriao(leitor, escritor, exato)
                 else:
                     await self._convidado(resto, leitor, escritor, par[0])
             elif comeco == LIGACAO:
@@ -280,11 +300,13 @@ class Repasse:
             return
         linha = cabecalho.split(b"\r\n", 1)[0].decode("ascii", "replace").split()
         metodo, caminho = (linha + ["", ""])[:2]
+        ip = str((escritor.get_extra_info("peername") or ("",))[0]).split("%")[0]
+        exato = ip[len("::ffff:"):] if ip.startswith("::ffff:") else ip
         if metodo == "POST" and caminho == "/sala":
-            status, corpo = self.reservar(chave)
+            status, corpo = self.reservar(chave, exato)
         elif metodo in ("GET", "HEAD") and caminho.startswith("/sala/"):
             codigo = caminho[len("/sala/"):]
-            status, corpo = (self.consultar(chave, codigo) if len(codigo) == 6 and codigo.isdigit()
+            status, corpo = (self.consultar(chave, codigo, vizinhanca(ip)) if len(codigo) == 6 and codigo.isdigit()
                              else (404, {"erro": "O codigo da sala tem 6 numeros."}))
         elif metodo in ("GET", "HEAD") and caminho == "/saude":
             status, corpo = self.saude()
@@ -299,9 +321,9 @@ class Repasse:
                        + (b"" if metodo == "HEAD" else dados))
         await escritor.drain()
 
-    async def _anfitriao(self, leitor, escritor, chave):
+    async def _anfitriao(self, leitor, escritor, exato):
         self._limpar_reservas_vencidas()
-        sala = next((s for s in self.salas.values() if s.chave == chave and s.sessao is None), None)
+        sala = next((s for s in self.salas.values() if s.ip == exato and s.sessao is None), None)
         if sala is None:
             return                         # sem reserva: nao e' um ARENA (o repasse nao e' aberto a estranhos)
         while True:

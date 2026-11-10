@@ -315,6 +315,22 @@
         administrador, chame o professor ou o TI.</span>
       </p>
 
+      <h3 class="grupo-titulo">Partidas entre casas (repasse da turma)</h3>
+      <p class="explica">
+        Para jogar com quem está em <b>outra casa</b>, o ARENA passa pelo repasse que o professor deixa ligado.
+        Ninguém aparece em lista nenhuma: quem abre a partida ganha um <b>código de 6 números</b> e passa ao amigo.
+      </p>
+      <label class="campo">
+        <span>Endereço do repasse (o professor passa)</span>
+        <input id="repasseEndereco" type="text" maxlength="255" autocomplete="off" spellcheck="false"
+               placeholder="exemplo: 200.100.50.25:55440">
+      </label>
+      <div class="modal-acoes">
+        <button class="botao" id="btnTestarRepasse" type="button">Testar</button>
+        <button class="botao botao--principal" id="btnSalvarRepasse" type="button">Guardar</button>
+      </div>
+      <p class="explica" id="resultadoRepasse" aria-live="polite"></p>
+
       <h3 class="grupo-titulo">Meus endereços</h3>
       <p class="explica">
         Passe <b>um destes</b> para o colega. O marcado como adaptador
@@ -1417,8 +1433,15 @@
       <span class="opcao-rotulo">Estamos em casas diferentes</span>
       <button class="chave opcao-controle" id="chaveInternet"
               aria-pressed="false" aria-label="Jogar pela internet"></button>
-      <span class="opcao-ajuda">Para amigos fora da rede local.</span>
+      <span class="opcao-ajuda">Para amigos fora da rede local, pelo repasse da turma.</span>
     </div>
+
+    <label class="campo" id="campoCodigoSala" hidden>
+      <span>Código da sala (6 números)</span>
+      <input id="codigoSala" type="text" inputmode="numeric" maxlength="7" autocomplete="off"
+             spellcheck="false" placeholder="123456">
+      <span class="opcao-ajuda">Quem abriu a partida vê o código na tela e passa para você.</span>
+    </label>
 
     <label class="campo" id="campoAmigoPartida" hidden>
       <span>Amigo ou partida encontrada</span>

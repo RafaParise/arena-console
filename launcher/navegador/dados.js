@@ -947,6 +947,7 @@ window.ARENA_DADOS = {
   "permitir_rede": false,
   "preset_grafico_externo": "automatico",
   "recentes": [],
+  "repasse_proprio": "",
   "rpcn_ativo": false,
   "servidores": [],
   "tema": "claro",

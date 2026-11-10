@@ -252,6 +252,7 @@ async function carregarEstado() {
   $("#ajudaRede").textContent = dados.config.permitir_rede
     ? "Ligado. Os colegas já podem te achar."
     : "Desligado, só este computador acessa.";
+  $("#repasseEndereco").value = dados.config.repasse_proprio || "";
 
   $("#listaNivelGrafico").value = nivelDoGrafico(dados.config);
   explicarNivelGrafico();
@@ -4065,19 +4066,32 @@ function abrirPartida(jogo) {
   // Ja pergunta ao Windows se a rede e' Publica (em segundo plano), para o
   // aviso de quem abre a partida sair certo no "Comecar".
   procurarPartidas(true);
-  // "Estamos em casas diferentes" ESCONDIDA (auditoria 3, revisao da Fase 4,
-  // 09/10/2026): testado com o RetroArch de verdade, com ela o anfitriao vai
-  // pelo repasse da internet e nao atende na rede local, e o convidado -- que
-  // o ARENA manda para o endereco do anfitriao, sem o codigo da sala do
-  // repasse -- nunca entra. Volta quando o convidado entrar pelo repasse.
-  $("#campoInternet").hidden = true;
+  // "Estamos em casas diferentes": escondida de 09/10 a 10/11/2026 (o convidado nao tinha como achar a sala no
+  // repasse). Agora volta, pelo repasse da turma (servidor\repasse_proprio.py): aparece quando ele esta em Ajustes,
+  // quem abre ganha um codigo de 6 numeros e quem entra digita o codigo.
+  $("#campoInternet").hidden = !temRepasse();
   $("#chaveInternet").setAttribute("aria-pressed", "false");
+  $("#codigoSala").value = "";
+  atualizarCamposDaInternet();
   $("#resultadoTeste").textContent = "";
 
   for (const b of document.querySelectorAll("#modalPartida .perfil")) {
     b.classList.toggle("ativo", b.dataset.papel === "hospedar");
   }
   $("#modalPartida").hidden = false;
+}
+
+// O repasse da turma esta em Ajustes? (sem ele, "Estamos em casas diferentes" nem aparece)
+function temRepasse() {
+  return Boolean((estado.config?.repasse_proprio || "").trim());
+}
+
+// Pela internet, quem entra digita o codigo da sala (a lista da rede local nao serve: o amigo esta em outra casa).
+function atualizarCamposDaInternet() {
+  const internet = !$("#campoInternet").hidden && $("#chaveInternet").getAttribute("aria-pressed") === "true";
+  const entrando = estado.papelDaPartida !== "hospedar";
+  $("#campoCodigoSala").hidden = !(internet && entrando);
+  $("#campoAmigoPartida").hidden = !entrando || internet;
 }
 
 async function comecarPartida() {
@@ -4095,7 +4109,14 @@ async function comecarPartida() {
   };
   // Quem abre a partida espera o jogador 2: os dois comecam juntos.
   if (estado.papelDaPartida === "hospedar") corpo.esperar = true;
-  if (estado.papelDaPartida !== "hospedar") {
+  if (pelaInternet && estado.papelDaPartida !== "hospedar") {
+    corpo.codigo_sala = $("#codigoSala").value.replace(/\D/g, "");
+    if (corpo.codigo_sala.length !== 6) {
+      recado("Digite o código da sala: os 6 números que aparecem na tela de quem abriu a partida.", true);
+      return;
+    }
+    recado("Procurando a sala no repasse…", false, 3000);
+  } else if (estado.papelDaPartida !== "hospedar") {
     const escolha = $("#listaAmigosPartida").selectedOptions[0];
     corpo.endereco = escolha ? escolha.value : "";
     corpo.partida_token = escolha ? (escolha.dataset.token || "") : "";
@@ -4127,6 +4148,11 @@ async function comecarPartida() {
       recado(texto + complemento, false, complemento ? 9000 : 4500);
     }
     mostrarFaixaTeclas();
+    if (dados.codigo_sala) {
+      estado.avisoDaMaquina = true;
+      aviso(`Código da sala: ${dados.codigo_sala}. Passe ao amigo: ele clica em “Entrar na partida do amigo”, liga “Estamos em ` +
+        "casas diferentes” e digita esses 6 números.");
+    }
     if (dados.aviso_rede) {
       // Rede Pública: fica na barra do alto até o jogo fechar. O recado
       // sumiria atrás da janela do jogo antes de alguém tentar entrar.
@@ -6358,8 +6384,8 @@ function ligarEventos() {
       }
       const entrando = estado.papelDaPartida !== "hospedar";
       $("#campoAmigoPartida").hidden = !entrando;
-      // "Estamos em casas diferentes" fica escondida (ver abrirPartida).
-      $("#campoInternet").hidden = true;
+      $("#campoInternet").hidden = !temRepasse();
+      atualizarCamposDaInternet();
       preencherAmigosPartida();
       vigiarPartidas(entrando);
 
@@ -6451,6 +6477,30 @@ function ligarEventos() {
     const botao = evento.currentTarget;
     const novo = botao.getAttribute("aria-pressed") === "true" ? "false" : "true";
     botao.setAttribute("aria-pressed", novo);
+    atualizarCamposDaInternet();
+  });
+
+  // O repasse da turma (janela Amigos).
+  $("#btnTestarRepasse").addEventListener("click", async () => {
+    const saida = $("#resultadoRepasse");
+    saida.textContent = "Testando…";
+    try {
+      const dados = await pedir("/api/repasse/testar", "POST", { endereco: $("#repasseEndereco").value.trim() });
+      saida.textContent = dados.mensagem || "";
+    } catch (falha) {
+      saida.textContent = falha.message;
+    }
+  });
+  $("#btnSalvarRepasse").addEventListener("click", async () => {
+    try {
+      const dados = await pedir("/api/config", "POST", { repasse_proprio: $("#repasseEndereco").value.trim() });
+      if (dados.config) estado.config = dados.config;
+      $("#resultadoRepasse").textContent = estado.config.repasse_proprio
+        ? "Guardado. Na partida, ligue “Estamos em casas diferentes”."
+        : "Apagado. Sem repasse, a partida é só na rede local.";
+    } catch (falha) {
+      $("#resultadoRepasse").textContent = falha.message;
+    }
   });
 
   $("#chaveApagarSaves").addEventListener("click", (evento) => {
