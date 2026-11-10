@@ -5169,14 +5169,20 @@ async function abrirBaixados() {
         "Ajustes → Máquina → Deixar o ARENA ver os arquivos. Depois, volte aqui.";
       return;
     }
-    const pastas = (dados.pastas || []).join(", ") || "nenhuma pasta de downloads";
+    desenharPastasDeProcura(dados.escolhidas || [], dados.celular_inteiro || "");
+    const biosAchadas = dados.bios || [];
+    $("#tituloBiosBaixadas").hidden = !biosAchadas.length;
+    $("#listaBiosBaixadas").hidden = !biosAchadas.length;
+    $("#listaBiosBaixadas").replaceChildren(...biosAchadas.map(desenharBiosBaixada));
+    const pastas = [...(dados.pastas || []), ...(dados.escolhidas || [])].join(", ") || "nenhuma pasta de downloads";
     if (!(dados.jogos || []).length) {
-      situacao.textContent = "Não achei jogos em " + pastas + ". Baixe o jogo e toque em " +
-        "Procurar de novo, ou veja Como colocar jogos.";
+      situacao.textContent = "Não achei jogos em " + pastas + "." +
+        (biosAchadas.length ? " Achei BIOS: veja abaixo." : " Baixe o jogo e toque em Procurar de novo, " +
+          "ou veja Como colocar jogos.");
       return;
     }
     situacao.textContent = "Achei " + dados.jogos.length + (dados.jogos.length === 1 ? " jogo" : " jogos") +
-      " em " + pastas + ".";
+      (biosAchadas.length ? " e " + biosAchadas.length + " BIOS" : "") + " em " + pastas + ".";
     lista.replaceChildren(...dados.jogos.map(desenharBaixado));
   } catch (falha) {
     situacao.textContent = falha.message;
@@ -5219,12 +5225,14 @@ function desenharBaixado(jogo) {
     }
     levar.disabled = true;
     try {
-      await pedir("/api/baixados/levar", "POST", { arquivo: jogo.arquivo, console: escolha.value });
+      const resposta = await pedir("/api/baixados/levar", "POST", { arquivo: jogo.arquivo, console: escolha.value });
       const console = escolha.options[escolha.selectedIndex].textContent;
+      // O que ainda falta para o jogo abrir (a BIOS do console...), com o que fazer: dito na hora.
+      const falta = resposta.falta ? " Atenção: " + resposta.falta : "";
       item.replaceChildren(Object.assign(document.createElement("span"), {
-        className: "nome", textContent: jogo.nome + ": pronto, foi para o " + console + ".",
+        className: "nome", textContent: jogo.nome + ": pronto, foi para o " + console + "." + falta,
       }));
-      recado(jogo.nome + " foi para o " + console + ". Já está na lista.");
+      recado(jogo.nome + " foi para o " + console + ". Já está na lista." + falta, Boolean(falta));
       await carregarCatalogo();
     } catch (falha) {
       levar.disabled = false;
@@ -5233,6 +5241,69 @@ function desenharBaixado(jogo) {
   });
   item.append(nome, campo, levar);
   return item;
+}
+
+// As BIOS achadas nos downloads ou nas pastas escolhidas (10/11/2026): vao para a pasta BIOS do ARENA, que as poe no
+// lugar do console de cada uma.
+function desenharBiosBaixada(achada) {
+  const item = document.createElement("li");
+  const nome = document.createElement("span");
+  nome.className = "nome";
+  nome.textContent = achada.nome + " (" + achada.tamanho + "): " +
+    (achada.certeza === "marca" ? "é a BIOS " + achada.bios + ", conferida."
+                                : "parece a BIOS " + achada.bios + " (pelo nome).");
+  const levar = document.createElement("button");
+  levar.className = "botao botao--principal";
+  levar.type = "button";
+  levar.textContent = "Levar para o ARENA";
+  levar.addEventListener("click", async () => {
+    levar.disabled = true;
+    try {
+      const resposta = await pedir("/api/baixados/levar-bios", "POST", { arquivo: achada.arquivo });
+      const instaladas = resposta.instaladas || [];
+      const texto = instaladas.length
+        ? achada.nome + ": pronto, a BIOS já está no lugar (" + instaladas.join(", ") + ")."
+        : achada.nome + ": foi para a pasta BIOS do ARENA. Se o console ainda pedir a BIOS, veja o aviso dele.";
+      item.replaceChildren(Object.assign(document.createElement("span"), { className: "nome", textContent: texto }));
+      recado(texto);
+      await carregarCatalogo();
+    } catch (falha) {
+      levar.disabled = false;
+      recado(falha.message, true);
+    }
+  });
+  item.append(nome, levar);
+  return item;
+}
+
+// As pastas a mais onde procurar (ate 5), com o botao de tirar.
+function desenharPastasDeProcura(escolhidas, celularInteiro) {
+  $("#btnCelularInteiro").hidden = !celularInteiro || escolhidas.includes(celularInteiro);
+  $("#btnCelularInteiro").dataset.pasta = celularInteiro;
+  $("#listaPastasDeProcura").replaceChildren(...escolhidas.map((pasta) => {
+    const item = document.createElement("li");
+    const nome = document.createElement("span");
+    nome.className = "nome";
+    nome.textContent = pasta;
+    const tirar = document.createElement("button");
+    tirar.className = "botao";
+    tirar.type = "button";
+    tirar.textContent = "Tirar";
+    tirar.setAttribute("aria-label", "Parar de procurar em " + pasta);
+    tirar.addEventListener("click", () => mudarPastaDeProcura(pasta, true));
+    item.append(nome, tirar);
+    return item;
+  }));
+}
+
+async function mudarPastaDeProcura(pasta, tirar) {
+  try {
+    await pedir("/api/baixados/pasta", "POST", { pasta, tirar: Boolean(tirar) });
+    $("#campoPastaDeProcura").value = "";
+    await abrirBaixados();
+  } catch (falha) {
+    recado(falha.message, true);
+  }
 }
 
 async function abrirComoColocar() {
@@ -6287,6 +6358,14 @@ function ligarEventos() {
       recado(falha.message, true);
     }
   });
+
+  $("#btnAcrescentarPasta").addEventListener("click", () =>
+    mudarPastaDeProcura($("#campoPastaDeProcura").value, false));
+  $("#campoPastaDeProcura").addEventListener("keydown", (evento) => {
+    if (evento.key === "Enter") mudarPastaDeProcura(evento.currentTarget.value, false);
+  });
+  $("#btnCelularInteiro").addEventListener("click", (evento) =>
+    mudarPastaDeProcura(evento.currentTarget.dataset.pasta, false));
 
   $("#chaveTravar").addEventListener("click", async (evento) => {
     const botao = evento.currentTarget;

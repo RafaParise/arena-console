@@ -376,13 +376,26 @@
   </div>
   <div class="aba-conteudo">
     <p class="explica">
-      O ARENA olha a pasta de downloads e mostra os jogos que achou. Confira o
-      console e toque em <strong>Levar para o ARENA</strong>: o jogo vai para a
-      pasta certa. Nada sai do lugar sem você pedir.
+      O ARENA olha a pasta de downloads (e as pastas que você escolher, logo abaixo) e mostra os jogos e as BIOS que
+      achou. Confira o console e toque em <strong>Levar para o ARENA</strong>: o jogo vai para a pasta certa, e a
+      BIOS vai para o lugar do console dela. Nada sai do lugar sem você pedir.
     </p>
     <p class="explica" id="estadoBaixados" role="status" aria-live="polite">—</p>
     <ul class="baixados-lista" id="listaBaixados"></ul>
+    <h3 class="grupo-titulo" id="tituloBiosBaixadas" hidden>BIOS achadas</h3>
+    <ul class="baixados-lista" id="listaBiosBaixadas" hidden></ul>
     <button class="botao" id="btnBaixadosDeNovo" type="button">Procurar de novo</button>
+    <h3 class="grupo-titulo">Procurar também em outras pastas</h3>
+    <p class="explica">Jogos ou BIOS guardados em outro lugar (outro disco, uma pasta de jogos antiga): escreva o
+      caminho da pasta. O ARENA olha nela e em até três pastas abaixo.</p>
+    <label class="campo">
+      <span>Pasta</span>
+      <input id="campoPastaDeProcura" type="text" autocomplete="off" spellcheck="false"
+             placeholder="Ex.: D:\Jogos">
+    </label>
+    <button class="botao" id="btnAcrescentarPasta" type="button">Procurar nesta pasta</button>
+    <button class="botao" id="btnCelularInteiro" type="button" hidden>Procurar no celular inteiro</button>
+    <ul class="baixados-lista" id="listaPastasDeProcura"></ul>
   </div>
 </aside>
 

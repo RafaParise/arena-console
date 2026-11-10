@@ -90,5 +90,105 @@ class Baixados(unittest.TestCase):
         self.assertTrue(os.path.isfile(os.path.join(self.download, "Mario.nes")))
 
 
+class BuscaAmpliada(unittest.TestCase):
+    """10/11/2026: as pastas escolhidas (3 niveis), a pasta do ARENA pulada e as BIOS a parte."""
+
+    def setUp(self):
+        self.pasta = os.path.realpath(tempfile.mkdtemp(prefix="arena_busca_"))
+        self.download = os.path.join(self.pasta, "Download")
+        self.outra = os.path.join(self.pasta, "D", "Jogos")
+        self.arena = os.path.join(self.outra, "ARENA")
+        os.makedirs(self.download)
+        criar(os.path.join(self.outra, "nes", "antigos", "fundo", "Contra.nes"))         # 3 niveis abaixo
+        criar(os.path.join(self.outra, "a", "b", "c", "d", "Longe.nes"))                 # 4 niveis: fica de fora
+        criar(os.path.join(self.arena, "jogos", "NES", "JaNoArena.nes"))                 # a pasta do ARENA: pulada
+        criar(os.path.join(self.outra, "Android", "data", "Escondido.nes"))              # pasta do sistema: pulada
+        criar(os.path.join(self.outra, "neogeo.zip"), tamanho=2048)                      # a BIOS do Neo Geo
+        self.bios = os.path.join(self.pasta, "ARENA-BIOS")
+
+    def tearDown(self):
+        limpeza.apagar_pasta(self.pasta)
+
+    def procurar(self):
+        bios_achadas = []
+        jogos = baixados.procurar(CONSOLES, [self.download], escolhidas=[self.outra], ignorar=[self.arena],
+                                  bios_achadas=bios_achadas)
+        return {j["nome"] for j in jogos}, bios_achadas
+
+    def test_acha_na_pasta_escolhida_ate_tres_niveis(self):
+        nomes, _ = self.procurar()
+        self.assertIn("Contra.nes", nomes)
+        self.assertNotIn("Longe.nes", nomes)
+
+    def test_pula_a_pasta_do_arena_e_as_do_sistema(self):
+        nomes, _ = self.procurar()
+        self.assertNotIn("JaNoArena.nes", nomes)
+        self.assertNotIn("Escondido.nes", nomes)
+
+    def test_a_bios_do_neo_geo_vem_a_parte(self):
+        nomes, bios_achadas = self.procurar()
+        self.assertEqual([b["bios"] for b in bios_achadas], ["neogeo.zip"])
+        self.assertNotIn("neogeo.zip", nomes)
+
+    def test_levar_a_bios_nao_apaga_a_que_ja_esta_la(self):
+        criar(os.path.join(self.bios, "neogeo.zip"), dados=b"a de antes" * 10)
+        destino = baixados.levar_bios(os.path.join(self.outra, "neogeo.zip"), self.bios, [self.outra])
+        self.assertEqual(os.path.basename(destino), "neogeo (2).zip")
+        with open(os.path.join(self.bios, "neogeo.zip"), "rb") as arquivo:
+            self.assertTrue(arquivo.read().startswith(b"a de antes"))
+        self.assertFalse(os.path.exists(os.path.join(self.outra, "neogeo.zip")))
+
+    def test_so_move_de_onde_procurou(self):
+        with self.assertRaises(baixados.NaoPode):
+            baixados.levar_bios(os.path.join(self.outra, "neogeo.zip"), self.bios, [self.download])
+        with self.assertRaises(baixados.NaoPode):
+            baixados.levar(os.path.join(self.outra, "nes", "antigos", "fundo", "Contra.nes"), "nes", CONSOLES,
+                           os.path.join(self.pasta, "jogos"), [self.download])
+
+    def test_conferir_pasta_escolhida(self):
+        self.assertEqual(baixados.conferir_pasta_escolhida(self.outra, os.path.join(self.pasta, "X")), self.outra)
+        with self.assertRaises(baixados.NaoPode):
+            baixados.conferir_pasta_escolhida(os.path.join(self.pasta, "nao-existe"), self.pasta)
+        with self.assertRaises(baixados.NaoPode):
+            baixados.conferir_pasta_escolhida(self.arena, self.arena)        # a pasta do proprio ARENA
+        with self.assertRaises(baixados.NaoPode):
+            baixados.conferir_pasta_escolhida("", self.pasta)
+
+
+class ReconhecerBios(unittest.TestCase):
+    """bios.reconhecer_arquivo_solto: pela marca (md5 da nota do .info), pelo nome, ou nada."""
+
+    def setUp(self):
+        import hashlib
+        import bios
+        self.bios = bios
+        self.pasta = os.path.realpath(tempfile.mkdtemp(prefix="arena_bios_solta_"))
+        self.info = os.path.join(self.pasta, "info")
+        conteudo = b"BIOS DE TESTE" * 100
+        marca = hashlib.md5(conteudo).hexdigest()
+        criar(os.path.join(self.info, "teste_libretro.info"),
+              dados=('notes = "(!) bios_teste.bin (md5): %s"\n' % marca).encode())
+        criar(os.path.join(self.pasta, "baixou_com_outro_nome.bin"), dados=conteudo)     # nome sem cara de BIOS
+        criar(os.path.join(self.pasta, "bios do console.bin"), dados=conteudo)           # cara de BIOS e marca certa
+        criar(os.path.join(self.pasta, "bios_teste.bin"), dados=b"outra versao" * 50)   # nome certo, marca errada
+        criar(os.path.join(self.pasta, "foto bios.jpg"), dados=conteudo)                 # imagem nunca e' BIOS
+
+    def tearDown(self):
+        limpeza.apagar_pasta(self.pasta)
+
+    def ver(self, nome):
+        return self.bios.reconhecer_arquivo_solto(os.path.join(self.pasta, nome), self.info)
+
+    def test_pela_marca(self):
+        self.assertEqual(self.ver("bios do console.bin"), {"bios": "bios_teste.bin", "certeza": "marca"})
+
+    def test_pelo_nome(self):
+        self.assertEqual(self.ver("bios_teste.bin"), {"bios": "bios_teste.bin", "certeza": "nome"})
+
+    def test_arquivo_sem_cara_de_bios_nem_e_lido(self):
+        self.assertIsNone(self.ver("baixou_com_outro_nome.bin"))
+        self.assertIsNone(self.ver("foto bios.jpg"))
+
+
 if __name__ == "__main__":
     unittest.main()

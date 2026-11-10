@@ -1359,6 +1359,8 @@ def config_padrao():
         # Continuar de onde parou (servidor\continuar.py, 10/11/2026): ligado de fabrica so no celular (o aparelho e'
         # do aluno); no computador da escola, dividido entre turmas, o aluno da tarde abriria no ponto do da manha.
         "continuar_de_onde_parou": plataforma_do_sistema.ANDROID,
+        # Pastas onde procurar jogos e BIOS alem dos downloads (servidor\baixados.py, 10/11/2026): a pessoa escolhe.
+        "pastas_de_procura": [],
         # Lossless Scaling (servidor\lossless.py): so para quem comprou o
         # programa na Steam. Ligado, o jogo abre numa janela do tamanho do
         # desenho e o programa estica ate a tela; "mais quadros" liga a
@@ -1548,6 +1550,9 @@ def ler_config_do_disco():
     config["travar_teclas"] = bool(salvo.get("travar_teclas"))
     if "continuar_de_onde_parou" in salvo:
         config["continuar_de_onde_parou"] = bool(salvo.get("continuar_de_onde_parou"))
+    if isinstance(salvo.get("pastas_de_procura"), list):
+        config["pastas_de_procura"] = [str(p)[:500] for p in salvo["pastas_de_procura"]
+                                       if isinstance(p, str)][:baixados.MAXIMO_DE_PASTAS_ESCOLHIDAS]
     config["lossless_scaling"] = bool(salvo.get("lossless_scaling"))
     config["lossless_mais_quadros"] = bool(salvo.get("lossless_mais_quadros"))
     if isinstance(salvo.get("tipo_controle"), str):
@@ -5866,11 +5871,18 @@ class Manipulador(BaseHTTPRequestHandler):
             # com o console sugerido. Nada sai do lugar sem o "Levar para o
             # ARENA". So deste aparelho (nao esta em ROTAS_REDE_EXTERNA).
             pastas = baixados.pastas_de_baixados()
+            escolhidas = baixados.pastas_escolhidas(carregar_config().get("pastas_de_procura"))
             sem_permissao = bool(plataforma_do_sistema.ANDROID and not ponte_android.ESTADO.get("permissao"))
+            # 10/11/2026: tambem as pastas que a pessoa escolheu, e as BIOS (vao para a pasta BIOS do ARENA).
+            achadas_bios = []
+            jogos = [] if sem_permissao else baixados.procurar(
+                carregar_catalogo(), pastas, escolhidas=escolhidas, ignorar=pastas_do_proprio_arena(),
+                bios_achadas=achadas_bios)
             return self.responder_json({
                 "ok": True, "pastas": [caminho_para_mostrar(p) for p in pastas],
-                "sem_permissao": sem_permissao,
-                "jogos": [] if sem_permissao else baixados.procurar(carregar_catalogo(), pastas)})
+                "escolhidas": escolhidas, "sem_permissao": sem_permissao,
+                "celular_inteiro": CELULAR_INTEIRO if plataforma_do_sistema.ANDROID else "",
+                "jogos": jogos, "bios": achadas_bios})
 
         if caminho == "/api/como-colocar":
             # O que falta aos emuladores de fora (BIOS do PS2, firmware do
@@ -6954,15 +6966,60 @@ class Manipulador(BaseHTTPRequestHandler):
             try:
                 # No celular com a pasta ARENA-jogos no cartao, o jogo baixado vai para ela (07/11/2026).
                 no_cartao = cartao_de_jogos.pasta_no_cartao() if plataforma_do_sistema.ANDROID else None
-                destino = baixados.levar(dados.get("arquivo"), str(dados.get("console", "")),
-                                         carregar_catalogo(), PASTA_JOGOS, prateleira=no_cartao)
+                console_id = str(dados.get("console", ""))
+                destino = baixados.levar(dados.get("arquivo"), console_id,
+                                         carregar_catalogo(), PASTA_JOGOS, prateleira=no_cartao,
+                                         pastas=pastas_onde_procurar())
             except baixados.NaoPode as falha:
                 return self.erro(str(falha))
             except OSError as falha:
                 return self.erro(traduzir_erro_do_sistema(falha, "levar o jogo para o ARENA"))
             limpar_caches()
             total = manifesto(forcar=True)["total"]
-            return self.responder_json({"ok": True, "destino": caminho_para_mostrar(destino), "total": total})
+            # O que ainda falta para ESTE jogo abrir (a BIOS do console, a da regiao...), na hora, com o que fazer.
+            try:
+                falta = bios.aviso_do_jogo(console_id, os.path.basename(destino), PASTA_SISTEMA, caminho=destino) or ""
+            except Exception:              # noqa: BLE001 -- o aviso e' ajuda; o jogo ja foi levado
+                falta = ""
+            return self.responder_json({"ok": True, "destino": caminho_para_mostrar(destino), "total": total,
+                                        "falta": falta})
+
+        if caminho == "/api/baixados/levar-bios":
+            # A BIOS achada nos downloads ou numa pasta escolhida vai para a pasta BIOS do ARENA, e o ARENA a poe
+            # no lugar do console dela na hora (o mesmo do Conferir). So deste aparelho (nao esta em
+            # ROTAS_REDE_EXTERNA).
+            try:
+                destino = baixados.levar_bios(dados.get("arquivo"), bios.caminhos(RAIZ)["bios"],
+                                              pastas=pastas_onde_procurar())
+            except baixados.NaoPode as falha:
+                return self.erro(str(falha))
+            except OSError as falha:
+                return self.erro(traduzir_erro_do_sistema(falha, "levar a BIOS para o ARENA"))
+            feito = organizar_bios(esperar=0) or {}
+            instaladas = [str(i.get("arquivo", "")) for i in feito.get("instaladas", []) if isinstance(i, dict)]
+            return self.responder_json({"ok": True, "destino": caminho_para_mostrar(destino),
+                                        "instaladas": instaladas})
+
+        if caminho == "/api/baixados/pasta":
+            # Acrescentar ou tirar uma pasta onde procurar jogos e BIOS (ate 5).
+            config = carregar_config()
+            atuais = list(config.get("pastas_de_procura") or [])
+            if dados.get("tirar"):
+                alvo = os.path.realpath(str(dados.get("pasta") or ""))
+                atuais = [p for p in atuais if os.path.realpath(p) != alvo]
+            else:
+                try:
+                    nova = baixados.conferir_pasta_escolhida(dados.get("pasta"), RAIZ)
+                except baixados.NaoPode as falha:
+                    return self.erro(str(falha))
+                if nova not in [os.path.realpath(p) for p in atuais]:
+                    if len(atuais) >= baixados.MAXIMO_DE_PASTAS_ESCOLHIDAS:
+                        return self.erro("Já são %d pastas. Remova uma (botão Tirar) antes de pôr outra."
+                                         % baixados.MAXIMO_DE_PASTAS_ESCOLHIDAS)
+                    atuais.append(nova)
+            config["pastas_de_procura"] = atuais
+            salvar_config(config)
+            return self.responder_json({"ok": True, "escolhidas": baixados.pastas_escolhidas(atuais)})
 
         # ---- BIOS: conferir agora e abrir a prateleira -------------------
         # Conferir: o mesmo que o ARENA faz ao abrir (servidor\bios.py), na
@@ -8555,6 +8612,29 @@ def conferir_fliperamas():
     if achou:
         limpar_caches()
         manifesto(forcar=True)
+
+
+# O celular inteiro, para a busca de jogos e BIOS (o botao "Procurar no celular inteiro").
+CELULAR_INTEIRO = "/storage/emulated/0"
+
+
+def pastas_do_proprio_arena():
+    """As pastas do ARENA, que a busca de jogos baixados pula (os jogos delas ja estao na lista)."""
+    pastas = [RAIZ, PASTA_JOGOS]
+    if plataforma_do_sistema.ANDROID:
+        pastas.append(os.path.join(CELULAR_INTEIRO, "ARENA"))
+        try:
+            no_cartao = cartao_de_jogos.pasta_no_cartao()
+        except Exception:                  # noqa: BLE001
+            no_cartao = None
+        if no_cartao:
+            pastas.append(no_cartao)
+    return pastas
+
+
+def pastas_onde_procurar():
+    """Onde a busca olhou: os downloads e as pastas escolhidas. So daqui a tela pode mover um arquivo."""
+    return baixados.pastas_de_baixados() + baixados.pastas_escolhidas(carregar_config().get("pastas_de_procura"))
 
 
 def organizar_bios(esperar=3.0):

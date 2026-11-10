@@ -30,6 +30,19 @@ estante que arruma o livro na prateleira certa, mas só quando você manda.
   Máquina → Deixar o ARENA ver os arquivos).
 - Se já existe um jogo com o mesmo nome no console, nada é trocado.
 
+**Desde 10/11/2026, em qualquer pasta e com as BIOS:**
+
+- **Outras pastas:** embaixo da lista, em **Procurar também em outras pastas**, escreva o caminho de uma pasta (por
+  exemplo `D:\Jogos`) e toque em **Procurar nesta pasta**. O ARENA olha nela e em até três pastas abaixo (até 5
+  pastas; **Tirar** para de olhar). No celular, **Procurar no celular inteiro** olha a memória toda. A pasta do
+  próprio ARENA e as do sistema ficam de fora.
+- **BIOS:** o arquivo que é uma BIOS conhecida (conferida pela marca do arquivo, ou reconhecida pelo nome, como o
+  `neogeo.zip`) aparece em **BIOS achadas**. **Levar para o ARENA** a põe na pasta `BIOS`, e o ARENA a instala no
+  lugar do console dela na hora. Nenhuma BIOS que já está lá é trocada: a nova ganha um número no nome.
+- **O que falta, na hora:** ao levar um jogo, se o console dele ainda precisa de uma BIOS (ou da BIOS da região do
+  jogo), o ARENA diz qual é e onde pôr. Jogo de Neo Geo sem o `neogeo.zip` na pasta ganha o botão **Arrumar** no
+  cartão, que põe a cópia da BIOS ao lado dele.
+
 ---
 
 ### Capa dos jogos

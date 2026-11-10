@@ -230,6 +230,30 @@ def md5_do_arquivo(caminho):
     return marca
 
 
+def reconhecer_arquivo_solto(caminho, pasta_info=None):
+    """Um arquivo achado fora do ARENA (nos downloads, numa pasta qualquer) e' uma BIOS? Pedido do Rafael, 10/11/2026:
+    "o ARENA deve saber identificar ... qualquer rom ou bios ... em qualquer lugar". Devolve {"bios": nome certo,
+    "certeza": "marca" | "nome"} ou None. "marca": o md5 e' o de uma BIOS conhecida (a nota dos .info do RetroArch);
+    "nome": o nome e' o de uma BIOS conhecida, mas a marca nao confere (outra versao, ou nao e' ela). So le (md5) o
+    arquivo pequeno com cara de BIOS (nome conhecido ou com "bios", "scph", "boot"...): o resto nem abre."""
+    nome = os.path.basename(caminho).lower()
+    extensao = os.path.splitext(nome)[1]
+    if extensao in _NAO_E_BIOS:
+        return None
+    if nome == "neogeo.zip":                         # o pacote de BIOS do Neo Geo: a marca muda a cada versao do pacote
+        return {"bios": "neogeo.zip", "certeza": "nome"}
+    conhecidos = marcas_dos_info(pasta_info)
+    if nome not in conhecidos and not _RE_NOME_DE_BIOS.search(nome):
+        return None
+    marca = md5_do_arquivo(caminho)
+    nomes = _reverso(pasta_info).get(marca) if marca else None
+    if nomes:
+        return {"bios": sorted(nomes)[0], "certeza": "marca"}
+    if nome in conhecidos:
+        return {"bios": nome, "certeza": "nome"}
+    return None
+
+
 def _playstation_dos_bytes(dados):
     regiao = catalogo.regiao_ps1(dados)
     if regiao:

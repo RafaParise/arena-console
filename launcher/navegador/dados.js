@@ -944,6 +944,7 @@ window.ARENA_DADOS = {
   "motor_ps2": "automatico",
   "navegador": "automatico",
   "nome_dispositivo": "",
+  "pastas_de_procura": [],
   "perfil_controle": {},
   "perfil_grafico": "automatico",
   "permitir_rede": false,
