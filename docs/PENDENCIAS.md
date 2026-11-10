@@ -513,6 +513,14 @@ calmo (depois de reiniciar o PC) antes de mexer no ARENA.
 
 ## Depende do Rafael
 
+- **"Estamos em casas diferentes" (partida pela internet, pelo repasse do RetroArch), investigado em 10/11:** o
+  convidado entra com `--connect <repasse> --port <porta> --mitm-session=<código>` (lido no `retroarch.c` 1.22.2). Mas
+  o código da sala só chega ao anfitrião pela conversa com o repasse e **o RetroArch não o escreve no registro**: ele
+  sai apenas no anúncio da **lista pública de salas** do libretro (lobby.libretro.com), junto com o apelido, o nome do
+  jogo e o país. Para a chave voltar, o ARENA teria de anunciar a sala nessa lista pública (dá para usar um apelido
+  sorteado e senha na sala, para ninguém de fora entrar). Como expõe o que o aluno joga numa lista pública, **a
+  decisão é sua**: anunciar (com apelido sorteado e senha) ou deixar a chave fora, como está.
+
 - **Layout novo (`docs\PROPOSTA-LAYOUT.md`, 10/11):** (1) as 5 abas (Jogos, Amigos, Placar, Biblioteca, Ajustes) no
   lugar dos 8 botões do topo, ou manter como está? (2) no celular, abas embaixo ou em cima? (3) o tema claro/escuro
   dentro do perfil, em Ajustes ou no topo? Com as respostas, cabe numa sessão (tela, guias, testes e fotos).
