@@ -498,7 +498,7 @@ calmo (depois de reiniciar o PC) antes de mexer no ARENA.
 **O que vem depois (fila combinada com o Rafael em 10/11, na ordem):**
 1. ~~Item 9~~ **feito em 10/11** (veja os limites conhecidos): o cartão de memória do convidado do PS1 no Jogar Junto nasce em branco (reproduzir antes com 2 RetroArch
    no PC; pode ser do próprio netplay, que usa o estado de quem hospeda).
-2. Item 7: mais de 4 controles do Xbox (o XInput do Windows só conta 4; plano: SDL2 automático com tradução de
+2. ~~Item 7~~ **feito em 10/11, falta o teste na sala com 5 controles** (veja os limites conhecidos): mais de 4 controles do Xbox (o XInput do Windows só conta 4; plano: SDL2 automático com tradução de
    botões). Cinco controles de verdade só na sala.
 3. Revisar PENDÊNCIAS e guias atrás de algo prometido e não feito.
 4. Pesquisa dos melhores projetos parecidos (Lemuroid, Daijishō, ES-DE, Pegasus, RetroBat, Batocera, RetroArch) atrás
@@ -594,7 +594,16 @@ calmo (depois de reiniciar o PC) antes de mexer no ARENA.
 - Só 4 controles do tipo Xbox de cada vez (limite do Windows, o XInput). O
   driver SDL2 do RetroArch passaria disso, mas a tela traduz os botões para
   a numeração do XInput: fica para depois de um teste com os controles na
-  mão.
+  mão. **Feito em 10/11/2026 (item 7), falta o teste na sala:** com os 4
+  lugares do XInput cheios e mais de 4 controles do tipo Xbox na lista do
+  Windows (Raw Input, "IG_" no nome), o jogo do RetroArch abre com
+  `input_joypad_driver = sdl2` e os botões definidos na tela traduzidos
+  (`controles.trocar_para_o_sdl2`; a tabela é conferida no teste contra os
+  perfis `xinput` e `sdl2` do próprio RetroArch). Com até 4, nada muda.
+  Conferido aqui: o `retroarch.exe` do ARENA abre com o SDL2 ("Found joypad
+  driver: sdl2"). **Para o Rafael, na sala:** 5 controles de Xbox num
+  jogo de 5 (ex.: um de PS1 com o adaptador), e ver se cada um mexe o seu
+  jogador e se os botões trocados na tela continuam certos.
 - Emuladores de fora no Jogar Junto: o PCSX2 não tem partida em rede (os
   jogos com System Link o ARENA já configura, e eles se acham na rede
   local); o NetPlay do Dolphin não abre pela linha de comando; o PS3 tem o

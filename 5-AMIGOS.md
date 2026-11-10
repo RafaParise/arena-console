@@ -409,7 +409,9 @@ ARENA liga o adaptador sozinho, até onde cada console vai:
 
 O Windows só enxerga 4 controles do tipo Xbox de cada vez. Para passar de
 4, ligue controles USB comuns, que não sejam do tipo Xbox, ou use o
-teclado. Para um jogo de 8, escreva, por exemplo, `Micro Machines V3 = 8`
+teclado. (Nos consoles do RetroArch, com mais de 4 do tipo Xbox ligados, o
+ARENA tenta o SDL2, que passa desse limite: veja o guia 3. Ainda sem teste
+com 5 controles de verdade.) Para um jogo de 8, escreva, por exemplo, `Micro Machines V3 = 8`
 na lista.
 
 Alguns desses jogos têm **rede própria** (System Link), como Gears of War e

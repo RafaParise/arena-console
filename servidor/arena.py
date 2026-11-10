@@ -1844,6 +1844,14 @@ def opcoes_efetivas(config, custo=None, controles_ligados=None):
     # udev): vale para o jogo e para o que a tela mostra como escolhido.
     plataforma_do_sistema.motores_deste_sistema(opcoes)
 
+    # Mais de 4 controles do tipo Xbox (item 7): o XInput do Windows so ve 4,
+    # e o SDL2 do RetroArch passa disso. So ao abrir um jogo (quem abre conta
+    # os controles) e so com mais de 4 contados: com ate 4, nada muda.
+    if (controles_ligados or 0) > controles.LUGARES_DO_XINPUT and controles.precisa_do_sdl2(
+            len(controles.controles_xinput()), controles.controles_tipo_xbox()):
+        if controles.trocar_para_o_sdl2(opcoes):
+            print("[ARENA] %d controles: o RetroArch usa o SDL2 (o XInput do Windows so ve 4)." % controles_ligados)
+
     # Filtro de tela: o perfil (ou o aluno) diz se quer; QUAL filtro e' se
     # o console aceita, so se sabe com o jogo na mao -- gravar_override().
     return opcoes

@@ -46,6 +46,15 @@ enxerga **4 controles do tipo Xbox** de cada vez (é limite do próprio
 Windows). Do 5º em diante, use controles USB comuns, que não sejam do tipo
 Xbox, ou o teclado.
 
+Desde 10/11/2026, nos jogos do RetroArch, o ARENA tenta passar desse limite
+sozinho: com os 4 lugares do Windows ocupados e **mais de 4 controles do
+tipo Xbox** ligados, o jogo abre com outro jeito de ler controles (o SDL2,
+que vem junto com o RetroArch), e os botões que você trocou na tela vão
+junto, já traduzidos. Com até 4 controles nada muda. Isso ainda não foi
+testado com 5 controles de verdade: se o 5º não responder, use um controle
+comum ou o teclado, como antes. O PCSX2, o Dolphin e o Xenia continuam com
+4.
+
 ---
 
 ### Regra número um

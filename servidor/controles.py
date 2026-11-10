@@ -396,13 +396,38 @@ def contar_controles():
         return ponte_android.controles()
     try:
         with _TRAVA_CONTAGEM:
-            return controles_sem_xinput() + len(controles_xinput())
+            sem_xinput, tipo_xbox = _controles_hid()
+            xinput = len(controles_xinput())
+            # O XInput so enxerga 4 (item 7): com os 4 lugares cheios, vale
+            # quantos do tipo Xbox o Windows lista. Com menos, nada muda.
+            if xinput >= LUGARES_DO_XINPUT:
+                xinput = max(xinput, tipo_xbox)
+            return sem_xinput + xinput
     except (AttributeError, OSError, ValueError):
         return 0
 
 
 def controles_sem_xinput():
     """Controles de jogo HID (joystick ou gamepad) que NAO sao XInput."""
+    return _controles_hid()[0]
+
+
+def controles_tipo_xbox():
+    """Quantos controles do tipo Xbox (XInput) o Windows lista agora, SEM o
+    limite de 4 do XInput: a lista de dispositivos (Raw Input) mostra cada
+    um com "IG_" no nome. Fora do Windows, ou se der erro, 0."""
+    if plataforma.ANDROID:
+        return 0
+    try:
+        with _TRAVA_CONTAGEM:
+            return _controles_hid()[1]
+    except (AttributeError, OSError, ValueError):
+        return 0
+
+
+def _controles_hid():
+    """(controles que NAO sao XInput, controles do tipo Xbox), pela lista
+    de dispositivos HID de jogo (joystick ou gamepad) do Windows."""
     import ctypes
     from ctypes import wintypes
 
@@ -431,12 +456,12 @@ def controles_sem_xinput():
 
     quantos = wintypes.UINT(0)
     if lista_de(None, ctypes.byref(quantos), ctypes.sizeof(LISTA)) == 0xFFFFFFFF or not quantos.value:
-        return 0
+        return 0, 0
     dispositivos = (LISTA * quantos.value)()
     lidos = lista_de(dispositivos, ctypes.byref(quantos), ctypes.sizeof(LISTA))
     if lidos == 0xFFFFFFFF:
-        return 0
-    contagem = 0
+        return 0, 0
+    contagem, tipo_xbox = 0, 0
     for dispositivo in dispositivos[:lidos]:
         if dispositivo.dwType != RIM_TYPEHID:
             continue
@@ -452,9 +477,10 @@ def controles_sem_xinput():
         nome = ctypes.create_unicode_buffer(letras.value + 1)
         info_de(dispositivo.hDevice, RIDI_DEVICENAME, nome, ctypes.byref(letras))
         if "IG_" in nome.value.upper():
-            continue                     # e' XInput: o XInput ja conta
+            tipo_xbox += 1               # e' XInput: o XInput ja conta (ate 4)
+            continue
         contagem += 1
-    return contagem
+    return contagem, tipo_xbox
 
 
 def controles_xinput():
@@ -473,6 +499,54 @@ def controles_xinput():
     except (AttributeError, OSError, ValueError):
         pass
     return []
+
+
+# ---------------------------------------------------------------------------
+# Mais de 4 controles do tipo Xbox (item 7, 10/11/2026)
+# ---------------------------------------------------------------------------
+# O XInput do Windows so enxerga 4 controles: o 5o controle de Xbox nao
+# aparece no RetroArch. O driver SDL2 do RetroArch (o SDL2.dll ja vem na
+# pasta retroarch) passa disso. So que a tela do ARENA grava os botoes na
+# numeracao do XInput, e o SDL2 numera de outro jeito. A tabela abaixo saiu
+# dos perfis que o proprio RetroArch traz para o mesmo controle
+# (retroarch\autoconfig\xinput\XBOX Series Controller.cfg x
+# retroarch\autoconfig\sdl2\Xbox Series X Controller.cfg):
+#   XInput: 0 A, 1 B, 2 X, 3 Y, 4 LB, 5 RB, 6 Start, 7 Back, 8 L3, 9 R3,
+#           10 Guide, direcional no chapeu (h0up...)
+#   SDL2:   0 A, 1 B, 2 X, 3 Y, 4 Back, 5 Guide, 6 Start, 7 L3, 8 R3,
+#           9 LB, 10 RB, 11 a 14 direcional (cima, baixo, esquerda, direita)
+# e os eixos verticais (1 e 3) com o sinal trocado. Os gatilhos (+4, +5) e
+# os eixos horizontais ficam iguais.
+LUGARES_DO_XINPUT = 4
+DO_XINPUT_PARA_O_SDL2 = {"0": "0", "1": "1", "2": "2", "3": "3", "4": "9", "5": "10", "6": "6", "7": "4",
+                         "8": "7", "9": "8", "10": "5",
+                         "h0up": "11", "h0down": "12", "h0left": "13", "h0right": "14"}
+EIXOS_COM_SINAL_TROCADO_NO_SDL2 = ("1", "3")
+
+
+def precisa_do_sdl2(controles_xinput_ligados, tipo_xbox):
+    """Os 4 lugares do XInput cheios E mais de 4 controles do tipo Xbox na
+    lista do Windows: so ai o RetroArch troca para o SDL2. Com ate 4, tudo
+    fica como sempre foi (o caminho testado com os controles na mao)."""
+    return controles_xinput_ligados >= LUGARES_DO_XINPUT and tipo_xbox > LUGARES_DO_XINPUT
+
+
+def trocar_para_o_sdl2(opcoes):
+    """Passa as opcoes do RetroArch do XInput para o SDL2: o driver e os
+    botoes e eixos que o aluno definiu na tela (os que estao "nul" seguem
+    o reconhecimento automatico, que o SDL2 tambem tem). As teclas do
+    teclado nao mudam. Devolve True se trocou."""
+    if opcoes.get("input_joypad_driver") != "xinput":
+        return False
+    opcoes["input_joypad_driver"] = "sdl2"
+    for chave, valor in list(opcoes.items()):
+        if not chave.startswith("input_player") or valor in ("", "nul"):
+            continue
+        if chave.endswith("_btn"):
+            opcoes[chave] = DO_XINPUT_PARA_O_SDL2.get(valor, valor)
+        elif chave.endswith("_axis") and valor[:1] in "+-" and valor[1:] in EIXOS_COM_SINAL_TROCADO_NO_SDL2:
+            opcoes[chave] = ("-" if valor[0] == "+" else "+") + valor[1:]
+    return True
 
 
 def opcoes_do_teclado(dados, controles_ligados):
