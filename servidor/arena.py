@@ -91,6 +91,7 @@ import companheiros  # noqa: E402  (programas que abrem junto com o jogo: o Drea
 import controle_remoto  # noqa: E402  (o celular como controle, pelo Wi-Fi: Network RetroPad -- 25/10/2026)
 import controle_usb  # noqa: E402  (o cabo USB: celular-controle e Jogar Junto pelo cabo -- 26/10/2026)
 import repasse_proprio  # noqa: E402  (partida entre casas pelo repasse do professor, com codigo de sala -- 10/11/2026)
+import continuar  # noqa: E402  (continuar de onde parou, sem passar por cima de save -- 10/11/2026)
 import pokketsx  # noqa: E402  (o PS1 com o PocketStation de verdade, so Windows -- 24/10/2026)
 import acessorios  # noqa: E402  (VMU, Rumble Pak, multitap, pistola de luz... ligar e desligar -- 24/10/2026)
 import arrumar     # noqa: E402  (o botao Arrumar: o arquivo do jogo no lugar certo -- 03/10/2026)
@@ -866,8 +867,13 @@ BASE_COMUM = {
     "input_poll_type_behavior": "2",
 
     "video_black_frame_insertion": "0",
+    # O ponto automatico (continuar de onde parou) e' decidido a cada jogo, em servidor\continuar.py.
     "savestate_auto_save": "false",
     "savestate_auto_load": "false",
+    # A bateria do cartucho (.srm) vai para o disco a cada 10 s, so quando mudou (revisao dos saves, 10/11/2026).
+    # E' o padrao do RetroArch no Windows e no Android, escrito aqui para nenhum retroarch.cfg antigo desligar: no
+    # celular, o Android pode fechar o app sem aviso, e o save feito no jogo so iria para o disco na saida.
+    "autosave_interval": "10",
     # A foto de onde parou (pedido do Rafael, 07/11/2026: "salvar fotos de onde parou como o RetroArch faz"):
     # o RetroArch guarda uma imagem ao lado de cada estado, e o menu e a gaveta Saves a mostram. So custa
     # na hora de salvar (alguns KB), nunca durante o jogo.
@@ -1350,6 +1356,9 @@ def config_padrao():
         "favoritos": [],
         "recentes": [],
         "travar_teclas": False,
+        # Continuar de onde parou (servidor\continuar.py, 10/11/2026): ligado de fabrica so no celular (o aparelho e'
+        # do aluno); no computador da escola, dividido entre turmas, o aluno da tarde abriria no ponto do da manha.
+        "continuar_de_onde_parou": plataforma_do_sistema.ANDROID,
         # Lossless Scaling (servidor\lossless.py): so para quem comprou o
         # programa na Steam. Ligado, o jogo abre numa janela do tamanho do
         # desenho e o programa estica ate a tela; "mais quadros" liga a
@@ -1537,6 +1546,8 @@ def ler_config_do_disco():
         if isinstance(guardado, list):
             config[chave] = [str(x)[:300] for x in guardado][:limite]
     config["travar_teclas"] = bool(salvo.get("travar_teclas"))
+    if "continuar_de_onde_parou" in salvo:
+        config["continuar_de_onde_parou"] = bool(salvo.get("continuar_de_onde_parou"))
     config["lossless_scaling"] = bool(salvo.get("lossless_scaling"))
     config["lossless_mais_quadros"] = bool(salvo.get("lossless_mais_quadros"))
     if isinstance(salvo.get("tipo_controle"), str):
@@ -3369,6 +3380,22 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         # PS1, em retroarch\system\OpenBIOS): o nucleo recebe essa pasta como
         # a pasta das BIOS. Solta na system, ela passaria na frente da BIOS
         # de verdade tambem no jeito original (servidor\jeitos_de_abrir.py).
+        # Continuar de onde parou (servidor\continuar.py): o ponto automatico so volta se nenhum save do jogo nem
+        # cartao do console foi gravado depois dele. As duas chaves vao sempre, ligadas ou nao, e so valem nesta
+        # partida (o RetroArch as grava no retroarch.cfg ao fechar).
+        # As opcoes avancadas "Salvar ao sair" e "Continuar de onde parou" (as chaves cruas do RetroArch) passam pela
+        # mesma trava: a segunda liga tudo; a primeira, sozinha, so grava o ponto.
+        avancado = config.get("avancado") or {}
+        ligada = lambda chave: str(avancado.get(chave, "")).lower() in ("true", "1")  # noqa: E731
+        decisao = continuar.decidir(config.get("continuar_de_onde_parou") or ligada("savestate_auto_load"),
+                                    bool(partida), jogo.get("plataforma"), caminho_jogo,
+                                    PASTA_STATES, PASTA_SAVES, PASTA_SISTEMA)
+        if not partida and ligada("savestate_auto_save"):
+            decisao["opcoes"]["savestate_auto_save"] = "true"
+        opcoes_jogo.update(decisao["opcoes"])
+        chaves_do_continuar = list(decisao["opcoes"])
+        if decisao["motivo"]:
+            print("[ARENA] Continuar de onde parou: %s." % decisao["motivo"])
         chaves_do_livre = []
         if jogo.get("sistema_livre"):
             opcoes_jogo["system_directory"] = jogo["sistema_livre"]
@@ -3414,7 +3441,8 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         # livre tambem: senao o proximo jogo, de outro console, procuraria a
         # BIOS la. E o que o console pediu (o video sem thread do Java ME)
         # fica so nele.
-        so_desta_partida += chaves_da_ponte + chaves_do_livre + list(opcoes_do_console) + chaves_do_remoto
+        so_desta_partida += (chaves_da_ponte + chaves_do_livre + list(opcoes_do_console) + chaves_do_remoto
+                             + chaves_do_continuar)
         if jogadores_ligacao > 2:
             for n in range(3, jogadores_controle + 1):
                 so_desta_partida += ["input_libretro_device_p%d" % n,
@@ -7565,6 +7593,8 @@ class Manipulador(BaseHTTPRequestHandler):
                     pass
             if "travar_teclas" in dados:
                 config["travar_teclas"] = bool(dados["travar_teclas"])
+            if "continuar_de_onde_parou" in dados:
+                config["continuar_de_onde_parou"] = bool(dados["continuar_de_onde_parou"])
             for chave in ("lossless_scaling", "lossless_mais_quadros"):
                 if chave in dados:
                     config[chave] = bool(dados[chave])

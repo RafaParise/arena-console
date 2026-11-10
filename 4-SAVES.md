@@ -576,3 +576,28 @@ paciência.
 No celular não há F2 nem F4. Use os botões **SALVAR** e **CARREGAR** no alto da tela do jogo: SALVAR guarda o ponto exato do jogo
 (e uma **foto** dele, que aparece no menu do jogo e na gaveta Saves), CARREGAR volta para lá. Com um controle ligado, o menu do jogo
 abre com **L3 + R3** (os dois analógicos apertados), e lá estão "Salvar estado" e "Carregar estado".
+
+## Continuar de onde parou (10/11/2026)
+
+Em **Ajustes**, a chave **Continuar de onde parou**: ao fechar o jogo, o ARENA guarda um **ponto automático** de onde você
+estava, e na próxima vez o mesmo jogo abre ali, sem apertar nada. Esse ponto fica num arquivo só dele
+(`retroarch\states\<núcleo>\<jogo>.state.auto`) e **não ocupa nenhum** dos 10 espaços do F2 nem o do botão SALVAR.
+
+- **Vem ligada no celular** (o aparelho é do aluno) e **desligada no computador** (o computador da escola é dividido entre
+  turmas: o aluno da tarde abriria no ponto do aluno da manhã). Dá para ligar e desligar nos dois.
+- **Nunca passa por cima de um save.** O ponto automático é uma "foto" da memória do console, inclusive do que o jogo acha
+  que tem no cartão de memória. Voltar numa foto velha depois de salvar no jogo pode fazer o próximo save do jogo escrever
+  por cima do save novo (no PS2, isso pode estragar o cartão inteiro). Por isso, antes de abrir, o ARENA compara as horas:
+  se o save do jogo (a bateria do cartucho, o cartão de memória do PS1, do PS2, o VMU do Dreamcast, o cartão do GameCube, o
+  save do PSP) foi gravado **depois** do ponto automático, o jogo começa normal, **pelo save**, e o ponto velho é trocado
+  pelo novo quando você fechar. Isso acontece quando o celular fechou o app sem aviso, ou quando outro jogo gravou no
+  cartão que é de todos os jogos do console (PS2, Dreamcast, GameCube, PSP).
+- **Não vale no Jogar Junto:** as duas máquinas precisam começar do mesmo ponto.
+- A bateria do cartucho vai para o disco a cada 10 segundos, quando muda (antes só ia na saída): se o Android fechar o
+  app no meio do jogo, o save feito no jogo não se perde.
+- As opções avançadas "Salvar ao sair" e "Continuar de onde parou" são a mesma coisa e passam pela mesma proteção.
+
+**O save mais seguro continua sendo o do próprio jogo** (o menu "Salvar" do jogo, que grava no cartão de memória ou na
+bateria do cartucho). O ponto automático e o F2 são atalhos; o save do jogo é o que vale em qualquer emulador e em
+qualquer console. Uma regra de ouro no PS2: **depois de salvar no cartão, não carregue um estado (F4 ou CARREGAR) de antes
+desse save.** Feche o jogo e abra de novo, ou continue jogando.

@@ -5,6 +5,7 @@ window.ARENA_DADOS = {
   "apply_cheats_after_load": "true",
   "auto_overrides_enable": "true",
   "auto_remaps_enable": "true",
+  "autosave_interval": "10",
   "check_firmware_before_loading": "false",
   "content_show_add_entry": "0",
   "content_show_explore": "false",
@@ -929,6 +930,7 @@ window.ARENA_DADOS = {
    "slot2_mb": 64
   },
   "codigo_proprio": false,
+  "continuar_de_onde_parou": false,
   "dispositivo_id": "",
   "escala_da_tela": "automatico",
   "favoritos": [],

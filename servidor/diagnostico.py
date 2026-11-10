@@ -67,7 +67,7 @@ PROGRAMA = [
     "servidor/controle_usb.py", "servidor/gamepad_virtual.py", "servidor/baixados.py", "servidor/cartao_de_jogos.py", "servidor/toque_consoles.py", "servidor/desempenho.py", "servidor/adb_aparelho.py", "servidor/painel_do_aparelho.py",
     "servidor/armazenamento.py",
     "servidor/acessorios.py", "servidor/acessorios.json", "servidor/companheiros.py", "servidor/pokketsx.py", "servidor/controle_remoto.py",
-    "servidor/repasse_proprio.py",
+    "servidor/repasse_proprio.py", "servidor/continuar.py",
     "servidor/toque/arena-menu.png", "servidor/toque/arena-sair.png",
     "servidor/filtros/pixel-nitido.slangp", "servidor/filtros/fsr.slangp",
     "servidor/filtros/catmull-rom.slangp", "servidor/filtros/rcas.slangp", "servidor/filtros/suave.slangp",

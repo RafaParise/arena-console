@@ -709,3 +709,29 @@ as proteções de privacidade mais recentes", com o link pequeno **"Instalar ass
   curto fica com dois donos). O ARENA não escolhe no chute quando há dois, e
   quem está no ar não perde o lugar; o endereço digitado na mão continua
   sendo o jeito seguro de adicionar um amigo.
+
+## Revisão dos saves e continuar de onde parou (10/11/2026, noite)
+
+- **Continuar de onde parou: feito.** Decidido pelo Rafael em 10/11 ("sim, para ser mais fácil de voltar, mas revise muito
+  bem os saves"). `servidor\continuar.py`: ligado de fábrica só no Android, chave em Ajustes nos dois. A proteção: o ponto
+  automático só volta se nenhum save do jogo (nome do jogo em `saves\`) nem cartão compartilhado do console (PS2, Dreamcast,
+  GameCube, Wii, PSP) foi gravado mais de 30 s depois dele; senão o jogo começa pelo save. Nunca no Jogar Junto. O
+  `autosave_interval` ficou escrito (10 s, o padrão do RetroArch no Windows e no Android, conferido no `config.def.h` da
+  1.22.2). Testes: `servidor\tests\test_continuar.py` (13) e `testes\teste_continuar_pelo_arena.py` (RetroArch de verdade,
+  4 etapas, passou). Guia: `4-SAVES.md`.
+- **O que falta conferir no celular:** abrir, fechar e reabrir um jogo no A12 e ver o "Continuar de onde parou: volta ao
+  ponto automatico" no registro (o A12 estava como webcam do Rafael nesta noite).
+- **Cartão de 64 MB do PS2 (hipótese 1 do relato do HugoVHK): recomendação, não mudei.** A documentação do PCSX2 (num
+  espelho, não no site principal) diz que o de 8 MB é o mais compatível, e há relatos de jogos que não salvam, não acham o
+  cartão ou travam com o de 64 MB [Provável]. Trocar o padrão esconderia os saves que já estão no cartão de 64 MB, e o
+  padrão foi decisão sua em 24/10. **Proposta:** cartão novo de 8 MB como padrão para quem ainda não tem cartão, e quem
+  já tem fica com o dele; ou manter 64 MB e orientar a troca em Ajustes → Cartões de memória do PS2 quando um jogo não
+  salvar. **Você decide.**
+- **Visto no A12 com a versão-alvo 35:** ao sair do jogo pelo SAIR, o processo do RetroArch registra um SIGSEGV numa linha
+  de execução do Java (`queued-work-looper`) durante o `exit()` do próprio RetroArch (`main_exit` → `exit`), e o Android
+  anota "exited cleanly (0)". O SALVAR gravou antes (o arquivo do estado estava no disco). Não muda nada para o aluno;
+  fica anotado para comparar com o APK antigo numa próxima vez.
+- **Versão-alvo 35 no A12 (Android 12), conferido:** instalou, abriu, o serviço ficou em primeiro plano, a permissão de
+  todos os arquivos valeu (catálogo com 3294 jogos, inclusive os do cartão SD), o Contra abriu, SALVAR gravou, CARREGAR e
+  SAIR voltaram ao ARENA. Falta o teste no emulador com Android 15 (`testes\teste_android.py`), que da outra vez foi
+  fechado pelo sistema por falta de memória.

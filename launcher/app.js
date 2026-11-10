@@ -405,6 +405,8 @@ async function carregarEstado() {
     dados.config.ultra_desempenho ? "true" : "false");
   $("#chaveTravar").setAttribute("aria-pressed",
     dados.config.travar_teclas ? "true" : "false");
+  $("#chaveContinuar").setAttribute("aria-pressed",
+    dados.config.continuar_de_onde_parou ? "true" : "false");
   mostrarLossless(dados.lossless, dados.config);
   mostrarNavegadores(dados.navegadores, dados.config);
   desenharFechamentos(dados.fechamentos || []);
@@ -6220,6 +6222,21 @@ function ligarEventos() {
     try {
       await salvarConfig({ motor_ps2: evento.target.value });
       recado("Pronto. Vale no próximo jogo de PS2.");
+    } catch (falha) {
+      recado(falha.message, true);
+    }
+  });
+
+  // Continuar de onde parou (servidor/continuar.py): o ponto automatico ao fechar o jogo.
+  $("#chaveContinuar").addEventListener("click", async (evento) => {
+    const botao = evento.currentTarget;
+    const novo = botao.getAttribute("aria-pressed") !== "true";
+    try {
+      await salvarConfig({ continuar_de_onde_parou: novo });
+      botao.setAttribute("aria-pressed", novo ? "true" : "false");
+      recado(novo
+        ? "Pronto. Ao fechar, o jogo guarda onde você parou e volta nele na próxima vez."
+        : "Desligado. O jogo sempre começa do início (ou pelo save do jogo).");
     } catch (falha) {
       recado(falha.message, true);
     }

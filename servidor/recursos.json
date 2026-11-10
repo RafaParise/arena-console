@@ -545,7 +545,7 @@
       "nome": "Continuar de onde parou",
       "tipo": "bool",
       "custo": "nada",
-      "explica": "Abre o jogo exatamente onde você fechou. Só funciona com o de cima ligado.",
+      "explica": "Abre o jogo exatamente onde você fechou (é a mesma chave \"Continuar de onde parou\" de Ajustes, e liga o de cima sozinha). Se o save do jogo ou o cartão de memória for mais novo que esse ponto, o jogo começa pelo save, para não passar por cima dele.",
       "exemplo": "O jogo abre exatamente onde você parou, sem você apertar nada. Como fechar um livro com o dedo na página."
     },
     {
