@@ -85,8 +85,32 @@ def marca_do_remendo():
     return hashlib.sha256(juntas.encode("utf-8")).hexdigest()
 
 
+# O compilador guarda o caminho de cada arquivo-fonte dentro da biblioteca
+# (os avisos do RetroArch usam o __FILE__). Sem isto, o APK publicado levava
+# a pasta da maquina de quem montou, com o nome do usuario do Windows
+# (achado de 10/11/2026). O -ffile-prefix-map troca o comeco do caminho por
+# um nome fixo, nas duas grafias (barra e barra invertida).
+NOME_NO_LUGAR_DO_CAMINHO = "arena-android"
+VERSAO_DOS_CAMINHOS = 1     # sobe quando o jeito de esconder o caminho mudar: obriga a recompilar
+
+
+def mapa_dos_caminhos():
+    """As opcoes do compilador que trocam a pasta desta maquina por um nome fixo."""
+    base = os.path.abspath(sdk.BASE)
+    grafias = sorted({base, base.replace("\\", "/")})
+    return " ".join("-ffile-prefix-map=%s=%s" % (g, NOME_NO_LUGAR_DO_CAMINHO) for g in grafias)
+
+
+def caminhos_da_maquina():
+    """Os pedacos de caminho que nao podem sobrar dentro da biblioteca."""
+    base = os.path.abspath(sdk.BASE)
+    perfil = os.path.expanduser("~")
+    return sorted({c.encode("utf-8") for c in (base, base.replace("\\", "/"), perfil, perfil.replace("\\", "/"))})
+
+
 def marca_esperada():
-    return {"fonte": FONTE["sha256"], "remendo": marca_do_remendo(), "ndk": sdk.NDK, "git": VERSAO_DO_GIT}
+    return {"fonte": FONTE["sha256"], "remendo": marca_do_remendo(), "ndk": sdk.NDK, "git": VERSAO_DO_GIT,
+            "caminhos": VERSAO_DOS_CAMINHOS}
 
 
 def ler_marca(arquivo):
@@ -159,6 +183,11 @@ def conferir(biblioteca):
     if (b"[ENV] Command line (ARGS)" not in dados or b"[ARENA] Controles na ordem" not in dados
             or VERSAO_DO_GIT.encode() not in dados):
         raise SystemExit("A biblioteca compilada nao tem os remendos do ARENA: %s" % biblioteca)
+    minusculas = dados.lower()     # o Windows nao liga para maiuscula: C:/Users e c:/users sao o mesmo lugar
+    sobrou = [c.decode("utf-8", "replace") for c in caminhos_da_maquina() if c.lower() in minusculas]
+    if sobrou:
+        raise SystemExit("A biblioteca compilada ainda guarda o caminho desta maquina (%s): o APK publicado "
+                         "levaria o nome do usuario. Confira o mapa_dos_caminhos." % ", ".join(sobrou))
     pedidas = bibliotecas_pedidas(biblioteca)
     if pedidas != BIBLIOTECAS_DO_ANDROID:
         raise SystemExit("A biblioteca compilada pede ao Android outras bibliotecas que a oficial: %s"
@@ -180,7 +209,8 @@ def compilar(abi):
     argumentos = ["NDK_PROJECT_PATH=null", "APP_BUILD_SCRIPT=" + os.path.join(jni, "Android.mk"),
                   "NDK_APPLICATION_MK=" + os.path.join(jni, "Application.mk"), "APP_ABI=" + abi,
                   "APP_PLATFORM=android-21", "NDK_OUT=" + objetos, "NDK_LIBS_OUT=" + saida,
-                  "NDK_DEBUG=0", "GIT_VERSION=" + VERSAO_DO_GIT, "-j%d" % (os.cpu_count() or 2)]
+                  "NDK_DEBUG=0", "GIT_VERSION=" + VERSAO_DO_GIT, "APP_CFLAGS=" + mapa_dos_caminhos(),
+                  "-j%d" % (os.cpu_count() or 2)]
     registro = os.path.join(OBJETOS, "compilar-%s.txt" % abi)
     os.makedirs(OBJETOS, exist_ok=True)
     with open(registro, "w", encoding="utf-8", errors="replace") as saida_do_registro:

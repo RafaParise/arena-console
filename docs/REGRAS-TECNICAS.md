@@ -136,3 +136,8 @@ de mexer** em servidor, threads, processos, vídeo ou RetroArch: cada item aqui 
   - Uma caixa do Windows (`processos.caixa_que_fecha_os_filhos`) fecha o
     Java que sobrar quando o RetroArch cai.
 
+- Android: a biblioteca do RetroArch que o ARENA compila
+  (`ferramentas\compilar_retroarch_android.py`) sai com a pasta da máquina
+  trocada por `arena-android` (`-ffile-prefix-map`). A conferência reprova a
+  biblioteca em que o caminho do usuário do Windows sobrar: o APK é público
+  (achado de 10/11/2026, nos APKs até a 2026.11.08).

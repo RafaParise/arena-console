@@ -150,5 +150,36 @@ class MarcaDosRemendos(unittest.TestCase):
         self.assertEqual(compilador.marca_do_remendo(), antes)         # sem mexer, a mesma marca
 
 
+class CaminhoDaMaquinaForaDaBiblioteca(unittest.TestCase):
+    """Achado de 10/11/2026: o libretroarch-activity.so do APK publicado guardava C:/Users/<usuario>/... (o __FILE__
+    dos avisos do RetroArch). O compilador troca a pasta por um nome fixo e reprova a biblioteca em que ela sobrar."""
+
+    def test_o_mapa_cobre_as_duas_grafias_da_pasta(self):
+        base = os.path.abspath(compilador.sdk.BASE)
+        mapa = compilador.mapa_dos_caminhos()
+        self.assertIn("-ffile-prefix-map=%s=%s" % (base.replace("\\", "/"), compilador.NOME_NO_LUGAR_DO_CAMINHO), mapa)
+        self.assertIn("-ffile-prefix-map=%s=" % base, mapa)
+
+    def test_a_marca_obriga_a_recompilar_a_biblioteca_antiga(self):
+        self.assertEqual(compilador.marca_esperada()["caminhos"], compilador.VERSAO_DOS_CAMINHOS)
+
+    def test_a_conferencia_reprova_a_biblioteca_com_o_caminho(self):
+        import tempfile
+        perfil = os.path.expanduser("~").replace("\\", "/").upper().encode("utf-8")
+        dados = (b"[ENV] Command line (ARGS)\x00[ARENA] Controles na ordem\x00" + compilador.VERSAO_DO_GIT.encode()
+                 + b"\x00" + perfil + b"/AppData/x.c\x00")
+        with tempfile.TemporaryDirectory() as pasta:
+            arquivo = os.path.join(pasta, "lib.so")
+            with open(arquivo, "wb") as saida:
+                saida.write(dados)
+            with mock.patch.object(compilador, "bibliotecas_pedidas", return_value=compilador.BIBLIOTECAS_DO_ANDROID):
+                with self.assertRaises(SystemExit) as erro:
+                    compilador.conferir(arquivo)
+                self.assertIn("caminho desta maquina", str(erro.exception))
+                with open(arquivo, "wb") as saida:
+                    saida.write(dados.replace(perfil, b"arena-android"))
+                compilador.conferir(arquivo)         # sem o caminho, passa
+
+
 if __name__ == "__main__":
     unittest.main()
