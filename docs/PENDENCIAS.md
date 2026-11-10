@@ -219,6 +219,9 @@ Falta (nesta ordem):
 4. Pokket e VeMUlator já abrem no PC e no celular (BIOS: o `kernel.bin` do Rafael); falta testar com minijogos de verdade e no
    Chromebook; o APK já leva os dois núcleos (marcas em `ferramentas\android_nucleos.json`).
 5. Ler as opções dos núcleos que só as declaram depois de abrir um jogo (fceumm, fbneo, dolphin, mame2003).
+   **Fechado em 10/11/2026, sem mudança:** dos quatro, só o fceumm tem acessório no catálogo, e os três (portas 1, 2 e a
+   de expansão) usam só o tipo de controle por porta (`alvo: porta`), que a leitura já traz. Nenhum acessório depende de
+   opção desses núcleos.
 6. **Conferir com controle real:** o ARENA manda o tipo `517` ao Saturn e ao PS1 (SwanStation); nesses núcleos `517` é
    "Arcade Racer" e "Analog Joystick", e o controle analógico é `261`. Se for defeito, o conserto é de uma linha em
    `servidor\perfis_controle.json`. Não mexi sem teste.
@@ -257,13 +260,15 @@ Falta (nesta ordem):
 - **Controles de verdade** (você): GameSir T4 Nova Lite no celular e G7 HE no computador. Todos os testes desta rodada usaram
   controles virtuais (`testes\controle_virtual_android.py`).
 - **Pacote novo do Windows**: o código do computador (controle pelo cabo, gamepad virtual, ajustes) está na `main`, mas o zip e a
-  atualização do Windows continuam os da 2026.10.22.
+  atualização do Windows continuam os da 2026.10.22. **Feito:** o zip e a atualização saíram na 2026.11.08 e de novo,
+  montados do zero, na 2026.11.09 (10/11).
 - **Release 2026.11.08 — o que falta para publicar (08/11, madrugada):** a versão, a auditoria 6 e o APK de produção arm64
   estão prontos (instalado no A12). O computador ficou sem memória duas vezes e o sistema parou a **matriz de consoles** e
   a montagem do **APK x86_64**; pela regra, só rodam de novo com o seu pedido. Faltam: (1) a rodada final
   (`ferramentas\rodada_final.py`); (2) o APK x86_64 (`montar_android.py --abi x86_64`); (3) o pacote do Windows
   (`montar_versao_alunos.py --zip-completo` e `--zip-atualizacao`); (4) publicar pelo `SINCRONIZAR.bat` e acrescentar à
-  página do release o texto de `docs\RELEASE-2026.11.08.md` (com "Qual arquivo baixar" por sistema).
+  página do release o texto de `docs\RELEASE-2026.11.08.md` (com "Qual arquivo baixar" por sistema). **Feito** em
+  08/11 (a 2026.11.08) e, completo e limpo, no release novo `v2026.11.09` (10/11).
 - ~~Botão "Partida pelo cabo" no Jogar Junto~~ **Feito** (`a12efa1`, testado nos dois sentidos em 07/11).
 - **Jogar Junto**: com 8 jogadores e o celular como um deles; num Linux de verdade; Wi-Fi do roteador (o celular está em 2,4 GHz e o
   computador em 5 GHz, e a partida ainda caiu uma vez em 6 s: o cabo é o jeito firme).
@@ -357,7 +362,8 @@ Falta (nesta ordem):
   também a partida entre computadores por um emulador menos compatível. Fica como melhoria futura, se o Rafael quiser.
 - **Partida pelo cabo**: testada nos dois sentidos (o celular abriu o Super Nintendo e o computador entrou como jogador 2, ping
   14 ms). Falta só o Saturn.
-- **APK e pacote do Windows novos e a página do release**: só depois do teste acima.
+- **APK e pacote do Windows novos e a página do release**: só depois do teste acima. **Feito:** release `v2026.11.09`
+  (10/11), com os APKs e os dois zips.
 - Da rodada anterior: 8 jogadores e Linux de verdade, `teste_matriz_consoles`, `teste_android`, modo de dados móveis, controles de
   verdade.
 - **Pedidos antigos conferidos na revisão de todos os pedidos (07/11)**: o clarão do tema claro ao abrir o jogo (24/10) já
