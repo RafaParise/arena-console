@@ -747,3 +747,21 @@ as proteções de privacidade mais recentes", com o link pequeno **"Instalar ass
    diagnostica e se resolve; se não conseguir, explica.
 3. **Créditos do aluno HugoVHK no fim do texto da próxima atualização**, com tudo o que ele mandou (tabela em
    `CREDITOS.md`).
+
+## Lançamento 2026.11.10: o que falta para publicar (10/11/2026, noite)
+
+Feito e no `main`: versão-alvo 35, continuar de onde parou, capas no molde, jogos e BIOS em qualquer pasta, crédito do
+HugoVHK. `VERSAO = "2026.11.10"`; rascunho do texto em `docs\RELEASE-2026.11.10.md` (crédito do aluno no fim, como o
+Rafael pediu duas vezes). APKs 2026.11.10 montados (produção arm64 e x86_64, e o de teste arm64).
+
+Falta, nesta ordem:
+1. **Teste no emulador com Android 15** (`testes\teste_android.py --apk <x86_64-teste>`): é o que confere o serviço em
+   primeiro plano com tipo (Android 14+) e a tela "Acesso a todos os arquivos". Da outra vez o sistema fechou o teste
+   por falta de memória (rodava junto com o provisionamento do FortiGate): rodar sozinho, **com o OK do Rafael**.
+2. **No Galaxy A12, com o APK de teste 2026.11.10:** abrir, fechar e reabrir um jogo (o continuar de onde parou), ver
+   as capas novas e Procurar no celular inteiro. O A12 estava como webcam do Rafael nesta noite.
+3. `ferramentas\rodada_final.py` (cerca de 80 min a 3 h e meia).
+4. Pacotes do PC: `montar_versao_alunos.py --zip-completo` e `--zip-atualizacao` (numa pasta temporária; nunca
+   remontar a `..\ARENA`).
+5. Completar o texto (tamanhos, SHA-256, como foi conferida), publicar o release novo **Latest** e acrescentar ao
+   README só o que for novo. Os releases antigos ficam como estão.

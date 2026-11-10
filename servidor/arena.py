@@ -143,7 +143,7 @@ ARQUIVO_OVERRIDE = os.path.join(PASTA_DADOS, "arena_override.cfg")
 # Serve para uma coisa so: acabar com a duvida de "sera que estou testando
 # a versao corrigida?". Quando algo nao bate com o esperado, o primeiro
 # passo e comparar este numero.
-VERSAO = "2026.11.09"   # lancamento novo e limpo: Dreamcast com botoes de toque no celular (Vulkan), abertura 1,3 s mais rapida, PSP e Voltar ao jogo no Android
+VERSAO = "2026.11.10"   # app do Android com a versao-alvo 35 (Play Protect), continuar de onde parou, capas no molde, jogos e BIOS em qualquer pasta
 
 PORTA = 8777
 # Os testes que sobem uma copia do ARENA (testes\copia_do_arena.py) usam
