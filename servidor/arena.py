@@ -3543,7 +3543,14 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
                 time.sleep(2)
             # Os programas companheiros que a pessoa pediu em Acessorios (hoje: o DreamPotato, o VMU de verdade do Dreamcast).
             pedidos = acessorios.companheiros(config.get("acessorios"), jogo["plataforma"])
-            abertos = companheiros.abrir_todos(pedidos)
+            argumentos_dos_companheiros = {}
+            if "dreampotato" in pedidos and (acessorios.limpar_estado(config.get("acessorios"))
+                                             .get("dc_vmu_memoria_compartilhada") or {}).get("compartilhar"):
+                # Memoria compartilhada: o DreamPotato abre um arquivo de VMU e grava nele (10/11/2026).
+                vmu = companheiros.vmu_do_dreampotato(PASTA_SAVES, PASTA_SISTEMA)
+                if vmu:
+                    argumentos_dos_companheiros["dreampotato"] = [vmu]
+            abertos = companheiros.abrir_todos(pedidos, argumentos=argumentos_dos_companheiros)
             for pedido in pedidos:
                 if pedido not in abertos and companheiros.achar(pedido) is None:
                     print("[ARENA] %s foi pedido em Acessorios, mas nao esta em emuladores\\%s (ou nao ha versao para este sistema): "

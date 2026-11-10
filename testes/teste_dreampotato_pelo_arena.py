@@ -44,7 +44,10 @@ def jogo_de_dreamcast():
 def main():
     caminhos = [a for a in sys.argv[1:] if not a.startswith("--")]
     jogo = os.path.abspath(caminhos[0]) if caminhos else jogo_de_dreamcast()
-    original = os.path.join(RAIZ, "emuladores", "DreamPotato")
+    # Para comparar versoes (10/11/2026): ARENA_DREAMPOTATO = outra pasta do DreamPotato; ARENA_FLYCAST = outro
+    # flycast_libretro.dll (os dois so na copia; o ARENA de verdade nao muda).
+    original = os.environ.get("ARENA_DREAMPOTATO") or os.path.join(RAIZ, "emuladores", "DreamPotato")
+    outro_flycast = os.environ.get("ARENA_FLYCAST")
     if not jogo or not os.path.exists(jogo) or not os.path.isfile(os.path.join(original, "DreamPotato.exe")):
         print("Faltam: um jogo em jogos\\pessoais\\Dreamcast e o DreamPotato em emuladores\\DreamPotato.")
         return 1
@@ -89,6 +92,8 @@ def main():
     try:
         print("Copiando o ARENA (com %s) para %s ..." % (os.path.basename(jogo), copia), flush=True)
         c.montar(copia, [NUCLEO], {"Dreamcast": [jogo]})
+        if outro_flycast:
+            shutil.copyfile(outro_flycast, os.path.join(retroarch, "cores", NUCLEO))
         shutil.copytree(original, pasta_do_potato, ignore=shutil.ignore_patterns("imgui.ini", "*.log"))
         servidor = c.subir_servidor(copia, registro)
         c.pedir("/api/indexar", {}, espera=90)
@@ -107,7 +112,12 @@ def main():
         confere("o jogo fechou pela janela", fechar_o_jogo())
 
         print("2. Com o encaixe 1 em DreamPotato", flush=True)
-        c.pedir("/api/config", {"acessorios": {ACESSORIO: {"encaixe1": "DreamPotato"}}})
+        acessorios = {ACESSORIO: {"encaixe1": "DreamPotato"}}
+        if "--memoria" in sys.argv:
+            # A memoria do VMU fica no DreamPotato (o jogo le e grava nela): o caso em que ele pode perguntar ao fechar.
+            acessorios["dc_vmu_memoria_compartilhada"] = {"compartilhar": True}
+            print("  (com a memoria do VMU compartilhada)", flush=True)
+        c.pedir("/api/config", {"acessorios": acessorios})
         resposta = c.pedir("/api/jogar", {"jogo_id": jogo_id, "jeito": "livre"}, espera=30)
         confere("o jogo abriu", bool(resposta.get("ok")), resposta)
         confere("o RetroArch abriu", bool(c.esperar(retroarchs, 30)))
@@ -145,6 +155,10 @@ def main():
         print("3. Fechar o jogo fecha os dois", flush=True)
         confere("o jogo fechou pela janela", fechar_o_jogo())
         confere("o DreamPotato fechou junto", bool(c.esperar(lambda: not potatos(), 20)), potatos())
+        if "--memoria" in sys.argv:
+            vmu = os.path.join(retroarch, "saves", "DreamPotato", "VMU-A1.bin")
+            confere("o VMU do DreamPotato esta em saves\\DreamPotato (128 KB)",
+                    os.path.isfile(vmu) and os.path.getsize(vmu) == 128 * 1024)
         novos = sorted(set(arquivos_do_potato()) - antes_dos_arquivos)
         print("  arquivos que o DreamPotato criou: %s" % (novos or "nenhum"), flush=True)
         for novo in novos:
