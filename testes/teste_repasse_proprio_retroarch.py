@@ -63,8 +63,16 @@ def main():
     if not os.path.isfile(JOGO):
         print("Falta o jogo do teste: %s" % JOGO)
         return 1
-    porta, fechar_repasse = abrir_repasse()
-    endereco = "127.0.0.1:%d" % porta
+    de_fora = os.environ.get("ARENA_REPASSE")
+    if de_fora:
+        # Um repasse que ja esta no ar (o do A12 da bancada, por exemplo): ARENA_REPASSE=192.168.0.10:55440
+        endereco = de_fora
+        maquina, porta = rp.separar_endereco(de_fora)
+        fechar_repasse = lambda: None  # noqa: E731
+    else:
+        porta, fechar_repasse = abrir_repasse()
+        maquina = "127.0.0.1"
+        endereco = "127.0.0.1:%d" % porta
     raiz = tempfile.mkdtemp(prefix="arena_repasse_ra_")
     abertos = []
     falhas = []
@@ -100,7 +108,7 @@ def main():
         opcoes_conv.update({"netplay_ip_port": str(porta), "netplay_use_mitm_server": "false",
                             "netplay_nat_traversal": "false"})
         abertos.append(abrir_retroarch(os.path.join(raiz, "conv"), opcoes_conv,
-                                       ["--connect", "127.0.0.1", "--port", str(porta), "--mitm-session=" + sessao]))
+                                       ["--connect", maquina, "--port", str(porta), "--mitm-session=" + sessao]))
         entrou = False
         limite = time.monotonic() + 40
         while time.monotonic() < limite and not entrou:

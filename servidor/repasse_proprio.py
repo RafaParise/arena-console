@@ -210,6 +210,7 @@ class Repasse:
                     sala.controle.close()          # o anfitriao sai do repasse; o canal de controle termina sozinho
         self.reservas.limpar(agora)
         self.consultas.limpar(agora)
+        self.erros.limpar(agora)
 
     def reservar(self, chave, ip=None):
         """(status HTTP, resposta) para o POST /sala."""

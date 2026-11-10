@@ -7940,7 +7940,6 @@ class Manipulador(BaseHTTPRequestHandler):
                         "console": plataforma.get("nome", ""),
                         "jogadores": jogo["ligacao"]["jogadores"],
                         "pela_internet": bool(dados.get("pela_internet")),
-                        "codigo_sala": partida.get("codigo_sala", ""),
                         "esperando": esperar,
                     }
 
