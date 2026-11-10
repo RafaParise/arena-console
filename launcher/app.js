@@ -61,6 +61,32 @@ function numeroBr(valor) {
   return typeof valor === "number" ? valor.toLocaleString("pt-BR") : String(valor ?? "—");
 }
 
+// O processador e a memoria no topo: aparecem inteiros ou nao aparecem.
+// Auditoria de 10/11/2026: em 1366x768 (o notebook da escola) com um apelido
+// comprido no botao do perfil, sobravam 53 px e a tela mostrava "Ryzen _" e
+// "11,_". A medida e' feita de verdade (mostra, mede e decide), porque o
+// lugar depende do apelido de cada um; o detalhe continua em Ajustes ->
+// Maquina. Mede de novo quando a janela ou a fileira de botoes muda.
+function ajustarLeituraDoTopo() {
+  const leitura = document.querySelector(".leitura");
+  if (!leitura) return;
+  leitura.classList.remove("leitura--sem-lugar");
+  const cortado = [...leitura.querySelectorAll("dt, dd")].some(
+    (item) => item.offsetParent !== null && item.scrollWidth > item.clientWidth + 1);
+  leitura.classList.toggle("leitura--sem-lugar", cortado);
+}
+
+let leituraVigiada = false;
+function vigiarLeituraDoTopo() {
+  ajustarLeituraDoTopo();
+  if (leituraVigiada) return;
+  leituraVigiada = true;
+  window.addEventListener("resize", ajustarLeituraDoTopo);
+  const botoes = document.querySelector(".topo-acoes");
+  if (botoes && "ResizeObserver" in window) new ResizeObserver(ajustarLeituraDoTopo).observe(botoes);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(ajustarLeituraDoTopo);
+}
+
 // "AMD Ryzen 5 5600G with Radeon Graphics" -> "Ryzen 5 5600G";
 // "Intel Celeron N5100 @ 1.10GHz" -> "Celeron N5100";
 // "13th Gen Intel Core i5-1345U" -> "Core i5-1345U".
@@ -267,6 +293,7 @@ async function carregarEstado() {
   $("#lidoCpu").title = m.cpu;
   $("#lidoRam").textContent = `${numeroBr(m.ram_total_gb)} GB`;
   $("#lidoDriver").textContent = estado.efetivas.video_driver || m.driver_video;
+  vigiarLeituraDoTopo();
   if (!estado.config.apelido) {
     $("#modalApelido").hidden = false;
     $("#campoApelidoInicial").focus();

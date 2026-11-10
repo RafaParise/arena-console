@@ -256,6 +256,8 @@ body[data-so-fundo="true"] > *:not(canvas):not(script):not(#btnVoltarAnimacao) {
   overflow: hidden;
 }
 .leitura > div { min-width: 0; }
+/* Sem lugar para mostrar inteiro (ajustarLeituraDoTopo, no app.js): some. */
+.leitura.leitura--sem-lugar { display: none; }
 
 .leitura dt {
   font-size: var(--t-micro);
@@ -477,7 +479,11 @@ input::placeholder { color: var(--texto-apagado); }
   margin-bottom: var(--gap);
 }
 
-.trilho-nome { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* O nome do console quebra em duas linhas em vez de cortar (auditoria de
+   10/11/2026: "Mega Drive, Master System e Ga..." em 1366 px e ate "Todos os
+   j..." em 768 px). No celular, a pilula continua numa linha so: o
+   .trilho-item de la tem white-space: nowrap, e o nome herda. */
+.trilho-nome { flex: 1; min-width: 0; overflow-wrap: anywhere; line-height: 1.25; }
 
 .trilho-conta {
   font-family: var(--fonte-numero);
@@ -1258,7 +1264,13 @@ input::placeholder { color: var(--texto-apagado); }
   :root { --gaveta-larg: 100vw; }
   .painel-topo { align-items: stretch; flex-wrap: wrap; padding: .7rem 1rem; gap: .65rem 1rem; }
   .leitura { order: 3; width: 100%; overflow-x: hidden; padding-left: 0; border-left: 0; min-width: 0; }
-  .topo-acoes { margin-left: auto; flex-wrap: wrap; justify-content: flex-end; }
+  /* flex-shrink 1 e min-width 0: sem eles a fileira nunca ficava mais
+     estreita que a soma dos botoes, a quebra de linha nao acontecia e, em
+     768 px (tablet de pe, Chromebook com a janela pela metade), a pagina
+     rolava de lado com o Ajustes fora da tela (auditoria de 10/11/2026). */
+  .topo-acoes { margin-left: auto; flex-wrap: wrap; justify-content: flex-end; flex-shrink: 1; min-width: 0;
+                max-width: 100%; }
+  .trilho-item--todos { font-size: var(--t-peq); }
   .conteudo { padding: 1rem; }
   .jogos { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
   .detalhes-jogo { display: none; }
