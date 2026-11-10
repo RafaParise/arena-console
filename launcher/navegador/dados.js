@@ -1723,6 +1723,8 @@ window.ARENA_DADOS = {
      "reicast_hle_bios": "enabled"
     }
    },
+   "motor_no_android": "vulkan",
+   "motor_no_android_motivo": "No Android, o Flycast em OpenGL ES deixa o controle de toque do RetroArch em quadrados escuros (em pe, nem isso): sem botoes, quem nao tem controle nao joga nem sai. Em Vulkan os botoes aparecem, na mesma velocidade (Galaxy A12, 09/11/2026: Armada 9,7 contra 9,3; Capcom vs. SNK 2, 30 nos dois). So vale com Vulkan no aparelho e o motor no automatico (arena.executar_jogo).",
    "netplay": false,
    "netplay_motivo": "O núcleo do Dreamcast (Flycast) não suporta jogo em rede - confirmado tentando hospedar, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Multiplayer só vale no mesmo computador.",
    "nome": "Sega Dreamcast",

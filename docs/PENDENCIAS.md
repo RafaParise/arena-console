@@ -449,6 +449,11 @@ e no modo alvo o 1b caiu de 4,51 para 2,0 s e o 1a de 3,33 para 1,37 s.
   esconde a outra e, no botão de início, a destrói (o `onTaskRemoved` do serviço encerrava o servidor). Consertado com
   afinidade própria para a tela do jogo e o serviço sem fechar o servidor com jogo aberto (c5c39ff). No A12, do zero:
   Contra → início → ARENA → Voltar ao jogo → SAIR → Golden Axe → SAIR, os 10 passos certos.
+- **Dreamcast sem botões de toque no celular (achado e consertado em 09/11):** em OpenGL ES, o Flycast deixava o
+  controle de toque do RetroArch em quadrados escuros (deitado) ou sumido (em pé): quem não tem controle não jogava nem
+  saía. Em Vulkan os botões aparecem, na mesma velocidade (Armada 9,7 contra 9,3; Capcom vs. SNK 2, 30 nos dois).
+  Agora o Dreamcast pede Vulkan no Android (`consoles.json → motor_no_android`), só com Vulkan no aparelho e o motor no
+  automático. Conferido no A12 pelo caminho normal ("vulkan driver forced" no registro, botões na foto).
 - **Recado do Java ME:** "Este console não tem versão para Android: abra o jogo no computador, com a mesma pasta do
   ARENA." Certo.
 - **Jogar Junto entre PC e celular, Wi-Fi da casa:** o celular hospedando, o PC entrou em 17,1 s; o PC hospedando, o

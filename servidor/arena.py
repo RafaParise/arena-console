@@ -2994,6 +2994,19 @@ def preparar_o_ps2_do_android(config, jogo=None, sem_jogo=False, degrau=0):
     return opcoes
 
 
+def motor_do_console_no_android(plataforma_jogo, config):
+    """O motor de video que o console pede no Android (consoles.json -> motor_no_android), ou "" quando nao vale: fora
+    do Android, sem Vulkan no aparelho ou com um motor escolhido a mao em Ajustes."""
+    motor = (plataforma_jogo or {}).get("motor_no_android", "")
+    if not motor or not plataforma_do_sistema.ANDROID:
+        return ""
+    if motor == "vulkan" and not MAQUINA.get("vulkan"):
+        return ""
+    if (config or {}).get("avancado", {}).get("video_driver", "automatico") != "automatico":
+        return ""
+    return motor
+
+
 def executar_jogo(jogo, apelido, config, custo=None, partida=None):
     """Abre o RetroArch, espera fechar e grava a sessao.
 
@@ -3287,6 +3300,12 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         # tudo, ate da partida a dois, porque e' defeito do nucleo.
         opcoes_do_console = plataforma_jogo.get("opcoes_retroarch", {})
         opcoes_jogo.update(opcoes_do_console)
+        # O motor de video que o console pede no Android (consoles.json -> motor_no_android): o Dreamcast em OpenGL ES
+        # apagava o controle de toque (09/11/2026). So com Vulkan no aparelho e com o motor no automatico: quem escolheu
+        # um motor em Ajustes fica com o dele.
+        motor_android = motor_do_console_no_android(plataforma_jogo, config)
+        if motor_android:
+            opcoes_jogo["video_driver"] = motor_android
         # O celular como controle (servidor\controle_remoto.py): com ele ligado em Ajustes -> Controles, o RetroArch
         # abre o Network RetroPad dos jogadores 1 a 4, numa porta sorteada para esta partida. So no RetroArch e fora
         # do Jogar Junto (o netplay cuida dos controles dele). O RetroArch so le o Network RetroPad dos jogadores

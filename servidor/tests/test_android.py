@@ -875,6 +875,24 @@ class OpcoesSoDoAndroid(unittest.TestCase):
                     no_pc = graficos.opcoes_finais_do_nucleo("swanstation", nota, nota, abaixo=abaixo)
                 self.assertEqual(no_pc.get("swanstation_CDROM_LoadImageToRAM"), "true", (nota, abaixo))
 
+    def test_dreamcast_em_vulkan_no_celular_com_vulkan_e_motor_automatico(self):
+        """O Flycast em OpenGL ES apagava o controle de toque no A12 (09/11/2026); em Vulkan ele aparece."""
+        import arena
+        with open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "consoles.json"),
+                  encoding="utf-8") as arquivo:
+            dreamcast = next(p for p in json.load(arquivo)["plataformas"] if p["id"] == "dreamcast")
+        automatico = {"avancado": {"video_driver": "automatico"}}
+        with no_android(), mock.patch.dict(arena.MAQUINA, {"vulkan": True}):
+            self.assertEqual(arena.motor_do_console_no_android(dreamcast, automatico), "vulkan")
+            # quem escolheu o motor em Ajustes fica com o dele
+            self.assertEqual(arena.motor_do_console_no_android(dreamcast, {"avancado": {"video_driver": "gl"}}), "")
+            # console sem pedido: nada muda
+            self.assertEqual(arena.motor_do_console_no_android({"id": "snes"}, automatico), "")
+        with no_android(), mock.patch.dict(arena.MAQUINA, {"vulkan": False}):
+            self.assertEqual(arena.motor_do_console_no_android(dreamcast, automatico), "")
+        with mock.patch.multiple(plataforma, ANDROID=False, WINDOWS=True, LINUX=False):
+            self.assertEqual(arena.motor_do_console_no_android(dreamcast, automatico), "")
+
     def test_psp_sem_pular_efeitos_no_celular(self):
         """O PPSSPP do Android cai 2 a 3 s depois de abrir com o 'pular efeitos de buffer' (Galaxy A12, 08/11/2026);
         no computador os niveis abaixo do original continuam ligando, porque la ele abre e alivia a maquina fraca."""

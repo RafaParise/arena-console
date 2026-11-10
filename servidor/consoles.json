@@ -737,6 +737,8 @@
       "nome": "Sega Dreamcast",
       "descricao": "Ultimo console da Sega, de 1998.",
       "core": "flycast_libretro.dll",
+      "motor_no_android": "vulkan",
+      "motor_no_android_motivo": "No Android, o Flycast em OpenGL ES deixa o controle de toque do RetroArch em quadrados escuros (em pe, nem isso): sem botoes, quem nao tem controle nao joga nem sai. Em Vulkan os botoes aparecem, na mesma velocidade (Galaxy A12, 09/11/2026: Armada 9,7 contra 9,3; Capcom vs. SNK 2, 30 nos dois). So vale com Vulkan no aparelho e o motor no automatico (arena.executar_jogo).",
       "livre": {
         "nome": "BIOS imitada (Flycast)",
         "opcoes_nucleo": {
