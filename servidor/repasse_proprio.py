@@ -40,6 +40,12 @@ RetroArch dele pede a sessao (RATS). Os dois saem do MESMO endereco de internet,
 pode haver uma reserva esperando por endereco (outra casa que divide a mesma internet espera alguns segundos), e um
 RetroArch que chega sem reserva e' recusado: o repasse nao serve de repasse aberto para estranhos.
 
+Risco aceito (revisao de seguranca de 10/11/2026): 6 numeros sao 1 milhao de codigos. Com 30 consultas por minuto por
+internet (o bloco /64 inteiro, no IPv6), no maximo 300 codigos errados por minuto no repasse todo e a sala fechando
+quando o jogo fecha, achar uma sala ao acaso levaria dias de tentativa. O pior caso e' um estranho entrar como jogador
+numa partida: o RetroArch mostra na tela o apelido de quem entrou, e fechar o jogo fecha a sala. Nao ha conversa, voz,
+nem dado do aluno no repasse.
+
 Uso (no aparelho que fica ligado):
     python repasse_proprio.py --servir [--porta 55440]
 So biblioteca padrao (roda no Termux, no Linux e no Windows)."""
@@ -74,6 +80,11 @@ SILENCIO_MAXIMO = 300.0            # ligacao emendada sem nenhum byte por 5 min 
 INTERVALO_DO_PING = 30.0
 LIMITE_RESERVAS = (10, 600.0)      # ate 10 reservas a cada 10 min por endereco
 LIMITE_CONSULTAS = (30, 60.0)      # ate 30 consultas de codigo por minuto por endereco (6 numeros nao se adivinham)
+# Revisao de seguranca (10/11/2026): muitos enderecos juntos tentando codigos ao acaso. Passando de 300 consultas ERRADAS
+# por minuto no repasse inteiro, ninguem consulta por 1 minuto (quem ja esta jogando continua).
+LIMITE_ERROS_GERAL = (300, 60.0)
+MAX_SALAS_POR_ENDERECO = 2         # salas abertas (esperando ou jogando) de uma mesma internet
+VIDA_MAXIMA_DA_SALA = 6 * 3600.0   # uma sala nao fica aberta mais de 6 horas
 
 
 def endereco_de_16_bytes(ip):
@@ -88,13 +99,17 @@ def endereco_de_16_bytes(ip):
 
 
 def chave_do_endereco(ip):
-    """O endereco de quem ligou, sem o "::ffff:" (o mesmo IPv4 pode chegar pelos dois jeitos)."""
+    """O endereco de quem ligou, sem o "::ffff:" (o mesmo IPv4 pode chegar pelos dois jeitos). No IPv6, a casa inteira
+    recebe um bloco /64 (milhoes de enderecos): os limites contam o bloco, senao quem tem IPv6 trocaria de endereco a
+    cada pedido e escaparia deles."""
     try:
         endereco = ipaddress.ip_address(ip.split("%")[0])
     except ValueError:
         return ip
     if endereco.version == 6 and endereco.ipv4_mapped:
         return str(endereco.ipv4_mapped)
+    if endereco.version == 6:
+        return str(ipaddress.ip_network("%s/64" % endereco, strict=False))
     return str(endereco)
 
 
@@ -114,6 +129,11 @@ class Limitador:
         recentes.append(agora)
         self.vezes[chave] = recentes
         return True
+
+    def cheio(self, chave, agora=None):
+        """Ja chegou ao maximo na janela (sem contar mais uma vez)?"""
+        agora = time.monotonic() if agora is None else agora
+        return sum(1 for t in self.vezes.get(chave, []) if agora - t < self.janela) >= self.maximo
 
     def limpar(self, agora=None):
         agora = time.monotonic() if agora is None else agora
@@ -159,6 +179,7 @@ class Repasse:
         self.total = 0
         self.reservas = Limitador(*LIMITE_RESERVAS)
         self.consultas = Limitador(*LIMITE_CONSULTAS)
+        self.erros = Limitador(*LIMITE_ERROS_GERAL)
 
     # --- Salas -----------------------------------------------------------------------------------------------
     def _limpar_reservas_vencidas(self):
@@ -166,6 +187,10 @@ class Repasse:
         for codigo, sala in list(self.salas.items()):
             if sala.sessao is None and agora - sala.criada > RESERVA_VALE:
                 del self.salas[codigo]
+            elif agora - sala.criada > VIDA_MAXIMA_DA_SALA:
+                self._fechar_sala(sala)
+                if sala.controle is not None:
+                    sala.controle.close()          # o anfitriao sai do repasse; o canal de controle termina sozinho
         self.reservas.limpar(agora)
         self.consultas.limpar(agora)
 
@@ -174,6 +199,8 @@ class Repasse:
         self._limpar_reservas_vencidas()
         if any(s.chave == chave and s.sessao is None for s in self.salas.values()):
             return 409, {"erro": "Outra sala desta mesma internet esta abrindo agora. Tente de novo em alguns segundos."}
+        if sum(1 for s in self.salas.values() if s.chave == chave) >= MAX_SALAS_POR_ENDERECO:
+            return 429, {"erro": "Ja ha salas demais abertas desta internet. Feche uma antes de abrir outra."}
         if len(self.salas) >= MAX_SALAS:
             return 503, {"erro": "O repasse esta cheio agora. Tente mais tarde."}
         if not self.reservas.pode(chave):
@@ -189,8 +216,13 @@ class Repasse:
         """(status HTTP, resposta) para o GET /sala/<codigo>."""
         if not self.consultas.pode(chave):
             return 429, {"erro": "Muitas tentativas. Espere um minuto e confira o codigo."}
+        if self.erros.cheio(""):
+            # Codigos errados demais no repasse inteiro (gente tentando ao acaso de muitos enderecos): ninguem consulta
+            # por 1 minuto. Quem ja esta jogando nao e' afetado.
+            return 429, {"erro": "O repasse esta recebendo tentativas demais. Espere um minuto."}
         sala = self.salas.get(codigo)
         if sala is None:
+            self.erros.pode("")                # conta o erro
             return 404, {"erro": "Nao ha sala com esse codigo (confira os 6 numeros, ou a sala ja fechou)."}
         if sala.sessao is None:
             return 202, {"aberta": False, "erro": "A sala ainda esta abrindo. Tente de novo em alguns segundos."}

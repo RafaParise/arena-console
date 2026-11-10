@@ -67,6 +67,7 @@ class RepasseDeVerdade(unittest.TestCase):
             self.repasse.por_sessao.clear()
             self.repasse.reservas.vezes.clear()
             self.repasse.consultas.vezes.clear()
+            self.repasse.erros.vezes.clear()
         self.loop.call_soon_threadsafe(zerar)
         time.sleep(0.05)
         self.abertos = []
@@ -189,6 +190,43 @@ class Pedacos(unittest.TestCase):
         self.assertEqual(rp.endereco_de_16_bytes("10.0.0.5"), bytes(10) + b"\xff\xff" + bytes([10, 0, 0, 5]))
         self.assertEqual(rp.endereco_de_16_bytes("::1"), bytes(15) + b"\x01")
         self.assertEqual(rp.endereco_de_16_bytes("lixo"), bytes(16))
+
+    def test_ipv6_conta_a_casa_inteira(self):
+        # Revisao de seguranca (10/11/2026): no IPv6 a casa tem um bloco /64; os limites contam o bloco.
+        self.assertEqual(rp.chave_do_endereco("2804:14c:1:2:aaaa::1"), rp.chave_do_endereco("2804:14c:1:2:bbbb::9"))
+        self.assertNotEqual(rp.chave_do_endereco("2804:14c:1:2::1"), rp.chave_do_endereco("2804:14c:1:3::1"))
+
+    def test_no_maximo_duas_salas_por_internet(self):
+        repasse = rp.Repasse()
+        for _ in range(2):
+            status, dados = repasse.reservar("200.1.2.3")
+            self.assertEqual(status, 200)
+            repasse.salas[dados["codigo"]].sessao = b"x" * 12          # o RetroArch chegou: a reserva vira sala
+        status, dados = repasse.reservar("200.1.2.3")
+        self.assertEqual(status, 429)
+        self.assertEqual(repasse.reservar("200.9.9.9")[0], 200)      # outra casa abre normalmente
+
+    def test_sala_velha_demais_fecha(self):
+        repasse = rp.Repasse()
+        _status, dados = repasse.reservar("200.1.2.3")
+        sala = repasse.salas[dados["codigo"]]
+        sala.sessao = b"y" * 12
+        repasse.por_sessao[sala.sessao] = sala
+        sala.criada -= rp.VIDA_MAXIMA_DA_SALA + 1
+        repasse._limpar_reservas_vencidas()
+        self.assertNotIn(dados["codigo"], repasse.salas)
+        self.assertNotIn(sala.sessao, repasse.por_sessao)
+
+    def test_tentativas_ao_acaso_de_muitos_enderecos_param(self):
+        repasse = rp.Repasse()
+        _status, dados = repasse.reservar("200.1.2.3")
+        sala = repasse.salas[dados["codigo"]]
+        sala.sessao = b"z" * 12
+        errado = "%06d" % ((int(dados["codigo"]) + 1) % 1000000)
+        for n in range(rp.LIMITE_ERROS_GERAL[0]):
+            self.assertEqual(repasse.consultar("10.%d.%d.1" % (n // 250, n % 250), errado)[0], 404)
+        # Agora o repasse inteiro para de responder codigos por um minuto, ate o certo.
+        self.assertEqual(repasse.consultar("10.200.0.1", dados["codigo"])[0], 429)
 
     def test_mesmo_ipv4_pelos_dois_jeitos(self):
         self.assertEqual(rp.chave_do_endereco("::ffff:200.1.2.3"), "200.1.2.3")
