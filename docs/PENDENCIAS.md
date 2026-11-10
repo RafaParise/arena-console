@@ -221,6 +221,12 @@ Falta (nesta ordem):
    (`retroarch\saves\Pokket\Meu PocketStation.srm`), com cópia de segurança. O PS2 fica de fora (não emula o aparelho).
 4. Pokket e VeMUlator já abrem no PC e no celular (BIOS: o `kernel.bin` do Rafael); falta testar com minijogos de verdade e no
    Chromebook; o APK já leva os dois núcleos (marcas em `ferramentas\android_nucleos.json`).
+   **Pokket no PC, 10/11/2026 (`testes\teste_pocketstation_pelo_arena.py`):** com o minijogo caseiro "15 Puzzle" que
+   já estava em `jogos\pessoais\PocketStation`, pelo ARENA de verdade numa pasta com acento: aparece no catálogo, abre,
+   a tela mostra imagem (um coração, a tela do próprio PocketStation; não conferi se é a da BIOS ou o ícone do jogo),
+   e fecha pela janela. Falta: entrar no minijogo pelos botões. O VeMUlator continua sem teste, porque não há minijogo
+   de VMU (`.vms`) entre os jogos do Rafael, e o PokketSX (PS1 conversando com o PocketStation) também, porque nenhum
+   dos 7 jogos de PS1 dele usa o PocketStation. Baixar um seria trazer jogo comercial: fica para quando ele tiver um.
 5. Ler as opções dos núcleos que só as declaram depois de abrir um jogo (fceumm, fbneo, dolphin, mame2003).
    **Fechado em 10/11/2026, sem mudança:** dos quatro, só o fceumm tem acessório no catálogo, e os três (portas 1, 2 e a
    de expansão) usam só o tipo de controle por porta (`alvo: porta`), que a leitura já traz. Nenhum acessório depende de
