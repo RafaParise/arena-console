@@ -22,6 +22,8 @@ Primeiro, o que já estava pedido:
    O Saturn não tem jeito livre (tela preta sem a BIOS, nos três
    emuladores). O Play! (PS2 sem BIOS) não entrou: o RetroArch fica preso
    ao fechar e ele cai em pasta com acento (números no guia 2).
+   Reavaliado em 10/11/2026 com o núcleo noturno do dia: mostra imagem, mas
+   continua preso ao fechar (3 de 3) e cai em pasta com acento. Continua fora.
 3. Feito: a biblioteca de jogos livres por console (`servidor\biblioteca_livre.json`,
    37 jogos de 15 consoles, baixados de quem publicou, com a marca conferida).
    Do mamedev.org, 20 dos 28: os 8 da Video Klein são de pôquer e aposta.

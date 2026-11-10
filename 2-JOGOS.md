@@ -761,6 +761,19 @@ Num Celeron da escola, que é bem mais lento, a velocidade cairia muito
 abaixo disso. Por isso o PS2 continua pelo PCSX2, com a BIOS do console. O
 Play! volta a ser avaliado quando fechar direito.
 
+**Reavaliado em 10/11/2026, com o núcleo mais novo do libretro** (o da
+compilação noturna do dia, com o Gran Turismo 4 e o God of War, no mesmo
+Ryzen). Nada mudou:
+
+| O que se mediu | Resultado |
+|---|---|
+| Jogo com imagem | sim, com o motor `gl` (3 de 3) |
+| Fechar o jogo | preso de novo ("Unloading core..."), 3 de 3 pela janela, com os motores `gl`, `vulkan` e `d3d11` (nos dois últimos o RetroArch troca sozinho para o `glcore`, que é o que o Play! pede) |
+| Pasta com acento | cai com uma exceção do próprio núcleo (código 0xE06D7363), em 12 s |
+| Motor `glcore` escolhido à mão | cai em 1 s, mesmo sem acento |
+
+Por isso ele continua fora do ARENA.
+
 #### BIOS livres: as que vêm com o ARENA
 
 Alguns consoles têm uma BIOS livre, escrita do zero por voluntários, que
