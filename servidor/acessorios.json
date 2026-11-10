@@ -197,7 +197,7 @@
           "id": "dc_vmu_memoria_compartilhada",
           "so_alguns_jogos": true,
           "nome": "VMU: memória compartilhada com o DreamPotato",
-          "texto": "Com o DreamPotato no encaixe A1, a memória do VMU (os saves e os minijogos) fica no DreamPotato: o que você fez nele fora do jogo aparece dentro do jogo, e o que o jogo grava aparece nele. Desligado, o jogo usa o VMU dele e o DreamPotato só mostra a telinha.",
+          "texto": "Com o DreamPotato no encaixe A1, a memória do VMU (os saves e os minijogos) fica no DreamPotato: o que você fez nele fora do jogo aparece dentro do jogo, e o que o jogo grava aparece nele. Desligado, o jogo usa o VMU dele e o DreamPotato só mostra a telinha. Atenção (10/11/2026): com o DreamPotato 0.3.1 a ligação com o jogo ainda cai; deixe esta chave desligada até ela funcionar.",
           "controles": [
             {
               "id": "compartilhar",
@@ -216,7 +216,7 @@
           "id": "dc_encaixes_{n}",
           "jogadores": 4,
           "nome": "Controle {n}: o que está encaixado nele",
-          "texto": "O controle do Dreamcast tinha dois encaixes na parte de cima (A1/A2, B1/B2...). Em geral ia um VMU no primeiro e um Jump Pack (a vibração) no segundo. Escolha \"DreamPotato\" no encaixe A1 do controle 1 para ter o VMU de verdade numa janela à parte (o ARENA abre o DreamPotato junto com o jogo; ele precisa estar em emuladores\\DreamPotato: veja docs\\ACESSORIOS.md). Ligue também \"Memória do VMU compartilhada\" para o que se faz no VMU valer no jogo e o contrário.",
+          "texto": "O controle do Dreamcast tinha dois encaixes na parte de cima (A1/A2, B1/B2...). Em geral ia um VMU no primeiro e um Jump Pack (a vibração) no segundo. Escolha \"DreamPotato\" no encaixe A1 do controle 1 para ter o VMU de verdade numa janela à parte (o ARENA abre o DreamPotato junto com o jogo; ele precisa estar em emuladores\\DreamPotato: veja docs\\ACESSORIOS.md). Ligue também \"Memória do VMU compartilhada\" para o que se faz no VMU valer no jogo e o contrário. Atenção (conferido em 10/11/2026): com o DreamPotato 0.3.1, o jogo ainda não fica ligado a ele (a janela abre e fecha com o jogo, mas não mostra a tela do VMU). Para ver a telinha, use \"VMU do jogador 1: a telinha por cima do jogo\".",
           "controles": [
             {
               "id": "encaixe1",

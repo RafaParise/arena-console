@@ -75,6 +75,7 @@ uma pistola de luz só mira em jogo de pistola. Por isso cada acessório do cat�
   Encaixe A1 = DreamPotato, e ligue "VMU: memória compartilhada com o DreamPotato". O ARENA abre o DreamPotato junto com o jogo
   e fecha com ele (`servidor\companheiros.py`; testado: abre, fica vivo e fecha). O do Rafael já está em `emuladores\DreamPotato`
   (zip conferido pela marca SHA-256, 24/10/2026). Só Windows e Linux: não existe para Android.
+  **Conferido com um jogo de verdade em 10/11/2026:** abre e fecha junto com o jogo, mas o Flycast (v2.7-15) cai ao   receber a resposta do DreamPotato 0.3.1 (`receive failed`), em qualquer ordem de abertura. Incompatibilidade de   versão provável; detalhes em `docs\PENDENCIAS.md`. Teste: `testes\teste_dreampotato_pelo_arena.py`.
 
 ### PocketStation (PlayStation 1)
 
