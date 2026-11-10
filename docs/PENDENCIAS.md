@@ -509,9 +509,13 @@ calmo (depois de reiniciar o PC) antes de mexer no ARENA.
 3. Revisar PENDÊNCIAS e guias atrás de algo prometido e não feito.
 4. ~~Pesquisa~~ **feita em 10/11** (`docs\PESQUISA-PROJETOS-PARECIDOS.md`; o LEIA em cada pasta de console já entrou no montador, `ab9eefb`; as outras ideias abaixo, em "Depende do Rafael" e no próprio documento). Pesquisa dos melhores projetos parecidos (Lemuroid, Daijishō, ES-DE, Pegasus, RetroBat, Batocera, RetroArch) atrás
    de recursos e otimizações para todo celular (meta realista: Android 7 ou mais novo, 64 bits, dos últimos 7 a 8 anos).
-5. Auditoria da tela e layout novo (abas, distribuição), o mesmo no PC, no celular e no Chromebook.
+5. ~~Auditoria da tela~~ **feita em 10/11** (defeitos consertados em `78a469e`; a proposta de layout em `docs\PROPOSTA-LAYOUT.md`, à espera das suas respostas abaixo). Auditoria da tela e layout novo (abas, distribuição), o mesmo no PC, no celular e no Chromebook.
 
 ## Depende do Rafael
+
+- **Layout novo (`docs\PROPOSTA-LAYOUT.md`, 10/11):** (1) as 5 abas (Jogos, Amigos, Placar, Biblioteca, Ajustes) no
+  lugar dos 8 botões do topo, ou manter como está? (2) no celular, abas embaixo ou em cima? (3) o tema claro/escuro
+  dentro do perfil, em Ajustes ou no topo? Com as respostas, cabe numa sessão (tela, guias, testes e fotos).
 
 - **Continuar de onde parou (ideia do Lemuroid, pesquisa de 10/11):** o jogo grava o estado sozinho ao sair e volta
   nele ao abrir (`savestate_auto_save` e `savestate_auto_load`; o estado automático fica num espaço próprio e não
