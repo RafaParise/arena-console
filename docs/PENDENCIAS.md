@@ -516,6 +516,7 @@ calmo (depois de reiniciar o PC) antes de mexer no ARENA.
 - **Layout novo (`docs\PROPOSTA-LAYOUT.md`, 10/11):** (1) as 5 abas (Jogos, Amigos, Placar, Biblioteca, Ajustes) no
   lugar dos 8 botões do topo, ou manter como está? (2) no celular, abas embaixo ou em cima? (3) o tema claro/escuro
   dentro do perfil, em Ajustes ou no topo? Com as respostas, cabe numa sessão (tela, guias, testes e fotos).
+  **Decidido pelo Rafael (10/11): esquecer o layout novo.** A tela fica como está, com os consertos de `78a469e`.
 
 - **Continuar de onde parou (ideia do Lemuroid, pesquisa de 10/11):** o jogo grava o estado sozinho ao sair e volta
   nele ao abrir (`savestate_auto_save` e `savestate_auto_load`; o estado automático fica num espaço próprio e não

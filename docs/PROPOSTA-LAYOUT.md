@@ -1,5 +1,8 @@
 # Auditoria da tela e proposta de layout (10/11/2026)
 
+> **Decisão do Rafael (10/11/2026): esquecer o layout novo.** A tela fica como está; valem só os consertos de
+> defeito da auditoria (`78a469e`). A proposta abaixo fica guardada como registro.
+
 Pedido do Rafael: auditar a tela e propor um layout novo (abas, distribuição), **o mesmo no computador, no celular e no
 Chromebook**. A auditoria e os consertos de defeito já entraram (`78a469e`). O layout novo é escolha de gosto, então
 fica como proposta: nada abaixo foi implementado.
