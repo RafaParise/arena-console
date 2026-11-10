@@ -467,6 +467,44 @@ volta vazio e o ARENA usava a placa do registro, que guarda placas que já saír
 Radeon). Agora vem antes `hardware.placas_presentes()`: as placas que estão na máquina, pela SetupAPI do Windows
 (`DIGCF_PRESENT`), em 24 ms e sem WMI; ela só roda quando a tela principal não responde. Com teste.
 
+## Lançamento 2026.11.09 (09 e 10/11/2026, de madrugada, com o Rafael dormindo)
+
+**Publicado:** release novo `v2026.11.09` (Latest), completo e limpo, com cada arquivo explicado por aparelho
+(`docs/RELEASE-2026.11.09.md`). Os releases antigos ficaram como estavam.
+
+**Rodada final de 09 e 10/11: 113 de 120** de primeira; os 7 que falharam, repetidos um de cada vez, passaram:
+
+| Teste | Causa | Situação |
+|---|---|---|
+| `teste_capas_todos_os_consoles` | a internet caiu no meio de um download (IncompleteRead) | **passou** |
+| `teste_chromebook` | o teste leva 10 min e o tempo-limite da rodada era 15 min com a máquina carregada | sozinho, 32 de 32 em 629 s: **passou** |
+| `teste_matriz_consoles` | a imagem do PocketStation no modo modesto (mesmo achado de 08/11) | só o PocketStation: **passou** |
+| `servidor/tests/run.py` | 1 conexão cortada pelo Windows (WinError 10053) no meio da sequência longa | sozinho, 4 vezes seguidas: **1226 OK**. Ambiental; não achei o teste culpado com `-v` |
+| `teste_orcamentos_modo_alvo` | 1b em 2,35 s (teto 2,3) | repetido 4 vezes: 1,51 / 2,77 / 2,58 / **1,07 s**. **Fica em observação** (abaixo) |
+| `teste_android` | a rodada usou o APK de teste antigo (2026.10.22) | com o APK de teste 2026.11.09 no emulador: **passou, 0 falhas** (duas vezes, antes e depois do conserto do caminho) |
+| `teste_jogar_junto_pc_celular` | o A12 estava com o APK de produção, que não deixa o teste conduzir a tela | com o APK de teste no A12: o PC entrou em 19,1 s, o celular em 5,1 s: **passou** |
+
+**Achado e consertado antes de publicar (ca5d604):** o `libretroarch-activity.so` que o ARENA compila para o APK
+guardava o caminho da pasta de quem montou, com o nome do usuário do Windows (`C:/Users/<usuário>/AppData/...`, pelo
+`__FILE__` dos avisos do RetroArch). Estava em todos os APKs até a 2026.11.08. Agora o `ndk-build` recebe
+`-ffile-prefix-map`, e a conferência da biblioteca reprova o APK em que o caminho sobrar. A conferência do pacote
+(zips e APKs) procurou também e-mail, token, BIOS, banco, `config.json` e saves: nada.
+
+**Em observação: o 1b no modo alvo oscila (1,07 a 2,77 s).** Nesta noite um `svchost` do Windows (os serviços
+DcomLaunch, PlugPlay e Power, juntos no mesmo processo) gastava **~95% de um núcleo o tempo todo**, mesmo sem nenhum
+teste rodando; dentro da caixa de 2 processadores do modo alvo isso pesa. Próximo passo: medir de novo com esse serviço
+calmo (depois de reiniciar o PC) antes de mexer no ARENA.
+
+**O que vem depois (fila combinada com o Rafael em 10/11, na ordem):**
+1. Item 9: o cartão de memória do convidado do PS1 no Jogar Junto nasce em branco (reproduzir antes com 2 RetroArch
+   no PC; pode ser do próprio netplay, que usa o estado de quem hospeda).
+2. Item 7: mais de 4 controles do Xbox (o XInput do Windows só conta 4; plano: SDL2 automático com tradução de
+   botões). Cinco controles de verdade só na sala.
+3. Revisar PENDÊNCIAS e guias atrás de algo prometido e não feito.
+4. Pesquisa dos melhores projetos parecidos (Lemuroid, Daijishō, ES-DE, Pegasus, RetroBat, Batocera, RetroArch) atrás
+   de recursos e otimizações para todo celular (meta realista: Android 7 ou mais novo, 64 bits, dos últimos 7 a 8 anos).
+5. Auditoria da tela e layout novo (abas, distribuição), o mesmo no PC, no celular e no Chromebook.
+
 ## Depende do Rafael
 
 - **Acessórios (24/10/2026), o que só você faz:**
