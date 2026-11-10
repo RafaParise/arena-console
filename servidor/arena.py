@@ -141,7 +141,7 @@ ARQUIVO_OVERRIDE = os.path.join(PASTA_DADOS, "arena_override.cfg")
 # Serve para uma coisa so: acabar com a duvida de "sera que estou testando
 # a versao corrigida?". Quando algo nao bate com o esperado, o primeiro
 # passo e comparar este numero.
-VERSAO = "2026.11.08"   # controle de toque com a cara de cada console, em pe, dois toques, PS2 no A12, Lossless nos emuladores de fora, auditoria 6
+VERSAO = "2026.11.09"   # lancamento novo e limpo: Dreamcast com botoes de toque no celular (Vulkan), abertura 1,3 s mais rapida, PSP e Voltar ao jogo no Android
 
 PORTA = 8777
 # Os testes que sobem uma copia do ARENA (testes\copia_do_arena.py) usam
