@@ -1613,6 +1613,37 @@ def levar_cartao_do_ps1(pasta_saves, caminho_jogo):
         return False
 
 
+def pasta_do_cartao_do_ps1_na_partida(pasta_saves, caminho_jogo):
+    """A pasta do cartao que o ANFITRIAO de uma partida de PS1 deve usar, ou
+    None para deixar como esta (saves\\PCSX-ReARMed).
+
+    Item 9 (10/11/2026): "o cartao do convidado nasce em branco". Medido com
+    dois RetroArch neste PC: o convidado recebe o cartao do ANFITRIAO na
+    entrada (o RetroArch manda a SRAM e grava a copia do convidado em
+    saves\\<nucleo>\\.netplay, sem tocar no cartao dele). O branco vinha do
+    anfitriao: sozinho, o PS1 joga no SwanStation (saves\\SwanStation), mas a
+    partida abre no PCSX ReARMed, que lia saves\\PCSX-ReARMed -- vazio, ou
+    parado no dia em que o PS1 ainda abria por ele. Os dois nucleos usam o
+    mesmo cartao de 128 KB, byte a byte, entao a partida usa o cartao mais
+    novo dos dois, no lugar dele: nada e' copiado e nada se perde. Fica no
+    PCSX ReARMed so se o cartao dele for o mais novo (ou o unico)."""
+    nome = os.path.splitext(os.path.basename(caminho_jogo))[0] + ".srm"
+    swan = os.path.join(pasta_saves, "SwanStation", nome)
+    pcsx = os.path.join(pasta_saves, "PCSX-ReARMed", nome)
+    try:
+        if os.path.getsize(swan) != TAMANHO_CARTAO_PS1:
+            return None
+        momento_swan = os.path.getmtime(swan)
+    except OSError:
+        return None
+    try:
+        if os.path.getmtime(pcsx) > momento_swan:
+            return None
+    except OSError:
+        pass
+    return os.path.dirname(swan)
+
+
 # ---------------------------------------------------------------------------
 # Cache de video do PS1 (so no modo economico)
 # ---------------------------------------------------------------------------

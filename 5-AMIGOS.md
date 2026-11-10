@@ -720,7 +720,7 @@ passar o mouse em cima.
 | Console | Jogar Junto |
 |---|---|
 | Super Nintendo, Mega Drive/Master System/Game Gear, a maioria dos consoles 2D | Funciona normal |
-| PlayStation 1 | Funciona, mas usa um emulador diferente por baixo (PCSX ReARMed) só enquanto durar o Jogar Junto — jogando sozinho, o emulador de sempre continua sendo o usado |
+| PlayStation 1 | Funciona, mas usa um emulador diferente por baixo (PCSX ReARMed) só enquanto durar o Jogar Junto — jogando sozinho, o emulador de sempre continua sendo o usado. O memory card é o de sempre de quem abriu a partida, e quem entra joga com uma cópia dele: o cartão de quem entrou fica como estava |
 | Nintendo 64, Dreamcast, PSP | Não dá. O emulador de cada um não tem esse recurso |
 | PS2, PS3, Xbox 360 | Não dá pelo Jogar Junto normal — esses usam um programa à parte (PCSX2, RPCS3, Xenia), sem esse recurso em rede pronto do jeito do RetroArch. Alguns jogos de PS2 têm rede de um outro jeito — ver abaixo |
 

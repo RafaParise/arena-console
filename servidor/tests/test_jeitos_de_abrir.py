@@ -207,6 +207,27 @@ class TestPS1NoJeitoLivre(unittest.TestCase):
         self.assertFalse(self.graficos.levar_cartao_do_ps1(self.saves, self.jogo))
         self.assertFalse(os.path.exists(os.path.join(self.saves, "SwanStation")))
 
+    def test_a_partida_usa_o_cartao_mais_novo_do_anfitriao(self):
+        """Item 9 (10/11/2026): o anfitriao da partida de PS1 (PCSX ReARMed) joga com o cartao do SwanStation, o de
+        sempre, quando ele e' o mais novo; o convidado recebe esse cartao do RetroArch na entrada."""
+        partida = self.graficos.pasta_do_cartao_do_ps1_na_partida
+        self.assertIsNone(partida(self.saves, self.jogo))                       # nenhum cartao: fica como esta
+        self.cartao("PCSX-ReARMed", b"R")
+        self.assertIsNone(partida(self.saves, self.jogo))                       # so o do PCSX ReARMed
+        self.cartao("SwanStation", b"S")
+        swan = os.path.join(self.saves, "SwanStation", "Crash Bandicoot (USA).srm")
+        pcsx = os.path.join(self.saves, "PCSX-ReARMed", "Crash Bandicoot (USA).srm")
+        os.utime(pcsx, (1_000_000, 1_000_000))
+        self.assertEqual(partida(self.saves, self.jogo), os.path.join(self.saves, "SwanStation"))
+        os.utime(swan, (500_000, 500_000))
+        self.assertIsNone(partida(self.saves, self.jogo))                       # o do PCSX ReARMed e' o mais novo
+        self.assertEqual(self.ler("PCSX-ReARMed")[:1], b"R")                    # nada copiado, nada trocado
+        self.assertEqual(self.ler("SwanStation")[:1], b"S")
+
+    def test_a_partida_nao_usa_arquivo_que_nao_e_cartao(self):
+        self.cartao("SwanStation", b"S", tamanho=1000)
+        self.assertIsNone(self.graficos.pasta_do_cartao_do_ps1_na_partida(self.saves, self.jogo))
+
     def test_cache_de_video_na_pasta_da_openbios(self):
         """O cache do SwanStation fica na pasta das BIOS que ele recebe; o
         cuidado do modo economico vale tambem la."""

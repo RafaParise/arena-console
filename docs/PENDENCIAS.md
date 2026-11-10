@@ -496,7 +496,7 @@ teste rodando; dentro da caixa de 2 processadores do modo alvo isso pesa. Próxi
 calmo (depois de reiniciar o PC) antes de mexer no ARENA.
 
 **O que vem depois (fila combinada com o Rafael em 10/11, na ordem):**
-1. Item 9: o cartão de memória do convidado do PS1 no Jogar Junto nasce em branco (reproduzir antes com 2 RetroArch
+1. ~~Item 9~~ **feito em 10/11** (veja os limites conhecidos): o cartão de memória do convidado do PS1 no Jogar Junto nasce em branco (reproduzir antes com 2 RetroArch
    no PC; pode ser do próprio netplay, que usa o estado de quem hospeda).
 2. Item 7: mais de 4 controles do Xbox (o XInput do Windows só conta 4; plano: SDL2 automático com tradução de
    botões). Cinco controles de verdade só na sala.
@@ -600,7 +600,15 @@ calmo (depois de reiniciar o PC) antes de mexer no ARENA.
   local); o NetPlay do Dolphin não abre pela linha de comando; o PS3 tem o
   RPCN.
 - Na partida a dois de PS1 (PCSX ReARMed), o memory card do convidado
-  nasce em branco e não sincroniza.
+  nasce em branco e não sincroniza. **Resolvido em 10/11/2026 (item 9):** o
+  convidado sempre recebeu o cartão de quem hospeda (o RetroArch manda na
+  entrada e guarda a cópia em `saves\<núcleo>\.netplay`, sem tocar no
+  cartão do convidado). O branco vinha de quem hospeda: a partida lia o
+  cartão do PCSX ReARMed, e o do dia a dia é o do SwanStation. Agora quem
+  hospeda joga com o cartão mais novo dos dois, no lugar dele
+  (`graficos.pasta_do_cartao_do_ps1_na_partida`). Conferido com dois
+  RetroArch neste PC; o cartão 2 da partida (`pcsx-card2.mcd`) passa a
+  ficar na pasta do SwanStation.
 - A partida pela internet (repasse) entre operadoras diferentes ainda não
   foi validada.
 - A descoberta de colegas não tem senha (revisão de segurança de 16/10/2026):

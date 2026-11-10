@@ -2078,7 +2078,8 @@ def gravar_override(config, custo=None, extras=None, em_partida=False,
 
     # Saves, estados e capturas sempre dentro do ARENA: e o que torna a
     # pasta portatil de verdade.
-    opcoes["savefile_directory"] = PASTA_SAVES
+    # A partida de PS1 pode mandar a pasta do cartao do SwanStation (item 9).
+    opcoes["savefile_directory"] = (extras or {}).get("savefile_directory") or PASTA_SAVES
     opcoes["savestate_directory"] = PASTA_STATES
     opcoes["screenshot_directory"] = PASTA_CAPTURAS
     # A pasta das BIOS e' a do ARENA, a nao ser que a partida mande outra:
@@ -3285,6 +3286,15 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             if copia_do_cartao:
                 print("[ARENA] Copia de seguranca do cartao do PocketStation: %s" % copia_do_cartao)
         extra = dict(partida["opcoes"]) if partida else None
+        # Partida de PS1 (item 9, 10/11/2026): quem hospeda joga com o cartao
+        # de sempre (o do SwanStation), e o convidado recebe esse cartao do
+        # RetroArch na entrada (graficos.pasta_do_cartao_do_ps1_na_partida).
+        if (partida and partida.get("hospedar") and jogo.get("plataforma") == "ps1"
+                and "pcsx_rearmed" in str(jogo.get("core", "")).lower()):
+            pasta_cartao = graficos.pasta_do_cartao_do_ps1_na_partida(PASTA_SAVES, caminho_jogo)
+            if pasta_cartao:
+                extra.update(savefile_directory=pasta_cartao, sort_savefiles_enable="false")
+                print("[ARENA] Partida de PS1: o cartao de memoria e' o de sempre (o do SwanStation).")
         # Mais de 2 jogadores (graficos.jogadores_do_jogo, calculado no
         # /api/jogar). Entra POR ULTIMO, depois das opcoes de controle:
         # achado real (Fase B do multitap) -- as opcoes de controle
