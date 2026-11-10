@@ -72,6 +72,18 @@ a base da revisão dos saves e dos cartões de memória e da troca da versão-al
 do app, na atualização de novembro de 2026. É o tipo de teste que o ARENA mais precisa: um aluno jogando de
 verdade, numa máquina que não é a do professor, e contando o que travou.
 
+**Tudo o que veio dele, e o que cada coisa virou no ARENA** (acrescentado em 10/11/2026):
+
+| O que ele mandou | O que virou |
+|---|---|
+| Fotos da tela de salvar parada no *Crash of the Titans* (PS2): o segundo save não gravou | A revisão dos saves e dos cartões de memória: o "Continuar de onde parou" com a trava que nunca passa por cima de um save (`servidor\continuar.py`), a bateria do cartucho gravada a cada 10 s e a regra de ouro do PS2 no guia `4-SAVES.md` |
+| O PS2 rodando liso no computador dele (*God of War*, com a BIOS do console dele) | A confirmação de que o caminho do PS2 no computador funciona fora da máquina do professor |
+| A foto do aviso do Play Protect ("App de risco bloqueado") | A troca da versão-alvo do app para o Android 15 (API 35) e o aviso no texto dos downloads |
+| A pergunta "desligar o Play Protect faz mal para o celular?" | A orientação para a turma: tocar em "Instalar assim mesmo" e **não** desligar o Play Protect (ele é o antivírus do celular) |
+| O aviso para orientar o grupo da turma sobre o erro na instalação | O texto dos downloads explicado por aparelho |
+| O colega com um Xiaomi mais novo que só instalou pelo APKMirror Installer | O estudo de como esse instalador funciona (o instalador em sessões do Android), anotado para o ARENA se atualizar sozinho |
+| Os prints do ARENA no celular dele e os dados completos do aparelho: Poco X7, HyperOS 2.0, Android 15, Dimensity 7300-Ultra, 12 GB de memória (mais 6 GB virtuais) | O primeiro teste do app num celular de aluno com Android 15: a referência de aparelho moderno, ao lado do A12 do professor |
+
 ## As versões para baixar
 
 Nos [Releases](https://github.com/RafaParise/arena-console/releases), da

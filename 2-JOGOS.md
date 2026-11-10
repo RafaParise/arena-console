@@ -40,6 +40,12 @@ passar o mouse), caixa de DVD ou cartão, dependendo do console. É por
 categoria de mídia, não um desenho exato de cada console — leve de
 propósito, para rodar bem até no Celeron mais fraco da escola.
 
+**Desde 10/11/2026, o molde se ajusta à capa.** Quando a capa chega, o ARENA mede o formato dela (mais larga, como as
+do Super Nintendo e do N64, ou mais alta, como as do PS2 e do PSP) e dá ao cartucho ou à caixa o formato que faz a capa
+encher a etiqueta inteira: sem cortar a imagem e sem sobra de fundo colorido em volta. O CD agora é uma caixa de CD de
+verdade, com a dobradiça do lado e a capa inteira à vista (antes, a capa virava um disco redondo e perdia os cantos).
+Jogo sem capa mostra as iniciais num fundo cinza neutro.
+
 **Para colocar a capa de um jogo**, coloque uma imagem (`.png`, `.jpg`,
 `.jpeg` ou `.webp`) com o **mesmo nome do jogo** na mesma pasta dele, ou
 dentro de uma subpasta `capas`:

@@ -735,3 +735,15 @@ as proteções de privacidade mais recentes", com o link pequeno **"Instalar ass
   todos os arquivos valeu (catálogo com 3294 jogos, inclusive os do cartão SD), o Contra abriu, SALVAR gravou, CARREGAR e
   SAIR voltaram ao ARENA. Falta o teste no emulador com Android 15 (`testes\teste_android.py`), que da outra vez foi
   fechado pelo sistema por falta de memória.
+
+## Pedidos de 10/11/2026, noite
+
+1. **Capas (com print do A12):** reconhecer o tamanho de cada capa e encaixá-la perfeitamente no molde (cartucho, caixa
+   de DVD, caixa de CD e os outros), tirar o roxo que sobra no fundo e caprichar nos moldes ("caixa de DVD, cartuchos
+   melhor trabalhados e bonitos").
+2. **Organizador de jogos e BIOS em toda versão (PC e Android):** reconhecer `.iso` e qualquer ROM ou BIOS, em qualquer
+   pasta, e levar para a pasta certa. Neo Geo em especial: montar o que o jogo precisa (pasta e `.zip` da BIOS junto,
+   quando for o caso). O que não der para montar: dizer qual arquivo falta, com instrução clara e simples. O ARENA se
+   diagnostica e se resolve; se não conseguir, explica.
+3. **Créditos do aluno HugoVHK no fim do texto da próxima atualização**, com tudo o que ele mandou (tabela em
+   `CREDITOS.md`).

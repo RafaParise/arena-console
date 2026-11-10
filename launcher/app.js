@@ -600,6 +600,43 @@ function tipoDeMidia(plataformaId) {
   return TIPO_MIDIA_POR_ID[plataformaId] || "cartao";
 }
 
+// <encaixe-da-capa> (10/11/2026, pedido do Rafael: "reconhecer o tamanho perfeito e redimensionar as capas para que
+// fiquem perfeitamente dentro dos layouts"). Cada molde diz onde fica a etiqueta (a capa) dentro do objeto, em fracao
+// do objeto: [cima, direita, baixo, esquerda], e a proporcao da capa enquanto ela nao chega (largura / altura).
+const MOLDES = {
+  cartucho_h: { etiqueta: [0.15, 0.07, 0.13, 0.07], capaPadrao: 1.2 },
+  cartucho_v: { etiqueta: [0.10, 0.09, 0.20, 0.09], capaPadrao: 1.0 },
+  jewel_case: { etiqueta: [0.025, 0.025, 0.025, 0.11], capaPadrao: 1.0 },
+  caixa_dvd: { etiqueta: [0.02, 0.025, 0.02, 0.10], capaPadrao: 0.71 },
+  caixa_xbox: { etiqueta: [0.02, 0.025, 0.02, 0.10], capaPadrao: 0.71 },
+  umd: { etiqueta: [0.025, 0.03, 0.025, 0.10], capaPadrao: 0.58 },
+  cartao: { etiqueta: [0.06, 0.06, 0.06, 0.06], capaPadrao: 0.75 },
+};
+const PROPORCAO_DA_VAGA = 3 / 4;   // a .jogo-cover (largura / altura), igual em todos os cards
+const OCUPA_DA_VAGA = 0.9;         // o objeto ocupa ate 90% da vaga (o resto e' a sombra)
+
+// Da ao objeto o formato que faz a etiqueta ter EXATAMENTE a proporcao da capa: a capa enche a etiqueta, sem sobra de
+// fundo e sem corte. 'proporcaoDaCapa' = largura / altura da imagem (sem imagem: a do molde). Capa estreita ou larga
+// demais (uma tira, uma foto panoramica) fica no limite de 0,45 a 2,2, para o objeto nao virar um palito.
+function encaixarCapa(objeto, tipo, proporcaoDaCapa) {
+  const molde = MOLDES[tipo] || MOLDES.cartao;
+  const [cima, direita, baixo, esquerda] = molde.etiqueta;
+  const capa = Math.min(2.2, Math.max(0.45, Number(proporcaoDaCapa) || molde.capaPadrao));
+  // etiqueta: (L * (1 - esquerda - direita)) / (A * (1 - cima - baixo)) = capa  ->  L / A = objeto:
+  const proporcaoDoObjeto = capa * (1 - cima - baixo) / (1 - esquerda - direita);
+  let largura = OCUPA_DA_VAGA;
+  let altura = OCUPA_DA_VAGA;
+  if (proporcaoDoObjeto < PROPORCAO_DA_VAGA) largura = OCUPA_DA_VAGA * proporcaoDoObjeto / PROPORCAO_DA_VAGA;
+  else altura = OCUPA_DA_VAGA * PROPORCAO_DA_VAGA / proporcaoDoObjeto;
+  objeto.style.width = `${(largura * 100).toFixed(2)}%`;
+  objeto.style.height = `${(altura * 100).toFixed(2)}%`;
+  objeto.style.setProperty("--et-cima", `${cima * 100}%`);
+  objeto.style.setProperty("--et-direita", `${direita * 100}%`);
+  objeto.style.setProperty("--et-baixo", `${baixo * 100}%`);
+  objeto.style.setProperty("--et-esquerda", `${esquerda * 100}%`);
+}
+// </encaixe-da-capa>
+
 function classeDaCapa(plataforma) {
   return String(plataforma || "").toLowerCase()
     .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
@@ -643,7 +680,7 @@ async function proximaMiniatura() {
   setTimeout(proximaMiniatura, 30);
 }
 
-function prepararCapa(elemento, jogo) {
+function prepararCapa(elemento, jogo, aoCarregar) {
   const iniciais = iniciaisDaCapa(jogo.titulo);
   elemento.textContent = iniciais;
   const urls = [...(jogo.capa_urls || [])];
@@ -666,7 +703,12 @@ function prepararCapa(elemento, jogo) {
     imagem.src = `${url}&mini=${LARGURA_MINIATURA}`;
   };
   imagem.addEventListener("error", tentar);
-  imagem.addEventListener("load", () => pedirMiniatura(imagem, arquivoAtual));
+  imagem.addEventListener("load", () => {
+    if (aoCarregar && imagem.naturalWidth && imagem.naturalHeight) {
+      aoCarregar(imagem.naturalWidth / imagem.naturalHeight);
+    }
+    pedirMiniatura(imagem, arquivoAtual);
+  });
   elemento.append(imagem);
   tentar();
 }
@@ -717,19 +759,23 @@ function linhaDoJogo(jogo) {
   faixa.className = "jogo-faixa";
 
   const tipoMidia = tipoDeMidia(jogo.plataforma);
+  // A vaga (sempre do mesmo tamanho) e, dentro dela, o objeto (cartucho, caixa...) no formato da capa.
   const capa = document.createElement("div");
-  capa.className = `jogo-cover jogo-cover--placeholder capa-${classeDaCapa(jogo.plataforma_nome)} ` +
-                   `midia midia--${tipoMidia}`;
+  capa.className = `jogo-cover jogo-cover--placeholder capa-${classeDaCapa(jogo.plataforma_nome)}`;
   capa.setAttribute("aria-hidden", "true");
   capa.title = { cartucho_h: "Cartucho", cartucho_v: "Cartucho portátil",
                 jewel_case: "Caixa de CD/Blu-ray", caixa_dvd: "Caixa de DVD",
                 caixa_xbox: "Caixa de DVD (Xbox 360)", umd: "UMD",
                 cartao: "Mídia digital" }[tipoMidia];
 
+  const objeto = document.createElement("div");
+  objeto.className = `midia midia--${tipoMidia}`;
+  encaixarCapa(objeto, tipoMidia);
   const etiqueta = document.createElement("div");
   etiqueta.className = "midia-etiqueta";
-  prepararCapa(etiqueta, jogo);
-  capa.append(etiqueta);
+  prepararCapa(etiqueta, jogo, (proporcao) => encaixarCapa(objeto, tipoMidia, proporcao));
+  objeto.append(etiqueta);
+  capa.append(objeto);
 
   const abrir = document.createElement("button");
   abrir.type = "button";

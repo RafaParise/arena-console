@@ -622,189 +622,159 @@ input::placeholder { color: var(--texto-apagado); }
 .jogo--falta_sistema .jogo-faixa { background: var(--espera); }
 .jogo--sem_pasta    .jogo-faixa { background: var(--azul-claro); }
 
-/* Capa / box art */
+/* Capa / box art (refeito em 10/11/2026, pedido do Rafael com print do celular: "reconhecer o tamanho perfeito e
+   redimensionar as capas para que fiquem perfeitamente dentro dos layouts", "ainda tem muito roxo no fundo").
+   A vaga (.jogo-cover) tem sempre o mesmo tamanho, para a grade ficar alinhada. Dentro dela fica o OBJETO (.midia:
+   cartucho, caixa de DVD, caixa de CD...), e o app.js (encaixarCapa) mede a capa quando ela chega e da ao objeto o
+   formato certo para a etiqueta ter exatamente a proporcao da capa: a capa enche a etiqueta, sem sobra e sem corte.
+   As margens da etiqueta (--et-cima, --et-direita, --et-baixo, --et-esquerda) vem do app.js (MOLDES), num lugar so. */
 .jogo-cover {
   width: 100%;
   aspect-ratio: 3 / 4;
   position: relative;
-  object-fit: cover;
-  display: block;
-  background: var(--painel-alto);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 70% at 50% 100%, rgba(0,0,0,.28), transparent 70%),
+    var(--painel-alto);
   border-bottom: 1px solid var(--borda);
+}
+.midia {
+  position: relative;
+  width: 80%;
+  height: 80%;
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,.45));
+  transition: width .25s ease, height .25s ease;
+}
+.midia-etiqueta {
+  position: absolute;
+  inset: var(--et-cima, 8%) var(--et-direita, 8%) var(--et-baixo, 8%) var(--et-esquerda, 8%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-family: var(--fonte-titulo);
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  /* Sem capa: so as iniciais, num fundo neutro (nada de roxo). */
+  background: linear-gradient(150deg, #4a5160, #20242c 75%), #2b303a;
+  color: rgba(255,255,255,.85);
+  user-select: none;
 }
 .capa-imagem {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
+  /* A etiqueta ja tem a proporcao da capa: "cover" so apara um fio, quando a capa e' estreita ou larga demais. */
   object-fit: cover;
   border-radius: inherit;
 }
-/* Cartucho, caixa de DVD/Xbox e cartao sao retangulos - mostra a capa
-   INTEIRA (sem cortar topo/base), preenchendo o resto com a cor do
-   molde em vez de esticar ou cortar a imagem enviada. So o disco
-   (jewel case/UMD) continua com "cover", porque ali a capa VIRA o
-   disco de proposito. */
-.midia--cartucho_h .capa-imagem,
-.midia--cartucho_v .capa-imagem,
-.midia--caixa_dvd .capa-imagem,
-.midia--caixa_xbox .capa-imagem,
-.midia--cartao .capa-imagem {
-  object-fit: contain;
-  background: rgba(0,0,0,.25);
-}
-.midia-etiqueta {
+/* O brilho do plastico, por cima da capa. */
+.midia-etiqueta::after {
+  content: "";
   position: absolute;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  font-family: var(--fonte-titulo);
-  font-size: 1.9rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  background:
-    linear-gradient(135deg, rgba(255,255,255,.12) 25%, transparent 25%) 0 0 / 18px 18px,
-    linear-gradient(315deg, rgba(255,255,255,.06) 25%, transparent 25%) 0 0 / 18px 18px,
-    linear-gradient(135deg, #7546a3, #28264b 70%);
-  color: rgba(255,255,255,.88);
-  user-select: none;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(115deg, rgba(255,255,255,.16) 0%, rgba(255,255,255,0) 38%,
+                              rgba(255,255,255,0) 70%, rgba(255,255,255,.07) 100%);
 }
 
-/* Molde por tipo de midia fisica - um por categoria, nao por console
-   (fiel o bastante pro aluno reconhecer o formato, leve de sobra).
-   Cada tipo usa clip-path pra ter uma SILHUETA de verdade, nao so um
-   retangulo com cor diferente - e' isso que faz parecer com o objeto. */
-
-/* Cartucho: topo cortado em angulo (o "ombro" caracteristico do
-   cartucho), tira preta de contatos embaixo. */
+/* Cartucho de mesa (NES, Super Nintendo, Mega Drive, N64...): plastico grafite, os "ombros" cortados em cima, os frisos
+   de pegar com o dedo no alto e a fenda escura dos contatos embaixo. */
 .midia--cartucho_h {
-  padding: 9% 5% 14%;
-  background: linear-gradient(165deg, #52525e, #26262e 65%);
-  clip-path: polygon(6% 0, 94% 0, 100% 8%, 100% 100%, 0 100%, 0 8%);
+  background:
+    repeating-linear-gradient(180deg, rgba(255,255,255,.10) 0 2px, rgba(0,0,0,.25) 2px 5px) 50% 3% / 70% 8% no-repeat,
+    linear-gradient(180deg, #5b5d68, #34353d 55%, #24252b);
+  clip-path: polygon(7% 0, 93% 0, 100% 5%, 100% 100%, 0 100%, 0 5%);
+  border-radius: 0 0 6px 6px;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), inset 0 -10px 18px rgba(0,0,0,.35);
 }
 .midia--cartucho_h .midia-etiqueta {
-  inset: 9% 5% 14%;
   border-radius: 3px;
-  box-shadow: inset 0 0 0 2px rgba(0,0,0,.35);
+  box-shadow: 0 0 0 2px rgba(0,0,0,.45), 0 1px 0 3px rgba(255,255,255,.06);
 }
 .midia--cartucho_h::after {
   content: "";
   position: absolute;
-  left: 8%; right: 8%; bottom: 4%;
-  height: 5.5%;
-  background: repeating-linear-gradient(90deg, #d8b84a 0 4px, #8a7226 4px 7px);
-  border-radius: 1px;
+  left: 22%; right: 22%; bottom: 3%;
+  height: 4%;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #111216, #2a2b31);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.8);
 }
 
-/* Cartucho portatil: bem mais moldura ao redor (plastico visivel),
-   cantos bem arredondados, sem tira de contato (fica escondida). */
+/* Cartucho de portatil (Game Boy, GBA, DS...): plastico claro, cantos arredondados, o canto de cima cortado e os frisos
+   embaixo. */
 .midia--cartucho_v {
-  padding: 16%;
-  background: linear-gradient(165deg, #4a5568, #1e2430 65%);
-  clip-path: polygon(10% 0, 90% 0, 100% 10%, 100% 90%, 90% 100%, 10% 100%, 0 90%, 0 10%);
+  background:
+    repeating-linear-gradient(90deg, rgba(0,0,0,.18) 0 2px, transparent 2px 6px) 50% 95% / 60% 7% no-repeat,
+    linear-gradient(160deg, #9aa0ab, #6c717b 60%, #555a63);
+  clip-path: polygon(0 0, 88% 0, 100% 9%, 100% 100%, 0 100%);
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.18), inset 0 -8px 14px rgba(0,0,0,.25);
 }
 .midia--cartucho_v .midia-etiqueta {
-  inset: 16%;
   border-radius: 4px;
-  box-shadow: inset 0 0 0 2px rgba(0,0,0,.35);
+  box-shadow: 0 0 0 2px rgba(0,0,0,.35);
 }
 
-/* Jewel case: a propria capa vira o disco, redondo, com o buraco do
-   meio - e' o jeito mais direto de parecer um CD de verdade. */
+/* Caixa de CD (PS1, Saturn, Dreamcast, PS3...): a capa inteira atras do acrilico, com a dobradica a esquerda. */
 .midia--jewel_case {
-  padding: 6%;
-  background: linear-gradient(160deg, #e8e8ee 0%, #b8b8c4 8%, #1c1c22 8.5%, #0d0d10 100%);
-  border: 1px solid rgba(255,255,255,.12);
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.28) 0 1px, transparent 1px) 7.5% 0 / 100% 100% no-repeat,
+    linear-gradient(90deg, #2c2f36 0%, #555963 4%, #2a2d33 8.5%, #15161a 9%, #101114 100%);
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.22), inset 0 0 0 3px rgba(0,0,0,.4);
 }
-.midia--jewel_case .midia-etiqueta {
-  inset: 10%;
-  border-radius: 50%;
-  box-shadow:
-    0 0 0 2px rgba(0,0,0,.4),
-    inset 0 0 0 8px rgba(0,0,0,.15);
-}
-.midia--jewel_case .midia-etiqueta::after {
+.midia--jewel_case .midia-etiqueta { border-radius: 1px; }
+.midia--jewel_case::after {
   content: "";
   position: absolute;
-  inset: 0; margin: auto;
-  width: 16%; height: 16%;
-  border-radius: 50%;
-  background: #0d0d10;
-  box-shadow: 0 0 0 2px rgba(0,0,0,.5);
-}
-.midia--jewel_case .capa-imagem { border-radius: 50%; }
-
-/* Caixa de DVD: retangular, lombada grossa e escura de um lado, mais
-   larga e "plana" que o jewel case redondo. */
-.midia--caixa_dvd {
-  padding: 4% 4% 4% 10%;
-  background: #0c0c0f;
-  border: 1px solid rgba(255,255,255,.08);
-}
-.midia--caixa_dvd .midia-etiqueta { inset: 4% 4% 4% 10%; border-radius: 1px; }
-.midia--caixa_dvd::before {
-  content: "";
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 8%;
-  background: linear-gradient(180deg, #3a3a44, #16161a);
-  border-right: 1px solid rgba(0,0,0,.5);
+  left: 2%; width: 4.5%;
+  top: 10%; bottom: 10%;
+  background:
+    linear-gradient(180deg, transparent 0 20%, rgba(255,255,255,.35) 20% 23%, transparent 23% 77%,
+                    rgba(255,255,255,.35) 77% 80%, transparent 80%);
 }
 
-/* Caixa do Xbox 360: mesma ideia da caixa de DVD, mas com a lombada
-   verde - a cor mais associada ao console. */
+/* Caixa de DVD (PS2, GameCube, Wii): plastico preto, cantos arredondados, a lombada com frisos a esquerda e a capa
+   debaixo do plastico transparente. */
+.midia--caixa_dvd,
 .midia--caixa_xbox {
-  padding: 4% 4% 4% 10%;
-  background: #0c0c0f;
-  border: 1px solid rgba(255,255,255,.08);
+  background:
+    repeating-linear-gradient(180deg, rgba(255,255,255,.07) 0 2px, transparent 2px 7px) 2% 50% / 4% 70% no-repeat,
+    linear-gradient(90deg, #1b1c21 0%, #34363e 3%, #1b1c21 7%, #0e0f12 8%);
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.12);
 }
-.midia--caixa_xbox .midia-etiqueta { inset: 4% 4% 4% 10%; border-radius: 1px; }
-.midia--caixa_xbox::before {
-  content: "";
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 8%;
-  background: linear-gradient(180deg, #6fbf3f, #2f6318);
-  border-right: 1px solid rgba(0,0,0,.5);
+.midia--caixa_dvd .midia-etiqueta,
+.midia--caixa_xbox .midia-etiqueta { border-radius: 2px; }
+/* Xbox 360: a lombada verde, a cor do console. */
+.midia--caixa_xbox {
+  background:
+    repeating-linear-gradient(180deg, rgba(255,255,255,.12) 0 2px, transparent 2px 7px) 2% 50% / 4% 70% no-repeat,
+    linear-gradient(90deg, #2f6318 0%, #6fbf3f 3%, #2f6318 7%, #0e0f12 8%);
 }
 
-/* UMD do PSP: disco pequeno dentro de uma caixinha propria (bem menor
-   que o disco do PS1/PS3, com moldura visivel ao redor). */
+/* UMD do PSP: a caixinha estreita e prateada. */
 .midia--umd {
-  padding: 14%;
-  background: linear-gradient(160deg, #3a3a44, #17171c 75%);
+  background: linear-gradient(90deg, #6c707a 0%, #b9bdc6 3%, #6c707a 8%, #2a2c31 8.5%, #1f2025 100%);
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.2);
 }
-.midia--umd .midia-etiqueta {
-  inset: 14%;
-  border-radius: 50%;
-  box-shadow:
-    0 0 0 2px rgba(0,0,0,.4),
-    inset 0 0 0 6px rgba(0,0,0,.15);
-}
-.midia--umd .midia-etiqueta::after {
-  content: "";
-  position: absolute;
-  inset: 0; margin: auto;
-  width: 22%; height: 22%;
-  border-radius: 50%;
-  background: #17171c;
-  box-shadow: 0 0 0 2px rgba(0,0,0,.5);
-}
-.midia--umd .capa-imagem { border-radius: 50%; }
+.midia--umd .midia-etiqueta { border-radius: 2px; }
 
-/* Cartao/digital: sem molde de plastico - so um cartao arredondado
-   simples, pra deixar claro que nao teve mídia física de verdade. */
+/* Digital (sem midia de verdade: TIC-80, Java ME, homebrew...): um cartao arredondado simples. */
 .midia--cartao {
-  padding: 7%;
-  background: linear-gradient(160deg, #34343f, #16161b 75%);
+  background: linear-gradient(160deg, #3b3f4a, #1b1d23 75%);
   border-radius: 12px;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.1);
 }
-.midia--cartao .midia-etiqueta { inset: 7%; border-radius: 8px; }
-.capa-super-nintendo { background: linear-gradient(135deg, #74458e, #29233b 70%); }
-.capa-playstation-1, .capa-playstation-2 { background: linear-gradient(135deg, #3759a0, #1c263d 70%); }
-.capa-gamecube-e-wii { background: linear-gradient(135deg, #b34d68, #39243d 70%); }
-.capa-atari-2600, .capa-mega-drive-master-system-game-gear { background: linear-gradient(135deg, #9a542c, #33251f 70%); }
+.midia--cartao .midia-etiqueta { border-radius: 8px; }
 
 /* Corpo do card */
 .jogo-corpo {
@@ -888,14 +858,16 @@ input::placeholder { color: var(--texto-apagado); }
   display: flex;
   align-items: center;
   justify-content: center;
+  /* Fundo neutro (10/11/2026: "ainda tem muito roxo no fundo"); a capa aparece inteira por cima. */
   background:
-    linear-gradient(90deg, transparent 48%, rgba(255,255,255,.1) 49% 51%, transparent 52%) 0 0 / 22px 22px,
-    linear-gradient(135deg, #ff6f9c, #7145a3 58%, #315f9e);
+    radial-gradient(90% 60% at 50% 100%, rgba(0,0,0,.3), transparent 70%),
+    linear-gradient(160deg, #3a404c, #1b1e25 75%);
   color: white;
   font: 700 3.6rem var(--fonte-titulo);
   letter-spacing: .08em;
 }
-.detalhes-capa .capa-imagem { z-index: 1; }
+.detalhes-capa .capa-imagem { z-index: 1; object-fit: contain; padding: 4%; box-sizing: border-box;
+  filter: drop-shadow(0 8px 14px rgba(0,0,0,.5)); }
 .detalhes-corpo { padding: 1rem; }
 .detalhes-kicker { color: var(--destaque-texto); font-size: var(--t-micro); text-transform: uppercase; letter-spacing: .08em; }
 .detalhes-corpo h2 { margin: .3rem 0 .5rem; font: 600 var(--t-med) var(--fonte-titulo); }
