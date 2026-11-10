@@ -531,7 +531,9 @@ calmo (depois de reiniciar o PC) antes de mexer no ARENA.
   apaga os 10 do F2). Bom no celular do aluno; no computador dividido entre turmas, o aluno da tarde abriria no ponto
   do aluno da manhã. Minha proposta: ligado por padrão só no Android, com a chave em Ajustes nos dois. **Você decide.**
 - **Modo de desempenho contínuo do Android:** ligar só depois de medir 30 minutos no A12 com e sem (teste longo, numa
-  madrugada com o celular na tomada).
+  madrugada com o celular na tomada). **Fechado em 10/11, sem mudança:** o A12 não aceita o modo (o registro do
+  Android diz `isSustainedPerformanceModeSupported? false` em toda abertura de jogo), então ligar não muda nada nele;
+  num aparelho que aceita, o modo baixa o teto do processador, e sem um aparelho desses para medir fica desligado.
 
 - **Acessórios (24/10/2026), o que só você faz:**
   1. ~~Olhar no celular a telinha do VMU num jogo de Dreamcast~~ **Conferido por foto em 09/11** (Capcom vs. SNK 2:

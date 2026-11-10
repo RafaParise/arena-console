@@ -54,7 +54,9 @@ minutos, contra 45 o tempo todo) [Certo]. O RetroArch tem a chave `sustained_per
 ARENA deixa desligada) [Certo]. Só funciona onde o fabricante implementou; num Samsung com MediaTek, como o A12, pode
 não mudar nada [Provável].
 
-- **Proposta:** medir no A12 30 minutos de um jogo pesado (Saturn ou Dreamcast) com e sem a chave, pelo mostrador de
+- **Conferido em 10/11/2026:** o A12 **não aceita** o modo (o RetroArch escreve no registro do Android
+  `isSustainedPerformanceModeSupported? false`). Sem aparelho que aceite para medir, fica desligado.
+- **Proposta original:** medir no A12 30 minutos de um jogo pesado (Saturn ou Dreamcast) com e sem a chave, pelo mostrador de
   velocidade do emulador (o fps do Android engana, lição de 25/10). Se ficar igual ou melhor, ligar no Android. Teste
   longo: fica para uma madrugada com o celular na tomada.
 
