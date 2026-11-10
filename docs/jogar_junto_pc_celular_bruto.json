@@ -15,14 +15,14 @@
     "[WARN] [Netplay] ATENÇÃO: Um par da Netplay está executando uma versão diferente do núcleo. Se ocorrerem problemas, use a mesma versão.",
     "[INFO] [Netplay] Vaga de conexão 0",
     "[INFO] [Netplay] Conexão recebida de: \"Rafa Parise Android\"",
-    "[INFO] [Netplay] Rafa Parise Android se juntou como o jogador 2 (ping: 29 ms)"
+    "[INFO] [Netplay] Rafa Parise Android se juntou como o jogador 2 (ping: 61 ms)"
   ],
   "celular_netplay": [
     "[Override] Redirecionando arquivo dados da memória do jogo em \"/data/user/0/io.github.rafaparise.arena/files/arena/retroarch/saves/Snes9x/.netplay/Super Bomberman 4 (Japan) [T-En by Svambo v1.0].srm\".",
     "[Environ] GET_SAVE_DIRECTORY: \"/data/user/0/io.github.rafaparise.arena/files/arena/retroarch/saves/Snes9x/.netplay\".",
     "[Netplay] ATENÇÃO: Um par da Netplay está executando uma versão diferente do núcleo. Se ocorrerem problemas, use a mesma versão.",
     "[Netplay] Conectado a: \"PC\"",
-    "[Netplay] Você se juntou como jogador 2 (ping: 29 ms)"
+    "[Netplay] Você se juntou como jogador 2 (ping: 40 ms)"
   ],
   "celular_registro_campos": [
     "arquivo",
@@ -60,7 +60,7 @@
     "Nonexistent Port (14).",
     "Nonexistent Port (15).",
     "[Netplay] Conectado a: \"PC\"",
-    "[Netplay] Você se juntou como jogador 2 (ping: 29 ms)"
+    "[Netplay] Você se juntou como jogador 2 (ping: 40 ms)"
   ],
   "celular_jogo_em_andamento": {
     "ativo": true,

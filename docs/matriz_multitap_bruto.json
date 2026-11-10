@@ -23,7 +23,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 235493,
-      "segundos": 10.7,
+      "segundos": 10.8,
       "travou": false,
       "erros": []
     },
@@ -41,7 +41,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 342861,
-      "segundos": 10.7,
+      "segundos": 10.8,
       "travou": false,
       "erros": [
         "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented."
@@ -81,7 +81,7 @@
     "abre": {
       "abre_e_mostra_imagem": false,
       "foto_bytes": 1797,
-      "segundos": 10.6,
+      "segundos": 10.7,
       "travou": false,
       "erros": []
     },
@@ -98,8 +98,8 @@
     "jogo": "GoldenEye 007 (USA).z64",
     "abre": {
       "abre_e_mostra_imagem": true,
-      "foto_bytes": 51646,
-      "segundos": 24.3,
+      "foto_bytes": 435421,
+      "segundos": 12.7,
       "travou": false,
       "erros": []
     },
@@ -119,8 +119,8 @@
     "jogo": "CTR - Crash Team Racing (USA).cue",
     "abre": {
       "abre_e_mostra_imagem": true,
-      "foto_bytes": 32824,
-      "segundos": 20.6,
+      "foto_bytes": 43950,
+      "segundos": 13.3,
       "travou": false,
       "erros": []
     },
@@ -156,7 +156,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 58602,
-      "segundos": 19.0,
+      "segundos": 13.0,
       "travou": false,
       "erros": [
         "[libretro INFO] [BOOT] USA region not supported. Using Europe instead"
@@ -179,8 +179,8 @@
     "jogo": "Killzone - Liberation (USA) (En,Fr,De,Es,It,Nl,Pl,Ru).iso",
     "abre": {
       "abre_e_mostra_imagem": true,
-      "foto_bytes": 3940,
-      "segundos": 18.9,
+      "foto_bytes": 6601,
+      "segundos": 11.0,
       "travou": false,
       "erros": [
         "[libretro WARN] [sceDisplay] Video out requested, not supported: mode=0 size=512,272"
