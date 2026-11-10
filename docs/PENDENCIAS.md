@@ -470,8 +470,9 @@ Radeon). Agora vem antes `hardware.placas_presentes()`: as placas que estão na 
 ## Depende do Rafael
 
 - **Acessórios (24/10/2026), o que só você faz:**
-  1. Olhar no celular: Ajustes → Emuladores → Acessórios dos consoles (ligar a telinha do VMU num jogo de Dreamcast,
-     conferir o canto e o tamanho) e **abrir a BIOS do PS2** para ver "PocketStation/1" (já conferi por foto).
+  1. ~~Olhar no celular a telinha do VMU num jogo de Dreamcast~~ **Conferido por foto em 09/11** (Capcom vs. SNK 2:
+     o logotipo do jogo na telinha, no canto de baixo à direita, em 3x, sem cobrir os botões). A BIOS do PS2 com
+     "PocketStation/1" já tinha sido conferida por foto.
   2. ~~Decidir o cartão do PS2~~ **Decidido em 24/10:** entrada 1 = cartão de 64 MB, entrada 2 = PocketStation (como no PC).
   3. ~~Autorizar o DreamPotato e o PokketSX~~ **Autorizado em 24/10** (a BIOS do VMU da Sega que vem no zip do DreamPotato
      fica só na máquina dele, em `emuladores\DreamPotato`, nunca no pacote).
