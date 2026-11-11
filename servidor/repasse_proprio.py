@@ -216,11 +216,11 @@ class Repasse:
         """(status HTTP, resposta) para o POST /sala."""
         self._limpar_reservas_vencidas()
         if any(s.chave == chave and s.sessao is None for s in self.salas.values()):
-            return 409, {"erro": "Outra sala desta mesma internet esta abrindo agora. Tente de novo em alguns segundos."}
+            return 409, {"erro": "Outra sala desta mesma internet está abrindo agora. Tente de novo em alguns segundos."}
         if sum(1 for s in self.salas.values() if s.chave == chave) >= MAX_SALAS_POR_ENDERECO:
-            return 429, {"erro": "Ja ha salas demais abertas desta internet. Feche uma antes de abrir outra."}
+            return 429, {"erro": "Já há salas demais abertas desta internet. Feche uma antes de abrir outra."}
         if len(self.salas) >= MAX_SALAS:
-            return 503, {"erro": "O repasse esta cheio agora. Tente mais tarde."}
+            return 503, {"erro": "O repasse está cheio agora. Tente mais tarde."}
         if not self.reservas.pode(chave):
             return 429, {"erro": "Muitas salas abertas em pouco tempo. Espere alguns minutos."}
         while True:
@@ -233,17 +233,17 @@ class Repasse:
     def consultar(self, chave, codigo, perto=None):
         """(status HTTP, resposta) para o GET /sala/<codigo>."""
         if not self.consultas.pode(chave):
-            return 429, {"erro": "Muitas tentativas. Espere um minuto e confira o codigo."}
+            return 429, {"erro": "Muitas tentativas. Espere um minuto e confira o código."}
         perto = perto or chave
         if self.erros.cheio(perto):
             # Codigos errados demais vindos desta vizinhanca de rede: so ela espera.
-            return 429, {"erro": "Muitos codigos errados desta rede. Espere alguns minutos e confira o codigo."}
+            return 429, {"erro": "Muitos códigos errados desta rede. Espere alguns minutos e confira o código."}
         sala = self.salas.get(codigo)
         if sala is None:
             self.erros.pode(perto)             # conta o erro
-            return 404, {"erro": "Nao ha sala com esse codigo (confira os 6 numeros, ou a sala ja fechou)."}
+            return 404, {"erro": "Não há sala com esse código (confira os 6 números, ou a sala já fechou)."}
         if sala.sessao is None:
-            return 202, {"aberta": False, "erro": "A sala ainda esta abrindo. Tente de novo em alguns segundos."}
+            return 202, {"aberta": False, "erro": "A sala ainda está abrindo. Tente de novo em alguns segundos."}
         return 200, {"aberta": True, "sessao": base64.b64encode(sala.sessao).decode("ascii"),
                      "porta": self.porta_publica}
 
@@ -308,7 +308,7 @@ class Repasse:
         elif metodo in ("GET", "HEAD") and caminho.startswith("/sala/"):
             codigo = caminho[len("/sala/"):]
             status, corpo = (self.consultar(chave, codigo, vizinhanca(ip)) if len(codigo) == 6 and codigo.isdigit()
-                             else (404, {"erro": "O codigo da sala tem 6 numeros."}))
+                             else (404, {"erro": "O código da sala tem 6 números."}))
         elif metodo in ("GET", "HEAD") and caminho == "/saude":
             status, corpo = self.saude()
         else:
@@ -470,7 +470,7 @@ def _pedir(endereco, metodo, caminho, espera=6.0):
     """(status, resposta em dict) de um pedido ao repasse; (None, {"erro": ...}) se nao alcancar."""
     partes = separar_endereco(endereco)
     if partes is None:
-        return None, {"erro": "Endereco do repasse invalido."}
+        return None, {"erro": "Endereço do repasse inválido."}
     conexao = http.client.HTTPConnection(partes[0], partes[1], timeout=espera)
     try:
         conexao.request(metodo, caminho, headers={"Content-Length": "0"} if metodo == "POST" else {})
@@ -482,7 +482,7 @@ def _pedir(endereco, metodo, caminho, espera=6.0):
             dados = {"erro": "O repasse respondeu algo estranho."}
         return resposta.status, dados if isinstance(dados, dict) else {"erro": "O repasse respondeu algo estranho."}
     except (OSError, http.client.HTTPException) as falha:
-        return None, {"erro": "Nao consegui falar com o repasse (%s)." % falha.__class__.__name__}
+        return None, {"erro": "Não consegui falar com o repasse (%s)." % falha.__class__.__name__}
     finally:
         conexao.close()
 
@@ -504,7 +504,7 @@ def procurar_sala(endereco, codigo, tentativas=8, intervalo=2.0):
     """(sessao em base64, porta) da sala, esperando um pouco se ela ainda estiver abrindo; ou (None, mensagem)."""
     codigo = "".join(c for c in str(codigo) if c.isdigit())
     if len(codigo) != 6:
-        return None, "O codigo da sala tem 6 numeros."
+        return None, "O código da sala tem 6 números."
     mensagem = "A sala nao abriu a tempo."
     for vez in range(max(1, tentativas)):
         status, dados = _pedir(endereco, "GET", "/sala/" + codigo)

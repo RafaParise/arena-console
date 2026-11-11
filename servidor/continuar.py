@@ -107,7 +107,7 @@ def decidir(ligado, em_rede, plataforma, caminho_jogo, pasta_states, pasta_saves
     try:
         hora_do_ponto = os.path.getmtime(ponto)
     except OSError:
-        return {"opcoes": opcoes, "volta": False, "motivo": "nao consegui ler o ponto automatico"}
+        return {"opcoes": opcoes, "volta": False, "motivo": "não consegui ler o ponto automático"}
     if save and save[0] > hora_do_ponto + FOLGA_EM_SEGUNDOS:
         return {"opcoes": opcoes, "volta": False,
                 "motivo": "o save %s e' mais novo que o ponto automatico: o jogo comeca pelo save (o ponto velho "

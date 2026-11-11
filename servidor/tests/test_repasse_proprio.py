@@ -146,7 +146,7 @@ class RepasseDeVerdade(unittest.TestCase):
         time.sleep(0.3)
         achado, erro = rp.procurar_sala(self.endereco, codigo, tentativas=1)
         self.assertIsNone(achado)
-        self.assertIn("Nao ha sala", erro)
+        self.assertIn("Não há sala", erro)
 
     def test_sala_reservada_ainda_abrindo(self):
         codigo, erro = rp.reservar_sala(self.endereco)
@@ -163,7 +163,7 @@ class RepasseDeVerdade(unittest.TestCase):
         for codigo in ("12345", "abcdef", "1234567", ""):
             achado, erro = rp.procurar_sala(self.endereco, codigo, tentativas=1)
             self.assertIsNone(achado)
-            self.assertIn("6 numeros", erro)
+            self.assertIn("6 números", erro)
         achado, erro = rp.procurar_sala(self.endereco, "000000", tentativas=1)
         self.assertIsNone(achado)
 
@@ -276,7 +276,7 @@ class Pedacos(unittest.TestCase):
         self.assertFalse(rp.saude("127.0.0.1:%d" % porta, 1))
         codigo, erro = rp.reservar_sala("127.0.0.1:%d" % porta)
         self.assertIsNone(codigo)
-        self.assertIn("Nao consegui", erro)
+        self.assertIn("Não consegui", erro)
 
 
 if __name__ == "__main__":

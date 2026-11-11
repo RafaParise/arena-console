@@ -124,7 +124,7 @@ def main():
         print("2. O ARENA entra pelo codigo", flush=True)
         resposta = pedir_ou_erro("/api/jogar", {"jogo_id": jogo_id, "apelido": "Teste", "partida": "entrar",
                                                 "pela_internet": True, "codigo_sala": "000000"})
-        confere("codigo que nao existe: o ARENA explica", "Nao ha sala" in str(resposta.get("erro", "")),
+        confere("codigo que nao existe: o ARENA explica", "Não há sala" in str(resposta.get("erro", "")),
                 resposta.get("erro"))
         codigo, erro = rp.reservar_sala(endereco)
         opcoes = graficos.opcoes_de_partida("Anfitriao", True, pela_internet=True, jogador=1)
