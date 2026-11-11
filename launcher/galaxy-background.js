@@ -1848,6 +1848,8 @@
     if (escolha === 'parado') return 'parado';
     if (escolha === 'sempre') return 'animado';
     if (document.body.dataset.modoModesto === 'true') return 'parado';
+    // Ninguem mexe na tela ha 3 minutos (app.js, acordarFundo): a cena para ate o proximo toque.
+    if (document.body.dataset.descanso === 'true') return 'parado';
     if (menosMovimento && menosMovimento.matches) return 'parado';
     return 'animado';
   }
@@ -1904,7 +1906,7 @@
 
   sincronizar();
   new MutationObserver(sincronizar).observe(document.body, {
-    attributes: true, attributeFilter: ['data-tema', 'data-modo-modesto', 'data-fundo-animado', 'data-so-fundo']
+    attributes: true, attributeFilter: ['data-tema', 'data-modo-modesto', 'data-fundo-animado', 'data-so-fundo', 'data-descanso']
   });
   if (menosMovimento && menosMovimento.addEventListener) {
     menosMovimento.addEventListener('change', sincronizar);

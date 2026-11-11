@@ -116,6 +116,24 @@ function atualizarBotaoTema() {
   botao.setAttribute("aria-label", escuro ? "Usar modo claro" : "Usar modo escuro");
 }
 
+// Descanso do fundo animado (11/11/2026): com a tela parada (ninguem mexe no
+// mouse, no teclado nem toca a tela por 3 minutos), o fundo do "Automatico"
+// para na cena parada e volta a se mexer no primeiro toque. Na sala, o ARENA
+// fica muito tempo aberto no menu sem ninguem: o fundo era o unico gasto
+// (5% de um nucleo do Ryzen, ~11% do Celeron, medido em 08/10/2026). Quem
+// escolheu "Sempre" continua vendo o fundo animar.
+const DESCANSO_DO_FUNDO_MS = 3 * 60 * 1000;
+let relogioDoDescanso = null;
+function acordarFundo() {
+  if (document.body.dataset.descanso === "true") document.body.dataset.descanso = "false";
+  clearTimeout(relogioDoDescanso);
+  relogioDoDescanso = setTimeout(() => { document.body.dataset.descanso = "true"; }, DESCANSO_DO_FUNDO_MS);
+}
+for (const tipo of ["pointermove", "pointerdown", "keydown", "wheel", "touchstart"]) {
+  window.addEventListener(tipo, acordarFundo, { passive: true, capture: true });
+}
+acordarFundo();
+
 // --------------------------------------------------------------------------
 // Comunicacao com o servidor
 // --------------------------------------------------------------------------
