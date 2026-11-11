@@ -802,3 +802,16 @@ Falta, nesta ordem:
   rodou: o teste do Linux** (o serviço de contêiner do WSL travou; nem `wsl --shutdown` nem reiniciar o `WslService`
   destravou, ele ficou "parando"): rodar de novo depois de reiniciar o computador. O teste agora desiste em 2 min com
   a explicação (`cc40a6e`).
+
+## 11/11/2026: Release v2026.11.10 publicada; o que vem na próxima
+
+- **Publicada** a v2026.11.10 (Latest, 4 arquivos, SHA-256 na descrição). O APK de produção foi instalado e aberto no
+  Galaxy A12.
+- **Falta da rodada:** o teste do Linux (o WSL travou e só volta depois de reiniciar o PC) e a partida PC+celular (o
+  Super Bomberman 4 do celular está numa pasta que o ARENA de lá não lê).
+- **MFG Super Motion** (commit 3bc9140, `servidor\mfg.py`): o ARENA acha o programa instalado, escolhe as opções e abre
+  o motor junto com o jogo, no lugar do Lossless. A licença (PolyForm Strict) proíbe levá-lo junto. Falta o teste de
+  ponta a ponta pelo ARENA, num jogo de PS2 com o modo "Sempre".
+- **Próxima versão** (pedido de 11/11, esperando os scripts do Rafael):
+  - a geração de quadros e a escala nativas, juntando o melhor do Lossless e do MFG;
+  - a camada web em Rust (roteiro Axum + rust-embed). O Chromebook gerenciado continua pela versão do navegador.
