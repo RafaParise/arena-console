@@ -62,6 +62,17 @@ basta.
 
 **Próximo passo:** medir a janela leve no Celeron N5100.
 
+## Alinhado ao driver da placa (11/11/2026, à noite)
+
+`servidor\driver_video.py` lê o painel do driver (AMD Software) sem administrador e o ARENA se alinha: o Mais quadros
+segue `min(tela, limite de quadros do driver)`; com o RSR ligado, o ARENA não estica de novo. Nada é gravado no
+driver: a tela diz o que mudar a mão. O mesmo bloco existe no celular (`itens_android`: driver da GPU, MSAA forçado,
+economia de bateria, taxa da tela, animações), lido com `getprop`, `/sys` e três chaves que o app passa em Java.
+
+O "Mais quadros" ficou **unificado**: o ARENA escolhe o programa que rende mais na placa (NVIDIA RTX: o MFG com o
+DLSS MFG; AMD e Intel: o Lossless, medido com 59,5 contra 56,6 quadros na tela), e nunca os dois juntos, porque o
+segundo criaria quadros a partir dos quadros adivinhados pelo primeiro.
+
 ## Riscos
 
 - **Janela do emulador:** o motor do MFG pega a maior janela do processo quando ela passa da metade da tela; se não

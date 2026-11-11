@@ -317,6 +317,135 @@ def paineis_da_intel():
 
 
 # ---------------------------------------------------------------------------
+# Android: o "painel do driver" do celular (a mesma ideia, com o que o sistema deixa ler)
+# ---------------------------------------------------------------------------
+# Conferido no Galaxy A12 em 11/11/2026, como o proprio app (run-as, sem root): o getprop e os arquivos de /sys
+# abaixo sao legiveis; o comando "settings" NAO e' (so o shell) -- o que vem dele (escalas de animacao, taxa de
+# atualizacao escolhida, economia de bateria) o app le em Java e manda junto com o aparelho (ArenaServico.java).
+ARQUIVOS_DA_GPU = ("/sys/kernel/gpu/gpu_model",                   # MediaTek (PowerVR, Mali): "PowerVR Rogue GE8320"
+                   "/sys/class/kgsl/kgsl-3d0/gpu_model",         # Qualcomm Adreno
+                   "/sys/class/misc/mali0/device/gpuinfo")       # Mali (Exynos, Unisoc)
+_PROPRIEDADES = ("ro.hardware.egl", "ro.opengles.version", "ro.gfx.driver.0", "ro.hardware.vulkan",
+                 "debug.egl.force_msaa")
+
+
+def _texto_do_arquivo(caminho):
+    try:
+        with open(caminho, encoding="utf-8", errors="replace") as arquivo:
+            return arquivo.read().strip()
+    except OSError:
+        return ""
+
+
+def propriedades_do_android(nomes=_PROPRIEDADES):
+    """{nome: valor} pelo getprop (o programa do sistema; qualquer app roda). {} fora do Android ou se falhar."""
+    import subprocess
+    lidas = {}
+    for nome in nomes:
+        try:
+            saida = subprocess.run(["getprop", nome], capture_output=True, timeout=2)
+            lidas[nome] = saida.stdout.decode("utf-8", "replace").strip()
+        except (OSError, subprocess.SubprocessError):
+            return lidas
+    return lidas
+
+
+def versao_do_gles(bruto):
+    """ro.opengles.version 196610 (0x30002) -> "3.2"."""
+    try:
+        numero = int(bruto)
+    except (TypeError, ValueError):
+        return ""
+    return "%d.%d" % (numero >> 16, numero & 0xFFFF)
+
+
+def itens_android(aparelho, propriedades=None, modelo_da_gpu="", governador="", clock_max="", clock_agora=""):
+    """A lista do painel do celular, na mesma forma da do PC (chave, nome, valor, bruto, efeito, certo, mude).
+
+    'aparelho': o que o app contou (ponte_android.aparelho): placa_de_video, opengl_es, vulkan_versao, tela_hz,
+    tela_modos_hz, animacoes, hz_escolhido_max, economia."""
+    a = aparelho or {}
+    p = propriedades or {}
+    itens = []
+
+    placa = a.get("placa_de_video") or modelo_da_gpu
+    driver = p.get("ro.gfx.driver.0") or ""
+    itens.append(_item("driver", "Driver da placa", (placa or "não li") + (
+        " · driver atualizável pela Play Store (%s)" % driver if driver else " · o driver que veio com o Android"),
+        p.get("ro.hardware.egl", ""),
+        "No celular o driver da placa vem com o sistema; alguns aparelhos aceitam o \"Driver da GPU\" que o Google "
+        "atualiza pela Play Store. Nada a configurar.", certo=True))
+
+    gles = a.get("opengl_es") or versao_do_gles(p.get("ro.opengles.version"))
+    vulkan = a.get("vulkan_versao") or ("sim" if a.get("vulkan") else "não tem")
+    itens.append(_item("motor", "OpenGL ES e Vulkan", "OpenGL ES %s · Vulkan %s" % (gles or "?", vulkan),
+                       p.get("ro.opengles.version", ""),
+                       "O ARENA escolhe o motor de cada núcleo por aqui (Vulkan onde o aparelho tem e o núcleo "
+                       "aguenta; OpenGL ES no resto).", certo=True))
+
+    msaa = (p.get("debug.egl.force_msaa") or "").strip()
+    itens.append(_item("msaa", "Forçar MSAA 4x (Opções do desenvolvedor)", "ligado" if msaa == "1" else "desligado", msaa,
+                       "Obriga todo jogo a desenhar com anti-serrilhado 4x, por cima do que o ARENA já escolhe por "
+                       "console. No celular de entrada o jogo cai pela metade.", certo=msaa != "1",
+                       mude="" if msaa != "1" else "Desligado, em Opções do desenvolvedor → Forçar MSAA 4x."))
+
+    economia = bool(a.get("economia"))
+    itens.append(_item("economia", "Economia de bateria", "ligada" if economia else "desligada", a.get("economia"),
+                       "Ligada, o Android segura o processador e a placa: o jogo perde quadros e o ARENA mede a "
+                       "máquina mais fraca do que ela é.", certo=not economia,
+                       mude="" if not economia else "Desligada enquanto joga (ou ligue o celular na tomada)."))
+
+    modos = [int(m) for m in (a.get("tela_modos_hz") or []) if isinstance(m, (int, float))]
+    hz = int(a.get("tela_hz") or 0)
+    escolhido = a.get("hz_escolhido_max") or 0
+    mais_rapido = max(modos) if modos else hz
+    certo_hz = not modos or hz >= mais_rapido or not hz
+    itens.append(_item("hz", "Taxa de atualização da tela",
+                       ("%d Hz" % hz if hz else "não li") + (" (a tela aceita até %d)" % mais_rapido if modos and mais_rapido > hz else ""),
+                       "%s / %s" % (hz, escolhido),
+                       "O jogo segue a tela: numa tela de 90 ou 120 Hz os consoles de 60 continuam a 60, mas o menu "
+                       "e o toque respondem antes.", certo=certo_hz,
+                       mude="" if certo_hz else "A mais alta, em Configurações → Tela → Taxa de atualização."))
+
+    animacoes = a.get("animacoes") or []
+    if isinstance(animacoes, list) and len(animacoes) == 3:
+        texto = "×".join(("%g" % float(x)) for x in animacoes)
+        itens.append(_item("animacoes", "Escalas de animação do Android", texto, texto,
+                           "Só o menu do Android: 0 deixa tudo instantâneo, 1 é o normal. Não mudam o jogo.",
+                           certo=all(float(x) <= 1.0 for x in animacoes),
+                           mude="" if all(float(x) <= 1.0 for x in animacoes) else
+                           "1x ou 0,5x em Opções do desenvolvedor: acima disso o menu do ARENA demora a abrir."))
+
+    if governador or clock_max:
+        try:
+            agora, maximo = int(clock_agora or 0) // 1000, int(clock_max or 0) // 1000
+        except ValueError:
+            agora, maximo = 0, 0
+        itens.append(_item("clock", "Relógio da placa", ("%s" % governador if governador else "") + (
+            " · até %d MHz (agora %d)" % (maximo, agora) if maximo else ""), "%s/%s" % (clock_agora, clock_max),
+            "O governador decide a velocidade da placa a cada instante; \"Default\" é o do fabricante. Sem root não "
+            "se muda, e não precisa.", certo=True))
+    return itens
+
+
+def situacao_android(aparelho):
+    """O painel do driver no celular: {fabricante: "android", placa, driver, itens, le_as_opcoes}."""
+    # O que nao muda enquanto o app esta aberto, lido uma vez (a tela pede este painel a cada poucos segundos).
+    if "android" not in _CACHE:
+        _CACHE["android"] = (propriedades_do_android(),
+                             next((_texto_do_arquivo(c) for c in ARQUIVOS_DA_GPU if _texto_do_arquivo(c)), ""),
+                             _texto_do_arquivo("/sys/kernel/gpu/gpu_governor"),
+                             _texto_do_arquivo("/sys/kernel/gpu/gpu_max_clock"))
+    propriedades, modelo, governador, clock_max = _CACHE["android"]
+    clock_agora = _texto_do_arquivo("/sys/kernel/gpu/gpu_clock")
+    itens = itens_android(aparelho, propriedades, modelo, governador, clock_max, clock_agora)
+    return {"fabricante": "android", "placa": (aparelho or {}).get("placa_de_video") or modelo,
+            "driver": propriedades.get("ro.gfx.driver.0") or propriedades.get("ro.hardware.egl") or "",
+            "painel": "", "itens": itens, "le_as_opcoes": bool(propriedades or modelo), "hz_limite": None,
+            "rsr": False, "antilag": False, "vsync_forcado": False}
+
+
+# ---------------------------------------------------------------------------
 # O que o ARENA usa
 # ---------------------------------------------------------------------------
 def situacao(nome_da_placa="", hz_da_tela=60):

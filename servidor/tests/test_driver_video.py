@@ -88,6 +88,49 @@ class Alinhar(unittest.TestCase):
         self.assertEqual(driver_video.escala_com_o_driver("nitido", {"rsr": False}), "nitido")
 
 
+class Android(unittest.TestCase):
+    # O Galaxy A12 em 11/11/2026 (o que o app conta e o que o getprop e o /sys dizem).
+    A12 = {"placa_de_video": "PowerVR Rogue GE8320", "opengl_es": "3.2", "vulkan": True, "vulkan_versao": "1.1",
+           "tela_hz": 60, "tela_modos_hz": [60], "animacoes": [0.0, 0.0, 0.0], "hz_escolhido_max": 0.0,
+           "economia": False}
+    PROPS = {"ro.hardware.egl": "meow", "ro.opengles.version": "196610", "ro.gfx.driver.0": "",
+             "ro.hardware.vulkan": "", "debug.egl.force_msaa": ""}
+
+    def por_chave(self, itens):
+        return {i["chave"]: i for i in itens}
+
+    def test_versao_do_gles(self):
+        self.assertEqual(driver_video.versao_do_gles("196610"), "3.2")
+        self.assertEqual(driver_video.versao_do_gles("196608"), "3.0")
+        self.assertEqual(driver_video.versao_do_gles(""), "")
+
+    def test_o_a12_esta_todo_certo(self):
+        itens = self.por_chave(driver_video.itens_android(self.A12, self.PROPS, "PowerVR Rogue GE8320",
+                                                          "Default", "680000", "0"))
+        self.assertEqual([c for c, i in itens.items() if not i["certo"]], [])
+        self.assertIn("PowerVR Rogue GE8320", itens["driver"]["valor"])
+        self.assertIn("veio com o Android", itens["driver"]["valor"])
+        self.assertEqual(itens["motor"]["valor"], "OpenGL ES 3.2 · Vulkan 1.1")
+        self.assertEqual(itens["msaa"]["valor"], "desligado")
+        self.assertEqual(itens["animacoes"]["valor"], "0×0×0")
+        self.assertIn("até 680 MHz", itens["clock"]["valor"])
+
+    def test_o_que_vale_mudar(self):
+        aparelho = dict(self.A12, economia=True, tela_hz=60, tela_modos_hz=[60, 90], animacoes=[1.5, 1.5, 1.5])
+        props = dict(self.PROPS, **{"debug.egl.force_msaa": "1", "ro.gfx.driver.0": "com.google.android.gpu"})
+        itens = self.por_chave(driver_video.itens_android(aparelho, props))
+        self.assertEqual(sorted(c for c, i in itens.items() if not i["certo"]), ["animacoes", "economia", "hz", "msaa"])
+        self.assertIn("Play Store", itens["driver"]["valor"])
+        self.assertIn("aceita até 90", itens["hz"]["valor"])
+        self.assertIn("Forçar MSAA 4x", itens["msaa"]["mude"])
+        self.assertIn("Desligada", itens["economia"]["mude"])
+
+    def test_sem_nada_do_app(self):
+        itens = driver_video.itens_android({}, {})
+        self.assertTrue(all("valor" in i for i in itens))
+        self.assertNotIn("animacoes", [i["chave"] for i in itens])
+
+
 @unittest.skipUnless(os.name == "nt", "o registro do Windows")
 class NestaMaquina(unittest.TestCase):
     def test_situacao_roda_e_tem_a_forma(self):

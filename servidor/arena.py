@@ -5887,6 +5887,11 @@ class Manipulador(BaseHTTPRequestHandler):
                       "velocidade_relativa": velocidade if isinstance(velocidade, (int, float)) else None,
                       "gravacao_mbs": (MAQUINA.get("disco") or {}).get("escrita_mbs"),
                       "internet": bool(VIGIA["internet"]), "economico": bool(ECONOMICO)}
+            # O painel do driver do celular (servidor\driver_video.py): o irmao do bloco do AMD Software do PC.
+            try:
+                extras["driver"] = driver_video.situacao_android(dados)["itens"]
+            except Exception as falha:  # noqa: BLE001  (um /sys estranho nunca derruba o painel)
+                print("[ARENA] Nao consegui ler o painel do driver do celular: %s" % falha)
             return self.responder_json({"ok": True, "aparelho": dados, "painel": painel_do_aparelho.painel(dados, extras)})
 
         if caminho == "/api/android/registro":

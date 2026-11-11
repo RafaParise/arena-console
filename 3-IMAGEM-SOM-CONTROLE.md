@@ -902,6 +902,39 @@ O perfil fica em `%LOCALAPPDATA%\ARENA\navegador`, fora do pen drive, porque o n
 gastaria o pen drive. As contas e os cookies de quem usa o computador ficam fora da janela do jogo. A proteção do
 navegador contra download perigoso continua ligada.
 
+### O painel do driver da placa: AMD Software, Intel e o celular (11/11/2026)
+
+Em **Ajustes → Máquina**, o bloco **"O painel do driver da placa"** mostra o que o driver da placa de vídeo está
+fazendo por fora do ARENA e se isso ajuda ou atrapalha o jogo. O ARENA **lê** o painel; ele **não mexe** no driver
+(isso pede administrador e grava no registro do Windows, duas coisas que o ARENA nunca faz). Cada linha diz:
+- **✓** está como o ARENA precisa;
+- **⚠** vale mudar a mão, e o que escolher.
+
+No **AMD Software: Adrenalin Edition**, ele lê: aguardar a atualização vertical (VSync), qualidade da filtragem de
+textura, tesselação, filtragem anisotrópica e anti-serrilhado, Radeon Super Resolution (RSR), Anti-Lag, limite de
+quadros (Frame Rate Target Control), Enhanced Sync, cache de shaders e a gravação. O valor cru do registro fica na
+dica de cada linha, para quem conferir no painel enxergar qualquer diferença.
+
+O que o ARENA faz com isso, sozinho:
+- o **Mais quadros** segue o menor entre a taxa da tela e o limite de quadros do driver (acima do limite o driver
+  descartaria os quadros criados);
+- com o **RSR ligado**, o driver já estica a imagem: o ARENA deixa o FSR dele de lado e aplica só a nitidez, para não
+  esticar duas vezes.
+
+Lido no PC do professor (Ryzen 5 5600G, Radeon integrada, AMD Software 26.5.2): só a **filtragem de textura** estava
+em "desempenho", que simplifica as texturas de todo jogo 3D. Em **Padrão**, a textura do PS2 volta inteira, quase sem
+custo. O resto (RSR desligado, filtros "do aplicativo", limite de 60 numa tela de 60 Hz, gravação desligada) já era
+o que o ARENA precisa.
+
+Na placa **Intel** e na **NVIDIA**, por enquanto o ARENA mostra a versão do driver e qual painel está instalado; as
+opções desses painéis ele ainda não lê (não houve máquina Intel para conferir onde ficam). Vale a mesma regra: tudo
+"do aplicativo" e o VSync como o jogo pedir.
+
+**No celular**, o mesmo bloco aparece no painel "Este celular", com o que o Android deixa ler: o driver da placa (e
+se é o atualizável pela Play Store), OpenGL ES e Vulkan, o **Forçar MSAA 4x** das Opções do desenvolvedor (ligado,
+o jogo cai pela metade no celular de entrada), a **economia de bateria** (ligada, o Android segura o processador e
+a placa), a taxa de atualização da tela e as escalas de animação.
+
 ### O que está deixando o computador lento
 
 Em **Ajustes → Máquina**, o botão **Verificar agora** olha o Windows (leva

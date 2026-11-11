@@ -151,6 +151,17 @@ def painel(d, extras=None):
         linha("Vulkan", vulkan if vulkan else ("este celular não tem" if d.get("vulkan") is False else None)),
     ])
 
+    # ------------------------------------------------------------------ o painel do driver (11/11/2026)
+    # A mesma leitura que o PC faz do AMD Software, com o que o celular deixa ler (servidor\driver_video.py,
+    # itens_android): ✓ esta como o ARENA precisa; ⚠ vale mudar a mao, e onde.
+    driver = extras.get("driver") or []
+    grupo("O painel do driver: o que mexe no jogo", [
+        linha(item["nome"], ("✓ " if item["certo"] else "⚠ ") + item["valor"]
+              + (" · mude: " + item["mude"] if item.get("mude") else ""),
+              100 if item["certo"] else 40, "ok" if item["certo"] else "atencao")
+        for item in driver if isinstance(item, dict) and item.get("valor")
+    ])
+
     # ------------------------------------------------------------------ memoria e armazenamento
     total, livre = _numero(d, "memoria_total_mb"), _numero(d, "memoria_livre_mb")
     memoria = None

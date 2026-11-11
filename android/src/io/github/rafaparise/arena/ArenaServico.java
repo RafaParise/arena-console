@@ -746,6 +746,23 @@ public class ArenaServico extends Service {
         } catch (RuntimeException falha) {
             Log.w(TAG, "vulkan e opengl: " + falha);
         }
+        // O "painel do driver" do celular (servidor\driver_video.py, 11/11/2026): o que o Android deixa ler sem
+        // permissao e que mexe no jogo -- as escalas de animacao, a taxa de atualizacao escolhida pela pessoa e a
+        // economia de bateria (que segura o processador e a placa).
+        try {
+            android.content.ContentResolver r = getContentResolver();
+            JSONArray animacoes = new JSONArray();
+            animacoes.put(Settings.Global.getFloat(r, Settings.Global.ANIMATOR_DURATION_SCALE, 1f));
+            animacoes.put(Settings.Global.getFloat(r, Settings.Global.WINDOW_ANIMATION_SCALE, 1f));
+            animacoes.put(Settings.Global.getFloat(r, Settings.Global.TRANSITION_ANIMATION_SCALE, 1f));
+            saida.put("animacoes", animacoes);
+            saida.put("hz_escolhido_max", Settings.System.getFloat(r, "peak_refresh_rate", 0f));
+            saida.put("hz_escolhido_min", Settings.System.getFloat(r, "min_refresh_rate", 0f));
+            android.os.PowerManager poder = (android.os.PowerManager) getSystemService(Context.POWER_SERVICE);
+            saida.put("economia", poder != null && poder.isPowerSaveMode());
+        } catch (RuntimeException falha) {
+            Log.w(TAG, "painel do driver: " + falha);
+        }
         saida.put("arquiteturas", new JSONArray(java.util.Arrays.asList(Build.SUPPORTED_ABIS)));
         saida.put("fabricante", Build.MANUFACTURER);
         saida.put("modelo", Build.MODEL);

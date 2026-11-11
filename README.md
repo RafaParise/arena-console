@@ -32,6 +32,11 @@
      alt="Downloads somando todas as versões do ARENA"></a>
 </p>
 
+<p align="center">
+  Feito pelo professor com os alunos: <a href="https://github.com/DOOK3DS"><b>DOOK3DS</b></a> (a primeira publicação, os fundos animados, as capas e a biblioteca online, as ideias do Mais quadros)
+  e <a href="https://github.com/HugoVHK"><b>HugoVHK</b></a> (os testes em casa que acharam o save do PS2 e o bloqueio do Play Protect). Detalhes em <a href="CREDITOS.md">CREDITOS.md</a>.
+</p>
+
 ---
 
 ## O que é

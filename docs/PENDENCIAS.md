@@ -850,3 +850,21 @@ Falta, nesta ordem:
   2. a rodada final inteira (`ferramentas\rodada_final.py`, numa janela própria);
   3. o APK de produção, testado no A12;
   4. a Release nova. A nota do lançamento termina com a seção do aluno **DOOK3DS** (só o @ do GitHub).
+
+## 11/11/2026 (noite): o painel do driver, o Mais quadros unificado e o plano da revisão
+
+- **Feito e testado:** o painel do driver (`servidor\driver_video.py`): AMD Software lido no PC (só a filtragem de
+  textura valia mudar), o irmão no celular (A12: 7 linhas, todas ✓, lidas pela rota do app com o APK de teste);
+  o Mais quadros unificado (RTX: MFG; AMD/Intel: Lossless; nunca os dois; medido com o PresentMon). README com os
+  dois alunos na parte principal.
+- **Não dá para fazer sem reescrever a história:** tirar a conta `ProfessorRafaParise` dos contribuidores do GitHub.
+  Ela entrou por um commit de 19/10 (`b017524`) feito com o e-mail de professor; o GitHub conta pelo e-mail do commit
+  e ignora `.mailmap`. Só saindo com `push --force` (proibido aqui) ou tirando esse e-mail daquela conta do GitHub
+  (mexe em conta: decisão do Rafael).
+- **Plano da revisão (ordem decidida, 11/11 à noite):**
+  1. revisão de código do que entrou desde a v2026.11.10 (11 commits, 3.200 linhas), corrigindo o que achar;
+  2. ideias adiadas, reavaliadas com o que existe hoje: 60 FPS no GameCube/Wii pelos códigos do próprio Dolphin
+     (por jogo, sem ligar trapaça no resto), o mesmo para o PS2 do celular (ARMSX2) se o núcleo lê os patches,
+     NIS/SGSR como filtros de escala (o SGSR é feito para a placa do celular), nitidez ajustável;
+  3. o Rust continua não: medido, o servidor é a parte mais leve (42 MB);
+  4. rodada final, APK de produção no A12, Release nova com DOOK3DS e HugoVHK no fim da nota.
