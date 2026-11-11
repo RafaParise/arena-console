@@ -266,10 +266,13 @@ def decidir(modo, nota, nota_gpu, degrau):
 
     O patch faz o jogo rodar o dobro: pesa o dobro no processador e na placa.
     - "desligado": nunca; "sempre": sempre que o jogo tiver o patch;
-    - "automatico": processador e placa fortes (nota 4 ou mais nos dois; a
-      integrada so na nota 4, a do Ryzen de mesa com Vega), e o console nao
-      ficou no limite antes (o "Desempenho que aprende" nao desceu degrau).
-      No Celeron N5100 da rede fica desligado."""
+    - "automatico": processador forte (nota 4 ou mais) e placa DEDICADA forte
+      ('nota_gpu' e' a nota dos emuladores de fora, que na integrada para no
+      3: a integrada divide a memoria com o emulador, e o dobro de quadros
+      podia deixar o jogo pior que os 30 lisos de antes -- regra do Rafael,
+      11/11/2026: "nunca regresso de desempenho"), e o console nao ficou no
+      limite antes (o "Desempenho que aprende" nao desceu degrau). No
+      Celeron N5100 da rede fica desligado; quem quiser, escolhe "Sempre"."""
     if modo == "desligado":
         return False, "desligado nos Ajustes"
     if modo == "sempre":
@@ -277,5 +280,5 @@ def decidir(modo, nota, nota_gpu, degrau):
     if int(degrau or 0) > 0:
         return False, "o PS2 ficou no limite da maquina antes"
     if int(nota or 0) < 4 or int(nota_gpu or 0) < 4:
-        return False, "a maquina e' fraca para o dobro de quadros"
+        return False, "o dobro de quadros pede processador e placa de video dedicada fortes"
     return True, "maquina forte"

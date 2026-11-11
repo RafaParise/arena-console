@@ -16,6 +16,11 @@ if PASTA_SERVIDOR not in sys.path:
 
 import navegadores  # noqa: E402
 
+PASTA_TESTES = os.path.join(os.path.dirname(PASTA_SERVIDOR), "testes")
+if PASTA_TESTES not in sys.path:
+    sys.path.insert(0, PASTA_TESTES)
+import limpeza  # noqa: E402
+
 EDGE = {"codigo": "edge", "nome": "Microsoft Edge", "familia": "chromium", "programa": r"C:\E\msedge.exe"}
 FIREFOX = {"codigo": "firefox", "nome": "Mozilla Firefox", "familia": "firefox", "programa": r"C:\F\firefox.exe"}
 OPERA = {"codigo": "opera", "nome": "Opera", "familia": "opera", "programa": r"C:\O\opera.exe"}
@@ -104,6 +109,24 @@ class Comando(unittest.TestCase):
         # Firefox e Opera nao mudam.
         self.assertEqual(navegadores.comando(FIREFOX, "http://x/", perfil="C:/perfil"),
                          [FIREFOX["programa"], "-new-window", "http://x/"])
+
+    @unittest.skipUnless(os.name == "nt", "a trava do perfil do Windows")
+    def test_navegador_ja_aberto_pela_trava_do_perfil(self):
+        import tempfile
+        from unittest import mock
+        pasta = tempfile.mkdtemp(prefix="arena_trava_")
+        try:
+            with mock.patch.dict(os.environ, {"LOCALAPPDATA": pasta}):
+                self.assertFalse(navegadores.ja_aberto(EDGE))          # sem trava: fechado
+                trava = os.path.join(pasta, "Microsoft", "Edge", "User Data")
+                os.makedirs(trava)
+                open(os.path.join(trava, "lockfile"), "wb").close()
+                self.assertFalse(navegadores.ja_aberto(EDGE))          # trava solta: fechado
+                with mock.patch("builtins.open", side_effect=PermissionError):
+                    self.assertTrue(navegadores.ja_aberto(EDGE))       # trava presa: aberto
+                self.assertFalse(navegadores.ja_aberto(FIREFOX))
+        finally:
+            limpeza.apagar_pasta(pasta)
 
     def test_firefox_em_janela_nova(self):
         self.assertEqual(navegadores.comando(FIREFOX, "http://127.0.0.1:8777/"),

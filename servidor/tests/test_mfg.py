@@ -54,9 +54,20 @@ class Decidir(unittest.TestCase):
         for nota in (1, 2, 3):
             self.assertFalse(mfg.decidir("automatico", self.ACHADO, nota, True, 60, True)[0])
 
-    def test_automatico_liga_no_emulador_de_fora_com_placa_forte(self):
-        self.assertTrue(mfg.decidir("automatico", self.ACHADO, 4, True, 60, True)[0])
+    def test_automatico_liga_no_emulador_de_fora_com_placa_dedicada(self):
+        self.assertTrue(mfg.decidir("automatico", self.ACHADO, 3, False, 60, True)[0])
         self.assertTrue(mfg.decidir("automatico", self.ACHADO, 5, False, 60, True)[0])
+        # A integrada, mesmo a forte (o Ryzen de mesa com Vega), nao liga sozinha: nunca regresso.
+        self.assertFalse(mfg.decidir("automatico", self.ACHADO, 4, True, 60, True)[0])
+        self.assertFalse(mfg.decidir("automatico", self.ACHADO, 4, True, 144, False)[0])
+        # A dedicada fraca (nota 2) tambem nao.
+        self.assertFalse(mfg.decidir("automatico", self.ACHADO, 2, False, 60, True)[0])
+
+    def test_console_que_ficou_no_limite_nao_liga_no_automatico(self):
+        usar, motivo = mfg.decidir("automatico", self.ACHADO, 5, False, 60, True, degrau=1)
+        self.assertFalse(usar)
+        self.assertIn("limite", motivo)
+        self.assertTrue(mfg.decidir("sempre", self.ACHADO, 5, False, 60, True, degrau=2)[0])
 
     def test_automatico_no_retroarch_so_com_tela_rapida(self):
         self.assertFalse(mfg.decidir("automatico", self.ACHADO, 5, False, 60, False)[0])

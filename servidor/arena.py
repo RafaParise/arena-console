@@ -2879,7 +2879,7 @@ def nota_da_placa_de_fora():
     return CAPACIDADE.get("nota_gpu_de_fora", CAPACIDADE.get("nota_gpu"))
 
 
-def preparar_mfg(jogo, config):
+def preparar_mfg(jogo, config, degrau=0):
     """A partida com os quadros a mais do MFG Super Motion (servidor\\mfg.py), ou None.
 
     Ele ocupa o lugar do Lossless Scaling (pedido de 11/11/2026): onde ele
@@ -2894,7 +2894,7 @@ def preparar_mfg(jogo, config):
     integrada = bool(MAQUINA["gpu"].get("integrada", True))
     hz = lossless.frequencia_da_tela()
     de_fora = bool(jogo.get("externo"))
-    usar, motivo = mfg.decidir(modo, achado, CAPACIDADE.get("nota_gpu"), integrada, hz, de_fora)
+    usar, motivo = mfg.decidir(modo, achado, CAPACIDADE.get("nota_gpu"), integrada, hz, de_fora, degrau)
     if not usar:
         if modo == "sempre" or achado:
             print("[ARENA] %s fica de fora deste jogo: %s." % (mfg.NOME, motivo))
@@ -2923,7 +2923,7 @@ def preparar_60_quadros_ps2(jogo, config, caminho_jogo, degrau):
         return ""
     serial, crc = identificado
     ligar, motivo = quadros_ps2.decidir(config.get("mfg_super_motion", mfg.MODO_PADRAO), CAPACIDADE.get("nota"),
-                                       CAPACIDADE.get("nota_gpu"), degrau)
+                                       nota_da_placa_de_fora(), degrau)
     try:
         nome = quadros_ps2.aplicar(pasta_pcsx2, serial, crc, ligar, PASTA_DADOS)
     except OSError as falha:
@@ -3232,7 +3232,7 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         # (quadros de verdade); senao o MFG Super Motion; e o Lossless so onde nenhum dos dois entrou.
         sessenta_ps2 = preparar_60_quadros_ps2(jogo, config, caminho_jogo, degrau) \
             if nome_externo == "PCSX2" else ""
-        pelo_mfg = None if (partida or sessenta_ps2) else preparar_mfg(jogo, config)
+        pelo_mfg = None if (partida or sessenta_ps2) else preparar_mfg(jogo, config, degrau)
         pelo_lossless = None if (partida or pelo_mfg or sessenta_ps2) else preparar_lossless_de_fora(
             jogo, config, programa_externo)
 
@@ -3542,7 +3542,7 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         # estica ate a tela. A janela vale so nesta partida; o filtro do
         # ARENA fica de fora (quem estica e' o Lossless Scaling).
         config_da_partida = config
-        pelo_mfg = None if partida else preparar_mfg(jogo, config)
+        pelo_mfg = None if partida else preparar_mfg(jogo, config, degrau)
         if pelo_mfg:
             opcoes_jogo.update(pelo_mfg["opcoes"])
             so_desta_partida += list(pelo_mfg["opcoes"])

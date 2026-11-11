@@ -287,6 +287,50 @@ def pasta_do_perfil():
     return pasta
 
 
+# O perfil de sempre de cada navegador: a trava dele (lockfile) fica presa enquanto o navegador esta aberto.
+PERFIS_DE_SEMPRE = {"edge": ("Microsoft", "Edge", "User Data"), "chrome": ("Google", "Chrome", "User Data"),
+                    "brave": ("BraveSoftware", "Brave-Browser", "User Data"), "vivaldi": ("Vivaldi", "User Data"),
+                    "chromium": ("Chromium", "User Data")}
+PERFIS_DE_SEMPRE_LINUX = {"edge": "microsoft-edge", "chrome": "google-chrome", "brave": "BraveSoftware/Brave-Browser",
+                          "vivaldi": "vivaldi", "chromium": "chromium"}
+
+
+def ja_aberto(navegador):
+    """O navegador ja esta aberto no perfil de sempre da pessoa?
+
+    Medido em 11/11/2026, com o Edge do Rafael aberto: a janela do ARENA dentro dele soma 56 MB e 1 processo; o
+    perfil leve, que e' um navegador a mais, somaria uns 238 MB. Entao, com o navegador aberto, a janela entra nele;
+    fechado, abre o perfil leve. Para saber sem gastar a abertura do ARENA (nada de perguntar ao Windows a lista de
+    processos), olha a trava do perfil: no Windows, o arquivo "lockfile" fica preso (abrir da erro de permissao);
+    no Linux, o "SingletonLock" aponta para "maquina-numero do processo", e o processo existe."""
+    codigo = navegador.get("codigo")
+    if os.name == "nt":
+        partes = PERFIS_DE_SEMPRE.get(codigo)
+        base = os.environ.get("LOCALAPPDATA")
+        if not partes or not base:
+            return False
+        trava = os.path.join(base, *partes, "lockfile")
+        if not os.path.exists(trava):
+            return False
+        try:
+            with open(trava, "rb"):
+                return False
+        except PermissionError:
+            return True
+        except OSError:
+            return False
+    nome = PERFIS_DE_SEMPRE_LINUX.get(codigo)
+    if not nome:
+        return False
+    trava = os.path.join(os.path.expanduser("~"), ".config", nome, "SingletonLock")
+    try:
+        alvo = os.readlink(trava)
+        os.kill(int(alvo.rsplit("-", 1)[1]), 0)
+        return True
+    except (OSError, ValueError, IndexError):
+        return False
+
+
 def comando(navegador, endereco, perfil=None):
     """A linha de comando que abre a tela neste navegador. 'perfil': a pasta do perfil so do ARENA (janela leve)."""
     programa, familia = navegador["programa"], navegador["familia"]
@@ -306,8 +350,10 @@ def abrir(endereco, preferido="automatico"):
     navegador = escolher(preferido)
     if navegador:
         try:
-            # O navegador do Flatpak (Linux) so grava dentro da caixa dele: ali fica o perfil de sempre.
-            perfil = None if os.sep + "flatpak" + os.sep in navegador["programa"] else pasta_do_perfil()
+            # O perfil leve so quando ele e' o mais barato: o navegador fechado (ja_aberto). O do Flatpak (Linux)
+            # so grava dentro da caixa dele: ali fica o perfil de sempre.
+            perfil = None if (os.sep + "flatpak" + os.sep in navegador["programa"] or ja_aberto(navegador)) \
+                else pasta_do_perfil()
             subprocess.Popen(comando(navegador, endereco, perfil), stdin=subprocess.DEVNULL,
                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             return navegador["codigo"]

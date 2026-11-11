@@ -1790,7 +1790,7 @@ function mostrarMfg(situacao, config) {
     texto = "Achado" + versao + ", " + onde + ". Aqui ele usa o " + situacao.gerador + ". ";
     texto += situacao.placa_forte
       ? "No automático, liga nos emuladores de fora" + (situacao.hz > 65 ? " e em todo jogo (tela de " + situacao.hz + " Hz)." : ".")
-      : "A placa de vídeo daqui é fraca para isso: no automático ele fica desligado (em Sempre, liga assim mesmo).";
+      : "Aqui a placa de vídeo é integrada (ou fraca): no automático ele fica desligado, para não tirar desempenho do jogo. Em Sempre, liga assim mesmo.";
   }
   $("#estadoMfg").textContent = texto;
 }

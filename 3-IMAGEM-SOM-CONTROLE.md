@@ -1573,6 +1573,16 @@ Por que não criar os quadros dentro do próprio ARENA? Criar quadros a partir d
 (Direct3D 12), e na placa da escola nem o próprio MFG aguenta: no teste dele, a Intel UHD 730 leva 13,6 ms por par
 de quadros. O estudo completo, com o que cada programa faz e o que o ARENA já tem, está em `docs\replica\`.
 
+**A regra que vale (11/11/2026, à tarde): nunca regresso de desempenho.** No **Automático**, o patch de 60 do PS2 e o
+MFG Super Motion só ligam com **placa de vídeo dedicada**: o patch com processador e placa de nota 4 ou mais, o MFG
+com placa de nota 3 ou mais. Os dois ficam desligados se o console já apertou a máquina antes. A placa integrada,
+mesmo a forte, divide a memória e o trabalho com o emulador, e os quadros a mais podiam deixar o jogo pior que antes.
+Quem quiser mesmo assim escolhe **Sempre**.
+
+A janela do ARENA também escolhe o jeito mais barato:
+- com o navegador **já aberto**, ela entra nele e soma só uns 56 MB (medido com o Edge);
+- com o navegador **fechado**, abre o perfil leve (238 MB, contra 629 MB do navegador inteiro).
+
 A ideia veio do aluno **[DOOK3DS](https://github.com/DOOK3DS)** (ver `CREDITOS.md`).
 
 ### Sobre 60 quadros por segundo

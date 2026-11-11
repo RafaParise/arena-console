@@ -153,14 +153,15 @@ def placas(motor, espera=30):
 # Decidir e escolher as opcoes
 # ---------------------------------------------------------------------------
 def placa_forte(nota_gpu, integrada):
-    """A placa aguenta criar quadros sem tirar do jogo? Dedicada (que nao seja
-    das fracas: a nota ja diz), ou integrada de nota 4 (o Ryzen de mesa com
-    Vega). A integrada comum (nota 3 ou menos, a do Celeron N5100) nao."""
-    nota = int(nota_gpu or 0)
-    return nota >= 4 if integrada else nota >= 3
+    """A placa aguenta criar quadros sem tirar do jogo, sozinha (no Automatico)?
+    So a DEDICADA que nao e' das fracas (a nota ja diz: 3 ou mais). A
+    integrada, mesmo a forte, divide a memoria e a placa com o emulador, e os
+    quadros criados podiam deixar o jogo pior (regra do Rafael, 11/11/2026:
+    "nunca regresso de desempenho"); quem quiser, escolhe "Sempre"."""
+    return (not integrada) and int(nota_gpu or 0) >= 3
 
 
-def decidir(modo, achado, nota_gpu, integrada, hz, de_fora):
+def decidir(modo, achado, nota_gpu, integrada, hz, de_fora, degrau=0):
     """(usar, motivo) para esta partida.
 
     - "desligado": nunca. "sempre": sempre que o programa estiver aqui.
@@ -179,7 +180,9 @@ def decidir(modo, achado, nota_gpu, integrada, hz, de_fora):
     if modo == "sempre":
         return True, "ligado sempre, nos Ajustes"
     if not placa_forte(nota_gpu, integrada):
-        return False, "a placa de video desta maquina e' fraca para criar quadros sem atrasar o jogo"
+        return False, "criar quadros sozinho pede placa de video dedicada"
+    if int(degrau or 0) > 0:
+        return False, "o console ficou no limite da maquina antes"
     if de_fora:
         return True, "emulador de fora, com placa que aguenta"
     if int(hz or 60) > 65:
