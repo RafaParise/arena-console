@@ -796,3 +796,9 @@ Falta, nesta ordem:
   novo nesta máquina) e o navegador disputando os 2 processadores limitados. **Ambiente:** o Jogar Junto PC e celular
   pede o Super Bomberman 4 no A12, e ele está numa pasta do cartão que o ARENA não lê
   (`Projetos\qwen-celular\ARENA\Super Nintendo`); não mexi nos arquivos do cartão.
+- **11/11, manhã: repetições fechadas.** Os testes de emulador passaram (`..._repeticao3.json` e `..._repeticao4.json`:
+  estresse e `teste_android`). Causa das falhas: o `DRWUI.exe` (um programa do Windows, pelo nome o Dr.Web [Provável])
+  passou a escutar na porta 5555, a do adb do emulador 5554; o teste agora escolhe um par livre (`70072cd`). **Não
+  rodou: o teste do Linux** (o serviço de contêiner do WSL travou; nem `wsl --shutdown` nem reiniciar o `WslService`
+  destravou, ele ficou "parando"): rodar de novo depois de reiniciar o computador. O teste agora desiste em 2 min com
+  a explicação (`cc40a6e`).

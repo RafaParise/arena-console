@@ -1,0 +1,24 @@
+[
+  {
+    "script": "testes\\teste_android.py",
+    "codigo_saida": 1,
+    "segundos": 422.5,
+    "ultimas_linhas": [
+      "O Android do emulador nao terminou de ligar em 7 minutos."
+    ],
+    "dados_reais_mexidos": [],
+    "pastas_esquecidas_no_temp": 0,
+    "mb_esquecidos": 0.0
+  },
+  {
+    "script": "testes\\teste_android_estresse.py",
+    "codigo_saida": 1,
+    "segundos": 421.8,
+    "ultimas_linhas": [
+      "O Android do emulador nao terminou de ligar em 7 minutos."
+    ],
+    "dados_reais_mexidos": [],
+    "pastas_esquecidas_no_temp": 0,
+    "mb_esquecidos": 0.0
+  }
+]

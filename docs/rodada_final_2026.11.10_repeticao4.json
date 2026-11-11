@@ -1,0 +1,20 @@
+[
+  {
+    "script": "testes\\teste_android.py",
+    "codigo_saida": 0,
+    "segundos": 324.3,
+    "ultimas_linhas": [
+      " ],",
+      " \"avisos_do_sistema_fechados\": [",
+      "  \"tocado o Wait\"",
+      " ],",
+      " \"falhas\": []",
+      "}",
+      "",
+      "Tudo certo. Fotos: C:\\Users\\passo\\AppData\\Local\\Temp\\teste_android_fotos"
+    ],
+    "dados_reais_mexidos": [],
+    "pastas_esquecidas_no_temp": 0,
+    "mb_esquecidos": 0.0
+  }
+]

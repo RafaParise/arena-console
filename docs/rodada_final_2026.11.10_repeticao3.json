@@ -1,0 +1,38 @@
+[
+  {
+    "script": "testes\\teste_android.py",
+    "codigo_saida": 1,
+    "segundos": 337.5,
+    "ultimas_linhas": [
+      " ],",
+      " \"falhas\": [",
+      "  \"D_chip8: o F8 nao tirou a foto do jogo (a tecla nao chegou ao RetroArch?)\"",
+      " ]",
+      "}",
+      "",
+      "FALHAS:",
+      "  D_chip8: o F8 nao tirou a foto do jogo (a tecla nao chegou ao RetroArch?)"
+    ],
+    "dados_reais_mexidos": [],
+    "pastas_esquecidas_no_temp": 0,
+    "mb_esquecidos": 0.0
+  },
+  {
+    "script": "testes\\teste_android_estresse.py",
+    "codigo_saida": 0,
+    "segundos": 451.4,
+    "ultimas_linhas": [
+      "== Estresse do ARENA no Android (15, 3000 toques)",
+      "  [OK] Monkey: toques ao acaso",
+      "  [OK] matar e voltar",
+      "  [OK] girar a tela",
+      "  [OK] pouca memoria",
+      "  [OK] sem rede",
+      "",
+      "Estresse no Android: 5 de 5 certos. Resultado: C:\\Users\\passo\\AppData\\Local\\Temp\\teste_android_estresse.json"
+    ],
+    "dados_reais_mexidos": [],
+    "pastas_esquecidas_no_temp": 0,
+    "mb_esquecidos": 0.0
+  }
+]
