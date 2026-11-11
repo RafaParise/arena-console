@@ -6,7 +6,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 36430,
-   "segundos": 11.6,
+   "segundos": 11.8,
    "travou": false,
    "erros": [
     "[ERROR] [Disc] Failed to set initial disc index. Expected #1 \"\", Detected #1 \"\"."
@@ -24,7 +24,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 16630,
-   "segundos": 12.3,
+   "segundos": 11.7,
    "travou": false,
    "erros": []
   },
@@ -44,7 +44,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 17201,
-   "segundos": 10.9,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -64,7 +64,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 24508,
-   "segundos": 10.9,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
@@ -84,7 +84,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 29416,
-   "segundos": 10.8,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
@@ -104,7 +104,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 8973,
-   "segundos": 10.9,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
@@ -124,7 +124,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 76999,
-   "segundos": 11.1,
+   "segundos": 11.3,
    "travou": false,
    "erros": []
   },
@@ -144,7 +144,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 102636,
-   "segundos": 11.0,
+   "segundos": 11.2,
    "travou": false,
    "erros": []
   },
@@ -164,7 +164,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 23175,
-   "segundos": 10.9,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
@@ -184,7 +184,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 4841,
-   "segundos": 10.8,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
@@ -203,8 +203,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 4525,
-   "segundos": 11.1,
+   "foto_bytes": 4488,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
@@ -224,7 +224,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 10936,
-   "segundos": 10.8,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
@@ -244,7 +244,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 7632,
-   "segundos": 11.1,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
@@ -264,7 +264,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 2054,
-   "segundos": 10.9,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -284,7 +284,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 7273,
-   "segundos": 10.8,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
@@ -320,7 +320,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 33082,
-   "segundos": 13.0,
+   "segundos": 13.2,
    "travou": false,
    "erros": []
   },
@@ -336,7 +336,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 91061,
-   "segundos": 13.0,
+   "segundos": 13.3,
    "travou": false,
    "erros": []
   },
@@ -352,7 +352,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 4160,
-   "segundos": 13.1,
+   "segundos": 13.0,
    "travou": false,
    "erros": []
   },
@@ -368,7 +368,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 68395,
-   "segundos": 12.8,
+   "segundos": 13.0,
    "travou": false,
    "erros": []
   },
@@ -384,7 +384,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 59412,
-   "segundos": 12.9,
+   "segundos": 13.0,
    "travou": false,
    "erros": []
   },
@@ -400,7 +400,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 35071,
-   "segundos": 12.8,
+   "segundos": 13.0,
    "travou": false,
    "erros": []
   },
@@ -416,7 +416,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 6408,
-   "segundos": 10.8,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
@@ -456,7 +456,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 191867,
-   "segundos": 10.8,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
@@ -506,7 +506,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 2089,
-   "segundos": 10.7,
+   "segundos": 10.9,
    "travou": false,
    "erros": [
     "[ERROR] [Environ] SET_MESSAGE_EXT: FreeJ2ME could not start!"
@@ -524,7 +524,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 2089,
-   "segundos": 10.7,
+   "segundos": 10.9,
    "travou": false,
    "erros": [
     "[ERROR] [Environ] SET_MESSAGE_EXT: FreeJ2ME could not start!"
@@ -542,7 +542,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 40800,
-   "segundos": 10.8,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
@@ -558,7 +558,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 459769,
-   "segundos": 11.0,
+   "segundos": 11.2,
    "travou": false,
    "erros": []
   },
@@ -578,7 +578,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 415256,
-   "segundos": 10.8,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
@@ -598,7 +598,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 41254,
-   "segundos": 10.7,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
@@ -618,7 +618,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 255633,
-   "segundos": 40.8,
+   "segundos": 41.0,
    "travou": false,
    "erros": [],
    "segunda_vez_com_40s": true
@@ -639,7 +639,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 210779,
-   "segundos": 10.7,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
@@ -659,7 +659,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 463286,
-   "segundos": 10.9,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -699,7 +699,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 8637,
-   "segundos": 10.8,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
@@ -719,7 +719,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 105657,
-   "segundos": 11.4,
+   "segundos": 11.6,
    "travou": false,
    "erros": []
   },
@@ -739,7 +739,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 47792,
-   "segundos": 11.0,
+   "segundos": 11.2,
    "travou": false,
    "erros": []
   },
@@ -759,17 +759,15 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 47792,
-   "segundos": 11.0,
+   "segundos": 11.2,
    "travou": false,
    "erros": []
   },
   "foto": "056 Neo Geo e fliperamas - Samurai Shodown II  Shin Samurai Spirit.png",
   "jogar_junto": {
-   "conectou": true,
-   "convidado_diz": "Você se juntou como jogador 2",
-   "recusa_do_nucleo": "",
-   "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "porta 55435 ocupada por outro programa: teste nao vale"
+   ]
   }
  },
  {
@@ -779,7 +777,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 187598,
-   "segundos": 10.9,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -799,7 +797,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 29667,
-   "segundos": 11.1,
+   "segundos": 11.3,
    "travou": false,
    "erros": []
   },
@@ -819,7 +817,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 30514,
-   "segundos": 11.2,
+   "segundos": 11.4,
    "travou": false,
    "erros": []
   },
@@ -863,7 +861,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 342861,
-   "segundos": 10.7,
+   "segundos": 11.0,
    "travou": false,
    "erros": [
     "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented."
@@ -887,7 +885,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 181503,
-   "segundos": 10.7,
+   "segundos": 10.9,
    "travou": false,
    "erros": [
     "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented."
@@ -911,7 +909,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 360860,
-   "segundos": 10.8,
+   "segundos": 10.9,
    "travou": false,
    "erros": [
     "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented."
@@ -935,7 +933,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 458042,
-   "segundos": 13.0,
+   "segundos": 12.7,
    "travou": false,
    "erros": []
   },
@@ -951,7 +949,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 682244,
-   "segundos": 14.3,
+   "segundos": 14.6,
    "travou": false,
    "erros": []
   },
@@ -967,7 +965,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 1400779,
-   "segundos": 11.8,
+   "segundos": 12.0,
    "travou": false,
    "erros": []
   },
@@ -983,7 +981,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 435421,
-   "segundos": 12.7,
+   "segundos": 12.9,
    "travou": false,
    "erros": []
   },
@@ -999,7 +997,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 590887,
-   "segundos": 13.4,
+   "segundos": 13.6,
    "travou": false,
    "erros": []
   },
@@ -1015,7 +1013,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 406434,
-   "segundos": 12.5,
+   "segundos": 12.7,
    "travou": false,
    "erros": []
   },
@@ -1031,7 +1029,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 251652,
-   "segundos": 11.8,
+   "segundos": 11.9,
    "travou": false,
    "erros": []
   },
@@ -1065,7 +1063,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 43950,
-   "segundos": 21.8,
+   "segundos": 21.6,
    "travou": false,
    "erros": []
   },
@@ -1085,7 +1083,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 43950,
-   "segundos": 22.7,
+   "segundos": 21.8,
    "travou": false,
    "erros": []
   },
@@ -1125,7 +1123,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 43950,
-   "segundos": 25.6,
+   "segundos": 25.3,
    "travou": false,
    "erros": []
   },
@@ -1145,7 +1143,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 43950,
-   "segundos": 12.8,
+   "segundos": 12.5,
    "travou": false,
    "erros": []
   },
@@ -1165,14 +1163,14 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 43950,
-   "segundos": 23.4,
+   "segundos": 23.1,
    "travou": false,
    "erros": []
   },
   "foto": "079 PlayStation - Twisted Metal 2.png",
   "jogar_junto": {
    "conectou": true,
-   "convidado_diz": "Você se juntou como jogador 2",
+   "convidado_diz": null,
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
    "erros": []
@@ -1185,7 +1183,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 66502,
-   "segundos": 14.0,
+   "segundos": 13.6,
    "travou": false,
    "erros": []
   },
@@ -1421,7 +1419,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 448271,
-   "segundos": 11.9,
+   "segundos": 12.0,
    "travou": false,
    "erros": []
   },
@@ -1437,7 +1435,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 93036,
-   "segundos": 11.0,
+   "segundos": 11.2,
    "travou": false,
    "erros": []
   },
@@ -1453,7 +1451,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 112903,
-   "segundos": 11.0,
+   "segundos": 11.2,
    "travou": false,
    "erros": []
   },
@@ -1469,7 +1467,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 6601,
-   "segundos": 11.0,
+   "segundos": 11.2,
    "travou": false,
    "erros": [
     "[libretro WARN] [sceDisplay] Video out requested, not supported: mode=0 size=512,272"
@@ -1487,7 +1485,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 19404,
-   "segundos": 11.0,
+   "segundos": 11.2,
    "travou": false,
    "erros": [
     "[libretro WARN] [sceDisplay] Video out requested, not supported: mode=0 size=512,272"
@@ -1505,7 +1503,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 1537199,
-   "segundos": 17.3,
+   "segundos": 17.5,
    "travou": false,
    "erros": []
   },
@@ -1521,7 +1519,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 430305,
-   "segundos": 11.2,
+   "segundos": 11.3,
    "travou": false,
    "erros": []
   },
@@ -1537,7 +1535,7 @@
   "abrir": {
    "abre_e_mostra_imagem": false,
    "foto_bytes": 212,
-   "segundos": 75.7,
+   "segundos": 75.9,
    "travou": false,
    "erros": [],
    "segunda_vez_com_40s": true
@@ -1551,7 +1549,7 @@
   "abrir": {
    "abre_e_mostra_imagem": false,
    "foto_bytes": 212,
-   "segundos": 75.7,
+   "segundos": 75.9,
    "travou": false,
    "erros": [],
    "segunda_vez_com_40s": true
@@ -1565,7 +1563,7 @@
   "abrir": {
    "abre_e_mostra_imagem": false,
    "foto_bytes": 212,
-   "segundos": 75.7,
+   "segundos": 75.9,
    "travou": false,
    "erros": [],
    "segunda_vez_com_40s": true
@@ -1579,7 +1577,7 @@
   "abrir": {
    "abre_e_mostra_imagem": false,
    "foto_bytes": 212,
-   "segundos": 75.7,
+   "segundos": 75.9,
    "travou": false,
    "erros": [],
    "segunda_vez_com_40s": true
@@ -1593,7 +1591,7 @@
   "abrir": {
    "abre_e_mostra_imagem": false,
    "foto_bytes": 212,
-   "segundos": 75.7,
+   "segundos": 75.9,
    "travou": false,
    "erros": [],
    "segunda_vez_com_40s": true
@@ -1607,7 +1605,7 @@
   "abrir": {
    "abre_e_mostra_imagem": false,
    "foto_bytes": 212,
-   "segundos": 75.7,
+   "segundos": 75.9,
    "travou": false,
    "erros": [],
    "segunda_vez_com_40s": true
@@ -1621,7 +1619,7 @@
   "abrir": {
    "abre_e_mostra_imagem": false,
    "foto_bytes": 212,
-   "segundos": 75.7,
+   "segundos": 75.9,
    "travou": false,
    "erros": [],
    "segunda_vez_com_40s": true
@@ -1635,7 +1633,7 @@
   "abrir": {
    "abre_e_mostra_imagem": false,
    "foto_bytes": 212,
-   "segundos": 75.7,
+   "segundos": 75.8,
    "travou": false,
    "erros": [],
    "segunda_vez_com_40s": true
@@ -1649,7 +1647,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 47656,
-   "segundos": 12.8,
+   "segundos": 13.0,
    "travou": false,
    "erros": []
   },
@@ -1669,14 +1667,14 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 11583,
-   "segundos": 10.7,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
   "foto": "235 Sega 32X - Star Wars Arcade.png",
   "jogar_junto": {
    "conectou": true,
-   "convidado_diz": "Você se juntou como jogador 2",
+   "convidado_diz": null,
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
    "erros": []
@@ -1689,7 +1687,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 525721,
-   "segundos": 11.6,
+   "segundos": 11.8,
    "travou": false,
    "erros": []
   },
@@ -1709,7 +1707,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 286742,
-   "segundos": 12.9,
+   "segundos": 13.1,
    "travou": false,
    "erros": []
   },
@@ -1729,7 +1727,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 107003,
-   "segundos": 13.1,
+   "segundos": 13.3,
    "travou": false,
    "erros": []
   },
@@ -1745,7 +1743,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 58602,
-   "segundos": 13.0,
+   "segundos": 13.2,
    "travou": false,
    "erros": []
   },
@@ -1761,7 +1759,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 58602,
-   "segundos": 12.9,
+   "segundos": 13.2,
    "travou": false,
    "erros": [
     "[libretro INFO] [BOOT] USA region not supported. Using Europe instead"
@@ -1779,7 +1777,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 58602,
-   "segundos": 12.9,
+   "segundos": 13.2,
    "travou": false,
    "erros": []
   },
@@ -1795,7 +1793,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 58602,
-   "segundos": 12.9,
+   "segundos": 13.2,
    "travou": false,
    "erros": [
     "[libretro INFO] [BOOT] USA region not supported. Using Europe instead"
@@ -1813,7 +1811,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 58602,
-   "segundos": 13.0,
+   "segundos": 13.2,
    "travou": false,
    "erros": [
     "[libretro INFO] [BOOT] USA region not supported. Using Europe instead"
@@ -1831,7 +1829,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 46284,
-   "segundos": 11.8,
+   "segundos": 11.9,
    "travou": false,
    "erros": []
   },
@@ -1851,7 +1849,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 186647,
-   "segundos": 10.9,
+   "segundos": 11.3,
    "travou": false,
    "erros": []
   },
@@ -1871,7 +1869,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 186647,
-   "segundos": 10.8,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
@@ -1891,7 +1889,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 344006,
-   "segundos": 10.8,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
@@ -1911,7 +1909,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 401369,
-   "segundos": 10.8,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -1931,7 +1929,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 137070,
-   "segundos": 10.8,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
@@ -1951,7 +1949,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 260650,
-   "segundos": 12.8,
+   "segundos": 13.1,
    "travou": false,
    "erros": []
   },
@@ -1971,7 +1969,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 347734,
-   "segundos": 13.0,
+   "segundos": 13.2,
    "travou": false,
    "erros": []
   },
@@ -1991,7 +1989,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 327956,
-   "segundos": 12.8,
+   "segundos": 13.0,
    "travou": false,
    "erros": []
   },
@@ -2023,7 +2021,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 11185,
-   "segundos": 13.0,
+   "segundos": 13.1,
    "travou": false,
    "erros": [
     "[ERROR] [Disc] Failed to set initial disc index. Expected #1 \"\", Detected #1 \"\"."
@@ -2047,7 +2045,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 16258,
-   "segundos": 12.7,
+   "segundos": 12.9,
    "travou": false,
    "erros": []
   },
