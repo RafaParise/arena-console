@@ -741,7 +741,7 @@
     "rota": "/api/sincronizar",
     "metodo": "POST",
     "categoria": "dados_corretos",
-    "status": 200,
+    "status": 502,
     "ok": true,
     "motivo": "ok",
     "extra": ""
@@ -750,7 +750,7 @@
     "rota": "/api/sincronizar",
     "metodo": "POST",
     "categoria": "dados_faltando",
-    "status": 200,
+    "status": 502,
     "ok": true,
     "motivo": "ok",
     "extra": ""

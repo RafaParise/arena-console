@@ -779,3 +779,10 @@ Falta, nesta ordem:
   2026.11.10, sem falhas): instalação do zero com a versão-alvo 35, o serviço em primeiro plano, a tela, os jogos e a
   partida a dois. Numa instalação limpa o "Continuar de onde parou" veio **ligado** ("primeira vez: o ponto automatico
   e' gravado ao sair"): o padrão do Android funciona; o `false` do A12 veio de um config gravado antes.
+- **11/11, madrugada: a rodada final foi interrompida pelo sistema (falta de memória do PC)** depois de 4 scripts
+  (`docs\rodada_final_2026.11.10.json`): a bateria principal e o fuzz das rotas passaram; o `textos_sem_acento`
+  achou 11 frases sem acento (repasse e continuar), já corrigidas (`a4cb910`). Os 4 APKs 2026.11.10 foram montados
+  antes da correção: **remontar antes de publicar**. Para retomar sem perder o que passou:
+  `servidor\python\python.exe ferramentas\rodada_final.py --saida=docs\rodada_final_2026.11.10.json --continuar`
+  (com o PC folgado: fechar navegador e programas pesados). O repasse do A12 também pode ser atualizado
+  (`python scripts\repasse_a12.py instalar`, no parise-sync) para levar as mensagens com acento.
