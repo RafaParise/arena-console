@@ -845,6 +845,11 @@ Em **Ajustes → Simples → Fundo animado**:
 | **Sempre animado** | Anima sempre |
 | **Parado** | Desenha a cena uma vez e não gasta mais nada |
 
+**Descanso (11/11/2026):** no **Automático**, se ninguém mexer no mouse, no teclado ou na tela por **3 minutos**, o
+fundo para na cena parada, e volta a se mexer no primeiro toque. Na sala, o ARENA fica muito tempo aberto no menu, e
+o fundo era o único gasto com a tela parada (5% de um núcleo do Ryzen, uns 11% do Celeron). No **Sempre animado**,
+ele continua animando.
+
 **"Os fundos não se mexem"**: o Windows em *Ajustar para obter melhor
 desempenho* (ou com *Efeitos de animação* desligado, em Acessibilidade)
 avisa o navegador que a pessoa prefere menos movimento. No automático, o
@@ -886,6 +891,16 @@ números ficam em `dados\desempenho.json`.
 Por que não os quadros por segundo: o RetroArch 1.22 só põe o FPS no título
 da janela junto com o contador desenhado em cima do jogo, e o registro dele
 não guarda a média (os dois conferidos em 22/10/2026).
+
+### A janela do ARENA, mais leve (11/11/2026)
+
+A tela do ARENA abre no Edge ou no Chrome num **perfil só dela**. Esse perfil não tem extensões, não sincroniza e não
+roda os serviços de fundo do navegador. Medido no PC do professor, com o ARENA parado na tela inicial: **629 MB e 14
+processos** no perfil de sempre, **238 MB e 8 processos** no perfil do ARENA. O servidor do ARENA usa 42 MB.
+
+O perfil fica em `%LOCALAPPDATA%\ARENA\navegador`, fora do pen drive, porque o navegador grava muito no cache e
+gastaria o pen drive. As contas e os cookies de quem usa o computador ficam fora da janela do jogo. A proteção do
+navegador contra download perigoso continua ligada.
 
 ### O que está deixando o computador lento
 
@@ -1524,6 +1539,41 @@ das capturas" (é o jeito de ele não se fotografar sem querer), e a foto pega
 o que está embaixo: a janela pequena do jogo.
 
 ---
+
+### Mais quadros: o PS2 a 60 e o MFG Super Motion (11/11/2026)
+
+Em **Ajustes → Emuladores → Mais quadros** (Automático, Sempre ou Desligado), o ARENA escolhe sozinho o melhor jeito
+de o jogo rodar mais liso, nesta ordem:
+
+1. **PS2 a 60 quadros de verdade.** Muitos jogos de PS2 rodam a 30 quadros por escolha de quem os fez. O PCSX2 traz
+   patches da comunidade que fazem o **próprio jogo** rodar a 60, para 627 jogos. O ARENA reconhece o jogo e liga o
+   patch dele, sem nada copiado nem adivinhado e sem atraso a mais.
+   - Ele lê o serial e o CRC no próprio disco (ISO). No disco comprimido (CHD, CSO), aprende na primeira partida,
+     pelo registro do PCSX2, e da segunda vez em diante o patch já vale.
+   - O patch fica no arquivo do jogo no PCSX2 (`gamesettings\SERIAL_CRC.ini`). O ARENA só mexe na linha que ele
+     mesmo pôs.
+   - Ele pesa o dobro. No **Automático**, liga só com processador e placa fortes (nota 4 ou mais). Se o PS2 apertar
+     a máquina, o Desempenho que aprende tira o patch na partida seguinte. No Celeron N5100 ele fica desligado.
+2. **MFG Super Motion**, programa gratuito que cria quadros entre os do jogo copiando a imagem da janela.
+   - Ele **não vem no ARENA**: a licença dele (PolyForm Strict) não deixa levar junto. Instale-o uma vez pela
+     [página oficial](https://github.com/NODIX-TECH/MFG-SUPER-MOTION/releases/latest): o instalador põe o programa
+     só para você, sem administrador.
+   - Daí em diante, o ARENA acha o programa, escolhe as opções para a sua máquina e abre o motor dele junto com o
+     jogo, sem a tela do programa, e fecha no fim.
+   - Na placa NVIDIA RTX, ele usa o DLSS MFG; nas outras, o gerador próprio dele (MSM FG), no modo rápido fora das
+     placas dedicadas fortes.
+   - Cria só os quadros que enchem a tela (nenhum, se o jogo já chega lá sozinho), com o menor atraso no controle.
+     Não desenha nada por cima do jogo.
+   - No **Automático**, liga só com placa forte, nos emuladores de PS2, GameCube, Wii, PS3 e Xbox 360, ou numa tela
+     de mais de 60 Hz.
+3. **Lossless Scaling**, para quem comprou: só onde o MFG Super Motion não estiver instalado. Ele ocupa o lugar que
+   era do Lossless.
+
+Por que não criar os quadros dentro do próprio ARENA? Criar quadros a partir da imagem pede a placa de vídeo inteira
+(Direct3D 12), e na placa da escola nem o próprio MFG aguenta: no teste dele, a Intel UHD 730 leva 13,6 ms por par
+de quadros. O estudo completo, com o que cada programa faz e o que o ARENA já tem, está em `docs\replica\`.
+
+A ideia veio do aluno **[DOOK3DS](https://github.com/DOOK3DS)** (ver `CREDITOS.md`).
 
 ### Sobre 60 quadros por segundo
 

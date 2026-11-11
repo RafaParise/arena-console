@@ -1,0 +1,29 @@
+feature,area,priority,original,clone,notes
+Esticar o jogo de pixel ate a tela com pixel nitido (Sharp Bilinear do LS),escala,must,yes,yes,servidor\filtros\pixel-nitido.slangp
+Escala FSR 1 para 3D desenhado menor que a tela (FSR do LS),escala,must,yes,yes,servidor\filtros\fsr.slangp; Catmull-Rom na placa media
+Escolher a escala sozinho por jogo e por placa (perfis do LS),escala,must,yes,yes,graficos.filtro_da_escala pela nota da placa
+Anime4K (LS; upscaler=4 do MFG),escala,should,yes,yes,servidor\filtros\anime4k.slangp
+Escala inteira com borda (Integer do LS; upscaler=2 do MFG),escala,should,yes,yes,escala "inteiro"
+Vizinho mais proximo (Nearest do LS; upscaler=3 do MFG),escala,could,yes,partial,"o ""original"" desenha sem filtro; sem opcao propria"
+xBR (LS),escala,could,yes,partial,o ScaleFX (suave) faz o mesmo papel e pesou menos (+5.7 contra +8.8 pontos de placa)
+Nitidez ajustavel (sharpness do LS; sharpness e over_sharpness do MFG),escala,could,yes,partial,RCAS automatico; sem controle de intensidade
+NIS da NVIDIA (LS),escala,could,yes,no,"FSR e Catmull cobrem; o NIS (licenca MIT) pode entrar depois"
+SGSR da Qualcomm (LS),escala,could,yes,no,feito para placa de celular: candidato para o Android numa proxima versao
+LS1 (escala propria do LS),escala,could,yes,skip,algoritmo fechado do Lossless Scaling; nada para estudar alem do resultado
+Gerar quadros copiando a tela (LSFG do LS; MSM FG / DLSS MFG / XeSS MFG do MFG),quadros,must,yes,partial,"usa o MFG Super Motion (ou o LS) instalado, configurado e aberto pelo ARENA (servidor\mfg.py, servidor\lossless.py); nativo em Python puro nao e' viavel: precisa de Direct3D 12 e a placa da escola nao aguenta (UHD 730 do proprio MFG: 13,6 ms por par)"
+So os quadros que enchem a tela (ADAPTIVE do LS; screen_limit do MFG),quadros,must,yes,yes,screen_limit=1 no MFG; LSFG3 ADAPTIVE no LS
+Quantos quadros por par seguindo a tela (x2 a x6 do MFG; x2 a x20 do LS),quadros,should,yes,yes,mfg.escolher_opcoes: 2 em 60 Hz; ate 4 em 144 Hz; 2 na integrada
+Escolher a placa que gera os quadros (gpu do MFG; GPU preferida do LS),quadros,could,yes,yes,a RTX para o DLSS MFG; senao o MSM FG na placa da tela
+Menor atraso no controle (queue=0 do MFG; Max Frame Latency do LS),quadros,should,yes,yes,queue=0 e sync=1 no MFG; swapchain de 2 imagens no RetroArch
+Pixel parado continua o de verdade (still do MFG),quadros,could,yes,yes,still=1: placar e vida nao tremem
+Ligar e desligar junto com o jogo sem tela do programa (AutoScale do LS),quadros,must,yes,yes,MFG pelo motor (--config; stop); LS minimizado com o perfil ARENA
+Nao pegar a janela errada (owner e hwnd do MFG; Filters do LS),quadros,should,yes,yes,hwnd da maior janela do emulador
+Limitar quadros (frame_limit do MFG; FPS limit do LS),quadros,could,yes,partial,o vsync do ARENA limita; sem opcao propria
+Aprender por jogo (Adaptive Motion Learning do MFG),quadros,could,yes,partial,o Desempenho que aprende ajusta por console sem desenhar o estudo na tela; o AML fica desligado (desenha no jogo)
+VRR e HDR (MFG e LS),quadros,could,yes,skip,as maquinas da escola nao tem tela VRR nem HDR
+Contador de quadros desenhado no jogo (Draw FPS do LS; counter do MFG),quadros,could,yes,skip,o ARENA mede sem desenhar nada na tela (servidor\desempenho.py)
+Compartilhar a imagem com outro programa (Spout do MFG),quadros,could,yes,skip,transmissao e gravacao desligadas de proposito no ARENA (dados dos alunos)
+Quadros de verdade no PS2: patch 60 FPS do proprio PCSX2,quadros,must,no,yes,servidor\quadros_ps2.py: 627 jogos; vem antes do MFG e do LS
+Janela leve do navegador (perfil so do ARENA),leveza,must,no,yes,629 MB -> 238 MB e 14 -> 8 processos no Edge (medido em 11/11/2026)
+Descanso do fundo animado,leveza,should,no,yes,3 minutos sem mexer: o fundo do Automatico para
+60 quadros no GameCube e no Wii (codigos do Dolphin),quadros,could,no,no,so 25 jogos e precisa ligar as trapacas do Dolphin inteiro: proxima versao

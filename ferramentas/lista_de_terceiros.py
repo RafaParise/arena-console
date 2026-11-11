@@ -77,6 +77,12 @@ NAO_VEM = [
     "aqui de jeito nenhum; o `servidor\\lossless.py` só o acha, ajusta o perfil",
     "\"ARENA\" dele e o abre junto com o jogo (guia 3, \"Lossless Scaling\"). O",
     "`.gitignore` e o montador do pacote barram a pasta dele.",
+    "",
+    "Também não vem no ARENA o **MFG Super Motion** (da NODIX-TECH, gratuito),",
+    "porque a licença dele (PolyForm Strict 1.0.0) proíbe redistribuir e modificar.",
+    "O `servidor\\mfg.py` só acha o programa instalado no computador, escolhe as",
+    "opções e abre o motor dele junto com o jogo (guia 3, \"Mais quadros\"); nenhuma",
+    "linha dele foi copiada. O `.gitignore` e o montador do pacote barram a pasta dele.",
 ]
 
 # Nucleos cujo codigo-fonte NAO fica no GitHub do libretro.

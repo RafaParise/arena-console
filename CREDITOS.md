@@ -45,6 +45,16 @@ JSON com chaves e o grande demais; favoritos e recentes deixaram de repetir
 jogo; o Jogar Junto do PlayStation passou a avisar em vez de falhar (o
 núcleo da época não sincronizava as duas máquinas).
 
+### As ideias de 11/11/2026: mais quadros e uma tela mais leve
+
+O DOOK3DS também mostrou ao professor programas que ele não conhecia, e o professor adaptou as ideias para o ARENA:
+
+| O que ele trouxe | O que virou |
+|---|---|
+| O **MFG Super Motion**, programa gratuito que cria quadros entre os do jogo, como o Lossless Scaling | O ARENA acha o programa instalado, escolhe as opções para cada máquina e abre o motor dele junto com o jogo, no lugar do Lossless (`servidor\mfg.py`). A licença dele não deixa levá-lo junto |
+| A ideia de juntar o melhor do Lossless e do MFG dentro do ARENA | Os **60 quadros de verdade no PS2**: o ARENA liga sozinho o patch "60 FPS" que o próprio PCSX2 traz (627 jogos), antes de qualquer programa de fora (`servidor\quadros_ps2.py`) |
+| A ideia de trocar a parte web por **Rust**, para o ARENA ficar mais leve | A medida de onde está o peso: o servidor em Python usa 42 MB, a janela do navegador 629 MB. Virou a **janela leve** (perfil só do ARENA no navegador: 238 MB) e o **descanso do fundo animado**. A decisão sobre o Rust, com os números, está em `docs/replica/architecture.md` |
+
 ## O aluno HugoVHK: o teste dos saves do PS2 (03/11/2026)
 
 O aluno da conta **[HugoVHK](https://github.com/HugoVHK)** testou o ARENA em
