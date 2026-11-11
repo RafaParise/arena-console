@@ -775,3 +775,7 @@ Falta, nesta ordem:
   com `ja_tem_o_de_64`): quem nunca escolheu e já tem o `Mcd001-64MB.ps2` fica com ele. Observação honesta: no
   computador o PCSX2 de fora sempre usou o de 8 MB; se o aluno jogou o *Crash of the Titans* no computador, a causa do
   relato dele é outra (fica a hipótese 2, a do estado salvo carregado depois do save no cartão).
+- **10/11, noite: teste no emulador com Android 15 passou inteiro** (`testes\teste_android.py`, APK de teste x86_64
+  2026.11.10, sem falhas): instalação do zero com a versão-alvo 35, o serviço em primeiro plano, a tela, os jogos e a
+  partida a dois. Numa instalação limpa o "Continuar de onde parou" veio **ligado** ("primeira vez: o ponto automatico
+  e' gravado ao sair"): o padrão do Android funciona; o `false` do A12 veio de um config gravado antes.
