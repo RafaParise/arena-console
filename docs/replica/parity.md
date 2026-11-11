@@ -29,3 +29,4 @@ Not shippable yet: 1 must-have features are not done.
 - Janela leve do navegador (perfil so do ARENA)
 - Descanso do fundo animado
 - 60 quadros no GameCube e no Wii (codigos do Dolphin)
+- 60 quadros no PS2 do celular (patches do PCSX2 no nucleo ARMSX2)

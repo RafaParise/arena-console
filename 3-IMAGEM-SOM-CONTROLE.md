@@ -1587,6 +1587,13 @@ de o jogo rodar mais liso, nesta ordem:
      mesmo pôs.
    - Ele pesa o dobro. No **Automático**, liga só com processador e placa fortes (nota 4 ou mais). Se o PS2 apertar
      a máquina, o Desempenho que aprende tira o patch na partida seguinte. No Celeron N5100 ele fica desligado.
+   - **GameCube e Wii (11/11/2026, à noite):** o mesmo jeito, com os códigos de 60 quadros que o próprio Dolphin traz
+     para 25 jogos (`Sys\GameSettings`). O ARENA lê o ID do disco (`.iso`, `.gcm`, `.wbfs`, `.rvz`) e liga o código
+     **só naquele jogo** (`User\GameSettings\<ID>.ini`); as trapaças dos outros jogos continuam desligadas. Provado
+     com o F-Zero GX: o Dolphin registrou o código ligado pelo arquivo do jogo.
+   - **No celular:** o PS2 do ARENA (o núcleo ARMSX2) é o PCSX2 compilado para o RetroArch e traz a mesma lista de
+     patches. O ARENA escreve o arquivo do jogo em `system/pcsx2/gamesettings` e liga a leitura de patches no núcleo.
+     No Galaxy A12 (placa fraca), o Automático deixa desligado; em "Sempre", liga.
 2. **MFG Super Motion**, programa gratuito que cria quadros entre os do jogo copiando a imagem da janela.
    - Ele **não vem no ARENA**: a licença dele (PolyForm Strict) não deixa levar junto. Instale-o uma vez pela
      [página oficial](https://github.com/NODIX-TECH/MFG-SUPER-MOTION/releases/latest): o instalador põe o programa
@@ -1599,8 +1606,10 @@ de o jogo rodar mais liso, nesta ordem:
      Não desenha nada por cima do jogo.
    - No **Automático**, liga só com placa forte, nos emuladores de PS2, GameCube, Wii, PS3 e Xbox 360, ou numa tela
      de mais de 60 Hz.
-3. **Lossless Scaling**, para quem comprou: só onde o MFG Super Motion não estiver instalado. Ele ocupa o lugar que
-   era do Lossless.
+3. **Lossless Scaling**, para quem comprou. Com os dois programas no computador, o ARENA usa o que rende mais na
+   placa (NVIDIA RTX: o MFG; AMD e Intel: o Lossless, medido) e nunca os dois juntos. Quem ligou a chave **"Usar o
+   Lossless Scaling"** (a escala dele, na aba Emuladores) continua com o caminho inteiro dele: a janela do tamanho do
+   desenho, esticada por ele, e os quadros a mais pelo "Mais quadros" daquele bloco.
 
 Por que não criar os quadros dentro do próprio ARENA? Criar quadros a partir da imagem pede a placa de vídeo inteira
 (Direct3D 12), e na placa da escola nem o próprio MFG aguenta: no teste dele, a Intel UHD 730 leva 13,6 ms por par

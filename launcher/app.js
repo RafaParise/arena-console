@@ -1825,7 +1825,6 @@ function mostrarMfg(situacao, config) {
   bloco.hidden = !(situacao && situacao.disponivel);
   if (bloco.hidden) return;
   $("#listaMfg").value = config.mfg_super_motion || "automatico";
-  $("#baixarMfg").hidden = !!situacao.achado;
   if (situacao.pagina) $("#linkMfg").href = situacao.pagina;
   // Os dois programas (11/11/2026): o ARENA usa um so por vez, o que rende mais nesta placa.
   $("#baixarMfg").hidden = !!(situacao.achado || situacao.lossless);

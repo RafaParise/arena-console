@@ -149,6 +149,33 @@ class Identificar(unittest.TestCase):
         self.assertEqual(quadros_ps2.identificar(iso, self.pasta),
                          ("SLUS-12345", "%08X" % (0x7F454C46 ^ 1 ^ 2 ^ 3)))
 
+    def test_o_iso_lido_uma_vez_fica_guardado(self):
+        # Revisao de 11/11/2026: o CRC do ELF e' lento na maquina fraca; o ARENA guarda e, da segunda vez, nem abre
+        # o ISO (aqui, o arquivo some e o jogo continua identificado).
+        iso = os.path.join(self.pasta, "jogo.iso")
+        montar_iso(iso, struct.pack("<2I", 7, 9))
+        primeiro = quadros_ps2.identificar(iso, self.pasta)
+        self.assertEqual(primeiro, ("SLUS-12345", "%08X" % (7 ^ 9)))
+        tamanho = os.path.getsize(iso)
+        os.remove(iso)
+        with open(iso, "wb") as arquivo:
+            arquivo.write(b"\x00" * tamanho)          # mesmo nome e tamanho, conteudo nenhum
+        self.assertEqual(quadros_ps2.identificar(iso, self.pasta), primeiro)
+
+    def test_lista_de_patches_na_pasta_do_programa(self):
+        # Linux: a configuracao numa pasta, o programa (AppImage desmontado) em outra.
+        config = os.path.join(self.pasta, "config")
+        programa = os.path.join(self.pasta, "squashfs-root")
+        os.makedirs(config)
+        os.makedirs(os.path.join(programa, "usr", "share", "PCSX2", "resources"))
+        self.assertFalse(quadros_ps2.tem_lista_de_patches(config))
+        with zipfile.ZipFile(os.path.join(programa, "usr", "share", "PCSX2", "resources", "patches.zip"), "w") as pacote:
+            pacote.writestr("SLUS-12345_0000ABCD.pnach", PNACH)
+        self.assertFalse(quadros_ps2.tem_lista_de_patches(config))
+        self.assertTrue(quadros_ps2.tem_lista_de_patches(config, [programa]))
+        self.assertEqual(quadros_ps2.patches_do_jogo(config, "SLUS-12345", "0000ABCD", [programa]),
+                         ["Widescreen 16:9", "60 FPS"])
+
     def test_aprende_o_disco_comprimido(self):
         chd = os.path.join(self.pasta, "jogo.chd")
         with open(chd, "wb") as arquivo:

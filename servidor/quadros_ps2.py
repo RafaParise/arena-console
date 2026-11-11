@@ -114,41 +114,67 @@ def _ler_json(caminho):
 
 
 def _gravar(caminho, texto):
-    """Gravacao atomica: temporario ao lado e troca (o pen drive pode sair no meio)."""
+    """Gravacao atomica: temporario ao lado e troca (o pen drive pode sair no meio). Se a troca falhar porque
+    outra thread esta lendo (no Windows acontece), tenta de novo por pouco tempo, como arena.gravar_texto_atomico."""
+    import time
     os.makedirs(os.path.dirname(caminho), exist_ok=True)
     temporario = "%s.%d.tmp" % (caminho, os.getpid())
     with open(temporario, "w", encoding="utf-8", newline="\n") as arquivo:
         arquivo.write(texto)
-    os.replace(temporario, caminho)
+    for tentativa in range(20):
+        try:
+            os.replace(temporario, caminho)
+            return
+        except PermissionError:
+            if tentativa == 19:
+                try:
+                    os.remove(temporario)
+                except OSError:
+                    pass
+                raise
+            time.sleep(0.05)
 
 
-def identificar(caminho, pasta_dados):
-    """(serial, crc) do jogo: do ISO, ou do que o ARENA aprendeu numa partida anterior. None se nao sabe."""
-    if caminho.lower().endswith(".iso"):
-        lido = ler_do_iso(caminho)
-        if lido:
-            return lido
-    aprendido = _ler_json(os.path.join(pasta_dados, ARQUIVO_DOS_JOGOS)).get(_chave_do_arquivo(caminho))
-    if isinstance(aprendido, list) and len(aprendido) == 2:
-        return aprendido[0], aprendido[1]
-    return None
-
-
-def aprender_do_registro(pasta_pcsx2, caminho, pasta_dados):
-    """Depois da partida: guarda o serial e o CRC que o PCSX2 escreveu no registro. Devolve (serial, crc) ou None."""
-    try:
-        with open(os.path.join(pasta_pcsx2, "logs", "emulog.txt"), encoding="utf-8", errors="replace") as arquivo:
-            lido = ler_do_registro(arquivo.read())
-    except OSError:
-        return None
-    if not lido:
-        return None
+def _guardar_aprendido(pasta_dados, caminho, lido):
     arquivo_dos_jogos = os.path.join(pasta_dados, ARQUIVO_DOS_JOGOS)
     jogos = _ler_json(arquivo_dos_jogos)
     chave = _chave_do_arquivo(caminho)
     if jogos.get(chave) != list(lido):
         jogos[chave] = list(lido)
         _gravar(arquivo_dos_jogos, json.dumps(jogos, ensure_ascii=False, indent=1))
+
+
+def identificar(caminho, pasta_dados):
+    """(serial, crc) do jogo: o que o ARENA ja sabe deste arquivo (nome e tamanho), senao lido do ISO (e
+    guardado: o CRC do ELF e' lento na maquina fraca) ou aprendido numa partida anterior. None se nao sabe."""
+    aprendido = _ler_json(os.path.join(pasta_dados, ARQUIVO_DOS_JOGOS)).get(_chave_do_arquivo(caminho))
+    if isinstance(aprendido, list) and len(aprendido) == 2:
+        return aprendido[0], aprendido[1]
+    if caminho.lower().endswith(".iso"):
+        lido = ler_do_iso(caminho)
+        if lido:
+            try:
+                _guardar_aprendido(pasta_dados, caminho, lido)
+            except OSError:
+                pass
+            return lido
+    return None
+
+
+def aprender_do_registro(pasta_pcsx2, caminho, pasta_dados, arquivo_do_registro=None):
+    """Depois da partida: guarda o serial e o CRC que o PCSX2 escreveu no registro. Devolve (serial, crc) ou None.
+    'arquivo_do_registro': outro registro no lugar do logs/emulog.txt (no celular, o do RetroArch: o nucleo
+    ARMSX2 escreve as mesmas linhas la)."""
+    if not arquivo_do_registro:
+        arquivo_do_registro = os.path.join(pasta_pcsx2, "logs", "emulog.txt")
+    try:
+        with open(arquivo_do_registro, encoding="utf-8", errors="replace") as arquivo:
+            lido = ler_do_registro(arquivo.read())
+    except OSError:
+        return None
+    if not lido:
+        return None
+    _guardar_aprendido(pasta_dados, caminho, lido)
     return lido
 
 
@@ -160,16 +186,33 @@ def nomes_dos_patches(texto):
     return [nome.strip() for nome in re.findall(r"^\s*\[([^\]\r\n]+)\]\s*$", texto or "", re.M)]
 
 
-def patches_do_jogo(pasta_pcsx2, serial, crc):
+def listas_de_patches(pasta_pcsx2, extras=()):
+    """Os patches.zip que existem: na pasta do PCSX2 e nas extras (no Linux, a pasta do programa; dentro do
+    AppImage desmontado, usr/share/PCSX2/resources)."""
+    achados = []
+    for pasta in [pasta_pcsx2] + list(extras or ()):
+        for relativo in (("resources", "patches.zip"), ("usr", "share", "PCSX2", "resources", "patches.zip")):
+            caminho = os.path.join(pasta, *relativo)
+            if os.path.isfile(caminho) and caminho not in achados:
+                achados.append(caminho)
+    return achados
+
+
+def tem_lista_de_patches(pasta_pcsx2, extras=()):
+    return bool(listas_de_patches(pasta_pcsx2, extras))
+
+
+def patches_do_jogo(pasta_pcsx2, serial, crc, extras=()):
     """Os nomes dos patches que o PCSX2 tem para este jogo (o patches.zip dele e a pasta patches)."""
     nome = "%s_%s.pnach" % (serial, crc)
     textos = []
-    try:
-        with zipfile.ZipFile(os.path.join(pasta_pcsx2, "resources", "patches.zip")) as pacote:
-            if nome in pacote.namelist():
-                textos.append(pacote.read(nome).decode("utf-8", "replace"))
-    except (OSError, zipfile.BadZipFile):
-        pass
+    for lista in listas_de_patches(pasta_pcsx2, extras):
+        try:
+            with zipfile.ZipFile(lista) as pacote:
+                if nome in pacote.namelist():
+                    textos.append(pacote.read(nome).decode("utf-8", "replace"))
+        except (OSError, zipfile.BadZipFile):
+            pass
     solto = os.path.join(pasta_pcsx2, "patches", nome)
     if os.path.isfile(solto):
         try:
@@ -218,7 +261,7 @@ def _trocar_na_secao(texto, nome, ligar):
     return "\n".join(linhas) + "\n"
 
 
-def aplicar(pasta_pcsx2, serial, crc, ligar, pasta_dados):
+def aplicar(pasta_pcsx2, serial, crc, ligar, pasta_dados, extras=()):
     """Liga (ou tira) o patch de 60 quadros deste jogo. Devolve o nome do patch ligado, ou "".
 
     So tira a linha que o ARENA pos; o arquivo que o ARENA criou e ficou
@@ -236,7 +279,7 @@ def aplicar(pasta_pcsx2, serial, crc, ligar, pasta_dados):
         existia = True
     except OSError:
         texto, existia = "", False
-    nome = patch_de_60(patches_do_jogo(pasta_pcsx2, serial, crc)) if ligar else ""
+    nome = patch_de_60(patches_do_jogo(pasta_pcsx2, serial, crc, extras)) if ligar else ""
     if ligar and not nome:
         ligar = False
     if ligar:

@@ -133,7 +133,7 @@ def ler_placas(texto):
     return [placas[n] for n in sorted(placas)]
 
 
-def placas(motor, espera=30):
+def placas(motor, espera=8):
     """As placas que o motor ve, perguntadas uma vez por motor (o "--cards"
     so lista e sai). Lista vazia se nao der para perguntar."""
     with _TRAVA_PLACAS:
@@ -364,13 +364,19 @@ class Sessao:
             ainda_aberto is None or ainda_aberto()))
         if not hwnd or self._fim.is_set():
             self.estado = "sem janela do jogo"
-            if not self._fim.is_set():
+            if self._fim.is_set():
+                pass                                   # o ARENA mandou parar: nada a dizer
+            elif ainda_aberto is not None and not ainda_aberto():
+                self.registrar("[ARENA] %s: o jogo fechou antes de o motor abrir." % NOME)
+            else:
                 self.registrar("[ARENA] %s: a janela do jogo nao apareceu; o jogo segue sem quadros a mais." % NOME)
             return
         try:
             os.makedirs(os.path.dirname(self.arquivo), exist_ok=True)
-            with open(self.arquivo, "w", encoding="utf-8", newline="\n") as arquivo:
+            temporario = "%s.%d.tmp" % (self.arquivo, os.getpid())
+            with open(temporario, "w", encoding="utf-8", newline="\n") as arquivo:
                 arquivo.write(texto_da_partida(self.opcoes, hwnd, os.getpid()))
+            os.replace(temporario, self.arquivo)
             processo = subprocess.Popen([self.motor, "--config", self.arquivo], cwd=os.path.dirname(self.motor),
                                         stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                         stderr=subprocess.DEVNULL, creationflags=SEM_JANELA)

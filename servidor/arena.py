@@ -77,6 +77,7 @@ import lossless    # noqa: E402  (o Lossless Scaling de quem comprou -- item 10,
 import driver_video  # noqa: E402  (o painel do driver da placa, AMD Software e Intel -- 11/11/2026)
 import mfg         # noqa: E402  (o MFG Super Motion, gratis, no lugar do Lossless -- 11/11/2026)
 import quadros_ps2  # noqa: E402  (os 60 quadros de verdade do PS2, pelos patches do PCSX2 -- 11/11/2026)
+import quadros_dolphin  # noqa: E402  (o mesmo no GameCube e no Wii, pelos codigos do Dolphin -- 11/11/2026)
 import navegadores  # noqa: E402  (em que navegador a tela abre -- item 11, 17/10/2026)
 # O que a configuracao aceita em "navegador".
 NAVEGADORES_ACEITOS = ("automatico",) + tuple(c[0] for c in navegadores.CONHECIDOS)
@@ -2957,7 +2958,7 @@ def preparar_mfg(jogo, config, degrau=0, programa=None):
     return {"tipo": "mfg", "motor": achado["motor"], "opcoes_do_motor": opcoes, "opcoes": opcoes_da_tela}
 
 
-def preparar_60_quadros_ps2(jogo, config, caminho_jogo, degrau):
+def preparar_60_quadros_ps2(jogo, config, caminho_jogo, degrau, programa=None):
     """Liga (ou tira) o patch de 60 quadros do PCSX2 para este jogo (servidor\\quadros_ps2.py).
 
     Segue a mesma chave "Mais quadros" dos Ajustes: e' o melhor jeito de ter
@@ -2965,6 +2966,11 @@ def preparar_60_quadros_ps2(jogo, config, caminho_jogo, degrau):
     vem antes do MFG Super Motion e do Lossless Scaling. Devolve o nome do
     patch ligado, ou ""."""
     pasta_pcsx2 = os.path.dirname(jogo["externo"]["caminho"])
+    # No Linux a configuracao fica na pasta XDG e o programa (e o patches.zip dele) em outra: as duas valem.
+    extras = [os.path.dirname(programa)] if programa and os.path.dirname(programa) != pasta_pcsx2 else []
+    if not quadros_ps2.tem_lista_de_patches(pasta_pcsx2, extras):
+        print("[ARENA] O PCSX2 daqui nao tem a lista de patches (resources/patches.zip): o PS2 abre sem os 60 quadros.")
+        return ""
     identificado = quadros_ps2.identificar(caminho_jogo, PASTA_DADOS)
     if not identificado:
         return ""
@@ -2972,14 +2978,59 @@ def preparar_60_quadros_ps2(jogo, config, caminho_jogo, degrau):
     ligar, motivo = quadros_ps2.decidir(config.get("mfg_super_motion", mfg.MODO_PADRAO), CAPACIDADE.get("nota"),
                                        nota_da_placa_de_fora(), degrau)
     try:
-        nome = quadros_ps2.aplicar(pasta_pcsx2, serial, crc, ligar, PASTA_DADOS)
+        nome = quadros_ps2.aplicar(pasta_pcsx2, serial, crc, ligar, PASTA_DADOS, extras)
     except OSError as falha:
         print("[ARENA] Nao consegui ajustar o patch de 60 quadros do PS2: %s" % falha)
         return ""
     if nome:
         print("[ARENA] PS2 a 60 quadros de verdade (patch \"%s\" do PCSX2, %s; %s)." % (nome, serial, motivo))
-    elif ligar is False and quadros_ps2.patch_de_60(quadros_ps2.patches_do_jogo(pasta_pcsx2, serial, crc)):
+    elif ligar is False and quadros_ps2.patch_de_60(quadros_ps2.patches_do_jogo(pasta_pcsx2, serial, crc, extras)):
         print("[ARENA] Este PS2 tem o patch de 60 quadros, mas ele fica desligado: %s." % motivo)
+    return nome
+
+
+def preparar_60_quadros_dolphin(jogo, config, caminho_jogo, degrau):
+    """Liga (ou tira) o codigo de 60 quadros do Dolphin para este jogo de GameCube ou Wii
+    (servidor\\quadros_dolphin.py): o irmao do patch do PS2, com a mesma regra (quadros_ps2.decidir)."""
+    pasta_dolphin = os.path.dirname(jogo["externo"]["caminho"])
+    lido = quadros_dolphin.ler_id(caminho_jogo)
+    if not lido:
+        return ""
+    identificador_do_jogo, revisao = lido
+    ligar, motivo = quadros_ps2.decidir(config.get("mfg_super_motion", mfg.MODO_PADRAO), CAPACIDADE.get("nota"),
+                                       nota_da_placa_de_fora(), degrau)
+    try:
+        nome = quadros_dolphin.aplicar(pasta_dolphin, identificador_do_jogo, revisao, ligar, PASTA_DADOS)
+    except OSError as falha:
+        print("[ARENA] Nao consegui ajustar o codigo de 60 quadros do Dolphin: %s" % falha)
+        return ""
+    if nome:
+        print("[ARENA] %s a 60 quadros de verdade (codigo \"%s\" do Dolphin, %s; %s)." % (
+            jogo.get("plataforma", "GameCube"), nome, identificador_do_jogo, motivo))
+    elif ligar is False and quadros_dolphin.codigo_de_60(pasta_dolphin, identificador_do_jogo, revisao):
+        print("[ARENA] Este jogo tem o codigo de 60 quadros no Dolphin, mas ele fica desligado: %s." % motivo)
+    return nome
+
+
+def preparar_60_quadros_ps2_do_android(jogo, config, degrau):
+    """O irmao do patch de 60 quadros no PS2 do celular (o nucleo ARMSX2 e' o PCSX2 compilado para o
+    RetroArch e traz o mesmo patches.zip, em system/pcsx2/resources). O arquivo do jogo vai em
+    system/pcsx2/gamesettings. Devolve o nome do patch ligado, ou ""."""
+    caminho_jogo = os.path.join(RAIZ, jogo.get("arquivo", ""))
+    pasta_pcsx2 = os.path.join(PASTA_SISTEMA, "pcsx2")
+    identificado = quadros_ps2.identificar(caminho_jogo, PASTA_DADOS)
+    if not identificado:
+        return ""
+    serial, crc = identificado
+    ligar, motivo = quadros_ps2.decidir(config.get("mfg_super_motion", mfg.MODO_PADRAO), CAPACIDADE.get("nota"),
+                                       CAPACIDADE.get("nota_gpu"), degrau)
+    try:
+        nome = quadros_ps2.aplicar(pasta_pcsx2, serial, crc, ligar, PASTA_DADOS)
+    except OSError as falha:
+        print("[ARENA] Nao consegui ajustar o patch de 60 quadros do PS2: %s" % falha)
+        return ""
+    if nome:
+        print("[ARENA] PS2 a 60 quadros de verdade (patch \"%s\", %s; %s)." % (nome, serial, motivo))
     return nome
 
 
@@ -3100,6 +3151,10 @@ def preparar_o_ps2_do_android(config, jogo=None, sem_jogo=False, degrau=0):
     # O .ini do nucleo (o que ele nao mostra como opcao): o padrao do ARENA e, por cima, o da pessoa.
     ini = graficos.ini_padrao_do_armsx2(opcoes.get("armsx2_renderer"), CAPACIDADE.get("nota_gpu"),
                                         grafico_original(config), nivel_abaixo(config))
+    # Os 60 quadros de verdade (o irmao do PC, 11/11/2026): o patch do proprio PCSX2, por jogo; com ele, o nucleo
+    # precisa ler os patches (EmuCore/EnablePatches).
+    if jogo and not sem_jogo and preparar_60_quadros_ps2_do_android(jogo, config, degrau):
+        ini.setdefault("EmuCore", {})["EnablePatches"] = "true"
     # Os memory cards em system/pcsx2/memcards, dentro da pasta do ARENA: por padrao o maior cartao do PS2 (64 MB) na
     # entrada 1 e o PocketStation na 2 (decisao do Rafael, 24/10/2026: igual ao ARENA do computador). A escolha vem de Acessorios; quem ja tinha mexido nos
     # tamanhos pelo config.json antigo (cartoes_ps2) continua valendo.
@@ -3253,9 +3308,12 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         # A geracao de quadros do Lossless Scaling tambem nos emuladores de fora (pedido de 07/11/2026).
         # Mais quadros, do melhor para o resto (11/11/2026): no PS2, o patch de 60 quadros do proprio PCSX2
         # (quadros de verdade); senao o MFG Super Motion; e o Lossless so onde nenhum dos dois entrou.
-        sessenta_ps2 = preparar_60_quadros_ps2(jogo, config, caminho_jogo, degrau) \
-            if nome_externo == "PCSX2" else ""
-        escolha = None if (partida or sessenta_ps2) else preparar_mfg(jogo, config, degrau, programa_externo)
+        sessenta = ""
+        if nome_externo == "PCSX2":
+            sessenta = preparar_60_quadros_ps2(jogo, config, caminho_jogo, degrau_que_vale, programa_externo)
+        elif nome_externo == "Dolphin":
+            sessenta = preparar_60_quadros_dolphin(jogo, config, caminho_jogo, degrau_que_vale)
+        escolha = None if (partida or sessenta) else preparar_mfg(jogo, config, degrau_que_vale, programa_externo)
         pelo_mfg = escolha if escolha and escolha["tipo"] == "mfg" else None
         pelo_lossless = escolha if escolha and escolha["tipo"] == "lossless" else None
 
@@ -3565,7 +3623,10 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         # estica ate a tela. A janela vale so nesta partida; o filtro do
         # ARENA fica de fora (quem estica e' o Lossless Scaling).
         config_da_partida = config
-        escolha = None if partida else preparar_mfg(jogo, config, degrau)
+        # Quem ligou a ESCALA do Lossless a mao (chave "Usar o Lossless Scaling") fica com o caminho inteiro dele:
+        # a janela do tamanho do desenho, esticada por ele, e os quadros a mais pelo "Mais quadros" antigo
+        # (preparar_lossless cuida dos dois). O unificado so entra sem essa chave (revisao de 11/11/2026).
+        escolha = None if (partida or config.get("lossless_scaling")) else preparar_mfg(jogo, config, degrau_que_vale)
         pelo_mfg = escolha if escolha and escolha["tipo"] == "mfg" else None
         pelo_lossless = escolha if escolha and escolha["tipo"] == "lossless" else None
         if escolha:
@@ -3738,6 +3799,13 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
                     quadros_ps2.aprender_do_registro(os.path.dirname(jogo["externo"]["caminho"]),
                                                      caminho_jogo, PASTA_DADOS)
                 except (OSError, ValueError):
+                    pass
+            elif plataforma_do_sistema.ANDROID and nome_curto_do_core(jogo.get("core", "")) == "armsx2":
+                # No celular o PCSX2 e' o nucleo: o serial e o CRC saem do registro do RetroArch desta partida.
+                try:
+                    quadros_ps2.aprender_do_registro(os.path.join(PASTA_SISTEMA, "pcsx2"), caminho_jogo, PASTA_DADOS,
+                                                     arquivo_do_registro=motivo_do_erro.registro_da_partida(PASTA_DADOS, 0))
+                except (OSError, ValueError, TypeError):
                     pass
             medida = medidor.parar()
             processos.fechar_caixa(caixa)

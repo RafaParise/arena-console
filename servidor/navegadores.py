@@ -302,7 +302,11 @@ def ja_aberto(navegador):
     perfil leve, que e' um navegador a mais, somaria uns 238 MB. Entao, com o navegador aberto, a janela entra nele;
     fechado, abre o perfil leve. Para saber sem gastar a abertura do ARENA (nada de perguntar ao Windows a lista de
     processos), olha a trava do perfil: no Windows, o arquivo "lockfile" fica preso (abrir da erro de permissao);
-    no Linux, o "SingletonLock" aponta para "maquina-numero do processo", e o processo existe."""
+    no Linux, o "SingletonLock" aponta para "maquina-numero do processo", e o processo existe.
+
+    Conferido ao vivo em 11/11/2026, com o Edge 157 do Rafael aberto: o open() do lockfile levanta
+    PermissionError (o Chromium o abre sem compartilhar a leitura) e ja_aberto() devolve True em 0,1 ms; com o Edge
+    fechado, False. Se um Chromium futuro compartilhar a leitura, o pior caso e' o antigo: o perfil leve."""
     codigo = navegador.get("codigo")
     if os.name == "nt":
         partes = PERFIS_DE_SEMPRE.get(codigo)

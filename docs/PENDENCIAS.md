@@ -868,3 +868,22 @@ Falta, nesta ordem:
      NIS/SGSR como filtros de escala (o SGSR é feito para a placa do celular), nitidez ajustável;
   3. o Rust continua não: medido, o servidor é a parte mais leve (42 MB);
   4. rodada final, APK de produção no A12, Release nova com DOOK3DS e HugoVHK no fim da nota.
+
+## 11/11/2026 (noite, 2): revisão de código feita, Dolphin a 60 e o PS2 a 60 no celular
+
+- **Revisão de código** (diff desde a v2026.11.10, 10 achados): 9 corrigidos no mesmo bloco: a escala do Lossless
+  ligada a mão volta a valer (quem liga "Usar o Lossless Scaling" fica com o caminho inteiro dele); o `degrau_que_vale`
+  nos quatro lugares do Mais quadros; o CRC do ISO de PS2 lido uma vez e guardado; gravação atômica com espera em
+  `quadros_ps2`, `quadros_dolphin` e no arquivo de partida do MFG; a lista de patches do PCSX2 também na pasta do
+  programa (Linux, AppImage) e um aviso quando ela não existe; o `--cards` do MFG com 8 s em vez de 30; a mensagem
+  certa quando o jogo fecha antes do motor; a linha morta do `app.js`.
+  - **Não acolhido:** "o `lockfile` do Chromium abre com leitura compartilhada". Conferido ao vivo com o Edge 157
+    aberto: o `open()` levanta `PermissionError` e `ja_aberto()` dá True em 0,1 ms. Nota no código.
+  - **Decisão (risco aceito):** com o Lossless comprado e instalado, o Mais quadros no Automático pode usá-lo mesmo
+    com a chave "Usar o Lossless Scaling" desligada: essa chave é da ESCALA dele; o Mais quadros é a chave de cima.
+    Ele só mexe no perfil "ARENA" e só com o programa fechado.
+- **GameCube e Wii a 60 quadros de verdade** (`servidor\quadros_dolphin.py`): 25 jogos, código ligado só no jogo,
+  provado com o F-Zero GX no Dolphin de verdade (`testes\teste_60_dolphin.py`).
+- **PS2 a 60 no celular** (o irmão): escrito no `preparar_o_ps2_do_android` (gamesettings + EnablePatches); **falta
+  o teste no A12**, que saiu do cabo às 13h (o Rafael está fora de casa). Primeira coisa quando ele voltar:
+  `testes\celular_arena.py api /api/jogar` num ISO de PS2 com "Sempre" e procurar "Enabled patch" no registro.

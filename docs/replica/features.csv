@@ -26,4 +26,5 @@ Compartilhar a imagem com outro programa (Spout do MFG),quadros,could,yes,skip,t
 Quadros de verdade no PS2: patch 60 FPS do proprio PCSX2,quadros,must,no,yes,servidor\quadros_ps2.py: 627 jogos; vem antes do MFG e do LS
 Janela leve do navegador (perfil so do ARENA),leveza,must,no,yes,629 MB -> 238 MB e 14 -> 8 processos no Edge (medido em 11/11/2026)
 Descanso do fundo animado,leveza,should,no,yes,3 minutos sem mexer: o fundo do Automatico para
-60 quadros no GameCube e no Wii (codigos do Dolphin),quadros,could,no,no,so 25 jogos e precisa ligar as trapacas do Dolphin inteiro: proxima versao
+60 quadros no GameCube e no Wii (codigos do Dolphin),quadros,could,no,yes,servidor\quadros_dolphin.py: 25 jogos; as trapacas ligam so no jogo (User\GameSettings\<ID>.ini); provado com o F-Zero GX
+60 quadros no PS2 do celular (patches do PCSX2 no nucleo ARMSX2),quadros,could,no,partial,escrito (system/pcsx2/gamesettings + EnablePatches); falta o teste no A12
