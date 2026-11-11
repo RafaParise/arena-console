@@ -914,3 +914,7 @@ Falta, nesta ordem:
 - **PRÓXIMO PASSO:** a rodada final (`ferramentas\rodada_final.py`), o APK de produção testado no A12
   (`auditoria_celular`), os zips do PC, e a Release 2026.11.11 (rascunho em `docs\RELEASE-2026.11.11.md`, com a seção
   do DOOK3DS no fim).
+- **11/11, 19h05: a rodada final foi interrompida pelo Claude Code por falta de memória do PC** (7 testes passaram
+  em 13 min, entre eles `teste_60_dolphin.py` e `teste_60_ps2_celular.py`, que a rodada pega sozinha; parou no
+  8º, depois de `teste_abaixo_do_original.py`). Retomar com `ferramentas\rodada_final.py --continuar` numa janela
+  própria, fora do Claude Code, com o PC folgado. Só então: VERSAO 2026.11.11, APK de produção no A12, zips, Release.
