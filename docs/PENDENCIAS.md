@@ -765,3 +765,9 @@ Falta, nesta ordem:
    remontar a `..\ARENA`).
 5. Completar o texto (tamanhos, SHA-256, como foi conferida), publicar o release novo **Latest** e acrescentar ao
    README só o que for novo. Os releases antigos ficam como estão.
+- **10/11, noite: o item 2 acima foi feito no A12 com o APK de teste 2026.11.10** (versão-alvo 35 confirmada): o
+  Contra gravou o ponto automático ao sair pelo SAIR, reabriu no meio da fase ("volta ao ponto automatico" no
+  registro), e a biblioteca mostrou as capas novas (o Killer Instinct num cartucho largo de Super Nintendo, sem roxo).
+  A chave foi devolvida como estava. **Sem explicação ainda:** o `config.json` do A12 já tinha
+  `"continuar_de_onde_parou": false` (gravado pelo código novo), e no Android o padrão é ligado. Conferir o padrão numa
+  instalação limpa no teste do emulador (item 1).
