@@ -837,3 +837,16 @@ Falta, nesta ordem:
   - NIS.
 - **No celular do professor:** há uma cópia do Lossless Scaling para Windows em `/sdcard/ARENA/Lossless Scaling`
   (176 MB, de 07/11). Ela não serve no Android e não foi o instalador do ARENA que a pôs lá. Não foi apagada.
+
+## 11/11/2026 (noite): nunca regresso de desempenho; PRÓXIMO PASSO depois de reiniciar o PC
+
+- **Feito** (commit 8b41e2b):
+  - a janela escolhe o jeito mais barato. Com o navegador já aberto, entra nele (+56 MB); fechado, abre o perfil
+    leve (238 MB);
+  - no Automático, o PS2 a 60 e o MFG só ligam com placa de vídeo dedicada, e nunca num console que ficou no limite
+    antes.
+- **PRÓXIMO PASSO (depois que o Rafael reiniciar o PC, para destravar o WSL):**
+  1. `wsl --status` e o teste do Linux;
+  2. a rodada final inteira (`ferramentas\rodada_final.py`, numa janela própria);
+  3. o APK de produção, testado no A12;
+  4. a Release nova. A nota do lançamento termina com a seção do aluno **DOOK3DS** (só o @ do GitHub).
