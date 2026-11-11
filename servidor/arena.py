@@ -75,6 +75,7 @@ import graficos    # noqa: E402
 import hardware    # noqa: E402
 import lossless    # noqa: E402  (o Lossless Scaling de quem comprou -- item 10, 17/10/2026)
 import mfg         # noqa: E402  (o MFG Super Motion, gratis, no lugar do Lossless -- 11/11/2026)
+import quadros_ps2  # noqa: E402  (os 60 quadros de verdade do PS2, pelos patches do PCSX2 -- 11/11/2026)
 import navegadores  # noqa: E402  (em que navegador a tela abre -- item 11, 17/10/2026)
 # O que a configuracao aceita em "navegador".
 NAVEGADORES_ACEITOS = ("automatico",) + tuple(c[0] for c in navegadores.CONHECIDOS)
@@ -2909,6 +2910,32 @@ def preparar_mfg(jogo, config):
             "opcoes": {} if de_fora else {"video_fullscreen": "true", "video_windowed_fullscreen": "true"}}
 
 
+def preparar_60_quadros_ps2(jogo, config, caminho_jogo, degrau):
+    """Liga (ou tira) o patch de 60 quadros do PCSX2 para este jogo (servidor\\quadros_ps2.py).
+
+    Segue a mesma chave "Mais quadros" dos Ajustes: e' o melhor jeito de ter
+    mais quadros no PS2 (o proprio jogo roda a 60, nada adivinhado), entao
+    vem antes do MFG Super Motion e do Lossless Scaling. Devolve o nome do
+    patch ligado, ou ""."""
+    pasta_pcsx2 = os.path.dirname(jogo["externo"]["caminho"])
+    identificado = quadros_ps2.identificar(caminho_jogo, PASTA_DADOS)
+    if not identificado:
+        return ""
+    serial, crc = identificado
+    ligar, motivo = quadros_ps2.decidir(config.get("mfg_super_motion", mfg.MODO_PADRAO), CAPACIDADE.get("nota"),
+                                       CAPACIDADE.get("nota_gpu"), degrau)
+    try:
+        nome = quadros_ps2.aplicar(pasta_pcsx2, serial, crc, ligar, PASTA_DADOS)
+    except OSError as falha:
+        print("[ARENA] Nao consegui ajustar o patch de 60 quadros do PS2: %s" % falha)
+        return ""
+    if nome:
+        print("[ARENA] PS2 a 60 quadros de verdade (patch \"%s\" do PCSX2, %s; %s)." % (nome, serial, motivo))
+    elif ligar is False and quadros_ps2.patch_de_60(quadros_ps2.patches_do_jogo(pasta_pcsx2, serial, crc)):
+        print("[ARENA] Este PS2 tem o patch de 60 quadros, mas ele fica desligado: %s." % motivo)
+    return nome
+
+
 def abrir_o_mfg(pelo_mfg, processo):
     """Abre o motor do MFG Super Motion quando a janela do jogo aparecer (numa thread). Devolve a sessao."""
     largura, altura = hardware.tamanho_da_tela()
@@ -3201,10 +3228,13 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             argumentos_externo + comando[1:]
         pasta_trabalho = os.path.dirname(programa_externo)
         # A geracao de quadros do Lossless Scaling tambem nos emuladores de fora (pedido de 07/11/2026).
-        # O MFG Super Motion vem primeiro (11/11/2026); o Lossless so entra onde ele nao entrou.
-        pelo_mfg = None if partida else preparar_mfg(jogo, config)
-        pelo_lossless = None if (partida or pelo_mfg) else preparar_lossless_de_fora(jogo, config,
-                                                                                     programa_externo)
+        # Mais quadros, do melhor para o resto (11/11/2026): no PS2, o patch de 60 quadros do proprio PCSX2
+        # (quadros de verdade); senao o MFG Super Motion; e o Lossless so onde nenhum dos dois entrou.
+        sessenta_ps2 = preparar_60_quadros_ps2(jogo, config, caminho_jogo, degrau) \
+            if nome_externo == "PCSX2" else ""
+        pelo_mfg = None if (partida or sessenta_ps2) else preparar_mfg(jogo, config)
+        pelo_lossless = None if (partida or pelo_mfg or sessenta_ps2) else preparar_lossless_de_fora(
+            jogo, config, programa_externo)
 
         # O PCSX2 tem tela propria, mas le a configuracao antes de abrir.
         # O ARENA escreve o controle ali: dois analogicos, direcional
@@ -3674,6 +3704,14 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
                     return graficos.ler_status_do_armsx2(PASTA_SISTEMA)
             medidor = desempenho.Medidor(getattr(processo, "pid", 0), velocidade=leitor_de_velocidade).comecar()
             codigo = processo.wait()
+            # Disco comprimido do PS2: o PCSX2 escreveu o serial e o CRC no registro dele; o ARENA guarda, e da
+            # proxima vez sabe se o jogo tem o patch de 60 quadros (servidor\quadros_ps2.py).
+            if jogo.get("externo") and jogo["externo"]["dados"]["nome"] == "PCSX2":
+                try:
+                    quadros_ps2.aprender_do_registro(os.path.dirname(jogo["externo"]["caminho"]),
+                                                     caminho_jogo, PASTA_DADOS)
+                except (OSError, ValueError):
+                    pass
             medida = medidor.parar()
             processos.fechar_caixa(caixa)
             caixa = None
