@@ -91,6 +91,20 @@ class Comando(unittest.TestCase):
         self.assertEqual(linha[:2], [EDGE["programa"], "--app=http://127.0.0.1:8777/"])
         self.assertIn("--window-size=1180,760", linha)
 
+    def test_janela_leve_com_perfil_proprio(self):
+        sem = navegadores.comando(EDGE, "http://127.0.0.1:8777/")
+        self.assertFalse(any(o.startswith("--user-data-dir") for o in sem))
+        com = navegadores.comando(EDGE, "http://127.0.0.1:8777/", perfil="C:/perfil")
+        self.assertEqual(com[:2], sem[:2])
+        self.assertIn("--user-data-dir=C:/perfil", com)
+        self.assertIn("--disable-extensions", com)
+        self.assertIn("--disable-sync", com)
+        # A protecao contra download perigoso continua ligada.
+        self.assertFalse(any("SmartScreen" in o for o in com))
+        # Firefox e Opera nao mudam.
+        self.assertEqual(navegadores.comando(FIREFOX, "http://x/", perfil="C:/perfil"),
+                         [FIREFOX["programa"], "-new-window", "http://x/"])
+
     def test_firefox_em_janela_nova(self):
         self.assertEqual(navegadores.comando(FIREFOX, "http://127.0.0.1:8777/"),
                          [FIREFOX["programa"], "-new-window", "http://127.0.0.1:8777/"])

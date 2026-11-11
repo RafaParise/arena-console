@@ -256,12 +256,46 @@ def escolher(preferido="automatico", lista=None, padrao=None):
     return lista[0] if lista else None
 
 
-def comando(navegador, endereco):
-    """A linha de comando que abre a tela neste navegador."""
+# A janela leve (11/11/2026). Medido no PC do Rafael, Edge parado na tela inicial do ARENA (catalogo de 3.294
+# jogos): no perfil de sempre, 14 processos e 629 MB de memoria; num perfil so do ARENA, sem extensoes, sem
+# sincronizar e sem os servicos de fundo do navegador, 7 processos e 230 MB (-63%). O servidor do ARENA, em
+# Python, usa 42 MB. O processador parado e' o do fundo animado (Ajustes -> Simples), igual nos dois.
+# O perfil so do ARENA tambem deixa as contas e os cookies de quem usa o computador fora da janela do jogo.
+# A protecao do navegador contra download perigoso (SmartScreen) fica ligada.
+RECURSOS_DESLIGADOS = ("Translate,AutofillServerCommunication,msEdgeShopping,EdgeCollections,msEdgeSidebarV2,"
+                       "msUndersideButton,SpareRendererForSitePerProcess")
+OPCOES_LEVES = ("--no-first-run", "--no-default-browser-check", "--disable-extensions",
+                "--disable-component-extensions-with-background-pages", "--disable-background-networking",
+                "--disable-sync", "--disable-default-apps", "--renderer-process-limit=1", "--process-per-site")
+
+
+def pasta_do_perfil():
+    """A pasta do perfil so do ARENA no navegador, fora do pen drive (o cache do navegador grava muito e gastaria o
+    pen drive): a pasta ARENA/navegador dentro do LOCALAPPDATA no Windows, ~/.cache/arena/navegador no Linux. None se nao der."""
+    if os.name == "nt":
+        base = os.environ.get("LOCALAPPDATA")
+        pasta = os.path.join(base, "ARENA", "navegador") if base else None
+    else:
+        base = os.environ.get("XDG_CACHE_HOME") or os.path.join(os.path.expanduser("~"), ".cache")
+        pasta = os.path.join(base, "arena", "navegador")
+    if not pasta:
+        return None
+    try:
+        os.makedirs(pasta, exist_ok=True)
+    except OSError:
+        return None
+    return pasta
+
+
+def comando(navegador, endereco, perfil=None):
+    """A linha de comando que abre a tela neste navegador. 'perfil': a pasta do perfil so do ARENA (janela leve)."""
     programa, familia = navegador["programa"], navegador["familia"]
     if familia == "chromium":
-        return [programa, "--app=" + endereco, "--window-size=" + TAMANHO_DA_JANELA,
-                "--disable-features=Translate,AutofillServerCommunication"]
+        linha = [programa, "--app=" + endereco, "--window-size=" + TAMANHO_DA_JANELA,
+                 "--disable-features=" + RECURSOS_DESLIGADOS]
+        if perfil:
+            linha += ["--user-data-dir=" + perfil] + list(OPCOES_LEVES)
+        return linha
     if familia == "firefox":
         return [programa, "-new-window", endereco]
     return [programa, "--new-window", endereco]
@@ -272,7 +306,9 @@ def abrir(endereco, preferido="automatico"):
     navegador = escolher(preferido)
     if navegador:
         try:
-            subprocess.Popen(comando(navegador, endereco), stdin=subprocess.DEVNULL,
+            # O navegador do Flatpak (Linux) so grava dentro da caixa dele: ali fica o perfil de sempre.
+            perfil = None if os.sep + "flatpak" + os.sep in navegador["programa"] else pasta_do_perfil()
+            subprocess.Popen(comando(navegador, endereco, perfil), stdin=subprocess.DEVNULL,
                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             return navegador["codigo"]
         except OSError:
