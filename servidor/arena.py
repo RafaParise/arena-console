@@ -2879,35 +2879,60 @@ def nota_da_placa_de_fora():
     return CAPACIDADE.get("nota_gpu_de_fora", CAPACIDADE.get("nota_gpu"))
 
 
-def preparar_mfg(jogo, config, degrau=0):
-    """A partida com os quadros a mais do MFG Super Motion (servidor\\mfg.py), ou None.
+def preparar_mfg(jogo, config, degrau=0, programa=None):
+    """Os quadros a mais desta partida (pedido de 11/11/2026: o melhor do Lossless Scaling e do MFG Super
+    Motion), ou None. Devolve {"tipo": "mfg", ...} ou {"tipo": "lossless", ...}.
 
-    Ele ocupa o lugar do Lossless Scaling (pedido de 11/11/2026): onde ele
-    liga, o Lossless fica de fora. Nao vale no Jogar Junto (a partida em
-    rede ja pesa, e o atraso a mais seria dos dois) nem no Android."""
+    - Quem cria os quadros: o programa que a pessoa tem e que rende mais nesta placa (mfg.qual_programa). Nunca
+      os dois juntos.
+    - Quando: a chave "Mais quadros" (mfg.decidir); o "Mais quadros" antigo do bloco do Lossless, ligado a mao,
+      vale como "Sempre" para o Lossless.
+    Nao vale no Jogar Junto (a partida em rede ja pesa, e o atraso a mais seria dos dois) nem no Android.
+    'programa': o executavel do emulador de fora (o perfil do Lossless pega a janela dele)."""
     if plataforma_do_sistema.ANDROID:
         return None
     modo = config.get("mfg_super_motion", mfg.MODO_PADRAO)
     if modo == "desligado":
         return None
     achado = mfg.achar(RAIZ)
+    achado_ls = lossless.achar(RAIZ)
+    tem_lossless = bool(achado_ls and achado_ls.get("licenca"))
+    if tem_lossless and config.get("lossless_mais_quadros"):
+        modo = "sempre"
     integrada = bool(MAQUINA["gpu"].get("integrada", True))
     hz = lossless.frequencia_da_tela()
     de_fora = bool(jogo.get("externo"))
-    usar, motivo = mfg.decidir(modo, achado, CAPACIDADE.get("nota_gpu"), integrada, hz, de_fora, degrau)
+    usar, motivo = mfg.decidir(modo, achado or tem_lossless, CAPACIDADE.get("nota_gpu"), integrada, hz, de_fora,
+                               degrau)
     if not usar:
-        if modo == "sempre" or achado:
-            print("[ARENA] %s fica de fora deste jogo: %s." % (mfg.NOME, motivo))
+        if modo == "sempre" or achado or tem_lossless:
+            print("[ARENA] Mais quadros fica de fora deste jogo: %s." % motivo)
         return None
+    escolhido = mfg.qual_programa(mfg.placas(achado["motor"]) if achado else [], bool(achado), tem_lossless)
+    # O emulador fica na tela cheia sem borda: o programa copia a imagem da tela (a exclusiva tomaria a tela e
+    # a imagem dele ficaria por baixo, como foi medido com o Lossless Scaling em 08/11/2026).
+    opcoes_da_tela = {} if de_fora else {"video_fullscreen": "true", "video_windowed_fullscreen": "true"}
+    if escolhido == "lossless":
+        trocas = lossless.trocas_para_o_externo(os.path.basename(programa) if programa else "retroarch.exe",
+                                                nota_da_placa_de_fora() if de_fora else CAPACIDADE.get("nota_gpu"),
+                                                hz)
+        try:
+            gravou, falha = lossless.gravar_perfil(trocas)
+        except (OSError, ValueError) as erro:
+            gravou, falha = False, str(erro)
+        if gravou:
+            print("[ARENA] Mais quadros pelo Lossless Scaling (%s; LSFG 3 seguindo a tela de %d Hz)." % (motivo, hz))
+            return {"tipo": "lossless", "executavel": achado_ls["executavel"], "opcoes": opcoes_da_tela,
+                    "escala": False}
+        print("[ARENA] Lossless Scaling: %s." % falha)
+        if not achado:
+            return None
     desenho_2d = (not de_fora) and jogo.get("plataforma") in (
         graficos.carregar_graficos().get("escala", {}).get("pixel") or [])
     opcoes = mfg.escolher_opcoes(mfg.placas(achado["motor"]), CAPACIDADE.get("nota_gpu"), integrada, hz,
                                  desenho_2d)
-    print("[ARENA] %s neste jogo (%s): %s." % (mfg.NOME, motivo, mfg.descrever(opcoes)))
-    # O motor copia a imagem da tela: o RetroArch fica na tela cheia sem borda (a exclusiva tomaria a tela
-    # e a imagem dele ficaria por baixo, como foi medido com o Lossless Scaling em 08/11/2026).
-    return {"motor": achado["motor"], "opcoes_do_motor": opcoes,
-            "opcoes": {} if de_fora else {"video_fullscreen": "true", "video_windowed_fullscreen": "true"}}
+    print("[ARENA] Mais quadros pelo %s (%s): %s." % (mfg.NOME, motivo, mfg.descrever(opcoes)))
+    return {"tipo": "mfg", "motor": achado["motor"], "opcoes_do_motor": opcoes, "opcoes": opcoes_da_tela}
 
 
 def preparar_60_quadros_ps2(jogo, config, caminho_jogo, degrau):
@@ -3023,30 +3048,6 @@ def trocar_id_dos_jogos(levados):
     if mudou:
         salvar_config(config)
     return len(trocas)
-
-
-def preparar_lossless_de_fora(jogo, config, programa):
-    """A geracao de quadros do Lossless Scaling num emulador de fora (PCSX2, Dolphin, RPCS3, Xenia), se o aluno
-    ligou o Lossless Scaling E o "mais quadros". Ele ja desenha na tela cheia: o LS nao estica, so cria quadros
-    (lossless.trocas_para_o_externo). Devolve None ou {"opcoes": {}, "executavel": o LosslessScaling.exe}."""
-    if not (config.get("lossless_scaling") and config.get("lossless_mais_quadros")):
-        return None
-    achado = lossless.achar(RAIZ)
-    if not achado or not achado["licenca"]:
-        print("[ARENA] Lossless Scaling ligado nos Ajustes, mas sem o programa instalado pela Steam desta conta: "
-              "o jogo abre sem ele.")
-        return None
-    trocas = lossless.trocas_para_o_externo(os.path.basename(programa), nota_da_placa_de_fora(),
-                                            lossless.frequencia_da_tela())
-    try:
-        gravou, motivo = lossless.gravar_perfil(trocas)
-    except (OSError, ValueError) as falha:
-        gravou, motivo = False, str(falha)
-    if not gravou:
-        print("[ARENA] Lossless Scaling: %s. O jogo abre sem ele." % motivo)
-        return None
-    print("[ARENA] %s com a geracao de quadros do Lossless Scaling." % jogo["externo"]["dados"]["nome"])
-    return {"opcoes": {}, "executavel": achado["executavel"]}
 
 
 def preparar_o_ps2_do_android(config, jogo=None, sem_jogo=False, degrau=0):
@@ -3232,9 +3233,9 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         # (quadros de verdade); senao o MFG Super Motion; e o Lossless so onde nenhum dos dois entrou.
         sessenta_ps2 = preparar_60_quadros_ps2(jogo, config, caminho_jogo, degrau) \
             if nome_externo == "PCSX2" else ""
-        pelo_mfg = None if (partida or sessenta_ps2) else preparar_mfg(jogo, config, degrau)
-        pelo_lossless = None if (partida or pelo_mfg or sessenta_ps2) else preparar_lossless_de_fora(
-            jogo, config, programa_externo)
+        escolha = None if (partida or sessenta_ps2) else preparar_mfg(jogo, config, degrau, programa_externo)
+        pelo_mfg = escolha if escolha and escolha["tipo"] == "mfg" else None
+        pelo_lossless = escolha if escolha and escolha["tipo"] == "lossless" else None
 
         # O PCSX2 tem tela propria, mas le a configuracao antes de abrir.
         # O ARENA escreve o controle ali: dois analogicos, direcional
@@ -3542,15 +3543,19 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         # estica ate a tela. A janela vale so nesta partida; o filtro do
         # ARENA fica de fora (quem estica e' o Lossless Scaling).
         config_da_partida = config
-        pelo_mfg = None if partida else preparar_mfg(jogo, config, degrau)
-        if pelo_mfg:
-            opcoes_jogo.update(pelo_mfg["opcoes"])
-            so_desta_partida += list(pelo_mfg["opcoes"])
-        pelo_lossless = None if (partida or pelo_mfg) else preparar_lossless(jogo, config)
-        if pelo_lossless:
-            opcoes_jogo.update(pelo_lossless["opcoes"])
-            so_desta_partida += list(pelo_lossless["opcoes"])
-            config_da_partida = dict(config, escala_da_tela="original")
+        escolha = None if partida else preparar_mfg(jogo, config, degrau)
+        pelo_mfg = escolha if escolha and escolha["tipo"] == "mfg" else None
+        pelo_lossless = escolha if escolha and escolha["tipo"] == "lossless" else None
+        if escolha:
+            opcoes_jogo.update(escolha["opcoes"])
+            so_desta_partida += list(escolha["opcoes"])
+        elif not partida:
+            # A ESCALA do Lossless (a janela do tamanho do desenho, esticada por ele), so para quem ligou a mao.
+            pelo_lossless = preparar_lossless(jogo, config)
+            if pelo_lossless:
+                opcoes_jogo.update(pelo_lossless["opcoes"])
+                so_desta_partida += list(pelo_lossless["opcoes"])
+                config_da_partida = dict(config, escala_da_tela="original")
         cfg_antes = graficos.valores_no_retroarch_cfg(so_desta_partida)
         # ORDEM IMPORTA. As opcoes vem antes do arquivo do jogo.
         #
@@ -5781,7 +5786,8 @@ class Manipulador(BaseHTTPRequestHandler):
                 # O MFG Super Motion desta maquina (servidor\mfg.py): achado, versao, placas, o que o automatico faz.
                 "mfg": None if plataforma_do_sistema.ANDROID else mfg.situacao(
                     RAIZ, CAPACIDADE.get("nota_gpu"), bool(MAQUINA["gpu"].get("integrada", True)),
-                    lossless.frequencia_da_tela()),
+                    lossless.frequencia_da_tela(),
+                    tem_lossless=bool((lossless.achar(RAIZ) or {}).get("licenca"))),
                 # Os navegadores deste computador e o padrao dele (a tela
                 # oferece a escolha em Ajustes -> Simples).
                 "navegadores": {"padrao": navegadores.padrao_do_computador(),

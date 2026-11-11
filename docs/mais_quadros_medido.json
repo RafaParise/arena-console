@@ -1,0 +1,49 @@
+{
+ "feito_em": "2026-11-11 13:08",
+ "jogo": "Black (PS2)",
+ "segundos_por_medida": 20,
+ "maquina": {
+  "placa": "AMD Radeon(TM) Graphics",
+  "integrada": true,
+  "nota": 4,
+  "nota_gpu": 4,
+  "hz": 60
+ },
+ "sem_nada": {
+  "pcsx2-qt.exe": {
+   "enviados": 29.8,
+   "na_tela": 29.8
+  }
+ },
+ "mfg": {
+  "nvngx.dll": {
+   "enviados": 56.6,
+   "na_tela": 56.6
+  },
+  "pcsx2-qt.exe": {
+   "enviados": 29.8,
+   "na_tela": 28.5
+  }
+ },
+ "mfg_opcoes": "MSM FG rapido, ate 2x, so o que enche a tela",
+ "mfg_linhas": [
+  "@source 50742 1440 900 dxgi borderless",
+  "@mfg 2"
+ ],
+ "lossless": {
+  "losslessscaling.exe": {
+   "enviados": 59.5,
+   "na_tela": 59.5
+  },
+  "pcsx2-qt.exe": {
+   "enviados": 29.8,
+   "na_tela": 29.8
+  }
+ },
+ "sem_nada_de_novo": {
+  "pcsx2-qt.exe": {
+   "enviados": 29.8,
+   "na_tela": 29.8
+  }
+ }
+}

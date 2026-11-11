@@ -44,7 +44,7 @@ class Decidir(unittest.TestCase):
         self.assertFalse(mfg.decidir("desligado", self.ACHADO, 5, False, 144, True)[0])
         usar, motivo = mfg.decidir("sempre", None, 5, False, 144, True)
         self.assertFalse(usar)
-        self.assertIn("instalado", motivo)
+        self.assertIn("nesta maquina", motivo)
 
     def test_sempre_liga_ate_na_placa_fraca(self):
         self.assertTrue(mfg.decidir("sempre", self.ACHADO, 1, True, 60, False)[0])
@@ -57,11 +57,22 @@ class Decidir(unittest.TestCase):
     def test_automatico_liga_no_emulador_de_fora_com_placa_dedicada(self):
         self.assertTrue(mfg.decidir("automatico", self.ACHADO, 3, False, 60, True)[0])
         self.assertTrue(mfg.decidir("automatico", self.ACHADO, 5, False, 60, True)[0])
-        # A integrada, mesmo a forte (o Ryzen de mesa com Vega), nao liga sozinha: nunca regresso.
-        self.assertFalse(mfg.decidir("automatico", self.ACHADO, 4, True, 60, True)[0])
-        self.assertFalse(mfg.decidir("automatico", self.ACHADO, 4, True, 144, False)[0])
+        # A integrada forte (o Ryzen de mesa com Vega, nota 4) liga: medido em 11/11/2026, o jogo ficou igual.
+        self.assertTrue(mfg.decidir("automatico", self.ACHADO, 4, True, 60, True)[0])
+        self.assertTrue(mfg.decidir("automatico", self.ACHADO, 4, True, 144, False)[0])
+        # A integrada comum (nota 3, o Celeron N5100), nao.
+        self.assertFalse(mfg.decidir("automatico", self.ACHADO, 3, True, 60, True)[0])
         # A dedicada fraca (nota 2) tambem nao.
         self.assertFalse(mfg.decidir("automatico", self.ACHADO, 2, False, 60, True)[0])
+
+    def test_qual_programa_por_placa(self):
+        rtx = [{"numero": 0, "dlss": True}]
+        radeon = [{"numero": 0, "dlss": False}]
+        self.assertEqual(mfg.qual_programa(rtx, True, True), "mfg")          # RTX: o DLSS MFG
+        self.assertEqual(mfg.qual_programa(radeon, True, True), "lossless")  # AMD/Intel: o Lossless (medido)
+        self.assertEqual(mfg.qual_programa(rtx, False, True), "lossless")
+        self.assertEqual(mfg.qual_programa(radeon, True, False), "mfg")
+        self.assertIsNone(mfg.qual_programa(radeon, False, False))
 
     def test_console_que_ficou_no_limite_nao_liga_no_automatico(self):
         usar, motivo = mfg.decidir("automatico", self.ACHADO, 5, False, 60, True, degrau=1)

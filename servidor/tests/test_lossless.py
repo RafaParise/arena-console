@@ -219,41 +219,85 @@ class Partida(unittest.TestCase):
         self.assertEqual((trocas["ScalingType"], trocas["FrameGeneration"]), ("LS1", "LSFG3"))
 
 
-class EmuladorDeFora(unittest.TestCase):
-    """arena.preparar_lossless_de_fora: a geracao de quadros nos emuladores de fora (PCSX2, Dolphin, RPCS3, Xenia).
-    Medido no PC do Rafael em 08/11/2026 (PresentMon): o Black desenha 30 quadros por segundo no PCSX2 e, pelo LS, a
-    tela mostra 60."""
+class MaisQuadrosUnificado(unittest.TestCase):
+    """arena.preparar_mfg: o melhor do Lossless Scaling e do MFG Super Motion, nunca os dois juntos (11/11/2026).
+    Medido no PC do Rafael (testes\\medir_mais_quadros.py, PresentMon, Black no PCSX2, Radeon integrada): o jogo
+    ficou nos 29,8 quadros com os dois; na tela, 59,5 pelo Lossless e 56,6 pelo MFG."""
 
     tearDown = Partida.tearDown
-    config = Partida.config
 
     def setUp(self):
         Partida.setUp(self)
+        import mfg
+        self.mfg = mfg
         self.jogo = {"plataforma": "ps2", "externo": {"dados": {"nome": "PCSX2"}}}
         self.programa = "C:\\ARENA\\emuladores\\PCSX2\\PCSX2\\pcsx2-qt.exe"
+        self.motor = {"motor": "C:\\MFG\\Engine\\nvngx.dll", "pasta": "C:\\MFG", "origem": "instalado",
+                      "versao": "1.0.5"}
+        mais = [mock.patch.dict(self.arena.CAPACIDADE, {"nota": 4, "nota_gpu": 4, "nota_gpu_de_fora": 3}),
+                mock.patch.dict(self.arena.MAQUINA["gpu"], {"integrada": True}),
+                mock.patch.object(lossless, "frequencia_da_tela", return_value=60)]
+        for troca in mais:
+            troca.start()
+        self.trocas += mais
 
-    def test_so_com_as_duas_chaves(self):
-        for config in (self.config(lossless_scaling=False, lossless_mais_quadros=True), self.config()):
-            self.assertIsNone(self.arena.preparar_lossless_de_fora(self.jogo, config, self.programa))
+    def config(self, **mudancas):
+        base = self.arena.config_padrao()
+        base.update(mudancas)
+        return base
 
-    def test_so_gera_quadros_e_so_para_este_emulador(self):
-        with mock.patch.object(lossless, "frequencia_da_tela", return_value=75):
-            pronto = self.arena.preparar_lossless_de_fora(self.jogo, self.config(lossless_mais_quadros=True),
-                                                          self.programa)
-        self.assertEqual(pronto, {"opcoes": {}, "executavel": self.achado["executavel"]})
+    def preparar(self, placas=(), tem_mfg=True, config=None, degrau=0):
+        with mock.patch.object(self.mfg, "achar", return_value=self.motor if tem_mfg else None), \
+                mock.patch.object(self.mfg, "placas", return_value=list(placas)):
+            return self.arena.preparar_mfg(self.jogo, config or self.config(), degrau, self.programa)
+
+    def test_amd_ou_intel_com_os_dois_vai_pelo_lossless(self):
+        pronto = self.preparar()
+        self.assertEqual(pronto["tipo"], "lossless")
+        self.assertEqual(pronto["executavel"], self.achado["executavel"])
         trocas = lossless.gravar_perfil.call_args[0][0]
         self.assertEqual(trocas["Path"], "pcsx2-qt.exe")
         self.assertEqual(trocas["ScalingType"], "Off")                     # ele ja desenha na tela cheia
-        self.assertEqual((trocas["FrameGeneration"], trocas["LSFG3Mode1"], trocas["LSFG3Target"]),
-                         ("LSFG3", "ADAPTIVE", "75"))                      # ate a frequencia da tela
+        self.assertEqual((trocas["FrameGeneration"], trocas["LSFG3Mode1"]), ("LSFG3", "ADAPTIVE"))
         lossless.montar_perfil(trocas)                                     # so campos e valores que o LS aceita
 
-    def test_sem_licenca_ou_com_o_ls_aberto(self):
-        com = self.config(lossless_mais_quadros=True)
+    def test_rtx_vai_pelo_mfg(self):
+        pronto = self.preparar(placas=[{"numero": 0, "dlss": True, "nome": "RTX 3060"}])
+        self.assertEqual(pronto["tipo"], "mfg")
+        self.assertEqual(pronto["opcoes_do_motor"]["generator"], "0")      # DLSS MFG
+        lossless.gravar_perfil.assert_not_called()
+
+    def test_so_o_mfg_ou_lossless_sem_licenca(self):
         with mock.patch.object(lossless, "achar", return_value=dict(self.achado, licenca=False)):
-            self.assertIsNone(self.arena.preparar_lossless_de_fora(self.jogo, com, self.programa))
+            self.assertEqual(self.preparar()["tipo"], "mfg")
+        with mock.patch.object(lossless, "achar", return_value=None):
+            self.assertEqual(self.preparar()["tipo"], "mfg")
+            self.assertIsNone(self.preparar(tem_mfg=False))
+
+    def test_lossless_aberto_cai_para_o_mfg(self):
         with mock.patch.object(lossless, "gravar_perfil", return_value=(False, "o Lossless Scaling esta aberto")):
-            self.assertIsNone(self.arena.preparar_lossless_de_fora(self.jogo, com, self.programa))
+            self.assertEqual(self.preparar()["tipo"], "mfg")
+            self.assertIsNone(self.preparar(tem_mfg=False))
+
+    def test_nunca_regresso(self):
+        # Integrada comum (o Celeron N5100), console que ficou no limite, desligado: nada liga sozinho.
+        with mock.patch.dict(self.arena.CAPACIDADE, {"nota_gpu": 3}):
+            self.assertIsNone(self.preparar())
+            self.assertEqual(self.preparar(config=self.config(mfg_super_motion="sempre"))["tipo"], "lossless")
+        self.assertIsNone(self.preparar(degrau=1))
+        self.assertIsNone(self.preparar(config=self.config(mfg_super_motion="desligado")))
+
+    def test_o_mais_quadros_antigo_do_lossless_vale_como_sempre(self):
+        with mock.patch.dict(self.arena.CAPACIDADE, {"nota_gpu": 2}):
+            self.assertEqual(self.preparar(config=self.config(lossless_mais_quadros=True))["tipo"], "lossless")
+
+    def test_retroarch_fica_na_tela_cheia_sem_borda(self):
+        self.jogo = {"plataforma": "psp", "core": "ppsspp_libretro.dll"}
+        self.programa = None                                               # o RetroArch nao manda programa
+        with mock.patch.object(lossless, "frequencia_da_tela", return_value=144):
+            pronto = self.preparar()
+        self.assertEqual(pronto["opcoes"], {"video_fullscreen": "true", "video_windowed_fullscreen": "true"})
+        self.assertEqual(lossless.gravar_perfil.call_args[0][0]["Path"], "retroarch.exe")
 
 
 class PcsxComOLossless(unittest.TestCase):

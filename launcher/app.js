@@ -426,7 +426,7 @@ async function carregarEstado() {
   $("#chaveContinuar").setAttribute("aria-pressed",
     dados.config.continuar_de_onde_parou ? "true" : "false");
   mostrarMfg(dados.mfg, dados.config);
-  mostrarLossless(dados.lossless, dados.config, dados.mfg && dados.mfg.achado);
+  mostrarLossless(dados.lossless, dados.config);
   mostrarNavegadores(dados.navegadores, dados.config);
   desenharFechamentos(dados.fechamentos || []);
 
@@ -1781,27 +1781,35 @@ function mostrarMfg(situacao, config) {
   $("#listaMfg").value = config.mfg_super_motion || "automatico";
   $("#baixarMfg").hidden = !!situacao.achado;
   if (situacao.pagina) $("#linkMfg").href = situacao.pagina;
+  // Os dois programas (11/11/2026): o ARENA usa um so por vez, o que rende mais nesta placa.
+  $("#baixarMfg").hidden = !!(situacao.achado || situacao.lossless);
   let texto;
-  if (!situacao.achado) {
-    texto = "Ainda não está instalado neste computador: os jogos abrem como sempre.";
+  if (!situacao.escolhido) {
+    texto = "Nem o MFG Super Motion nem o Lossless Scaling estão neste computador: os jogos abrem como sempre.";
   } else {
-    const versao = situacao.versao ? " (versão " + situacao.versao + ")" : "";
-    const onde = situacao.origem === "arena" ? "na pasta do ARENA" : "instalado neste computador";
-    texto = "Achado" + versao + ", " + onde + ". Aqui ele usa o " + situacao.gerador + ". ";
+    const tem = [situacao.achado ? "MFG Super Motion" + (situacao.versao ? " " + situacao.versao : "") : "",
+                 situacao.lossless ? "Lossless Scaling" : ""].filter(Boolean).join(" e ");
+    texto = "Neste computador: " + tem + ". ";
+    texto += situacao.escolhido === "lossless"
+      ? "O ARENA cria os quadros pelo Lossless Scaling" +
+        (situacao.achado ? " (nesta placa ele rende mais que o MFG: medido)." : ".")
+      : "O ARENA cria os quadros pelo MFG Super Motion, com o " + situacao.gerador + ".";
+    texto += " Nunca os dois juntos: um em cima do outro somaria o atraso. ";
     texto += situacao.placa_forte
       ? "No automático, liga nos emuladores de fora" + (situacao.hz > 65 ? " e em todo jogo (tela de " + situacao.hz + " Hz)." : ".")
-      : "Aqui a placa de vídeo é integrada (ou fraca): no automático ele fica desligado, para não tirar desempenho do jogo. Em Sempre, liga assim mesmo.";
+      : "A placa de vídeo daqui é fraca para isso: no automático fica desligado, para não tirar desempenho do jogo. Em Sempre, liga assim mesmo.";
   }
   $("#estadoMfg").textContent = texto;
 }
 
 // O Lossless Scaling de quem comprou (servidor\lossless.py). O bloco so
-// aparece se o programa estiver nesta maquina E o MFG Super Motion, que
-// ocupa o lugar dele (11/11/2026), nao estiver.
-function mostrarLossless(situacao, config, mfgAchado) {
+// aparece se o programa estiver nesta maquina. Os quadros a mais dele seguem
+// o "Mais quadros" de cima (11/11/2026); aqui ficam a escala dele e o "Mais
+// quadros" antigo, que vale como "Sempre" pelo Lossless.
+function mostrarLossless(situacao, config) {
   const bloco = $("#blocoLossless");
   if (!bloco) return;
-  bloco.hidden = !(situacao && situacao.achado) || !!mfgAchado;
+  bloco.hidden = !(situacao && situacao.achado);
   if (bloco.hidden) return;
   const versao = situacao.versao ? ", versão " + situacao.versao : "";
   let texto = "Achado (" + situacao.origem + versao + "). ";

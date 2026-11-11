@@ -154,11 +154,36 @@ def placas(motor, espera=30):
 # ---------------------------------------------------------------------------
 def placa_forte(nota_gpu, integrada):
     """A placa aguenta criar quadros sem tirar do jogo, sozinha (no Automatico)?
-    So a DEDICADA que nao e' das fracas (a nota ja diz: 3 ou mais). A
-    integrada, mesmo a forte, divide a memoria e a placa com o emulador, e os
-    quadros criados podiam deixar o jogo pior (regra do Rafael, 11/11/2026:
-    "nunca regresso de desempenho"); quem quiser, escolhe "Sempre"."""
-    return (not integrada) and int(nota_gpu or 0) >= 3
+
+    Medido em 11/11/2026 (testes/medir_mais_quadros.py, PresentMon, Black no
+    PCSX2, Ryzen 5 5600G com a Radeon integrada, nota da placa 4): o jogo
+    ficou nos mesmos 29,8 quadros com o MFG (56,6 na tela) e com o Lossless
+    (59,5 na tela) -- nada tirado do jogo. Entao: a dedicada que nao e' das
+    fracas (nota 3 ou mais) e a integrada forte (nota 4, a do Ryzen de mesa
+    com Vega). A integrada comum (nota 3 ou menos: o Celeron N5100 da rede)
+    fica de fora -- regra do Rafael, "nunca regresso de desempenho"; quem
+    quiser, escolhe "Sempre"."""
+    nota = int(nota_gpu or 0)
+    return nota >= 4 if integrada else nota >= 3
+
+
+def qual_programa(placas_do_mfg, tem_mfg, tem_lossless):
+    """Qual programa cria os quadros nesta maquina: "mfg", "lossless" ou None. NUNCA os dois juntos: dois
+    geradores um em cima do outro somam o atraso e os erros dos dois, e o segundo criaria quadros a partir dos
+    quadros adivinhados pelo primeiro.
+
+    - Placa NVIDIA RTX: o MFG Super Motion (o DLSS MFG e' feito pela propria placa, com o fluxo optico dela).
+    - Outra placa (AMD, Intel): o Lossless Scaling, se a pessoa tiver -- medido na Radeon integrada, ele chegou
+      a 59,5 quadros na tela contra 56,6 do MFG, e nos dois o jogo ficou igual; senao o MFG.
+    """
+    rtx = any(p.get("dlss") for p in placas_do_mfg or ())
+    if tem_mfg and rtx:
+        return "mfg"
+    if tem_lossless:
+        return "lossless"
+    if tem_mfg:
+        return "mfg"
+    return None
 
 
 def decidir(modo, achado, nota_gpu, integrada, hz, de_fora, degrau=0):
@@ -176,11 +201,11 @@ def decidir(modo, achado, nota_gpu, integrada, hz, de_fora, degrau=0):
     if modo == "desligado":
         return False, "desligado nos Ajustes"
     if not achado:
-        return False, "o %s nao esta instalado nesta maquina" % NOME
+        return False, "nem o MFG Super Motion nem o Lossless Scaling estao nesta maquina"
     if modo == "sempre":
         return True, "ligado sempre, nos Ajustes"
     if not placa_forte(nota_gpu, integrada):
-        return False, "criar quadros sozinho pede placa de video dedicada"
+        return False, "a placa de video desta maquina e' fraca para criar quadros sem atrasar o jogo"
     if int(degrau or 0) > 0:
         return False, "o console ficou no limite da maquina antes"
     if de_fora:
@@ -416,17 +441,20 @@ def descrever(opcoes, para_a_tela=False):
                                                    opcoes.get("multiplier", "2"))
 
 
-def situacao(raiz, nota_gpu=None, integrada=True, hz=60):
-    """Para a tela dos Ajustes: achou, de onde, a versao, as placas e o que o automatico faz aqui."""
+def situacao(raiz, nota_gpu=None, integrada=True, hz=60, tem_lossless=False):
+    """Para a tela dos Ajustes: o MFG (achou, de onde, a versao, o gerador), se o Lossless pronto tambem esta
+    aqui, qual dos dois o ARENA usa nesta maquina (qual_programa) e se o automatico liga (placa_forte)."""
     achado = achar(raiz)
+    lista = placas(achado["motor"]) if achado else []
+    base = {"achado": bool(achado), "disponivel": os.name == "nt", "lossless": bool(tem_lossless),
+            "escolhido": qual_programa(lista, bool(achado), bool(tem_lossless)),
+            "placa_forte": placa_forte(nota_gpu, integrada), "hz": int(hz or 60), "pagina": PAGINA_OFICIAL}
     if not achado:
-        return {"achado": False, "disponivel": os.name == "nt", "pagina": PAGINA_OFICIAL}
-    lista = placas(achado["motor"])
+        return base
     opcoes = escolher_opcoes(lista, nota_gpu, integrada, hz, False)
-    return {"achado": True, "disponivel": True, "origem": achado["origem"], "versao": achado["versao"],
-            "placas": [p.get("nome", "") for p in lista],
-            "gerador": descrever(opcoes, para_a_tela=True), "placa_forte": placa_forte(nota_gpu, integrada),
-            "hz": int(hz or 60), "pagina": PAGINA_OFICIAL}
+    base.update({"origem": achado["origem"], "versao": achado["versao"], "placas": [p.get("nome", "") for p in lista],
+                 "gerador": descrever(opcoes, para_a_tela=True)})
+    return base
 
 
 if __name__ == "__main__":
