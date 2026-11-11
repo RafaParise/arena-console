@@ -107,10 +107,38 @@ def ligado():
     return any(linha.split() == [SERIE_DO_EMULADOR, "device"] for linha in adb_texto("devices").splitlines())
 
 
+def _emulador_aberto():
+    """Ha algum emulador (qemu) aberto neste computador?"""
+    saida = subprocess.run(["tasklist", "/FI", "IMAGENAME eq qemu-system-x86_64-headless.exe", "/NH"],
+                           capture_output=True, text=True).stdout
+    return "qemu-system" in saida.lower()
+
+
+def _apagar_travas_velhas():
+    """As travas do aparelho virtual que sobram quando um emulador e' fechado a forca. Achado de 11/11/2026: um
+    emulador travado fechado as 02:06 deixou a pasta hardware-qemu.ini.lock, e todo emulador depois dela parava antes
+    de ligar (4 testes falharam em seguida). So apaga com NENHUM emulador aberto (com um aberto, a trava e' dele)."""
+    if _emulador_aberto():
+        return
+    pasta = os.path.join(sdk.AVD, sdk.NOME_DO_AVD + ".avd")
+    for nome in ("hardware-qemu.ini.lock", "multiinstance.lock"):
+        caminho = os.path.join(pasta, nome)
+        try:
+            if os.path.isdir(caminho):
+                for dentro in os.listdir(caminho):
+                    os.remove(os.path.join(caminho, dentro))
+                os.rmdir(caminho)
+            elif os.path.exists(caminho):
+                os.remove(caminho)
+        except OSError:
+            pass
+
+
 def ligar_emulador():
     """Liga o aparelho virtual sem janela (ou usa o que ja estiver ligado)."""
     if ligado():
         return None, 0.0
+    _apagar_travas_velhas()
     inicio = time.monotonic()
     processo = subprocess.Popen([EMULADOR, "-avd", sdk.NOME_DO_AVD, "-port", SERIE_DO_EMULADOR.split("-")[1],
                                  "-no-window", "-no-audio", "-no-snapshot",
@@ -121,6 +149,9 @@ def ligar_emulador():
         if adb_texto("shell", "getprop", "sys.boot_completed", segundos=15).strip() == "1":
             return processo, time.monotonic() - inicio
         time.sleep(3)
+    # Nao ligou: fecha o emulador (e o qemu, que e' filho dele) antes de desistir. Antes ele ficava aberto, travado, e
+    # o proximo teste de emulador tambem nao ligava (11/11/2026).
+    subprocess.run(["taskkill", "/T", "/F", "/PID", str(processo.pid)], capture_output=True)
     raise SystemExit("O Android do emulador nao terminou de ligar em 7 minutos.")
 
 
