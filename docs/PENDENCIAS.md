@@ -771,3 +771,7 @@ Falta, nesta ordem:
   A chave foi devolvida como estava. **Sem explicação ainda:** o `config.json` do A12 já tinha
   `"continuar_de_onde_parou": false` (gravado pelo código novo), e no Android o padrão é ligado. Conferir o padrão numa
   instalação limpa no teste do emulador (item 1).
+- **Cartão do PS2: decidido pelo Rafael em 10/11, à noite: o de 8 MB como padrão.** Feito (`acessorios.cartoes_ps2`
+  com `ja_tem_o_de_64`): quem nunca escolheu e já tem o `Mcd001-64MB.ps2` fica com ele. Observação honesta: no
+  computador o PCSX2 de fora sempre usou o de 8 MB; se o aluno jogou o *Crash of the Titans* no computador, a causa do
+  relato dele é outra (fica a hipótese 2, a do estado salvo carregado depois do save no cartão).

@@ -601,3 +601,8 @@ estava, e na próxima vez o mesmo jogo abre ali, sem apertar nada. Esse ponto fi
 bateria do cartucho). O ponto automático e o F2 são atalhos; o save do jogo é o que vale em qualquer emulador e em
 qualquer console. Uma regra de ouro no PS2: **depois de salvar no cartão, não carregue um estado (F4 ou CARREGAR) de antes
 desse save.** Feche o jogo e abra de novo, ou continue jogando.
+
+**Cartão do PS2 no celular (10/11/2026):** o padrão voltou a ser o cartão de **8 MB**, o tamanho do cartão original e o
+que todos os jogos aceitam (alguns jogos não salvavam direito no de 64 MB, o padrão de 24/10 a 10/11). Quem já usava o
+de 64 MB continua com ele e com os saves dele. Para trocar: Ajustes → Emuladores → Acessórios dos consoles → Cartões de
+memória do PS2. No computador, o PCSX2 sempre usou o de 8 MB.

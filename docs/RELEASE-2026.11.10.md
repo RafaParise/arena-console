@@ -51,6 +51,9 @@ O que muda para quem instala:
   próxima vez. Vem ligado no celular e desligado no computador da escola (dividido entre turmas); a chave fica em
   **Ajustes**. **Nunca passa por cima de um save:** se o save do jogo ou o cartão de memória foi gravado depois desse
   ponto, o jogo começa pelo save. Não vale no Jogar Junto.
+- **Cartão do PS2 no celular: de volta ao de 8 MB**, o tamanho do cartão original e o que todos os jogos aceitam
+  (alguns jogos não salvavam direito no de 64 MB). Quem já usava o de 64 MB continua com ele e com os saves; dá para
+  trocar em Ajustes → Emuladores → Acessórios dos consoles → Cartões de memória do PS2.
 - A memória de save do cartucho vai para o disco a cada 10 segundos, quando muda. Se o celular fechar o app sem
   aviso, o save feito no jogo não se perde.
 
@@ -81,8 +84,6 @@ O que muda para quem instala:
 
 - **Celular:** PS3, Xbox 360 e Java ME são só do computador. Consoles pesados (Wii, GameCube, Dreamcast, fliperama de
   3D) ficam lentos num celular de entrada como o Galaxy A12.
-- **PS2 e o cartão de memória de 64 MB:** alguns jogos de PS2 não lidam bem com cartão maior que 8 MB. Se um jogo não
-  salvar, troque para o de 8 MB em Ajustes → Emuladores → Acessórios dos consoles → Cartões de memória do PS2.
 - **Partida entre casas:** precisa de alguém com o repasse ligado e a porta liberada no roteador; na operadora com
   CGNAT (sem endereço público), ninguém de fora chega.
 - **Xbox 360:** o Xenia exige processador com AVX; não roda no Celeron N5100 de muitos notebooks da rede.

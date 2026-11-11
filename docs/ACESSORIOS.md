@@ -402,3 +402,12 @@ opções nessa leitura; os tipos de controle por porta deles (como Zapper e Powe
 - **Microfone (PSP)** (só o controle é mapeado (sem o acessório de verdade)): Microfone do PSP para jogos de voz Ideia: Microfone do computador, se o núcleo aceitar . [Palpite] — https://docs.libretro.com/library/ppsspp/
 - **Câmera (PSP Go, USB)** (nenhum núcleo emula): Câmera USB do PSP Ideia: Webcam do computador como sobreposição, se for preciso . [Certo] — https://docs.libretro.com/library/ppsspp/
 
+
+## Cartão do PS2: o padrão voltou ao de 8 MB (10/11/2026)
+
+Decisão do Rafael em 10/11/2026: no celular, a entrada 1 passa a ser o **cartão de PS2 de 8 MB** (o tamanho do cartão
+original, o que todos os jogos aceitam), no lugar do de 64 MB (padrão de 24/10 a 10/11). Motivo: o relato do aluno
+HugoVHK (o segundo save do *Crash of the Titans* não gravava) e a documentação do PCSX2, que aponta o de 8 MB como o
+mais compatível [Provável]. **Quem nunca escolheu e já tem o `Mcd001-64MB.ps2` continua com ele** (os saves estão lá);
+quem escolheu em Ajustes fica com a escolha. Nada é apagado. No computador, o PCSX2 de fora já usava o `Mcd001.ps2` de
+8 MB. Código: `acessorios.cartoes_ps2(estado, ja_tem_o_de_64)`.

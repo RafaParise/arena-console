@@ -490,12 +490,27 @@ class CartoesDoPs2(unittest.TestCase):
             arena.preparar_o_ps2_do_android(arena.config_padrao(), {"arquivo": "x.chd"})
         with open(graficos.arquivo_de_ajustes_do_armsx2(self.pasta), encoding="utf-8") as arquivo:
             texto = arquivo.read()
-        # O padrao (decisao do Rafael, 24/10/2026): o maior cartao do PS2 na entrada 1 e o PocketStation na 2.
-        self.assertIn("MemoryCards/Slot1_Filename = Mcd001-64MB.ps2", texto)
+        # O padrao (decisao do Rafael, 10/11/2026): o cartao do PS2 de 8 MB na entrada 1 e o PocketStation na 2.
+        self.assertIn("MemoryCards/Slot1_Filename = Mcd001.ps2", texto)
         self.assertIn("MemoryCards/Slot2_Filename = PocketStation.mcr", texto)
         self.assertIn("EmuCore/WarnAboutUnsafeSettings = false", texto)
         self.assertEqual(os.path.getsize(os.path.join(self.memcards, "PocketStation.mcr")), 131072)
-        self.assertEqual(os.path.getsize(os.path.join(self.memcards, "Mcd001-64MB.ps2")), 69206016)
+        self.assertEqual(os.path.getsize(os.path.join(self.memcards, "Mcd001.ps2")), 8650752)
+        self.assertFalse(os.path.exists(os.path.join(self.memcards, "Mcd001-64MB.ps2")))
+
+    def test_quem_ja_tem_o_cartao_de_64_mb_continua_com_ele(self):
+        import arena
+        os.makedirs(self.memcards, exist_ok=True)
+        with open(os.path.join(self.memcards, "Mcd001-64MB.ps2"), "wb") as arquivo:
+            arquivo.write(b"MEUS SAVES")
+        with mock.patch.object(arena, "PASTA_SISTEMA", self.pasta), \
+                mock.patch.object(arena.plataforma_do_sistema, "preparar_recursos", return_value=0):
+            arena.preparar_o_ps2_do_android(arena.config_padrao(), {"arquivo": "x.chd"})
+        with open(graficos.arquivo_de_ajustes_do_armsx2(self.pasta), encoding="utf-8") as arquivo:
+            texto = arquivo.read()
+        self.assertIn("MemoryCards/Slot1_Filename = Mcd001-64MB.ps2", texto)
+        with open(os.path.join(self.memcards, "Mcd001-64MB.ps2"), "rb") as arquivo:
+            self.assertEqual(arquivo.read(), b"MEUS SAVES")          # nunca trocado nem apagado
 
     def test_a_pessoa_troca_o_pocketstation_pelo_cartao_do_ps2(self):
         import arena

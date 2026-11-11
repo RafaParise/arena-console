@@ -200,20 +200,24 @@ def opcoes_de_porta(estado, console_id, nome_nucleo):
     return {"input_libretro_device_p%d" % numero: tipo for numero, tipo in portas.items() if 1 <= numero <= 8}
 
 
-def cartoes_ps2(estado):
-    """Os cartoes do PS2 pedidos: {"slot1_tipo": "ps1" ou "ps2", "slot1_mb": 64, "slot2_tipo": ..., "slot2_mb": ...}.
-    Sem escolha nenhuma vale o padrao do catalogo: o maior cartao do PS2 (64 MB) na entrada 1 e o PocketStation na 2,
-    como no ARENA do computador (decisao do Rafael, 24/10/2026)."""
+def cartoes_ps2(estado, ja_tem_o_de_64=False):
+    """Os cartoes do PS2 pedidos: {"slot1_tipo": "ps1" ou "ps2", "slot1_mb": 8, "slot2_tipo": ..., "slot2_mb": ...}.
+    Sem escolha nenhuma vale o padrao do catalogo: o cartao do PS2 de 8 MB na entrada 1 e o PocketStation na 2.
+    Historia: de 24/10 a 10/11/2026 o padrao foi o de 64 MB; em 10/11 o Rafael voltou ao de 8 MB, o mais compativel
+    (o save do PS2 que travava no relato do aluno HugoVHK). 'ja_tem_o_de_64': o cartao Mcd001-64MB.ps2 existe; quem
+    nunca escolheu e ja tem esse cartao continua com ele (os saves dele estao la)."""
     estado = limpar_estado(estado)
-    resultado = {"slot1_tipo": "ps2", "slot1_mb": 64, "slot2_tipo": "ps1", "slot2_mb": 8}
+    resultado = {"slot1_tipo": "ps2", "slot1_mb": 64 if ja_tem_o_de_64 else 8, "slot2_tipo": "ps1", "slot2_mb": 8}
     acessorio = todos_os_acessorios().get("ps2_cartoes")
     if acessorio is None:
         return resultado
     controles = _controles(acessorio)
     escolhas = estado.get("ps2_cartoes", {})
-    padroes = {1: "64", 2: "pocketstation"}
+    padroes = {1: "8", 2: "pocketstation"}
     for entrada in (1, 2):
         controle = controles.get("entrada%d" % entrada, {"id": "entrada%d" % entrada, "padrao": padroes[entrada]})
+        if entrada == 1 and ja_tem_o_de_64 and "entrada1" not in escolhas:
+            continue                     # nunca escolheu e ja tem o de 64 MB: fica com ele
         valor = str(valor_efetivo(controle, escolhas))
         if valor == "pocketstation":
             resultado["slot%d_tipo" % entrada] = "ps1"

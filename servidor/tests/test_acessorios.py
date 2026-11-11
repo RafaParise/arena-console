@@ -158,10 +158,18 @@ class EscolhaDaPessoa(unittest.TestCase):
 
 
 class CartoesDoPs2PeloAcessorio(unittest.TestCase):
-    def test_sem_escolha_vale_o_maior_cartao_na_entrada_1_e_o_pocketstation_na_2(self):
-        # Decisao do Rafael (24/10/2026): igual ao ARENA do computador.
-        esperado = {"slot1_tipo": "ps2", "slot1_mb": 64, "slot2_tipo": "ps1", "slot2_mb": 8}
+    def test_sem_escolha_vale_o_de_8_mb_na_entrada_1_e_o_pocketstation_na_2(self):
+        # Decisao do Rafael (10/11/2026): o de 8 MB, o mais compativel (de 24/10 a 10/11 o padrao foi o de 64 MB).
+        esperado = {"slot1_tipo": "ps2", "slot1_mb": 8, "slot2_tipo": "ps1", "slot2_mb": 8}
         self.assertEqual(acessorios.cartoes_ps2({}), esperado)
+
+    def test_quem_ja_tem_o_de_64_mb_e_nunca_escolheu_fica_com_ele(self):
+        esperado = {"slot1_tipo": "ps2", "slot1_mb": 64, "slot2_tipo": "ps1", "slot2_mb": 8}
+        self.assertEqual(acessorios.cartoes_ps2({}, ja_tem_o_de_64=True), esperado)
+
+    def test_a_escolha_da_pessoa_vale_mesmo_com_o_de_64_mb_no_disco(self):
+        estado = {"ps2_cartoes": {"entrada1": "8"}}
+        self.assertEqual(acessorios.cartoes_ps2(estado, ja_tem_o_de_64=True)["slot1_mb"], 8)
 
     def test_a_pessoa_troca_os_cartoes(self):
         estado = {"ps2_cartoes": {"entrada1": "8", "entrada2": "32"}}
@@ -169,7 +177,7 @@ class CartoesDoPs2PeloAcessorio(unittest.TestCase):
 
     def test_o_pocketstation_pode_ir_na_entrada_1(self):
         estado = {"ps2_cartoes": {"entrada1": "pocketstation", "entrada2": "64"}}
-        self.assertEqual(acessorios.cartoes_ps2(estado), {"slot1_tipo": "ps1", "slot1_mb": 64, "slot2_tipo": "ps2", "slot2_mb": 64})
+        self.assertEqual(acessorios.cartoes_ps2(estado), {"slot1_tipo": "ps1", "slot1_mb": 8, "slot2_tipo": "ps2", "slot2_mb": 64})
 
     def test_valor_estranho_volta_ao_padrao(self):
         estado = {"ps2_cartoes": {"entrada1": "1000", "entrada2": "abc"}}

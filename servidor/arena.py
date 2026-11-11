@@ -3008,7 +3008,9 @@ def preparar_o_ps2_do_android(config, jogo=None, sem_jogo=False, degrau=0):
     # Os memory cards em system/pcsx2/memcards, dentro da pasta do ARENA: por padrao o maior cartao do PS2 (64 MB) na
     # entrada 1 e o PocketStation na 2 (decisao do Rafael, 24/10/2026: igual ao ARENA do computador). A escolha vem de Acessorios; quem ja tinha mexido nos
     # tamanhos pelo config.json antigo (cartoes_ps2) continua valendo.
-    cartoes = acessorios.cartoes_ps2(config.get("acessorios"))
+    # 10/11/2026: o padrao voltou ao de 8 MB (o mais compativel); quem nunca escolheu e ja tem o de 64 MB fica com ele.
+    ja_tem_o_de_64 = os.path.isfile(os.path.join(PASTA_SISTEMA, "pcsx2", "memcards", graficos.nome_do_cartao_ps2(1, 64)))
+    cartoes = acessorios.cartoes_ps2(config.get("acessorios"), ja_tem_o_de_64)
     antigo = graficos.limpar_cartoes_ps2(config.get("cartoes_ps2"))
     if antigo != graficos.limpar_cartoes_ps2(None):
         cartoes = dict(antigo, slot1_tipo=antigo.get("slot1_tipo", "ps2"), slot2_tipo=antigo.get("slot2_tipo", "ps2"))
