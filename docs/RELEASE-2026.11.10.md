@@ -5,22 +5,19 @@ recordes, conquistas e o **Jogar Junto** (partida em rede entre os computadores 
 ou de um pen drive, **sem instalar nada e sem administrador**, e funciona sem internet. Feito em Python puro sobre o
 RetroArch, com o código comentado em português para servir de material de aula.
 
-> **RASCUNHO** (10/11/2026): tamanhos, SHA-256 e "Como esta versão foi conferida" entram na hora de publicar, depois da
-> rodada final, do teste no emulador com Android 15 e do teste no Galaxy A12 com o APK desta versão.
-
 ## ⬇️ Qual arquivo baixar
 
 Os arquivos estão em **Assets**, no fim desta página.
 
 | Seu aparelho | Baixe este arquivo | Tamanho |
 |---|---|---|
-| 🖥️ **Computador com Windows 10 ou 11**, primeira vez | **`ARENA-2026.11.10-PC-windows-linux-chromebook.zip`** | (a medir) |
-| 🖥️ **Computador com Windows**, já usa o ARENA | **`ARENA-2026.11.10-PC-atualizacao.zip`** (só o programa) | (a medir) |
-| 🐧 **Computador com Linux** (Ubuntu, Debian, Mint, Fedora; 64 bits) | o mesmo **`ARENA-2026.11.10-PC-windows-linux-chromebook.zip`** | (a medir) |
-| 📱 **Celular ou tablet Android** (Android 7 ou mais novo; quase todos) | **`ARENA-2026.11.10-android-celular-arm64.apk`** | (a medir) |
-| 💻 **Chromebook da escola** (gerenciado) ou **sem instalar nada** | o mesmo **`ARENA-2026.11.10-PC-windows-linux-chromebook.zip`**, num pen drive | (a medir) |
-| 💻 **Chromebook pessoal com processador Intel ou AMD**, ou emulador de Android no computador | **`ARENA-2026.11.10-android-chromebook-intel-amd-x86_64.apk`** | (a medir) |
-| 💻 Chromebook pessoal com processador ARM (MediaTek, Snapdragon) | o APK do celular, **`ARENA-2026.11.10-android-celular-arm64.apk`** | (a medir) |
+| 🖥️ **Computador com Windows 10 ou 11**, primeira vez | **`ARENA-2026.11.10-PC-windows-linux-chromebook.zip`** | 1,1 GB |
+| 🖥️ **Computador com Windows**, já usa o ARENA | **`ARENA-2026.11.10-PC-atualizacao.zip`** (só o programa) | 106 MB |
+| 🐧 **Computador com Linux** (Ubuntu, Debian, Mint, Fedora; 64 bits) | o mesmo **`ARENA-2026.11.10-PC-windows-linux-chromebook.zip`** | 1,1 GB |
+| 📱 **Celular ou tablet Android** (Android 7 ou mais novo; quase todos) | **`ARENA-2026.11.10-android-celular-arm64.apk`** | 245 MB |
+| 💻 **Chromebook da escola** (gerenciado) ou **sem instalar nada** | o mesmo **`ARENA-2026.11.10-PC-windows-linux-chromebook.zip`**, num pen drive | 1,1 GB |
+| 💻 **Chromebook pessoal com processador Intel ou AMD**, ou emulador de Android no computador | **`ARENA-2026.11.10-android-chromebook-intel-amd-x86_64.apk`** | 235 MB |
+| 💻 Chromebook pessoal com processador ARM (MediaTek, Snapdragon) | o APK do celular, **`ARENA-2026.11.10-android-celular-arm64.apk`** | 245 MB |
 
 **Não sabe qual é o seu celular?** Quase todo celular e tablet Android dos últimos 8 anos é `arm64`: baixe o do
 celular. O `x86_64` é só para Chromebook com processador Intel ou AMD e para emulador de Android no computador.
@@ -79,6 +76,33 @@ O que muda para quem instala:
 - **PocketStation** conferido com minijogo de verdade.
 - Mais de 4 controles do tipo Xbox no computador.
 - No Jogar Junto de PS1, quem hospeda joga com o cartão de memória de sempre.
+
+## Como esta versão foi conferida
+
+- **1.295 testes automáticos** do servidor passaram antes de cada mudança entrar.
+- **Rodada final** (os testes de ponta a ponta, que abrem os emuladores de verdade): 117 de 126 passaram na primeira
+  volta. Os que falharam passaram na repetição, menos dois, que dependem do ambiente:
+  - o **teste no Linux** não rodou: o WSL do computador de testes travou e só volta depois de reiniciar a máquina;
+  - o **teste de partida entre computador e celular** não achou o jogo no celular (o jogo estava numa pasta que o
+    ARENA do celular não lê). O código da partida é o mesmo da versão anterior.
+- **Tempo de abertura:** no computador de testes, com o antivírus local ligado, o ARENA levou de 4,5 a 5,3 s para abrir
+  no modo da máquina-alvo (a meta é 2,3 s). O servidor sozinho abriu em 0,8 a 1,8 s, mais rápido que na versão
+  anterior; a diferença vem do navegador e do antivírus disputando o processador.
+- **Android 15** (emulador, instalação nova): o app abriu, pediu as permissões novas e ligou o "Continuar de onde
+  parou" sozinho.
+- **Galaxy A12** (Android 12): o APK publicado aqui foi instalado e abriu o servidor com 3.294 jogos, sem fechar. O
+  "Continuar de onde parou" gravou o ponto e voltou a ele, e as capas novas apareceram certas.
+- **Pacote do computador:** montado do zero e conferido. Não tem BIOS proprietária, jogo comercial, banco de dados nem
+  dado de quem montou.
+
+### SHA-256 dos arquivos
+
+```
+a56bca9d6a4a8a44db0bb796c6571cb68209dc6cfc73ffe4d0aaaa21512189d7  ARENA-2026.11.10-PC-windows-linux-chromebook.zip
+024cf8061e773779cdc6339315ed84ace5a1556e1b4559524ae2689679bf4279  ARENA-2026.11.10-PC-atualizacao.zip
+bda707f3e3f4e72ce856eceb5d75048aa9ccc5d68efb3914d6a99180cd720039  ARENA-2026.11.10-android-celular-arm64.apk
+a8d7d637cfddc897d71c52d6c7c9eb7eee1e3ed5ef1775572a35842ef67bf949  ARENA-2026.11.10-android-chromebook-intel-amd-x86_64.apk
+```
 
 ## Limites conhecidos
 
