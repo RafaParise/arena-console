@@ -629,6 +629,7 @@
       <div><dt>Disco</dt><dd id="hwDisco">—</dd></div>
       <div><dt>Sistema</dt><dd id="hwSistema">—</dd></div>
       <div><dt>Motor gráfico</dt><dd id="hwMotor">—</dd></div>
+      <div data-so-windows><dt>Driver da placa</dt><dd id="hwDriver">—</dd></div>
       <div data-so-windows><dt>Perfil aplicado</dt><dd id="hwPerfil">—</dd></div>
       <div data-so-windows><dt>Bibliotecas gráficas</dt><dd id="hwRuntime">—</dd></div>
       <div><dt>Capacidade</dt><dd id="hwCapacidade">—</dd></div>
@@ -636,6 +637,14 @@
       <div data-so-windows><dt>Velocidade de gravação</dt><dd id="hwVelocidade">—</dd></div>
       <div><dt>Internet</dt><dd id="hwInternet">—</dd></div>
     </dl>
+
+    <!-- O painel do driver da placa (servidor\driver_video.py, 11/11/2026): o ARENA le as opcoes do AMD
+         Software e diz o que esta como ele precisa e o que vale mudar a mao (ele nao grava no registro). -->
+    <div id="blocoDriverVideo" data-so-windows hidden>
+      <h3 class="grupo-titulo">O painel do driver da placa</h3>
+      <p class="explica" id="explicaDriverVideo"></p>
+      <ul class="controles" id="listaDriverVideo"></ul>
+    </div>
 
     <!-- So no Android (auditoria 4, 23/10/2026): tudo do celular, ate os
          miliamperes da bateria (ArenaServico.java, aparelho()). -->

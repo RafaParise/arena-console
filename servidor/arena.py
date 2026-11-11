@@ -74,6 +74,7 @@ import capas_online     # noqa: E402
 import graficos    # noqa: E402
 import hardware    # noqa: E402
 import lossless    # noqa: E402  (o Lossless Scaling de quem comprou -- item 10, 17/10/2026)
+import driver_video  # noqa: E402  (o painel do driver da placa, AMD Software e Intel -- 11/11/2026)
 import mfg         # noqa: E402  (o MFG Super Motion, gratis, no lugar do Lossless -- 11/11/2026)
 import quadros_ps2  # noqa: E402  (os 60 quadros de verdade do PS2, pelos patches do PCSX2 -- 11/11/2026)
 import navegadores  # noqa: E402  (em que navegador a tela abre -- item 11, 17/10/2026)
@@ -654,6 +655,18 @@ def ler_ranking():
 def detectar_maquina():
     """Le a maquina uma vez, na abertura. Ver servidor/hardware.py."""
     return hardware.resumo(RAIZ)
+
+
+def driver_da_placa():
+    """O painel do driver da placa da tela (servidor\\driver_video.py), lido na primeira vez que alguem
+    precisa e guardado (o registro nao muda sem o painel). No Android nao ha o que ler."""
+    if plataforma_do_sistema.ANDROID:
+        return None
+    try:
+        return driver_video.situacao(MAQUINA["gpu"].get("nome", ""), lossless.frequencia_da_tela())
+    except Exception as falha:  # noqa: BLE001  (o registro de uma maquina estranha nunca derruba o jogo)
+        print("[ARENA] Nao consegui ler o painel do driver da placa: %s" % falha)
+        return None
 
 
 # Lidos uma vez na abertura. Nao mudam enquanto o ARENA estiver aberto.
@@ -2186,6 +2199,13 @@ def gravar_override(config, custo=None, extras=None, em_partida=False,
                      or perfil_para(config, custo) == "desempenho")
         jeito = graficos.jeito_da_escala(plataforma, escolha, nome_core, opcoes_nucleo, altura_tela,
                                          CAPACIDADE.get("nota_gpu", 3), folga)
+        # Alinhado ao driver (11/11/2026): com o Radeon Super Resolution ligado, o driver ja estica; o ARENA
+        # nao estica de novo, so afia (driver_video.escala_com_o_driver).
+        alinhado = driver_video.escala_com_o_driver(jeito, driver_da_placa())
+        if alinhado != jeito:
+            print("[ARENA] O Radeon Super Resolution do driver ja estica a imagem: o ARENA troca o filtro %s "
+                  "pela nitidez (%s), para nao esticar duas vezes." % (jeito, alinhado))
+            jeito = alinhado
         filtro = graficos.caminho_do_filtro(jeito)
         if filtro and jeito == "rcas":
             # O RCAS afia o quadro ainda pequeno; quem estica depois e' o
@@ -2900,7 +2920,9 @@ def preparar_mfg(jogo, config, degrau=0, programa=None):
     if tem_lossless and config.get("lossless_mais_quadros"):
         modo = "sempre"
     integrada = bool(MAQUINA["gpu"].get("integrada", True))
-    hz = lossless.frequencia_da_tela()
+    # A frequencia que os quadros a mais seguem: a da tela, ou o limite de quadros do driver, se for menor
+    # (o AMD Software com o Frame Rate Target Control: acima dele o driver descarta o que foi criado).
+    hz = driver_video.hz_efetivo(lossless.frequencia_da_tela(), driver_da_placa())
     de_fora = bool(jogo.get("externo"))
     usar, motivo = mfg.decidir(modo, achado or tem_lossless, CAPACIDADE.get("nota_gpu"), integrada, hz, de_fora,
                                degrau)
@@ -5784,6 +5806,9 @@ class Manipulador(BaseHTTPRequestHandler):
                 # dele se ele estiver nesta maquina.
                 "lossless": lossless.situacao(RAIZ),
                 # O MFG Super Motion desta maquina (servidor\mfg.py): achado, versao, placas, o que o automatico faz.
+                # O painel do driver da placa (servidor\driver_video.py): o que esta como esta e o que vale
+                # mudar a mao no AMD Software (o ARENA nao grava no registro).
+                "driver_video": driver_da_placa(),
                 "mfg": None if plataforma_do_sistema.ANDROID else mfg.situacao(
                     RAIZ, CAPACIDADE.get("nota_gpu"), bool(MAQUINA["gpu"].get("integrada", True)),
                     lossless.frequencia_da_tela(),

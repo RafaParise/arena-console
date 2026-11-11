@@ -246,10 +246,23 @@ class MaisQuadrosUnificado(unittest.TestCase):
         base.update(mudancas)
         return base
 
-    def preparar(self, placas=(), tem_mfg=True, config=None, degrau=0):
+    def preparar(self, placas=(), tem_mfg=True, config=None, degrau=0, driver=None):
+        # 'driver': o painel do driver da placa (driver_video.situacao); None = sem limite de quadros nem RSR.
         with mock.patch.object(self.mfg, "achar", return_value=self.motor if tem_mfg else None), \
-                mock.patch.object(self.mfg, "placas", return_value=list(placas)):
+                mock.patch.object(self.mfg, "placas", return_value=list(placas)), \
+                mock.patch.object(self.arena, "driver_da_placa", return_value=driver):
             return self.arena.preparar_mfg(self.jogo, config or self.config(), degrau, self.programa)
+
+    def test_o_limite_de_quadros_do_driver_corta_a_tela_rapida(self):
+        # Tela de 144 Hz, mas o AMD Software com o limite de quadros em 60: o Mais quadros segue os 60 e, no
+        # RetroArch (jogo de 60), nao ha o que criar.
+        self.jogo = {"plataforma": "psp", "core": "ppsspp_libretro.dll"}
+        self.programa = None
+        with mock.patch.object(lossless, "frequencia_da_tela", return_value=144):
+            self.assertIsNone(self.preparar(driver={"hz_limite": 60, "rsr": False}))
+            pronto = self.preparar(driver={"hz_limite": 144, "rsr": False})
+        self.assertEqual(pronto["tipo"], "lossless")
+        self.assertEqual(lossless.gravar_perfil.call_args[0][0]["LSFG3Target"], "144")
 
     def test_amd_ou_intel_com_os_dois_vai_pelo_lossless(self):
         pronto = self.preparar()

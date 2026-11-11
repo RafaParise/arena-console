@@ -338,6 +338,7 @@ async function carregarEstado() {
     : "sem internet — tudo continua funcionando e sobe depois";
   $("#hwSistema").textContent = m.sistema;
   $("#hwMotor").textContent = estado.efetivas.video_driver || m.driver_video;
+  mostrarDriverVideo(dados.driver_video);
   // O que o perfil muda de verdade: o modo econômico (rede e cópias de
   // segurança mais espaçadas). Nenhum console some da lista -- a frase
   // antiga ("consoles pesados ficam ocultos") não valia mais desde que o
@@ -1768,6 +1769,51 @@ function mostrarNavegadores(situacao, config) {
     lista.append(opcao);
   }
   lista.value = [...lista.options].some((o) => o.value === escolhido) ? escolhido : "automatico";
+}
+
+// O painel do driver da placa (servidor\driver_video.py, 11/11/2026). O
+// ARENA le o AMD Software e diz o que esta como ele precisa (✓) e o que vale
+// mudar a mao (⚠, com o valor a escolher): ele nao grava no registro do
+// Windows. Na Intel e na NVIDIA, por enquanto so a versao e o painel.
+function mostrarDriverVideo(situacao) {
+  const bloco = $("#blocoDriverVideo");
+  const linha = $("#hwDriver");
+  if (!bloco || !linha) return;
+  if (!situacao || !situacao.fabricante) {
+    linha.textContent = "não li o driver desta placa";
+    bloco.hidden = true;
+    return;
+  }
+  const nomeFab = { amd: "AMD", intel: "Intel", nvidia: "NVIDIA" }[situacao.fabricante] || situacao.fabricante;
+  linha.textContent = nomeFab + " " + (situacao.driver || "") + (situacao.painel ? " · " + situacao.painel : "");
+  bloco.hidden = false;
+  const lista = $("#listaDriverVideo");
+  lista.textContent = "";
+  if (!situacao.le_as_opcoes) {
+    $("#explicaDriverVideo").textContent = situacao.fabricante === "amd"
+      ? "Não consegui ler as opções do AMD Software nesta máquina."
+      : "O ARENA ainda não lê as opções do painel da " + nomeFab + " (não houve máquina dela para conferir onde ficam). " +
+        "O que vale: deixar filtragem, anti-serrilhado e escala \"do aplicativo\", e o vsync como o jogo pedir.";
+    return;
+  }
+  const mudar = situacao.itens.filter((i) => !i.certo);
+  $("#explicaDriverVideo").textContent = (mudar.length
+    ? mudar.length + " opção(ões) do painel vale(m) mudar a mão, no AMD Software (o ARENA não mexe no driver). "
+    : "Tudo o que o ARENA precisa está como deve no AMD Software. ") +
+    "O \"Mais quadros\" e a escala do ARENA já seguem o que está aqui.";
+  for (const item of situacao.itens) {
+    const li = document.createElement("li");
+    li.className = "controle-linha";
+    const titulo = document.createElement("strong");
+    titulo.textContent = (item.certo ? "✓ " : "⚠ ") + item.nome + ": " + item.valor;
+    titulo.title = "valor no registro: " + item.bruto;
+    li.appendChild(titulo);
+    const texto = document.createElement("div");
+    texto.className = "explica";
+    texto.textContent = item.efeito + (item.mude ? " Escolha: " + item.mude : "");
+    li.appendChild(texto);
+    lista.appendChild(li);
+  }
 }
 
 // O MFG Super Motion (servidor\mfg.py, 11/11/2026): gratis, no lugar do
