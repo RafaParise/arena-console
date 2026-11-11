@@ -71,7 +71,14 @@ RETROARCH_VAZIAS = {"system", "saves", "states", "screenshots", "cache", "remaps
 # ---------------------------------------------------------------------------
 
 def pelo_conteiner(argumentos, copiar_para=None):
-    imagens = subprocess.run([CONTAINER, "image", "list"], capture_output=True, text=True, errors="replace").stdout
+    # Achado de 11/11/2026: o servico de conteiner do WSL travou e o "image list" ficou parado ate a rodada cortar o
+    # teste em 30 min, sem uma linha de saida. Agora: 2 min e a mensagem do que fazer.
+    try:
+        imagens = subprocess.run([CONTAINER, "image", "list"], capture_output=True, text=True, errors="replace",
+                                 timeout=120).stdout
+    except subprocess.TimeoutExpired:
+        raise SystemExit("O conteiner do WSL nao respondeu em 2 minutos (\"container image list\"). Reinicie o "
+                         "computador (ou rode wsl --shutdown) e repita o teste.")
     if IMAGEM not in imagens:
         print("Montando a imagem %s (uma vez so)..." % IMAGEM, flush=True)
         subprocess.run([CONTAINER, "build", "-t", IMAGEM, os.path.join(AQUI, "linux")], check=True)
