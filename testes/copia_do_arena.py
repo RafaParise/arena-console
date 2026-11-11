@@ -196,10 +196,27 @@ def fechar_pela_janela(pasta_retroarch, limite=30):
 
 
 def derrubar(copia):
-    """Fecha a forca tudo o que a copia abriu (fim do teste)."""
+    """Fecha a forca tudo o que a copia abriu (fim do teste), inclusive o servidor dela.
+
+    Achado de 11/11/2026: o servidor da copia roda com o Python do repositorio (so o arena.py fica na copia), entao a
+    busca pelo caminho do programa nunca o achava. Cada teste com copia deixava um servidor aberto, e a pasta da copia
+    presa no Temp (25 deles numa noite). Agora o servidor sai pelo comando: o arena.py DESTA copia."""
     for nome in ("retroarch", "javaw"):
         for pid in processos(nome, copia):
             subprocess.run(["taskkill", "/F", "/PID", str(pid)], capture_output=True)
+    for pid in servidores_da_copia(copia):
+        subprocess.run(["taskkill", "/F", "/PID", str(pid)], capture_output=True)
+
+
+def servidores_da_copia(copia):
+    """Os PIDs dos Python que rodam o servidor\\arena.py desta copia."""
+    alvo = os.path.join(copia, "servidor", "arena.py").replace("'", "''")
+    comando = ("Get-CimInstance Win32_Process -Filter \"Name='python.exe'\" | "
+               "Where-Object { $_.CommandLine -and $_.CommandLine.Contains('%s') } | "
+               "ForEach-Object { $_.ProcessId }" % alvo)
+    saida = subprocess.run(["powershell", "-NoProfile", "-Command", comando],
+                           capture_output=True, text=True).stdout
+    return [int(p) for p in saida.split() if p.isdigit()]
 
 
 def nova_pasta():
