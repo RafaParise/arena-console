@@ -79,7 +79,33 @@ def adb_texto(*argumentos, segundos=120):
     return adb(*argumentos, segundos=segundos).stdout.decode("utf-8", "replace")
 
 
-SERIE_DO_EMULADOR = "emulator-5554"
+def _porta_livre(porta):
+    teste = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        teste.bind(("127.0.0.1", porta))
+        return True
+    except OSError:
+        return False
+    finally:
+        teste.close()
+
+
+def _escolher_porta_do_emulador():
+    """A porta do console do emulador (a do adb e' a seguinte). Achado de 11/11/2026: um programa do Windows (o
+    DRWUI.exe) passou a escutar na 5555, a porta do adb do emulador 5554; o emulador ligava, mas o adb nunca o via, e
+    todo teste de emulador falhava com "nao terminou de ligar em 7 minutos". Agora vale o primeiro par livre entre
+    5554 e 5584 (os que o adb procura sozinho). Com um emulador ja ligado num par, fica nele."""
+    for porta in range(5554, 5586, 2):
+        if _porta_livre(porta) and _porta_livre(porta + 1):
+            return porta
+        if not _porta_livre(porta) and not _porta_livre(porta + 1):
+            # Os dois ocupados: pode ser um emulador ja ligado ali (o "usa o que ja estiver ligado").
+            if "emulator-%d\tdevice" % porta in adb_texto("devices", segundos=15):
+                return porta
+    return 5554
+
+
+SERIE_DO_EMULADOR = "emulator-%d" % _escolher_porta_do_emulador()
 
 
 def so_o_emulador():
