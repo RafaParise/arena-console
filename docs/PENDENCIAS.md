@@ -815,3 +815,25 @@ Falta, nesta ordem:
 - **Próxima versão** (pedido de 11/11, esperando os scripts do Rafael):
   - a geração de quadros e a escala nativas, juntando o melhor do Lossless e do MFG;
   - a camada web em Rust (roteiro Axum + rust-embed). O Chromebook gerenciado continua pela versão do navegador.
+
+## 11/11/2026 (tarde): mais quadros, tela leve e a decisão sobre o Rust (ideias do aluno DOOK3DS)
+
+- **Feito e testado** (commits 3bc9140 a 340f9b7, já no main):
+  - PS2 a 60 quadros de verdade pelo patch do PCSX2 (`servidor\quadros_ps2.py`; `teste_mais_quadros`: "Enabled
+    patch: 60 FPS" no Black);
+  - MFG Super Motion instalado, aberto pelo ARENA (`servidor\mfg.py`);
+  - janela leve do navegador (629 MB para 238 MB);
+  - descanso do fundo animado (`teste_descanso_do_fundo`, 9 de 9);
+  - o estudo pelo método replica em `docs\replica\` (paridade 83,8).
+- **Celular:** o APK de teste com tudo isso passou na `auditoria_celular` do A12: 27 rotas sem erro, abertura de
+  2 s, nenhuma falha.
+- **Rust:** decidido não trocar o servidor (medido: 42 MB e quase 0% parado; o peso está no navegador). Ver
+  `docs\replica\architecture.md`. Falta medir a janela leve no Celeron N5100.
+- **Próxima versão:** a rodada final, com o teste do Linux depois de reiniciar o PC (o WSL travou), e aí o
+  lançamento com o APK de produção testado no A12.
+- **Fica para depois:**
+  - 60 quadros no GameCube e no Wii (só 25 jogos, e ligaria as trapaças do Dolphin inteiro);
+  - SGSR para o celular;
+  - NIS.
+- **No celular do professor:** há uma cópia do Lossless Scaling para Windows em `/sdcard/ARENA/Lossless Scaling`
+  (176 MB, de 07/11). Ela não serve no Android e não foi o instalador do ARENA que a pôs lá. Não foi apagada.
