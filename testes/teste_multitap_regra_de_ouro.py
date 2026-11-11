@@ -118,7 +118,11 @@ VALOR_NOVO_DE_PROPOSITO = {("rgui_menu_color_theme", "27"): "4", ("content_show_
 #    e' o 261; no Flycast so existe o 1 (o 517 e o 513 eram de outro nucleo). A versao de antes passa por este mapa;
 #  - Mega Drive e Sega CD ganharam o nucleo so de netplay (PicoDrive, 32af42f), e todo nucleo de netplay desliga a
 #    checagem de dessincronia (netplay_check_frames = 0, a mesma regra do PS1 desde 22/09).
-FORA_DA_COMPARACAO_DESDE_07_11 = {"savestate_thumbnail_enable"}
+FORA_DA_COMPARACAO_DESDE_07_11 = {"savestate_thumbnail_enable",
+                                  # 10/11/2026 (revisao dos saves): a bateria do cartucho vai para o disco a cada 10 s
+                                  # em TODO jogo, de proposito (o padrao do RetroArch escrito, para nenhum cfg antigo
+                                  # desligar).
+                                  "autosave_interval"}
 TIPO_DE_PORTA_NOVO = {"ps1": {"517": "261"}, "dreamcast": {"517": "1", "513": "1"}}
 NUCLEO_DE_NETPLAY_NOVO = {"megadrive", "segacd"}
 
