@@ -1,0 +1,116 @@
+[
+  {
+    "script": "testes\\textos_sem_acento.py",
+    "codigo_saida": 0,
+    "segundos": 0.5,
+    "ultimas_linhas": [
+      "0 frase(s) sem acento que chegam na tela."
+    ],
+    "dados_reais_mexidos": [],
+    "pastas_esquecidas_no_temp": 0,
+    "mb_esquecidos": 0.0
+  },
+  {
+    "script": "testes\\teste_android.py",
+    "codigo_saida": 1,
+    "segundos": 421.5,
+    "ultimas_linhas": [
+      "O Android do emulador nao terminou de ligar em 7 minutos."
+    ],
+    "dados_reais_mexidos": [],
+    "pastas_esquecidas_no_temp": 0,
+    "mb_esquecidos": 0.0
+  },
+  {
+    "script": "testes\\teste_android_estresse.py",
+    "codigo_saida": 1,
+    "segundos": 420.6,
+    "ultimas_linhas": [
+      "O Android do emulador nao terminou de ligar em 7 minutos."
+    ],
+    "dados_reais_mexidos": [],
+    "pastas_esquecidas_no_temp": 0,
+    "mb_esquecidos": 0.0
+  },
+  {
+    "script": "testes\\teste_chromebook.py",
+    "codigo_saida": 0,
+    "segundos": 638.7,
+    "ultimas_linhas": [
+      "    x4 NES              Contra                         59.9 q/s, 544 MB",
+      "    x4 Super Nintendo   BS F ZERO                      59.9 q/s, 541 MB",
+      "    x4 Mega Drive       Golden Axe                     59.9 q/s, 545 MB",
+      "    x4 PS1              Crash Bandicoot                48.7 q/s, 1013 MB",
+      "    x4 Sega CD          Sonic CD                       59.9 q/s, 874 MB",
+      "    x4 Neo Geo          The King of Fighters '97       60.0 q/s, 736 MB",
+      "",
+      "ARENA no Chromebook: 32 de 32 certos. Resultado: C:\\Users\\passo\\AppData\\Local\\Temp\\teste_chromebook.json"
+    ],
+    "dados_reais_mexidos": [],
+    "pastas_esquecidas_no_temp": 0,
+    "mb_esquecidos": 0.0
+  },
+  {
+    "script": "testes\\teste_linux.py",
+    "codigo_saida": "tempo esgotado (1800 s)",
+    "segundos": 1800.2,
+    "ultimas_linhas": [],
+    "dados_reais_mexidos": [],
+    "pastas_esquecidas_no_temp": 0,
+    "mb_esquecidos": 0.0
+  },
+  {
+    "script": "testes\\teste_matriz_consoles.py",
+    "codigo_saida": 0,
+    "segundos": 1107.1,
+    "ultimas_linhas": [
+      "ZX Spectrum                  s/s      s/s    s/s    s/s    s      48.5/51.0   7.8/7.4    ",
+      "ZX81                         s/s      s/s    s/s    s/s    -      47.6/52.1   7.8/6.6    ",
+      "[SEM ESTADO SALVO] Java ME (celular antigo): o nucleo nao salva estado (savestate = \"false\" na ficha dele)",
+      "",
+      "Consoles: 29 | falhas: 0",
+      "Resultado: C:\\Projetos\\arena-console\\docs\\auditoria3\\matriz_consoles.json",
+      "RESULTADO: PASSOU",
+      "[protege_cfg] arquivos de verdade devolvidos como estavam antes do teste: retroarch\\system\\dc\\dc_nvmem.bin, retroarch\\system\\dc\\vulkan_pipeline.cache"
+    ],
+    "dados_reais_mexidos": [],
+    "pastas_esquecidas_no_temp": 0,
+    "mb_esquecidos": 0.0
+  },
+  {
+    "script": "testes\\teste_multitap_regra_de_ouro.py",
+    "codigo_saida": 0,
+    "segundos": 165.0,
+    "ultimas_linhas": [
+      "  Super Smash Bros Melee | sozinho                        p2=517 max_users=2 conexoes=- nucleo=- vazou=nada",
+      "  Super Smash Bros | sozinho                              p2=1 max_users=4 conexoes=- nucleo=- vazou=nada",
+      "  Tmnt2 | entrar                                          p2=1 max_users=4 conexoes=3 nucleo=- vazou=nada",
+      "  Tmnt2 | hospedar                                        p2=1 max_users=4 conexoes=3 nucleo=- vazou=nada",
+      "  Tmnt2 | sozinho                                         p2=1 max_users=4 conexoes=- nucleo=- vazou=nada",
+      "",
+      "Nenhuma diferenca fora do esperado.",
+      "RESULTADO: PASSOU"
+    ],
+    "dados_reais_mexidos": [],
+    "pastas_esquecidas_no_temp": 0,
+    "mb_esquecidos": 0.0
+  },
+  {
+    "script": "testes\\teste_orcamentos_modo_alvo.py",
+    "codigo_saida": 1,
+    "segundos": 402.7,
+    "ultimas_linhas": [
+      "5b   Gravacoes com o ARENA parado (volume)                  0.0 KB/min   max 16.0  PASSOU",
+      "6a   FPS do Super Nintendo (piso)                             52.5 FPS   min 59.0  NAO VALE: a saida de som segura o ritmo (sem ela: 59.9 FPS)",
+      "6b   Variacao dos quadros no SNES                             23.533 %    max 5.0  NAO VALE: a saida de som segura o ritmo (sem ela: 59.9 FPS)",
+      "",
+      "REPROVOU: 1 orcamento(s) estourado(s) no modo alvo:",
+      "  - 1b Abertura do servidor (arena.py ate os dados da tela): 5.25 s (teto 2.3)",
+      "Antes de propor conserto: apontar a causa (medir de novo, olhar o que mudou).",
+      "[protege_cfg] arquivos de verdade devolvidos como estavam antes do teste: dados\\builtin\\content_history.lpl"
+    ],
+    "dados_reais_mexidos": [],
+    "pastas_esquecidas_no_temp": 0,
+    "mb_esquecidos": 0.0
+  }
+]

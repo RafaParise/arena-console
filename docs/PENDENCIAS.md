@@ -786,3 +786,13 @@ Falta, nesta ordem:
   `servidor\python\python.exe ferramentas\rodada_final.py --saida=docs\rodada_final_2026.11.10.json --continuar`
   (com o PC folgado: fechar navegador e programas pesados). O repasse do A12 também pode ser atualizado
   (`python scripts\repasse_a12.py instalar`, no parise-sync) para levar as mensagens com acento.
+- **11/11, rodada final da 2026.11.10** (`docs\rodada_final_2026.11.10.json`, janela própria): 117 de 126 de primeira.
+  Repetidos (`..._repeticao.json`): passaram o textos sem acento (corrigido), o Chromebook (demora), a matriz de
+  consoles (o PocketStation passou) e o multitap (a referência passou a aceitar o `autosave_interval`, de propósito).
+  Achados e corrigidos no caminho: o `derrubar` da cópia não fechava o servidor (25 abertos numa noite) e o teste do
+  emulador deixava o emulador e as travas do aparelho virtual quando ele não ligava (`22f3206`). **Abertura no modo
+  alvo (1b):** 4,55 e 5,25 s pelo `ARENA.bat` (teto 2,3); o servidor sozinho, no mesmo modo, abre em 0,77 a 1,75 s, e
+  fora dele em 0,70 s (era 1,07): o código não ficou mais lento. Suspeita [Palpite]: o antivírus ClamAV (`clamd`,
+  novo nesta máquina) e o navegador disputando os 2 processadores limitados. **Ambiente:** o Jogar Junto PC e celular
+  pede o Super Bomberman 4 no A12, e ele está numa pasta do cartão que o ARENA não lê
+  (`Projetos\qwen-celular\ARENA\Super Nintendo`); não mexi nos arquivos do cartão.
