@@ -939,6 +939,7 @@ window.ARENA_DADOS = {
   "jeito_de_abrir": {},
   "lossless_mais_quadros": false,
   "lossless_scaling": false,
+  "mfg_super_motion": "automatico",
   "modo_desempenho": false,
   "modo_modesto": false,
   "motor_ps2": "automatico",

@@ -407,7 +407,8 @@ async function carregarEstado() {
     dados.config.travar_teclas ? "true" : "false");
   $("#chaveContinuar").setAttribute("aria-pressed",
     dados.config.continuar_de_onde_parou ? "true" : "false");
-  mostrarLossless(dados.lossless, dados.config);
+  mostrarMfg(dados.mfg, dados.config);
+  mostrarLossless(dados.lossless, dados.config, dados.mfg && dados.mfg.achado);
   mostrarNavegadores(dados.navegadores, dados.config);
   desenharFechamentos(dados.fechamentos || []);
 
@@ -1751,12 +1752,38 @@ function mostrarNavegadores(situacao, config) {
   lista.value = [...lista.options].some((o) => o.value === escolhido) ? escolhido : "automatico";
 }
 
+// O MFG Super Motion (servidor\mfg.py, 11/11/2026): gratis, no lugar do
+// Lossless Scaling. O bloco aparece em todo Windows; sem o programa, ensina
+// a instalar.
+function mostrarMfg(situacao, config) {
+  const bloco = $("#blocoMfg");
+  if (!bloco) return;
+  bloco.hidden = !(situacao && situacao.disponivel);
+  if (bloco.hidden) return;
+  $("#listaMfg").value = config.mfg_super_motion || "automatico";
+  $("#baixarMfg").hidden = !!situacao.achado;
+  if (situacao.pagina) $("#linkMfg").href = situacao.pagina;
+  let texto;
+  if (!situacao.achado) {
+    texto = "Ainda não está instalado neste computador: os jogos abrem como sempre.";
+  } else {
+    const versao = situacao.versao ? " (versão " + situacao.versao + ")" : "";
+    const onde = situacao.origem === "arena" ? "na pasta do ARENA" : "instalado neste computador";
+    texto = "Achado" + versao + ", " + onde + ". Aqui ele usa o " + situacao.gerador + ". ";
+    texto += situacao.placa_forte
+      ? "No automático, liga nos emuladores de fora" + (situacao.hz > 65 ? " e em todo jogo (tela de " + situacao.hz + " Hz)." : ".")
+      : "A placa de vídeo daqui é fraca para isso: no automático ele fica desligado (em Sempre, liga assim mesmo).";
+  }
+  $("#estadoMfg").textContent = texto;
+}
+
 // O Lossless Scaling de quem comprou (servidor\lossless.py). O bloco so
-// aparece se o programa estiver nesta maquina.
-function mostrarLossless(situacao, config) {
+// aparece se o programa estiver nesta maquina E o MFG Super Motion, que
+// ocupa o lugar dele (11/11/2026), nao estiver.
+function mostrarLossless(situacao, config, mfgAchado) {
   const bloco = $("#blocoLossless");
   if (!bloco) return;
-  bloco.hidden = !(situacao && situacao.achado);
+  bloco.hidden = !(situacao && situacao.achado) || !!mfgAchado;
   if (bloco.hidden) return;
   const versao = situacao.versao ? ", versão " + situacao.versao : "";
   let texto = "Achado (" + situacao.origem + versao + "). ";
@@ -6141,6 +6168,17 @@ function ligarEventos() {
     } catch (falha) {
       lista.value = (estado.config && estado.config.botoes_na_tela) || "automatico";
       explicarBotoesNaTela();
+      recado(falha.message, true);
+    }
+  });
+
+  $("#listaMfg").addEventListener("change", async (evento) => {
+    const lista = evento.currentTarget;
+    try {
+      await salvarConfig({ mfg_super_motion: lista.value });
+      recado(lista.value === "desligado" ? "Mais quadros desligado." : "Pronto. Vale no próximo jogo.");
+    } catch (falha) {
+      lista.value = (estado.config && estado.config.mfg_super_motion) || "automatico";
       recado(falha.message, true);
     }
   });

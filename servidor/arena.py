@@ -74,6 +74,7 @@ import capas_online     # noqa: E402
 import graficos    # noqa: E402
 import hardware    # noqa: E402
 import lossless    # noqa: E402  (o Lossless Scaling de quem comprou -- item 10, 17/10/2026)
+import mfg         # noqa: E402  (o MFG Super Motion, gratis, no lugar do Lossless -- 11/11/2026)
 import navegadores  # noqa: E402  (em que navegador a tela abre -- item 11, 17/10/2026)
 # O que a configuracao aceita em "navegador".
 NAVEGADORES_ACEITOS = ("automatico",) + tuple(c[0] for c in navegadores.CONHECIDOS)
@@ -1367,6 +1368,9 @@ def config_padrao():
         # geracao de quadros dele (LSFG).
         "lossless_scaling": False,
         "lossless_mais_quadros": False,
+        # MFG Super Motion (servidor\mfg.py, 11/11/2026): quadros a mais, criados entre os do jogo, pelo
+        # programa gratis instalado na maquina. "automatico": o ARENA liga so onde ajuda e a placa aguenta.
+        "mfg_super_motion": mfg.MODO_PADRAO,
         "tipo_controle": "xbox360",
         # Por console: direcional, analogicos, vibracao e se o jogador 2
         # vira mouse ou teclado.
@@ -1555,6 +1559,8 @@ def ler_config_do_disco():
                                        if isinstance(p, str)][:baixados.MAXIMO_DE_PASTAS_ESCOLHIDAS]
     config["lossless_scaling"] = bool(salvo.get("lossless_scaling"))
     config["lossless_mais_quadros"] = bool(salvo.get("lossless_mais_quadros"))
+    if salvo.get("mfg_super_motion") in mfg.MODOS:
+        config["mfg_super_motion"] = salvo["mfg_super_motion"]
     if isinstance(salvo.get("tipo_controle"), str):
         config["tipo_controle"] = salvo["tipo_controle"][:24]
     if isinstance(salvo.get("perfil_controle"), dict):
@@ -2872,6 +2878,45 @@ def nota_da_placa_de_fora():
     return CAPACIDADE.get("nota_gpu_de_fora", CAPACIDADE.get("nota_gpu"))
 
 
+def preparar_mfg(jogo, config):
+    """A partida com os quadros a mais do MFG Super Motion (servidor\\mfg.py), ou None.
+
+    Ele ocupa o lugar do Lossless Scaling (pedido de 11/11/2026): onde ele
+    liga, o Lossless fica de fora. Nao vale no Jogar Junto (a partida em
+    rede ja pesa, e o atraso a mais seria dos dois) nem no Android."""
+    if plataforma_do_sistema.ANDROID:
+        return None
+    modo = config.get("mfg_super_motion", mfg.MODO_PADRAO)
+    if modo == "desligado":
+        return None
+    achado = mfg.achar(RAIZ)
+    integrada = bool(MAQUINA["gpu"].get("integrada", True))
+    hz = lossless.frequencia_da_tela()
+    de_fora = bool(jogo.get("externo"))
+    usar, motivo = mfg.decidir(modo, achado, CAPACIDADE.get("nota_gpu"), integrada, hz, de_fora)
+    if not usar:
+        if modo == "sempre" or achado:
+            print("[ARENA] %s fica de fora deste jogo: %s." % (mfg.NOME, motivo))
+        return None
+    desenho_2d = (not de_fora) and jogo.get("plataforma") in (
+        graficos.carregar_graficos().get("escala", {}).get("pixel") or [])
+    opcoes = mfg.escolher_opcoes(mfg.placas(achado["motor"]), CAPACIDADE.get("nota_gpu"), integrada, hz,
+                                 desenho_2d)
+    print("[ARENA] %s neste jogo (%s): %s." % (mfg.NOME, motivo, mfg.descrever(opcoes)))
+    # O motor copia a imagem da tela: o RetroArch fica na tela cheia sem borda (a exclusiva tomaria a tela
+    # e a imagem dele ficaria por baixo, como foi medido com o Lossless Scaling em 08/11/2026).
+    return {"motor": achado["motor"], "opcoes_do_motor": opcoes,
+            "opcoes": {} if de_fora else {"video_fullscreen": "true", "video_windowed_fullscreen": "true"}}
+
+
+def abrir_o_mfg(pelo_mfg, processo):
+    """Abre o motor do MFG Super Motion quando a janela do jogo aparecer (numa thread). Devolve a sessao."""
+    largura, altura = hardware.tamanho_da_tela()
+    arquivo = os.path.join(PASTA_DADOS, "mfg_partida.cfg")
+    return mfg.Sessao(pelo_mfg["motor"], pelo_mfg["opcoes_do_motor"], arquivo).comecar(
+        processo.pid, largura * altura, ainda_aberto=lambda: processo.poll() is None)
+
+
 def preparar_lossless(jogo, config):
     """A partida pelo Lossless Scaling, se o aluno ligou e da para usar.
 
@@ -3132,6 +3177,9 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
     devolver_ponte = None
     # A partida pelo Lossless Scaling (preparar_lossless), ou None.
     pelo_lossless = None
+    # Os quadros a mais do MFG Super Motion (preparar_mfg), ou None; a sessao do motor, aberta com o jogo.
+    pelo_mfg = None
+    sessao_mfg = None
     # Linux: o que o emulador de fora precisa no ambiente (a pasta de dados
     # dele, a mesma do Windows: servidor\plataforma.py, dados_do_externo).
     ambiente_externo = {}
@@ -3153,7 +3201,10 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             argumentos_externo + comando[1:]
         pasta_trabalho = os.path.dirname(programa_externo)
         # A geracao de quadros do Lossless Scaling tambem nos emuladores de fora (pedido de 07/11/2026).
-        pelo_lossless = None if partida else preparar_lossless_de_fora(jogo, config, programa_externo)
+        # O MFG Super Motion vem primeiro (11/11/2026); o Lossless so entra onde ele nao entrou.
+        pelo_mfg = None if partida else preparar_mfg(jogo, config)
+        pelo_lossless = None if (partida or pelo_mfg) else preparar_lossless_de_fora(jogo, config,
+                                                                                     programa_externo)
 
         # O PCSX2 tem tela propria, mas le a configuracao antes de abrir.
         # O ARENA escreve o controle ali: dois analogicos, direcional
@@ -3182,7 +3233,7 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
                 motor=config.get("motor_ps2", "automatico"),
                 formato=graficos.formato_de_fora("ps2", config.get("formato_da_imagem", "automatico"),
                                                  hardware.tamanho_da_tela()),
-                so_quadros_novos=bool(pelo_lossless))
+                so_quadros_novos=bool(pelo_lossless or pelo_mfg))
             if escrito:
                 print("[ARENA] Controle e qualidade do PCSX2 configurados "
                       "(%s jogadores)." % jogo.get("jogadores_max", 2))
@@ -3461,7 +3512,11 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         # estica ate a tela. A janela vale so nesta partida; o filtro do
         # ARENA fica de fora (quem estica e' o Lossless Scaling).
         config_da_partida = config
-        pelo_lossless = None if partida else preparar_lossless(jogo, config)
+        pelo_mfg = None if partida else preparar_mfg(jogo, config)
+        if pelo_mfg:
+            opcoes_jogo.update(pelo_mfg["opcoes"])
+            so_desta_partida += list(pelo_mfg["opcoes"])
+        pelo_lossless = None if (partida or pelo_mfg) else preparar_lossless(jogo, config)
         if pelo_lossless:
             opcoes_jogo.update(pelo_lossless["opcoes"])
             so_desta_partida += list(pelo_lossless["opcoes"])
@@ -3603,6 +3658,8 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             aberto_em = time.time()
             # No Android, quem abre o RetroArch e' o app (plataforma.py).
             processo = plataforma_do_sistema.abrir_programa(comando, cwd=pasta_trabalho, **extras)
+            if pelo_mfg:
+                sessao_mfg = abrir_o_mfg(pelo_mfg, processo)
             # Java ME: o RetroArch entra numa caixa do Windows; fechada no
             # fim, ela encerra o Java que tiver ficado para tras (o RetroArch
             # que cai deixava o Java aberto, escondido: processos.py).
@@ -3663,6 +3720,8 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             processos.fechar_caixa(caixa)
             if companheiros.fechar_os_que_o_arena_abriu():
                 print("[ARENA] Programas companheiros fechados junto com o jogo.")
+            if sessao_mfg and sessao_mfg.parar():
+                print("[ARENA] %s fechado junto com o jogo." % mfg.NOME)
             if pelo_lossless and lossless.fechar_o_que_o_arena_abriu():
                 print("[ARENA] Lossless Scaling fechado junto com o jogo.")
             if acelerar:
@@ -5681,6 +5740,10 @@ class Manipulador(BaseHTTPRequestHandler):
                 # da Steam (servidor\lossless.py). A tela so mostra o bloco
                 # dele se ele estiver nesta maquina.
                 "lossless": lossless.situacao(RAIZ),
+                # O MFG Super Motion desta maquina (servidor\mfg.py): achado, versao, placas, o que o automatico faz.
+                "mfg": None if plataforma_do_sistema.ANDROID else mfg.situacao(
+                    RAIZ, CAPACIDADE.get("nota_gpu"), bool(MAQUINA["gpu"].get("integrada", True)),
+                    lossless.frequencia_da_tela()),
                 # Os navegadores deste computador e o padrao dele (a tela
                 # oferece a escolha em Ajustes -> Simples).
                 "navegadores": {"padrao": navegadores.padrao_do_computador(),
@@ -7657,6 +7720,8 @@ class Manipulador(BaseHTTPRequestHandler):
             for chave in ("lossless_scaling", "lossless_mais_quadros"):
                 if chave in dados:
                     config[chave] = bool(dados[chave])
+            if dados.get("mfg_super_motion") in mfg.MODOS:
+                config["mfg_super_motion"] = dados["mfg_super_motion"]
             if "ultra_desempenho" in dados:
                 config["ultra_desempenho"] = bool(dados["ultra_desempenho"])
                 # Ultra sem prioridade nao faz sentido: ligam juntos.

@@ -977,6 +977,7 @@ window.ArenaRotas = (function () {
       consoles_botoes: [],
       externos: [],
       lossless: null,
+      mfg: null,
       navegadores: null,
       rede_ps2: {},
       bios_disponiveis: [],

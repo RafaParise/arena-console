@@ -820,6 +820,12 @@ def conferir(destino, com_bios=False):
             if pago in arquivos:
                 problemas.append("programa pago (Lossless Scaling) na versao: %s"
                                  % os.path.relpath(os.path.join(atual, pago), destino))
+    # O MFG Super Motion e' gratis, mas a licenca dele (PolyForm Strict 1.0.0) proibe redistribuir: o ARENA so
+    # usa o instalado na maquina (servidor\mfg.py, 11/11/2026), nunca leva junto.
+    for atual, _sub, arquivos in os.walk(destino):
+        if "Mfg Super Motion.exe" in arquivos or ("engine-version.txt" in arquivos and "nvngx.dll" in arquivos):
+            problemas.append("MFG Super Motion na versao (a licenca dele proibe levar junto): %s"
+                             % os.path.relpath(atual, destino))
     # O ARENA do Chromebook foi inteiro (a entrada, a tela e os nucleos).
     falta = falta_no_navegador(destino)
     if not os.path.isfile(os.path.join(destino, "ARENA-CHROMEBOOK.html")):

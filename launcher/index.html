@@ -1114,6 +1114,23 @@
     <p class="explica" data-so-android hidden>No celular, os emuladores já vêm dentro do ARENA: cada console abre
       pelo seu próprio núcleo, sem nada para baixar. Abaixo, a BIOS de cada console e o jeito de ligar os que têm mais de um.</p>
 
+    <div id="blocoMfg" data-fora-do-android hidden>
+      <h3 class="grupo-titulo">Mais quadros: MFG Super Motion (grátis)</h3>
+      <p class="explica">O <strong>MFG Super Motion</strong> é um programa gratuito que cria quadros novos entre os do jogo, como o desenhista que faz o meio de um movimento: o jogo que roda a 30 aparece a 60 na tela. Ele não vem no ARENA (a licença dele não deixa levar junto): instale-o uma vez pelo site oficial e o ARENA acha, ajusta e abre sozinho, junto com o jogo, e fecha no fim. Ele ocupa o lugar do Lossless Scaling.</p>
+      <p class="explica" id="estadoMfg" role="status"></p>
+      <div class="opcao">
+        <span class="opcao-rotulo">Mais quadros</span>
+        <select class="opcao-controle" id="listaMfg" aria-label="Mais quadros (MFG Super Motion)"
+                aria-describedby="estadoMfg">
+          <option value="automatico">Automático (recomendado)</option>
+          <option value="sempre">Sempre</option>
+          <option value="desligado">Desligado</option>
+        </select>
+        <span class="opcao-ajuda">Automático: o ARENA liga só onde ajuda e a placa de vídeo aguenta (os emuladores de PS2, GameCube, Wii, PS3 e Xbox 360, ou tela de mais de 60 Hz). Fora da partida a dois.</span>
+      </div>
+      <p class="explica" id="baixarMfg" hidden>Para instalar: baixe o <code>MFG-SUPER-MOTION-Setup</code> na <a id="linkMfg" href="https://github.com/NODIX-TECH/MFG-SUPER-MOTION/releases/latest" target="_blank" rel="noopener">página oficial do programa</a>, abra e avance. Ele instala só para você, sem administrador. Depois, volte aqui.</p>
+    </div>
+
     <div id="blocoLossless" hidden>
       <h3 class="grupo-titulo">Lossless Scaling (de quem comprou)</h3>
       <p class="explica">O <strong>Lossless Scaling</strong> é um programa pago, da Steam, que estica a janela do jogo até a tela inteira e pode criar quadros novos entre os do jogo. Ele não vem no ARENA: é de quem comprou. Ligado aqui, o jogo abre numa janela do tamanho em que é desenhado, e o ARENA abre o Lossless Scaling junto, já ajustado para aquele jogo, e fecha junto. A escala do próprio ARENA (aba Simples) faz o mesmo sem ele, com menos atraso.</p>
