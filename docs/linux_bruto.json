@@ -1,5 +1,5 @@
 {
- "quando": "2026-11-10 03:00:02",
+ "quando": "2026-11-11 21:26:40",
  "partes": [
   "A",
   "B",
@@ -9,7 +9,7 @@
   "F"
  ],
  "sistema": "Debian GNU/Linux 13 (trixie) (Linux 6.18.54.1)",
- "retroarch_tirar_do_appimage_s": 0.11,
+ "retroarch_tirar_do_appimage_s": 0.15,
  "retroarch_ja_pronto_s": 0.001,
  "retroarch": "/home/aluno/.cache/arena/retroarch-10390008/AppRun",
  "jogos": [
@@ -21,10 +21,10 @@
    "imagem": true,
    "detalhe": "1440x1080, 193 cores, a mais comum em 96%",
    "travou": false,
-   "segundos": 30.8,
+   "segundos": 31.0,
    "pela_ponte": false,
    "quadros": 1800,
-   "quadros_por_segundo": 58.5
+   "quadros_por_segundo": 58.1
   },
   {
    "parte": "B",
@@ -34,10 +34,10 @@
    "imagem": true,
    "detalhe": "1440x1080, 193 cores, a mais comum em 96%",
    "travou": false,
-   "segundos": 30.5,
+   "segundos": 30.6,
    "pela_ponte": false,
    "quadros": 1800,
-   "quadros_por_segundo": 59.0
+   "quadros_por_segundo": 58.8
   },
   {
    "parte": "A",
@@ -50,7 +50,7 @@
    "segundos": 15.2,
    "pela_ponte": false,
    "quadros": 900,
-   "quadros_por_segundo": 59.2
+   "quadros_por_segundo": 59.0
   },
   {
    "parte": "B",
@@ -76,7 +76,7 @@
    "segundos": 30.5,
    "pela_ponte": false,
    "quadros": 1500,
-   "quadros_por_segundo": 49.2
+   "quadros_por_segundo": 49.1
   },
   {
    "parte": "B",
@@ -99,10 +99,10 @@
    "imagem": true,
    "detalhe": "255x192, 208 cores, a mais comum em 70%",
    "travou": false,
-   "segundos": 10.1,
+   "segundos": 10.2,
    "pela_ponte": false,
    "quadros": 600,
-   "quadros_por_segundo": 59.2
+   "quadros_por_segundo": 58.9
   },
   {
    "parte": "B",
@@ -180,7 +180,7 @@
    "segundos": 24.3,
    "pela_ponte": false,
    "quadros": 1200,
-   "quadros_por_segundo": 49.4
+   "quadros_por_segundo": 49.3
   },
   {
    "parte": "B",
@@ -193,7 +193,7 @@
    "segundos": 24.3,
    "pela_ponte": false,
    "quadros": 1200,
-   "quadros_por_segundo": 49.3
+   "quadros_por_segundo": 49.4
   },
   {
    "parte": "A",
@@ -203,10 +203,10 @@
    "imagem": true,
    "detalhe": "1137x852, 435 cores, a mais comum em 53%",
    "travou": false,
-   "segundos": 30.2,
+   "segundos": 30.3,
    "pela_ponte": false,
    "quadros": 1500,
-   "quadros_por_segundo": 49.6
+   "quadros_por_segundo": 49.5
   },
   {
    "parte": "B",
@@ -219,7 +219,7 @@
    "segundos": 30.2,
    "pela_ponte": false,
    "quadros": 1500,
-   "quadros_por_segundo": 49.6
+   "quadros_por_segundo": 49.7
   },
   {
    "parte": "A",
@@ -245,7 +245,7 @@
    "segundos": 30.2,
    "pela_ponte": false,
    "quadros": 1500,
-   "quadros_por_segundo": 49.6
+   "quadros_por_segundo": 49.7
   },
   {
    "parte": "A",
@@ -268,10 +268,10 @@
    "imagem": true,
    "detalhe": "960x720, 256 cores, a mais comum em 91%",
    "travou": false,
-   "segundos": 15.7,
+   "segundos": 15.5,
    "pela_ponte": true,
    "quadros": 900,
-   "quadros_por_segundo": 57.3
+   "quadros_por_segundo": 57.9
   },
   {
    "parte": "A",
@@ -281,10 +281,10 @@
    "imagem": true,
    "detalhe": "960x720, 98 cores, a mais comum em 75%, (90, 40, 0)",
    "travou": false,
-   "segundos": 10.3,
+   "segundos": 10.6,
    "pela_ponte": false,
    "quadros": 600,
-   "quadros_por_segundo": 58.3
+   "quadros_por_segundo": 56.7
   },
   {
    "parte": "B",
@@ -294,10 +294,10 @@
    "imagem": true,
    "detalhe": "960x720, 98 cores, a mais comum em 75%, (90, 40, 0)",
    "travou": false,
-   "segundos": 10.3,
+   "segundos": 10.2,
    "pela_ponte": false,
    "quadros": 600,
-   "quadros_por_segundo": 58.3
+   "quadros_por_segundo": 58.6
   },
   {
    "parte": "A",
@@ -310,7 +310,7 @@
    "segundos": 30.3,
    "pela_ponte": false,
    "quadros": 1500,
-   "quadros_por_segundo": 49.6
+   "quadros_por_segundo": 49.5
   },
   {
    "parte": "B",
@@ -320,7 +320,7 @@
    "imagem": true,
    "detalhe": "1065x798, 7 cores, a mais comum em 63%, (101, 208, 69)",
    "travou": false,
-   "segundos": 30.2,
+   "segundos": 30.3,
    "pela_ponte": false,
    "quadros": 1500,
    "quadros_por_segundo": 49.6
@@ -336,7 +336,7 @@
    "segundos": 30.5,
    "pela_ponte": false,
    "quadros": 1500,
-   "quadros_por_segundo": 49.2
+   "quadros_por_segundo": 49.1
   },
   {
    "parte": "B",
@@ -401,7 +401,7 @@
    "segundos": 12.2,
    "pela_ponte": false,
    "quadros": 600,
-   "quadros_por_segundo": 49.2
+   "quadros_por_segundo": 49.0
   },
   {
    "parte": "A",
@@ -424,20 +424,20 @@
    "imagem": true,
    "detalhe": "1440x1080, 13313 cores, a mais comum em 71%, (255, 0, 0)",
    "travou": false,
-   "segundos": 10.4,
+   "segundos": 10.5,
    "pela_ponte": false,
    "quadros": 600,
-   "quadros_por_segundo": 57.8
+   "quadros_por_segundo": 57.2
   }
  ],
- "servidor_abriu_s": 0.61,
+ "servidor_abriu_s": 0.91,
  "sistema_do_computador": "linux",
  "maquina": {
   "sistema": "Debian GNU/Linux 13 (trixie) (Linux 6.18.54.1) (x86_64, 64 bits)",
   "processador": null,
   "driver_video": "vulkan"
  },
- "servidor_memoria_mb": 58.4,
+ "servidor_memoria_mb": 61.1,
  "jogo_abriu_s": 8.5,
  "tela_do_jogo": {
   "largura": 1280,
@@ -445,7 +445,7 @@
   "cores": 2,
   "a_mais_comum": 0.783
  },
- "retroarch_memoria_mb": 144.5,
+ "retroarch_memoria_mb": 144.6,
  "sessoes_encerradas": 1,
  "arena_sh_abriu_s": 0.9,
  "arena_sh_cache": [
@@ -463,21 +463,21 @@
    "programa": "/home/aluno/.cache/arena/pcsx2-60119544/AppRun"
   },
   "RPCS3": {
-   "tirar_do_appimage_s": 1.7,
+   "tirar_do_appimage_s": 1.3,
    "abriu": true,
    "codigo": 0,
    "saida": "No AppImage path found, checking for executable\nFound exec path: /home/aluno/.cache/arena/rpcs3-94026641/usr/bin/rpcs3\n[TSC calibration] Available clock sources: 'tsc hyperv_clocksource_tsc_page hyper",
    "programa": "/home/aluno/.cache/arena/rpcs3-94026641/AppRun"
   },
   "Xenia": {
-   "tirar_do_appimage_s": 0.2,
+   "tirar_do_appimage_s": 0.1,
    "abriu": true,
    "codigo": null,
    "saida": "i> 0000051C VulkanPresenter: Created 1280x720 swapchain with format 44, color space 0, presentation mode 0",
    "programa": "/home/aluno/.cache/arena/xenia-17832440/AppRun"
   }
  },
- "segundos": 663.4,
+ "segundos": 663.8,
  "falhas": [],
- "segundos_com_o_conteiner": 687.7
+ "segundos_com_o_conteiner": 694.7
 }

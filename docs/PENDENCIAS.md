@@ -887,3 +887,30 @@ Falta, nesta ordem:
 - **PS2 a 60 no celular** (o irmão): escrito no `preparar_o_ps2_do_android` (gamesettings + EnablePatches); **falta
   o teste no A12**, que saiu do cabo às 13h (o Rafael está fora de casa). Primeira coisa quando ele voltar:
   `testes\celular_arena.py api /api/jogar` num ISO de PS2 com "Sempre" e procurar "Enabled patch" no registro.
+
+## 11/11/2026 (noite, 3): o PS2 a 60 provado no A12, o Linux passou, e o que o Rafael pediu de ferramentas
+
+- **PS2 a 60 no celular: provado** (`testes\teste_60_ps2_celular.py`, "tudo certo"): o Black (BR).iso foi para
+  `jogos\pessoais\PS2` do A12; o ARENA identificou pelo ISO, gravou o `gamesettings\SLUS-21376_5C891FF1.ini`, ligou o
+  `EnablePatches` e o ARMSX2 escreveu "Enabled patch" no `emulog.txt`. O servidor viu o fim do jogo e guardou o serial.
+  Duas lições do teste: (1) o núcleo ARMSX2 **não sai pelo F10 injetado** (os outros núcleos saem) e sem root o adb
+  não mata o processo: o teste fecha o app e reabre; (2) a linha do servidor vai ao logcat com a tag `ARENA-servidor`,
+  e a pasta `dados` do app é `files\arena-dados\dados`.
+- **Teste do Linux (WSL, depois de reiniciar o PC): tudo certo em 664 s** (`docs\linux_bruto.json`).
+- **Segunda opinião do OmniRoute** (combo `auditoria`, modelo DiffusionGemma, 105 s) sobre o `quadros_dolphin.py`: 9
+  apontamentos, nenhum bug real (2 falsos: "parêntese sobrando", "ANSI do Dolphin"); os demais já estavam cobertos
+  (temporário apagado na falha, `try/except` no aprendizado do fim do jogo). Fica registrado como o jeito de usar.
+- **Pedido do Rafael (noite): "implemente o omniroute e todas as ferramentas de IA... parece que o Fable não está
+  usando tudo como o Opus estava".** Feito: os plugins desligados em `.claude\settings.local.json` deste projeto foram
+  religados (valem na próxima sessão), e o trabalho passa a usar a skill `delegar` (combos) e o `bracal` para coleta.
+- **parise-sync (a bancada do FortiGate 60D):** já está unificado: está no `REGISTRO` do parise-core
+  (`projetos.py`, id `parise-sync`) e o repasse do ARENA pelo A12 na DMZ já foi aplicado em 10/11. Hoje o Rafael ligou
+  a porta 1 ao PC (a placa de 2,5G pegou 10.0.20.100 por DHCP; o aparelho responde em 10.0.20.1:443) e a porta **USB
+  MGMT (mini-USB)** por cabo de dados: o Windows mostrou "Dispositivo USB desconhecido (falha na redefinição de
+  porta)". É o esperado: a `docs\equipamento-fortigate-60d.md` do parise-sync já diz que essa porta só fala com o
+  FortiExplorer; o console de verdade é o **RJ-45 da frente**, com cabo console USB↔RJ-45. A COM5 que apareceu é o
+  celular Samsung (VID 04E8), não o FortiGate. O que falta lá continua físico (WAN1, hub do A12 na DMZ, switch na
+  porta 2).
+- **PRÓXIMO PASSO:** a rodada final (`ferramentas\rodada_final.py`), o APK de produção testado no A12
+  (`auditoria_celular`), os zips do PC, e a Release 2026.11.11 (rascunho em `docs\RELEASE-2026.11.11.md`, com a seção
+  do DOOK3DS no fim).

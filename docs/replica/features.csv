@@ -27,4 +27,4 @@ Quadros de verdade no PS2: patch 60 FPS do proprio PCSX2,quadros,must,no,yes,ser
 Janela leve do navegador (perfil so do ARENA),leveza,must,no,yes,629 MB -> 238 MB e 14 -> 8 processos no Edge (medido em 11/11/2026)
 Descanso do fundo animado,leveza,should,no,yes,3 minutos sem mexer: o fundo do Automatico para
 60 quadros no GameCube e no Wii (codigos do Dolphin),quadros,could,no,yes,servidor\quadros_dolphin.py: 25 jogos; as trapacas ligam so no jogo (User\GameSettings\<ID>.ini); provado com o F-Zero GX
-60 quadros no PS2 do celular (patches do PCSX2 no nucleo ARMSX2),quadros,could,no,partial,escrito (system/pcsx2/gamesettings + EnablePatches); falta o teste no A12
+60 quadros no PS2 do celular (patches do PCSX2 no nucleo ARMSX2),quadros,could,no,yes,provado no Galaxy A12 com o Black (testes	este_60_ps2_celular.py): o ARMSX2 escreveu Enabled patch
