@@ -2053,3 +2053,6 @@ html[data-navegador="true"] [data-so-windows] { display: none !important; }
 #faixaNitidez { min-height: 44px; width: min(100%, 22rem); cursor: pointer; }
 
 .equip-aviso-admin { margin: 0; font-size: var(--t-base); font-weight: 700; }
+
+.equip-internet { display: grid; gap: .45rem; }
+.equip-passos { margin: 0; padding-left: 1.3rem; font-size: var(--t-base); line-height: 1.5; }

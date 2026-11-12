@@ -1364,6 +1364,13 @@ function linhaDoEquipamento(item) {
                                  () => equiparItens([item.id]), rodando));
   } else if (acao.tipo === "loja") {
     li.append(botaoDoEquipamento(acao.rotulo || "Ver na loja", `loja:${item.id}`, abrirLojaDoLossless));
+  } else if (acao.tipo === "conferir") {
+    const caixa = document.createElement("div");
+    caixa.className = "equip-internet";
+    caixa.id = "caixaInternet";
+    caixa.setAttribute("aria-live", "polite");
+    if (estado.internet) caixa.append(...desenharInternet(estado.internet));
+    li.append(botaoDoEquipamento(acao.rotulo || "Conferir", `conferir:${item.id}`, conferirInternet), caixa);
   } else if (acao.tipo === "admin") {
     // A unica coisa que pede administrador: o aviso fica escrito na linha E e' perguntado antes.
     const aviso = document.createElement("p");
@@ -1485,6 +1492,69 @@ async function equiparItens(ids, tudo = false) {
   } catch (falha) {
     recado(falha.message, true);
   }
+}
+
+// A internet de casa serve para partidas entre casas? (servidor\internet_de_casa.py, 13/11/2026)
+async function conferirInternet() {
+  const caixa = $("#caixaInternet");
+  if (caixa) caixa.replaceChildren(Object.assign(document.createElement("p"), { textContent: "⏳ Conferindo (uns 10 segundos)..." }));
+  try {
+    estado.internet = await pedir("/api/internet/conferir");
+  } catch (falha) {
+    estado.internet = { titulo: "Não deu para conferir", explica: falha.message, passos: [] };
+  }
+  ultimoDesenhoEquip = "";
+  carregarEquipamentos();
+}
+
+function desenharInternet(dados) {
+  const partes = [];
+  const titulo = document.createElement("p");
+  titulo.className = "equip-andamento";
+  const icone = { pronto: "✅", sem_cgnat: "✅", cgnat: "⛔", sem_internet: "⚠️" }[dados.conclusao] || "🔎";
+  titulo.textContent = `${icone} ${dados.titulo}`;
+  const explica = document.createElement("p");
+  explica.className = "equip-para-que";
+  explica.textContent = dados.explica;
+  partes.push(titulo, explica);
+  if (dados.passos && dados.passos.length) {
+    const lista = document.createElement("ol");
+    lista.className = "equip-passos";
+    for (const passo of dados.passos) lista.append(Object.assign(document.createElement("li"), { textContent: passo }));
+    partes.push(lista);
+  }
+  if (dados.pagina_do_roteador && dados.conclusao !== "cgnat") {
+    partes.push(botaoDoEquipamento("Abrir a página do roteador", "roteador", async () => {
+      try { await pedir("/api/internet/pagina-do-roteador", "POST", { endereco: dados.pagina_do_roteador }); }
+      catch (falha) { recado(falha.message, true); }
+    }));
+  }
+  if (dados.passos && dados.passos.length) {
+    const rotulo = document.createElement("label");
+    rotulo.className = "campo";
+    const texto = Object.assign(document.createElement("span"), { textContent: "Endereço IP que aparece no roteador" });
+    const campo = Object.assign(document.createElement("input"), { type: "text", id: "campoIpRoteador", inputMode: "decimal",
+      autocomplete: "off", maxLength: 40, placeholder: "ex.: 200.150.10.20" });
+    rotulo.append(texto, campo);
+    partes.push(rotulo, botaoDoEquipamento("Comparar", "comparar", async () => {
+      try {
+        const resposta = await pedir("/api/internet/comparar", "POST", { ip: campo.value });
+        estado.internet = { ...resposta, passos: resposta.conclusao === "invalido" ? estado.internet.passos : [],
+                            pagina_do_roteador: estado.internet.pagina_do_roteador };
+        ultimoDesenhoEquip = "";
+        carregarEquipamentos();
+      } catch (falha) { recado(falha.message, true); }
+    }));
+  }
+  if (dados.upnp && ["pronto", "sem_cgnat"].includes(dados.conclusao)) {
+    partes.push(botaoDoEquipamento("Abrir as portas sozinho (por 4 horas)", "portas", async () => {
+      try {
+        const r = await pedir("/api/internet/abrir-portas", "POST", {});
+        recado(`Pronto: o roteador abriu as portas ${r.abertas.join(" e ")} para este computador.`, false, 7000);
+      } catch (falha) { recado(falha.message, true, 9000); }
+    }));
+  }
+  return partes;
 }
 
 async function pedirAdministrador(itemId, aviso) {
@@ -4523,9 +4593,10 @@ function abrirPartida(jogo) {
   // aviso de quem abre a partida sair certo no "Comecar".
   procurarPartidas(true);
   // "Estamos em casas diferentes": escondida de 09/10 a 10/11/2026 (o convidado nao tinha como achar a sala no
-  // repasse). Agora volta, pelo repasse da turma (servidor\repasse_proprio.py): aparece quando ele esta em Ajustes,
-  // quem abre ganha um codigo de 6 numeros e quem entra digita o codigo.
-  $("#campoInternet").hidden = !temRepasse();
+  // repasse). Voltou em 10/11 pelo repasse da turma (servidor\repasse_proprio.py, codigo de 6 numeros) e, desde
+  // 13/11/2026, aparece sempre: sem o repasse, vale o retransmissor da internet (servidor\repasse_publico.py,
+  // codigo de 20 letras), que funciona ate com CGNAT.
+  $("#campoInternet").hidden = false;
   $("#chaveInternet").setAttribute("aria-pressed", "false");
   $("#codigoSala").value = "";
   atualizarCamposDaInternet();
@@ -4535,11 +4606,6 @@ function abrirPartida(jogo) {
     b.classList.toggle("ativo", b.dataset.papel === "hospedar");
   }
   $("#modalPartida").hidden = false;
-}
-
-// O repasse da turma esta em Ajustes? (sem ele, "Estamos em casas diferentes" nem aparece)
-function temRepasse() {
-  return Boolean((estado.config?.repasse_proprio || "").trim());
 }
 
 // Pela internet, quem entra digita o codigo da sala (a lista da rede local nao serve: o amigo esta em outra casa).
@@ -4566,12 +4632,14 @@ async function comecarPartida() {
   // Quem abre a partida espera o jogador 2: os dois comecam juntos.
   if (estado.papelDaPartida === "hospedar") corpo.esperar = true;
   if (pelaInternet && estado.papelDaPartida !== "hospedar") {
-    corpo.codigo_sala = $("#codigoSala").value.replace(/\D/g, "");
-    if (corpo.codigo_sala.length !== 6) {
-      recado("Digite o código da sala: os 6 números que aparecem na tela de quem abriu a partida.", true);
+    // Dois tipos de código: o de 20 letras (retransmissor da internet, 13/11/2026) e o de 6 números (repasse da turma).
+    const digitado = $("#codigoSala").value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+    corpo.codigo_sala = /^\d{6}$/.test(digitado) ? digitado : digitado.length === 20 ? digitado : "";
+    if (!corpo.codigo_sala) {
+      recado("Cole o código da sala que o amigo mandou (20 letras e números, ou os 6 números do repasse da turma).", true);
       return;
     }
-    recado("Procurando a sala no repasse…", false, 3000);
+    recado("Entrando na sala…", false, 3000);
   } else if (estado.papelDaPartida !== "hospedar") {
     const escolha = $("#listaAmigosPartida").selectedOptions[0];
     corpo.endereco = escolha ? escolha.value : "";
@@ -4606,8 +4674,11 @@ async function comecarPartida() {
     mostrarFaixaTeclas();
     if (dados.codigo_sala) {
       estado.avisoDaMaquina = true;
-      aviso(`Código da sala: ${dados.codigo_sala}. Passe ao amigo: ele clica em “Entrar na partida do amigo”, liga “Estamos em ` +
-        "casas diferentes” e digita esses 6 números.");
+      const longo = dados.codigo_sala.length > 6;
+      aviso(`Código da sala: ${dados.codigo_sala}. Mande ao amigo (copie e cole no grupo): ele clica em “Entrar na partida do ` +
+        `amigo”, liga “Estamos em casas diferentes” e ${longo ? "cola esse código" : "digita esses 6 números"}.`);
+      if (longo && navigator.clipboard) navigator.clipboard.writeText(dados.codigo_sala).then(
+        () => recado("O código da sala já foi copiado: é só colar no grupo.", false, 6000), () => {});
     }
     if (dados.aviso_rede) {
       // Rede Pública: fica na barra do alto até o jogo fechar. O recado
@@ -6967,7 +7038,6 @@ function ligarEventos() {
       }
       const entrando = estado.papelDaPartida !== "hospedar";
       $("#campoAmigoPartida").hidden = !entrando;
-      $("#campoInternet").hidden = !temRepasse();
       atualizarCamposDaInternet();
       preencherAmigosPartida();
       vigiarPartidas(entrando);

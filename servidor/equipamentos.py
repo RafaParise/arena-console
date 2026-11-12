@@ -264,6 +264,10 @@ def listar(raiz, plataformas, jogos, achar_externo, nucleos_prontos=0, retroarch
                 "Pronto." if achado else "Vem no pacote completo do ARENA (o zip grande da página de downloads)."))
     lista.append(_item("imagem", "🖼️", "Imagem mais bonita", "Deixa o jogo antigo nítido na tela grande (FSR, SGSR).",
                        "pronto", "Já vem no ARENA. Escolha em Ajustes, Escala da tela."))
+    lista.append(_item("internet", "🌐", "Partidas pela internet",
+                       "Confere se a sua internet deixa jogar com quem está em outra casa.", "opcional",
+                       "Toque em Conferir: o ARENA olha o caminho até a internet e o roteador, sozinho.",
+                       {"tipo": "conferir", "rotulo": "Conferir minha internet"}))
     if android:
         return lista
 

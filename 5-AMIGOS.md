@@ -867,9 +867,33 @@ da internet. Funciona assim:
 3. Quem entra: **Jogar junto** → **Entrar na partida do amigo** → ligue **Estamos em casas
    diferentes** → digite o código → **Começar**.
 
-O código só vale enquanto o jogo de quem abriu estiver aberto. Sem o
-endereço do repasse em Amigos, a chave nem aparece. Para quem monta o
-repasse (o professor): `docs\REPASSE-PROPRIO.md`.
+O código só vale enquanto o jogo de quem abriu estiver aberto. Para quem
+monta o repasse (o professor): `docs\REPASSE-PROPRIO.md`.
+
+**Sem o repasse da turma, pelo retransmissor da internet (13/11/2026).**
+Agora a chave aparece sempre. Se não há repasse em Amigos (ou se ele está
+na rede de casa, que ninguém de fora alcança), o ARENA usa o retransmissor
+público do RetroArch em São Paulo. Os dois computadores ligam para fora,
+então **funciona até com CGNAT dos dois lados**:
+
+1. Quem abre: **Jogar junto** → **Eu abro a partida** → ligue **Estamos em
+   casas diferentes** → **Começar**. Aparece um **código de 20 letras e
+   números** (ex.: `ABCD-EFGH-IJKL-MNOP-QRST`), que já vai copiado: cole no
+   grupo da turma.
+2. Quem entra: **Entrar na partida do amigo** → ligue **Estamos em casas
+   diferentes** → cole o código → **Começar**. Pode colar com ou sem
+   tracinhos, em maiúscula ou minúscula.
+
+A sala **não aparece em lista nenhuma**: o ARENA conversa com o
+retransmissor por uma ponte só deste computador e mostra o código só para
+quem abriu. O retransmissor vê o endereço de internet de quem joga, como
+qualquer site. Precisa de internet nos dois lados.
+
+**Minha internet serve?** Em **🧰 Equipamentos → Partidas pela internet →
+Conferir minha internet**, o ARENA olha sozinho o caminho até a internet e
+o roteador e diz, em palavras simples, se a casa tem CGNAT. Sem CGNAT e com
+o roteador aceitando, o botão **Abrir as portas sozinho (por 4 horas)** pede
+ao roteador a porta da partida para este computador.
 
 Se as máquinas da escola não se enxergam, é isolamento de cliente no
 roteador. As saídas estão na Parte A deste mesmo documento.

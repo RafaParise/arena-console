@@ -27,6 +27,9 @@ O que aparece:
 
 - **Consoles clássicos** e os **emuladores de fora** (PS2, GameCube e Wii, PS3, Xbox 360): vêm no pacote completo.
 - **Imagem mais bonita** (FSR, SGSR...): já vem no ARENA.
+- **Partidas pela internet**: o botão **Conferir minha internet** diz se a casa tem CGNAT (a operadora divide um
+  endereço de internet entre várias casas). Com CGNAT, a partida entre casas vai pelo retransmissor da internet
+  (código de 20 letras, documento 5); sem CGNAT, o ARENA pode pedir ao roteador a porta da partida por 4 horas.
 - **Movimento mais liso (MFG Super Motion)**: grátis; o ARENA baixa do site do autor e guarda na pasta dele.
 - **Lossless Scaling**: pago, na Steam; o botão abre a página dele. Não é obrigatório.
 - **Versões para PC dos seus jogos** (recomps): uma por jogo que você tem, cada uma com o botão **Baixar**.

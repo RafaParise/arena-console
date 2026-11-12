@@ -1510,13 +1510,13 @@
       <span class="opcao-rotulo">Estamos em casas diferentes</span>
       <button class="chave opcao-controle" id="chaveInternet"
               aria-pressed="false" aria-label="Jogar pela internet"></button>
-      <span class="opcao-ajuda">Para amigos fora da rede local, pelo repasse da turma.</span>
+      <span class="opcao-ajuda">Para amigos em outra casa, pela internet.</span>
     </div>
 
     <label class="campo" id="campoCodigoSala" hidden>
-      <span>Código da sala (6 números)</span>
-      <input id="codigoSala" type="text" inputmode="numeric" maxlength="7" autocomplete="off"
-             spellcheck="false" placeholder="123456">
+      <span>Código da sala (o que o amigo mandou)</span>
+      <input id="codigoSala" type="text" maxlength="32" autocomplete="off" autocapitalize="characters"
+             spellcheck="false" placeholder="ABCD-EFGH-IJKL-MNOP-QRST">
       <span class="opcao-ajuda">Quem abriu a partida vê o código na tela e passa para você.</span>
     </label>
 

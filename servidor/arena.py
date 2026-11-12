@@ -80,7 +80,9 @@ import quadros_ps2  # noqa: E402  (os 60 quadros de verdade do PS2, pelos patche
 import quadros_dolphin  # noqa: E402  (o mesmo no GameCube e no Wii, pelos codigos do Dolphin -- 11/11/2026)
 import recomps      # noqa: E402  (o jogo de console recompilado para PC: baixar da release e jogar -- 12/11/2026)
 import jogos_pc     # noqa: E402  (o console PC: o programa do jogo, as lojas, Wine e WSL -- 12/11/2026)
-import equipamentos  # noqa: E402  (o painel Equipamentos: o que o ARENA tem e o botao que resolve -- 13/11/2026)
+import equipamentos  # noqa: E402
+import internet_de_casa  # noqa: E402
+import repasse_publico  # noqa: E402  (partida entre casas pelo retransmissor publico, sem lista -- 13/11/2026)  (a internet de casa serve para partida entre casas? CGNAT, UPnP -- 13/11/2026)  (o painel Equipamentos: o que o ARENA tem e o botao que resolve -- 13/11/2026)
 import navegadores  # noqa: E402  (em que navegador a tela abre -- item 11, 17/10/2026)
 # O que a configuracao aceita em "navegador".
 NAVEGADORES_ACEITOS = ("automatico",) + tuple(c[0] for c in navegadores.CONHECIDOS)
@@ -3935,6 +3937,8 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         if partida:
             controle_usb.soltar_partida()       # a partida pelo cabo (adb forward/reverse), se havia
             fechar_porta_dos_colegas()
+            if partida.get("ponte_publica"):
+                repasse_publico.fechar_ponte()  # a ponte local do retransmissor publico (13/11/2026)
 
 
 # ---------------------------------------------------------------------------
@@ -6173,6 +6177,14 @@ class Manipulador(BaseHTTPRequestHandler):
                                         "tudo": {"quantos": len(tudo),
                                                  "tamanho": equipamentos.tamanho_aproximado(itens, tudo)}})
 
+        if caminho == "/api/internet/conferir":
+            # A internet de casa serve para partida entre casas? (servidor\internet_de_casa.py; uns 8 s: o caminho ate
+            # a internet, o endereco publico e o roteador pelo UPnP). So quando a pessoa toca em Conferir.
+            resultado = internet_de_casa.conferir()
+            with TRAVA_CACHE:
+                _cache["ip_publico"] = resultado.get("publico")
+            return self.responder_json(dict(ok=True, **resultado))
+
         if caminho == "/api/recomp/progresso":
             parametros = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
             andamento = recomps.progresso((parametros.get("id") or [""])[0][:60])
@@ -7264,6 +7276,41 @@ class Manipulador(BaseHTTPRequestHandler):
             except recomps.NaoDaParaInstalar as falha:
                 return self.erro(str(falha), 409)
             return self.responder_json({"ok": True, "mensagem": frase})
+
+        if caminho == "/api/internet/comparar":
+            # O passo 3 da conferencia: o endereco que a pessoa leu na pagina do roteador.
+            with TRAVA_CACHE:
+                publico = _cache.get("ip_publico")
+            if not publico:
+                return self.erro("Clique em Conferir de novo antes de comparar.", 409)
+            return self.responder_json(dict(ok=True, **internet_de_casa.comparar(str(dados.get("ip") or "")[:64],
+                                                                                 publico)))
+
+        if caminho == "/api/internet/abrir-portas":
+            # O roteador abre as portas da partida para este computador, pelo UPnP, por 4 horas (so com o toque).
+            abertas = internet_de_casa.abrir_portas()
+            if not abertas:
+                return self.erro("O roteador não aceitou abrir a porta sozinho. Abra a página do roteador e procure "
+                                 "\"Encaminhamento de porta\".", 409)
+            return self.responder_json({"ok": True, "abertas": abertas})
+
+        if caminho == "/api/internet/pagina-do-roteador":
+            # Abre a pagina do roteador no navegador. So endereco da rede de casa (nada vem da internet).
+            endereco = str(dados.get("endereco") or "")[:40]
+            maquina = endereco[len("http://"):-1] if endereco.startswith("http://") and endereco.endswith("/") else ""
+            try:
+                ipaddress.IPv4Address(maquina)
+            except ValueError:
+                maquina = ""
+            if not maquina or not internet_de_casa.de_casa(maquina) or plataforma_do_sistema.ANDROID:
+                return self.erro("Esse endereço não é de um roteador da sua casa. Clique em Conferir de novo.", 400)
+            if os.name == "nt":
+                subprocess.Popen([shutil.which("rundll32") or "rundll32", "url.dll,FileProtocolHandler", endereco],
+                                 creationflags=0x08000000)
+            elif shutil.which("xdg-open"):
+                subprocess.Popen([shutil.which("xdg-open"), endereco], stdout=subprocess.DEVNULL,
+                                 stderr=subprocess.DEVNULL)
+            return self.responder_json({"ok": True})
 
         if caminho == "/api/equipamentos/loja":
             # So o Lossless Scaling (pago): abre a pagina dele na Steam. Endereco fixo, nada vem da tela.
@@ -8376,10 +8423,36 @@ class Manipulador(BaseHTTPRequestHandler):
                     # publica da internet. Quem abre ganha um codigo de 6 numeros; quem entra digita o codigo.
                     repasse = str(config.get("repasse_proprio") or "").strip()
                     falha_do_repasse = None
-                    if not repasse:
-                        falha_do_repasse = ("Para jogar com quem está em outra casa, o ARENA precisa do repasse da "
-                                            "turma: botão Amigos, no alto → Partidas entre casas. Peça o endereço "
-                                            "ao professor.")
+                    # 13/11/2026: sem repasse da turma alcancavel de fora (nenhum, ou um endereco da rede de casa, que
+                    # ninguem de outra casa alcanca -- o caso do CGNAT), vale o retransmissor publico do RetroArch
+                    # pela ponte local (servidor\repasse_publico.py): codigo de 20 letras, sem lista publica.
+                    partes_do_repasse = repasse_proprio.separar_endereco(repasse) if repasse else None
+                    publico = not partes_do_repasse or internet_de_casa.de_casa(partes_do_repasse[0])
+                    codigo_digitado = str(dados.get("codigo_sala") or "")
+                    if hospedar and publico:
+                        ponte = repasse_publico.abrir_ponte()
+                        partida["opcoes"].update({
+                            "netplay_use_mitm_server": "true",
+                            "netplay_mitm_server": "custom",
+                            "netplay_custom_mitm_server": "127.0.0.1|%d" % ponte.porta,
+                            "netplay_nat_traversal": "false",
+                            "netplay_public_announce": "false",
+                        })
+                        partida["ponte_publica"] = True
+                    elif not hospedar and repasse_publico.parece_codigo_publico(codigo_digitado):
+                        partida["opcoes"].update({
+                            "netplay_ip_port": str(repasse_publico.TUNEL[1]),
+                            "netplay_use_mitm_server": "false",
+                            "netplay_nat_traversal": "false",
+                        })
+                        partida["argumentos"] = ["--connect", repasse_publico.TUNEL[0], "--port",
+                                                 str(repasse_publico.TUNEL[1]), "--mitm-session=" +
+                                                 repasse_publico.para_o_retroarch(
+                                                     repasse_publico.sessao_do_codigo(codigo_digitado))]
+                    elif not repasse:
+                        falha_do_repasse = ("Esse código tem 6 números, que são do repasse da turma, e este ARENA não "
+                                            "tem o endereço dele. Peça ao amigo o código de 20 letras (ou o endereço "
+                                            "do repasse ao professor: Amigos → Partidas entre casas).")
                     elif hospedar:
                         codigo_sala, falha_do_repasse = repasse_proprio.reservar_sala(repasse)
                         if codigo_sala:
@@ -8468,6 +8541,15 @@ class Manipulador(BaseHTTPRequestHandler):
                 resposta["porta"] = graficos.PORTA_PARTIDA
                 if partida.get("codigo_sala"):
                     resposta["codigo_sala"] = partida["codigo_sala"]
+                if partida.get("ponte_publica"):
+                    # O codigo so existe quando o retransmissor responde ao RetroArch (uns 2 s depois de abrir).
+                    ponte = repasse_publico.ponte_atual()
+                    codigo = ponte.esperar_codigo(15) if ponte else None
+                    if codigo:
+                        resposta["codigo_sala"] = codigo
+                    else:
+                        resposta["aviso"] = ("O retransmissor da internet não respondeu: confira a internet e abra a "
+                                             "partida de novo.")
             if esperar:
                 resposta["esperando"] = True
             if aviso_netplay or aviso_sem_bios or aviso_pc or aviso_recomp:
