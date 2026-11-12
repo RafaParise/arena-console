@@ -8,8 +8,8 @@ Lossless Scaling), o painel do driver da placa lido e explicado, e uma janela ma
 
 | Você vai usar em | Baixe | Tamanho |
 |---|---|---|
-| 📱 **Celular ou tablet Android** (a maioria dos aparelhos, incluindo Galaxy, Xiaomi, Motorola) | **`ARENA-2026.11.11-celular-android.apk`** | (preencher) |
-| 📱 **Chromebook com Intel** ou **emulador de Android no PC** | **`ARENA-2026.11.11-chromebook-x86_64.apk`** | (preencher) |
+| 📱 **Celular ou tablet Android** (a maioria dos aparelhos, incluindo Galaxy, Xiaomi, Motorola) | **`ARENA-2026.11.11-android-celular-arm64.apk`** | (preencher) |
+| 📱 **Chromebook com Intel** ou **emulador de Android no PC** | **`ARENA-2026.11.11-android-chromebook-intel-amd-x86_64.apk`** | (preencher) |
 | 🖥️ **Computador com Windows 10 ou 11**, primeira vez | **`ARENA-2026.11.11-PC-windows-linux-chromebook.zip`** | (preencher) |
 | 🖥️ **Computador com Windows**, já usa o ARENA | **`ARENA-2026.11.11-PC-atualizacao.zip`** (só o programa) | (preencher) |
 | 🐧 **Computador com Linux** (Ubuntu, Debian, Mint, Fedora; 64 bits) | o mesmo **`ARENA-2026.11.11-PC-windows-linux-chromebook.zip`** | (preencher) |

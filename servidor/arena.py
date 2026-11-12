@@ -9054,6 +9054,13 @@ def principal():
     # A pasta BIOS: prateleiras, LEIA e a BIOS posta la vai para onde o
     # emulador procura, com o nome certo (servidor\bios.py).
     threading.Thread(target=organizar_bios, daemon=True).start()
+    # O motor do MFG lista as placas uma vez (0,3 s, medido em 11/11/2026 no orcamento 1b); em segundo plano, para
+    # o primeiro /api/estado nao esperar por ele.
+    def aquecer_mfg():
+        achado = None if plataforma_do_sistema.ANDROID else mfg.achar(RAIZ)
+        if achado:
+            mfg.placas(achado["motor"])
+    threading.Thread(target=aquecer_mfg, daemon=True).start()
     # Porta do ARENA dentro das faixas que o Windows reservou neste reinicio
     # (Hyper-V, WSL, Docker): avisa na janela preta, sem atrasar a abertura.
     threading.Thread(target=avisar_portas_reservadas, daemon=True).start()

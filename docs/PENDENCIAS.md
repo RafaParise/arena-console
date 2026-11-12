@@ -918,3 +918,16 @@ Falta, nesta ordem:
   em 13 min, entre eles `teste_60_dolphin.py` e `teste_60_ps2_celular.py`, que a rodada pega sozinha; parou no
   8º, depois de `teste_abaixo_do_original.py`). Retomar com `ferramentas\rodada_final.py --continuar` numa janela
   própria, fora do Claude Code, com o PC folgado. Só então: VERSAO 2026.11.11, APK de produção no A12, zips, Release.
+- **11/11, 23h: rodada final retomada e terminada: 128 de 130.** As duas falhas, repetidas com o PC folgado: a
+  partida PC+celular PASSOU (o Super Bomberman 4 não estava no cartão do A12; uma cópia de 2 MB foi para a pasta
+  interna de Super Nintendo; nada do cartão foi movido); o orçamento 1b (abertura do servidor) deu 2,64 s com o PC
+  folgado (teto 2,3; 4,4 s dentro da rodada). Causa medida: `mfg.situacao` lista as placas do motor do MFG no
+  primeiro `/api/estado` (0,29 s). Conserto: o `aquecer_mfg` em thread daemon na abertura (`principal()`). **Falta
+  medir de novo o 1b** (`testes\teste_orcamentos_modo_alvo.py`) com esse conserto; se ainda passar de 2,3 s, anotar
+  na nota da release como limite de ambiente (como na 2026.11.10) e seguir.
+- **PRÓXIMO PASSO:** VERSAO = "2026.11.11" em `servidor\arena.py` (linha 150), APK de produção (`montar_android.py`
+  arm64 e x86_64, nomes `ARENA-2026.11.11-android-celular-arm64.apk` e
+  `...-android-chromebook-intel-amd-x86_64.apk`) instalado e auditado no A12 (`auditoria_celular.py`), zips do PC
+  (`montar_versao_alunos.py --zip-completo` e `--zip-atualizacao` em `%LOCALAPPDATA%\ARENA-release-2026.11.11`),
+  SHA-256, completar `docs\RELEASE-2026.11.11.md` (tamanhos, "Como esta versão foi conferida": 128/130, Linux 664 s,
+  A12) e `gh release create v2026.11.11` como Latest, com a seção do DOOK3DS no fim. README: só o que for novo.
