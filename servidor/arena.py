@@ -149,7 +149,7 @@ ARQUIVO_OVERRIDE = os.path.join(PASTA_DADOS, "arena_override.cfg")
 # Serve para uma coisa so: acabar com a duvida de "sera que estou testando
 # a versao corrigida?". Quando algo nao bate com o esperado, o primeiro
 # passo e comparar este numero.
-VERSAO = "2026.11.11"   # quadros de verdade (PS2 a 60 no PC e no celular, Dolphin a 60), Mais quadros unificado, painel do driver, janela leve
+VERSAO = "2026.11.12"   # versao para PC dos jogos de console (recomps), jogos de PC e das lojas, jogos de Android no celular, SGSR e nitidez
 
 PORTA = 8777
 # Os testes que sobem uma copia do ARENA (testes\copia_do_arena.py) usam
@@ -2308,7 +2308,8 @@ def manifesto(forcar=False):
                 if salvo and (time.time() - idade) < VALIDADE_CACHE:
                     return salvo
         # lojas=True: a lista do servidor mostra tambem os jogos instalados pela Steam, GOG, Epic e Heroic.
-        resultado = indexador.indexar(forcar=forcar, lojas=True)
+        # ARENA_SEM_LOJAS=1 desliga isso nas copias de teste (testes\copia_do_arena.py), que contam os jogos.
+        resultado = indexador.indexar(forcar=forcar, lojas=not os.environ.get("ARENA_SEM_LOJAS"))
         with TRAVA_CACHE:
             _cache["manifesto"] = (time.time(), resultado)
         return resultado
@@ -7335,6 +7336,9 @@ class Manipulador(BaseHTTPRequestHandler):
             criadas = []
             base = os.path.join(PASTA_JOGOS, "pessoais")
             for plataforma in carregar_catalogo():
+                # Os jogos de Android vem do proprio aparelho (sem pasta); no celular, o PC nao roda (12/11/2026).
+                if plataforma.get("sem_pasta") or (plataforma.get("nativo") and plataforma_do_sistema.ANDROID):
+                    continue
                 alvo = os.path.join(base, plataforma["pasta"])
                 if not os.path.isdir(alvo):
                     try:

@@ -339,7 +339,7 @@ def nucleos_usados():
         for chave in ("core", "core_netplay"):
             if p.get(chave):
                 usados.add(p[chave].lower())
-    return usados, [p["pasta"] for p in dados["plataformas"] if p.get("pasta")]
+    return usados, [p["pasta"] for p in dados["plataformas"] if p.get("pasta") and not p.get("sem_pasta")]
 
 
 def partes_do_linux():
@@ -826,6 +826,11 @@ def conferir(destino, com_bios=False):
         if "Mfg Super Motion.exe" in arquivos or ("engine-version.txt" in arquivos and "nvngx.dll" in arquivos):
             problemas.append("MFG Super Motion na versao (a licenca dele proibe levar junto): %s"
                              % os.path.relpath(atual, destino))
+    # Os recomps (servidor\recomps.py, 12/11/2026) sao baixados por quem usa, da release de quem os fez: nunca vao no
+    # pacote (programa de terceiros que o ARENA nao redistribui).
+    recomps_no_pacote = os.path.join(destino, "emuladores", "Recomps")
+    if os.path.isdir(recomps_no_pacote) and any(not n.lower().startswith("leia") for n in os.listdir(recomps_no_pacote)):
+        problemas.append("recomp baixado no pacote (cada um baixa o seu): emuladores\\Recomps")
     # O ARENA do Chromebook foi inteiro (a entrada, a tela e os nucleos).
     falta = falta_no_navegador(destino)
     if not os.path.isfile(os.path.join(destino, "ARENA-CHROMEBOOK.html")):

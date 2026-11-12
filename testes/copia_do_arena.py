@@ -83,6 +83,11 @@ def montar(destino, nucleos, jogos, sistema=(), java=False):
     for pasta in ("servidor", "launcher"):
         shutil.copytree(os.path.join(RAIZ, pasta), os.path.join(destino, pasta),
                         ignore=shutil.ignore_patterns("__pycache__", "tests", "python"))
+    # Sem o catalogo de recomps (12/11/2026): o jogo que tem versao para PC (o GoldenEye) faria o Jogar perguntar
+    # o jeito de abrir, e os testes daqui abrem pelo RetroArch. O recomp tem os testes dele (test_recomps.py).
+    catalogo_recomps = os.path.join(destino, "servidor", "recomps.json")
+    if os.path.exists(catalogo_recomps):
+        os.remove(catalogo_recomps)
     ra, ra_d = os.path.join(RAIZ, "retroarch"), os.path.join(destino, "retroarch")
     for pasta in ("cores", "info", "system"):
         os.makedirs(os.path.join(ra_d, pasta))
@@ -126,7 +131,7 @@ def subir_servidor(copia, registro):
         processo = subprocess.Popen([os.path.join(RAIZ, "servidor", "python", "python.exe"),
                                      os.path.join(copia, "servidor", "arena.py")], cwd=copia,
                                     env=dict(os.environ, ARENA_SEM_JANELA="1", PYTHONIOENCODING="utf-8",
-                                             ARENA_PORTA=str(PORTA)),
+                                             ARENA_PORTA=str(PORTA), ARENA_SEM_LOJAS="1"),
                                     stdin=subprocess.DEVNULL, stdout=saida, stderr=subprocess.STDOUT)
     esperar(lambda: responde() or processo.poll() is not None, 60)
     if processo.poll() is not None:

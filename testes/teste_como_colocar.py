@@ -54,6 +54,8 @@ def main():
     try:
         plataformas = json.load(open(os.path.join(RAIZ, "servidor", "consoles.json"),
                                      encoding="utf-8"))["plataformas"]
+        # Console sem pasta (Jogos de Android: os apps do celular) nao tem guia.
+        plataformas = [p for p in plataformas if not p.get("sem_pasta")]
         sistema = os.path.join(pasta, "system")
         os.makedirs(sistema)
 

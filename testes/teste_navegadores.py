@@ -16,7 +16,7 @@ instalar nada), numa tela de 1366x768 como a do notebook da escola:
     2. nenhum erro de JavaScript (erro, promessa recusada, console.error);
     3. nada vaza para os lados (sem barra de rolagem horizontal);
     4. Ajustes abre, e cada uma das 5 abas mostra o painel dela;
-    5. a Escala da tela tem as 7 escolhas, e trocar grava no servidor;
+    5. a Escala da tela tem as 8 escolhas (o SGSR desde 12/11/2026), e trocar grava no servidor;
     6. a lista "Abrir a tela em" tem o padrao e os instalados;
     7. a busca filtra a lista de jogos;
     8. clicar num jogo mostra os detalhes dele;
@@ -279,8 +279,8 @@ def conferir(r):
         ("nada vaza para os lados", r.get("sem_rolagem_lateral") is True),
         ("Ajustes abre e as 5 abas mostram o painel", r.get("ajustes_abre") is True
          and len(abas) == 5 and all(abas.values())),
-        ("Escala da tela: 7 escolhas e a troca grava", r.get("escalas") ==
-         ["automatico", "pixel", "nitido", "suave", "anime4k", "inteiro", "original"]
+        ("Escala da tela: 8 escolhas e a troca grava", r.get("escalas") ==
+         ["automatico", "pixel", "nitido", "sgsr", "suave", "anime4k", "inteiro", "original"]
          and r.get("escala_gravada") == "nitido"),
         ("Abrir a tela em: o padrao e os instalados", (r.get("navegadores") or [""])[0] == "automatico"
          and len(r.get("navegadores") or []) >= 2),

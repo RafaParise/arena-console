@@ -1761,7 +1761,7 @@
     {
       "id": "pc",
       "nome": "PC (jogos de computador)",
-      "descricao": "Jogos feitos para computador: o programa do jogo na pasta PC, os instalados pela Steam, GOG e Epic, e os consoles recompilados para PC (recomps). Rodam direto, sem emulador; jogo de outro sistema abre pela camada que o computador ja tiver (Wine no Linux, WSL no Windows).",
+      "descricao": "Jogos feitos para computador: o programa do jogo na pasta PC, os instalados pela Steam, GOG e Epic, e os consoles recompilados para PC (recomps). Rodam direto, sem emulador; jogo de outro sistema abre pela camada que o computador já tiver (Wine no Linux, WSL no Windows).",
       "core": "",
       "nativo": true,
       "extensoes": [
@@ -1771,7 +1771,7 @@
         ".sh"
       ],
       "netplay": false,
-      "netplay_motivo": "Jogo de PC usa a rede do proprio jogo: o Jogar Junto do ARENA e' so do RetroArch.",
+      "netplay_motivo": "Jogo de PC usa a rede do próprio jogo: o Jogar Junto do ARENA é só do RetroArch.",
       "peso": "completo",
       "arquivos_sistema": 0,
       "custo": 4,
@@ -1797,10 +1797,11 @@
       "core": "",
       "nativo": true,
       "so_android": true,
+      "sem_pasta": true,
       "motivo_fora": "Os jogos de Android abrem no ARENA do celular, onde estão instalados. No computador não há Android para rodá-los sem instalar programa.",
       "extensoes": [],
       "netplay": false,
-      "netplay_motivo": "Jogo de Android usa a rede do proprio jogo: o Jogar Junto do ARENA e' so do RetroArch.",
+      "netplay_motivo": "Jogo de Android usa a rede do próprio jogo: o Jogar Junto do ARENA é só do RetroArch.",
       "peso": "leve",
       "arquivos_sistema": 0,
       "custo": 1,

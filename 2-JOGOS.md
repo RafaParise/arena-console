@@ -292,6 +292,7 @@ No fliperama do MAME, a BIOS vai na pasta dos próprios jogos.
 | Nintendo 64 | `Nintendo 64` | `.n64` `.z64` `.v64` | pode | não precisa |
 | Nintendo DS | `Nintendo DS` | `.nds` | pode | não precisa |
 | Nintendo Wii | `Wii` | `.rvz` `.wbfs` `.wia` `.iso` | **não** | não precisa |
+| PC (jogos de computador) | `PC` | `.exe` `.appimage` `.x86_64` `.sh` | **não** (a pasta do jogo inteira) | não precisa |
 | PC Engine | `PC Engine` | `.pce` `.sgx` | pode | não precisa |
 | PC-FX | `PC-FX` | `.cue` `.chd` | **não** | `pcfx.rom` |
 | Philips CD-i | `CD-i` | `.chd` `.cue` | **não** | `same_cdi\bios\cdimono1.zip` |

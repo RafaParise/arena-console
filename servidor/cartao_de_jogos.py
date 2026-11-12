@@ -94,6 +94,8 @@ def pastas_dos_consoles(arquivo_de_consoles=None):
         return []
     nomes = []
     for plataforma in plataformas:
+        if plataforma.get("nativo"):
+            continue   # o PC e os jogos do aparelho: nada para pôr no cartão (12/11/2026)
         pasta = str(plataforma.get("pasta") or "").replace("\\", "/").strip("/")
         if pasta and ".." not in pasta.split("/") and pasta not in nomes:
             nomes.append(pasta)

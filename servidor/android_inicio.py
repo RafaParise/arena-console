@@ -174,7 +174,7 @@ def criar_a_pasta_do_arena():
         plataformas = []
     # Os consoles do RetroArch (os de fora, PS2, GameCube, Wii, PS3 e Xbox
     # 360, sao programas de computador).
-    consoles = [p["pasta"] for p in plataformas if p.get("pasta") and not p.get("externo")]
+    consoles = [p["pasta"] for p in plataformas if p.get("pasta") and not p.get("externo") and not p.get("nativo")]
     try:
         for relativo in ["BIOS", "retroarch"] + ["jogos/pessoais/" + c for c in consoles]:
             os.makedirs(os.path.join(pasta, *relativo.split("/")), exist_ok=True)

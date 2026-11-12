@@ -203,7 +203,9 @@ def principal():
     try:
         montar(pasta)
         r = subprocess.run([PYTHON, os.path.abspath(__file__), "--trabalhador", pasta, "18793"],
-                           capture_output=True, timeout=900)
+                           capture_output=True, timeout=900,
+                           # O filho escreve o resultado em UTF-8 (o "ate" do motivo) em qualquer console.
+                           env=dict(os.environ, PYTHONIOENCODING="utf-8"))
         linhas = r.stdout.decode("utf-8", "replace").strip().splitlines()
         try:
             resultados = json.loads(linhas[-1])

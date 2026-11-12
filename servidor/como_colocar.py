@@ -68,7 +68,7 @@ TIPOS = {
         "zip": "nao",
         "regra_zip": "Descompacte: o jogo de PC roda da pasta dele, com o programa e os arquivos ao lado.",
         "como": ("A pasta do jogo inteira (o ARENA acha o programa principal: o .exe do Windows, o AppImage ou o "
-                 "programa do Linux). Os jogos ja instalados pela Steam, GOG, Epic e Heroic entram sozinhos."),
+                 "programa do Linux). Os jogos já instalados pela Steam, GOG, Epic e Heroic entram sozinhos."),
     },
     "dos": {
         "zip": "pode",
@@ -147,7 +147,7 @@ CONSOLES = {
     "dos": {"tipo": "dos", "exemplo": "Commander Keen 1.zip"},
     "pc": {"tipo": "pc", "exemplo": "Meu Jogo\\MeuJogo.exe",
            "dica": ("Jogo do Windows no Linux abre pelo Wine (se houver); jogo do Linux no Windows, pelo WSL (se houver). "
-                    "No celular nao roda. Jogo de console que tem versao recompilada para PC: o Jogar oferece.")},
+                    "No celular não roda. Jogo de console que tem versão recompilada para PC: o Jogar oferece.")},
     "scummvm": {"tipo": "scummvm", "exemplo": "Monkey Island\\monkey.scummvm"},
     "msx": {"tipo": "computador", "exemplo": "Nome do Jogo.rom",
             "bios": ("alguns", ["Machines"],
@@ -258,6 +258,10 @@ def guia(plataformas, pasta_sistema, pasta_jogos, falta_externo=None):
     falta_externo = falta_externo or {}
     saida = []
     for plataforma in plataformas:
+        # Console sem pasta (os jogos de Android sao os apps instalados no
+        # celular): nao ha o que colocar, entao nao entra no guia.
+        if plataforma.get("sem_pasta"):
+            continue
         info = CONSOLES.get(plataforma["id"], {})
         tipo = info.get("tipo") or ("externo" if plataforma.get("externo") else "cartucho")
         regras = TIPOS[tipo]

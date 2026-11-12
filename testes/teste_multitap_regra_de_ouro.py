@@ -186,6 +186,11 @@ def montar(destino, revisao):
         ignorar = shutil.ignore_patterns("python", "tests", "__pycache__")
         for pasta in ("servidor", "launcher"):
             shutil.copytree(os.path.join(RAIZ, pasta), os.path.join(destino, pasta), ignore=ignorar)
+    # Sem o catalogo de recomps (12/11/2026): o jogo que tem versao para PC faria o Jogar perguntar o jeito de
+    # abrir, e este teste e' do multitap do RetroArch, nao do recomp.
+    catalogo_recomps = os.path.join(destino, "servidor", "recomps.json")
+    if os.path.exists(catalogo_recomps):
+        os.remove(catalogo_recomps)
 
     os.makedirs(os.path.join(destino, "dados"))
     config = json.load(open(os.path.join(RAIZ, "dados", "config.json"), encoding="utf-8"))
@@ -268,6 +273,10 @@ def trabalhador(raiz, porta):
     jogos = catalogo.get("jogos", catalogo if isinstance(catalogo, list) else [])
     resultado = {}
     for jogo in sorted(jogos, key=lambda j: j["id"]):
+        # Jogo de PC (da pasta ou instalado pela Steam, GOG, Epic) e app do celular nao passam pelo RetroArch,
+        # e o Jogar abriria o jogo de verdade (12/11/2026).
+        if jogo.get("plataforma") in ("pc", "android"):
+            continue
         for modo in MODOS:
             corpo = {"jogo_id": jogo["id"], "id": jogo["id"]}
             if modo != "sozinho":
