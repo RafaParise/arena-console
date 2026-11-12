@@ -1,5 +1,5 @@
 {
- "quando": "2026-11-12 00:31:29",
+ "quando": "2026-11-12 18:26:41",
  "partes": [
   "A",
   "B",
@@ -9,7 +9,7 @@
   "F"
  ],
  "sistema": "Debian GNU/Linux 13 (trixie) (Linux 6.18.54.1)",
- "retroarch_tirar_do_appimage_s": 0.11,
+ "retroarch_tirar_do_appimage_s": 0.12,
  "retroarch_ja_pronto_s": 0.001,
  "retroarch": "/home/aluno/.cache/arena/retroarch-10390008/AppRun",
  "jogos": [
@@ -37,7 +37,7 @@
    "segundos": 30.5,
    "pela_ponte": false,
    "quadros": 1800,
-   "quadros_por_segundo": 59.1
+   "quadros_por_segundo": 59.0
   },
   {
    "parte": "A",
@@ -86,10 +86,10 @@
    "imagem": true,
    "detalhe": "1439x1080, 3247 cores, a mais comum em 60%",
    "travou": false,
-   "segundos": 30.5,
+   "segundos": 30.4,
    "pela_ponte": false,
    "quadros": 1500,
-   "quadros_por_segundo": 49.2
+   "quadros_por_segundo": 49.4
   },
   {
    "parte": "A",
@@ -99,10 +99,10 @@
    "imagem": true,
    "detalhe": "255x192, 208 cores, a mais comum em 70%",
    "travou": false,
-   "segundos": 10.1,
+   "segundos": 10.2,
    "pela_ponte": false,
    "quadros": 600,
-   "quadros_por_segundo": 59.2
+   "quadros_por_segundo": 58.9
   },
   {
    "parte": "B",
@@ -128,7 +128,7 @@
    "segundos": 10.2,
    "pela_ponte": false,
    "quadros": 600,
-   "quadros_por_segundo": 58.9
+   "quadros_por_segundo": 58.6
   },
   {
    "parte": "B",
@@ -203,10 +203,10 @@
    "imagem": true,
    "detalhe": "1137x852, 435 cores, a mais comum em 53%",
    "travou": false,
-   "segundos": 30.3,
+   "segundos": 30.2,
    "pela_ponte": false,
    "quadros": 1500,
-   "quadros_por_segundo": 49.5
+   "quadros_por_segundo": 49.6
   },
   {
    "parte": "B",
@@ -245,7 +245,7 @@
    "segundos": 30.2,
    "pela_ponte": false,
    "quadros": 1500,
-   "quadros_por_segundo": 49.6
+   "quadros_por_segundo": 49.7
   },
   {
    "parte": "A",
@@ -258,7 +258,7 @@
    "segundos": 16.1,
    "pela_ponte": false,
    "quadros": 900,
-   "quadros_por_segundo": 55.8
+   "quadros_por_segundo": 55.7
   },
   {
    "parte": "B",
@@ -268,10 +268,10 @@
    "imagem": true,
    "detalhe": "960x720, 256 cores, a mais comum em 91%",
    "travou": false,
-   "segundos": 15.5,
+   "segundos": 15.6,
    "pela_ponte": true,
    "quadros": 900,
-   "quadros_por_segundo": 57.9
+   "quadros_por_segundo": 57.5
   },
   {
    "parte": "A",
@@ -284,7 +284,7 @@
    "segundos": 10.3,
    "pela_ponte": false,
    "quadros": 600,
-   "quadros_por_segundo": 58.3
+   "quadros_por_segundo": 58.1
   },
   {
    "parte": "B",
@@ -294,10 +294,10 @@
    "imagem": true,
    "detalhe": "960x720, 98 cores, a mais comum em 75%, (90, 40, 0)",
    "travou": false,
-   "segundos": 10.2,
+   "segundos": 10.3,
    "pela_ponte": false,
    "quadros": 600,
-   "quadros_por_segundo": 58.6
+   "quadros_por_segundo": 58.3
   },
   {
    "parte": "A",
@@ -307,10 +307,10 @@
    "imagem": true,
    "detalhe": "1065x798, 7 cores, a mais comum em 63%, (101, 208, 69)",
    "travou": false,
-   "segundos": 30.2,
+   "segundos": 30.3,
    "pela_ponte": false,
    "quadros": 1500,
-   "quadros_por_segundo": 49.6
+   "quadros_por_segundo": 49.5
   },
   {
    "parte": "B",
@@ -346,10 +346,10 @@
    "imagem": true,
    "detalhe": "1152x864, 331 cores, a mais comum em 56%, (122, 65, 50)",
    "travou": false,
-   "segundos": 30.4,
+   "segundos": 30.5,
    "pela_ponte": false,
    "quadros": 1500,
-   "quadros_por_segundo": 49.3
+   "quadros_por_segundo": 49.2
   },
   {
    "parte": "A",
@@ -430,14 +430,14 @@
    "quadros_por_segundo": 57.8
   }
  ],
- "servidor_abriu_s": 0.91,
+ "servidor_abriu_s": 0.61,
  "sistema_do_computador": "linux",
  "maquina": {
   "sistema": "Debian GNU/Linux 13 (trixie) (Linux 6.18.54.1) (x86_64, 64 bits)",
   "processador": null,
   "driver_video": "vulkan"
  },
- "servidor_memoria_mb": 61.0,
+ "servidor_memoria_mb": 59.9,
  "jogo_abriu_s": 8.5,
  "tela_do_jogo": {
   "largura": 1280,
@@ -445,7 +445,7 @@
   "cores": 2,
   "a_mais_comum": 0.783
  },
- "retroarch_memoria_mb": 144.7,
+ "retroarch_memoria_mb": 144.6,
  "sessoes_encerradas": 1,
  "arena_sh_abriu_s": 0.9,
  "arena_sh_cache": [
@@ -456,7 +456,7 @@
  "verificar_sh": "RESUMO\n============================================================\n  Tudo certo:   12\n  Consertado:   0\n  Atencao:      3\n  Grave:        0\n   [atencao]   pasta faltando: jogos/livres\n   [atencao]   pasta faltando: jogos/turma\n   [atencao]   faltam os arquivos de apoio do Dolphin (retroarch\\system\\dolphin-emu\\Sys)\n\n  Nada a consertar. O ARENA esta saudavel.\n\n  (modo so conferir: nada foi alterado)\n\n  ---\n  Para testes automatizados:  sh RODAR_TESTES.sh\n\n",
  "externos": {
   "PCSX2": {
-   "tirar_do_appimage_s": 0.5,
+   "tirar_do_appimage_s": 0.4,
    "abriu": true,
    "codigo": 1,
    "saida": "PCSX2 v2.8.2\nhttps://pcsx2.net/\n\nUsage: /home/aluno/.cache/arena/pcsx2-60119544/AppRun [parameters] [--] [boot filename]\n\n  -help: Displays this information and exits.\n  -version: Displays version inf",
@@ -477,7 +477,7 @@
    "programa": "/home/aluno/.cache/arena/xenia-17832440/AppRun"
   }
  },
- "segundos": 661.1,
+ "segundos": 660.5,
  "falhas": [],
- "segundos_com_o_conteiner": 669.2
+ "segundos_com_o_conteiner": 680.1
 }

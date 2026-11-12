@@ -6,7 +6,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 36430,
-   "segundos": 11.5,
+   "segundos": 11.6,
    "travou": false,
    "erros": [
     "[ERROR] [Disc] Failed to set initial disc index. Expected #1 \"\", Detected #1 \"\"."
@@ -24,7 +24,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 16630,
-   "segundos": 11.5,
+   "segundos": 12.3,
    "travou": false,
    "erros": []
   },
@@ -64,7 +64,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 24508,
-   "segundos": 10.9,
+   "segundos": 10.8,
    "travou": false,
    "erros": []
   },
@@ -84,7 +84,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 29416,
-   "segundos": 10.8,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
@@ -104,7 +104,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 8973,
-   "segundos": 10.9,
+   "segundos": 10.8,
    "travou": false,
    "erros": []
   },
@@ -144,7 +144,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 102636,
-   "segundos": 11.0,
+   "segundos": 11.3,
    "travou": false,
    "erros": []
   },
@@ -164,7 +164,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 23175,
-   "segundos": 10.8,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
@@ -184,7 +184,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 4841,
-   "segundos": 10.7,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
@@ -203,8 +203,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 4490,
-   "segundos": 10.8,
+   "foto_bytes": 4433,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
@@ -224,7 +224,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 10811,
-   "segundos": 10.8,
+   "segundos": 10.7,
    "travou": false,
    "erros": []
   },
@@ -244,7 +244,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 7632,
-   "segundos": 10.8,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
@@ -271,7 +271,7 @@
   "foto": "026 CHIP-8 - Slippery Slope.png",
   "jogar_junto": {
    "conectou": true,
-   "convidado_diz": "Você se juntou como jogador 2",
+   "convidado_diz": null,
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
    "erros": []
@@ -284,7 +284,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 7273,
-   "segundos": 10.7,
+   "segundos": 10.8,
    "travou": false,
    "erros": []
   },
@@ -304,7 +304,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 30159,
-   "segundos": 13.0,
+   "segundos": 13.1,
    "travou": false,
    "erros": []
   },
@@ -352,7 +352,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 4160,
-   "segundos": 12.8,
+   "segundos": 13.1,
    "travou": false,
    "erros": []
   },
@@ -384,7 +384,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 59412,
-   "segundos": 13.0,
+   "segundos": 12.8,
    "travou": false,
    "erros": []
   },
@@ -436,7 +436,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 26262,
-   "segundos": 10.7,
+   "segundos": 10.8,
    "travou": false,
    "erros": []
   },
@@ -659,7 +659,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 463286,
-   "segundos": 10.9,
+   "segundos": 10.8,
    "travou": false,
    "erros": []
   },
@@ -839,7 +839,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 244013,
-   "segundos": 10.7,
+   "segundos": 10.8,
    "travou": false,
    "erros": [
     "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented."
@@ -999,7 +999,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 590887,
-   "segundos": 13.4,
+   "segundos": 13.3,
    "travou": false,
    "erros": []
   },
@@ -1072,7 +1072,7 @@
   "foto": "074 PlayStation - CTR Crash Team Racing.png",
   "jogar_junto": {
    "conectou": true,
-   "convidado_diz": "Você se juntou como jogador 2",
+   "convidado_diz": null,
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
    "erros": []
@@ -1105,14 +1105,14 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 66502,
-   "segundos": 18.8,
+   "segundos": 19.0,
    "travou": false,
    "erros": []
   },
   "foto": "076 PlayStation - Crash Bandicoot 3 Warped.png",
   "jogar_junto": {
    "conectou": true,
-   "convidado_diz": "Você se juntou como jogador 2",
+   "convidado_diz": null,
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
    "erros": []
@@ -1125,7 +1125,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 43950,
-   "segundos": 25.3,
+   "segundos": 25.1,
    "travou": false,
    "erros": []
   },
@@ -1185,7 +1185,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 66502,
-   "segundos": 13.4,
+   "segundos": 13.3,
    "travou": false,
    "erros": []
   },
@@ -1420,7 +1420,7 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 448271,
+   "foto_bytes": 451924,
    "segundos": 11.8,
    "travou": false,
    "erros": []
@@ -1505,7 +1505,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 1537199,
-   "segundos": 17.5,
+   "segundos": 17.3,
    "travou": false,
    "erros": []
   },
@@ -1521,7 +1521,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 430305,
-   "segundos": 11.4,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -1537,7 +1537,7 @@
   "abrir": {
    "abre_e_mostra_imagem": false,
    "foto_bytes": 212,
-   "segundos": 75.7,
+   "segundos": 75.6,
    "travou": false,
    "erros": [],
    "segunda_vez_com_40s": true
@@ -1551,7 +1551,7 @@
   "abrir": {
    "abre_e_mostra_imagem": false,
    "foto_bytes": 212,
-   "segundos": 75.6,
+   "segundos": 75.7,
    "travou": false,
    "erros": [],
    "segunda_vez_com_40s": true
@@ -1579,7 +1579,7 @@
   "abrir": {
    "abre_e_mostra_imagem": false,
    "foto_bytes": 212,
-   "segundos": 75.6,
+   "segundos": 75.7,
    "travou": false,
    "erros": [],
    "segunda_vez_com_40s": true
@@ -1593,7 +1593,7 @@
   "abrir": {
    "abre_e_mostra_imagem": false,
    "foto_bytes": 212,
-   "segundos": 75.6,
+   "segundos": 75.7,
    "travou": false,
    "erros": [],
    "segunda_vez_com_40s": true
@@ -1607,7 +1607,7 @@
   "abrir": {
    "abre_e_mostra_imagem": false,
    "foto_bytes": 212,
-   "segundos": 75.7,
+   "segundos": 75.6,
    "travou": false,
    "erros": [],
    "segunda_vez_com_40s": true
@@ -1621,7 +1621,7 @@
   "abrir": {
    "abre_e_mostra_imagem": false,
    "foto_bytes": 212,
-   "segundos": 75.7,
+   "segundos": 75.6,
    "travou": false,
    "erros": [],
    "segunda_vez_com_40s": true
@@ -1635,7 +1635,7 @@
   "abrir": {
    "abre_e_mostra_imagem": false,
    "foto_bytes": 212,
-   "segundos": 75.9,
+   "segundos": 75.6,
    "travou": false,
    "erros": [],
    "segunda_vez_com_40s": true
@@ -1709,7 +1709,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 286742,
-   "segundos": 12.9,
+   "segundos": 12.8,
    "travou": false,
    "erros": []
   },
@@ -1745,7 +1745,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 58602,
-   "segundos": 13.0,
+   "segundos": 12.9,
    "travou": false,
    "erros": []
   },
@@ -1795,7 +1795,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 58602,
-   "segundos": 12.9,
+   "segundos": 13.0,
    "travou": false,
    "erros": [
     "[libretro INFO] [BOOT] USA region not supported. Using Europe instead"
@@ -1813,7 +1813,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 58602,
-   "segundos": 13.0,
+   "segundos": 12.9,
    "travou": false,
    "erros": [
     "[libretro INFO] [BOOT] USA region not supported. Using Europe instead"
@@ -1831,7 +1831,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 46284,
-   "segundos": 11.8,
+   "segundos": 11.6,
    "travou": false,
    "erros": []
   },
@@ -1851,7 +1851,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 186647,
-   "segundos": 10.9,
+   "segundos": 10.8,
    "travou": false,
    "erros": []
   },
@@ -1931,7 +1931,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 137070,
-   "segundos": 10.8,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
@@ -1951,7 +1951,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 260650,
-   "segundos": 12.9,
+   "segundos": 12.8,
    "travou": false,
    "erros": []
   },
@@ -2023,7 +2023,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 11185,
-   "segundos": 12.8,
+   "segundos": 12.9,
    "travou": false,
    "erros": [
     "[ERROR] [Disc] Failed to set initial disc index. Expected #1 \"\", Detected #1 \"\"."
