@@ -7265,7 +7265,7 @@ class Manipulador(BaseHTTPRequestHandler):
                                                            and recomps.recomp(item_id.split(":", 1)[1])):
                     validos.append(item_id)
             if not validos:
-                return self.erro("Não há nada para baixar: está tudo pronto. Feche esta janela e jogue.", 400)
+                return self.erro("Não há nada para baixar: está tudo pronto. Feche a janela e jogue.", 400)
 
             def depois(item_id):
                 limpar_caches()
