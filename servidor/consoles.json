@@ -1757,9 +1757,44 @@
       "jogadores_por_jogo": {
         "Left 4 Dead 2": 4
       }
+    },
+    {
+      "id": "pc",
+      "nome": "PC (jogos de computador)",
+      "descricao": "Jogos feitos para computador: o programa do jogo na pasta PC, os instalados pela Steam, GOG e Epic, e os consoles recompilados para PC (recomps). Rodam direto, sem emulador; jogo de outro sistema abre pela camada que o computador ja tiver (Wine no Linux, WSL no Windows).",
+      "core": "",
+      "nativo": true,
+      "extensoes": [
+        ".exe",
+        ".appimage",
+        ".x86_64",
+        ".sh"
+      ],
+      "netplay": false,
+      "netplay_motivo": "Jogo de PC usa a rede do proprio jogo: o Jogar Junto do ARENA e' so do RetroArch.",
+      "peso": "completo",
+      "arquivos_sistema": 0,
+      "custo": 4,
+      "pede_placar": false,
+      "apelidos": [
+        "pc",
+        "computador",
+        "windows",
+        "linux",
+        "steam",
+        "gog",
+        "epic",
+        "recomp",
+        "recomps"
+      ],
+      "pasta": "PC"
     }
   ],
   "preferencia": {
+    ".exe": [
+      "dos",
+      "pc"
+    ],
     ".iso": [
       "ps2",
       "ps1",

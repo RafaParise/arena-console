@@ -33,6 +33,8 @@ import jogadores
 import nomes_arcade
 import integridade
 import plataforma as plataforma_do_sistema
+import jogos_pc    # o console PC: o programa do jogo, os instalados pelas lojas (12/11/2026)
+import recomps     # os consoles recompilados para PC (12/11/2026)
 import zipfile
 
 # ---------------------------------------------------------------------------
@@ -911,6 +913,8 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None,
         # dentro. Nao e' um jogo -- e o MAME nao le .chd de dentro de .zip.
         # Sai da lista e vira aviso no jogo dele (o kinst.zip).
         discos_zipados = discos_de_fliperama_zipados(pasta_atual, arquivos)
+        if console_da_pasta == jogos_pc.ID:
+            arquivos = jogos_pc.so_o_jogo(pasta_atual, arquivos)
         arquivos_por_base = {}
         for nome in arquivos:
             base, extensao = os.path.splitext(nome)
@@ -933,6 +937,9 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None,
                 continue
 
             caminho_absoluto = os.path.join(pasta_atual, nome_arquivo)
+            if extensao == ".exe" and jogos_pc.ID in candidatos and len(candidatos) > 1:
+                candidatos = ([jogos_pc.ID] if jogos_pc.e_jogo_de_windows(caminho_absoluto)
+                              else [c for c in candidatos if c != jogos_pc.ID])
             try:
                 tamanho = os.path.getsize(caminho_absoluto)
             except OSError:
@@ -1225,8 +1232,12 @@ def gravar_manifesto_do_navegador(texto):
         pass
 
 
-def indexar(forcar=False):
+def indexar(forcar=False, lojas=False):
     """Funcao principal. Devolve o manifesto e grava em disco.
+
+    lojas=True (so o servidor): entram tambem os jogos instalados pela Steam,
+    GOG, Epic e Heroic (servidor\\jogos_pc.py). Os testes, que montam a
+    biblioteca numa pasta temporaria, nao enxergam as lojas do computador.
 
     Com forcar=False, reaproveita o catalogo salvo se nada mudou nas pastas.
     """
@@ -1258,6 +1269,25 @@ def indexar(forcar=False):
         # procura os nomes: soltos aqui, o servidor volta a caber no
         # orcamento de memoria do notebook-alvo (02/10/2026).
         nomes_arcade.liberar()
+
+    # Os jogos ja instalados neste computador pelas lojas (Steam, GOG, Epic,
+    # Heroic), no console PC (servidor\jogos_pc.py). Um erro ali nunca
+    # derruba a lista dos jogos da pasta.
+    if lojas and jogos_pc.ID in por_id:
+        try:
+            for jogo in jogos_pc.entradas_do_manifesto(por_id[jogos_pc.ID]):
+                jogo["ordenacao"] = chave_ordenacao(jogo["titulo"])
+                jogos.append(jogo)
+        except Exception as falha:  # noqa: BLE001
+            print("[ARENA] Nao consegui listar os jogos instalados pelas lojas: %s" % falha)
+    # O jogo de console que tambem existe recompilado para PC (servidor\recomps.py):
+    # a tela mostra e o Jogar oferece a versao nativa.
+    for jogo in jogos:
+        try:
+            jogo["recomps"] = [recomps.resumo_para_a_tela(r)
+                               for r in recomps.para_o_titulo(jogo["titulo"], jogo["plataforma"])]
+        except Exception:  # noqa: BLE001
+            jogo["recomps"] = []
 
     # Primeira vez: cria o dados\jogadores.txt com os jogos da pasta e o
     # numero que cada um aceitava ate aqui (nada muda para ninguem).

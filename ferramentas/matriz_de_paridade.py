@@ -44,8 +44,9 @@ def montar():
     for p in plataformas:
         externo = p.get("externo")
         nucleo = p.get("core") or ""
-        win = bool(externo) or (nucleo in existentes)
-        linux = bool(externo) or (nucleo.replace(".dll", ".so") in existentes)
+        # O console PC (servidor\jogos_pc.py) roda o jogo direto: existe no Windows e no Linux, nunca no celular.
+        win = bool(externo) or bool(p.get("nativo")) or (nucleo in existentes)
+        linux = bool(externo) or bool(p.get("nativo")) or (nucleo.replace(".dll", ".so") in existentes)
         so = nomes_android(p)
         a64 = bool(so) and all(n in marcas.get("arm64-v8a", {}) for n in so)
         ax = bool(so) and all(n in marcas.get("x86_64", {}) for n in so)

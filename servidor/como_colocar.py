@@ -64,6 +64,12 @@ TIPOS = {
         "regra_zip": "NÃO use .zip: este emulador não abre zip. Descompacte antes.",
         "como": "Um arquivo por disco, solto na pasta (ou numa pasta só dele).",
     },
+    "pc": {
+        "zip": "nao",
+        "regra_zip": "Descompacte: o jogo de PC roda da pasta dele, com o programa e os arquivos ao lado.",
+        "como": ("A pasta do jogo inteira (o ARENA acha o programa principal: o .exe do Windows, o AppImage ou o "
+                 "programa do Linux). Os jogos ja instalados pela Steam, GOG, Epic e Heroic entram sozinhos."),
+    },
     "dos": {
         "zip": "pode",
         "regra_zip": "Pode: um .zip com o jogo dentro funciona direto (o DOSBox abre o zip).",
@@ -139,6 +145,9 @@ CONSOLES = {
                 "dica": ("Também .xex. Precisa de processador com AVX (o Celeron N5100 da escola não "
                          "tem: lá o Xbox 360 não abre).")},
     "dos": {"tipo": "dos", "exemplo": "Commander Keen 1.zip"},
+    "pc": {"tipo": "pc", "exemplo": "Meu Jogo\\MeuJogo.exe",
+           "dica": ("Jogo do Windows no Linux abre pelo Wine (se houver); jogo do Linux no Windows, pelo WSL (se houver). "
+                    "No celular nao roda. Jogo de console que tem versao recompilada para PC: o Jogar oferece.")},
     "scummvm": {"tipo": "scummvm", "exemplo": "Monkey Island\\monkey.scummvm"},
     "msx": {"tipo": "computador", "exemplo": "Nome do Jogo.rom",
             "bios": ("alguns", ["Machines"],

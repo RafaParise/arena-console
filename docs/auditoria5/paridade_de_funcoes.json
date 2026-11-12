@@ -1,6 +1,6 @@
 {
- "rotas_da_tela": 79,
- "rotas_do_servidor": 89,
+ "rotas_da_tela": 94,
+ "rotas_do_servidor": 106,
  "a_tela_chama_e_o_servidor_nao_tem": [],
  "a_tela_chama_e_o_navegador_nao_atende": [
   "/api/acervo/instalar",
@@ -15,14 +15,19 @@
   "/api/android/pastas",
   "/api/android/permissao",
   "/api/armazenamento",
+  "/api/armazenamento/criar-pasta",
   "/api/armazenamento/listar",
   "/api/armazenamento/medir",
+  "/api/armazenamento/mover",
+  "/api/armazenamento/na-memoria",
   "/api/armazenamento/procurar",
   "/api/armazenamento/tirar",
   "/api/armazenamento/usar",
   "/api/backup",
   "/api/baixados",
   "/api/baixados/levar",
+  "/api/baixados/levar-bios",
+  "/api/baixados/pasta",
   "/api/barreiras/fechar",
   "/api/biblioteca-livre/instalar",
   "/api/biblioteca-online/instalar",
@@ -36,17 +41,25 @@
   "/api/celular/procurar",
   "/api/cheat/adicionar",
   "/api/cheat/alterar",
+  "/api/controle-remoto",
+  "/api/controle-remoto/desligar",
+  "/api/controle-remoto/gamepad",
+  "/api/controle-remoto/jogadores",
+  "/api/controle-remoto/ligar",
+  "/api/controle-remoto/usb",
   "/api/desempenho/zerar",
   "/api/exportar",
   "/api/importar",
   "/api/jogo/arrumar",
   "/api/jogo/console",
   "/api/jogo/mover",
+  "/api/jogo/voltar",
   "/api/mala",
   "/api/mapeamento/definir",
   "/api/mapeamento/limpar",
   "/api/mapeamento/padrao",
   "/api/pacote/mostrar",
+  "/api/partida/cabo",
   "/api/partida/cancelar",
   "/api/partida/comecar",
   "/api/partida/testar",
@@ -55,7 +68,9 @@
   "/api/perfil-controle",
   "/api/perfil/novo",
   "/api/reparar-runtime",
-  "/api/sincronizar"
+  "/api/repasse/testar",
+  "/api/sincronizar",
+  "/api/toque"
  ],
  "elementos_so_windows_na_tela": [
   "button btnAmigos",
@@ -84,6 +99,8 @@
   "div (sem id)",
   "div (sem id)",
   "div (sem id)",
+  "div (sem id)",
+  "div blocoDriverVideo",
   "div blocoCelularNoCabo",
   "div blocoRuntime",
   "div (sem id)",
@@ -93,6 +110,7 @@
   "div (sem id)",
   "div (sem id)",
   "div (sem id)",
+  "div blocoControleRemoto",
   "div (sem id)",
   "button cheats",
   "div (sem id)"
@@ -124,9 +142,23 @@
    "tem_guarda_de_sistema": true
   },
   {
+   "arquivo": "servidor/companheiros.py",
+   "chamadas": [
+    "taskkill"
+   ],
+   "tem_guarda_de_sistema": true
+  },
+  {
    "arquivo": "servidor/controles.py",
    "chamadas": [
     "ctypes.windll"
+   ],
+   "tem_guarda_de_sistema": true
+  },
+  {
+   "arquivo": "servidor/driver_video.py",
+   "chamadas": [
+    "winreg"
    ],
    "tem_guarda_de_sistema": true
   },
@@ -158,6 +190,13 @@
    "tem_guarda_de_sistema": true
   },
   {
+   "arquivo": "servidor/mfg.py",
+   "chamadas": [
+    "CREATE_NO_WINDOW"
+   ],
+   "tem_guarda_de_sistema": true
+  },
+  {
    "arquivo": "servidor/navegadores.py",
    "chamadas": [
     "winreg"
@@ -180,6 +219,13 @@
   },
   {
    "arquivo": "servidor/portas.py",
+   "chamadas": [
+    "CREATE_NO_WINDOW"
+   ],
+   "tem_guarda_de_sistema": true
+  },
+  {
+   "arquivo": "servidor/recomps.py",
    "chamadas": [
     "CREATE_NO_WINDOW"
    ],

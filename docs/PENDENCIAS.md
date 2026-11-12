@@ -964,3 +964,32 @@ Falta, nesta ordem:
     logo no início da abertura, não junto com o `serve_forever`.
 - Sem o limite do modo alvo, o servidor chega aos dados da tela em 0,6 a 0,9 s (a variação é do PC do Rafael, que
   roda outras coisas); dentro do modo alvo, 1,91 s. A nota da próxima versão deve registrar.
+
+## 12/11/2026, 13h: o ARENA abre jogo de PC e a versão para PC dos jogos de console (recomps)
+
+- Pedido do Rafael: "emulador universal": achar sozinho jogo de PC onde estiver, rodar jogo de um sistema no outro,
+  jogos de Android, e estudar o RecompLauncher (`recomplauncher-agent.md`, o AppImage e o instalador, que ficaram fora
+  do git) para fazer o mesmo no ARENA, sempre "baixar e jogar".
+- **O que os arquivos são** (lidos sem executar): o RecompLauncher 0.90 beta 39 é um programa em Rust com Tauri (WebKitGTK),
+  de código fechado; ele baixa recomps das releases do GitHub (`api.github.com/repos/...`), lê o `recomplauncher.json`
+  de cada um e confere discos ISO 9660 e XDVDFS. O `RecompStore-Installer.elf` só baixa o RecompStore das releases de
+  `elripalda/RecompStore`. Regra do projeto: nada deles entra no ARENA; a técnica foi refeita em Python.
+- **Feito:**
+  - Console **PC** (`consoles.json`, `servidor\jogos_pc.py`): programa do jogo na pasta PC (acha o principal e ignora
+    desinstalador e ajudante; `.exe` do DOS continua no MS-DOS pelo cabeçalho), jogos instalados pela Steam, GOG, Epic e
+    Heroic (só os arquivos que as lojas gravam; ferramentas como o Lossless Scaling ficam de fora), Wine/Proton no Linux,
+    WSL no Windows, mensagem clara quando falta a camada e no Android.
+  - **Recomps** (`servidor\recomps.py`, `servidor\recomps.json` com 1.219 recomps de 22 consoles, feito por
+    `ferramentas\atualizar_recomps.py` do catálogo público do RecompLauncher): o jogo da biblioteca ganha o jeito
+    "versão para PC"; o ARENA pergunta, baixa da release oficial, confere o SHA-256 do GitHub, descompacta em
+    `emuladores\Recomps\<id>` e abre com a cópia do jogo; lê o `recomplauncher.json` (programa, argumentos com {game},
+    ambiente, ajustes TOML/INI/JSON, preparo com andamento, conferência do disco).
+  - Testes `servidor\tests\test_recomps.py` e `test_jogos_pc.py`; guia `2-JOGOS.md` (Parte C); `docs\PARIDADE.md`.
+  - Medido ao vivo: 270 jogos na lista, os 2 da Steam deste PC entraram, 12+ jogos da biblioteca com versão para PC;
+    o Bomberman 64: Recompiled baixou (25 MB, marca do GitHub conferida) e abriu pelo ARENA, mas o próprio recomp
+    congelou o PC e caiu sozinho (0xC0000005) em 94 s. **Não abrir jogo de verdade nos testes** sem o Rafael avisado.
+- **Não dá (dito ao Rafael):** jogo de Android no computador sem instalar nada (o Windows Subsystem for Android acabou; o
+  Waydroid do Linux precisa de módulo do kernel e de administrador) e jogo de PC no celular (outro processador).
+- **Falta:** no celular, listar e abrir pelo ARENA os jogos de Android instalados (pedido "jogos" no `ArenaServico.java`,
+  `<queries>` no manifesto pelo `montar_android.py`, APK de teste no A12); os ajustes do recomp na tela (nível 2 do
+  `recomplauncher.json`, `settings`); medir um recomp no Celeron N5100.

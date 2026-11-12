@@ -62,7 +62,7 @@ PROGRAMA = [
     "servidor/motivo_do_erro.py", "servidor/bios.py", "servidor/bios_catalogo.py", "servidor/arrumar.py",
     "servidor/nomes_arcade.py", "servidor/processos.py", "servidor/capas_do_disco.py",
     "servidor/como_colocar.py", "servidor/ponte_sem_acento.py", "servidor/java_do_arena.py",
-    "servidor/jeitos_de_abrir.py", "servidor/biblioteca_livre.py", "servidor/lossless.py", "servidor/mfg.py", "servidor/quadros_ps2.py", "servidor/quadros_dolphin.py", "servidor/driver_video.py", "servidor/navegadores.py",
+    "servidor/jeitos_de_abrir.py", "servidor/biblioteca_livre.py", "servidor/lossless.py", "servidor/mfg.py", "servidor/quadros_ps2.py", "servidor/quadros_dolphin.py", "servidor/recomps.py", "servidor/jogos_pc.py", "servidor/driver_video.py", "servidor/navegadores.py",
     "servidor/plataforma.py", "servidor/baixar.py", "servidor/portas.py", "servidor/ponte_android.py",
     "servidor/controle_usb.py", "servidor/gamepad_virtual.py", "servidor/baixados.py", "servidor/cartao_de_jogos.py", "servidor/toque_consoles.py", "servidor/desempenho.py", "servidor/adb_aparelho.py", "servidor/painel_do_aparelho.py",
     "servidor/armazenamento.py",
@@ -72,11 +72,12 @@ PROGRAMA = [
     "servidor/filtros/pixel-nitido.slangp", "servidor/filtros/fsr.slangp",
     "servidor/filtros/catmull-rom.slangp", "servidor/filtros/rcas.slangp", "servidor/filtros/suave.slangp",
     "servidor/consoles.json", "servidor/graficos.json", "servidor/recursos.json",
-    "servidor/perfis_controle.json", "servidor/biblioteca_livre.json",
+    "servidor/perfis_controle.json", "servidor/biblioteca_livre.json", "servidor/recomps.json",
 ]
 
 JSONS = ["servidor/consoles.json", "servidor/graficos.json",
-         "servidor/recursos.json", "servidor/perfis_controle.json", "servidor/biblioteca_livre.json"]
+         "servidor/recursos.json", "servidor/perfis_controle.json", "servidor/biblioteca_livre.json",
+         "servidor/recomps.json"]
 
 SO_VER = "--so-ver" in sys.argv
 

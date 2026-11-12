@@ -78,6 +78,8 @@ import driver_video  # noqa: E402  (o painel do driver da placa, AMD Software e 
 import mfg         # noqa: E402  (o MFG Super Motion, gratis, no lugar do Lossless -- 11/11/2026)
 import quadros_ps2  # noqa: E402  (os 60 quadros de verdade do PS2, pelos patches do PCSX2 -- 11/11/2026)
 import quadros_dolphin  # noqa: E402  (o mesmo no GameCube e no Wii, pelos codigos do Dolphin -- 11/11/2026)
+import recomps      # noqa: E402  (o jogo de console recompilado para PC: baixar da release e jogar -- 12/11/2026)
+import jogos_pc     # noqa: E402  (o console PC: o programa do jogo, as lojas, Wine e WSL -- 12/11/2026)
 import navegadores  # noqa: E402  (em que navegador a tela abre -- item 11, 17/10/2026)
 # O que a configuracao aceita em "navegador".
 NAVEGADORES_ACEITOS = ("automatico",) + tuple(c[0] for c in navegadores.CONHECIDOS)
@@ -2298,7 +2300,8 @@ def manifesto(forcar=False):
                 idade, salvo = _cache["manifesto"]
                 if salvo and (time.time() - idade) < VALIDADE_CACHE:
                     return salvo
-        resultado = indexador.indexar(forcar=forcar)
+        # lojas=True: a lista do servidor mostra tambem os jogos instalados pela Steam, GOG, Epic e Heroic.
+        resultado = indexador.indexar(forcar=forcar, lojas=True)
         with TRAVA_CACHE:
             _cache["manifesto"] = (time.time(), resultado)
         return resultado
@@ -2346,7 +2349,12 @@ def avaliar_plataformas(forcar=False):
         # Quem quer tentar, tenta. O ARENA so nao mente sobre o resultado.
         falta_externo = (graficos.falta_para_o_externo(dados_externo["nome"], caminho_externo)
                          if caminho_externo else "")
-        if caminho_externo and falta_externo:
+        if plataforma.get("nativo"):
+            # O console PC (servidor\jogos_pc.py): o jogo roda direto, sem nucleo nem emulador. No celular, nao.
+            estado = "sem_core" if plataforma_do_sistema.ANDROID else "pronta"
+            motivo = ("Jogo de PC não roda no celular: o processador e o sistema são outros. Abra no computador."
+                      if plataforma_do_sistema.ANDROID else "")
+        elif caminho_externo and falta_externo:
             # Emulador de fora instalado, mas sem o que ele precisa para
             # abrir um jogo (BIOS do PS2, firmware do PS3): cartao amarelo
             # com o motivo, em vez de "pronto" que so falha depois.
@@ -2415,12 +2423,12 @@ def avaliar_plataformas(forcar=False):
             "classe_rotulo": etiqueta["rotulo"],
             "classe_cor": etiqueta["cor"],
             "classe_detalhe": etiqueta["detalhe"],
-            "emulador": (dados_externo["nome"] if caminho_externo
+            "emulador": ("o computador" if plataforma.get("nativo") else dados_externo["nome"] if caminho_externo
                          else "RetroArch"),
             # Partida a dois e coisa do RetroArch. Emulador de fora tem
             # rede propria, entao a tela nem oferece o botao - melhor que
             # deixar o aluno clicar e receber um erro no meio da aula.
-            "aceita_partida": not caminho_externo,
+            "aceita_partida": not caminho_externo and not plataforma.get("nativo"),
             "motivo_sem_partida": (
                 "Esta plataforma usa o %s, que tem rede própria. "
                 "Jogar junto só funciona pelo RetroArch."
@@ -3316,7 +3324,9 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         comando = graficos.comando_externo(caminho_dados, jogo["externo"]["dados"], caminho_jogo)
         comando = [plataforma_do_sistema.programa_que_roda(programa_externo, nome_externo)] + \
             argumentos_externo + comando[1:]
-        pasta_trabalho = os.path.dirname(programa_externo)
+        pasta_trabalho = jogo["externo"]["dados"].get("pasta_trabalho") or os.path.dirname(programa_externo)
+        # O ambiente que o recomp pede (recomplauncher.json -> start.env; servidor\recomps.py).
+        ambiente_externo = dict(ambiente_externo, **(jogo["externo"]["dados"].get("ambiente") or {}))
         # A geracao de quadros do Lossless Scaling tambem nos emuladores de fora (pedido de 07/11/2026).
         # Mais quadros, do melhor para o resto (11/11/2026): no PS2, o patch de 60 quadros do proprio PCSX2
         # (quadros de verdade); senao o MFG Super Motion; e o Lossless so onde nenhum dos dois entrou.
@@ -6133,6 +6143,13 @@ class Manipulador(BaseHTTPRequestHandler):
         # BIOS dos consoles): ativa, de outra versao ou falta, e onde fica a
         # prateleira de cada uma (a pasta BIOS do ARENA, servidor\bios.py).
         # Andamento do "Arrumar" demorado (descompactar um jogo de CD).
+        if caminho == "/api/recomp/progresso":
+            parametros = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+            andamento = recomps.progresso((parametros.get("id") or [""])[0][:60])
+            if not andamento:
+                return self.erro("Esse download não está em andamento. Clique em Jogar agora de novo para começar.", 404)
+            return self.responder_json(dict(ok=True, **andamento))
+
         if caminho == "/api/arrumar/progresso":
             parametros = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
             tarefa = arrumar.progresso((parametros.get("tarefa") or [""])[0][:40])
@@ -7182,6 +7199,25 @@ class Manipulador(BaseHTTPRequestHandler):
                 print("[ARENA] Celular como controle desligado.")
             return self.responder_json(dict(estado_do_controle, ok=True))
 
+        if caminho == "/api/recomp/instalar":
+            # Baixa o recomp da release oficial do GitHub para emuladores\Recomps\<id>, em segundo plano
+            # (servidor\recomps.py); a tela acompanha por /api/recomp/progresso e depois chama o Jogar de novo.
+            recomp_id = str(dados.get("id") or "")[:60]
+            if not recomps.recomp(recomp_id):
+                return self.erro("Esse recomp não está no catálogo do ARENA. Clique em Atualizar lista e tente de novo.", 404)
+            if recomps.progresso(recomp_id).get("estado") == "rodando":
+                return self.responder_json({"ok": True, "ja_rodando": True})
+
+            def baixar_recomp():
+                try:
+                    recomps.instalar(recomp_id)
+                    limpar_caches()
+                    manifesto(forcar=True)    # a lista passa a dizer "ja esta no ARENA"
+                except recomps.NaoDaParaInstalar as falha:
+                    print("[ARENA] Recomp %s: %s" % (recomp_id, falha))
+            threading.Thread(target=baixar_recomp, daemon=True).start()
+            return self.responder_json({"ok": True})
+
         if caminho == "/api/baixados/levar":
             try:
                 # No celular com a pasta ARENA-jogos no cartao, o jogo baixado vai para ela (07/11/2026).
@@ -7931,9 +7967,28 @@ class Manipulador(BaseHTTPRequestHandler):
                 return self.erro("Este jogo de CD está dentro de um .zip, e o emulador não abre assim. "
                                  "Clique no botão Arrumar, no painel do jogo: o ARENA descompacta.")
 
+            # O console PC (servidor\jogos_pc.py): o programa do jogo, ou o atalho da loja (Steam, GOG, Epic); o
+            # jogo de outro sistema vai pela camada que o computador tiver (Wine no Linux, WSL no Windows), e sem
+            # ela a frase explica. Entra no lugar do emulador de fora (12/11/2026).
+            de_pc, aviso_pc = None, ""
+            if plataforma.get("nativo"):
+                if jogo.get("origem") == jogos_pc.ORIGEM_INSTALADOS:
+                    caminho_pc = jogo["arquivo"]
+                else:
+                    caminho_pc = os.path.join(RAIZ, jogo["arquivo"])
+                    if not dentro_da_pasta(caminho_pc, PASTA_JOGOS) or not os.path.exists(caminho_pc):
+                        return self.erro("O arquivo do jogo não está mais no lugar (foi movido ou apagado). "
+                                         "Clique em Atualizar lista.", 404)
+                try:
+                    de_pc, aviso_pc = jogos_pc.externo_para(jogo, caminho_pc)
+                except jogos_pc.NaoDaParaAbrir as falha:
+                    return self.erro(str(falha), 409)
+
             # Emulador de fora tem prioridade. Se ele existe, o RetroArch
             # nem precisa estar instalado para esta plataforma.
             caminho_externo, dados_externo = graficos.achar_externo(plataforma)
+            if de_pc:
+                caminho_externo, dados_externo = de_pc["caminho"], de_pc["dados"]
             # O emulador de fora A MAIS (consoles.json -> externo_extra: o PokketSX do PS1) so abre se a pessoa o
             # escolher. Sem escolha, e no Jogar Junto, o console segue pelo RetroArch.
             caminho_extra, dados_extra = graficos.achar_externo_extra(plataforma)
@@ -7950,6 +8005,10 @@ class Manipulador(BaseHTTPRequestHandler):
                 plataforma, PASTA_CORES, PASTA_SISTEMA,
                 dados_externo["nome"] if caminho_externo else None,
                 dados_extra["nome"] if caminho_extra else None)
+            # O jogo de console que tambem existe recompilado para PC (servidor\recomps.py): mais um jeito de
+            # abrir, 'recomp:<id>' (12/11/2026). Nao no Jogar Junto: partida a dois e' coisa do RetroArch.
+            if not dados.get("partida") and not plataforma.get("nativo"):
+                lista_jeitos += recomps.jeitos_para(jogo["titulo"], plataforma["id"])
             lembrado = jeitos_de_abrir.lembrado_que_vale(
                 carregar_config().get("jeito_de_abrir", {}).get(plataforma["id"]),
                 bool(dados.get("partida")), bool(caminho_extra))
@@ -7959,7 +8018,8 @@ class Manipulador(BaseHTTPRequestHandler):
                                             "console": plataforma["nome"],
                                             "plataforma": plataforma["id"],
                                             "jeitos": lista_jeitos})
-            if jeito and dados.get("jeito") == jeito and dados.get("lembrar"):
+            pelo_recomp = bool(jeito) and str(jeito).startswith("recomp:")
+            if jeito and dados.get("jeito") == jeito and dados.get("lembrar") and not pelo_recomp:
                 lembrar = carregar_config()
                 lembrar["jeito_de_abrir"][plataforma["id"]] = jeito
                 salvar_config(lembrar)
@@ -7970,7 +8030,7 @@ class Manipulador(BaseHTTPRequestHandler):
             livre = (plataforma.get("livre") or {}) if jeito == "livre" else {}
             core_do_jeito = livre.get("core") or plataforma["core"]
 
-            if not caminho_externo:
+            if not caminho_externo and not pelo_recomp:
                 if not os.path.isfile(EXECUTAVEL_RETROARCH):
                     return self.erro(
                         "Não achei o %s na pasta retroarch. A pasta tem que se chamar retroarch (guia 1); rode o %s "
@@ -7989,9 +8049,27 @@ class Manipulador(BaseHTTPRequestHandler):
                         "Falta o núcleo deste console na pasta retroarch%scores. Rode o %s (guia 6)."
                         % (os.sep, plataforma_do_sistema.VERIFICAR) + sugestao)
 
-            caminho_rom = os.path.join(RAIZ, jogo["arquivo"])
-            if not dentro_da_pasta(caminho_rom, PASTA_JOGOS) or not os.path.isfile(caminho_rom):
+            caminho_rom = caminho_pc if de_pc else os.path.join(RAIZ, jogo["arquivo"])
+            if not de_pc and (not dentro_da_pasta(caminho_rom, PASTA_JOGOS) or not os.path.isfile(caminho_rom)):
                 return self.erro("O arquivo do jogo não está mais no lugar (foi movido ou apagado). Clique em Atualizar lista.", 404)
+
+            # O recomp escolhido: ainda nao baixado, a tela pergunta e baixa (/api/recomp/instalar); baixado, ele
+            # entra como o emulador de fora, com a copia do jogo (servidor\recomps.py).
+            aviso_recomp = ""
+            if pelo_recomp:
+                recomp_id = str(jeito).split(":", 1)[1]
+                if not recomps.instalado(recomp_id):
+                    r = recomps.recomp(recomp_id)
+                    if not r:
+                        return self.erro("Esse recomp não está no catálogo do ARENA. Clique em Atualizar lista e "
+                                         "escolha outro jeito de abrir.", 404)
+                    return self.responder_json({"ok": True, "baixar_recomp": recomps.resumo_para_a_tela(r),
+                                                "jeito": jeito})
+                try:
+                    externo_recomp, aviso_recomp = recomps.externo_para(recomp_id, caminho_rom)
+                except recomps.NaoDaParaInstalar as falha:
+                    return self.erro(str(falha), 409)
+                caminho_externo, dados_externo = externo_recomp["caminho"], externo_recomp["dados"]
 
             if caminho_externo:
                 falta = graficos.falta_para_o_externo(dados_externo["nome"], caminho_externo)
@@ -8268,7 +8346,7 @@ class Manipulador(BaseHTTPRequestHandler):
             resposta = {"ok": True, "titulo": jogo["titulo"],
                         "pela_internet": bool(partida and
                                               dados.get("pela_internet")),
-                        "emulador": (dados_externo["nome"] if caminho_externo
+                        "emulador": ("o computador" if de_pc else dados_externo["nome"] if caminho_externo
                                      else "RetroArch")}
             if partida:
                 resposta["papel"] = partida["papel"]
@@ -8277,8 +8355,8 @@ class Manipulador(BaseHTTPRequestHandler):
                     resposta["codigo_sala"] = partida["codigo_sala"]
             if esperar:
                 resposta["esperando"] = True
-            if aviso_netplay or aviso_sem_bios:
-                resposta["aviso"] = " ".join(a for a in (aviso_sem_bios, aviso_netplay) if a)
+            if aviso_netplay or aviso_sem_bios or aviso_pc or aviso_recomp:
+                resposta["aviso"] = " ".join(a for a in (aviso_sem_bios, aviso_netplay, aviso_pc, aviso_recomp) if a)
             if partida and partida.get("hospedar"):
                 # Vai separado do "aviso": a tela o deixa fixo no alto ate o
                 # jogo fechar -- um recado sumiria atras da janela do jogo antes

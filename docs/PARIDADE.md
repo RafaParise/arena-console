@@ -87,8 +87,14 @@ toda rota `/api/...` (86) e toda aba existe onde o servidor roda; o que muda é 
 | Java ME (celular antigo) | sim | sim | **não** | **não** | **não** |
 | PlayStation 3 (de fora) | sim | sim | **não** | **não** | **não** |
 | Xbox 360 (de fora) | sim | sim | **não** | **não** | **não** |
+| PC (jogos de computador) | sim | sim | **não** | **não** | **não** |
 
 ## Funções que só existem em parte (decidido)
+
+- **Console PC e versões para PC (recomps), 12/11/2026** (`servidor\jogos_pc.py`, `servidor\recomps.py`, guia
+  `2-JOGOS.md`, Parte C): Windows e Linux. Jogo do Windows no Linux pelo Wine/Proton e jogo do Linux no Windows pelo WSL,
+  quando já instalados. No Android e no Chromebook com o APK: não (processador e sistema diferentes; o console aparece
+  cinza com o motivo). No navegador: não (sem servidor).
 
 - **Acessórios dos consoles** (`docs\ACESSORIOS.md`): Windows, Linux e Android. Navegador: não (sem servidor).
 - **Cartão PocketStation na entrada 1 do PS2**: só no celular (ARMSX2). No PC o PCSX2 de fora segue com os cartões do

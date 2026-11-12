@@ -1326,6 +1326,81 @@ opção específica que só ele tem.
 | "Jogar junto só funciona pelo RetroArch" | É esperado. Use a rede do próprio emulador, ou tire a pasta dele |
 
 
+
+---
+
+## Parte C — Jogos de PC e versões para PC (12/11/2026)
+
+### O console PC
+
+O ARENA tem um console a mais, **PC (jogos de computador)**. Ele junta:
+
+- **o jogo que você põe na pasta `jogos › pessoais › PC`**: a pasta inteira do jogo, do jeito que ele veio. O ARENA acha o
+  programa principal sozinho (o `.exe` do Windows, o AppImage ou o programa do Linux) e deixa de fora o que não é o jogo
+  (desinstalador, `UnityCrashHandler`, `vcredist`, instalador);
+- **os jogos já instalados neste computador** pela Steam, pela GOG, pela Epic e pelo Heroic. Eles entram sozinhos na lista,
+  com a origem "Instalado pela Steam" (ou pela loja de cada um), e abrem pelo atalho da própria loja. O ARENA só lê os
+  arquivos que essas lojas gravam: não entra na conta de ninguém, não mexe no registro. Programas que a loja vende e
+  que não são jogos (o Lossless Scaling, o Wallpaper Engine) ficam de fora.
+
+`.exe` de MS-DOS e de Windows têm a mesma extensão: o ARENA olha o começo do arquivo. Programa do Windows vai para o PC;
+programa do DOS (dos anos 80 e 90) continua no MS-DOS, pelo DOSBox.
+
+### Jogo de um sistema no outro
+
+O jogo roda direto no sistema para o qual foi feito. Quando não é o sistema do computador, o ARENA usa a camada de
+compatibilidade que **já estiver instalada** (ele não instala nada):
+
+| Jogo | No Windows | No Linux | No celular |
+|---|---|---|---|
+| Feito para Windows | abre direto | pelo **Wine** (ou o **Proton** da Steam), se houver | não roda |
+| Feito para Linux | pelo **WSL**, se houver uma distribuição instalada | abre direto | não roda |
+
+Sem a camada, o ARENA diz o que falta em vez de tentar. Jogo de PC não roda no celular: o processador e o sistema são
+outros (lá o console PC aparece cinza, com o motivo).
+
+### A versão para PC de um jogo de console (recomp)
+
+Um **recomp** (recompilação) é um jogo de console transformado em programa de computador: o código da máquina do
+console foi traduzido para código de PC, e o jogo roda **sem emulador**, com a resolução da tela, 60 quadros ou mais,
+tela larga e controle moderno. O recomp traz só o código novo; os dados do jogo (sons, texturas, fases) continuam vindo
+**da sua cópia**, a ROM ou o disco que já está no ARENA. Quase todos são de código aberto, publicados no GitHub de quem os
+fez (o Zelda 64: Recompiled, o Mario Kart 64: Recompiled, o Sonic Unleashed Recompiled...).
+
+Como funciona no ARENA:
+
+1. O ARENA confere cada jogo da biblioteca no catálogo de recomps (`servidor\recomps.json`, uns 1.200, de 22
+   consoles). O painel do jogo mostra **"Versão para PC: ..."** quando existe.
+2. Em **Jogar agora**, a pergunta "Como ligar?" ganha o jeito **"<nome> · versão para PC"**.
+3. Na primeira vez, o ARENA pergunta se pode baixar, com o tamanho, o autor e a licença. Ele baixa **da release oficial
+   no GitHub**, confere a marca SHA-256 que o GitHub publica e descompacta em `emuladores\Recomps\<nome>`. Nada é
+   instalado no sistema; apagar a pasta desfaz tudo.
+4. O jogo abre com a sua cópia. Quando o recomp traz o arquivo `recomplauncher.json` (o padrão que vários recomps
+   seguem), o ARENA confere se o disco é o certo (lê o disco por dentro), escreve os ajustes que o recomp pede, roda o
+   passo de preparo dele mostrando o andamento e passa a cópia na linha de comando. Sem esse arquivo, o próprio recomp
+   pede a cópia na primeira vez, e o ARENA mostra onde ela está.
+
+Uma versão nova por cima da antiga guarda o que o jogo gravou (saves e ajustes). O catálogo se atualiza com
+`servidor\python\python.exe ferramentas\atualizar_recomps.py`.
+
+**Cuidado com computador fraco:** o recomp desenha com a placa de vídeo (Direct3D 12 ou Vulkan). Na máquina da escola
+(Intel UHD) o resultado varia de jogo para jogo; se travar, use o jeito de sempre (o emulador).
+
+**De onde vem a lista.** Do catálogo público do RecompLauncher (recomplauncher.com, de elripalda), um lançador de código
+fechado que faz isso no Windows e no Linux. O ARENA **não leva o lançador junto**: guarda só os fatos do catálogo (o nome
+do jogo, o repositório, a licença, o nome do arquivo de cada sistema) e faz o resto com código próprio, em Python.
+
+### Problemas
+
+| O que aconteceu | O que fazer |
+|---|---|
+| "Não consegui ler a release no GitHub" | Sem internet não dá. Com internet, o GitHub limita as consultas (60 por hora por computador): espere um pouco |
+| "A marca SHA-256 não bate" | O download veio errado. Nada foi instalado; tente de novo |
+| "publica este recomp como .exe/.7z" | O autor só publica instalador ou 7z. Baixe do GitHub, descompacte em `emuladores\Recomps\<nome>` e clique em Jogar |
+| "Este disco não é o que o recomp espera" | O recomp pede outra versão do jogo (outra região). A mensagem diz qual |
+| O recomp pede a ROM ao abrir | É o jeito dele: aponte para o arquivo do jogo, que o ARENA mostrou no aviso |
+| Jogo do Windows no Linux não abre | Instale o Wine pelo gerenciador de pacotes, ou use a versão para Linux do jogo |
+
 ---
 
 ## A pasta de jogos do ARENA no cartão de memória (celular, 07/11/2026)

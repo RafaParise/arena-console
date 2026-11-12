@@ -601,7 +601,7 @@ const MIDIA_POR_PLATAFORMA = {
     "ps1", "ps3", "saturn", "dreamcast", "segacd", "threedo", "cdi", "pcfx",
     "scummvm", "dos", "amiga", "spectrum", "atarist", "zx81", "apple2", "pet",
   ],
-  caixa_dvd: ["ps2", "gamecube", "wii"],
+  caixa_dvd: ["ps2", "gamecube", "wii", "pc"],
   caixa_xbox: ["xbox360"],
   // UMD: disco pequeno numa caixinha propria, nem CD nem cartucho.
   umd: ["psp"],
@@ -877,6 +877,7 @@ function desenharDetalhes() {
     consoleBotao.hidden = true;
     $("#btnAtualizarCapa").disabled = true;
     $("#detalhesAviso").hidden = true;
+    $("#detalhesRecomp").hidden = true;
     return;
   }
   $("#btnAtualizarCapa").disabled = false;
@@ -895,6 +896,15 @@ function desenharDetalhes() {
   $("#detalhesPlataforma").textContent = jogo.plataforma_nome;
   $("#detalhesTamanho").textContent = formatarMb(jogo.tamanho_mb) + (discos > 1 ? ` · ${discos} discos` : "");
   $("#detalhesOrigem").textContent = jogo.origem_rotulo;
+  // A versao recompilada para PC deste jogo (servidor\recomps.py): aqui so
+  // conta; o Jogar agora e' que oferece, junto com os outros jeitos.
+  const recomps = Array.isArray(jogo.recomps) ? jogo.recomps : [];
+  const caixaRecomp = $("#detalhesRecomp");
+  caixaRecomp.hidden = recomps.length === 0;
+  caixaRecomp.textContent = recomps.length
+    ? `Versão para PC: ${recomps.map((r) => r.nome + (r.instalado ? " (já no ARENA)" : "")).join(", ")}. ` +
+      "Clique em Jogar agora e escolha: roda direto no computador, sem emulador, com a sua cópia do jogo."
+    : "";
   const capa = $("#detalhesCapa");
   capa.className = `detalhes-capa capa-${classeDaCapa(jogo.plataforma_nome)}`;
   prepararCapa(capa, jogo);
@@ -1145,8 +1155,15 @@ async function jogar(jogo, jeito = "", lembrar = false) {
       perguntarJeito(jogo, dados);
       return;
     }
+    // O jogo recompilado para PC ainda nao esta aqui: pergunta, baixa da
+    // release oficial no GitHub (servidor\recomps.py) e abre em seguida.
+    if (dados.baixar_recomp) {
+      baixarRecompEJogar(jogo, dados.baixar_recomp, dados.jeito);
+      return;
+    }
     // A escolha lembrada ja aparece em Ajustes > Emuladores, sem recarregar.
-    if (jeito && lembrar && estado.config) {
+    // A versao para PC (recomp:...) vale so para este jogo: o servidor nao a lembra para o console inteiro.
+    if (jeito && lembrar && estado.config && !jeito.startsWith("recomp:")) {
       estado.config.jeito_de_abrir = { ...(estado.config.jeito_de_abrir || {}), [jogo.plataforma]: jeito };
       desenharJeitos();
     }
@@ -1208,6 +1225,48 @@ function perguntarJeito(jogo, dados) {
   $("#modalJeito").hidden = false;
   const primeiro = $("#listaJeitosModal .perfil");
   if (primeiro) primeiro.focus();
+}
+
+// --------------------------------------------------------------------------
+// O jogo recompilado para PC (12/11/2026, servidor\recomps.py)
+// --------------------------------------------------------------------------
+// O jogo de console que tambem existe como programa de PC de verdade (sem
+// emulador): o ARENA baixa da release oficial de quem o fez, com a pessoa
+// confirmando o tamanho e a licenca, mostra o andamento e abre com a copia
+// do jogo que ja esta na biblioteca. Nada e' instalado no sistema.
+async function baixarRecompEJogar(jogo, recomp, jeito) {
+  const tamanho = recomp.tamanho ? ` (${recomp.tamanho})` : "";
+  const licenca = recomp.licenca ? `, licença ${recomp.licenca}` : "";
+  const pergunta = `Baixar ${recomp.nome}${tamanho} da release oficial no GitHub (${recomp.repo}${licenca}) ` +
+    `para a pasta emuladores › Recomps do ARENA? Nada é instalado no sistema; o jogo abre com a sua cópia de ${jogo.titulo}.`;
+  if (!window.confirm(pergunta)) return;
+  try {
+    await pedir("/api/recomp/instalar", "POST", { id: recomp.id });
+    recado(`Baixando ${recomp.nome}...`, false, 3000);
+    let andamento = {};
+    let semResposta = 0;
+    for (;;) {
+      await new Promise((pronto) => setTimeout(pronto, 1000));
+      try {
+        andamento = await pedir(`/api/recomp/progresso?id=${encodeURIComponent(recomp.id)}`);
+      } catch (falha) {
+        if (++semResposta > 30) throw falha;
+        continue;
+      }
+      if (andamento.estado !== "rodando") break;
+      const parte = andamento.total ? ` ${Math.floor((100 * andamento.feito) / andamento.total)}%` : "";
+      recado(`${andamento.mensagem || "Baixando..."}${parte}`, false, 2500);
+    }
+    if (andamento.estado === "erro") {
+      recado(andamento.mensagem || "O download falhou.", true, 9000);
+      return;
+    }
+    recado(`${recomp.nome} pronto. Abrindo...`, false, 3000);
+    await carregarCatalogo();
+    jogar(jogo, jeito);
+  } catch (falha) {
+    recado(falha.message, true);
+  }
 }
 
 // Ajustes > Emuladores: o jeito de cada console que tem mais de um.

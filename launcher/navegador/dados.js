@@ -2722,6 +2722,37 @@ window.ARENA_DADOS = {
     ]
    },
    "tamanho_max_mb": 15000
+  },
+  {
+   "apelidos": [
+    "pc",
+    "computador",
+    "windows",
+    "linux",
+    "steam",
+    "gog",
+    "epic",
+    "recomp",
+    "recomps"
+   ],
+   "arquivos_sistema": 0,
+   "core": "",
+   "custo": 4,
+   "descricao": "Jogos feitos para computador: o programa do jogo na pasta PC, os instalados pela Steam, GOG e Epic, e os consoles recompilados para PC (recomps). Rodam direto, sem emulador; jogo de outro sistema abre pela camada que o computador ja tiver (Wine no Linux, WSL no Windows).",
+   "extensoes": [
+    ".exe",
+    ".appimage",
+    ".x86_64",
+    ".sh"
+   ],
+   "id": "pc",
+   "nativo": true,
+   "netplay": false,
+   "netplay_motivo": "Jogo de PC usa a rede do proprio jogo: o Jogar Junto do ARENA e' so do RetroArch.",
+   "nome": "PC (jogos de computador)",
+   "pasta": "PC",
+   "pede_placar": false,
+   "peso": "completo"
   }
  ],
  "etiquetas": {
@@ -3242,6 +3273,10 @@ window.ARENA_DADOS = {
    "amstrad",
    "msx",
    "apple2"
+  ],
+  ".exe": [
+   "dos",
+   "pc"
   ],
   ".iso": [
    "ps2",
