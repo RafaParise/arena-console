@@ -37,7 +37,7 @@ professor da rede estadual de SP.
 | Restrição | O que isso obriga |
 |---|---|
 | Sem `pip install` | Só a biblioteca padrão; o Windows é alcançado por `ctypes` |
-| Sem administrador | Nada de driver, serviço, regra de firewall ou gravação no registro |
+| Sem administrador | Nada de driver, serviço, regra de firewall ou gravação no registro. **Exceção única** (pedido do Rafael, 13/11/2026): o botão opcional **Equipamentos → Instalar o WSL**, que avisa antes e deixa o próprio Windows pedir a permissão |
 | Pen drive | Caminho sempre relativo. Caminho absoluto vazando é bug de portabilidade |
 | Offline | Internet é bônus, e sem ela tudo degrada com uma mensagem clara |
 | Máquina-alvo | Celeron N5100 (4 threads, **sem AVX**), 7,7 GB e Intel UHD integrada (`docs\MAQUINA-ALVO.md`). O desempenho se julga nela, não no Ryzen do Rafael |

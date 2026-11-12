@@ -1349,15 +1349,28 @@ programa do DOS (dos anos 80 e 90) continua no MS-DOS, pelo DOSBox.
 
 ### Jogo de um sistema no outro
 
-O jogo roda direto no sistema para o qual foi feito. Quando não é o sistema do computador, o ARENA usa a camada de
-compatibilidade que **já estiver instalada** (ele não instala nada):
+O jogo roda direto no sistema para o qual foi feito. Quando não é o sistema do computador, o ARENA usa uma camada de
+compatibilidade, e ele mesmo a prepara pelo botão **🧰 Equipamentos** (13/11/2026):
 
 | Jogo | No Windows | No Linux | No celular |
 |---|---|---|---|
-| Feito para Windows | abre direto | pelo **Wine** (ou o **Proton** da Steam), se houver | não roda |
-| Feito para Linux | pelo **WSL**, se houver uma distribuição instalada | abre direto | não roda |
+| Feito para Windows | abre direto | pelo **Wine** | não roda |
+| Feito para Linux | pelo **WSL**, com o **Linux do ARENA** | abre direto | não roda |
 
-Sem a camada, o ARENA diz o que falta em vez de tentar. Jogo de PC não roda no celular: o processador e o sistema são
+- **No Linux, Equipamentos → Jogos de Windows no Linux → Baixar o Wine.** O ARENA baixa o Wine portátil (as
+  compilações abertas do projeto Kron4ek, no GitHub; uns 100 MB), confere a marca SHA-256 e abre em
+  `emuladores/Wine`, **sem pedir permissão**. O "C:" do Wine fica em `dados/wine`, dentro do ARENA. Se o Linux já tiver
+  o Wine ou o Proton da Steam, o ARENA usa o dele.
+- **No Windows, Equipamentos → Jogos de Linux no Windows**, em dois toques:
+  1. **Instalar (pede permissão de administrador).** Ligar o WSL, da Microsoft, é a **única** coisa do ARENA que pede
+     administrador. O botão avisa antes; aceitando, o próprio Windows pede a permissão e liga o WSL numa janela à parte
+     (pode pedir para reiniciar). Na escola, sem a senha de administrador, não dá: peça a quem cuida dos computadores.
+  2. **Preparar o Linux do ARENA** (sem administrador). O ARENA baixa a imagem oficial do Ubuntu 24.04 para WSL (uns
+     350 MB), confere pela lista de marcas do próprio site, monta o "ARENA-Linux" com o disco em `emuladores\Linux` e
+     instala as peças de vídeo e som que os jogos pedem. Levou o ARENA para outro computador com o WSL ligado? O mesmo
+     botão só registra o disco que já está na pasta.
+
+Sem a camada, o ARENA diz o que falta e onde resolver. Jogo de PC não roda no celular: o processador e o sistema são
 outros (lá o console PC aparece cinza, com o motivo).
 
 ### Os jogos de Android do celular
@@ -1415,7 +1428,8 @@ do jogo, o repositório, a licença, o nome do arquivo de cada sistema) e faz o 
 | "publica este recomp como .exe..." | O autor só publica instalador. Baixe do GitHub, descompacte em `emuladores\Recomps\<nome>` e clique em Jogar |
 | "Este disco não é o que o recomp espera" | O recomp pede outra versão do jogo (outra região). A mensagem diz qual |
 | O recomp pede a ROM ao abrir | É o jeito dele: aponte para o arquivo do jogo, que o ARENA mostrou no aviso |
-| Jogo do Windows no Linux não abre | Instale o Wine pelo gerenciador de pacotes, ou use a versão para Linux do jogo |
+| Jogo do Windows no Linux não abre | Equipamentos → Jogos de Windows no Linux → Baixar o Wine |
+| Jogo do Linux no Windows não abre | Equipamentos → Jogos de Linux no Windows (o primeiro passo pede administrador) |
 
 ---
 

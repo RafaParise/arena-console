@@ -1364,6 +1364,13 @@ function linhaDoEquipamento(item) {
                                  () => equiparItens([item.id]), rodando));
   } else if (acao.tipo === "loja") {
     li.append(botaoDoEquipamento(acao.rotulo || "Ver na loja", `loja:${item.id}`, abrirLojaDoLossless));
+  } else if (acao.tipo === "admin") {
+    // A unica coisa que pede administrador: o aviso fica escrito na linha E e' perguntado antes.
+    const aviso = document.createElement("p");
+    aviso.className = "equip-aviso-admin";
+    aviso.textContent = "🔑 Pede permissão de administrador.";
+    li.append(aviso, botaoDoEquipamento(acao.rotulo || "Instalar", `admin:${item.id}`,
+                                        () => pedirAdministrador(item.id, acao.aviso)));
   }
   if (item.itens && item.itens.length) {
     const lista = document.createElement("ul");
@@ -1477,6 +1484,18 @@ async function equiparItens(ids, tudo = false) {
     carregarEquipamentos();
   } catch (falha) {
     recado(falha.message, true);
+  }
+}
+
+async function pedirAdministrador(itemId, aviso) {
+  if (!window.confirm(aviso || "Isto pede a permissão de administrador do Windows. Continuar?")) return;
+  try {
+    const resposta = await pedir("/api/equipamentos/admin", "POST", { id: itemId });
+    recado(resposta.mensagem, false, 12000);
+    ultimoDesenhoEquip = "";
+    setTimeout(carregarEquipamentos, 4000);
+  } catch (falha) {
+    recado(falha.message, true, 9000);
   }
 }
 

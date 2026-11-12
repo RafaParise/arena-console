@@ -831,6 +831,11 @@ def conferir(destino, com_bios=False):
     recomps_no_pacote = os.path.join(destino, "emuladores", "Recomps")
     if os.path.isdir(recomps_no_pacote) and any(not n.lower().startswith("leia") for n in os.listdir(recomps_no_pacote)):
         problemas.append("recomp baixado no pacote (cada um baixa o seu): emuladores\\Recomps")
+    # O Wine portatil e o Linux do ARENA (servidor\equipamentos.py, 13/11/2026) sao baixados por quem usa; o disco do
+    # Linux tem mais de 1 GB e e' registrado no WSL de cada computador: nunca vao no pacote.
+    for baixado in ("Wine", "Linux"):
+        if os.path.isdir(os.path.join(destino, "emuladores", baixado)):
+            problemas.append("pasta baixada por quem usa no pacote: emuladores\\%s" % baixado)
     # O ARENA do Chromebook foi inteiro (a entrada, a tela e os nucleos).
     falta = falta_no_navegador(destino)
     if not os.path.isfile(os.path.join(destino, "ARENA-CHROMEBOOK.html")):

@@ -2051,3 +2051,5 @@ html[data-navegador="true"] [data-so-windows] { display: none !important; }
 /* O controle da Nitidez (Ajustes > Escala da tela): alvo de toque de 44 px de altura (a auditoria do front de
    13/11/2026 achou 16 px, pequeno para dedo e para quem tem dificuldade motora). */
 #faixaNitidez { min-height: 44px; width: min(100%, 22rem); cursor: pointer; }
+
+.equip-aviso-admin { margin: 0; font-size: var(--t-base); font-weight: 700; }

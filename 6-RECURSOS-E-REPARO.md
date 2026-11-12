@@ -30,7 +30,10 @@ O que aparece:
 - **Movimento mais liso (MFG Super Motion)**: grátis; o ARENA baixa do site do autor e guarda na pasta dele.
 - **Lossless Scaling**: pago, na Steam; o botão abre a página dele. Não é obrigatório.
 - **Versões para PC dos seus jogos** (recomps): uma por jogo que você tem, cada uma com o botão **Baixar**.
-- **Jogos de Linux no Windows** (WSL): opcional, só para quem tem jogo de computador feito para Linux.
+- **Jogos de Linux no Windows** (WSL e o Linux do ARENA): opcional. O primeiro botão, **Instalar**, é a única
+  coisa do ARENA que pede **permissão de administrador** (🔑 escrito na linha e perguntado antes); o segundo,
+  **Preparar o Linux do ARENA**, não pede.
+- **Jogos de Windows no Linux** (Wine), no ARENA do Linux: opcional; o ARENA baixa o Wine portátil, sem permissão.
 
 **Equipar tudo o que é grátis** baixa de uma vez o que falta, um item por vez, em segundo plano: dá para fechar a
 janela e jogar. O botão diz antes quantos itens são e o tamanho aproximado. Tudo vem do site de quem fez, com a marca

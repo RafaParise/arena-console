@@ -176,6 +176,10 @@ def _trabalhar(depois=None):
         try:
             if item_id == "mfg":
                 instalar_mfg()
+            elif item_id == "wine":
+                instalar_wine()
+            elif item_id == "linux":
+                preparar_linux()
             elif item_id.startswith("recomp:"):
                 recomps.instalar(item_id.split(":", 1)[1])
             if depois:
@@ -213,13 +217,6 @@ def _item(item_id, icone, nome, para_que, estado, detalhe="", acao=None, itens=N
     andando = andamento(item_id) if acao and acao.get("tipo") == "baixar" else {}
     return {"id": item_id, "icone": icone, "nome": nome, "para_que": para_que, "estado": estado,
             "detalhe": detalhe, "acao": acao or {"tipo": "nenhuma"}, "andamento": andando, "itens": itens or []}
-
-
-def _wsl_em_cache():
-    if "valor" not in _CACHE_WSL:
-        import jogos_pc
-        _CACHE_WSL["valor"] = bool(jogos_pc.wsl())
-    return _CACHE_WSL["valor"]
 
 
 def recomps_da_biblioteca(jogos):
@@ -288,12 +285,45 @@ def listar(raiz, plataformas, jogos, achar_externo, nucleos_prontos=0, retroarch
                            "%d de %d prontas." % (prontos, len(itens)),
                            {"tipo": "lista", "rotulo": "Ver os jogos"}, itens))
     if plataforma_do_sistema.WINDOWS:
-        lista.append(_item("wsl", "🐧", "Jogos de Linux no Windows",
-                           "Só para quem tem jogo de computador feito para Linux.",
-                           "pronto" if _wsl_em_cache() else "opcional",
-                           "Pronto (WSL)." if _wsl_em_cache() else
-                           "Não é preciso para jogar. Quem cuida do computador pode instalar o WSL da Microsoft."))
+        lista.append(_item_do_wsl())
+    elif os.name != "nt":
+        lista.append(_item_do_wine(raiz))
     return lista
+
+
+def _item_do_wsl():
+    """Jogos de Linux no Windows: ligar o WSL (administrador), depois o Linux do ARENA (sem administrador)."""
+    situacao = situacao_do_wsl()
+    nome, icone = "Jogos de Linux no Windows", "🐧"
+    para_que = "Só para quem tem jogo de computador feito para Linux. Não é preciso para jogar o resto."
+    if not situacao["ativo"]:
+        return _item("wsl", icone, nome, para_que, "opcional",
+                     "Precisa ligar o WSL, da Microsoft. É a única coisa do ARENA que pede permissão de administrador.",
+                     {"tipo": "admin", "rotulo": "Instalar (pede permissão de administrador)",
+                      "aviso": "Para ligar o WSL, o Windows vai pedir a permissão de administrador (a senha de quem "
+                               "cuida do computador). Pode pedir para reiniciar no fim. Na escola, sem a senha, não dá. "
+                               "Continuar?"})
+    if not situacao["do_arena"]:
+        return _item("linux", icone, nome, para_que, "opcional",
+                     "O WSL está ligado. Falta o Linux do ARENA: o ARENA baixa o Ubuntu oficial (uns 350 MB) e guarda "
+                     "em emuladores\\Linux, sem pedir permissão.",
+                     {"tipo": "baixar", "rotulo": "Preparar o Linux do ARENA"})
+    return _item("wsl", icone, nome, para_que, "pronto", "Pronto: o Linux do ARENA fica em emuladores\\Linux.")
+
+
+def _item_do_wine(raiz):
+    """Jogos de Windows no Linux: o Wine (o do sistema, o do Proton ou o portatil que o ARENA baixa)."""
+    import jogos_pc
+    camada = jogos_pc.wine()
+    nome, icone = "Jogos de Windows no Linux", "🍷"
+    para_que = "Só para quem tem jogo de computador feito para Windows. Não é preciso para jogar o resto."
+    if camada:
+        de_onde = "o do ARENA" if camada[0].startswith(pasta_do_wine(raiz)) else (
+            "o Proton da Steam" if "proton" in camada[0].lower() else "o deste Linux")
+        return _item("wine", icone, nome, para_que, "pronto", "Pronto: o Wine é %s." % de_onde)
+    return _item("wine", icone, nome, para_que, "opcional",
+                 "O ARENA baixa o Wine portátil (uns 100 MB) e guarda em emuladores/Wine, sem pedir permissão.",
+                 {"tipo": "baixar", "rotulo": "Baixar o Wine"})
 
 
 def _quadros_a_mais(raiz):
@@ -332,6 +362,243 @@ def ids_para_equipar_tudo(lista):
             if not sub.get("instalado"):
                 ids.append(sub["id"])
     return ids
+
+
+# ---------------------------------------------------------------------------
+# Jogo de um sistema no outro (13/11/2026): o Wine no Linux e o WSL no Windows, por dentro do ARENA
+# ---------------------------------------------------------------------------
+# Jogo do Windows no Linux: o Wine portatil das compilacoes abertas do Kron4ek (LGPL; o "wow64" dispensa as
+# bibliotecas de 32 bits), baixado para emuladores/Wine, sem administrador. O prefixo (o "C:" do Wine) fica em
+# dados/wine, dentro do ARENA.
+REPO_WINE = "Kron4ek/Wine-Builds"
+# Jogo do Linux no Windows: o WSL. Liga-lo e' a UNICA coisa do ARENA que pede administrador (pedido do Rafael em
+# 13/11/2026; o botao avisa antes e o proprio Windows pede a permissao). Ligado, o ARENA monta o Linux dele com a
+# imagem oficial do Ubuntu para WSL, com o disco em emuladores\Linux (sem administrador).
+DISTRO_DO_ARENA = "ARENA-Linux"
+PAGINA_UBUNTU_WSL = "https://cloud-images.ubuntu.com/wsl/releases/noble/current/"
+ARQUIVO_UBUNTU_WSL = "ubuntu-noble-wsl-amd64-wsl.rootfs.tar.gz"
+# O que os jogos de Linux pedem para abrir janela, desenhar e tocar som (Ubuntu 24.04).
+PACOTES_DOS_JOGOS = ("libgl1 libegl1 libgles2 libvulkan1 mesa-vulkan-drivers libsdl2-2.0-0 libpulse0 libasound2t64 "
+                     "libx11-6 libxext6 libxrandr2 libxi6 libxcursor1 libxinerama1 libxkbcommon0 libwayland-client0 "
+                     "libopenal1 libfreetype6 libfontconfig1 ca-certificates")
+_SEM_JANELA = {"creationflags": 0x08000000} if os.name == "nt" else {}
+_CACHE_WSL_TEMPO = 30
+
+
+def pasta_do_wine(raiz=RAIZ):
+    return os.path.join(raiz, "emuladores", "Wine")
+
+
+def instalar_wine(raiz=RAIZ, release=None):
+    """Baixa o Wine portatil (o .tar.xz "amd64-wow64", sem staging) e abre em emuladores/Wine. So no Linux."""
+    if os.name == "nt":
+        raise recomps.NaoDaParaInstalar("No Windows o jogo do Windows abre direto: o Wine é para o Linux.")
+    _anotar("wine", estado="rodando", mensagem="Procurando o Wine mais novo...", feito=0, total=0)
+    try:
+        rel = release or recomps.release(REPO_WINE, "")
+        arquivo = next((a for a in rel["arquivos"] if re.fullmatch(r"wine-[\d.]+-amd64-wow64\.tar\.xz", a["nome"])),
+                       None)
+        if not arquivo:
+            raise recomps.NaoDaParaInstalar("A versão %s do Wine não tem o arquivo para este computador." % rel["tag"])
+        _baixar_conferido("wine", arquivo, [arquivo.get("sha256", "")], pasta_do_wine(raiz), raiz,
+                          lambda nova: os.path.isfile(os.path.join(nova, "bin", "wine")))
+        _anotar("wine", estado="pronto", mensagem="Wine pronto: os jogos do Windows abrem neste Linux.")
+        return pasta_do_wine(raiz)
+    except recomps.NaoDaParaInstalar as falha:
+        _anotar("wine", estado="erro", mensagem=str(falha))
+        raise
+
+
+def _baixar_conferido(item_id, arquivo, marcas, pasta, raiz, tem_o_programa):
+    """Baixa 'arquivo' (da release), confere com 'marcas' (as que houver; sem nenhuma, nao instala), abre numa pasta
+    nova e troca a velha. tem_o_programa(pasta_nova) diz se veio o que importa."""
+    if not arquivo["url"].lower().startswith("https://"):
+        raise recomps.NaoDaParaInstalar("O arquivo não vem por https; o ARENA não baixa assim.")
+    esperadas = [m.lower() for m in marcas if m]
+    if not esperadas:
+        raise recomps.NaoDaParaInstalar("O site não mostra a marca de conferência deste arquivo. Por segurança, "
+                                        "nada foi baixado.")
+    baixando = os.path.join(raiz, "emuladores", ".baixando")
+    os.makedirs(baixando, exist_ok=True)
+    caminho = os.path.join(baixando, re.sub(r"[^A-Za-z0-9._-]", "_", arquivo["nome"]))
+    _anotar(item_id, mensagem="Baixando (%s)..." % recomps._legivel(arquivo.get("tamanho", 0)),
+            total=arquivo.get("tamanho", 0))
+    try:
+        codigo, _ = baixar.rodar(arquivo["url"], recomps.SEGUNDOS_DOWNLOAD, destino=caminho)
+        if codigo != 0 or not os.path.isfile(caminho):
+            raise recomps.NaoDaParaInstalar("O download não terminou (código %s). Confira a internet e toque de novo."
+                                            % codigo)
+        _anotar(item_id, mensagem="Conferindo se o arquivo chegou inteiro...", feito=arquivo.get("tamanho", 0))
+        if any(recomps._sha256(caminho) != m for m in esperadas):
+            raise recomps.NaoDaParaInstalar("O arquivo chegou diferente do publicado. Nada foi instalado; toque de "
+                                            "novo.")
+        _anotar(item_id, mensagem="Abrindo o arquivo na pasta do ARENA...")
+        nova = pasta + ".nova"
+        if os.path.isdir(nova):
+            shutil.rmtree(nova)
+        try:
+            recomps.descompactar(caminho, nova)
+        except OSError as falha:
+            raise recomps.NaoDaParaInstalar("Não deu para abrir o arquivo (%s). Toque de novo." % falha)
+        if not tem_o_programa(nova):
+            shutil.rmtree(nova, ignore_errors=True)
+            raise recomps.NaoDaParaInstalar("O arquivo não trouxe o programa esperado. Nada foi instalado.")
+        if os.path.isdir(pasta):
+            velha = pasta + ".velha"
+            if os.path.isdir(velha):
+                shutil.rmtree(velha)
+            os.replace(pasta, velha)
+            os.replace(nova, pasta)
+            shutil.rmtree(velha, ignore_errors=True)
+        else:
+            os.replace(nova, pasta)
+    finally:
+        try:
+            os.remove(caminho)
+        except OSError:
+            pass
+
+
+def _wsl_exe():
+    return shutil.which("wsl.exe") or shutil.which("wsl") if os.name == "nt" else None
+
+
+def _rodar_wsl(argumentos, segundos=30):
+    """(codigo, texto) de um wsl.exe; a saida dele vem em UTF-16 quando fala do proprio WSL."""
+    programa = _wsl_exe()
+    if not programa:
+        return 1, ""
+    try:
+        saida = subprocess.run([programa] + argumentos, capture_output=True, timeout=segundos, **_SEM_JANELA)
+    except (OSError, subprocess.SubprocessError) as falha:
+        return 1, str(falha)
+    bruto = saida.stdout + saida.stderr
+    texto = bruto.decode("utf-16-le", "replace") if b"\x00" in bruto else bruto.decode("utf-8", "replace")
+    return saida.returncode, texto.replace("\x00", "")
+
+
+def situacao_do_wsl(forcar=False):
+    """{"ativo": o WSL esta ligado neste Windows, "do_arena": o Linux do ARENA esta registrado, "outras": [...]}.
+    Guardada por 30 s (o painel atualiza a cada 1,5 s enquanto baixa)."""
+    agora = time.monotonic()
+    guardada = _CACHE_WSL.get("situacao")
+    if guardada and not forcar and agora - guardada[0] < _CACHE_WSL_TEMPO:
+        return guardada[1]
+    situacao = {"ativo": False, "do_arena": False, "outras": []}
+    if _wsl_exe():
+        codigo, _texto = _rodar_wsl(["--status"], 20)
+        situacao["ativo"] = codigo == 0
+        if situacao["ativo"]:
+            codigo, texto = _rodar_wsl(["-l", "-q"], 20)
+            nomes = [l.strip() for l in texto.splitlines() if l.strip()] if codigo == 0 else []
+            situacao["do_arena"] = DISTRO_DO_ARENA in nomes
+            situacao["outras"] = [n for n in nomes if n != DISTRO_DO_ARENA and "docker" not in n.lower()]
+    _CACHE_WSL["situacao"] = (agora, situacao)
+    return situacao
+
+
+def ligar_o_wsl_com_administrador():
+    """Pede ao Windows para rodar 'wsl --install --no-distribution' como administrador (a janela do UAC aparece).
+    Devolve a frase para a tela. Lanca recomps.NaoDaParaInstalar se a pessoa negar ou o Windows nao deixar."""
+    if os.name != "nt":
+        raise recomps.NaoDaParaInstalar("O WSL é do Windows.")
+    import ctypes
+    from ctypes import wintypes
+    executar = ctypes.windll.shell32.ShellExecuteW
+    executar.argtypes = [wintypes.HWND, wintypes.LPCWSTR, wintypes.LPCWSTR, wintypes.LPCWSTR, wintypes.LPCWSTR,
+                         ctypes.c_int]
+    executar.restype = ctypes.c_void_p
+    resultado = executar(None, "runas", "wsl.exe", "--install --no-distribution", None, 1)
+    codigo = int(resultado or 0)
+    _CACHE_WSL.clear()
+    if codigo <= 32:
+        if codigo == 5:
+            raise recomps.NaoDaParaInstalar("A permissão de administrador não foi dada, então nada mudou. Na escola, "
+                                            "peça a quem cuida dos computadores.")
+        raise recomps.NaoDaParaInstalar("O Windows não deixou ligar o WSL (código %d). Peça a quem cuida do computador."
+                                        % codigo)
+    return ("O Windows está ligando o WSL numa janela à parte. Quando ela terminar, se pedir, reinicie o computador; "
+            "depois volte aqui e toque em Preparar o Linux do ARENA.")
+
+
+def pasta_do_linux(raiz=RAIZ):
+    return os.path.join(raiz, "emuladores", "Linux")
+
+
+def preparar_linux(raiz=RAIZ):
+    """Monta o Linux do ARENA no WSL (sem administrador): registra o disco que ja esta na pasta (o ARENA levado para
+    outro computador) ou baixa a imagem oficial do Ubuntu para WSL, confere, importa e poe o que os jogos pedem."""
+    situacao = situacao_do_wsl(forcar=True)
+    if not situacao["ativo"]:
+        raise recomps.NaoDaParaInstalar("O WSL ainda não está ligado neste Windows: toque antes em Instalar (pede "
+                                        "permissão de administrador).")
+    pasta = pasta_do_linux(raiz)
+    disco = os.path.join(pasta, "ext4.vhdx")
+    _anotar("linux", estado="rodando", mensagem="Preparando o Linux do ARENA...", feito=0, total=0)
+    try:
+        if not situacao["do_arena"]:
+            if os.path.isfile(disco):
+                _anotar("linux", mensagem="Achei o Linux do ARENA na pasta: registrando neste computador...")
+                codigo, texto = _rodar_wsl(["--import-in-place", DISTRO_DO_ARENA, disco], 300)
+                if codigo != 0:
+                    raise recomps.NaoDaParaInstalar("O WSL não aceitou o disco da pasta emuladores\\Linux (%s). "
+                                                    "Atualize o WSL e toque de novo." % texto.strip()[:160])
+            else:
+                _importar_ubuntu(raiz, pasta)
+        _anotar("linux", mensagem="Instalando o que os jogos de Linux pedem (vídeo e som). Pode demorar...")
+        codigo, texto = _rodar_wsl(["-d", DISTRO_DO_ARENA, "-u", "root", "--", "sh", "-c",
+                                    "export DEBIAN_FRONTEND=noninteractive; apt-get update -q && "
+                                    "apt-get install -y -q --no-install-recommends " + PACOTES_DOS_JOGOS], 2400)
+        if codigo != 0:
+            raise recomps.NaoDaParaInstalar("O Linux do ARENA foi montado, mas não baixou as peças de vídeo e som "
+                                            "(%s). Confira a internet e toque de novo." % texto.strip()[-160:])
+        _CACHE_WSL.clear()
+        _anotar("linux", estado="pronto", mensagem="Linux do ARENA pronto: os jogos de Linux abrem neste Windows.")
+        return pasta
+    except recomps.NaoDaParaInstalar as falha:
+        _anotar("linux", estado="erro", mensagem=str(falha))
+        raise
+
+
+def _importar_ubuntu(raiz, pasta):
+    """Baixa a imagem oficial do Ubuntu 24.04 para WSL, confere pela lista de marcas do proprio site e importa."""
+    baixando = os.path.join(raiz, "emuladores", ".baixando")
+    os.makedirs(baixando, exist_ok=True)
+    lista = os.path.join(baixando, "SHA256SUMS")
+    imagem = os.path.join(baixando, ARQUIVO_UBUNTU_WSL)
+    try:
+        _anotar("linux", mensagem="Lendo a lista de conferência do Ubuntu...")
+        codigo, _ = baixar.rodar(PAGINA_UBUNTU_WSL + "SHA256SUMS", 60, destino=lista)
+        marca = ""
+        if codigo == 0 and os.path.isfile(lista):
+            with open(lista, encoding="utf-8", errors="replace") as arquivo:
+                for linha in arquivo:
+                    partes = linha.split()
+                    if len(partes) == 2 and partes[1].lstrip("*") == ARQUIVO_UBUNTU_WSL:
+                        marca = partes[0].lower()
+        if not re.fullmatch(r"[0-9a-f]{64}", marca):
+            raise recomps.NaoDaParaInstalar("Não consegui ler a lista de conferência do Ubuntu. Confira a internet e "
+                                            "toque de novo.")
+        _anotar("linux", mensagem="Baixando o Ubuntu oficial para WSL (uns 350 MB)...")
+        codigo, _ = baixar.rodar(PAGINA_UBUNTU_WSL + ARQUIVO_UBUNTU_WSL, recomps.SEGUNDOS_DOWNLOAD, destino=imagem)
+        if codigo != 0 or not os.path.isfile(imagem):
+            raise recomps.NaoDaParaInstalar("O download do Ubuntu não terminou (código %s). Confira a internet e toque "
+                                            "de novo." % codigo)
+        _anotar("linux", mensagem="Conferindo se o Ubuntu chegou inteiro...")
+        if recomps._sha256(imagem) != marca:
+            raise recomps.NaoDaParaInstalar("O Ubuntu chegou diferente do publicado. Nada foi instalado; toque de novo.")
+        _anotar("linux", mensagem="Montando o Linux do ARENA em emuladores\\Linux...")
+        os.makedirs(pasta, exist_ok=True)
+        codigo, texto = _rodar_wsl(["--import", DISTRO_DO_ARENA, pasta, imagem, "--version", "2"], 900)
+        if codigo != 0:
+            raise recomps.NaoDaParaInstalar("O WSL não montou o Linux do ARENA (%s). Reinicie o computador e toque de "
+                                            "novo." % texto.strip()[:160])
+    finally:
+        for arquivo in (lista, imagem):
+            try:
+                os.remove(arquivo)
+            except OSError:
+                pass
 
 
 def abrir_loja_do_lossless():

@@ -284,3 +284,132 @@ class SeteZipPeloTarDoSistema(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class JogoDeUmSistemaNoOutro(unittest.TestCase):
+    """O Wine portatil (Linux) e o WSL com o Linux do ARENA (Windows), 13/11/2026."""
+
+    def setUp(self):
+        self.pasta = tempfile.mkdtemp(prefix="arena_camadas_")
+        equipamentos._CACHE_WSL.clear()
+
+    def tearDown(self):
+        equipamentos._CACHE_WSL.clear()
+        limpeza.apagar_pasta(self.pasta)
+
+    def _situacao(self, ativo, do_arena=False):
+        return mock.patch.object(equipamentos, "situacao_do_wsl",
+                                 return_value={"ativo": ativo, "do_arena": do_arena, "outras": []})
+
+    def test_wsl_desligado_pede_administrador_com_aviso(self):
+        with self._situacao(False):
+            item = equipamentos._item_do_wsl()
+        self.assertEqual(item["acao"]["tipo"], "admin")
+        self.assertIn("administrador", item["acao"]["rotulo"])
+        self.assertIn("administrador", item["acao"]["aviso"])
+        self.assertEqual(item["estado"], "opcional")          # nunca entra no "Equipar tudo"
+        self.assertEqual(equipamentos.ids_para_equipar_tudo([item]), [])
+
+    def test_wsl_ligado_prepara_o_linux_do_arena_sem_administrador(self):
+        with self._situacao(True):
+            item = equipamentos._item_do_wsl()
+        self.assertEqual((item["id"], item["acao"]["tipo"]), ("linux", "baixar"))
+        with self._situacao(True, do_arena=True):
+            self.assertEqual(equipamentos._item_do_wsl()["estado"], "pronto")
+
+    def test_administrador_negado_ou_aceito(self):
+        import ctypes
+        if os.name != "nt":
+            self.skipTest("so no Windows")
+        with mock.patch.object(ctypes.windll.shell32, "ShellExecuteW", return_value=5):
+            with self.assertRaises(recomps.NaoDaParaInstalar) as erro:
+                equipamentos.ligar_o_wsl_com_administrador()
+            self.assertIn("não foi dada", str(erro.exception))
+        with mock.patch.object(ctypes.windll.shell32, "ShellExecuteW", return_value=42) as chamada:
+            frase = equipamentos.ligar_o_wsl_com_administrador()
+        self.assertIn("reinicie", frase)
+        self.assertEqual(chamada.call_args[0][1:4], ("runas", "wsl.exe", "--install --no-distribution"))
+
+    def test_linux_do_arena_baixa_confere_importa_e_poe_as_pecas(self):
+        imagem = b"imagem do ubuntu"
+        import hashlib
+        marca = hashlib.sha256(imagem).hexdigest()
+
+        def baixar_falso(url, segundos, destino=None, agente=None):
+            with open(destino, "wb") as saida:
+                saida.write(("%s *%s\n" % (marca, equipamentos.ARQUIVO_UBUNTU_WSL)).encode() if url.endswith("SHA256SUMS")
+                            else imagem)
+            return 0, b""
+        chamadas = []
+        with self._situacao(True), mock.patch.object(equipamentos.baixar, "rodar", side_effect=baixar_falso), \
+                mock.patch.object(equipamentos, "_rodar_wsl", side_effect=lambda a, s=30: chamadas.append(a) or (0, "")):
+            equipamentos.preparar_linux(self.pasta)
+        self.assertEqual(chamadas[0][:2], ["--import", "ARENA-Linux"])
+        self.assertEqual(chamadas[0][2], os.path.join(self.pasta, "emuladores", "Linux"))
+        self.assertIn("apt-get install", chamadas[1][-1])
+        self.assertEqual(chamadas[1][:4], ["-d", "ARENA-Linux", "-u", "root"])
+        self.assertEqual(equipamentos.andamento("linux")["estado"], "pronto")
+        self.assertFalse(os.listdir(os.path.join(self.pasta, "emuladores", ".baixando")))   # a imagem foi embora
+
+    def test_linux_do_arena_com_marca_errada_nao_importa(self):
+        def baixar_falso(url, segundos, destino=None, agente=None):
+            with open(destino, "wb") as saida:
+                saida.write(("%s *%s\n" % ("0" * 64, equipamentos.ARQUIVO_UBUNTU_WSL)).encode()
+                            if url.endswith("SHA256SUMS") else b"outra coisa")
+            return 0, b""
+        with self._situacao(True), mock.patch.object(equipamentos.baixar, "rodar", side_effect=baixar_falso), \
+                mock.patch.object(equipamentos, "_rodar_wsl", return_value=(0, "")) as wsl:
+            with self.assertRaises(recomps.NaoDaParaInstalar):
+                equipamentos.preparar_linux(self.pasta)
+        wsl.assert_not_called()
+
+    def test_arena_levado_para_outro_computador_so_registra_o_disco(self):
+        pasta = os.path.join(self.pasta, "emuladores", "Linux")
+        os.makedirs(pasta)
+        open(os.path.join(pasta, "ext4.vhdx"), "wb").close()
+        chamadas = []
+        with self._situacao(True), mock.patch.object(equipamentos.baixar, "rodar") as baixar, \
+                mock.patch.object(equipamentos, "_rodar_wsl", side_effect=lambda a, s=30: chamadas.append(a) or (0, "")):
+            equipamentos.preparar_linux(self.pasta)
+        baixar.assert_not_called()
+        self.assertEqual(chamadas[0][:2], ["--import-in-place", "ARENA-Linux"])
+
+    def test_sem_wsl_ligado_explica(self):
+        with self._situacao(False):
+            with self.assertRaises(recomps.NaoDaParaInstalar) as erro:
+                equipamentos.preparar_linux(self.pasta)
+        self.assertIn("administrador", str(erro.exception))
+
+    def test_wine_portatil_baixa_e_abre_em_emuladores(self):
+        import io
+        import tarfile
+        origem = os.path.join(self.pasta, "wine.tar.xz")
+        with tarfile.open(origem, "w:xz") as tar:
+            for nome, conteudo in (("wine-11.21-amd64-wow64/bin/wine", b"#!/bin/sh\n"),
+                                   ("wine-11.21-amd64-wow64/lib/wine/x86_64-windows/kernel32.dll", b"MZ")):
+                info = tarfile.TarInfo(nome)
+                info.size = len(conteudo)
+                info.mode = 0o755
+                tar.addfile(info, io.BytesIO(conteudo))
+        marca = recomps._sha256(origem)
+        release = {"tag": "11.21", "arquivos": [
+            {"nome": "wine-11.21-staging-amd64-wow64.tar.xz", "url": "https://x/s.tar.xz", "tamanho": 9, "sha256": "aa"},
+            {"nome": "wine-11.21-amd64-wow64.tar.xz", "url": "https://x/w.tar.xz", "tamanho": 9, "sha256": marca}]}
+
+        def baixar_falso(url, segundos, destino=None, agente=None):
+            self.assertTrue(url.endswith("/w.tar.xz"))             # o sem "staging"
+            with open(origem, "rb") as de, open(destino, "wb") as para:
+                para.write(de.read())
+            return 0, b""
+        with mock.patch.object(equipamentos.os, "name", "posix"), \
+                mock.patch.object(equipamentos.baixar, "rodar", side_effect=baixar_falso):
+            pasta = equipamentos.instalar_wine(self.pasta, release=release)
+        self.assertTrue(os.path.isfile(os.path.join(pasta, "bin", "wine")))
+        self.assertEqual(equipamentos.andamento("wine")["estado"], "pronto")
+
+    def test_jogo_de_linux_no_windows_usa_o_linux_do_arena(self):
+        import jogos_pc
+        with mock.patch.object(jogos_pc, "wsl", return_value="wsl.exe"), \
+                mock.patch.dict(jogos_pc._WSL_DO_ARENA, {"tem": True}):
+            comando, _aviso = jogos_pc.comando_para(os.path.join("C:" + os.sep, "Jogos", "jogo"), "", "windows", "linux")
+        self.assertEqual(comando[:3], ["wsl.exe", "-d", "ARENA-Linux"])

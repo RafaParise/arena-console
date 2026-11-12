@@ -97,8 +97,8 @@ toda rota `/api/...` (86) e toda aba existe onde o servidor roda; o que muda é 
   quando já instalados. No Android e no Chromebook com o APK: não (processador e sistema diferentes; o console aparece
   cinza com o motivo). No navegador: não (sem servidor).
 - **Equipamentos, 13/11/2026** (`servidor\equipamentos.py`, botão 🧰 Equipamentos; guia `6-RECURSOS-E-REPARO.md`): em
-  todas as versões. Windows: tudo (baixa o MFG e os recomps, abre a loja do Lossless). Linux: consoles, emuladores, imagem e
-  recomps (o MFG e o Lossless são só do Windows). Android (celular e Chromebook com o APK): consoles, jogos do celular e
+  todas as versões. Windows: tudo (baixa o MFG e os recomps, abre a loja do Lossless). Linux: consoles, emuladores, imagem,
+  recomps e o Wine portátil (o MFG e o Lossless são só do Windows; o WSL, com o pedido de administrador, também). Android (celular e Chromebook com o APK): consoles, jogos do celular e
   imagem; nada a baixar (tudo vem no APK). Navegador: consoles e o aviso do que fica no ARENA do Windows.
 - **Jogos de Android instalados no celular, 12/11/2026** (`ArenaServico.java`, pedidos `jogos_do_aparelho` e `abrir_app`;
   `servidor\ponte_android.py`): só no APK (celular e Chromebook com o APK). No computador: não (sem Android para rodar

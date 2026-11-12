@@ -347,10 +347,22 @@ def pacote_do_arquivo(arquivo):
 # Como abrir (o sistema do jogo e o sistema da maquina)
 # ---------------------------------------------------------------------------
 
+RAIZ_DO_ARENA = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DISTRO_DO_ARENA = "ARENA-Linux"      # o Linux que o ARENA monta no WSL (servidor\equipamentos.py)
+
+
+def wine_do_arena():
+    """O Wine portatil que o ARENA baixou (emuladores/Wine, servidor/equipamentos.py), ou None."""
+    caminho = os.path.join(RAIZ_DO_ARENA, "emuladores", "Wine", "bin", "wine")
+    return caminho if os.path.isfile(caminho) and os.access(caminho, os.X_OK) else None
+
+
 def wine():
-    """O Wine do Linux, ou o Proton da Steam (o 'proton' do script), ou None."""
+    """O Wine do ARENA, o do Linux, ou o Proton da Steam (o 'proton' do script), ou None."""
     if plataforma_do_sistema.WINDOWS:
         return None
+    if wine_do_arena():
+        return [wine_do_arena()]
     for nome in ("wine", "wine64", "wine-stable"):
         caminho = shutil.which(nome)
         if caminho:
@@ -373,8 +385,12 @@ def wsl():
     except (OSError, subprocess.SubprocessError):
         return None
     texto = saida.stdout.decode("utf-16-le", "replace") if b"\x00" in saida.stdout else saida.stdout.decode("utf-8", "replace")
-    distribuicoes = [l.strip() for l in texto.splitlines() if l.strip() and "docker" not in l.lower()]
+    distribuicoes = [l.strip().replace("\x00", "") for l in texto.splitlines() if l.strip() and "docker" not in l.lower()]
+    _WSL_DO_ARENA["tem"] = DISTRO_DO_ARENA in distribuicoes
     return programa if saida.returncode == 0 and distribuicoes else None
+
+
+_WSL_DO_ARENA = {"tem": False}
 
 
 def caminho_no_wsl(caminho):
@@ -406,18 +422,20 @@ def comando_para(caminho, argumentos="", sistema_atual=None, tipo=None):
         camada = wine()
         if camada:
             return camada + [caminho] + extras, "Jogo do Windows aberto pelo %s." % ("Proton" if "proton" in camada[0].lower() else "Wine")
-        raise NaoDaParaAbrir("Este é um jogo do Windows, e este Linux não tem o Wine (nem o Proton da Steam). "
-                             "Instale o Wine pelo gerenciador de pacotes, ou use a versão para Linux do jogo.")
+        raise NaoDaParaAbrir("Este é um jogo do Windows, e este Linux não tem o Wine. Abra Equipamentos e toque em "
+                             "Baixar o Wine (sem pedir permissão).")
     if tipo in ("linux", "script"):
         if sistema_atual in ("linux", "chromeos"):
             programa = plataforma_do_sistema.programa_que_roda(caminho, "jogo-pc") if tipo == "linux" else caminho
             return (["sh", programa] if tipo == "script" else [programa]) + extras, ""
         camada = wsl()
         if camada:
-            return [camada, "-e", "sh", "-c", 'cd "$(dirname "$1")" && exec "$1" "${@:2}"', "sh", caminho_no_wsl(caminho)] + extras, \
+            # O Linux do ARENA (com as pecas de video e som dos jogos), se ele estiver montado; senao, o padrao do WSL.
+            camada = [camada] + (["-d", DISTRO_DO_ARENA] if _WSL_DO_ARENA["tem"] else [])
+            return camada + ["-e", "sh", "-c", 'cd "$(dirname "$1")" && exec "$1" "${@:2}"', "sh", caminho_no_wsl(caminho)] + extras, \
                 "Jogo do Linux aberto pelo WSL (sem aceleração de vídeo garantida)."
-        raise NaoDaParaAbrir("Este é um jogo do Linux, e este Windows não tem o WSL com uma distribuição instalada. "
-                             "Use a versão para Windows do jogo, ou abra no computador com Linux.")
+        raise NaoDaParaAbrir("Este é um jogo do Linux, e este Windows ainda não tem o Linux do ARENA. Abra "
+                             "Equipamentos, em Jogos de Linux no Windows.")
     if tipo == "dos":
         raise NaoDaParaAbrir("Este programa é do MS-DOS: ponha o jogo na pasta MS-DOS, que ele abre pelo DOSBox.")
     raise NaoDaParaAbrir("Este arquivo não é um programa de jogo que o ARENA saiba abrir.")
@@ -428,8 +446,11 @@ def externo_para(jogo, caminho):
     programa (ou a camada: Wine, WSL, o atalho da loja) e os argumentos. Devolve (externo, aviso)."""
     comando, aviso = comando_para(caminho, jogo.get("argumentos_do_jogo", ""))
     pasta = jogo.get("pasta_do_jogo") or (os.path.dirname(caminho) if os.path.isabs(caminho) else "")
+    # O Wine do ARENA guarda o "C:" dele (o prefixo) em dados/wine, dentro do ARENA (portatil).
+    ambiente = {"WINEPREFIX": os.path.join(RAIZ_DO_ARENA, "dados", "wine"), "WINEDEBUG": "-all"} \
+        if wine_do_arena() and comando[0] == wine_do_arena() else {}
     # "loja": quem abre o jogo e' a loja (Steam, GOG, Epic), nao o ARENA: o Mais quadros nao acharia a janela dele.
-    return ({"caminho": comando[0], "dados": {"nome": "PC", "argumentos": comando[1:], "ambiente": {},
+    return ({"caminho": comando[0], "dados": {"nome": "PC", "argumentos": comando[1:], "ambiente": ambiente,
                                              "loja": jogo.get("origem") == ORIGEM_INSTALADOS,
                                              "pasta_trabalho": pasta if os.path.isdir(pasta) else ""}},
             aviso)

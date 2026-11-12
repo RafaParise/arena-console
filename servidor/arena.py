@@ -7242,7 +7242,8 @@ class Manipulador(BaseHTTPRequestHandler):
             validos = []
             for item_id in pedidos[:200]:
                 item_id = str(item_id)[:80]
-                if item_id == "mfg" or (item_id.startswith("recomp:") and recomps.recomp(item_id.split(":", 1)[1])):
+                if item_id in ("mfg", "wine", "linux") or (item_id.startswith("recomp:")
+                                                           and recomps.recomp(item_id.split(":", 1)[1])):
                     validos.append(item_id)
             if not validos:
                 return self.erro("Não há nada para baixar: está tudo pronto. Feche esta janela e jogue.", 400)
@@ -7252,6 +7253,17 @@ class Manipulador(BaseHTTPRequestHandler):
                 manifesto(forcar=True)      # a lista passa a dizer "pronto"
             entraram = equipamentos.equipar(validos, depois)
             return self.responder_json({"ok": True, "entraram": entraram})
+
+        if caminho == "/api/equipamentos/admin":
+            # A UNICA coisa do ARENA que pede administrador (pedido do Rafael, 13/11/2026): ligar o WSL, para os jogos
+            # de Linux no Windows. A tela avisa antes; aqui o proprio Windows mostra o pedido de permissao (UAC).
+            if str(dados.get("id") or "") != "wsl" or not plataforma_do_sistema.WINDOWS:
+                return self.erro("Isso só existe no Windows: o WSL. Abra Equipamentos de novo.", 400)
+            try:
+                frase = equipamentos.ligar_o_wsl_com_administrador()
+            except recomps.NaoDaParaInstalar as falha:
+                return self.erro(str(falha), 409)
+            return self.responder_json({"ok": True, "mensagem": frase})
 
         if caminho == "/api/equipamentos/loja":
             # So o Lossless Scaling (pago): abre a pagina dele na Steam. Endereco fixo, nada vem da tela.
