@@ -68,6 +68,7 @@ Ele nasceu nas aulas do curso técnico de **Desenvolvimento de Sistemas**
 | 🕹️ **Vários controles** | Xbox, PlayStation, Switch Pro, fliperamas e genéricos, com o teclado como o próximo jogador |
 | 🏆 **Recordes da turma** | Placar com posição por jogo, conquistas e sincronização entre os computadores da sala — até sem rede, levando a "mala" no pen drive |
 | 🧰 **Conserta sozinho** | `VERIFICAR.bat` confere e conserta a pasta; `PARTIDA.bat` explica por que a partida a dois não conecta; a tela explica por que um jogo não abriu |
+| 🎞️ **Quadros de verdade** | O PS2 a 60 quadros pelo patch do próprio PCSX2 (627 jogos, no computador e no celular) e o GameCube e o Wii a 60 pelos códigos do Dolphin, ligados só no jogo; com o MFG Super Motion ou o Lossless Scaling instalado, o ARENA abre o que rende mais na sua placa, e nunca um quadro a menos do que antes |
 | 🔒 **Seguro para menores** | Sem gravação de vídeo e sem transmissão ao vivo. Só o que o Jogar Junto precisa fica aberto à rede |
 | 💻 **Também no Chromebook** | O mesmo pen drive abre no Chromebook, dentro do Chrome (`ARENA-CHROMEBOOK.html`), sem instalar nada: a mesma tela, 35 consoles e o mesmo save do Windows ([`docs/CHROMEBOOK.md`](docs/CHROMEBOOK.md)) |
 | 🐧 **Também no Linux** | O mesmo pen drive abre no Linux (`sh ARENA.sh`), sem instalar nada e sem administrador: o mesmo ARENA, os 66 consoles e o mesmo save do Windows ([`docs/LINUX.md`](docs/LINUX.md)) |

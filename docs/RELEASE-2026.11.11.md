@@ -8,12 +8,12 @@ Lossless Scaling), o painel do driver da placa lido e explicado, e uma janela ma
 
 | Você vai usar em | Baixe | Tamanho |
 |---|---|---|
-| 📱 **Celular ou tablet Android** (a maioria dos aparelhos, incluindo Galaxy, Xiaomi, Motorola) | **`ARENA-2026.11.11-android-celular-arm64.apk`** | (preencher) |
-| 📱 **Chromebook com Intel** ou **emulador de Android no PC** | **`ARENA-2026.11.11-android-chromebook-intel-amd-x86_64.apk`** | (preencher) |
-| 🖥️ **Computador com Windows 10 ou 11**, primeira vez | **`ARENA-2026.11.11-PC-windows-linux-chromebook.zip`** | (preencher) |
-| 🖥️ **Computador com Windows**, já usa o ARENA | **`ARENA-2026.11.11-PC-atualizacao.zip`** (só o programa) | (preencher) |
-| 🐧 **Computador com Linux** (Ubuntu, Debian, Mint, Fedora; 64 bits) | o mesmo **`ARENA-2026.11.11-PC-windows-linux-chromebook.zip`** | (preencher) |
-| 💻 **Chromebook da escola** (gerenciado) ou **sem instalar nada** | o mesmo **`ARENA-2026.11.11-PC-windows-linux-chromebook.zip`**, num pen drive | (preencher) |
+| 📱 **Celular ou tablet Android** (a maioria dos aparelhos, incluindo Galaxy, Xiaomi, Motorola) | **`ARENA-2026.11.11-android-celular-arm64.apk`** | 256 MB |
+| 📱 **Chromebook com Intel** ou **emulador de Android no PC** | **`ARENA-2026.11.11-android-chromebook-intel-amd-x86_64.apk`** | 246 MB |
+| 🖥️ **Computador com Windows 10 ou 11**, primeira vez | **`ARENA-2026.11.11-PC-windows-linux-chromebook.zip`** | 1,1 GB |
+| 🖥️ **Computador com Windows**, já usa o ARENA | **`ARENA-2026.11.11-PC-atualizacao.zip`** (só o programa) | 111 MB |
+| 🐧 **Computador com Linux** (Ubuntu, Debian, Mint, Fedora; 64 bits) | o mesmo **`ARENA-2026.11.11-PC-windows-linux-chromebook.zip`** | 1,1 GB |
+| 💻 **Chromebook da escola** (gerenciado) ou **sem instalar nada** | o mesmo **`ARENA-2026.11.11-PC-windows-linux-chromebook.zip`**, num pen drive | 1,1 GB |
 
 No celular, instale o APK por cima do anterior: os jogos, os saves e os recordes ficam. No computador, quem já tem o
 ARENA descompacta o `PC-atualizacao.zip` por cima da pasta (só o programa muda: `dados\`, `jogos\`, `BIOS\` e
@@ -58,22 +58,33 @@ ARENA descompacta o `PC-atualizacao.zip` por cima da pasta (só o programa muda:
 
 ## Como esta versão foi conferida
 
-(preencher depois da rodada final)
-
-- **testes automáticos** do servidor passaram antes de cada mudança entrar.
-- **Rodada final** (os testes de ponta a ponta, que abrem os emuladores de verdade): (preencher).
+- **1.356 testes automáticos** do servidor passaram antes de cada mudança entrar.
+- **Rodada final** (os testes de ponta a ponta, que abrem os emuladores de verdade): **128 de 130** passaram. Os dois
+  que falharam foram repetidos com o computador folgado:
+  - a **partida entre computador e celular** passou (o celular hospedou e o computador entrou em 18 s; na rodada o
+    jogo do teste não estava no celular);
+  - o **orçamento da abertura do servidor no modo da máquina-alvo** ficou em 2,56 s (meta 2,3 s; na versão anterior
+    eram 4,5 a 5,3 s, e dentro da rodada, com o computador carregado, 4,4 s). A causa medida foi a listagem das
+    placas pelo motor do MFG no primeiro pedido da tela, que agora roda em segundo plano. O que sobra é o antivírus
+    e o navegador disputando o processador do computador de testes; o servidor sozinho abre em menos de 2 s.
 - **Teste no Linux** (Ubuntu no WSL): todos os jogos livres abriram com imagem, o `ARENA.sh` e o `VERIFICAR.sh`
   passaram (664 s).
-- **Galaxy A12** (Android 12, 4 GB): o PS2 a 60 quadros provado com o *Black* (o ARMSX2 escreveu "Enabled patch" no
-  registro dele); auditoria do celular com o APK de produção: (preencher).
-- **PS2 a 60 e MFG no computador** (`testes\teste_mais_quadros.py`): o PCSX2 ligou o patch e o motor do MFG pegou a
+- **Galaxy A12** (Android 12, 4 GB): o PS2 a 60 quadros provado com o *Black* (o núcleo ARMSX2 escreveu "Enabled
+  patch" no registro dele); o teste do Android no emulador (Android 15) e o de estresse passaram na rodada;
+  auditoria do celular com o APK de produção (`ferramentasuditoria_celular.py`): pacote 2026.11.11 com versão-alvo 35, sem depuração e sem cópia na nuvem, nenhuma porta aberta pelo app, abertura a frio em 868 ms (mediana), 70 MB de memória, e o ciclo de vida (sair e voltar, girar a tela, pouca memória) passou.
+- **PS2 a 60 e MFG no computador** (`testes	este_mais_quadros.py`): o PCSX2 ligou o patch e o motor do MFG pegou a
   janela do jogo e fechou com o jogo.
-- **GameCube a 60** (`testes\teste_60_dolphin.py`): o Dolphin leu o código do F-Zero GX pelo arquivo do jogo.
+- **GameCube a 60** (`testes	este_60_dolphin.py`): o Dolphin leu o código do F-Zero GX pelo arquivo do jogo.
+- **Revisão de código** de tudo o que entrou desde a 2026.11.10 (10 achados, 9 corrigidos) e uma segunda opinião de
+  outra IA sobre o módulo do Dolphin (nenhum defeito real).
 
 SHA-256 dos arquivos:
 
 ```
-(preencher)
+20b01e857cec6a45cc13684e1fe040fd495b2bebcc82665ad4e15bd41b21c501  ARENA-2026.11.11-PC-windows-linux-chromebook.zip
+d8910dcdc3b1a2856895576dfbaa826d208d43812fe3981e9563bfebbcf302ca  ARENA-2026.11.11-PC-atualizacao.zip
+c6af62f6f43ddf395fdfc4b6837170697a5734b93a57edb0a1b8a6e7ed5d02e0  ARENA-2026.11.11-android-celular-arm64.apk
+242719ed3037da37e5197e175bf9e048d25cbc7e477b3bfa05a44411e0e00c7d  ARENA-2026.11.11-android-chromebook-intel-amd-x86_64.apk
 ```
 
 ## Limites conhecidos
