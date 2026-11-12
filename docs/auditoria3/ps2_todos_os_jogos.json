@@ -3,7 +3,7 @@
   "jogo": "Black (BR).iso",
   "nivel": "automatico",
   "comecou": true,
-  "segundos": 21.3,
+  "segundos": 22.1,
   "avisos": []
  },
  {
@@ -24,7 +24,7 @@
   "jogo": "Bully (BR).chd",
   "nivel": "automatico",
   "comecou": true,
-  "segundos": 21.1,
+  "segundos": 22.1,
   "avisos": []
  },
  {
@@ -73,7 +73,7 @@
   "jogo": "Devil May Cry 3 - Dante_s Awakening (Special Edition) (BR)-008.chd",
   "nivel": "automatico",
   "comecou": true,
-  "segundos": 21.1,
+  "segundos": 22.1,
   "avisos": []
  },
  {
@@ -199,7 +199,7 @@
   "jogo": "Mortal Kombat - Armageddon (USA) (Premium Edition).chd",
   "nivel": "automatico",
   "comecou": true,
-  "segundos": 21.1,
+  "segundos": 22.1,
   "avisos": []
  },
  {
@@ -234,7 +234,7 @@
   "jogo": "SOCOM - U.S. Navy SEALs - Combined Assault (USA).chd",
   "nivel": "automatico",
   "comecou": true,
-  "segundos": 20.1,
+  "segundos": 20.2,
   "avisos": []
  },
  {
@@ -248,7 +248,7 @@
   "jogo": "Half-Life (USA).chd",
   "nivel": "bonito",
   "comecou": true,
-  "segundos": 20.1,
+  "segundos": 21.1,
   "avisos": []
  },
  {
@@ -276,7 +276,7 @@
   "jogo": "Champions of Norrath (Europe) (En,Fr,De).iso",
   "nivel": "bonito",
   "comecou": true,
-  "segundos": 20.1,
+  "segundos": 21.1,
   "avisos": []
  }
 ]

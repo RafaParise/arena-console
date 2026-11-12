@@ -12,14 +12,14 @@
       "[INFO] [Netplay] Jogador3 se juntou como o jogador 3 (ping: 16 ms)",
       "[INFO] [Netplay] Vaga de conexão 2",
       "[INFO] [Netplay] Conexão recebida de: \"Jogador4\"",
-      "[INFO] [Netplay] Jogador4 se juntou como o jogador 4 (ping: 33 ms)",
+      "[INFO] [Netplay] Jogador4 se juntou como o jogador 4 (ping: 32 ms)",
       "[INFO] [Netplay] Vaga de conexão 3",
       "[INFO] [Netplay] Conexão recebida de: \"Jogador5\"",
-      "[INFO] [Netplay] Jogador5 se juntou como o jogador 5 (ping: 32 ms)"
+      "[INFO] [Netplay] Jogador5 se juntou como o jogador 5 (ping: 16 ms)"
     ],
     "convidado2": [
       "[INFO] [Netplay] Conectado a: \"Anfitriao\"",
-      "[INFO] [Netplay] Você se juntou como jogador 2 (ping: 0 ms)",
+      "[INFO] [Netplay] Você se juntou como jogador 2 (ping: 1 ms)",
       "[INFO] [Netplay] Jogador3 se juntou como o jogador 3",
       "[INFO] [Netplay] Jogador4 se juntou como o jogador 4",
       "[INFO] [Netplay] Jogador5 se juntou como o jogador 5"
@@ -32,7 +32,7 @@
     ],
     "convidado4": [
       "[INFO] [Netplay] Conectado a: \"Anfitriao\"",
-      "[INFO] [Netplay] Você se juntou como jogador 4 (ping: 16 ms)",
+      "[INFO] [Netplay] Você se juntou como jogador 4 (ping: 17 ms)",
       "[INFO] [Netplay] Jogador5 se juntou como o jogador 5"
     ],
     "convidado5": [
@@ -43,29 +43,29 @@
   "tempos_de_entrada_s": {
     "convidado2": 0.62,
     "convidado3": 0.61,
-    "convidado4": 0.61,
-    "convidado5": 0.61
+    "convidado4": 0.92,
+    "convidado5": 0.91
   },
   "amostras_host": [
     {
       "apos": "convidado2",
-      "ram_mb": 255.2,
-      "cpu_s": 1.34375
+      "ram_mb": 255.5,
+      "cpu_s": 1.390625
     },
     {
       "apos": "convidado3",
-      "ram_mb": 255.3,
-      "cpu_s": 1.78125
+      "ram_mb": 255.6,
+      "cpu_s": 1.890625
     },
     {
       "apos": "convidado4",
-      "ram_mb": 255.4,
-      "cpu_s": 2.15625
+      "ram_mb": 255.7,
+      "cpu_s": 2.359375
     },
     {
       "apos": "convidado5",
-      "ram_mb": 255.5,
-      "cpu_s": 2.4375
+      "ram_mb": 255.8,
+      "cpu_s": 2.828125
     }
   ]
 }

@@ -931,3 +931,16 @@ Falta, nesta ordem:
   (`montar_versao_alunos.py --zip-completo` e `--zip-atualizacao` em `%LOCALAPPDATA%\ARENA-release-2026.11.11`),
   SHA-256, completar `docs\RELEASE-2026.11.11.md` (tamanhos, "Como esta versão foi conferida": 128/130, Linux 664 s,
   A12) e `gh release create v2026.11.11` como Latest, com a seção do DOOK3DS no fim. README: só o que for novo.
+
+## 12/11/2026, 0h47: Release 2026.11.11 publicada (Latest)
+
+- https://github.com/RafaParise/arena-console/releases/tag/v2026.11.11 com os 5 arquivos: zip completo (1,1 GB),
+  zip de atualização (111 MB), APK do celular arm64 (256 MB), APK do Chromebook x86_64 (246 MB) e SHA256.txt. A nota
+  (`docs\RELEASE-2026.11.11.md`) termina com a seção do aluno DOOK3DS; o README ganhou a linha "Quadros de verdade".
+- Conferido antes: rodada final 128 de 130 (as duas falhas repetidas: partida PC+celular passou; orçamento 1b em
+  2,56 s com o aquecimento do MFG, documentado como limite de ambiente), Linux 664 s, APK de produção auditado no A12.
+- **Fica para depois:** o orçamento 1b abaixo de 2,3 s (medir onde vão os 2,5 s: catálogo, hardware.py, navegador);
+  o sentinela do A12 no Termux e os itens físicos da bancada (parise-sync); o cartão único dos acessórios; NIS/SGSR e
+  a nitidez ajustável (plano da revisão); a conta ProfessorRafaParise (decisão do Rafael, ver 11/11).
+- A montagem da versão dos alunos ficou em `%LOCALAPPDATA%\ARENA-montagem\ARENA-alunos` (1,1 GB; pode apagar) e os
+  pacotes em `%LOCALAPPDATA%\ARENA-release-2026.11.11`. O Black (BR).iso e o Super Bomberman 4 continuam no A12.

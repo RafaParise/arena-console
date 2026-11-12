@@ -5,7 +5,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 97658,
-      "segundos": 11.0,
+      "segundos": 10.7,
       "travou": false,
       "erros": []
     },
@@ -23,7 +23,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 235493,
-      "segundos": 11.0,
+      "segundos": 10.8,
       "travou": false,
       "erros": []
     },
@@ -41,7 +41,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 342861,
-      "segundos": 10.9,
+      "segundos": 10.7,
       "travou": false,
       "erros": [
         "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented."
@@ -63,7 +63,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 41254,
-      "segundos": 10.9,
+      "segundos": 10.7,
       "travou": false,
       "erros": []
     },
@@ -81,7 +81,7 @@
     "abre": {
       "abre_e_mostra_imagem": false,
       "foto_bytes": 1797,
-      "segundos": 10.9,
+      "segundos": 10.7,
       "travou": false,
       "erros": []
     },
@@ -99,7 +99,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 435421,
-      "segundos": 12.9,
+      "segundos": 12.7,
       "travou": false,
       "erros": []
     },
@@ -120,7 +120,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 43950,
-      "segundos": 12.6,
+      "segundos": 13.0,
       "travou": false,
       "erros": []
     },
@@ -138,7 +138,7 @@
     "abre": {
       "abre_e_mostra_imagem": false,
       "foto_bytes": 1850,
-      "segundos": 10.9,
+      "segundos": 10.7,
       "travou": false,
       "erros": []
     },
@@ -156,7 +156,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 58602,
-      "segundos": 13.3,
+      "segundos": 13.0,
       "travou": false,
       "erros": [
         "[libretro INFO] [BOOT] USA region not supported. Using Europe instead"
@@ -180,7 +180,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 6595,
-      "segundos": 11.2,
+      "segundos": 11.0,
       "travou": false,
       "erros": [
         "[libretro WARN] [sceDisplay] Video out requested, not supported: mode=0 size=512,272"
@@ -203,7 +203,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 29667,
-      "segundos": 11.4,
+      "segundos": 11.3,
       "travou": false,
       "erros": []
     },
