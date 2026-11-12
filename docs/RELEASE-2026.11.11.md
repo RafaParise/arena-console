@@ -71,10 +71,10 @@ ARENA descompacta o `PC-atualizacao.zip` por cima da pasta (só o programa muda:
   passaram (664 s).
 - **Galaxy A12** (Android 12, 4 GB): o PS2 a 60 quadros provado com o *Black* (o núcleo ARMSX2 escreveu "Enabled
   patch" no registro dele); o teste do Android no emulador (Android 15) e o de estresse passaram na rodada;
-  auditoria do celular com o APK de produção (`ferramentasuditoria_celular.py`): pacote 2026.11.11 com versão-alvo 35, sem depuração e sem cópia na nuvem, nenhuma porta aberta pelo app, abertura a frio em 868 ms (mediana), 70 MB de memória, e o ciclo de vida (sair e voltar, girar a tela, pouca memória) passou.
-- **PS2 a 60 e MFG no computador** (`testes	este_mais_quadros.py`): o PCSX2 ligou o patch e o motor do MFG pegou a
+  auditoria do celular com o APK de produção (`ferramentas\auditoria_celular.py`): pacote 2026.11.11 com versão-alvo 35, sem depuração e sem cópia na nuvem, nenhuma porta aberta pelo app, abertura a frio em 868 ms (mediana), 70 MB de memória, e o ciclo de vida (sair e voltar, girar a tela, pouca memória) passou.
+- **PS2 a 60 e MFG no computador** (`testes\teste_mais_quadros.py`): o PCSX2 ligou o patch e o motor do MFG pegou a
   janela do jogo e fechou com o jogo.
-- **GameCube a 60** (`testes	este_60_dolphin.py`): o Dolphin leu o código do F-Zero GX pelo arquivo do jogo.
+- **GameCube a 60** (`testes\teste_60_dolphin.py`): o Dolphin leu o código do F-Zero GX pelo arquivo do jogo.
 - **Revisão de código** de tudo o que entrou desde a 2026.11.10 (10 achados, 9 corrigidos) e uma segunda opinião de
   outra IA sobre o módulo do Dolphin (nenhum defeito real).
 
