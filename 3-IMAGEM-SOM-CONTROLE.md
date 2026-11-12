@@ -1607,9 +1607,11 @@ de o jogo rodar mais liso, nesta ordem:
      patches. O ARENA escreve o arquivo do jogo em `system/pcsx2/gamesettings` e liga a leitura de patches no núcleo.
      No Galaxy A12 (placa fraca), o Automático deixa desligado; em "Sempre", liga.
 2. **MFG Super Motion**, programa gratuito que cria quadros entre os do jogo copiando a imagem da janela.
-   - Ele **não vem no ARENA**: a licença dele (PolyForm Strict) não deixa levar junto. Instale-o uma vez pela
-     [página oficial](https://github.com/NODIX-TECH/MFG-SUPER-MOTION/releases/latest): o instalador põe o programa
-     só para você, sem administrador.
+   - Ele **não vem no pacote do ARENA**: a licença dele (PolyForm Strict) não deixa levar junto. Mas o ARENA baixa
+     para você: **🧰 Equipamentos → Movimento mais liso (MFG Super Motion) → Baixar e instalar**. Ele baixa o `.rar`
+     da [página oficial](https://github.com/NODIX-TECH/MFG-SUPER-MOTION/releases/latest), confere a marca SHA-256 e
+     abre em `emuladores\MFG SUPER MOTION` com o `tar` que vem no Windows 10 e 11, sem instalar nada. O MFG instalado
+     pelo instalador dele também vale. Cada computador baixa o seu (não repasse a pasta para outras pessoas).
    - Daí em diante, o ARENA acha o programa, escolhe as opções para a sua máquina e abre o motor dele junto com o
      jogo, sem a tela do programa, e fecha no fim.
    - Na placa NVIDIA RTX, ele usa o DLSS MFG; nas outras, o gerador próprio dele (MSM FG), no modo rápido fora das
@@ -1617,8 +1619,12 @@ de o jogo rodar mais liso, nesta ordem:
    - Cria só os quadros que enchem a tela (nenhum, se o jogo já chega lá sozinho), com o menor atraso no controle.
      Não desenha nada por cima do jogo.
    - No **Automático**, liga só com placa forte, nos emuladores de PS2, GameCube, Wii, PS3 e Xbox 360, ou numa tela
-     de mais de 60 Hz.
-3. **Lossless Scaling**, para quem comprou. Com os dois programas no computador, o ARENA usa o que rende mais na
+     de mais de 60 Hz. Fica de fora da **versão para PC** (recomp), que já desenha na velocidade da tela (em
+     "Sempre", liga), e do **jogo aberto pela loja** (Steam, GOG, Epic): quem abre esse jogo é a loja, e o MFG não
+     acharia a janela dele.
+3. **Lossless Scaling**, para quem comprou (não é obrigatório: o MFG faz o mesmo de graça). Sem ele, **🧰
+   Equipamentos → Lossless Scaling → Ver na Steam** abre a página da loja; depois de comprar e instalar, o ARENA acha
+   sozinho. Com os dois programas no computador, o ARENA usa o que rende mais na
    placa (NVIDIA RTX: o MFG; AMD e Intel: o Lossless, medido) e nunca os dois juntos. Quem ligou a chave **"Usar o
    Lossless Scaling"** (a escala dele, na aba Emuladores) continua com o caminho inteiro dele: a janela do tamanho do
    desenho, esticada por ele, e os quadros a mais pelo "Mais quadros" daquele bloco.

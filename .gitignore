@@ -150,3 +150,6 @@ launcher/navegador/livres.js
 
 # O ViGEmClient.dll (gamepad Xbox virtual, opcional) nao vai ao repositorio publico: ferramentasaixar_vigem_client.py
 servidor/vigem/*.dll
+
+# Fotos e registros do Playwright (testes da tela)
+.playwright-mcp/

@@ -164,11 +164,42 @@ def instalado(recomp_id):
     return programa_na_pasta(pasta)
 
 
+def em_uso(recomp_id):
+    """Baixado e escolhido: o Jogar abre o jogo por ele, sem perguntar (13/11/2026: o ARENA simples para quem nao
+    entende de computador). A pessoa volta ao emulador pelo painel do jogo ("usar": false na marca)."""
+    pasta = pasta_do(recomp_id)
+    marca = ler_marca(pasta)
+    return bool(marca) and marca.get("usar", True) is not False and bool(programa_na_pasta(pasta))
+
+
+def escolhido_para(titulo, plataforma_id):
+    """O id do recomp que o Jogar usa neste jogo, ou None (o de sempre: o emulador)."""
+    for r in para_o_titulo(titulo, plataforma_id):
+        if em_uso(r["id"]):
+            return r["id"]
+    return None
+
+
+def preferir(recomp_id, usar):
+    """Liga (usar=True) ou desliga a versao para PC deste jogo, sem apagar nada. Gravacao atomica da marca."""
+    pasta = pasta_do(recomp_id)
+    marca = ler_marca(pasta)
+    if not marca:
+        raise NaoDaParaInstalar("Essa versão para PC ainda não foi baixada.")
+    marca["usar"] = bool(usar)
+    temporario = os.path.join(pasta, "%s.%d.tmp" % (MARCA, threading.get_ident()))
+    with open(temporario, "w", encoding="utf-8") as saida:
+        json.dump(marca, saida, ensure_ascii=False, indent=1)
+    os.replace(temporario, os.path.join(pasta, MARCA))
+    return marca["usar"]
+
+
 def resumo_para_a_tela(r):
-    """O que a tela mostra de um recomp: nome, de quem, licenca, tamanho e se ja esta aqui."""
+    """O que a tela mostra de um recomp: nome, de quem, licenca, tamanho, se ja esta aqui e se esta em uso."""
     programa = instalado(r["id"])
     return {"id": r["id"], "nome": r["nome"], "repo": r.get("repo", ""), "licenca": r.get("licenca", ""),
             "versao": r.get("versao", ""), "tamanho": r.get("tamanho", ""), "instalado": bool(programa),
+            "em_uso": bool(programa) and em_uso(r["id"]),
             "sistemas": r.get("sistemas", []), "estrelas": r.get("estrelas", 0)}
 
 
@@ -303,9 +334,39 @@ def _seguro(nome):
     return True
 
 
+def tar_do_sistema():
+    """O bsdtar que abre rar e 7z sem instalar nada: o tar.exe que vem no Windows 10 e 11 (libarchive), ou o bsdtar
+    do Linux, se houver. None se nao houver."""
+    if os.name == "nt":
+        caminho = os.path.join(os.environ.get("SystemRoot") or r"C:\Windows", "System32", "tar.exe")
+        return caminho if os.path.isfile(caminho) else None
+    return shutil.which("bsdtar")
+
+
+def _pelo_tar_do_sistema(arquivo, destino):
+    """rar e 7z pelo bsdtar. Ele recusa por conta propria caminho absoluto e '..' (so os aceita com -P); depois o
+    ARENA ainda confere que nada saiu da pasta."""
+    programa = tar_do_sistema()
+    if not programa:
+        return False
+    extra = {"creationflags": 0x08000000} if os.name == "nt" else {}      # CREATE_NO_WINDOW: sem janela preta
+    try:
+        saida = subprocess.run([programa, "-xf", arquivo, "-C", destino], capture_output=True, timeout=900, **extra)
+    except (OSError, subprocess.SubprocessError) as falha:
+        raise OSError("o tar do sistema nao abriu o arquivo (%s)" % falha)
+    if saida.returncode != 0:
+        raise OSError("o arquivo veio quebrado (%s)" % saida.stderr.decode("utf-8", "replace").strip()[:200])
+    base = os.path.realpath(destino)
+    for atual, _pastas, _nomes in os.walk(destino):
+        if os.path.commonpath([base, os.path.realpath(atual)]) != base:
+            raise OSError("o arquivo tentou gravar fora da pasta")
+    return True
+
+
 def _descompactar(arquivo, destino):
-    """Descompacta 'arquivo' em 'destino' (que nao existe ainda). Zip e tar (gz, xz) pelo Python; o AppImage e
-    copiado e marcado como executavel. 7z, rar, exe e msi: o ARENA nao abre sozinho (avisa)."""
+    """Descompacta 'arquivo' em 'destino' (que nao existe ainda). Zip e tar (gz, xz) pelo Python; rar e 7z pelo tar do
+    proprio sistema (Windows 10 e 11); o AppImage e copiado e marcado como executavel. exe e msi: o ARENA nao abre
+    sozinho (avisa)."""
     baixo = arquivo.lower()
     os.makedirs(destino, exist_ok=True)
     if baixo.endswith(".zip"):
@@ -329,6 +390,8 @@ def _descompactar(arquivo, destino):
                 tar.extractall(destino, members=membros, filter="data")
         except tarfile.TarError as falha:
             raise OSError("o arquivo .tar veio quebrado (%s)" % falha)
+    elif baixo.endswith((".rar", ".7z")) and tar_do_sistema():
+        _pelo_tar_do_sistema(arquivo, destino)
     elif baixo.endswith(".appimage"):
         copia = os.path.join(destino, os.path.basename(arquivo))
         shutil.copyfile(arquivo, copia)
@@ -339,10 +402,13 @@ def _descompactar(arquivo, destino):
     else:
         extensao = os.path.splitext(baixo)[1] or "esse formato"
         raise NaoDaParaInstalar(
-            "O autor publica este recomp como %s, que o ARENA não descompacta sozinho (só zip, tar e AppImage). "
+            "O autor publica este recomp como %s, que o ARENA não descompacta sozinho neste computador. "
             "Baixe do GitHub, descompacte em emuladores\\Recomps\\%s e clique em Jogar de novo."
             % (extensao, os.path.basename(destino)))
     _desembrulhar(destino)
+
+
+descompactar = _descompactar      # o painel Equipamentos (servidor\equipamentos.py) usa o mesmo
 
 
 def _desembrulhar(destino):
@@ -412,8 +478,10 @@ def instalar(recomp_id, sistema_alvo=None, arq=None):
         if os.path.isdir(nova):
             shutil.rmtree(nova)
         _descompactar(caminho, nova)
+        antiga = ler_marca(pasta) or {}
         with open(os.path.join(nova, MARCA), "w", encoding="utf-8") as saida:
             json.dump({"id": recomp_id, "nome": r["nome"], "repo": r.get("repo", ""), "tag": rel["tag"],
+                       "usar": antiga.get("usar", True) is not False,
                        "arquivo": nome, "sha256": marca, "conferido": bool(esperada),
                        "conferido_pelo_catalogo": do_catalogo.get("nome") == nome,
                        "instalado_em": time.strftime("%Y-%m-%d %H:%M")}, saida, ensure_ascii=False, indent=1)

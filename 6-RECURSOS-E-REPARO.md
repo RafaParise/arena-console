@@ -4,8 +4,40 @@ A explicação de cada opção da aba Avançado e o verificador embutido.
 
 **Neste documento:**
 
+- Equipamentos: o que o ARENA tem e o que falta
 - Parte A — Todos os recursos, explicados
 - Parte B — Quando alguma coisa der errado
+
+---
+
+## Equipamentos: o que o ARENA tem e o que falta (13/11/2026)
+
+O botão **🧰 Equipamentos**, no alto da tela, mostra numa lista tudo o que o ARENA tem. Foi feito para quem não
+entende de computador nem de videogame: uma linha por recurso, uma frase dizendo para que serve, o estado escrito
+(com ícone, não só com cor) e **um botão** quando há algo a fazer.
+
+| Estado | Quer dizer |
+|---|---|
+| ✅ Pronto | Já funciona. Não precisa fazer nada |
+| ⬇️ Falta | Falta e é grátis: o botão **Baixar** resolve |
+| ➖ Opcional | Não é preciso para jogar |
+| 🛒 Pago, não é obrigatório | O botão abre a loja. O ARENA funciona sem ele |
+
+O que aparece:
+
+- **Consoles clássicos** e os **emuladores de fora** (PS2, GameCube e Wii, PS3, Xbox 360): vêm no pacote completo.
+- **Imagem mais bonita** (FSR, SGSR...): já vem no ARENA.
+- **Movimento mais liso (MFG Super Motion)**: grátis; o ARENA baixa do site do autor e guarda na pasta dele.
+- **Lossless Scaling**: pago, na Steam; o botão abre a página dele. Não é obrigatório.
+- **Versões para PC dos seus jogos** (recomps): uma por jogo que você tem, cada uma com o botão **Baixar**.
+- **Jogos de Linux no Windows** (WSL): opcional, só para quem tem jogo de computador feito para Linux.
+
+**Equipar tudo o que é grátis** baixa de uma vez o que falta, um item por vez, em segundo plano: dá para fechar a
+janela e jogar. O botão diz antes quantos itens são e o tamanho aproximado. Tudo vem do site de quem fez, com a marca
+SHA-256 conferida, e fica dentro da pasta do ARENA (portátil). No celular, a lista mostra o que existe lá (os consoles
+e os jogos instalados no celular); o resto é do computador.
+
+O ARENA **não baixa jogo comercial**: a versão para PC usa o jogo que você já tem.
 
 ---
 

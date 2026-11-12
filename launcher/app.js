@@ -898,15 +898,9 @@ function desenharDetalhes() {
   $("#detalhesPlataforma").textContent = jogo.plataforma_nome;
   $("#detalhesTamanho").textContent = formatarMb(jogo.tamanho_mb) + (discos > 1 ? ` · ${discos} discos` : "");
   $("#detalhesOrigem").textContent = jogo.origem_rotulo;
-  // A versao recompilada para PC deste jogo (servidor\recomps.py): aqui so
-  // conta; o Jogar agora e' que oferece, junto com os outros jeitos.
-  const recomps = Array.isArray(jogo.recomps) ? jogo.recomps : [];
-  const caixaRecomp = $("#detalhesRecomp");
-  caixaRecomp.hidden = recomps.length === 0;
-  caixaRecomp.textContent = recomps.length
-    ? `Versão para PC: ${recomps.map((r) => r.nome + (r.instalado ? " (já no ARENA)" : "")).join(", ")}. ` +
-      "Clique em Jogar agora e escolha: roda direto no computador, sem emulador, com a sua cópia do jogo."
-    : "";
+  // A versao para PC deste jogo (servidor\recomps.py; 13/11/2026: sem pergunta no Jogar). Um botao so: baixar e
+  // jogar por ela; ja baixada, trocar entre ela e o emulador. O Jogar agora abre pela que estiver escolhida.
+  desenharRecompDoJogo(jogo);
   const capa = $("#detalhesCapa");
   capa.className = `detalhes-capa capa-${classeDaCapa(jogo.plataforma_nome)}`;
   prepararCapa(capa, jogo);
@@ -1239,8 +1233,9 @@ function perguntarJeito(jogo, dados) {
 async function baixarRecompEJogar(jogo, recomp, jeito) {
   const tamanho = recomp.tamanho ? ` (${recomp.tamanho})` : "";
   const licenca = recomp.licenca ? `, licença ${recomp.licenca}` : "";
-  const pergunta = `Baixar ${recomp.nome}${tamanho} da release oficial no GitHub (${recomp.repo}${licenca}) ` +
-    `para a pasta emuladores › Recomps do ARENA? Nada é instalado no sistema; o jogo abre com a sua cópia de ${jogo.titulo}.`;
+  const pergunta = `Baixar a versão para PC de ${jogo.titulo}${tamanho}?\n\n` +
+    `Ela usa o jogo que você já tem e fica na pasta do ARENA (nada é instalado no computador). ` +
+    `Vem do site de quem fez (${recomp.repo}${licenca}).`;
   if (!window.confirm(pergunta)) return;
   try {
     await pedir("/api/recomp/instalar", "POST", { id: recomp.id });
@@ -1266,6 +1261,230 @@ async function baixarRecompEJogar(jogo, recomp, jeito) {
     recado(`${recomp.nome} pronto. Abrindo...`, false, 3000);
     await carregarCatalogo();
     jogar(jogo, jeito);
+  } catch (falha) {
+    recado(falha.message, true);
+  }
+}
+
+// --------------------------------------------------------------------------
+// A versao para PC no painel do jogo (13/11/2026)
+// --------------------------------------------------------------------------
+function desenharRecompDoJogo(jogo) {
+  const recomps = Array.isArray(jogo.recomps) ? jogo.recomps : [];
+  const caixa = $("#detalhesRecomp");
+  caixa.hidden = recomps.length === 0;
+  if (!recomps.length) return;
+  const emUso = recomps.find((r) => r.em_uso);
+  const baixada = recomps.find((r) => r.instalado);
+  const melhor = recomps[0];
+  const botao = $("#btnRecompAcao");
+  if (emUso) {
+    $("#detalhesRecompTexto").textContent = `🕹️ Este jogo abre pela versão para PC (${emUso.nome}): sem emulador, com imagem melhor.`;
+    botao.textContent = "Voltar a abrir pelo emulador";
+    botao.onclick = () => usarRecomp(emUso.id, false);
+  } else if (baixada) {
+    $("#detalhesRecompTexto").textContent = `🕹️ A versão para PC (${baixada.nome}) já está no ARENA, mas está desligada.`;
+    botao.textContent = "Abrir pela versão para PC";
+    botao.onclick = () => usarRecomp(baixada.id, true);
+  } else {
+    const tamanho = melhor.tamanho ? ` (${melhor.tamanho})` : "";
+    $("#detalhesRecompTexto").textContent =
+      `🕹️ Este jogo tem uma versão feita para computador: roda sem emulador, com imagem melhor. Usa o jogo que você já tem.`;
+    botao.textContent = `Baixar a versão para PC${tamanho}`;
+    botao.onclick = () => jogar(jogo, `recomp:${melhor.id}`);
+  }
+}
+
+async function usarRecomp(recompId, usar) {
+  try {
+    await pedir("/api/recomp/usar", "POST", { id: recompId, usar });
+    recado(usar ? "Pronto: o Jogar agora abre pela versão para PC." : "Pronto: o Jogar agora abre pelo emulador.", false, 4000);
+    await carregarCatalogo();
+    if (!$("#gavetaEquipamentos").hidden) carregarEquipamentos();
+  } catch (falha) {
+    recado(falha.message, true);
+  }
+}
+
+// --------------------------------------------------------------------------
+// Equipamentos (13/11/2026): o que o ARENA tem, o que falta e o botao que resolve (servidor\equipamentos.py)
+// --------------------------------------------------------------------------
+// Estado sempre com icone E palavra: quem nao distingue cores (ou usa leitor de tela) entende igual.
+const ESTADO_DO_EQUIPAMENTO = {
+  pronto: ["✅", "Pronto"],
+  falta: ["⬇️", "Falta"],
+  opcional: ["➖", "Opcional"],
+  pago: ["🛒", "Pago, não é obrigatório"],
+};
+let vigiaDosEquipamentos = null;
+let ultimoDesenhoEquip = "";
+
+function textoDoAndamento(andamento) {
+  if (!andamento || !andamento.estado) return "";
+  if (andamento.estado === "pronto") return "✅ Pronto.";
+  if (andamento.estado === "erro") return `⚠️ ${andamento.mensagem || "Não deu certo. Toque de novo."}`;
+  if (andamento.estado === "esperando") return "⏳ Na fila: começa logo.";
+  const parte = andamento.total && andamento.feito ? ` (${Math.floor((100 * andamento.feito) / andamento.total)}%)` : "";
+  return `⏳ ${andamento.mensagem || "Baixando..."}${parte}`;
+}
+
+function linhaDoEquipamento(item) {
+  const li = document.createElement("li");
+  li.className = `equip-item equip-item--${item.estado}`;
+  const [icone, palavra] = ESTADO_DO_EQUIPAMENTO[item.estado] || ["", item.estado];
+  const titulo = document.createElement("h3");
+  titulo.className = "equip-nome";
+  const simbolo = document.createElement("span");
+  simbolo.className = "equip-icone";
+  simbolo.setAttribute("aria-hidden", "true");
+  simbolo.textContent = item.icone || "";
+  titulo.append(simbolo, document.createTextNode(item.nome));
+  const selo = document.createElement("span");
+  selo.className = `equip-estado equip-estado--${item.estado}`;
+  selo.textContent = `${icone} ${palavra}`;
+  const paraQue = document.createElement("p");
+  paraQue.className = "equip-para-que";
+  paraQue.textContent = item.para_que;
+  const detalhe = document.createElement("p");
+  detalhe.className = "equip-detalhe";
+  detalhe.textContent = item.detalhe || "";
+  li.append(titulo, selo, paraQue, detalhe);
+
+  const andando = textoDoAndamento(item.andamento);
+  const rodando = item.andamento && ["rodando", "esperando"].includes(item.andamento.estado);
+  if (andando) {
+    const p = document.createElement("p");
+    p.className = "equip-andamento";
+    p.textContent = andando;
+    li.append(p);
+  }
+  const acao = item.acao || {};
+  if (acao.tipo === "baixar" && item.estado !== "pronto") {
+    li.append(botaoDoEquipamento(rodando ? "Baixando..." : acao.rotulo || "Baixar", `equipar:${item.id}`,
+                                 () => equiparItens([item.id]), rodando));
+  } else if (acao.tipo === "loja") {
+    li.append(botaoDoEquipamento(acao.rotulo || "Ver na loja", `loja:${item.id}`, abrirLojaDoLossless));
+  }
+  if (item.itens && item.itens.length) {
+    const lista = document.createElement("ul");
+    lista.className = "equip-subitens";
+    for (const sub of item.itens) lista.append(linhaDaVersaoParaPC(sub));
+    const gaveta = document.createElement("details");
+    gaveta.className = "equip-detalhes";
+    const resumo = document.createElement("summary");
+    resumo.textContent = acao.rotulo || "Ver";
+    gaveta.append(resumo, lista);
+    gaveta.open = Boolean(estado.equipAberto && estado.equipAberto[item.id]);
+    gaveta.addEventListener("toggle", () => {
+      estado.equipAberto = { ...(estado.equipAberto || {}), [item.id]: gaveta.open };
+    });
+    li.append(gaveta);
+  }
+  return li;
+}
+
+function botaoDoEquipamento(rotulo, chave, aoClicar, desligado = false) {
+  const botao = document.createElement("button");
+  botao.type = "button";
+  botao.className = "botao botao--principal equip-botao";
+  botao.textContent = rotulo;
+  botao.dataset.chave = chave;
+  botao.disabled = desligado;
+  botao.addEventListener("click", aoClicar);
+  return botao;
+}
+
+function linhaDaVersaoParaPC(sub) {
+  const li = document.createElement("li");
+  li.className = "equip-subitem";
+  const nome = document.createElement("p");
+  nome.className = "equip-subnome";
+  const forte = document.createElement("strong");
+  forte.textContent = sub.jogo;
+  nome.append(forte, document.createTextNode(` — ${sub.nome}${sub.tamanho ? ` (${sub.tamanho})` : ""}`));
+  li.append(nome);
+  const andando = textoDoAndamento(sub.andamento);
+  const rodando = sub.andamento && ["rodando", "esperando"].includes(sub.andamento.estado);
+  if (andando && !sub.instalado) {
+    const p = document.createElement("p");
+    p.className = "equip-andamento";
+    p.textContent = andando;
+    li.append(p);
+  }
+  const recompId = sub.id.split(":")[1];
+  if (!sub.instalado) {
+    li.append(botaoDoEquipamento(rodando ? "Baixando..." : "Baixar", `equipar:${sub.id}`,
+                                 () => equiparItens([sub.id]), rodando));
+  } else if (sub.em_uso) {
+    const p = document.createElement("p");
+    p.className = "equip-detalhe";
+    p.textContent = "✅ Pronta. O Jogar abre este jogo por ela.";
+    li.append(p, botaoDoEquipamento("Usar o emulador", `usar:${sub.id}`, () => usarRecomp(recompId, false)));
+  } else {
+    const p = document.createElement("p");
+    p.className = "equip-detalhe";
+    p.textContent = "Baixada, mas desligada: o Jogar usa o emulador.";
+    li.append(p, botaoDoEquipamento("Usar a versão para PC", `usar:${sub.id}`, () => usarRecomp(recompId, true)));
+  }
+  return li;
+}
+
+function desenharEquipamentos(dados) {
+  const desenho = JSON.stringify(dados);
+  if (desenho === ultimoDesenhoEquip) return;      // nada mudou: nao redesenha (o foco do teclado fica onde estava)
+  ultimoDesenhoEquip = desenho;
+  const lista = $("#listaEquipamentos");
+  const focado = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.chave : "";
+  lista.replaceChildren(...dados.itens.map(linhaDoEquipamento));
+  const tudo = $("#btnEquiparTudo");
+  const quantos = (dados.tudo && dados.tudo.quantos) || 0;
+  tudo.hidden = quantos === 0;
+  tudo.disabled = Boolean(dados.trabalhando);
+  tudo.textContent = dados.trabalhando ? "Baixando... pode continuar usando o ARENA"
+    : `Equipar tudo o que é grátis (${quantos} ${quantos === 1 ? "item" : "itens"}, ${dados.tudo.tamanho})`;
+  const faltam = dados.itens.filter((item) => item.estado === "falta").length;
+  $("#equipAviso").textContent = dados.trabalhando ? "O ARENA está baixando. Você pode fechar esta janela e jogar."
+    : faltam ? (faltam === 1 ? "Falta 1 coisa." : `Faltam ${faltam} coisas.`) : "Tudo o que é preciso está pronto.";
+  if (focado) {
+    const volta = lista.querySelector(`[data-chave="${CSS.escape(focado)}"]`) || (tudo.dataset.chave === focado ? tudo : null);
+    if (volta) volta.focus();
+  }
+}
+
+async function carregarEquipamentos() {
+  try {
+    const dados = await pedir("/api/equipamentos");
+    desenharEquipamentos(dados);
+    clearTimeout(vigiaDosEquipamentos);
+    // Enquanto baixa, a lista se atualiza sozinha (so com a janela aberta: parado, nada de consulta).
+    if (dados.trabalhando && !$("#gavetaEquipamentos").hidden) {
+      vigiaDosEquipamentos = setTimeout(carregarEquipamentos, 1500);
+    } else if (estado.equipBaixando && !dados.trabalhando) {
+      estado.equipBaixando = false;
+      recado("Pronto: o ARENA terminou de baixar.", false, 5000);
+      carregarCatalogo();
+    }
+  } catch (falha) {
+    $("#equipAviso").textContent = falha.message;
+  }
+}
+
+async function equiparItens(ids, tudo = false) {
+  try {
+    await pedir("/api/equipamentos/equipar", "POST", tudo ? { tudo: true } : { ids });
+    estado.equipBaixando = true;
+    ultimoDesenhoEquip = "";
+    carregarEquipamentos();
+  } catch (falha) {
+    recado(falha.message, true);
+  }
+}
+
+async function abrirLojaDoLossless() {
+  try {
+    await pedir("/api/equipamentos/loja", "POST", { id: "lossless" });
+    recado("Abri a página do Lossless Scaling na Steam. Depois de comprar e instalar, volte aqui: o ARENA acha sozinho.",
+      false, 9000);
   } catch (falha) {
     recado(falha.message, true);
   }
@@ -6141,6 +6360,16 @@ function ligarEventos() {
   $("#btnConquistas").addEventListener("click", () => {
     abrirGaveta("gavetaConquistas");
     carregarConquistas();
+  });
+  $("#btnEquipamentos").addEventListener("click", () => {
+    abrirGaveta("gavetaEquipamentos");
+    ultimoDesenhoEquip = "";
+    carregarEquipamentos();
+  });
+  $("#btnEquiparTudo").addEventListener("click", () => {
+    const texto = $("#btnEquiparTudo").textContent;
+    if (window.confirm(`${texto}?\n\nO ARENA baixa do site de quem fez cada um e guarda tudo na pasta dele. ` +
+                       "Pode demorar; você pode jogar enquanto isso.")) equiparItens([], true);
   });
   $("#btnAcervo").addEventListener("click", () => {
     abrirGaveta("gavetaAcervo");

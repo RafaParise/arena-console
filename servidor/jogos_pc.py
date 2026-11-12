@@ -428,6 +428,8 @@ def externo_para(jogo, caminho):
     programa (ou a camada: Wine, WSL, o atalho da loja) e os argumentos. Devolve (externo, aviso)."""
     comando, aviso = comando_para(caminho, jogo.get("argumentos_do_jogo", ""))
     pasta = jogo.get("pasta_do_jogo") or (os.path.dirname(caminho) if os.path.isabs(caminho) else "")
+    # "loja": quem abre o jogo e' a loja (Steam, GOG, Epic), nao o ARENA: o Mais quadros nao acharia a janela dele.
     return ({"caminho": comando[0], "dados": {"nome": "PC", "argumentos": comando[1:], "ambiente": {},
+                                             "loja": jogo.get("origem") == ORIGEM_INSTALADOS,
                                              "pasta_trabalho": pasta if os.path.isdir(pasta) else ""}},
             aviso)

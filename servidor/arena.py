@@ -80,6 +80,7 @@ import quadros_ps2  # noqa: E402  (os 60 quadros de verdade do PS2, pelos patche
 import quadros_dolphin  # noqa: E402  (o mesmo no GameCube e no Wii, pelos codigos do Dolphin -- 11/11/2026)
 import recomps      # noqa: E402  (o jogo de console recompilado para PC: baixar da release e jogar -- 12/11/2026)
 import jogos_pc     # noqa: E402  (o console PC: o programa do jogo, as lojas, Wine e WSL -- 12/11/2026)
+import equipamentos  # noqa: E402  (o painel Equipamentos: o que o ARENA tem e o botao que resolve -- 13/11/2026)
 import navegadores  # noqa: E402  (em que navegador a tela abre -- item 11, 17/10/2026)
 # O que a configuracao aceita em "navegador".
 NAVEGADORES_ACEITOS = ("automatico",) + tuple(c[0] for c in navegadores.CONHECIDOS)
@@ -2954,6 +2955,14 @@ def preparar_mfg(jogo, config, degrau=0, programa=None):
     # (o AMD Software com o Frame Rate Target Control: acima dele o driver descarta o que foi criado).
     hz = driver_video.hz_efetivo(lossless.frequencia_da_tela(), driver_da_placa())
     de_fora = bool(jogo.get("externo"))
+    dados_de_fora = (jogo.get("externo") or {}).get("dados") or {}
+    if dados_de_fora.get("loja"):
+        print("[ARENA] Mais quadros fica de fora deste jogo: quem abre o jogo é a loja, não o ARENA.")
+        return None
+    if dados_de_fora.get("recomp") and modo != "sempre":
+        print("[ARENA] Mais quadros fica de fora deste jogo: a versão para PC já desenha na velocidade da tela "
+              "(com 'Sempre' nos Ajustes, liga).")
+        return None
     usar, motivo = mfg.decidir(modo, achado or tem_lossless, CAPACIDADE.get("nota_gpu"), integrada, hz, de_fora,
                                degrau)
     if not usar:
@@ -6152,6 +6161,18 @@ class Manipulador(BaseHTTPRequestHandler):
         # BIOS dos consoles): ativa, de outra versao ou falta, e onde fica a
         # prateleira de cada uma (a pasta BIOS do ARENA, servidor\bios.py).
         # Andamento do "Arrumar" demorado (descompactar um jogo de CD).
+        if caminho == "/api/equipamentos":
+            # O painel Equipamentos (servidor\equipamentos.py): cada recurso, o estado e o botao que resolve.
+            itens = equipamentos.listar(
+                RAIZ, carregar_catalogo(), manifesto().get("jogos", []),
+                lambda plataforma: graficos.achar_externo(plataforma)[0],
+                sum(1 for p in avaliar_plataformas() if p.get("estado") == "pronta"),
+                plataforma_do_sistema.ANDROID or os.path.isfile(EXECUTAVEL_RETROARCH))
+            tudo = equipamentos.ids_para_equipar_tudo(itens)
+            return self.responder_json({"itens": itens, "trabalhando": equipamentos.trabalhando(),
+                                        "tudo": {"quantos": len(tudo),
+                                                 "tamanho": equipamentos.tamanho_aproximado(itens, tudo)}})
+
         if caminho == "/api/recomp/progresso":
             parametros = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
             andamento = recomps.progresso((parametros.get("id") or [""])[0][:60])
@@ -7208,6 +7229,55 @@ class Manipulador(BaseHTTPRequestHandler):
                 print("[ARENA] Celular como controle desligado.")
             return self.responder_json(dict(estado_do_controle, ok=True))
 
+        if caminho == "/api/equipamentos/equipar":
+            # {"ids": [...]} ou {"tudo": true}. So entra o que o ARENA sabe baixar: o MFG e os recomps do catalogo.
+            if plataforma_do_sistema.ANDROID:
+                return self.erro("No celular não há nada para baixar aqui: tudo já vem no app. Volte e jogue.", 409)
+            if dados.get("tudo"):
+                itens = equipamentos.listar(RAIZ, carregar_catalogo(), manifesto().get("jogos", []),
+                                            lambda plataforma: graficos.achar_externo(plataforma)[0])
+                pedidos = equipamentos.ids_para_equipar_tudo(itens)
+            else:
+                pedidos = dados.get("ids") if isinstance(dados.get("ids"), list) else []
+            validos = []
+            for item_id in pedidos[:200]:
+                item_id = str(item_id)[:80]
+                if item_id == "mfg" or (item_id.startswith("recomp:") and recomps.recomp(item_id.split(":", 1)[1])):
+                    validos.append(item_id)
+            if not validos:
+                return self.erro("Não há nada para baixar: está tudo pronto. Feche esta janela e jogue.", 400)
+
+            def depois(item_id):
+                limpar_caches()
+                manifesto(forcar=True)      # a lista passa a dizer "pronto"
+            entraram = equipamentos.equipar(validos, depois)
+            return self.responder_json({"ok": True, "entraram": entraram})
+
+        if caminho == "/api/equipamentos/loja":
+            # So o Lossless Scaling (pago): abre a pagina dele na Steam. Endereco fixo, nada vem da tela.
+            if plataforma_do_sistema.ANDROID or os.name != "nt":
+                return self.erro("O Lossless Scaling só existe para Windows. Use a Imagem mais bonita, em Ajustes.", 409)
+            try:
+                endereco = equipamentos.abrir_loja_do_lossless()
+            except OSError as falha:
+                return self.erro("Não consegui abrir a loja (%s). Procure Lossless Scaling na Steam." % falha, 500)
+            return self.responder_json({"ok": True, "endereco": endereco})
+
+        if caminho == "/api/recomp/usar":
+            # A versao para PC deste jogo: ligada, o Jogar abre por ela; desligada, pelo emulador (nada e' apagado).
+            recomp_id = str(dados.get("id") or "")[:60]
+            if not recomps.recomp(recomp_id):
+                return self.erro("Essa versão para PC não está no catálogo do ARENA. Clique em Atualizar lista.", 404)
+            try:
+                usar = recomps.preferir(recomp_id, bool(dados.get("usar")))
+            except recomps.NaoDaParaInstalar as falha:
+                return self.erro(str(falha), 409)
+            except OSError as falha:
+                return self.erro(traduzir_erro_do_sistema(falha, "guardar a escolha"), 500)
+            limpar_caches()
+            manifesto(forcar=True)
+            return self.responder_json({"ok": True, "usar": usar})
+
         if caminho == "/api/recomp/instalar":
             # Baixa o recomp da release oficial do GitHub para emuladores\Recomps\<id>, em segundo plano
             # (servidor\recomps.py); a tela acompanha por /api/recomp/progresso e depois chama o Jogar de novo.
@@ -8032,12 +8102,20 @@ class Manipulador(BaseHTTPRequestHandler):
                 dados_extra["nome"] if caminho_extra else None)
             # O jogo de console que tambem existe recompilado para PC (servidor\recomps.py): mais um jeito de
             # abrir, 'recomp:<id>' (12/11/2026). Nao no Jogar Junto: partida a dois e' coisa do RetroArch.
+            # 13/11/2026: o Jogar nao pergunta mais pelo recomp (o ARENA simples, para quem nao entende de
+            # computador): a versao para PC que a pessoa baixou e deixou ligada abre sozinha; a que ela pediu agora
+            # (pelo painel do jogo), tambem; sem nenhuma das duas, o Jogar segue como sempre.
+            recomp_escolhido = None
             if not dados.get("partida") and not plataforma.get("nativo"):
-                lista_jeitos += recomps.jeitos_para(jogo["titulo"], plataforma["id"])
+                if str(dados.get("jeito") or "").startswith("recomp:"):
+                    lista_jeitos += recomps.jeitos_para(jogo["titulo"], plataforma["id"])
+                elif not dados.get("jeito"):
+                    recomp_escolhido = recomps.escolhido_para(jogo["titulo"], plataforma["id"])
             lembrado = jeitos_de_abrir.lembrado_que_vale(
                 carregar_config().get("jeito_de_abrir", {}).get(plataforma["id"]),
                 bool(dados.get("partida")), bool(caminho_extra))
-            jeito = jeitos_de_abrir.escolher(lista_jeitos, dados.get("jeito"), lembrado)
+            jeito = ("recomp:" + recomp_escolhido if recomp_escolhido else
+                     jeitos_de_abrir.escolher(lista_jeitos, dados.get("jeito"), lembrado))
             if jeito is None and len(lista_jeitos) > 1 and not dados.get("partida"):
                 return self.responder_json({"ok": True, "escolher_jeito": True,
                                             "console": plataforma["nome"],

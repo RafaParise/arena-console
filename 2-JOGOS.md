@@ -1382,11 +1382,15 @@ fez (o Zelda 64: Recompiled, o Mario Kart 64: Recompiled, o Sonic Unleashed Reco
 Como funciona no ARENA:
 
 1. O ARENA confere cada jogo da biblioteca no catálogo de recomps (`servidor\recomps.json`, uns 1.200, de 22
-   consoles). O painel do jogo mostra **"Versão para PC: ..."** quando existe.
-2. Em **Jogar agora**, a pergunta "Como ligar?" ganha o jeito **"<nome> · versão para PC"**.
-3. Na primeira vez, o ARENA pergunta se pode baixar, com o tamanho, o autor e a licença. Ele baixa **da release oficial
-   no GitHub**, confere a marca SHA-256 que o GitHub publica e descompacta em `emuladores\Recomps\<nome>`. Nada é
+   consoles). O painel do jogo mostra **"Este jogo tem uma versão feita para computador"** e um botão só:
+   **Baixar a versão para PC**. Os de todos os seus jogos aparecem juntos em **🧰 Equipamentos → Versões para PC dos
+   seus jogos**, e o **Equipar tudo** baixa todos de uma vez.
+2. O ARENA baixa **da release oficial no GitHub**, confere a marca SHA-256 e descompacta em
+   `emuladores\Recomps\<nome>` (zip, tar, AppImage e, pelo `tar` que vem no Windows 10 e 11, também 7z e rar). Nada é
    instalado no sistema; apagar a pasta desfaz tudo.
+3. **Baixou, o Jogar agora abre o jogo por ela, sem perguntar nada** (13/11/2026: antes, o Jogar perguntava "Como
+   ligar?"). Para voltar ao emulador, o painel do jogo tem o botão **Voltar a abrir pelo emulador** (nada é apagado; o
+   mesmo botão liga de novo). No Jogar Junto, o jogo abre sempre pelo emulador.
 4. O jogo abre com a sua cópia. Quando o recomp traz o arquivo `recomplauncher.json` (o padrão que vários recomps
    seguem), o ARENA confere se o disco é o certo (lê o disco por dentro), escreve os ajustes que o recomp pede, roda o
    passo de preparo dele mostrando o andamento e passa a cópia na linha de comando. Sem esse arquivo, o próprio recomp
@@ -1408,7 +1412,7 @@ do jogo, o repositório, a licença, o nome do arquivo de cada sistema) e faz o 
 |---|---|
 | "Não consegui ler a release no GitHub" | Sem internet não dá. Com internet, o GitHub limita as consultas (60 por hora por computador): espere um pouco |
 | "A marca SHA-256 não bate" | O download veio errado. Nada foi instalado; tente de novo |
-| "publica este recomp como .exe/.7z" | O autor só publica instalador ou 7z. Baixe do GitHub, descompacte em `emuladores\Recomps\<nome>` e clique em Jogar |
+| "publica este recomp como .exe..." | O autor só publica instalador. Baixe do GitHub, descompacte em `emuladores\Recomps\<nome>` e clique em Jogar |
 | "Este disco não é o que o recomp espera" | O recomp pede outra versão do jogo (outra região). A mensagem diz qual |
 | O recomp pede a ROM ao abrir | É o jeito dele: aponte para o arquivo do jogo, que o ARENA mostrou no aviso |
 | Jogo do Windows no Linux não abre | Instale o Wine pelo gerenciador de pacotes, ou use a versão para Linux do jogo |

@@ -48,6 +48,7 @@
     <button class="botao" id="btnRecordes" type="button">Recordes</button>
     <button class="botao" id="btnConquistas" type="button">Conquistas</button>
     <button class="botao" id="btnAcervo" type="button" data-so-windows>Biblioteca</button>
+    <button class="botao" id="btnEquipamentos" type="button" aria-label="Equipamentos: o que o ARENA tem e o que falta">🧰 Equipamentos</button>
     <button class="botao botao-tema" id="btnTema" type="button" aria-label="Alternar modo de cor">☾ Escuro</button>
     <button class="botao" id="btnSincronizar" type="button" data-so-windows>
       Enviar recordes <span class="selo" id="seloPendentes" hidden>0</span>
@@ -155,7 +156,10 @@
       <span class="detalhes-kicker" id="detalhesConsole">Sua biblioteca</span>
       <h2 id="detalhesTitulo">Selecione um jogo</h2>
       <p class="detalhes-descricao" id="detalhesDescricao">Escolha um título na grade para ver mais informações.</p>
-      <p class="detalhes-descricao" id="detalhesRecomp" hidden></p>
+      <div class="detalhes-recomp" id="detalhesRecomp" hidden>
+        <p id="detalhesRecompTexto"></p>
+        <button class="botao" id="btnRecompAcao" type="button"></button>
+      </div>
       <div class="detalhes-aviso" id="detalhesAviso" role="note" hidden>
         <p id="detalhesAvisoTexto"></p>
         <button class="botao" id="btnMoverSugerido" type="button" hidden>Mover para a pasta certa</button>
@@ -425,6 +429,25 @@
       <select id="listaComoColocar"></select>
     </label>
     <div class="como-colocar" id="cartaoComoColocar" aria-live="polite"></div>
+  </div>
+</aside>
+
+<!-- ===================== EQUIPAMENTOS ===================== -->
+<!-- Tudo o que o ARENA tem, o que falta e o botao que resolve (servidor\equipamentos.py, 13/11/2026). Feito para
+     quem nao entende de computador: uma linha por recurso, frase curta, estado com icone e palavra, um botao. -->
+<aside class="gaveta" id="gavetaEquipamentos" hidden aria-labelledby="tituloEquipamentos">
+  <div class="gaveta-cabeca">
+    <h2 id="tituloEquipamentos">Equipamentos</h2>
+    <button class="botao botao--fechar" data-fechar="gavetaEquipamentos" type="button">Fechar</button>
+  </div>
+  <div class="aba-conteudo">
+    <p class="equip-intro">
+      Aqui está tudo o que o ARENA tem. <strong>✅ Pronto</strong> quer dizer que já funciona.
+      O que faltar e for grátis, o ARENA baixa sozinho: é só tocar no botão.
+    </p>
+    <button class="botao botao--principal equip-tudo" id="btnEquiparTudo" type="button" hidden>Equipar tudo</button>
+    <p class="equip-aviso" id="equipAviso" role="status" aria-live="polite"></p>
+    <ul class="equip-lista" id="listaEquipamentos"></ul>
   </div>
 </aside>
 

@@ -1,6 +1,6 @@
 {
  "axe": "4.10.2",
- "feito_em": "2026-11-07 16:24",
+ "feito_em": "2026-11-12 18:58",
  "telas": [
   {
    "estouro_horizontal_px": 0,
@@ -24,7 +24,7 @@
     ]
    },
    "contraste": {
-    "medidos": 18,
+    "medidos": 19,
     "nao_medido": {
      "fundo_com_imagem": 11,
      "fundo_translucido": 0,
@@ -75,7 +75,7 @@
     ]
    },
    "contraste": {
-    "medidos": 18,
+    "medidos": 19,
     "nao_medido": {
      "fundo_com_imagem": 11,
      "fundo_translucido": 0,
@@ -126,7 +126,7 @@
     ]
    },
    "contraste": {
-    "medidos": 39,
+    "medidos": 40,
     "nao_medido": {
      "fundo_com_imagem": 13,
      "fundo_translucido": 0,
@@ -166,7 +166,7 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
-    "total": 14,
+    "total": 17,
     "amostra": [
      "button#btnVerAnimacao 42x33",
      "input#campoBusca 336x35",
@@ -177,7 +177,7 @@
     ]
    },
    "contraste": {
-    "medidos": 58,
+    "medidos": 72,
     "nao_medido": {
      "fundo_com_imagem": 14,
      "fundo_translucido": 0,
@@ -217,7 +217,7 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
-    "total": 8,
+    "total": 10,
     "amostra": [
      "button#btnVerAnimacao 42x33",
      "input#campoBusca 336x35",
@@ -228,7 +228,7 @@
     ]
    },
    "contraste": {
-    "medidos": 24,
+    "medidos": 29,
     "nao_medido": {
      "fundo_com_imagem": 11,
      "fundo_translucido": 0,
@@ -279,7 +279,7 @@
     ]
    },
    "contraste": {
-    "medidos": 30,
+    "medidos": 31,
     "nao_medido": {
      "fundo_com_imagem": 11,
      "fundo_translucido": 0,
@@ -319,6 +319,57 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
+    "total": 7,
+    "amostra": [
+     "button#btnVerAnimacao 42x33",
+     "input#campoBusca 336x35",
+     "button#btnTodosJogos 56x31",
+     "button#btnFavoritos 85x31",
+     "button#btnRecentes 71x31",
+     "ul#listaJogos > li.jogo.jogo--sem_core > button.jogo-favorito 32x32"
+    ]
+   },
+   "contraste": {
+    "medidos": 23,
+    "nao_medido": {
+     "fundo_com_imagem": 11,
+     "fundo_translucido": 0,
+     "cor_estranha": 0
+    },
+    "falhas": 0,
+    "piores": []
+   },
+   "texto_menor_que_12px": {
+    "total": 0,
+    "amostra": []
+   },
+   "id_repetido": [],
+   "imagem_sem_alt": [],
+   "tabindex_positivo": [],
+   "titulos": {
+    "h1": 1,
+    "pulos": 0
+   },
+   "zoom_bloqueado": false,
+   "lang": "pt-BR",
+   "regras_reduzir_movimento": 2,
+   "canvas_visiveis": 1,
+   "tamanho": "celular",
+   "tema": "claro",
+   "tela": "gavetaEquipamentos",
+   "axe": []
+  },
+  {
+   "estouro_horizontal_px": 0,
+   "sem_nome_acessivel": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_menor_que_24px": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_entre_24_e_44px": {
     "total": 9,
     "amostra": [
      "button#btnVerAnimacao 42x33",
@@ -330,7 +381,7 @@
     ]
    },
    "contraste": {
-    "medidos": 29,
+    "medidos": 30,
     "nao_medido": {
      "fundo_com_imagem": 11,
      "fundo_translucido": 0,
@@ -381,7 +432,7 @@
     ]
    },
    "contraste": {
-    "medidos": 52,
+    "medidos": 55,
     "nao_medido": {
      "fundo_com_imagem": 11,
      "fundo_translucido": 0,
@@ -432,7 +483,7 @@
     ]
    },
    "contraste": {
-    "medidos": 196,
+    "medidos": 197,
     "nao_medido": {
      "fundo_com_imagem": 11,
      "fundo_translucido": 0,
@@ -472,7 +523,7 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
-    "total": 21,
+    "total": 22,
     "amostra": [
      "button#btnVerAnimacao 42x33",
      "input#campoBusca 336x35",
@@ -483,7 +534,7 @@
     ]
    },
    "contraste": {
-    "medidos": 82,
+    "medidos": 109,
     "nao_medido": {
      "fundo_com_imagem": 11,
      "fundo_translucido": 0,
@@ -534,7 +585,7 @@
     ]
    },
    "contraste": {
-    "medidos": 190,
+    "medidos": 191,
     "nao_medido": {
      "fundo_com_imagem": 11,
      "fundo_translucido": 0,
@@ -574,7 +625,7 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
-    "total": 85,
+    "total": 88,
     "amostra": [
      "button#btnVerAnimacao 42x33",
      "input#campoBusca 336x35",
@@ -585,7 +636,7 @@
     ]
    },
    "contraste": {
-    "medidos": 322,
+    "medidos": 338,
     "nao_medido": {
      "fundo_com_imagem": 11,
      "fundo_translucido": 0,
@@ -636,7 +687,7 @@
     ]
    },
    "contraste": {
-    "medidos": 21,
+    "medidos": 22,
     "nao_medido": {
      "fundo_com_imagem": 11,
      "fundo_translucido": 0,
@@ -687,7 +738,7 @@
     ]
    },
    "contraste": {
-    "medidos": 22,
+    "medidos": 23,
     "nao_medido": {
      "fundo_com_imagem": 11,
      "fundo_translucido": 0,
@@ -738,7 +789,7 @@
     ]
    },
    "contraste": {
-    "medidos": 22,
+    "medidos": 23,
     "nao_medido": {
      "fundo_com_imagem": 11,
      "fundo_translucido": 0,
@@ -789,7 +840,7 @@
     ]
    },
    "contraste": {
-    "medidos": 27,
+    "medidos": 28,
     "nao_medido": {
      "fundo_com_imagem": 11,
      "fundo_translucido": 0,
@@ -840,7 +891,7 @@
     ]
    },
    "contraste": {
-    "medidos": 27,
+    "medidos": 28,
     "nao_medido": {
      "fundo_com_imagem": 11,
      "fundo_translucido": 0,
@@ -880,7 +931,7 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
-    "total": 48,
+    "total": 47,
     "amostra": [
      "button#btnVerAnimacao 42x33",
      "input#campoBusca 336x35",
@@ -891,9 +942,9 @@
     ]
    },
    "contraste": {
-    "medidos": 202,
+    "medidos": 191,
     "nao_medido": {
-     "fundo_com_imagem": 12,
+     "fundo_com_imagem": 11,
      "fundo_translucido": 0,
      "cor_estranha": 0
     },
@@ -942,7 +993,7 @@
     ]
    },
    "contraste": {
-    "medidos": 22,
+    "medidos": 23,
     "nao_medido": {
      "fundo_com_imagem": 11,
      "fundo_translucido": 0,
@@ -993,7 +1044,7 @@
     ]
    },
    "contraste": {
-    "medidos": 29,
+    "medidos": 30,
     "nao_medido": {
      "fundo_com_imagem": 11,
      "fundo_translucido": 0,
@@ -1044,7 +1095,7 @@
     ]
    },
    "contraste": {
-    "medidos": 30,
+    "medidos": 31,
     "nao_medido": {
      "fundo_com_imagem": 11,
      "fundo_translucido": 0,
@@ -1095,7 +1146,7 @@
     ]
    },
    "contraste": {
-    "medidos": 25,
+    "medidos": 26,
     "nao_medido": {
      "fundo_com_imagem": 11,
      "fundo_translucido": 0,
@@ -1146,7 +1197,7 @@
     ]
    },
    "contraste": {
-    "medidos": 21,
+    "medidos": 22,
     "nao_medido": {
      "fundo_com_imagem": 11,
      "fundo_translucido": 0,
@@ -1197,7 +1248,7 @@
     ]
    },
    "contraste": {
-    "medidos": 23,
+    "medidos": 24,
     "nao_medido": {
      "fundo_com_imagem": 11,
      "fundo_translucido": 0,
@@ -1248,7 +1299,7 @@
     ]
    },
    "contraste": {
-    "medidos": 32,
+    "medidos": 33,
     "nao_medido": {
      "fundo_com_imagem": 11,
      "fundo_translucido": 0,
@@ -1299,7 +1350,7 @@
     ]
    },
    "contraste": {
-    "medidos": 23,
+    "medidos": 24,
     "nao_medido": {
      "fundo_com_imagem": 11,
      "fundo_translucido": 0,
@@ -1350,7 +1401,7 @@
     ]
    },
    "contraste": {
-    "medidos": 22,
+    "medidos": 23,
     "nao_medido": {
      "fundo_com_imagem": 11,
      "fundo_translucido": 0,
@@ -1401,7 +1452,7 @@
     ]
    },
    "contraste": {
-    "medidos": 23,
+    "medidos": 24,
     "nao_medido": {
      "fundo_com_imagem": 6,
      "fundo_translucido": 0,
@@ -1452,7 +1503,7 @@
     ]
    },
    "contraste": {
-    "medidos": 23,
+    "medidos": 24,
     "nao_medido": {
      "fundo_com_imagem": 6,
      "fundo_translucido": 0,
@@ -1503,7 +1554,7 @@
     ]
    },
    "contraste": {
-    "medidos": 46,
+    "medidos": 47,
     "nao_medido": {
      "fundo_com_imagem": 6,
      "fundo_translucido": 0,
@@ -1543,7 +1594,7 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
-    "total": 14,
+    "total": 17,
     "amostra": [
      "button#btnVerAnimacao 42x33",
      "input#campoBusca 336x35",
@@ -1554,7 +1605,7 @@
     ]
    },
    "contraste": {
-    "medidos": 66,
+    "medidos": 80,
     "nao_medido": {
      "fundo_com_imagem": 6,
      "fundo_translucido": 0,
@@ -1594,7 +1645,7 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
-    "total": 8,
+    "total": 10,
     "amostra": [
      "button#btnVerAnimacao 42x33",
      "input#campoBusca 336x35",
@@ -1605,7 +1656,7 @@
     ]
    },
    "contraste": {
-    "medidos": 29,
+    "medidos": 34,
     "nao_medido": {
      "fundo_com_imagem": 6,
      "fundo_translucido": 0,
@@ -1656,7 +1707,7 @@
     ]
    },
    "contraste": {
-    "medidos": 35,
+    "medidos": 36,
     "nao_medido": {
      "fundo_com_imagem": 6,
      "fundo_translucido": 0,
@@ -1696,6 +1747,57 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
+    "total": 7,
+    "amostra": [
+     "button#btnVerAnimacao 42x33",
+     "input#campoBusca 336x35",
+     "button#btnTodosJogos 56x31",
+     "button#btnFavoritos 85x31",
+     "button#btnRecentes 71x31",
+     "ul#listaJogos > li.jogo.jogo--sem_core > button.jogo-favorito 32x32"
+    ]
+   },
+   "contraste": {
+    "medidos": 28,
+    "nao_medido": {
+     "fundo_com_imagem": 6,
+     "fundo_translucido": 0,
+     "cor_estranha": 0
+    },
+    "falhas": 0,
+    "piores": []
+   },
+   "texto_menor_que_12px": {
+    "total": 0,
+    "amostra": []
+   },
+   "id_repetido": [],
+   "imagem_sem_alt": [],
+   "tabindex_positivo": [],
+   "titulos": {
+    "h1": 1,
+    "pulos": 0
+   },
+   "zoom_bloqueado": false,
+   "lang": "pt-BR",
+   "regras_reduzir_movimento": 2,
+   "canvas_visiveis": 1,
+   "tamanho": "celular",
+   "tema": "escuro",
+   "tela": "gavetaEquipamentos",
+   "axe": []
+  },
+  {
+   "estouro_horizontal_px": 0,
+   "sem_nome_acessivel": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_menor_que_24px": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_entre_24_e_44px": {
     "total": 9,
     "amostra": [
      "button#btnVerAnimacao 42x33",
@@ -1707,7 +1809,7 @@
     ]
    },
    "contraste": {
-    "medidos": 34,
+    "medidos": 35,
     "nao_medido": {
      "fundo_com_imagem": 6,
      "fundo_translucido": 0,
@@ -1758,7 +1860,7 @@
     ]
    },
    "contraste": {
-    "medidos": 57,
+    "medidos": 60,
     "nao_medido": {
      "fundo_com_imagem": 6,
      "fundo_translucido": 0,
@@ -1809,7 +1911,7 @@
     ]
    },
    "contraste": {
-    "medidos": 201,
+    "medidos": 202,
     "nao_medido": {
      "fundo_com_imagem": 6,
      "fundo_translucido": 0,
@@ -1849,7 +1951,7 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
-    "total": 21,
+    "total": 22,
     "amostra": [
      "button#btnVerAnimacao 42x33",
      "input#campoBusca 336x35",
@@ -1860,7 +1962,7 @@
     ]
    },
    "contraste": {
-    "medidos": 87,
+    "medidos": 114,
     "nao_medido": {
      "fundo_com_imagem": 6,
      "fundo_translucido": 0,
@@ -1911,7 +2013,7 @@
     ]
    },
    "contraste": {
-    "medidos": 195,
+    "medidos": 196,
     "nao_medido": {
      "fundo_com_imagem": 6,
      "fundo_translucido": 0,
@@ -1951,7 +2053,7 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
-    "total": 85,
+    "total": 88,
     "amostra": [
      "button#btnVerAnimacao 42x33",
      "input#campoBusca 336x35",
@@ -1962,7 +2064,7 @@
     ]
    },
    "contraste": {
-    "medidos": 327,
+    "medidos": 343,
     "nao_medido": {
      "fundo_com_imagem": 6,
      "fundo_translucido": 0,
@@ -2013,7 +2115,7 @@
     ]
    },
    "contraste": {
-    "medidos": 26,
+    "medidos": 27,
     "nao_medido": {
      "fundo_com_imagem": 6,
      "fundo_translucido": 0,
@@ -2064,7 +2166,7 @@
     ]
    },
    "contraste": {
-    "medidos": 27,
+    "medidos": 28,
     "nao_medido": {
      "fundo_com_imagem": 6,
      "fundo_translucido": 0,
@@ -2115,7 +2217,7 @@
     ]
    },
    "contraste": {
-    "medidos": 27,
+    "medidos": 28,
     "nao_medido": {
      "fundo_com_imagem": 6,
      "fundo_translucido": 0,
@@ -2166,7 +2268,7 @@
     ]
    },
    "contraste": {
-    "medidos": 32,
+    "medidos": 33,
     "nao_medido": {
      "fundo_com_imagem": 6,
      "fundo_translucido": 0,
@@ -2217,7 +2319,7 @@
     ]
    },
    "contraste": {
-    "medidos": 32,
+    "medidos": 33,
     "nao_medido": {
      "fundo_com_imagem": 6,
      "fundo_translucido": 0,
@@ -2257,7 +2359,7 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
-    "total": 48,
+    "total": 47,
     "amostra": [
      "button#btnVerAnimacao 42x33",
      "input#campoBusca 336x35",
@@ -2268,7 +2370,7 @@
     ]
    },
    "contraste": {
-    "medidos": 208,
+    "medidos": 196,
     "nao_medido": {
      "fundo_com_imagem": 6,
      "fundo_translucido": 0,
@@ -2319,7 +2421,7 @@
     ]
    },
    "contraste": {
-    "medidos": 27,
+    "medidos": 28,
     "nao_medido": {
      "fundo_com_imagem": 6,
      "fundo_translucido": 0,
@@ -2370,7 +2472,7 @@
     ]
    },
    "contraste": {
-    "medidos": 34,
+    "medidos": 35,
     "nao_medido": {
      "fundo_com_imagem": 6,
      "fundo_translucido": 0,
@@ -2421,7 +2523,7 @@
     ]
    },
    "contraste": {
-    "medidos": 35,
+    "medidos": 36,
     "nao_medido": {
      "fundo_com_imagem": 6,
      "fundo_translucido": 0,
@@ -2472,7 +2574,7 @@
     ]
    },
    "contraste": {
-    "medidos": 30,
+    "medidos": 31,
     "nao_medido": {
      "fundo_com_imagem": 6,
      "fundo_translucido": 0,
@@ -2523,7 +2625,7 @@
     ]
    },
    "contraste": {
-    "medidos": 26,
+    "medidos": 27,
     "nao_medido": {
      "fundo_com_imagem": 6,
      "fundo_translucido": 0,
@@ -2574,7 +2676,7 @@
     ]
    },
    "contraste": {
-    "medidos": 28,
+    "medidos": 29,
     "nao_medido": {
      "fundo_com_imagem": 6,
      "fundo_translucido": 0,
@@ -2625,7 +2727,7 @@
     ]
    },
    "contraste": {
-    "medidos": 37,
+    "medidos": 38,
     "nao_medido": {
      "fundo_com_imagem": 6,
      "fundo_translucido": 0,
@@ -2676,7 +2778,7 @@
     ]
    },
    "contraste": {
-    "medidos": 28,
+    "medidos": 29,
     "nao_medido": {
      "fundo_com_imagem": 6,
      "fundo_translucido": 0,
@@ -2727,7 +2829,7 @@
     ]
    },
    "contraste": {
-    "medidos": 27,
+    "medidos": 28,
     "nao_medido": {
      "fundo_com_imagem": 6,
      "fundo_translucido": 0,
@@ -2767,7 +2869,7 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
-    "total": 93,
+    "total": 94,
     "amostra": [
      "button#btnVerAnimacao 42x33",
      "button#btnPerfil 54x33",
@@ -2778,7 +2880,7 @@
     ]
    },
    "contraste": {
-    "medidos": 24,
+    "medidos": 25,
     "nao_medido": {
      "fundo_com_imagem": 164,
      "fundo_translucido": 0,
@@ -2818,7 +2920,7 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
-    "total": 93,
+    "total": 94,
     "amostra": [
      "button#btnVerAnimacao 42x33",
      "button#btnPerfil 54x33",
@@ -2829,7 +2931,7 @@
     ]
    },
    "contraste": {
-    "medidos": 24,
+    "medidos": 25,
     "nao_medido": {
      "fundo_com_imagem": 164,
      "fundo_translucido": 0,
@@ -2869,7 +2971,7 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
-    "total": 100,
+    "total": 101,
     "amostra": [
      "button#btnVerAnimacao 42x33",
      "button#btnPerfil 54x33",
@@ -2880,7 +2982,7 @@
     ]
    },
    "contraste": {
-    "medidos": 45,
+    "medidos": 46,
     "nao_medido": {
      "fundo_com_imagem": 166,
      "fundo_translucido": 0,
@@ -2920,7 +3022,7 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
-    "total": 101,
+    "total": 105,
     "amostra": [
      "button#btnVerAnimacao 42x33",
      "button#btnPerfil 54x33",
@@ -2931,7 +3033,7 @@
     ]
    },
    "contraste": {
-    "medidos": 64,
+    "medidos": 78,
     "nao_medido": {
      "fundo_com_imagem": 167,
      "fundo_translucido": 0,
@@ -2971,7 +3073,7 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
-    "total": 95,
+    "total": 98,
     "amostra": [
      "button#btnVerAnimacao 42x33",
      "button#btnPerfil 54x33",
@@ -2982,7 +3084,7 @@
     ]
    },
    "contraste": {
-    "medidos": 30,
+    "medidos": 35,
     "nao_medido": {
      "fundo_com_imagem": 164,
      "fundo_translucido": 0,
@@ -3022,7 +3124,7 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
-    "total": 95,
+    "total": 96,
     "amostra": [
      "button#btnVerAnimacao 42x33",
      "button#btnPerfil 54x33",
@@ -3033,7 +3135,7 @@
     ]
    },
    "contraste": {
-    "medidos": 36,
+    "medidos": 37,
     "nao_medido": {
      "fundo_com_imagem": 164,
      "fundo_translucido": 0,
@@ -3073,618 +3175,6 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
-    "total": 96,
-    "amostra": [
-     "button#btnVerAnimacao 42x33",
-     "button#btnPerfil 54x33",
-     "button#btnAmigos 68x33",
-     "button#btnRecordes 79x33",
-     "button#btnConquistas 88x33",
-     "button#btnAcervo 80x33"
-    ]
-   },
-   "contraste": {
-    "medidos": 35,
-    "nao_medido": {
-     "fundo_com_imagem": 164,
-     "fundo_translucido": 0,
-     "cor_estranha": 0
-    },
-    "falhas": 0,
-    "piores": []
-   },
-   "texto_menor_que_12px": {
-    "total": 0,
-    "amostra": []
-   },
-   "id_repetido": [],
-   "imagem_sem_alt": [],
-   "tabindex_positivo": [],
-   "titulos": {
-    "h1": 1,
-    "pulos": 0
-   },
-   "zoom_bloqueado": false,
-   "lang": "pt-BR",
-   "regras_reduzir_movimento": 2,
-   "canvas_visiveis": 1,
-   "tamanho": "notebook",
-   "tema": "claro",
-   "tela": "gavetaAcervo",
-   "axe": []
-  },
-  {
-   "estouro_horizontal_px": 0,
-   "sem_nome_acessivel": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_menor_que_24px": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_entre_24_e_44px": {
-    "total": 103,
-    "amostra": [
-     "button#btnVerAnimacao 42x33",
-     "button#btnPerfil 54x33",
-     "button#btnAmigos 68x33",
-     "button#btnRecordes 79x33",
-     "button#btnConquistas 88x33",
-     "button#btnAcervo 80x33"
-    ]
-   },
-   "contraste": {
-    "medidos": 58,
-    "nao_medido": {
-     "fundo_com_imagem": 164,
-     "fundo_translucido": 0,
-     "cor_estranha": 0
-    },
-    "falhas": 0,
-    "piores": []
-   },
-   "texto_menor_que_12px": {
-    "total": 0,
-    "amostra": []
-   },
-   "id_repetido": [],
-   "imagem_sem_alt": [],
-   "tabindex_positivo": [],
-   "titulos": {
-    "h1": 1,
-    "pulos": 0
-   },
-   "zoom_bloqueado": false,
-   "lang": "pt-BR",
-   "regras_reduzir_movimento": 2,
-   "canvas_visiveis": 1,
-   "tamanho": "notebook",
-   "tema": "claro",
-   "tela": "gavetaAjustes:simples",
-   "axe": []
-  },
-  {
-   "estouro_horizontal_px": 0,
-   "sem_nome_acessivel": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_menor_que_24px": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_entre_24_e_44px": {
-    "total": 196,
-    "amostra": [
-     "button#btnVerAnimacao 42x33",
-     "button#btnPerfil 54x33",
-     "button#btnAmigos 68x33",
-     "button#btnRecordes 79x33",
-     "button#btnConquistas 88x33",
-     "button#btnAcervo 80x33"
-    ]
-   },
-   "contraste": {
-    "medidos": 202,
-    "nao_medido": {
-     "fundo_com_imagem": 164,
-     "fundo_translucido": 0,
-     "cor_estranha": 0
-    },
-    "falhas": 0,
-    "piores": []
-   },
-   "texto_menor_que_12px": {
-    "total": 0,
-    "amostra": []
-   },
-   "id_repetido": [],
-   "imagem_sem_alt": [],
-   "tabindex_positivo": [],
-   "titulos": {
-    "h1": 1,
-    "pulos": 0
-   },
-   "zoom_bloqueado": false,
-   "lang": "pt-BR",
-   "regras_reduzir_movimento": 2,
-   "canvas_visiveis": 1,
-   "tamanho": "notebook",
-   "tema": "claro",
-   "tela": "gavetaAjustes:avancado",
-   "axe": []
-  },
-  {
-   "estouro_horizontal_px": 0,
-   "sem_nome_acessivel": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_menor_que_24px": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_entre_24_e_44px": {
-    "total": 108,
-    "amostra": [
-     "button#btnVerAnimacao 42x33",
-     "button#btnPerfil 54x33",
-     "button#btnAmigos 68x33",
-     "button#btnRecordes 79x33",
-     "button#btnConquistas 88x33",
-     "button#btnAcervo 80x33"
-    ]
-   },
-   "contraste": {
-    "medidos": 88,
-    "nao_medido": {
-     "fundo_com_imagem": 164,
-     "fundo_translucido": 0,
-     "cor_estranha": 0
-    },
-    "falhas": 0,
-    "piores": []
-   },
-   "texto_menor_que_12px": {
-    "total": 0,
-    "amostra": []
-   },
-   "id_repetido": [],
-   "imagem_sem_alt": [],
-   "tabindex_positivo": [],
-   "titulos": {
-    "h1": 1,
-    "pulos": 0
-   },
-   "zoom_bloqueado": false,
-   "lang": "pt-BR",
-   "regras_reduzir_movimento": 2,
-   "canvas_visiveis": 1,
-   "tamanho": "notebook",
-   "tema": "claro",
-   "tela": "gavetaAjustes:maquina",
-   "axe": []
-  },
-  {
-   "estouro_horizontal_px": 0,
-   "sem_nome_acessivel": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_menor_que_24px": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_entre_24_e_44px": {
-    "total": 134,
-    "amostra": [
-     "button#btnVerAnimacao 42x33",
-     "button#btnPerfil 54x33",
-     "button#btnAmigos 68x33",
-     "button#btnRecordes 79x33",
-     "button#btnConquistas 88x33",
-     "button#btnAcervo 80x33"
-    ]
-   },
-   "contraste": {
-    "medidos": 196,
-    "nao_medido": {
-     "fundo_com_imagem": 164,
-     "fundo_translucido": 0,
-     "cor_estranha": 0
-    },
-    "falhas": 0,
-    "piores": []
-   },
-   "texto_menor_que_12px": {
-    "total": 0,
-    "amostra": []
-   },
-   "id_repetido": [],
-   "imagem_sem_alt": [],
-   "tabindex_positivo": [],
-   "titulos": {
-    "h1": 1,
-    "pulos": 0
-   },
-   "zoom_bloqueado": false,
-   "lang": "pt-BR",
-   "regras_reduzir_movimento": 2,
-   "canvas_visiveis": 1,
-   "tamanho": "notebook",
-   "tema": "claro",
-   "tela": "gavetaAjustes:controles",
-   "axe": []
-  },
-  {
-   "estouro_horizontal_px": 0,
-   "sem_nome_acessivel": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_menor_que_24px": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_entre_24_e_44px": {
-    "total": 172,
-    "amostra": [
-     "button#btnVerAnimacao 42x33",
-     "button#btnPerfil 54x33",
-     "button#btnAmigos 68x33",
-     "button#btnRecordes 79x33",
-     "button#btnConquistas 88x33",
-     "button#btnAcervo 80x33"
-    ]
-   },
-   "contraste": {
-    "medidos": 328,
-    "nao_medido": {
-     "fundo_com_imagem": 164,
-     "fundo_translucido": 0,
-     "cor_estranha": 0
-    },
-    "falhas": 0,
-    "piores": []
-   },
-   "texto_menor_que_12px": {
-    "total": 0,
-    "amostra": []
-   },
-   "id_repetido": [],
-   "imagem_sem_alt": [],
-   "tabindex_positivo": [],
-   "titulos": {
-    "h1": 1,
-    "pulos": 0
-   },
-   "zoom_bloqueado": false,
-   "lang": "pt-BR",
-   "regras_reduzir_movimento": 2,
-   "canvas_visiveis": 1,
-   "tamanho": "notebook",
-   "tema": "claro",
-   "tela": "gavetaAjustes:emuladores",
-   "axe": []
-  },
-  {
-   "estouro_horizontal_px": 0,
-   "sem_nome_acessivel": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_menor_que_24px": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_entre_24_e_44px": {
-    "total": 94,
-    "amostra": [
-     "button#btnVerAnimacao 42x33",
-     "button#btnPerfil 54x33",
-     "button#btnAmigos 68x33",
-     "button#btnRecordes 79x33",
-     "button#btnConquistas 88x33",
-     "button#btnAcervo 80x33"
-    ]
-   },
-   "contraste": {
-    "medidos": 27,
-    "nao_medido": {
-     "fundo_com_imagem": 164,
-     "fundo_translucido": 0,
-     "cor_estranha": 0
-    },
-    "falhas": 0,
-    "piores": []
-   },
-   "texto_menor_que_12px": {
-    "total": 0,
-    "amostra": []
-   },
-   "id_repetido": [],
-   "imagem_sem_alt": [],
-   "tabindex_positivo": [],
-   "titulos": {
-    "h1": 1,
-    "pulos": 0
-   },
-   "zoom_bloqueado": false,
-   "lang": "pt-BR",
-   "regras_reduzir_movimento": 2,
-   "canvas_visiveis": 1,
-   "tamanho": "notebook",
-   "tema": "claro",
-   "tela": "gavetaConquistas",
-   "axe": []
-  },
-  {
-   "estouro_horizontal_px": 0,
-   "sem_nome_acessivel": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_menor_que_24px": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_entre_24_e_44px": {
-    "total": 96,
-    "amostra": [
-     "button#btnVerAnimacao 42x33",
-     "button#btnPerfil 54x33",
-     "button#btnAmigos 68x33",
-     "button#btnRecordes 79x33",
-     "button#btnConquistas 88x33",
-     "button#btnAcervo 80x33"
-    ]
-   },
-   "contraste": {
-    "medidos": 28,
-    "nao_medido": {
-     "fundo_com_imagem": 164,
-     "fundo_translucido": 0,
-     "cor_estranha": 0
-    },
-    "falhas": 0,
-    "piores": []
-   },
-   "texto_menor_que_12px": {
-    "total": 0,
-    "amostra": []
-   },
-   "id_repetido": [],
-   "imagem_sem_alt": [],
-   "tabindex_positivo": [],
-   "titulos": {
-    "h1": 1,
-    "pulos": 0
-   },
-   "zoom_bloqueado": false,
-   "lang": "pt-BR",
-   "regras_reduzir_movimento": 2,
-   "canvas_visiveis": 1,
-   "tamanho": "notebook",
-   "tema": "claro",
-   "tela": "gavetaRecordes:pontos",
-   "axe": []
-  },
-  {
-   "estouro_horizontal_px": 0,
-   "sem_nome_acessivel": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_menor_que_24px": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_entre_24_e_44px": {
-    "total": 96,
-    "amostra": [
-     "button#btnVerAnimacao 42x33",
-     "button#btnPerfil 54x33",
-     "button#btnAmigos 68x33",
-     "button#btnRecordes 79x33",
-     "button#btnConquistas 88x33",
-     "button#btnAcervo 80x33"
-    ]
-   },
-   "contraste": {
-    "medidos": 28,
-    "nao_medido": {
-     "fundo_com_imagem": 164,
-     "fundo_translucido": 0,
-     "cor_estranha": 0
-    },
-    "falhas": 0,
-    "piores": []
-   },
-   "texto_menor_que_12px": {
-    "total": 0,
-    "amostra": []
-   },
-   "id_repetido": [],
-   "imagem_sem_alt": [],
-   "tabindex_positivo": [],
-   "titulos": {
-    "h1": 1,
-    "pulos": 0
-   },
-   "zoom_bloqueado": false,
-   "lang": "pt-BR",
-   "regras_reduzir_movimento": 2,
-   "canvas_visiveis": 1,
-   "tamanho": "notebook",
-   "tema": "claro",
-   "tela": "gavetaRecordes:tempo",
-   "axe": []
-  },
-  {
-   "estouro_horizontal_px": 0,
-   "sem_nome_acessivel": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_menor_que_24px": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_entre_24_e_44px": {
-    "total": 97,
-    "amostra": [
-     "button#btnVerAnimacao 42x33",
-     "button#btnPerfil 54x33",
-     "button#btnAmigos 68x33",
-     "button#btnRecordes 79x33",
-     "button#btnConquistas 88x33",
-     "button#btnAcervo 80x33"
-    ]
-   },
-   "contraste": {
-    "medidos": 33,
-    "nao_medido": {
-     "fundo_com_imagem": 164,
-     "fundo_translucido": 0,
-     "cor_estranha": 0
-    },
-    "falhas": 0,
-    "piores": []
-   },
-   "texto_menor_que_12px": {
-    "total": 0,
-    "amostra": []
-   },
-   "id_repetido": [],
-   "imagem_sem_alt": [],
-   "tabindex_positivo": [],
-   "titulos": {
-    "h1": 1,
-    "pulos": 0
-   },
-   "zoom_bloqueado": false,
-   "lang": "pt-BR",
-   "regras_reduzir_movimento": 2,
-   "canvas_visiveis": 1,
-   "tamanho": "notebook",
-   "tema": "claro",
-   "tela": "gavetaJogo:estados",
-   "axe": []
-  },
-  {
-   "estouro_horizontal_px": 0,
-   "sem_nome_acessivel": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_menor_que_24px": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_entre_24_e_44px": {
-    "total": 98,
-    "amostra": [
-     "button#btnVerAnimacao 42x33",
-     "button#btnPerfil 54x33",
-     "button#btnAmigos 68x33",
-     "button#btnRecordes 79x33",
-     "button#btnConquistas 88x33",
-     "button#btnAcervo 80x33"
-    ]
-   },
-   "contraste": {
-    "medidos": 33,
-    "nao_medido": {
-     "fundo_com_imagem": 164,
-     "fundo_translucido": 0,
-     "cor_estranha": 0
-    },
-    "falhas": 0,
-    "piores": []
-   },
-   "texto_menor_que_12px": {
-    "total": 0,
-    "amostra": []
-   },
-   "id_repetido": [],
-   "imagem_sem_alt": [],
-   "tabindex_positivo": [],
-   "titulos": {
-    "h1": 1,
-    "pulos": 0
-   },
-   "zoom_bloqueado": false,
-   "lang": "pt-BR",
-   "regras_reduzir_movimento": 2,
-   "canvas_visiveis": 1,
-   "tamanho": "notebook",
-   "tema": "claro",
-   "tela": "gavetaJogo:cheats",
-   "axe": []
-  },
-  {
-   "estouro_horizontal_px": 0,
-   "sem_nome_acessivel": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_menor_que_24px": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_entre_24_e_44px": {
-    "total": 136,
-    "amostra": [
-     "button#btnVerAnimacao 42x33",
-     "button#btnPerfil 54x33",
-     "button#btnAmigos 68x33",
-     "button#btnRecordes 79x33",
-     "button#btnConquistas 88x33",
-     "button#btnAcervo 80x33"
-    ]
-   },
-   "contraste": {
-    "medidos": 208,
-    "nao_medido": {
-     "fundo_com_imagem": 165,
-     "fundo_translucido": 0,
-     "cor_estranha": 0
-    },
-    "falhas": 0,
-    "piores": []
-   },
-   "texto_menor_que_12px": {
-    "total": 0,
-    "amostra": []
-   },
-   "id_repetido": [],
-   "imagem_sem_alt": [],
-   "tabindex_positivo": [],
-   "titulos": {
-    "h1": 1,
-    "pulos": 0
-   },
-   "zoom_bloqueado": false,
-   "lang": "pt-BR",
-   "regras_reduzir_movimento": 2,
-   "canvas_visiveis": 1,
-   "tamanho": "notebook",
-   "tema": "claro",
-   "tela": "controle_remoto_ligado",
-   "axe": []
-  },
-  {
-   "estouro_horizontal_px": 0,
-   "sem_nome_acessivel": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_menor_que_24px": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_entre_24_e_44px": {
     "total": 95,
     "amostra": [
      "button#btnVerAnimacao 42x33",
@@ -3696,7 +3186,7 @@
     ]
    },
    "contraste": {
-    "medidos": 28,
+    "medidos": 29,
     "nao_medido": {
      "fundo_com_imagem": 164,
      "fundo_translucido": 0,
@@ -3722,58 +3212,7 @@
    "canvas_visiveis": 1,
    "tamanho": "notebook",
    "tema": "claro",
-   "tela": "modalJuntoLocal",
-   "axe": []
-  },
-  {
-   "estouro_horizontal_px": 0,
-   "sem_nome_acessivel": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_menor_que_24px": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_entre_24_e_44px": {
-    "total": 101,
-    "amostra": [
-     "button#btnVerAnimacao 42x33",
-     "button#btnPerfil 54x33",
-     "button#btnAmigos 68x33",
-     "button#btnRecordes 79x33",
-     "button#btnConquistas 88x33",
-     "button#btnAcervo 80x33"
-    ]
-   },
-   "contraste": {
-    "medidos": 35,
-    "nao_medido": {
-     "fundo_com_imagem": 164,
-     "fundo_translucido": 0,
-     "cor_estranha": 0
-    },
-    "falhas": 0,
-    "piores": []
-   },
-   "texto_menor_que_12px": {
-    "total": 0,
-    "amostra": []
-   },
-   "id_repetido": [],
-   "imagem_sem_alt": [],
-   "tabindex_positivo": [],
-   "titulos": {
-    "h1": 1,
-    "pulos": 0
-   },
-   "zoom_bloqueado": false,
-   "lang": "pt-BR",
-   "regras_reduzir_movimento": 2,
-   "canvas_visiveis": 1,
-   "tamanho": "notebook",
-   "tema": "claro",
-   "tela": "modalToque",
+   "tela": "gavetaEquipamentos",
    "axe": []
   },
   {
@@ -3824,7 +3263,262 @@
    "canvas_visiveis": 1,
    "tamanho": "notebook",
    "tema": "claro",
-   "tela": "modalPartida",
+   "tela": "gavetaAcervo",
+   "axe": []
+  },
+  {
+   "estouro_horizontal_px": 0,
+   "sem_nome_acessivel": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_menor_que_24px": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_entre_24_e_44px": {
+    "total": 104,
+    "amostra": [
+     "button#btnVerAnimacao 42x33",
+     "button#btnPerfil 54x33",
+     "button#btnAmigos 68x33",
+     "button#btnRecordes 79x33",
+     "button#btnConquistas 88x33",
+     "button#btnAcervo 80x33"
+    ]
+   },
+   "contraste": {
+    "medidos": 61,
+    "nao_medido": {
+     "fundo_com_imagem": 164,
+     "fundo_translucido": 0,
+     "cor_estranha": 0
+    },
+    "falhas": 0,
+    "piores": []
+   },
+   "texto_menor_que_12px": {
+    "total": 0,
+    "amostra": []
+   },
+   "id_repetido": [],
+   "imagem_sem_alt": [],
+   "tabindex_positivo": [],
+   "titulos": {
+    "h1": 1,
+    "pulos": 0
+   },
+   "zoom_bloqueado": false,
+   "lang": "pt-BR",
+   "regras_reduzir_movimento": 2,
+   "canvas_visiveis": 1,
+   "tamanho": "notebook",
+   "tema": "claro",
+   "tela": "gavetaAjustes:simples",
+   "axe": []
+  },
+  {
+   "estouro_horizontal_px": 0,
+   "sem_nome_acessivel": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_menor_que_24px": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_entre_24_e_44px": {
+    "total": 197,
+    "amostra": [
+     "button#btnVerAnimacao 42x33",
+     "button#btnPerfil 54x33",
+     "button#btnAmigos 68x33",
+     "button#btnRecordes 79x33",
+     "button#btnConquistas 88x33",
+     "button#btnAcervo 80x33"
+    ]
+   },
+   "contraste": {
+    "medidos": 203,
+    "nao_medido": {
+     "fundo_com_imagem": 164,
+     "fundo_translucido": 0,
+     "cor_estranha": 0
+    },
+    "falhas": 0,
+    "piores": []
+   },
+   "texto_menor_que_12px": {
+    "total": 0,
+    "amostra": []
+   },
+   "id_repetido": [],
+   "imagem_sem_alt": [],
+   "tabindex_positivo": [],
+   "titulos": {
+    "h1": 1,
+    "pulos": 0
+   },
+   "zoom_bloqueado": false,
+   "lang": "pt-BR",
+   "regras_reduzir_movimento": 2,
+   "canvas_visiveis": 1,
+   "tamanho": "notebook",
+   "tema": "claro",
+   "tela": "gavetaAjustes:avancado",
+   "axe": []
+  },
+  {
+   "estouro_horizontal_px": 0,
+   "sem_nome_acessivel": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_menor_que_24px": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_entre_24_e_44px": {
+    "total": 110,
+    "amostra": [
+     "button#btnVerAnimacao 42x33",
+     "button#btnPerfil 54x33",
+     "button#btnAmigos 68x33",
+     "button#btnRecordes 79x33",
+     "button#btnConquistas 88x33",
+     "button#btnAcervo 80x33"
+    ]
+   },
+   "contraste": {
+    "medidos": 115,
+    "nao_medido": {
+     "fundo_com_imagem": 164,
+     "fundo_translucido": 0,
+     "cor_estranha": 0
+    },
+    "falhas": 0,
+    "piores": []
+   },
+   "texto_menor_que_12px": {
+    "total": 0,
+    "amostra": []
+   },
+   "id_repetido": [],
+   "imagem_sem_alt": [],
+   "tabindex_positivo": [],
+   "titulos": {
+    "h1": 1,
+    "pulos": 0
+   },
+   "zoom_bloqueado": false,
+   "lang": "pt-BR",
+   "regras_reduzir_movimento": 2,
+   "canvas_visiveis": 1,
+   "tamanho": "notebook",
+   "tema": "claro",
+   "tela": "gavetaAjustes:maquina",
+   "axe": []
+  },
+  {
+   "estouro_horizontal_px": 0,
+   "sem_nome_acessivel": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_menor_que_24px": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_entre_24_e_44px": {
+    "total": 135,
+    "amostra": [
+     "button#btnVerAnimacao 42x33",
+     "button#btnPerfil 54x33",
+     "button#btnAmigos 68x33",
+     "button#btnRecordes 79x33",
+     "button#btnConquistas 88x33",
+     "button#btnAcervo 80x33"
+    ]
+   },
+   "contraste": {
+    "medidos": 197,
+    "nao_medido": {
+     "fundo_com_imagem": 164,
+     "fundo_translucido": 0,
+     "cor_estranha": 0
+    },
+    "falhas": 0,
+    "piores": []
+   },
+   "texto_menor_que_12px": {
+    "total": 0,
+    "amostra": []
+   },
+   "id_repetido": [],
+   "imagem_sem_alt": [],
+   "tabindex_positivo": [],
+   "titulos": {
+    "h1": 1,
+    "pulos": 0
+   },
+   "zoom_bloqueado": false,
+   "lang": "pt-BR",
+   "regras_reduzir_movimento": 2,
+   "canvas_visiveis": 1,
+   "tamanho": "notebook",
+   "tema": "claro",
+   "tela": "gavetaAjustes:controles",
+   "axe": []
+  },
+  {
+   "estouro_horizontal_px": 0,
+   "sem_nome_acessivel": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_menor_que_24px": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_entre_24_e_44px": {
+    "total": 176,
+    "amostra": [
+     "button#btnVerAnimacao 42x33",
+     "button#btnPerfil 54x33",
+     "button#btnAmigos 68x33",
+     "button#btnRecordes 79x33",
+     "button#btnConquistas 88x33",
+     "button#btnAcervo 80x33"
+    ]
+   },
+   "contraste": {
+    "medidos": 344,
+    "nao_medido": {
+     "fundo_com_imagem": 164,
+     "fundo_translucido": 0,
+     "cor_estranha": 0
+    },
+    "falhas": 0,
+    "piores": []
+   },
+   "texto_menor_que_12px": {
+    "total": 0,
+    "amostra": []
+   },
+   "id_repetido": [],
+   "imagem_sem_alt": [],
+   "tabindex_positivo": [],
+   "titulos": {
+    "h1": 1,
+    "pulos": 0
+   },
+   "zoom_bloqueado": false,
+   "lang": "pt-BR",
+   "regras_reduzir_movimento": 2,
+   "canvas_visiveis": 1,
+   "tamanho": "notebook",
+   "tema": "claro",
+   "tela": "gavetaAjustes:emuladores",
    "axe": []
   },
   {
@@ -3849,7 +3543,466 @@
     ]
    },
    "contraste": {
-    "medidos": 31,
+    "medidos": 28,
+    "nao_medido": {
+     "fundo_com_imagem": 164,
+     "fundo_translucido": 0,
+     "cor_estranha": 0
+    },
+    "falhas": 0,
+    "piores": []
+   },
+   "texto_menor_que_12px": {
+    "total": 0,
+    "amostra": []
+   },
+   "id_repetido": [],
+   "imagem_sem_alt": [],
+   "tabindex_positivo": [],
+   "titulos": {
+    "h1": 1,
+    "pulos": 0
+   },
+   "zoom_bloqueado": false,
+   "lang": "pt-BR",
+   "regras_reduzir_movimento": 2,
+   "canvas_visiveis": 1,
+   "tamanho": "notebook",
+   "tema": "claro",
+   "tela": "gavetaConquistas",
+   "axe": []
+  },
+  {
+   "estouro_horizontal_px": 0,
+   "sem_nome_acessivel": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_menor_que_24px": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_entre_24_e_44px": {
+    "total": 97,
+    "amostra": [
+     "button#btnVerAnimacao 42x33",
+     "button#btnPerfil 54x33",
+     "button#btnAmigos 68x33",
+     "button#btnRecordes 79x33",
+     "button#btnConquistas 88x33",
+     "button#btnAcervo 80x33"
+    ]
+   },
+   "contraste": {
+    "medidos": 29,
+    "nao_medido": {
+     "fundo_com_imagem": 164,
+     "fundo_translucido": 0,
+     "cor_estranha": 0
+    },
+    "falhas": 0,
+    "piores": []
+   },
+   "texto_menor_que_12px": {
+    "total": 0,
+    "amostra": []
+   },
+   "id_repetido": [],
+   "imagem_sem_alt": [],
+   "tabindex_positivo": [],
+   "titulos": {
+    "h1": 1,
+    "pulos": 0
+   },
+   "zoom_bloqueado": false,
+   "lang": "pt-BR",
+   "regras_reduzir_movimento": 2,
+   "canvas_visiveis": 1,
+   "tamanho": "notebook",
+   "tema": "claro",
+   "tela": "gavetaRecordes:pontos",
+   "axe": []
+  },
+  {
+   "estouro_horizontal_px": 0,
+   "sem_nome_acessivel": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_menor_que_24px": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_entre_24_e_44px": {
+    "total": 97,
+    "amostra": [
+     "button#btnVerAnimacao 42x33",
+     "button#btnPerfil 54x33",
+     "button#btnAmigos 68x33",
+     "button#btnRecordes 79x33",
+     "button#btnConquistas 88x33",
+     "button#btnAcervo 80x33"
+    ]
+   },
+   "contraste": {
+    "medidos": 29,
+    "nao_medido": {
+     "fundo_com_imagem": 164,
+     "fundo_translucido": 0,
+     "cor_estranha": 0
+    },
+    "falhas": 0,
+    "piores": []
+   },
+   "texto_menor_que_12px": {
+    "total": 0,
+    "amostra": []
+   },
+   "id_repetido": [],
+   "imagem_sem_alt": [],
+   "tabindex_positivo": [],
+   "titulos": {
+    "h1": 1,
+    "pulos": 0
+   },
+   "zoom_bloqueado": false,
+   "lang": "pt-BR",
+   "regras_reduzir_movimento": 2,
+   "canvas_visiveis": 1,
+   "tamanho": "notebook",
+   "tema": "claro",
+   "tela": "gavetaRecordes:tempo",
+   "axe": []
+  },
+  {
+   "estouro_horizontal_px": 0,
+   "sem_nome_acessivel": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_menor_que_24px": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_entre_24_e_44px": {
+    "total": 98,
+    "amostra": [
+     "button#btnVerAnimacao 42x33",
+     "button#btnPerfil 54x33",
+     "button#btnAmigos 68x33",
+     "button#btnRecordes 79x33",
+     "button#btnConquistas 88x33",
+     "button#btnAcervo 80x33"
+    ]
+   },
+   "contraste": {
+    "medidos": 34,
+    "nao_medido": {
+     "fundo_com_imagem": 164,
+     "fundo_translucido": 0,
+     "cor_estranha": 0
+    },
+    "falhas": 0,
+    "piores": []
+   },
+   "texto_menor_que_12px": {
+    "total": 0,
+    "amostra": []
+   },
+   "id_repetido": [],
+   "imagem_sem_alt": [],
+   "tabindex_positivo": [],
+   "titulos": {
+    "h1": 1,
+    "pulos": 0
+   },
+   "zoom_bloqueado": false,
+   "lang": "pt-BR",
+   "regras_reduzir_movimento": 2,
+   "canvas_visiveis": 1,
+   "tamanho": "notebook",
+   "tema": "claro",
+   "tela": "gavetaJogo:estados",
+   "axe": []
+  },
+  {
+   "estouro_horizontal_px": 0,
+   "sem_nome_acessivel": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_menor_que_24px": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_entre_24_e_44px": {
+    "total": 99,
+    "amostra": [
+     "button#btnVerAnimacao 42x33",
+     "button#btnPerfil 54x33",
+     "button#btnAmigos 68x33",
+     "button#btnRecordes 79x33",
+     "button#btnConquistas 88x33",
+     "button#btnAcervo 80x33"
+    ]
+   },
+   "contraste": {
+    "medidos": 34,
+    "nao_medido": {
+     "fundo_com_imagem": 164,
+     "fundo_translucido": 0,
+     "cor_estranha": 0
+    },
+    "falhas": 0,
+    "piores": []
+   },
+   "texto_menor_que_12px": {
+    "total": 0,
+    "amostra": []
+   },
+   "id_repetido": [],
+   "imagem_sem_alt": [],
+   "tabindex_positivo": [],
+   "titulos": {
+    "h1": 1,
+    "pulos": 0
+   },
+   "zoom_bloqueado": false,
+   "lang": "pt-BR",
+   "regras_reduzir_movimento": 2,
+   "canvas_visiveis": 1,
+   "tamanho": "notebook",
+   "tema": "claro",
+   "tela": "gavetaJogo:cheats",
+   "axe": []
+  },
+  {
+   "estouro_horizontal_px": 0,
+   "sem_nome_acessivel": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_menor_que_24px": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_entre_24_e_44px": {
+    "total": 135,
+    "amostra": [
+     "button#btnVerAnimacao 42x33",
+     "button#btnPerfil 54x33",
+     "button#btnAmigos 68x33",
+     "button#btnRecordes 79x33",
+     "button#btnConquistas 88x33",
+     "button#btnAcervo 80x33"
+    ]
+   },
+   "contraste": {
+    "medidos": 197,
+    "nao_medido": {
+     "fundo_com_imagem": 164,
+     "fundo_translucido": 0,
+     "cor_estranha": 0
+    },
+    "falhas": 0,
+    "piores": []
+   },
+   "texto_menor_que_12px": {
+    "total": 0,
+    "amostra": []
+   },
+   "id_repetido": [],
+   "imagem_sem_alt": [],
+   "tabindex_positivo": [],
+   "titulos": {
+    "h1": 1,
+    "pulos": 0
+   },
+   "zoom_bloqueado": false,
+   "lang": "pt-BR",
+   "regras_reduzir_movimento": 2,
+   "canvas_visiveis": 1,
+   "tamanho": "notebook",
+   "tema": "claro",
+   "tela": "controle_remoto_ligado",
+   "axe": []
+  },
+  {
+   "estouro_horizontal_px": 0,
+   "sem_nome_acessivel": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_menor_que_24px": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_entre_24_e_44px": {
+    "total": 96,
+    "amostra": [
+     "button#btnVerAnimacao 42x33",
+     "button#btnPerfil 54x33",
+     "button#btnAmigos 68x33",
+     "button#btnRecordes 79x33",
+     "button#btnConquistas 88x33",
+     "button#btnAcervo 80x33"
+    ]
+   },
+   "contraste": {
+    "medidos": 29,
+    "nao_medido": {
+     "fundo_com_imagem": 164,
+     "fundo_translucido": 0,
+     "cor_estranha": 0
+    },
+    "falhas": 0,
+    "piores": []
+   },
+   "texto_menor_que_12px": {
+    "total": 0,
+    "amostra": []
+   },
+   "id_repetido": [],
+   "imagem_sem_alt": [],
+   "tabindex_positivo": [],
+   "titulos": {
+    "h1": 1,
+    "pulos": 0
+   },
+   "zoom_bloqueado": false,
+   "lang": "pt-BR",
+   "regras_reduzir_movimento": 2,
+   "canvas_visiveis": 1,
+   "tamanho": "notebook",
+   "tema": "claro",
+   "tela": "modalJuntoLocal",
+   "axe": []
+  },
+  {
+   "estouro_horizontal_px": 0,
+   "sem_nome_acessivel": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_menor_que_24px": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_entre_24_e_44px": {
+    "total": 102,
+    "amostra": [
+     "button#btnVerAnimacao 42x33",
+     "button#btnPerfil 54x33",
+     "button#btnAmigos 68x33",
+     "button#btnRecordes 79x33",
+     "button#btnConquistas 88x33",
+     "button#btnAcervo 80x33"
+    ]
+   },
+   "contraste": {
+    "medidos": 36,
+    "nao_medido": {
+     "fundo_com_imagem": 164,
+     "fundo_translucido": 0,
+     "cor_estranha": 0
+    },
+    "falhas": 0,
+    "piores": []
+   },
+   "texto_menor_que_12px": {
+    "total": 0,
+    "amostra": []
+   },
+   "id_repetido": [],
+   "imagem_sem_alt": [],
+   "tabindex_positivo": [],
+   "titulos": {
+    "h1": 1,
+    "pulos": 0
+   },
+   "zoom_bloqueado": false,
+   "lang": "pt-BR",
+   "regras_reduzir_movimento": 2,
+   "canvas_visiveis": 1,
+   "tamanho": "notebook",
+   "tema": "claro",
+   "tela": "modalToque",
+   "axe": []
+  },
+  {
+   "estouro_horizontal_px": 0,
+   "sem_nome_acessivel": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_menor_que_24px": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_entre_24_e_44px": {
+    "total": 98,
+    "amostra": [
+     "button#btnVerAnimacao 42x33",
+     "button#btnPerfil 54x33",
+     "button#btnAmigos 68x33",
+     "button#btnRecordes 79x33",
+     "button#btnConquistas 88x33",
+     "button#btnAcervo 80x33"
+    ]
+   },
+   "contraste": {
+    "medidos": 37,
+    "nao_medido": {
+     "fundo_com_imagem": 164,
+     "fundo_translucido": 0,
+     "cor_estranha": 0
+    },
+    "falhas": 0,
+    "piores": []
+   },
+   "texto_menor_que_12px": {
+    "total": 0,
+    "amostra": []
+   },
+   "id_repetido": [],
+   "imagem_sem_alt": [],
+   "tabindex_positivo": [],
+   "titulos": {
+    "h1": 1,
+    "pulos": 0
+   },
+   "zoom_bloqueado": false,
+   "lang": "pt-BR",
+   "regras_reduzir_movimento": 2,
+   "canvas_visiveis": 1,
+   "tamanho": "notebook",
+   "tema": "claro",
+   "tela": "modalPartida",
+   "axe": []
+  },
+  {
+   "estouro_horizontal_px": 0,
+   "sem_nome_acessivel": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_menor_que_24px": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_entre_24_e_44px": {
+    "total": 96,
+    "amostra": [
+     "button#btnVerAnimacao 42x33",
+     "button#btnPerfil 54x33",
+     "button#btnAmigos 68x33",
+     "button#btnRecordes 79x33",
+     "button#btnConquistas 88x33",
+     "button#btnAcervo 80x33"
+    ]
+   },
+   "contraste": {
+    "medidos": 32,
     "nao_medido": {
      "fundo_com_imagem": 164,
      "fundo_translucido": 0,
@@ -3889,7 +4042,7 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
-    "total": 95,
+    "total": 96,
     "amostra": [
      "button#btnVerAnimacao 42x33",
      "button#btnPerfil 54x33",
@@ -3900,7 +4053,7 @@
     ]
    },
    "contraste": {
-    "medidos": 27,
+    "medidos": 28,
     "nao_medido": {
      "fundo_com_imagem": 164,
      "fundo_translucido": 0,
@@ -3940,7 +4093,7 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
-    "total": 96,
+    "total": 97,
     "amostra": [
      "button#btnVerAnimacao 42x33",
      "button#btnPerfil 54x33",
@@ -3951,7 +4104,7 @@
     ]
    },
    "contraste": {
-    "medidos": 29,
+    "medidos": 30,
     "nao_medido": {
      "fundo_com_imagem": 164,
      "fundo_translucido": 0,
@@ -3991,7 +4144,7 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
-    "total": 104,
+    "total": 105,
     "amostra": [
      "button#btnVerAnimacao 42x33",
      "button#btnPerfil 54x33",
@@ -4002,7 +4155,7 @@
     ]
    },
    "contraste": {
-    "medidos": 38,
+    "medidos": 39,
     "nao_medido": {
      "fundo_com_imagem": 164,
      "fundo_translucido": 0,
@@ -4042,7 +4195,7 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
-    "total": 96,
+    "total": 97,
     "amostra": [
      "button#btnVerAnimacao 42x33",
      "button#btnPerfil 54x33",
@@ -4053,7 +4206,7 @@
     ]
    },
    "contraste": {
-    "medidos": 29,
+    "medidos": 30,
     "nao_medido": {
      "fundo_com_imagem": 164,
      "fundo_translucido": 0,
@@ -4093,7 +4246,7 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
-    "total": 95,
+    "total": 96,
     "amostra": [
      "button#btnVerAnimacao 42x33",
      "button#btnPerfil 54x33",
@@ -4104,7 +4257,7 @@
     ]
    },
    "contraste": {
-    "medidos": 28,
+    "medidos": 29,
     "nao_medido": {
      "fundo_com_imagem": 164,
      "fundo_translucido": 0,
@@ -4144,7 +4297,7 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
-    "total": 93,
+    "total": 94,
     "amostra": [
      "button#btnVerAnimacao 42x33",
      "button#btnPerfil 54x33",
@@ -4155,7 +4308,7 @@
     ]
    },
    "contraste": {
-    "medidos": 171,
+    "medidos": 172,
     "nao_medido": {
      "fundo_com_imagem": 17,
      "fundo_translucido": 0,
@@ -4195,7 +4348,7 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
-    "total": 93,
+    "total": 94,
     "amostra": [
      "button#btnVerAnimacao 42x33",
      "button#btnPerfil 54x33",
@@ -4206,7 +4359,7 @@
     ]
    },
    "contraste": {
-    "medidos": 171,
+    "medidos": 172,
     "nao_medido": {
      "fundo_com_imagem": 17,
      "fundo_translucido": 0,
@@ -4246,7 +4399,7 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
-    "total": 100,
+    "total": 101,
     "amostra": [
      "button#btnVerAnimacao 42x33",
      "button#btnPerfil 54x33",
@@ -4257,7 +4410,7 @@
     ]
    },
    "contraste": {
-    "medidos": 194,
+    "medidos": 195,
     "nao_medido": {
      "fundo_com_imagem": 17,
      "fundo_translucido": 0,
@@ -4297,7 +4450,7 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
-    "total": 101,
+    "total": 105,
     "amostra": [
      "button#btnVerAnimacao 42x33",
      "button#btnPerfil 54x33",
@@ -4308,7 +4461,7 @@
     ]
    },
    "contraste": {
-    "medidos": 214,
+    "medidos": 228,
     "nao_medido": {
      "fundo_com_imagem": 17,
      "fundo_translucido": 0,
@@ -4348,7 +4501,7 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
-    "total": 95,
+    "total": 98,
     "amostra": [
      "button#btnVerAnimacao 42x33",
      "button#btnPerfil 54x33",
@@ -4359,7 +4512,7 @@
     ]
    },
    "contraste": {
-    "medidos": 177,
+    "medidos": 182,
     "nao_medido": {
      "fundo_com_imagem": 17,
      "fundo_translucido": 0,
@@ -4399,7 +4552,7 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
-    "total": 95,
+    "total": 96,
     "amostra": [
      "button#btnVerAnimacao 42x33",
      "button#btnPerfil 54x33",
@@ -4410,7 +4563,7 @@
     ]
    },
    "contraste": {
-    "medidos": 183,
+    "medidos": 184,
     "nao_medido": {
      "fundo_com_imagem": 17,
      "fundo_translucido": 0,
@@ -4450,618 +4603,6 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
-    "total": 96,
-    "amostra": [
-     "button#btnVerAnimacao 42x33",
-     "button#btnPerfil 54x33",
-     "button#btnAmigos 68x33",
-     "button#btnRecordes 79x33",
-     "button#btnConquistas 88x33",
-     "button#btnAcervo 80x33"
-    ]
-   },
-   "contraste": {
-    "medidos": 182,
-    "nao_medido": {
-     "fundo_com_imagem": 17,
-     "fundo_translucido": 0,
-     "cor_estranha": 0
-    },
-    "falhas": 0,
-    "piores": []
-   },
-   "texto_menor_que_12px": {
-    "total": 0,
-    "amostra": []
-   },
-   "id_repetido": [],
-   "imagem_sem_alt": [],
-   "tabindex_positivo": [],
-   "titulos": {
-    "h1": 1,
-    "pulos": 0
-   },
-   "zoom_bloqueado": false,
-   "lang": "pt-BR",
-   "regras_reduzir_movimento": 2,
-   "canvas_visiveis": 1,
-   "tamanho": "notebook",
-   "tema": "escuro",
-   "tela": "gavetaAcervo",
-   "axe": []
-  },
-  {
-   "estouro_horizontal_px": 0,
-   "sem_nome_acessivel": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_menor_que_24px": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_entre_24_e_44px": {
-    "total": 103,
-    "amostra": [
-     "button#btnVerAnimacao 42x33",
-     "button#btnPerfil 54x33",
-     "button#btnAmigos 68x33",
-     "button#btnRecordes 79x33",
-     "button#btnConquistas 88x33",
-     "button#btnAcervo 80x33"
-    ]
-   },
-   "contraste": {
-    "medidos": 205,
-    "nao_medido": {
-     "fundo_com_imagem": 17,
-     "fundo_translucido": 0,
-     "cor_estranha": 0
-    },
-    "falhas": 0,
-    "piores": []
-   },
-   "texto_menor_que_12px": {
-    "total": 0,
-    "amostra": []
-   },
-   "id_repetido": [],
-   "imagem_sem_alt": [],
-   "tabindex_positivo": [],
-   "titulos": {
-    "h1": 1,
-    "pulos": 0
-   },
-   "zoom_bloqueado": false,
-   "lang": "pt-BR",
-   "regras_reduzir_movimento": 2,
-   "canvas_visiveis": 1,
-   "tamanho": "notebook",
-   "tema": "escuro",
-   "tela": "gavetaAjustes:simples",
-   "axe": []
-  },
-  {
-   "estouro_horizontal_px": 0,
-   "sem_nome_acessivel": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_menor_que_24px": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_entre_24_e_44px": {
-    "total": 196,
-    "amostra": [
-     "button#btnVerAnimacao 42x33",
-     "button#btnPerfil 54x33",
-     "button#btnAmigos 68x33",
-     "button#btnRecordes 79x33",
-     "button#btnConquistas 88x33",
-     "button#btnAcervo 80x33"
-    ]
-   },
-   "contraste": {
-    "medidos": 349,
-    "nao_medido": {
-     "fundo_com_imagem": 17,
-     "fundo_translucido": 0,
-     "cor_estranha": 0
-    },
-    "falhas": 0,
-    "piores": []
-   },
-   "texto_menor_que_12px": {
-    "total": 0,
-    "amostra": []
-   },
-   "id_repetido": [],
-   "imagem_sem_alt": [],
-   "tabindex_positivo": [],
-   "titulos": {
-    "h1": 1,
-    "pulos": 0
-   },
-   "zoom_bloqueado": false,
-   "lang": "pt-BR",
-   "regras_reduzir_movimento": 2,
-   "canvas_visiveis": 1,
-   "tamanho": "notebook",
-   "tema": "escuro",
-   "tela": "gavetaAjustes:avancado",
-   "axe": []
-  },
-  {
-   "estouro_horizontal_px": 0,
-   "sem_nome_acessivel": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_menor_que_24px": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_entre_24_e_44px": {
-    "total": 108,
-    "amostra": [
-     "button#btnVerAnimacao 42x33",
-     "button#btnPerfil 54x33",
-     "button#btnAmigos 68x33",
-     "button#btnRecordes 79x33",
-     "button#btnConquistas 88x33",
-     "button#btnAcervo 80x33"
-    ]
-   },
-   "contraste": {
-    "medidos": 235,
-    "nao_medido": {
-     "fundo_com_imagem": 17,
-     "fundo_translucido": 0,
-     "cor_estranha": 0
-    },
-    "falhas": 0,
-    "piores": []
-   },
-   "texto_menor_que_12px": {
-    "total": 0,
-    "amostra": []
-   },
-   "id_repetido": [],
-   "imagem_sem_alt": [],
-   "tabindex_positivo": [],
-   "titulos": {
-    "h1": 1,
-    "pulos": 0
-   },
-   "zoom_bloqueado": false,
-   "lang": "pt-BR",
-   "regras_reduzir_movimento": 2,
-   "canvas_visiveis": 1,
-   "tamanho": "notebook",
-   "tema": "escuro",
-   "tela": "gavetaAjustes:maquina",
-   "axe": []
-  },
-  {
-   "estouro_horizontal_px": 0,
-   "sem_nome_acessivel": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_menor_que_24px": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_entre_24_e_44px": {
-    "total": 134,
-    "amostra": [
-     "button#btnVerAnimacao 42x33",
-     "button#btnPerfil 54x33",
-     "button#btnAmigos 68x33",
-     "button#btnRecordes 79x33",
-     "button#btnConquistas 88x33",
-     "button#btnAcervo 80x33"
-    ]
-   },
-   "contraste": {
-    "medidos": 343,
-    "nao_medido": {
-     "fundo_com_imagem": 17,
-     "fundo_translucido": 0,
-     "cor_estranha": 0
-    },
-    "falhas": 0,
-    "piores": []
-   },
-   "texto_menor_que_12px": {
-    "total": 0,
-    "amostra": []
-   },
-   "id_repetido": [],
-   "imagem_sem_alt": [],
-   "tabindex_positivo": [],
-   "titulos": {
-    "h1": 1,
-    "pulos": 0
-   },
-   "zoom_bloqueado": false,
-   "lang": "pt-BR",
-   "regras_reduzir_movimento": 2,
-   "canvas_visiveis": 1,
-   "tamanho": "notebook",
-   "tema": "escuro",
-   "tela": "gavetaAjustes:controles",
-   "axe": []
-  },
-  {
-   "estouro_horizontal_px": 0,
-   "sem_nome_acessivel": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_menor_que_24px": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_entre_24_e_44px": {
-    "total": 172,
-    "amostra": [
-     "button#btnVerAnimacao 42x33",
-     "button#btnPerfil 54x33",
-     "button#btnAmigos 68x33",
-     "button#btnRecordes 79x33",
-     "button#btnConquistas 88x33",
-     "button#btnAcervo 80x33"
-    ]
-   },
-   "contraste": {
-    "medidos": 475,
-    "nao_medido": {
-     "fundo_com_imagem": 17,
-     "fundo_translucido": 0,
-     "cor_estranha": 0
-    },
-    "falhas": 0,
-    "piores": []
-   },
-   "texto_menor_que_12px": {
-    "total": 0,
-    "amostra": []
-   },
-   "id_repetido": [],
-   "imagem_sem_alt": [],
-   "tabindex_positivo": [],
-   "titulos": {
-    "h1": 1,
-    "pulos": 0
-   },
-   "zoom_bloqueado": false,
-   "lang": "pt-BR",
-   "regras_reduzir_movimento": 2,
-   "canvas_visiveis": 1,
-   "tamanho": "notebook",
-   "tema": "escuro",
-   "tela": "gavetaAjustes:emuladores",
-   "axe": []
-  },
-  {
-   "estouro_horizontal_px": 0,
-   "sem_nome_acessivel": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_menor_que_24px": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_entre_24_e_44px": {
-    "total": 94,
-    "amostra": [
-     "button#btnVerAnimacao 42x33",
-     "button#btnPerfil 54x33",
-     "button#btnAmigos 68x33",
-     "button#btnRecordes 79x33",
-     "button#btnConquistas 88x33",
-     "button#btnAcervo 80x33"
-    ]
-   },
-   "contraste": {
-    "medidos": 174,
-    "nao_medido": {
-     "fundo_com_imagem": 17,
-     "fundo_translucido": 0,
-     "cor_estranha": 0
-    },
-    "falhas": 0,
-    "piores": []
-   },
-   "texto_menor_que_12px": {
-    "total": 0,
-    "amostra": []
-   },
-   "id_repetido": [],
-   "imagem_sem_alt": [],
-   "tabindex_positivo": [],
-   "titulos": {
-    "h1": 1,
-    "pulos": 0
-   },
-   "zoom_bloqueado": false,
-   "lang": "pt-BR",
-   "regras_reduzir_movimento": 2,
-   "canvas_visiveis": 1,
-   "tamanho": "notebook",
-   "tema": "escuro",
-   "tela": "gavetaConquistas",
-   "axe": []
-  },
-  {
-   "estouro_horizontal_px": 0,
-   "sem_nome_acessivel": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_menor_que_24px": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_entre_24_e_44px": {
-    "total": 96,
-    "amostra": [
-     "button#btnVerAnimacao 42x33",
-     "button#btnPerfil 54x33",
-     "button#btnAmigos 68x33",
-     "button#btnRecordes 79x33",
-     "button#btnConquistas 88x33",
-     "button#btnAcervo 80x33"
-    ]
-   },
-   "contraste": {
-    "medidos": 175,
-    "nao_medido": {
-     "fundo_com_imagem": 17,
-     "fundo_translucido": 0,
-     "cor_estranha": 0
-    },
-    "falhas": 0,
-    "piores": []
-   },
-   "texto_menor_que_12px": {
-    "total": 0,
-    "amostra": []
-   },
-   "id_repetido": [],
-   "imagem_sem_alt": [],
-   "tabindex_positivo": [],
-   "titulos": {
-    "h1": 1,
-    "pulos": 0
-   },
-   "zoom_bloqueado": false,
-   "lang": "pt-BR",
-   "regras_reduzir_movimento": 2,
-   "canvas_visiveis": 1,
-   "tamanho": "notebook",
-   "tema": "escuro",
-   "tela": "gavetaRecordes:pontos",
-   "axe": []
-  },
-  {
-   "estouro_horizontal_px": 0,
-   "sem_nome_acessivel": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_menor_que_24px": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_entre_24_e_44px": {
-    "total": 96,
-    "amostra": [
-     "button#btnVerAnimacao 42x33",
-     "button#btnPerfil 54x33",
-     "button#btnAmigos 68x33",
-     "button#btnRecordes 79x33",
-     "button#btnConquistas 88x33",
-     "button#btnAcervo 80x33"
-    ]
-   },
-   "contraste": {
-    "medidos": 175,
-    "nao_medido": {
-     "fundo_com_imagem": 17,
-     "fundo_translucido": 0,
-     "cor_estranha": 0
-    },
-    "falhas": 0,
-    "piores": []
-   },
-   "texto_menor_que_12px": {
-    "total": 0,
-    "amostra": []
-   },
-   "id_repetido": [],
-   "imagem_sem_alt": [],
-   "tabindex_positivo": [],
-   "titulos": {
-    "h1": 1,
-    "pulos": 0
-   },
-   "zoom_bloqueado": false,
-   "lang": "pt-BR",
-   "regras_reduzir_movimento": 2,
-   "canvas_visiveis": 1,
-   "tamanho": "notebook",
-   "tema": "escuro",
-   "tela": "gavetaRecordes:tempo",
-   "axe": []
-  },
-  {
-   "estouro_horizontal_px": 0,
-   "sem_nome_acessivel": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_menor_que_24px": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_entre_24_e_44px": {
-    "total": 97,
-    "amostra": [
-     "button#btnVerAnimacao 42x33",
-     "button#btnPerfil 54x33",
-     "button#btnAmigos 68x33",
-     "button#btnRecordes 79x33",
-     "button#btnConquistas 88x33",
-     "button#btnAcervo 80x33"
-    ]
-   },
-   "contraste": {
-    "medidos": 180,
-    "nao_medido": {
-     "fundo_com_imagem": 17,
-     "fundo_translucido": 0,
-     "cor_estranha": 0
-    },
-    "falhas": 0,
-    "piores": []
-   },
-   "texto_menor_que_12px": {
-    "total": 0,
-    "amostra": []
-   },
-   "id_repetido": [],
-   "imagem_sem_alt": [],
-   "tabindex_positivo": [],
-   "titulos": {
-    "h1": 1,
-    "pulos": 0
-   },
-   "zoom_bloqueado": false,
-   "lang": "pt-BR",
-   "regras_reduzir_movimento": 2,
-   "canvas_visiveis": 1,
-   "tamanho": "notebook",
-   "tema": "escuro",
-   "tela": "gavetaJogo:estados",
-   "axe": []
-  },
-  {
-   "estouro_horizontal_px": 0,
-   "sem_nome_acessivel": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_menor_que_24px": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_entre_24_e_44px": {
-    "total": 98,
-    "amostra": [
-     "button#btnVerAnimacao 42x33",
-     "button#btnPerfil 54x33",
-     "button#btnAmigos 68x33",
-     "button#btnRecordes 79x33",
-     "button#btnConquistas 88x33",
-     "button#btnAcervo 80x33"
-    ]
-   },
-   "contraste": {
-    "medidos": 180,
-    "nao_medido": {
-     "fundo_com_imagem": 17,
-     "fundo_translucido": 0,
-     "cor_estranha": 0
-    },
-    "falhas": 0,
-    "piores": []
-   },
-   "texto_menor_que_12px": {
-    "total": 0,
-    "amostra": []
-   },
-   "id_repetido": [],
-   "imagem_sem_alt": [],
-   "tabindex_positivo": [],
-   "titulos": {
-    "h1": 1,
-    "pulos": 0
-   },
-   "zoom_bloqueado": false,
-   "lang": "pt-BR",
-   "regras_reduzir_movimento": 2,
-   "canvas_visiveis": 1,
-   "tamanho": "notebook",
-   "tema": "escuro",
-   "tela": "gavetaJogo:cheats",
-   "axe": []
-  },
-  {
-   "estouro_horizontal_px": 0,
-   "sem_nome_acessivel": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_menor_que_24px": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_entre_24_e_44px": {
-    "total": 136,
-    "amostra": [
-     "button#btnVerAnimacao 42x33",
-     "button#btnPerfil 54x33",
-     "button#btnAmigos 68x33",
-     "button#btnRecordes 79x33",
-     "button#btnConquistas 88x33",
-     "button#btnAcervo 80x33"
-    ]
-   },
-   "contraste": {
-    "medidos": 356,
-    "nao_medido": {
-     "fundo_com_imagem": 17,
-     "fundo_translucido": 0,
-     "cor_estranha": 0
-    },
-    "falhas": 0,
-    "piores": []
-   },
-   "texto_menor_que_12px": {
-    "total": 0,
-    "amostra": []
-   },
-   "id_repetido": [],
-   "imagem_sem_alt": [],
-   "tabindex_positivo": [],
-   "titulos": {
-    "h1": 1,
-    "pulos": 0
-   },
-   "zoom_bloqueado": false,
-   "lang": "pt-BR",
-   "regras_reduzir_movimento": 2,
-   "canvas_visiveis": 1,
-   "tamanho": "notebook",
-   "tema": "escuro",
-   "tela": "controle_remoto_ligado",
-   "axe": []
-  },
-  {
-   "estouro_horizontal_px": 0,
-   "sem_nome_acessivel": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_menor_que_24px": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_entre_24_e_44px": {
     "total": 95,
     "amostra": [
      "button#btnVerAnimacao 42x33",
@@ -5073,7 +4614,7 @@
     ]
    },
    "contraste": {
-    "medidos": 175,
+    "medidos": 176,
     "nao_medido": {
      "fundo_com_imagem": 17,
      "fundo_translucido": 0,
@@ -5099,58 +4640,7 @@
    "canvas_visiveis": 1,
    "tamanho": "notebook",
    "tema": "escuro",
-   "tela": "modalJuntoLocal",
-   "axe": []
-  },
-  {
-   "estouro_horizontal_px": 0,
-   "sem_nome_acessivel": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_menor_que_24px": {
-    "total": 0,
-    "amostra": []
-   },
-   "alvo_entre_24_e_44px": {
-    "total": 101,
-    "amostra": [
-     "button#btnVerAnimacao 42x33",
-     "button#btnPerfil 54x33",
-     "button#btnAmigos 68x33",
-     "button#btnRecordes 79x33",
-     "button#btnConquistas 88x33",
-     "button#btnAcervo 80x33"
-    ]
-   },
-   "contraste": {
-    "medidos": 182,
-    "nao_medido": {
-     "fundo_com_imagem": 17,
-     "fundo_translucido": 0,
-     "cor_estranha": 0
-    },
-    "falhas": 0,
-    "piores": []
-   },
-   "texto_menor_que_12px": {
-    "total": 0,
-    "amostra": []
-   },
-   "id_repetido": [],
-   "imagem_sem_alt": [],
-   "tabindex_positivo": [],
-   "titulos": {
-    "h1": 1,
-    "pulos": 0
-   },
-   "zoom_bloqueado": false,
-   "lang": "pt-BR",
-   "regras_reduzir_movimento": 2,
-   "canvas_visiveis": 1,
-   "tamanho": "notebook",
-   "tema": "escuro",
-   "tela": "modalToque",
+   "tela": "gavetaEquipamentos",
    "axe": []
   },
   {
@@ -5201,7 +4691,262 @@
    "canvas_visiveis": 1,
    "tamanho": "notebook",
    "tema": "escuro",
-   "tela": "modalPartida",
+   "tela": "gavetaAcervo",
+   "axe": []
+  },
+  {
+   "estouro_horizontal_px": 0,
+   "sem_nome_acessivel": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_menor_que_24px": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_entre_24_e_44px": {
+    "total": 104,
+    "amostra": [
+     "button#btnVerAnimacao 42x33",
+     "button#btnPerfil 54x33",
+     "button#btnAmigos 68x33",
+     "button#btnRecordes 79x33",
+     "button#btnConquistas 88x33",
+     "button#btnAcervo 80x33"
+    ]
+   },
+   "contraste": {
+    "medidos": 208,
+    "nao_medido": {
+     "fundo_com_imagem": 17,
+     "fundo_translucido": 0,
+     "cor_estranha": 0
+    },
+    "falhas": 0,
+    "piores": []
+   },
+   "texto_menor_que_12px": {
+    "total": 0,
+    "amostra": []
+   },
+   "id_repetido": [],
+   "imagem_sem_alt": [],
+   "tabindex_positivo": [],
+   "titulos": {
+    "h1": 1,
+    "pulos": 0
+   },
+   "zoom_bloqueado": false,
+   "lang": "pt-BR",
+   "regras_reduzir_movimento": 2,
+   "canvas_visiveis": 1,
+   "tamanho": "notebook",
+   "tema": "escuro",
+   "tela": "gavetaAjustes:simples",
+   "axe": []
+  },
+  {
+   "estouro_horizontal_px": 0,
+   "sem_nome_acessivel": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_menor_que_24px": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_entre_24_e_44px": {
+    "total": 197,
+    "amostra": [
+     "button#btnVerAnimacao 42x33",
+     "button#btnPerfil 54x33",
+     "button#btnAmigos 68x33",
+     "button#btnRecordes 79x33",
+     "button#btnConquistas 88x33",
+     "button#btnAcervo 80x33"
+    ]
+   },
+   "contraste": {
+    "medidos": 350,
+    "nao_medido": {
+     "fundo_com_imagem": 17,
+     "fundo_translucido": 0,
+     "cor_estranha": 0
+    },
+    "falhas": 0,
+    "piores": []
+   },
+   "texto_menor_que_12px": {
+    "total": 0,
+    "amostra": []
+   },
+   "id_repetido": [],
+   "imagem_sem_alt": [],
+   "tabindex_positivo": [],
+   "titulos": {
+    "h1": 1,
+    "pulos": 0
+   },
+   "zoom_bloqueado": false,
+   "lang": "pt-BR",
+   "regras_reduzir_movimento": 2,
+   "canvas_visiveis": 1,
+   "tamanho": "notebook",
+   "tema": "escuro",
+   "tela": "gavetaAjustes:avancado",
+   "axe": []
+  },
+  {
+   "estouro_horizontal_px": 0,
+   "sem_nome_acessivel": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_menor_que_24px": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_entre_24_e_44px": {
+    "total": 110,
+    "amostra": [
+     "button#btnVerAnimacao 42x33",
+     "button#btnPerfil 54x33",
+     "button#btnAmigos 68x33",
+     "button#btnRecordes 79x33",
+     "button#btnConquistas 88x33",
+     "button#btnAcervo 80x33"
+    ]
+   },
+   "contraste": {
+    "medidos": 262,
+    "nao_medido": {
+     "fundo_com_imagem": 17,
+     "fundo_translucido": 0,
+     "cor_estranha": 0
+    },
+    "falhas": 0,
+    "piores": []
+   },
+   "texto_menor_que_12px": {
+    "total": 0,
+    "amostra": []
+   },
+   "id_repetido": [],
+   "imagem_sem_alt": [],
+   "tabindex_positivo": [],
+   "titulos": {
+    "h1": 1,
+    "pulos": 0
+   },
+   "zoom_bloqueado": false,
+   "lang": "pt-BR",
+   "regras_reduzir_movimento": 2,
+   "canvas_visiveis": 1,
+   "tamanho": "notebook",
+   "tema": "escuro",
+   "tela": "gavetaAjustes:maquina",
+   "axe": []
+  },
+  {
+   "estouro_horizontal_px": 0,
+   "sem_nome_acessivel": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_menor_que_24px": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_entre_24_e_44px": {
+    "total": 135,
+    "amostra": [
+     "button#btnVerAnimacao 42x33",
+     "button#btnPerfil 54x33",
+     "button#btnAmigos 68x33",
+     "button#btnRecordes 79x33",
+     "button#btnConquistas 88x33",
+     "button#btnAcervo 80x33"
+    ]
+   },
+   "contraste": {
+    "medidos": 344,
+    "nao_medido": {
+     "fundo_com_imagem": 17,
+     "fundo_translucido": 0,
+     "cor_estranha": 0
+    },
+    "falhas": 0,
+    "piores": []
+   },
+   "texto_menor_que_12px": {
+    "total": 0,
+    "amostra": []
+   },
+   "id_repetido": [],
+   "imagem_sem_alt": [],
+   "tabindex_positivo": [],
+   "titulos": {
+    "h1": 1,
+    "pulos": 0
+   },
+   "zoom_bloqueado": false,
+   "lang": "pt-BR",
+   "regras_reduzir_movimento": 2,
+   "canvas_visiveis": 1,
+   "tamanho": "notebook",
+   "tema": "escuro",
+   "tela": "gavetaAjustes:controles",
+   "axe": []
+  },
+  {
+   "estouro_horizontal_px": 0,
+   "sem_nome_acessivel": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_menor_que_24px": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_entre_24_e_44px": {
+    "total": 176,
+    "amostra": [
+     "button#btnVerAnimacao 42x33",
+     "button#btnPerfil 54x33",
+     "button#btnAmigos 68x33",
+     "button#btnRecordes 79x33",
+     "button#btnConquistas 88x33",
+     "button#btnAcervo 80x33"
+    ]
+   },
+   "contraste": {
+    "medidos": 491,
+    "nao_medido": {
+     "fundo_com_imagem": 17,
+     "fundo_translucido": 0,
+     "cor_estranha": 0
+    },
+    "falhas": 0,
+    "piores": []
+   },
+   "texto_menor_que_12px": {
+    "total": 0,
+    "amostra": []
+   },
+   "id_repetido": [],
+   "imagem_sem_alt": [],
+   "tabindex_positivo": [],
+   "titulos": {
+    "h1": 1,
+    "pulos": 0
+   },
+   "zoom_bloqueado": false,
+   "lang": "pt-BR",
+   "regras_reduzir_movimento": 2,
+   "canvas_visiveis": 1,
+   "tamanho": "notebook",
+   "tema": "escuro",
+   "tela": "gavetaAjustes:emuladores",
    "axe": []
   },
   {
@@ -5226,7 +4971,466 @@
     ]
    },
    "contraste": {
-    "medidos": 178,
+    "medidos": 175,
+    "nao_medido": {
+     "fundo_com_imagem": 17,
+     "fundo_translucido": 0,
+     "cor_estranha": 0
+    },
+    "falhas": 0,
+    "piores": []
+   },
+   "texto_menor_que_12px": {
+    "total": 0,
+    "amostra": []
+   },
+   "id_repetido": [],
+   "imagem_sem_alt": [],
+   "tabindex_positivo": [],
+   "titulos": {
+    "h1": 1,
+    "pulos": 0
+   },
+   "zoom_bloqueado": false,
+   "lang": "pt-BR",
+   "regras_reduzir_movimento": 2,
+   "canvas_visiveis": 1,
+   "tamanho": "notebook",
+   "tema": "escuro",
+   "tela": "gavetaConquistas",
+   "axe": []
+  },
+  {
+   "estouro_horizontal_px": 0,
+   "sem_nome_acessivel": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_menor_que_24px": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_entre_24_e_44px": {
+    "total": 97,
+    "amostra": [
+     "button#btnVerAnimacao 42x33",
+     "button#btnPerfil 54x33",
+     "button#btnAmigos 68x33",
+     "button#btnRecordes 79x33",
+     "button#btnConquistas 88x33",
+     "button#btnAcervo 80x33"
+    ]
+   },
+   "contraste": {
+    "medidos": 176,
+    "nao_medido": {
+     "fundo_com_imagem": 17,
+     "fundo_translucido": 0,
+     "cor_estranha": 0
+    },
+    "falhas": 0,
+    "piores": []
+   },
+   "texto_menor_que_12px": {
+    "total": 0,
+    "amostra": []
+   },
+   "id_repetido": [],
+   "imagem_sem_alt": [],
+   "tabindex_positivo": [],
+   "titulos": {
+    "h1": 1,
+    "pulos": 0
+   },
+   "zoom_bloqueado": false,
+   "lang": "pt-BR",
+   "regras_reduzir_movimento": 2,
+   "canvas_visiveis": 1,
+   "tamanho": "notebook",
+   "tema": "escuro",
+   "tela": "gavetaRecordes:pontos",
+   "axe": []
+  },
+  {
+   "estouro_horizontal_px": 0,
+   "sem_nome_acessivel": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_menor_que_24px": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_entre_24_e_44px": {
+    "total": 97,
+    "amostra": [
+     "button#btnVerAnimacao 42x33",
+     "button#btnPerfil 54x33",
+     "button#btnAmigos 68x33",
+     "button#btnRecordes 79x33",
+     "button#btnConquistas 88x33",
+     "button#btnAcervo 80x33"
+    ]
+   },
+   "contraste": {
+    "medidos": 176,
+    "nao_medido": {
+     "fundo_com_imagem": 17,
+     "fundo_translucido": 0,
+     "cor_estranha": 0
+    },
+    "falhas": 0,
+    "piores": []
+   },
+   "texto_menor_que_12px": {
+    "total": 0,
+    "amostra": []
+   },
+   "id_repetido": [],
+   "imagem_sem_alt": [],
+   "tabindex_positivo": [],
+   "titulos": {
+    "h1": 1,
+    "pulos": 0
+   },
+   "zoom_bloqueado": false,
+   "lang": "pt-BR",
+   "regras_reduzir_movimento": 2,
+   "canvas_visiveis": 1,
+   "tamanho": "notebook",
+   "tema": "escuro",
+   "tela": "gavetaRecordes:tempo",
+   "axe": []
+  },
+  {
+   "estouro_horizontal_px": 0,
+   "sem_nome_acessivel": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_menor_que_24px": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_entre_24_e_44px": {
+    "total": 98,
+    "amostra": [
+     "button#btnVerAnimacao 42x33",
+     "button#btnPerfil 54x33",
+     "button#btnAmigos 68x33",
+     "button#btnRecordes 79x33",
+     "button#btnConquistas 88x33",
+     "button#btnAcervo 80x33"
+    ]
+   },
+   "contraste": {
+    "medidos": 181,
+    "nao_medido": {
+     "fundo_com_imagem": 17,
+     "fundo_translucido": 0,
+     "cor_estranha": 0
+    },
+    "falhas": 0,
+    "piores": []
+   },
+   "texto_menor_que_12px": {
+    "total": 0,
+    "amostra": []
+   },
+   "id_repetido": [],
+   "imagem_sem_alt": [],
+   "tabindex_positivo": [],
+   "titulos": {
+    "h1": 1,
+    "pulos": 0
+   },
+   "zoom_bloqueado": false,
+   "lang": "pt-BR",
+   "regras_reduzir_movimento": 2,
+   "canvas_visiveis": 1,
+   "tamanho": "notebook",
+   "tema": "escuro",
+   "tela": "gavetaJogo:estados",
+   "axe": []
+  },
+  {
+   "estouro_horizontal_px": 0,
+   "sem_nome_acessivel": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_menor_que_24px": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_entre_24_e_44px": {
+    "total": 99,
+    "amostra": [
+     "button#btnVerAnimacao 42x33",
+     "button#btnPerfil 54x33",
+     "button#btnAmigos 68x33",
+     "button#btnRecordes 79x33",
+     "button#btnConquistas 88x33",
+     "button#btnAcervo 80x33"
+    ]
+   },
+   "contraste": {
+    "medidos": 181,
+    "nao_medido": {
+     "fundo_com_imagem": 17,
+     "fundo_translucido": 0,
+     "cor_estranha": 0
+    },
+    "falhas": 0,
+    "piores": []
+   },
+   "texto_menor_que_12px": {
+    "total": 0,
+    "amostra": []
+   },
+   "id_repetido": [],
+   "imagem_sem_alt": [],
+   "tabindex_positivo": [],
+   "titulos": {
+    "h1": 1,
+    "pulos": 0
+   },
+   "zoom_bloqueado": false,
+   "lang": "pt-BR",
+   "regras_reduzir_movimento": 2,
+   "canvas_visiveis": 1,
+   "tamanho": "notebook",
+   "tema": "escuro",
+   "tela": "gavetaJogo:cheats",
+   "axe": []
+  },
+  {
+   "estouro_horizontal_px": 0,
+   "sem_nome_acessivel": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_menor_que_24px": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_entre_24_e_44px": {
+    "total": 135,
+    "amostra": [
+     "button#btnVerAnimacao 42x33",
+     "button#btnPerfil 54x33",
+     "button#btnAmigos 68x33",
+     "button#btnRecordes 79x33",
+     "button#btnConquistas 88x33",
+     "button#btnAcervo 80x33"
+    ]
+   },
+   "contraste": {
+    "medidos": 344,
+    "nao_medido": {
+     "fundo_com_imagem": 17,
+     "fundo_translucido": 0,
+     "cor_estranha": 0
+    },
+    "falhas": 0,
+    "piores": []
+   },
+   "texto_menor_que_12px": {
+    "total": 0,
+    "amostra": []
+   },
+   "id_repetido": [],
+   "imagem_sem_alt": [],
+   "tabindex_positivo": [],
+   "titulos": {
+    "h1": 1,
+    "pulos": 0
+   },
+   "zoom_bloqueado": false,
+   "lang": "pt-BR",
+   "regras_reduzir_movimento": 2,
+   "canvas_visiveis": 1,
+   "tamanho": "notebook",
+   "tema": "escuro",
+   "tela": "controle_remoto_ligado",
+   "axe": []
+  },
+  {
+   "estouro_horizontal_px": 0,
+   "sem_nome_acessivel": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_menor_que_24px": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_entre_24_e_44px": {
+    "total": 96,
+    "amostra": [
+     "button#btnVerAnimacao 42x33",
+     "button#btnPerfil 54x33",
+     "button#btnAmigos 68x33",
+     "button#btnRecordes 79x33",
+     "button#btnConquistas 88x33",
+     "button#btnAcervo 80x33"
+    ]
+   },
+   "contraste": {
+    "medidos": 176,
+    "nao_medido": {
+     "fundo_com_imagem": 17,
+     "fundo_translucido": 0,
+     "cor_estranha": 0
+    },
+    "falhas": 0,
+    "piores": []
+   },
+   "texto_menor_que_12px": {
+    "total": 0,
+    "amostra": []
+   },
+   "id_repetido": [],
+   "imagem_sem_alt": [],
+   "tabindex_positivo": [],
+   "titulos": {
+    "h1": 1,
+    "pulos": 0
+   },
+   "zoom_bloqueado": false,
+   "lang": "pt-BR",
+   "regras_reduzir_movimento": 2,
+   "canvas_visiveis": 1,
+   "tamanho": "notebook",
+   "tema": "escuro",
+   "tela": "modalJuntoLocal",
+   "axe": []
+  },
+  {
+   "estouro_horizontal_px": 0,
+   "sem_nome_acessivel": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_menor_que_24px": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_entre_24_e_44px": {
+    "total": 102,
+    "amostra": [
+     "button#btnVerAnimacao 42x33",
+     "button#btnPerfil 54x33",
+     "button#btnAmigos 68x33",
+     "button#btnRecordes 79x33",
+     "button#btnConquistas 88x33",
+     "button#btnAcervo 80x33"
+    ]
+   },
+   "contraste": {
+    "medidos": 183,
+    "nao_medido": {
+     "fundo_com_imagem": 17,
+     "fundo_translucido": 0,
+     "cor_estranha": 0
+    },
+    "falhas": 0,
+    "piores": []
+   },
+   "texto_menor_que_12px": {
+    "total": 0,
+    "amostra": []
+   },
+   "id_repetido": [],
+   "imagem_sem_alt": [],
+   "tabindex_positivo": [],
+   "titulos": {
+    "h1": 1,
+    "pulos": 0
+   },
+   "zoom_bloqueado": false,
+   "lang": "pt-BR",
+   "regras_reduzir_movimento": 2,
+   "canvas_visiveis": 1,
+   "tamanho": "notebook",
+   "tema": "escuro",
+   "tela": "modalToque",
+   "axe": []
+  },
+  {
+   "estouro_horizontal_px": 0,
+   "sem_nome_acessivel": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_menor_que_24px": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_entre_24_e_44px": {
+    "total": 98,
+    "amostra": [
+     "button#btnVerAnimacao 42x33",
+     "button#btnPerfil 54x33",
+     "button#btnAmigos 68x33",
+     "button#btnRecordes 79x33",
+     "button#btnConquistas 88x33",
+     "button#btnAcervo 80x33"
+    ]
+   },
+   "contraste": {
+    "medidos": 184,
+    "nao_medido": {
+     "fundo_com_imagem": 17,
+     "fundo_translucido": 0,
+     "cor_estranha": 0
+    },
+    "falhas": 0,
+    "piores": []
+   },
+   "texto_menor_que_12px": {
+    "total": 0,
+    "amostra": []
+   },
+   "id_repetido": [],
+   "imagem_sem_alt": [],
+   "tabindex_positivo": [],
+   "titulos": {
+    "h1": 1,
+    "pulos": 0
+   },
+   "zoom_bloqueado": false,
+   "lang": "pt-BR",
+   "regras_reduzir_movimento": 2,
+   "canvas_visiveis": 1,
+   "tamanho": "notebook",
+   "tema": "escuro",
+   "tela": "modalPartida",
+   "axe": []
+  },
+  {
+   "estouro_horizontal_px": 0,
+   "sem_nome_acessivel": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_menor_que_24px": {
+    "total": 0,
+    "amostra": []
+   },
+   "alvo_entre_24_e_44px": {
+    "total": 96,
+    "amostra": [
+     "button#btnVerAnimacao 42x33",
+     "button#btnPerfil 54x33",
+     "button#btnAmigos 68x33",
+     "button#btnRecordes 79x33",
+     "button#btnConquistas 88x33",
+     "button#btnAcervo 80x33"
+    ]
+   },
+   "contraste": {
+    "medidos": 179,
     "nao_medido": {
      "fundo_com_imagem": 17,
      "fundo_translucido": 0,
@@ -5266,7 +5470,7 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
-    "total": 95,
+    "total": 96,
     "amostra": [
      "button#btnVerAnimacao 42x33",
      "button#btnPerfil 54x33",
@@ -5277,7 +5481,7 @@
     ]
    },
    "contraste": {
-    "medidos": 174,
+    "medidos": 175,
     "nao_medido": {
      "fundo_com_imagem": 17,
      "fundo_translucido": 0,
@@ -5317,7 +5521,7 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
-    "total": 96,
+    "total": 97,
     "amostra": [
      "button#btnVerAnimacao 42x33",
      "button#btnPerfil 54x33",
@@ -5328,7 +5532,7 @@
     ]
    },
    "contraste": {
-    "medidos": 176,
+    "medidos": 177,
     "nao_medido": {
      "fundo_com_imagem": 17,
      "fundo_translucido": 0,
@@ -5368,7 +5572,7 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
-    "total": 104,
+    "total": 105,
     "amostra": [
      "button#btnVerAnimacao 42x33",
      "button#btnPerfil 54x33",
@@ -5379,7 +5583,7 @@
     ]
    },
    "contraste": {
-    "medidos": 185,
+    "medidos": 186,
     "nao_medido": {
      "fundo_com_imagem": 17,
      "fundo_translucido": 0,
@@ -5419,7 +5623,7 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
-    "total": 96,
+    "total": 97,
     "amostra": [
      "button#btnVerAnimacao 42x33",
      "button#btnPerfil 54x33",
@@ -5430,7 +5634,7 @@
     ]
    },
    "contraste": {
-    "medidos": 176,
+    "medidos": 177,
     "nao_medido": {
      "fundo_com_imagem": 17,
      "fundo_translucido": 0,
@@ -5470,7 +5674,7 @@
     "amostra": []
    },
    "alvo_entre_24_e_44px": {
-    "total": 95,
+    "total": 96,
     "amostra": [
      "button#btnVerAnimacao 42x33",
      "button#btnPerfil 54x33",
@@ -5481,7 +5685,7 @@
     ]
    },
    "contraste": {
-    "medidos": 175,
+    "medidos": 176,
     "nao_medido": {
      "fundo_com_imagem": 17,
      "fundo_translucido": 0,

@@ -2013,3 +2013,41 @@ html[data-navegador="true"] [data-so-windows] { display: none !important; }
 }
 .toque-peca--analogico.toque-peca--imagem { background-size: 55% 55%, 100% 100%; }
 .toque-peca--arrastando { cursor: grabbing; filter: brightness(1.2); }
+
+
+/* ===================== EQUIPAMENTOS (13/11/2026) =====================
+   Para quem nao entende de computador: letra maior, um bloco por recurso, estado com icone e palavra, botao grande
+   (alvo de toque de 48 px). */
+.equip-intro { margin: 0 0 var(--gap); font-size: var(--t-base); line-height: 1.5; }
+.equip-tudo { width: 100%; min-height: 48px; font-size: var(--t-base); margin-bottom: var(--gap); }
+.equip-aviso { margin: 0 0 var(--gap); font-size: var(--t-base); font-weight: 600; }
+.equip-lista, .equip-subitens { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--gap); }
+.equip-item {
+  border: 2px solid var(--borda); border-radius: var(--raio); background: var(--painel);
+  padding: .9rem 1rem; display: grid; gap: .35rem;
+}
+.equip-item--pronto { border-left: 8px solid var(--pronto); }
+.equip-item--falta { border-left: 8px solid var(--azul-escuro); }
+.equip-item--pago, .equip-item--opcional { border-left: 8px solid var(--borda-forte); }
+.equip-nome { margin: 0; font-size: var(--t-med); display: flex; gap: .5rem; align-items: center; }
+.equip-icone { font-size: 1.4rem; }
+.equip-estado { font-weight: 700; font-size: var(--t-base); }
+.equip-para-que { margin: 0; font-size: var(--t-base); line-height: 1.45; }
+.equip-detalhe { margin: 0; font-size: var(--t-peq); color: var(--texto-fraco); line-height: 1.45; }
+.equip-andamento { margin: 0; font-size: var(--t-base); font-weight: 600; }
+.equip-botao { min-height: 48px; font-size: var(--t-base); justify-self: start; padding: .55rem 1.2rem; }
+.equip-detalhes summary {
+  cursor: pointer; min-height: 48px; display: flex; align-items: center; font-size: var(--t-base); font-weight: 600;
+}
+.equip-subitem { border-top: 1px solid var(--borda); padding-top: .6rem; display: grid; gap: .3rem; }
+.equip-subnome { margin: 0; font-size: var(--t-base); }
+.detalhes-recomp { display: grid; gap: .4rem; margin: .4rem 0; }
+.detalhes-recomp p { margin: 0; font-size: var(--t-peq); line-height: 1.45; }
+.detalhes-recomp .botao { width: 100%; min-height: 44px; }
+@media (max-width: 640px) {
+  .equip-botao { width: 100%; justify-self: stretch; }
+}
+
+/* O controle da Nitidez (Ajustes > Escala da tela): alvo de toque de 44 px de altura (a auditoria do front de
+   13/11/2026 achou 16 px, pequeno para dedo e para quem tem dificuldade motora). */
+#faixaNitidez { min-height: 44px; width: min(100%, 22rem); cursor: pointer; }

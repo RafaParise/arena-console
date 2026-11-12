@@ -1061,6 +1061,24 @@ window.ArenaRotas = (function () {
         case "/api/botoes": return { botoes: [] };
         case "/api/perfis-controle": return {};
         case "/api/como-colocar": return { consoles: [] };
+        // Equipamentos (13/11/2026; servidor\equipamentos.py no ARENA do Windows). No navegador nada se baixa: mostra o
+        // que vale aqui e diz, em palavras simples, onde estao os outros recursos.
+        case "/api/equipamentos": {
+          const quantos = Object.keys(nucleos()).length;
+          return {
+            itens: [
+              { id: "consoles", icone: "🎮", nome: "Consoles clássicos", estado: quantos ? "pronto" : "falta",
+                para_que: "Abre os jogos de Super Nintendo, Mega Drive e outros, aqui no navegador.",
+                detalhe: quantos ? quantos + " consoles prontos para jogar." : "Abra a pasta do ARENA (botão Escolher a pasta).",
+                acao: { tipo: "nenhuma" }, andamento: {}, itens: [] },
+              { id: "navegador", icone: "💻", nome: "Versão sem instalar", estado: "pronto",
+                para_que: "O ARENA roda direto no navegador, sem instalar nada.",
+                detalhe: "A versão para PC dos jogos, o movimento mais liso (MFG) e o Lossless Scaling ficam no ARENA do Windows.",
+                acao: { tipo: "nenhuma" }, andamento: {}, itens: [] },
+            ],
+            trabalhando: false, tudo: { quantos: 0, tamanho: "" },
+          };
+        }
         default: throw falha("Rota não encontrada.", 404);
       }
     }
