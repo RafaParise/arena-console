@@ -293,7 +293,7 @@ def jogos_do_aparelho():
     """Os jogos instalados no aparelho (o app pergunta ao Android, ArenaServico.java, jogosDoAparelho): uma lista de
     {"pacote", "nome"}. Vazia se o app nao responder (12/11/2026)."""
     try:
-        resposta = perguntar({"pedido": "jogos_do_aparelho"}, limite=8.0)
+        resposta = perguntar({"pedido": "jogos_do_aparelho"}, limite=4.0)
     except OSError:
         return []
     return [j for j in resposta.get("jogos") or []

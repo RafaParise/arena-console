@@ -1378,6 +1378,7 @@ Pense numa foto pequena que precisa virar um cartaz:
 | **Automático** (recomendado) | O ARENA escolhe pelo console, pela placa de vídeo e pelo nível | Todo mundo |
 | **Pixel nítido** | Todo pixel vira um quadradinho do mesmo tamanho, como azulejo bem assentado | Jogo 2D |
 | **Nítido (FSR da AMD)** | Procura as bordas antes de esticar, como quem passa o contorno do desenho a limpo | Jogo 3D, placa boa |
+| **SGSR (da Qualcomm)** | Estica num passo só e refaz só as bordas; feito para a placa de vídeo do celular | Celular e placa fraca que aguenta um pouco mais que o comum |
 | **Suave** | Arredonda o pixel art, como se o desenho fosse refeito à mão | Quem gosta (pesa mais) |
 | **Anime4K** | Afina as linhas do contorno ao esticar (o modo Anime4K do Lossless Scaling) | Jogo com cara de desenho animado |
 | **Inteiro** | Cada pixel vira 2, 3 ou 4 pontos, sempre o mesmo número, com borda preta em volta (o Integer do Lossless) | Quem quer o pixel perfeito |
@@ -1387,10 +1388,21 @@ As funções do Lossless Scaling, no ARENA (22/10/2026): o FSR, o pixel
 nítido (SharpBilinear), o Anime4K, o Inteiro e o "sem filtro" (Nearest)
 estão na lista acima; o xBR fica com o **Suave** (os dois arredondam o pixel
 art, e o xBR pesou mais: +8,8 pontos de placa contra +5,7); o "Tela cheia" e
-o "Proporção" do Lossless são o **Formato da imagem**, logo abaixo. O LS1, o
-NIS e o SGSR não vêm no RetroArch 1.22 (o LS1 é fechado; o FSR faz o mesmo
-papel), e a geração de quadros (LSFG) só existe no Lossless de quem comprou:
-o ARENA continua usando o programa de verdade quando ele está na máquina.
+o "Proporção" do Lossless são o **Formato da imagem**, logo abaixo. O LS1 e o
+NIS não vêm no RetroArch 1.22 (o LS1 é fechado; o NIS precisa de tabelas de
+coeficientes e de dois passos, e o FSR faz o mesmo papel); o **SGSR** entrou
+em 12/11/2026, portado pelo ARENA do código aberto da Qualcomm (licença
+BSD-3-Clause, em `servidor\filtros\sgsr`). Ele só vale quando escolhido: o
+Automático continua o mesmo. A geração de quadros (LSFG) só existe no
+Lossless de quem comprou: o ARENA continua usando o programa de verdade quando
+ele está na máquina.
+
+**Nitidez** (logo abaixo da Escala da tela, 12/11/2026): de 0 a 100, quanto o
+FSR, o SGSR e a nitidez das placas fracas (o RCAS) firmam as bordas. O **50** é
+o de sempre; abaixo dele a imagem fica mais macia, acima mais firme (firme
+demais deixa o jogo granulado). O pixel nítido, o Suave, o Anime4K e o Inteiro
+não mudam. O ARENA grava uma cópia do filtro com o número escolhido em
+`dados\filtros`, e no 50 usa o filtro de sempre.
 
 #### O que o Automático escolhe
 

@@ -39,7 +39,6 @@ import shutil
 import stat
 import struct
 import subprocess
-import tarfile
 import threading
 import time
 import unicodedata
@@ -323,9 +322,13 @@ def _descompactar(arquivo, destino):
                     except OSError:
                         pass
     elif baixo.endswith((".tar.gz", ".tgz", ".tar.xz", ".tar")):
-        with tarfile.open(arquivo) as tar:
-            membros = [m for m in tar.getmembers() if _seguro(m.name) and (m.isfile() or m.isdir())]
-            tar.extractall(destino, members=membros, filter="data")
+        import tarfile   # so aqui: a abertura do ARENA nao paga por ele (2 ms)
+        try:
+            with tarfile.open(arquivo) as tar:
+                membros = [m for m in tar.getmembers() if _seguro(m.name) and (m.isfile() or m.isdir())]
+                tar.extractall(destino, members=membros, filter="data")
+        except tarfile.TarError as falha:
+            raise OSError("o arquivo .tar veio quebrado (%s)" % falha)
     elif baixo.endswith(".appimage"):
         copia = os.path.join(destino, os.path.basename(arquivo))
         shutil.copyfile(arquivo, copia)
@@ -434,7 +437,7 @@ def instalar(recomp_id, sistema_alvo=None, arq=None):
     except NaoDaParaInstalar as falha:
         _anotar(recomp_id, estado="erro", mensagem=str(falha))
         raise
-    except (OSError, zipfile.BadZipFile, tarfile.TarError) as falha:
+    except (OSError, zipfile.BadZipFile) as falha:
         _anotar(recomp_id, estado="erro", mensagem="Não consegui instalar %s: %s" % (r["nome"], falha))
         raise NaoDaParaInstalar("Não consegui instalar %s: %s" % (r["nome"], falha))
 

@@ -541,7 +541,16 @@ PASTA_FILTROS = os.path.join(PASTA_SERVIDOR, "filtros")
 # ainda nao tinha, por tecnicas abertas. O xBR do Lossless fica com o
 # "suave" (ScaleFX): os dois arredondam o pixel art, e o xBR pesou mais
 # (+8,8 pontos de placa contra +5,7, medido em 16/10/2026).
-ESCALAS = ("automatico", "pixel", "nitido", "suave", "anime4k", "inteiro", "original")
+# SGSR (12/11/2026): o SGSR 1 da Qualcomm, feito para a placa do celular (servidor\filtros\sgsr). So por escolha:
+# o automatico continua o mesmo (nada de regresso em aparelho que nao deu para medir).
+ESCALAS = ("automatico", "pixel", "nitido", "sgsr", "suave", "anime4k", "inteiro", "original")
+
+# Nitidez ajustavel (12/11/2026): de 0 a 100 nos Ajustes. 50 = os valores de sempre: quem nao mexe, nada muda.
+# O parametro de cada filtro que afia, e o valor dele em 0, 50 e 100 (no FSR, numero menor afia mais).
+NITIDEZ_PADRAO = 50
+PARAMETRO_DA_NITIDEZ = {"rcas": ("RCAS_STRENGTH", 0.0, 0.5, 1.0),
+                        "nitido": ("FSR_SHARPENING", 2.0, 0.2, 0.0),
+                        "sgsr": ("SGSR_NITIDEZ", 1.0, 2.0, 3.0)}
 
 # Formato da imagem (pedido do Rafael, 22/10/2026: "a tela nao mais esta
 # esticando ate a borda da tela como fazia antes"): a proporcao da imagem do
@@ -595,7 +604,7 @@ def formato_de_fora(plataforma, formato, tela):
     return "console"
 ARQUIVOS_DOS_FILTROS = {"pixel": "pixel-nitido.slangp", "nitido": "fsr.slangp", "anime4k": "anime4k.slangp",
                         "catmull": "catmull-rom.slangp", "rcas": "rcas.slangp",
-                        "suave": "suave.slangp"}
+                        "suave": "suave.slangp", "sgsr": "sgsr.slangp"}
 # Achado de 22/10/2026 (rodada final, matriz de consoles): o SwanStation
 # (PlayStation) com o RCAS e o video em thread fecha sozinho no Vulkan
 # (0xC0000005 logo depois de "framebuffer size 0x0": o nucleo comeca com o
@@ -661,7 +670,69 @@ def caminho_do_filtro(nome):
         return ""
     if citado and not os.path.isfile(os.path.normpath(os.path.join(PASTA_FILTROS, citado.group(1)))):
         return ""
+    # O preset que traz o shader dele (o SGSR): o shader tambem tem que estar la.
+    for shader in _shaders_do_preset(caminho):
+        if not os.path.isfile(os.path.normpath(os.path.join(PASTA_FILTROS, shader))):
+            return ""
     return caminho
+
+
+def _shaders_do_preset(caminho):
+    """Os caminhos (relativos ao preset) dos shaders que ele cita: o #reference e os shaderN."""
+    try:
+        with open(caminho, encoding="utf-8") as preset:
+            texto = preset.read()
+    except OSError:
+        return []
+    return re.findall(r'^\s*shader\d+\s*=\s*"([^"]+)"', texto, re.M)
+
+
+def valor_da_nitidez(jeito, nitidez):
+    """(parametro, valor) do filtro 'jeito' para a nitidez 0-100, ou None se o filtro nao afia."""
+    par = PARAMETRO_DA_NITIDEZ.get(jeito)
+    if not par:
+        return None
+    nome, zero, meio, cem = par
+    n = max(0, min(100, int(nitidez)))
+    if n <= 50:
+        return nome, zero + (meio - zero) * n / 50.0
+    return nome, meio + (cem - meio) * (n - 50) / 50.0
+
+
+def filtro_com_nitidez(caminho, jeito, nitidez, pasta_destino):
+    """O preset com a nitidez escolhida: uma copia em 'pasta_destino' (dados\filtros, na mesma altura de
+    servidor\filtros, para os caminhos relativos valerem igual), com o parametro trocado. Na nitidez de sempre
+    (50), num filtro que nao afia, ou se a copia nao der certo, devolve o proprio 'caminho' (nada muda)."""
+    try:
+        n = max(0, min(100, int(nitidez)))
+    except (TypeError, ValueError):
+        return caminho
+    if not caminho or n == NITIDEZ_PADRAO or jeito not in PARAMETRO_DA_NITIDEZ:
+        return caminho
+    try:
+        with open(caminho, encoding="utf-8") as preset:
+            texto = preset.read()
+    except OSError:
+        return caminho
+    citados = re.findall(r'^#reference\s+"([^"]+)"', texto, re.M) + _shaders_do_preset(caminho)
+    if any(not os.path.isfile(os.path.normpath(os.path.join(pasta_destino, c))) for c in citados):
+        return caminho      # nesta instalacao a pasta de dados fica em outro lugar: vale o preset de sempre
+    nome, valor = valor_da_nitidez(jeito, n)
+    linha = '%s = "%.6f"' % (nome, valor)
+    if re.search(r"^%s\s*=" % nome, texto, re.M):
+        texto = re.sub(r"^%s\s*=.*$" % nome, linha, texto, flags=re.M)
+    else:
+        texto = texto.rstrip("\n") + "\n" + linha + "\n"
+    destino = os.path.join(pasta_destino, "%s-nitidez-%d.slangp" % (os.path.splitext(os.path.basename(caminho))[0], n))
+    try:
+        os.makedirs(pasta_destino, exist_ok=True)
+        temporario = "%s.%d.tmp" % (destino, threading.get_ident())
+        with open(temporario, "w", encoding="utf-8", newline="\n") as saida:
+            saida.write(texto)
+        os.replace(temporario, destino)
+    except OSError:
+        return caminho
+    return destino
 
 
 def jeito_da_escala(plataforma, escolha="automatico", nome_curto=None, opcoes_nucleo=None,
@@ -686,6 +757,8 @@ def jeito_da_escala(plataforma, escolha="automatico", nome_curto=None, opcoes_nu
         return "suave" if plataforma in de_pixel else "nitido"
     if escolha == "anime4k":
         return "anime4k"
+    if escolha == "sgsr":
+        return "sgsr"
     # Automatico.
     if plataforma in de_pixel:
         return "pixel"

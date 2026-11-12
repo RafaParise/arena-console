@@ -501,6 +501,7 @@
         <option value="automatico">Automático (recomendado)</option>
         <option value="pixel">Pixel nítido</option>
         <option value="nitido">Nítido (FSR da AMD)</option>
+        <option value="sgsr">SGSR (da Qualcomm, leve no celular)</option>
         <option value="suave">Suave (desenho arredondado)</option>
         <option value="anime4k">Anime4K (desenho animado)</option>
         <option value="inteiro">Inteiro (pixel perfeito, com borda)</option>
@@ -508,6 +509,13 @@
       </select>
     </div>
     <p class="explica" id="explicaEscalaTela" data-so-windows></p>
+
+    <div class="opcao" data-so-windows>
+      <span class="opcao-rotulo">Nitidez</span>
+      <input class="opcao-controle" id="faixaNitidez" type="range" min="0" max="100" step="10" value="50"
+             aria-label="Nitidez da escala" aria-describedby="explicaNitidez">
+    </div>
+    <p class="explica" id="explicaNitidez" data-so-windows></p>
 
     <div class="opcao">
       <span class="opcao-rotulo">Formato da imagem</span>

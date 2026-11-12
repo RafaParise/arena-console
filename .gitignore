@@ -22,6 +22,8 @@ __pycache__/
 dados/*.json
 dados/*.db
 dados/*.cfg
+# Os filtros com a nitidez escolhida nos Ajustes (servidor\graficos.py, filtro_com_nitidez): feitos em cada maquina.
+dados/filtros/
 
 # Mantém as pastas de código, interface e documentação
 !launcher/

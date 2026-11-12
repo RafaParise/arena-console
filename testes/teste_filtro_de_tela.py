@@ -34,7 +34,8 @@ RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RA = os.path.join(RAIZ, "retroarch")
 # O shader que cada preset do ARENA cita (o que o registro tem que mostrar).
 CITADOS = {"pixel": "sharp-bilinear-simple.slang", "nitido": "fsr-pass1.slang",
-           "catmull": "catmull-rom-x.slang", "rcas": "rcas.slang", "suave": "scalefx-pass"}
+           "catmull": "catmull-rom-x.slang", "rcas": "rcas.slang", "suave": "scalefx-pass",
+           "sgsr": "sgsr1.slang"}
 
 
 def ler_cfg(caminho):
@@ -110,6 +111,14 @@ def main():
                        key=os.path.getsize)
         jogos = [j for j in jogos if not os.path.basename(j).lower().startswith("bs ")]
         presets = {jeito: graficos.caminho_do_filtro(jeito) for jeito in CITADOS}
+        # A nitidez ajustavel (12/11/2026): a copia com outra nitidez, em dados\filtros, tambem compila.
+        com_nitidez = {}
+        if all(presets.values()):
+            pasta_nitidez = os.path.join(RAIZ, "dados", "filtros")
+            for jeito in ("rcas", "nitido", "sgsr"):
+                copia = graficos.filtro_com_nitidez(presets[jeito], jeito, 80, pasta_nitidez)
+                confere("nitidez 80 no %s vira uma copia em dados\\filtros" % jeito, copia != presets[jeito], copia)
+                com_nitidez["%s+nitidez" % jeito] = copia
         if jogos and all(presets.values()):
             caminho = arena.gravar_override(config, 1)
             extra = os.path.join(pasta, "extra.cfg")
@@ -119,7 +128,7 @@ def main():
                         'audio_enable = "false"\nvideo_fullscreen = "false"\n'
                         'video_shader_enable = "true"\nlog_verbosity = "true"\n'
                         'frontend_log_level = "0"\n' % (pasta, pasta))
-            for jeito, preset in presets.items():
+            for jeito, preset in list(presets.items()) + list(com_nitidez.items()):
                 log = os.path.join(pasta, "log_%s.txt" % jeito)
                 subprocess.run([os.path.join(RA, "retroarch.exe"), "-L",
                                 os.path.join(RA, "cores", "snes9x_libretro.dll"),
@@ -127,8 +136,9 @@ def main():
                                 "--max-frames=90", "--verbose", "--log-file=" + log, jogos[0]],
                                cwd=RAIZ, capture_output=True, timeout=120)
                 texto = open(log, encoding="utf-8", errors="replace").read() if os.path.isfile(log) else ""
-                confere("RetroArch compila o preset %s (%s)" % (os.path.basename(preset), CITADOS[jeito]),
-                        CITADOS[jeito] in texto and "Compiling shader" in texto
+                citado = CITADOS[jeito.split("+")[0]]
+                confere("RetroArch compila o preset %s (%s)" % (os.path.basename(preset), citado),
+                        citado in texto and "Compiling shader" in texto
                         and "Loading stock shader" not in texto,
                         "[nada no registro]" if not texto else "")
         else:

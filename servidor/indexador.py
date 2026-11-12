@@ -1287,13 +1287,17 @@ def indexar(forcar=False, lojas=False):
         except Exception as falha:  # noqa: BLE001
             print("[ARENA] Nao consegui listar os jogos instalados pelas lojas ou no aparelho: %s" % falha)
     # O jogo de console que tambem existe recompilado para PC (servidor\recomps.py):
-    # a tela mostra e o Jogar oferece a versao nativa.
-    for jogo in jogos:
-        try:
-            jogo["recomps"] = [recomps.resumo_para_a_tela(r)
-                               for r in recomps.para_o_titulo(jogo["titulo"], jogo["plataforma"])]
-        except Exception:  # noqa: BLE001
-            jogo["recomps"] = []
+    # a tela mostra e o Jogar oferece a versao nativa. So onde recomp roda (no
+    # celular o catalogo nem e' lido), e a chave so no jogo que tem: a lista do
+    # celular (3 mil jogos) nao cresce a toa.
+    if recomps.sistema():
+        for jogo in jogos:
+            try:
+                achados = recomps.para_o_titulo(jogo["titulo"], jogo["plataforma"])
+            except Exception:  # noqa: BLE001
+                achados = []
+            if achados:
+                jogo["recomps"] = [recomps.resumo_para_a_tela(r) for r in achados]
 
     # Primeira vez: cria o dados\jogadores.txt com os jogos da pasta e o
     # numero que cada um aceitava ate aqui (nada muda para ninguem).

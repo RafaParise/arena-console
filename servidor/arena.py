@@ -1337,6 +1337,8 @@ def config_padrao():
         # tela inteira. "automatico" escolhe pelo console, pela placa e pelo
         # perfil (item 10 dos pedidos de 15/10/2026).
         "escala_da_tela": "automatico",
+        # Nitidez dos filtros que afiam (RCAS, FSR, SGSR), de 0 a 100; 50 = a de sempre (12/11/2026).
+        "nitidez_da_escala": graficos.NITIDEZ_PADRAO,
         # Formato da imagem (graficos.FORMATOS, pedido de 22/10/2026):
         # "automatico" estica o 4:3 dos consoles de TV ate a borda da tela
         # larga (ate 16:9); "esticar", todo jogo; "console", a proporcao do
@@ -1538,6 +1540,8 @@ def ler_config_do_disco():
         config["repasse_proprio"] = repasse_salvo
     if salvo.get("escala_da_tela") in graficos.ESCALAS:
         config["escala_da_tela"] = salvo["escala_da_tela"]
+    if isinstance(salvo.get("nitidez_da_escala"), int) and 0 <= salvo["nitidez_da_escala"] <= 100:
+        config["nitidez_da_escala"] = salvo["nitidez_da_escala"]
     if salvo.get("formato_da_imagem") in graficos.FORMATOS:
         config["formato_da_imagem"] = salvo["formato_da_imagem"]
     if salvo.get("botoes_na_tela") in plataforma_do_sistema.BOTOES_NA_TELA:
@@ -2210,6 +2214,9 @@ def gravar_override(config, custo=None, extras=None, em_partida=False,
                   "pela nitidez (%s), para nao esticar duas vezes." % (jeito, alinhado))
             jeito = alinhado
         filtro = graficos.caminho_do_filtro(jeito)
+        # A nitidez escolhida nos Ajustes (12/11/2026): na de sempre (50), o mesmo preset de antes.
+        filtro = graficos.filtro_com_nitidez(filtro, jeito, config.get("nitidez_da_escala", graficos.NITIDEZ_PADRAO),
+                                             os.path.join(PASTA_DADOS, "filtros"))
         if filtro and jeito == "rcas":
             # O RCAS afia o quadro ainda pequeno; quem estica depois e' o
             # RetroArch, e esticar sem suavizar faria degraus.
@@ -7853,6 +7860,9 @@ class Manipulador(BaseHTTPRequestHandler):
                 config["modo_desempenho"] = bool(dados["modo_desempenho"])
             if dados.get("escala_da_tela") in graficos.ESCALAS:
                 config["escala_da_tela"] = dados["escala_da_tela"]
+            if isinstance(dados.get("nitidez_da_escala"), int) and not isinstance(dados["nitidez_da_escala"], bool) \
+                    and 0 <= dados["nitidez_da_escala"] <= 100:
+                config["nitidez_da_escala"] = dados["nitidez_da_escala"]
             if dados.get("formato_da_imagem") in graficos.FORMATOS:
                 config["formato_da_imagem"] = dados["formato_da_imagem"]
             if dados.get("botoes_na_tela") in plataforma_do_sistema.BOTOES_NA_TELA:

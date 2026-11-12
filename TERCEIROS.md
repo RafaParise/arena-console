@@ -21,6 +21,7 @@ por voluntários para qualquer um copiar.
 | RetroArch | GPL-3.0 | <https://github.com/libretro/RetroArch> | `retroarch` |
 | Recursos do RetroArch (menu, sons) | CC BY 4.0 | <https://github.com/libretro/retroarch-assets> | `retroarch\assets` |
 | Filtros de tela do RetroArch (slang-shaders) | licença de cada filtro, no cabeçalho do arquivo | <https://github.com/libretro/slang-shaders> | `retroarch\shaders` |
+| Filtro SGSR 1 da Qualcomm (Snapdragon Game Super Resolution), portado para slang pelo ARENA | BSD-3-Clause (o texto vai junto, em servidor\filtros\sgsr\LICENSE.txt) | <https://github.com/SnapdragonStudios/snapdragon-gsr> | `servidor\filtros\sgsr` |
 | Perfis de controle do RetroArch (autoconfig) | a do repositório | <https://github.com/libretro/retroarch-joypad-autoconfig> | `retroarch\autoconfig` |
 | PCSX2 (PlayStation 2) | GPL-3.0 ou posterior | <https://github.com/PCSX2/pcsx2> | `emuladores\PCSX2` |
 | Dolphin (GameCube e Wii) | GPL-2.0 ou posterior | <https://github.com/dolphin-emu/dolphin> | `emuladores\Dolphin` |

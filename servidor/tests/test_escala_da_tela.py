@@ -121,6 +121,69 @@ class Presets(unittest.TestCase):
         self.assertEqual(graficos.caminho_do_filtro(""), "")
 
 
+class SgsrENitidez(unittest.TestCase):
+    """12/11/2026: o SGSR da Qualcomm (so por escolha) e a nitidez ajustavel (50 = a de sempre)."""
+
+    def test_sgsr_so_por_escolha(self):
+        self.assertEqual(graficos.jeito_da_escala("ps1", "sgsr", "swanstation", {}, 900, 3), "sgsr")
+        self.assertEqual(graficos.jeito_da_escala("snes", "sgsr"), "sgsr")
+        for nota in (1, 2, 3, 4, 5):   # o automatico nao mudou: nunca escolhe o SGSR sozinho
+            self.assertNotEqual(graficos.jeito_da_escala("ps1", "automatico", "swanstation", {}, 900, nota), "sgsr")
+        preset = os.path.join(graficos.PASTA_FILTROS, "sgsr.slangp")
+        shader = os.path.join(graficos.PASTA_FILTROS, "sgsr", "sgsr1.slang")
+        self.assertTrue(os.path.isfile(shader) and os.path.isfile(os.path.join(graficos.PASTA_FILTROS, "sgsr", "LICENSE.txt")))
+        self.assertEqual(graficos.caminho_do_filtro("sgsr"), preset)
+        texto = open(shader, encoding="utf-8").read()
+        self.assertIn("BSD-3-Clause", texto)
+        self.assertIn("#pragma parameter SGSR_NITIDEZ", texto)
+
+    def test_conta_da_nitidez(self):
+        conta = graficos.valor_da_nitidez
+
+        def arredondado(jeito, nitidez):
+            nome, valor = conta(jeito, nitidez)
+            return nome, round(valor, 6)
+        graficos_valor = arredondado
+        self.assertEqual(graficos_valor("rcas", 50), ("RCAS_STRENGTH", 0.5))     # o padrao do RCAS
+        self.assertEqual(graficos_valor("nitido", 50), ("FSR_SHARPENING", 0.2))  # o fsr.slangp de sempre
+        self.assertEqual(graficos_valor("sgsr", 50), ("SGSR_NITIDEZ", 2.0))      # o padrao do SGSR
+        self.assertEqual(graficos_valor("rcas", 100), ("RCAS_STRENGTH", 1.0))
+        self.assertEqual(graficos_valor("nitido", 100), ("FSR_SHARPENING", 0.0))  # no FSR, menor afia mais
+        self.assertEqual(graficos_valor("nitido", 0), ("FSR_SHARPENING", 2.0))
+        self.assertEqual(graficos_valor("sgsr", 250), ("SGSR_NITIDEZ", 3.0))     # fora da faixa: o limite
+        self.assertIsNone(graficos.valor_da_nitidez("pixel", 80))
+
+    def test_nitidez_de_sempre_nao_muda_nada(self):
+        fsr = os.path.join(graficos.PASTA_FILTROS, "fsr.slangp")
+        for n in (50, "x", None):
+            self.assertEqual(graficos.filtro_com_nitidez(fsr, "nitido", n, tempfile.gettempdir()), fsr)
+        pixel = os.path.join(graficos.PASTA_FILTROS, "pixel-nitido.slangp")
+        self.assertEqual(graficos.filtro_com_nitidez(pixel, "pixel", 90, tempfile.gettempdir()), pixel)
+        self.assertEqual(graficos.filtro_com_nitidez("", "rcas", 90, tempfile.gettempdir()), "")
+
+    def test_copia_com_a_nitidez(self):
+        raiz = tempfile.mkdtemp(prefix="arena_nitidez_")
+        try:
+            filtros, dados = os.path.join(raiz, "servidor", "filtros"), os.path.join(raiz, "dados", "filtros")
+            os.makedirs(filtros)
+            citado = os.path.join(raiz, "retroarch", "fsr.slangp")
+            os.makedirs(os.path.dirname(citado))
+            open(citado, "w").close()
+            preset = os.path.join(filtros, "fsr.slangp")
+            with open(preset, "w", encoding="utf-8") as arquivo:
+                arquivo.write('#reference "../../retroarch/fsr.slangp"\nFSR_SHARPENING = "0.200000"\n')
+            copia = graficos.filtro_com_nitidez(preset, "nitido", 100, dados)
+            self.assertEqual(copia, os.path.join(dados, "fsr-nitidez-100.slangp"))
+            texto = open(copia, encoding="utf-8").read()
+            self.assertIn('FSR_SHARPENING = "0.000000"', texto)
+            self.assertNotIn("0.200000", texto)
+            self.assertIn('#reference "../../retroarch/fsr.slangp"', texto)
+            # Pasta de dados em outra altura (o caminho relativo nao acharia o shader): vale o preset de sempre.
+            self.assertEqual(graficos.filtro_com_nitidez(preset, "nitido", 100, os.path.join(raiz, "a", "b", "c")), preset)
+        finally:
+            limpeza.apagar_pasta(raiz)
+
+
 @unittest.skipUnless(os.path.isdir(SHADERS), "sem o pacote de shaders do RetroArch")
 class ArquivoDaPartida(unittest.TestCase):
     """O arquivo de opcoes de verdade (gravar_override), numa pasta temporaria."""

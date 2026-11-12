@@ -1002,5 +1002,25 @@ Falta, nesta ordem:
   GitHub, e sem ela recusa e pede para atualizar o catálogo. **Risco aceito:** recomp sem marca nenhuma no catálogo
   (a maioria) vale pela marca do GitHub, ou só pelo https da release oficial que a pessoa confirmou na tela (o mesmo
   que o RecompLauncher faz).
-- **Falta:** os ajustes do recomp na tela (nível 2 do `recomplauncher.json`, `settings`); medir um recomp no Celeron
-  N5100; o APK de produção desta versão (no A12 ficou o APK de teste).
+- **Decidido (não fazer agora): os ajustes do recomp na tela** (nível 2 do `recomplauncher.json`, `settings`). Só 40
+  dos 1.606 recomps do catálogo trazem esse arquivo, e todos têm o menu próprio de ajustes dentro do jogo; o ARENA já
+  escreve os ajustes que o arquivo manda escrever antes de abrir. Reabrir se o número crescer.
+- **Medir um recomp no Celeron N5100:** só na máquina da escola (o recomp desenha pela placa, Direct3D 12 ou Vulkan).
+
+## 12/11/2026, 16h: SGSR, nitidez ajustável e o que estava velho nesta lista
+
+- **Cartão único dos acessórios: já estava feito** (25/10, `docs\ACESSORIOS.md`, "Cartão único": o PokketSX e o Pokket
+  usam o mesmo `Meu PocketStation.srm`, com cópia de segurança). A linha "o cartão único dos acessórios" do bloco de
+  12/11, 0h47, estava desatualizada.
+- **SGSR** (o SGSR 1 da Qualcomm, BSD-3-Clause): portado para o formato do RetroArch em `servidor\filtros\sgsr`
+  (`sgsr1.slang`, o texto da licença ao lado, `TERCEIROS.md`), escolha nova em Ajustes → Escala da tela. **O automático
+  não mudou** (não há como medir celulares médios aqui; nada de regresso). O RetroArch de verdade compila o preset
+  (`testes\teste_filtro_de_tela.py`, 23 de 23) e a foto do quadro sai certa (cores iguais, bordas mais firmes).
+- **NIS: decidido não.** Precisa de tabelas de coeficientes e de dois passos, e o FSR já faz o mesmo papel.
+- **Nitidez ajustável** (0 a 100; 50 = os valores de sempre, então quem não mexe não muda nada): vale para o FSR
+  (`FSR_SHARPENING`), o SGSR (`SGSR_NITIDEZ`) e o RCAS (`RCAS_STRENGTH`). O ARENA grava a cópia do preset em
+  `dados\filtros` (fora do git) e cai no preset de sempre se a cópia não achar os shaders.
+- **Nunca regresso, conferido no código de hoje:** no celular o catálogo de recomps nem é lido; a chave `recomps` só vai
+  no jogo que tem algum; a pergunta dos jogos do aparelho tem prazo de 4 s; o `tarfile` só é importado ao descompactar.
+  Medido na abertura do servidor: `recomps` 4 ms e `jogos_pc` 1 ms de importação; o catálogo, 9 ms; 3.300 consultas,
+  12 ms; as lojas, 27 ms (só no índice).

@@ -944,6 +944,7 @@ window.ARENA_DADOS = {
   "modo_modesto": false,
   "motor_ps2": "automatico",
   "navegador": "automatico",
+  "nitidez_da_escala": 50,
   "nome_dispositivo": "",
   "pastas_de_procura": [],
   "perfil_controle": {},

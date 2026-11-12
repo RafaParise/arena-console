@@ -1,0 +1,10 @@
+# Filtro do ARENA: SGSR 1 da Qualcomm (licenca BSD-3-Clause, o texto em sgsr/LICENSE.txt), feito para a placa de
+# video do celular. Um passo so: estica o quadro ate a tela e refaz as bordas (nao borra como o bilinear).
+# Escolha do aluno (Ajustes -> Escala da tela -> SGSR); o automatico nao usa (12/11/2026).
+# O caminho do shader sobe ate a raiz do ARENA para valer tambem na copia com a nitidez escolhida (dados/filtros).
+# Quem escolhe: servidor/graficos.py -> filtro_da_escala.
+shaders = "1"
+shader0 = "../../servidor/filtros/sgsr/sgsr1.slang"
+filter_linear0 = "true"
+scale_type0 = "viewport"
+scale0 = "1.000000"

@@ -275,6 +275,8 @@ async function carregarEstado() {
   $("#listaNivelGrafico").value = nivelDoGrafico(dados.config);
   explicarNivelGrafico();
   $("#listaEscalaTela").value = dados.config.escala_da_tela || "automatico";
+  $("#faixaNitidez").value = Number.isInteger(dados.config.nitidez_da_escala) ? dados.config.nitidez_da_escala : 50;
+  explicarNitidez();
   $("#listaFormatoImagem").value = dados.config.formato_da_imagem || "automatico";
   $("#listaBotoesNaTela").value = dados.config.botoes_na_tela || "automatico";
   $("#chaveVibrarCelular").setAttribute("aria-pressed", dados.config.vibrar_o_celular ? "true" : "false");
@@ -1798,6 +1800,8 @@ const EXPLICA_ESCALA_TELA = {
     "assentado. Perfeito no 2D; no 3D, o jogo fica com cara de blocos. Quase não pesa.",
   nitido: "O FSR, da AMD, procura as bordas antes de esticar, como quem amplia um desenho " +
     "passando o contorno a limpo. O mais bonito no 3D, e pesa um pouco mais na placa de vídeo.",
+  sgsr: "O SGSR, da Qualcomm, foi feito para a placa de vídeo do celular: estica num passo só e refaz " +
+    "só as bordas. Mais leve que o FSR, mais firme que o esticar comum.",
   suave: "Arredonda os pixels dos jogos 2D, como se o desenho fosse refeito à mão. No 3D, usa " +
     "o FSR. É o que mais pesa.",
   anime4k: "Afina as linhas do contorno ao esticar, como o modo Anime4K do Lossless Scaling. " +
@@ -2598,6 +2602,15 @@ function explicarFormatoImagem() {
 function explicarEscalaTela() {
   const valor = $("#listaEscalaTela").value;
   $("#explicaEscalaTela").textContent = EXPLICA_ESCALA_TELA[valor] || EXPLICA_ESCALA_TELA.automatico;
+}
+
+// Nitidez (12/11/2026, servidor\graficos.py -> filtro_com_nitidez): quanto os filtros que afiam (o RCAS, o FSR e o
+// SGSR) firmam as bordas. 50 e' o de sempre.
+function explicarNitidez() {
+  const valor = Number($("#faixaNitidez").value);
+  const como = valor === 50 ? "a de sempre" : valor < 50 ? "mais macia que a de sempre" : "mais firme que a de sempre";
+  $("#explicaNitidez").textContent = `Nitidez ${valor} de 100 (${como}). Vale para o FSR, o SGSR e a nitidez ` +
+    "das placas fracas; o pixel nítido e o Inteiro não mudam. Firme demais pode deixar o jogo granulado.";
 }
 
 function nivelDoGrafico(config) {
@@ -6326,6 +6339,18 @@ function ligarEventos() {
     }
   });
 
+  $("#faixaNitidez").addEventListener("input", explicarNitidez);
+  $("#faixaNitidez").addEventListener("change", async (evento) => {
+    const faixa = evento.currentTarget;
+    try {
+      await salvarConfig({ nitidez_da_escala: Number(faixa.value) });
+      recado("Pronto. Vale no próximo jogo.");
+    } catch (falha) {
+      faixa.value = (estado.config && estado.config.nitidez_da_escala) || 50;
+      recado(falha.message, true);
+    }
+    explicarNitidez();
+  });
   $("#listaEscalaTela").addEventListener("change", async (evento) => {
     const lista = evento.currentTarget;
     try {
