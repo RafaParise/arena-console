@@ -310,11 +310,17 @@ def entradas_do_manifesto(plataforma):
 def entradas_do_aparelho(plataforma, jogos=None):
     """Os jogos de Android instalados no celular, no formato do manifesto (o 'arquivo' e' android://<pacote>). So no
     ARENA do celular; 'jogos' (lista de {"pacote", "nome"}) serve aos testes."""
+    rotulo = "Instalado no celular"
     if jogos is None:
         if not plataforma_do_sistema.ANDROID:
-            return []
-        import ponte_android
-        jogos = ponte_android.jogos_do_aparelho()
+            # No Linux, os do Android do Waydroid (servidor\waydroid.py, 13/11/2026); no Windows, nenhum.
+            import waydroid
+            if not waydroid.pronto():
+                return []
+            jogos, rotulo = waydroid.jogos(), "No Android deste Linux"
+        else:
+            import ponte_android
+            jogos = ponte_android.jogos_do_aparelho()
     entradas = []
     for jogo in jogos:
         pacote = re.sub(r"[^A-Za-z0-9._]", "", str(jogo.get("pacote") or ""))
@@ -327,7 +333,7 @@ def entradas_do_aparelho(plataforma, jogos=None):
             "plataforma_nome": plataforma["nome"],
             "arquivo": "android://" + pacote,
             "origem": ORIGEM_APARELHO,
-            "origem_rotulo": "Instalado no celular",
+            "origem_rotulo": rotulo,
             "loja": "android",
             "pede_placar": False,
             "jogadores_do_jogo": 1, "jogadores_max": 1, "rede_propria": False, "motivo_jogadores": "",

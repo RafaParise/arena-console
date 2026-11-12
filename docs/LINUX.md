@@ -198,3 +198,29 @@ controle XInput vira udev; o d3d11 vira glcore), e o contrário no Windows.
 - **Prioridade alta para o emulador:** sem administrador, o Linux não deixa
   subir a prioridade de um programa. O efeito parecido vem da sessão
   própria do emulador (ver a tabela).
+
+## Jogos de Android no Linux, pelo Waydroid (13/11/2026)
+
+Pedido de um aluno que usa Linux: os mesmos jogos de Android do ARENA do
+celular. O Waydroid (waydro.id, GPL-3.0) roda um Android inteiro num
+contêiner do Linux, e o jogo abre numa janela, sem emulador
+(`servidor/waydroid.py`).
+
+- **Instalar** fica em **Equipamentos → Jogos de Android no Linux**. Pede a
+  senha de administrador (a tela avisa antes e o `pkexec` mostra a janela
+  do próprio Linux). O roteiro faz o mesmo que o roteiro oficial
+  (`repo.waydro.id`), escrito no ARENA para não rodar como administrador um
+  script baixado: a chave do repositório, a linha do apt (só para as versões
+  que o repositório atende), `apt-get install waydroid`, `waydroid init` com
+  os canais oficiais e o `waydroid-container` ligado. No Fedora e no Void,
+  o pacote do próprio sistema.
+- Depois disso, nada pede senha: o ARENA liga a sessão do Android, lê os
+  apps (`waydroid app list`, sem os do sistema), instala os `.apk` de
+  `jogos/pessoais/Android` e abre o jogo (`waydroid app launch`).
+- **Precisa de duas coisas do Linux**, que o ARENA confere e explica em vez
+  de falhar calado: o **binder** no núcleo e a sessão **Wayland**.
+- **Não testado num Linux de verdade com Waydroid**: o WSL do computador de
+  desenvolvimento não tem binder. Os testes (`servidor/tests/test_waydroid.py`)
+  usam as saídas no formato do próprio Waydroid; no Ubuntu 26.04 do WSL, o
+  módulo reconheceu a versão (`resolute`), montou o roteiro (`sh -n` sem
+  erro) e disse que falta o binder.

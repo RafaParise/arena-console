@@ -36,6 +36,7 @@ import lossless
 import mfg
 import plataforma as plataforma_do_sistema
 import recomps
+import waydroid
 
 PASTA_SERVIDOR = os.path.dirname(os.path.abspath(__file__))
 RAIZ = os.path.dirname(PASTA_SERVIDOR)
@@ -180,6 +181,8 @@ def _trabalhar(depois=None):
                 instalar_wine()
             elif item_id == "linux":
                 preparar_linux()
+            elif item_id == "waydroid":
+                atualizar_android_do_linux()
             elif item_id.startswith("recomp:"):
                 recomps.instalar(item_id.split(":", 1)[1])
             if depois:
@@ -214,7 +217,7 @@ def equipar(ids, depois=None):
 # ---------------------------------------------------------------------------
 def _item(item_id, icone, nome, para_que, estado, detalhe="", acao=None, itens=None):
     """Um recurso. 'estado': pronto | falta | opcional | pago. A tela escreve a palavra e o icone (nunca so a cor)."""
-    andando = andamento(item_id) if acao and acao.get("tipo") == "baixar" else {}
+    andando = andamento(item_id) if acao and acao.get("tipo") in ("baixar", "admin") else {}
     return {"id": item_id, "icone": icone, "nome": nome, "para_que": para_que, "estado": estado,
             "detalhe": detalhe, "acao": acao or {"tipo": "nenhuma"}, "andamento": andando, "itens": itens or []}
 
@@ -292,6 +295,7 @@ def listar(raiz, plataformas, jogos, achar_externo, nucleos_prontos=0, retroarch
         lista.append(_item_do_wsl())
     elif os.name != "nt":
         lista.append(_item_do_wine(raiz))
+        lista.append(_item_do_waydroid(raiz))
     return lista
 
 
@@ -461,6 +465,88 @@ def _baixar_conferido(item_id, arquivo, marcas, pasta, raiz, tem_o_programa):
             os.remove(caminho)
         except OSError:
             pass
+
+
+def _item_do_waydroid(raiz):
+    """Jogos de Android no Linux: o Waydroid (instalar pede administrador, avisado antes; o resto, nao)."""
+    nome, icone = "Jogos de Android no Linux", "🤖"
+    para_que = "Os jogos de celular (Android) abrem numa janela deste Linux. Não é preciso para jogar o resto."
+    situacao = waydroid.situacao()
+    andando = andamento("waydroid")
+    if andando.get("estado") == "rodando" and not situacao["preparado"]:
+        return _item("waydroid", icone, nome, para_que, "opcional", "⏳ " + andando.get("mensagem", ""))
+    if not situacao["preparado"]:
+        falta = "" if situacao["binder"] else (" Atenção: este Linux não tem o \"binder\" do Android no núcleo; sem "
+                                               "ele o Waydroid não liga (veja docs.waydro.id).")
+        return _item("waydroid", icone, nome, para_que, "opcional",
+                     "Precisa do Waydroid, um Android que roda dentro do Linux. Instalar pede a senha de "
+                     "administrador e baixa uns 800 MB." + falta,
+                     {"tipo": "admin", "rotulo": "Instalar (pede permissão de administrador)",
+                      "aviso": "Para instalar o Waydroid, o Linux vai pedir a senha de administrador (de quem cuida "
+                               "do computador). Ele baixa o Android oficial do Waydroid, uns 800 MB, e pode demorar. "
+                               "Continuar?"})
+    if not situacao["binder"]:
+        return _item("waydroid", icone, nome, para_que, "falta",
+                     "O Waydroid está instalado, mas este Linux não tem o \"binder\" no núcleo. Peça a quem cuida do "
+                     "computador (docs.waydro.id, Troubleshooting).")
+    jogos = waydroid.jogos(raiz)
+    aviso = "" if waydroid.tem_wayland() else (" Para abrir, entre no Linux pela sessão Wayland (na tela de entrada, "
+                                                "a engrenagem).")
+    return _item("waydroid", icone, nome, para_que, "pronto",
+                 "Pronto: %d jogos de Android. Ponha APKs em jogos/pessoais/Android e clique em Atualizar.%s"
+                 % (len(jogos), aviso),
+                 {"tipo": "baixar", "rotulo": "Atualizar os jogos de Android"})
+
+
+def atualizar_android_do_linux(raiz=RAIZ):
+    """Liga o Android do Waydroid, instala os APKs novos da pasta e le a lista de jogos de novo."""
+    _anotar("waydroid", estado="rodando", mensagem="Ligando o Android (uns 30 segundos)...", feito=0, total=0)
+    if not waydroid.ligar_sessao():
+        _anotar("waydroid", estado="erro", mensagem="O Android não ligou. Reinicie o computador e tente de novo.")
+        return
+    _anotar("waydroid", mensagem="Instalando os APKs da pasta jogos/pessoais/Android...")
+    novos = waydroid.instalar_apks(raiz)
+    lista = waydroid.jogos(raiz)
+    _anotar("waydroid", estado="pronto", mensagem="Pronto: %d jogos (%d novos)." % (len(lista), novos))
+
+
+def instalar_waydroid_com_administrador(raiz=RAIZ):
+    """Roda o roteiro de instalacao do Waydroid com o pkexec (a janela da senha e' do proprio Linux), em segundo
+    plano, e guarda o que ele escreveu em dados/waydroid-instalacao.log. Devolve a frase para a tela."""
+    if os.name == "nt" or plataforma_do_sistema.ANDROID:
+        raise recomps.NaoDaParaInstalar("O Waydroid é do Linux.")
+    if (andamento("waydroid") or {}).get("estado") == "rodando":
+        return "A instalação do Waydroid já está andando. Espere terminar."
+    roteiro, motivo = waydroid.roteiro_de_instalacao()
+    if not roteiro:
+        raise recomps.NaoDaParaInstalar(motivo)
+    comando = waydroid.comando_com_administrador(roteiro)
+    if not comando:
+        raise recomps.NaoDaParaInstalar("Este Linux não tem o pkexec, que pede a senha de administrador. Peça a quem "
+                                        "cuida do computador para instalar o Waydroid (docs.waydro.id).")
+    os.makedirs(os.path.join(raiz, "dados"), exist_ok=True)
+    caminho_log = os.path.join(raiz, "dados", "waydroid-instalacao.log")
+    _anotar("waydroid", estado="rodando", mensagem="Instalando o Waydroid (pode levar uns 15 minutos)...")
+
+    def instalar():
+        texto = ""
+        try:
+            with open(caminho_log, "wb") as log:
+                codigo = subprocess.run(comando, stdout=log, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL,
+                                        timeout=3600).returncode
+        except (OSError, subprocess.SubprocessError) as falha:
+            codigo, texto = 1, str(falha)
+        waydroid.esquecer()
+        if codigo in (126, 127):
+            _anotar("waydroid", estado="erro", mensagem="A senha de administrador não foi dada, então nada mudou.")
+        elif codigo != 0:
+            _anotar("waydroid", estado="erro", mensagem="A instalação parou (código %d%s). O que aconteceu está em "
+                    "dados/waydroid-instalacao.log." % (codigo, (": " + texto) if texto else ""))
+        else:
+            _anotar("waydroid", estado="pronto", mensagem="Waydroid instalado. Clique em Atualizar os jogos.")
+    threading.Thread(target=instalar, daemon=True).start()
+    return ("O Linux vai pedir a senha de administrador numa janela à parte. Depois o ARENA instala o Waydroid e baixa "
+            "o Android sozinho: acompanhe aqui, na linha Jogos de Android no Linux.")
 
 
 def _wsl_exe():

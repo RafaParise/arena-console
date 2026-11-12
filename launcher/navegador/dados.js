@@ -2768,7 +2768,7 @@ window.ARENA_DADOS = {
    "descricao": "Os jogos de Android instalados neste celular. O ARENA acha cada um sozinho e abre direto, sem emulador.",
    "extensoes": [],
    "id": "android",
-   "motivo_fora": "Os jogos de Android abrem no ARENA do celular, onde estão instalados. No computador não há Android para rodá-los sem instalar programa.",
+   "motivo_fora": "Os jogos de Android abrem no ARENA do celular, onde estão instalados, ou no ARENA do Linux com o Waydroid (Equipamentos). No Windows não há Android para rodá-los.",
    "nativo": true,
    "netplay": false,
    "netplay_motivo": "Jogo de Android usa a rede do próprio jogo: o Jogar Junto do ARENA é só do RetroArch.",

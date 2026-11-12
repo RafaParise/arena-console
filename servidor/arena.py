@@ -82,7 +82,8 @@ import recomps      # noqa: E402  (o jogo de console recompilado para PC: baixar
 import jogos_pc     # noqa: E402  (o console PC: o programa do jogo, as lojas, Wine e WSL -- 12/11/2026)
 import equipamentos  # noqa: E402
 import internet_de_casa  # noqa: E402
-import repasse_publico  # noqa: E402  (partida entre casas pelo retransmissor publico, sem lista -- 13/11/2026)  (a internet de casa serve para partida entre casas? CGNAT, UPnP -- 13/11/2026)  (o painel Equipamentos: o que o ARENA tem e o botao que resolve -- 13/11/2026)
+import repasse_publico  # noqa: E402
+import waydroid  # noqa: E402  (os jogos de Android no Linux, 13/11/2026)  (partida entre casas pelo retransmissor publico, sem lista -- 13/11/2026)  (a internet de casa serve para partida entre casas? CGNAT, UPnP -- 13/11/2026)  (o painel Equipamentos: o que o ARENA tem e o botao que resolve -- 13/11/2026)
 import navegadores  # noqa: E402  (em que navegador a tela abre -- item 11, 17/10/2026)
 # O que a configuracao aceita em "navegador".
 NAVEGADORES_ACEITOS = ("automatico",) + tuple(c[0] for c in navegadores.CONHECIDOS)
@@ -2364,8 +2365,14 @@ def avaliar_plataformas(forcar=False):
             # O console PC (servidor\jogos_pc.py): o jogo roda direto, sem nucleo nem emulador. No celular, nao.
             # O console "Jogos de Android" e' o contrario: so no celular, onde os jogos estao instalados.
             neste = plataforma_do_sistema.ANDROID == bool(plataforma.get("so_android"))
+            motivo_fora = plataforma.get("motivo_fora", "")
+            if plataforma.get("so_android") and plataforma_do_sistema.LINUX and not plataforma_do_sistema.ANDROID:
+                # No Linux, os jogos de Android abrem pelo Waydroid (servidor\waydroid.py, 13/11/2026).
+                neste = waydroid.pronto()
+                motivo_fora = ("No Linux, os jogos de Android abrem pelo Waydroid: abra Equipamentos, linha Jogos de "
+                               "Android no Linux, e clique em Instalar.")
             estado = "pronta" if neste else "sem_core"
-            motivo = "" if neste else plataforma.get("motivo_fora", "")
+            motivo = "" if neste else motivo_fora
         elif caminho_externo and falta_externo:
             # Emulador de fora instalado, mas sem o que ele precisa para
             # abrir um jogo (BIOS do PS2, firmware do PS3): cartao amarelo
@@ -7254,7 +7261,7 @@ class Manipulador(BaseHTTPRequestHandler):
             validos = []
             for item_id in pedidos[:200]:
                 item_id = str(item_id)[:80]
-                if item_id in ("mfg", "wine", "linux") or (item_id.startswith("recomp:")
+                if item_id in ("mfg", "wine", "linux", "waydroid") or (item_id.startswith("recomp:")
                                                            and recomps.recomp(item_id.split(":", 1)[1])):
                     validos.append(item_id)
             if not validos:
@@ -7269,8 +7276,17 @@ class Manipulador(BaseHTTPRequestHandler):
         if caminho == "/api/equipamentos/admin":
             # A UNICA coisa do ARENA que pede administrador (pedido do Rafael, 13/11/2026): ligar o WSL, para os jogos
             # de Linux no Windows. A tela avisa antes; aqui o proprio Windows mostra o pedido de permissao (UAC).
-            if str(dados.get("id") or "") != "wsl" or not plataforma_do_sistema.WINDOWS:
-                return self.erro("Isso só existe no Windows: o WSL. Abra Equipamentos de novo.", 400)
+            # A irma no Linux (13/11/2026): instalar o Waydroid, para os jogos de Android; o pkexec pede a senha.
+            pedido_admin = str(dados.get("id") or "")
+            if pedido_admin == "waydroid" and plataforma_do_sistema.LINUX and not plataforma_do_sistema.ANDROID:
+                try:
+                    frase = equipamentos.instalar_waydroid_com_administrador()
+                except recomps.NaoDaParaInstalar as falha:
+                    return self.erro(str(falha), 409)
+                return self.responder_json({"ok": True, "mensagem": frase})
+            if pedido_admin != "wsl" or not plataforma_do_sistema.WINDOWS:
+                return self.erro("Isso só existe no Windows (o WSL) ou no Linux (o Waydroid). Abra Equipamentos de "
+                                 "novo.", 400)
             try:
                 frase = equipamentos.ligar_o_wsl_com_administrador()
             except recomps.NaoDaParaInstalar as falha:
@@ -8118,6 +8134,14 @@ class Manipulador(BaseHTTPRequestHandler):
             if plataforma.get("so_android"):
                 # O jogo de Android instalado no celular: o ARENA so o abre (ArenaServico.java, abrirApp).
                 pacote = jogos_pc.pacote_do_arquivo(jogo.get("arquivo"))
+                if not plataforma_do_sistema.ANDROID and plataforma_do_sistema.LINUX and waydroid.pronto():
+                    # O Android dentro do Linux (Waydroid, 13/11/2026): o jogo abre numa janela.
+                    aberto, motivo_waydroid = waydroid.abrir(pacote)
+                    if not aberto:
+                        return self.erro(motivo_waydroid, 409)
+                    return self.responder_json({"ok": True, "titulo": jogo["titulo"], "emulador": "Waydroid",
+                                                "aviso": "O jogo abre numa janela do Android (pode levar uns "
+                                                         "segundos na primeira vez)."})
                 if not plataforma_do_sistema.ANDROID:
                     return self.erro(plataforma.get("motivo_fora") or "Abra este jogo no celular.", 409)
                 if not pacote or not ponte_android.abrir_app(pacote):

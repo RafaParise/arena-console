@@ -1798,7 +1798,7 @@
       "nativo": true,
       "so_android": true,
       "sem_pasta": true,
-      "motivo_fora": "Os jogos de Android abrem no ARENA do celular, onde estão instalados. No computador não há Android para rodá-los sem instalar programa.",
+      "motivo_fora": "Os jogos de Android abrem no ARENA do celular, onde estão instalados, ou no ARENA do Linux com o Waydroid (Equipamentos). No Windows não há Android para rodá-los.",
       "extensoes": [],
       "netplay": false,
       "netplay_motivo": "Jogo de Android usa a rede do próprio jogo: o Jogar Junto do ARENA é só do RetroArch.",

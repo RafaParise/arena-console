@@ -1558,7 +1558,7 @@ function desenharInternet(dados) {
 }
 
 async function pedirAdministrador(itemId, aviso) {
-  if (!window.confirm(aviso || "Isto pede a permissão de administrador do Windows. Continuar?")) return;
+  if (!window.confirm(aviso || "Isto pede a permissão de administrador do computador. Continuar?")) return;
   try {
     const resposta = await pedir("/api/equipamentos/admin", "POST", { id: itemId });
     recado(resposta.mensagem, false, 12000);

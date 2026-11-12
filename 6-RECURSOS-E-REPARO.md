@@ -37,6 +37,13 @@ O que aparece:
   coisa do ARENA que pede **permissão de administrador** (🔑 escrito na linha e perguntado antes); o segundo,
   **Preparar o Linux do ARENA**, não pede.
 - **Jogos de Windows no Linux** (Wine), no ARENA do Linux: opcional; o ARENA baixa o Wine portátil, sem permissão.
+- **Jogos de Android no Linux** (Waydroid), no ARENA do Linux: opcional. **Instalar** pede a senha de
+  administrador (avisado antes; o Linux mostra a janela da senha) e baixa o Android oficial do Waydroid, uns
+  800 MB. Depois, os jogos de Android instalados nele aparecem no console **Jogos de Android** e abrem numa
+  janela. Para pôr um jogo: copie o `.apk` para `jogos/pessoais/Android` e clique em **Atualizar os jogos de
+  Android**. Precisa de duas coisas do Linux que o ARENA confere e explica: o "binder" no núcleo (o Ubuntu
+  e o Fedora já têm) e a sessão **Wayland** (na tela de entrada, a engrenagem). O que a instalação escreveu
+  fica em `dados/waydroid-instalacao.log`.
 
 **Equipar tudo o que é grátis** baixa de uma vez o que falta, um item por vez, em segundo plano: dá para fechar a
 janela e jogar. O botão diz antes quantos itens são e o tamanho aproximado. Tudo vem do site de quem fez, com a marca
