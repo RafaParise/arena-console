@@ -997,8 +997,10 @@ Falta, nesta ordem:
 - **Revisão de segurança automática (dois achados, consertados):** o atalho da Epic passava pelo `cmd /c start` (o `&`
   do endereço viraria outro comando): agora vai pelo `rundll32 url.dll,FileProtocolHandler` e só com nome de jogo de
   letras, números, ponto e hífen. A marca SHA-256 do recomp vinha só do GitHub: a do catálogo (outra fonte, com o nome do
-  arquivo) agora manda e as duas têm de bater. **Risco aceito:** sem nenhuma marca, ou quando o GitHub não tem a versão
-  do catálogo e o ARENA usa a mais nova, vale o https da release oficial que a pessoa confirmou na tela (o mesmo que o
-  RecompLauncher faz).
+  arquivo) agora manda e as duas têm de bater. Terceiro achado (mesmo dia): o arquivo marcado no catálogo é o que se
+  baixa quando está na release; se o catálogo marca outro arquivo (versão nova do autor), só instala com a marca do
+  GitHub, e sem ela recusa e pede para atualizar o catálogo. **Risco aceito:** recomp sem marca nenhuma no catálogo
+  (a maioria) vale pela marca do GitHub, ou só pelo https da release oficial que a pessoa confirmou na tela (o mesmo
+  que o RecompLauncher faz).
 - **Falta:** os ajustes do recomp na tela (nível 2 do `recomplauncher.json`, `settings`); medir um recomp no Celeron
   N5100; o APK de produção desta versão (no A12 ficou o APK de teste).

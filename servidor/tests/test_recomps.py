@@ -211,11 +211,38 @@ class Instalar(unittest.TestCase):
             self._instalar_com(recomps._sha256(origem))     # o GitHub "concorda" com o arquivo, o catalogo nao
         self.assertFalse(os.path.isdir(recomps.pasta_do("zelda64recomp")))
 
-    def test_marca_de_outro_arquivo_nao_vale(self):
-        """A marca do catalogo e' de outra versao (outro nome): vale so a do GitHub."""
+    def test_marca_de_outro_arquivo_so_com_a_do_github(self):
+        """A marca do catalogo e' de outra versao (outro nome): instala so se o GitHub publica a marca desta; sem
+        nenhuma das duas, recusa (revisao de seguranca de 12/11/2026)."""
         self._com_marca_no_catalogo("f" * 64, nome="Zelda64Recompiled-v1.0-Windows.zip")
-        self._instalar_com("")
+        with self.assertRaises(recomps.NaoDaParaInstalar) as erro:
+            self._instalar_com("")
+        self.assertIn("catálogo", str(erro.exception))
+        self.assertFalse(os.path.isdir(recomps.pasta_do("zelda64recomp")))
+        origem = os.path.join(self.pasta, "o.zip")
+        zip_de_teste(origem)
+        self._instalar_com(recomps._sha256(origem))
         self.assertFalse(recomps.ler_marca(recomps.pasta_do("zelda64recomp"))["conferido_pelo_catalogo"])
+
+    def test_o_arquivo_marcado_no_catalogo_vem_primeiro(self):
+        """Na release ha dois arquivos que servem; o marcado no catalogo e' o baixado."""
+        origem = os.path.join(self.pasta, "o.zip")
+        zip_de_teste(origem)
+        self._com_marca_no_catalogo(recomps._sha256(origem), nome="Zelda64-Windows-pinado.zip")
+        rel = {"tag": "v1", "arquivos": [
+            {"nome": n, "url": "https://github.com/x/y/releases/download/v1/" + n, "tamanho": 10, "sha256": ""}
+            for n in ("Zelda64Recompiled-v1.2.2-Windows.zip", "Zelda64-Windows-pinado.zip")]}
+        baixados = []
+
+        def baixar_falso(url, segundos, destino=None, agente=None):
+            baixados.append(url)
+            with open(origem, "rb") as de, open(destino, "wb") as para:
+                para.write(de.read())
+            return 0, b""
+        with mock.patch.object(recomps, "release", return_value=rel), \
+                mock.patch.object(recomps.baixar, "rodar", side_effect=baixar_falso):
+            recomps.instalar("zelda64recomp", "windows", "x64")
+        self.assertTrue(baixados[0].endswith("/Zelda64-Windows-pinado.zip"))
 
     def test_formato_que_o_arena_nao_abre_explica(self):
         with mock.patch.object(recomps, "release", return_value=self._release_falsa("Jogo-Setup.exe")), \

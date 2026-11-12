@@ -368,8 +368,12 @@ def instalar(recomp_id, sistema_alvo=None, arq=None):
     baixando = os.path.join(PASTA_RECOMPS, ".baixando")
     try:
         rel = release(r.get("repo", ""), r.get("tag", ""))
-        nome = escolher_arquivo([a["nome"] for a in rel["arquivos"]], (r.get("arquivos") or {}).get(sistema_alvo),
-                                sistema_alvo, arq)
+        # O arquivo que o catalogo marcou (nome e SHA-256, guardados a parte do GitHub) vem primeiro, se estiver na
+        # release; senao, o que o padrao do nome e as palavras escolherem (revisao de seguranca de 12/11/2026).
+        do_catalogo = (r.get("marcas") or {}).get(sistema_alvo) or {}
+        nomes = [a["nome"] for a in rel["arquivos"]]
+        nome = (do_catalogo.get("nome") if do_catalogo.get("nome") in nomes else
+                escolher_arquivo(nomes, (r.get("arquivos") or {}).get(sistema_alvo), sistema_alvo, arq))
         if not nome:
             raise NaoDaParaInstalar("A release %s de %s não tem arquivo para %s %s." % (rel["tag"], r["nome"], sistema_alvo, arq))
         arquivo = next(a for a in rel["arquivos"] if a["nome"] == nome)
@@ -387,9 +391,14 @@ def instalar(recomp_id, sistema_alvo=None, arq=None):
         # Duas marcas: a do catalogo (guardada a parte, vale para o mesmo nome de arquivo) e a que o GitHub publica.
         # A do catalogo manda; as duas tem que bater com o arquivo. Sem nenhuma, o download vale pelo https da
         # release oficial que a pessoa confirmou na tela (risco aceito, anotado em docs\PENDENCIAS.md, 12/11/2026).
-        do_catalogo = (r.get("marcas") or {}).get(sistema_alvo) or {}
         esperadas = [m.lower() for m in (do_catalogo.get("sha256") if do_catalogo.get("nome") == nome else "",
                                          arquivo["sha256"]) if m]
+        if do_catalogo and do_catalogo.get("nome") != nome and not arquivo["sha256"]:
+            # O catalogo conhece outra versao deste arquivo e o GitHub nao publica marca desta: nao instala no escuro.
+            os.remove(caminho)
+            raise NaoDaParaInstalar("O autor publicou uma versão de %s que o catálogo do ARENA ainda não conferiu, e o "
+                                    "GitHub não mostra a marca dela. Nada foi instalado. Peça ao professor para atualizar "
+                                    "o catálogo (ferramentas\\atualizar_recomps.py)." % r["nome"])
         if any(marca.lower() != m for m in esperadas):
             os.remove(caminho)
             raise NaoDaParaInstalar("A marca SHA-256 de %s não bate com a publicada: o download veio errado ou foi "
