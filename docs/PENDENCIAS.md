@@ -1039,3 +1039,16 @@ Falta, nesta ordem:
   quase vazia (passou em 3 de 6 tentativas, ora no normal, ora no modesto). Nada do PocketStation mudou desde a
   2026.11.11. Fica para olhar a foto a olho num momento calmo.
 - Bateria do servidor: 1.414 testes OK.
+
+## 12/11/2026, 18h: Release 2026.11.12 publicada (Latest)
+
+- https://github.com/RafaParise/arena-console/releases/tag/v2026.11.12 com os 5 arquivos: zip completo (1,1 GB),
+  zip de atualização (111 MB), APK do celular arm64 (257 MB), APK do Chromebook x86_64 (246 MB) e SHA256.txt (as 4
+  marcas conferidas com as do GitHub). A nota (`docs\RELEASE-2026.11.12.md`) termina com os créditos do DOOK3DS e do
+  HugoVHK. `main` = o commit do lançamento.
+- O A12 ficou com o APK de produção 2026.11.12 (abertura a frio 700 ms; era 868 ms).
+- A montagem da versão dos alunos ficou em `%LOCALAPPDATA%\ARENA-montagem-2026.11.12\ARENA-alunos` (2,6 GB; pode
+  apagar, como a de 2026.11.11 em `%LOCALAPPDATA%\ARENA-montagem`) e os pacotes em
+  `%LOCALAPPDATA%\ARENA-release-2026.11.12`. O disco C: está com 98% (uns 10 GB livres).
+- **Fica para depois:** a foto instável do PocketStation na matriz; a versão dos alunos do Rafael (`..\ARENA`) só
+  recebe esta versão pelo `montar_versao_alunos.py --atualizar`, quando ele quiser.
