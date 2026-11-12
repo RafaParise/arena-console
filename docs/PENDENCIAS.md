@@ -1069,3 +1069,25 @@ Falta, nesta ordem:
   confere o pedido "runas" e a recusa). Testar num PC sem WSL.
 - **Fica para decidir:** jogos de Android no computador pelo **Waydroid** (Linux, pede administrador e módulos do
   kernel; não dá para testar aqui); a próxima release (rodada final de ~80 min antes).
+
+## 13/11/2026 (noite): partida entre casas com CGNAT e jogos de Android no Linux
+
+- **Feito (d0fdc2b):** a casa do Rafael tem **CGNAT** (conferido pelo UPnP: a ONT tem 100.66.x, o endereço público é
+  outro). Então a partida entre casas passou a ir pelo **retransmissor público do RetroArch** (São Paulo), por uma
+  **ponte local** do ARENA que lê a sessão e mostra um código de 20 letras: sem lista pública, funciona com CGNAT dos
+  dois lados (teste com dois RetroArch de verdade: jogador 2 entrou, ping 16 a 32 ms). Equipamentos ganhou **Conferir
+  minha internet** (CGNAT, dois roteadores, abrir as portas pelo UPnP por 4 h). A chave "Estamos em casas diferentes"
+  aparece sempre.
+- **Feito (90e1420):** **jogos de Android no Linux pelo Waydroid** (`servidor\waydroid.py`). Instalar pede a senha
+  (segunda exceção ao "sem administrador", registrada no `CLAUDE.md`, avisada antes, `pkexec`); depois liga a sessão,
+  lê os apps, instala os APKs de `jogos/pessoais/Android` e abre o jogo numa janela. **Não testado num Linux com
+  binder** (o WSL não tem): 19 testes com as saídas do Waydroid; no Ubuntu 26.04 do WSL, o roteiro saiu certo.
+  **Pedir ao aluno que usa Linux** para testar e mandar o `dados/waydroid-instalacao.log` se falhar.
+- **Próximo (desempenho por máquina):** nos emuladores já existe (`por_nota` do `graficos.json`, modo modesto, ultra
+  do PCSX2 e do Dolphin). Falta nos **recomps**: o descritor já aceita `config` com `new` (só na primeira vez, sem
+  apagar o ajuste da pessoa), mas as chaves mudam de jogo para jogo (os do N64 usam o `graphics.json` do RT64).
+  Conferir as chaves em cada repositório antes de escrever; nada de chute.
+- **Ideia, não feita:** usar as antenas Wi-Fi para uma "rede de jogo" (Hotspot Móvel do Windows). A AX210 não aceita a
+  rede hospedada antiga; fica para quando houver pedido.
+- **Próximo passo:** rodada final (`ferramentas\rodada_final.py`, ~80 min), VERSAO nova, APKs testados no A12,
+  pacote dos alunos montado do zero, release com os créditos (DOOK3DS, HugoVHK).
