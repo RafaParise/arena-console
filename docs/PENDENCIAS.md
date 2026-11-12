@@ -1052,3 +1052,20 @@ Falta, nesta ordem:
   `%LOCALAPPDATA%\ARENA-release-2026.11.12`. O disco C: está com 98% (uns 10 GB livres).
 - **Fica para depois:** a foto instável do PocketStation na matriz; a versão dos alunos do Rafael (`..\ARENA`) só
   recebe esta versão pelo `montar_versao_alunos.py --atualizar`, quando ele quiser.
+
+## 13/11/2026: Equipamentos, tudo por dentro do ARENA (pedido do Rafael)
+
+- **Feito:** botão **🧰 Equipamentos** (`servidor\equipamentos.py`), para quem não entende de computador: uma linha por
+  recurso, estado com ícone e palavra, um botão. Baixa sozinho o **MFG Super Motion** (do autor, `.rar` aberto pelo
+  `tar` do Windows), as **versões para PC** dos jogos que a pessoa tem (agora também 7z e rar) e, no Linux, o **Wine
+  portátil**; abre a página do **Lossless Scaling** na Steam (pago, não obrigatório). O **Jogar** não pergunta mais pelo
+  recomp: a versão para PC baixada abre sozinha, e o painel do jogo volta ao emulador. **WSL** no Windows: a única
+  exceção ao "sem administrador" (registrada no `CLAUDE.md`), com aviso e o pedido do próprio Windows; depois o
+  **Linux do ARENA** (Ubuntu oficial para WSL, disco em `emuladores\Linux`), sem administrador.
+- **Testado de verdade:** recomp `.7z` baixado e aberto pelo Equipar tudo; Wine 11.21 rodou um programa do Windows no
+  Ubuntu; o Linux do ARENA montou em 1 min com OpenGL e SDL2 (desfeito depois). Bateria 1.441 OK; navegadores 30/30;
+  acessibilidade 10/10; auditoria do front 0 problemas (o controle da Nitidez passou a 44 px).
+- **Não testado com clique de verdade:** a janela do UAC do botão do WSL (este PC já tem o WSL; o teste automático
+  confere o pedido "runas" e a recusa). Testar num PC sem WSL.
+- **Fica para decidir:** jogos de Android no computador pelo **Waydroid** (Linux, pede administrador e módulos do
+  kernel; não dá para testar aqui); a próxima release (rodada final de ~80 min antes).
