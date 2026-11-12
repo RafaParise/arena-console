@@ -1091,3 +1091,8 @@ Falta, nesta ordem:
   rede hospedada antiga; fica para quando houver pedido.
 - **Próximo passo:** rodada final (`ferramentas\rodada_final.py`, ~80 min), VERSAO nova, APKs testados no A12,
   pacote dos alunos montado do zero, release com os créditos (DOOK3DS, HugoVHK).
+- **Rodada final de 13/11 interrompida** (o Claude Code a parou por falta de memória do PC) depois de 7 testes:
+  `textos_sem_acento` falhou por um falso alarme ("Feche esta janela"; frase trocada, 5034bb7);
+  `teste_60_ps2_celular` falhou porque o A12 estava sendo usado ao mesmo tempo (teste do 4G); `teste_abaixo_do_original`
+  deu 1 de 36 (qual, a rodada não mostrou: rodar sozinho). Retomar: `ferramentas\rodada_final.py --continuar`, com o
+  PC folgado. O erro intermitente de "conexão abortada" nos testes do Android foi achado e corrigido (e87618c).
