@@ -52,6 +52,9 @@ def montar():
         ax = bool(so) and all(n in marcas.get("x86_64", {}) for n in so)
         if externo and not so:
             a64 = ax = False
+        if p.get("so_android"):   # os jogos de Android instalados no celular: so no APK
+            win = linux = False
+            a64 = ax = True
         linhas.append({"id": p["id"], "nome": p["nome"], "windows": win, "linux": linux, "android_arm64": a64,
                        "android_x86_64": ax, "navegador": bool(p.get("core_navegador")), "externo": bool(externo)})
     return linhas

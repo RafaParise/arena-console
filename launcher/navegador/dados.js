@@ -2746,6 +2746,7 @@ window.ARENA_DADOS = {
     ".sh"
    ],
    "id": "pc",
+   "motivo_fora": "Jogo de PC não roda no celular: o processador e o sistema são outros. Abra no computador.",
    "nativo": true,
    "netplay": false,
    "netplay_motivo": "Jogo de PC usa a rede do proprio jogo: o Jogar Junto do ARENA e' so do RetroArch.",
@@ -2753,6 +2754,28 @@ window.ARENA_DADOS = {
    "pasta": "PC",
    "pede_placar": false,
    "peso": "completo"
+  },
+  {
+   "apelidos": [
+    "android",
+    "celular",
+    "apk"
+   ],
+   "arquivos_sistema": 0,
+   "core": "",
+   "custo": 1,
+   "descricao": "Os jogos de Android instalados neste celular. O ARENA acha cada um sozinho e abre direto, sem emulador.",
+   "extensoes": [],
+   "id": "android",
+   "motivo_fora": "Os jogos de Android abrem no ARENA do celular, onde estão instalados. No computador não há Android para rodá-los sem instalar programa.",
+   "nativo": true,
+   "netplay": false,
+   "netplay_motivo": "Jogo de Android usa a rede do proprio jogo: o Jogar Junto do ARENA e' so do RetroArch.",
+   "nome": "Jogos de Android",
+   "pasta": "Android",
+   "pede_placar": false,
+   "peso": "leve",
+   "so_android": true
   }
  ],
  "etiquetas": {

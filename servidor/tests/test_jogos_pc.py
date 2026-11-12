@@ -136,6 +136,18 @@ class Lojas(unittest.TestCase):
         self.assertEqual(entradas[0]["origem_rotulo"], "Instalado pela Steam")
         self.assertEqual(entradas[0]["arquivo"], "steam://rungameid/220")
 
+    def test_jogos_do_celular(self):
+        entradas = jogos_pc.entradas_do_aparelho({"id": "android", "nome": "Jogos de Android"}, [
+            {"pacote": "com.exemplo.corrida", "nome": "Corrida"}, {"pacote": "", "nome": "sem pacote"},
+            {"pacote": "com.mal;rm -rf", "nome": "Estranho"}])
+        self.assertEqual([e["titulo"] for e in entradas], ["Corrida", "Estranho"])
+        self.assertEqual(entradas[0]["arquivo"], "android://com.exemplo.corrida")
+        self.assertEqual(entradas[0]["origem_rotulo"], "Instalado no celular")
+        self.assertEqual(jogos_pc.pacote_do_arquivo(entradas[1]["arquivo"]), "com.malrm-rf".replace("-", ""))
+        self.assertEqual(jogos_pc.pacote_do_arquivo("C:/jogo.exe"), "")
+        with mock.patch.object(jogos_pc.plataforma_do_sistema, "ANDROID", False):
+            self.assertEqual(jogos_pc.entradas_do_aparelho({"id": "android", "nome": "A"}), [])   # no computador, nada
+
     def test_no_android_nada(self):
         with mock.patch.object(jogos_pc.plataforma_do_sistema, "ANDROID", True):
             self.assertEqual(jogos_pc.entradas_do_manifesto({"id": "pc", "nome": "PC"}), [])
@@ -183,6 +195,24 @@ class ComoAbrir(unittest.TestCase):
         self.assertIn("Steam", aviso)
         with self.assertRaises(jogos_pc.NaoDaParaAbrir):
             jogos_pc.comando_para(self.exe, "", "android")
+
+    def test_atalho_da_epic_sem_passar_pelo_cmd(self):
+        """Revisao de seguranca de 12/11/2026: o '&' do endereco da Epic, no 'cmd /c start', viraria outro comando."""
+        url = "com.epicgames.launcher://apps/Abc.1-x?action=launch&silent=true"
+        comando, _ = jogos_pc.comando_para(url, "", "windows")
+        self.assertNotIn("cmd", os.path.basename(comando[0]).lower())
+        self.assertEqual(comando[1:], ["url.dll,FileProtocolHandler", url])
+        for estranho in ("com.epicgames.launcher://apps/a&calc?action=launch&silent=true", "steam://rungameid/1&x",
+                         "steam://run/220"):
+            with self.assertRaises(jogos_pc.NaoDaParaAbrir):
+                jogos_pc.comando_para(estranho, "", "windows")
+
+    def test_epic_com_nome_estranho_fica_de_fora(self):
+        pasta = os.path.join(self.pasta, "Manifests")
+        os.makedirs(pasta)
+        with open(os.path.join(pasta, "a.item"), "w", encoding="utf-8") as arquivo:
+            json.dump({"DisplayName": "Mal", "AppName": "x&calc"}, arquivo)
+        self.assertEqual(jogos_pc.jogos_da_epic(pasta), [])
 
     def test_dos_vai_para_o_dosbox(self):
         dos = os.path.join(self.pasta, "d.exe")

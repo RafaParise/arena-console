@@ -383,12 +383,18 @@ def instalar(recomp_id, sistema_alvo=None, arq=None):
         if codigo != 0 or not os.path.isfile(caminho):
             raise NaoDaParaInstalar("O download de %s falhou (código %s). Confira a internet e tente de novo." % (nome, codigo))
         _anotar(recomp_id, etapa="conferindo", feito=arquivo["tamanho"], mensagem="Conferindo a marca do arquivo...")
-        esperada = arquivo["sha256"] or (r.get("marcas") or {}).get(sistema_alvo, "")
         marca = _sha256(caminho)
-        if esperada and marca.lower() != esperada.lower():
+        # Duas marcas: a do catalogo (guardada a parte, vale para o mesmo nome de arquivo) e a que o GitHub publica.
+        # A do catalogo manda; as duas tem que bater com o arquivo. Sem nenhuma, o download vale pelo https da
+        # release oficial que a pessoa confirmou na tela (risco aceito, anotado em docs\PENDENCIAS.md, 12/11/2026).
+        do_catalogo = (r.get("marcas") or {}).get(sistema_alvo) or {}
+        esperadas = [m.lower() for m in (do_catalogo.get("sha256") if do_catalogo.get("nome") == nome else "",
+                                         arquivo["sha256"]) if m]
+        if any(marca.lower() != m for m in esperadas):
             os.remove(caminho)
             raise NaoDaParaInstalar("A marca SHA-256 de %s não bate com a publicada: o download veio errado ou foi "
                                     "trocado. Nada foi instalado; tente de novo." % nome)
+        esperada = esperadas[0] if esperadas else ""
         _anotar(recomp_id, etapa="descompactando", mensagem="Descompactando em emuladores\\Recomps\\%s..." % os.path.basename(pasta))
         nova = pasta + ".nova"
         if os.path.isdir(nova):
@@ -397,6 +403,7 @@ def instalar(recomp_id, sistema_alvo=None, arq=None):
         with open(os.path.join(nova, MARCA), "w", encoding="utf-8") as saida:
             json.dump({"id": recomp_id, "nome": r["nome"], "repo": r.get("repo", ""), "tag": rel["tag"],
                        "arquivo": nome, "sha256": marca, "conferido": bool(esperada),
+                       "conferido_pelo_catalogo": do_catalogo.get("nome") == nome,
                        "instalado_em": time.strftime("%Y-%m-%d %H:%M")}, saida, ensure_ascii=False, indent=1)
         if os.path.isdir(pasta):
             # Versao nova por cima da antiga: o que o jogo gravou (saves, ajustes) fica, como manda o padrao.

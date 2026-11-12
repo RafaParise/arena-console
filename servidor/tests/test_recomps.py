@@ -177,6 +177,46 @@ class Instalar(unittest.TestCase):
         self.assertFalse(os.path.isdir(recomps.pasta_do("zelda64recomp")))
         self.assertEqual(recomps.progresso("zelda64recomp")["estado"], "erro")
 
+    def _com_marca_no_catalogo(self, marca, nome="Zelda64Recompiled-v1.2.2-Windows.zip"):
+        catalogo = json.loads(json.dumps(CATALOGO))
+        catalogo["recomps"]["zelda64recomp"]["marcas"] = {"windows": {"nome": nome, "sha256": marca}}
+        recomps._catalogo["dados"] = catalogo
+
+    def _instalar_com(self, marca_do_github=""):
+        origem = os.path.join(self.pasta, "origem.zip")
+        zip_de_teste(origem)
+
+        def baixar_falso(url, segundos, destino=None, agente=None):
+            with open(origem, "rb") as de, open(destino, "wb") as para:
+                para.write(de.read())
+            return 0, b""
+        with mock.patch.object(recomps, "release", return_value=self._release_falsa("Zelda64Recompiled-v1.2.2-Windows.zip",
+                                                                                     marca_do_github)), \
+                mock.patch.object(recomps.baixar, "rodar", side_effect=baixar_falso):
+            return recomps.instalar("zelda64recomp", "windows", "x64"), recomps._sha256(origem)
+
+    def test_marca_do_catalogo_manda(self):
+        """Revisao de seguranca de 12/11/2026: a marca guardada no catalogo (outra fonte) confere o download."""
+        origem = os.path.join(self.pasta, "o.zip")
+        zip_de_teste(origem)
+        self._com_marca_no_catalogo(recomps._sha256(origem))
+        self._instalar_com("")
+        self.assertTrue(recomps.ler_marca(recomps.pasta_do("zelda64recomp"))["conferido_pelo_catalogo"])
+
+    def test_catalogo_e_github_discordam_nao_instala(self):
+        origem = os.path.join(self.pasta, "o.zip")
+        zip_de_teste(origem)
+        self._com_marca_no_catalogo("f" * 64)
+        with self.assertRaises(recomps.NaoDaParaInstalar):
+            self._instalar_com(recomps._sha256(origem))     # o GitHub "concorda" com o arquivo, o catalogo nao
+        self.assertFalse(os.path.isdir(recomps.pasta_do("zelda64recomp")))
+
+    def test_marca_de_outro_arquivo_nao_vale(self):
+        """A marca do catalogo e' de outra versao (outro nome): vale so a do GitHub."""
+        self._com_marca_no_catalogo("f" * 64, nome="Zelda64Recompiled-v1.0-Windows.zip")
+        self._instalar_com("")
+        self.assertFalse(recomps.ler_marca(recomps.pasta_do("zelda64recomp"))["conferido_pelo_catalogo"])
+
     def test_formato_que_o_arena_nao_abre_explica(self):
         with mock.patch.object(recomps, "release", return_value=self._release_falsa("Jogo-Setup.exe")), \
                 mock.patch.object(recomps.baixar, "rodar", side_effect=lambda url, s, destino=None, agente=None: (open(destino, "wb").close() or (0, b""))):

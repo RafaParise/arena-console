@@ -77,7 +77,10 @@ def recomp_enxuto(app):
     jogo = (app.get("game") or "").strip()
     if not plataforma or not jogo:
         return None
-    marcas = {s: v["sha256"] for s, v in (app.get("files") or {}).items() if s in sistemas and v.get("sha256")}
+    # A marca SHA-256 do arquivo de cada sistema, com o nome do arquivo a que ela vale (o catalogo a guarda a parte do
+    # GitHub: o ARENA confere o download com ela, e nao so com a marca que o proprio GitHub publica).
+    marcas = {s: {"nome": v["name"], "sha256": v["sha256"].lower()} for s, v in (app.get("files") or {}).items()
+              if s in sistemas and v.get("sha256") and v.get("name")}
     apoio = app.get("support") or {}
     return {
         "id": app["id"],

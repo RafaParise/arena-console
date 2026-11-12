@@ -1273,13 +1273,19 @@ def indexar(forcar=False, lojas=False):
     # Os jogos ja instalados neste computador pelas lojas (Steam, GOG, Epic,
     # Heroic), no console PC (servidor\jogos_pc.py). Um erro ali nunca
     # derruba a lista dos jogos da pasta.
-    if lojas and jogos_pc.ID in por_id:
+    # No celular, os jogos de Android instalados nele (console "android").
+    if lojas:
         try:
-            for jogo in jogos_pc.entradas_do_manifesto(por_id[jogos_pc.ID]):
+            de_fora = []
+            if jogos_pc.ID in por_id:
+                de_fora += jogos_pc.entradas_do_manifesto(por_id[jogos_pc.ID])
+            if jogos_pc.ID_ANDROID in por_id:
+                de_fora += jogos_pc.entradas_do_aparelho(por_id[jogos_pc.ID_ANDROID])
+            for jogo in de_fora:
                 jogo["ordenacao"] = chave_ordenacao(jogo["titulo"])
                 jogos.append(jogo)
         except Exception as falha:  # noqa: BLE001
-            print("[ARENA] Nao consegui listar os jogos instalados pelas lojas: %s" % falha)
+            print("[ARENA] Nao consegui listar os jogos instalados pelas lojas ou no aparelho: %s" % falha)
     # O jogo de console que tambem existe recompilado para PC (servidor\recomps.py):
     # a tela mostra e o Jogar oferece a versao nativa.
     for jogo in jogos:

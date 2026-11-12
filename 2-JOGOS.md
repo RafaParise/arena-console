@@ -1359,6 +1359,17 @@ compatibilidade que **já estiver instalada** (ele não instala nada):
 Sem a camada, o ARENA diz o que falta em vez de tentar. Jogo de PC não roda no celular: o processador e o sistema são
 outros (lá o console PC aparece cinza, com o motivo).
 
+### Os jogos de Android do celular
+
+No ARENA do celular há o console **Jogos de Android**: o ARENA pergunta ao Android quais apps instalados são jogos (o
+próprio Android marca cada app como jogo ou não) e mostra todos na lista, com a origem "Instalado no celular". **Jogar
+agora** abre o jogo direto, sem emulador; para voltar, use o botão de voltar ou o de apps recentes. O ARENA só lê a lista
+e abre o app: não instala, não desinstala e não vê nada dentro de outros apps. Jogo instalado depois aparece ao tocar em
+Atualizar lista.
+
+No computador esse console fica cinza: não há Android para rodar um `.apk` sem instalar programa (o subsistema de Android
+do Windows acabou, e o Waydroid do Linux pede administrador).
+
 ### A versão para PC de um jogo de console (recomp)
 
 Um **recomp** (recompilação) é um jogo de console transformado em programa de computador: o código da máquina do

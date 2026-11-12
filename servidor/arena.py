@@ -2351,9 +2351,10 @@ def avaliar_plataformas(forcar=False):
                          if caminho_externo else "")
         if plataforma.get("nativo"):
             # O console PC (servidor\jogos_pc.py): o jogo roda direto, sem nucleo nem emulador. No celular, nao.
-            estado = "sem_core" if plataforma_do_sistema.ANDROID else "pronta"
-            motivo = ("Jogo de PC não roda no celular: o processador e o sistema são outros. Abra no computador."
-                      if plataforma_do_sistema.ANDROID else "")
+            # O console "Jogos de Android" e' o contrario: so no celular, onde os jogos estao instalados.
+            neste = plataforma_do_sistema.ANDROID == bool(plataforma.get("so_android"))
+            estado = "pronta" if neste else "sem_core"
+            motivo = "" if neste else plataforma.get("motivo_fora", "")
         elif caminho_externo and falta_externo:
             # Emulador de fora instalado, mas sem o que ele precisa para
             # abrir um jogo (BIOS do PS2, firmware do PS3): cartao amarelo
@@ -7971,6 +7972,16 @@ class Manipulador(BaseHTTPRequestHandler):
             # jogo de outro sistema vai pela camada que o computador tiver (Wine no Linux, WSL no Windows), e sem
             # ela a frase explica. Entra no lugar do emulador de fora (12/11/2026).
             de_pc, aviso_pc = None, ""
+            if plataforma.get("so_android"):
+                # O jogo de Android instalado no celular: o ARENA so o abre (ArenaServico.java, abrirApp).
+                pacote = jogos_pc.pacote_do_arquivo(jogo.get("arquivo"))
+                if not plataforma_do_sistema.ANDROID:
+                    return self.erro(plataforma.get("motivo_fora") or "Abra este jogo no celular.", 409)
+                if not pacote or not ponte_android.abrir_app(pacote):
+                    return self.erro("O Android não abriu %s. Clique em Atualizar lista: se o jogo foi desinstalado, "
+                                     "ele sai da lista." % jogo["titulo"], 409)
+                return self.responder_json({"ok": True, "titulo": jogo["titulo"], "emulador": "Android",
+                                            "aviso": "Para voltar ao ARENA, use o botão de voltar ou o de apps recentes."})
             if plataforma.get("nativo"):
                 if jogo.get("origem") == jogos_pc.ORIGEM_INSTALADOS:
                     caminho_pc = jogo["arquivo"]

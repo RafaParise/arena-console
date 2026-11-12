@@ -415,6 +415,35 @@ public class ArenaServico extends Service {
         }
     }
 
+    /** Os jogos instalados no aparelho (12/11/2026, servidor/jogos_pc.py): os apps que abrem pela tela inicial e que o
+     *  Android marca como jogo (a categoria "Jogo" do app, ou a marca antiga de jogo). So leitura. O manifesto do ARENA
+     *  pede a lista dos apps da tela inicial (<queries>); sem isso o Android 11 em diante esconde os outros apps. */
+    JSONArray jogosDoAparelho() throws JSONException {
+        PackageManager pm = getPackageManager();
+        Intent inicio = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER);
+        JSONArray lista = new JSONArray();
+        java.util.HashSet<String> vistos = new java.util.HashSet<>();
+        for (android.content.pm.ResolveInfo achado : pm.queryIntentActivities(inicio, 0)) {
+            android.content.pm.ApplicationInfo app = achado.activityInfo.applicationInfo;
+            if (app.packageName.equals(getPackageName()) || !vistos.add(app.packageName)) continue;
+            @SuppressWarnings("deprecation")
+            boolean marcaAntiga = (app.flags & android.content.pm.ApplicationInfo.FLAG_IS_GAME) != 0;
+            boolean categoria = Build.VERSION.SDK_INT >= 26 && app.category == android.content.pm.ApplicationInfo.CATEGORY_GAME;
+            if (!marcaAntiga && !categoria) continue;
+            lista.put(new JSONObject().put("pacote", app.packageName).put("nome", String.valueOf(app.loadLabel(pm))));
+        }
+        return lista;
+    }
+
+    /** Abre um app do aparelho pela porta de entrada dele (a mesma do icone na tela inicial). */
+    boolean abrirApp(String pacote) {
+        Intent abrir = pacote.isEmpty() ? null : getPackageManager().getLaunchIntentForPackage(pacote);
+        if (abrir == null) return false;
+        abrir.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(abrir);
+        return true;
+    }
+
     void responder(int numero, String chave, Object valor) {
         try {
             responder(new JSONObject().put("id", numero).put(chave, valor));
@@ -456,6 +485,10 @@ public class ArenaServico extends Service {
                 responder(energia().put("id", numero));
             } else if (tipo.equals("aparelho")) {
                 responder(aparelho().put("id", numero));
+            } else if (tipo.equals("jogos_do_aparelho")) {
+                responder(new JSONObject().put("id", numero).put("jogos", jogosDoAparelho()));
+            } else if (tipo.equals("abrir_app")) {
+                responder(numero, "ok", abrirApp(pedido.optString("pacote")));
             } else if (tipo.equals("abrir_pasta")) {
                 responder(numero, "ok", abrirAPasta(pedido.optString("caminho")));
             } else if (tipo.equals("escolher_pasta")) {

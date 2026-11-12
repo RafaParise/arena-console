@@ -990,6 +990,15 @@ Falta, nesta ordem:
     congelou o PC e caiu sozinho (0xC0000005) em 94 s. **Não abrir jogo de verdade nos testes** sem o Rafael avisado.
 - **Não dá (dito ao Rafael):** jogo de Android no computador sem instalar nada (o Windows Subsystem for Android acabou; o
   Waydroid do Linux precisa de módulo do kernel e de administrador) e jogo de PC no celular (outro processador).
-- **Falta:** no celular, listar e abrir pelo ARENA os jogos de Android instalados (pedido "jogos" no `ArenaServico.java`,
-  `<queries>` no manifesto pelo `montar_android.py`, APK de teste no A12); os ajustes do recomp na tela (nível 2 do
-  `recomplauncher.json`, `settings`); medir um recomp no Celeron N5100.
+- **Feito depois (14h):** console **Jogos de Android** (só no celular): o `ArenaServico.java` lista os apps que o
+  Android marca como jogo (`jogos_do_aparelho`, com `<queries>` no manifesto) e abre cada um (`abrir_app`). Testado no
+  A12 com o APK de teste (instalado por cima, dados mantidos): achou o Moonlight (o único jogo instalado) e o abriu; o
+  console PC lá aparece cinza com o motivo.
+- **Revisão de segurança automática (dois achados, consertados):** o atalho da Epic passava pelo `cmd /c start` (o `&`
+  do endereço viraria outro comando): agora vai pelo `rundll32 url.dll,FileProtocolHandler` e só com nome de jogo de
+  letras, números, ponto e hífen. A marca SHA-256 do recomp vinha só do GitHub: a do catálogo (outra fonte, com o nome do
+  arquivo) agora manda e as duas têm de bater. **Risco aceito:** sem nenhuma marca, ou quando o GitHub não tem a versão
+  do catálogo e o ARENA usa a mais nova, vale o https da release oficial que a pessoa confirmou na tela (o mesmo que o
+  RecompLauncher faz).
+- **Falta:** os ajustes do recomp na tela (nível 2 do `recomplauncher.json`, `settings`); medir um recomp no Celeron
+  N5100; o APK de produção desta versão (no A12 ficou o APK de teste).

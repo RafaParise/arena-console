@@ -1787,7 +1787,30 @@
         "recomp",
         "recomps"
       ],
-      "pasta": "PC"
+      "pasta": "PC",
+      "motivo_fora": "Jogo de PC não roda no celular: o processador e o sistema são outros. Abra no computador."
+    },
+    {
+      "id": "android",
+      "nome": "Jogos de Android",
+      "descricao": "Os jogos de Android instalados neste celular. O ARENA acha cada um sozinho e abre direto, sem emulador.",
+      "core": "",
+      "nativo": true,
+      "so_android": true,
+      "motivo_fora": "Os jogos de Android abrem no ARENA do celular, onde estão instalados. No computador não há Android para rodá-los sem instalar programa.",
+      "extensoes": [],
+      "netplay": false,
+      "netplay_motivo": "Jogo de Android usa a rede do proprio jogo: o Jogar Junto do ARENA e' so do RetroArch.",
+      "peso": "leve",
+      "arquivos_sistema": 0,
+      "custo": 1,
+      "pede_placar": false,
+      "apelidos": [
+        "android",
+        "celular",
+        "apk"
+      ],
+      "pasta": "Android"
     }
   ],
   "preferencia": {

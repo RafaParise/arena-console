@@ -500,6 +500,12 @@ PERMISSOES_DO_SERVIDOR = '''    <uses-permission android:name="android.permissio
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN"/>
+            <category android:name="android.intent.category.LAUNCHER"/>
+        </intent>
+    </queries>
 '''
 # O WebView so fala sem HTTPS com o servidor do proprio aparelho.
 REDE_DO_ARENA = '''<?xml version="1.0" encoding="utf-8"?>

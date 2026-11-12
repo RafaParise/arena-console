@@ -289,6 +289,26 @@ def abrir_pasta(caminho):
     return bool(resposta.get("ok"))
 
 
+def jogos_do_aparelho():
+    """Os jogos instalados no aparelho (o app pergunta ao Android, ArenaServico.java, jogosDoAparelho): uma lista de
+    {"pacote", "nome"}. Vazia se o app nao responder (12/11/2026)."""
+    try:
+        resposta = perguntar({"pedido": "jogos_do_aparelho"}, limite=8.0)
+    except OSError:
+        return []
+    return [j for j in resposta.get("jogos") or []
+            if isinstance(j, dict) and j.get("pacote") and j.get("nome")]
+
+
+def abrir_app(pacote):
+    """Abre o app 'pacote' do aparelho (um jogo de Android instalado). False se o Android nao achou como abrir."""
+    try:
+        resposta = perguntar({"pedido": "abrir_app", "pacote": pacote}, limite=5.0)
+    except OSError:
+        return False
+    return bool(resposta.get("ok"))
+
+
 def voltar_ao_jogo():
     """Traz para a frente o jogo que ficou aberto atras do ARENA (o aluno saiu pelo botao de inicio do aparelho).
     False se o app nao achou o jogo (ja fechou) ou nao respondeu."""
