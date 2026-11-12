@@ -259,7 +259,7 @@ def prova_do_programa(destino):
     os.makedirs(os.path.join(copia, "dados"))
     servidor = subprocess.Popen([os.path.join(copia, "servidor", "python", "python.exe"),
                                  os.path.join(copia, "servidor", "arena.py")], cwd=copia,
-                                env=dict(os.environ, ARENA_SEM_JANELA="1"),
+                                env=dict(os.environ, ARENA_SEM_JANELA="1", ARENA_SEM_LOJAS="1"),  # sem os jogos das lojas deste PC
                                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     problemas, estado = [], None
     try:
@@ -845,7 +845,7 @@ def conferir(destino, com_bios=False):
     shutil.copytree(destino, copia)
     servidor = subprocess.Popen([os.path.join(copia, "servidor", "python", "python.exe"),
                                  os.path.join(copia, "servidor", "arena.py")], cwd=copia,
-                                env=dict(os.environ, ARENA_SEM_JANELA="1"),
+                                env=dict(os.environ, ARENA_SEM_JANELA="1", ARENA_SEM_LOJAS="1"),  # sem os jogos das lojas deste PC
                                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     try:
         estado = catalogo = None

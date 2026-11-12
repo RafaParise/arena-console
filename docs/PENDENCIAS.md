@@ -1024,3 +1024,18 @@ Falta, nesta ordem:
   no jogo que tem algum; a pergunta dos jogos do aparelho tem prazo de 4 s; o `tarfile` só é importado ao descompactar.
   Medido na abertura do servidor: `recomps` 4 ms e `jogos_pc` 1 ms de importação; o catálogo, 9 ms; 3.300 consultas,
   12 ms; as lojas, 27 ms (só no índice).
+
+## 12/11/2026, 17h: rodada final da 2026.11.12
+
+- `ferramentas\rodada_final.py`: **130 testes, 9 falhas, todas olhadas.** Oito eram testes que não conheciam o que
+  entrou hoje e foram consertados e repetidos (passaram): frases sem acento no `consoles.json`; capas (PC e Android
+  sem banco do libretro); "Como colocar jogos" (o console sem pasta saiu do guia; a linha do PC entrou no
+  `2-JOGOS.md`); multitap por console e regra de ouro (a cópia de teste agora vai sem o catálogo de recomps e sem os
+  jogos de PC; o filho escreve em UTF-8); pasta system (o N64 do teste é o Bomberman 64, que tem recomp e passou a
+  perguntar o jeito); navegadores (a cópia contava os 2 jogos da Steam deste computador: `ARENA_SEM_LOJAS=1` nas
+  cópias de teste; 8 escalas com o SGSR; 30 de 30 nos 3 navegadores); orçamentos (1b deu 3,76 s com a máquina
+  ocupada; repetido sozinho, **2,08 s**, teto 2,3; o código novo custa ~12 ms na abertura).
+- **Instável, sem relação com esta versão:** a foto do PocketStation (15 Puzzle) na matriz de consoles sai às vezes
+  quase vazia (passou em 3 de 6 tentativas, ora no normal, ora no modesto). Nada do PocketStation mudou desde a
+  2026.11.11. Fica para olhar a foto a olho num momento calmo.
+- Bateria do servidor: 1.414 testes OK.

@@ -1,13 +1,13 @@
 {
- "feito_em": "2026-11-12 00:40",
+ "feito_em": "2026-11-12 17:44",
  "aparelho": {
   "modelo": "SM-A125M",
   "android": "12",
   "abis": "arm64-v8a,armeabi-v7a,armeabi"
  },
  "pacote": {
-  "versionName": "2026.11.11",
-  "versionCode": "20261111",
+  "versionName": "2026.11.12",
+  "versionCode": "20261112",
   "targetSdk": "35",
   "minSdk": "24",
   "depuravel": false,
@@ -60,38 +60,55 @@
  },
  "bateria_antes": {
   "nivel": 100,
-  "temperatura_c": 26.7
+  "temperatura_c": 30.0
  },
  "abertura_a_frio": {
   "tempos_ms": [
-   967,
-   868,
-   880,
-   718,
-   719
+   721,
+   695,
+   703,
+   700,
+   695
   ],
-  "mediana_ms": 868
+  "mediana_ms": 700
  },
  "soquetes": {
-  "tcp": [],
-  "udp": []
+  "tcp": [
+   {
+    "porta": 8777,
+    "so_do_aparelho": false,
+    "endereco": "00000000"
+   }
+  ],
+  "udp": [
+   {
+    "porta": 50245,
+    "so_do_aparelho": false,
+    "endereco": "16EA7564"
+   },
+   {
+    "porta": 55436,
+    "so_do_aparelho": false,
+    "endereco": "00000000"
+   },
+   {
+    "porta": 41142,
+    "so_do_aparelho": false,
+    "endereco": "00000000"
+   }
+  ]
  },
  "memoria": {
   "pss_mb": {
-   "io.github.rafaparise.arena:tela": 70.1
+   "io.github.rafaparise.arena:tela": 109.4
   }
- },
- "ciclo_de_vida": {
-  "home_e_volta": true,
-  "girar_e_voltar": true,
-  "pouca_memoria": true
  },
  "bateria_depois": {
   "nivel": 100,
-  "temperatura_c": 26.7
+  "temperatura_c": 30.0
  },
  "pasta_do_arena": {
-  "livre_mb": 8326,
+  "livre_mb": 7832,
   "pasta_no_armazenamento": "/sdcard/ARENA",
   "itens": [
    "BIOS",
