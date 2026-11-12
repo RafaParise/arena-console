@@ -36,6 +36,44 @@ class Placas(unittest.TestCase):
         self.assertEqual(mfg.ler_placas(""), [])
         self.assertEqual(mfg.ler_placas("@card x y z\n@xess 9 1\n"), [])
 
+    def test_lista_guardada_poupa_o_motor(self):
+        """A lista guardada em dados\\mfg_placas.json vale para o mesmo motor e a mesma maquina; em outra maquina
+        (o pen drive mudou de computador) ou com outro motor, pergunta de novo (12/11/2026, orcamento 1b)."""
+        pasta = tempfile.mkdtemp(prefix="arena_mfg_placas_")
+        self.addCleanup(limpeza.apagar_pasta, pasta)
+        motor = os.path.join(pasta, "nvngx.dll")
+        with open(motor, "wb") as f:
+            f.write(b"motor de mentira")
+        arquivo = os.path.join(pasta, "dados", "mfg_placas.json")
+        saida = mock.Mock(stdout=b"@card 0 0 4079 AMD Radeon(TM) Graphics\n@xess 0 1\n")
+        with mock.patch.object(mfg.subprocess, "run", return_value=saida) as run:
+            mfg._PLACAS.clear()
+            primeira = mfg.placas(motor, guardar_em=arquivo, maquina="pc-a | radeon")
+            self.assertEqual([p["nome"] for p in primeira], ["AMD Radeon(TM) Graphics"])
+            self.assertEqual(run.call_count, 1)
+            self.assertTrue(os.path.isfile(arquivo))
+            # Outra abertura do ARENA (a memoria vazia): vem do arquivo, sem abrir o motor.
+            mfg._PLACAS.clear()
+            self.assertEqual(mfg.placas(motor, guardar_em=arquivo, maquina="pc-a | radeon"), primeira)
+            self.assertEqual(run.call_count, 1)
+            # Outro computador: pergunta de novo e regrava.
+            mfg._PLACAS.clear()
+            mfg.placas(motor, guardar_em=arquivo, maquina="pc-b | intel")
+            self.assertEqual(run.call_count, 2)
+            # O motor mudou de versao (outro tamanho): pergunta de novo.
+            with open(motor, "ab") as f:
+                f.write(b" novo")
+            mfg._PLACAS.clear()
+            mfg.placas(motor, guardar_em=arquivo, maquina="pc-b | intel")
+            self.assertEqual(run.call_count, 3)
+            # Resposta vazia (o motor falhou) nao se guarda: a proxima abertura tenta de novo.
+            run.return_value = mock.Mock(stdout=b"")
+            mfg._PLACAS.clear()
+            os.remove(arquivo)
+            self.assertEqual(mfg.placas(motor, guardar_em=arquivo, maquina="pc-b | intel"), [])
+            self.assertFalse(os.path.isfile(arquivo))
+        mfg._PLACAS.clear()
+
 
 class Decidir(unittest.TestCase):
     ACHADO = {"motor": "x", "pasta": "y", "origem": "instalado", "versao": "1.0.5"}

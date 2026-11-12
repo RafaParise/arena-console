@@ -37,6 +37,7 @@ integrada, 60 Hz): o motor pegou a janela do RetroArch sem administrador,
 ligou o MSM FG 2x e devolveu a janela ao "stop". A primeira vez compila os
 shaders (11 s); dali em diante vem do cache dele.
 """
+import json
 import os
 import subprocess
 import threading
@@ -133,12 +134,23 @@ def ler_placas(texto):
     return [placas[n] for n in sorted(placas)]
 
 
-def placas(motor, espera=8):
+def placas(motor, espera=8, guardar_em=None, maquina=""):
     """As placas que o motor ve, perguntadas uma vez por motor (o "--cards"
-    so lista e sai). Lista vazia se nao der para perguntar."""
+    so lista e sai, mas leva de 0,13 a 0,27 s: e' um processo a parte, medido
+    em 12/11/2026). Com guardar_em (dados\\mfg_placas.json), a resposta fica
+    guardada e vale enquanto forem o mesmo motor (caminho, tamanho e data do
+    arquivo) e a mesma maquina (`maquina`: o computador e a placa de video;
+    o pen drive muda de computador). E' o que deixa a primeira tela do ARENA
+    sair sem esperar o motor (orcamento 1b). Lista vazia se nao der para
+    perguntar, e essa nao se guarda: na proxima abertura pergunta de novo."""
     with _TRAVA_PLACAS:
         if motor in _PLACAS:
             return _PLACAS[motor]
+        chave = _chave_das_placas(motor, maquina)
+        guardada = _placas_guardadas(guardar_em, chave)
+        if guardada is not None:
+            _PLACAS[motor] = guardada
+            return guardada
         try:
             feito = subprocess.run([motor, "--cards"], cwd=os.path.dirname(motor), capture_output=True,
                                    timeout=espera, creationflags=SEM_JANELA)
@@ -146,7 +158,50 @@ def placas(motor, espera=8):
         except (OSError, subprocess.SubprocessError):
             lista = []
         _PLACAS[motor] = lista
+        if guardar_em and chave and lista:
+            _guardar_placas(guardar_em, chave, lista)
         return lista
+
+
+def _chave_das_placas(motor, maquina):
+    """O que tem de ser igual para a lista guardada valer. None se o motor nao esta ai."""
+    try:
+        estado = os.stat(motor)
+    except OSError:
+        return None
+    return {"motor": os.path.abspath(motor), "tamanho": estado.st_size, "data": int(estado.st_mtime),
+            "maquina": maquina or ""}
+
+
+def _placas_guardadas(arquivo, chave):
+    """A lista guardada em `arquivo`, se a chave bate; senao None."""
+    if not arquivo or not chave:
+        return None
+    try:
+        with open(arquivo, encoding="utf-8") as f:
+            dados = json.load(f)
+    except (OSError, ValueError):
+        return None
+    if isinstance(dados, dict) and dados.get("chave") == chave and isinstance(dados.get("placas"), list):
+        return dados["placas"]
+    return None
+
+
+def _guardar_placas(arquivo, chave, lista):
+    """Grava a lista com a chave, de forma atomica (temporario .tmp e os.replace; o ARENA apaga .tmp orfao
+    na abertura). Falha de disco nao derruba nada: so fica sem a guardada."""
+    temporario = "%s.%d.tmp" % (arquivo, threading.get_ident())
+    try:
+        os.makedirs(os.path.dirname(arquivo) or ".", exist_ok=True)
+        with open(temporario, "w", encoding="utf-8") as f:
+            json.dump({"chave": chave, "placas": lista, "quando": time.strftime("%Y-%m-%d %H:%M:%S")}, f,
+                      ensure_ascii=False, indent=1)
+        os.replace(temporario, arquivo)
+    except OSError:
+        try:
+            os.remove(temporario)
+        except OSError:
+            pass
 
 
 # ---------------------------------------------------------------------------
@@ -447,11 +502,12 @@ def descrever(opcoes, para_a_tela=False):
                                                    opcoes.get("multiplier", "2"))
 
 
-def situacao(raiz, nota_gpu=None, integrada=True, hz=60, tem_lossless=False):
+def situacao(raiz, nota_gpu=None, integrada=True, hz=60, tem_lossless=False, guardar_em=None, maquina=""):
     """Para a tela dos Ajustes: o MFG (achou, de onde, a versao, o gerador), se o Lossless pronto tambem esta
-    aqui, qual dos dois o ARENA usa nesta maquina (qual_programa) e se o automatico liga (placa_forte)."""
+    aqui, qual dos dois o ARENA usa nesta maquina (qual_programa) e se o automatico liga (placa_forte).
+    guardar_em e maquina: os de placas()."""
     achado = achar(raiz)
-    lista = placas(achado["motor"]) if achado else []
+    lista = placas(achado["motor"], guardar_em=guardar_em, maquina=maquina) if achado else []
     base = {"achado": bool(achado), "disponivel": os.name == "nt", "lossless": bool(tem_lossless),
             "escolhido": qual_programa(lista, bool(achado), bool(tem_lossless)),
             "placa_forte": placa_forte(nota_gpu, integrada), "hz": int(hz or 60), "pagina": PAGINA_OFICIAL}

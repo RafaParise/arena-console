@@ -77,7 +77,17 @@ class _SoHttps(urllib.request.HTTPRedirectHandler):
         return super().redirect_request(req, fp, code, msg, headers, newurl)
 
 
-_ABRIR = urllib.request.build_opener(_SoHttps)
+_ABRIR = None
+
+
+def _abridor():
+    """O abridor do urllib, montado no primeiro download e guardado. Montar
+    custa 14 ms (o ProxyHandler le o proxy do Windows no registro), e na
+    abertura do ARENA isso era pago sem download nenhum (orcamento 1b)."""
+    global _ABRIR
+    if _ABRIR is None:
+        _ABRIR = urllib.request.build_opener(_SoHttps)
+    return _ABRIR
 
 
 def _pelo_python(url, segundos, destino, agente):
@@ -88,7 +98,7 @@ def _pelo_python(url, segundos, destino, agente):
     pedido = urllib.request.Request(url, headers={"User-Agent": agente})
     temporario = destino + ".parcial" if destino else None
     try:
-        with _ABRIR.open(pedido, timeout=max(1.0, segundos)) as resposta:
+        with _abridor().open(pedido, timeout=max(1.0, segundos)) as resposta:
             partes = []
             saida = open(temporario, "wb") if temporario else None
             try:

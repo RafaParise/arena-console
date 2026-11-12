@@ -20,7 +20,6 @@ import re
 import urllib.parse
 import urllib.error
 import urllib.request
-from concurrent.futures import ThreadPoolExecutor
 
 import baixar
 
@@ -182,6 +181,9 @@ def buscar(consulta):
 
     # As fichas ao mesmo tempo (antes, uma de cada vez): numa rede lenta, a
     # busca inteira leva o tempo de umas poucas fichas, nao de 30.
+    # (importado aqui: o concurrent.futures custa 7 ms na abertura do ARENA e so
+    # a busca o usa.)
+    from concurrent.futures import ThreadPoolExecutor
     with ThreadPoolExecutor(max_workers=FICHAS_AO_MESMO_TEMPO) as grupo:
         fichas = list(grupo.map(ficha, documentos))
     if documentos and all(isinstance(f, FalhaDeRede) for f in fichas):

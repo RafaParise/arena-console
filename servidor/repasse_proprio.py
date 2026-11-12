@@ -53,7 +53,6 @@ Uso (no aparelho que fica ligado):
     python repasse_proprio.py --servir [--porta 55440]
 So biblioteca padrao (roda no Termux, no Linux e no Windows)."""
 import argparse
-import asyncio
 import base64
 import http.client
 import ipaddress
@@ -61,6 +60,21 @@ import json
 import secrets
 import socket
 import time
+
+
+class _AsyncioNoPrimeiroUso:
+    """O asyncio so e' preciso para HOSPEDAR o repasse (servir, main). O servidor
+    do ARENA importa este modulo so pelas funcoes de cliente (separar_endereco,
+    saude, reservar_sala...), e importar o asyncio custa 35 ms na abertura dele
+    (orcamento 1b): fica para o primeiro uso, que troca este objeto pelo modulo."""
+
+    def __getattr__(self, nome):
+        import asyncio as modulo
+        globals()["asyncio"] = modulo
+        return getattr(modulo, nome)
+
+
+asyncio = _AsyncioNoPrimeiroUso()
 
 PORTA_PADRAO = 55440
 VERSAO = 1

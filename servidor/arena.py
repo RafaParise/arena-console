@@ -2900,6 +2900,18 @@ def nota_da_placa_de_fora():
     return CAPACIDADE.get("nota_gpu_de_fora", CAPACIDADE.get("nota_gpu"))
 
 
+def chave_das_placas_do_mfg():
+    """Onde e com que chave o mfg guarda a lista de placas do motor (servidor\\mfg.py, placas): o arquivo em
+    dados\\ e "computador | placa de video", porque o pen drive muda de computador."""
+    return {"guardar_em": os.path.join(PASTA_DADOS, "mfg_placas.json"),
+            "maquina": "%s | %s" % (socket.gethostname(), (MAQUINA.get("gpu") or {}).get("nome", ""))}
+
+
+def placas_do_mfg(achado):
+    """As placas que o motor do MFG ve, pela lista guardada (ou perguntando ao motor uma vez)."""
+    return mfg.placas(achado["motor"], **chave_das_placas_do_mfg())
+
+
 def preparar_mfg(jogo, config, degrau=0, programa=None):
     """Os quadros a mais desta partida (pedido de 11/11/2026: o melhor do Lossless Scaling e do MFG Super
     Motion), ou None. Devolve {"tipo": "mfg", ...} ou {"tipo": "lossless", ...}.
@@ -2931,7 +2943,7 @@ def preparar_mfg(jogo, config, degrau=0, programa=None):
         if modo == "sempre" or achado or tem_lossless:
             print("[ARENA] Mais quadros fica de fora deste jogo: %s." % motivo)
         return None
-    escolhido = mfg.qual_programa(mfg.placas(achado["motor"]) if achado else [], bool(achado), tem_lossless)
+    escolhido = mfg.qual_programa(placas_do_mfg(achado) if achado else [], bool(achado), tem_lossless)
     # O emulador fica na tela cheia sem borda: o programa copia a imagem da tela (a exclusiva tomaria a tela e
     # a imagem dele ficaria por baixo, como foi medido com o Lossless Scaling em 08/11/2026).
     opcoes_da_tela = {} if de_fora else {"video_fullscreen": "true", "video_windowed_fullscreen": "true"}
@@ -2952,7 +2964,7 @@ def preparar_mfg(jogo, config, degrau=0, programa=None):
             return None
     desenho_2d = (not de_fora) and jogo.get("plataforma") in (
         graficos.carregar_graficos().get("escala", {}).get("pixel") or [])
-    opcoes = mfg.escolher_opcoes(mfg.placas(achado["motor"]), CAPACIDADE.get("nota_gpu"), integrada, hz,
+    opcoes = mfg.escolher_opcoes(placas_do_mfg(achado), CAPACIDADE.get("nota_gpu"), integrada, hz,
                                  desenho_2d)
     print("[ARENA] Mais quadros pelo %s (%s): %s." % (mfg.NOME, motivo, mfg.descrever(opcoes)))
     return {"tipo": "mfg", "motor": achado["motor"], "opcoes_do_motor": opcoes, "opcoes": opcoes_da_tela}
@@ -5880,7 +5892,8 @@ class Manipulador(BaseHTTPRequestHandler):
                 "mfg": None if plataforma_do_sistema.ANDROID else mfg.situacao(
                     RAIZ, CAPACIDADE.get("nota_gpu"), bool(MAQUINA["gpu"].get("integrada", True)),
                     lossless.frequencia_da_tela(),
-                    tem_lossless=bool((lossless.achar(RAIZ) or {}).get("licenca"))),
+                    tem_lossless=bool((lossless.achar(RAIZ) or {}).get("licenca")),
+                    **chave_das_placas_do_mfg()),
                 # Os navegadores deste computador e o padrao dele (a tela
                 # oferece a escolha em Ajustes -> Simples).
                 "navegadores": {"padrao": navegadores.padrao_do_computador(),
@@ -8895,6 +8908,20 @@ def principal():
     # Janela preta: registro da queda, Edicao Rapida desligada e recados que
     # nunca travam o servidor (servidor\janela_preta.py, achado de 02/10/2026).
     janela_preta.preparar(os.path.join(PASTA_DADOS, "logs"), VERSAO)
+    # O que a primeira tela pede e demora na primeira vez, feito desde ja em segundo plano (orcamento 1b): o motor
+    # do MFG listando as placas (0,13 s, um processo a parte) e a procura dos emuladores de fora (0,04 s de disco;
+    # a tela refaz em 0,004 s). Antes isso comecava junto com o serve_forever e disputava o processador com o
+    # primeiro /api/estado; comecando aqui, termina enquanto o resto da abertura roda (medido em 12/11/2026).
+    def aquecer_a_primeira_tela():
+        try:
+            if not plataforma_do_sistema.ANDROID:
+                graficos.situacao_dos_externos(carregar_catalogo())
+                achado = mfg.achar(RAIZ)
+                if achado:
+                    placas_do_mfg(achado)         # da lista guardada em dados\, ou do motor (e guarda)
+        except Exception as falha:            # aquecer e' bonus: a tela refaz tudo se faltar
+            print("[ARENA] aquecimento da primeira tela: %s" % falha)
+    threading.Thread(target=aquecer_a_primeira_tela, daemon=True).start()
     janela_preta.vigiar_abertura()       # abertura com mais de 60 s: o registro de queda diz onde parou
     print("=" * 62)
     print("  ARENA %s - servidor local" % VERSAO)
@@ -9054,13 +9081,6 @@ def principal():
     # A pasta BIOS: prateleiras, LEIA e a BIOS posta la vai para onde o
     # emulador procura, com o nome certo (servidor\bios.py).
     threading.Thread(target=organizar_bios, daemon=True).start()
-    # O motor do MFG lista as placas uma vez (0,3 s, medido em 11/11/2026 no orcamento 1b); em segundo plano, para
-    # o primeiro /api/estado nao esperar por ele.
-    def aquecer_mfg():
-        achado = None if plataforma_do_sistema.ANDROID else mfg.achar(RAIZ)
-        if achado:
-            mfg.placas(achado["motor"])
-    threading.Thread(target=aquecer_mfg, daemon=True).start()
     # Porta do ARENA dentro das faixas que o Windows reservou neste reinicio
     # (Hyper-V, WSL, Docker): avisa na janela preta, sem atrasar a abertura.
     threading.Thread(target=avisar_portas_reservadas, daemon=True).start()

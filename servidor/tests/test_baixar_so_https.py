@@ -29,7 +29,7 @@ class SoHttps(unittest.TestCase):
 
     def test_sem_curl_o_endereco_sem_https_nem_e_tentado(self):
         with mock.patch.object(baixar, "curl", return_value=None), \
-                mock.patch.object(baixar._ABRIR, "open", side_effect=AssertionError("nao devia abrir")):
+                mock.patch.object(baixar._abridor(), "open", side_effect=AssertionError("nao devia abrir")):
             self.assertEqual(baixar.rodar("http://download.xbox.com/capa.jpg", 5), (1, b""))
             self.assertEqual(baixar.rodar("ftp://exemplo.org/jogo.zip", 5), (1, b""))
 
@@ -62,7 +62,7 @@ class SoHttps(unittest.TestCase):
 
     def test_redirecionamento_recusado_vira_o_codigo_1(self):
         with mock.patch.object(baixar, "curl", return_value=None), \
-                mock.patch.object(baixar._ABRIR, "open", side_effect=baixar._SemHttps("redirecionamento sem HTTPS")):
+                mock.patch.object(baixar._abridor(), "open", side_effect=baixar._SemHttps("redirecionamento sem HTTPS")):
             self.assertEqual(baixar.rodar("https://exemplo.org/a", 5), (1, b""))
 
     def test_a_capa_do_xbox360_nao_vem_mais_pelo_disco(self):

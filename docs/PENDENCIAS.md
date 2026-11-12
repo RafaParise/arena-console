@@ -944,3 +944,23 @@ Falta, nesta ordem:
   a nitidez ajustável (plano da revisão); a conta ProfessorRafaParise (decisão do Rafael, ver 11/11).
 - A montagem da versão dos alunos ficou em `%LOCALAPPDATA%\ARENA-montagem\ARENA-alunos` (1,1 GB; pode apagar) e os
   pacotes em `%LOCALAPPDATA%\ARENA-release-2026.11.11`. O Black (BR).iso e o Super Bomberman 4 continuam no A12.
+
+## 12/11/2026, 6h: orçamento 1b dentro do teto (1,91 s no modo alvo; ontem 2,56 s, teto 2,3 s)
+
+- **Onde iam os 2,5 s** (medido com o PC sem limite, `-X importtime` e um cronômetro em cada pedaço do
+  `/api/estado`, no servidor vivo): as importações custavam 0,23 s, e a primeira tela esperava de 0,10 a 0,13 s
+  pela trava das placas do MFG enquanto o motor (`nvngx.dll --cards`, um processo à parte) levava de 0,14 a 0,27 s;
+  a procura dos emuladores de fora custava 0,035 s na primeira vez. As tarefas de fundo (vigia, Vulkan, fliperamas,
+  BIOS) NÃO eram a causa: desligadas uma a uma, nada mudou. No modo alvo tudo isso vale 2,3 vezes mais.
+- **Consertos** (nenhum regresso: só adiamento do que a abertura não usa e cache do que não muda):
+  - `servidor\repasse_proprio.py`: o `asyncio` (35 ms) só entra quando o módulo HOSPEDA o repasse; o servidor do
+    ARENA usa só as funções de cliente. `servidor\baixar.py`: o abridor do urllib (14 ms: o ProxyHandler lê o
+    proxy do Windows no registro) montado no primeiro download. `servidor\internet_archive.py`: o
+    `concurrent.futures` (7 ms) importado na busca. Importações: 0,23 s → 0,14 s.
+  - `servidor\mfg.py`: a lista de placas do motor fica guardada em `dados\mfg_placas.json`, com a chave "motor
+    (caminho, tamanho, data) + computador + placa de vídeo" (o pen drive muda de computador); lista vazia não se
+    guarda. Teste em `servidor\tests\test_mfg.py`.
+  - `servidor\arena.py` (`principal()`): o aquecimento da primeira tela (placas do MFG e emuladores de fora) começa
+    logo no início da abertura, não junto com o `serve_forever`.
+- Sem o limite do modo alvo, o servidor chega aos dados da tela em 0,6 a 0,9 s (a variação é do PC do Rafael, que
+  roda outras coisas); dentro do modo alvo, 1,91 s. A nota da próxima versão deve registrar.
