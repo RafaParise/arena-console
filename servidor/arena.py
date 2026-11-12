@@ -5746,7 +5746,31 @@ class Manipulador(BaseHTTPRequestHandler):
         self.wfile.write(corpo)
 
     def erro(self, mensagem, codigo=400):
+        self._descartar_corpo_nao_lido()
         self.responder_json({"ok": False, "erro": mensagem}, codigo)
+
+    def _descartar_corpo_nao_lido(self):
+        """Recusa ANTES de ler o corpo (403 de acesso, 415 de tipo): o Windows fecha a conexao com dados nao lidos
+        mandando um "reset", e o outro lado as vezes recebe "conexao abortada" no lugar da resposta (WinError
+        10053, visto 2 vezes nos testes do Android em 13/11/2026). Esvazia o que veio, com teto, antes de responder."""
+        if self.command != "POST" or getattr(self, "_corpo_lido", True):
+            return
+        self._corpo_lido = True
+        try:
+            restante = int(self.headers.get("Content-Length") or 0)
+        except ValueError:
+            restante = 0
+        if restante > self.LIMITE_CORPO:
+            self.close_connection = True       # nao vale ler tanto so para jogar fora: fecha depois de responder
+            return
+        try:
+            while restante > 0:
+                pedaco = self.rfile.read(min(65536, restante))
+                if not pedaco:
+                    break
+                restante -= len(pedaco)
+        except (TimeoutError, OSError):
+            self.close_connection = True
 
     def erro_interno(self, falha):
         """Ultima rede de seguranca de toda rota. Erro do sistema (disco
@@ -5772,6 +5796,7 @@ class Manipulador(BaseHTTPRequestHandler):
         """Le o JSON enviado. Devolve (dados, erro); o codigo HTTP do erro
         fica em self.status_corpo (413 grande demais, 400 o resto)."""
         self.status_corpo = 400
+        self._corpo_lido = True
         dados, erro = self._ler_corpo()
         if erro is None and not isinstance(dados, dict):
             # [] ou "texto" no lugar de {...}: antes chegava nas rotas e
@@ -6393,6 +6418,7 @@ class Manipulador(BaseHTTPRequestHandler):
     # -- POST -------------------------------------------------------------
     def do_POST(self):
         caminho = urllib.parse.urlparse(self.path).path
+        self._corpo_lido = False      # por pedido: a mesma ligacao serve varios (keep-alive)
         try:
             if not self.checar_acesso_de_rede(caminho):
                 return
