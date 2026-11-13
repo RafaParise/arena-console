@@ -112,7 +112,10 @@ toda rota `/api/...` (86) e toda aba existe onde o servidor roda; o que muda é 
 - **Barra do jogo retrátil e topo compacto, 13/11/2026:** a mesma tela em todas as versões. Na tela estreita (celular,
   tablet, janela pela metade), o painel do jogo entra pela direita; na larga, fica sempre à vista.
 - **Recomps ajustados por máquina, 13/11/2026** (`docs\RECOMPS-DESEMPENHO.md`): Windows e Linux, onde os recomps
-  rodam. Por enquanto vale para o RT64 (Zelda 64, Mario Kart 64, Banjo) e o UnleashedRecomp (que é recusado sem AVX).
+  rodam. Vale para o RT64 (Zelda 64, Mario Kart 64, Banjo), o UnleashedRecomp (recusado sem AVX) e o libultraship
+  (Ship of Harkinian, 2 Ship 2 Harkinian, Starship).
+- **Filtros de escala (SGSR, FSR, Pixel nítido...), 13/11/2026**: Windows e Linux em todo jogo; Android só nos jogos
+  2D, que abrem no Vulkan quando o aluno escolhe um filtro (os 3D seguem no OpenGL ES, sem filtro). Navegador: não.
 - **Jogos de Android instalados no celular, 12/11/2026** (`ArenaServico.java`, pedidos `jogos_do_aparelho` e `abrir_app`;
   `servidor\ponte_android.py`): só no APK (celular e Chromebook com o APK). No computador: não (sem Android para rodar
   `.apk` sem instalar programa).
