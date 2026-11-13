@@ -8473,11 +8473,11 @@ class Manipulador(BaseHTTPRequestHandler):
                     # publica da internet. Quem abre ganha um codigo de 6 numeros; quem entra digita o codigo.
                     repasse = str(config.get("repasse_proprio") or "").strip()
                     falha_do_repasse = None
-                    # 13/11/2026: sem repasse da turma alcancavel de fora (nenhum, ou um endereco da rede de casa, que
-                    # ninguem de outra casa alcanca -- o caso do CGNAT), vale o retransmissor publico do RetroArch
-                    # pela ponte local (servidor\repasse_publico.py): codigo de 20 letras, sem lista publica.
-                    partes_do_repasse = repasse_proprio.separar_endereco(repasse) if repasse else None
-                    publico = not partes_do_repasse or internet_de_casa.de_casa(partes_do_repasse[0])
+                    # 13/11/2026: sem repasse da turma em Ajustes, vale o retransmissor publico do RetroArch pela
+                    # ponte local (servidor\repasse_publico.py): codigo de 20 letras, sem lista publica, e funciona ate
+                    # com CGNAT. Com repasse configurado, vale o que a pessoa escolheu (mesmo endereco de rede local:
+                    # pode ser o da escola, ou o do Tailscale) -- a rodada de 13/11 pegou a troca automatica atropelando.
+                    publico = not repasse
                     codigo_digitado = str(dados.get("codigo_sala") or "")
                     if hospedar and publico:
                         ponte = repasse_publico.abrir_ponte()

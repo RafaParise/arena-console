@@ -871,8 +871,7 @@ O código só vale enquanto o jogo de quem abriu estiver aberto. Para quem
 monta o repasse (o professor): `docs\REPASSE-PROPRIO.md`.
 
 **Sem o repasse da turma, pelo retransmissor da internet (13/11/2026).**
-Agora a chave aparece sempre. Se não há repasse em Amigos (ou se ele está
-na rede de casa, que ninguém de fora alcança), o ARENA usa o retransmissor
+Agora a chave aparece sempre. Se não há repasse em Amigos, o ARENA usa o retransmissor
 público do RetroArch em São Paulo. Os dois computadores ligam para fora,
 então **funciona até com CGNAT dos dois lados**:
 

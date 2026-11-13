@@ -87,8 +87,10 @@ def main():
         c.pedir("/api/config", {"apelido": "Teste"})
 
         print("0. Sem repasse em Ajustes", flush=True)
-        resposta = pedir_ou_erro("/api/jogar", {"jogo_id": jogo_id, "apelido": "Teste", "partida": "hospedar",
-                                                "pela_internet": True})
+        # Desde 13/11/2026, abrir sem repasse vai pelo retransmissor publico (codigo de 20 letras; testado em
+        # teste_repasse_publico_retroarch.py). O que segue pedindo o repasse e' ENTRAR com o codigo de 6 numeros.
+        resposta = pedir_ou_erro("/api/jogar", {"jogo_id": jogo_id, "apelido": "Teste", "partida": "entrar",
+                                                "pela_internet": True, "codigo_sala": "123456"})
         confere("o ARENA explica que falta o repasse", "repasse da turma" in str(resposta.get("erro", "")),
                 resposta.get("erro"))
         guardado = c.pedir("/api/config", {"repasse_proprio": endereco})
