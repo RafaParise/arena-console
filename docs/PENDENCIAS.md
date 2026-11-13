@@ -1121,3 +1121,17 @@ Falta, nesta ordem:
 - **Próximo da fila "dá para implementar":** desempenho por máquina nos recomps (conferir as chaves de configuração
   em cada repositório antes de escrever); depois 60 quadros no GameCube/Wii por jogo, SGSR no celular e NIS, e a foto
   do PocketStation.
+- **13/11, manhã (3): favoritos, repetidos, cartão SD e recomps (d592063, b55de00).**
+  - Favorito consertado (a tela mandava a lista inteira, que o servidor ignora) e **★ Favoritos** no topo da lista.
+  - **Repetidos e cartão SD** (coluna da esquerda): cópias iguais (arquivo inteiro até 256 MB) e o mesmo jogo pelas
+    etiquetas GoodTools/No-Intro; Lixeira do Windows ou **Lixeira do ARENA** (`.ARENA-lixeira`, com Devolver tudo e
+    Esvaziar). **No A12 do Rafael, 406 arquivos (18,4 GB) estão nas Lixeiras do ARENA** (cartão e memória): o
+    Esvaziar, que apaga de vez, é com ele (Repetidos e cartão SD → Jogos repetidos → Lixeira do ARENA).
+  - **Exportar para o cartão SD** no computador (pen drive ou cartão no leitor). Não testado com cartão de verdade
+    (não havia nenhum ligado); a cópia conferida é a mesma do Levar para o cartão (testada).
+  - **Recomps RT64 por máquina** (Zelda 64, Mario Kart 64, Banjo). O resto em `docs\RECOMPS-DESEMPENHO.md`:
+    o escritor precisa entender seção de TOML/INI (Unleashed) e JSON aninhado (Shipwright).
+  - O A12 está com o **APK de TESTE** (para resolver os repetidos): devolver o de produção na release.
+- **Próximo:** os outros itens "dá para implementar" (60 quadros no GameCube/Wii por jogo, SGSR no celular, NIS, a
+  foto do PocketStation, o escritor dos recomps com seção e JSON aninhado); depois a rodada final (~80 min, janela
+  própria), a VERSAO nova, os APKs de produção testados no A12, o pacote dos alunos e a release.
