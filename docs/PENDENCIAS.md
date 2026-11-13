@@ -1107,3 +1107,9 @@ Falta, nesta ordem:
   - `teste_matriz_consoles` (PocketStation modesto, `mostra_imagem`): instabilidade já conhecida.
   - `teste_60_ps2_celular` e `teste_jogar_junto_pc_celular`: precisam do APK de TESTE no A12
     (`montar_android.py --abi arm64-v8a --teste`); o A12 está com o de produção 2026.11.12.
+- **13/11, manhã: Release 2026.11.13** (nota em `docs\RELEASE-2026.11.13.md`). Antes dela: os dois testes do celular
+  passaram no A12 com o APK de teste (PS2 a 60 quadros; PC entra como jogador 2 em 18 s); a auditoria do celular achou
+  um aviso sério do axe no painel "Este celular" (consertado, 1e496ee); o APK de produção voltou ao A12 (abertura a
+  frio 740 ms, nenhuma falha); o pacote dos alunos foi montado do zero em `%LOCALAPPDATA%\ARENA-montagem-2026.11.13`
+  e conferido (nada de BIOS, save ou dado do professor nos zips). Disco C: com pouco espaço (cerca de 4 GB livres):
+  as montagens antigas em `%LOCALAPPDATA%\ARENA-montagem*` podem ser apagadas pelo Rafael quando quiser.
