@@ -190,9 +190,20 @@ def main():
             registro = os.path.join(raiz_bat, "servidor", "inicios.txt")
             if os.path.exists(registro):
                 os.remove(registro)
-            rodou = subprocess.run(["cmd", "/c", os.path.join(raiz_bat, "ARENA.bat")], cwd=raiz_bat,
-                                   stdin=subprocess.DEVNULL, capture_output=True, timeout=120, env=ambiente)
-            saida = rodou.stdout.decode("cp850", errors="replace")
+            # Saida em ARQUIVO, nao em pipe: se o .bat travar, o run(timeout=) mata o cmd, mas o python filho
+            # segura o pipe e a leitura espera para sempre (13/11/2026: o ping travado do Windows prendeu a
+            # rodada 15 min). Com arquivo, o tempo esgotado derruba a arvore inteira e o teste reprova.
+            arquivo_saida = os.path.join(base, "saida_bat_%s.txt" % modo)
+            with open(arquivo_saida, "wb") as destino:
+                processo_bat = subprocess.Popen(["cmd", "/c", os.path.join(raiz_bat, "ARENA.bat")], cwd=raiz_bat,
+                                                stdin=subprocess.DEVNULL, stdout=destino, stderr=subprocess.STDOUT,
+                                                env=ambiente)
+                try:
+                    processo_bat.wait(120)
+                except subprocess.TimeoutExpired:
+                    subprocess.run(["taskkill", "/T", "/F", "/PID", str(processo_bat.pid)], capture_output=True)
+                    processo_bat.wait(15)
+            saida = open(arquivo_saida, "rb").read().decode("cp850", errors="replace")
             inicios = open(registro).read().split() if os.path.exists(registro) else []
             confere("ARENA.bat (%s): abriu %d vez(es), reabertas sem abrir outra janela" % (
                 modo, len(esperado_inicios)), inicios == esperado_inicios, inicios)

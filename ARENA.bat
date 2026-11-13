@@ -91,8 +91,9 @@ if %QUEDAS% GTR 3 goto :desistiu
 echo           Reabrindo sozinho, tentativa %QUEDAS% de 3. A tela volta sozinha.
 echo.
 set "ARENA_REABERTO=1"
-REM  Espera 2 s (o ping e' o jeito de esperar que funciona ate sem teclado).
-ping -n 3 127.0.0.1 >nul 2>&1
+REM  Espera 2 s com o proprio Python (funciona sem teclado). Ate 13/11/2026 era o ping, que TRAVA para
+REM  sempre quando a pilha de rede do Windows emperra (visto no PC do Rafael): o servidor nao reabria.
+"%PYTHON%" -c "import time; time.sleep(2)"
 goto :abrirServidor
 
 :desistiu
