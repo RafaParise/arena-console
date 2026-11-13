@@ -393,7 +393,9 @@ def _sessao_aberta(jogo, plataforma, modesto, pasta, override, filtro, pastas, c
             # devagar, e o Contra ainda estava na tela preta da abertura na
             # hora da foto (1,8 KB, toda preta; 3 s depois, a tela-titulo).
             fotos = {}
-            for _foto in range(3):
+            # Ate 5 fotos (eram 3): a telinha do PocketStation (32x32) as vezes ainda esta quase vazia nas tres
+            # primeiras, mais no modo modesto (rodada final de 12 e 13/11/2026). So custa tempo quando a foto vem vazia.
+            for _foto in range(5):
                 comando("SCREENSHOT")
                 anterior, limite = None, time.monotonic() + 10
                 while time.monotonic() < limite:
