@@ -2953,7 +2953,14 @@ function explicarFormatoImagem() {
 
 function explicarEscalaTela() {
   const valor = $("#listaEscalaTela").value;
-  $("#explicaEscalaTela").textContent = EXPLICA_ESCALA_TELA[valor] || EXPLICA_ESCALA_TELA.automatico;
+  let texto = EXPLICA_ESCALA_TELA[valor] || EXPLICA_ESCALA_TELA.automatico;
+  // No celular, os filtros so funcionam no motor Vulkan: o ARENA abre o jogo 2D nele quando o aluno escolhe um filtro
+  // (arena.filtro_pede_vulkan_no_android, 13/11/2026). O 3D e o grafico minimo ficam sem filtro.
+  if (noCelular() && ["pixel", "nitido", "suave", "anime4k", "sgsr"].includes(valor)) {
+    texto += " No celular, vale nos jogos 2D: o ARENA abre o jogo com o motor Vulkan, se o aparelho tiver. " +
+      "Nos jogos 3D e no gráfico mínimo, fica sem filtro.";
+  }
+  $("#explicaEscalaTela").textContent = texto;
 }
 
 // Nitidez (12/11/2026, servidor\graficos.py -> filtro_com_nitidez): quanto os filtros que afiam (o RCAS, o FSR e o

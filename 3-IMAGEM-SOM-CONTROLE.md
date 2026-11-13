@@ -1393,7 +1393,15 @@ NIS não vêm no RetroArch 1.22 (o LS1 é fechado; o NIS precisa de tabelas de
 coeficientes e de dois passos, e o FSR faz o mesmo papel); o **SGSR** entrou
 em 12/11/2026, portado pelo ARENA do código aberto da Qualcomm (licença
 BSD-3-Clause, em `servidor\filtros\sgsr`). Ele só vale quando escolhido: o
-Automático continua o mesmo. A geração de quadros (LSFG) só existe no
+Automático continua o mesmo.
+
+**No celular** (13/11/2026): os filtros só funcionam no motor Vulkan do
+Android. Quando você escolhe um filtro (Pixel nítido, Nítido, Suave, Anime4K
+ou SGSR), o ARENA abre os jogos 2D no Vulkan, se o aparelho tiver. Os jogos 3D
+continuam no OpenGL ES, sem filtro, e o gráfico mínimo também fica sem. No
+Galaxy A12, o SGSR rodou no Super Nintendo.
+
+A geração de quadros (LSFG) só existe no
 Lossless de quem comprou: o ARENA continua usando o programa de verdade quando
 ele está na máquina.
 

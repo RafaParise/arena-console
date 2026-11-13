@@ -3243,13 +3243,34 @@ def motor_do_console_no_android(plataforma_jogo, config):
     """O motor de video que o console pede no Android (consoles.json -> motor_no_android), ou "" quando nao vale: fora
     do Android, sem Vulkan no aparelho ou com um motor escolhido a mao em Ajustes."""
     motor = (plataforma_jogo or {}).get("motor_no_android", "")
-    if not motor or not plataforma_do_sistema.ANDROID:
-        return ""
-    if motor == "vulkan" and not MAQUINA.get("vulkan"):
+    if not plataforma_do_sistema.ANDROID:
         return ""
     if (config or {}).get("avancado", {}).get("video_driver", "automatico") != "automatico":
         return ""
+    if not motor and filtro_pede_vulkan_no_android(plataforma_jogo, config):
+        motor = "vulkan"
+    if not motor:
+        return ""
+    if motor == "vulkan" and not MAQUINA.get("vulkan"):
+        return ""
     return motor
+
+
+# Os filtros que o aluno escolhe em Ajustes -> Escala da tela (o Automatico, o Original e o Inteiro ficam de fora).
+ESCALAS_COM_FILTRO = ("pixel", "nitido", "suave", "anime4k", "sgsr")
+
+
+def filtro_pede_vulkan_no_android(plataforma_jogo, config):
+    """O filtro escolhido vale no celular (13/11/2026)? No Android o RetroArch so compila os filtros do ARENA (.slang)
+    no Vulkan, e a aba Avancado (onde fica o motor) nao aparece la: sem isto, o SGSR escolhido no celular nao fazia
+    nada. So quando o ALUNO escolheu um filtro (o Automatico nao muda, nada de regresso), fora do grafico minimo, e so
+    nos consoles 2D (graficos.json -> escala.pixel), cujo nucleo desenha sem a placa e nao depende do OpenGL ES.
+    Provado no Galaxy A12 (PowerVR GE8320): o SGSR compilou e rodou no SNES (testes\\experiencia_sgsr_celular.py)."""
+    config = config or {}
+    if config.get("escala_da_tela") not in ESCALAS_COM_FILTRO or nivel_abaixo(config) == "minimo":
+        return False
+    plataforma = (plataforma_jogo or {}).get("id", "")
+    return plataforma in set(graficos.carregar_graficos().get("escala", {}).get("pixel") or [])
 
 
 def executar_jogo(jogo, apelido, config, custo=None, partida=None):

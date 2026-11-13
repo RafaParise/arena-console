@@ -893,6 +893,26 @@ class OpcoesSoDoAndroid(unittest.TestCase):
         with mock.patch.multiple(plataforma, ANDROID=False, WINDOWS=True, LINUX=False):
             self.assertEqual(arena.motor_do_console_no_android(dreamcast, automatico), "")
 
+    def test_filtro_escolhido_no_celular_abre_o_2d_em_vulkan(self):
+        """O SGSR (e os outros filtros) so compilam no Vulkan do Android, e o celular nao mostra a aba Avancado
+        (13/11/2026): o filtro escolhido pelo aluno leva o jogo 2D ao Vulkan. Nada muda no Automatico, no grafico
+        minimo, no 3D, com motor escolhido a mao ou sem Vulkan no aparelho."""
+        import arena
+        sgsr = {"escala_da_tela": "sgsr", "avancado": {"video_driver": "automatico"}}
+        with no_android(), mock.patch.dict(arena.MAQUINA, {"vulkan": True}):
+            self.assertEqual(arena.motor_do_console_no_android({"id": "snes"}, sgsr), "vulkan")
+            self.assertEqual(arena.motor_do_console_no_android({"id": "snes"}, dict(sgsr, escala_da_tela="pixel")), "vulkan")
+            self.assertEqual(arena.motor_do_console_no_android({"id": "snes"}, dict(sgsr, escala_da_tela="automatico")), "")
+            self.assertEqual(arena.motor_do_console_no_android({"id": "snes"}, dict(sgsr, escala_da_tela="inteiro")), "")
+            self.assertEqual(arena.motor_do_console_no_android({"id": "snes"}, dict(sgsr, abaixo_do_original="minimo")), "")
+            self.assertEqual(arena.motor_do_console_no_android({"id": "psp"}, sgsr), "")          # 3D: fica no GL
+            self.assertEqual(arena.motor_do_console_no_android(
+                {"id": "snes"}, dict(sgsr, avancado={"video_driver": "gl"})), "")
+        with no_android(), mock.patch.dict(arena.MAQUINA, {"vulkan": False}):
+            self.assertEqual(arena.motor_do_console_no_android({"id": "snes"}, sgsr), "")
+        with mock.patch.multiple(plataforma, ANDROID=False, WINDOWS=True, LINUX=False):
+            self.assertEqual(arena.motor_do_console_no_android({"id": "snes"}, sgsr), "")
+
     def test_psp_sem_pular_efeitos_no_celular(self):
         """O PPSSPP do Android cai 2 a 3 s depois de abrir com o 'pular efeitos de buffer' (Galaxy A12, 08/11/2026);
         no computador os niveis abaixo do original continuam ligando, porque la ele abre e alivia a maquina fraca."""

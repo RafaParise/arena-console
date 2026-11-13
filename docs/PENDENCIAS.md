@@ -1149,3 +1149,11 @@ Falta, nesta ordem:
 - **2 Ship 2 Harkinian e Starship** (mesmo motor) também ajustados por máquina; cada um tem nomes de chave
   diferentes (os quadros do 2 Ship ficam fora do `gSettings`; o Starship não tem prefixo nem escala).
 - **Próximo da fila:** 60 quadros no GameCube/Wii por jogo, SGSR no celular.
+- **SGSR no celular: feito e provado no A12** (PowerVR GE8320). Os filtros do ARENA (.slang) só compilam no Vulkan
+  do Android, e o celular não mostra a aba Avançado (onde fica o motor): o SGSR escolhido não fazia nada. Agora,
+  quando o aluno escolhe um filtro (Pixel nítido, Nítido, Suave, Anime4K, SGSR), o jogo 2D abre no Vulkan, se o
+  aparelho tiver (`arena.filtro_pede_vulkan_no_android`). O Automático, o 3D (núcleos de OpenGL ES), o gráfico
+  mínimo e o motor escolhido a mão não mudam. Prova: `testes\experiencia_sgsr_celular.py` (APK de teste; devolve os
+  ajustes): motor no Automático, `[Display] Found display driver: "vulkan"` e `[Slang] Compiling shader: sgsr1.slang`.
+  O A12 do Rafael está no gráfico **mínimo** (sem filtro, de propósito) e voltou ao APK de produção 2026.11.13.2.
+  60 quadros no GameCube/Wii já estavam feitos (11/11, 25 jogos): a fila "dá para implementar" acabou.
