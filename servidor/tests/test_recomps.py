@@ -565,6 +565,50 @@ class TestSecaoEUnleashed(unittest.TestCase):
         self.assertIn('ShadowResolution = "512"', texto)
         self.assertLess(texto.index("[Video]"), texto.index("ShadowResolution"))
 
+    def test_shipwright_no_windows_grava_na_pasta_do_programa_em_niveis(self):
+        perfil = recomps.ajuste_da_maquina("shipwright", 1, windows=True)
+        self.assertEqual(perfil["file"], "{programa}/shipofharkinian.json")
+        self.assertEqual(perfil["ensure"]["CVars"]["gSettings"],
+                         {"InternalResolution": 0.5, "MSAAValue": 1, "InterpolationFPS": 20})
+        self.assertIsInstance(perfil["ensure"]["CVars"]["gSettings"]["InternalResolution"], float)
+        self.assertIsInstance(recomps.ajuste_da_maquina("shipwright", 3, windows=True)
+                              ["ensure"]["CVars"]["gSettings"]["InternalResolution"], float)   # 1.0, nao 1
+        self.assertIsNone(recomps.ajuste_da_maquina("shipwright", 4))
+
+    def test_shipwright_no_linux_usa_a_pasta_do_appimage_so_se_ela_ja_tem_os_arquivos(self):
+        perfil = recomps.ajuste_da_maquina("shipwright", 2, windows=False)
+        pasta = tempfile.mkdtemp(prefix="arena_soh_")
+        self.addCleanup(limpeza.apagar_pasta, pasta)
+        programa, local = os.path.join(pasta, "bin"), os.path.join(pasta, "share")
+        os.makedirs(programa)
+        vars_ = {"programa": programa, "local": local}
+        self.assertEqual(recomps._primeiro_caminho(perfil["file"], vars_), local + "/soh/shipofharkinian.json")
+        open(os.path.join(programa, "oot.o2r"), "w").close()
+        self.assertEqual(recomps._primeiro_caminho(perfil["file"], vars_), programa + "/shipofharkinian.json")
+
+    def test_shipwright_mescla_nos_niveis_sem_estragar_a_escolha(self):
+        pasta = tempfile.mkdtemp(prefix="arena_soh_")
+        self.addCleanup(limpeza.apagar_pasta, pasta)
+        arquivo = os.path.join(pasta, "shipofharkinian.json")
+        with open(arquivo, "w", encoding="utf-8") as saida:
+            json.dump({"CVars": {"gSettings": {"MSAAValue": 4, "Language": 1}, "gCosmetics": {"x": 1}},
+                       "Window": {"Width": 640}}, saida)
+        perfil = recomps.ajuste_da_maquina("shipwright", 1, windows=True)
+        recomps.escrever_configuracao({"config": [perfil]}, {"programa": pasta})
+        with open(arquivo, encoding="utf-8") as entrada:
+            dados = json.load(entrada)
+        ajustes = dados["CVars"]["gSettings"]
+        self.assertEqual(ajustes["MSAAValue"], 4)                  # a escolha da pessoa fica
+        self.assertEqual(ajustes["Language"], 1)                   # o resto do nivel fica
+        self.assertEqual(ajustes["InternalResolution"], 0.5)       # o que faltava entrou
+        self.assertEqual(dados["CVars"]["gCosmetics"], {"x": 1})
+        self.assertEqual(dados["Window"], {"Width": 640})
+
+    def test_mescla_nao_troca_valor_da_pessoa_por_um_nivel(self):
+        dados = {"CVars": 7}
+        recomps._mesclar_o_que_falta(dados, {"CVars": {"gSettings": {"MSAAValue": 1}}, "Novo": {"a": 1}})
+        self.assertEqual(dados, {"CVars": 7, "Novo": {"a": 1}})
+
     def test_sem_avx_nao_baixa_nem_abre(self):
         self.assertTrue(recomps.falta_no_processador("unleashedrecomp", {"avx": False, "avx2": False}))
         self.assertEqual(recomps.falta_no_processador("unleashedrecomp", {"avx": True, "avx2": True}), "")

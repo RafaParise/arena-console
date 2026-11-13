@@ -1135,3 +1135,16 @@ Falta, nesta ordem:
 - **Próximo:** os outros itens "dá para implementar" (60 quadros no GameCube/Wii por jogo, SGSR no celular, NIS, a
   foto do PocketStation, o escritor dos recomps com seção e JSON aninhado); depois a rodada final (~80 min, janela
   própria), a VERSAO nova, os APKs de produção testados no A12, o pacote dos alunos e a release.
+
+## 13/11/2026 (tarde): Release 2026.11.13.2, limpeza do disco e o Ship of Harkinian por máquina
+
+- **Release v2026.11.13.2 publicada (Latest)** com os 5 arquivos (APKs arm64 e x86_64, zip do PC, atualização,
+  SHA256); rodada final 124 de 131, as 7 falhas repetidas passaram sozinhas; o A12 ficou com o APK de produção.
+- **Disco:** apagadas as montagens e os pacotes antigos em `%LOCALAPPDATA%` (2026.11.10 a 2026.11.13; os pacotes eram
+  iguais, em nome e tamanho, aos do GitHub Releases). Ficaram o cache `ARENA-montagem` (Linux, Android, Java) e a
+  montagem da 2026.11.13.2. O C: foi de 41,9 para 57,3 GB livres.
+- **Ship of Harkinian por máquina** (`recomps._perfil_shipwright`): o escritor de JSON mescla em profundidade e o
+  perfil grava em `CVars.gSettings` (detalhe e fontes em `docs\RECOMPS-DESEMPENHO.md`). O documento antigo dava as
+  chaves certas, mas o lugar do arquivo e o formato aninhado só foram confirmados agora, no código da 9.3.1.
+- **Próximo da fila:** 2 Ship 2 Harkinian e Starship (mesmo motor; conferir o prefixo das chaves de cada um), 60
+  quadros no GameCube/Wii por jogo, SGSR no celular.

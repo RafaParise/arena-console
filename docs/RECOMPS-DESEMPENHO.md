@@ -69,11 +69,33 @@ seção, acrescenta no fim dela e cria a seção quando falta.
 support for the AVX instruction set"]. Sem AVX (o Celeron N5100), o ARENA não baixa nem abre e explica o motivo
 (`recomps.falta_no_processador`). Ele também pede placa com Direct3D 12 ou Vulkan 1.2.
 
+## Ship of Harkinian (Zelda: Ocarina of Time, motor libultraship): feito
+
+Arquivo `shipofharkinian.json`, **aninhado**: a chave `gSettings.InternalResolution` fica em
+`{"CVars": {"gSettings": {"InternalResolution": ...}}}` (o libultraship troca cada ponto por um nível,
+`Config::FormatNestedKey` e `unflatten`). O escritor do ARENA agora mescla em profundidade: só entra o que falta,
+e o que a pessoa escolheu no menu do jogo continua valendo. [Certo, conferido na versão 9.3.1 do catálogo]
+
+- Nomes: `CMake/lus-cvars.cmake` e `CMake/soh-cvars.cmake` do Shipwright (`CVAR_PREFIX_SETTING = gSettings`).
+- Limites e padrões: `soh/soh/SohGui/SohMenuSettings.cpp` (resolução de 0,5 a 2,0, padrão 1; MSAA de 1 a 8,
+  padrão 1; quadros a partir de 20, o original).
+- Lugar: no Windows, a pasta de onde o jogo abre (`Context::GetAppDirectoryPath` devolve "."; o ARENA abre o
+  recomp na pasta do programa). No Linux (AppImage), `$XDG_DATA_HOME/soh` ou `~/.local/share/soh`, a não ser que
+  a pasta de onde ele abre já tenha `shipofharkinian.json`, `oot.o2r` ou `oot-mq.o2r` (`SetAppImageHome` em
+  `OTRGlobals.cpp`; o README diz o mesmo).
+
+| nível | o que o ARENA grava (em `CVars.gSettings`) |
+|---|---|
+| fraco | `InternalResolution = 0.5`, `MSAAValue = 1`, `InterpolationFPS = 20` (o original) |
+| médio | `InternalResolution = 1.0`, `MSAAValue = 1`, `InterpolationFPS = 60` |
+
+Placa forte: nada muda. Não medido no Celeron N5100 (falta a cópia do jogo para medir).
+
 ## O que falta (precisa mudar o escritor primeiro)
 
 | Motor | Arquivo | O que falta |
 |---|---|---|
-| libultraship (Shipwright e parentes) | `shipofharkinian.json`, com as chaves dentro de `"CVars"` | mescla em profundidade no JSON |
+| libultraship (2 Ship 2 Harkinian, Starship) | o `.json` de cada um, como o do Ship of Harkinian | conferir os nomes das chaves de cada um (o prefixo pode mudar) |
 | dusklight (GameCube) | `config.json` plano (o escritor já atende) | o caminho fora do modo portátil e o sentido de `game.internalResolutionScale` não foram confirmados |
 | SuperTuxKart, OpenRA | XML e YAML | o escritor não lê esses formatos |
 

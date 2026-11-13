@@ -813,6 +813,30 @@ RT64 = {
 UNLEASHED = "unleashedrecomp"
 
 
+# libultraship (Ship of Harkinian, 13/11/2026): shipofharkinian.json ANINHADO, com as chaves dentro de "CVars" (o
+# nome "gSettings.InternalResolution" vira {"CVars": {"gSettings": {"InternalResolution": ...}}}). Fontes, na versao
+# 9.3.1 do catalogo: Shipwright CMake/lus-cvars.cmake e soh-cvars.cmake (os nomes), soh/SohGui/SohMenuSettings.cpp
+# (limites e padroes: resolucao 0.5 a 2.0, padrao 1; MSAA 1 a 8, padrao 1; quadros a partir de 20, o original),
+# libultraship src/ship/config/Config.cpp (o "." vira um nivel do JSON) e Context.cpp (o lugar: no Windows a pasta
+# de onde o jogo abre, que no ARENA e' a do programa; no Linux, pelo AppImage, $XDG_DATA_HOME/soh ou
+# ~/.local/share/soh, a nao ser que a pasta de onde ele abre ja tenha os arquivos dele: OTRGlobals.cpp).
+SHIPWRIGHT = "shipwright"
+
+
+def _perfil_shipwright(nivel, windows):
+    if nivel == "fraco":
+        chaves = {"InternalResolution": 0.5, "MSAAValue": 1, "InterpolationFPS": 20}
+    else:
+        chaves = {"InternalResolution": 1.0, "MSAAValue": 1, "InterpolationFPS": 60}
+    if windows:
+        arquivo = "{programa}/shipofharkinian.json"
+    else:
+        arquivo = [{"path": "{programa}/shipofharkinian.json", "if": "{programa}/%s" % nome}
+                   for nome in ("shipofharkinian.json", "oot.o2r", "oot-mq.o2r")]
+        arquivo.append({"path": "{local}/soh/shipofharkinian.json"})
+    return {"file": arquivo, "format": "json", "ensure": {"CVars": {"gSettings": chaves}}}
+
+
 def _toml(valor):
     """O valor escrito em TOML: texto entre aspas, verdadeiro/falso em minusculas, numero como esta."""
     if isinstance(valor, bool):
@@ -847,13 +871,15 @@ def nivel_da_placa(nota_gpu):
 def ajuste_da_maquina(recomp_id, nota_gpu, windows=None):
     """A entrada 'config' (o formato do descritor) com o perfil desta maquina, ou None quando nao ha o que mudar
     (motor nao conferido ou placa forte)."""
-    if recomp_id not in RT64 and recomp_id != UNLEASHED:
+    if recomp_id not in RT64 and recomp_id not in (UNLEASHED, SHIPWRIGHT):
         return None
     nivel = nivel_da_placa(nota_gpu)
     if nivel == "forte":
         return None
     if recomp_id == UNLEASHED:
         return _perfil_unleashed(nivel, plataforma_do_sistema.WINDOWS if windows is None else windows)
+    if recomp_id == SHIPWRIGHT:
+        return _perfil_shipwright(nivel, plataforma_do_sistema.WINDOWS if windows is None else windows)
     pasta, tem_hpfb, sem_ds = RT64[recomp_id]
     windows = plataforma_do_sistema.WINDOWS if windows is None else windows
     arquivo = ("{local}/%s/graphics.json" if windows else "{home}/.config/%s/graphics.json") % pasta
@@ -900,11 +926,8 @@ def escrever_configuracao(descritor, vars_):
                 dados = {}
             if not isinstance(dados, dict):
                 dados = {}
-            for k, v in novos.items():
-                dados.setdefault(k, v)
-            for k, v in garantir.items():
-                if dados.get(k) in (None, ""):
-                    dados[k] = v
+            _mesclar_o_que_falta(dados, novos)
+            _mesclar_o_que_falta(dados, garantir)
             dados.update(sempre)
             texto = json.dumps(dados, ensure_ascii=False, indent=2) + "\n"
         else:
@@ -924,6 +947,20 @@ def escrever_configuracao(descritor, vars_):
         os.replace(temporario, caminho)
         escritos.append(caminho)
     return escritos
+
+
+def _mesclar_o_que_falta(dados, chaves):
+    """JSON: poe em 'dados' so o que falta (ou esta vazio), descendo nos niveis ({"CVars": {"gSettings": {...}}} do
+    Ship of Harkinian, 13/11/2026). Um valor que a pessoa ja tem fica, mesmo que nao seja um nivel."""
+    for k, v in chaves.items():
+        atual = dados.get(k)
+        if isinstance(v, dict):
+            if atual in (None, ""):
+                atual = dados[k] = {}
+            if isinstance(atual, dict):
+                _mesclar_o_que_falta(atual, v)
+        elif atual in (None, ""):
+            dados[k] = v
 
 
 RE_CABECALHO = re.compile(r"^\s*\[([^\[\]]+)\]\s*(?:[#;].*)?$")
@@ -1054,6 +1091,7 @@ def externo_para(recomp_id, caminho_jogo, avisar=print, nota_gpu=None):
     descritor = ler_descritor(pasta) or {}
     base = descritor.get("_pasta", pasta)
     vars_ = variaveis(base, caminho_jogo)
+    vars_["programa"] = os.path.dirname(programa)   # a pasta de onde o recomp abre (o Ship of Harkinian grava ali)
     aviso = ""
     argumentos = []
     ambiente = {}
