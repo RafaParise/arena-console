@@ -763,6 +763,57 @@ def _valor_toml(texto):
     return json.dumps(texto)   # string TOML basica = string JSON (as mesmas aspas e barras)
 
 
+# ---------------------------------------------------------------------------
+# O desempenho por maquina (13/11/2026, pedido do Rafael: "ajustar as versoes para PC a cada computador, como ja
+# acontece com os emuladores"). Um perfil por MOTOR, so com chaves conferidas no codigo-fonte de cada um
+# (pesquisa de 13/11/2026, docs\RECOMPS-DESEMPENHO.md). Vai pelo grupo 'ensure' do escritor: so entra a chave que
+# ainda nao existe, entao o que a pessoa escolher dentro do jogo continua valendo. Placa forte: nada muda (o padrao
+# do recomp ja e' o mais bonito).
+# ---------------------------------------------------------------------------
+
+# RT64 (os recomps de N64 da familia N64Recomp): graphics.json plano. No Windows em %LOCALAPPDATA%\<programa>; no
+# Linux em ~/.config/<programa> (o recomp usa o $HOME direto, sem o XDG_CONFIG_HOME). Fontes: Zelda64Recomp
+# src/game/config.cpp e src/main/rt64_render_context.cpp; N64ModernRuntime ultramodern/config.hpp; MarioKart64Recomp
+# src/game/config.cpp; RecompFrontend recompui/src/config (o Banjo).
+RT64 = {
+    # id do catalogo: (pasta do programa, tem o hpfb_option, o "sem superamostragem" do ds_option)
+    "zelda64recomp": ("Zelda64Recompiled", True, 1),
+    "mariokart64recomp": ("MarioKart64Recompiled", False, 1),
+    "mariokart64recomp-2": ("MarioKart64Recompiled", False, 1),
+    "banjorecomp": ("BanjoRecompiled", True, 0),
+}
+
+
+def nivel_da_placa(nota_gpu):
+    """'fraco' (nota 1 e 2), 'medio' (3) ou 'forte' (4 e 5). Sem nota: medio."""
+    try:
+        nota = int(nota_gpu)
+    except (TypeError, ValueError):
+        return "medio"
+    return "fraco" if nota <= 2 else "medio" if nota == 3 else "forte"
+
+
+def ajuste_da_maquina(recomp_id, nota_gpu, windows=None):
+    """A entrada 'config' (o formato do descritor) com o perfil desta maquina, ou None quando nao ha o que mudar
+    (motor nao conferido ou placa forte)."""
+    if recomp_id not in RT64:
+        return None
+    nivel = nivel_da_placa(nota_gpu)
+    if nivel == "forte":
+        return None
+    pasta, tem_hpfb, sem_ds = RT64[recomp_id]
+    windows = plataforma_do_sistema.WINDOWS if windows is None else windows
+    arquivo = ("{local}/%s/graphics.json" if windows else "{home}/.config/%s/graphics.json") % pasta
+    if nivel == "fraco":
+        chaves = {"res_option": "Original", "ds_option": sem_ds, "msaa_option": "None", "rr_option": "Original"}
+    else:
+        chaves = {"res_option": "Original2x", "ds_option": sem_ds, "msaa_option": "None", "rr_option": "Manual",
+                  "rr_manual_value": 60}
+    if tem_hpfb:
+        chaves["hpfb_option"] = "Off"
+    return {"file": arquivo, "format": "json", "ensure": chaves}
+
+
 def escrever_configuracao(descritor, vars_):
     """Escreve nos arquivos de ajuste do recomp o que o descritor manda antes de abrir: 'game_path' (a copia do
     jogo, sempre), 'always' (sempre), 'ensure' (so quando falta) e 'new' (so se o arquivo nao existe). TOML e INI
@@ -902,7 +953,7 @@ def preparar(descritor, pasta, caminho_jogo, recomp_id, avisar=print):
     return ""
 
 
-def externo_para(recomp_id, caminho_jogo, avisar=print):
+def externo_para(recomp_id, caminho_jogo, avisar=print, nota_gpu=None):
     """Como o /api/jogar abre um recomp: o mesmo dicionario do emulador de fora (jogo["externo"]), com o programa,
     os argumentos (a copia do jogo no lugar de {game}) e o ambiente do descritor. Antes, confere a copia, escreve
     os ajustes e roda o preparo. Devolve (externo, aviso) ou lanca NaoDaParaInstalar com o motivo."""
@@ -937,6 +988,14 @@ def externo_para(recomp_id, caminho_jogo, avisar=print):
     else:
         aviso = ("%s não diz como receber o jogo: se ele pedir a sua cópia na primeira vez, ela está em %s."
                  % (r["nome"], caminho_jogo))
+    # O desempenho desta maquina (so o que falta no arquivo: a escolha da pessoa dentro do jogo fica).
+    perfil = ajuste_da_maquina(recomp_id, nota_gpu)
+    if perfil:
+        try:
+            if escrever_configuracao({"config": [perfil]}, vars_):
+                avisar("[ARENA] Recomp ajustado para esta maquina (placa %s)." % nivel_da_placa(nota_gpu))
+        except OSError as falha_perfil:
+            avisar("[ARENA] Nao consegui ajustar o recomp para esta maquina: %s" % falha_perfil)
     return ({"caminho": programa,
              "dados": {"nome": r["nome"], "argumentos": argumentos, "ambiente": ambiente, "recomp": recomp_id}},
             aviso)

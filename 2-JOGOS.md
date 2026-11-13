@@ -1442,3 +1442,42 @@ Em Ajustes → Máquina → Onde ficam os jogos:
 2. **Levar jogos da memória para o cartão** mostra os jogos que estão ocupando a memória do aparelho, com o tamanho. Marque os que
    vão para o cartão e toque em **Levar os marcados**. O ARENA copia, confere e só depois apaga da memória; se faltar espaço ou der
    erro, o jogo fica onde estava. Os saves continuam valendo. Não tire o cartão enquanto a mudança anda.
+
+## Favoritos, jogos repetidos e o cartão SD (13/11/2026)
+
+### Favoritos
+
+Toque na estrela **☆** de um jogo e ela fica **★**. O primeiro item da lista de consoles, **★ Favoritos**, mostra
+os favoritos de todos os consoles juntos, com a quantidade ao lado. (Até a versão 2026.11.13 a estrela não ficava
+gravada; foi consertado.)
+
+### Jogos repetidos
+
+Na coluna da esquerda, **Repetidos e cartão SD → Jogos repetidos → Procurar repetidos**. O ARENA compara os arquivos e
+mostra dois tipos:
+
+- **Cópias iguais**: o mesmo arquivo em dois lugares. Uma basta, e as que sobram já vêm marcadas. Fica a cópia
+  favorita, a jogada por último ou a que está direto na pasta do console.
+- **O mesmo jogo em arquivos diferentes**: outra região, outro formato, outra versão. Nos conjuntos de ROMs com
+  etiquetas no nome (GoodTools, No-Intro), vêm marcadas só as variantes ruins que têm uma cópia limpa da mesma
+  região: `[b]` (dump ruim), `[o]` (overdump), `[a]` (alternativo), `[h]` (hack), `[t]` (trainer), `[f]`, `[p]`.
+  A cópia conferida `[!]` fica. Tradução e outra região nunca vêm marcadas, e **tradução em português nunca sai
+  sem você pedir**.
+
+Confira as marcas e toque em **Apagar os marcados → Sim, apagar**. Fica sempre pelo menos uma cópia de cada jogo.
+Para onde vão os apagados:
+
+- **Windows** (disco do computador): para a **Lixeira do Windows**.
+- **Celular, Linux, pen drive e cartão** (sem Lixeira): para a **Lixeira do ARENA**, uma pasta `.ARENA-lixeira` ao
+  lado da pasta de jogos, no mesmo cartão ou disco. Lá embaixo, **Devolver tudo** põe cada arquivo de volta no
+  lugar, e **Esvaziar** apaga de vez e libera o espaço.
+
+Jogos de loja (Steam...), apps do celular e recomps nunca entram. Jogo numa pasta inteira só dele, lista de discos
+(`.m3u`) e jogo de vários discos aparecem, mas se apagam à mão.
+
+### Exportar para o cartão SD (no computador)
+
+**Repetidos e cartão SD → Exportar para o cartão**. Encaixe o cartão SD no leitor do computador (ou ligue um pen drive),
+escolha-o em **Para onde**, marque os jogos (dá para procurar pelo nome) e toque em **Exportar os marcados**. O ARENA
+copia para a pasta `ARENA-jogos` do cartão, uma pasta por console, e confere cada arquivo. Os jogos continuam também
+no computador. No celular, encaixe o cartão e toque em **Ajustes → Máquina → Procurar jogos no cartão**.

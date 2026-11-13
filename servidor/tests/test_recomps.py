@@ -487,5 +487,41 @@ class Preparo(unittest.TestCase):
             self.assertIn("código 3", recomps.preparar(descritor, self.pasta, "x.iso", "meu2", avisar=lambda m: None))
 
 
+
+class TestDesempenhoPorMaquina(unittest.TestCase):
+    """O perfil do motor RT64 por maquina (13/11/2026): so chaves conferidas, so o que falta, nada na placa forte."""
+
+    def test_placa_forte_nao_muda_nada(self):
+        self.assertIsNone(recomps.ajuste_da_maquina("zelda64recomp", 5))
+        self.assertIsNone(recomps.ajuste_da_maquina("recomp-que-nao-tem-perfil", 1))
+
+    def test_placa_fraca_no_windows(self):
+        perfil = recomps.ajuste_da_maquina("zelda64recomp", 2, windows=True)
+        self.assertEqual(perfil["file"], "{local}/Zelda64Recompiled/graphics.json")
+        self.assertEqual(perfil["ensure"]["res_option"], "Original")
+        self.assertEqual(perfil["ensure"]["msaa_option"], "None")
+        self.assertEqual(perfil["ensure"]["hpfb_option"], "Off")
+
+    def test_mario_kart_nao_tem_hpfb_e_linux_usa_o_home(self):
+        perfil = recomps.ajuste_da_maquina("mariokart64recomp", 3, windows=False)
+        self.assertNotIn("hpfb_option", perfil["ensure"])
+        self.assertEqual(perfil["file"], "{home}/.config/MarioKart64Recompiled/graphics.json")
+        self.assertEqual(perfil["ensure"]["rr_option"], "Manual")
+
+    def test_so_grava_o_que_falta(self):
+        pasta = tempfile.mkdtemp(prefix="arena_rt64_")
+        self.addCleanup(limpeza.apagar_pasta, pasta)
+        arquivo = os.path.join(pasta, "Zelda64Recompiled", "graphics.json")
+        os.makedirs(os.path.dirname(arquivo))
+        with open(arquivo, "w", encoding="utf-8") as saida:
+            json.dump({"res_option": "Auto"}, saida)       # a escolha da pessoa dentro do jogo
+        perfil = recomps.ajuste_da_maquina("zelda64recomp", 1, windows=True)
+        recomps.escrever_configuracao({"config": [perfil]}, {"local": pasta})
+        with open(arquivo, encoding="utf-8") as entrada:
+            dados = json.load(entrada)
+        self.assertEqual(dados["res_option"], "Auto")          # ficou a dela
+        self.assertEqual(dados["msaa_option"], "None")         # o que faltava entrou
+
+
 if __name__ == "__main__":
     unittest.main()

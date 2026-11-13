@@ -2106,3 +2106,24 @@ html[data-navegador="true"] [data-so-windows] { display: none !important; }
 
 .equip-internet { display: grid; gap: .45rem; }
 .equip-passos { margin: 0; padding-left: 1.3rem; font-size: var(--t-base); line-height: 1.5; }
+
+/* ========================= REPETIDOS E CARTAO SD (13/11/2026) ========================= */
+.repetidos-grupo {
+  margin: var(--gap) 0 0;
+  padding: .5rem .8rem .7rem;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  background: var(--painel-alto);
+}
+.repetidos-grupo legend { padding: 0 .3rem; font-weight: 600; font-size: var(--t-peq); color: var(--texto); }
+.repetidos-item, .exportar-lista label {
+  display: flex; align-items: flex-start; gap: .55rem; padding: .35rem 0; min-height: 44px;
+  font-size: var(--t-peq); color: var(--texto-fraco); cursor: pointer;
+}
+.repetidos-item input, .exportar-lista input { width: 1.2rem; height: 1.2rem; margin-top: .15rem; flex-shrink: 0; }
+.repetidos-item code { overflow-wrap: anywhere; color: var(--texto); }
+.repetidos-meta { color: var(--texto-apagado); }
+.repetidos-rodape { position: sticky; bottom: 0; margin-top: var(--gap); padding: .6rem 0;
+                    background: var(--painel); border-top: 1px solid var(--borda); }
+.exportar-lista { list-style: none; margin: var(--gap) 0; padding: 0; max-height: 50vh; overflow-y: auto;
+                  border: 1px solid var(--borda); border-radius: var(--raio); padding: 0 .7rem; }

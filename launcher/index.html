@@ -92,6 +92,12 @@
 
   <!-- ---------- TRILHO DE PLATAFORMAS ---------- -->
   <nav class="trilho" aria-label="Plataformas">
+    <!-- Favoritos como primeira opcao da lista (13/11/2026, pedido do Rafael): o mesmo filtro do "★ Favoritos" da
+         busca, em todos os consoles. -->
+    <button class="trilho-item trilho-item--favoritos" data-favoritos="sim" data-plataforma="" type="button">
+      <span class="trilho-nome"><span aria-hidden="true">★</span> Favoritos</span>
+      <span class="trilho-conta" id="contaFavoritos">0</span>
+    </button>
     <button class="trilho-item trilho-item--todos ativo" data-plataforma="" type="button">
       <span class="trilho-nome">Todos os jogos</span>
       <span class="trilho-conta" id="contaTodos">0</span>
@@ -106,6 +112,8 @@
            title="Escolhe o arquivo do jogo (o baixado fica na pasta Download) e o guarda neste aparelho">Guardar um jogo</label>
     <button class="botao botao--largo" id="btnCriarPastas" type="button" data-so-windows>Criar pastas dos consoles</button>
     <button class="botao botao--largo" id="btnAtualizar" type="button">Atualizar lista</button>
+    <button class="botao botao--largo" id="btnOrganizar" type="button" data-so-windows
+            title="Acha os jogos repetidos (e apaga o que sobra) e exporta jogos para o cartão SD">Repetidos e cartão SD</button>
     <button class="botao botao--largo" id="btnBuscarCapas" type="button" data-so-windows
             title="Procura na internet a capa de cada jogo que está sem (PS3 e PSP pegam o ícone do próprio disco, sem internet)">Buscar capas que faltam</button>
   </nav>
@@ -386,6 +394,87 @@
     </div>
 
     <p class="explica rede-automatica">Descoberta local automática. IPs ficam ocultos.</p>
+  </div>
+</aside>
+
+<!-- ===================== REPETIDOS E CARTAO SD ===================== -->
+<!-- Pedido do Rafael (13/11/2026): achar e apagar os jogos repetidos (servidor\repetidos.py) e exportar jogos para o
+     cartao SD ou pen drive no computador (servidor\exportar.py). No celular, o cartao e' o Levar para o cartao. -->
+<aside class="gaveta" id="gavetaOrganizar" hidden aria-labelledby="tituloOrganizar">
+  <div class="gaveta-cabeca">
+    <h2 id="tituloOrganizar">Repetidos e cartão SD</h2>
+    <button class="botao botao--fechar" data-fechar="gavetaOrganizar" type="button">Fechar</button>
+  </div>
+
+  <div class="abas" role="tablist">
+    <button class="aba ativo" role="tab" data-aba="repetidos" type="button">Jogos repetidos</button>
+    <button class="aba" role="tab" data-aba="exportar" type="button">Exportar para o cartão</button>
+  </div>
+
+  <div class="aba-conteudo" data-painel="repetidos">
+    <p class="explica">
+      O ARENA compara os arquivos dos seus jogos e mostra os <b>iguais</b> (o mesmo arquivo em dois lugares: um basta,
+      e os que sobram já vêm marcados) e o <b>mesmo jogo</b> em arquivos diferentes (outra região ou outro formato:
+      nada vem marcado, você escolhe). Jogos de loja e os apps do celular ficam de fora.
+    </p>
+    <button class="botao botao--principal" id="btnProcurarRepetidos" type="button">Procurar repetidos</button>
+    <p class="explica" id="repetidosStatus" role="status" aria-live="polite"></p>
+    <div id="listaRepetidos"></div>
+    <div class="repetidos-rodape" id="repetidosRodape" hidden>
+      <p class="explica" id="repetidosTotal"></p>
+      <p class="explica" id="repetidosLixeira"></p>
+      <button class="botao botao--perigo" id="btnApagarRepetidos" type="button">Apagar os marcados</button>
+      <div class="modal-acoes" id="repetidosConfirmar" hidden>
+        <button class="botao botao--perigo" id="btnConfirmarRepetidos" type="button">Sim, apagar</button>
+        <button class="botao" id="btnCancelarRepetidos" type="button">Não apagar</button>
+      </div>
+    </div>
+    <!-- Onde o sistema nao tem Lixeira (celular, Linux, pen drive), o apagar leva para a Lixeira do ARENA, ao lado da
+         pasta de jogos: da para devolver tudo ou esvaziar (servidor\repetidos.py). -->
+    <div id="blocoLixeiraArena" hidden>
+      <h3 class="grupo-titulo">Lixeira do ARENA</h3>
+      <p class="explica" id="lixeiraArenaTexto"></p>
+      <div class="modal-acoes" id="lixeiraAcoes">
+        <button class="botao" id="btnDevolverLixeira" type="button">Devolver tudo</button>
+        <button class="botao botao--perigo" id="btnEsvaziarLixeira" type="button">Esvaziar (apaga de vez)</button>
+      </div>
+      <div class="modal-acoes" id="lixeiraConfirmar" hidden>
+        <button class="botao botao--perigo" id="btnConfirmarEsvaziar" type="button">Sim, apagar de vez</button>
+        <button class="botao" id="btnCancelarEsvaziar" type="button">Não apagar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="aba-conteudo" data-painel="exportar" hidden>
+    <p class="explica" data-so-android hidden>
+      No celular, o cartão SD fica em <b>Ajustes → Máquina → Onde ficam os jogos → Levar para o cartão</b>.
+    </p>
+    <div data-fora-do-android>
+      <p class="explica">
+        Copia os jogos marcados para o <b>cartão SD</b> (no leitor do computador) ou para um <b>pen drive</b>, na pasta
+        <code>ARENA-jogos</code>, uma pasta por console. No celular, encaixe o cartão e toque em <b>Ajustes → Máquina →
+        Procurar jogos no cartão</b>. Os jogos continuam também no computador.
+      </p>
+      <label class="campo">
+        <span>Para onde</span>
+        <select id="exportarDestino"></select>
+      </label>
+      <div class="modal-acoes">
+        <button class="botao" id="btnExportarDestinos" type="button">Procurar cartão de novo</button>
+      </div>
+      <label class="campo">
+        <span>Procurar jogo</span>
+        <input id="exportarBusca" type="search" autocomplete="off" placeholder="nome do jogo ou do console">
+      </label>
+      <div class="modal-acoes">
+        <button class="botao" id="btnExportarMarcarVisiveis" type="button">Marcar os da lista</button>
+        <button class="botao" id="btnExportarLimpar" type="button">Desmarcar todos</button>
+      </div>
+      <ul class="exportar-lista" id="listaExportar"></ul>
+      <p class="explica" id="exportarTotal" role="status" aria-live="polite"></p>
+      <button class="botao botao--principal" id="btnExportarCartao" type="button">Exportar os marcados</button>
+      <p class="explica" id="exportarAndamento" role="status" aria-live="polite"></p>
+    </div>
   </div>
 </aside>
 

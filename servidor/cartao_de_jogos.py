@@ -285,8 +285,9 @@ def _copiar(origem, destino, progresso):
         raise
 
 
-def levar_jogo(caminho_do_jogo, pasta_do_console, destino_do_console, progresso=lambda n: None):
+def levar_jogo(caminho_do_jogo, pasta_do_console, destino_do_console, progresso=lambda n: None, manter_original=False):
     """Leva o jogo (todos os arquivos dele) para destino_do_console. Devolve o novo caminho do arquivo do jogo.
+    'manter_original': so copia (o Exportar para o cartao SD do computador, 13/11/2026); o original fica.
     Arquivo que ja esta no destino so conta como ja copiado (uma mudanca interrompida continua) se for IGUAL ao
     original, byte por byte; diferente, para sem mexer em nada. Auditoria 6 (DAD6-01): antes bastava o mesmo nome e o
     mesmo tamanho, e um Zelda.srm de outro progresso no cartao fazia o do aluno ser apagado."""
@@ -315,6 +316,9 @@ def levar_jogo(caminho_do_jogo, pasta_do_console, destino_do_console, progresso=
         alvo = os.path.join(destino_do_console, nome)
         if not os.path.isfile(alvo) or os.path.getsize(alvo) != os.path.getsize(os.path.join(pasta, nome)):
             raise NaoPode("A cópia de %s no cartão não confere (o cartão saiu?): o original ficou onde estava." % nome)
+    relativo = os.path.relpath(os.path.abspath(caminho_do_jogo), os.path.abspath(pasta_do_console))
+    if manter_original:
+        return os.path.join(destino_do_console, relativo)
     nao_apagados = []
     for nome in nomes:
         try:
@@ -388,7 +392,7 @@ class Mudanca:
                         raise NaoPode("O cartão não tem espaço para %s (%d MB livres)." % (item["titulo"], livre))
                     _apagar_parciais(item["destino_do_console"])
                     novo = levar_jogo(item["caminho"], item["pasta_do_console"], item["destino_do_console"],
-                                      self._somar)
+                                      self._somar, manter_original=bool(item.get("manter_original")))
                     with self.trava:
                         self._levados.append((item["caminho"], novo))
                 except Exception as falha:          # qualquer erro vira recado do item (auditoria 6, DAD6-08)

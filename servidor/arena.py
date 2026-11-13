@@ -81,6 +81,8 @@ import quadros_dolphin  # noqa: E402  (o mesmo no GameCube e no Wii, pelos codig
 import recomps      # noqa: E402  (o jogo de console recompilado para PC: baixar da release e jogar -- 12/11/2026)
 import jogos_pc     # noqa: E402  (o console PC: o programa do jogo, as lojas, Wine e WSL -- 12/11/2026)
 import equipamentos  # noqa: E402
+import repetidos    # noqa: E402  (os jogos repetidos: achar e apagar o que sobra -- 13/11/2026)
+import exportar     # noqa: E402  (exportar jogos para o cartao SD ou pen drive, no computador -- 13/11/2026)
 import internet_de_casa  # noqa: E402
 import repasse_publico  # noqa: E402
 import waydroid  # noqa: E402  (os jogos de Android no Linux, 13/11/2026)  (partida entre casas pelo retransmissor publico, sem lista -- 13/11/2026)  (a internet de casa serve para partida entre casas? CGNAT, UPnP -- 13/11/2026)  (o painel Equipamentos: o que o ARENA tem e o botao que resolve -- 13/11/2026)
@@ -118,6 +120,18 @@ import adb_aparelho  # noqa: E402  (o celular ligado no cabo, visto pelo computa
 import armazenamento  # noqa: E402  (a memoria do celular e o cartao SD, juntos -- 23/10/2026)
 import cartao_de_jogos  # noqa: E402  (a pasta ARENA-jogos no cartao e levar os jogos para ela -- 07/11/2026)
 MUDANCA_PARA_O_CARTAO = cartao_de_jogos.Mudanca()
+PROCURA_DE_REPETIDOS = repetidos.Procura()
+
+
+def origens_de_pasta():
+    """As pastas de jogos onde pode haver Lixeira do ARENA: as de sempre e as do cartao que estao na lista."""
+    vistas = set(repetidos.ORIGENS_DE_PASTA)
+    try:
+        vistas.update(j.get("origem") for j in manifesto()["jogos"] if repetidos.origem_de_pasta(j.get("origem")))
+    except Exception:  # noqa: BLE001 -- sem lista ainda: as de sempre
+        pass
+    return sorted(o for o in vistas if o)
+EXPORTACAO = cartao_de_jogos.Mudanca()      # a mesma copia conferida do "Levar para o cartao", mas o original fica
 
 PASTA_LAUNCHER = os.path.join(RAIZ, "launcher")
 PASTA_DADOS = os.path.join(RAIZ, "dados")
@@ -6389,6 +6403,22 @@ class Manipulador(BaseHTTPRequestHandler):
         if caminho == "/api/ranking":
             return self.responder_json(ler_ranking())
 
+        if caminho == "/api/repetidos":
+            # A ultima procura de jogos repetidos e o andamento (servidor\repetidos.py).
+            return self.responder_json(dict(PROCURA_DE_REPETIDOS.estado(), ok=True,
+                                            lixeira=repetidos.vai_para_a_lixeira(PASTA_JOGOS),
+                                            lixeiras_do_arena=repetidos.lixeiras(PASTA_JOGOS, origens_de_pasta())))
+
+        if caminho == "/api/exportar":
+            # Os cartoes SD e pen drives ligados, os jogos que podem ir e o andamento da copia (servidor\exportar.py).
+            if plataforma_do_sistema.ANDROID:
+                return self.erro("No celular, use Ajustes → Máquina → Levar para o cartão.", 404)
+            jogos = [{"id": j["id"], "titulo": j.get("titulo", ""), "plataforma_nome": j.get("plataforma_nome", ""),
+                      "tamanho_mb": j.get("tamanho_mb", 0)}
+                     for j in manifesto()["jogos"] if repetidos.origem_de_pasta(j.get("origem"))]
+            return self.responder_json({"ok": True, "destinos": exportar.destinos(), "jogos": jogos,
+                                        "mudanca": EXPORTACAO.estado()})
+
         if caminho == "/api/jogo":
             parametros = urllib.parse.parse_qs(
                 urllib.parse.urlparse(self.path).query)
@@ -6611,6 +6641,93 @@ class Manipulador(BaseHTTPRequestHandler):
                 return self.erro("Isto é só do ARENA do Android. No computador, ponha os jogos na pasta jogos do "
                                  "ARENA (Como colocar jogos mostra onde).", 404)
             return self.api_armazenamento(caminho, dados)
+
+        # ---- Repetidos e exportar para o cartao SD (13/11/2026) --
+        if caminho == "/api/repetidos/procurar":
+            config = carregar_config()
+            if not PROCURA_DE_REPETIDOS.comecar(manifesto()["jogos"], RAIZ, config.get("favoritos") or [],
+                                                config.get("recentes") or []):
+                return self.erro("Já estou procurando os repetidos. Espere terminar.", 409)
+            return self.responder_json(dict(PROCURA_DE_REPETIDOS.estado(), ok=True))
+
+        if caminho == "/api/repetidos/apagar":
+            with TRAVA_JOGO:
+                if JOGO_EM_ANDAMENTO["ativo"]:
+                    return self.erro("Feche o jogo aberto antes de apagar os repetidos.", 409)
+            pedidos = dados.get("jogos")
+            if not isinstance(pedidos, list) or not pedidos or len(pedidos) > 20000:
+                return self.erro("Marque os repetidos que vão ser apagados.")
+            ultima = PROCURA_DE_REPETIDOS.resultado()
+            if not ultima:
+                return self.erro("Procure os repetidos de novo antes de apagar (a lista mudou ou é antiga).", 409)
+            feito = repetidos.apagar(pedidos, ultima, manifesto()["jogos"], RAIZ, pasta_dos_jogos=PASTA_JOGOS)
+            PROCURA_DE_REPETIDOS.esquecer()
+            limpar_caches()
+            manifesto(forcar=True)
+            return self.responder_json(dict(feito, ok=True))
+
+        if caminho == "/api/repetidos/lixeira":
+            # A Lixeira do ARENA (onde o sistema nao tem Lixeira): devolver tudo ao lugar ou esvaziar de vez.
+            acao = dados.get("acao")
+            if acao not in ("devolver", "esvaziar"):
+                return self.erro("Escolha Devolver tudo ou Esvaziar.")
+            with TRAVA_JOGO:
+                if JOGO_EM_ANDAMENTO["ativo"]:
+                    return self.erro("Feche o jogo aberto antes de mexer na lixeira.", 409)
+            feitos, total, erros = 0, 0, []
+            for lixeira in repetidos.lixeiras(PASTA_JOGOS, origens_de_pasta()):
+                if acao == "devolver":
+                    n, e = repetidos.devolver_da_lixeira(lixeira)
+                    feitos += n
+                else:
+                    b, e = repetidos.esvaziar_lixeira(lixeira)
+                    total += b
+                    feitos += lixeira["arquivos"]
+                erros += e
+            PROCURA_DE_REPETIDOS.esquecer()
+            limpar_caches()
+            manifesto(forcar=True)
+            return self.responder_json({"ok": True, "acao": acao, "arquivos": feitos, "bytes": total, "erros": erros})
+
+        if caminho == "/api/exportar":
+            if plataforma_do_sistema.ANDROID:
+                return self.erro("No celular, use Ajustes → Máquina → Levar para o cartão.", 404)
+            pasta = exportar.destino_valido(dados.get("destino"))
+            if not pasta:
+                return self.erro("O cartão ou pen drive escolhido não está mais ligado. Encaixe de novo e escolha na "
+                                 "lista.")
+            pedidos = dados.get("jogos")
+            if not isinstance(pedidos, list) or not pedidos or len(pedidos) > 20000:
+                return self.erro("Marque os jogos que vão para o cartão.")
+            pedidos = {str(p) for p in pedidos}
+            itens = []
+            for jogo in manifesto()["jogos"]:
+                if jogo["id"] not in pedidos or not repetidos.origem_de_pasta(jogo.get("origem")):
+                    continue
+                caminho_do_jogo = os.path.join(RAIZ, jogo["arquivo"])
+                if not dentro_da_pasta(caminho_do_jogo, PASTA_JOGOS) or not os.path.isfile(caminho_do_jogo):
+                    continue
+                console = cartao_de_jogos._pasta_do_console(caminho_do_jogo, os.path.join(PASTA_JOGOS, jogo["origem"]))
+                if not console:
+                    continue
+                itens.append({"titulo": jogo.get("titulo", ""), "caminho": caminho_do_jogo, "pasta_do_console": console,
+                              "destino_do_console": os.path.join(pasta, os.path.basename(console)),
+                              "bytes": cartao_de_jogos.bytes_do_jogo(caminho_do_jogo, console),
+                              "manter_original": True})
+            if not itens:
+                return self.erro("Nenhum dos jogos marcados pode ir (jogo de loja ou pasta fora de jogos). Marque outros.")
+            try:
+                os.makedirs(pasta, exist_ok=True)
+                leia = os.path.join(pasta, "LEIA.txt")
+                if not os.path.isfile(leia):
+                    with open(leia, "w", encoding="utf-8") as arquivo:
+                        arquivo.write(cartao_de_jogos.LEIA)
+            except OSError as falha:
+                return self.erro("O cartão não deixou criar a pasta (%s). Confira se a trava de gravação do cartão "
+                                 "está solta e tente de novo." % (falha.strerror or falha))
+            if not EXPORTACAO.comecar(itens):
+                return self.erro("Já há jogos indo para o cartão. Espere terminar.", 409)
+            return self.responder_json({"ok": True, "mudanca": EXPORTACAO.estado()})
 
         # ---- Android: traz de volta o jogo que ficou atras do ARENA (08/11/2026) --
         if caminho == "/api/jogo/voltar":
@@ -8278,7 +8395,8 @@ class Manipulador(BaseHTTPRequestHandler):
                     return self.responder_json({"ok": True, "baixar_recomp": recomps.resumo_para_a_tela(r),
                                                 "jeito": jeito})
                 try:
-                    externo_recomp, aviso_recomp = recomps.externo_para(recomp_id, caminho_rom)
+                    externo_recomp, aviso_recomp = recomps.externo_para(recomp_id, caminho_rom,
+                                                                       nota_gpu=nota_da_placa_de_fora())
                 except recomps.NaoDaParaInstalar as falha:
                     return self.erro(str(falha), 409)
                 caminho_externo, dados_externo = externo_recomp["caminho"], externo_recomp["dados"]

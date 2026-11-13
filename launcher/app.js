@@ -490,6 +490,9 @@ function desenharPlataformas() {
   for (const jogo of estado.jogos) {
     contagem[jogo.plataforma] = (contagem[jogo.plataforma] || 0) + 1;
   }
+  // Quantos favoritos ainda estao na lista (um jogo apagado ou movido sai da conta).
+  const favoritos = new Set(estado.config.favoritos || []);
+  $("#contaFavoritos").textContent = estado.jogos.filter((jogo) => favoritos.has(jogo.id)).length;
 
   // Plataformas com jogos primeiro; depois as vazias, para consulta.
   const ordenadas = [...estado.plataformas].sort((a, b) => {
@@ -552,6 +555,14 @@ function desenharPlataformas() {
 // Tira acento e caixa alta para a busca achar "Pokemon" digitando "pokémon".
 function normalizar(texto) {
   return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+}
+
+// Os filtros rapidos (Todos, Favoritos, Recentes) acima da grade; o Favoritos da lista de consoles usa o mesmo.
+const BOTAO_DO_FILTRO = { todos: "btnTodosJogos", favoritos: "btnFavoritos", recentes: "btnRecentes" };
+function marcarFiltroRapido(filtro) {
+  estado.filtroRapido = filtro;
+  for (const botao of document.querySelectorAll(".filtro-rapido"))
+    botao.classList.toggle("ativo", botao.id === BOTAO_DO_FILTRO[filtro]);
 }
 
 function jogosVisiveis() {
@@ -1002,7 +1013,10 @@ function desenharJogos() {
     lista.hidden = true;
     vazio.hidden = false;
     $("#btnMais").hidden = true;
-    if (estado.jogos.length > 0) {
+    if (estado.jogos.length > 0 && estado.filtroRapido === "favoritos" && !(estado.config.favoritos || []).length) {
+      $("#vazioTitulo").textContent = "Nenhum favorito ainda";
+      $("#vazioTexto").textContent = "Toque na estrela ☆ de um jogo: ele aparece aqui, em Favoritos.";
+    } else if (estado.jogos.length > 0) {
       $("#vazioTitulo").textContent = "Nada encontrado com esse filtro";
       $("#vazioTexto").textContent =
         "Limpe a busca ou escolha Todos os jogos no lado esquerdo.";
@@ -1811,13 +1825,14 @@ function marcarJogoAberto(id) {
 window.addEventListener("focus", conferirFaixaTeclas);
 
 async function alternarFavorito(jogo) {
-  const atuais = new Set(estado.config.favoritos || []);
-  if (atuais.has(jogo.id)) atuais.delete(jogo.id);
-  else atuais.add(jogo.id);
+  // O servidor inverte o jogo pedido ({favorito: id}). Antes (ate 13/11/2026) a tela mandava a lista inteira
+  // ({favoritos: [...]}), que o /api/config ignora: a estrela nunca era gravada.
   try {
-    await salvarConfig({ favoritos: [...atuais] });
+    await salvarConfig({ favorito: jogo.id });
+    const agora = (estado.config.favoritos || []).includes(jogo.id);
     desenharJogos();
-    recado(atuais.has(jogo.id) ? "Adicionado aos favoritos." : "Removido dos favoritos.");
+    desenharPlataformas();
+    recado(agora ? "Adicionado aos favoritos." : "Removido dos favoritos.");
   } catch (falha) {
     recado(falha.message, true);
   }
@@ -5418,6 +5433,360 @@ async function adicionarCheat() {
 }
 
 // --------------------------------------------------------------------------
+// Repetidos e cartao SD (13/11/2026, pedido do Rafael): achar os jogos repetidos e apagar o que sobra
+// (servidor\repetidos.py) e exportar jogos para o cartao SD ou pen drive no computador (servidor\exportar.py).
+// --------------------------------------------------------------------------
+let esperaRepetidos = null;
+let esperaExportar = null;
+const LIMITE_DA_LISTA_DE_EXPORTAR = 200;
+
+function abrirOrganizar() {
+  abrirGaveta("gavetaOrganizar");
+  mostrarRepetidos();
+  if (!noCelular()) carregarExportar();
+}
+
+async function procurarRepetidos() {
+  estado.repetidosMarcados = null;
+  try {
+    await pedir("/api/repetidos/procurar", "POST", {});
+  } catch (falha) {
+    recado(falha.message, true);
+  }
+  mostrarRepetidos();
+}
+
+async function mostrarRepetidos() {
+  clearTimeout(esperaRepetidos);
+  const status = $("#repetidosStatus");
+  let r;
+  try {
+    r = await pedir("/api/repetidos");
+  } catch (falha) {
+    status.textContent = falha.message;
+    return;
+  }
+  $("#btnProcurarRepetidos").disabled = !!r.rodando;
+  if (r.rodando) {
+    status.textContent = r.total ? `Comparando os arquivos… ${r.feitos} de ${r.total}.` : "Procurando…";
+    // So enquanto a gaveta esta aberta: fechada, ninguem esta olhando.
+    if (!$("#gavetaOrganizar").hidden) esperaRepetidos = setTimeout(mostrarRepetidos, 1000);
+    return;
+  }
+  estado.lixeiraDosRepetidos = !!r.lixeira;
+  estado.repetidos = r.resultado || null;
+  desenharLixeiraDoArena(r.lixeiras_do_arena || []);
+  if (!estado.repetidos) {
+    status.textContent = r.erro || "Toque em Procurar repetidos.";
+    $("#listaRepetidos").replaceChildren();
+    $("#repetidosRodape").hidden = true;
+    return;
+  }
+  desenharRepetidos();
+}
+
+function desenharRepetidos() {
+  const res = estado.repetidos;
+  const grupos = [...res.iguais, ...res.mesmo_jogo];
+  if (!estado.repetidosMarcados) {
+    estado.repetidosMarcados = new Set();
+    for (const grupo of grupos) for (const item of grupo.itens) if (item.marcado) estado.repetidosMarcados.add(item.id);
+  }
+  const status = $("#repetidosStatus");
+  if (!grupos.length) {
+    status.textContent = "Nenhum repetido: cada jogo está uma vez só.";
+    $("#listaRepetidos").replaceChildren();
+    $("#repetidosRodape").hidden = true;
+    return;
+  }
+  status.textContent = `${res.iguais.length} jogo(s) com cópias iguais (apagar as que sobram libera ` +
+    `${formatarBytes(res.livra_bytes)}) e ${res.mesmo_jogo.length} com o mesmo jogo em arquivos diferentes.`;
+
+  const lote = document.createDocumentFragment();
+  for (const grupo of grupos) {
+    const caixa = document.createElement("fieldset");
+    caixa.className = "repetidos-grupo";
+    const titulo = document.createElement("legend");
+    titulo.textContent = grupo.tipo === "iguais"
+      ? `${grupo.titulo} · ${grupo.plataforma_nome}: ${grupo.itens.length} cópias iguais`
+      : `${grupo.titulo} · ${grupo.plataforma_nome}: o mesmo jogo em ${grupo.itens.length} arquivos diferentes`;
+    caixa.append(titulo);
+    for (const item of grupo.itens) {
+      const linha = document.createElement("label");
+      linha.className = "repetidos-item";
+      const marca = document.createElement("input");
+      marca.type = "checkbox";
+      marca.dataset.id = item.id;
+      marca.disabled = !item.apagavel;
+      marca.checked = item.apagavel && estado.repetidosMarcados.has(item.id);
+      const texto = document.createElement("span");
+      const caminho = document.createElement("code");
+      caminho.textContent = item.arquivo;            // dado de fora (nome de arquivo): sempre por textContent
+      const meta = document.createElement("span");
+      meta.className = "repetidos-meta";
+      meta.textContent = ` ${formatarBytes(item.bytes)} · ${item.origem_rotulo}` +
+        (item.arquivos > 1 ? ` · ${item.arquivos} arquivos` : "") +
+        (item.fica ? " · fica (é a cópia que o ARENA guarda)" : "") +
+        (item.motivo ? ` · ${item.motivo}` : "");
+      texto.append(caminho, meta);
+      linha.append(marca, texto);
+      caixa.append(linha);
+    }
+    lote.append(caixa);
+  }
+  $("#listaRepetidos").replaceChildren(lote);
+  $("#repetidosRodape").hidden = false;
+  $("#repetidosConfirmar").hidden = true;
+  $("#btnApagarRepetidos").hidden = false;
+  $("#repetidosLixeira").textContent = estado.lixeiraDosRepetidos
+    ? "Os apagados vão para a Lixeira do Windows: dá para desfazer por lá."
+    : "Os apagados vão para a Lixeira do ARENA, no mesmo cartão ou disco: dá para devolver tudo. O espaço só fica " +
+      "livre quando você esvazia a lixeira (logo abaixo).";
+  mostrarTotalDosRepetidos();
+}
+
+function desenharLixeiraDoArena(lixeiras) {
+  const arquivos = lixeiras.reduce((soma, l) => soma + l.arquivos, 0);
+  const bytes = lixeiras.reduce((soma, l) => soma + l.bytes, 0);
+  $("#blocoLixeiraArena").hidden = arquivos === 0;
+  $("#lixeiraArenaTexto").textContent = `${arquivos} arquivo(s), ${formatarBytes(bytes)}. Devolver põe cada um de ` +
+    "volta no lugar; esvaziar apaga de vez e libera o espaço.";
+  $("#lixeiraConfirmar").hidden = true;
+  $("#lixeiraAcoes").hidden = false;
+}
+
+async function mexerNaLixeiraDoArena(acao) {
+  $("#lixeiraConfirmar").hidden = true;
+  $("#lixeiraAcoes").hidden = false;
+  try {
+    const r = await pedir("/api/repetidos/lixeira", "POST", { acao });
+    let texto = acao === "devolver"
+      ? `${r.arquivos} arquivo(s) de volta no lugar.`
+      : `Lixeira esvaziada: ${formatarBytes(r.bytes)} livres.`;
+    if (r.erros.length) texto += ` Não deu: ${r.erros.join("; ")}.`;
+    recado(texto, r.erros.length > 0);
+    await carregarCatalogo();
+  } catch (falha) {
+    recado(falha.message, true);
+  }
+  mostrarRepetidos();
+}
+
+function bytesMarcadosDosRepetidos() {
+  const vistos = new Map();
+  for (const grupo of [...estado.repetidos.iguais, ...estado.repetidos.mesmo_jogo]) {
+    for (const item of grupo.itens) if (estado.repetidosMarcados.has(item.id)) vistos.set(item.id, item.bytes);
+  }
+  return { quantos: vistos.size, bytes: [...vistos.values()].reduce((a, b) => a + b, 0) };
+}
+
+function mostrarTotalDosRepetidos() {
+  const { quantos, bytes } = bytesMarcadosDosRepetidos();
+  $("#repetidosTotal").textContent = quantos
+    ? `${quantos} marcado(s): ${formatarBytes(bytes)}.`
+    : "Nada marcado.";
+  $("#btnApagarRepetidos").disabled = quantos === 0;
+}
+
+function pedirConfirmacaoDosRepetidos() {
+  const { quantos, bytes } = bytesMarcadosDosRepetidos();
+  if (!quantos) return;
+  $("#repetidosTotal").textContent = `Apagar ${quantos} jogo(s) (${formatarBytes(bytes)})? ` +
+    "Fica sempre pelo menos uma cópia de cada jogo.";
+  $("#btnApagarRepetidos").hidden = true;
+  $("#repetidosConfirmar").hidden = false;
+  $("#btnCancelarRepetidos").focus();
+}
+
+async function apagarRepetidos() {
+  const ids = [...estado.repetidosMarcados];
+  $("#repetidosConfirmar").hidden = true;
+  $("#btnApagarRepetidos").hidden = false;
+  try {
+    const r = await pedir("/api/repetidos/apagar", "POST", { jogos: ids });
+    estado.repetidosMarcados = null;
+    let texto = r.lixeira === "arena"
+      ? `${r.apagados.length} jogo(s) na Lixeira do ARENA (${formatarBytes(r.bytes)}): esvazie a lixeira para liberar ` +
+        "o espaço, ou devolva tudo."
+      : `${r.apagados.length} jogo(s) apagado(s), ${formatarBytes(r.bytes)} livres` +
+        (r.lixeira === "windows" ? " (na Lixeira do Windows)." : ".");
+    if (r.erros.length) texto += ` Não deu para apagar: ${r.erros.join("; ")}.`;
+    recado(texto, r.erros.length > 0);
+    await carregarCatalogo();
+    if (!noCelular()) carregarExportar();      // a lista do Exportar tambem perde os apagados
+  } catch (falha) {
+    recado(falha.message, true);
+  }
+  mostrarRepetidos();
+}
+
+// ---------- Exportar para o cartao SD (so no computador) ----------
+
+async function carregarExportar() {
+  clearTimeout(esperaExportar);
+  let r;
+  try {
+    r = await pedir("/api/exportar");
+  } catch (falha) {
+    $("#exportarAndamento").textContent = falha.message;
+    return;
+  }
+  const lista = $("#exportarDestino");
+  const antes = lista.value;
+  lista.replaceChildren(...(r.destinos.length ? r.destinos.map((d) => {
+    const opcao = document.createElement("option");
+    opcao.value = d.raiz;
+    opcao.textContent = `${d.nome} (${d.raiz})` + (d.livre_mb != null ? ` · ${formatarMb(d.livre_mb)} livres` : "") +
+      (d.tem_pasta ? " · já tem a pasta ARENA-jogos" : "");
+    opcao.selected = d.raiz === antes;
+    return opcao;
+  }) : [Object.assign(document.createElement("option"), {
+    value: "", textContent: "Nenhum cartão SD ou pen drive ligado: encaixe e toque em Procurar cartão de novo",
+  })]));
+  estado.exportarJogos = r.jogos || [];
+  if (!estado.exportarMarcados) estado.exportarMarcados = new Set();
+  desenharExportar();
+  mostrarAndamentoDaExportacao(r.mudanca);
+}
+
+function desenharExportar() {
+  const busca = normalizar(($("#exportarBusca").value || "").trim());
+  const achados = estado.exportarJogos.filter((j) =>
+    !busca || normalizar(`${j.titulo} ${j.plataforma_nome}`).includes(busca));
+  estado.exportarVisiveis = achados.slice(0, LIMITE_DA_LISTA_DE_EXPORTAR);
+  const lote = document.createDocumentFragment();
+  for (const jogo of estado.exportarVisiveis) {
+    const item = document.createElement("li");
+    const linha = document.createElement("label");
+    const marca = document.createElement("input");
+    marca.type = "checkbox";
+    marca.dataset.id = jogo.id;
+    marca.checked = estado.exportarMarcados.has(jogo.id);
+    const texto = document.createElement("span");
+    texto.textContent = `${jogo.titulo} · ${jogo.plataforma_nome} · ${formatarMb(jogo.tamanho_mb)}`;
+    linha.append(marca, texto);
+    item.append(linha);
+    lote.append(item);
+  }
+  if (achados.length > estado.exportarVisiveis.length) {
+    const mais = document.createElement("li");
+    mais.className = "explica";
+    mais.textContent = `Mostrando ${estado.exportarVisiveis.length} de ${achados.length}: procure pelo nome para ` +
+      "achar os outros.";
+    lote.append(mais);
+  }
+  $("#listaExportar").replaceChildren(lote);
+  mostrarTotalDaExportacao();
+}
+
+function mostrarTotalDaExportacao() {
+  const porId = new Map(estado.exportarJogos.map((j) => [j.id, j]));
+  const marcados = [...estado.exportarMarcados].filter((id) => porId.has(id));
+  const mb = marcados.reduce((soma, id) => soma + (Number(porId.get(id).tamanho_mb) || 0), 0);
+  $("#exportarTotal").textContent = marcados.length
+    ? `${marcados.length} jogo(s) marcado(s), ${formatarMb(mb)}.` : "Nenhum jogo marcado.";
+  $("#btnExportarCartao").disabled = marcados.length === 0 || !$("#exportarDestino").value;
+}
+
+function mostrarAndamentoDaExportacao(mudanca) {
+  const texto = $("#exportarAndamento");
+  if (!mudanca || (!mudanca.rodando && !mudanca.terminou_em)) {
+    texto.textContent = "";
+    return;
+  }
+  if (mudanca.rodando) {
+    const pct = mudanca.bytes_total ? Math.floor(100 * mudanca.bytes_feitos / mudanca.bytes_total) : 0;
+    texto.textContent = `Copiando ${mudanca.feitos + 1} de ${mudanca.total} (${pct}%): ${mudanca.atual}`;
+    $("#btnExportarCartao").disabled = true;
+    if (!$("#gavetaOrganizar").hidden) esperaExportar = setTimeout(acompanharExportacao, 1000);
+    return;
+  }
+  const certos = mudanca.total - mudanca.erros.length;
+  texto.textContent = `Pronto: ${certos} de ${mudanca.total} jogo(s) no cartão.` +
+    (mudanca.erros.length ? ` Não foram: ${mudanca.erros.join("; ")}` : " Pode tirar o cartão (com segurança).");
+}
+
+async function acompanharExportacao() {
+  try {
+    const r = await pedir("/api/exportar");
+    mostrarAndamentoDaExportacao(r.mudanca);
+    if (!r.mudanca.rodando) carregarExportar();
+  } catch (falha) {
+    $("#exportarAndamento").textContent = falha.message;
+  }
+}
+
+async function exportarMarcados() {
+  const destino = $("#exportarDestino").value;
+  if (!destino) { recado("Coloque o cartão SD ou o pen drive no computador e clique em Procurar cartão de novo.", true); return; }
+  try {
+    const r = await pedir("/api/exportar", "POST", { destino, jogos: [...estado.exportarMarcados] });
+    mostrarAndamentoDaExportacao(r.mudanca);
+  } catch (falha) {
+    recado(falha.message, true);
+  }
+}
+
+function ligarOrganizar() {
+  $("#btnOrganizar").addEventListener("click", abrirOrganizar);
+  $("#btnProcurarRepetidos").addEventListener("click", procurarRepetidos);
+  $("#listaRepetidos").addEventListener("change", (evento) => {
+    const marca = evento.target.closest("input[type=checkbox]");
+    if (!marca) return;
+    if (marca.checked) estado.repetidosMarcados.add(marca.dataset.id);
+    else estado.repetidosMarcados.delete(marca.dataset.id);
+    // O mesmo jogo pode estar em dois grupos (iguais e mesmo jogo): as duas caixas andam juntas.
+    for (const outra of document.querySelectorAll(`#listaRepetidos input[data-id="${CSS.escape(marca.dataset.id)}"]`))
+      outra.checked = marca.checked;
+    $("#repetidosConfirmar").hidden = true;
+    $("#btnApagarRepetidos").hidden = false;
+    mostrarTotalDosRepetidos();
+  });
+  $("#btnApagarRepetidos").addEventListener("click", pedirConfirmacaoDosRepetidos);
+  $("#btnDevolverLixeira").addEventListener("click", () => mexerNaLixeiraDoArena("devolver"));
+  $("#btnEsvaziarLixeira").addEventListener("click", () => {
+    $("#lixeiraAcoes").hidden = true;
+    $("#lixeiraConfirmar").hidden = false;
+    $("#btnCancelarEsvaziar").focus();
+  });
+  $("#btnConfirmarEsvaziar").addEventListener("click", () => mexerNaLixeiraDoArena("esvaziar"));
+  $("#btnCancelarEsvaziar").addEventListener("click", () => {
+    $("#lixeiraConfirmar").hidden = true;
+    $("#lixeiraAcoes").hidden = false;
+  });
+  $("#btnConfirmarRepetidos").addEventListener("click", apagarRepetidos);
+  $("#btnCancelarRepetidos").addEventListener("click", () => {
+    $("#repetidosConfirmar").hidden = true;
+    $("#btnApagarRepetidos").hidden = false;
+    mostrarTotalDosRepetidos();
+  });
+
+  let atrasoBuscaExportar = null;
+  $("#exportarBusca").addEventListener("input", () => {
+    clearTimeout(atrasoBuscaExportar);
+    atrasoBuscaExportar = setTimeout(desenharExportar, 150);
+  });
+  $("#listaExportar").addEventListener("change", (evento) => {
+    const marca = evento.target.closest("input[type=checkbox]");
+    if (!marca) return;
+    if (marca.checked) estado.exportarMarcados.add(marca.dataset.id);
+    else estado.exportarMarcados.delete(marca.dataset.id);
+    mostrarTotalDaExportacao();
+  });
+  $("#btnExportarMarcarVisiveis").addEventListener("click", () => {
+    for (const jogo of estado.exportarVisiveis || []) estado.exportarMarcados.add(jogo.id);
+    desenharExportar();
+  });
+  $("#btnExportarLimpar").addEventListener("click", () => {
+    estado.exportarMarcados = new Set();
+    desenharExportar();
+  });
+  $("#exportarDestino").addEventListener("change", mostrarTotalDaExportacao);
+  $("#btnExportarDestinos").addEventListener("click", carregarExportar);
+  $("#btnExportarCartao").addEventListener("click", exportarMarcados);
+}
+
+// --------------------------------------------------------------------------
 // Sincronizacao de recordes
 // --------------------------------------------------------------------------
 
@@ -6273,6 +6642,10 @@ function ligarEventos() {
     for (const item of document.querySelectorAll(".trilho-item")) {
       item.classList.toggle("ativo", item === botao);
     }
+    // Favoritos da lista de consoles: os favoritos de todos os consoles. Saindo dele para um console, volta a mostrar
+    // todos os jogos daquele console.
+    if (botao.dataset.favoritos) marcarFiltroRapido("favoritos");
+    else if (estado.filtroRapido === "favoritos") marcarFiltroRapido("todos");
     desenharJogos();
   });
 
@@ -6333,10 +6706,8 @@ function ligarEventos() {
                               ["btnFavoritos", "favoritos"],
                               ["btnRecentes", "recentes"]]) {
     $("#" + id).addEventListener("click", () => {
-      estado.filtroRapido = filtro;
+      marcarFiltroRapido(filtro);
       estado.limite = PASSO_LIMITE;
-      for (const botao of document.querySelectorAll(".filtro-rapido"))
-        botao.classList.toggle("ativo", botao.id === id);
       desenharJogos();
     });
   }
@@ -7326,6 +7697,7 @@ function ligarEventos() {
 
 async function iniciar() {
   ligarEventos();
+  ligarOrganizar();
   ligarFocoDasJanelas();
   try {
     await carregarEstado();
