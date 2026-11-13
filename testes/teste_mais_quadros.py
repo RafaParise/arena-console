@@ -68,7 +68,7 @@ def parte_ps2(dados):
     processo = subprocess.Popen([EXE, "-batch", "-fullscreen", "--", JOGO_PS2], cwd=PCSX2)
     registro = ""
     try:
-        limite = time.monotonic() + 90
+        limite = time.monotonic() + 150     # 90 s nao bastaram na rodada final de 13/11 (maquina sem memoria)
         while time.monotonic() < limite and "Enabled patch" not in registro:
             time.sleep(2)
             try:
@@ -83,6 +83,11 @@ def parte_ps2(dados):
             processo.wait(20)
         except subprocess.TimeoutExpired:
             processo.kill()
+    try:    # o PCSX2 descarrega o registro ao fechar: a linha do patch pode chegar so agora
+        with open(REGISTRO_PCSX2, encoding="utf-8", errors="replace") as arquivo:
+            registro = arquivo.read()
+    except OSError:
+        pass
     confere("o PCSX2 ligou o patch (registro)", "Enabled patch: 60 FPS" in registro)
     confere("o PCSX2 escreveu o serial e o CRC", quadros_ps2.ler_do_registro(registro) == identificado)
     quadros_ps2.aplicar(PCSX2, serial, crc, False, dados)

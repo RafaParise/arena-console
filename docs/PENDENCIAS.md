@@ -1096,3 +1096,14 @@ Falta, nesta ordem:
   `teste_60_ps2_celular` falhou porque o A12 estava sendo usado ao mesmo tempo (teste do 4G); `teste_abaixo_do_original`
   deu 1 de 36 (qual, a rodada não mostrou: rodar sozinho). Retomar: `ferramentas\rodada_final.py --continuar`, com o
   PC folgado. O erro intermitente de "conexão abortada" nos testes do Android foi achado e corrigido (e87618c).
+- **Rodada final de 13/11 terminada (janela própria): 123 de 131.** As falhas, repetidas uma a uma com o PC folgado:
+  - `teste_repasse_proprio_pelo_arena`: a regra do retransmissor público pegava também o repasse "de casa".
+    Consertado: público só sem repasse em Ajustes (e9a67b1).
+  - `teste_orcamentos_modo_alvo` (1b em 3,86 s), `teste_abaixo_do_original` (1 de 36), `teste_ps2_todos_os_jogos`
+    (16 de 40 "não começou" em 60 s) e `teste_mais_quadros` (o registro do PCSX2 sem a linha do patch): sozinhos,
+    **todos passam** (1b em 2,0 s; 36 de 36; Burnout 3 e Killzone começam em 21 s; patch ligado). Era carga: a máquina
+    estava sem memória. Sem regressão; o import do `arena.py` segue em ~0,2 s. O `teste_mais_quadros` ficou mais
+    robusto: espera até 150 s e relê o registro depois que o PCSX2 fecha.
+  - `teste_matriz_consoles` (PocketStation modesto, `mostra_imagem`): instabilidade já conhecida.
+  - `teste_60_ps2_celular` e `teste_jogar_junto_pc_celular`: precisam do APK de TESTE no A12
+    (`montar_android.py --abi arm64-v8a --teste`); o A12 está com o de produção 2026.11.12.
