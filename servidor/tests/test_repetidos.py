@@ -67,10 +67,36 @@ class TestRepetidos(unittest.TestCase):
         self.assertTrue(itens["b"]["marcado"])
         self.assertEqual(r["livra_bytes"], UM_MEGA)
 
+    def test_o_mesmo_arquivo_por_dois_caminhos_nao_e_repetido(self):
+        # duas pastas da lista que levam ao mesmo lugar: o mesmo arquivo, nunca "duas copias"
+        outro = jogo("a2", os.path.join("jogos", "pessoais", "SNES", ".", "Mario.sfc"), "Mario")
+        self.jogos.append(outro)
+        r = self.procurar()
+        ids = {i["id"] for g in r["iguais"] for i in g["itens"]}
+        self.assertEqual(len([i for i in ids if i in ("a", "a2")]), 1)
+
+    def test_fica_a_copia_da_pasta_do_arena_e_depois_a_do_cartao(self):
+        # achado no A12 (13/11/2026): ficava a copia de uma pasta velha de projeto e saia a da ARENA-jogos
+        self.assertEqual(repetidos._lugar("/storage/X/ARENA-jogos/PS2/a.iso", "cartao-1"), 1)
+        self.assertEqual(repetidos._lugar("/storage/X/Projetos/arena/jogos/pessoais/PS2/a.iso", "cartao-2"), 2)
+        self.assertEqual(repetidos._lugar("/qualquer/lugar/a.iso", "pessoais"), 0)
+
     def test_mesmo_tamanho_com_conteudo_diferente_nao_e_igual(self):
         r = self.procurar()
         ids = {i["id"] for g in r["iguais"] for i in g["itens"]}
         self.assertNotIn("c", ids)
+
+    def test_traducao_que_muda_so_o_meio_do_arquivo_nao_e_igual(self):
+        # o achado do A12 (13/11/2026): o patch muda poucos bytes longe do comeco, do meio e do fim
+        conteudo = bytearray(open(os.path.join(self.raiz, self.a), "rb").read())
+        conteudo[200000:200010] = b"TRADUZIDO!"
+        caminho = os.path.join("jogos", "pessoais", "SNES", "Mario [T+Por].sfc")
+        escrever(os.path.join(self.raiz, caminho), bytes(conteudo))
+        self.jogos.append(jogo("t", caminho, "Mario"))
+        r = self.procurar()
+        iguais = {i["id"] for g in r["iguais"] for i in g["itens"]}
+        self.assertNotIn("t", iguais)
+        self.assertEqual(iguais, {"a", "b"})
 
     def test_mesmo_jogo_em_arquivos_diferentes_vem_sem_marca(self):
         r = self.procurar()

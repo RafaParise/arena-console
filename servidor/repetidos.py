@@ -26,7 +26,6 @@ import errno
 import hashlib
 import os
 import re
-import shutil
 import sys
 import threading
 import time
@@ -158,16 +157,34 @@ def _pedaco(caminho, onde, tamanho):
         return arquivo.read(PEDACO)
 
 
+INTEIRO_ATE = 256 * 1024 * 1024     # ate aqui, a etapa 2 compara o arquivo INTEIRO
+PONTOS_NO_GRANDE = 32               # acima disso, 32 pedacos espalhados (um ISO de 4 GB no pen drive levaria minutos)
+
+
 def marca(arquivos, etapa):
-    """Marca do conteudo do jogo: etapa 1 = o comeco de cada arquivo; etapa 2 = o meio e o fim. None se nao leu."""
+    """Marca do conteudo do jogo. Etapa 1: o comeco de cada arquivo (separa rapido o que e' diferente). Etapa 2: o
+    arquivo inteiro ate 256 MB; acima, 32 pedacos espalhados e o fim. None se nao leu.
+    Achado no Galaxy A12 (13/11/2026): com so o comeco, o meio e o fim, uma ROM de Super Nintendo traduzida (o patch
+    muda o texto no meio do arquivo, fora dos pedacos lidos) saia "igual" a original -- e iria para a lixeira."""
     resumo = hashlib.sha1()
     try:
         for caminho in sorted(arquivos, key=lambda c: os.path.getsize(c), reverse=True):
             tamanho = os.path.getsize(caminho)
             resumo.update(str(tamanho).encode())
-            partes = ("comeco",) if etapa == 1 else ("meio", "fim")
-            for onde in partes:
-                resumo.update(_pedaco(caminho, onde, tamanho))
+            if etapa == 1:
+                resumo.update(_pedaco(caminho, "comeco", tamanho))
+                continue
+            with open(caminho, "rb") as arquivo:
+                if tamanho <= INTEIRO_ATE:
+                    for bloco in iter(lambda: arquivo.read(1024 * 1024), b""):
+                        resumo.update(bloco)
+                else:
+                    passo = tamanho // PONTOS_NO_GRANDE
+                    for n in range(PONTOS_NO_GRANDE):
+                        arquivo.seek(n * passo)
+                        resumo.update(arquivo.read(PEDACO))
+                    arquivo.seek(max(0, tamanho - PEDACO))
+                    resumo.update(arquivo.read(PEDACO))
     except OSError:
         return None
     return resumo.hexdigest()
@@ -184,13 +201,23 @@ def _caminho_curto(raiz, caminho):
         return caminho
 
 
+def _lugar(caminho, origem):
+    """0: a pasta do proprio ARENA (Meus jogos, Da turma); 1: a pasta ARENA-jogos do cartao; 2: as outras pastas da
+    lista (uma copia velha de projeto no cartao, por exemplo). Achado no A12 (13/11/2026): sem isto ficava a copia
+    da pasta velha e saia a da ARENA-jogos."""
+    if origem in ORIGENS_DE_PASTA:
+        return 0
+    partes = os.path.realpath(caminho).replace("\\", "/").lower().split("/")   # lower: no Android o normcase nao muda
+    return 1 if "arena-jogos" in partes else 2
+
+
 def _quem_fica(itens, favoritos, recentes):
-    """O que fica num grupo de iguais: o favorito, o jogado por ultimo, depois o caminho mais curto (o que esta direto
-    na pasta do console, em vez de uma subpasta de downloads)."""
+    """O que fica num grupo de iguais: o favorito, o jogado por ultimo, a copia da pasta do ARENA, depois o caminho
+    mais curto (o que esta direto na pasta do console, em vez de uma subpasta de downloads)."""
     def chave(item):
         recente = recentes.index(item["id"]) if item["id"] in recentes else len(recentes)
-        return (0 if item["id"] in favoritos else 1, recente, item["arquivo"].count(os.sep) + item["arquivo"].count("/"),
-                len(item["arquivo"]), item["arquivo"].lower())
+        return (0 if item["id"] in favoritos else 1, recente, item.get("_lugar", 2),
+                item["arquivo"].count(os.sep) + item["arquivo"].count("/"), len(item["arquivo"]), item["arquivo"].lower())
     return min(itens, key=chave)
 
 
@@ -199,13 +226,23 @@ def procurar(jogos, raiz, favoritos=(), recentes=(), progresso=lambda feitos, to
     "livra_bytes", "itens": [{id, titulo, arquivo, plataforma_nome, origem_rotulo, bytes, apagavel, motivo, marcado,
     fica}]}. 'jogos': o catalogo (manifesto)."""
     favoritos, recentes = set(favoritos or ()), list(recentes or ())
-    candidatos = []
+    candidatos, fisicos = [], set()
     for jogo in jogos:
         if not origem_de_pasta(jogo.get("origem")):
             continue
         arquivos, motivo = arquivos_do_jogo(jogo, raiz)
         if not arquivos:
             continue
+        # O MESMO arquivo fisico por dois caminhos (duas pastas da lista que levam ao mesmo lugar) nunca conta como
+        # duas copias: apagar "uma" apagaria o jogo.
+        try:
+            info = os.stat(arquivos[0])
+            fisico = (info.st_dev, info.st_ino) if info.st_ino else os.path.normcase(os.path.realpath(arquivos[0]))
+        except OSError:
+            continue
+        if fisico in fisicos:
+            continue
+        fisicos.add(fisico)
         # O que se compara: num .cue/.gdi, so as trilhas (o indice cita o nome delas, e duas copias do mesmo jogo
         # com nomes diferentes teriam o indice diferente).
         indice = len(arquivos) > 1 and os.path.splitext(arquivos[0])[1].lower() in INDICES
@@ -248,7 +285,7 @@ def procurar(jogos, raiz, favoritos=(), recentes=(), progresso=lambda feitos, to
                 "plataforma_nome": jogo.get("plataforma_nome", ""), "origem_rotulo": jogo.get("origem_rotulo", ""),
                 "bytes": c["bytes"], "arquivos": len(c["arquivos"]), "apagavel": not c["motivo"],
                 "motivo": c["motivo"], "marcado": False, "fica": False, "_iguais": grupo_iguais,
-                "_etiquetas": etiquetas(c["arquivos"][0])}
+                "_etiquetas": etiquetas(c["arquivos"][0]), "_lugar": _lugar(c["arquivos"][0], jogo.get("origem"))}
 
     saida_iguais, ja_em_iguais = [], set()
     for grupo in grupos_iguais:
@@ -283,6 +320,7 @@ def procurar(jogos, raiz, favoritos=(), recentes=(), progresso=lambda feitos, to
         for i in grupo["itens"]:
             i.pop("_iguais", None)
             i.pop("_etiquetas", None)
+            i.pop("_lugar", None)
     saida_iguais.sort(key=lambda g: -g["livra_bytes"])
     saida_mesmo.sort(key=lambda g: (g["plataforma_nome"], g["titulo"].lower()))
     return {"iguais": saida_iguais, "mesmo_jogo": saida_mesmo,
@@ -344,9 +382,10 @@ def _mover(de, para):
     try:
         os.replace(de, para)
     except OSError as falha:
-        if falha.errno != errno.EXDEV:
-            raise
-        shutil.move(de, para)          # outro disco (raro: o atalho da origem aponta para outro lugar)
+        if falha.errno == errno.EXDEV:
+            # Outro disco: mover seria copiar (um ISO de 8 GB encheria a memoria do celular). Nao move.
+            raise OSError(errno.EXDEV, "a lixeira ficaria em outro disco; apague este à mão")
+        raise
     return para
 
 
