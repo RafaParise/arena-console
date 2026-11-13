@@ -821,20 +821,37 @@ UNLEASHED = "unleashedrecomp"
 # de onde o jogo abre, que no ARENA e' a do programa; no Linux, pelo AppImage, $XDG_DATA_HOME/soh ou
 # ~/.local/share/soh, a nao ser que a pasta de onde ele abre ja tenha os arquivos dele: OTRGlobals.cpp).
 SHIPWRIGHT = "shipwright"
+# Os parentes do mesmo motor, conferidos do mesmo jeito (13/11/2026). Os dois nao tem a troca de pasta do AppImage
+# do Ship of Harkinian e o libultraship deles devolve "." sem o SHIP_HOME: o arquivo fica na pasta de onde abrem,
+# no Windows e no Linux.
+# - 2 Ship 2 Harkinian 5.0.1: 2ship2harkinian.json; CMake/2ship-cvars.cmake e lus-cvars.cmake (gSettings.*), mas os
+#   quadros sao "gInterpolationFPS", fora do gSettings (mm/2s2h/BenGui/BenMenu.cpp: 20 a 360, padrao 20).
+# - Starship 2.0.0 (Star Fox 64): starship.cfg.json; nomes sem prefixo (src/port/ui/ImguiUI.cpp): "gMSAAValue" (1 a 8,
+#   padrao 1) e "gInterpolationFPS" (padrao 60, o original e' 30: src/port/Engine.cpp). A escala de resolucao
+#   esta desligada no codigo dele, entao fica de fora. Placa media: o padrao dele ja serve, nada muda.
+LIBULTRASHIP = (SHIPWRIGHT, "2ship2harkinian", "starship")
 
 
-def _perfil_shipwright(nivel, windows):
-    if nivel == "fraco":
-        chaves = {"InternalResolution": 0.5, "MSAAValue": 1, "InterpolationFPS": 20}
-    else:
-        chaves = {"InternalResolution": 1.0, "MSAAValue": 1, "InterpolationFPS": 60}
+def _perfil_libultraship(recomp_id, nivel, windows):
+    fraco = nivel == "fraco"
+    if recomp_id == "starship":
+        if not fraco:
+            return None
+        return {"file": "{programa}/starship.cfg.json", "format": "json",
+                "ensure": {"CVars": {"gMSAAValue": 1, "gInterpolationFPS": 30}}}
+    ajustes = {"InternalResolution": 0.5 if fraco else 1.0, "MSAAValue": 1}
+    quadros = 20 if fraco else 60
+    if recomp_id == "2ship2harkinian":
+        return {"file": "{programa}/2ship2harkinian.json", "format": "json",
+                "ensure": {"CVars": {"gSettings": ajustes, "gInterpolationFPS": quadros}}}
+    ajustes["InterpolationFPS"] = quadros
     if windows:
         arquivo = "{programa}/shipofharkinian.json"
     else:
         arquivo = [{"path": "{programa}/shipofharkinian.json", "if": "{programa}/%s" % nome}
                    for nome in ("shipofharkinian.json", "oot.o2r", "oot-mq.o2r")]
         arquivo.append({"path": "{local}/soh/shipofharkinian.json"})
-    return {"file": arquivo, "format": "json", "ensure": {"CVars": {"gSettings": chaves}}}
+    return {"file": arquivo, "format": "json", "ensure": {"CVars": {"gSettings": ajustes}}}
 
 
 def _toml(valor):
@@ -871,15 +888,15 @@ def nivel_da_placa(nota_gpu):
 def ajuste_da_maquina(recomp_id, nota_gpu, windows=None):
     """A entrada 'config' (o formato do descritor) com o perfil desta maquina, ou None quando nao ha o que mudar
     (motor nao conferido ou placa forte)."""
-    if recomp_id not in RT64 and recomp_id not in (UNLEASHED, SHIPWRIGHT):
+    if recomp_id not in RT64 and recomp_id != UNLEASHED and recomp_id not in LIBULTRASHIP:
         return None
     nivel = nivel_da_placa(nota_gpu)
     if nivel == "forte":
         return None
     if recomp_id == UNLEASHED:
         return _perfil_unleashed(nivel, plataforma_do_sistema.WINDOWS if windows is None else windows)
-    if recomp_id == SHIPWRIGHT:
-        return _perfil_shipwright(nivel, plataforma_do_sistema.WINDOWS if windows is None else windows)
+    if recomp_id in LIBULTRASHIP:
+        return _perfil_libultraship(recomp_id, nivel, plataforma_do_sistema.WINDOWS if windows is None else windows)
     pasta, tem_hpfb, sem_ds = RT64[recomp_id]
     windows = plataforma_do_sistema.WINDOWS if windows is None else windows
     arquivo = ("{local}/%s/graphics.json" if windows else "{home}/.config/%s/graphics.json") % pasta

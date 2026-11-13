@@ -91,11 +91,25 @@ e o que a pessoa escolheu no menu do jogo continua valendo. [Certo, conferido na
 
 Placa forte: nada muda. Não medido no Celeron N5100 (falta a cópia do jogo para medir).
 
+### Os parentes do mesmo motor: feito [Certo, conferido no código de cada versão do catálogo]
+
+Os dois não têm a troca de pasta do AppImage do Ship of Harkinian, e o libultraship deles devolve "." sem o
+`SHIP_HOME` (nenhum dos três liga o `NON_PORTABLE`): o arquivo fica na pasta de onde abrem, no Windows e no Linux.
+
+| Jogo (versão) | Arquivo | fraco | médio |
+|---|---|---|---|
+| 2 Ship 2 Harkinian (5.0.1) | `2ship2harkinian.json` | `gSettings.InternalResolution = 0.5`, `gSettings.MSAAValue = 1`, `gInterpolationFPS = 20` | `1.0`, `1`, `60` |
+| Starship (2.0.0, Star Fox 64) | `starship.cfg.json` | `gMSAAValue = 1`, `gInterpolationFPS = 30` (o original) | nada (o padrão dele, 60, já serve) |
+
+- 2 Ship: os nomes vêm de `CMake/2ship-cvars.cmake` e `lus-cvars.cmake`, mas os quadros são `gInterpolationFPS`,
+  **fora** do `gSettings` (`mm/2s2h/BenGui/BenMenu.cpp`, 20 a 360, padrão 20).
+- Starship: nomes sem prefixo (`src/port/ui/ImguiUI.cpp`); o padrão dos quadros é 60 (`src/port/Engine.cpp`) e a
+  escala de resolução está desligada no código dele, então fica de fora.
+
 ## O que falta (precisa mudar o escritor primeiro)
 
 | Motor | Arquivo | O que falta |
 |---|---|---|
-| libultraship (2 Ship 2 Harkinian, Starship) | o `.json` de cada um, como o do Ship of Harkinian | conferir os nomes das chaves de cada um (o prefixo pode mudar) |
 | dusklight (GameCube) | `config.json` plano (o escritor já atende) | o caminho fora do modo portátil e o sentido de `game.internalResolutionScale` não foram confirmados |
 | SuperTuxKart, OpenRA | XML e YAML | o escritor não lê esses formatos |
 

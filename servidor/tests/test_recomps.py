@@ -604,6 +604,18 @@ class TestSecaoEUnleashed(unittest.TestCase):
         self.assertEqual(dados["CVars"]["gCosmetics"], {"x": 1})
         self.assertEqual(dados["Window"], {"Width": 640})
 
+    def test_2ship_tem_os_quadros_fora_do_gsettings(self):
+        perfil = recomps.ajuste_da_maquina("2ship2harkinian", 2, windows=False)
+        self.assertEqual(perfil["file"], "{programa}/2ship2harkinian.json")       # sem a troca de pasta do AppImage
+        self.assertEqual(perfil["ensure"]["CVars"]["gInterpolationFPS"], 20)
+        self.assertEqual(perfil["ensure"]["CVars"]["gSettings"], {"InternalResolution": 0.5, "MSAAValue": 1})
+
+    def test_starship_so_muda_na_placa_fraca_e_sem_escala(self):
+        perfil = recomps.ajuste_da_maquina("starship", 1, windows=True)
+        self.assertEqual(perfil["file"], "{programa}/starship.cfg.json")
+        self.assertEqual(perfil["ensure"]["CVars"], {"gMSAAValue": 1, "gInterpolationFPS": 30})
+        self.assertIsNone(recomps.ajuste_da_maquina("starship", 3, windows=True))   # o padrao dele ja serve
+
     def test_mescla_nao_troca_valor_da_pessoa_por_um_nivel(self):
         dados = {"CVars": 7}
         recomps._mesclar_o_que_falta(dados, {"CVars": {"gSettings": {"MSAAValue": 1}}, "Novo": {"a": 1}})

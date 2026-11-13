@@ -1146,5 +1146,6 @@ Falta, nesta ordem:
 - **Ship of Harkinian por máquina** (`recomps._perfil_shipwright`): o escritor de JSON mescla em profundidade e o
   perfil grava em `CVars.gSettings` (detalhe e fontes em `docs\RECOMPS-DESEMPENHO.md`). O documento antigo dava as
   chaves certas, mas o lugar do arquivo e o formato aninhado só foram confirmados agora, no código da 9.3.1.
-- **Próximo da fila:** 2 Ship 2 Harkinian e Starship (mesmo motor; conferir o prefixo das chaves de cada um), 60
-  quadros no GameCube/Wii por jogo, SGSR no celular.
+- **2 Ship 2 Harkinian e Starship** (mesmo motor) também ajustados por máquina; cada um tem nomes de chave
+  diferentes (os quadros do 2 Ship ficam fora do `gSettings`; o Starship não tem prefixo nem escala).
+- **Próximo da fila:** 60 quadros no GameCube/Wii por jogo, SGSR no celular.
