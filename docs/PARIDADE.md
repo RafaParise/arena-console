@@ -102,6 +102,17 @@ toda rota `/api/...` (86) e toda aba existe onde o servidor roda; o que muda é 
   todas as versões. Windows: tudo (baixa o MFG e os recomps, abre a loja do Lossless). Linux: consoles, emuladores, imagem,
   recomps e o Wine portátil (o MFG e o Lossless são só do Windows; o WSL, com o pedido de administrador, também). Android (celular e Chromebook com o APK): consoles, jogos do celular e
   imagem; nada a baixar (tudo vem no APK). Navegador: consoles e o aviso do que fica no ARENA do Windows.
+- **Repetidos e cartão SD, 13/11/2026** (`servidor\repetidos.py`, `servidor\exportar.py`; guia `2-JOGOS.md`, fim):
+  - **Jogos repetidos:** Windows, Linux e Android (celular e Chromebook com o APK).
+    - No Windows (disco do computador), os apagados vão para a Lixeira do Windows.
+    - No resto (celular, Linux, pen drive), vão para a Lixeira do ARENA, com Devolver tudo e Esvaziar.
+  - **Exportar para o cartão SD:** Windows e Linux (cartão no leitor ou pen drive). No celular, o equivalente é o
+    **Levar para o cartão** (Ajustes → Máquina), que já existia; a aba explica isso.
+  - **Navegador:** não (sem servidor; o botão fica escondido).
+- **Barra do jogo retrátil e topo compacto, 13/11/2026:** a mesma tela em todas as versões. Na tela estreita (celular,
+  tablet, janela pela metade), o painel do jogo entra pela direita; na larga, fica sempre à vista.
+- **Recomps ajustados por máquina, 13/11/2026** (`docs\RECOMPS-DESEMPENHO.md`): Windows e Linux, onde os recomps
+  rodam. Por enquanto vale para o RT64 (Zelda 64, Mario Kart 64, Banjo) e o UnleashedRecomp (que é recusado sem AVX).
 - **Jogos de Android instalados no celular, 12/11/2026** (`ArenaServico.java`, pedidos `jogos_do_aparelho` e `abrir_app`;
   `servidor\ponte_android.py`): só no APK (celular e Chromebook com o APK). No computador: não (sem Android para rodar
   `.apk` sem instalar programa).

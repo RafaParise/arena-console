@@ -167,7 +167,7 @@ ARQUIVO_OVERRIDE = os.path.join(PASTA_DADOS, "arena_override.cfg")
 # Serve para uma coisa so: acabar com a duvida de "sera que estou testando
 # a versao corrigida?". Quando algo nao bate com o esperado, o primeiro
 # passo e comparar este numero.
-VERSAO = "2026.11.13"   # partida entre casas com CGNAT (retransmissor da internet), jogos de Android no Linux (Waydroid), Wine e WSL por dentro, Equipamentos
+VERSAO = "2026.11.13.2"   # celular deitado e barra do jogo, favoritos consertados, repetidos e cartao SD, recomps por maquina, ARENA.bat sem ping
 
 PORTA = 8777
 # Os testes que sobem uma copia do ARENA (testes\copia_do_arena.py) usam

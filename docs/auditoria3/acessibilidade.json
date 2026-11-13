@@ -8,8 +8,8 @@
    "tabindexPositivo": [],
    "contrasteBaixo": [],
    "menorLetra": 12,
-   "menorLetraOnde": "#.marca-sub central retrô da turma v2026.11.12",
-   "textosVistos": 121,
+   "menorLetraOnde": "#.marca-sub central retrô da turma v2026.11.13",
+   "textosVistos": 122,
    "escondidoAparece": []
   },
   "gavetaPerfil": {
@@ -20,8 +20,20 @@
    "tabindexPositivo": [],
    "contrasteBaixo": [],
    "menorLetra": 12,
-   "menorLetraOnde": "#.marca-sub central retrô da turma v2026.11.12",
-   "textosVistos": 198,
+   "menorLetraOnde": "#.marca-sub central retrô da turma v2026.11.13",
+   "textosVistos": 145,
+   "escondidoAparece": []
+  },
+  "gavetaAmigos": {
+   "semNome": [],
+   "soIcone": [],
+   "camposSemRotulo": [],
+   "imagensSemAlt": [],
+   "tabindexPositivo": [],
+   "contrasteBaixo": [],
+   "menorLetra": 12,
+   "menorLetraOnde": "#.marca-sub central retrô da turma v2026.11.13",
+   "textosVistos": 184,
    "escondidoAparece": []
   },
   "gavetaComoColocar": {
@@ -32,8 +44,8 @@
    "tabindexPositivo": [],
    "contrasteBaixo": [],
    "menorLetra": 12,
-   "menorLetraOnde": "#.marca-sub central retrô da turma v2026.11.12",
-   "textosVistos": 133,
+   "menorLetraOnde": "#.marca-sub central retrô da turma v2026.11.13",
+   "textosVistos": 134,
    "escondidoAparece": []
   },
   "gavetaAcervo": {
@@ -44,8 +56,8 @@
    "tabindexPositivo": [],
    "contrasteBaixo": [],
    "menorLetra": 12,
-   "menorLetraOnde": "#.marca-sub central retrô da turma v2026.11.12",
-   "textosVistos": 132,
+   "menorLetraOnde": "#.marca-sub central retrô da turma v2026.11.13",
+   "textosVistos": 133,
    "escondidoAparece": []
   },
   "gavetaAjustes": {
@@ -56,8 +68,8 @@
    "tabindexPositivo": [],
    "contrasteBaixo": [],
    "menorLetra": 12,
-   "menorLetraOnde": "#.marca-sub central retrô da turma v2026.11.12",
-   "textosVistos": 669,
+   "menorLetraOnde": "#.marca-sub central retrô da turma v2026.11.13",
+   "textosVistos": 670,
    "escondidoAparece": []
   },
   "gavetaConquistas": {
@@ -68,20 +80,8 @@
    "tabindexPositivo": [],
    "contrasteBaixo": [],
    "menorLetra": 12,
-   "menorLetraOnde": "#.marca-sub central retrô da turma v2026.11.12",
-   "textosVistos": 124,
-   "escondidoAparece": []
-  },
-  "gavetaRecordes": {
-   "semNome": [],
-   "soIcone": [],
-   "camposSemRotulo": [],
-   "imagensSemAlt": [],
-   "tabindexPositivo": [],
-   "contrasteBaixo": [],
-   "menorLetra": 12,
-   "menorLetraOnde": "#.marca-sub central retrô da turma v2026.11.12",
-   "textosVistos": 125,
+   "menorLetraOnde": "#.marca-sub central retrô da turma v2026.11.13",
+   "textosVistos": 128,
    "escondidoAparece": []
   },
   "gavetaJogo": {
@@ -92,8 +92,8 @@
    "tabindexPositivo": [],
    "contrasteBaixo": [],
    "menorLetra": 12,
-   "menorLetraOnde": "#.marca-sub central retrô da turma v2026.11.12",
-   "textosVistos": 132,
+   "menorLetraOnde": "#.marca-sub central retrô da turma v2026.11.13",
+   "textosVistos": 133,
    "escondidoAparece": []
   },
   "janelaJogarJunto": {
@@ -104,8 +104,8 @@
    "tabindexPositivo": [],
    "contrasteBaixo": [],
    "menorLetra": 12,
-   "menorLetraOnde": "#.marca-sub central retrô da turma v2026.11.12",
-   "textosVistos": 133,
+   "menorLetraOnde": "#.marca-sub central retrô da turma v2026.11.13",
+   "textosVistos": 134,
    "escondidoAparece": []
   }
  },
@@ -118,8 +118,8 @@
    "tabindexPositivo": [],
    "contrasteBaixo": [],
    "menorLetra": 12,
-   "menorLetraOnde": "#.marca-sub central retrô da turma v2026.11.12",
-   "textosVistos": 121,
+   "menorLetraOnde": "#.marca-sub central retrô da turma v2026.11.13",
+   "textosVistos": 122,
    "escondidoAparece": []
   },
   "gavetaPerfil": {
@@ -130,8 +130,20 @@
    "tabindexPositivo": [],
    "contrasteBaixo": [],
    "menorLetra": 12,
-   "menorLetraOnde": "#.marca-sub central retrô da turma v2026.11.12",
-   "textosVistos": 198,
+   "menorLetraOnde": "#.marca-sub central retrô da turma v2026.11.13",
+   "textosVistos": 145,
+   "escondidoAparece": []
+  },
+  "gavetaAmigos": {
+   "semNome": [],
+   "soIcone": [],
+   "camposSemRotulo": [],
+   "imagensSemAlt": [],
+   "tabindexPositivo": [],
+   "contrasteBaixo": [],
+   "menorLetra": 12,
+   "menorLetraOnde": "#.marca-sub central retrô da turma v2026.11.13",
+   "textosVistos": 184,
    "escondidoAparece": []
   },
   "gavetaComoColocar": {
@@ -142,8 +154,8 @@
    "tabindexPositivo": [],
    "contrasteBaixo": [],
    "menorLetra": 12,
-   "menorLetraOnde": "#.marca-sub central retrô da turma v2026.11.12",
-   "textosVistos": 133,
+   "menorLetraOnde": "#.marca-sub central retrô da turma v2026.11.13",
+   "textosVistos": 134,
    "escondidoAparece": []
   },
   "gavetaAcervo": {
@@ -154,8 +166,8 @@
    "tabindexPositivo": [],
    "contrasteBaixo": [],
    "menorLetra": 12,
-   "menorLetraOnde": "#.marca-sub central retrô da turma v2026.11.12",
-   "textosVistos": 132,
+   "menorLetraOnde": "#.marca-sub central retrô da turma v2026.11.13",
+   "textosVistos": 133,
    "escondidoAparece": []
   },
   "gavetaAjustes": {
@@ -166,8 +178,8 @@
    "tabindexPositivo": [],
    "contrasteBaixo": [],
    "menorLetra": 12,
-   "menorLetraOnde": "#.marca-sub central retrô da turma v2026.11.12",
-   "textosVistos": 669,
+   "menorLetraOnde": "#.marca-sub central retrô da turma v2026.11.13",
+   "textosVistos": 670,
    "escondidoAparece": []
   },
   "gavetaConquistas": {
@@ -178,20 +190,8 @@
    "tabindexPositivo": [],
    "contrasteBaixo": [],
    "menorLetra": 12,
-   "menorLetraOnde": "#.marca-sub central retrô da turma v2026.11.12",
-   "textosVistos": 124,
-   "escondidoAparece": []
-  },
-  "gavetaRecordes": {
-   "semNome": [],
-   "soIcone": [],
-   "camposSemRotulo": [],
-   "imagensSemAlt": [],
-   "tabindexPositivo": [],
-   "contrasteBaixo": [],
-   "menorLetra": 12,
-   "menorLetraOnde": "#.marca-sub central retrô da turma v2026.11.12",
-   "textosVistos": 125,
+   "menorLetraOnde": "#.marca-sub central retrô da turma v2026.11.13",
+   "textosVistos": 128,
    "escondidoAparece": []
   },
   "gavetaJogo": {
@@ -202,8 +202,8 @@
    "tabindexPositivo": [],
    "contrasteBaixo": [],
    "menorLetra": 12,
-   "menorLetraOnde": "#.marca-sub central retrô da turma v2026.11.12",
-   "textosVistos": 132,
+   "menorLetraOnde": "#.marca-sub central retrô da turma v2026.11.13",
+   "textosVistos": 133,
    "escondidoAparece": []
   },
   "janelaJogarJunto": {
@@ -214,8 +214,8 @@
    "tabindexPositivo": [],
    "contrasteBaixo": [],
    "menorLetra": 12,
-   "menorLetraOnde": "#.marca-sub central retrô da turma v2026.11.12",
-   "textosVistos": 133,
+   "menorLetraOnde": "#.marca-sub central retrô da turma v2026.11.13",
+   "textosVistos": 134,
    "escondidoAparece": []
   }
  }

@@ -1,14 +1,14 @@
 {
- "quando": "2026-11-13 01:20:17",
+ "quando": "2026-11-13 10:00:51",
  "apk": "ARENA-2026.11.10-x86_64-teste.apk",
- "emulador_ligou_s": 52.3,
+ "emulador_ligou_s": 58.7,
  "android": "15",
- "instalou_s": 2.6,
- "servidor_e_tela_s": 7.3,
+ "instalou_s": 6.2,
+ "servidor_e_tela_s": 12.8,
  "tela_foto": {
   "arquivo": "tela.png",
-  "cores": 574,
-  "a_mais_comum": 0.177
+  "cores": 334,
+  "a_mais_comum": 0.174
  },
  "estado": {
   "sistema": "android",
@@ -20,11 +20,11 @@
   "nota": 2
  },
  "jogos_na_lista": 2,
- "D_chip8_abriu_s": 1.4,
+ "D_chip8_abriu_s": 3.5,
  "D_chip8_foto": {
   "arquivo": "D_chip8.png",
-  "cores": 406,
-  "a_mais_comum": 0.79
+  "cores": 227,
+  "a_mais_comum": 0.684
  },
  "D_chip8_foto_do_retroarch": {
   "arquivo": "D_chip8_retroarch.png",
@@ -32,8 +32,8 @@
   "a_mais_comum": 0.69
  },
  "D_chip8_saiu_por": "F10",
- "D_chip8_fechou_s": 39.9,
- "E_partida_abriu_s": 1.4,
+ "D_chip8_fechou_s": 41.7,
+ "E_partida_abriu_s": 1.6,
  "E_partida_foto": {
   "arquivo": "E_partida.png",
   "cores": 305,
@@ -45,7 +45,7 @@
   "a_mais_comum": 0.755
  },
  "E_partida_saiu_por": "F10",
- "E_partida_fechou_s": 39.6,
+ "E_partida_fechou_s": 40.6,
  "E_porta_55435_escutando": true,
  "E_linha_de_comando": [
   "--config",
@@ -60,13 +60,13 @@
   "/data/user/0/io.github.rafaparise.arena/files/arena/jogos/pessoais/CHIP-8/slipperyslope.ch8"
  ],
  "G_pedido_de_fora": 403,
- "F_reabriu_s": 6.0,
+ "F_reabriu_s": 7.3,
  "F_jogos_livres": 8,
- "F_livre_abriu_s": 1.5,
+ "F_livre_abriu_s": 1.6,
  "F_livre_foto": {
   "arquivo": "F_livre.png",
-  "cores": 440,
-  "a_mais_comum": 0.633
+  "cores": 446,
+  "a_mais_comum": 0.631
  },
  "F_livre_foto_do_retroarch": {
   "arquivo": "F_livre_retroarch.png",
@@ -74,37 +74,39 @@
   "a_mais_comum": 0.51
  },
  "F_livre_saiu_por": "F10",
- "F_livre_fechou_s": 39.3,
+ "F_livre_fechou_s": 39.6,
  "erros": [],
  "servidor_registro": [
-  "11-13 04:22:42.706  2041  2143 I ARENA-servidor: [ARENA] Continuar de onde parou: desligado no Jogar Junto (as duas maquinas comecam do mesmo ponto).",
-  "11-13 04:22:42.882  2041  2143 I ARENA-servidor: [ARENA] /data/user/0/io.github.rafaparise.arena/files/arena/retroarch/retroarch-android.txt --config /data/user/0/io.github.rafaparise.arena/files/arena/retroarch/retroarch.cfg -L /data/user/0/io.github.rafaparise.arena/files/arena/retroarch/cores/jaxe_libretro_android.so --appendconfig /data/user/0/io.github.rafaparise.arena/files/arena/dados/arena_override.cfg --host --port 55435 /data/user/0/io.github.rafaparise.arena/files/arena/jogos/pessoais/CHIP-8/slipperyslope.ch8",
-  "11-13 04:23:20.659  2041  2143 I ARENA-servidor: [ARENA] Sessao encerrada: 37s",
-  "11-13 04:23:24.030  2041  2525 I ARENA-servidor: [ARENA] Jogos livres do APK postos na pasta jogos do app: 16 arquivos.",
-  "11-13 04:23:25.196  2041  2525 I ARENA-servidor: ==============================================================",
-  "11-13 04:23:25.197  2041  2525 I ARENA-servidor:   ARENA 2026.11.10 - servidor local",
-  "11-13 04:23:25.197  2041  2525 I ARENA-servidor: ==============================================================",
-  "11-13 04:23:25.317  2041  2525 I ARENA-servidor:   Catalogo: 8 jogo(s)  [varredura, 0.05s]",
-  "11-13 04:23:25.324  2041  2525 I ARENA-servidor:   CPU:      AOSP ranchu (2 nucleos)",
-  "11-13 04:23:25.331  2041  2525 I ARENA-servidor:   RAM:      2.4 GB  ->  perfil leve",
-  "11-13 04:23:25.332  2041  2525 I ARENA-servidor:   Disco:    SSD (95 MB/s) em /data/data/io.github.rafaparise.arena",
-  "11-13 04:23:25.337  2041  2525 I ARENA-servidor:   Sistema:  Android 15 (unknown Android SDK built for x86_64) (x86_64, 64 bits)",
-  "11-13 04:23:25.339  2041  2525 I ARENA-servidor:   Video:    motor detectado -> gl",
-  "11-13 04:23:25.347  2041  2525 I ARENA-servidor:   Modo:     economico (maquina modesta ou midia removivel)",
-  "11-13 04:23:25.347  2041  2525 I ARENA-servidor:             rede a cada 60s, copia a cada 15 min",
-  "11-13 04:23:25.348  2041  2525 I ARENA-servidor:   Video:    Android Emulator OpenGL ES Translator (Google SwiftShader) (integrada)",
-  "11-13 04:23:25.348  2041  2525 I ARENA-servidor:   Imagem:   nota 2/5, placa 2/5, 59 ajustes",
-  "11-13 04:23:25.359  2041  2525 I ARENA-servidor:   Recordes: 2 aguardando envio ao servidor",
-  "11-13 04:23:25.359  2041  2525 I ARENA-servidor:   Rede:     fechada (so este computador)",
-  "11-13 04:23:25.360  2041  2525 I ARENA-servidor:   Endereco: http://127.0.0.1:8777",
-  "11-13 04:23:25.360  2041  2525 I ARENA-servidor:   Para encerrar, feche esta janela.",
-  "11-13 04:23:25.365  2041  2525 I ARENA-servidor: ==============================================================",
-  "11-13 04:23:25.365  2041  2525 I ARENA-servidor:   Reaberto sozinho depois de uma queda. A tela que ja estava",
-  "11-13 04:23:25.366  2041  2525 I ARENA-servidor:   aberta volta sozinha em poucos segundos.",
-  "11-13 04:23:28.656  2041  2525 I ARENA-servidor: [ARENA] Continuar de onde parou: primeira vez: o ponto automatico e' gravado ao sair.",
-  "11-13 04:23:28.939  2041  2525 I ARENA-servidor: [ARENA] /data/user/0/io.github.rafaparise.arena/files/arena/retroarch/retroarch-android.txt --config /data/user/0/io.github.rafaparise.arena/files/arena/retroarch/retroarch.cfg -L /data/user/0/io.github.rafaparise.arena/files/arena/retroarch/cores/81_libretro_android.so --appendconfig /data/user/0/io.github.rafaparise.arena/files/arena/dados/arena_override.cfg /data/user/0/io.github.rafaparise.arena/files/arena/jogos/livres/ZX81/factory2023.P",
-  "11-13 04:24:06.749  2041  2525 I ARENA-servidor: [ARENA] Sessao encerrada: 37s"
+  "11-13 13:03:37.777  2100  2204 I ARENA-servidor: [ARENA] Continuar de onde parou: desligado no Jogar Junto (as duas maquinas comecam do mesmo ponto).",
+  "11-13 13:03:37.993  2100  2204 I ARENA-servidor: [ARENA] /data/user/0/io.github.rafaparise.arena/files/arena/retroarch/retroarch-android.txt --config /data/user/0/io.github.rafaparise.arena/files/arena/retroarch/retroarch.cfg -L /data/user/0/io.github.rafaparise.arena/files/arena/retroarch/cores/jaxe_libretro_android.so --appendconfig /data/user/0/io.github.rafaparise.arena/files/arena/dados/arena_override.cfg --host --port 55435 /data/user/0/io.github.rafaparise.arena/files/arena/jogos/pessoais/CHIP-8/slipperyslope.ch8",
+  "11-13 13:04:16.147  2100  2204 I ARENA-servidor: [ARENA] Sessao encerrada: 38s",
+  "11-13 13:04:21.767  2100  2545 I ARENA-servidor: [ARENA] Jogos livres do APK postos na pasta jogos do app: 16 arquivos.",
+  "11-13 13:04:23.942  2100  2545 I ARENA-servidor: ==============================================================",
+  "11-13 13:04:23.942  2100  2545 I ARENA-servidor:   ARENA 2026.11.10 - servidor local",
+  "11-13 13:04:23.943  2100  2545 I ARENA-servidor: ==============================================================",
+  "11-13 13:04:24.084  2100  2545 I ARENA-servidor:   Catalogo: 8 jogo(s)  [varredura, 0.04s]",
+  "11-13 13:04:24.084  2100  2545 I ARENA-servidor:   CPU:      AOSP ranchu (2 nucleos)",
+  "11-13 13:04:24.084  2100  2545 I ARENA-servidor:   RAM:      2.4 GB  ->  perfil leve",
+  "11-13 13:04:24.084  2100  2545 I ARENA-servidor:   Disco:    SSD (114 MB/s) em /data/data/io.github.rafaparise.arena",
+  "11-13 13:04:24.084  2100  2545 I ARENA-servidor:   Sistema:  Android 15 (unknown Android SDK built for x86_64) (x86_64, 64 bits)",
+  "11-13 13:04:24.099  2100  2545 I ARENA-servidor:   Video:    motor detectado -> gl",
+  "11-13 13:04:24.099  2100  2545 I ARENA-servidor:   Modo:     economico (maquina modesta ou midia removivel)",
+  "11-13 13:04:24.105  2100  2545 I ARENA-servidor:             rede a cada 60s, copia a cada 15 min",
+  "11-13 13:04:24.106  2100  2545 I ARENA-servidor:   Video:    Android Emulator OpenGL ES Translator (Google SwiftShader) (integrada)",
+  "11-13 13:04:24.107  2100  2545 I ARENA-servidor:   Imagem:   nota 2/5, placa 2/5, 59 ajustes",
+  "11-13 13:04:24.107  2100  2545 I ARENA-servidor:   Recordes: 2 aguardando envio ao servidor",
+  "11-13 13:04:24.108  2100  2545 I ARENA-servidor:   Rede:     fechada (so este computador)",
+  "11-13 13:04:24.109  2100  2545 I ARENA-servidor:   Endereco: http://127.0.0.1:8777",
+  "11-13 13:04:24.109  2100  2545 I ARENA-servidor:   Para encerrar, feche esta janela.",
+  "11-13 13:04:24.110  2100  2545 I ARENA-servidor: ==============================================================",
+  "11-13 13:04:24.110  2100  2545 I ARENA-servidor:   Reaberto sozinho depois de uma queda. A tela que ja estava",
+  "11-13 13:04:24.111  2100  2545 I ARENA-servidor:   aberta volta sozinha em poucos segundos.",
+  "11-13 13:04:26.664  2100  2545 I ARENA-servidor: [ARENA] Continuar de onde parou: primeira vez: o ponto automatico e' gravado ao sair.",
+  "11-13 13:04:26.838  2100  2545 I ARENA-servidor: [ARENA] /data/user/0/io.github.rafaparise.arena/files/arena/retroarch/retroarch-android.txt --config /data/user/0/io.github.rafaparise.arena/files/arena/retroarch/retroarch.cfg -L /data/user/0/io.github.rafaparise.arena/files/arena/retroarch/cores/81_libretro_android.so --appendconfig /data/user/0/io.github.rafaparise.arena/files/arena/dados/arena_override.cfg /data/user/0/io.github.rafaparise.arena/files/arena/jogos/livres/ZX81/factory2023.P",
+  "11-13 13:05:04.579  2100  2545 I ARENA-servidor: [ARENA] Sessao encerrada: 37s"
  ],
- "avisos_do_sistema_fechados": [],
+ "avisos_do_sistema_fechados": [
+  "tocado o Wait"
+ ],
  "falhas": []
 }

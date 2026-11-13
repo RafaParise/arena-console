@@ -6,10 +6,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 36430,
-   "segundos": 11.5,
+   "segundos": 11.6,
    "travou": false,
    "erros": [
-    "[ERROR] [Disc] Failed to set initial disc index. Expected #1 \"\", Detected #1 \"\"."
+    "[ERROR] [Disc] Failed to set initial disc index. Expected #1 \"\", Detected #1 \"\".",
+    "[ERROR] [Vulkan] Failed to update swapchain."
    ]
   },
   "foto": "000 Apple II - DIAFLW.png",
@@ -24,7 +25,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 16630,
-   "segundos": 11.4,
+   "segundos": 12.4,
    "travou": false,
    "erros": []
   },
@@ -44,7 +45,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 17201,
-   "segundos": 10.8,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
@@ -64,7 +65,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 24508,
-   "segundos": 10.8,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
@@ -84,7 +85,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 29416,
-   "segundos": 10.8,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
@@ -104,7 +105,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 8973,
-   "segundos": 10.8,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
@@ -124,7 +125,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 76999,
-   "segundos": 11.0,
+   "segundos": 11.2,
    "travou": false,
    "erros": []
   },
@@ -164,7 +165,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 23175,
-   "segundos": 10.8,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
@@ -184,7 +185,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 4841,
-   "segundos": 10.7,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
@@ -203,8 +204,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 4515,
-   "segundos": 10.7,
+   "foto_bytes": 4506,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
@@ -223,8 +224,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 10811,
-   "segundos": 10.7,
+   "foto_bytes": 10936,
+   "segundos": 10.8,
    "travou": false,
    "erros": []
   },
@@ -244,7 +245,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 7632,
-   "segundos": 10.7,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
@@ -264,7 +265,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 2054,
-   "segundos": 10.8,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
@@ -284,7 +285,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 7273,
-   "segundos": 10.7,
+   "segundos": 10.8,
    "travou": false,
    "erros": []
   },
@@ -304,7 +305,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 30159,
-   "segundos": 13.0,
+   "segundos": 13.2,
    "travou": false,
    "erros": []
   },
@@ -320,7 +321,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 33082,
-   "segundos": 13.0,
+   "segundos": 13.1,
    "travou": false,
    "erros": []
   },
@@ -336,7 +337,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 91061,
-   "segundos": 13.0,
+   "segundos": 13.1,
    "travou": false,
    "erros": []
   },
@@ -352,7 +353,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 4160,
-   "segundos": 12.8,
+   "segundos": 13.4,
    "travou": false,
    "erros": []
   },
@@ -368,7 +369,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 68395,
-   "segundos": 12.8,
+   "segundos": 12.9,
    "travou": false,
    "erros": []
   },
@@ -384,7 +385,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 59412,
-   "segundos": 13.0,
+   "segundos": 12.9,
    "travou": false,
    "erros": []
   },
@@ -416,7 +417,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 6408,
-   "segundos": 10.8,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
@@ -436,7 +437,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 26262,
-   "segundos": 10.7,
+   "segundos": 10.8,
    "travou": false,
    "erros": []
   },
@@ -456,14 +457,14 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 191867,
-   "segundos": 10.8,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
   "foto": "037 Game Boy e Game Boy  - UCity.png",
   "jogar_junto": {
    "conectou": true,
-   "convidado_diz": null,
+   "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
    "erros": []
@@ -504,10 +505,10 @@
   "titulo": "God of War Betrayal J2ME EN V0195",
   "jogadores": 2,
   "abrir": {
-   "abre_e_mostra_imagem": true,
+   "abre_e_mostra_imagem": false,
    "foto_bytes": 97199,
-   "segundos": 11.9,
-   "travou": false,
+   "segundos": 110.0,
+   "travou": true,
    "erros": []
   },
   "foto": "043 Java ME (celular ant - God of War Betrayal J2ME EN V0195.png",
@@ -520,10 +521,10 @@
   "titulo": "Shooter",
   "jogadores": 2,
   "abrir": {
-   "abre_e_mostra_imagem": true,
+   "abre_e_mostra_imagem": false,
    "foto_bytes": 34850,
-   "segundos": 11.3,
-   "travou": false,
+   "segundos": 110.0,
+   "travou": true,
    "erros": []
   },
   "foto": "044 Java ME (celular ant - Shooter.png",
@@ -538,7 +539,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 40800,
-   "segundos": 10.8,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -554,9 +555,11 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 459769,
-   "segundos": 11.0,
+   "segundos": 11.1,
    "travou": false,
-   "erros": []
+   "erros": [
+    "[ERROR] [Vulkan] Failed to update swapchain."
+   ]
   },
   "foto": "046 Mega Drive, Master S - Golden Axe.png",
   "jogar_junto": {
@@ -574,7 +577,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 415256,
-   "segundos": 10.8,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
@@ -594,7 +597,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 41254,
-   "segundos": 10.7,
+   "segundos": 10.8,
    "travou": false,
    "erros": []
   },
@@ -612,14 +615,26 @@
   "titulo": "Micro Machines 2 Turbo Tournament",
   "jogadores": 4,
   "abrir": {
-   "abre_e_mostra_imagem": true,
-   "foto_bytes": 255633,
-   "segundos": 40.8,
-   "travou": false,
+   "abre_e_mostra_imagem": false,
+   "foto_bytes": 0,
+   "segundos": 170.0,
+   "travou": true,
    "erros": [],
    "segunda_vez_com_40s": true
+  }
+ },
+ {
+  "console": "Mega Drive, Master System e Game Gear",
+  "titulo": "Sonic & Knuckles + Sonic the Hedgehog 2",
+  "jogadores": 2,
+  "abrir": {
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 210779,
+   "segundos": 10.8,
+   "travou": false,
+   "erros": []
   },
-  "foto": "049 Mega Drive, Master S - Micro Machines 2 Turbo Tournament.png",
+  "foto": "050 Mega Drive, Master S - Sonic & Knuckles + Sonic the Hedgehog 2.png",
   "jogar_junto": {
    "conectou": true,
    "convidado_diz": "Você se juntou como jogador 2",
@@ -630,32 +645,12 @@
  },
  {
   "console": "Mega Drive, Master System e Game Gear",
-  "titulo": "Sonic & Knuckles + Sonic the Hedgehog 2",
-  "jogadores": 2,
-  "abrir": {
-   "abre_e_mostra_imagem": true,
-   "foto_bytes": 210779,
-   "segundos": 10.7,
-   "travou": false,
-   "erros": []
-  },
-  "foto": "050 Mega Drive, Master S - Sonic & Knuckles + Sonic the Hedgehog 2.png",
-  "jogar_junto": {
-   "conectou": false,
-   "convidado_diz": null,
-   "recusa_do_nucleo": "",
-   "hospedeiro_vivo": false,
-   "erros": []
-  }
- },
- {
-  "console": "Mega Drive, Master System e Game Gear",
   "titulo": "Sonic the Hedgehog 3",
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 463286,
-   "segundos": 10.8,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
@@ -695,7 +690,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 8637,
-   "segundos": 10.7,
+   "segundos": 10.8,
    "travou": false,
    "erros": []
   },
@@ -715,7 +710,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 105657,
-   "segundos": 11.4,
+   "segundos": 11.5,
    "travou": false,
    "erros": []
   },
@@ -735,7 +730,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 47792,
-   "segundos": 10.9,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
@@ -755,7 +750,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 47792,
-   "segundos": 11.0,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -795,7 +790,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 29667,
-   "segundos": 11.1,
+   "segundos": 11.2,
    "travou": false,
    "erros": []
   },
@@ -815,7 +810,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 30514,
-   "segundos": 11.2,
+   "segundos": 11.3,
    "travou": false,
    "erros": []
   },
@@ -835,7 +830,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 244013,
-   "segundos": 10.7,
+   "segundos": 10.9,
    "travou": false,
    "erros": [
     "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented."
@@ -859,7 +854,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 342861,
-   "segundos": 10.7,
+   "segundos": 10.8,
    "travou": false,
    "erros": [
     "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented."
@@ -883,7 +878,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 181503,
-   "segundos": 10.7,
+   "segundos": 10.8,
    "travou": false,
    "erros": [
     "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented."
@@ -907,7 +902,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 360860,
-   "segundos": 10.7,
+   "segundos": 10.8,
    "travou": false,
    "erros": [
     "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented."
@@ -947,7 +942,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 682244,
-   "segundos": 14.3,
+   "segundos": 14.5,
    "travou": false,
    "erros": []
   },
@@ -979,7 +974,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 435421,
-   "segundos": 12.6,
+   "segundos": 12.7,
    "travou": false,
    "erros": []
   },
@@ -995,7 +990,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 590887,
-   "segundos": 13.4,
+   "segundos": 13.5,
    "travou": false,
    "erros": []
   },
@@ -1011,7 +1006,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 406434,
-   "segundos": 12.5,
+   "segundos": 12.6,
    "travou": false,
    "erros": []
   },
@@ -1027,7 +1022,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 251652,
-   "segundos": 11.7,
+   "segundos": 11.9,
    "travou": false,
    "erros": []
   },
@@ -1061,7 +1056,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 43950,
-   "segundos": 21.6,
+   "segundos": 22.0,
    "travou": false,
    "erros": []
   },
@@ -1081,7 +1076,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 43950,
-   "segundos": 21.9,
+   "segundos": 23.0,
    "travou": false,
    "erros": []
   },
@@ -1091,7 +1086,9 @@
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": []
+   "erros": [
+    "[ERROR] [Vulkan] Failed to update swapchain."
+   ]
   }
  },
  {
@@ -1101,14 +1098,14 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 66502,
-   "segundos": 18.6,
+   "segundos": 19.2,
    "travou": false,
    "erros": []
   },
   "foto": "076 PlayStation - Crash Bandicoot 3 Warped.png",
   "jogar_junto": {
    "conectou": true,
-   "convidado_diz": null,
+   "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
    "erros": []
@@ -1121,7 +1118,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 43950,
-   "segundos": 25.0,
+   "segundos": 25.4,
    "travou": false,
    "erros": []
   },
@@ -1141,7 +1138,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 43950,
-   "segundos": 12.1,
+   "segundos": 12.3,
    "travou": false,
    "erros": []
   },
@@ -1161,7 +1158,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 43950,
-   "segundos": 22.9,
+   "segundos": 23.5,
    "travou": false,
    "erros": []
   },
@@ -1181,7 +1178,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 66502,
-   "segundos": 13.4,
+   "segundos": 13.7,
    "travou": false,
    "erros": []
   },
@@ -1417,7 +1414,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 448271,
-   "segundos": 11.8,
+   "segundos": 11.9,
    "travou": false,
    "erros": []
   },
@@ -1449,7 +1446,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 112903,
-   "segundos": 11.0,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -1464,8 +1461,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 6595,
-   "segundos": 11.0,
+   "foto_bytes": 6601,
+   "segundos": 11.1,
    "travou": false,
    "erros": [
     "[libretro WARN] [sceDisplay] Video out requested, not supported: mode=0 size=512,272"
@@ -1501,7 +1498,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 1537199,
-   "segundos": 17.2,
+   "segundos": 17.5,
    "travou": false,
    "erros": []
   },
@@ -1517,7 +1514,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 430305,
-   "segundos": 11.1,
+   "segundos": 11.2,
    "travou": false,
    "erros": []
   },
@@ -1533,7 +1530,7 @@
   "abrir": {
    "abre_e_mostra_imagem": false,
    "foto_bytes": 212,
-   "segundos": 75.6,
+   "segundos": 75.7,
    "travou": false,
    "erros": [],
    "segunda_vez_com_40s": true
@@ -1547,7 +1544,7 @@
   "abrir": {
    "abre_e_mostra_imagem": false,
    "foto_bytes": 212,
-   "segundos": 75.6,
+   "segundos": 75.7,
    "travou": false,
    "erros": [],
    "segunda_vez_com_40s": true
@@ -1561,7 +1558,7 @@
   "abrir": {
    "abre_e_mostra_imagem": false,
    "foto_bytes": 212,
-   "segundos": 75.6,
+   "segundos": 75.7,
    "travou": false,
    "erros": [],
    "segunda_vez_com_40s": true
@@ -1575,7 +1572,7 @@
   "abrir": {
    "abre_e_mostra_imagem": false,
    "foto_bytes": 212,
-   "segundos": 75.6,
+   "segundos": 75.7,
    "travou": false,
    "erros": [],
    "segunda_vez_com_40s": true
@@ -1589,7 +1586,7 @@
   "abrir": {
    "abre_e_mostra_imagem": false,
    "foto_bytes": 212,
-   "segundos": 75.6,
+   "segundos": 75.7,
    "travou": false,
    "erros": [],
    "segunda_vez_com_40s": true
@@ -1631,7 +1628,7 @@
   "abrir": {
    "abre_e_mostra_imagem": false,
    "foto_bytes": 212,
-   "segundos": 75.6,
+   "segundos": 75.7,
    "travou": false,
    "erros": [],
    "segunda_vez_com_40s": true
@@ -1645,7 +1642,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 47656,
-   "segundos": 12.7,
+   "segundos": 12.8,
    "travou": false,
    "erros": []
   },
@@ -1665,7 +1662,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 11583,
-   "segundos": 10.7,
+   "segundos": 10.8,
    "travou": false,
    "erros": []
   },
@@ -1685,7 +1682,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 525721,
-   "segundos": 11.6,
+   "segundos": 11.7,
    "travou": false,
    "erros": []
   },
@@ -1725,7 +1722,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 107003,
-   "segundos": 13.1,
+   "segundos": 13.2,
    "travou": false,
    "erros": []
   },
@@ -1775,7 +1772,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 58602,
-   "segundos": 12.9,
+   "segundos": 13.0,
    "travou": false,
    "erros": []
   },
@@ -1791,7 +1788,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 58602,
-   "segundos": 12.9,
+   "segundos": 13.0,
    "travou": false,
    "erros": [
     "[libretro INFO] [BOOT] USA region not supported. Using Europe instead"
@@ -1809,7 +1806,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 58602,
-   "segundos": 12.9,
+   "segundos": 13.0,
    "travou": false,
    "erros": [
     "[libretro INFO] [BOOT] USA region not supported. Using Europe instead"
@@ -1827,7 +1824,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 46284,
-   "segundos": 11.7,
+   "segundos": 11.9,
    "travou": false,
    "erros": []
   },
@@ -1887,7 +1884,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 344006,
-   "segundos": 10.8,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
@@ -1907,7 +1904,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 401369,
-   "segundos": 10.8,
+   "segundos": 10.9,
    "travou": false,
    "erros": []
   },
@@ -1967,7 +1964,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 347734,
-   "segundos": 12.9,
+   "segundos": 13.0,
    "travou": false,
    "erros": []
   },
@@ -2019,7 +2016,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 11185,
-   "segundos": 12.9,
+   "segundos": 13.0,
    "travou": false,
    "erros": [
     "[ERROR] [Disc] Failed to set initial disc index. Expected #1 \"\", Detected #1 \"\"."

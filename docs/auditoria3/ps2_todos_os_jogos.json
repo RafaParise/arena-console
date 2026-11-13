@@ -3,7 +3,7 @@
   "jogo": "Black (BR).iso",
   "nivel": "automatico",
   "comecou": true,
-  "segundos": 21.4,
+  "segundos": 22.2,
   "avisos": []
  },
  {
@@ -24,7 +24,7 @@
   "jogo": "Bully (BR).chd",
   "nivel": "automatico",
   "comecou": true,
-  "segundos": 21.4,
+  "segundos": 23.1,
   "avisos": []
  },
  {
@@ -38,7 +38,7 @@
   "jogo": "Call of Duty 2 - Big Red One (USA) (Collector's Edition).chd",
   "nivel": "automatico",
   "comecou": true,
-  "segundos": 20.1,
+  "segundos": 22.1,
   "avisos": []
  },
  {
@@ -59,7 +59,7 @@
   "jogo": "Crash Twinsanity (USA) (v2.00).chd",
   "nivel": "automatico",
   "comecou": true,
-  "segundos": 20.1,
+  "segundos": 22.1,
   "avisos": []
  },
  {
@@ -73,35 +73,35 @@
   "jogo": "Devil May Cry 3 - Dante_s Awakening (Special Edition) (BR)-008.chd",
   "nivel": "automatico",
   "comecou": true,
-  "segundos": 21.1,
+  "segundos": 38.1,
   "avisos": []
  },
  {
   "jogo": "Dragon Ball Z - Budokai Tenkaichi 3 (USA) (En,Ja).chd",
   "nivel": "automatico",
   "comecou": true,
-  "segundos": 20.1,
+  "segundos": 26.1,
   "avisos": []
  },
  {
   "jogo": "Dynasty Warriors 6 (USA).chd",
   "nivel": "automatico",
   "comecou": true,
-  "segundos": 20.1,
+  "segundos": 22.1,
   "avisos": []
  },
  {
   "jogo": "God Hand (USA).chd",
   "nivel": "automatico",
   "comecou": true,
-  "segundos": 20.1,
+  "segundos": 25.1,
   "avisos": []
  },
  {
   "jogo": "God of War (BR).chd",
   "nivel": "automatico",
   "comecou": true,
-  "segundos": 20.1,
+  "segundos": 43.1,
   "avisos": []
  },
  {
@@ -115,28 +115,28 @@
   "jogo": "Gran Turismo 4 (USA) (v2.00).iso",
   "nivel": "automatico",
   "comecou": true,
-  "segundos": 19.1,
+  "segundos": 33.2,
   "avisos": []
  },
  {
   "jogo": "Guitar Hero II (USA).chd",
   "nivel": "automatico",
   "comecou": true,
-  "segundos": 20.1,
+  "segundos": 30.1,
   "avisos": []
  },
  {
   "jogo": "Guitar Hero III - Legends of Rock (USA).chd",
   "nivel": "automatico",
   "comecou": true,
-  "segundos": 20.1,
+  "segundos": 41.1,
   "avisos": []
  },
  {
   "jogo": "Gun (USA).chd",
   "nivel": "automatico",
   "comecou": true,
-  "segundos": 20.1,
+  "segundos": 21.1,
   "avisos": []
  },
  {
@@ -171,7 +171,7 @@
   "jogo": "Max Payne (BR).chd",
   "nivel": "automatico",
   "comecou": true,
-  "segundos": 19.1,
+  "segundos": 21.1,
   "avisos": []
  },
  {
@@ -199,42 +199,42 @@
   "jogo": "Mortal Kombat - Armageddon (USA) (Premium Edition).chd",
   "nivel": "automatico",
   "comecou": true,
-  "segundos": 21.1,
+  "segundos": 22.1,
   "avisos": []
  },
  {
   "jogo": "Mortal Kombat - Deadly Alliance (USA).chd",
   "nivel": "automatico",
   "comecou": true,
-  "segundos": 20.1,
+  "segundos": 27.1,
   "avisos": []
  },
  {
   "jogo": "Naruto Shippuden - Ultimate Ninja 4 (Europe) (De,Es,It).iso",
   "nivel": "automatico",
   "comecou": true,
-  "segundos": 21.1,
+  "segundos": 46.1,
   "avisos": []
  },
  {
   "jogo": "Prince of Persia - The Sands of Time (USA) (En,Fr,Es).chd",
   "nivel": "automatico",
-  "comecou": true,
-  "segundos": 21.1,
+  "comecou": false,
+  "segundos": 60.1,
   "avisos": []
  },
  {
   "jogo": "Red Dead Revolver (USA).chd",
   "nivel": "automatico",
-  "comecou": true,
-  "segundos": 19.1,
+  "comecou": false,
+  "segundos": 60.0,
   "avisos": []
  },
  {
   "jogo": "SOCOM - U.S. Navy SEALs - Combined Assault (USA).chd",
   "nivel": "automatico",
-  "comecou": true,
-  "segundos": 19.1,
+  "comecou": false,
+  "segundos": 60.0,
   "avisos": []
  },
  {
@@ -248,7 +248,7 @@
   "jogo": "Half-Life (USA).chd",
   "nivel": "bonito",
   "comecou": true,
-  "segundos": 20.1,
+  "segundos": 23.1,
   "avisos": []
  },
  {
