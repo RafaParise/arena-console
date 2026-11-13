@@ -5,7 +5,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 97658,
-      "segundos": 10.8,
+      "segundos": 10.7,
       "travou": false,
       "erros": []
     },
@@ -63,7 +63,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 41254,
-      "segundos": 10.8,
+      "segundos": 10.7,
       "travou": false,
       "erros": []
     },
@@ -99,7 +99,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 435421,
-      "segundos": 12.6,
+      "segundos": 12.7,
       "travou": false,
       "erros": []
     },
@@ -120,7 +120,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 43950,
-      "segundos": 12.8,
+      "segundos": 12.9,
       "travou": false,
       "erros": []
     },
@@ -144,7 +144,7 @@
     },
     "jogar_junto": {
       "conectou": true,
-      "convidado_diz": null,
+      "convidado_diz": "Você se juntou como jogador 2",
       "recusa_do_nucleo": "",
       "hospedeiro_vivo": true,
       "erros": []
