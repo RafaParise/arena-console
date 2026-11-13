@@ -592,7 +592,12 @@ saves do Windows. Precisa do Android 7 ou mais novo.
      memória do aparelho e o que está no cartão, só lê (não copia nem apaga
      nada) e, se você tirar o cartão, os jogos dele somem da lista até você
      encaixá-lo de novo.
-5. **Jogar.** Sem controle, o jogo mostra um controle desenhado na tela;
+5. **O painel do jogo.** Toque no **nome** do jogo para jogar na hora. Toque
+   na **capa** (ou na alça **‹ Jogo**, na borda direita) para abrir o painel
+   do jogo, o mesmo do computador: **Jogar agora**, **Desafio em rede**,
+   **Saves e cheats**, a capa e o resto. Ele fecha no **Fechar**, no botão
+   voltar ou tocando fora dele.
+   **Jogar.** Sem controle, o jogo mostra um controle desenhado na tela;
    com um controle ligado (pelo cabo OTG ou por Bluetooth), ele some. Para
    sair do jogo, o botão **voltar** do aparelho abre o menu do RetroArch:
    escolha **Sair do RetroArch**. Num teclado, o **F10** duas vezes.

@@ -947,6 +947,37 @@ async function abrirEscolhaConsole(jogo) {
   }
 }
 
+// --------------------------------------------------------------------------
+// O painel do jogo como barra retratil (13/11/2026, pedido do Rafael: "nenhum botao ou recurso das versoes de pc deve
+// ficar de fora das outras versoes, mas adaptado para o celular"). Na tela larga ele fica sempre a direita; na
+// estreita (a mesma medida do estilo.css) ele entra pela direita ao tocar na capa ou na alca "Jogo".
+// --------------------------------------------------------------------------
+const TELA_ESTREITA = "(max-width: 1050px)";
+const telaEstreita = () => !!(window.matchMedia && matchMedia(TELA_ESTREITA).matches);
+const detalhesAbertos = () => $("#detalhesJogo").classList.contains("detalhes--aberto");
+
+function abrirDetalhes() {
+  if (!telaEstreita()) return;
+  $("#detalhesJogo").classList.add("detalhes--aberto");
+  $("#btnAbrirDetalhes").setAttribute("aria-expanded", "true");
+  // O foco vai para dentro (quem usa teclado ou leitor de tela): o Jogar agora, ou o Fechar sem jogo escolhido.
+  setTimeout(() => {
+    const jogar = $("#btnJogarSelecionado");
+    (jogar.disabled ? $("#btnFecharDetalhes") : jogar).focus();
+  }, 60);
+}
+
+function fecharDetalhes({ devolverFoco = false } = {}) {
+  if (!detalhesAbertos()) return;
+  const focoDentro = $("#detalhesJogo").contains(document.activeElement);
+  $("#detalhesJogo").classList.remove("detalhes--aberto");
+  $("#btnAbrirDetalhes").setAttribute("aria-expanded", "false");
+  if (devolverFoco || focoDentro) {
+    const cartao = document.querySelector("#listaJogos .jogo--selecionado .jogo-abrir");
+    (cartao || $("#btnAbrirDetalhes")).focus();
+  }
+}
+
 function selecionarJogo(jogo) {
   estado.jogoSelecionado = jogo;
   // A grade nao precisa ser recriada: recria-la faria cada imagem voltar
@@ -1081,12 +1112,6 @@ function explicarFundoAnimado() {
 // --------------------------------------------------------------------------
 // Perfil: quem sou eu (foto, apelido) e meus amigos -- tarefa 6 do Rafael.
 // --------------------------------------------------------------------------
-
-function abrirPerfil(aba) {
-  abrirGaveta("gavetaPerfil");
-  const botao = document.querySelector(`#gavetaPerfil .aba[data-aba="${aba}"]`);
-  if (botao) botao.click();
-}
 
 // O apelido aparece em tres lugares: no botao do topo, no campo de trocar e
 // em "Jogando como".
@@ -3898,7 +3923,7 @@ async function pedirPermissaoAndroid(todosOsArquivos) {
 if (!window.ARENA_ANDROID_VOLTAR) {
   window.ARENA_ANDROID_VOLTAR = () => {
     const aberto = [...document.querySelectorAll(".gaveta, .modal")].some((painel) => !painel.hidden) ||
-      document.body.dataset.soFundo === "true";
+      document.body.dataset.soFundo === "true" || detalhesAbertos();
     if (!aberto) return "nao";
     document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
     return "sim";
@@ -5401,13 +5426,16 @@ function mostrarPendentes(quantos) {
   selo.textContent = quantos;
   selo.hidden = quantos === 0;
 
-  $("#statusPendentes").textContent = quantos === 0
-    ? "Está tudo enviado."
-    : `${quantos} recorde(s) esperando para subir.`;
+  // O mesmo texto em Jogar junto e no Perfil (13/11/2026: o envio fica nos dois lugares).
+  const texto = quantos === 0 ? "Está tudo enviado." : `${quantos} recorde(s) esperando para subir.`;
+  for (const id of ["#statusPendentes", "#statusPendentesPerfil"]) {
+    const linha = $(id);
+    if (linha) linha.textContent = texto;
+  }
 }
 
 async function enviarRecordes() {
-  const botoes = [$("#btnSincronizar"), $("#btnEnviarAgora")];
+  const botoes = [$("#btnEnviarPerfil"), $("#btnEnviarAgora")];
   for (const b of botoes) b.disabled = true;
   recado("Mandando…");
 
@@ -5538,7 +5566,7 @@ async function carregarRanking() {
     desenharRanking("#rankingPontos", dados.placar,
       (e) => e.pontos.toLocaleString("pt-BR"),
       "Ninguém registrou pontuação ainda. Jogue um jogo de TIC-80, WASM-4 ou LowRes NX e, no " +
-      "painel do jogo, clique em Registrar pontos. O botão Enviar recordes, no alto, traz os dos amigos.");
+      "painel do jogo, clique em Registrar pontos. O Enviar recordes, em Jogar junto, traz os dos amigos.");
     desenharRanking("#rankingTempo", dados.tempo,
       (e) => `${formatarTempo(e.segundos)} · ${e.partidas} partidas`,
       "Nenhuma partida registrada ainda. Partidas de menos de 30 segundos não contam.");
@@ -6167,6 +6195,7 @@ function lerEditorAcervo() {
 // --------------------------------------------------------------------------
 
 function abrirGaveta(id) {
+  fecharDetalhes();
   for (const gaveta of document.querySelectorAll(".gaveta")) {
     gaveta.hidden = gaveta.id !== id;
   }
@@ -6253,6 +6282,7 @@ function ligarEventos() {
     const item = evento.target.closest(".jogo");
     if (item) {
       selecionarJogo(acharJogo(item.dataset.jogo));
+      if (!alvo) abrirDetalhes();       // so na tela estreita (no PC o painel ja esta a vista)
     }
     if (!alvo) return;
     const jogo = acharJogo(alvo.closest(".jogo").dataset.jogo);
@@ -6277,6 +6307,22 @@ function ligarEventos() {
   });
 
   $("#avisoVoltarAoJogo").addEventListener("click", voltarAoJogo);
+
+  // A barra do jogo na tela estreita: a alca abre, o Fechar fecha, e tocar fora dela (no topo ou na lista) tambem.
+  $("#btnAbrirDetalhes").addEventListener("click", abrirDetalhes);
+  $("#btnFecharDetalhes").addEventListener("click", () => fecharDetalhes({ devolverFoco: true }));
+  for (const fora of document.querySelectorAll("header.painel-topo, main.corpo")) {
+    fora.addEventListener("click", (evento) => {
+      if (!detalhesAbertos() || evento.target.closest("#detalhesJogo, #btnAbrirDetalhes, #listaJogos .jogo")) return;
+      fecharDetalhes();
+    });
+  }
+  // Girou o celular para uma tela larga: o painel volta ao lugar de sempre, sem a classe de aberto.
+  if (window.matchMedia) {
+    const medida = matchMedia(TELA_ESTREITA);
+    const aoMudar = () => { if (!medida.matches) fecharDetalhes(); };
+    if (medida.addEventListener) medida.addEventListener("change", aoMudar);
+  }
 
   $("#btnMais").addEventListener("click", () => {
     estado.limite += PASSO_LIMITE;
@@ -6440,20 +6486,18 @@ function ligarEventos() {
       recado(falha.message, true);
     }
   });
-  $("#btnAmigos").addEventListener("click", () => abrirPerfil("rede"));
-  $("#btnPerfil").addEventListener("click", () => abrirPerfil("perfil"));
+  $("#btnAmigos").addEventListener("click", () => abrirGaveta("gavetaAmigos"));
+  $("#btnPerfil").addEventListener("click", () => abrirGaveta("gavetaPerfil"));
   $("#btnTrocarApelido").addEventListener("click", () =>
     trocarApelido().catch((falha) => recado(falha.message, true)));
   $("#campoApelido").addEventListener("keydown", (evento) => {
     if (evento.key === "Enter") trocarApelido().catch((falha) => recado(falha.message, true));
   });
-  $("#btnRecordes").addEventListener("click", () => {
-    abrirGaveta("gavetaRecordes");
-    carregarRanking();
-  });
+  // Conquistas e recordes numa gaveta so (13/11/2026): as duas listas carregam ao abrir.
   $("#btnConquistas").addEventListener("click", () => {
     abrirGaveta("gavetaConquistas");
     carregarConquistas();
+    carregarRanking();
   });
   $("#btnEquipamentos").addEventListener("click", () => {
     abrirGaveta("gavetaEquipamentos");
@@ -7213,7 +7257,7 @@ function ligarEventos() {
     }
   });
 
-  $("#btnSincronizar").addEventListener("click", enviarRecordes);
+  $("#btnEnviarPerfil").addEventListener("click", enviarRecordes);
   $("#btnEnviarAgora").addEventListener("click", enviarRecordes);
 
 
@@ -7262,9 +7306,12 @@ function ligarEventos() {
     // Esc na espera do jogador 2 vale como Cancelar: senao a partida ficava
     // esperando escondida, sem botao para desfazer.
     if (!$("#modalEsperaPartida").hidden) $("#btnCancelarEspera").click();
+    // Com uma janela ou gaveta aberta, o Esc fecha ela; sem nenhuma, fecha a barra do jogo (celular).
+    const algumAberto = [...document.querySelectorAll(".gaveta, .modal")].some((painel) => !painel.hidden);
     for (const painel of document.querySelectorAll(".gaveta, .modal")) {
       painel.hidden = true;
     }
+    if (!algumAberto) fecharDetalhes({ devolverFoco: true });
   });
 
   $("#btnSalvarPontos").addEventListener("click", salvarPlacar);

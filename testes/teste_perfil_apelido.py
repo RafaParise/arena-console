@@ -112,16 +112,18 @@ def main():
     repetidos = sorted({i for i in ids if ids.count(i) > 1})
     confere("nenhum id repetido na tela", not repetidos, str(repetidos))
     gaveta = html.split('id="gavetaPerfil"', 1)[-1].split("</aside>", 1)[0]
-    confere("gaveta Perfil com as abas Meu perfil e Amigos",
-            'data-aba="perfil"' in gaveta and 'data-aba="rede"' in gaveta
-            and 'data-painel="perfil"' in gaveta and 'data-painel="rede"' in gaveta)
+    # Desde 13/11/2026 a rede tem a gaveta propria (Jogar junto); o Perfil leva tambem o Enviar recordes.
+    amigos = html.split('id="gavetaAmigos"', 1)[-1].split("</aside>", 1)[0]
+    confere("gaveta Perfil so com o perfil (e o Enviar recordes); a rede na gaveta Jogar junto",
+            'data-painel="perfil"' in gaveta and 'data-painel="rede"' not in gaveta and 'id="btnEnviarPerfil"' in gaveta
+            and 'data-painel="rede"' in amigos and 'id="btnEnviarAgora"' in amigos)
     confere("campo e botao de trocar o apelido na gaveta",
             'id="campoApelido"' in gaveta and 'id="btnTrocarApelido"' in gaveta)
     ajustes = html.split('id="gavetaAjustes"', 1)[-1].split("</aside>", 1)[0]
     confere("Ajustes sem as abas Amigos e Perfil",
             'data-aba="rede"' not in ajustes and 'data-aba="perfil"' not in ajustes)
-    confere("botoes do topo ligados (Perfil e Amigos abrem a gaveta)",
-            'abrirPerfil("perfil")' in js and 'abrirPerfil("rede")' in js and "trocarApelido()" in js)
+    confere("botoes do topo ligados (Perfil e Jogar junto abrem a gaveta de cada um)",
+            'abrirGaveta("gavetaPerfil")' in js and 'abrirGaveta("gavetaAmigos")' in js and "trocarApelido()" in js)
 
     print()
     if falhas:

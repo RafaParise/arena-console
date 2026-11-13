@@ -11,13 +11,14 @@ Ver a pontuação dos colegas e jogar junto, com ou sem Wi-Fi.
 
 ### Meu perfil
 
-O botão com o **seu apelido**, no topo da tela, abre a gaveta **Perfil**,
-com duas abas:
+Dois botões no topo da tela (desde a versão 2026.11.13):
 
-| Aba | O que tem |
+| Botão | O que tem |
 |---|---|
-| **Meu perfil** | Foto opcional (PNG, JPG ou WEBP, até 2 MB — o ARENA recorta e reduz sozinho pra 256×256, bem leve), **o apelido, que dá para trocar a qualquer hora** (campo + **Salvar apelido**), o código deste ARENA, os recordes guardados e o **Começar do zero** |
-| **Amigos** | Seu código de amigo, a lista de amigos, **Aceitar conexões da rede**, seus endereços, a atividade na rede e a troca pelo pen drive. O botão **Amigos** do topo abre direto aqui |
+| **o seu apelido** (gaveta **Perfil**) | Foto opcional (PNG, JPG ou WEBP, até 2 MB — o ARENA recorta e reduz sozinho pra 256×256, bem leve), **o apelido, que dá para trocar a qualquer hora** (campo + **Salvar apelido**), o código deste ARENA, os recordes guardados, o **Enviar recordes** e o **Começar do zero** |
+| **Jogar junto** | Seu código de amigo, a lista de amigos, **Aceitar conexões da rede**, as partidas entre casas, seus endereços, a atividade na rede, o **Enviar recordes** e a troca pelo pen drive. O número amarelo no botão é o de recordes esperando para subir |
+
+Os recordes da turma ficam em **Conquistas**, nas abas **Pontuação** e **Tempo de jogo**.
 
 Tudo fica salvo em `dados\` (a foto em `dados\perfil\`), permanente —
 sobrevive a fechar e abrir o ARENA, e trocar de pen drive não perde nada se
@@ -112,7 +113,7 @@ seu pacote.
 
 Se não dá para ligar as máquinas de jeito nenhum, os recordes ainda viajam.
 
-1. No seu ARENA: **Perfil → Amigos → Trocar pelo pen drive**.
+1. No seu ARENA: **Jogar junto → Trocar pelo pen drive**.
 2. Leve o pen drive até a máquina do colega.
 3. No ARENA dele, o mesmo botão.
 4. Volte e clique de novo no seu.
@@ -142,7 +143,7 @@ controle do roteador da escola.
 
 ### Passo 3 — Deixe o colega te achar
 
-**Perfil → Amigos → Aceitar conexões da rede.**
+**Jogar junto → Aceitar conexões da rede.**
 
 Ligue. **Vale na hora**: não precisa fechar o ARENA. (Até setembro de 2026
 precisava fechar e abrir; se o seu ARENA for mais antigo, ainda precisa.)
@@ -181,7 +182,7 @@ Na primeira vez o Windows pergunta se o Python pode se comunicar na rede.
 
 #### O jeito fácil: o código de amigo
 
-Em **Perfil → Amigos** aparece o **seu código de amigo**, no formato
+Em **Jogar junto** (no alto) aparece o **seu código de amigo**, no formato
 `ARENA-7YD1-R2VX`. Dite o seu para o colega (e anote o dele): ele digita em
 **Código do amigo** e clica em **Adicionar pelo código**.
 
@@ -222,7 +223,7 @@ porta. Não leva recorde, não leva nome, não sai da rede local.
 
 #### O jeito manual
 
-**Perfil → Amigos.**
+**Jogar junto**, no alto.
 
 1. **Apelido do amigo** — o apelido dele.
 2. **Endereço que ele te passou** — pode digitar só o número; o ARENA
@@ -236,7 +237,8 @@ Fica guardado. Não precisa repetir.
 
 ### Passo 5 — Sincronize
 
-Clique em **Enviar recordes**, no topo.
+Clique em **Jogar junto**, no alto, e depois em **Enviar recordes** (o mesmo botão está
+no seu **Perfil**).
 
 O ARENA fala com todos os amigos de uma vez e mostra quem respondeu, quem
 estava fora do ar, quanto foi enviado e quanto chegou.
@@ -253,7 +255,8 @@ sincroniza sozinho.
 
 ### Ver as estatísticas dos amigos
 
-Depois de sincronizar, clique em **Recordes**, no topo. Duas abas.
+Depois de sincronizar, clique em **Conquistas**, no alto. Os recordes estão nas abas
+**Pontuação** e **Tempo de jogo**.
 
 #### Aba Pontuação
 
@@ -291,7 +294,7 @@ Partida de menos de 30 segundos não conta — abrir e fechar não é jogar.
 | Quem jogou mais? | Aba Tempo de jogo |
 | Que jogos meus amigos andam jogando? | Os títulos que aparecem nas duas abas |
 | Meu recorde ainda está de pé? | Procure seu apelido na lista |
-| Quantos recordes meus ainda não subiram? | O número amarelo no botão Enviar recordes |
+| Quantos recordes meus ainda não subiram? | O número amarelo no botão Jogar junto |
 
 #### Por que um amigo não aparece
 
@@ -313,7 +316,7 @@ vê os três — porque o que a Marina mandou passou pelo ARENA do Lucas.
 Mas se você nunca sincronizou com ninguém, vê só o seu.
 
 Para ver o placar completo da turma, abra **o endereço do servidor da
-escola** no navegador e clique em Recordes lá.
+escola** no navegador e clique em Conquistas lá.
 
 ---
 
@@ -461,7 +464,7 @@ Para quem vai centralizar o placar na TV.
 4. Libere no firewall quando o Windows perguntar.
 
 Para projetar: abra o endereço do servidor no navegador da TV e clique em
-**Recordes**.
+**Conquistas**.
 
 #### Se o firewall não perguntou
 
@@ -859,7 +862,7 @@ aparelho com o repasse do ARENA (`servidor\repasse_proprio.py`): é ele quem
 passa os dados de uma casa para a outra. Ninguém aparece em lista nenhuma
 da internet. Funciona assim:
 
-1. Uma vez só: botão **Amigos**, no alto → **Partidas entre casas** →
+1. Uma vez só: botão **Jogar junto**, no alto → **Partidas entre casas** →
    escreva o endereço que o professor passou → **Testar** → **Guardar**.
 2. Quem abre: **Jogar junto** → **Eu abro a partida** → ligue **Estamos em
    casas diferentes** → **Começar**. No alto da tela aparece o **código da

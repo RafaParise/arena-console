@@ -7873,7 +7873,7 @@ class Manipulador(BaseHTTPRequestHandler):
                 # ar" para sempre, sem dizer por que.
                 return self.erro(ENDERECO_ESTRANHO)
             if len(config["servidores"]) >= 20:
-                return self.erro("Você já tem 20 amigos, o máximo. Remova um (Perfil → Amigos) para adicionar outro.")
+                return self.erro("Você já tem 20 amigos, o máximo. Remova um (Jogar junto, no alto) para adicionar outro.")
             if any(a["apelido"].lower() == apelido.lower()
                    for a in config["servidores"]):
                 return self.erro("Já existe um amigo com esse apelido. Escolha outro apelido para ele.")

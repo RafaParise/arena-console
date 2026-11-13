@@ -187,7 +187,9 @@ def baixar_o_axe():
 def estados(nav):
     """(nome, JS que liga o estado, JS que desliga) de cada tela, gaveta (e aba de gaveta) e janela do ARENA."""
     lista = [("inicio", "1", "1")]
-    lista.append(("detalhes_do_jogo", "selecionarJogo(estado.jogos[0]); true", "1"))
+    # Na tela estreita (celular) o painel e' uma barra retratil (13/11/2026): abre para o axe olhar dentro e fecha depois.
+    lista.append(("detalhes_do_jogo", "selecionarJogo(estado.jogos[0]); abrirDetalhes(); true",
+                  "fecharDetalhes(); true"))
     gavetas = nav.avaliar("JSON.stringify([...document.querySelectorAll('.gaveta')].map(g => ({id: g.id, abas: [...g.querySelectorAll('[role=tab]')].map(a => a.dataset.aba)})))")
     for g in json.loads(gavetas):
         ligar = "abrirGaveta('%s'); true" % g["id"]

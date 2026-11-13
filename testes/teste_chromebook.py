@@ -239,7 +239,9 @@ def parte_a(nav, endereco):
     r["origens"] = nav.avaliar("ArenaRotas.estado.jogos.reduce((c, j) => (c[j.origem] = (c[j.origem] || 0) + 1, c), {})")
     r["manifesto"] = nav.avaliar("ArenaRotas.estado.manifesto ? (ArenaRotas.estado.manifesto.feito_no_navegador ? 'aqui' : 'windows') : null")
     r["escondidos"] = nav.avaliar(
-        "['btnAmigos', 'btnSincronizar', 'btnAcervo'].every((id) => getComputedStyle(document.getElementById(id)).display === 'none')"
+        # o bloco marcado data-so-windows (o Enviar recordes do Perfil fica dentro de um, desde 13/11/2026)
+        "['btnAmigos', 'btnEnviarPerfil', 'btnAcervo'].every((id) => getComputedStyle(document.getElementById(id)"
+        ".closest('[data-so-windows]')).display === 'none')"
         " && ['avancado', 'emuladores', 'controles'].every((a) => getComputedStyle(document.querySelector("
         "'#gavetaAjustes .aba[data-aba=\"' + a + '\"]')).display === 'none')")
     # A capa: o jogo que vem junto fica com a do igual do pen drive.
@@ -266,10 +268,10 @@ def parte_a(nav, endereco):
         "(async () => { const j = ArenaRotas.estado.jogos.find((x) => x.titulo === 'Slippery Slope' && x.origem === 'vem_com');"
         " const d = await (await fetch('/api/jogo?id=' + encodeURIComponent(j.id))).json();"
         " return d.estados && d.estados[0] && d.estados[0].existe; })()")
-    # Os recordes: a pontuacao registrada aparece na gaveta Recordes.
+    # Os recordes: a pontuacao registrada aparece na gaveta Conquistas e recordes (desde 13/11/2026).
     nav.avaliar("fetch('/api/placar', {method: 'POST', headers: {'Content-Type': 'application/json'},"
                 " body: JSON.stringify({jogo_id: 'vem-com/CHIP-8/slipperyslope.ch8', pontos: 1234, apelido: 'teste'})})"
-                ".then(() => document.getElementById('btnRecordes').click()); 1")
+                ".then(() => document.getElementById('btnConquistas').click()); 1")
     r["recorde"] = esperar(nav, "document.getElementById('rankingPontos').textContent.includes('1.234')", 10)
     # A foto do perfil, guardada no navegador e mostrada pela tela.
     foto = "data:image/png;base64," + base64.b64encode(png_quadrado(24, (30, 120, 220))).decode("ascii")

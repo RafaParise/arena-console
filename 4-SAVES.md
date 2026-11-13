@@ -409,7 +409,7 @@ uma cópia, é *Ajustes → Máquina → Fazer cópia agora*.
 ### Sem internet, nada se perde
 
 Você joga a tarde inteira sem rede. Cada pontuação fica guardada, marcada
-como pendente — o número amarelo no botão **Enviar recordes** mostra
+como pendente — o número amarelo no botão **Jogar junto** mostra
 quantas.
 
 Quando encontrar um amigo ligado ou chegar na escola, sobe tudo. Se você

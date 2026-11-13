@@ -44,15 +44,13 @@
       <img id="perfilMini" class="perfil-mini" alt="" hidden>
       <span id="perfilMiniNome">Perfil</span>
     </button>
-    <button class="botao" id="btnAmigos" type="button" data-so-windows>Amigos</button>
-    <button class="botao" id="btnRecordes" type="button">Recordes</button>
+    <!-- Jogar junto (13/11/2026, pedido do Rafael): os amigos, a rede e o envio de recordes numa gaveta so; o numero
+         amarelo e' o de recordes esperando para subir. Os recordes ficam dentro de Conquistas. -->
+    <button class="botao" id="btnAmigos" type="button" data-so-windows>Jogar junto <span class="selo" id="seloPendentes" hidden>0</span></button>
     <button class="botao" id="btnConquistas" type="button">Conquistas</button>
     <button class="botao" id="btnAcervo" type="button" data-so-windows>Biblioteca</button>
-    <button class="botao" id="btnEquipamentos" type="button" aria-label="Equipamentos: o que o ARENA tem e o que falta">🧰 Equipamentos</button>
+    <button class="botao" id="btnEquipamentos" type="button" aria-label="Equipamentos: o que o ARENA tem e o que falta"><span aria-hidden="true">🧰</span><span class="rotulo-compacto"> Equipamentos</span></button>
     <button class="botao botao-tema" id="btnTema" type="button" aria-label="Alternar modo de cor">☾ Escuro</button>
-    <button class="botao" id="btnSincronizar" type="button" data-so-windows>
-      Enviar recordes <span class="selo" id="seloPendentes" hidden>0</span>
-    </button>
     <button class="botao" id="btnAjustes" type="button">Ajustes</button>
   </div>
 </header>
@@ -84,9 +82,10 @@
   <!-- No celular nao ha F2, F10 nem Esc: o controle de toque tem os botoes MENU (salvar, carregar, cheats, sair
        para o ARENA) e SAIR (toque duas vezes), e o controle de verdade abre o menu com os dois analogicos
        apertados (servidor\plataforma.py, BOTOES_DO_TOQUE; EXPLICA_BOTOES_NA_TELA no app.js). -->
-  <span class="faixa-tecla" data-so-android hidden><kbd>MENU</kbd> abre o menu (salvar, carregar)</span>
-  <span class="faixa-tecla" data-so-android hidden><kbd>SAIR</kbd> fecha o jogo (toque duas vezes)</span>
-  <span class="faixa-tecla" data-so-android hidden><kbd>L3 + R3</kbd> abre o menu pelo controle</span>
+  <!-- Frases curtas (13/11/2026): com o celular deitado, as tres cabem numa linha. -->
+  <span class="faixa-tecla" data-so-android hidden><kbd>MENU</kbd> salvar e carregar</span>
+  <span class="faixa-tecla" data-so-android hidden><kbd>SAIR</kbd> fecha o jogo (2 toques)</span>
+  <span class="faixa-tecla" data-so-android hidden><kbd>L3 + R3</kbd> menu pelo controle</span>
 </div>
 
 <main class="corpo">
@@ -150,7 +149,14 @@
     </div>
   </section>
 
+  <!-- Na tela estreita (celular, tablet, janela pela metade) o painel do jogo vira uma barra que entra pela direita
+       (13/11/2026, pedido do Rafael: nada do PC fica de fora do celular -- o Desafio em rede, os saves, a capa...).
+       Abre ao tocar na capa ou na alca "Jogo"; fecha no Fechar, no Esc, no voltar do Android ou tocando fora. -->
+  <button class="botao detalhes-alca" id="btnAbrirDetalhes" type="button" aria-controls="detalhesJogo"
+          aria-expanded="false" aria-label="Abrir o painel do jogo"><span aria-hidden="true">‹</span> Jogo</button>
   <aside class="detalhes-jogo" id="detalhesJogo" aria-labelledby="detalhesTitulo">
+    <button class="botao detalhes-fechar" id="btnFecharDetalhes" type="button"
+            aria-label="Fechar o painel do jogo">Fechar <span aria-hidden="true">›</span></button>
     <div class="detalhes-capa" id="detalhesCapa" aria-hidden="true">AR</div>
     <div class="detalhes-corpo">
       <span class="detalhes-kicker" id="detalhesConsole">Sua biblioteca</span>
@@ -198,11 +204,6 @@
     <button class="botao botao--fechar" data-fechar="gavetaPerfil" type="button">Fechar</button>
   </div>
 
-  <div class="abas" role="tablist">
-    <button class="aba ativo" role="tab" data-aba="perfil" type="button">Meu perfil</button>
-    <button class="aba" role="tab" data-aba="rede" type="button" data-so-windows>Amigos</button>
-  </div>
-
   <div class="aba-conteudo" data-painel="perfil">
     <div>
       <h3 class="grupo-titulo">Este ARENA agora</h3>
@@ -239,6 +240,12 @@
     </div>
 
     <div data-so-windows>
+      <h3 class="grupo-titulo">Enviar recordes</h3>
+      <p class="explica" id="statusPendentesPerfil">Nenhum recorde aguardando envio.</p>
+      <button class="botao botao--principal" id="btnEnviarPerfil" type="button">Enviar recordes</button>
+    </div>
+
+    <div data-so-windows>
       <h3 class="grupo-titulo">Começar do zero</h3>
       <p class="explica">Apaga o perfil e as configurações. Os jogos ficam.</p>
 
@@ -257,7 +264,17 @@
     </div>
   </div>
 
-  <div class="aba-conteudo" data-painel="rede" hidden>
+</aside>
+
+<!-- ===================== JOGAR JUNTO ===================== -->
+<!-- Os amigos, a rede, as partidas entre casas e o envio de recordes (13/11/2026: antes era a aba Amigos do Perfil). -->
+<aside class="gaveta" id="gavetaAmigos" hidden aria-labelledby="tituloAmigos">
+  <div class="gaveta-cabeca">
+    <h2 id="tituloAmigos">Jogar junto</h2>
+    <button class="botao botao--fechar" data-fechar="gavetaAmigos" type="button">Fechar</button>
+  </div>
+
+  <div class="aba-conteudo" data-painel="rede">
     <div>
       <h3 class="grupo-titulo">Meus amigos</h3>
       <p class="explica">Adicione amigos pelo código.</p>
@@ -347,9 +364,11 @@
       <h3 class="grupo-titulo">Atividade na rede</h3>
       <p class="explica">Partidas abertas na rede local.</p>
       <ul class="controles" id="listaColegas"></ul>
+
+      <h3 class="grupo-titulo">Enviar recordes</h3>
       <p class="explica" id="statusPendentes">Nenhum recorde aguardando envio.</p>
       <button class="botao botao--principal" id="btnEnviarAgora" type="button">
-        Sincronizar agora
+        Enviar recordes
       </button>
     </div>
 
@@ -368,7 +387,6 @@
 
     <p class="explica rede-automatica">Descoberta local automática. IPs ficam ocultos.</p>
   </div>
-
 </aside>
 
 <!-- ===================== JOGOS BAIXADOS ===================== -->
@@ -1341,30 +1359,24 @@
 </aside>
 
 <!-- ===================== GAVETA DE CONQUISTAS ===================== -->
+<!-- Conquistas e recordes (13/11/2026, pedido do Rafael: os recordes dentro de Conquistas). -->
 <aside class="gaveta" id="gavetaConquistas" hidden aria-labelledby="tituloConquistas">
   <div class="gaveta-cabeca">
-    <h2 id="tituloConquistas">Conquistas da turma</h2>
+    <h2 id="tituloConquistas">Conquistas e recordes</h2>
     <button class="botao botao--fechar" data-fechar="gavetaConquistas" type="button">Fechar</button>
-  </div>
-  <div class="aba-conteudo">
-    <p class="explica">Conquistas da turma.</p>
-    <div id="listaConquistas" class="conquistas-lista"></div>
-  </div>
-</aside>
-
-<!-- ===================== GAVETA DE RECORDES ===================== -->
-<aside class="gaveta" id="gavetaRecordes" hidden aria-labelledby="tituloRecordes">
-  <div class="gaveta-cabeca">
-    <h2 id="tituloRecordes">Recordes</h2>
-    <button class="botao botao--fechar" data-fechar="gavetaRecordes" type="button">Fechar</button>
   </div>
 
   <div class="abas" role="tablist">
-    <button class="aba ativo" role="tab" data-aba="pontos" type="button">Pontuação</button>
+    <button class="aba ativo" role="tab" data-aba="conquistas" type="button">Conquistas</button>
+    <button class="aba" role="tab" data-aba="pontos" type="button">Pontuação</button>
     <button class="aba" role="tab" data-aba="tempo" type="button">Tempo de jogo</button>
   </div>
 
-  <div class="aba-conteudo" data-painel="pontos"><div id="rankingPontos"></div></div>
+  <div class="aba-conteudo" data-painel="conquistas">
+    <p class="explica">Conquistas da turma.</p>
+    <div id="listaConquistas" class="conquistas-lista"></div>
+  </div>
+  <div class="aba-conteudo" data-painel="pontos" hidden><div id="rankingPontos"></div></div>
   <div class="aba-conteudo" data-painel="tempo" hidden><div id="rankingTempo"></div></div>
 </aside>
 

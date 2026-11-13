@@ -869,6 +869,7 @@ input::placeholder { color: var(--texto-apagado); }
 .detalhes-capa .capa-imagem { z-index: 1; object-fit: contain; padding: 4%; box-sizing: border-box;
   filter: drop-shadow(0 8px 14px rgba(0,0,0,.5)); }
 .detalhes-corpo { padding: 1rem; }
+.detalhes-alca, .detalhes-fechar { display: none; }
 .detalhes-kicker { color: var(--destaque-texto); font-size: var(--t-micro); text-transform: uppercase; letter-spacing: .08em; }
 .detalhes-corpo h2 { margin: .3rem 0 .5rem; font: 600 var(--t-med) var(--fonte-titulo); }
 .detalhes-descricao { color: var(--texto-fraco); font-size: var(--t-peq); }
@@ -1245,7 +1246,31 @@ input::placeholder { color: var(--texto-apagado); }
   .trilho-item--todos { font-size: var(--t-peq); }
   .conteudo { padding: 1rem; }
   .jogos { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
-  .detalhes-jogo { display: none; }
+  /* O painel do jogo vira uma barra retratil que entra pela direita (13/11/2026; antes sumia, e o Desafio em rede,
+     os saves e a capa ficavam fora do celular). Fechada, sai da tela e do Tab (visibility). */
+  .detalhes-jogo {
+    position: fixed; top: 0; right: 0; bottom: 0; z-index: 25;
+    width: min(320px, 88vw); flex: none; margin: 0;
+    border-radius: 16px 0 0 16px; border-right: 0;
+    box-shadow: -12px 0 32px rgba(0, 0, 0, .45);
+    transform: translateX(105%); visibility: hidden;
+    transition: transform .22s ease, visibility .22s;
+  }
+  .detalhes-jogo.detalhes--aberto { transform: none; visibility: visible; }
+  .detalhes-fechar {
+    display: flex; align-items: center; gap: .35rem; position: sticky; top: 0; z-index: 2; margin: 0 0 0 auto;
+    min-height: 44px; border-radius: 0 0 0 12px;
+  }
+  .detalhes-alca {
+    display: block; position: fixed; right: 0; top: 50%; z-index: 15;
+    transform: translateY(-50%); min-height: 44px; padding: .5rem .6rem;
+    border-radius: 12px 0 0 12px; border-right: 0;
+    box-shadow: -4px 0 14px rgba(0, 0, 0, .35);
+  }
+  .detalhes-alca[aria-expanded="true"] { display: none; }
+}
+@media (max-width: 1050px) and (prefers-reduced-motion: reduce) {
+  .detalhes-jogo { transition: none; }
 }
 
 @media (max-width: 560px) {
@@ -1287,6 +1312,31 @@ input::placeholder { color: var(--texto-apagado); }
     flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start;
   }
   .topo-acoes > .botao { flex: 0 0 auto; white-space: nowrap; min-height: 44px; }
+}
+
+/* Celular deitado e telas baixas (13/11/2026, foto do Rafael no A12): o topo virava duas fileiras de botoes e a faixa
+   das teclas tomava um terco da altura. Agora o topo fica numa linha so, com letra e botao menores (o que nao couber
+   rola para o lado), e a faixa das teclas fica com letra menor. */
+@media (max-height: 500px) and (min-width: 701px) {
+  .painel-topo { flex-wrap: nowrap; align-items: center; min-height: 0; padding: .3rem .75rem; gap: .6rem; }
+  .marca { width: auto; flex-shrink: 0; align-items: center; }
+  .marca-icone { width: 26px; height: 26px; }
+  .marca-nome { font-size: var(--t-med); }
+  .topo-acoes {
+    margin-left: auto; flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start;
+    gap: .35rem; min-width: 0; flex-shrink: 1;
+  }
+  .topo-acoes > .botao { flex: 0 0 auto; white-space: nowrap; padding: .3rem .6rem; font-size: var(--t-peq);
+                         min-height: 38px; }
+  .detalhes-jogo .detalhes-capa { max-height: 42vh; }
+}
+@media (max-height: 500px), (max-width: 1050px) {
+  .faixa-teclas { font-size: var(--t-peq); gap: .2rem .9rem; padding: .3rem .75rem; border-bottom-width: 1px; }
+  .faixa-teclas kbd { min-width: 0; padding: .05em .4em; border-bottom-width: 2px; }
+}
+/* So o icone dos Equipamentos onde o topo aperta (o nome fica no aria-label). */
+@media (max-height: 500px), (max-width: 700px) {
+  .rotulo-compacto { display: none; }
 }
 
 /* Celular (de pe ou deitado, como o app do Android): os consoles sem jogo

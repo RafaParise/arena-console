@@ -37,8 +37,9 @@ import limpeza  # noqa: E402
 import tela_sem_janela  # noqa: E402
 import teste_servidor_que_cai as servidor_de_teste  # noqa: E402
 
-GAVETAS = ["gavetaPerfil", "gavetaComoColocar", "gavetaAcervo", "gavetaAjustes", "gavetaConquistas",
-           "gavetaRecordes", "gavetaJogo"]
+# Desde 13/11/2026 os recordes ficam dentro de Conquistas e a rede na gaveta Jogar junto (gavetaAmigos).
+GAVETAS = ["gavetaPerfil", "gavetaAmigos", "gavetaComoColocar", "gavetaAcervo", "gavetaAjustes", "gavetaConquistas",
+           "gavetaJogo"]
 LETRA_MINIMA_PX = 11.0
 
 CONFERIR = r"""
