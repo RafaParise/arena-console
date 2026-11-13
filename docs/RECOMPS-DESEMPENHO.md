@@ -48,11 +48,31 @@ Ainda **sem perfil**:
 - **Os outros recomps de N64** (Starfox, Goemon, DK64...): devem usar o mesmo `graphics.json`, mas as chaves mudam de
   um para outro. Cada um precisa ser conferido antes de entrar. [Provável]
 
+## UnleashedRecomp (Sonic Unleashed, Xbox 360): feito
+
+Arquivo `config.toml`, seção `[Video]`. O escritor passou a entender seção de TOML e INI: procura a chave dentro da
+seção, acrescenta no fim dela e cria a seção quando falta.
+
+| Sistema | Onde fica o arquivo |
+|---|---|
+| Windows | `%APPDATA%\UnleashedRecomp\config.toml` |
+| Linux | `~/.config/UnleashedRecomp/config.toml` |
+
+[Certo nos dois]
+
+| nível | o que o ARENA grava |
+|---|---|
+| fraco | `ResolutionScale = 0.5`, `AntiAliasing = "None"`, `TransparencyAntiAliasing = false`, `ShadowResolution = "512"`, `GITextureFiltering = "Bilinear"`, `DepthOfFieldQuality = "Low"`, `MotionBlur = "Off"`, `FPS = 30` |
+| médio | `ResolutionScale = 0.75`, `AntiAliasing = "2x MSAA"`, `ShadowResolution = "2048"`, `DepthOfFieldQuality = "Medium"` |
+
+**Exige AVX** [Certo, [README](https://github.com/hedge-dev/UnleashedRecomp#minimum-system-requirements): "CPU with
+support for the AVX instruction set"]. Sem AVX (o Celeron N5100), o ARENA não baixa nem abre e explica o motivo
+(`recomps.falta_no_processador`). Ele também pede placa com Direct3D 12 ou Vulkan 1.2.
+
 ## O que falta (precisa mudar o escritor primeiro)
 
 | Motor | Arquivo | O que falta |
 |---|---|---|
-| UnleashedRecomp (Xbox 360) | `%APPDATA%\UnleashedRecomp\config.toml`, seção `[Video]` | o escritor precisa entender seção de TOML e INI (hoje a chave nova vai para o fim do arquivo, na última seção) |
 | libultraship (Shipwright e parentes) | `shipofharkinian.json`, com as chaves dentro de `"CVars"` | mescla em profundidade no JSON |
 | dusklight (GameCube) | `config.json` plano (o escritor já atende) | o caminho fora do modo portátil e o sentido de `game.internalResolutionScale` não foram confirmados |
 | SuperTuxKart, OpenRA | XML e YAML | o escritor não lê esses formatos |

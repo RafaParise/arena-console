@@ -422,12 +422,35 @@ def _desembrulhar(destino):
     os.rmdir(de)
 
 
+# Recomp que exige uma instrucao do processador que o notebook da escola (Celeron N5100) nao tem. Conferido no README
+# de cada um (13/11/2026): o UnleashedRecomp pede AVX ("CPU with support for the AVX instruction set").
+EXIGE_AVX = {"unleashedrecomp"}
+
+
+def falta_no_processador(recomp_id, instrucoes=None):
+    """A frase de por que o recomp nao roda neste processador, ou "" (roda, ou nao deu para saber)."""
+    if recomp_id not in EXIGE_AVX:
+        return ""
+    if instrucoes is None:
+        try:
+            import hardware
+            instrucoes = hardware.instrucoes()
+        except Exception:  # noqa: BLE001 -- sem saber, nao impede
+            instrucoes = None
+    if instrucoes and instrucoes.get("avx") is False:
+        return ("Esta versão para PC exige processador com AVX, e o deste computador não tem (é o caso do Celeron "
+                "N5100). Escolha abrir pelo emulador.")
+    return ""
+
+
 def instalar(recomp_id, sistema_alvo=None, arq=None):
     """Baixa e descompacta o recomp em emuladores\\Recomps\\<id>. Devolve o caminho do programa. Lanca
     NaoDaParaInstalar com a frase para o aluno; o andamento fica em PROGRESSO[recomp_id]."""
     r = recomp(recomp_id)
     if not r:
         raise NaoDaParaInstalar("Esse recomp não está no catálogo do ARENA.")
+    if falta_no_processador(recomp_id):
+        raise NaoDaParaInstalar(falta_no_processador(recomp_id))
     sistema_alvo = sistema_alvo or sistema()
     arq = arq or arquitetura()
     if not sistema_alvo or sistema_alvo not in r.get("sistemas", []):
@@ -784,6 +807,34 @@ RT64 = {
 }
 
 
+# UnleashedRecomp (Sonic Unleashed, Xbox 360): config.toml, secao [Video]. No Windows em %APPDATA%\UnleashedRecomp;
+# no Linux em ~/.config/UnleashedRecomp (ou ~/.UnleashedRecomp sem o ~/.config). Fontes: hedge-dev/UnleashedRecomp
+# UnleashedRecomp/user/config_def.h (chaves e padroes), config.cpp (os textos aceitos) e paths.cpp (o lugar).
+UNLEASHED = "unleashedrecomp"
+
+
+def _toml(valor):
+    """O valor escrito em TOML: texto entre aspas, verdadeiro/falso em minusculas, numero como esta."""
+    if isinstance(valor, bool):
+        return "true" if valor else "false"
+    if isinstance(valor, (int, float)):
+        return str(valor)
+    return _valor_toml(str(valor))
+
+
+def _perfil_unleashed(nivel, windows):
+    if nivel == "fraco":
+        chaves = {"ResolutionScale": 0.5, "AntiAliasing": "None", "TransparencyAntiAliasing": False,
+                  "ShadowResolution": "512", "GITextureFiltering": "Bilinear", "DepthOfFieldQuality": "Low",
+                  "MotionBlur": "Off", "FPS": 30}
+    else:
+        chaves = {"ResolutionScale": 0.75, "AntiAliasing": "2x MSAA", "ShadowResolution": "2048",
+                  "DepthOfFieldQuality": "Medium"}
+    arquivo = "{config}/UnleashedRecomp/config.toml" if windows else "{home}/.config/UnleashedRecomp/config.toml"
+    return {"file": arquivo, "format": "toml", "section": "Video",
+            "ensure": {k: _toml(v) for k, v in chaves.items()}}
+
+
 def nivel_da_placa(nota_gpu):
     """'fraco' (nota 1 e 2), 'medio' (3) ou 'forte' (4 e 5). Sem nota: medio."""
     try:
@@ -796,11 +847,13 @@ def nivel_da_placa(nota_gpu):
 def ajuste_da_maquina(recomp_id, nota_gpu, windows=None):
     """A entrada 'config' (o formato do descritor) com o perfil desta maquina, ou None quando nao ha o que mudar
     (motor nao conferido ou placa forte)."""
-    if recomp_id not in RT64:
+    if recomp_id not in RT64 and recomp_id != UNLEASHED:
         return None
     nivel = nivel_da_placa(nota_gpu)
     if nivel == "forte":
         return None
+    if recomp_id == UNLEASHED:
+        return _perfil_unleashed(nivel, plataforma_do_sistema.WINDOWS if windows is None else windows)
     pasta, tem_hpfb, sem_ds = RT64[recomp_id]
     windows = plataforma_do_sistema.WINDOWS if windows is None else windows
     arquivo = ("{local}/%s/graphics.json" if windows else "{home}/.config/%s/graphics.json") % pasta
@@ -860,9 +913,10 @@ def escrever_configuracao(descritor, vars_):
                     linhas = arquivo.read().splitlines() if existia else []
             except OSError:
                 linhas = []
-            linhas = _escrever_chaves(linhas, novos, so_se_falta=True)
-            linhas = _escrever_chaves(linhas, garantir, so_se_falta=True, tambem_vazia=True)
-            linhas = _escrever_chaves(linhas, sempre, so_se_falta=False)
+            secao = cfg.get("section") if isinstance(cfg.get("section"), str) else None
+            linhas = _escrever_chaves(linhas, novos, so_se_falta=True, secao=secao)
+            linhas = _escrever_chaves(linhas, garantir, so_se_falta=True, tambem_vazia=True, secao=secao)
+            linhas = _escrever_chaves(linhas, sempre, so_se_falta=False, secao=secao)
             texto = "\n".join(linhas) + "\n"
         temporario = caminho + ".arena-tmp"
         with open(temporario, "w", encoding="utf-8", newline="\n") as saida:
@@ -872,23 +926,56 @@ def escrever_configuracao(descritor, vars_):
     return escritos
 
 
-def _escrever_chaves(linhas, chaves, so_se_falta, tambem_vazia=False):
-    """Linha a linha (TOML e INI): troca o valor de cada chave que existe, acrescenta no fim a que falta."""
+RE_CABECALHO = re.compile(r"^\s*\[([^\[\]]+)\]\s*(?:[#;].*)?$")
+
+
+def _trecho_da_secao(linhas, secao):
+    """(inicio, fim) das linhas da secao [secao] (sem o cabecalho), ou None se ela nao existe. Sem secao: o comeco do
+    arquivo ate o primeiro cabecalho."""
+    if not secao:
+        fim = next((n for n, linha in enumerate(linhas) if RE_CABECALHO.match(linha)), len(linhas))
+        return 0, fim
+    for n, linha in enumerate(linhas):
+        achado = RE_CABECALHO.match(linha)
+        if achado and achado.group(1).strip() == secao:
+            fim = next((m for m in range(n + 1, len(linhas)) if RE_CABECALHO.match(linhas[m])), len(linhas))
+            return n + 1, fim
+    return None
+
+
+def _escrever_chaves(linhas, chaves, so_se_falta, tambem_vazia=False, secao=None):
+    """Linha a linha (TOML e INI): troca o valor de cada chave que existe, acrescenta a que falta. Com 'secao'
+    ([Video] no UnleashedRecomp, 13/11/2026): procura e acrescenta so dentro dela, e cria a secao no fim se ela nao
+    existe. Sem secao, a chave nova vai para o fim do arquivo, como antes."""
     linhas = list(linhas)
     for chave_, valor in chaves.items():
         padrao = re.compile(r"^(\s*)%s(\s*)=(\s*)(.*)$" % re.escape(chave_))
+        trecho = _trecho_da_secao(linhas, secao) if secao else (0, len(linhas))
         achou = False
-        for n, linha in enumerate(linhas):
-            par = padrao.match(linha)
-            if not par:
-                continue
-            achou = True
-            vazia = par.group(4).strip().strip('"').strip("'") == ""
-            if not so_se_falta or (tambem_vazia and vazia):
-                linhas[n] = "%s%s%s=%s%s" % (par.group(1), chave_, par.group(2) or " ", par.group(3) or " ", valor)
-            break
-        if not achou:
-            linhas.append("%s = %s" % (chave_, valor))
+        if trecho:
+            for n in range(trecho[0], trecho[1]):
+                par = padrao.match(linhas[n])
+                if not par:
+                    continue
+                achou = True
+                vazia = par.group(4).strip().strip('"').strip("'") == ""
+                if not so_se_falta or (tambem_vazia and vazia):
+                    linhas[n] = "%s%s%s=%s%s" % (par.group(1), chave_, par.group(2) or " ", par.group(3) or " ", valor)
+                break
+        if achou:
+            continue
+        nova = "%s = %s" % (chave_, valor)
+        if not secao:
+            linhas.append(nova)
+        elif trecho is None:
+            if linhas and linhas[-1].strip():
+                linhas.append("")
+            linhas += ["[%s]" % secao, nova]
+        else:
+            fim = trecho[1]
+            while fim > trecho[0] and not linhas[fim - 1].strip():
+                fim -= 1                         # antes das linhas em branco que separam da proxima secao
+            linhas.insert(fim, nova)
     return linhas
 
 
@@ -962,6 +1049,8 @@ def externo_para(recomp_id, caminho_jogo, avisar=print, nota_gpu=None):
     programa = instalado(recomp_id)
     if not programa:
         raise NaoDaParaInstalar("%s ainda não foi baixado." % r["nome"])
+    if falta_no_processador(recomp_id):
+        raise NaoDaParaInstalar(falta_no_processador(recomp_id))
     descritor = ler_descritor(pasta) or {}
     base = descritor.get("_pasta", pasta)
     vars_ = variaveis(base, caminho_jogo)

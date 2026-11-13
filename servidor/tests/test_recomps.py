@@ -523,5 +523,54 @@ class TestDesempenhoPorMaquina(unittest.TestCase):
         self.assertEqual(dados["msaa_option"], "None")         # o que faltava entrou
 
 
+class TestSecaoEUnleashed(unittest.TestCase):
+    """Secao de TOML/INI no escritor e o perfil do UnleashedRecomp (13/11/2026)."""
+
+    def test_chave_que_existe_na_secao_certa(self):
+        linhas = ["[System]", "FPS = 99", "", "[Video]", "FPS = 60", "VSync = true", "", "[Audio]", "Volume = 1"]
+        saida = recomps._escrever_chaves(linhas, {"FPS": "30"}, so_se_falta=False, secao="Video")
+        self.assertEqual(saida[1], "FPS = 99")             # a de outra secao nao muda
+        self.assertEqual(saida[4], "FPS = 30")
+
+    def test_chave_nova_entra_no_fim_da_secao(self):
+        linhas = ["[Video]", "VSync = true", "", "[Audio]", "Volume = 1"]
+        saida = recomps._escrever_chaves(linhas, {"FPS": "30"}, so_se_falta=True, secao="Video")
+        self.assertEqual(saida, ["[Video]", "VSync = true", "FPS = 30", "", "[Audio]", "Volume = 1"])
+
+    def test_secao_que_falta_e_criada(self):
+        saida = recomps._escrever_chaves(["[Audio]", "Volume = 1"], {"FPS": "30"}, so_se_falta=True, secao="Video")
+        self.assertEqual(saida, ["[Audio]", "Volume = 1", "", "[Video]", "FPS = 30"])
+
+    def test_perfil_do_unleashed_em_toml(self):
+        perfil = recomps.ajuste_da_maquina("unleashedrecomp", 2, windows=True)
+        self.assertEqual(perfil["section"], "Video")
+        self.assertEqual(perfil["file"], "{config}/UnleashedRecomp/config.toml")
+        self.assertEqual(perfil["ensure"]["AntiAliasing"], '"None"')
+        self.assertEqual(perfil["ensure"]["TransparencyAntiAliasing"], "false")
+        self.assertEqual(perfil["ensure"]["ResolutionScale"], "0.5")
+        self.assertIsNone(recomps.ajuste_da_maquina("unleashedrecomp", 5))
+
+    def test_escreve_no_arquivo_de_verdade_sem_estragar_a_escolha(self):
+        pasta = tempfile.mkdtemp(prefix="arena_unleashed_")
+        self.addCleanup(limpeza.apagar_pasta, pasta)
+        arquivo = os.path.join(pasta, "UnleashedRecomp", "config.toml")
+        os.makedirs(os.path.dirname(arquivo))
+        with open(arquivo, "w", encoding="utf-8") as saida:
+            saida.write("\n".join(['[System]', 'Language = "English"', '', '[Video]', 'AntiAliasing = "4x MSAA"', '']))
+        perfil = recomps.ajuste_da_maquina("unleashedrecomp", 1, windows=True)
+        recomps.escrever_configuracao({"config": [perfil]}, {"config": pasta})
+        with open(arquivo, encoding="utf-8") as entrada:
+            texto = entrada.read()
+        self.assertIn('AntiAliasing = "4x MSAA"', texto)       # a escolha da pessoa fica
+        self.assertIn('ShadowResolution = "512"', texto)
+        self.assertLess(texto.index("[Video]"), texto.index("ShadowResolution"))
+
+    def test_sem_avx_nao_baixa_nem_abre(self):
+        self.assertTrue(recomps.falta_no_processador("unleashedrecomp", {"avx": False, "avx2": False}))
+        self.assertEqual(recomps.falta_no_processador("unleashedrecomp", {"avx": True, "avx2": True}), "")
+        self.assertEqual(recomps.falta_no_processador("zelda64recomp", {"avx": False}), "")
+        self.assertEqual(recomps.falta_no_processador("unleashedrecomp", {"avx": None}), "")
+
+
 if __name__ == "__main__":
     unittest.main()
