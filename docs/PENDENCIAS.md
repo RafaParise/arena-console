@@ -1113,3 +1113,11 @@ Falta, nesta ordem:
   frio 740 ms, nenhuma falha); o pacote dos alunos foi montado do zero em `%LOCALAPPDATA%\ARENA-montagem-2026.11.13`
   e conferido (nada de BIOS, save ou dado do professor nos zips). Disco C: com pouco espaço (cerca de 4 GB livres):
   as montagens antigas em `%LOCALAPPDATA%\ARENA-montagem*` podem ser apagadas pelo Rafael quando quiser.
+- **13/11, manhã (2): tela do celular revista (0746d43), pedido do Rafael com foto do A12 deitado.** Topo numa linha
+  e a faixa "No jogo" menor (49 + 35 px no A12); o painel do jogo virou barra retrátil na tela estreita (capa ou alça
+  "‹ Jogo"); Amigos virou **Jogar junto** (gaveta própria, com o Enviar recordes e o número de pendentes); Recordes
+  entrou em **Conquistas**; o Enviar recordes saiu do topo e fica em Jogar junto e no Perfil. O A12 ficou com o APK
+  de produção desta tela (mesmo número 2026.11.13 da release, mas com a tela nova): **a próxima release leva isso**.
+- **Próximo da fila "dá para implementar":** desempenho por máquina nos recomps (conferir as chaves de configuração
+  em cada repositório antes de escrever); depois 60 quadros no GameCube/Wii por jogo, SGSR no celular e NIS, e a foto
+  do PocketStation.
