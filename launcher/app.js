@@ -2311,15 +2311,19 @@ function desenharPainelDoAparelho(painel, grupos) {
         const caixa = document.createElement("div");
         const termo = document.createElement("dt");
         termo.textContent = rotulo;
-        const dado = document.createElement("dd");
-        caixa.append(termo, dado);
+        const definicao = document.createElement("dd");
+        caixa.append(termo, definicao);
+        let dado = definicao;
         let faixa = null;
         if (barra) {
+          // A barrinha vai DENTRO do <dd>, com o numero num <span> proprio: dentro do <div> de um <dl> so pode haver
+          // <dt> e <dd> (auditoria do celular de 13/11/2026, axe "definition-list").
+          dado = document.createElement("span");
           faixa = document.createElement("span");
           faixa.className = "aparelho-barra";
           faixa.setAttribute("role", "img");
           faixa.append(document.createElement("span"));
-          caixa.append(faixa);
+          definicao.append(dado, faixa);
         }
         linhas.set(grupo.titulo + ":" + rotulo, { dado, faixa });
         lista.append(caixa);

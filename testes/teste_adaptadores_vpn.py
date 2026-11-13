@@ -52,7 +52,9 @@ def main():
         suspeito = any(p in nome for p in arena.PALAVRAS_VIRTUAL + arena.PALAVRAS_VPN) or "local*" in nome
         errado = suspeito and e["tipo"] in ("rede_local", "cabo_direto")
         ok = ok and not errado
-        print("  %-16s %-12s %-45s %s" % (e["ip"], e["tipo"], nome[:45], "ERRADO" if errado else "ok"))
+        # O endereco da VPN (Tailscale) sai com o fim escondido: este registro vai para o repositorio publico.
+        mostrado = e["ip"].rsplit(".", 2)[0] + ".x.x" if e["tipo"] == "vpn" else e["ip"]
+        print("  %-16s %-12s %-45s %s" % (mostrado, e["tipo"], nome[:45], "ERRADO" if errado else "ok"))
     print("\nRESULTADO:", "PASSOU" if ok else "FALHOU")
     return 0 if ok else 1
 
