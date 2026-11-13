@@ -310,6 +310,7 @@ class Pagina:
         endereco = self.endereco
         fim = time.monotonic() + segundos
         alvo = None
+        pid = ""
         while time.monotonic() < fim and not alvo:
             pid = adb_texto("shell", "pidof", PACOTE + ":tela").strip()
             if pid:
@@ -323,6 +324,11 @@ class Pagina:
             if not alvo:
                 time.sleep(2)
         if not alvo:
+            # 13/11/2026: o motivo comum e' o APK de PRODUCAO no aparelho (sem a depuracao do WebView, nao ha o canal
+            # deste teste). Dizer isso em vez de "nao apareceu", que parecia defeito da tela.
+            if pid and "webview_devtools_remote_%s" % pid not in adb_texto("shell", "cat", "/proc/net/unix"):
+                raise SystemExit("O ARENA do aparelho e' o APK de producao (sem a depuracao do WebView): este teste "
+                                 "precisa do APK de teste (ferramentas\\montar_android.py --abi arm64-v8a --teste).")
             raise SystemExit("A tela do servidor do ARENA (%s) nao apareceu no WebView em %d s." % (endereco, segundos))
         self.ws = _WebSocket(alvo["webSocketDebuggerUrl"])
         self.n = 0
