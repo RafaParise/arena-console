@@ -1157,3 +1157,10 @@ Falta, nesta ordem:
   ajustes): motor no Automático, `[Display] Found display driver: "vulkan"` e `[Slang] Compiling shader: sgsr1.slang`.
   O A12 do Rafael está no gráfico **mínimo** (sem filtro, de propósito) e voltou ao APK de produção 2026.11.13.2.
   60 quadros no GameCube/Wii já estavam feitos (11/11, 25 jogos): a fila "dá para implementar" acabou.
+
+## 13/11/2026 (noite): versão 2026.11.14 em andamento
+
+- Rodada final começou às ~19h (`docs\rodada_final_bruta.json`, gravado a cada teste; retomar com
+  `ferramentas\rodada_final.py --saida=docs\rodada_final_bruta.json --continuar`). O A12 está com o APK de TESTE.
+- Depois: repetir as falhas sozinhas, VERSAO 2026.11.14, APKs de produção (arm64 e x86_64) com o de produção
+  conferido no A12, pacote dos alunos do zero, nota `docs\RELEASE-2026.11.14.md` (rascunho pronto) e a release.
