@@ -10,13 +10,16 @@ Nada do ARENA de verdade e' tocado (a copia vive no Temp e usa outra porta).
 
 Uso:  servidor\python\python.exe testes\teste_nativo.py [caminho do arena-nativo.exe]
 """
+import base64
 import http.client
 import json
 import os
+import shutil
 import socket
 import subprocess
 import sys
 import time
+import urllib.parse
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
 RAIZ = os.path.dirname(AQUI)
@@ -90,7 +93,7 @@ def fechar(processo, saida, pasta):
 
 
 def principal():
-    nativo = sys.argv[1] if len(sys.argv) > 1 else NATIVO_PADRAO
+    nativo = os.path.abspath(sys.argv[1]) if len(sys.argv) > 1 else NATIVO_PADRAO
     if not os.path.isfile(nativo):
         raise SystemExit("Falta o servidor nativo (%s). Compile com ferramentas\\compilar_nativo.py." % nativo)
     trabalho, pasta = copia.nova_pasta()
@@ -104,6 +107,11 @@ def principal():
             if os.path.isdir(onde):
                 jogos[console] = [os.path.join(onde, n) for n in os.listdir(onde) if not n.endswith((".txt", ".md"))]
         copia.montar(pasta, [], jogos)
+        # O nativo DENTRO da copia (servidor/), como no pacote: ele acha a pasta do ARENA pelo proprio lugar, e assim
+        # nada do teste vai para o dados/ do ARENA de verdade.
+        dentro = os.path.join(pasta, "servidor", os.path.basename(nativo))
+        shutil.copyfile(nativo, dentro)
+        nativo = dentro
         registro = os.path.join(trabalho, "servidor.txt")
 
         # A: so o Python (como era), duas aberturas (a segunda com o .pyc pronto e a lista guardada).
@@ -117,6 +125,7 @@ def principal():
             processo, saida, tempos = abrir(pasta, porta, nativo, registro)
             if rodada == "nativo_3":
                 falhas += conferir_seguranca(porta)
+                falhas += conferir_capas(porta, pasta)
                 falhas += conferir_saida(processo, pasta)
             fechar(processo, saida, pasta)
             resultados[rodada] = tempos
@@ -169,6 +178,47 @@ def conferir_seguranca(porta):
     codigo, _, corpo = pedir(porta, "GET", "/../servidor/arena.py", local)
     if codigo == 200 and b"def principal" in corpo:
         falhas.append("o caminho com .. entregou um arquivo do servidor")
+    return falhas
+
+
+# Uma imagem PNG de 1x1 ponto (valida: o Python confere o tipo pelos bytes).
+PNG_1X1 = base64.b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==")
+
+
+def conferir_capas(porta, pasta):
+    """Etapa R2: o nativo entrega a capa e acha a miniatura que o PYTHON guardou (o mesmo SHA-1 nos dois)."""
+    falhas = []
+    local = {"Host": "127.0.0.1:%d" % porta}
+    capas = os.path.join(pasta, "jogos", "pessoais", "snes", "capas")
+    os.makedirs(capas, exist_ok=True)
+    cheia = PNG_1X1 + b"capa-cheia" * 50
+    with open(os.path.join(capas, "Jogo de Teste ção.png"), "wb") as saida:
+        saida.write(cheia)
+    arquivo = urllib.parse.quote("jogos/pessoais/snes/capas/Jogo de Teste ção.png")
+    codigo, cab, corpo = pedir(porta, "GET", "/api/capa?arquivo=%s&mini=280" % arquivo, local)
+    if codigo != 200 or corpo != cheia or cab.get("Cache-Control") != "max-age=86400":
+        falhas.append("a capa cheia nao veio certa pelo nativo (codigo %d)" % codigo)
+    # O que o Python responde chega pelo repasse, que sempre fecha a conexao; o que o nativo responde, nao.
+    if cab.get("Connection", "").lower() == "close":
+        falhas.append("a capa veio do Python, nao do nativo")
+    # O Python guarda a miniatura que a tela fez (o POST continua nele)...
+    corpo_post = json.dumps({"arquivo": urllib.parse.unquote(arquivo), "largura": 280,
+                             "imagem": "data:image/png;base64," + base64.b64encode(PNG_1X1).decode()}).encode()
+    codigo, _, _ = pedir(porta, "POST", "/api/capa/miniatura", dict(local, **{"Content-Type": "application/json"}),
+                         corpo=corpo_post)
+    if codigo != 200:
+        falhas.append("o Python nao guardou a miniatura (codigo %d)" % codigo)
+    # ... e o nativo acha a mesma miniatura pelo nome (sha1 de "caminho|tamanho|data|largura").
+    codigo, cab, corpo = pedir(porta, "GET", "/api/capa?arquivo=%s&mini=280" % arquivo, local)
+    if cab.get("Connection", "").lower() == "close":
+        falhas.append("a miniatura veio do Python, nao do nativo")
+    if codigo != 200 or corpo != PNG_1X1:
+        falhas.append("o nativo nao achou a miniatura que o Python guardou (veio %d bytes)" % len(corpo))
+    # Fora das pastas de jogos e de miniaturas: o nativo nao entrega; o Python responde 404, como sempre.
+    for proibido in ("dados/config.json", "jogos/../dados/config.json", "servidor/arena.py"):
+        codigo, _, corpo = pedir(porta, "GET", "/api/capa?arquivo=" + urllib.parse.quote(proibido), local)
+        if codigo == 200:
+            falhas.append("a capa entregou um arquivo de fora: %s" % proibido)
     return falhas
 
 

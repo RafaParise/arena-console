@@ -13,6 +13,7 @@
 //! Uso:  arena-nativo <programa do Python> [argumentos...]
 //!   (o ARENA.bat, o ARENA.sh e o app do Android passam o mesmo comando que usavam para abrir o Python)
 
+mod capas;
 mod http;
 mod sistema;
 
@@ -32,6 +33,7 @@ const GUARDADAS: [(&str, &str); 2] = [("/api/estado", "estado.json"), ("/api/cat
 const ESPERA_PELO_PYTHON: Duration = Duration::from_secs(120);
 
 struct Arena {
+    raiz: PathBuf,
     launcher: PathBuf,
     pasta_guardada: PathBuf,
     porta: u16,
@@ -48,6 +50,8 @@ struct Arena {
     escuta: Mutex<String>,
     geracao: AtomicU64,
     inicio: Instant,
+    /// Quantas capas o nativo entregou antes de o Python ficar pronto (a medida da etapa R2).
+    capas_antes_do_python: AtomicU64,
 }
 
 fn main() {
@@ -58,13 +62,14 @@ fn main() {
         std::process::exit(2);
     }
     sistema::ignorar_ctrl_c();
-    let raiz = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
+    let raiz = raiz_do_arena();
     let porta: u16 = std::env::var("ARENA_PORTA").ok().and_then(|p| p.parse().ok()).unwrap_or(8777);
     let porta_python = porta_livre().unwrap_or(porta.wrapping_add(1));
     let segredo_android = std::env::var("ARENA_ANDROID_SEGREDO").ok().filter(|s| !s.is_empty());
     let pasta_guardada = raiz.join("dados").join("nativo");
     let arena = Arc::new(Arena {
         launcher: raiz.join("launcher"),
+        raiz: raiz.clone(),
         guardadas: Mutex::new(ler_guardadas(&pasta_guardada)),
         pasta_guardada,
         porta,
@@ -77,6 +82,7 @@ fn main() {
         escuta: Mutex::new(String::new()),
         geracao: AtomicU64::new(0),
         inicio,
+        capas_antes_do_python: AtomicU64::new(0),
     });
 
     // 1. A porta, ja (a escuta da configuracao: so este computador, ou a rede se a chave estiver ligada).
@@ -157,6 +163,23 @@ fn codigo_da_saida(status: io::Result<ExitStatus>) -> i32 {
         }
         Err(_) => 3,
     }
+}
+
+/// A pasta do ARENA: a de cima do servidor/, quando o nativo esta la (no PC: servidor\arena-nativo.exe); senao, a
+/// pasta atual (no Android, o app abre o nativo de dentro do APK, ja na pasta do ARENA). Assim o nativo nunca grava
+/// o dados/nativo numa pasta qualquer, mesmo aberto por um atalho com outra pasta de trabalho.
+fn raiz_do_arena() -> PathBuf {
+    if let Ok(programa) = std::env::current_exe() {
+        if let Some(servidor) = programa.parent() {
+            let nome = servidor.file_name().and_then(|n| n.to_str()).unwrap_or("");
+            if let Some(raiz) = servidor.parent() {
+                if nome.eq_ignore_ascii_case("servidor") && raiz.join("launcher").is_dir() {
+                    return raiz.to_path_buf();
+                }
+            }
+        }
+    }
+    std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
 }
 
 /// Uma porta livre so deste computador, para o Python (o sistema escolhe).
@@ -257,8 +280,9 @@ fn esperar_o_python(arena: &Arc<Arena>) {
             *arena.python_pronto.lock().unwrap() = true;
             arena.sinal_pronto.notify_all();
             eprintln!(
-                "[ARENA] Nativo: o Python ficou pronto em {} ms.",
-                arena.inicio.elapsed().as_millis()
+                "[ARENA] Nativo: o Python ficou pronto em {} ms ({} capas ja tinham saido daqui).",
+                arena.inicio.elapsed().as_millis(),
+                arena.capas_antes_do_python.load(Ordering::SeqCst)
             );
             return;
         }
@@ -336,6 +360,19 @@ fn atender(arena: &Arc<Arena>, conexao: TcpStream) -> io::Result<()> {
                 if let Ok(corpo) = std::fs::read(&arquivo) {
                     http::responder(&mut escrita, 200, tipo_do_arquivo(&arquivo), &[("Cache-Control", "no-cache")],
                                     &corpo, manter)?;
+                    if manter {
+                        continue;
+                    }
+                    return Ok(());
+                }
+            }
+            // As capas (etapa R2): a mesma regra do Python; o que nao for o caminho simples vai a ele.
+            if caminho == "/api/capa" {
+                if let Some((corpo, tipo)) = capas::capa(&arena.raiz, &pedido.alvo) {
+                    if !*arena.python_pronto.lock().unwrap() {
+                        arena.capas_antes_do_python.fetch_add(1, Ordering::SeqCst);
+                    }
+                    http::responder(&mut escrita, 200, tipo, &[("Cache-Control", "max-age=86400")], &corpo, manter)?;
                     if manter {
                         continue;
                     }
