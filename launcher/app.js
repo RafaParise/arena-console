@@ -771,6 +771,12 @@ function linhaDoJogo(jogo) {
     if (evento.key === "Enter" || evento.key === " ") {
       evento.preventDefault();
       selecionarJogo(jogo);
+    } else if ((evento.key === "f" || evento.key === "F") && !evento.ctrlKey && !evento.altKey && !evento.metaKey) {
+      // F favorita o jogo em foco (14/11/2026); a lista se redesenha, e o foco volta ao mesmo jogo.
+      evento.preventDefault();
+      alternarFavorito(jogo).then(() => {
+        document.querySelector(`.jogo[data-jogo="${CSS.escape(jogo.id)}"]`)?.focus();
+      });
     }
   });
 

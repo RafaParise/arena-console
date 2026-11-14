@@ -1455,7 +1455,8 @@ Em Ajustes → Máquina → Onde ficam os jogos:
 
 Toque na estrela **☆** de um jogo e ela fica **★**. O primeiro item da lista de consoles, **★ Favoritos**, mostra
 os favoritos de todos os consoles juntos, com a quantidade ao lado. (Até a versão 2026.11.13 a estrela não ficava
-gravada; foi consertado.)
+gravada; foi consertado.) Pelo teclado: com o jogo selecionado na lista (Tab ou setas), a tecla **F** põe ou tira
+dos favoritos.
 
 ### Jogos repetidos
 
