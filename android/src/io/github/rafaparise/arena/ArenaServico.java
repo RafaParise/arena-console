@@ -32,9 +32,11 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
@@ -141,10 +143,78 @@ public class ArenaServico extends Service {
         } catch (RuntimeException falha) {
             Log.w(TAG, "sem a trava da rede: " + falha);
         }
+        ouvirOsCartoes();
+    }
+
+    // ------------------------------------------------------------------
+    // Pen drive e cartao que entram ou saem com o ARENA aberto (21º guia, 14/11/2026)
+    // ------------------------------------------------------------------
+    // O receptor e' registrado aqui, em codigo, e nao no manifesto: so vale com o ARENA aberto e nenhum outro app
+    // consegue mandar um aviso falso a ele. Sem o esquema "file", o Android nao entrega esses avisos [Certo].
+
+    BroadcastReceiver cartoes;
+
+    void ouvirOsCartoes() {
+        IntentFilter filtro = new IntentFilter();
+        filtro.addAction(Intent.ACTION_MEDIA_MOUNTED);
+        filtro.addAction(Intent.ACTION_MEDIA_UNMOUNTED);
+        filtro.addAction(Intent.ACTION_MEDIA_EJECT);
+        filtro.addAction(Intent.ACTION_MEDIA_BAD_REMOVAL);
+        filtro.addDataScheme("file");
+        cartoes = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context contexto, Intent aviso) {
+                boolean entrou = Intent.ACTION_MEDIA_MOUNTED.equals(aviso.getAction());
+                Log.i(TAG, "pen drive ou cartao: " + aviso.getAction());
+                ArenaActivity quem = tela.get();
+                if (quem != null) {
+                    quem.avisarAPagina("window.ARENA_ANDROID_MIDIA && window.ARENA_ANDROID_MIDIA("
+                            + (entrou ? "'entrou'" : "'saiu'") + ")");
+                }
+            }
+        };
+        try {
+            if (Build.VERSION.SDK_INT >= 33) {
+                registerReceiver(cartoes, filtro, Context.RECEIVER_NOT_EXPORTED);
+            } else {
+                registerReceiver(cartoes, filtro);
+            }
+        } catch (RuntimeException falha) {
+            Log.w(TAG, "sem o aviso de pen drive e cartao: " + falha);
+            cartoes = null;
+        }
+    }
+
+    // ------------------------------------------------------------------
+    // O botao "Fechar o ARENA" do aviso (14/11/2026)
+    // ------------------------------------------------------------------
+    // Fecha a tela, o servidor e o aviso de uma vez. Com um jogo aberto, nao fecha o jogo (perderia o que nao foi
+    // salvo): traz o jogo para a frente e pede para sair dele pelo SAIR antes.
+
+    static final String FECHAR = "io.github.rafaparise.arena.FECHAR";
+
+    void fecharPeloAviso() {
+        if (processoDoRetroArch() > 0) {
+            voltarAoJogo();
+            android.widget.Toast.makeText(this, "Saia do jogo pelo SAIR (salve antes) e toque em Fechar de novo.",
+                    android.widget.Toast.LENGTH_LONG).show();
+            return;
+        }
+        Log.i(TAG, "fechado pelo botao do aviso");
+        ArenaActivity quem = tela.get();
+        if (quem != null) quem.fecharDeVez();
+        encerrar();
+        if (Build.VERSION.SDK_INT >= 24) stopForeground(STOP_FOREGROUND_REMOVE);
+        else stopForeground(true);
+        stopSelf();
     }
 
     @Override
     public int onStartCommand(Intent pedido, int marcas, int numero) {
+        if (pedido != null && FECHAR.equals(pedido.getAction())) {
+            fecharPeloAviso();
+            return START_NOT_STICKY;
+        }
         if (servidor == null && !desistiu) {
             new Thread(new Runnable() {
                 public void run() {
@@ -173,6 +243,14 @@ public class ArenaServico extends Service {
     @Override
     public void onDestroy() {
         encerrar();
+        if (cartoes != null) {
+            try {
+                unregisterReceiver(cartoes);
+            } catch (RuntimeException falha) {
+                // ja tinha saido
+            }
+            cartoes = null;
+        }
         if (rede != null && rede.isHeld()) rede.release();
         if (atual == this) atual = null;
         super.onDestroy();
@@ -198,11 +276,14 @@ public class ArenaServico extends Service {
         }
         Intent abrir = new Intent(this, ArenaActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         int tipo = Build.VERSION.SDK_INT >= 23 ? PendingIntent.FLAG_IMMUTABLE : 0;
+        Intent fechar = new Intent(this, ArenaServico.class).setAction(FECHAR);
         aviso.setContentTitle("ARENA aberto")
                 .setContentText("Toque para voltar ao ARENA.")
                 .setSmallIcon(getApplicationInfo().icon)
                 .setOngoing(true)
-                .setContentIntent(PendingIntent.getActivity(this, 0, abrir, tipo));
+                .setContentIntent(PendingIntent.getActivity(this, 0, abrir, tipo))
+                .addAction(new Notification.Action.Builder(null, "Fechar o ARENA",
+                        PendingIntent.getService(this, 1, fechar, tipo)).build());
         if (Build.VERSION.SDK_INT >= 34) {
             // Versao-alvo 35 (10/11/2026): do Android 14 em diante, o servico em primeiro plano diz o tipo (o mesmo do
             // manifesto), senao o Android fecha o app. "specialUse": o servidor local do ARENA durante o jogo.
@@ -503,6 +584,19 @@ public class ArenaServico extends Service {
                 if (quem != null) quem.pedirPermissao(pedido.optBoolean("todos_os_arquivos"));
             } else if (tipo.equals("reabrir")) {
                 reabrir();
+            } else if (tipo.equals("tela_inicial")) {
+                // Modo TV Box (14º guia): sem "ligar", so diz se esta ligado; com "ligar", liga ou desliga.
+                boolean ligado = ArenaActivity.ehTelaInicial(this);
+                if (pedido.has("ligar")) {
+                    ArenaActivity quem = tela.get();
+                    if (quem == null) {
+                        responder(numero, "erro", "A tela do ARENA nao esta aberta.");
+                        return;
+                    }
+                    ligado = pedido.getBoolean("ligar");
+                    quem.usarComoTelaInicial(ligado);
+                }
+                responder(numero, "ligado", ligado);
             } else {
                 Log.w(TAG, "pedido que nao conheco: " + tipo);
             }

@@ -802,6 +802,20 @@
       <button class="botao" id="btnAparelhoDeNovo" type="button">Ler de novo</button>
     </div>
 
+    <!-- So no Android (14/11/2026, modo TV Box): o ARENA como tela inicial. Vem desligado; ligar abre a escolha
+         da tela inicial do proprio Android (ArenaActivity.usarComoTelaInicial). -->
+    <div id="blocoTelaInicial" data-so-android hidden>
+      <h3 class="grupo-titulo">TV Box</h3>
+      <div class="opcao">
+        <span class="opcao-rotulo">Usar o ARENA como tela inicial</span>
+        <button class="chave opcao-controle" id="chaveTelaInicial"
+                aria-pressed="false" aria-label="Usar o ARENA como tela inicial (TV Box)"></button>
+        <span class="opcao-ajuda">Para uma TV Box só de jogos: o botão de início do controle remoto abre o ARENA.
+          Ao ligar, o Android pergunta qual tela inicial usar: escolha ARENA. Desligar volta à tela de fábrica.
+          No celular, deixe desligado.</span>
+      </div>
+    </div>
+
     <!-- So no Android (auditoria 4, 23/10/2026): a memoria do aparelho e o cartao
          de memoria ao mesmo tempo (servidor\armazenamento.py). O cartao entra como
          mais uma pasta de jogos: nada e' copiado, movido nem apagado. -->

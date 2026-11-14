@@ -339,6 +339,22 @@ class Ponte(unittest.TestCase):
         self.assertEqual(ponte_android.controles(), 2)
         self.assertTrue(ponte_android.abrir_pasta("/storage/emulated/0/ARENA"))
 
+    def test_modo_tv_box_pergunta_e_liga(self):
+        # 14/11/2026: sem "ligar" so pergunta; com ele, o pedido leva o valor. Sem resposta, None (a rota avisa).
+        app = AppDeMentira(respostas={"tela_inicial": {"ligado": True}})
+        ponte_android.CANAL = app
+        self.assertTrue(ponte_android.tela_inicial())
+        self.assertNotIn("ligar", app.pedidos[-1])
+        self.assertTrue(ponte_android.tela_inicial(True))
+        self.assertIs(app.pedidos[-1]["ligar"], True)
+        ponte_android.CANAL = AppDeMentira(respostas={})
+        antes = ponte_android.perguntar
+        ponte_android.perguntar = lambda pedido, limite=5.0: {}
+        try:
+            self.assertIsNone(ponte_android.tela_inicial(False))
+        finally:
+            ponte_android.perguntar = antes
+
     def test_o_app_que_nao_responde_nao_prende(self):
         ponte_android.CANAL = AppDeMentira(respostas={})
         inicio = time.monotonic()

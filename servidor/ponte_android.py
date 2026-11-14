@@ -337,6 +337,22 @@ def voltar_ao_jogo():
     return bool(resposta.get("ok"))
 
 
+def tela_inicial(ligar=None):
+    """Modo TV Box (14/11/2026): o ARENA como tela inicial do aparelho. Sem 'ligar', so pergunta se esta ligado; com
+    True/False, liga ou desliga (ArenaActivity.usarComoTelaInicial, que ao ligar abre a escolha da tela inicial do
+    Android). Devolve o estado (True/False), ou None se o app nao respondeu."""
+    pedido = {"pedido": "tela_inicial"}
+    if ligar is not None:
+        pedido["ligar"] = bool(ligar)
+    try:
+        resposta = perguntar(pedido, limite=5.0)
+    except OSError:
+        return None
+    if "ligado" not in resposta:
+        return None
+    return bool(resposta["ligado"])
+
+
 def tela_pronta(endereco):
     """O servidor ja escuta: o app pode mostrar a tela do ARENA."""
     try:

@@ -396,6 +396,7 @@ async function carregarEstado() {
     mostrarAparelho();          // so le se a aba Maquina estiver a vista; senao espera o aluno abrir
     mostrarArmazenamento();
     mostrarAndroid(dados.android || {});
+    mostrarTelaInicial();
   }
   prepararTipoDeControle(dados.recursos || []);
   $("#listaDriverControleTopo").value = estado.efetivas.input_joypad_driver ||
@@ -3952,6 +3953,36 @@ if (!window.ARENA_ANDROID_VOLTAR) {
   };
 }
 
+// Pen drive ou cartao que entra ou sai com o ARENA aberto (21º guia, 14/11/2026; ArenaServico.ouvirOsCartoes).
+// O Android manda varios avisos seguidos (o EJECT e depois o UNMOUNTED): espera eles acabarem e le as pastas uma vez.
+let esperaDaMidia = 0;
+window.ARENA_ANDROID_MIDIA = (comoFicou) => {
+  clearTimeout(esperaDaMidia);
+  esperaDaMidia = setTimeout(async () => {
+    recado(comoFicou === "entrou" ? "Um pen drive ou cartão entrou: lendo as pastas de jogos de novo..."
+      : "O pen drive ou cartão saiu: os jogos dele saem da lista.");
+    try {
+      await pedir("/api/indexar", "POST");
+      await carregarCatalogo();
+      if (estado.sistemaDoComputador === "android") mostrarArmazenamento();
+      recado(`Lista atualizada: ${estado.jogos.length} jogo(s).`);
+    } catch (falha) {
+      recado(falha.message, true);
+    }
+  }, 1500);
+};
+
+// Modo TV Box (14/11/2026): o ARENA como tela inicial. O estado vem do proprio Android (o apelido ligado ou nao),
+// nao da configuracao: se alguem desfez pelo adb, a chave mostra o que vale de verdade.
+async function mostrarTelaInicial() {
+  try {
+    const resposta = await pedir("/api/android/tela-inicial", "POST", {});
+    $("#chaveTelaInicial").setAttribute("aria-pressed", resposta.ligado ? "true" : "false");
+  } catch (_falha) {
+    // app antigo ou sem resposta: a chave fica como esta
+  }
+}
+
 // No Linux, as opções do tipo de controle são as de lá (o recursos.json diz
 // quais, em "no_linux"): o udev lê todos os controles; o sdl2 é a reserva.
 // No Windows, ficam as do index.html (xinput e dinput).
@@ -7170,6 +7201,19 @@ function ligarEventos() {
       }
     });
   }
+
+  $("#chaveTelaInicial").addEventListener("click", async (evento) => {
+    const botao = evento.currentTarget;
+    const novo = botao.getAttribute("aria-pressed") !== "true";
+    try {
+      const resposta = await pedir("/api/android/tela-inicial", "POST", { ligar: novo });
+      botao.setAttribute("aria-pressed", resposta.ligado ? "true" : "false");
+      recado(resposta.ligado ? "Pronto: na tela do Android que abriu, escolha ARENA como tela inicial."
+        : "Desligado: o botão de início volta para a tela de fábrica do aparelho.");
+    } catch (falha) {
+      recado(falha.message, true);
+    }
+  });
 
   $("#chaveAjusteDesempenho").addEventListener("click", async (evento) => {
     const botao = evento.currentTarget;

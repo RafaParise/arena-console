@@ -615,7 +615,30 @@ O que muda no Android:
 - Não há o Java ME, o PS3 nem o Xbox 360 (não têm versão para Android); o
   PS2, o GameCube e o Wii vão pelos núcleos do RetroArch, em aparelho bom.
 - Enquanto o ARENA está aberto, o Android mostra "ARENA aberto" na barra:
-  é o que deixa o ARENA aberto durante o jogo. Para fechar de vez, tire o
+  é o que deixa o ARENA aberto durante o jogo. Para fechar de vez, toque em
+  **Fechar o ARENA** nesse aviso (com um jogo aberto, ele traz o jogo de
+  volta para você sair pelo SAIR e não perder o que não salvou) ou tire o
   ARENA da tela dos apps abertos.
+- Pen drive ou cartão que **entra ou sai com o ARENA aberto**: o ARENA lê
+  as pastas de jogos de novo sozinho e avisa na tela.
+
+### Numa TV Box com Android
+
+O mesmo APK. Duas coisas a mais:
+
+- **ARENA como tela inicial.** Em **Ajustes → Máquina → TV Box**, ligue
+  **Usar o ARENA como tela inicial**: o Android pergunta qual tela inicial
+  usar; escolha ARENA. O botão de início do controle remoto passa a abrir o
+  ARENA, e o voltar sem nada aberto fica nele. Desligar a chave devolve a
+  tela de fábrica. No celular, deixe desligado (vem assim).
+  Se a TV Box não mostrar a escolha, pelo computador com o `adb`:
+  `adb shell cmd package set-home-activity io.github.rafaparise.arena/.ArenaComoInicio`
+  (para desfazer, desligue a chave ou escolha a tela de fábrica nas
+  configurações do Android).
+- **Ver os arquivos.** Se a TV Box não tem a tela "Acesso a todos os
+  arquivos" do app, o ARENA abre a lista geral dessa permissão (procure o
+  ARENA nela) ou a tela do app (Permissões). Se nenhuma existir, pelo `adb`:
+  `adb shell appops set --uid io.github.rafaparise.arena MANAGE_EXTERNAL_STORAGE allow`.
+  Sem a permissão o ARENA abre do mesmo jeito, com as pastas dele.
 
 Os detalhes estão em `docs/ANDROID.md`.

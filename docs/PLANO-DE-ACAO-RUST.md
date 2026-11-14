@@ -283,6 +283,11 @@ TV Box; teste no emulador de Android TV (x86_64).
 
 ## O 14º guia (13/11, ARENA como tela inicial da TV Box): vira o "modo TV Box", desligado por padrão
 
+**Feito em 14/11:** passos 1 a 4 (apelido `ArenaComoInicio` desligado, chave em Ajustes → Máquina → TV Box pela rota
+`/api/android/tela-inicial`, Voltar que fica no ARENA, `adb` no `1-COMECAR.md`). Conferido no A12: o ARENA não aparece
+entre as telas iniciais e a chave aparece. **Falta:** ligar e desligar a chave no emulador de Android TV (não no A12,
+para não mexer na tela inicial do Rafael).
+
 **Já existe:** a `ArenaActivity` já tem `singleTask`, já aparece na grade da Android TV (`LEANBACK_LAUNCHER`,
 `montar_android.py` linhas 542 e 559) e o Voltar já não fecha o ARENA: fecha a janela aberta na tela e, sem nada
 aberto, só manda o app para trás (`ArenaActivity.java`, linhas 381 a 393).
@@ -308,6 +313,10 @@ aberto, só manda o app para trás (`ArenaActivity.java`, linhas 381 a 393).
 
 ## O 15º guia (13/11, tela cheia de verdade na TV Box): quase tudo já existe; três ajustes pequenos
 
+**Feito em 14/11:** ajustes 1 e 2 (`onWindowFocusChanged` e `WindowInsetsController` no Android 11 em diante).
+Conferido no A12: barras escondidas, e escondidas de novo sozinhas depois de abrir e fechar a cortina. O 3 (entalhe da
+câmera) continua só estudo.
+
 **Já existe:** tela sempre acesa (`FLAG_KEEP_SCREEN_ON`, `ArenaActivity.java` linha 166), barras escondidas no modo
 imersivo (`esconderAsBarras`, linhas 396 a 400) ao abrir e ao voltar do jogo (`onResume`, linha 364), e tema preto
 sem barra de título (`Theme.Black.NoTitleBar.Fullscreen`, `montar_android.py` linha 538). O código do guia usa
@@ -324,6 +333,10 @@ Gradle, só com o Android puro.
    foto no A12, deitado e em pé, mostrar que nenhum botão fica embaixo da câmera; senão fica como está.
 
 ## O 17º guia (13/11, controle e foco na tela do Android): o que existe e um teste a fazer
+
+**Feito em 14/11:** a tela pede o foco no `onWindowFocusChanged` (o WebView aparece com foco no `dumpsys` do A12); o
+manifesto final declara `gamepad`, `leanback`, `touchscreen` e `type.pc` como `required="false"`. **Falta:** o teste
+com o T4 virtual depois de um jogo.
 
 **Já existe:** a tela do ARENA lê o controle pela Gamepad API (`launcher\app.js` e `launcher\navegador\`), e o
 botão B do controle já funciona como "voltar" do jeito certo para o ARENA: o Android o entrega como Voltar, e o
@@ -353,6 +366,10 @@ TV como opcionais (`uses-feature ... required="false"`), para a Play Protect e a
 
 ## O 19º guia (13/11, acesso a todos os arquivos): já existe; dois ajustes para TV Box e Android 10
 
+**Feito em 14/11:** ajuste 1 (as três telas em ordem e o `adb appops` no `1-COMECAR.md`). Ajuste 2 conferido no
+manifesto final: `requestLegacyExternalStorage="true"` e sem `maxSdkVersion` no `READ`/`WRITE_EXTERNAL_STORAGE`,
+então o Android 10 enxerga as pastas. **Falta:** o teste num emulador com Android 10.
+
 **Já existe:** o `montar_android.py` declara o `MANAGE_EXTERNAL_STORAGE` (linha 500); a `ArenaActivity` explica
 antes de pedir, abre a tela "Acesso a todos os arquivos" do ARENA no Android 11 em diante (linhas 317 a 337), confere
 com o `Environment.isExternalStorageManager()` (linha 433) e faz o pedido antigo de leitura e gravação nos aparelhos
@@ -378,6 +395,11 @@ forma de núcleo) e pelo `pcsx_rearmed`, Nintendo 64 pelo `mupen64plus_next` (`s
 redistribuir versões modificadas [Provável].
 
 ## O 21º guia (13/11, cartão SD e pen drive no Android): já acha; falta perceber quando entra ou sai
+
+**Feito em 14/11:** passos 1 e 2 (`ArenaServico.ouvirOsCartoes`, e a tela lê as pastas de novo pelo `/api/indexar`
+com um aviso). Conferido no A12: o receptor aparece registrado com as quatro ações e o esquema `file`. Mais o botão
+**Fechar o ARENA** no aviso (testado no A12: fecha a tela, o servidor e o aviso). **Falta:** o teste com um pen drive
+de verdade no OTG (o aviso do sistema não se imita pelo `adb`).
 
 **Já existe:** a `ArenaActivity.raizes()` (linhas 581 a 601) acha a memória interna e cada cartão SD ou pen drive
 pelo `getExternalFilesDirs` (cortando o `/Android/data/...`), e a `candidatas()` procura a pasta do ARENA até dois

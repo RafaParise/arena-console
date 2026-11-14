@@ -6765,6 +6765,16 @@ class Manipulador(BaseHTTPRequestHandler):
             return self.erro("Não consegui trazer o jogo de volta. Abra os apps recentes do celular (o botão do "
                              "quadrado ou das três barras), toque no jogo e saia pelo SAIR.")
 
+        # ---- Android: o ARENA como tela inicial (modo TV Box, 14/11/2026) --
+        if caminho == "/api/android/tela-inicial":
+            if not plataforma_do_sistema.ANDROID:
+                return self.erro("Isto é só do ARENA do Android (TV Box). Use o APK do ARENA na TV Box.", 404)
+            ligar = dados.get("ligar")
+            estado = ponte_android.tela_inicial(None if ligar is None else bool(ligar))
+            if estado is None:
+                return self.erro("O app do ARENA não respondeu. Feche e abra o ARENA e tente de novo.", 503)
+            return self.responder_json({"ok": True, "ligado": estado})
+
         # ---- Android: a pasta do ARENA no aparelho e a permissao (item 14) --
         if caminho in ("/api/android/pasta", "/api/android/permissao"):
             if not plataforma_do_sistema.ANDROID:

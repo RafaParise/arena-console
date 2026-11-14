@@ -542,7 +542,17 @@ ATIVIDADE_DO_ARENA = '''        <activity android:configChanges="keyboard|keyboa
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity-alias android:enabled="false" android:exported="true" android:label="ARENA" android:name="io.github.rafaparise.arena.ArenaComoInicio" android:targetActivity="io.github.rafaparise.arena.ArenaActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.HOME"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity-alias>
 '''
+# O apelido acima (14/11/2026, 14º guia) e' o "modo TV Box": o ARENA como tela inicial. Vem DESLIGADO (enabled="false"):
+# nos celulares o botao de inicio continua indo para a tela de fabrica, sem perguntar nada. So a chave de Ajustes (no
+# proprio aparelho, ArenaActivity.usarComoTelaInicial) liga, e desligar a chave devolve a tela de fabrica.
 
 
 def ajustar_manifesto(pasta, versao_nome, versao_codigo, teste=False):

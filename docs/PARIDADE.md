@@ -2,7 +2,7 @@
 
 Gerado em 24/10/2026 e conferido em 14/11/2026 (70 consoles) por `ferramentas\matriz_de_paridade.py` (rode de novo quando entrar console ou núcleo novo).
 O servidor Python e a tela (`launcher\`) são **os mesmos** no Windows, no Linux, no Android e no Chromebook com o APK:
-toda rota `/api/...` (119) e toda aba existe onde o servidor roda; o que muda é o que cada sistema tem por baixo.
+toda rota `/api/...` (120) e toda aba existe onde o servidor roda; o que muda é o que cada sistema tem por baixo.
 
 ## O que não existe em cada versão, e por quê
 
@@ -127,7 +127,7 @@ toda rota `/api/...` (119) e toda aba existe onde o servidor roda; o que muda é
 
 ## Funções por versão (medido em 14/11/2026, `ferramentas\paridade_de_funcoes.py`)
 
-- A tela chama **109 rotas** `/api/` e o servidor (que atende 119) tem **todas** (nenhuma rota órfã). Como o servidor e a tela são os
+- A tela chama **110 rotas** `/api/` e o servidor (que atende 120) tem **todas** (nenhuma rota órfã). Como o servidor e a tela são os
   mesmos no Windows, no Linux, no Android e no Chromebook com o APK, as funções existem em todos eles; o que muda é o que
   cada sistema tem por baixo (a tabela de consoles acima, e "Só Windows").
 - A **versão web** (Chromebook sem instalar, sem servidor) atende 30 dessas rotas; as outras 80 e poucas (amigos,

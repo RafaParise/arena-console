@@ -301,6 +301,15 @@ public class ArenaActivity extends Activity {
         });
     }
 
+    /** O botao "Fechar o ARENA" do aviso (ArenaServico.fecharPeloAviso): a tela sai e some dos apps abertos. */
+    void fecharDeVez() {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                finishAndRemoveTask();
+            }
+        });
+    }
+
     /** O servidor nao abriu neste aparelho: a tela de reserva, com o motivo
      *  no registro do Android. */
     void servidorNaoAbriu(final String motivo, final String ultimas) {
@@ -335,17 +344,26 @@ public class ArenaActivity extends Activity {
         });
     }
 
-    /** A tela do sistema "Acesso a todos os arquivos" do ARENA (Android 11 em diante). False se o aparelho nao tem. */
+    /** A tela do sistema "Acesso a todos os arquivos" do ARENA (Android 11 em diante). False se o aparelho nao tem
+     *  nenhuma das tres. Ha TV Box (e Android de fabrica enxuto) sem a tela do proprio app (19º guia, 14/11/2026):
+     *  tenta entao a lista geral de "Acesso a todos os arquivos", onde a pessoa acha o ARENA, e por ultimo a tela de
+     *  detalhes do app (Permissoes). Se nem essa existir, o professor libera pelo adb (guia 1-COMECAR.md). */
     boolean abrirTodosOsArquivos(int pedido) {
-        try {
-            startActivityForResult(new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
-                    Uri.parse("package:" + getPackageName())), pedido);
-            return true;
-        } catch (RuntimeException falha) {
-            Log.w(TAG, "sem a tela de todos os arquivos: " + falha);
-            if (pedido == TODOS_OS_ARQUIVOS_DA_ABERTURA) comecar();
-            return false;
+        Intent[] telas = {
+            new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + getPackageName())),
+            new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION),
+            new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + getPackageName())),
+        };
+        for (Intent destino : telas) {
+            try {
+                startActivityForResult(destino, pedido);
+                return true;
+            } catch (RuntimeException falha) {
+                Log.w(TAG, "sem a tela " + destino.getAction() + ": " + falha);
+            }
         }
+        if (pedido == TODOS_OS_ARQUIVOS_DA_ABERTURA) comecar();
+        return false;
     }
 
     @Override
@@ -398,16 +416,79 @@ public class ArenaActivity extends Activity {
         tela.evaluateJavascript("window.ARENA_ANDROID_VOLTAR ? String(window.ARENA_ANDROID_VOLTAR()) : 'nao'",
                 new ValueCallback<String>() {
                     public void onReceiveValue(String resposta) {
-                        if (!"\"sim\"".equals(resposta)) moveTaskToBack(true);
+                        // Como tela inicial (modo TV Box), nao ha para onde ir: o Voltar sem nada aberto fica no ARENA.
+                        if (!"\"sim\"".equals(resposta) && !ehTelaInicial(ArenaActivity.this)) moveTaskToBack(true);
                     }
                 });
     }
 
+    /** A barra voltou (um aviso, a cortina de notificacoes, o teclado) e a janela recebeu o foco de novo: esconde de
+     *  novo na hora, sem esperar o proximo onResume (15º guia, 14/11/2026). E pede o foco para a tela, para o controle
+     *  mexer nela ao voltar do jogo sem tocar na tela (17º guia). */
+    @Override
+    public void onWindowFocusChanged(boolean comFoco) {
+        super.onWindowFocusChanged(comFoco);
+        if (!comFoco) return;
+        esconderAsBarras();
+        if (tela != null && !tela.hasFocus()) tela.requestFocus();
+    }
+
+    @SuppressWarnings("deprecation")
     void esconderAsBarras() {
-        View decor = getWindow().getDecorView();
-        decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_FULLSCREEN
+        Window janela = getWindow();
+        if (Build.VERSION.SDK_INT >= 30) {
+            // Android 11 em diante: o jeito novo do proprio Android (o setSystemUiVisibility esta marcado como antigo).
+            // As barras voltam com um deslize da borda e somem sozinhas depois (o "imersivo" de antes).
+            janela.setDecorFitsSystemWindows(false);
+            android.view.WindowInsetsController controle = janela.getInsetsController();
+            if (controle != null) {
+                controle.hide(android.view.WindowInsets.Type.statusBars() | android.view.WindowInsets.Type.navigationBars());
+                controle.setSystemBarsBehavior(android.view.WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+                return;
+            }
+        }
+        janela.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+    }
+
+    // ------------------------------------------------------------------
+    // Modo TV Box: o ARENA como tela inicial (14º guia, 14/11/2026)
+    // ------------------------------------------------------------------
+    // O manifesto tem um apelido da ArenaActivity com a categoria HOME, que vem DESLIGADO: nos celulares nada muda (o
+    // botao de inicio nao pergunta "qual tela inicial?"). A chave de Ajustes liga o apelido e abre a tela do Android
+    // para a pessoa escolher a tela inicial; desligar a chave desliga o apelido e o aparelho volta a tela de fabrica.
+
+    static final String APELIDO_DE_INICIO = "io.github.rafaparise.arena.ArenaComoInicio";
+
+    static boolean ehTelaInicial(Context contexto) {
+        try {
+            return contexto.getPackageManager().getComponentEnabledSetting(
+                    new android.content.ComponentName(contexto, APELIDO_DE_INICIO))
+                    == PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
+        } catch (RuntimeException falha) {
+            return false;
+        }
+    }
+
+    /** Liga ou desliga o apelido e, ao ligar, abre a escolha da tela inicial do Android (se o aparelho tiver). */
+    void usarComoTelaInicial(final boolean ligar) {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                getPackageManager().setComponentEnabledSetting(
+                        new android.content.ComponentName(ArenaActivity.this, APELIDO_DE_INICIO),
+                        ligar ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+                              : PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                        PackageManager.DONT_KILL_APP);
+                if (!ligar) return;
+                try {
+                    startActivity(new Intent(Settings.ACTION_HOME_SETTINGS));
+                } catch (RuntimeException falha) {
+                    // Sem a tela de escolha: o proprio botao de inicio pergunta na proxima vez.
+                    Log.w(TAG, "sem a tela de escolher a tela inicial: " + falha);
+                }
+            }
+        });
     }
 
     void avisarAPagina(final String codigo) {
