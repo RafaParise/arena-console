@@ -138,6 +138,8 @@ acordarFundo();
 // Comunicacao com o servidor
 // --------------------------------------------------------------------------
 
+let respostaGuardada = false;
+
 async function pedir(rota, metodo = "GET", corpo = null) {
   const opcoes = { method: metodo, headers: { "Content-Type": "application/json" } };
   if (corpo) opcoes.body = JSON.stringify(corpo);
@@ -155,6 +157,9 @@ async function pedir(rota, metodo = "GET", corpo = null) {
     throw erro;
   }
   const dados = await resposta.json().catch(() => ({}));
+  // O servidor nativo (Rust) entregou a resposta guardada da ultima abertura, porque o Python ainda carrega: a tela
+  // mostra assim mesmo e pede de novo quando ele ficar pronto (iniciar, abaixo; docs/MIGRACAO-RUST.md).
+  if (resposta.headers.get("X-Arena-Guardado") === "1") respostaGuardada = true;
 
   if (!resposta.ok || dados.ok === false) {
     const erro = new Error(dados.erro || "O servidor não respondeu como esperado.");
@@ -7761,6 +7766,23 @@ async function iniciar() {
     await carregarCatalogo();
   } catch (falha) {
     aviso(`O ARENA parou de responder. Para voltar, ${comoAbrirDeNovo()}.`);
+  }
+  // A marca da medida da abertura (docs/DESEMPENHO-SERVIDOR.md): no Android, vai para o registro do aparelho.
+  console.info("[ARENA] lista na tela" + (respostaGuardada ? " (guardada pelo nativo)" : ""));
+  if (respostaGuardada) atualizarQuandoOPythonFicarPronto();
+}
+
+// A tela abriu com o que o servidor nativo tinha guardado: espera o Python (o nativo responde quando ele abre) e pede
+// o estado e a lista de verdade (um jogo copiado com o ARENA fechado aparece aqui).
+async function atualizarQuandoOPythonFicarPronto() {
+  respostaGuardada = false;
+  try {
+    const resposta = await fetch("/_nativo/pronto", { cache: "no-store" });
+    if (!resposta.ok) return;
+    await carregarEstado();
+    await carregarCatalogo();
+  } catch (falha) {
+    // sem o Python, a tela segue com o que tem; o aviso de "sem servidor" cuida do resto
   }
 }
 

@@ -374,8 +374,13 @@ public class ArenaServico extends Service {
             return;
         }
         String lancador = new File(getApplicationInfo().nativeLibraryDir, "libarenapython.so").getPath();
-        ProcessBuilder construtor = new ProcessBuilder(lancador,
-                new File(pastaDoArena(), "servidor/android_inicio.py").getPath());
+        String inicio = new File(pastaDoArena(), "servidor/android_inicio.py").getPath();
+        // O servidor nativo (Rust, 14/11/2026, docs/MIGRACAO-RUST.md): abre a porta e a tela na hora e abre o Python
+        // atras, com o mesmo fio (ele herda a entrada e a saida). Depois de uma queda, so o Python, como antes.
+        File nativo = new File(getApplicationInfo().nativeLibraryDir, "libarenanativo.so");
+        ProcessBuilder construtor = (nativo.isFile() && quedas == 0)
+                ? new ProcessBuilder(nativo.getPath(), lancador, inicio)
+                : new ProcessBuilder(lancador, inicio);
         construtor.directory(pastaDoArena());
         Map<String, String> ambiente = construtor.environment();
         ambiente.putAll(ambienteDoServidor());

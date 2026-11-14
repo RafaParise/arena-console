@@ -79,8 +79,17 @@ REM  (repetir nao adianta). Qualquer outro numero = queda.
 set "QUEDAS=0"
 
 :abrirServidor
+REM  O servidor nativo (Rust, 14/11/2026, docs\MIGRACAO-RUST.md) vai na frente: abre a porta e a tela na hora e
+REM  abre o Python atras. Sem ele (ou com ARENA_SEM_NATIVO=1, ou depois de uma queda), so o Python, como antes.
+if defined ARENA_SEM_NATIVO goto :soPython
+if not exist "%~dp0servidor\arena-nativo.exe" goto :soPython
+"%~dp0servidor\arena-nativo.exe" "%PYTHON%" "%~dp0servidor\arena.py"
+set "SAIDA=%errorlevel%"
+goto :depoisDoServidor
+:soPython
 "%PYTHON%" "%~dp0servidor\arena.py"
 set "SAIDA=%errorlevel%"
+:depoisDoServidor
 if "%SAIDA%"=="0" goto :fimServidor
 if "%SAIDA%"=="1" goto :fimServidor
 set /a QUEDAS+=1
@@ -91,6 +100,9 @@ if %QUEDAS% GTR 3 goto :desistiu
 echo           Reabrindo sozinho, tentativa %QUEDAS% de 3. A tela volta sozinha.
 echo.
 set "ARENA_REABERTO=1"
+REM  Depois de uma queda, a reabertura vai so com o Python: se o problema for o nativo (antivirus que barra o .exe,
+REM  Windows antigo), o ARENA abre do jeito de sempre.
+set "ARENA_SEM_NATIVO=1"
 REM  Espera 2 s com o proprio Python (funciona sem teclado). Ate 13/11/2026 era o ping, que TRAVA para
 REM  sempre quando a pilha de rede do Windows emperra (visto no PC do Rafael): o servidor nao reabria.
 "%PYTHON%" -c "import time; time.sleep(2)"

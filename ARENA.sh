@@ -104,9 +104,40 @@ fi
 #  explicacao na tela (repetir nao adianta); 130 = Ctrl+C nesta janela.
 #  Qualquer outro numero = queda.
 trap 'echo; echo "  ARENA encerrado."; exit 0' INT
+
+# O servidor nativo (Rust, 14/11/2026, docs/MIGRACAO-RUST.md) vai na frente: abre a porta e a tela na hora e abre o
+# Python atras. No pen drive que nao deixa executar (FAT32), vai uma copia para a pasta de cache da conta, como o
+# Python. Sem ele (ou com ARENA_SEM_NATIVO=1, ou depois de uma queda), so o Python, como antes.
+NATIVO=""
+achar_nativo() {
+    case "$(uname -m)" in
+        aarch64|arm64) _nativo="$RAIZ/servidor/arena-nativo-linux-aarch64" ;;
+        *)             _nativo="$RAIZ/servidor/arena-nativo-linux-x86_64" ;;
+    esac
+    [ -f "$_nativo" ] || return 1
+    [ -x "$_nativo" ] || chmod u+x "$_nativo" 2>/dev/null
+    if [ -x "$_nativo" ] && [ ! -d "$_nativo" ]; then
+        NATIVO="$_nativo"
+    else
+        _cache="${XDG_CACHE_HOME:-$HOME/.cache}/arena"
+        _copia="$_cache/arena-nativo-$(wc -c < "$_nativo" | tr -d ' ')"
+        if [ ! -x "$_copia" ]; then
+            mkdir -p "$_cache" && cp "$_nativo" "$_copia.copiando" && chmod u+x "$_copia.copiando" \
+                && mv "$_copia.copiando" "$_copia"
+        fi
+        [ -x "$_copia" ] && NATIVO="$_copia"
+    fi
+    [ -n "$NATIVO" ]
+}
+[ -z "$ARENA_SEM_NATIVO" ] && achar_nativo
+
 QUEDAS=0
 while :; do
-    "$PYTHON" "$RAIZ/servidor/arena.py"
+    if [ -n "$NATIVO" ]; then
+        "$NATIVO" "$PYTHON" "$RAIZ/servidor/arena.py"
+    else
+        "$PYTHON" "$RAIZ/servidor/arena.py"
+    fi
     SAIDA=$?
     case "$SAIDA" in
         0|1|130) break ;;
@@ -124,6 +155,7 @@ while :; do
     echo
     ARENA_REABERTO=1
     export ARENA_REABERTO
+    NATIVO=""        # a reabertura vai so com o Python (se o problema for o nativo, o ARENA abre como sempre)
     sleep 2
 done
 

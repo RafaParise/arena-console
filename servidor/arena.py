@@ -178,6 +178,16 @@ try:
     PORTA = int(os.environ.get("ARENA_PORTA") or PORTA)
 except ValueError:
     pass
+# Atras do servidor nativo (nativo\, docs\MIGRACAO-RUST.md, 14/11/2026): o nativo, em Rust, abre a PORTA na hora,
+# entrega a tela e repassa o resto a este servidor, que escuta so em 127.0.0.1 na PORTA_INTERNA (sorteada por ele).
+# O segredo prova que o pedido veio do nativo (Manipulador.parse_request). Sem o nativo, tudo como antes.
+SEGREDO_DO_NATIVO = os.environ.get("ARENA_ATRAS_DO_NATIVO", "")
+try:
+    PORTA_INTERNA = int(os.environ.get("ARENA_PORTA_INTERNA") or 0) if SEGREDO_DO_NATIVO else 0
+except ValueError:
+    PORTA_INTERNA = 0
+if not PORTA_INTERNA:
+    SEGREDO_DO_NATIVO = ""
 
 # Porta usada quando o aluno digita so o IP do servidor, sem ":porta".
 PORTA_PADRAO = 8777
@@ -5690,6 +5700,21 @@ class Manipulador(BaseHTTPRequestHandler):
     def log_message(self, formato, *args):
         pass
 
+    def parse_request(self):
+        """Atras do servidor nativo (SEGREDO_DO_NATIVO): todo pedido chega de 127.0.0.1, e quem pediu de verdade vem
+        no X-Arena-Origem. So vale com o segredo da abertura no X-Arena-Proxy (o nativo tira esses dois cabecalhos
+        de quem pede e escreve os seus). Sem o segredo, o pedido continua sendo de 127.0.0.1: passa pelas mesmas
+        regras de sempre (Host da tela e, no Android, o segredo da tela)."""
+        if not super().parse_request():
+            return False
+        if SEGREDO_DO_NATIVO:
+            import hmac
+            prova = (self.headers.get("X-Arena-Proxy") or "").encode("utf-8")
+            origem = (self.headers.get("X-Arena-Origem") or "").strip()
+            if origem and hmac.compare_digest(prova, SEGREDO_DO_NATIVO.encode("utf-8")):
+                self.client_address = (origem, self.client_address[1] if len(self.client_address) > 1 else 0)
+        return True
+
     def pedido_e_local(self):
         """O pedido veio deste MESMO computador (qualquer um dos enderecos
         dele), e nao de outra maquina na rede?"""
@@ -9249,6 +9274,31 @@ def escuta_da_config(config):
     return "0.0.0.0" if config.get("permitir_rede") else "127.0.0.1"
 
 
+def endereco_de_escuta(escuta):
+    """Onde este servidor escuta: (escuta, PORTA); atras do nativo, so (127.0.0.1, PORTA_INTERNA), e quem escuta
+    a rede e' o nativo (avisar_o_nativo)."""
+    return ("127.0.0.1", PORTA_INTERNA) if SEGREDO_DO_NATIVO else (escuta, PORTA)
+
+
+def avisar_o_nativo(escuta):
+    """Conta ao servidor nativo a escuta que a configuracao pede ("0.0.0.0" com a rede liberada). Devolve a escuta
+    que ficou valendo (o nativo volta a "127.0.0.1" se nao conseguir abrir para a rede). Sem o nativo, a propria."""
+    if not SEGREDO_DO_NATIVO:
+        return escuta
+    import http.client
+    try:
+        conexao = http.client.HTTPConnection("127.0.0.1", PORTA, timeout=10)
+        corpo = json.dumps({"escuta": escuta})
+        conexao.request("POST", "/_nativo/rede", body=corpo,
+                        headers={"Content-Type": "application/json", "X-Arena-Proxy": SEGREDO_DO_NATIVO})
+        resposta = json.loads(conexao.getresponse().read().decode("utf-8") or "{}")
+        conexao.close()
+        return resposta.get("escuta") or escuta
+    except (OSError, ValueError) as falha:
+        print("[ARENA] Nao consegui avisar o servidor nativo da escuta (%s): %s" % (escuta, falha))
+        return escuta
+
+
 def trocar_escuta_de_rede():
     """Pede para o servidor reabrir com a escuta nova. Devolve False quando
     nao ha servidor principal (ex.: teste que sobe o seu proprio)."""
@@ -9550,7 +9600,7 @@ def principal():
     print("=" * 62)
 
     try:
-        servidor = Servidor((escuta, PORTA), Manipulador)
+        servidor = Servidor(endereco_de_escuta(escuta), Manipulador)
     except OSError as falha:
         if falha.errno in (errno.EADDRINUSE, 10048):
             print("\n  [ERRO] A porta %d ja esta em uso." % PORTA)
@@ -9565,6 +9615,9 @@ def principal():
                 pass
         return
 
+    # Atras do nativo, quem escuta a rede e' ele: conta a escuta que a configuracao pede (normalmente a mesma que ele
+    # ja abriu, lendo a configuracao).
+    avisar_o_nativo(escuta)
     threading.Thread(target=rodar_vigia, daemon=True).start()
     threading.Thread(target=anunciar_e_escutar, daemon=True).start()
     # Vulkan de verdade? (hardware.vulkan_tem_placa): pergunta em segundo
@@ -9621,15 +9674,16 @@ def principal():
                 # ultimo clique, mesmo com varios cliques seguidos.
                 escuta = escuta_da_config(carregar_config())
                 try:
-                    servidor = Servidor((escuta, PORTA), Manipulador)
+                    servidor = Servidor(endereco_de_escuta(escuta), Manipulador)
                 except OSError as falha:
                     # Nao conseguiu abrir para a rede: volta a escutar so
                     # aqui, para a tela nunca ficar sem servidor.
                     print("[ARENA] Nao consegui abrir para a rede (%s). "
                           "Continuo so neste computador." % falha)
-                    servidor = Servidor(("127.0.0.1", PORTA), Manipulador)
+                    servidor = Servidor(endereco_de_escuta("127.0.0.1"), Manipulador)
                     escuta = "127.0.0.1"
                 SERVIDOR_ATUAL["servidor"] = servidor
+                escuta = avisar_o_nativo(escuta)
             if escuta == "0.0.0.0":
                 print("  Rede:     LIBERADA agora. Outros PCs usam http://%s:%d"
                       % (ip_da_rede(), PORTA))

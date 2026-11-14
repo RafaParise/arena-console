@@ -92,7 +92,8 @@ ARQUIVOS_DA_RAIZ = ["ARENA.bat", "VERIFICAR.bat", "PARTIDA.bat", "COLETAR.bat", 
 # ela, o ARENA.sh e o ARENA dao um jeito, ver servidor\achar_python.sh).
 EXECUTAVEIS_DO_LINUX = ["*.sh", "*.desktop", "*.appimage", "python3.13", "java", "keytool", "rmiregistry",
                         "jspawnhelper",
-                        "retroarch"]      # o RetroArch do Linux ARM64 (programa solto, sem extensao)
+                        "retroarch",       # o RetroArch do Linux ARM64 (programa solto, sem extensao)
+                        "arena-nativo-linux-*"]   # o servidor nativo (Rust) do Linux
 # Do ferramentas\, so o que o COLETAR.bat usa.
 FERRAMENTAS = ["coletar_maquina.py", "medir_arena.py"]
 # Jogo pequeno do proprio projeto para conferir que o RetroArch da versao

@@ -109,7 +109,7 @@ FORA_DO_APK = [os.path.join("assets", "database"), os.path.join("assets", "shade
 FORA_DA_TELA = ["nucleos", "*.wasm.js", "__pycache__"]
 # O servidor que vai no APK: o mesmo do pacote, sem os testes e sem o Python
 # do Windows e o do Linux (o do Android vem pelo python_android).
-FORA_DO_SERVIDOR = ["tests", "python", "python-linux", "python-linux-aarch64", "__pycache__", "*.pyc", "*.pyo",
+FORA_DO_SERVIDOR = ["tests", "python", "python-linux", "python-linux-aarch64", "arena-nativo*", "__pycache__", "*.pyc", "*.pyo",
                     "*.log", "*.tmp", "achar_python.sh"]
 # Da raiz do ARENA: os guias, a licenca e os creditos (o servidor mostra os guias).
 DA_RAIZ_NO_APK = ["LEIA-ME.md", "1-COMECAR.md", "2-JOGOS.md", "3-IMAGEM-SOM-CONTROLE.md", "4-SAVES.md",
@@ -727,6 +727,15 @@ def montar_apk(abi, teste, atualizar, trabalho):
     modulos = python_android.por_no_apk(pasta, abi)
     print("  servidor do ARENA, Python %s (%d modulos nativos), %d jogos livres e %d arquivos de apoio dos "
           "nucleos" % (python_android.VERSAO, modulos, livres, de_apoio), flush=True)
+    # O servidor nativo (Rust, docs\MIGRACAO-RUST.md): o mesmo programa do Linux da mesma arquitetura (estatico, sem
+    # depender de biblioteca do sistema), com o nome lib*.so para o Android deixar executar (como o libarenapython).
+    nativo = os.path.join(RAIZ, "servidor", "arena-nativo-linux-" + ("aarch64" if abi == "arm64-v8a" else "x86_64"))
+    if os.path.isfile(nativo):
+        shutil.copyfile(nativo, os.path.join(pasta, "lib", abi, "libarenanativo.so"))
+        print("  servidor nativo (Rust): lib/%s/libarenanativo.so (%d KB)" % (abi, os.path.getsize(nativo) // 1024),
+              flush=True)
+    else:
+        print("  (sem o servidor nativo: rode ferramentas\\compilar_nativo.py; o APK abre so com o Python)", flush=True)
     destino_nucleos = os.path.join(assets, "arena-nucleos", abi)
     os.makedirs(destino_nucleos)
     for nome, caminho in nucleos.items():

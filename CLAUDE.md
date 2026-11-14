@@ -12,7 +12,9 @@ token ou dado de aluno** (nome, nota, planilha de turma).
 
 O ARENA é um lançador portátil de emuladores para a sala de aula (curso
 técnico de Desenvolvimento de Sistemas, com alunos menores de idade). É
-feito em **Python puro** sobre o **RetroArch** (núcleos libretro), com
+feito em **Python** e, desde 14/11/2026, **Rust** (pedido do Rafael: "eu
+quero desempenho máximo possível, mesmo que não seja mais em Python"; a
+migração por etapas está em `docs\MIGRACAO-RUST.md`), sobre o **RetroArch** (núcleos libretro), com
 emuladores externos para PS2 (PCSX2), GameCube/Wii (Dolphin), PS3 (RPCS3)
 e Xbox 360 (Xenia). Roda **local**, de uma pasta ou de um pen drive, sem
 instalar nada. O código também é material de aula: comentários em
@@ -36,7 +38,8 @@ professor da rede estadual de SP.
 
 | Restrição | O que isso obriga |
 |---|---|
-| Sem `pip install` | Só a biblioteca padrão; o Windows é alcançado por `ctypes` |
+| Sem `pip install` | No Python, só a biblioteca padrão; o Windows é alcançado por `ctypes` |
+| Rust (14/11/2026) | O servidor nativo (`nativo\`) vai na frente e o Python atrás, como reserva: sem o executável, o ARENA abre como antes. Compila no PC (`ferramentas\compilar_nativo.py`); o aluno nunca compila. Comentários em português, como no Python |
 | Sem administrador | Nada de driver, serviço, regra de firewall ou gravação no registro. **Exceções** (pedido do Rafael, 13/11/2026): os botões opcionais **Equipamentos → Instalar o WSL** (Windows) e **Instalar o Waydroid** (Linux), que avisam antes e deixam o próprio sistema pedir a permissão (UAC, pkexec) |
 | Pen drive | Caminho sempre relativo. Caminho absoluto vazando é bug de portabilidade |
 | Offline | Internet é bônus, e sem ela tudo degrada com uma mensagem clara |

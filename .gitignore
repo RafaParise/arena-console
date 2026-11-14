@@ -162,3 +162,8 @@ servidor/vigem/*.dll
 
 # A prova em Rust da Fase 3 (ferramentas/prova_rust): o que o cargo compila fica fora
 ferramentas/prova_rust/target/
+
+# O servidor nativo (Rust): o que o cargo compila e os executaveis que o ferramentas/compilar_nativo.py poe no servidor
+nativo/target/
+servidor/arena-nativo.exe
+servidor/arena-nativo-linux-*
