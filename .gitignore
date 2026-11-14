@@ -153,3 +153,8 @@ servidor/vigem/*.dll
 
 # Fotos e registros do Playwright (testes da tela)
 .playwright-mcp/
+
+# Chave de assinatura do APK: fica fora do git (%LOCALAPPDATA%\ARENA-android\); isto so protege de um descuido
+*.keystore
+*.jks
+*.p12

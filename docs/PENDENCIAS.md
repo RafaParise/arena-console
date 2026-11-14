@@ -1162,5 +1162,24 @@ Falta, nesta ordem:
 
 - Rodada final começou às ~19h (`docs\rodada_final_bruta.json`, gravado a cada teste; retomar com
   `ferramentas\rodada_final.py --saida=docs\rodada_final_bruta.json --continuar`). O A12 está com o APK de TESTE.
-- Depois: repetir as falhas sozinhas, VERSAO 2026.11.14, APKs de produção (arm64 e x86_64) com o de produção
+- ~20h: o Claude Code parou a rodada por falta de memória no PC (não foi falha do ARENA). Os 15 primeiros testes
+  passaram, até o `teste_alcas_sem_vazamento`; parou no começo do `teste_android_estresse`. O celular ficou normal.
+  Retomada às 20h05; às ~21h o Claude Code parou de novo (mesmo motivo) com 52 testes OK e nenhuma falha, no
+  `teste_dreampotato_pelo_arena`. Retomada numa janela à parte às 21h10: terminou às 22h40 com **127 de 131**.
+- As 4 falhas repetidas sozinhas:
+  - `teste_orcamentos_modo_alvo` (1b em 4,04 s com o PC ocupado): **passou**;
+  - `teste_pasta_system_pelo_arena` (a foto da janela do VIC-20 não saiu): falhou de novo, **passou** na 3ª;
+  - `teste_multitap_regra_de_ouro`: o teste estava velho. A versão de antes (97ffe03) ligava o som exclusivo no
+    perfil Qualidade; desde 16/10 o ARENA não liga mais, de propósito. Só aparece quando a máquina cai no perfil
+    Qualidade. O teste passou a traduzir essa mudança (`VALOR_NOVO_DE_PROPOSITO`) e **passou**;
+  - `teste_ps2_todos_os_jogos`: **a investigar**. O PCSX2 às vezes não começa em 60 s (rodada 6 de 40, repetição 8
+    de 40, depois um jogo por vez: cada jogo e cada nível às vezes abre em ~21 s e às vezes para logo depois de criar
+    a tela do D3D12, com o processador quase parado e sem erro do driver). Jogo e nível mudam a cada vez (o Black e o
+    Bully falharam na rodada e passaram na repetição; o Call of Duty 2 no Automático passou na 3ª). Memória livre
+    entre 3,7 e 7,7 GB. Nada do PS2 mudou no código desde a 2026.11.13.2 (diff de `servidor\`, `launcher\` e
+    `emuladores\`) e às 13h58 de hoje os 40 passaram: não é regressão desta versão. Próximo passo: medir com a tela
+    ligada e o PC sem uso, olhar o registro inteiro do PCSX2 (e o `procmon`) de uma partida parada.
+- Feito antes da VERSAO: o indexador pula os `._` do Mac e as pastas ocultas do sistema (`docs\PLANO-DE-ACAO-RUST.md`,
+  22º guia), com teste no `run.py` (1513 testes OK).
+- Depois: VERSAO 2026.11.14, APKs de produção (arm64 e x86_64) com o de produção
   conferido no A12, pacote dos alunos do zero, nota `docs\RELEASE-2026.11.14.md` (rascunho pronto) e a release.

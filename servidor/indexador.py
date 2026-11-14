@@ -64,6 +64,23 @@ ORIGENS = {
 IGNORAR = {"leia.txt", "leia-me.txt", "_console.txt", "readme.txt", "licenca.txt",
            "license.txt", "thumbs.db", "desktop.ini", ".gitkeep"}
 
+# Pastas que o sistema cria no pen drive e que nunca guardam jogo (13/11/2026): a lixeira do Windows e a pasta dos
+# pontos de restauracao. As que comecam com ponto (a lixeira do Mac, ".Trashes"; a do Linux, ".Trash-1000"; o indice
+# do Spotlight; ".fseventsd") ficam de fora pelo ponto.
+PASTAS_DO_SISTEMA = {"$recycle.bin", "system volume information"}
+
+
+def pasta_escondida(nome):
+    """A pasta e' do sistema (lixeira, indice, pasta oculta) e a varredura nao entra nela?"""
+    return nome.startswith(".") or nome.lower() in PASTAS_DO_SISTEMA
+
+
+def arquivo_escondido(nome):
+    """Arquivo oculto, que nunca e' jogo. O caso que motivou (13/11/2026): num pen drive usado num Mac, cada arquivo
+    ganha um irmao de 4 KB com '._' na frente ('._Mario.sfc'), que aparecia como um segundo Mario na lista e nao
+    abria."""
+    return nome.startswith(".")
+
 # BIOS de fliperama que o aluno costuma deixar junto dos jogos (neogeo.zip,
 # neogeo.mame.zip, pgm.zip...): nao e jogo, nao entra na lista. Os nomes sao
 # os dos romsets de BIOS do MAME/FBNeo (e o qsound.zip, som do CPS2).
@@ -504,7 +521,7 @@ def arquivo_de_jogadores():
 # (ex.: o jogo de CD em trilhas virar um jogo so) nao valia num ARENA que ja
 # tinha a lista salva, ate alguma pasta mudar. 2 = nomes de fliperama pelos
 # bancos do RetroArch + avisos do jogo.
-VERSAO_INDICE = 8     # 8 = jogadores dos jogos testados vem com o programa
+VERSAO_INDICE = 9     # 9 = sem os arquivos ocultos do Mac ('._') e sem a lixeira (13/11/2026)
 
 
 def assinatura_das_pastas():
@@ -525,7 +542,7 @@ def assinatura_das_pastas():
         if not os.path.isdir(caminho):
             continue
         for pasta_atual, subpastas, _arquivos in os.walk(caminho):
-            subpastas.sort()
+            subpastas[:] = sorted(p for p in subpastas if not pasta_escondida(p))
             try:
                 partes.append("%s|%d" % (pasta_atual, os.path.getmtime(pasta_atual)))
             except OSError:
@@ -899,7 +916,9 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None,
         return encontrados
 
     for pasta_atual, subpastas, arquivos in os.walk(caminho_pasta):
-        subpastas.sort()
+        # A lixeira e as pastas ocultas do sistema ficam de fora (o os.walk nao entra nas que saem desta lista).
+        subpastas[:] = sorted(p for p in subpastas if not pasta_escondida(p))
+        arquivos = [a for a in arquivos if not arquivo_escondido(a)]
         # O caminho inteiro conta, nao so a ultima pasta: quem organiza em
         # 'Sony\PlayStation 2\Corrida' tambem e atendido.
         caminho_relativo_pasta = os.path.relpath(pasta_atual, caminho_pasta)

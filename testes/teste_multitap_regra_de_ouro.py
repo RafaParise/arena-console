@@ -109,7 +109,11 @@ VALOR_NOVO_DE_PROPOSITO = {("rgui_menu_color_theme", "27"): "4", ("content_show_
                            # Fase 5 da auditoria 3: o perfil Qualidade nao liga mais
                            # sozinho o voltar no tempo e a resposta instantanea (o N64
                            # caia para 30 quadros/s; o PS1 gastava 5x o processador).
-                           ("rewind_enable", "true"): "false", ("run_ahead_enabled", "true"): "false"}
+                           ("rewind_enable", "true"): "false", ("run_ahead_enabled", "true"): "false",
+                           # 16/10/2026: o perfil Qualidade nao toma mais a placa de som para si (o modo exclusivo
+                           # deixava o jogo 13% mais lento e tremido com fone sem fio; arena.py, ajustar_para_driver).
+                           # So aparece quando a maquina cai no perfil Qualidade (rodada de 13/11, 242 casos).
+                           ("audio_wasapi_exclusive_mode", "true"): "false"}
 
 # Mudancas de 07/11/2026, de proposito (achadas pela rodada final de 08/11, que reprovou 242 casos so por elas):
 #  - a foto de onde parou (savestate_thumbnail_enable, 326a430): vale para todo jogo e nao mexe em porta nem em

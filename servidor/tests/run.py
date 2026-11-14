@@ -88,6 +88,35 @@ class TestIndexador(unittest.TestCase):
         self.assertIn("leia.txt", self.mod.IGNORAR)
         self.assertIn("thumbs.db", self.mod.IGNORAR)
 
+    def test_pen_drive_do_mac_e_lixeiras_nao_viram_jogo(self):
+        # 13/11/2026: o '._Mario (USA).sfc' de 4 KB que o macOS deixa ao lado de cada arquivo aparecia como um
+        # segundo Mario, e o que estava na lixeira (do Mac, do Linux, do Windows) aparecia como jogo.
+        por_id, por_ext = self.mod.carregar_plataformas()
+        pessoais = os.path.join(self.mod.PASTA_JOGOS, "pessoais")
+        snes = os.path.join(pessoais, "Super Nintendo")
+        lixeiras = [os.path.join(pessoais, nome) for nome in
+                    (".Trashes", ".Trash-1000", ".Spotlight-V100", "$RECYCLE.BIN", "System Volume Information")]
+        for pasta in [snes] + lixeiras:
+            os.makedirs(pasta)
+        with open(os.path.join(snes, "Mario (USA).sfc"), "wb") as f:
+            f.write(b"\0" * 1024)
+        with open(os.path.join(snes, "._Mario (USA).sfc"), "wb") as f:
+            f.write(b"\0\x05\x16\x07" + b"\0" * 60)
+        for pasta in lixeiras:
+            with open(os.path.join(pasta, "Zelda (USA).sfc"), "wb") as f:
+                f.write(b"\0" * 1024)
+        achados = self.mod.varrer_pasta(pessoais, "pessoais", por_ext, por_id)
+        self.assertEqual([os.path.relpath(j["arquivo"], pessoais) for j in achados],
+                         [os.path.join("Super Nintendo", "Mario (USA).sfc")])
+        # A pasta oculta tambem nao entra na assinatura (mexer na lixeira nao refaz a lista).
+        antes = self.mod.assinatura_das_pastas()
+        with open(os.path.join(lixeiras[0], "outro.sfc"), "wb") as f:
+            f.write(b"\0")
+        os.utime(lixeiras[0], (1, 1))
+        self.assertEqual(antes, self.mod.assinatura_das_pastas())
+        self.assertTrue(self.mod.pasta_escondida(".fseventsd"))
+        self.assertFalse(self.mod.pasta_escondida("Super Nintendo"))
+
     def test_disco_em_trilhas_vira_um_jogo(self):
         # Achado 25/09/2026: Saturn Bomberman aparecia 31 vezes (trilhas).
         por_id, por_ext = self.mod.carregar_plataformas()
