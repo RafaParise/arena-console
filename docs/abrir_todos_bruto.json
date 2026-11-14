@@ -6,11 +6,10 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 36430,
-   "segundos": 11.6,
+   "segundos": 12.0,
    "travou": false,
    "erros": [
-    "[ERROR] [Disc] Failed to set initial disc index. Expected #1 \"\", Detected #1 \"\".",
-    "[ERROR] [Vulkan] Failed to update swapchain."
+    "[ERROR] [Disc] Failed to set initial disc index. Expected #1 \"\", Detected #1 \"\"."
    ]
   },
   "foto": "000 Apple II - DIAFLW.png",
@@ -45,7 +44,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 17201,
-   "segundos": 10.9,
+   "segundos": 11.2,
    "travou": false,
    "erros": []
   },
@@ -65,7 +64,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 24508,
-   "segundos": 10.9,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
@@ -85,7 +84,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 29416,
-   "segundos": 10.9,
+   "segundos": 11.2,
    "travou": false,
    "erros": []
   },
@@ -105,7 +104,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 8973,
-   "segundos": 10.9,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -125,7 +124,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 76999,
-   "segundos": 11.2,
+   "segundos": 11.4,
    "travou": false,
    "erros": []
   },
@@ -145,7 +144,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 102636,
-   "segundos": 11.0,
+   "segundos": 11.3,
    "travou": false,
    "erros": []
   },
@@ -165,7 +164,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 23175,
-   "segundos": 10.9,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -185,7 +184,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 4841,
-   "segundos": 10.9,
+   "segundos": 11.3,
    "travou": false,
    "erros": []
   },
@@ -204,8 +203,8 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": true,
-   "foto_bytes": 4506,
-   "segundos": 11.0,
+   "foto_bytes": 4511,
+   "segundos": 11.3,
    "travou": false,
    "erros": []
   },
@@ -225,7 +224,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 10936,
-   "segundos": 10.8,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -245,7 +244,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 7632,
-   "segundos": 10.9,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -265,7 +264,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 2054,
-   "segundos": 11.0,
+   "segundos": 11.2,
    "travou": false,
    "erros": []
   },
@@ -285,7 +284,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 7273,
-   "segundos": 10.8,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -305,7 +304,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 30159,
-   "segundos": 13.2,
+   "segundos": 13.4,
    "travou": false,
    "erros": []
   },
@@ -321,7 +320,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 33082,
-   "segundos": 13.1,
+   "segundos": 13.2,
    "travou": false,
    "erros": []
   },
@@ -337,7 +336,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 91061,
-   "segundos": 13.1,
+   "segundos": 13.4,
    "travou": false,
    "erros": []
   },
@@ -369,7 +368,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 68395,
-   "segundos": 12.9,
+   "segundos": 13.1,
    "travou": false,
    "erros": []
   },
@@ -385,7 +384,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 59412,
-   "segundos": 12.9,
+   "segundos": 13.0,
    "travou": false,
    "erros": []
   },
@@ -401,7 +400,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 35071,
-   "segundos": 12.8,
+   "segundos": 13.0,
    "travou": false,
    "erros": []
   },
@@ -417,7 +416,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 6408,
-   "segundos": 10.9,
+   "segundos": 11.2,
    "travou": false,
    "erros": []
   },
@@ -437,7 +436,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 26262,
-   "segundos": 10.8,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -457,7 +456,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 191867,
-   "segundos": 10.9,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -505,10 +504,10 @@
   "titulo": "God of War Betrayal J2ME EN V0195",
   "jogadores": 2,
   "abrir": {
-   "abre_e_mostra_imagem": false,
+   "abre_e_mostra_imagem": true,
    "foto_bytes": 97199,
-   "segundos": 110.0,
-   "travou": true,
+   "segundos": 13.1,
+   "travou": false,
    "erros": []
   },
   "foto": "043 Java ME (celular ant - God of War Betrayal J2ME EN V0195.png",
@@ -522,7 +521,7 @@
   "jogadores": 2,
   "abrir": {
    "abre_e_mostra_imagem": false,
-   "foto_bytes": 34850,
+   "foto_bytes": 36222,
    "segundos": 110.0,
    "travou": true,
    "erros": []
@@ -555,11 +554,9 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 459769,
-   "segundos": 11.1,
+   "segundos": 11.4,
    "travou": false,
-   "erros": [
-    "[ERROR] [Vulkan] Failed to update swapchain."
-   ]
+   "erros": []
   },
   "foto": "046 Mega Drive, Master S - Golden Axe.png",
   "jogar_junto": {
@@ -577,7 +574,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 415256,
-   "segundos": 10.9,
+   "segundos": 11.2,
    "travou": false,
    "erros": []
   },
@@ -597,7 +594,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 41254,
-   "segundos": 10.8,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
@@ -615,12 +612,20 @@
   "titulo": "Micro Machines 2 Turbo Tournament",
   "jogadores": 4,
   "abrir": {
-   "abre_e_mostra_imagem": false,
-   "foto_bytes": 0,
-   "segundos": 170.0,
-   "travou": true,
+   "abre_e_mostra_imagem": true,
+   "foto_bytes": 255633,
+   "segundos": 41.1,
+   "travou": false,
    "erros": [],
    "segunda_vez_com_40s": true
+  },
+  "foto": "049 Mega Drive, Master S - Micro Machines 2 Turbo Tournament.png",
+  "jogar_junto": {
+   "conectou": true,
+   "convidado_diz": "Você se juntou como jogador 2",
+   "recusa_do_nucleo": "",
+   "hospedeiro_vivo": true,
+   "erros": []
   }
  },
  {
@@ -630,7 +635,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 210779,
-   "segundos": 10.8,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -650,7 +655,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 463286,
-   "segundos": 10.9,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -670,7 +675,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 151578,
-   "segundos": 10.8,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -690,7 +695,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 8637,
-   "segundos": 10.8,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -710,7 +715,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 105657,
-   "segundos": 11.5,
+   "segundos": 11.8,
    "travou": false,
    "erros": []
   },
@@ -730,7 +735,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 47792,
-   "segundos": 11.0,
+   "segundos": 11.3,
    "travou": false,
    "erros": []
   },
@@ -750,7 +755,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 47792,
-   "segundos": 11.1,
+   "segundos": 11.3,
    "travou": false,
    "erros": []
   },
@@ -770,7 +775,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 187598,
-   "segundos": 10.9,
+   "segundos": 11.2,
    "travou": false,
    "erros": []
   },
@@ -790,7 +795,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 29667,
-   "segundos": 11.2,
+   "segundos": 11.4,
    "travou": false,
    "erros": []
   },
@@ -810,7 +815,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 30514,
-   "segundos": 11.3,
+   "segundos": 11.6,
    "travou": false,
    "erros": []
   },
@@ -830,7 +835,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 244013,
-   "segundos": 10.9,
+   "segundos": 11.1,
    "travou": false,
    "erros": [
     "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented."
@@ -854,7 +859,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 342861,
-   "segundos": 10.8,
+   "segundos": 11.1,
    "travou": false,
    "erros": [
     "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented."
@@ -878,7 +883,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 181503,
-   "segundos": 10.8,
+   "segundos": 11.0,
    "travou": false,
    "erros": [
     "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented."
@@ -902,7 +907,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 360860,
-   "segundos": 10.8,
+   "segundos": 11.0,
    "travou": false,
    "erros": [
     "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented."
@@ -926,7 +931,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 458042,
-   "segundos": 12.5,
+   "segundos": 12.8,
    "travou": false,
    "erros": []
   },
@@ -942,7 +947,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 682244,
-   "segundos": 14.5,
+   "segundos": 14.7,
    "travou": false,
    "erros": []
   },
@@ -958,7 +963,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 1400779,
-   "segundos": 11.8,
+   "segundos": 12.1,
    "travou": false,
    "erros": []
   },
@@ -974,7 +979,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 435421,
-   "segundos": 12.7,
+   "segundos": 13.3,
    "travou": false,
    "erros": []
   },
@@ -990,7 +995,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 590887,
-   "segundos": 13.5,
+   "segundos": 13.9,
    "travou": false,
    "erros": []
   },
@@ -1006,7 +1011,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 406434,
-   "segundos": 12.6,
+   "segundos": 12.7,
    "travou": false,
    "erros": []
   },
@@ -1022,7 +1027,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 251652,
-   "segundos": 11.9,
+   "segundos": 12.0,
    "travou": false,
    "erros": []
   },
@@ -1056,7 +1061,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 43950,
-   "segundos": 22.0,
+   "segundos": 21.8,
    "travou": false,
    "erros": []
   },
@@ -1076,7 +1081,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 43950,
-   "segundos": 23.0,
+   "segundos": 22.2,
    "travou": false,
    "erros": []
   },
@@ -1086,9 +1091,7 @@
    "convidado_diz": "Você se juntou como jogador 2",
    "recusa_do_nucleo": "",
    "hospedeiro_vivo": true,
-   "erros": [
-    "[ERROR] [Vulkan] Failed to update swapchain."
-   ]
+   "erros": []
   }
  },
  {
@@ -1098,7 +1101,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 66502,
-   "segundos": 19.2,
+   "segundos": 19.1,
    "travou": false,
    "erros": []
   },
@@ -1118,7 +1121,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 43950,
-   "segundos": 25.4,
+   "segundos": 25.0,
    "travou": false,
    "erros": []
   },
@@ -1138,7 +1141,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 43950,
-   "segundos": 12.3,
+   "segundos": 12.4,
    "travou": false,
    "erros": []
   },
@@ -1158,7 +1161,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 43950,
-   "segundos": 23.5,
+   "segundos": 22.8,
    "travou": false,
    "erros": []
   },
@@ -1178,7 +1181,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 66502,
-   "segundos": 13.7,
+   "segundos": 13.9,
    "travou": false,
    "erros": []
   },
@@ -1414,7 +1417,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 448271,
-   "segundos": 11.9,
+   "segundos": 12.1,
    "travou": false,
    "erros": []
   },
@@ -1430,7 +1433,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 93036,
-   "segundos": 11.0,
+   "segundos": 11.3,
    "travou": false,
    "erros": []
   },
@@ -1446,7 +1449,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 112903,
-   "segundos": 11.1,
+   "segundos": 11.3,
    "travou": false,
    "erros": []
   },
@@ -1462,7 +1465,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 6601,
-   "segundos": 11.1,
+   "segundos": 11.3,
    "travou": false,
    "erros": [
     "[libretro WARN] [sceDisplay] Video out requested, not supported: mode=0 size=512,272"
@@ -1480,7 +1483,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 19404,
-   "segundos": 11.0,
+   "segundos": 11.3,
    "travou": false,
    "erros": [
     "[libretro WARN] [sceDisplay] Video out requested, not supported: mode=0 size=512,272"
@@ -1498,7 +1501,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 1537199,
-   "segundos": 17.5,
+   "segundos": 17.8,
    "travou": false,
    "erros": []
   },
@@ -1514,7 +1517,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 430305,
-   "segundos": 11.2,
+   "segundos": 11.5,
    "travou": false,
    "erros": []
   },
@@ -1530,7 +1533,7 @@
   "abrir": {
    "abre_e_mostra_imagem": false,
    "foto_bytes": 212,
-   "segundos": 75.7,
+   "segundos": 75.9,
    "travou": false,
    "erros": [],
    "segunda_vez_com_40s": true
@@ -1544,7 +1547,7 @@
   "abrir": {
    "abre_e_mostra_imagem": false,
    "foto_bytes": 212,
-   "segundos": 75.7,
+   "segundos": 75.9,
    "travou": false,
    "erros": [],
    "segunda_vez_com_40s": true
@@ -1558,7 +1561,7 @@
   "abrir": {
    "abre_e_mostra_imagem": false,
    "foto_bytes": 212,
-   "segundos": 75.7,
+   "segundos": 75.9,
    "travou": false,
    "erros": [],
    "segunda_vez_com_40s": true
@@ -1572,7 +1575,7 @@
   "abrir": {
    "abre_e_mostra_imagem": false,
    "foto_bytes": 212,
-   "segundos": 75.7,
+   "segundos": 75.9,
    "travou": false,
    "erros": [],
    "segunda_vez_com_40s": true
@@ -1586,7 +1589,7 @@
   "abrir": {
    "abre_e_mostra_imagem": false,
    "foto_bytes": 212,
-   "segundos": 75.7,
+   "segundos": 75.9,
    "travou": false,
    "erros": [],
    "segunda_vez_com_40s": true
@@ -1600,7 +1603,7 @@
   "abrir": {
    "abre_e_mostra_imagem": false,
    "foto_bytes": 212,
-   "segundos": 75.7,
+   "segundos": 75.9,
    "travou": false,
    "erros": [],
    "segunda_vez_com_40s": true
@@ -1614,7 +1617,7 @@
   "abrir": {
    "abre_e_mostra_imagem": false,
    "foto_bytes": 212,
-   "segundos": 75.7,
+   "segundos": 75.9,
    "travou": false,
    "erros": [],
    "segunda_vez_com_40s": true
@@ -1628,7 +1631,7 @@
   "abrir": {
    "abre_e_mostra_imagem": false,
    "foto_bytes": 212,
-   "segundos": 75.7,
+   "segundos": 75.9,
    "travou": false,
    "erros": [],
    "segunda_vez_com_40s": true
@@ -1642,7 +1645,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 47656,
-   "segundos": 12.8,
+   "segundos": 13.1,
    "travou": false,
    "erros": []
   },
@@ -1662,7 +1665,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 11583,
-   "segundos": 10.8,
+   "segundos": 11.0,
    "travou": false,
    "erros": []
   },
@@ -1682,7 +1685,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 525721,
-   "segundos": 11.7,
+   "segundos": 11.9,
    "travou": false,
    "erros": []
   },
@@ -1702,7 +1705,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 286742,
-   "segundos": 12.9,
+   "segundos": 13.1,
    "travou": false,
    "erros": []
   },
@@ -1722,7 +1725,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 107003,
-   "segundos": 13.2,
+   "segundos": 13.8,
    "travou": false,
    "erros": []
   },
@@ -1738,7 +1741,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 58602,
-   "segundos": 13.0,
+   "segundos": 13.6,
    "travou": false,
    "erros": []
   },
@@ -1754,7 +1757,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 58602,
-   "segundos": 13.0,
+   "segundos": 13.6,
    "travou": false,
    "erros": [
     "[libretro INFO] [BOOT] USA region not supported. Using Europe instead"
@@ -1772,7 +1775,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 58602,
-   "segundos": 13.0,
+   "segundos": 13.6,
    "travou": false,
    "erros": []
   },
@@ -1788,7 +1791,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 58602,
-   "segundos": 13.0,
+   "segundos": 13.8,
    "travou": false,
    "erros": [
     "[libretro INFO] [BOOT] USA region not supported. Using Europe instead"
@@ -1806,7 +1809,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 58602,
-   "segundos": 13.0,
+   "segundos": 13.8,
    "travou": false,
    "erros": [
     "[libretro INFO] [BOOT] USA region not supported. Using Europe instead"
@@ -1824,7 +1827,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 46284,
-   "segundos": 11.9,
+   "segundos": 12.2,
    "travou": false,
    "erros": []
   },
@@ -1844,7 +1847,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 186647,
-   "segundos": 10.9,
+   "segundos": 11.2,
    "travou": false,
    "erros": []
   },
@@ -1864,7 +1867,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 186647,
-   "segundos": 10.8,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -1884,7 +1887,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 344006,
-   "segundos": 10.9,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -1904,7 +1907,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 401369,
-   "segundos": 10.9,
+   "segundos": 11.4,
    "travou": false,
    "erros": []
   },
@@ -1924,7 +1927,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 137070,
-   "segundos": 10.8,
+   "segundos": 11.1,
    "travou": false,
    "erros": []
   },
@@ -1944,7 +1947,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 260650,
-   "segundos": 12.9,
+   "segundos": 13.2,
    "travou": false,
    "erros": []
   },
@@ -1964,7 +1967,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 347734,
-   "segundos": 13.0,
+   "segundos": 13.3,
    "travou": false,
    "erros": []
   },
@@ -1984,7 +1987,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 327956,
-   "segundos": 12.8,
+   "segundos": 13.1,
    "travou": false,
    "erros": []
   },
@@ -2016,7 +2019,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 11185,
-   "segundos": 13.0,
+   "segundos": 13.1,
    "travou": false,
    "erros": [
     "[ERROR] [Disc] Failed to set initial disc index. Expected #1 \"\", Detected #1 \"\"."
@@ -2040,7 +2043,7 @@
   "abrir": {
    "abre_e_mostra_imagem": true,
    "foto_bytes": 16258,
-   "segundos": 12.8,
+   "segundos": 13.1,
    "travou": false,
    "erros": []
   },

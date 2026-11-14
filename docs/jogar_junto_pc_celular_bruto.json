@@ -13,12 +13,12 @@
   "pc_netplay": [
     "[WARN] [Netplay] ATENÇÃO: Um par da Netplay está executando uma versão diferente do núcleo. Se ocorrerem problemas, use a mesma versão.",
     "[INFO] [Netplay] Conectado a: \"Rafa Parise Android\"",
-    "[INFO] [Netplay] Você se juntou como jogador 2 (ping: 19 ms)"
+    "[INFO] [Netplay] Você se juntou como jogador 2 (ping: 18 ms)"
   ],
   "celular_sem_resposta": "a tela do ARENA, atras do jogo, nao respondeu (timed out)",
   "celular_netplay": [],
   "celular_registro_campos": [],
   "celular_registro_cauda": [],
   "celular_jogo_em_andamento": null,
-  "entrou_em_s": 18.1
+  "entrou_em_s": 18.2
 }

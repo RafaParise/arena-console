@@ -5,7 +5,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 97658,
-      "segundos": 10.9,
+      "segundos": 11.1,
       "travou": false,
       "erros": []
     },
@@ -23,7 +23,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 235493,
-      "segundos": 11.2,
+      "segundos": 11.1,
       "travou": false,
       "erros": []
     },
@@ -41,7 +41,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 342861,
-      "segundos": 11.2,
+      "segundos": 11.0,
       "travou": false,
       "erros": [
         "[ERROR] [Environ] GET_VARIABLE: fceumm_hdpacks - Not implemented."
@@ -63,7 +63,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 41254,
-      "segundos": 10.8,
+      "segundos": 11.0,
       "travou": false,
       "erros": []
     },
@@ -81,7 +81,7 @@
     "abre": {
       "abre_e_mostra_imagem": false,
       "foto_bytes": 1797,
-      "segundos": 10.8,
+      "segundos": 11.0,
       "travou": false,
       "erros": []
     },
@@ -99,7 +99,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 435421,
-      "segundos": 19.1,
+      "segundos": 21.2,
       "travou": false,
       "erros": []
     },
@@ -120,7 +120,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 43950,
-      "segundos": 13.4,
+      "segundos": 13.6,
       "travou": false,
       "erros": []
     },
@@ -138,13 +138,13 @@
     "abre": {
       "abre_e_mostra_imagem": false,
       "foto_bytes": 1850,
-      "segundos": 10.9,
+      "segundos": 11.4,
       "travou": false,
       "erros": []
     },
     "jogar_junto": {
       "conectou": true,
-      "convidado_diz": "Você se juntou como jogador 2",
+      "convidado_diz": null,
       "recusa_do_nucleo": "",
       "hospedeiro_vivo": true,
       "erros": []
@@ -156,10 +156,15 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 58602,
-      "segundos": 13.1,
+      "segundos": 21.4,
       "travou": false,
       "erros": [
-        "[libretro INFO] [BOOT] USA region not supported. Using Europe instead"
+        "[libretro INFO] [BOOT] USA region not supported. Using Europe instead",
+        "[ERROR] [Vulkan] Failed to update swapchain.",
+        "[ERROR] [Vulkan] Failed to update swapchain.",
+        "[ERROR] [Vulkan] Failed to update swapchain.",
+        "[ERROR] [Vulkan] Failed to update swapchain.",
+        "[ERROR] [Vulkan] Failed to update swapchain."
       ]
     },
     "jogar_junto": {
@@ -180,7 +185,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 6601,
-      "segundos": 11.1,
+      "segundos": 11.5,
       "travou": false,
       "erros": [
         "[libretro WARN] [sceDisplay] Video out requested, not supported: mode=0 size=512,272"
@@ -203,7 +208,7 @@
     "abre": {
       "abre_e_mostra_imagem": true,
       "foto_bytes": 29667,
-      "segundos": 11.4,
+      "segundos": 11.7,
       "travou": false,
       "erros": []
     },

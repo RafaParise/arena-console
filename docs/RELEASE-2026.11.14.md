@@ -38,7 +38,21 @@ ARENA descompacta o `PC-atualizacao.zip` por cima da pasta (só o programa muda:
 
 ## Como esta versão foi conferida
 
-RESULTADO_DA_RODADA
+- **Rodada final** (131 testes de uma vez, cerca de 3 h): **127 passaram**. As 4 falhas foram repetidas uma a uma:
+  - o tempo de abertura do servidor (estourou com o PC ocupado) e a foto da janela do Commodore VIC-20 passaram
+    sozinhos;
+  - o teste da regra de ouro do multitap estava desatualizado (comparava com uma versão antiga, de antes da mudança
+    de 16/10 no som); foi corrigido e passou;
+  - o teste de **todos os jogos de PS2** segue em investigação: nesta noite o PCSX2 às vezes não começou em 60 s,
+    um jogo e um nível diferentes a cada vez, e o mesmo jogo abriu em cerca de 21 s na repetição. Nada do PS2 mudou
+    desde a 2026.11.13.2, e de tarde os 40 abriram.
+- **Bateria do servidor:** 1513 testes, todos passando.
+- **Celular:** o SGSR conferido no Galaxy A12 (Vulkan e o filtro compilado no registro do RetroArch); o APK de
+  produção instalado e conferido no A12 (abertura a frio e `auditoria_celular`).
+
+**Também nesta versão:** num pen drive usado num Mac, os arquivos ocultos que o macOS cria ao lado de cada jogo
+(`._Mario.sfc`) apareciam como jogos repetidos que não abriam, e o que estava na lixeira também aparecia. Agora o
+ARENA ignora os arquivos ocultos e as lixeiras do Mac, do Linux e do Windows.
 
 ## Limites conhecidos
 
