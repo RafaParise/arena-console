@@ -1214,3 +1214,20 @@ Falta, nesta ordem:
   segundo plano; o servidor nasce antes da WebView. Dentro do Python: 4,75 s -> 2,6 a 3,0 s; do toque até a lista:
   cerca de 3,5 s. Marcas `[ARENA] Abertura, X s` no registro do Android. Falta para os 2 s: as pastas do cartão SD
   (~0,7 s, FUSE) e carregar os módulos sob demanda. Vai na próxima versão (APK de produção já no A12).
+
+## 14/11/2026 (madrugada, 2): repasse com vários endereços, acervo do Batocera, lote do Android
+
+Feito e enviado (vai na próxima versão): repasse próprio com até 4 endereços e recusa de código conhecido por mais de
+um (`cef9ae1`, `20d7d59`); recomps com a release guardada e download direto quando a API do GitHub limita (`7bf8117`);
+nome e capa do `gamelist.xml` do Batocera/EmulationStation (`141b2a3`); `docs/PARIDADE.md` conferido (`90ad96e`); lote
+do Android (`afc1cf5`: modo TV Box desligado por padrão, botão **Fechar o ARENA** no aviso, pen drive/cartão que entra
+ou sai, barras e foco, as três telas de "todos os arquivos"), testado no A12 com o APK de produção; Linux ARM64
+conferido nas fontes (`4f426d9`, em `docs/PLANO-DE-ACAO-RUST.md`); tecla F favorita (`d0ad584`).
+
+**Próximo passo:**
+1. Testes que faltam do lote do Android: chave da TV Box no emulador de Android TV (não no A12); pen drive de verdade
+   no OTG; o foco do controle (T4 virtual) depois de um jogo; o Fechar com jogo aberto.
+2. Linux ARM64: só se a escola tiver TV Box com Armbian ou Raspberry Pi (pergunta ao Rafael); a ordem está no plano.
+3. Busca na sinopse: a lista não tem sinopse (o indexador só lê nome e capa); precisaria entrar no índice.
+4. Favoritar pelo botão Y do controle: a tela não lê o controle fora do mapeamento (no Android o direcional vira foco
+   do WebView); conferir qual tecla o WebView entrega para o Y antes de prometer.
