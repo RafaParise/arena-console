@@ -786,6 +786,52 @@ class OQueOCelularNaoTem(unittest.TestCase):
             self.assertNotIn("F10", arena.mensagem_cheat_com_jogo_aberto())
 
 
+class RecursosEmSegundoPlano(unittest.TestCase):
+    """Os ~2300 recursos do RetroArch saem do APK numa thread (8,6 s a menos antes de o servidor abrir no Galaxy A12,
+    14/11/2026), e o jogo espera por eles."""
+
+    def setUp(self):
+        self.pasta = tempfile.mkdtemp(prefix="arena_recursos_bg_")
+        self.trocas = [mock.patch.object(android_inicio, "RAIZ", self.pasta),
+                       mock.patch.object(ponte_android, "marca_do_apk", return_value="apk-novo")]
+        for troca in self.trocas:
+            troca.start()
+        os.makedirs(os.path.join(self.pasta, "retroarch"))
+
+    def tearDown(self):
+        for troca in self.trocas:
+            troca.stop()
+        ponte_android.RECURSOS_PRONTOS.set()
+        limpeza.apagar_pasta(self.pasta)
+
+    def test_ja_postos_nao_abre_thread(self):
+        with open(os.path.join(self.pasta, "retroarch", ".arena-do-apk"), "w", encoding="utf-8") as marca:
+            marca.write("apk-novo")
+        self.assertIsNone(android_inicio.tirar_em_segundo_plano("x.apk"))
+        self.assertTrue(ponte_android.RECURSOS_PRONTOS.is_set())
+
+    def test_apk_novo_tira_em_segundo_plano_e_libera_o_jogo(self):
+        liberar = threading.Event()
+
+        def tirar_devagar(_apk):
+            liberar.wait(5)
+            return 2305
+
+        with mock.patch.object(android_inicio, "tirar_do_apk", side_effect=tirar_devagar):
+            fio = android_inicio.tirar_em_segundo_plano("x.apk")
+            self.assertIsNotNone(fio)
+            self.assertFalse(ponte_android.RECURSOS_PRONTOS.is_set())     # o servidor seguiu; o jogo espera
+            liberar.set()
+            fio.join(5)
+        self.assertTrue(ponte_android.RECURSOS_PRONTOS.is_set())
+
+    def test_falha_na_extracao_nao_prende_o_jogo(self):
+        with mock.patch.object(android_inicio, "tirar_do_apk", side_effect=OSError("disco cheio")):
+            fio = android_inicio.tirar_em_segundo_plano("x.apk")
+            fio.join(5)
+        self.assertTrue(ponte_android.RECURSOS_PRONTOS.is_set())
+
+
 class Lentidao(unittest.TestCase):
     """O que deixa o jogo lento, no aparelho (servidor\\barreiras.py): a memoria
     pelo /proc, a bateria e a economia de bateria pelo app."""

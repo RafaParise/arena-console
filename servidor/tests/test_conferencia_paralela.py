@@ -84,5 +84,45 @@ class ConferenciaParalela(unittest.TestCase):
         self.assertLess(agora, antes * 3 + 0.05)
 
 
+class AssinaturaPeloConteudo(unittest.TestCase):
+    """Cada APK novo regrava os arquivos do servidor (data nova, conteudo igual): a assinatura nao pode mudar, ou o
+    Galaxy A12 varre os 2699 jogos de novo (9,9 s, medido em 14/11/2026 com o multitap.json)."""
+
+    def setUp(self):
+        from unittest import mock
+        self.pasta = tempfile.mkdtemp(prefix="arena_assinatura_")
+        self.mapa = os.path.join(self.pasta, "multitap.json")
+        self.consoles = os.path.join(self.pasta, "consoles.json")
+        for caminho in (self.mapa, self.consoles):
+            with open(caminho, "w", encoding="utf-8") as saida:
+                saida.write('{"a": 1}')
+        os.makedirs(os.path.join(self.pasta, "jogos", "pessoais", "snes"))
+        self.trocas = [mock.patch.object(indexador.graficos, "ARQUIVO_MAPA_MULTITAP", self.mapa),
+                       mock.patch.object(indexador, "ARQUIVO_CONSOLES", self.consoles),
+                       mock.patch.object(indexador, "PASTA_JOGOS", os.path.join(self.pasta, "jogos")),
+                       mock.patch.object(indexador, "PASTA_DADOS", os.path.join(self.pasta, "dados"))]
+        for troca in self.trocas:
+            troca.start()
+
+    def tearDown(self):
+        for troca in self.trocas:
+            troca.stop()
+        limpeza.apagar_pasta(self.pasta)
+
+    def regravar(self, caminho, texto):
+        with open(caminho, "w", encoding="utf-8") as saida:
+            saida.write(texto)
+        futuro = time.time() + 120
+        os.utime(caminho, (futuro, futuro))       # data nova, como o APK novo deixa
+
+    def test_regravar_igual_nao_muda_e_mudar_muda(self):
+        antes = indexador.assinatura_das_pastas()
+        self.regravar(self.mapa, '{"a": 1}')
+        self.regravar(self.consoles, '{"a": 1}')
+        self.assertEqual(indexador.assinatura_das_pastas(), antes)
+        self.regravar(self.mapa, '{"a": 2}')
+        self.assertNotEqual(indexador.assinatura_das_pastas(), antes)
+
+
 if __name__ == "__main__":
     unittest.main()

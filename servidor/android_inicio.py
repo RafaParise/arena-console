@@ -37,6 +37,7 @@ import json
 import os
 import shutil
 import sys
+import threading
 import time
 import zipfile
 
@@ -262,17 +263,46 @@ def montar_os_jogos(escolhida, privada):
             print("[ARENA] Pasta de jogos do cartao %s: %s." % (identificador, situacao))
 
 
+def recursos_ja_postos():
+    """Os recursos do RetroArch deste APK ja estao na pasta (a marca bate)?"""
+    try:
+        with open(caminho("retroarch", ".arena-do-apk"), encoding="utf-8") as arquivo:
+            return arquivo.read().strip() == ponte_android.marca_do_apk()
+    except OSError:
+        return False
+
+
+def tirar_em_segundo_plano(apk):
+    """Na primeira abertura depois de instalar ou atualizar o app, tirar os ~2300 recursos do RetroArch levava
+    8,6 s ANTES de o servidor comecar (Galaxy A12, 14/11/2026), e eles so servem quando um jogo abre. Agora saem
+    numa thread, enquanto o servidor abre; o jogo espera por eles (ponte_android.RECURSOS_PRONTOS). Devolve a
+    thread, ou None quando ja estavam postos."""
+    if recursos_ja_postos():
+        return None
+    ponte_android.RECURSOS_PRONTOS.clear()
+
+    def tirar():
+        try:
+            postos = tirar_do_apk(apk)
+            if postos:
+                print("[ARENA] Recursos do RetroArch do Android postos (em segundo plano): %d arquivos." % postos)
+        except Exception as falha:          # nunca deixa o jogo esperando para sempre
+            print("[ARENA] Nao consegui tirar do APK os recursos do RetroArch: %s" % falha)
+        finally:
+            ponte_android.RECURSOS_PRONTOS.set()
+
+    fio = threading.Thread(target=tirar, name="recursos-do-retroarch", daemon=True)
+    fio.start()
+    return fio
+
+
 def tirar_do_apk(apk):
     """Os recursos do RetroArch do Android (DO_APK), uma vez por APK. Nunca
     apaga: so poe (ou troca) os arquivos que vieram nele."""
     marca = caminho("retroarch", ".arena-do-apk")
     desta = ponte_android.marca_do_apk()
-    try:
-        with open(marca, encoding="utf-8") as arquivo:
-            if arquivo.read().strip() == desta:
-                return 0
-    except OSError:
-        pass
+    if recursos_ja_postos():
+        return 0
     postos = 0
     try:
         with zipfile.ZipFile(apk) as pacote:
@@ -367,9 +397,7 @@ def preparar():
     # A marca de que o RetroArch veio no APK (plataforma.executavel_do_retroarch).
     with open(caminho("retroarch", plataforma.RETROARCH_DO_ANDROID), "w", encoding="utf-8") as arquivo:
         arquivo.write("O RetroArch do Android vem dentro do APK do ARENA (android/retroarch/arena-args.patch).\n")
-    postos = tirar_do_apk(ponte_android.APK)
-    if postos:
-        print("[ARENA] Recursos do RetroArch do Android postos: %d arquivos." % postos)
+    tirar_em_segundo_plano(ponte_android.APK)
     livres = por_os_jogos_livres(ponte_android.APK, ponte_android.ESTADO.get("pasta"))
     if livres:
         print("[ARENA] Jogos livres do APK postos na pasta jogos do app: %d arquivos." % livres)

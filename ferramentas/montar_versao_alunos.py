@@ -42,7 +42,7 @@ dela abre, a lista de jogos sai (vazia), nenhum arquivo do teste fica na
 versao, e nenhum caminho da maquina do professor sobra nela.
 
 Uso:
-    servidor\python\python.exe ferramentas\montar_versao_alunos.py [--com-bios] [--destino PASTA]
+    servidor\python\python.exe ferramentas\montar_versao_alunos.py [--com-bios] [--com-arm64] [--destino PASTA]
     servidor\python\python.exe ferramentas\montar_versao_alunos.py --atualizar [--destino PASTA]
     servidor\python\python.exe ferramentas\montar_versao_alunos.py --zip-atualizacao ARQUIVO.zip
     servidor\python\python.exe ferramentas\montar_versao_alunos.py --zip-completo ARQUIVO.zip [--destino PASTA]
@@ -91,7 +91,8 @@ ARQUIVOS_DA_RAIZ = ["ARENA.bat", "VERIFICAR.bat", "PARTIDA.bat", "COLETAR.bat", 
 # Linux: o que roda direto (a permissao de executar vai marcada no zip; sem
 # ela, o ARENA.sh e o ARENA dao um jeito, ver servidor\achar_python.sh).
 EXECUTAVEIS_DO_LINUX = ["*.sh", "*.desktop", "*.appimage", "python3.13", "java", "keytool", "rmiregistry",
-                        "jspawnhelper"]
+                        "jspawnhelper",
+                        "retroarch"]      # o RetroArch do Linux ARM64 (programa solto, sem extensao)
 # Do ferramentas\, so o que o COLETAR.bat usa.
 FERRAMENTAS = ["coletar_maquina.py", "medir_arena.py"]
 # Jogo pequeno do proprio projeto para conferir que o RetroArch da versao
@@ -222,7 +223,7 @@ def atualizar(destino):
         if mudou(origem, alvo):
             copiar_arquivo(origem, alvo)
             copiados.append(nome)
-    for pasta, extra in (("servidor", ["tests"]), ("launcher", [])):
+    for pasta, extra in (("servidor", fora_do_servidor(destino)), ("launcher", [])):
         c, r = espelhar(os.path.join(RAIZ, pasta), os.path.join(destino, pasta), extra)
         copiados += [os.path.join(pasta, x) for x in c]
         tirados += [os.path.join(pasta, x) for x in r]
@@ -233,7 +234,7 @@ def atualizar(destino):
             copiados.append(os.path.join("ferramentas", nome))
     # O Linux (item 13): so acrescenta e troca programa (o RetroArch e os
     # emuladores do Linux, os nucleos .so), nunca a configuracao de ninguem.
-    for origem, rel in partes_do_linux():
+    for origem, rel in partes_do_linux(com_arm64(destino)):
         alvo = os.path.join(destino, rel)
         if mudou(origem, alvo):
             copiar_arquivo(origem, alvo)
@@ -342,14 +343,36 @@ def nucleos_usados():
     return usados, [p["pasta"] for p in dados["plataformas"] if p.get("pasta") and not p.get("sem_pasta")]
 
 
-def partes_do_linux():
+def com_arm64(destino=None):
+    """O pacote leva o Linux ARM64 (TV Box com Armbian, Raspberry Pi; ferramentas\\preparar_linux.py --arm64)? So
+    com --com-arm64, ou quando a versao a atualizar ja o tem (assim o --atualizar nao tira o que alguem pos). Sao
+    uns 900 MB a mais (63 nucleos, o RetroArch e o Python do ARM): fica de fora se a escola nao tem o aparelho."""
+    return "--com-arm64" in sys.argv or bool(
+        destino and os.path.isdir(os.path.join(destino, "servidor", "python-linux-aarch64")))
+
+
+def fora_do_servidor(destino=None):
+    """O que da pasta servidor\\ nao vai no pacote: os testes e, sem o ARM64, o Python dele."""
+    return ["tests"] + ([] if com_arm64(destino) else ["python-linux-aarch64"])
+
+
+def partes_do_linux(arm64=False):
     """(origem, caminho no pacote) do que o mesmo pen drive precisa para
     abrir no Linux, fora do servidor\\ (o Python do Linux mora la): o
     RetroArch do Linux (o AppImage), os nucleos .so que o ARENA usa, os
     perfis de controle do Linux, as bibliotecas de reserva e os AppImage
-    dos emuladores de fora (ferramentas\\preparar_linux.py poe tudo no lugar)."""
+    dos emuladores de fora (ferramentas\\preparar_linux.py poe tudo no lugar).
+    Com 'arm64', tambem o RetroArch e os nucleos do Linux ARM64."""
     ra = os.path.join(RAIZ, "retroarch")
     lista = []
+    if arm64:
+        programa = os.path.join(ra, "linux-aarch64", "retroarch")
+        if os.path.isfile(programa):
+            lista.append((programa, os.path.join("retroarch", "linux-aarch64", "retroarch")))
+        pasta_arm = os.path.join(ra, "cores-aarch64")
+        for nome in sorted(os.listdir(pasta_arm) if os.path.isdir(pasta_arm) else []):
+            if nome.endswith(".so"):
+                lista.append((os.path.join(pasta_arm, nome), os.path.join("retroarch", "cores-aarch64", nome)))
     appimage = os.path.join(ra, "RetroArch-Linux-x86_64.AppImage")
     if os.path.isfile(appimage):
         lista.append((appimage, os.path.join("retroarch", os.path.basename(appimage))))
@@ -467,7 +490,7 @@ def montar(destino, com_bios=False):
     # 1. Raiz, servidor, tela.
     for nome in ARQUIVOS_DA_RAIZ:
         copiar_arquivo(os.path.join(RAIZ, nome), os.path.join(destino, nome))
-    copiar_arvore(os.path.join(RAIZ, "servidor"), os.path.join(destino, "servidor"), extra=["tests"])
+    copiar_arvore(os.path.join(RAIZ, "servidor"), os.path.join(destino, "servidor"), extra=fora_do_servidor())
     copiar_arvore(os.path.join(RAIZ, "launcher"), os.path.join(destino, "launcher"))
     for nome in FERRAMENTAS:
         copiar_arquivo(os.path.join(RAIZ, "ferramentas", nome), os.path.join(destino, "ferramentas", nome))
@@ -495,7 +518,7 @@ def montar(destino, com_bios=False):
             copiar_arquivo(caminho, os.path.join(RA_D, nome))
     # O Linux: o AppImage, os nucleos .so, os perfis de controle de la, as
     # bibliotecas de reserva e os emuladores de fora (partes_do_linux).
-    for origem, rel in partes_do_linux():
+    for origem, rel in partes_do_linux(com_arm64(destino)):
         copiar_arquivo(origem, os.path.join(destino, rel))
     limpar_retroarch_cfg(os.path.join(RA, "retroarch.cfg"), os.path.join(RA_D, "retroarch.cfg"))
     # exist_ok: os nucleos .so do Linux (partes_do_linux, acima) ja criaram a

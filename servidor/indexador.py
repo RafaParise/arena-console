@@ -525,26 +525,34 @@ def arquivo_de_jogadores():
 VERSAO_INDICE = 10    # 10 = nomes e capas do gamelist.xml e das pastas do EmulationStation/Batocera (14/11/2026)
 
 
-_CONTEUDO_DO_CONSOLES = {}
+_CONTEUDO_DOS_ARQUIVOS = {}
+
+
+def conteudo_do_arquivo(caminho):
+    """Um resumo (md5) do CONTEUDO de um arquivo do programa, ou "" se nao deu para ler. A assinatura das pastas
+    usa o conteudo, nunca a data: no Android, cada APK novo regrava os arquivos do servidor (data nova, conteudo
+    igual), e com a data o ARENA varria todos os jogos de novo, 9 a 13 s no Galaxy A12 (14/11/2026: primeiro o
+    consoles.json; depois, na mesma madrugada, o multitap.json). Guardado pela data e tamanho, para nao reler o
+    arquivo a toa."""
+    try:
+        informacao = os.stat(caminho)
+    except OSError:
+        return ""
+    marca = (informacao.st_mtime_ns, informacao.st_size)
+    guardado = _CONTEUDO_DOS_ARQUIVOS.get(caminho)
+    if not guardado or guardado[0] != marca:
+        try:
+            with open(caminho, "rb") as arquivo:
+                guardado = (marca, hashlib.md5(arquivo.read()).hexdigest())
+        except OSError:
+            return ""
+        _CONTEUDO_DOS_ARQUIVOS[caminho] = guardado
+    return guardado[1]
 
 
 def conteudo_do_consoles():
-    """Um resumo (md5) do CONTEUDO do consoles.json, ou "" se nao deu para ler. Antes entrava a data do arquivo: no
-    Android, cada APK novo regrava o consoles.json (data nova, conteudo igual) e o ARENA varria todos os jogos de
-    novo, 9 a 13 s no Galaxy A12 (14/11/2026). Guardado pela data e tamanho, para nao reler o arquivo a toa."""
-    try:
-        informacao = os.stat(ARQUIVO_CONSOLES)
-    except OSError:
-        return ""
-    marca = (ARQUIVO_CONSOLES, informacao.st_mtime_ns, informacao.st_size)
-    if _CONTEUDO_DO_CONSOLES.get("marca") != marca:
-        try:
-            with open(ARQUIVO_CONSOLES, "rb") as arquivo:
-                resumo = hashlib.md5(arquivo.read()).hexdigest()
-        except OSError:
-            return ""
-        _CONTEUDO_DO_CONSOLES.update(marca=marca, resumo=resumo)
-    return _CONTEUDO_DO_CONSOLES["resumo"]
+    """O resumo do conteudo do consoles.json (conteudo_do_arquivo)."""
+    return conteudo_do_arquivo(ARQUIVO_CONSOLES)
 
 
 # Quantas pastas a conferencia le ao mesmo tempo (pastas_com_data). Achado da prova em Rust da Fase 3 do
@@ -613,10 +621,9 @@ def assinatura_das_pastas():
     # O arquivo de jogadores do professor e o mapa do multitap tambem mudam
     # a lista (numero de jogadores de cada jogo).
     partes.append(jogadores.assinatura(arquivo_de_jogadores()))
-    try:
-        partes.append("mapa|%d" % os.path.getmtime(graficos.ARQUIVO_MAPA_MULTITAP))
-    except OSError:
-        pass
+    mapa = conteudo_do_arquivo(graficos.ARQUIVO_MAPA_MULTITAP)     # o conteudo, nao a data (ver acima)
+    if mapa:
+        partes.append("mapa|%s" % mapa)
     texto = "\n".join(sorted(partes))
     return hashlib.md5(texto.encode("utf-8")).hexdigest()
 

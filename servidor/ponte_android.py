@@ -87,6 +87,10 @@ def marca_da_abertura(etapa):
 CANAL = None
 _TRAVA_DO_CANAL = threading.Lock()
 _TRAVA = threading.Lock()
+# Ligado quando os recursos do RetroArch do APK ja estao na pasta (android_inicio.tirar_em_segundo_plano). Comeca
+# ligado: fora da primeira abertura depois de atualizar o app (e nos testes), nao ha o que esperar.
+RECURSOS_PRONTOS = threading.Event()
+RECURSOS_PRONTOS.set()
 _numero = [0]
 _respostas = {}      # numero -> resposta (dict)
 _esperas = {}        # numero -> threading.Event
@@ -222,6 +226,10 @@ def abrir_retroarch(comando, **_nao_se_aplicam):
     RetroArch do APK recebe o resto inteiro (o remendo
     android/retroarch/arena-args.patch). O cwd e as variaveis do ambiente
     nao se aplicam: o RetroArch e' uma tela do app."""
+    # Os recursos do RetroArch (perfis de controle, overlays, .info, imagens do menu) saem do APK em segundo plano
+    # na primeira abertura depois de atualizar (android_inicio.tirar_em_segundo_plano): o jogo so abre com eles la.
+    if not RECURSOS_PRONTOS.wait(180.0):
+        print("[ARENA] Os recursos do RetroArch ainda estao saindo do APK; o jogo abre assim mesmo.")
     numero = _novo_numero()
     processo = ProcessoDoRetroArch(numero)
     espera = threading.Event()

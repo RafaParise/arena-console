@@ -109,8 +109,8 @@ FORA_DO_APK = [os.path.join("assets", "database"), os.path.join("assets", "shade
 FORA_DA_TELA = ["nucleos", "*.wasm.js", "__pycache__"]
 # O servidor que vai no APK: o mesmo do pacote, sem os testes e sem o Python
 # do Windows e o do Linux (o do Android vem pelo python_android).
-FORA_DO_SERVIDOR = ["tests", "python", "python-linux", "__pycache__", "*.pyc", "*.pyo", "*.log", "*.tmp",
-                    "achar_python.sh"]
+FORA_DO_SERVIDOR = ["tests", "python", "python-linux", "python-linux-aarch64", "__pycache__", "*.pyc", "*.pyo",
+                    "*.log", "*.tmp", "achar_python.sh"]
 # Da raiz do ARENA: os guias, a licenca e os creditos (o servidor mostra os guias).
 DA_RAIZ_NO_APK = ["LEIA-ME.md", "1-COMECAR.md", "2-JOGOS.md", "3-IMAGEM-SOM-CONTROLE.md", "4-SAVES.md",
                   "5-AMIGOS.md", "6-RECURSOS-E-REPARO.md", "LICENSE", "TERCEIROS.md", "CREDITOS.md"]
@@ -388,6 +388,17 @@ def por_o_servidor(assets):
     destino = os.path.join(assets, "arena")
     shutil.copytree(os.path.join(RAIZ, "servidor"), os.path.join(destino, "servidor"),
                     ignore=shutil.ignore_patterns(*FORA_DO_SERVIDOR))
+    # Os .pyc ja prontos (14/11/2026): sem eles, a primeira abertura depois de instalar ou atualizar o app compilava
+    # as ~9.400 linhas do arena.py e os ~60 modulos no celular (3,5 s no Galaxy A12). O modo "checked-hash" guarda no
+    # .pyc o resumo do .py: o Python do celular usa o .pyc so se o .py for o mesmo (a data do arquivo, que muda ao
+    # sair do APK, nao importa), e compila de novo se nao for. So com o Python 3.13 (o mesmo formato do Android).
+    if sys.version_info[:2] == (3, 13):
+        import compileall
+        import py_compile
+        compileall.compile_dir(os.path.join(destino, "servidor"), quiet=1, workers=1,
+                               invalidation_mode=py_compile.PycInvalidationMode.CHECKED_HASH)
+    else:
+        print("  (sem os .pyc prontos: o montador nao esta no Python 3.13, o do Android)")
     # Os dois bancos pequenos que dao o nome de verdade aos jogos de fliperama (Samsho2 -> Samurai Shodown II):
     # sem eles o celular mostra o nome do arquivo (servidor\nomes_arcade.py procura nesta pasta).
     bancos = os.path.join(destino, "servidor", "bancos_de_nomes")
