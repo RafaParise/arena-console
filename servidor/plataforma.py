@@ -37,6 +37,8 @@ WINDOWS = sys.platform.startswith("win")
 LINUX = sys.platform.startswith("linux")
 # O Python do Android (o 3.13 do APK) se apresenta como "android" (PEP 738).
 ANDROID = sys.platform == "android"
+# A pasta do ARENA (a de cima de servidor\): o que esta dentro dela fica no PATH do emulador (abrir_programa).
+RAIZ_DO_ARENA = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # O RetroArch do Linux (stable 1.22.2 do libretro): um AppImage, um arquivo
 # so que roda sem instalar (ver retroarch_que_roda).
@@ -381,6 +383,12 @@ def abrir_programa(comando, **extras):
     if ANDROID:
         import ponte_android
         return ponte_android.abrir_retroarch(comando, **extras)
+    if WINDOWS:
+        # O emulador nunca preso pela DLL de outro programa (o aviso "Ponto de entrada nao encontrado" que segurava o
+        # PCSX2, 14/11/2026): PATH so do Windows e do ARENA, e sem a caixa de erro do Windows (processos.py).
+        import processos
+        processos.sem_caixa_de_dll_errada()
+        extras["env"] = processos.ambiente_do_emulador(extras.get("env"), RAIZ_DO_ARENA)
     return subprocess.Popen(comando, **extras)
 
 

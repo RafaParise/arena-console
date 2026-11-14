@@ -137,9 +137,13 @@ def abrir(programa, raiz=None, argumentos=()):
         if programa in PREPARAR:
             PREPARAR[programa](os.path.dirname(caminho))
         try:
+            # O mesmo PATH limpo do emulador (processos.ambiente_do_emulador): a DLL de outro programa nunca entra.
+            import processos
+            raiz_do_arena = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             _ABERTOS[programa] = subprocess.Popen([caminho] + list(argumentos), cwd=os.path.dirname(caminho),
                                                   stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
-                                                  stderr=subprocess.DEVNULL)
+                                                  stderr=subprocess.DEVNULL,
+                                                  env=processos.ambiente_do_emulador(None, raiz_do_arena))
         except OSError as falha:
             print("[ARENA] Nao consegui abrir o %s: %s" % (PROGRAMAS[programa]["nome"], falha))
             return False

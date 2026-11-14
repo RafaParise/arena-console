@@ -1188,3 +1188,22 @@ Falta, nesta ordem:
   `%LOCALAPPDATA%\ARENA-release-2026.11.14`. O A12 ficou com o APK de produção 2026.11.14.
 - Próximo: o PS2 que às vezes não começa (acima) e o plano de `docs\PLANO-DE-ACAO-RUST.md` (Fase 1, medir; depois a
   paridade e os itens pequenos).
+
+## 14/11/2026 (madrugada): o PS2 que "não começava" — causa achada e corrigida
+
+- **Causa:** um aviso do Windows escondido atrás da janela ("pcsx2-qt.exe - Ponto de entrada não encontrado: iconv ...
+  `C:\Projetos\ferramentas\testdisk\testdisk-7.2\libintl-8.dll`"). A pasta do TestDisk tinha entrado no PATH do usuário
+  em 11/11; o Windows achava o `libintl-8.dll` dela, de outra versão, e o PCSX2 esperava alguém clicar OK (por isso
+  voltava sozinho às vezes, quando o Rafael clicava, e parava de vez com o PC sozinho). Achado com um vigia das
+  janelas de aviso (o Rafael confirmou com a foto do aviso). Não dependia do motor: D3D11, Vulkan e D3D12 paravam.
+- **Neste PC:** a pasta do TestDisk saiu do PATH; ficaram atalhos em `~\.local\bin` (`testdisk`, `photorec`,
+  `qphotorec`, `fidentify`). O PATH antigo está em `%USERPROFILE%\path-usuario-backup-20261114.txt`.
+- **No ARENA (para o aluno com o PATH cheio de outros programas, como o Git para Windows, que traz o mesmo
+  `libintl-8.dll`):** `processos.ambiente_do_emulador` (PATH só do Windows, do ARENA e do Java) e
+  `processos.sem_caixa_de_dll_errada` (sem a caixa de erro do Windows), usados pelo `plataforma.abrir_programa` (todo
+  emulador e o RetroArch) e pelos companheiros. 5 testes novos (`test_plataforma.EmuladorSemDllDeFora`); o
+  `teste_ps2_todos_os_jogos` abre o PCSX2 do mesmo jeito.
+- **Prova:** os 40 do PS2 com o `libintl-8.dll` errado de propósito no PATH: **40 de 40**, nenhum aviso; o
+  `teste_pasta_system_pelo_arena` (RetroArch pelo ARENA) passou; bateria 1518 OK. Vai na próxima versão.
+- **Fase 1 do plano:** medida, em `docs\DESEMPENHO-SERVIDOR.md`. Memória e processador parado folgados; a abertura no
+  A12 passa do limite (cerca de 5 s): abre a Fase 2 (otimizar o Python), não o Rust.

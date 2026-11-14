@@ -36,6 +36,7 @@ sys.path.insert(0, os.path.join(RAIZ, "servidor"))
 sys.path.insert(0, AQUI)
 import graficos  # noqa: E402
 import limpeza  # noqa: E402
+import processos  # noqa: E402
 import teste_pcsx2_seguro as seguro  # noqa: E402
 
 PASTA_PCSX2 = os.path.join(RAIZ, "emuladores", "PCSX2", "PCSX2")
@@ -72,7 +73,11 @@ def abrir(copia, jogo, preset):
     janela.dwFlags |= subprocess.STARTF_USESHOWWINDOW
     janela.wShowWindow = 7                       # minimizada, sem roubar o foco
     inicio = time.monotonic()
-    processo = subprocess.Popen([exe, jogo], cwd=copia, startupinfo=janela)
+    # Como o ARENA abre (plataforma.abrir_programa, 14/11/2026): o PATH so do Windows e do ARENA e sem a caixa de
+    # "DLL errada" do Windows. Antes, o libintl-8.dll de outro programa no PATH prendia o PCSX2 num aviso escondido.
+    processos.sem_caixa_de_dll_errada()
+    processo = subprocess.Popen([exe, jogo], cwd=copia, startupinfo=janela,
+                                env=processos.ambiente_do_emulador(None, RAIZ))
     lido, comecou = "", False
     try:
         while time.monotonic() - inicio < ESPERA and processo.poll() is None:

@@ -222,6 +222,75 @@ class _JobEstendida(ctypes.Structure):
                 ("PeakProcessMemoryUsed", ctypes.c_size_t), ("PeakJobMemoryUsed", ctypes.c_size_t)]
 
 
+# ---------------------------------------------------------------------------
+# O emulador nunca preso por uma DLL de outro programa (14/11/2026)
+# ---------------------------------------------------------------------------
+# Achado: o PCSX2 as vezes "nao comecava". Ele estava parado num aviso do Windows ("Ponto de entrada nao
+# encontrado ... iconv ... libintl-8.dll"), escondido atras da janela: o Windows procurou o libintl-8.dll e achou o
+# de outro programa (o TestDisk, posto no PATH do usuario), de outra versao. O jogo so seguia quando alguem clicava
+# OK. No computador do aluno o mesmo acontece com o PATH cheio de outros programas (o Git para Windows traz o mesmo
+# libintl-8.dll; o scrcpy traz outro SDL2.dll). Duas protecoes, so para o que o ARENA abre:
+#   1. o PATH do emulador fica so com as pastas do Windows, as do proprio ARENA e a do Java (Java ME): as DLLs de
+#      outros programas deixam de ser achadas;
+#   2. o Windows nao mostra a caixa de "DLL errada" para o emulador (SetErrorMode, que o filho herda): se faltar algo,
+#      a parte que precisava dele falha em silencio, sem prender o jogo.
+
+# SetErrorMode: sem a caixa de erro critico e sem a de "arquivo nao abre" (documentacao da Microsoft).
+SEM_FAILCRITICALERRORS = 0x0001
+SEM_NOOPENFILEERRORBOX = 0x8000
+
+
+def _dentro(pasta, raiz):
+    """A pasta fica dentro da raiz (ou e' ela)? Compara sem diferenca de maiusculas e de barra no fim."""
+    pasta = os.path.normcase(os.path.abspath(pasta)).rstrip("\\/")
+    raiz = os.path.normcase(os.path.abspath(raiz)).rstrip("\\/")
+    return pasta == raiz or pasta.startswith(raiz + os.sep)
+
+
+def path_so_do_windows_e_do_arena(path, raiz_do_arena, windows=None):
+    """O PATH que o emulador recebe: as pastas do Windows, as que ficam dentro do ARENA e as que tem o Java (o nucleo
+    de Java ME abre o 'javaw' que achar no PATH). O resto (Git, TestDisk, scrcpy, LibreOffice...) fica de fora, na
+    mesma ordem de antes."""
+    windows = windows or os.environ.get("SystemRoot") or r"C:\Windows"
+    ficam = []
+    for pasta in (path or "").split(os.pathsep):
+        if not pasta.strip():
+            continue
+        tem_java = os.path.isfile(os.path.join(pasta, "javaw.exe")) or os.path.isfile(os.path.join(pasta, "java.exe"))
+        if _dentro(pasta, windows) or _dentro(pasta, raiz_do_arena) or tem_java:
+            if pasta not in ficam:
+                ficam.append(pasta)
+    return os.pathsep.join(ficam)
+
+
+def ambiente_do_emulador(ambiente, raiz_do_arena):
+    """Copia do ambiente com o PATH limpo (path_so_do_windows_e_do_arena). So no Windows: no Linux, o PATH e' o de
+    sempre (la a biblioteca vem pelo LD_LIBRARY_PATH, que o ARENA ja cuida)."""
+    ambiente = dict(ambiente if ambiente is not None else os.environ)
+    if not _no_windows():
+        return ambiente
+    chave = next((c for c in ambiente if c.upper() == "PATH"), "PATH")
+    ambiente[chave] = path_so_do_windows_e_do_arena(ambiente.get(chave, ""), raiz_do_arena)
+    return ambiente
+
+
+def sem_caixa_de_dll_errada():
+    """O ARENA (e quem ele abrir depois, que herda) sem as caixas de erro critico do Windows. O servidor nao tem
+    janela para essas caixas; o emulador ganha o aviso no registro dele, e nao uma caixa que prende o jogo.
+    Devolve True se o Windows aceitou."""
+    if not _no_windows():
+        return False
+    try:
+        k = _kernel32()
+        k.SetErrorMode.argtypes = [w.UINT]
+        k.SetErrorMode.restype = w.UINT
+        antes = k.SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX)
+        k.SetErrorMode(antes | SEM_FAILCRITICALERRORS | SEM_NOOPENFILEERRORBOX)
+        return True
+    except (OSError, AttributeError):
+        return False
+
+
 def _kernel32_caixa():
     k = _kernel32()
     k.CreateJobObjectW.restype = w.HANDLE

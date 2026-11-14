@@ -384,5 +384,65 @@ class Sistema(unittest.TestCase):
             self.assertFalse(plataforma.no_chromebook())
 
 
+class EmuladorSemDllDeFora(unittest.TestCase):
+    """14/11/2026: o PCSX2 parava num aviso "Ponto de entrada nao encontrado" do libintl-8.dll de OUTRO programa
+    (o TestDisk no PATH do usuario). O emulador recebe o PATH so do Windows, do ARENA e do Java."""
+
+    def setUp(self):
+        import processos
+        self.processos = processos
+        self.base = tempfile.mkdtemp(prefix="arena_path_")
+        self.addCleanup(limpeza.apagar_pasta, self.base)
+        self.windows = os.path.join(self.base, "Windows")
+        self.arena = os.path.join(self.base, "ARENA")
+        self.java = os.path.join(self.base, "Java", "bin")
+        self.testdisk = os.path.join(self.base, "ferramentas", "testdisk-7.2")
+        for pasta in (os.path.join(self.windows, "System32"), os.path.join(self.arena, "emuladores", "Java", "bin"),
+                      self.java, self.testdisk):
+            os.makedirs(pasta)
+        open(os.path.join(self.java, "javaw.exe"), "wb").close()
+        open(os.path.join(self.testdisk, "libintl-8.dll"), "wb").close()
+
+    def test_so_ficam_windows_arena_e_java(self):
+        path = os.pathsep.join([os.path.join(self.windows, "System32"), self.testdisk, self.java,
+                                os.path.join(self.arena, "emuladores", "Java", "bin"), "",
+                                os.path.join(self.base, "Git", "usr", "bin")])
+        limpo = self.processos.path_so_do_windows_e_do_arena(path, self.arena, windows=self.windows)
+        self.assertEqual(limpo.split(os.pathsep),
+                         [os.path.join(self.windows, "System32"), self.java,
+                          os.path.join(self.arena, "emuladores", "Java", "bin")])
+
+    def test_pasta_com_nome_parecido_nao_entra(self):
+        # "ARENA-velho" comeca com "ARENA", mas nao fica dentro do ARENA.
+        vizinha = self.arena + "-velho"
+        limpo = self.processos.path_so_do_windows_e_do_arena(vizinha, self.arena, windows=self.windows)
+        self.assertEqual(limpo, "")
+
+    def test_ambiente_do_emulador_so_mexe_no_path(self):
+        ambiente = {"Path": self.testdisk, "ARENA_X": "1"}
+        with mock.patch.object(self.processos, "_no_windows", return_value=True):
+            novo = self.processos.ambiente_do_emulador(ambiente, self.arena)
+        self.assertEqual(novo["Path"], "")
+        self.assertEqual(novo["ARENA_X"], "1")
+        self.assertEqual(ambiente["Path"], self.testdisk)   # o original nao muda
+        with mock.patch.object(self.processos, "_no_windows", return_value=False):
+            self.assertEqual(self.processos.ambiente_do_emulador(ambiente, self.arena)["Path"], self.testdisk)
+
+    def test_abrir_programa_no_windows_manda_o_path_limpo(self):
+        with no_windows(True), mock.patch.object(plataforma, "ANDROID", False), \
+                mock.patch.object(self.processos, "sem_caixa_de_dll_errada") as sem_caixa, \
+                mock.patch.object(plataforma.subprocess, "Popen") as popen:
+            plataforma.abrir_programa(["pcsx2-qt.exe"], cwd=self.base, env={"PATH": self.testdisk})
+        sem_caixa.assert_called_once()
+        self.assertNotIn(self.testdisk, popen.call_args.kwargs["env"]["PATH"])
+
+    @unittest.skipUnless(sys.platform.startswith("win"), "so no Windows")
+    def test_caixa_de_erro_desligada_no_windows(self):
+        import ctypes
+        self.assertTrue(self.processos.sem_caixa_de_dll_errada())
+        modo = ctypes.windll.kernel32.GetErrorMode()
+        self.assertTrue(modo & self.processos.SEM_FAILCRITICALERRORS)
+
+
 if __name__ == "__main__":
     unittest.main()

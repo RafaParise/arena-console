@@ -64,7 +64,7 @@ Ele nasceu nas aulas do curso técnico de **Desenvolvimento de Sistemas**
 | 🎮 **Um clique para jogar** | A pasta de cada console decide de quem é o jogo. Capas, nomes e quantos jogadores cada jogo aceita aparecem sozinhos |
 | 🧠 **Ajuste automático** | Mede o computador (processador, memória, placa de vídeo, disco) e escolhe a imagem certa para cada console. Tem modo para notebook fraco |
 | 💾 **Saves e cópia de segurança** | 10 lugares de salvar por jogo, cheats, e uma cópia de segurança quando algo muda |
-| 👥 **Jogar junto** | Dois ou mais computadores na mesma rede, sem servidor: até **5 jogadores** no Super Bomberman (Multitap). Funciona por Wi-Fi, cabo direto e celular como rede (de uma casa para outra, pela internet, ainda não) |
+| 👥 **Jogar junto** | Dois ou mais computadores na mesma rede, sem servidor: até **5 jogadores** no Super Bomberman (Multitap). Funciona por Wi-Fi, cabo direto, celular como rede e, de uma casa para outra, pela internet (um código de 20 letras) |
 | 🕹️ **Vários controles** | Xbox, PlayStation, Switch Pro, fliperamas e genéricos, com o teclado como o próximo jogador |
 | 🏆 **Recordes da turma** | Placar com posição por jogo, conquistas e sincronização entre os computadores da sala — até sem rede, levando a "mala" no pen drive |
 | 🧰 **Conserta sozinho** | `VERIFICAR.bat` confere e conserta a pasta; `PARTIDA.bat` explica por que a partida a dois não conecta; a tela explica por que um jogo não abriu |
@@ -75,27 +75,21 @@ Ele nasceu nas aulas do curso técnico de **Desenvolvimento de Sistemas**
 | 🐧 **Também no Linux** | O mesmo pen drive abre no Linux (`sh ARENA.sh`), sem instalar nada e sem administrador: o mesmo ARENA, os 66 consoles e o mesmo save do Windows ([`docs/LINUX.md`](docs/LINUX.md)) |
 | 📱 **Também no Android** | O app do ARENA (o APK nos *Releases*): o mesmo servidor e a mesma tela, o Jogar Junto, os jogos e os saves da pasta do ARENA copiada para o aparelho ou no pen drive pelo cabo OTG ([`docs/ANDROID.md`](docs/ANDROID.md)) |
 
-## Novidades de 26/10/2026
+## Novidades
 
-Acrescentado à versão 2026.10.22 (o que já existia continua valendo): o **app do Android 2026.10.26** (mesma página de download,
-[releases/latest](https://github.com/RafaParise/arena-console/releases/latest)), com o painel "Este celular" ao vivo e sem dica
-de teclado de PC; o **celular como controle** do jogo do computador (Wi-Fi, **cabo USB** de 4 a 6 ms, até 8 jogadores, ajustes e
-perfis) e, como opção que exige driver, o celular como **gamepad Xbox 360 virtual**; e o **Jogar Junto entre celular e computador**.
-O que foi feito e o que ainda falta: [docs/PENDENCIAS.md](docs/PENDENCIAS.md); guia do controle: [3-IMAGEM-SOM-CONTROLE.md](3-IMAGEM-SOM-CONTROLE.md).
-
-## Novidades de 07/11/2026
-
-Acrescentado (no código; o APK novo sai depois do teste no celular): no Android, a **abertura que levava minutos com muitos jogos
-no cartão** agora leva segundos; **SALVAR e CARREGAR** no controle de toque, com a **foto de onde parou**; a **pasta de jogos do ARENA no
-cartão SD**, para onde vão os jogos baixados e os da memória do aparelho; o **celular vibra junto** com o jogo; e o **controle de
-toque com a cara de cada console** (GameCube, N64, PlayStation, Mega Drive...), com **dois analógicos** quando o aluno quiser e botões
-que ele **arrasta para onde preferir**. No computador, o **Jogar Junto pelo cabo USB** com o celular. Tudo o que foi feito e o que
-falta: [docs/PENDENCIAS.md](docs/PENDENCIAS.md).
+A versão mais nova é a **2026.11.14** ([nota completa](docs/RELEASE-2026.11.14.md)): o **SGSR** e os outros filtros de
+imagem funcionando no celular, mais três versões para PC (*recomps*) ajustadas a cada computador (Zelda: Ocarina of
+Time, Zelda: Majora's Mask e Star Fox 64) e o pen drive usado num Mac sem jogos repetidos. Antes dela vieram, entre
+outras, o **Jogar Junto entre casas** pela internet (um código de 20 letras), o **celular como controle** do computador,
+o **controle de toque** com a cara de cada console e os **60 quadros** no PS2, no GameCube e no Wii. As notas de cada
+versão ficam em `docs/RELEASE-*.md` e na página [Releases](https://github.com/RafaParise/arena-console/releases);
+o que falta fazer, em [docs/PENDENCIAS.md](docs/PENDENCIAS.md).
 
 ## Baixar e usar
 
-1. Baixe o arquivo **`ARENA-2026.10.22.zip`** (uns 1.065 MB; descompactado, 2,6 GB) na página
-   [**Releases**](https://github.com/RafaParise/arena-console/releases/latest).
+1. Baixe o arquivo **`ARENA-<versão>-PC-windows-linux-chromebook.zip`** (uns 1,0 GB; descompactado, 2,6 GB) na
+   página [**Releases**](https://github.com/RafaParise/arena-console/releases/latest). No celular ou no tablet, o
+   arquivo é o **`ARENA-<versão>-android-celular-arm64.apk`**; a página diz qual baixar em cada aparelho.
 2. **Antes de descompactar, desbloqueie o arquivo:** botão direito no `.zip`
    → **Propriedades** → marque **Desbloquear** (embaixo, em "Segurança") →
    **OK**. O Windows marca tudo o que vem da internet; sem esse passo, cada
@@ -115,7 +109,7 @@ falta: [docs/PENDENCIAS.md](docs/PENDENCIAS.md).
    jogos**, que diz a pasta, os formatos e o que falta para cada console.
 
 **Já usa o ARENA?** Para atualizar sem perder nada, baixe o
-`ARENA-2026.10.22-atualizacao.zip` (só o programa, uns 104 MB) e descompacte
+`ARENA-<versão>-PC-atualizacao.zip` (só o programa, uns 106 MB) e descompacte
 no mesmo lugar, substituindo os arquivos: o passo a passo está no
 [guia 6](6-RECURSOS-E-REPARO.md). O pacote completo é para instalar do zero.
 O Java ME e o GameCube e o Wii dentro do RetroArch precisam de arquivos que
