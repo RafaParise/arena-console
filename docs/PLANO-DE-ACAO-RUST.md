@@ -193,8 +193,7 @@ compila e guarda o `.so`); quem monta, assina e publica continua sendo o PC do R
 
 ## Paridade: o que ainda falta em alguma versão (`docs\PARIDADE.md`)
 
-- **Atualizar a matriz:** foi gerada em 24/10 (fala em 86 rotas; hoje são 118). Rodar de novo o
-  `ferramentas\matriz_de_paridade.py` depois da release.
+- **Atualizar a matriz:** feito em 14/11 (110 rotas da tela, 120 do servidor, 70 consoles; `docs\PARIDADE.md`).
 - **Android x86_64 (Chromebook com o APK):** sem PS2 (o ARMSX2 é só arm64). Conferir se a nota "falta compilar a
   biblioteca do RetroArch para x86_64" ainda vale e o que dá para fechar.
 - **Navegador (Chromebook sem instalar):** 33 consoles a menos, limitados pelos núcleos que existem para o RetroArch do
@@ -204,8 +203,27 @@ compila e guarda o `.so`); quem monta, assina e publica continua sendo o PC do R
   servidor (o Python roda em ARM), e sim três peças: o Python 3.13 embutido para aarch64 (o python-build-standalone
   publica essa versão), o RetroArch do Linux aarch64 e os núcleos aarch64. Caminho sem Rust: o `preparar_linux.py`
   baixar as três por arquitetura e o `ARENA.sh` escolher pela `uname -m`; teste sem aparelho ARM pelo QEMU no WSL
-  (lento, mas abre). Primeiro conferir se o RetroArch e os núcleos aarch64 existem para baixar (não verificado).
-  Lembrete: no Chromebook ARM com a Play Store, o APK arm64 já roda hoje (se a escola deixar instalar).
+  (lento, mas abre). Lembrete: no Chromebook ARM com a Play Store, o APK arm64 já roda hoje (se a escola deixar
+  instalar).
+  **Conferido em 14/11 (nas fontes):**
+  - Núcleos: o buildbot do libretro publica `nightly/linux/aarch64/latest/` com 244 núcleos, entre eles os do ARENA
+    (fceumm, snes9x, mgba, genesis_plus_gx, pcsx_rearmed, swanstation, mupen64plus_next, ppsspp, flycast, dolphin,
+    melonds, citra, play, pcsx2) [Certo, listagem do buildbot.libretro.com].
+  - RetroArch: o estável 1.22.2 do Linux só sai para x86 e x86_64; para aarch64 só há o **nightly**
+    (`nightly/linux/aarch64/RetroArch.7z`, 5,7 MB), que é **um executável solto**, não AppImage [Certo, baixado e
+    aberto]. Ele usa as bibliotecas do sistema: ALSA, PulseAudio, freetype, fontconfig, Wayland, X11 (Xxf86vm,
+    Xinerama, Xrandr, Xi, xcb), xkbcommon, udev, gbm, drm, GL/EGL, **SDL2** e **v4l2** [Certo, lido do ELF]. Um Armbian
+    com área de trabalho tem quase todas; SDL2 e v4l2 podem faltar e iriam na pasta `bibliotecas-linux` (aarch64),
+    com `LD_LIBRARY_PATH`, como já se faz com o AppImage.
+  - Python: o python-build-standalone publica `cpython-3.13.18+20261110-aarch64-unknown-linux-gnu-install_only`
+    [Certo, release mais nova no GitHub]. Sem ele, o `achar_python.sh` já cai no Python do sistema (3.11 ou mais novo):
+    Armbian sobre Debian 12 traz o 3.11 e sobre Ubuntu 24.04 o 3.12 [Provável].
+  - **Decisão:** não mudar o `ARENA.sh` antes das três peças juntas: aceitar `aarch64` sem o RetroArch abriria o ARENA
+    com nenhum jogo iniciando, pior que mandar para a versão do navegador. Ordem: (1) `preparar_linux.py --arch
+    aarch64` baixa o nightly do RetroArch para `retroarch/linux-aarch64/`, os núcleos para `retroarch/cores-aarch64/`
+    e o Python para `servidor/python-linux-aarch64/`; (2) `plataforma.py` escolhe pela `platform.machine()`;
+    (3) `ARENA.sh` aceita `aarch64`; (4) teste pelo QEMU e, se a escola tiver TV Box com Armbian, nela. Vale só se
+    houver esse aparelho na escola (pergunta ao Rafael).
 - O que é só do Windows (Lossless, MFG, patch de 60 do PS2 no PCSX2) já tem irmão no Android quando é possível (painel
   "Este celular", PS2 a 60 no ARMSX2); o resto depende de programa que só existe no Windows.
 
