@@ -1409,7 +1409,8 @@ window.ARENA_DADOS = {
   {
    "apelidos": [
     "game and watch",
-    "gamewatch"
+    "gamewatch",
+    "gameandwatch"
    ],
    "arquivos_sistema": 0,
    "core": "gw_libretro.dll",
@@ -1594,7 +1595,9 @@ window.ARENA_DADOS = {
     "md",
     "mega drive",
     "megadrive",
-    "sms"
+    "sms",
+    "mastersystem",
+    "gamegear"
    ],
    "arquivos_sistema": 0,
    "core": "genesis_plus_gx_libretro.dll",
@@ -1917,7 +1920,8 @@ window.ARENA_DADOS = {
   {
    "apelidos": [
     "neo geo pocket",
-    "ngp"
+    "ngp",
+    "ngpc"
    ],
    "arquivos_sistema": 0,
    "core": "mednafen_ngp_libretro.dll",
@@ -1964,7 +1968,11 @@ window.ARENA_DADOS = {
   {
    "apelidos": [
     "pc engine",
-    "pcengine"
+    "pcengine",
+    "pcenginecd",
+    "tg16",
+    "turbografx",
+    "turbografx16"
    ],
    "arquivos_sistema": 0,
    "core": "mednafen_pce_libretro.dll",
@@ -2004,7 +2012,9 @@ window.ARENA_DADOS = {
   },
   {
    "apelidos": [
-    "wonderswan"
+    "wonderswan",
+    "wswan",
+    "wswanc"
    ],
    "arquivos_sistema": 0,
    "core": "mednafen_wswan_libretro.dll",
@@ -2088,7 +2098,9 @@ window.ARENA_DADOS = {
   {
    "apelidos": [
     "odyssey 2",
-    "odyssey2"
+    "odyssey2",
+    "o2em",
+    "videopac"
    ],
    "arquivos_sistema": 1,
    "core": "o2em_libretro.dll",
@@ -2160,7 +2172,8 @@ window.ARENA_DADOS = {
   {
    "apelidos": [
     "msx",
-    "msx2"
+    "msx2",
+    "msx1"
    ],
    "arquivos_sistema": 0,
    "core": "bluemsx_libretro.dll",

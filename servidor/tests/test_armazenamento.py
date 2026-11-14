@@ -166,6 +166,24 @@ class EscolherAPasta(Base):
         self.assertIsNone(erro)
         self.assertEqual(real, os.path.realpath(pasta))
 
+    def test_pasta_roms_do_batocera_vale(self):
+        # Ideia do guia de 13/11 (subpastas "ROMs/roms"): o cartao que veio do Batocera, do RetroPie ou do
+        # EmulationStation tem roms/snes, roms/psx, roms/megadrive... Com os nomes do consoles.json de verdade
+        # (pastas e apelidos de uma palavra), essa pasta passa; "dc" e "ss" soltos nao contam.
+        nomes = armazenamento.nomes_de_pastas_de_console()
+        self.assertTrue({"snes", "psx", "megadrive", "mastersystem", "gba", "n64", "nes", "ps1"} <= nomes)
+        self.assertFalse({"dc", "ss", "gg", "md"} & nomes)
+        roms = self.criar("1234-5678", "roms")
+        for console in ("snes", "psx", "megadrive"):
+            os.makedirs(os.path.join(roms, console))
+        real, erro = armazenamento.validar_pasta_de_jogos(roms, self.raizes, nomes)
+        self.assertIsNone(erro)
+        self.assertEqual(real, os.path.realpath(roms))
+        solta = self.criar("1234-5678", "Fotos")
+        for pasta in ("dc", "ss"):
+            os.makedirs(os.path.join(solta, pasta))
+        self.assertIsNotNone(armazenamento.validar_pasta_de_jogos(solta, self.raizes, nomes)[1])
+
     def test_o_que_fazer_em_cada_recusa(self):
         cartao_inteiro = self.cartao
         pasta_de_apps = self.criar("1234-5678", "Android", "data", "com.x")

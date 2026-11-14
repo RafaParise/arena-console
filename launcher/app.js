@@ -584,10 +584,17 @@ function jogosVisiveis() {
         !(estado.config.recentes || []).includes(jogo.id)) return false;
     if (plataforma && jogo.plataforma !== plataforma) return false;
     // 'ordenacao' ja vem do servidor sem acento e em minusculas: comparar
-    // com ela evita normalizar 3000 titulos a cada tecla digitada.
-    if (busca && !jogo.ordenacao.includes(busca)) return false;
+    // com ela evita normalizar 3000 titulos a cada tecla digitada. A sinopse (do gamelist.xml do Batocera/
+    // EmulationStation) tambem vale: "encanador" acha o Mario. Ela e' normalizada uma vez so, na primeira busca.
+    if (busca && !jogo.ordenacao.includes(busca) && !sinopseDaBusca(jogo).includes(busca)) return false;
     return true;
   });
+}
+
+function sinopseDaBusca(jogo) {
+  if (!jogo.sinopse) return "";
+  if (jogo._sinopseDaBusca === undefined) jogo._sinopseDaBusca = normalizar(jogo.sinopse);
+  return jogo._sinopseDaBusca;
 }
 
 // Capa tipográfica local: funciona offline e dá identidade visual mesmo
@@ -914,10 +921,15 @@ function desenharDetalhes() {
   // Jogo de varios discos (um cartao so, servidor\indexador.py): o aluno
   // precisa saber como trocar de disco sem sair do jogo.
   const discos = Array.isArray(jogo.discos) ? jogo.discos.length : 0;
-  $("#detalhesDescricao").textContent = discos > 1
+  // A sinopse do gamelist.xml (quando o acervo veio do Batocera/EmulationStation): texto puro, com textContent.
+  const dosDiscos = discos > 1
     ? `Jogo de ${discos} discos. Quando ele pedir o próximo, ${noCelular() ? "toque em MENU" : "aperte Esc"} e use ` +
       "Controle de disco: ejetar, escolher o disco e inserir — sem sair do jogo."
-    : (plataforma.descricao || "Jogo da biblioteca do ARENA.");
+    : "";
+  const descricao = $("#detalhesDescricao");
+  descricao.textContent = [dosDiscos, jogo.sinopse || ""].filter(Boolean).join("\n\n") ||
+    plataforma.descricao || "Jogo da biblioteca do ARENA.";
+  descricao.classList.toggle("detalhes-descricao--sinopse", Boolean(jogo.sinopse));
   $("#detalhesPlataforma").textContent = jogo.plataforma_nome;
   $("#detalhesTamanho").textContent = formatarMb(jogo.tamanho_mb) + (discos > 1 ? ` · ${discos} discos` : "");
   $("#detalhesOrigem").textContent = jogo.origem_rotulo;

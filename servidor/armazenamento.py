@@ -185,7 +185,11 @@ def gravar(dados):
 # ---------------------------------------------------------------------------
 
 def nomes_de_pastas_de_console():
-    """Os nomes (minusculos) das pastas de console do ARENA (consoles.json)."""
+    """Os nomes (minusculos) das pastas de console do ARENA (consoles.json) e os apelidos de uma palavra so (snes,
+    psx, megadrive, mastersystem, gba...): assim a pasta "roms" de um cartao ou pen drive que veio do Batocera, do
+    RetroPie ou do EmulationStation (roms/snes, roms/psx...) tambem e' reconhecida como pasta de jogos (ideia do
+    guia de 13/11, "subpastas ROMs/roms"). Apelido com espaco ou com menos de 3 letras fica de fora: "dc" ou "ss"
+    soltos em qualquer pasta dariam falso positivo."""
     try:
         with open(ARQUIVO_DE_CONSOLES, encoding="utf-8") as arquivo:
             plataformas = json.load(arquivo).get("plataformas", [])
@@ -196,6 +200,10 @@ def nomes_de_pastas_de_console():
         pasta = str(plataforma.get("pasta") or "")
         if pasta:
             nomes.add(re.split(r"[\\/]", pasta)[-1].lower())
+        for apelido in plataforma.get("apelidos") or []:
+            apelido = str(apelido).lower()
+            if len(apelido) >= 3 and " " not in apelido:
+                nomes.add(apelido)
     return nomes
 
 

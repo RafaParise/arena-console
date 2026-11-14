@@ -100,8 +100,10 @@ class TestIndexador(unittest.TestCase):
                 f.write(b"\x89PNG")
         with open(os.path.join(snes, "gamelist.xml"), "w", encoding="utf-8") as f:
             f.write('<?xml version="1.0"?><gameList>'
-                    '<game><path>./smw.sfc</path><name>Super Mario World</name><image>./images/smw-image.png</image></game>'
-                    '<game><path>./zelda.sfc</path><name>Zelda</name><image>../../../fora.png</image></game>'
+                    '<game><path>./smw.sfc</path><name>Super Mario World</name><image>./images/smw-image.png</image>'
+                    '<desc><![CDATA[O encanador   Mario\n salva a princesa & o reino.]]></desc></game>'
+                    '<game><path>./zelda.sfc</path><name>Zelda</name><image>../../../fora.png</image>'
+                    '<desc>' + 'Link &amp; Zelda. ' * 60 + '</desc></game>'
                     '</gameList>')
         self.mod.esquecer_miniaturas()
         achados = {os.path.basename(j["arquivo"]): j for j in self.mod.varrer_pasta(pessoais, "pessoais", por_ext, por_id)}
@@ -110,6 +112,13 @@ class TestIndexador(unittest.TestCase):
         self.assertEqual(achados["zelda.sfc"]["titulo"], "Zelda")
         self.assertFalse(any("fora.png" in c for c in achados["zelda.sfc"]["capas"]))   # a imagem nao sai da pasta
         self.assertTrue(any(c.endswith("media/covers/kart.png") for c in achados["kart.sfc"]["capas"]))
+        # A sinopse (<desc>): texto puro, sem espacos repetidos (o CDATA e o &amp; viram texto), com teto; quem nao
+        # tem sinopse nao leva o campo (a lista de milhares de jogos nao cresce a toa).
+        self.assertEqual(achados["smw.sfc"]["sinopse"], "O encanador Mario salva a princesa & o reino.")
+        longa = achados["zelda.sfc"]["sinopse"]
+        self.assertTrue(longa.startswith("Link & Zelda.") and longa.endswith("…"))
+        self.assertLessEqual(len(longa), self.mod.LIMITE_DA_SINOPSE + 1)
+        self.assertNotIn("sinopse", achados["kart.sfc"])
 
     def test_consoles_json_regravado_igual_nao_refaz_a_lista(self):
         # 14/11/2026: cada APK novo regrava o consoles.json (data nova, conteudo igual) e o ARENA varria todos os

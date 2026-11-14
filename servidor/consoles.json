@@ -455,7 +455,8 @@
       "pede_placar": false,
       "apelidos": [
         "game and watch",
-        "gamewatch"
+        "gamewatch",
+        "gameandwatch"
       ],
       "pasta": "Game and Watch"
     },
@@ -647,7 +648,9 @@
         "md",
         "mega drive",
         "megadrive",
-        "sms"
+        "sms",
+        "mastersystem",
+        "gamegear"
       ],
       "netplay": true,
       "pasta": "Mega Drive",
@@ -964,7 +967,8 @@
       "pede_placar": false,
       "apelidos": [
         "neo geo pocket",
-        "ngp"
+        "ngp",
+        "ngpc"
       ],
       "pasta": "Neo Geo Pocket"
     },
@@ -1011,7 +1015,11 @@
       "pede_placar": false,
       "apelidos": [
         "pc engine",
-        "pcengine"
+        "pcengine",
+        "pcenginecd",
+        "tg16",
+        "turbografx",
+        "turbografx16"
       ],
       "pasta": "PC Engine"
     },
@@ -1051,7 +1059,9 @@
       "custo": 1,
       "pede_placar": false,
       "apelidos": [
-        "wonderswan"
+        "wonderswan",
+        "wswan",
+        "wswanc"
       ],
       "pasta": "WonderSwan"
     },
@@ -1134,7 +1144,9 @@
       "pede_placar": false,
       "apelidos": [
         "odyssey 2",
-        "odyssey2"
+        "odyssey2",
+        "o2em",
+        "videopac"
       ],
       "pasta": "Odyssey 2"
     },
@@ -1207,7 +1219,8 @@
       "pede_placar": false,
       "apelidos": [
         "msx",
-        "msx2"
+        "msx2",
+        "msx1"
       ],
       "netplay": false,
       "netplay_motivo": "O núcleo do MSX (blueMSX) não suporta jogo em rede - confirmado tentando hospedar em 14/10/2026, o RetroArch recusa (\"o núcleo não tem suporte para Netplay\"). Os 2 jogadores só valem no mesmo computador.",

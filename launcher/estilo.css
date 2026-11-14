@@ -872,7 +872,9 @@ input::placeholder { color: var(--texto-apagado); }
 .detalhes-alca, .detalhes-fechar { display: none; }
 .detalhes-kicker { color: var(--destaque-texto); font-size: var(--t-micro); text-transform: uppercase; letter-spacing: .08em; }
 .detalhes-corpo h2 { margin: .3rem 0 .5rem; font: 600 var(--t-med) var(--fonte-titulo); }
-.detalhes-descricao { color: var(--texto-fraco); font-size: var(--t-peq); }
+.detalhes-descricao { color: var(--texto-fraco); font-size: var(--t-peq); white-space: pre-line; }
+/* A sinopse do gamelist.xml (ate 600 letras): rola dentro do painel em vez de empurrar os botoes para fora. */
+.detalhes-descricao--sinopse { max-height: 9.5em; overflow-y: auto; }
 
 /* Botao do perfil no topo: foto pequena redonda + apelido. */
 .botao--perfil { display: inline-flex; align-items: center; gap: .4rem; max-width: 12rem; }

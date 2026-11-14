@@ -522,7 +522,7 @@ def arquivo_de_jogadores():
 # (ex.: o jogo de CD em trilhas virar um jogo so) nao valia num ARENA que ja
 # tinha a lista salva, ate alguma pasta mudar. 2 = nomes de fliperama pelos
 # bancos do RetroArch + avisos do jogo.
-VERSAO_INDICE = 10    # 10 = nomes e capas do gamelist.xml e das pastas do EmulationStation/Batocera (14/11/2026)
+VERSAO_INDICE = 11    # 11 = a sinopse (<desc>) do gamelist.xml, para a busca e o painel do jogo (14/11/2026)
 
 
 _CONTEUDO_DOS_ARQUIVOS = {}
@@ -832,11 +832,12 @@ def miniaturas_baixadas(miniaturas):
 PASTAS_DO_EMULATIONSTATION = (("images", ("-image", "-thumb", "")), ("media/covers", ("",)),
                               ("media/box2dfront", ("",)), ("downloaded_images", ("-image", "")))
 TAMANHO_MAXIMO_DO_GAMELIST = 4 * 1024 * 1024        # um gamelist.xml maior que isso nao e' lido (nao trava a varredura)
+LIMITE_DA_SINOPSE = 600                             # letras da sinopse guardadas por jogo
 _GAMELISTS = {}
 
 
 def gamelist_da_pasta(pasta_atual, arquivos):
-    """{chave do nome do arquivo do jogo: {"nome", "imagem"}} do gamelist.xml desta pasta (lido uma vez por varredura);
+    """{chave do nome do arquivo do jogo: {"nome", "imagem", "sinopse"}} do gamelist.xml desta pasta (lido uma vez por varredura);
     {} se nao houver. A imagem so vale se ficar DENTRO da pasta do console (um "../../" no arquivo nao leva a capa
     para fora dela). XML do proprio acervo, lido pelo ElementTree da biblioteca padrao: ele nao busca entidade externa,
     e o expat do Python 3.13 corta a "bomba" de entidades."""
@@ -854,6 +855,13 @@ def gamelist_da_pasta(pasta_atual, arquivos):
                 if not arquivo_do_jogo:
                     continue
                 item = {"nome": " ".join((jogo.findtext("name") or "").split())[:120]}
+                # A sinopse (<desc>), para a busca achar o jogo pelo assunto e o painel do jogo mostrar (ideia do
+                # guia de 13/11, "busca na sinopse"): texto puro, sem espacos repetidos e com teto, para a lista de
+                # milhares de jogos nao pesar no celular. A tela mostra com textContent (nunca como HTML).
+                sinopse = " ".join((jogo.findtext("desc") or "").split())
+                if sinopse:
+                    item["sinopse"] = sinopse if len(sinopse) <= LIMITE_DA_SINOPSE else (
+                        sinopse[:LIMITE_DA_SINOPSE].rsplit(" ", 1)[0] + "…")
                 imagem = (jogo.findtext("image") or jogo.findtext("thumbnail") or "").strip()
                 if imagem:
                     absoluto = os.path.realpath(os.path.join(pasta_atual, imagem.replace("/", os.sep)))
@@ -1139,8 +1147,10 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None,
             titulo_do_arquivo = titulo
             if sozinho_na_pasta(pasta_atual, caminho_pasta, nome_arquivo, arquivos):
                 titulo = nome_do_gamebase(pasta_atual, arquivos) or titulo
-            # O nome do gamelist.xml do EmulationStation/Batocera (14/11/2026), quando o acervo veio de la.
-            titulo = gamelist_da_pasta(pasta_atual, arquivos).get(_chave_do_arquivo(nome_arquivo), {}).get("nome") or titulo
+            # O nome e a sinopse do gamelist.xml do EmulationStation/Batocera (14/11/2026), quando o acervo veio de la.
+            do_gamelist = gamelist_da_pasta(pasta_atual, arquivos).get(_chave_do_arquivo(nome_arquivo), {})
+            titulo = do_gamelist.get("nome") or titulo
+            sinopse = do_gamelist.get("sinopse", "")
 
             # Fliperama: o nome do arquivo e' o do romset ("mslugx"). O nome
             # de verdade vem dos bancos do RetroArch (servidor\nomes_arcade.py).
@@ -1325,6 +1335,9 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None,
                 # romset montado de um jeito que o emulador nao le.
                 "avisos": avisos,
             })
+            # So o jogo que tem sinopse leva o campo: a lista de milhares de jogos nao cresce a toa.
+            if sinopse:
+                encontrados[-1]["sinopse"] = sinopse
 
         # Discos do mesmo jogo, nesta pasta: um cartao so.
         encontrados[inicio_da_pasta:] = agrupar_discos(encontrados[inicio_da_pasta:], por_id)
