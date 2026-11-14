@@ -84,6 +84,24 @@ class TestIndexador(unittest.TestCase):
         depois = self.mod.assinatura_das_pastas()
         self.assertNotEqual(antes, depois)
 
+    def test_consoles_json_regravado_igual_nao_refaz_a_lista(self):
+        # 14/11/2026: cada APK novo regrava o consoles.json (data nova, conteudo igual) e o ARENA varria todos os
+        # jogos de novo (9 a 13 s no Galaxy A12). Vale o conteudo: igual nao muda; um console a mais muda.
+        import shutil as _shutil
+        copia = os.path.join(self.dir, "consoles.json")
+        _shutil.copyfile(self.mod.ARQUIVO_CONSOLES, copia)
+        antigo = self.mod.ARQUIVO_CONSOLES
+        self.mod.ARQUIVO_CONSOLES = copia
+        try:
+            antes = self.mod.assinatura_das_pastas()
+            os.utime(copia, (time.time() + 120, time.time() + 120))
+            self.assertEqual(antes, self.mod.assinatura_das_pastas())
+            with open(copia, "a", encoding="utf-8") as arquivo:
+                arquivo.write("\n")
+            self.assertNotEqual(antes, self.mod.assinatura_das_pastas())
+        finally:
+            self.mod.ARQUIVO_CONSOLES = antigo
+
     def test_ignorar(self):
         self.assertIn("leia.txt", self.mod.IGNORAR)
         self.assertIn("thumbs.db", self.mod.IGNORAR)
@@ -106,8 +124,9 @@ class TestIndexador(unittest.TestCase):
             with open(os.path.join(pasta, "Zelda (USA).sfc"), "wb") as f:
                 f.write(b"\0" * 1024)
         achados = self.mod.varrer_pasta(pessoais, "pessoais", por_ext, por_id)
-        self.assertEqual([os.path.relpath(j["arquivo"], pessoais) for j in achados],
-                         [os.path.join("Super Nintendo", "Mario (USA).sfc")])
+        # O "arquivo" do jogo e' relativo a raiz do ARENA: confere-se o fim, que nao depende de onde o teste roda.
+        self.assertEqual([j["arquivo"].replace("\\", "/").split("/")[-2:] for j in achados],
+                         [["Super Nintendo", "Mario (USA).sfc"]])
         # A pasta oculta tambem nao entra na assinatura (mexer na lixeira nao refaz a lista).
         antes = self.mod.assinatura_das_pastas()
         with open(os.path.join(lixeiras[0], "outro.sfc"), "wb") as f:
@@ -594,6 +613,33 @@ class TestHardware(unittest.TestCase):
         self.assertGreater(v["operacoes_por_segundo"], 0)
         self.assertGreater(v["relativa_ao_alvo"], 0)
         self.assertIn("avx", hardware.instrucoes())
+
+    def test_velocidade_guardada_por_aparelho(self):
+        # 14/11/2026: a conta de velocidade rodava a cada abertura (quase 1 s no Galaxy A12). Agora vale 7 dias no
+        # mesmo aparelho; outro computador (o pen drive levado para outra sala) mede de novo.
+        import hardware
+        from unittest import mock
+        pasta = pasta_temp()
+        arquivo = os.path.join(pasta, "dados", "processador_medido.json")
+        contas = []
+
+        def medir():
+            contas.append(1)
+            return {"operacoes_por_segundo": 1000 * len(contas), "relativa_ao_alvo": 1.0,
+                    "referencia_provisoria": True}
+        with mock.patch.object(hardware, "velocidade_de_um_nucleo", side_effect=medir), \
+                mock.patch.object(hardware, "identidade_da_maquina", return_value="pc-a"):
+            primeira = hardware.velocidade_guardada(arquivo, agora=1000)
+            segunda = hardware.velocidade_guardada(arquivo, agora=2000)
+            self.assertEqual(len(contas), 1)
+            self.assertEqual(segunda["operacoes_por_segundo"], primeira["operacoes_por_segundo"])
+            self.assertTrue(segunda.get("guardada"))
+            hardware.velocidade_guardada(arquivo, agora=1000 + hardware.VALIDADE_DA_MEDIDA_S + 1)
+            self.assertEqual(len(contas), 2)                       # venceu: mede de novo
+        with mock.patch.object(hardware, "velocidade_de_um_nucleo", side_effect=medir), \
+                mock.patch.object(hardware, "identidade_da_maquina", return_value="pc-b"):
+            hardware.velocidade_guardada(arquivo, agora=2000)
+            self.assertEqual(len(contas), 3)                       # outro computador: mede
 
     def test_driver_video(self):
         import hardware

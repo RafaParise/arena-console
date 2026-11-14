@@ -35,7 +35,6 @@ O que o app conta ao abrir (variaveis do ambiente):
 """
 import json
 import os
-import runpy
 import shutil
 import sys
 import time
@@ -379,6 +378,7 @@ def preparar():
 
 def principal():
     abrir_o_fio()
+    ponte_android.marca_da_abertura("Python pronto")
     try:
         preparar()
     except Exception:
@@ -387,8 +387,12 @@ def principal():
         print("[ARENA] A pasta do ARENA no aparelho nao ficou pronta: o app tenta de novo.")
         sys.stdout.flush()
         os._exit(3)
+    ponte_android.marca_da_abertura("pasta do ARENA pronta")
     sys.argv = [os.path.join(AQUI, "arena.py")]
-    runpy.run_path(sys.argv[0], run_name="__main__")
+    # Por import, e nao pelo runpy.run_path: o run_path compila as ~9.400 linhas do arena.py a cada abertura (0,6 s
+    # no Galaxy A12, medido em 14/11/2026); o import usa o .pyc que o Python guardou na primeira vez.
+    import arena
+    arena.principal()
 
 
 if __name__ == "__main__":

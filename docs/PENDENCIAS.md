@@ -1207,3 +1207,10 @@ Falta, nesta ordem:
   `teste_pasta_system_pelo_arena` (RetroArch pelo ARENA) passou; bateria 1518 OK. Vai na próxima versão.
 - **Fase 1 do plano:** medida, em `docs\DESEMPENHO-SERVIDOR.md`. Memória e processador parado folgados; a abertura no
   A12 passa do limite (cerca de 5 s): abre a Fase 2 (otimizar o Python), não o Rust.
+- **Fase 2 feita (14/11, madrugada)**, medida no A12 com o `cProfile` dentro do app (`docs\DESEMPENHO-SERVIDOR.md`):
+  a conta de velocidade do processador a cada abertura (~0,9 s) agora vale 7 dias; o `arena.py` abre por `import`
+  (o `runpy` recompilava 9.400 linhas, 0,63 s); a medida do disco fica guardada também no Android; atualizar o APK
+  não varre mais os 2699 jogos de novo (9 a 13 s; a assinatura usa o conteúdo do `consoles.json`); certificados em
+  segundo plano; o servidor nasce antes da WebView. Dentro do Python: 4,75 s -> 2,6 a 3,0 s; do toque até a lista:
+  cerca de 3,5 s. Marcas `[ARENA] Abertura, X s` no registro do Android. Falta para os 2 s: as pastas do cartão SD
+  (~0,7 s, FUSE) e carregar os módulos sob demanda. Vai na próxima versão (APK de produção já no A12).

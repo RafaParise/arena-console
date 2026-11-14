@@ -119,6 +119,7 @@ import ponte_android  # noqa: E402  (no Android, o que o servidor pede ao app --
 import adb_aparelho  # noqa: E402  (o celular ligado no cabo, visto pelo computador -- 23/10/2026)
 import armazenamento  # noqa: E402  (a memoria do celular e o cartao SD, juntos -- 23/10/2026)
 import cartao_de_jogos  # noqa: E402  (a pasta ARENA-jogos no cartao e levar os jogos para ela -- 07/11/2026)
+ponte_android.marca_da_abertura("arena.py compilado e os modulos carregados")
 MUDANCA_PARA_O_CARTAO = cartao_de_jogos.Mudanca()
 PROCURA_DE_REPETIDOS = repetidos.Procura()
 
@@ -9197,6 +9198,7 @@ def abrir_janela(endereco):
         # ja escuta (item 14).
         ponte_android.tela_pronta(endereco)
         print("[ARENA] Tela do app do ARENA avisada.")
+        ponte_android.marca_da_abertura("tela avisada")
         return
     try:
         preferido = carregar_config().get("navegador", "automatico")
@@ -9387,6 +9389,7 @@ def principal():
             print("[ARENA] aquecimento da primeira tela: %s" % falha)
     threading.Thread(target=aquecer_a_primeira_tela, daemon=True).start()
     janela_preta.vigiar_abertura()       # abertura com mais de 60 s: o registro de queda diz onde parou
+    ponte_android.marca_da_abertura("arena.py inteiro lido; comeca o principal()")
     print("=" * 62)
     print("  ARENA %s - servidor local" % VERSAO)
     print("=" * 62)
@@ -9452,16 +9455,19 @@ def principal():
     if trocados:
         print("  Caminhos: %d corrigido(s) no retroarch.cfg" % trocados)
 
+    ponte_android.marca_da_abertura("pastas, limpeza e configuracoes conferidas")
     preparar_banco()
     config = carregar_config()
     gravar_override(config)
+    ponte_android.marca_da_abertura("banco e configuracao prontos")
 
     inicio = time.monotonic()
     try:
         catalogo = manifesto()
         origem = "cache" if catalogo.get("reaproveitado") else "varredura"
-        print("  Catalogo: %d jogo(s)  [%s, %.2fs]"
-              % (catalogo["total"], origem, time.monotonic() - inicio))
+        partes = ", ".join("%s %.2fs" % (nome.replace("_", " "), s) for nome, s in indexador.TEMPOS.items())
+        print("  Catalogo: %d jogo(s)  [%s, %.2fs%s]"
+              % (catalogo["total"], origem, time.monotonic() - inicio, ": " + partes if partes else ""))
     except Exception as falha:
         print("  Nao foi possivel montar o catalogo agora: %s" % falha)
 

@@ -1129,10 +1129,26 @@ public class ArenaServico extends Service {
      *  nao serve direto: os nomes dos arquivos la sao do jeito antigo do
      *  OpenSSL, e o OpenSSL 3 do Python nao os acha. Vao os do sistema e os
      *  que a pessoa (ou a escola) instalou no aparelho, como no Windows, que
-     *  confia nos certificados instalados no computador. Feito a cada
-     *  abertura do servico (leva uma fracao de segundo). */
+     *  confia nos certificados instalados no computador. Refeito a cada
+     *  abertura do servico; desde 14/11/2026 (Fase 2 do desempenho), com o
+     *  arquivo ja feito, o servidor nasce com ele e o novo e' montado em
+     *  segundo plano (antes o Python esperava a montagem para nascer). */
     File certificados() {
-        File arquivo = new File(getFilesDir(), "certificados.pem");
+        final File arquivo = new File(getFilesDir(), "certificados.pem");
+        if (arquivo.isFile() && arquivo.length() > 0) {
+            new Thread(new Runnable() {
+                public void run() {
+                    montarCertificados(arquivo);
+                }
+            }, "arena-certificados").start();
+            return arquivo;
+        }
+        return montarCertificados(arquivo);
+    }
+
+    /** Monta o PEM (o copiar grava num .parcial e troca de uma vez: o Python
+     *  nunca le um arquivo pela metade). */
+    File montarCertificados(File arquivo) {
         try {
             KeyStore loja = KeyStore.getInstance("AndroidCAStore");
             loja.load(null, null);

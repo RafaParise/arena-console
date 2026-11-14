@@ -165,6 +165,16 @@ public class ArenaActivity extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         guardado = getSharedPreferences("arena", Context.MODE_PRIVATE);
+        // O servidor (o Python, outro processo) comeca ANTES de criar a WebView: as duas coisas pesadas correm juntas.
+        // Antes, a WebView (o Chromium inteiro) carregava primeiro e so depois o servidor nascia: no Galaxy A12 eram
+        // ~2,7 s de espera a mais na abertura (Fase 2 de docs/DESEMPENHO-SERVIDOR.md, 14/11/2026).
+        boolean explicarPermissao = Build.VERSION.SDK_INT >= 23 && !temPermissao()
+                && !guardado.getBoolean("pediu_permissao", false);
+        boolean comecouCedo = false;
+        if (!ArenaServico.desistiu && !ArenaServico.pronto && !explicarPermissao) {
+            comecar();
+            comecouCedo = true;
+        }
         // O APK de teste (ferramentas/montar_android.py --teste) deixa o
         // teste ler o que a pagina escreve no console (chrome://inspect).
         WebView.setWebContentsDebuggingEnabled(existeNoApk("arena/android/depurar"));
@@ -200,10 +210,10 @@ public class ArenaActivity extends Activity {
             tela.loadDataWithBaseURL(null, ABRINDO, "text/html", "utf-8", null);
             // Na primeira abertura, a permissao de arquivos (para achar a
             // pasta do ARENA no aparelho); depois, so quando a pessoa pede.
-            if (Build.VERSION.SDK_INT >= 23 && !temPermissao() && !guardado.getBoolean("pediu_permissao", false)) {
+            if (explicarPermissao) {
                 guardado.edit().putBoolean("pediu_permissao", true).apply();
                 explicarAntesDePedir();
-            } else {
+            } else if (!comecouCedo) {
                 comecar();
             }
         }

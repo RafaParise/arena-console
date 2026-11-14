@@ -31,6 +31,7 @@ import os
 import subprocess
 import sys
 import threading
+import time
 import zipfile
 
 # Quem abriu o servidor conta pelas variaveis do ambiente (ArenaServico.java).
@@ -64,6 +65,23 @@ def segredo_confere(cabecalho_cookie):
         return False
     item = biscoitos.get(NOME_DO_COOKIE)
     return bool(item) and hmac.compare_digest(item.value.encode("utf-8"), SEGREDO.encode("utf-8"))
+
+
+
+def marca_da_abertura(etapa):
+    """No Android, anota no registro quanto tempo passou desde que o processo do servidor nasceu (Fase 2 de
+    docs\\DESEMPENHO-SERVIDOR.md, 14/11/2026: a abertura no A12 levava ~5 s e era preciso saber onde). O tempo vem do
+    proprio Linux (/proc), entao conta tambem o Python acordando. Fora do Android, nao faz nada."""
+    if not SEGREDO:
+        return
+    try:
+        with open("/proc/self/stat", encoding="ascii") as arquivo:
+            nasceu = int(arquivo.read().rsplit(")", 1)[1].split()[19]) / os.sysconf("SC_CLK_TCK")
+        agora = time.clock_gettime(time.CLOCK_BOOTTIME)    # o /proc/uptime o Android nao deixa o app ler
+    except (OSError, ValueError, IndexError, AttributeError):
+        return
+    print("[ARENA] Abertura, %.2f s: %s" % (agora - nasceu, etapa))
+
 
 # O fio para o app (o stdout de verdade). O android_inicio.py preenche.
 CANAL = None

@@ -22,6 +22,7 @@ import json
 import os
 import re
 import threading
+import time
 import unicodedata
 
 import arrumar
@@ -524,6 +525,28 @@ def arquivo_de_jogadores():
 VERSAO_INDICE = 9     # 9 = sem os arquivos ocultos do Mac ('._') e sem a lixeira (13/11/2026)
 
 
+_CONTEUDO_DO_CONSOLES = {}
+
+
+def conteudo_do_consoles():
+    """Um resumo (md5) do CONTEUDO do consoles.json, ou "" se nao deu para ler. Antes entrava a data do arquivo: no
+    Android, cada APK novo regrava o consoles.json (data nova, conteudo igual) e o ARENA varria todos os jogos de
+    novo, 9 a 13 s no Galaxy A12 (14/11/2026). Guardado pela data e tamanho, para nao reler o arquivo a toa."""
+    try:
+        informacao = os.stat(ARQUIVO_CONSOLES)
+    except OSError:
+        return ""
+    marca = (ARQUIVO_CONSOLES, informacao.st_mtime_ns, informacao.st_size)
+    if _CONTEUDO_DO_CONSOLES.get("marca") != marca:
+        try:
+            with open(ARQUIVO_CONSOLES, "rb") as arquivo:
+                resumo = hashlib.md5(arquivo.read()).hexdigest()
+        except OSError:
+            return ""
+        _CONTEUDO_DO_CONSOLES.update(marca=marca, resumo=resumo)
+    return _CONTEUDO_DO_CONSOLES["resumo"]
+
+
 def assinatura_das_pastas():
     """Resume o estado atual das pastas de jogos em um texto curto.
 
@@ -533,10 +556,9 @@ def assinatura_das_pastas():
     console novo): mudou um dos dois, a lista e' refeita.
     """
     partes = ["indice|%d" % VERSAO_INDICE]
-    try:
-        partes.append("consoles|%d" % os.path.getmtime(ARQUIVO_CONSOLES))
-    except OSError:
-        pass
+    conteudo = conteudo_do_consoles()
+    if conteudo:
+        partes.append("consoles|%s" % conteudo)
     for origem in list(ORIGENS):
         caminho = os.path.join(PASTA_JOGOS, origem)
         if not os.path.isdir(caminho):
@@ -1251,6 +1273,11 @@ def gravar_manifesto_do_navegador(texto):
         pass
 
 
+# Quanto levou cada parte da ultima chamada do indexar() (a abertura no celular, Fase 2 de
+# docs\DESEMPENHO-SERVIDOR.md): conferir as pastas e ler a lista guardada. O servidor mostra na abertura.
+TEMPOS = {}
+
+
 def indexar(forcar=False, lojas=False):
     """Funcao principal. Devolve o manifesto e grava em disco.
 
@@ -1260,11 +1287,15 @@ def indexar(forcar=False, lojas=False):
 
     Com forcar=False, reaproveita o catalogo salvo se nada mudou nas pastas.
     """
+    inicio = time.monotonic()
     assinatura = assinatura_das_pastas()
+    TEMPOS["pastas"] = time.monotonic() - inicio
     esquecer_miniaturas()          # capas baixadas desde a ultima varredura entram
 
     if not forcar:
+        inicio = time.monotonic()
         salvo = ler_manifesto_salvo()
+        TEMPOS["lista_guardada"] = time.monotonic() - inicio
         if salvo and salvo.get("assinatura") == assinatura:
             salvo["reaproveitado"] = True
             if not os.path.isfile(arquivo_do_navegador()):

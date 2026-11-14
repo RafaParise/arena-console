@@ -390,6 +390,13 @@ def _disco_linux(pasta):
 def numero_do_volume(pasta):
     """Numero de serie do disco (volume) onde a pasta esta, ou None.
     Muda quando o ARENA vai para outro pen drive ou outro disco."""
+    if NO_ANDROID:
+        # Android: o /dev/disk/by-uuid nao existe para o app; o numero do dispositivo da pasta basta (muda com o
+        # cartao trocado; depois de reiniciar o aparelho pode mudar, e ai mede de novo). Fase 2, 14/11/2026.
+        try:
+            return "android-%x" % os.stat(pasta).st_dev
+        except OSError:
+            return None
     if not sys.platform.startswith("win"):
         # Linux: o UUID do sistema de arquivos (o mesmo pen drive tem o mesmo
         # em qualquer computador), pela lista /dev/disk/by-uuid.
@@ -417,16 +424,10 @@ def numero_do_volume(pasta):
         return None
 
 
-def medir_velocidade_guardada(pasta, arquivo, agora=None):
-    """medir_velocidade(), mas guardada em `arquivo` (dados\\disco_medido.json)
-    por computador + disco, por VALIDADE_DA_MEDIDA_S. Sem computador ou sem
-    numero do disco conhecidos, mede sempre (como antes)."""
+def _medida_guardada(arquivo, chave, medir, confere, agora):
+    """A medida guardada em `arquivo` (um JSON {chave: {"quando", "medida"}}) se ainda vale (VALIDADE_DA_MEDIDA_S) e
+    passa no `confere`; senao mede de novo com `medir()` e guarda. Serve ao disco e ao processador."""
     import json
-    agora = time.time() if agora is None else agora
-    maquina, volume = identidade_da_maquina(), numero_do_volume(pasta)
-    if not maquina or not volume:
-        return medir_velocidade(pasta)
-    chave = "%s|%s" % (maquina, volume)
     try:
         with open(arquivo, encoding="utf-8") as entrada:
             guardadas = json.load(entrada)
@@ -438,15 +439,14 @@ def medir_velocidade_guardada(pasta, arquivo, agora=None):
     try:
         if (isinstance(item, dict) and isinstance(item.get("medida"), dict)
                 and 0 <= agora - float(item.get("quando", 0)) < VALIDADE_DA_MEDIDA_S
-                and float(item["medida"].get("escrita_mbs", 0)) > 0):
+                and confere(item["medida"])):
             return dict(item["medida"], guardada=True)
     except (TypeError, ValueError):
         pass
-    medida = medir_velocidade(pasta)
+    medida = medir()
     if medida is None:
         return None
     guardadas[chave] = {"quando": agora, "medida": medida}
-    # So as mais recentes (o pen drive passa por muitos computadores).
     if len(guardadas) > MEDIDAS_GUARDADAS:
         def quando(k):
             try:
@@ -467,6 +467,31 @@ def medir_velocidade_guardada(pasta, arquivo, agora=None):
         except OSError:
             pass
     return medida
+
+
+def medir_velocidade_guardada(pasta, arquivo, agora=None):
+    """medir_velocidade(), mas guardada em `arquivo` (dados\\disco_medido.json)
+    por computador + disco, por VALIDADE_DA_MEDIDA_S. Sem computador ou sem
+    numero do disco conhecidos, mede sempre (como antes)."""
+    agora = time.time() if agora is None else agora
+    maquina, volume = identidade_da_maquina(), numero_do_volume(pasta)
+    if not maquina or not volume:
+        return medir_velocidade(pasta)
+    return _medida_guardada(arquivo, "%s|%s" % (maquina, volume), lambda: medir_velocidade(pasta),
+                            lambda medida: float(medida.get("escrita_mbs", 0)) > 0, agora)
+
+
+def velocidade_guardada(arquivo, agora=None):
+    """velocidade_de_um_nucleo(), guardada em `arquivo` (dados\\processador_medido.json) por computador, por
+    VALIDADE_DA_MEDIDA_S. Achado da Fase 2 do desempenho (14/11/2026): no Galaxy A12 a conta de velocidade rodava
+    a cada abertura e levava quase 1 s, com a tela esperando. O processador nao muda de uma abertura para a outra;
+    noutro computador (o pen drive levado para outra sala) a identidade e' outra e ele mede de novo."""
+    agora = time.time() if agora is None else agora
+    maquina = identidade_da_maquina()
+    if not maquina or not arquivo:
+        return velocidade_de_um_nucleo()
+    return _medida_guardada(arquivo, maquina, velocidade_de_um_nucleo,
+                            lambda medida: int(medida.get("operacoes_por_segundo", 0)) > 0, agora)
 
 
 def disco(pasta, guardar_em=None):
@@ -1090,7 +1115,7 @@ def resumo(pasta_raiz):
         "cpu": processador(),
         "gpu": gpu,
         "instrucoes": instrucoes(),
-        "velocidade": velocidade_de_um_nucleo(),
+        "velocidade": velocidade_guardada(os.path.join(pasta_raiz, "dados", "processador_medido.json")),
         "nucleos": total_nucleos,
         "ram_total_gb": ram["total_gb"],
         "ram_livre_gb": ram["livre_gb"],
