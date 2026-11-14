@@ -8,12 +8,12 @@ Esta versão faz o **SGSR** (o filtro de imagem feito para a placa do celular) e
 
 | Você vai usar em | Baixe | Tamanho |
 |---|---|---|
-| 📱 **Celular ou tablet Android** (a maioria dos aparelhos, incluindo Galaxy, Xiaomi, Motorola) | **`ARENA-2026.11.14-android-celular-arm64.apk`** | TAMANHO_APK_ARM |
-| 📱 **Chromebook com Intel** ou **emulador de Android no PC** | **`ARENA-2026.11.14-android-chromebook-intel-amd-x86_64.apk`** | TAMANHO_APK_X86 |
-| 🖥️ **Computador com Windows 10 ou 11**, primeira vez | **`ARENA-2026.11.14-PC-windows-linux-chromebook.zip`** | TAMANHO_ZIP |
-| 🖥️ **Computador com Windows**, já usa o ARENA | **`ARENA-2026.11.14-PC-atualizacao.zip`** (só o programa) | TAMANHO_ATU |
-| 🐧 **Computador com Linux** (Ubuntu, Debian, Mint, Fedora; 64 bits) | o mesmo **`ARENA-2026.11.14-PC-windows-linux-chromebook.zip`** | TAMANHO_ZIP |
-| 💻 **Chromebook da escola** (gerenciado) ou **sem instalar nada** | o mesmo **`ARENA-2026.11.14-PC-windows-linux-chromebook.zip`**, num pen drive | TAMANHO_ZIP |
+| 📱 **Celular ou tablet Android** (a maioria dos aparelhos, incluindo Galaxy, Xiaomi, Motorola) | **`ARENA-2026.11.14-android-celular-arm64.apk`** | 245 MB |
+| 📱 **Chromebook com Intel** ou **emulador de Android no PC** | **`ARENA-2026.11.14-android-chromebook-intel-amd-x86_64.apk`** | 234 MB |
+| 🖥️ **Computador com Windows 10 ou 11**, primeira vez | **`ARENA-2026.11.14-PC-windows-linux-chromebook.zip`** | 1,0 GB |
+| 🖥️ **Computador com Windows**, já usa o ARENA | **`ARENA-2026.11.14-PC-atualizacao.zip`** (só o programa) | 106 MB |
+| 🐧 **Computador com Linux** (Ubuntu, Debian, Mint, Fedora; 64 bits) | o mesmo **`ARENA-2026.11.14-PC-windows-linux-chromebook.zip`** | 1,0 GB |
+| 💻 **Chromebook da escola** (gerenciado) ou **sem instalar nada** | o mesmo **`ARENA-2026.11.14-PC-windows-linux-chromebook.zip`**, num pen drive | 1,0 GB |
 
 No celular, instale o APK por cima do anterior: os jogos, os saves e os recordes ficam. No computador, quem já tem o
 ARENA descompacta o `PC-atualizacao.zip` por cima da pasta (só o programa muda: `dados\`, `jogos\`, `BIOS\` e
@@ -36,6 +36,12 @@ ARENA descompacta o `PC-atualizacao.zip` por cima da pasta (só o programa muda:
 - Só entra o que falta: o que você escolher no menu do jogo continua valendo.
 - As chaves de cada jogo foram conferidas no código de cada um (cada jogo usa nomes diferentes).
 
+**Pen drive usado num Mac**
+- O macOS cria, ao lado de cada arquivo, um irmão oculto de 4 KB (`._Mario.sfc`). Ele aparecia como um segundo jogo,
+  que não abria, e o que estava na lixeira também aparecia.
+- Agora o ARENA ignora os arquivos ocultos e as lixeiras do Mac, do Linux e do Windows (`$RECYCLE.BIN`). A lista de
+  jogos se refaz sozinha na primeira abertura.
+
 ## Como esta versão foi conferida
 
 - **Rodada final** (131 testes de uma vez, cerca de 3 h): **127 passaram**. As 4 falhas foram repetidas uma a uma:
@@ -47,12 +53,21 @@ ARENA descompacta o `PC-atualizacao.zip` por cima da pasta (só o programa muda:
     um jogo e um nível diferentes a cada vez, e o mesmo jogo abriu em cerca de 21 s na repetição. Nada do PS2 mudou
     desde a 2026.11.13.2, e de tarde os 40 abriram.
 - **Bateria do servidor:** 1513 testes, todos passando.
-- **Celular:** o SGSR conferido no Galaxy A12 (Vulkan e o filtro compilado no registro do RetroArch); o APK de
-  produção instalado e conferido no A12 (abertura a frio e `auditoria_celular`).
+- **Celular:** o SGSR conferido no Galaxy A12 (Vulkan e o filtro compilado no registro do RetroArch). O APK de
+  produção instalado no A12: abre a frio em cerca de 1 s, sem nenhuma falha no registro, passa por sair e voltar,
+  girar a tela e pouca memória, e o servidor abre em primeiro plano com os 2699 jogos na tela.
+- **O pacote do computador** foi montado do zero e aberto numa cópia: o servidor abriu, o RetroArch desenhou o jogo de
+  prova (58 de 71 consoles prontos; os outros pedem BIOS ou programa de fora), e nenhum jogo, BIOS proprietária, save
+  ou dado de quem montou ficou nele.
 
-**Também nesta versão:** num pen drive usado num Mac, os arquivos ocultos que o macOS cria ao lado de cada jogo
-(`._Mario.sfc`) apareciam como jogos repetidos que não abriam, e o que estava na lixeira também aparecia. Agora o
-ARENA ignora os arquivos ocultos e as lixeiras do Mac, do Linux e do Windows.
+SHA-256 dos arquivos:
+
+```
+339a928c67a9296da607ea45a811861938a82d210225e63cf6bb665de9d9d735  ARENA-2026.11.14-PC-atualizacao.zip
+c389cc177d4e7f85881052c6fc51ddf7d668083c90d013b17b96ad39457e2712  ARENA-2026.11.14-PC-windows-linux-chromebook.zip
+9bf000b27aad666ca0034a26359bd41cfc61e8b217abef320894318956be4eca  ARENA-2026.11.14-android-celular-arm64.apk
+b10f2395fc90dcce7440fa6a079e630a20a425f6e1f4a28732c25b49ea410f73  ARENA-2026.11.14-android-chromebook-intel-amd-x86_64.apk
+```
 
 ## Limites conhecidos
 

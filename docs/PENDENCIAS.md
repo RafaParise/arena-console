@@ -1181,5 +1181,10 @@ Falta, nesta ordem:
     ligada e o PC sem uso, olhar o registro inteiro do PCSX2 (e o `procmon`) de uma partida parada.
 - Feito antes da VERSAO: o indexador pula os `._` do Mac e as pastas ocultas do sistema (`docs\PLANO-DE-ACAO-RUST.md`,
   22º guia), com teste no `run.py` (1513 testes OK).
-- Depois: VERSAO 2026.11.14, APKs de produção (arm64 e x86_64) com o de produção
-  conferido no A12, pacote dos alunos do zero, nota `docs\RELEASE-2026.11.14.md` (rascunho pronto) e a release.
+- 14/11 de madrugada: VERSAO 2026.11.14; APKs de produção (arm64 245 MB, x86_64 234 MB); o de produção instalado e
+  conferido no A12 (`auditoria_celular`: abertura a frio em 957 ms, nenhuma falha, ciclo de vida certo; o servidor na
+  8777 em primeiro plano e os 2699 jogos na tela). Pacote dos alunos montado do zero em
+  `%LOCALAPPDATA%\ARENA-montagem-2026.11.14\ARENA-alunos` (2,62 GB; pode apagar) e os 5 arquivos da release em
+  `%LOCALAPPDATA%\ARENA-release-2026.11.14`. O A12 ficou com o APK de produção 2026.11.14.
+- Próximo: o PS2 que às vezes não começa (acima) e o plano de `docs\PLANO-DE-ACAO-RUST.md` (Fase 1, medir; depois a
+  paridade e os itens pequenos).
