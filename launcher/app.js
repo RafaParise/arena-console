@@ -7768,7 +7768,8 @@ async function iniciar() {
     aviso(`O ARENA parou de responder. Para voltar, ${comoAbrirDeNovo()}.`);
   }
   // A marca da medida da abertura (docs/DESEMPENHO-SERVIDOR.md): no Android, vai para o registro do aparelho.
-  console.info("[ARENA] lista na tela" + (respostaGuardada ? " (guardada pelo nativo)" : ""));
+  console.info("[ARENA] lista na tela" + (respostaGuardada ? " (guardada pelo nativo)" : "") + ", " +
+    Math.round(performance.now()) + " ms depois de a pagina comecar a carregar");
   if (respostaGuardada) atualizarQuandoOPythonFicarPronto();
 }
 
