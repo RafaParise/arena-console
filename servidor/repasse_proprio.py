@@ -578,15 +578,24 @@ def procurar_sala_em_algum(texto, codigo, tentativas=8, intervalo=2.0):
         return None, None, "O código da sala tem 6 números."
     mensagem = "A sala nao abriu a tempo."
     for vez in range(max(1, tentativas)):
-        abrindo = False
+        # Pergunta a TODOS antes de decidir (revisao de seguranca de 14/11/2026): o mesmo codigo pode existir em dois
+        # repasses ao mesmo tempo (salas de pessoas diferentes). Se mais de um conhece o codigo, nao entra em nenhum:
+        # entrar no primeiro poderia por o aluno na partida de outra pessoa.
+        achados, abrindo = [], 0
         for endereco in lista:
             status, dados = _pedir(endereco, "GET", "/sala/" + codigo, espera=3.0)
             if status == 200 and dados.get("sessao"):
-                return endereco, (dados["sessao"], int(dados.get("porta") or PORTA_PADRAO)), None
-            if status == 202:
-                abrindo = True
-            if status is not None:
+                achados.append((endereco, (dados["sessao"], int(dados.get("porta") or PORTA_PADRAO))))
+            elif status == 202:
+                abrindo += 1
+            if status is not None and status != 200:
                 mensagem = dados.get("erro") or mensagem
+        if len(achados) + abrindo > 1:
+            return None, None, ("Esse código existe em mais de um repasse agora. Peça ao amigo para fechar o jogo e "
+                                "abrir a partida de novo (sai um código novo).")
+        if achados:
+            endereco, achado = achados[0]
+            return endereco, achado, None
         if not abrindo:
             break
         if vez + 1 < tentativas:

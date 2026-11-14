@@ -295,6 +295,24 @@ class Pedacos(unittest.TestCase):
         self.assertIsNone(rp.enderecos_validos("a.lan, b lan"))           # um invalido estraga a lista
         self.assertIsNone(rp.enderecos_validos(",".join("h%d.lan" % i for i in range(rp.MAXIMO_DE_REPASSES + 1))))
 
+    def test_mesmo_codigo_em_dois_repasses_nao_entra(self):
+        # Revisao de seguranca de 14/11/2026: o codigo existe nos dois (salas de pessoas diferentes). Entrar no
+        # primeiro poderia por o aluno na partida de outra pessoa: recusa e pede um codigo novo.
+        from unittest import mock
+        respostas = {"a.lan": (200, {"sessao": "QUFB", "porta": 55440}),
+                     "b.lan": (200, {"sessao": "QkJC", "porta": 55440})}
+        with mock.patch.object(rp, "_pedir", side_effect=lambda e, *_a, **_k: respostas[e]):
+            onde, achado, erro = rp.procurar_sala_em_algum("a.lan, b.lan", "123456", tentativas=1)
+        self.assertIsNone(onde)
+        self.assertIsNone(achado)
+        self.assertIn("mais de um repasse", erro)
+        respostas["b.lan"] = (202, {"erro": "A sala ainda esta abrindo."})   # um com a sala e outro abrindo: tambem
+        with mock.patch.object(rp, "_pedir", side_effect=lambda e, *_a, **_k: respostas[e]):
+            self.assertIsNone(rp.procurar_sala_em_algum("a.lan, b.lan", "123456", tentativas=1)[1])
+        respostas["b.lan"] = (404, {"erro": "Sala não encontrada."})
+        with mock.patch.object(rp, "_pedir", side_effect=lambda e, *_a, **_k: respostas[e]):
+            self.assertEqual(rp.procurar_sala_em_algum("a.lan, b.lan", "123456", tentativas=1)[0], "a.lan")
+
     def test_repasse_fora_do_ar(self):
         livre = socket.socket()
         livre.bind(("127.0.0.1", 0))
