@@ -9,6 +9,7 @@ toda rota `/api/...` (120) e toda aba existe onde o servidor roda; o que muda é
 | Versão | Falta | Motivo |
 |---|---|---|
 | Linux | nenhum console | `pokket` e `vemulator` entram pelo `preparar_linux.py` (marcas conferidas); PCSX2, Dolphin, RPCS3 e Xenia são os do Linux, em `emuladores\` |
+| Linux ARM64 (TV Box com Armbian, Raspberry Pi 4 e 5; desde 14/11/2026) | Arduboy, Java ME; PS2, PS3 e Xbox 360 pelos emuladores de fora | o libretro não publica `ardens` nem `freej2me` para ARM; os AppImage de fora são x86-64 (o ARENA lê o processador no cabeçalho do programa e os mostra como ausentes). O RetroArch do ARM é o nightly (programa solto); as peças vêm pelo `preparar_linux.py --arm64` e só entram no pacote com `--com-arm64` (~900 MB). Testado pelo QEMU (servidor abre, acha o RetroArch, recusa o AppImage x86-64); falta uma TV Box de verdade |
 | Android arm64 | Java ME, PS3, Xbox 360 | o núcleo do Java ME não existe para Android; PS3 e Xbox 360 só por emulador de fora (não cabe no celular) |
 | Android x86_64 (Chromebook com o APK) | os mesmos + PS2 | o ARMSX2 é só de arm64; falta compilar a biblioteca do RetroArch para x86_64 (`ferramentas\compilar_retroarch_android.py --abi x86_64`) |
 | Navegador (Chromebook sem instalar) | 33 consoles | só os núcleos que o RetroArch do navegador (Emscripten) traz; sem servidor, então sem **Acessórios** (escondidos), sem emuladores de fora e sem BIOS pela tela |

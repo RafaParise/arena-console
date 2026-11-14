@@ -144,6 +144,11 @@ servidor inteiro). Condições:
 
 **Fase 4:** decisão registrada em `docs\replica\architecture.md`, com os números.
 
+**Andamento (14/11/2026):** Fase 0 a 4 feitas. Fase 1 e 2 em `docs\DESEMPENHO-SERVIDOR.md`; a **Fase 3** (prova em
+`ferramentas\prova_rust`, medida no A12) mostrou que a linguagem muda ~10% na conferência das pastas e o paralelismo
+4 a 5 vezes; o paralelismo e mais três achados entraram no Python, e a abertura a frio no A12 ficou em 2,1 a 2,5 s
+dentro do Python (a primeira depois de atualizar, de 13,4 para 2,9 s). **Fase 4: o servidor continua em Python.**
+
 ## O terceiro guia (13/11, "sincronizar com as releases e compilar no Termux e no Chromebook")
 
 Repete os problemas 1 a 10 e acrescenta:
@@ -224,6 +229,15 @@ compila e guarda o `.so`); quem monta, assina e publica continua sendo o PC do R
     e o Python para `servidor/python-linux-aarch64/`; (2) `plataforma.py` escolhe pela `platform.machine()`;
     (3) `ARENA.sh` aceita `aarch64`; (4) teste pelo QEMU e, se a escola tiver TV Box com Armbian, nela. Vale só se
     houver esse aparelho na escola (pergunta ao Rafael).
+  - **Feito em 14/11 (manhã), a pedido do Rafael ("vamos seguir então"):** (1) `preparar_linux.py --arm64
+    [--registrar]` (lista conferida `ferramentas\linux_aarch64.json`: RetroArch nightly de 17 MB, 63 núcleos; sem
+    versão ARM: `ardens` e `freej2me`); (2) `plataforma.ARM64`, `pasta_dos_nucleos`, o RetroArch do pacote ou o do
+    sistema, e `roda_neste_processador` (AppImage x86-64 conta como ausente no ARM); (3) `ARENA.sh` aceita `aarch64`
+    quando há RetroArch (do pacote ou o `sudo apt install retroarch`), e o erro diz as três saídas; (4) **QEMU**: o
+    Python aarch64 do pacote rodou (3.13.16, SQLite 3.53.1) e o servidor inteiro abriu em ~9 s sob emulação,
+    reconheceu "aarch64, 64 bits", achou o RetroArch do ARM e mostrou o PCSX2 x86-64 como ausente. **Falta:** abrir
+    um jogo numa TV Box ou Raspberry Pi de verdade (o QEMU não tem a placa de vídeo nem as bibliotecas do sistema
+    que o RetroArch pede). O pacote dos alunos só leva o ARM com `montar_versao_alunos.py --com-arm64` (~900 MB).
 - O que é só do Windows (Lossless, MFG, patch de 60 do PS2 no PCSX2) já tem irmão no Android quando é possível (painel
   "Este celular", PS2 a 60 no ARMSX2); o resto depende de programa que só existe no Windows.
 

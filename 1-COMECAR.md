@@ -560,6 +560,25 @@ aparece. O resto é igual, inclusive o PS2, o PS3 e o Xbox 360, com os
 emuladores do Linux usando a mesma pasta de dados dos do Windows. Para
 conferir a pasta, `sh VERIFICAR.sh`. Os detalhes estão em `docs\LINUX.md`.
 
+### Numa TV Box com Armbian, num Raspberry Pi 4 ou 5 (Linux ARM de 64 bits)
+
+Desde 14/11/2026 o mesmo `sh ARENA.sh` abre também no Linux dos processadores
+ARM de 64 bits. Para isso, a pasta precisa das peças do ARM, que não vêm no
+pacote comum porque somam uns 900 MB:
+
+- **Quem monta o pacote** roda, no Windows,
+  `servidor\python\python.exe ferramentas\preparar_linux.py --arm64` (baixa o
+  RetroArch, 63 núcleos e o Python do ARM, conferindo cada arquivo) e depois
+  `ferramentas\montar_versao_alunos.py --com-arm64`.
+- **Sem as peças na pasta**, o ARENA usa o RetroArch instalado no próprio
+  Linux, se houver (`sudo apt install retroarch`).
+
+O que fica de fora no ARM: o Arduboy e o Java ME (o libretro não publica esses
+núcleos para ARM), e o PS2, o PS3 e o Xbox 360 pelos emuladores de fora, que
+são programas do PC (Intel e AMD). O GameCube e o Wii vão pelo núcleo do
+Dolphin. A placa de vídeo dessas TV Box varia muito: teste os consoles 3D na
+própria caixa antes de levar para a turma.
+
 ---
 
 ## Parte E — No celular ou no tablet Android

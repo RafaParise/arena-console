@@ -1231,3 +1231,25 @@ conferido nas fontes (`4f426d9`, em `docs/PLANO-DE-ACAO-RUST.md`); tecla F favor
 3. Busca na sinopse: a lista não tem sinopse (o indexador só lê nome e capa); precisaria entrar no índice.
 4. Favoritar pelo botão Y do controle: a tela não lê o controle fora do mapeamento (no Android o direcional vira foco
    do WebView); conferir qual tecla o WebView entrega para o Y antes de prometer.
+
+## 14/11/2026 (manhã): Linux ARM64 feito, Fase 3 e 4 do plano Rust, abertura no A12
+
+Feito e enviado (vai na próxima versão):
+- **Linux ARM64** (`56c4da5`): `preparar_linux.py --arm64`, `plataforma.ARM64`, `ARENA.sh` aceita `aarch64` com
+  RetroArch do pacote ou do sistema, AppImage x86-64 conta como ausente no ARM. Testado pelo QEMU (servidor abre,
+  acha o RetroArch, recusa o AppImage x86-64). Pacote dos alunos só com `--com-arm64` (~900 MB).
+- **Fase 3 do plano Rust** (`584c234`): prova em `ferramentas\prova_rust` medida no A12; a linguagem muda ~10%, o
+  paralelismo 4 a 5 vezes; a conferência das pastas em paralelo entrou no Python.
+- **Abertura no A12** (`73edc42`): assinatura pelo conteúdo do `multitap.json` (cada APK novo fazia varrer os 2699
+  jogos), recursos do RetroArch em segundo plano, `.pyc` prontos no APK, APK sem o Python do Linux ARM. Do Python
+  nascer até a tela: a frio 2,7-3,6 s → 2,1-2,5 s; a primeira depois de atualizar 13,4 s → 2,9 s.
+- **Fase 4:** o servidor continua em Python (números em `docs\DESEMPENHO-SERVIDOR.md` e `docs\replica\architecture.md`).
+
+**Próximo passo:**
+1. Linux ARM64 numa TV Box ou Raspberry Pi de verdade: abrir um jogo de NES, um de PS1 e um 3D (N64 ou PSP),
+   medindo a velocidade. Só se a escola tiver o aparelho (pergunta ao Rafael).
+2. A12: abrir um jogo logo depois de atualizar o app (o jogo espera os recursos saírem do APK, ~7 s no pior caso);
+   conferir que não trava e que a espera não passa disso.
+3. Os testes que faltavam do lote do Android continuam (item 1 da seção anterior).
+4. Conferência das pastas no app ainda leva ~0,6 s (no Termux, ~0,1 s com 8 threads): ver se o tempo vai em outra
+   parte da medida (a "pastas" do catálogo) ou se a WebView abrindo junto disputa o processador.

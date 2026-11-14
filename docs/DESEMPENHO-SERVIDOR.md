@@ -79,3 +79,64 @@ abertura com o celular parado caiu de cerca de 5,3 s para cerca de 3,5 s. Os 152
 - **O limite de 2 s ainda não é alcançado no A12** (cerca de 3,5 s). Pela regra do plano, o Rust continua fora: o
   ganho veio todo de corrigir trabalho repetido no Python e no Java, e o que sobra é ler o cartão e carregar o
   programa, que o Rust não tornaria mais rápidos sem reescrever o servidor inteiro.
+
+## Fase 3: a prova em Rust (14/11/2026, manhã)
+
+Pedido do Rafael: "finalize os testes em Rust de todas as etapas; se não for mudar tudo para Rust, pelo menos aprender
+com esses testes". A prova (`ferramentas\prova_rust`, Rust só com a biblioteca padrão, compilado estático para ARM64
+com o linker do próprio Rust) faz o trabalho do trecho que a Fase 2 deixou como o maior: a conferência das pastas de
+jogos (`indexador.assinatura_das_pastas`). O gêmeo em Python (`medir_python.py`) faz o mesmo trabalho, e o "resumo"
+impresso confere que os dois viram as mesmas pastas.
+
+**Conferência das pastas no Galaxy A12** (134 pastas do cartão SD, os dois rodando como o mesmo app, no Termux):
+
+| Jeito | Rust | Python |
+|---|---|---|
+| uma pasta de cada vez | ~370 ms | ~410 ms (o `os.walk` de antes: ~460 ms) |
+| 8 pastas ao mesmo tempo | ~60 ms | ~92 ms |
+
+Rodando pelo `adb` (outro usuário do Android), o Rust em sequência levava 190 ms: o FUSE do cartão confere a
+permissão de cada app, então só vale comparar no mesmo usuário. **A linguagem muda uns 10%; perguntar ao disco em
+paralelo muda 4 a 5 vezes**, nas duas. O Python faz isso com threads, porque o `os.scandir` e o `os.stat` soltam a
+trava do Python enquanto esperam o disco.
+
+**O nascimento do programa no A12:** o Python vazio nasce em ~200 ms e um programa Rust em ~27 ms. Os módulos da
+biblioteca padrão que um servidor em Python precisa somam mais ~450 ms (só o `http.server`, ~300 ms). Isso o Rust
+tiraria, mas só reescrevendo o servidor inteiro (9.600 linhas e 62 módulos), e o `-X importtime` mostrou que não há
+um módulo do ARENA que pese sozinho: carregar sob demanda daria pouco (o `urllib.request` e o `ssl` por cima do
+`http.server` ficaram dentro do ruído da medida).
+
+### O que a prova ensinou e entrou no ARENA (em Python)
+
+| Achado | Correção | Antes → depois no A12 (APK de produção) |
+|---|---|---|
+| Conferir as pastas uma de cada vez | `indexador.pastas_com_data`: por níveis, 8 ao mesmo tempo, a mesma lista de antes | conferência 1,24-1,42 s → 0,59-0,78 s |
+| O `multitap.json` entrava na assinatura pela data, e cada APK novo o regrava | `indexador.conteudo_do_arquivo`: o conteúdo (md5), como o `consoles.json` | a 1ª abertura depois de atualizar varria os 2699 jogos (9,9 s); agora usa a lista guardada |
+| Os 2305 recursos do RetroArch saíam do APK antes de o servidor começar | `android_inicio.tirar_em_segundo_plano`: numa thread; o jogo espera (`ponte_android.RECURSOS_PRONTOS`) | 8,6 s a menos antes do servidor |
+| O celular compilava o `arena.py` e os ~60 módulos depois de cada atualização | o APK leva os `.pyc` no modo *checked-hash* (valem se o `.py` for o mesmo) | ~3,5 s a menos |
+| O APK levava o `servidor/python-linux-aarch64` do Linux ARM | fora (`FORA_DO_SERVIDOR`) | 22 MB a menos no APK |
+
+**Do Python nascer até a tela avisada**, mesmo celular:
+
+| Abertura | Antes (14/11, 10h38) | Depois (14/11, 11h04) |
+|---|---|---|
+| a frio, celular parado | 2,7 a 3,6 s | **2,1 a 2,5 s** |
+| a primeira depois de instalar ou atualizar o app | 13,4 s (21 s quando varria os jogos) | **2,8 a 2,9 s** |
+
+Somando o ~0,6 s antes de o Python nascer, a abertura a frio do toque até a lista fica perto de 2,7 a 3,1 s: ainda
+acima dos 2 s do portão, mas agora o que sobra é o próprio Python nascer e carregar a biblioteca padrão (~1,2 s) e o
+cartão SD (~0,6 s).
+
+## Fase 4: a decisão (14/11/2026)
+
+**O servidor continua em Python.** Medido no aparelho mais fraco (o A12), o que deixava a abertura lenta era trabalho
+repetido ou feito em série, e tudo se resolveu em Python: a abertura a frio caiu de ~5,3 s (13/11) para ~2,3 s
+dentro do Python, e a primeira depois de atualizar, de 13 a 21 s para 2,9 s. O que o Rust ainda daria (~1,2 s do
+Python nascer e carregar a biblioteca) exigiria reescrever o servidor inteiro, com duas bases de código, e o código
+deixaria de ser material de aula legível por aluno do ensino médio. Os números e o porquê ficam também em
+`docs\replica\architecture.md`.
+
+**O que fica do Rust:** a prova em `ferramentas\prova_rust` (ferramenta de medida, fora do pacote) e o jeito de
+compilar para ARM64 sem o NDK (`aarch64-unknown-linux-musl` com o `rust-lld`), que serve para medir qualquer outro
+trecho no celular ou na TV Box antes de decidir. Reabrir a pergunta só se uma medida nova apontar um trecho de
+processador (não de disco) que o Python não resolva.

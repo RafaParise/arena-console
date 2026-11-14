@@ -62,6 +62,17 @@ basta.
 
 **Próximo passo:** medir a janela leve no Celeron N5100.
 
+### Fase 4 do plano Rust: decisão com os números (14/11/2026)
+
+Seguiu o `docs\PLANO-DE-ACAO-RUST.md` até o fim (medir, otimizar o Python, prova em Rust só do trecho apontado).
+No Galaxy A12, a conferência das pastas do cartão SD levou ~370 ms em Rust e ~410 ms em Python, uma pasta de cada
+vez, e ~60 ms contra ~92 ms com 8 ao mesmo tempo: o ganho veio do paralelismo, e ele entrou no Python
+(`indexador.pastas_com_data`). Com mais três correções achadas na mesma medida (assinatura pelo conteúdo, recursos
+do RetroArch em segundo plano e `.pyc` prontos no APK), a abertura a frio no A12 ficou em 2,1 a 2,5 s dentro do
+Python e a primeira depois de atualizar caiu de 13,4 s para 2,9 s. **Continua decidido: o servidor fica em Python.**
+O Rust só tiraria o ~1,2 s do Python nascer e carregar a biblioteca padrão, ao custo de reescrever o servidor
+inteiro. Detalhes em `docs\DESEMPENHO-SERVIDOR.md` (Fases 3 e 4); a prova fica em `ferramentas\prova_rust`.
+
 ## Alinhado ao driver da placa (11/11/2026, à noite)
 
 `servidor\driver_video.py` lê o painel do driver (AMD Software) sem administrador e o ARENA se alinha: o Mais quadros
