@@ -77,6 +77,12 @@ jogos\pessoais\XBOX360\Gears Of War - Judgment\Gears of War Judgment.iso
 jogos\pessoais\XBOX360\Gears Of War - Judgment\Cover.jpg
 ```
 
+**Acervo que veio do Batocera, do EmulationStation, do RetroPie ou do Recalbox
+(desde 14/11/2026):** pode copiar a pasta do console como está. O ARENA lê o
+`gamelist.xml` dela (o nome bonito e a imagem de cada jogo) e acha as capas
+em `images\` (com o fim `-image` ou `-thumb`), `media\covers\`,
+`media\box2dfront\` e `downloaded_images\`.
+
 Sem capa, aparecem as duas primeiras letras do título. Não tem limite de
 tamanho de imagem além do bom senso: a sua capa fica como está. Para a
 lista abrir leve, na primeira vez que uma capa aparece o próprio navegador

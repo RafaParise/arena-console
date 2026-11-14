@@ -84,6 +84,33 @@ class TestIndexador(unittest.TestCase):
         depois = self.mod.assinatura_das_pastas()
         self.assertNotEqual(antes, depois)
 
+    def test_acervo_do_batocera_nome_e_capa_do_gamelist(self):
+        # 14/11/2026: o acervo do EmulationStation/Batocera traz o gamelist.xml e as capas em images\ e media\covers\.
+        por_id, por_ext = self.mod.carregar_plataformas()
+        pessoais = os.path.join(self.mod.PASTA_JOGOS, "pessoais")
+        snes = os.path.join(pessoais, "Super Nintendo")
+        os.makedirs(os.path.join(snes, "images"))
+        os.makedirs(os.path.join(snes, "media", "covers"))
+        for nome in ("smw.sfc", "zelda.sfc", "kart.sfc"):
+            with open(os.path.join(snes, nome), "wb") as f:
+                f.write(b"\0" * 1024)
+        for caminho in (os.path.join(snes, "images", "smw-image.png"), os.path.join(snes, "media", "covers", "kart.png"),
+                        os.path.join(self.dir, "fora.png")):
+            with open(caminho, "wb") as f:
+                f.write(b"\x89PNG")
+        with open(os.path.join(snes, "gamelist.xml"), "w", encoding="utf-8") as f:
+            f.write('<?xml version="1.0"?><gameList>'
+                    '<game><path>./smw.sfc</path><name>Super Mario World</name><image>./images/smw-image.png</image></game>'
+                    '<game><path>./zelda.sfc</path><name>Zelda</name><image>../../../fora.png</image></game>'
+                    '</gameList>')
+        self.mod.esquecer_miniaturas()
+        achados = {os.path.basename(j["arquivo"]): j for j in self.mod.varrer_pasta(pessoais, "pessoais", por_ext, por_id)}
+        self.assertEqual(achados["smw.sfc"]["titulo"], "Super Mario World")
+        self.assertTrue(achados["smw.sfc"]["capas"][0].endswith("images/smw-image.png"))
+        self.assertEqual(achados["zelda.sfc"]["titulo"], "Zelda")
+        self.assertFalse(any("fora.png" in c for c in achados["zelda.sfc"]["capas"]))   # a imagem nao sai da pasta
+        self.assertTrue(any(c.endswith("media/covers/kart.png") for c in achados["kart.sfc"]["capas"]))
+
     def test_consoles_json_regravado_igual_nao_refaz_a_lista(self):
         # 14/11/2026: cada APK novo regrava o consoles.json (data nova, conteudo igual) e o ARENA varria todos os
         # jogos de novo (9 a 13 s no Galaxy A12). Vale o conteudo: igual nao muda; um console a mais muda.

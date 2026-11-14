@@ -522,7 +522,7 @@ def arquivo_de_jogadores():
 # (ex.: o jogo de CD em trilhas virar um jogo so) nao valia num ARENA que ja
 # tinha a lista salva, ate alguma pasta mudar. 2 = nomes de fliperama pelos
 # bancos do RetroArch + avisos do jogo.
-VERSAO_INDICE = 9     # 9 = sem os arquivos ocultos do Mac ('._') e sem a lixeira (13/11/2026)
+VERSAO_INDICE = 10    # 10 = nomes e capas do gamelist.xml e das pastas do EmulationStation/Batocera (14/11/2026)
 
 
 _CONTEUDO_DO_CONSOLES = {}
@@ -643,6 +643,21 @@ def capas_do_jogo(caminho_absoluto, pasta_atual, titulo, nome_banco=None, sozinh
             nome = nomes_aqui.get(_chave_do_arquivo(base + extensao))
             if nome:
                 achados.append(os.path.join(onde, nome))
+    # O jeito do EmulationStation e do Batocera (14/11/2026): a imagem do gamelist.xml e as pastas de capas dele.
+    if arquivos_da_pasta is not None:
+        da_lista = gamelist_da_pasta(pasta_atual, arquivos_da_pasta).get(
+            _chave_do_arquivo(os.path.basename(caminho_absoluto)), {})
+        if da_lista.get("imagem") and da_lista["imagem"] not in achados:
+            achados.insert(0, da_lista["imagem"])
+    for sub, sufixos in PASTAS_DO_EMULATIONSTATION:
+        onde = os.path.join(pasta_atual, *sub.split("/"))
+        nomes_aqui = _nomes_da_pasta(onde)
+        if not nomes_aqui:
+            continue
+        nome = next((nomes_aqui[_chave_do_arquivo(base + sufixo + extensao)] for sufixo in sufixos
+                     for extensao in CAPAS_EXTENSOES if _chave_do_arquivo(base + sufixo + extensao) in nomes_aqui), None)
+        if nome and os.path.join(onde, nome) not in achados:
+            achados.append(os.path.join(onde, nome))
     if sozinho_na_pasta and not achados:
         try:
             nomes = {nome.casefold(): nome for nome in os.listdir(pasta_atual)}
@@ -698,6 +713,7 @@ def esquecer_miniaturas():
     """A proxima busca de capa le de novo as pastas (comeco de cada varredura; capa nova baixada)."""
     _MINIATURAS["pasta"] = _MINIATURAS["lista"] = None
     _PASTAS_LIDAS.clear()
+    _GAMELISTS.clear()
 
 
 # As pastas ja lidas nesta varredura (a subpasta "capas" de cada pasta de jogos): {pasta: {chave: nome}}.
@@ -760,6 +776,49 @@ def miniaturas_baixadas(miniaturas):
         lista.append((sistema, arquivos))
     _MINIATURAS["pasta"], _MINIATURAS["lista"] = miniaturas, lista
     return lista
+
+
+# O acervo que vem do EmulationStation, do Batocera, do RetroPie ou do Recalbox (14/11/2026, plano dos guias de 13/11):
+# cada pasta de console traz um gamelist.xml (nome bonito e a imagem de cada jogo) e as capas em images\ (com o sufixo
+# -image ou -thumb), media\covers\, media\box2dfront\ ou downloaded_images\.
+PASTAS_DO_EMULATIONSTATION = (("images", ("-image", "-thumb", "")), ("media/covers", ("",)),
+                              ("media/box2dfront", ("",)), ("downloaded_images", ("-image", "")))
+TAMANHO_MAXIMO_DO_GAMELIST = 4 * 1024 * 1024        # um gamelist.xml maior que isso nao e' lido (nao trava a varredura)
+_GAMELISTS = {}
+
+
+def gamelist_da_pasta(pasta_atual, arquivos):
+    """{chave do nome do arquivo do jogo: {"nome", "imagem"}} do gamelist.xml desta pasta (lido uma vez por varredura);
+    {} se nao houver. A imagem so vale se ficar DENTRO da pasta do console (um "../../" no arquivo nao leva a capa
+    para fora dela). XML do proprio acervo, lido pelo ElementTree da biblioteca padrao: ele nao busca entidade externa,
+    e o expat do Python 3.13 corta a "bomba" de entidades."""
+    if pasta_atual in _GAMELISTS:
+        return _GAMELISTS[pasta_atual]
+    lido = {}
+    nome_do_arquivo = next((n for n in arquivos if n.lower() == "gamelist.xml"), None)
+    caminho = os.path.join(pasta_atual, nome_do_arquivo) if nome_do_arquivo else None
+    try:
+        if caminho and os.path.getsize(caminho) <= TAMANHO_MAXIMO_DO_GAMELIST:
+            import xml.etree.ElementTree as ElementTree
+            raiz_da_pasta = os.path.normcase(os.path.realpath(pasta_atual))
+            for jogo in ElementTree.parse(caminho).getroot().iter("game"):
+                arquivo_do_jogo = (jogo.findtext("path") or "").strip()
+                if not arquivo_do_jogo:
+                    continue
+                item = {"nome": " ".join((jogo.findtext("name") or "").split())[:120]}
+                imagem = (jogo.findtext("image") or jogo.findtext("thumbnail") or "").strip()
+                if imagem:
+                    absoluto = os.path.realpath(os.path.join(pasta_atual, imagem.replace("/", os.sep)))
+                    if (os.path.normcase(absoluto).startswith(raiz_da_pasta + os.sep)
+                            and absoluto.lower().endswith(CAPAS_EXTENSOES) and os.path.isfile(absoluto)):
+                        item["imagem"] = absoluto
+                lido[_chave_do_arquivo(os.path.basename(arquivo_do_jogo.replace("\\", "/")))] = item
+    except (OSError, ValueError, SyntaxError):          # ParseError herda de SyntaxError
+        lido = {}
+    if len(_GAMELISTS) > 1024:
+        _GAMELISTS.clear()
+    _GAMELISTS[pasta_atual] = lido
+    return lido
 
 
 RE_NOME_DO_GAMEBASE = re.compile(r"^Name:[ \t]*(\S.*?)\s*$", re.M)
@@ -1032,6 +1091,8 @@ def varrer_pasta(caminho_pasta, origem, por_extensao, por_id, manuais=None,
             titulo_do_arquivo = titulo
             if sozinho_na_pasta(pasta_atual, caminho_pasta, nome_arquivo, arquivos):
                 titulo = nome_do_gamebase(pasta_atual, arquivos) or titulo
+            # O nome do gamelist.xml do EmulationStation/Batocera (14/11/2026), quando o acervo veio de la.
+            titulo = gamelist_da_pasta(pasta_atual, arquivos).get(_chave_do_arquivo(nome_arquivo), {}).get("nome") or titulo
 
             # Fliperama: o nome do arquivo e' o do romset ("mslugx"). O nome
             # de verdade vem dos bancos do RetroArch (servidor\nomes_arcade.py).
