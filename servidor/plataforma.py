@@ -14,6 +14,11 @@ no mesmo pen drive. O que muda e' pouco, e mora aqui:
     guarda o nome do Windows, "fceumm_libretro.dll"; no Linux vira
     "fceumm_libretro.so");
   - o Python que vem junto: servidor\python (Windows) ou servidor/python-linux;
+  - o Linux dos processadores ARM de 64 bits (aarch64: TV Box com Armbian,
+    Raspberry Pi 4 e 5, Chromebook ARM com Linux), desde 14/11/2026: o
+    RetroArch, os nucleos e o Python dele ficam em pastas proprias
+    (retroarch/linux-aarch64, retroarch/cores-aarch64 e
+    servidor/python-linux-aarch64), entao o mesmo pen drive serve aos dois;
   - o Linux de dentro do Chromebook (o ChromeOS deixa a marca dele), que o
     ARENA reconhece para explicar o que muda la;
   - o Android (item 14): o mesmo servidor roda dentro do app do ARENA, com o
@@ -37,6 +42,12 @@ WINDOWS = sys.platform.startswith("win")
 LINUX = sys.platform.startswith("linux")
 # O Python do Android (o 3.13 do APK) se apresenta como "android" (PEP 738).
 ANDROID = sys.platform == "android"
+# O Linux do processador ARM de 64 bits (14/11/2026). O RetroArch dele e' o
+# "nightly" do libretro, um programa solto (nao AppImage): o estavel so sai
+# para x86-64.
+ARM64 = LINUX and not ANDROID and platform.machine().lower() in ("aarch64", "arm64")
+PASTA_DO_RETROARCH_ARM64 = "linux-aarch64"
+PASTA_DOS_NUCLEOS_ARM64 = "cores-aarch64"
 # A pasta do ARENA (a de cima de servidor\): o que esta dentro dela fica no PATH do emulador (abrir_programa).
 RAIZ_DO_ARENA = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -48,7 +59,8 @@ APPIMAGE_RETROARCH = "RetroArch-Linux-x86_64.AppImage"
 # No Android, o RetroArch vem dentro do APK: o arquivo da pasta retroarch so
 # marca que ele esta la (o servidor/android_inicio.py o escreve).
 RETROARCH_DO_ANDROID = "retroarch-android.txt"
-NOME_DO_RETROARCH = "retroarch.exe" if WINDOWS else (RETROARCH_DO_ANDROID if ANDROID else APPIMAGE_RETROARCH)
+NOME_DO_RETROARCH = "retroarch.exe" if WINDOWS else (RETROARCH_DO_ANDROID if ANDROID else (
+    PASTA_DO_RETROARCH_ARM64 + "/retroarch" if ARM64 else APPIMAGE_RETROARCH))
 VERIFICAR = "VERIFICAR.bat" if WINDOWS else ("APK do ARENA (instale de novo)" if ANDROID else "VERIFICAR.sh")
 # As bibliotecas que o RetroArch do Linux pede e que alguns Linux nao trazem
 # (ferramentas\preparar_linux.py poe aqui): entram so onde faltam.
@@ -212,10 +224,57 @@ def preparar_recursos(pasta_sistema):
 
 def executavel_do_retroarch(pasta_retroarch):
     """O programa do RetroArch deste sistema, dentro da pasta retroarch (no
-    Android, a marca de que ele veio no APK)."""
+    Android, a marca de que ele veio no APK). No Linux ARM64, o que veio no
+    pacote (retroarch/linux-aarch64/retroarch); sem ele, o RetroArch
+    instalado no proprio Linux (sudo apt install retroarch), se houver."""
     if ANDROID:
         return os.path.join(pasta_retroarch, RETROARCH_DO_ANDROID)
+    if ARM64:
+        do_pacote = os.path.join(pasta_retroarch, PASTA_DO_RETROARCH_ARM64, "retroarch")
+        if not os.path.isfile(do_pacote):
+            return shutil.which("retroarch") or do_pacote
+        return do_pacote
     return os.path.join(pasta_retroarch, "retroarch.exe" if WINDOWS else APPIMAGE_RETROARCH)
+
+
+def pasta_dos_nucleos(pasta_retroarch):
+    """A pasta dos nucleos deste sistema: retroarch/cores (os .dll do
+    Windows, os .so do Linux x86-64 e a marca do Android) ou, no Linux ARM64,
+    retroarch/cores-aarch64 (os .so do ARM tem o mesmo nome dos do x86-64,
+    entao nao cabem na mesma pasta)."""
+    return os.path.join(pasta_retroarch, PASTA_DOS_NUCLEOS_ARM64 if ARM64 else "cores")
+
+
+# O numero do processador que fica no cabecalho de todo programa do Linux
+# (o campo e_machine do ELF, na posicao 18): 62 = x86-64, 183 = ARM de 64 bits.
+_PROCESSADOR_DO_ELF = {62: "x86_64", 183: "aarch64"}
+
+
+def processador_do_programa(caminho):
+    """'x86_64', 'aarch64', outro numero (texto) ou None se nao for programa
+    do Linux (ELF). O AppImage tambem comeca com o cabecalho ELF."""
+    try:
+        with open(caminho, "rb") as arquivo:
+            cabecalho = arquivo.read(20)
+    except OSError:
+        return None
+    if len(cabecalho) < 20 or cabecalho[:4] != b"\x7fELF":
+        return None
+    ordem = "little" if cabecalho[5] == 1 else "big"
+    numero = int.from_bytes(cabecalho[18:20], ordem)
+    return _PROCESSADOR_DO_ELF.get(numero, str(numero))
+
+
+def roda_neste_processador(caminho):
+    """False so quando o programa e' do Linux e de outro processador (o
+    AppImage x86-64 do PCSX2 numa TV Box ARM, por exemplo). Fora do Linux,
+    ou se nao der para saber, True."""
+    if not LINUX or ANDROID:
+        return True
+    tipo = processador_do_programa(caminho)
+    if tipo is None:
+        return True
+    return tipo == ("aarch64" if ARM64 else "x86_64")
 
 
 # ---------------------------------------------------------------------------
@@ -357,9 +416,13 @@ def appimage_que_roda(appimage, nome, pasta_bibliotecas=None):
 
 def retroarch_que_roda(appimage):
     """Linux: o programa que abre o RetroArch (appimage_que_roda, com as
-    bibliotecas de reserva). No Windows, o mesmo."""
+    bibliotecas de reserva). No Windows, o mesmo. No Linux ARM64 e' um
+    programa solto: no pen drive que nao deixa executar, vai para o cache
+    (programa_que_roda); o instalado no sistema roda direto."""
     if WINDOWS:
         return appimage
+    if ARM64 and not appimage.lower().endswith(".appimage"):
+        return programa_que_roda(appimage, "retroarch-aarch64")
     return appimage_que_roda(appimage, "retroarch",
                              os.path.join(os.path.dirname(appimage), PASTA_DAS_BIBLIOTECAS))
 
@@ -399,7 +462,7 @@ def python_que_veio_junto(pasta_servidor):
         return sys.executable
     if WINDOWS:
         return os.path.join(pasta_servidor, "python", "python.exe")
-    return os.path.join(pasta_servidor, "python-linux", "bin", "python3.13")
+    return os.path.join(pasta_servidor, "python-linux-aarch64" if ARM64 else "python-linux", "bin", "python3.13")
 
 
 def modulos_que_faltam_no_python_linux(pasta_linux, modulos):

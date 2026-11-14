@@ -21,14 +21,34 @@ echo "  ARENA"
 echo "  Iniciando. Nao feche esta janela enquanto estiver jogando."
 echo
 
-# --- 0. So o Linux de 64 bits dos processadores Intel e AMD -----------------
-#  O RetroArch e o Python que vem junto sao do Linux x86-64. No Chromebook de
-#  processador ARM (e no Raspberry Pi), o ARENA que roda e' o do navegador.
+# --- 0. So o Linux de 64 bits (Intel e AMD, ou ARM) --------------------------
+#  O RetroArch e o Python que vem junto sao do Linux x86-64. Desde 14/11/2026
+#  o ARM de 64 bits (TV Box com Armbian, Raspberry Pi 4 e 5, Chromebook ARM
+#  com Linux) tambem abre, com o RetroArch de retroarch/linux-aarch64 (o
+#  ferramentas/preparar_linux.py --arm64 poe la) ou o instalado no sistema.
+#  Sem nenhum dos dois, o ARENA do navegador e' o melhor caminho.
+ARM64=""
 case "$(uname -m)" in
     x86_64|amd64) ;;
+    aarch64|arm64)
+        ARM64=1
+        if [ ! -f "$RAIZ/retroarch/linux-aarch64/retroarch" ] && ! command -v retroarch >/dev/null 2>&1; then
+            echo "  [ERRO] Este computador e' ARM de 64 bits ($(uname -m)), e esta pasta"
+            echo "  nao tem o RetroArch dele (retroarch/linux-aarch64/retroarch)."
+            echo
+            echo "  Como resolver, escolha uma das tres:"
+            echo "    a) Copie o ARENA preparado para ARM (no computador de quem monta o"
+            echo "       pacote: ferramentas/preparar_linux.py --arm64)."
+            echo "    b) Instale o RetroArch neste Linux: sudo apt install retroarch"
+            echo "    c) Abra o ARENA do navegador: o arquivo ARENA-CHROMEBOOK.html,"
+            echo "       nesta mesma pasta (guia 1, Parte C)."
+            echo
+            pausar
+            exit 1
+        fi ;;
     *)
         echo "  [ERRO] Este computador e' $(uname -m), e o ARENA do Linux e' para"
-        echo "  processador Intel ou AMD de 64 bits (x86-64)."
+        echo "  processador de 64 bits (x86-64 da Intel e da AMD, ou ARM de 64 bits)."
         echo
         echo "  Neste computador, abra o ARENA do Chromebook, que roda no navegador:"
         echo "  o arquivo ARENA-CHROMEBOOK.html, nesta mesma pasta (guia 1, Parte C)."
@@ -63,7 +83,13 @@ fi
 achar_python || { pausar; exit 1; }
 
 # --- 3. Confere se o RetroArch esta no lugar --------------------------------
-if [ ! -f "$RAIZ/retroarch/RetroArch-Linux-x86_64.AppImage" ]; then
+if [ -n "$ARM64" ]; then
+    if [ ! -d "$RAIZ/retroarch/cores-aarch64" ]; then
+        echo "  [AVISO] Falta a pasta retroarch/cores-aarch64 (os emuladores do ARM)."
+        echo "          O ARENA vai abrir, mas os jogos so iniciam com os nucleos dela."
+        echo
+    fi
+elif [ ! -f "$RAIZ/retroarch/RetroArch-Linux-x86_64.AppImage" ]; then
     echo "  [AVISO] RetroArch-Linux-x86_64.AppImage nao encontrado em ./retroarch"
     echo "          O ARENA vai abrir, mas nenhum jogo vai iniciar."
     echo

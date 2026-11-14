@@ -52,6 +52,8 @@ Uso:
     servidor\python\python.exe ferramentas\preparar_linux.py [--sem-externos] [--aceitar-applewin=<marca>]
                                                               [--aceitar-bluemsx=<marca>] [--aceitar-pokket=<marca>]
                                                               [--aceitar-vemulator=<marca>]
+    servidor\python\python.exe ferramentas\preparar_linux.py --arm64 [--registrar]
+        (o Linux do ARM de 64 bits: TV Box com Armbian, Raspberry Pi 4 e 5; ver "Linux ARM64" no fim)
 """
 import hashlib
 import io
@@ -62,6 +64,7 @@ import subprocess
 import sys
 import tarfile
 import tempfile
+import urllib.error
 import urllib.request
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -189,6 +192,7 @@ FORA_DO_PYTHON = ("python/include/", "python/share/", "python/lib/pkgconfig/", "
                   "python/lib/python3.13/idlelib/", "python/lib/python3.13/tkinter/",
                   "python/lib/python3.13/turtledemo/", "python/lib/python3.13/ensurepip/",
                   "python/lib/python3.13/lib2to3/", "python/lib/python3.13/config-3.13-x86_64-linux-gnu/",
+                  "python/lib/python3.13/config-3.13-aarch64-linux-gnu/",
                   "python/lib/libtcl", "python/lib/libtk", "python/lib/tcl", "python/lib/tk", "python/lib/itcl",
                   "python/lib/thread", "python/bin/idle", "python/bin/pydoc", "python/bin/python3-config",
                   "python/bin/python3.13-config")
@@ -283,9 +287,9 @@ def preparar_nucleos(sete, trabalho):
     return faltam
 
 
-def preparar_python(trabalho):
-    arquivo = baixado(PYTHON)
-    destino = os.path.join(RAIZ, "servidor", "python-linux")
+def preparar_python(trabalho, item=None, pasta="python-linux"):
+    arquivo = baixado(item or PYTHON)
+    destino = os.path.join(RAIZ, "servidor", pasta)
     montando = destino + ".montando"
     if os.path.isdir(montando):
         limpeza.apagar_pasta(montando)
@@ -310,7 +314,7 @@ def preparar_python(trabalho):
         limpeza.apagar_pasta(destino)
     os.replace(montando, destino)
     total = sum(os.path.getsize(os.path.join(a, n)) for a, _s, ns in os.walk(destino) for n in ns)
-    print("  Python 3.13 para Linux: servidor\\python-linux (%.0f MB)" % (total / 1048576), flush=True)
+    print("  Python 3.13 para Linux: servidor\\%s (%.0f MB)" % (pasta, total / 1048576), flush=True)
 
 
 def tirar_do_deb(arquivo_deb, dentro):
@@ -445,7 +449,103 @@ def preparar_externos():
         print("  emulador de fora: emuladores\\%s\\%s (%.0f MB)" % (pasta, nome, tamanho / 1048576), flush=True)
 
 
+# ---------------------------------------------------------------------------
+# Linux ARM64 (aarch64): TV Box com Armbian, Raspberry Pi 4 e 5, Chromebook ARM com Linux (14/11/2026)
+# ---------------------------------------------------------------------------
+# O libretro so publica o RetroArch do ARM de 64 bits como "nightly": um programa solto (nao AppImage), que muda de
+# um dia para o outro no mesmo endereco; os nucleos tambem (nightly/linux/aarch64/latest). Vale o conferido, como
+# nos nucleos do nightly acima: a lista ferramentas\linux_aarch64.json guarda a marca e o tamanho de cada arquivo
+# do dia em que alguem conferiu, e o --arm64 so aceita esses. Para trocar por um nightly novo: --arm64 --registrar
+# (baixa tudo de novo e regrava a lista, com a data). O Python vem do mesmo lancamento do x86-64, com a marca da
+# lista oficial (SHA256SUMS do lancamento 20261013). Vai tudo para pastas proprias (retroarch\linux-aarch64,
+# retroarch\cores-aarch64 e servidor\python-linux-aarch64): o mesmo pen drive serve ao PC e a TV Box.
+ARM64_LISTA = os.path.join(RAIZ, "ferramentas", "linux_aarch64.json")
+ARM64_NIGHTLY = "https://buildbot.libretro.com/nightly/linux/aarch64/"
+PYTHON_ARM64 = {
+    "endereco": ("https://github.com/astral-sh/python-build-standalone/releases/download/20261013/"
+                 "cpython-3.13.16%2B20261013-aarch64-unknown-linux-gnu-install_only_stripped.tar.gz"),
+    "arquivo": os.path.join("python-linux", "python-aarch64.tar.gz"),
+    "sha256": "69a30ed26198178732c37b8de0b6b5191479fbacfe526954da776befe38f18e7",
+}
+
+
+def _baixar_de_novo(endereco, arquivo):
+    """Baixa sempre (sem conferir: e' o registro de um nightly novo). None se o arquivo nao existe la (404)."""
+    caminho = os.path.join(CACHE, arquivo)
+    os.makedirs(os.path.dirname(caminho), exist_ok=True)
+    parcial = caminho + ".baixando"
+    try:
+        with urllib.request.urlopen(endereco, timeout=60) as resposta, open(parcial, "wb") as saida:
+            shutil.copyfileobj(resposta, saida, 1 << 20)
+    except urllib.error.HTTPError as falha:
+        if falha.code == 404:
+            return None
+        raise
+    os.replace(parcial, caminho)
+    return {"endereco": endereco, "arquivo": arquivo, "sha256": marca(caminho), "tamanho": os.path.getsize(caminho)}
+
+
+def registrar_arm64():
+    """Confere um nightly novo: baixa o RetroArch e os nucleos do ARM e regrava a lista com as marcas e a data."""
+    import datetime
+    print("Registrando o nightly do Linux ARM64 (baixa tudo de novo)...", flush=True)
+    retroarch = _baixar_de_novo(ARM64_NIGHTLY + "RetroArch.7z", os.path.join("linux-aarch64", "RetroArch.7z"))
+    if not retroarch:
+        raise SystemExit("O buildbot do libretro nao tem mais o RetroArch.7z do ARM64. Nada foi mudado.")
+    nucleos, sem_versao = [], []
+    for nome in nucleos_usados():
+        item = _baixar_de_novo(ARM64_NIGHTLY + "latest/" + nome + ".zip",
+                               os.path.join("linux-aarch64", "nucleos", nome + ".zip"))
+        if item:
+            item["nome"] = nome
+            nucleos.append(item)
+        else:
+            sem_versao.append(nome)
+    lista = {"conferido": datetime.date.today().isoformat(), "retroarch": retroarch, "nucleos": nucleos,
+             "sem_versao_arm64": sem_versao}
+    with open(ARM64_LISTA, "w", encoding="utf-8", newline="\n") as arquivo:
+        json.dump(lista, arquivo, ensure_ascii=False, indent=1)
+        arquivo.write("\n")
+    print("  lista regravada: %d nucleos, %d sem versao ARM64 (%s)" % (len(nucleos), len(sem_versao),
+                                                                     ", ".join(sem_versao) or "nenhum"), flush=True)
+
+
+def preparar_arm64(sete, trabalho):
+    """Poe o RetroArch, os nucleos e o Python do ARM64 nas pastas proprias, so com os arquivos da lista conferida."""
+    import zipfile
+    with open(ARM64_LISTA, encoding="utf-8") as arquivo:
+        lista = json.load(arquivo)
+    print("Preparando o ARENA para Linux ARM64 (nightly conferido em %s)..." % lista["conferido"], flush=True)
+    os.makedirs(trabalho, exist_ok=True)
+    tirar_do_7z(sete, baixado(lista["retroarch"]), ["retroarch"], trabalho)
+    pasta_ra = os.path.join(RAIZ, "retroarch", "linux-aarch64")
+    os.makedirs(pasta_ra, exist_ok=True)
+    shutil.copyfile(os.path.join(trabalho, "retroarch"), os.path.join(pasta_ra, "retroarch"))
+    print("  RetroArch do ARM64: retroarch\\linux-aarch64\\retroarch (%.1f MB)"
+          % (os.path.getsize(os.path.join(pasta_ra, "retroarch")) / 1048576), flush=True)
+    pasta_nucleos = os.path.join(RAIZ, "retroarch", "cores-aarch64")
+    os.makedirs(pasta_nucleos, exist_ok=True)
+    for item in lista["nucleos"]:
+        with zipfile.ZipFile(baixado(item)) as pacote, pacote.open(item["nome"]) as origem, \
+                open(os.path.join(pasta_nucleos, item["nome"]), "wb") as saida:
+            shutil.copyfileobj(origem, saida, 1 << 20)
+    print("  nucleos do ARM64: %d em retroarch\\cores-aarch64%s"
+          % (len(lista["nucleos"]), (" (sem versao ARM64: %s)" % ", ".join(lista["sem_versao_arm64"]))
+             if lista["sem_versao_arm64"] else ""), flush=True)
+    preparar_python(trabalho, PYTHON_ARM64, "python-linux-aarch64")
+
+
 def principal():
+    if "--arm64" in sys.argv:
+        trabalho = tempfile.mkdtemp(prefix="arena_preparar_arm64_")
+        try:
+            if "--registrar" in sys.argv:
+                registrar_arm64()
+            preparar_arm64(achar_7zip(), os.path.join(trabalho, "ra"))
+            print("Pronto. Na TV Box ou no Raspberry Pi com Linux, o ARENA abre pelo ARENA.sh.")
+            return 0
+        finally:
+            limpeza.apagar_pasta(trabalho)
     sete = achar_7zip()
     trabalho = tempfile.mkdtemp(prefix="arena_preparar_linux_")
     try:

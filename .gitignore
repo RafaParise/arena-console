@@ -43,6 +43,7 @@ dados/filtros/
 servidor/python/
 # O Python do Linux (ferramentas\preparar_linux.py poe no lugar)
 servidor/python-linux/
+servidor/python-linux-aarch64/
 
 # ---------------------------------------------------------------------------
 # jogos/, emuladores/ e retroarch/: mantém só a estrutura de pastas vazias
@@ -158,3 +159,6 @@ servidor/vigem/*.dll
 *.keystore
 *.jks
 *.p12
+
+# A prova em Rust da Fase 3 (ferramentas/prova_rust): o que o cargo compila fica fora
+ferramentas/prova_rust/target/

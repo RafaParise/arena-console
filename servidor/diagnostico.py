@@ -358,7 +358,7 @@ else:
 # ---------------------------------------------------------------------------
 titulo("7. RetroArch e emuladores")
 
-exe = caminho("retroarch", plataforma.NOME_DO_RETROARCH)
+exe = plataforma.executavel_do_retroarch(caminho("retroarch"))
 if os.path.isfile(exe):
     print("  ok     %s encontrado" % plataforma.NOME_DO_RETROARCH)
     ok.append("retroarch presente")
@@ -367,7 +367,7 @@ else:
     print("  FALTA  %s em %s" % (plataforma.NOME_DO_RETROARCH, os.path.join("retroarch", "")))
     print("         Sem ele o ARENA abre mas nenhum jogo inicia.")
 
-pasta_cores = caminho("retroarch", "cores")
+pasta_cores = plataforma.pasta_dos_nucleos(caminho("retroarch"))
 cores = []
 if os.path.isdir(pasta_cores):
     extensao_nucleo = ".dll" if plataforma.WINDOWS else ".so"
@@ -390,7 +390,7 @@ print("  %d arquivo(s) de sistema na pasta system" % quantos_sistema)
 # Linux: o RetroArch abre de uma copia na pasta de cache da conta (tirada do
 # AppImage na primeira vez, servidor/plataforma.py), e as bibliotecas que
 # alguns Linux nao trazem vem em retroarch/bibliotecas-linux.
-if not plataforma.WINDOWS:
+if not plataforma.WINDOWS and not plataforma.ARM64:     # as de reserva sao do x86-64
     pasta_bibliotecas = caminho("retroarch", plataforma.PASTA_DAS_BIBLIOTECAS)
     reservas = sorted(n for n in os.listdir(pasta_bibliotecas) if ".so" in n) if os.path.isdir(
         pasta_bibliotecas) else []

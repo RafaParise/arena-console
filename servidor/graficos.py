@@ -871,6 +871,11 @@ def achar_externo_detalhado(plataforma, chave="externo"):
     for raiz, subpastas, arquivos in os.walk(base):
         for arquivo in arquivos:
             nome_baixo = arquivo.lower()
+            # Linux ARM64 (TV Box, Raspberry Pi): o AppImage x86-64 do mesmo pen drive nao roda aqui; fica como
+            # se nao estivesse (a tela explica que falta o emulador), em vez de abrir e falhar.
+            if (not NO_WINDOWS and nome_baixo.endswith(extensao_do_programa)
+                    and not plataforma_do_sistema.roda_neste_processador(os.path.join(raiz, arquivo))):
+                continue
             padrao = next((p for p in procurados if fnmatch.fnmatch(nome_baixo, p)), None)
             if padrao and padrao not in achados:
                 achados[padrao] = os.path.join(raiz, arquivo)

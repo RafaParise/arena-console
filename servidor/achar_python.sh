@@ -24,7 +24,12 @@ pausar() {
 
 achar_python() {
     PYTHON=""
-    _origem="$PWD/servidor/python-linux"
+    # O do processador ARM de 64 bits (TV Box, Raspberry Pi) fica em outra
+    # pasta: o mesmo pen drive serve aos dois (14/11/2026).
+    case "$(uname -m)" in
+        aarch64|arm64) _origem="$PWD/servidor/python-linux-aarch64" ;;
+        *)             _origem="$PWD/servidor/python-linux" ;;
+    esac
     if [ -f "$_origem/bin/python3.13" ]; then
         # Do zip sem a permissao de executar, numa pasta que aceita (a da
         # conta): basta marcar. No pen drive FAT32 isto nao pega, e segue.
