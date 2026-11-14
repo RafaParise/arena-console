@@ -547,6 +547,55 @@ def conteudo_do_consoles():
     return _CONTEUDO_DO_CONSOLES["resumo"]
 
 
+# Quantas pastas a conferencia le ao mesmo tempo (pastas_com_data). Achado da prova em Rust da Fase 3 do
+# docs/PLANO-DE-ACAO-RUST.md (14/11/2026): no Galaxy A12, o cartao SD chega ao app por uma camada lenta do Android
+# (FUSE), e cada pergunta ao disco e' uma ida e volta. As 134 pastas do cartao levavam ~410 ms em sequencia no
+# Python e ~370 ms no Rust (a linguagem quase nao muda nada), mas ~92 ms no Python com 8 perguntas ao mesmo tempo
+# (~60 ms no Rust): o que acelera e' perguntar em paralelo, e o Python faz isso com threads, porque o os.scandir e o
+# os.stat soltam a trava do Python enquanto esperam o disco. No PC, 88 pastas: de 8 para 5 ms.
+THREADS_DA_CONFERENCIA = 8
+
+
+def _ler_pasta_conferida(pasta):
+    """O que o os.walk faria com uma pasta: (a linha "pasta|data", ou None, e as subpastas que ele visitaria).
+    Pasta que nao abre fica de fora com tudo o que tem dentro, e atalho para pasta (link) nao e' visitado, como
+    no os.walk."""
+    subpastas = []
+    try:
+        with os.scandir(pasta) as itens:
+            for item in itens:
+                try:
+                    if item.is_dir() and not item.is_symlink() and not pasta_escondida(item.name):
+                        subpastas.append(item.path)
+                except OSError:
+                    continue
+    except OSError:
+        return None, []
+    try:
+        return "%s|%d" % (pasta, os.path.getmtime(pasta)), subpastas
+    except OSError:
+        return None, subpastas
+
+
+def pastas_com_data(raizes):
+    """["pasta|data", ...] de cada pasta dentro de 'raizes' (elas inclusive), sem as escondidas: a mesma lista do
+    os.walk + getmtime de antes, mas lida por niveis, com as pastas de cada nivel perguntadas ao mesmo tempo
+    (THREADS_DA_CONFERENCIA, acima)."""
+    from concurrent.futures import ThreadPoolExecutor
+    linhas, nivel = [], list(raizes)
+    if not nivel:
+        return linhas
+    with ThreadPoolExecutor(max_workers=THREADS_DA_CONFERENCIA, thread_name_prefix="conferir-pastas") as grupo:
+        while nivel:
+            proximo = []
+            for linha, subpastas in grupo.map(_ler_pasta_conferida, nivel):
+                if linha:
+                    linhas.append(linha)
+                proximo.extend(subpastas)
+            nivel = proximo
+    return linhas
+
+
 def assinatura_das_pastas():
     """Resume o estado atual das pastas de jogos em um texto curto.
 
@@ -559,16 +608,8 @@ def assinatura_das_pastas():
     conteudo = conteudo_do_consoles()
     if conteudo:
         partes.append("consoles|%s" % conteudo)
-    for origem in list(ORIGENS):
-        caminho = os.path.join(PASTA_JOGOS, origem)
-        if not os.path.isdir(caminho):
-            continue
-        for pasta_atual, subpastas, _arquivos in os.walk(caminho):
-            subpastas[:] = sorted(p for p in subpastas if not pasta_escondida(p))
-            try:
-                partes.append("%s|%d" % (pasta_atual, os.path.getmtime(pasta_atual)))
-            except OSError:
-                continue
+    raizes = [os.path.join(PASTA_JOGOS, origem) for origem in list(ORIGENS)]
+    partes.extend(pastas_com_data([caminho for caminho in raizes if os.path.isdir(caminho)]))
     # O arquivo de jogadores do professor e o mapa do multitap tambem mudam
     # a lista (numero de jogadores de cada jogo).
     partes.append(jogadores.assinatura(arquivo_de_jogadores()))

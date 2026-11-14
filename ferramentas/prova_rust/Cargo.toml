@@ -1,0 +1,15 @@
+[package]
+name = "conferir_pastas"
+version = "0.1.0"
+edition = "2021"
+description = "Fase 3 do docs/PLANO-DE-ACAO-RUST.md: a conferencia das pastas de jogos do indexador, em Rust, so para medir"
+
+# So a biblioteca padrao: compila sem internet e sem nenhuma dependencia de fora.
+[dependencies]
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true
+panic = "abort"
