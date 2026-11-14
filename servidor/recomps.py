@@ -42,6 +42,7 @@ import subprocess
 import threading
 import time
 import unicodedata
+import urllib.parse
 import zipfile
 
 import baixar
@@ -281,9 +282,72 @@ def _api(url):
         return None
 
 
-def release(repo, tag=""):
+# As releases lidas da API ficam guardadas (14/11/2026, plano dos guias de 13/11): a API publica do GitHub deixa 60
+# consultas por hora por endereco de internet, e a sala inteira sai pelo MESMO endereco da escola. Guardada, a release
+# vale 6 h (a "mais nova") ou 7 dias (a de um tag fixo, que quase nunca muda); sem resposta da API vale a guardada,
+# mesmo velha; e sem nenhuma guardada, o arquivo que o catalogo marcou (nome + SHA-256) baixa direto pelo endereco da
+# release, que nao passa pela API. O SHA-256 do catalogo continua sendo conferido depois do download.
+ARQUIVO_RELEASES = os.path.join(RAIZ, "dados", "recomps-releases.json")
+VALIDADE_LATEST_S = 6 * 3600
+VALIDADE_TAG_S = 7 * 24 * 3600
+DOWNLOAD_DIRETO = "https://github.com/%s/releases/download/%s/%s"
+
+
+def _releases_guardadas():
+    try:
+        with open(ARQUIVO_RELEASES, encoding="utf-8") as arquivo:
+            dados = json.load(arquivo)
+        return dados if isinstance(dados, dict) else {}
+    except (OSError, ValueError):
+        return {}
+
+
+def _guardar_release(chave_release, rel):
+    with _TRAVA:
+        dados = _releases_guardadas()
+        dados[chave_release] = {"quando": time.time(), "release": rel}
+        for velha in sorted(dados, key=lambda k: dados[k].get("quando", 0))[:-200]:   # no maximo 200 guardadas
+            dados.pop(velha, None)
+        temporario = "%s.%d.%d.tmp" % (ARQUIVO_RELEASES, os.getpid(), threading.get_ident())
+        try:
+            os.makedirs(os.path.dirname(ARQUIVO_RELEASES), exist_ok=True)
+            with open(temporario, "w", encoding="utf-8") as arquivo:
+                json.dump(dados, arquivo, ensure_ascii=False)
+            os.replace(temporario, ARQUIVO_RELEASES)
+        except OSError:
+            try:
+                os.remove(temporario)
+            except OSError:
+                pass
+
+
+def release(repo, tag="", marca=None):
     """A release do GitHub: {"tag", "arquivos": [{"nome", "url", "tamanho", "sha256"}]}. A do 'tag' do catalogo;
-    sem ela, a mais nova. A API publica do GitHub deixa 60 consultas por hora sem conta: a mensagem avisa."""
+    sem ela, a mais nova. Guardada por um tempo (ARQUIVO_RELEASES); sem API, a guardada ou o download direto do
+    arquivo de `marca` ({"nome", "sha256"} do catalogo). Sem nada disso, a mensagem explica o limite do GitHub."""
+    chave_release = "%s|%s" % (repo, tag)
+    guardada = _releases_guardadas().get(chave_release)
+    validade = VALIDADE_TAG_S if tag else VALIDADE_LATEST_S
+    if (isinstance(guardada, dict) and isinstance(guardada.get("release"), dict)
+            and 0 <= time.time() - float(guardada.get("quando", 0)) < validade):
+        return guardada["release"]
+    try:
+        rel = _release_da_api(repo, tag)
+    except NaoDaParaInstalar:
+        if isinstance(guardada, dict) and isinstance(guardada.get("release"), dict):
+            return guardada["release"]                                   # velha, mas melhor que nada
+        if tag and marca and marca.get("nome") and marca.get("sha256"):
+            nome = marca["nome"]
+            return {"tag": tag, "direto": True, "arquivos": [{
+                "nome": nome, "tamanho": 0, "sha256": marca["sha256"].lower(),
+                "url": DOWNLOAD_DIRETO % (repo, urllib.parse.quote(tag, safe=""), urllib.parse.quote(nome))}]}
+        raise
+    _guardar_release(chave_release, rel)
+    return rel
+
+
+def _release_da_api(repo, tag=""):
+    """A release lida da API do GitHub (sem guardar). Lanca NaoDaParaInstalar sem resposta."""
     dados = None
     if tag:
         dados = _api(API_RELEASE % (repo, "tags/" + tag))
@@ -459,7 +523,7 @@ def instalar(recomp_id, sistema_alvo=None, arq=None):
     pasta = pasta_do(recomp_id)
     baixando = os.path.join(PASTA_RECOMPS, ".baixando")
     try:
-        rel = release(r.get("repo", ""), r.get("tag", ""))
+        rel = release(r.get("repo", ""), r.get("tag", ""), (r.get("marcas") or {}).get(sistema_alvo))
         # O arquivo que o catalogo marcou (nome e SHA-256, guardados a parte do GitHub) vem primeiro, se estiver na
         # release; senao, o que o padrao do nome e as palavras escolherem (revisao de seguranca de 12/11/2026).
         do_catalogo = (r.get("marcas") or {}).get(sistema_alvo) or {}
@@ -472,7 +536,8 @@ def instalar(recomp_id, sistema_alvo=None, arq=None):
         if not arquivo["url"].lower().startswith("https://"):
             raise NaoDaParaInstalar("O arquivo da release não vem por https; o ARENA não baixa assim.")
         _anotar(recomp_id, etapa="baixando", total=arquivo["tamanho"],
-                mensagem="Baixando %s (%s)..." % (nome, _legivel(arquivo["tamanho"])))
+                mensagem="Baixando %s (%s)..." % (nome, _legivel(arquivo["tamanho"]) if arquivo["tamanho"]
+                                                  else r.get("tamanho") or "tamanho não informado"))
         os.makedirs(baixando, exist_ok=True)
         caminho = os.path.join(baixando, "%s-%s" % (recomp_id, re.sub(r"[^A-Za-z0-9._-]", "_", nome)))
         codigo, _ = baixar.rodar(arquivo["url"], SEGUNDOS_DOWNLOAD, destino=caminho)

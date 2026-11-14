@@ -101,6 +101,39 @@ class ArquivoDaRelease(unittest.TestCase):
 
 
 class Release(unittest.TestCase):
+    def setUp(self):
+        # As releases guardadas vao para uma pasta temporaria (nunca o dados\ de verdade).
+        self.pasta = tempfile.mkdtemp(prefix="arena_releases_")
+        self.troca = mock.patch.object(recomps, "ARQUIVO_RELEASES", os.path.join(self.pasta, "releases.json"))
+        self.troca.start()
+
+    def tearDown(self):
+        self.troca.stop()
+        limpeza.apagar_pasta(self.pasta)
+
+    def test_guardada_poupa_a_api_e_vale_sem_internet(self):
+        # 14/11/2026: 60 consultas por hora por endereco, e a sala sai toda pelo mesmo. A segunda leitura nao consulta;
+        # vencida e sem API, vale a guardada mesmo velha.
+        resposta = json.dumps({"tag_name": "v1", "assets": [
+            {"name": "A.zip", "browser_download_url": "https://github.com/x/a/releases/download/v1/A.zip",
+             "size": 5, "digest": "sha256:aa"}]}).encode("utf-8")
+        with mock.patch.object(recomps.baixar, "rodar", return_value=(0, resposta)) as api:
+            recomps.release("x/a", "v1")
+            recomps.release("x/a", "v1")
+        self.assertEqual(api.call_count, 1)
+        with mock.patch.object(recomps, "VALIDADE_TAG_S", -1), \
+                mock.patch.object(recomps.baixar, "rodar", return_value=(22, b"")):
+            self.assertEqual(recomps.release("x/a", "v1")["arquivos"][0]["nome"], "A.zip")
+
+    def test_sem_api_e_sem_guardada_baixa_direto_pela_marca_do_catalogo(self):
+        marca = {"nome": "Jogo 1.zip", "sha256": "ABC"}
+        with mock.patch.object(recomps.baixar, "rodar", return_value=(22, b"")):
+            rel = recomps.release("x/a", "v1.0", marca)
+        arquivo = rel["arquivos"][0]
+        self.assertTrue(rel["direto"])
+        self.assertEqual(arquivo["url"], "https://github.com/x/a/releases/download/v1.0/Jogo%201.zip")
+        self.assertEqual(arquivo["sha256"], "abc")               # a marca do catalogo segue valendo depois do download
+
     def test_le_os_arquivos_e_a_marca_da_api(self):
         resposta = json.dumps({"tag_name": "v1.2.2", "assets": [
             {"name": "A-Windows.zip", "browser_download_url": "https://github.com/x/a/releases/download/v1.2.2/A-Windows.zip",
