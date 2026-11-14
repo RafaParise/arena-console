@@ -1555,7 +1555,7 @@ def ler_config_do_disco():
     config["cartoes_ps2"] = graficos.limpar_cartoes_ps2(salvo.get("cartoes_ps2"))
     config["rpcn_ativo"] = bool(salvo.get("rpcn_ativo"))
     repasse_salvo = str(salvo.get("repasse_proprio") or "").strip()[:255]
-    if repasse_salvo and repasse_proprio.separar_endereco(repasse_salvo) is not None:
+    if repasse_salvo and repasse_proprio.enderecos_validos(repasse_salvo) is not None:
         config["repasse_proprio"] = repasse_salvo
     if salvo.get("escala_da_tela") in graficos.ESCALAS:
         config["escala_da_tela"] = salvo["escala_da_tela"]
@@ -8103,14 +8103,25 @@ class Manipulador(BaseHTTPRequestHandler):
             endereco = str(dados.get("endereco") or carregar_config().get("repasse_proprio") or "").strip()[:255]
             if not endereco:
                 return self.erro("Escreva o endereço do repasse primeiro.")
-            if repasse_proprio.separar_endereco(endereco) is None:
+            lista = repasse_proprio.enderecos_validos(endereco)
+            if lista is None:
                 return self.erro("Endereço do repasse inválido. Use o nome ou o número que o professor passou "
-                                 "(exemplo: 200.100.50.25:55440).")
-            if repasse_proprio.saude(endereco):
-                return self.responder_json({"ok": True, "mensagem": "O repasse respondeu: as partidas entre casas "
-                                                                      "vão por ele."})
-            return self.responder_json({"ok": False, "mensagem": "O repasse não respondeu. Confira o endereço e se o "
-                                                                   "aparelho dele está ligado e com internet."})
+                                 "(exemplo: 200.100.50.25:55440; mais de um, separados por vírgula).")
+            if len(lista) == 1:
+                if repasse_proprio.saude(lista[0]):
+                    return self.responder_json({"ok": True, "mensagem": "O repasse respondeu: as partidas entre "
+                                                                          "casas vão por ele."})
+                return self.responder_json({"ok": False, "mensagem": "O repasse não respondeu. Confira o endereço e "
+                                                                       "se o aparelho dele está ligado e com internet."})
+            # Varios repasses (14/11/2026): diz quais respondem; com um so de pe, as partidas ja vao por ele.
+            respondem = [e for e in lista if repasse_proprio.saude(e, espera=3.0)]
+            if not respondem:
+                return self.responder_json({"ok": False, "mensagem": "Nenhum dos %d repasses respondeu. Confira os "
+                                                                       "endereços e se os aparelhos estão ligados."
+                                                                       % len(lista)})
+            return self.responder_json({"ok": True, "mensagem": "%d de %d repasses responderam (%s): as partidas "
+                                                                  "entre casas abrem no primeiro que estiver de pé."
+                                                                  % (len(respondem), len(lista), ", ".join(respondem))})
 
         if caminho == "/api/config":
             config = carregar_config()
@@ -8196,9 +8207,10 @@ class Manipulador(BaseHTTPRequestHandler):
                 config["fundo_animado"] = dados["fundo_animado"]
             if isinstance(dados.get("repasse_proprio"), str):
                 texto = dados["repasse_proprio"].strip()[:255]
-                if texto and repasse_proprio.separar_endereco(texto) is None:
+                if texto and repasse_proprio.enderecos_validos(texto) is None:
                     return self.erro("Endereço do repasse inválido. Use o nome ou o número, com a porta depois "
-                                     "de dois pontos se não for a 55440 (exemplo: 200.100.50.25:55440).")
+                                     "de dois pontos se não for a 55440 (exemplo: 200.100.50.25:55440); até %d, "
+                                     "separados por vírgula." % repasse_proprio.MAXIMO_DE_REPASSES)
                 config["repasse_proprio"] = texto
             if dados.get("tema") in ("claro", "escuro"):
                 config["tema"] = dados["tema"]
@@ -8644,23 +8656,25 @@ class Manipulador(BaseHTTPRequestHandler):
                                             "tem o endereço dele. Peça ao amigo o código de 20 letras (ou o endereço "
                                             "do repasse ao professor: Amigos → Partidas entre casas).")
                     elif hospedar:
-                        codigo_sala, falha_do_repasse = repasse_proprio.reservar_sala(repasse)
+                        # Varios repasses (14/11/2026): o primeiro que responder abre a sala.
+                        escolhido, codigo_sala, falha_do_repasse = repasse_proprio.reservar_sala_em_algum(repasse)
                         if codigo_sala:
                             partida["opcoes"].update({
                                 "netplay_use_mitm_server": "true",
                                 "netplay_mitm_server": "custom",
-                                "netplay_custom_mitm_server": repasse_proprio.para_o_retroarch(repasse),
+                                "netplay_custom_mitm_server": repasse_proprio.para_o_retroarch(escolhido),
                                 "netplay_nat_traversal": "false",
                                 "netplay_public_announce": "false",
                             })
                             partida["codigo_sala"] = codigo_sala
                     else:
-                        achado, falha_do_repasse = repasse_proprio.procurar_sala(repasse, dados.get("codigo_sala", ""))
+                        escolhido, achado, falha_do_repasse = repasse_proprio.procurar_sala_em_algum(
+                            repasse, dados.get("codigo_sala", ""))
                         if achado:
                             # O tunel fica na MESMA porta do endereco que o ARENA ja alcancou (a que o roteador do
                             # professor abre), nao na que o repasse diz de si: assim nao ha desencontro de porta.
                             sessao = achado[0]
-                            maquina_do_repasse, porta_do_repasse = repasse_proprio.separar_endereco(repasse)
+                            maquina_do_repasse, porta_do_repasse = repasse_proprio.separar_endereco(escolhido)
                             partida["opcoes"].update({
                                 # A porta vale pelo arquivo (o "--port" da linha de comando e' ignorado, 08/10/2026).
                                 "netplay_ip_port": str(porta_do_repasse),

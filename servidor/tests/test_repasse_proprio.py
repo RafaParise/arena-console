@@ -148,6 +148,26 @@ class RepasseDeVerdade(unittest.TestCase):
         self.assertIsNone(achado)
         self.assertIn("Não há sala", erro)
 
+    def test_dois_repasses_com_um_fora_do_ar(self):
+        # 14/11/2026: o A12 e o PC, cada um com o seu repasse. Com o primeiro fora do ar, a sala abre no segundo e o
+        # convidado a acha procurando nos dois.
+        livre = socket.socket()
+        livre.bind(("127.0.0.1", 0))
+        fora = "127.0.0.1:%d" % livre.getsockname()[1]
+        livre.close()
+        dois = "%s, %s" % (fora, self.endereco)
+        escolhido, codigo, erro = rp.reservar_sala_em_algum(dois, espera_da_saude=1)
+        self.assertEqual((escolhido, erro), (self.endereco, None))
+        self.assertRegex(codigo, r"^\d{6}$")
+        achado_em, achado, erro = rp.procurar_sala_em_algum(dois, codigo, tentativas=1)
+        self.assertIsNone(achado)                                  # reservada, o RetroArch ainda nao chegou
+        self.assertIn("abrindo", erro)
+        self.setUp()
+        codigo, _controle, sessao = self.abrir_sala()
+        achado_em, achado, erro = rp.procurar_sala_em_algum(dois, codigo, tentativas=1)
+        self.assertEqual((achado_em, erro), (self.endereco, None))
+        self.assertEqual(base64.b64decode(achado[0]), sessao)
+
     def test_sala_reservada_ainda_abrindo(self):
         codigo, erro = rp.reservar_sala(self.endereco)
         self.assertIsNone(erro)
@@ -267,6 +287,13 @@ class Pedacos(unittest.TestCase):
         self.assertFalse(limite.pode("a", 2))
         self.assertTrue(limite.pode("b", 2))
         self.assertTrue(limite.pode("a", 11))
+
+    def test_enderecos_validos(self):
+        self.assertEqual(rp.enderecos_validos("repasse.bancada.lan"), ["repasse.bancada.lan"])
+        self.assertEqual(rp.enderecos_validos(" a.lan, b.lan:55441 ; a.lan "), ["a.lan", "b.lan:55441"])
+        self.assertIsNone(rp.enderecos_validos(""))
+        self.assertIsNone(rp.enderecos_validos("a.lan, b lan"))           # um invalido estraga a lista
+        self.assertIsNone(rp.enderecos_validos(",".join("h%d.lan" % i for i in range(rp.MAXIMO_DE_REPASSES + 1))))
 
     def test_repasse_fora_do_ar(self):
         livre = socket.socket()

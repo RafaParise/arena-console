@@ -96,6 +96,13 @@ O que precisa existir, em ordem:
 professor passa na aula. Se a operadora troca o endereço de vez em quando, um nome de DNS dinâmico grátis evita
 repassar o endereço novo, mas isso exige criar uma conta num serviço, e essa decisão é do professor.
 
+**Dois aparelhos, ativo-ativo (14/11/2026).** O campo aceita até 4 endereços separados por vírgula. Na bancada do
+Rafael: `repasse.bancada.lan, repasse-pc.bancada.lan` (o A12 na DMZ, no Termux, e o PC, tarefa `Repasse-ARENA-PC` do
+`parise-sync\scripts\repasse_pc.py`). Cada um guarda as próprias salas e não depende do outro; quem abre usa o
+primeiro que responder (`reservar_sala_em_algum`) e quem entra procura nos dois (`procurar_sala_em_algum`). Se o A12
+sai da DMZ, a próxima partida vai pelo PC sozinha. Limite do protocolo: a partida em andamento não muda de repasse no
+meio (o RetroArch fica ligado àquele endereço).
+
 ## Testes
 
 - `servidor\tests\test_repasse_proprio.py`: o protocolo byte a byte e os limites, com o repasse de verdade aberto

@@ -532,6 +532,68 @@ def procurar_sala(endereco, codigo, tentativas=8, intervalo=2.0):
     return None, mensagem
 
 
+# Mais de um repasse (14/11/2026, pedido do Rafael: o A12 e o PC "trabalhando juntos, mas independentes"): o endereco
+# pode ter ate 4 repasses separados por virgula ("repasse.bancada.lan, repasse-pc.bancada.lan"). Cada repasse guarda
+# as proprias salas; quem abre a partida usa o PRIMEIRO que responder, e quem entra procura a sala em todos. Se um
+# aparelho sai do ar, a proxima partida ja vai para o outro. A partida que ja esta rodando num repasse nao pula para o
+# outro no meio (o RetroArch fica ligado aquele endereco).
+MAXIMO_DE_REPASSES = 4
+
+
+def enderecos_validos(texto):
+    """A lista de enderecos de `texto` (um, ou varios separados por virgula ou ponto e virgula), na ordem e sem
+    repetir; None se algum nao der para entender, se nao houver nenhum ou se passar de MAXIMO_DE_REPASSES."""
+    partes = [p.strip() for p in (texto or "").replace(";", ",").split(",")]
+    partes = [p for p in partes if p]
+    if not partes or len(partes) > MAXIMO_DE_REPASSES or any(separar_endereco(p) is None for p in partes):
+        return None
+    return list(dict.fromkeys(partes))
+
+
+def reservar_sala_em_algum(texto, espera_da_saude=2.5):
+    """(endereco escolhido, codigo, None) no primeiro repasse que responder; ou (None, None, mensagem)."""
+    lista = enderecos_validos(texto) or []
+    mensagem = "Nenhum repasse respondeu." if lista else "Endereço do repasse inválido."
+    for endereco in lista:
+        if len(lista) > 1 and not saude(endereco, espera_da_saude):
+            continue
+        codigo, falha = reservar_sala(endereco)
+        if codigo:
+            return endereco, codigo, None
+        mensagem = falha or mensagem
+    return None, None, mensagem
+
+
+def procurar_sala_em_algum(texto, codigo, tentativas=8, intervalo=2.0):
+    """(endereco, (sessao, porta), None) do repasse que tem a sala; ou (None, None, mensagem). Como o
+    procurar_sala, espera um pouco se algum repasse disser que a sala ainda esta abrindo (202)."""
+    lista = enderecos_validos(texto) or []
+    if not lista:
+        return None, None, "Endereço do repasse inválido."
+    if len(lista) == 1:
+        achado, mensagem = procurar_sala(lista[0], codigo, tentativas, intervalo)
+        return (lista[0] if achado else None), achado, mensagem
+    codigo = "".join(c for c in str(codigo) if c.isdigit())
+    if len(codigo) != 6:
+        return None, None, "O código da sala tem 6 números."
+    mensagem = "A sala nao abriu a tempo."
+    for vez in range(max(1, tentativas)):
+        abrindo = False
+        for endereco in lista:
+            status, dados = _pedir(endereco, "GET", "/sala/" + codigo, espera=3.0)
+            if status == 200 and dados.get("sessao"):
+                return endereco, (dados["sessao"], int(dados.get("porta") or PORTA_PADRAO)), None
+            if status == 202:
+                abrindo = True
+            if status is not None:
+                mensagem = dados.get("erro") or mensagem
+        if not abrindo:
+            break
+        if vez + 1 < tentativas:
+            time.sleep(intervalo)
+    return None, None, mensagem
+
+
 def main():
     argumentos = argparse.ArgumentParser(description="Repasse proprio do ARENA (partida entre casas, sem lista publica).")
     argumentos.add_argument("--servir", action="store_true", help="abre o repasse e fica atendendo")

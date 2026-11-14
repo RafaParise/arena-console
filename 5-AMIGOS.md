@@ -870,8 +870,14 @@ da internet. Funciona assim:
 3. Quem entra: **Jogar junto** → **Entrar na partida do amigo** → ligue **Estamos em casas
    diferentes** → digite o código → **Começar**.
 
-O código só vale enquanto o jogo de quem abriu estiver aberto. Para quem
-monta o repasse (o professor): `docs\REPASSE-PROPRIO.md`.
+O código só vale enquanto o jogo de quem abriu estiver aberto.
+
+**Dois repasses, um de reserva do outro (14/11/2026).** O endereço aceita até 4
+repasses separados por vírgula (exemplo: `repasse.bancada.lan, repasse-pc.bancada.lan`).
+Quem abre a partida usa o primeiro que responder, e quem entra procura a sala em
+todos: se um aparelho do professor sair do ar, a próxima partida já vai pelo outro,
+sem mexer em nada. A partida que já está rodando não troca de repasse no meio.
+Para quem monta o repasse (o professor): `docs\REPASSE-PROPRIO.md`.
 
 **Sem o repasse da turma, pelo retransmissor da internet (13/11/2026).**
 Agora a chave aparece sempre. Se não há repasse em Amigos, o ARENA usa o retransmissor
