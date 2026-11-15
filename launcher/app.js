@@ -28,6 +28,9 @@ const estado = {
   amigos: [],
   colegasOnline: [],
   filtroRapido: "todos",
+  // "Só os que abrem aqui" (ideia do blueprint arena_realtime_ui.js, 14/11/2026): esconde os jogos cujo console
+  // ainda não abre neste aparelho. Começa desligado a cada abertura: no laboratório, o próximo aluno vê tudo.
+  soOsQueAbrem: false,
   jogoSelecionado: null,
 };
 
@@ -139,6 +142,7 @@ acordarFundo();
 // --------------------------------------------------------------------------
 
 let respostaGuardada = false;
+let temNativo = false;
 
 async function pedir(rota, metodo = "GET", corpo = null) {
   const opcoes = { method: metodo, headers: { "Content-Type": "application/json" } };
@@ -160,6 +164,8 @@ async function pedir(rota, metodo = "GET", corpo = null) {
   // O servidor nativo (Rust) entregou a resposta guardada da ultima abertura, porque o Python ainda carrega: a tela
   // mostra assim mesmo e pede de novo quando ele ficar pronto (iniciar, abaixo; docs/MIGRACAO-RUST.md).
   if (resposta.headers.get("X-Arena-Guardado") === "1") respostaGuardada = true;
+  // Com o nativo na frente, a tela pode ouvir os avisos do servidor (ouvirOsAvisosDoServidor, abaixo).
+  if (resposta.headers.get("X-Arena-Nativo") === "1") temNativo = true;
 
   if (!resposta.ok || dados.ok === false) {
     const erro = new Error(dados.erro || "O servidor não respondeu como esperado.");
@@ -464,9 +470,11 @@ async function carregarEstado() {
   desenharAvancado();
 }
 
-async function carregarCatalogo() {
+async function carregarCatalogo({ manterLimite = false } = {}) {
   const dados = await pedir("/api/catalogo");
   estado.plataformas = dados.plataformas;
+  // A geracao desta lista (sobe a cada mudanca no servidor): o aviso de lista nova se compara com ela.
+  estado.geracaoDoCatalogo = Number(dados.geracao) || 0;
 
   // O servidor manda a lista de plataformas e a lista de jogos separadas.
   // Aqui a gente cruza as duas uma unica vez, em vez de o servidor repetir
@@ -475,9 +483,10 @@ async function carregarCatalogo() {
   for (const p of dados.plataformas) estado.porPlataforma[p.id] = p;
   desenharJeitos();
   estado.jogos = dados.jogos;
-  if (!estado.jogoSelecionado || !estado.jogos.some((jogo) => jogo.id === estado.jogoSelecionado.id))
-    estado.jogoSelecionado = estado.jogos[0] || null;
-  estado.limite = PASSO_LIMITE;
+  // O jogo escolhido continua o mesmo, mas com os dados novos (a capa que acabou de chegar, por exemplo).
+  const escolhido = estado.jogoSelecionado && estado.jogos.find((jogo) => jogo.id === estado.jogoSelecionado.id);
+  estado.jogoSelecionado = escolhido || estado.jogos[0] || null;
+  if (!manterLimite) estado.limite = PASSO_LIMITE;
 
   $("#lidoJogos").textContent = dados.total;
   $("#contaTodos").textContent = dados.total;
@@ -575,9 +584,10 @@ function jogosVisiveis() {
   const busca = normalizar(estado.busca.trim());
   const plataforma = estado.filtroPlataforma;
 
-  if (!busca && !plataforma && estado.filtroRapido === "todos") return estado.jogos;
+  if (!busca && !plataforma && estado.filtroRapido === "todos" && !estado.soOsQueAbrem) return estado.jogos;
 
   return estado.jogos.filter((jogo) => {
+    if (estado.soOsQueAbrem && (estado.porPlataforma[jogo.plataforma] || {}).estado !== "pronta") return false;
     if (estado.filtroRapido === "favoritos" &&
         !(estado.config.favoritos || []).includes(jogo.id)) return false;
     if (estado.filtroRapido === "recentes" &&
@@ -1040,6 +1050,10 @@ function desenharJogos() {
     if (estado.jogos.length > 0 && estado.filtroRapido === "favoritos" && !(estado.config.favoritos || []).length) {
       $("#vazioTitulo").textContent = "Nenhum favorito ainda";
       $("#vazioTexto").textContent = "Toque na estrela ☆ de um jogo: ele aparece aqui, em Favoritos.";
+    } else if (estado.jogos.length > 0 && estado.soOsQueAbrem) {
+      $("#vazioTitulo").textContent = "Nenhum destes jogos abre neste aparelho ainda";
+      $("#vazioTexto").textContent =
+        "Toque em \"Só os que abrem aqui\" de novo para ver todos, com o que falta para cada um abrir.";
     } else if (estado.jogos.length > 0) {
       $("#vazioTitulo").textContent = "Nada encontrado com esse filtro";
       $("#vazioTexto").textContent =
@@ -4103,6 +4117,9 @@ function desenharExternos(lista) {
     } else if (item.instalado && item.extra) {
       nota.textContent =
         "instalado. É um jeito a mais de abrir o jogo: aparece na pergunta \"Como ligar o console?\".";
+    } else if (item.instalado && item.de_onde) {
+      // Linux: o emulador do pacote da distribuição, com a configuração na pasta do ARENA (14/11/2026).
+      nota.textContent = `${item.de_onde}. O ARENA está usando ele.`;
     } else if (item.instalado) {
       nota.textContent = "instalado. O ARENA está usando ele.";
     } else if (item.compactado_pendente) {
@@ -6772,6 +6789,13 @@ function ligarEventos() {
       desenharJogos();
     });
   }
+  // Liga e desliga, e soma com os outros filtros (Favoritos que abrem aqui, por exemplo).
+  $("#btnSoOsQueAbrem").addEventListener("click", () => {
+    estado.soOsQueAbrem = !estado.soOsQueAbrem;
+    $("#btnSoOsQueAbrem").setAttribute("aria-pressed", String(estado.soOsQueAbrem));
+    estado.limite = PASSO_LIMITE;
+    desenharJogos();
+  });
 
   $("#btnCriarPastas").addEventListener("click", async () => {
     try {
@@ -7783,7 +7807,65 @@ async function iniciar() {
   console.info("[ARENA] lista na tela" + (respostaGuardada ? " (guardada pelo nativo)" : "") + ", " +
     Math.round(performance.now()) + " ms depois de a pagina comecar a carregar");
   if (respostaGuardada) atualizarQuandoOPythonFicarPronto();
+  ouvirOsAvisosDoServidor();
 }
+
+// Avisos do servidor em tempo real (ideia do blueprint events.rs, adaptada; 14/11/2026). Com o nativo na frente, a
+// tela fica ouvindo o /_nativo/eventos: quando um trabalho de segundo plano muda a lista (a busca de capas, um
+// download, as BIOS organizadas na abertura), ela se redesenha sozinha. Nao fica perguntando de tempos em tempos:
+// parada, a conexao aberta nao gasta processador (o jogo do Celeron e do celular continua com tudo).
+let esperaDoCatalogo = null;
+
+function ouvirOsAvisosDoServidor() {
+  if (!temNativo || !window.EventSource || estado.avisosDoServidor) return;
+  const fonte = new EventSource("/_nativo/eventos");
+  estado.avisosDoServidor = fonte;
+  fonte.addEventListener("catalogo", (evento) => {
+    let dados = {};
+    try { dados = JSON.parse(evento.data); } catch (falha) { /* aviso sem dados: recarrega assim mesmo */ }
+    catalogoMudouNoServidor(Number(dados.geracao) || 0);
+  });
+  fonte.addEventListener("jogo", () => conferirFaixaTeclas());
+  // Se a conexao cair, o navegador reconecta sozinho (o servidor pede 3 s); uma recusa (403, 404) fecha de vez.
+}
+
+function catalogoMudouNoServidor(geracao) {
+  if (geracao && geracao <= (estado.geracaoDoCatalogo || 0)) return;   // a tela ja tem esta lista
+  if (document.hidden) {                                                // redesenha quando voltar (depois do jogo)
+    estado.catalogoVelho = true;
+    return;
+  }
+  clearTimeout(esperaDoCatalogo);
+  esperaDoCatalogo = setTimeout(() => {
+    if (geracao && geracao <= (estado.geracaoDoCatalogo || 0)) return;  // o proprio clique ja trouxe a lista nova
+    recarregarCatalogoSemPerderOLugar();
+  }, 400);
+}
+
+// Redesenha a lista sem tirar a pessoa do lugar: o mesmo jogo em foco (controle e teclado), as linhas que ja estavam
+// abertas pelo "Mostrar mais" e o jogo escolhido no painel.
+async function recarregarCatalogoSemPerderOLugar() {
+  const ativo = document.activeElement;
+  const cartao = ativo && ativo.closest ? ativo.closest(".jogo[data-jogo]") : null;
+  const idDoCartao = cartao ? cartao.dataset.jogo : null;
+  const idDoElemento = ativo && ativo.id ? ativo.id : null;
+  try {
+    await carregarCatalogo({ manterLimite: true });
+  } catch (falha) {
+    return;   // sem resposta: a lista fica como esta, e o proximo aviso tenta de novo
+  }
+  if (document.activeElement && document.activeElement !== document.body) return;   // o foco nem saiu do lugar
+  const volta = idDoCartao ? document.querySelector(`.jogo[data-jogo="${CSS.escape(idDoCartao)}"]`)
+    : (idDoElemento ? document.getElementById(idDoElemento) : null);
+  if (volta) volta.focus({ preventScroll: true });
+}
+
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden && estado.catalogoVelho) {
+    estado.catalogoVelho = false;
+    catalogoMudouNoServidor(0);
+  }
+});
 
 // A tela abriu com o que o servidor nativo tinha guardado: espera o Python (o nativo responde quando ele abre) e pede
 // o estado e a lista de verdade (um jogo copiado com o ARENA fechado aparece aqui).

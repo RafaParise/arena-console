@@ -522,7 +522,7 @@ input::placeholder { color: var(--texto-apagado); }
   border-color: var(--azul);
   box-shadow: 0 0 0 3px rgba(61, 139, 253, 0.14);
 }
-.filtros-rapidos { display: flex; gap: .35rem; }
+.filtros-rapidos { display: flex; flex-wrap: wrap; gap: .35rem; }
 .filtro-rapido {
   border: 1px solid var(--borda);
   border-radius: 999px;
@@ -533,7 +533,7 @@ input::placeholder { color: var(--texto-apagado); }
   font-size: var(--t-micro);
   padding: .35rem .7rem;
 }
-.filtro-rapido:hover, .filtro-rapido.ativo {
+.filtro-rapido:hover, .filtro-rapido.ativo, .filtro-rapido[aria-pressed="true"] {
   background: var(--azul-escuro);
   border-color: var(--azul);
   color: var(--texto);

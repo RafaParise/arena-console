@@ -29,6 +29,7 @@ no mesmo pen drive. O que muda e' pouco, e mora aqui:
 O resto do ARENA pergunta aqui, em vez de cada modulo testar o sistema do
 seu jeito.
 """
+import json
 import os
 import platform
 import re
@@ -797,13 +798,119 @@ def motores_deste_sistema(opcoes):
 #   - o Xenia recebe a pasta pelo --storage_root, e o Dolphin pelo -u (a
 #     pasta User, a mesma do Windows).
 
+#
+# O emulador instalado no sistema (14/11/2026): quando a pasta do ARENA nao
+# tem o programa do Linux, mas a distribuicao tem (o pacote pcsx2-qt,
+# dolphin-emu ou rpcs3, no PATH), o ARENA usa esse. A pasta do ARENA vem
+# sempre antes. A configuracao, a BIOS e os saves continuam na pasta do
+# ARENA (emuladores/<pasta do cadastro>/...), como se o programa estivesse
+# la: a pasta do programa do sistema (/usr/bin) nem deixa gravar.
+# O flatpak fica de fora: o sandbox dele troca o XDG_CONFIG_HOME e pode nao
+# enxergar o pen drive (e o nome dele, net.pcsx2.PCSX2, nem e' o do PATH).
+
+# A pasta dos emuladores de fora (a mesma do graficos.PASTA_EMULADORES).
+PASTA_DOS_EMULADORES = os.path.join(RAIZ_DO_ARENA, "emuladores")
+# Os emuladores de fora que tem pasta de dados (os de dados_do_externo).
+EXTERNOS_COM_DADOS = ("PCSX2", "RPCS3", "Xenia", "Dolphin")
+
+
+def programa_do_sistema(nomes):
+    """Linux: o caminho do primeiro dos 'nomes' (os "executaveis_linux" do
+    consoles.json) instalado no sistema, no PATH, e que roda neste
+    processador; ou None. O nome com * (o AppImage com a versao no nome) so
+    vale na pasta do ARENA e fica de fora. No Windows e no Android: None."""
+    if WINDOWS or ANDROID:
+        return None
+    for nome in nomes:
+        if not nome or any(letra in nome for letra in "*?["):
+            continue
+        achado = shutil.which(nome)
+        # O mesmo filtro dos programas da pasta do ARENA: o x86-64 numa TV
+        # Box ARM fica como se nao estivesse.
+        if achado and roda_neste_processador(achado):
+            return achado
+    return None
+
+
+def _dentro_da_pasta(caminho, pasta):
+    """O 'caminho' esta dentro da 'pasta'? (False se der erro: outro disco.)"""
+    try:
+        caminho = os.path.normcase(os.path.abspath(caminho))
+        pasta = os.path.normcase(os.path.abspath(pasta))
+        return os.path.commonpath([caminho, pasta]) == pasta
+    except ValueError:
+        return False
+
+
+def e_do_sistema(caminho):
+    """Linux: o programa em 'caminho' e' o instalado no sistema (o que o
+    shutil.which acha pelo nome), e nao um da pasta do ARENA? No Windows e no
+    Android, sempre False."""
+    if WINDOWS or ANDROID or not caminho or _dentro_da_pasta(caminho, RAIZ_DO_ARENA):
+        return False
+    achado = shutil.which(os.path.basename(caminho))
+    if not achado:
+        return False
+    return os.path.normcase(os.path.realpath(achado)) == os.path.normcase(os.path.realpath(caminho))
+
+
+def _cadastro_do_externo(nome):
+    """(pasta, executaveis do Windows) do emulador de fora 'nome', lidos do
+    servidor/consoles.json. Sem o arquivo, a pasta tem o nome do emulador."""
+    try:
+        with open(os.path.join(RAIZ_DO_ARENA, "servidor", "consoles.json"), encoding="utf-8") as arquivo:
+            catalogo = json.load(arquivo)
+        for item in catalogo.get("plataformas", []):
+            externo = item.get("externo") or {}
+            if externo.get("nome") == nome:
+                return externo.get("pasta") or nome, list(externo.get("executaveis") or [])
+    except (OSError, ValueError, AttributeError):
+        pass
+    return nome, []
+
+
+def pasta_do_externo_no_arena(nome):
+    """Linux, emulador do sistema: a pasta do ARENA que faz o papel da pasta
+    do programa. Se o pen drive tem o programa do Windows (o pcsx2-qt.exe em
+    emuladores/PCSX2/PCSX2), e' a pasta dele: os dois sistemas usam a mesma
+    BIOS e os mesmos saves. Senao, emuladores/<pasta>/<pasta>, o lugar de
+    sempre (o mesmo do pacote do ARENA)."""
+    pasta, executaveis = _cadastro_do_externo(nome)
+    base = os.path.join(PASTA_DOS_EMULADORES, pasta)
+    procurados = {programa.lower() for programa in executaveis}
+    if procurados and os.path.isdir(base):
+        for raiz, subpastas, arquivos in os.walk(base):
+            if any(arquivo.lower() in procurados for arquivo in arquivos):
+                return raiz
+            # Como o graficos.achar_externo_detalhado: so um nivel abaixo.
+            if raiz.count(os.sep) - base.count(os.sep) >= 1:
+                subpastas[:] = []
+    return os.path.join(base, pasta)
+
+
 def dados_do_externo(nome, caminho):
     """(caminho para a configuracao, variaveis do ambiente, argumentos a mais)
     do emulador de fora 'nome' cujo programa esta em 'caminho'. A pasta do
     "caminho para a configuracao" e' onde o emulador le e grava (o
-    graficos.py escreve la). No Windows: (caminho, {}, [])."""
+    graficos.py escreve la). No Windows: (caminho, {}, []).
+    Programa do sistema (/usr/bin/pcsx2-qt): tudo como se ele estivesse na
+    pasta do ARENA (pasta_do_externo_no_arena), que o ARENA cria se faltar."""
     if WINDOWS or not caminho:
         return caminho, {}, []
+    if nome in EXTERNOS_COM_DADOS and e_do_sistema(caminho):
+        caminho = os.path.join(pasta_do_externo_no_arena(nome), os.path.basename(caminho))
+        resultado = _dados_pela_pasta(nome, caminho)
+        try:
+            os.makedirs(os.path.dirname(resultado[0]), exist_ok=True)
+        except OSError as falha:
+            print("[ARENA] Nao consegui criar a pasta de dados do %s: %s. Confira se o pen drive "
+                  "deixa gravar (nao esta so de leitura)." % (nome, falha))
+        return resultado
+    return _dados_pela_pasta(nome, caminho)
+
+
+def _dados_pela_pasta(nome, caminho):
+    """dados_do_externo, a partir da pasta onde o programa esta (ou faz de conta que esta)."""
     pasta = os.path.dirname(caminho)
     acima = os.path.dirname(pasta)
     programa = os.path.basename(caminho)

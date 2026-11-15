@@ -126,6 +126,7 @@ def principal():
             if rodada == "nativo_3":
                 falhas += conferir_seguranca(porta)
                 falhas += conferir_capas(porta, pasta)
+                falhas += conferir_avisos(porta)
                 falhas += conferir_saida(processo, pasta)
             fechar(processo, saida, pasta)
             resultados[rodada] = tempos
@@ -178,6 +179,80 @@ def conferir_seguranca(porta):
     codigo, _, corpo = pedir(porta, "GET", "/../servidor/arena.py", local)
     if codigo == 200 and b"def principal" in corpo:
         falhas.append("o caminho com .. entregou um arquivo do servidor")
+    return falhas
+
+
+def conferir_avisos(porta):
+    """Os avisos em tempo real (/_nativo/eventos, 14/11/2026): o Atualizar lista da tela faz chegar o aviso de lista
+    nova, com a geracao maior; so a tela deste aparelho ouve, e so o Python (com o segredo) manda aviso."""
+    falhas = []
+    local = {"Host": "127.0.0.1:%d" % porta}
+    codigo, cabecalhos, corpo = pedir(porta, "GET", "/api/catalogo", local)
+    geracao = json.loads(corpo.decode("utf-8")).get("geracao") if codigo == 200 else None
+    if not isinstance(geracao, int):
+        return ["o /api/catalogo nao trouxe a geracao da lista (%r)" % (geracao,)]
+    if cabecalhos.get("X-Arena-Nativo") != "1":
+        falhas.append("a resposta do /api/catalogo nao diz que o nativo esta na frente (X-Arena-Nativo)")
+    # Ouvir como o EventSource do navegador: conexao crua, que nao termina.
+    ouvinte = socket.create_connection(("127.0.0.1", porta), timeout=10)
+    try:
+        ouvinte.sendall(("GET /_nativo/eventos HTTP/1.1\r\nHost: 127.0.0.1:%d\r\nAccept: text/event-stream\r\n\r\n"
+                         % porta).encode("ascii"))
+        recebido = b""
+        while b"\r\n\r\n" not in recebido:
+            pedaco = ouvinte.recv(4096)
+            if not pedaco:
+                break
+            recebido += pedaco
+        cabeca, _, resto = recebido.partition(b"\r\n\r\n")
+        cabeca = cabeca.decode("latin-1")
+        if not cabeca.startswith("HTTP/1.1 200") or "text/event-stream" not in cabeca:
+            return falhas + ["o /_nativo/eventos nao abriu como Server-Sent Events: %s" % cabeca.splitlines()[:1]]
+        # Uma mudanca de verdade na lista: o botao Atualizar lista (POST /api/indexar).
+        inicio = time.perf_counter()
+        codigo, _, _ = pedir(porta, "POST", "/api/indexar", dict(local, **{"Content-Type": "application/json"}),
+                             corpo=b"{}")
+        if codigo != 200:
+            return falhas + ["o Atualizar lista (/api/indexar) falhou (codigo %d)" % codigo]
+        nova = None
+        texto = resto.decode("utf-8", "replace")
+        while nova is None and time.perf_counter() - inicio < 10:
+            for bloco in texto.split("\n\n")[:-1]:
+                linhas = dict(l.split(": ", 1) for l in bloco.split("\n") if ": " in l and not l.startswith(":"))
+                if linhas.get("event") == "catalogo":
+                    nova = json.loads(linhas.get("data") or "{}").get("geracao")
+            if nova is None:
+                pedaco = ouvinte.recv(4096)
+                if not pedaco:
+                    break
+                texto += pedaco.decode("utf-8", "replace")
+        if nova is None:
+            falhas.append("o aviso de lista nova nao chegou em 10 s")
+        elif not isinstance(nova, int) or nova <= geracao:
+            falhas.append("o aviso trouxe uma geracao que nao subiu (%r -> %r)" % (geracao, nova))
+        else:
+            print("  aviso de lista nova chegou %.0f ms depois do Atualizar lista (geracao %d -> %d)"
+                  % ((time.perf_counter() - inicio) * 1000, geracao, nova))
+    except OSError as falha:
+        falhas.append("a conexao dos avisos caiu: %s" % falha)
+    finally:
+        ouvinte.close()
+    # As recusas: outro site (DNS rebinding) nao ouve; aviso sem o segredo, ou com o segredo errado, nao entra.
+    codigo, _, _ = pedir(porta, "GET", "/_nativo/eventos", {"Host": "site-malvado.com:%d" % porta}, espera=5)
+    if codigo != 403:
+        falhas.append("os avisos aceitaram um Host de fora (codigo %d)" % codigo)
+    # Outro site aberto no mesmo navegador (o Host e' o certo, mas o Origin denuncia): nao ocupa vaga de ouvinte.
+    codigo, _, _ = pedir(porta, "GET", "/_nativo/eventos", dict(local, Origin="https://site-malvado.com"), espera=5)
+    if codigo != 403:
+        falhas.append("os avisos aceitaram um pedido de outro site (codigo %d)" % codigo)
+    json_local = dict(local, **{"Content-Type": "application/json"})
+    codigo, _, _ = pedir(porta, "POST", "/_nativo/evento?tipo=catalogo", json_local, corpo=b'{"geracao": 1}')
+    if codigo != 403:
+        falhas.append("um aviso sem o segredo foi aceito (codigo %d)" % codigo)
+    codigo, _, _ = pedir(porta, "POST", "/_nativo/evento?tipo=catalogo", dict(json_local, **{"X-Arena-Proxy": "chute"}),
+                         corpo=b'{"geracao": 1}')
+    if codigo != 403:
+        falhas.append("um aviso com o segredo errado foi aceito (codigo %d)" % codigo)
     return falhas
 
 

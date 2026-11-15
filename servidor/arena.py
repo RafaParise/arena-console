@@ -330,6 +330,7 @@ def cancelar_partida_pendente(vez=None):
         PARTIDA_ABERTA["partida"] = None
         JOGO_EM_ANDAMENTO["ativo"] = False
         JOGO_EM_ANDAMENTO["titulo"] = ""
+    avisar_a_tela("jogo", {"ativo": False})
     threading.Thread(target=controle_usb.soltar_partida, daemon=True).start()     # a partida pelo cabo, se havia
     threading.Thread(target=fechar_porta_dos_colegas, daemon=True).start()
     return True
@@ -2514,6 +2515,8 @@ def montar_catalogo():
         idade, salvo = _cache["resposta"]
         if salvo and (time.time() - idade) < VALIDADE_CACHE:
             return salvo
+        # A geracao de agora vai junto na resposta: a tela compara com a do aviso (avisar_a_tela).
+        geracao = GERACAO_DO_CATALOGO[0]
 
     por_id = {p["id"]: p for p in avaliar_plataformas()}
 
@@ -2565,11 +2568,80 @@ def montar_catalogo():
         "plataformas": list(por_id.values()),
         "jogos": jogos,
         "total": len(jogos),
+        "geracao": geracao,
     }, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
 
     with TRAVA_CACHE:
-        _cache["resposta"] = (time.time(), corpo)
+        # Se a lista mudou ENQUANTO esta resposta era montada (uma busca de capas terminou no meio, por
+        # exemplo), ela ja nasceu velha: vai para quem pediu, mas nao fica guardada (o proximo pedido monta de novo).
+        if GERACAO_DO_CATALOGO[0] == geracao:
+            _cache["resposta"] = (time.time(), corpo)
     return corpo
+
+
+# --------------------------------------------------------------------------
+# Avisos para a tela em tempo real (ideia do blueprint events.rs, adaptada; 14/11/2026)
+# --------------------------------------------------------------------------
+# Trabalho que termina em segundo plano (a busca de capas, um download, as BIOS organizadas na abertura, a mudanca
+# de jogos para o cartao) muda a lista DEPOIS de a tela ja ter desenhado. Antes, a tela so via a mudanca no proximo
+# clique. Agora o Python conta ao servidor nativo, que repassa na hora a tela pelo /_nativo/eventos. A tela nao fica
+# perguntando: parada, a conexao aberta nao gasta processador (a regra de nada de laco de consulta continua).
+# Sem o nativo na frente, nada muda: a tela segue como antes.
+
+# A geracao da lista de jogos: sobe a cada mudanca. Comeca na hora da abertura, em milissegundos, para ser sempre
+# maior que a de uma abertura anterior (a resposta guardada pelo nativo traz a geracao antiga).
+GERACAO_DO_CATALOGO = [int(time.time() * 1000)]
+_AVISOS_PENDENTES = {}                 # tipo -> dados; so o ultimo de cada tipo importa
+_TRAVA_DOS_AVISOS = threading.Lock()
+_TEM_AVISO = threading.Event()
+_CARTEIRO = {"thread": None}
+
+
+def avisar_a_tela(tipo, dados=None):
+    """Conta a tela (pelo nativo) que algo mudou: "catalogo" (com a geracao nova) ou "jogo" (o jogo fechou).
+    Nunca espera nem derruba quem chamou: quem entrega e' uma thread so, que dorme enquanto nao ha aviso."""
+    if not SEGREDO_DO_NATIVO:
+        return
+    try:
+        with _TRAVA_DOS_AVISOS:
+            _AVISOS_PENDENTES[tipo] = dados or {}
+            if _CARTEIRO["thread"] is None:
+                carteiro = threading.Thread(target=_entregar_avisos, name="avisos-da-tela", daemon=True)
+                carteiro.start()
+                _CARTEIRO["thread"] = carteiro
+        _TEM_AVISO.set()
+    except RuntimeError:
+        pass   # sem thread nova (maquina sem recurso): fica sem o aviso, e quem chamou segue como se nada fosse
+
+
+def _entregar_avisos():
+    import http.client
+    while True:
+        _TEM_AVISO.wait()
+        time.sleep(0.1)    # junta os avisos da mesma rajada (varios limpar_caches() seguidos viram um aviso so)
+        with _TRAVA_DOS_AVISOS:
+            _TEM_AVISO.clear()
+            pendentes = list(_AVISOS_PENDENTES.items())
+            _AVISOS_PENDENTES.clear()
+        for tipo, dados in pendentes:
+            try:
+                conexao = http.client.HTTPConnection("127.0.0.1", PORTA, timeout=5)
+                conexao.request("POST", "/_nativo/evento?tipo=" + tipo,
+                                body=json.dumps(dados, ensure_ascii=True, separators=(",", ":")),
+                                headers={"Content-Type": "application/json", "X-Arena-Proxy": SEGREDO_DO_NATIVO})
+                conexao.getresponse().read()
+                conexao.close()
+            except OSError:
+                pass   # a tela fica sem este aviso; o proximo clique traz a lista nova, como era antes
+
+
+def esquecer_resposta_do_catalogo():
+    """So a resposta pronta do /api/catalogo sai (as outras partes do cache ficam), e a tela e' avisada."""
+    with TRAVA_CACHE:
+        _cache["resposta"] = (0.0, None)
+        GERACAO_DO_CATALOGO[0] += 1
+        geracao = GERACAO_DO_CATALOGO[0]
+    avisar_a_tela("catalogo", {"geracao": geracao})
 
 
 def limpar_caches():
@@ -2577,6 +2649,9 @@ def limpar_caches():
         _cache["plataformas"] = (0.0, None)
         _cache["manifesto"] = (0.0, None)
         _cache["resposta"] = (0.0, None)
+        GERACAO_DO_CATALOGO[0] += 1
+        geracao = GERACAO_DO_CATALOGO[0]
+    avisar_a_tela("catalogo", {"geracao": geracao})
 
 
 def ligar_o_cartao():
@@ -2891,8 +2966,7 @@ def anotar_motivo_do_erro(jogo, desde, partida=None):
         guardados = sorted(problemas.items(), key=lambda item: item[1].get("quando", ""))
         gravar_texto_atomico(ARQUIVO_PROBLEMAS, json.dumps(
             dict(guardados[-PROBLEMAS_GUARDADOS:]), ensure_ascii=False, indent=1))
-        with TRAVA_CACHE:
-            _cache["resposta"] = (0.0, None)   # o cartao mostra o motivo novo
+        esquecer_resposta_do_catalogo()   # o cartao mostra o motivo novo
         return resultado
     except Exception as falha:   # noqa: BLE001 -- explicar e' bonus, nunca derruba
         print("[ARENA] Nao consegui ler o motivo do jogo: %s" % falha)
@@ -2910,8 +2984,7 @@ def anotar_desempenho(jogo, medida, config):
             print("[ARENA] Desempenho: %s rodou a %d%% da velocidade do console (mediana de %d medidas)."
                   % (jogo.get("titulo", "o jogo"), round(desempenho.mediana(velocidades)), len(velocidades)))
             if desempenho.registrar_jogo(jogo.get("id"), velocidades) is not None:
-                with TRAVA_CACHE:
-                    _cache["resposta"] = (0.0, None)      # o painel do jogo mostra a velocidade nova
+                esquecer_resposta_do_catalogo()      # o painel do jogo mostra a velocidade nova
         if depois > antes and config.get("ajuste_pelo_desempenho", True):
             texto = ("ficou pesado para esta maquina. Na proxima vez, o ARENA deixa o grafico deste "
                      "console mais leve (Ajustes -> Maquina desfaz).")
@@ -3397,7 +3470,10 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
         comando = graficos.comando_externo(caminho_dados, jogo["externo"]["dados"], caminho_jogo)
         comando = [plataforma_do_sistema.programa_que_roda(programa_externo, nome_externo)] + \
             argumentos_externo + comando[1:]
-        pasta_trabalho = jogo["externo"]["dados"].get("pasta_trabalho") or os.path.dirname(programa_externo)
+        # O emulador instalado no sistema (Linux, /usr/bin) trabalha na pasta de dados dele no ARENA: a do programa
+        # nem deixa gravar (plataforma.dados_do_externo, 14/11/2026).
+        pasta_trabalho = jogo["externo"]["dados"].get("pasta_trabalho") or os.path.dirname(
+            caminho_dados if plataforma_do_sistema.e_do_sistema(programa_externo) else programa_externo)
         # O ambiente que o recomp pede (recomplauncher.json -> start.env; servidor\recomps.py).
         ambiente_externo = dict(ambiente_externo, **(jogo["externo"]["dados"].get("ambiente") or {}))
         # A geracao de quadros do Lossless Scaling tambem nos emuladores de fora (pedido de 07/11/2026).
@@ -3987,6 +4063,7 @@ def executar_jogo(jogo, apelido, config, custo=None, partida=None):
             JOGO_EM_ANDAMENTO["ativo"] = False
             JOGO_EM_ANDAMENTO["titulo"] = ""
             PARTIDA_ABERTA["partida"] = None
+        avisar_a_tela("jogo", {"ativo": False})   # a faixa de teclas sai da tela sem esperar o clique
         if partida:
             controle_usb.soltar_partida()       # a partida pelo cabo (adb forward/reverse), se havia
             fechar_porta_dos_colegas()

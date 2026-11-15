@@ -17,7 +17,7 @@ mod capas;
 mod http;
 mod sistema;
 
-use std::collections::HashMap;
+use std::collections::{HashMap, VecDeque};
 use std::io::{self, BufReader, Read, Write};
 use std::net::{IpAddr, Shutdown, SocketAddr, TcpListener, TcpStream};
 use std::path::{Path, PathBuf};
@@ -31,6 +31,19 @@ const GUARDADAS: [(&str, &str); 2] = [("/api/estado", "estado.json"), ("/api/cat
 /// Quanto um pedido espera o Python ficar pronto antes de desistir (a primeira abertura depois de atualizar o app,
 /// no A12, leva ~3 s; com folga larga para o celular ocupado).
 const ESPERA_PELO_PYTHON: Duration = Duration::from_secs(120);
+/// Os avisos para a tela (ideia do blueprint events.rs, adaptada; 14/11/2026): quantos ficam guardados para quem
+/// reconecta, quantas telas podem ouvir ao mesmo tempo (cada uma prende uma thread daqui) e de quanto em quanto
+/// tempo a conexao parada recebe um sinal de vida (e' assim que se descobre uma aba fechada).
+const AVISOS_GUARDADOS: usize = 64;
+const OUVINTES_NO_MAXIMO: u64 = 8;
+const SINAL_DE_VIDA: Duration = Duration::from_secs(20);
+
+/// A fila dos avisos: (numero, tipo, dados em JSON numa linha so). O numero comeca na hora da abertura, em ms, para
+/// nunca repetir o de uma abertura anterior (o navegador manda o ultimo que viu, no Last-Event-ID, ao reconectar).
+struct Avisos {
+    ultimo: u64,
+    fila: VecDeque<(u64, String, String)>,
+}
 
 struct Arena {
     raiz: PathBuf,
@@ -52,6 +65,10 @@ struct Arena {
     inicio: Instant,
     /// Quantas capas o nativo entregou antes de o Python ficar pronto (a medida da etapa R2).
     capas_antes_do_python: AtomicU64,
+    /// Os avisos do Python para a tela (/_nativo/evento entra, /_nativo/eventos sai) e quantas telas ouvem agora.
+    avisos: Mutex<Avisos>,
+    sinal_aviso: Condvar,
+    ouvintes: AtomicU64,
 }
 
 fn main() {
@@ -83,6 +100,9 @@ fn main() {
         geracao: AtomicU64::new(0),
         inicio,
         capas_antes_do_python: AtomicU64::new(0),
+        avisos: Mutex::new(Avisos { ultimo: agora_em_ms(), fila: VecDeque::new() }),
+        sinal_aviso: Condvar::new(),
+        ouvintes: AtomicU64::new(0),
     });
 
     // 1. A porta, ja (a escuta da configuracao: so este computador, ou a rede se a chave estiver ligada).
@@ -352,6 +372,19 @@ fn atender(arena: &Arc<Arena>, conexao: TcpStream) -> io::Result<()> {
             }
             return Ok(());
         }
+        // O Python conta que algo mudou (a lista de jogos, o jogo que fechou); o nativo repassa a tela.
+        if caminho == "/_nativo/evento" {
+            receber_aviso(arena, &pedido, ip, &mut escrita)?;
+            return Ok(());
+        }
+        // A tela fica ouvindo os avisos (Server-Sent Events): uma conexao parada, sem perguntar de novo.
+        if caminho == "/_nativo/eventos" && pedido.metodo == "GET" {
+            if !local_confiavel(arena, ip, &pedido) || !da_propria_tela(&pedido, arena.porta) {
+                http::responder_erro(&mut escrita, 403, "Os avisos do ARENA sao so para a tela do ARENA neste aparelho.")?;
+                return Ok(());
+            }
+            return ouvir_avisos(arena, &pedido, &mut escrita);
+        }
 
         let confiavel = local_confiavel(arena, ip, &pedido);
         if confiavel && pedido.metodo == "GET" {
@@ -387,7 +420,7 @@ fn atender(arena: &Arc<Arena>, conexao: TcpStream) -> io::Result<()> {
                         &mut escrita,
                         200,
                         "application/json; charset=utf-8",
-                        &[("Cache-Control", "no-store"), ("X-Arena-Guardado", "1")],
+                        &[("Cache-Control", "no-store"), ("X-Arena-Guardado", "1"), ("X-Arena-Nativo", "1")],
                         &corpo,
                         manter,
                     )?;
@@ -420,6 +453,150 @@ fn responder_rede(arena: &Arc<Arena>, pedido: &http::Pedido, ip: IpAddr, saida: 
     let resposta = format!("{{\"ok\": true, \"escuta\": \"{}\"}}", ficou);
     http::responder(saida, 200, "application/json; charset=utf-8", &[("Cache-Control", "no-store")],
                     resposta.as_bytes(), false)
+}
+
+/// O aviso do Python (do mesmo computador, com o segredo): entra na fila e acorda quem esta ouvindo.
+/// POST /_nativo/evento?tipo=catalogo com o corpo {"geracao": 123} (JSON numa linha so).
+fn receber_aviso(arena: &Arena, pedido: &http::Pedido, ip: IpAddr, saida: &mut TcpStream) -> io::Result<()> {
+    let segredo_ok = pedido
+        .cabecalho("X-Arena-Proxy")
+        .map(|s| iguais_em_tempo_constante(s.as_bytes(), arena.segredo_proxy.as_bytes()))
+        .unwrap_or(false);
+    if pedido.metodo != "POST" || !ip.is_loopback() || !segredo_ok {
+        return http::responder_erro(saida, 403, "So o proprio ARENA manda avisos para a tela.");
+    }
+    let tipo = valor_da_consulta(&pedido.alvo, "tipo").unwrap_or("").to_string();
+    let corpo = String::from_utf8_lossy(&pedido.corpo).trim().to_string();
+    let dados = if corpo.is_empty() { "{}".to_string() } else { corpo };
+    if !tipo_de_aviso_valido(&tipo) || !dados_de_aviso_validos(&dados) {
+        return http::responder_erro(saida, 400, "Aviso que o servidor nativo nao entendeu. Atualize o ARENA inteiro.");
+    }
+    let numero = {
+        let mut avisos = arena.avisos.lock().unwrap();
+        avisos.ultimo += 1;
+        let numero = avisos.ultimo;
+        avisos.fila.push_back((numero, tipo, dados));
+        while avisos.fila.len() > AVISOS_GUARDADOS {
+            avisos.fila.pop_front();
+        }
+        numero
+    };
+    arena.sinal_aviso.notify_all();
+    let resposta = format!("{{\"ok\": true, \"numero\": {}}}", numero);
+    http::responder(saida, 200, "application/json; charset=utf-8", &[("Cache-Control", "no-store")],
+                    resposta.as_bytes(), false)
+}
+
+/// Solta a vaga de ouvinte quando a conexao acaba, de qualquer jeito (aba fechada, erro de escrita).
+struct VagaDeOuvinte<'a>(&'a AtomicU64);
+
+impl Drop for VagaDeOuvinte<'_> {
+    fn drop(&mut self) {
+        self.0.fetch_sub(1, Ordering::SeqCst);
+    }
+}
+
+/// A tela ouvindo os avisos: a resposta nunca termina; cada aviso novo sai na hora, e a cada SINAL_DE_VIDA sem
+/// aviso sai um comentario (": vivo"), que o navegador ignora. Parada, a thread dorme na Condvar (0% de CPU).
+fn ouvir_avisos(arena: &Arena, pedido: &http::Pedido, saida: &mut TcpStream) -> io::Result<()> {
+    if arena.ouvintes.fetch_add(1, Ordering::SeqCst) >= OUVINTES_NO_MAXIMO {
+        arena.ouvintes.fetch_sub(1, Ordering::SeqCst);
+        return http::responder_erro(saida, 503, "Ha telas demais abertas no ARENA. Feche as abas repetidas.");
+    }
+    let _vaga = VagaDeOuvinte(&arena.ouvintes);
+    // Quem para de ler (aba congelada) nao prende a thread para sempre.
+    let _ = saida.set_write_timeout(Some(Duration::from_secs(10)));
+    saida.write_all(
+        b"HTTP/1.1 200 OK\r\nContent-Type: text/event-stream; charset=utf-8\r\nCache-Control: no-store\r\n\
+          X-Content-Type-Options: nosniff\r\nX-Arena-Nativo: 1\r\nConnection: close\r\n\r\nretry: 3000\n\n",
+    )?;
+    saida.flush()?;
+    let mut visto = {
+        let avisos = arena.avisos.lock().unwrap();
+        desde_onde(pedido.cabecalho("Last-Event-ID"), avisos.ultimo)
+    };
+    loop {
+        let novos: Vec<(u64, String, String)> = {
+            let mut avisos = arena.avisos.lock().unwrap();
+            if avisos.ultimo <= visto {
+                avisos = arena.sinal_aviso.wait_timeout(avisos, SINAL_DE_VIDA).unwrap().0;
+            }
+            let novos = avisos.fila.iter().filter(|aviso| aviso.0 > visto).cloned().collect();
+            visto = visto.max(avisos.ultimo);
+            novos
+        };
+        let texto = if novos.is_empty() { ": vivo\n\n".to_string() } else { texto_dos_avisos(&novos) };
+        saida.write_all(texto.as_bytes())?;
+        saida.flush()?;
+    }
+}
+
+/// De que aviso a tela continua. O navegador manda, ao reconectar, o numero do ultimo que viu (Last-Event-ID): se
+/// ele e' desta abertura ou de uma anterior (numero menor), a tela recebe os guardados depois dele; sem ele, ou com
+/// um numero do futuro (relogio que voltou), so os avisos que vierem daqui em diante.
+fn desde_onde(ultimo_visto: Option<&str>, ultimo: u64) -> u64 {
+    match ultimo_visto.and_then(|valor| valor.trim().parse::<u64>().ok()) {
+        Some(numero) if numero <= ultimo => numero,
+        _ => ultimo,
+    }
+}
+
+/// O pedido veio da propria pagina do ARENA, e nao de outro site aberto no mesmo navegador? (Achado da revisao de
+/// 14/11/2026: sem isto, um site qualquer no PC do laboratorio podia abrir conexoes aqui e ocupar as vagas de
+/// ouvinte.) O navegador avisa quem pediu: o Sec-Fetch-Site ("same-origin" na pagina do ARENA, "none" quando a
+/// pessoa digita o endereco) e, num pedido de outro site, o Origin. Sem esses cabecalhos, nao e' navegador.
+fn da_propria_tela(pedido: &http::Pedido, porta: u16) -> bool {
+    if let Some(site) = pedido.cabecalho("Sec-Fetch-Site") {
+        let site = site.trim().to_ascii_lowercase();
+        if site != "same-origin" && site != "none" {
+            return false;
+        }
+    }
+    match pedido.cabecalho("Origin") {
+        None => true,
+        Some(origem) => {
+            let origem = origem.trim().to_ascii_lowercase();
+            [format!("http://127.0.0.1:{}", porta), format!("http://localhost:{}", porta), format!("http://[::1]:{}", porta)]
+                .iter()
+                .any(|propria| *propria == origem)
+        }
+    }
+}
+
+/// Os avisos no formato do Server-Sent Events: "id", "event" e "data", com uma linha em branco no fim de cada um.
+fn texto_dos_avisos(avisos: &[(u64, String, String)]) -> String {
+    let mut texto = String::new();
+    for (numero, tipo, dados) in avisos {
+        texto.push_str(&format!("id: {}\nevent: {}\ndata: {}\n\n", numero, tipo, dados));
+    }
+    texto
+}
+
+/// O tipo do aviso: so letras minusculas e _, ate 24 (vira o nome do evento na tela).
+fn tipo_de_aviso_valido(tipo: &str) -> bool {
+    !tipo.is_empty() && tipo.len() <= 24 && tipo.bytes().all(|b| b.is_ascii_lowercase() || b == b'_')
+}
+
+/// Os dados: um objeto JSON pequeno e numa linha so (quebra de linha no meio cortaria o aviso em dois).
+fn dados_de_aviso_validos(dados: &str) -> bool {
+    dados.len() <= 2048 && dados.starts_with('{') && dados.ends_with('}') && !dados.contains(['\r', '\n'])
+}
+
+/// O valor de um parametro simples da consulta (?tipo=catalogo), sem decodificar: quem chama confere o formato.
+fn valor_da_consulta<'a>(alvo: &'a str, nome: &str) -> Option<&'a str> {
+    let consulta = alvo.split_once('?')?.1;
+    consulta.split('&').find_map(|parte| match parte.split_once('=') {
+        Some((chave, valor)) if chave == nome => Some(valor),
+        _ => None,
+    })
+}
+
+/// Milissegundos desde 1970 (o comeco da numeracao dos avisos).
+fn agora_em_ms() -> u64 {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_millis() as u64)
+        .unwrap_or(0)
 }
 
 /// O pedido veio da tela do ARENA neste mesmo aparelho? So para esses o nativo responde sozinho; qualquer outro
@@ -581,7 +758,8 @@ fn repassar(arena: &Arc<Arena>, pedido: &http::Pedido, ip: IpAddr, cliente: &mut
         saida_cabeca.push_str(linha);
         saida_cabeca.push_str("\r\n");
     }
-    saida_cabeca.push_str("Connection: close\r\n\r\n");
+    // A marca de que o nativo esta na frente: com ela, a tela passa a ouvir os avisos (/_nativo/eventos).
+    saida_cabeca.push_str("X-Arena-Nativo: 1\r\nConnection: close\r\n\r\n");
     cliente.write_all(saida_cabeca.as_bytes())?;
 
     match guardar_como {
@@ -732,5 +910,74 @@ mod testes {
         assert!(fica_de_fora("Connection"));
         assert!(!fica_de_fora("Host"));
         assert!(!fica_de_fora("Cookie"));
+    }
+
+    #[test]
+    fn avisos_no_formato_do_server_sent_events() {
+        let avisos = vec![
+            (10, "catalogo".to_string(), "{\"geracao\":5}".to_string()),
+            (11, "jogo".to_string(), "{}".to_string()),
+        ];
+        assert_eq!(
+            texto_dos_avisos(&avisos),
+            "id: 10\nevent: catalogo\ndata: {\"geracao\":5}\n\nid: 11\nevent: jogo\ndata: {}\n\n"
+        );
+        assert_eq!(texto_dos_avisos(&[]), "");
+    }
+
+    #[test]
+    fn so_aviso_bem_formado_entra() {
+        assert!(tipo_de_aviso_valido("catalogo"));
+        assert!(tipo_de_aviso_valido("jogo_fechou"));
+        assert!(!tipo_de_aviso_valido(""));
+        assert!(!tipo_de_aviso_valido("Catalogo"));
+        assert!(!tipo_de_aviso_valido("catalogo\nevent: x"));
+        assert!(!tipo_de_aviso_valido(&"a".repeat(25)));
+        assert!(dados_de_aviso_validos("{}"));
+        assert!(dados_de_aviso_validos("{\"geracao\":1763140000000}"));
+        assert!(!dados_de_aviso_validos("{\"a\":1}\ndata: {}"));
+        assert!(!dados_de_aviso_validos("[1, 2]"));
+        assert!(!dados_de_aviso_validos(&format!("{{\"a\":\"{}\"}}", "x".repeat(2100))));
+    }
+
+    #[test]
+    fn so_a_propria_tela_ouve_os_avisos() {
+        let pedido = |cabecalhos: &[(&str, &str)]| http::Pedido {
+            metodo: "GET".to_string(),
+            alvo: "/_nativo/eventos".to_string(),
+            versao: "HTTP/1.1".to_string(),
+            cabecalhos: cabecalhos.iter().map(|(n, v)| (n.to_string(), v.to_string())).collect(),
+            corpo: Vec::new(),
+        };
+        assert!(da_propria_tela(&pedido(&[]), 8777));
+        assert!(da_propria_tela(&pedido(&[("Sec-Fetch-Site", "same-origin")]), 8777));
+        assert!(da_propria_tela(&pedido(&[("Origin", "http://127.0.0.1:8777")]), 8777));
+        assert!(!da_propria_tela(&pedido(&[("Sec-Fetch-Site", "cross-site")]), 8777));
+        assert!(!da_propria_tela(&pedido(&[("Origin", "https://site-malvado.com")]), 8777));
+        assert!(!da_propria_tela(&pedido(&[("Origin", "http://127.0.0.1:9999")]), 8777));
+    }
+
+    #[test]
+    fn de_onde_a_tela_continua() {
+        assert_eq!(desde_onde(None, 500), 500);
+        assert_eq!(desde_onde(Some("498"), 500), 498);
+        assert_eq!(desde_onde(Some(" 500 "), 500), 500);
+        // Numero do futuro (relogio que voltou) ou lixo: so os avisos novos.
+        assert_eq!(desde_onde(Some("900"), 500), 500);
+        assert_eq!(desde_onde(Some("abc"), 500), 500);
+    }
+
+    #[test]
+    fn parametro_simples_da_consulta() {
+        assert_eq!(valor_da_consulta("/_nativo/evento?tipo=catalogo", "tipo"), Some("catalogo"));
+        assert_eq!(valor_da_consulta("/_nativo/evento?x=1&tipo=jogo", "tipo"), Some("jogo"));
+        assert_eq!(valor_da_consulta("/_nativo/evento", "tipo"), None);
+        assert_eq!(valor_da_consulta("/_nativo/evento?tipos=jogo", "tipo"), None);
+    }
+
+    #[test]
+    fn numeracao_dos_avisos_comeca_na_hora() {
+        // Setembro de 2026 em ms: a numeracao de uma abertura nova sempre passa a de uma anterior.
+        assert!(agora_em_ms() > 1_790_000_000_000);
     }
 }

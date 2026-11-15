@@ -851,7 +851,8 @@ def achar_externo_detalhado(plataforma, chave="externo"):
 
     base = os.path.join(PASTA_EMULADORES, externo["pasta"])
     if not os.path.isdir(base):
-        return None, None, externo
+        # Sem a pasta no ARENA, no Linux ainda vale o do sistema.
+        return _externo_do_sistema(externo), None, externo
 
     # No Linux, os programas do Linux ("executaveis_linux", que podem ter *:
     # o AppImage leva a versao no nome), na mesma pasta dos do Windows.
@@ -899,7 +900,30 @@ def achar_externo_detalhado(plataforma, chave="externo"):
 
     if candidato_prefixo:
         return candidato_prefixo, None, externo
+    # Nada na pasta do ARENA: no Linux, o instalado no sistema (pacote da
+    # distribuicao, no PATH), com a configuracao na pasta do ARENA
+    # (plataforma.dados_do_externo). No Windows, None, como sempre.
+    do_sistema = _externo_do_sistema(externo)
+    if do_sistema:
+        return do_sistema, None, externo
     return None, compactado, externo
+
+
+def _externo_do_sistema(externo):
+    """Linux: o programa do emulador de fora 'externo' instalado no sistema
+    (os nomes sem * de "executaveis_linux", pelo PATH), ou None. No Windows
+    e no Android: None (o plataforma.programa_do_sistema ja diz que nao)."""
+    if NO_WINDOWS:
+        return None
+    return plataforma_do_sistema.programa_do_sistema(externo.get("executaveis_linux", []))
+
+
+def de_onde_vem_o_externo(caminho):
+    """Para a tela: "sistema" se o emulador e' o instalado no sistema (Linux),
+    "arena" se e' o da pasta do ARENA, "" se nao esta instalado."""
+    if not caminho:
+        return ""
+    return "sistema" if plataforma_do_sistema.e_do_sistema(caminho) else "arena"
 
 
 def comando_externo(caminho_executavel, dados, caminho_jogo):
@@ -958,6 +982,7 @@ def situacao_dos_externos(plataformas):
             if chave == "externo_extra" and externo.get("so_windows") and not NO_WINDOWS:
                 continue
             caminho, compactado, _ = achar_externo_detalhado(plataforma, chave)
+            origem = de_onde_vem_o_externo(caminho)
             saida.append({
                 "plataforma": plataforma["nome"],
                 "id": plataforma["id"],
@@ -969,6 +994,12 @@ def situacao_dos_externos(plataformas):
                 "instalado": bool(caminho),
                 "compactado_pendente": os.path.basename(compactado) if compactado else "",
                 "falta": falta_para_o_externo(externo["nome"], caminho),
+                # De onde veio o programa: "sistema" (Linux, o pacote da
+                # distribuicao) ou "arena" (a pasta emuladores\), e a frase.
+                "origem": origem,
+                "de_onde": ("instalado no sistema (%s); a configuração e a BIOS ficam em %s"
+                            % (caminho, os.path.join("emuladores", externo["pasta"]))
+                            if origem == "sistema" else ""),
             })
     return saida
 
