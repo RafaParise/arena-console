@@ -140,3 +140,10 @@ deixaria de ser material de aula legível por aluno do ensino médio. Os número
 compilar para ARM64 sem o NDK (`aarch64-unknown-linux-musl` com o `rust-lld`), que serve para medir qualquer outro
 trecho no celular ou na TV Box antes de decidir. Reabrir a pergunta só se uma medida nova apontar um trecho de
 processador (não de disco) que o Python não resolva.
+
+## Fase 5: a regra mudou (14/11/2026, tarde)
+
+O Rafael pediu desempenho máximo, "mesmo que não seja mais em Python", e a decisão da Fase 4 foi revista: o
+servidor **nativo em Rust** passou a ir na frente do Python (que fica atrás, como reserva), por etapas medidas. No
+A12, do toque até a lista: 6,76 s → 2,52 a 2,65 s. Como funciona, cada etapa (R1 abertura, R2 capas, R3 avisos em
+tempo real) e por que as ~121 rotas restantes continuam em Python: `docs\MIGRACAO-RUST.md`.

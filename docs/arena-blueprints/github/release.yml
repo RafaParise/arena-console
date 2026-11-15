@@ -1,0 +1,47 @@
+changelog:
+  exclude:
+    labels:
+      - ignore-for-release
+      - skip-changelog
+    authors:
+      - dependabot
+
+  categories:
+    - title: "🦀 Servidor Web & Core (Rust)"
+      labels:
+        - rust
+        - arena-web
+        - backend
+
+    - title: "🤖 App Android & TV Box"
+      labels:
+        - android
+        - apk
+        - tv-box
+
+    - title: "🐧 Linux & Chromebook"
+      labels:
+        - linux
+        - chromebook
+        - installer
+
+    - title: "🎮 Novos Recursos & Emuladores"
+      labels:
+        - enhancement
+        - feature
+        - emulator
+
+    - title: "🐛 Correções & Estabilidade"
+      labels:
+        - bug
+        - fix
+
+    - title: "⚙️ CI/CD & Manutenção"
+      labels:
+        - ci
+        - chore
+        - documentation
+
+    - title: "📦 Outras Mudanças"
+      labels:
+        - "*"

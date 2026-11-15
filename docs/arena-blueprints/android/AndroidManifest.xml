@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission
+        android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="29" />
+
+    <uses-feature android:name="android.hardware.gamepad" android:required="false" />
+    <uses-feature android:name="android.software.leanback" android:required="false" />
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+
+    <queries>
+        <package android:name="com.retroarch.aarch64" />
+        <package android:name="com.retroarch" />
+        <package android:name="xyz.aethersx2.android" />
+        <package android:name="org.dolphinemu.dolphinemu" />
+        <package android:name="org.ppsspp.ppsspp" />
+        <package android:name="org.ppsspp.ppssppgold" />
+        <package android:name="com.github.stenzek.duckstation" />
+        <package android:name="org.mupen64plusae.v3.fzurita" />
+        <package android:name="org.mupen64plusae.v3.fzurita.pro" />
+    </queries>
+
+    <application
+        android:allowBackup="true"
+        android:extractNativeLibs="true"
+        android:hardwareAccelerated="true"
+        android:label="ARENA Console"
+        android:requestLegacyExternalStorage="true"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.ArenaConsole"
+        android:usesCleartextTraffic="true">
+
+        <activity
+            android:name=".MainActivity"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|navigation|uiMode"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:screenOrientation="landscape"
+            android:stateNotNeeded="true"
+            android:theme="@style/Theme.ArenaConsole">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.HOME" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name=".ArenaWebService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Local embedded Rust HTTP/WebSocket server for ARENA console frontend and emulator IPC" />
+        </service>
+
+        <receiver
+            android:name=".BootReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".MediaMountReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_MOUNTED" />
+                <action android:name="android.intent.action.MEDIA_UNMOUNTED" />
+                <action android:name="android.intent.action.MEDIA_EJECT" />
+                <action android:name="android.intent.action.MEDIA_BAD_REMOVAL" />
+                <data android:scheme="file" />
+            </intent-filter>
+        </receiver>
+    </application>
+</manifest>

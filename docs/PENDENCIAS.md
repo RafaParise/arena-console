@@ -1253,3 +1253,27 @@ Feito e enviado (vai na próxima versão):
 3. Os testes que faltavam do lote do Android continuam (item 1 da seção anterior).
 4. Conferência das pastas no app ainda leva ~0,6 s (no Termux, ~0,1 s com 8 threads): ver se o tempo vai em outra
    parte da medida (a "pastas" do catálogo) ou se a WebView abrindo junto disputa o processador.
+
+## 14 e 15/11/2026: o servidor nativo em Rust (R1 a R3) e as ideias dos blueprints
+
+Feito (detalhe em `docs/MIGRACAO-RUST.md` e no mapa `docs/arena-blueprints/LEIA.md`):
+- **Nativo R1 e R2** (`c78281e`, `d49ff91`): o Rust abre a porta e a tela na hora, entrega a lista guardada e as
+  capas; no A12, do toque até a lista, 6,76 s → 2,52-2,65 s. A Fase 4 ("continua em Python") foi revista pelo Rafael.
+- **R3, avisos em tempo real**: `/_nativo/eventos` (Server-Sent Events); a lista se redesenha sozinha quando um
+  trabalho de segundo plano a muda, sem perder o foco do controle. Só a própria tela ouve (loopback, Host, cookie
+  no Android, Origin/Sec-Fetch-Site: achado da revisão de segurança). No PC, a lista nova chega 103 ms depois.
+- **Sinopse do gamelist.xml e pasta roms/ do Batocera** (`fb26024`); **"Só os que abrem aqui"** (desligado a cada
+  abertura); **emulador instalado no sistema** no Linux (a pasta `emuladores/` vem antes; configuração na pasta do ARENA).
+- Ferramentas novas: `rascunho_da_release.py` (só o rascunho da nota), `conferir_servidor.py` (confere um ARENA
+  rodando, só lê), `medir_abertura_no_celular.py` (mede no celular sem apagar o registro, sem tecla, sem configuração).
+- `CLAUDE.md` voltou às regras do ARENA (os geradores de 14/11 o tinham trocado pelo do `arena-web`).
+
+**Próximo passo:**
+1. A12 (estava fora do alcance do adb em 15/11): instalar o APK já montado
+   (`adb install -r %LOCALAPPDATA%\ARENA-android\apk\ARENA-2026.11.14-arm64-v8a.apk`) e rodar
+   `servidor\python\python.exe ferramentas\medir_abertura_no_celular.py --vezes 3 --foto foto.png`; conferir à mão
+   o botão "Só os que abrem aqui" e que a lista se redesenha sozinha quando a busca de capas termina.
+2. No A12, a chave **Liberar a rede** está ligada (o registro diz "Rede: LIBERADA"): o Rafael confere se é de propósito.
+3. Na raiz há 5 geradores novos do "BancadaSync" (`0*_*BancadaSync*.ps1` e afins, 14/11 14h49), sem commit: não rodar
+   aqui (o 01 reescreve o `CLAUDE.md`); o lugar deles parece ser o parise-sync.
+4. Entalhe da câmera (ideia do `styles.xml`): só com teste no aparelho; o WebView pode não informar a área segura.

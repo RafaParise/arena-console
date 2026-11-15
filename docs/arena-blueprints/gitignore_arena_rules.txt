@@ -1,0 +1,10 @@
+# Rust & Build Artifacts
+arena-web/target/
+bin/
+dist/
+apk-out/
+
+# Android Native Libs & Keystores
+*.keystore
+*.jks
+**/src/main/jniLibs/**/*.so

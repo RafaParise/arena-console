@@ -1,0 +1,36 @@
+rust:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'arena-web/**'
+          - '**/*.rs'
+          - '**/Cargo.toml'
+          - '**/Cargo.lock'
+
+android:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'android/**'
+          - 'app/**'
+          - '**/*.kt'
+          - '**/*.java'
+          - '**/AndroidManifest.xml'
+          - '**/*.gradle'
+          - '**/*.gradle.kts'
+
+linux:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'install.sh'
+          - 'scripts/**'
+          - '**/*.sh'
+          - '**/*.service'
+
+ci:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '.github/**'
+
+documentation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '**/*.md'

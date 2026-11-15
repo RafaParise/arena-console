@@ -112,9 +112,23 @@ certa de `docs\REGRAS-TECNICAS.md`**. O mínimo que vale sempre:
 - **Economize tokens:**
   - Não leia arquivo grande inteiro (o `arena.py` tem cerca de 8.200
     linhas): use a busca e leia só o trecho.
-  - Não use agentes nem workflows sem pedido.
+  - Não use agentes nem workflows sem pedido (com pedido: de 3 a 5
+    agentes, esforço médio e teto de trabalho no prompt).
   - Use comandos curtos. Operação de vários passos vira um script `.py` em
     `ferramentas\`.
+- **Leia o arquivo real antes de escrever**: nome de função, rota, campo ou
+  pacote se confere no disco (busca primeiro), nunca de memória. Os
+  blueprints de `docs\arena-blueprints\` (14/11/2026: `arena-web`, Axum,
+  Kotlin, `/ws`) descrevem um projeto que **não existe aqui**: são ideias,
+  não contrato. O que entrou no ARENA, e onde, está no `LEIA.md` de lá; os
+  geradores `0*_Gerar_*.ps1` reescreviam este arquivo e não se rodam.
+- **Portão por camada antes do commit**: Rust `ferramentas\compilar_nativo.py`
+  (compila os 3 alvos e roda o `cargo test`), Python `servidor\tests\run.py`,
+  tela `node --check launcher\app.js`, Android `ferramentas\montar_android.py`
+  e o teste no aparelho (`ferramentas\testar_no_android.py`).
+- **Preserve o que existe**: rotas, `ROTAS_REDE_EXTERNA`, o Python como
+  reserva do nativo e a regra de que o nativo só responde sozinho a pedido
+  local confiável (o resto vai para o Python, que confere tudo).
 - Antes de corrigir, reproduza o problema e ache a causa no código. Faça
   uma mudança por vez, com teste, e um commit ao fim de cada uma. Ao mudar
   uma função, atualize o guia certo (de `1-COMECAR.md` a
